@@ -787,8 +787,8 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="grid-2">
     <div class="panel stack chartbox" style="gap:8px">
       <h3>Every gauge of this repetition against native</h3>
-      <canvas id="tRadar" aria-label="Bar chart: each gauge of this repetition, Omni-Compass as a share of native, native at 100%"></canvas>
-      <div class="legend"><span><i class="sq" style="background:var(--steel)"></i>native, the 100% line</span><span><i class="sq" style="background:var(--brass)"></i>Omni-Compass, as a share of native on that gauge</span><span>each row's word is the run's own reading over all its repetitions, decided by what the gauge is for: a shorter wait or fewer failures is GAIN; a resource that rose is power given</span></div>
+      <canvas id="tRadar" aria-label="Bar chart from the native 0 line: each gauge of this repetition, GAIN to the right in green, LOSS to the left in red"></canvas>
+      <div class="legend"><span><i class="sq" style="background:var(--steel)"></i>native, the 0 line</span><span><i class="sq" style="background:var(--ok)"></i>GAIN ▶ Omni-Compass helped (GAIN · power given where a resource rose to buy it)</span><span><i class="sq" style="background:var(--bad)"></i>◀ LOSS: it hurt</span><span><i class="sq" style="background:var(--even)"></i>EVEN ◆</span><span>the size: how far Omni-Compass moved from native on that gauge</span></div>
       <p class="note" id="tRadarNote">—</p>
       <div class="opsTip" id="tTipRadar" hidden></div>
     </div>
@@ -2826,21 +2826,27 @@ const T_RADAR = [["95th percentile", "response time (ms), 95th percentile"], ["m
   ["node-hours", "node-hours"], ["energy", "energy (Wh)"], ["host CPU", "host CPU busy, the real machine under kind (%)"]];
 function radarAxes() { const P = ruP(); if (!P || ruB().kind !== "k8s") return []; const a = P.native.official || {}, o = P.omni.official || {};
   return T_RADAR.map(([l, k]) => ({l, k, n: a[k], o: o[k]})).filter(x => typeof x.n === "number" && x.n > 0 && typeof x.o === "number"); }
-function drawRadar() {   // every gauge of this repetition, Omni-Compass as a share of native (the panel kept its name in the code)
-  const cv = $("tRadar"); if (!cv) return; const A = radarAxes(), rowH = 30, hh = Math.max(120, A.length*rowH + 34); cv.style.height = hh + "px";
+function drawRadar() {   // every gauge of this repetition against native: native is the 0 line; a gauge that helped runs right in green (GAIN, or GAIN · power given), one that hurt runs left in red (LOSS); the size is how far it moved from native
+  const cv = $("tRadar"); if (!cv) return; const A = radarAxes(), rowH = 30, hh = Math.max(120, A.length*rowH + 40); cv.style.height = hh + "px";
   const {g, w, h} = fit(cv, hh/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
   if (A.length < 1) { opsEmpty(g, w, h, ruB() && ruB().kind === "k8s" ? "no gauge with native above zero" : "a database run: see its repetitions above"); TL.radar = null; $("tRadarNote").textContent = ""; return; }
-  const pr = (ruR() || {}).official_paired || {}, ml = Math.min(200, w*0.34), mr = Math.min(230, w*0.36), X = v => ml + Math.min(v, 2)/2*(w - ml - mr); TL.radar = {rowH, top: 6, n: A.length};
+  const pr = (ruR() || {}).official_paired || {}, ml = Math.min(200, w*0.34), mr = Math.min(250, w*0.38), pw = w - ml - mr, z = ml + 0.16*pw, sq = v => Math.sqrt(Math.min(1, v));
+  const XR = v => z + sq(v)*(w - mr - z), XL = v => z - sq(v)*(z - ml); TL.radar = {rowH, top: 6, n: A.length};
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
-  for (const t of [0, 0.5, 1, 1.5, 2]) { g.strokeStyle = t === 1 ? css.steel : alpha(css.rule, 0.9); g.lineWidth = t === 1 ? 2 : 1; g.beginPath(); g.moveTo(X(t), 4); g.lineTo(X(t), h - 24); g.stroke(); g.lineWidth = 1;
-    g.fillStyle = css.muted; g.textAlign = "center"; g.fillText((100*t).toFixed(0) + "%", X(t), h - 12); }
-  A.forEach((a, j) => { const y = 6 + j*rowH, r = a.o/a.n, x = X(r);
+  for (const [t, x] of [[0.1, XR(0.1)], [0.5, XR(0.5)], [1, XR(1)], [1, XL(1)]]) { g.strokeStyle = alpha(css.rule, 0.9); g.beginPath(); g.moveTo(x, 4); g.lineTo(x, h - 30); g.stroke(); g.fillStyle = css.muted; g.textAlign = "center"; g.fillText((100*t).toFixed(0) + "%", x, h - 12); }
+  g.strokeStyle = css.steel; g.lineWidth = 2; g.beginPath(); g.moveTo(z, 4); g.lineTo(z, h - 30); g.stroke(); g.lineWidth = 1;
+  g.fillStyle = css.bad; g.textAlign = "right"; g.fillText("◀ LOSS", z - 6, h - 28); g.fillStyle = css.ok; g.textAlign = "left"; g.fillText("GAIN ▶", z + 6, h - 28); g.fillStyle = css.steel; g.textAlign = "left"; g.fillText("0 = native", z + 64, h - 28);
+  A.forEach((a, j) => { const y = 6 + j*rowH, ch = a.o/a.n - 1, size = Math.abs(ch), aim = RU_AIM[a.k] || "shown";
     if (TL.radarHov === j) { g.fillStyle = alpha(css.ink, 0.06); g.fillRect(0, y, w, rowH); }
     g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(a.l, ml - 8, y + rowH/2);
-    g.fillStyle = css.brass; const x0 = Math.min(X(1), x), x1 = Math.max(X(1), x); g.fillRect(x0, y + 7, Math.max(2, x1 - x0), rowH - 14);
-    if (r > 2) { g.fillStyle = css.ink; g.textAlign = "right"; g.fillText("▶", X(2) - 3, y + rowH/2); }
-    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`${(100*r).toFixed(0)}% · ${wordText(pr[a.k], RU_AIM[a.k])}`, X(2) + 8, y + rowH/2); });
-  $("tRadarNote").textContent = `Repetition ${ruP().n} of run ${ruR().tag}, scored by the repository's own scorer: each bar runs from native (the 100% line) to Omni-Compass on that gauge. Left of 100% is less than native, right of it more; the word beside it (the run's own reading over all its repetitions) says whether that helped. Gauges where native is zero are left off; past 200% a bar runs to the edge and is marked.`;
+    const even = size < 0.0005, helped = aim === "down" ? ch < 0 : aim === "up" ? ch > 0 : aim === "spent" ? true : null;
+    let word, tx = z + 10;
+    if (even || helped === null) { g.fillStyle = helped === null ? css.muted : css.even; g.beginPath(); g.moveTo(z, y + 7); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 7); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); word = helped === null ? "shown, not judged" : "EVEN"; }
+    else if (helped) { g.fillStyle = css.ok; g.fillRect(z + 1, y + 7, Math.max(2, XR(size) - z - 1), rowH - 14); tx = XR(size) + 8; word = aim === "spent" && ch > 0 ? "GAIN · power given" : "GAIN"; }
+    else { g.fillStyle = css.bad; g.fillRect(XL(size), y + 7, Math.max(2, z - XL(size) - 1), rowH - 14); word = "LOSS"; }
+    if (size > 1 && !even && helped !== null) { g.fillStyle = css.bg; g.textAlign = helped ? "right" : "left"; g.fillText(helped ? "▶" : "◀", helped ? XR(size) - 3 : XL(size) + 3, y + rowH/2); }
+    g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, `${word}${even || helped === null ? "" : " " + mag(ch)} · run ${wordText(pr[a.k], aim).replace(/^power given/, "GAIN · power given").replace(/^power lost/, "LOSS · power lost")}`, Math.max(tx, z + 10), y + rowH/2); });
+  $("tRadarNote").textContent = `Repetition ${ruP().n} of run ${ruR().tag}, scored by the repository's own scorer. Native is the 0 line. Each gauge runs from it by how far Omni-Compass moved from native on that gauge, the size unsigned: to the right in green where the move helped (a shorter wait, fewer failures: GAIN; a resource that rose to buy it: GAIN · power given; a resource cut: GAIN), to the left in red where it hurt (LOSS), a yellow mark where it stayed EVEN. "The run" is the run's own reading over all its repetitions, decided the same way. Gauges where native is zero are left off; past 100% a bar runs to the edge and is marked.`;
 }
 function tNarrate() {
   const lines = [], B = ruB(), R = ruR(), P = ruP();
