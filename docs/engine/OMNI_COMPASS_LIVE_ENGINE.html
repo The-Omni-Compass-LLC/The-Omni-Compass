@@ -303,8 +303,37 @@ button:disabled{opacity:.45;cursor:not-allowed}
 </section>
 
 <nav class="toc" aria-label="Contents"><b>Contents</b>
-  <a href="#s-ops">The operations center</a><a href="#s-lab">The tensor lab and the AI analyst</a><a href="#s-fleet">The benefit board and the grid</a><a href="#s-engines">1 · The two engines</a><a href="#s-live">2 · The live controller</a><a href="#s-stacks">3 · Every stack</a><a href="#s-runs">4 · The official runs</a><a href="#s-decision">5 · One decision</a><a href="#s-plane">6 · The plane and the scoreboard</a><a href="#s-brain">7 · Inside the brain</a><a href="#s-verdict">8 · The verdict</a><a href="#s-math">9 · The math and the code</a><a href="#s-disclose">10 · Disclosures and contact</a>
+  <a href="#s-self">Omni-Compass inside this engine</a><a href="#s-ops">The operations center</a><a href="#s-lab">The tensor lab and the AI analyst</a><a href="#s-fleet">The benefit board and the grid</a><a href="#s-engines">1 · The two engines</a><a href="#s-live">2 · The live controller</a><a href="#s-stacks">3 · Every stack</a><a href="#s-runs">4 · The official runs</a><a href="#s-decision">5 · One decision</a><a href="#s-plane">6 · The plane and the scoreboard</a><a href="#s-brain">7 · Inside the brain</a><a href="#s-verdict">8 · The verdict</a><a href="#s-math">9 · The math and the code</a><a href="#s-disclose">10 · Disclosures and contact</a>
 </nav>
+
+<section class="stack" id="s-self" aria-label="Omni-Compass inside this engine: the page governs its own drawing">
+  <h2>Omni-Compass inside this engine</h2>
+  <p class="lede" style="max-width:96ch">The engine that runs this page has Omni-Compass in it. <b>Native</b> is the browser's own loop: every chart on screen drawn on every frame, and when the frame overruns, whole frames dropped. <b>Omni-Compass on top</b> is the same loop with the engine's own compass law (<code>omnicompass/compass_law.py</code>, ported here and checked against the Python) governing it: each chart is a muscle whose knob is how many frames it waits between draws; the reading is the time between frames; below the band's center the pedal lifts and every chart is handed back to native (drawn every frame); toward the line it pushes, and the charts farthest from where you are looking wait a frame or more, so the frame itself stays inside its line. Every step is a trial run to its full measurement and kept only when the frame shortens; a step that buys nothing is refused and every chart handed back to native (the reflex rule: where a knob cannot bring a GAIN, it stays native). The reading is the time between frames, the band two frames wide with its center one frame at 60 Hz. The two arms take turns in paired windows of three seconds on this same page, on your own machine, and are read by the three-run rule's interval (class L: this browser, live; a reading of this page, never a benchmark of record).</p>
+  <div class="row">
+    <span class="ctl-label">Load</span>
+    <div class="seg" role="group" aria-label="Added load"><button data-sload="0" aria-pressed="true">as it is</button><button data-sload="8" aria-pressed="false">+8 ms a frame</button><button data-sload="16" aria-pressed="false">+16 ms a frame</button></div>
+    <span class="ctl-label">Governor</span>
+    <div class="seg" role="group" aria-label="Who drives the page"><button data-sgov="pair" aria-pressed="true">paired: native, then on top</button><button data-sgov="omni" aria-pressed="false">Omni-Compass on top</button><button data-sgov="native" aria-pressed="false">native only</button></div>
+    <span class="clock" id="selfClock">—</span>
+  </div>
+  <div class="twin">
+    <div class="panel arm-nat"><div class="ringhead"><h3 class="t-steel big">Native</h3><span>the browser draws every chart every frame</span></div><div class="live" id="selfN"></div></div>
+    <div class="panel arm-omni"><div class="ringhead"><h3 class="t-brass big">Omni-Compass on top of native</h3><span>the compass law holds the frame inside its line</span></div><div class="live" id="selfO"></div></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel stack" style="gap:8px">
+      <h3>The frame, live: the time between frames against one frame</h3>
+      <canvas id="selfCv" aria-label="The time between frames, native windows and Omni-Compass windows, against one frame"></canvas>
+      <div class="legend"><span><i class="sq" style="background:var(--steel)"></i>a native window</span><span><i class="sq" style="background:var(--brass)"></i>an Omni-Compass window</span><span><i class="sq" style="background:var(--bad)"></i>one frame at 60 Hz (16.7 ms); a bar past 100 ms is drawn at the top</span><span>below: the compass position (0.5 is one frame, 1 two frames)</span></div>
+    </div>
+    <div class="panel stack" style="gap:8px">
+      <h3>The paired reading of this page, window by window</h3>
+      <div class="tbl-wrap"><table id="selfTab"><thead><tr><th>Gauge</th><th>Native</th><th>Omni-Compass on top</th><th>Reading (paired windows)</th></tr></thead><tbody></tbody></table></div>
+      <p class="note" id="selfNote">—</p>
+      <div class="lk" id="selfChips" style="min-height:40px"><span>—</span></div>
+    </div>
+  </div>
+</section>
 
 <section class="stack" id="s-ops" aria-label="The operations center: the official runs, streaming">
   <div class="head" style="align-items:flex-end">
@@ -2441,7 +2470,7 @@ function opsHover(id, tipId, html) {
     tip.style.left = Math.max(0, Math.min(cv.offsetLeft + x + 14, pw - tw - 4)) + "px"; tip.style.top = (cv.offsetTop + y + 14) + "px"; });
   cv.addEventListener("pointerleave", () => { OPS.hov[id] = null; tip.hidden = true; });
 }
-function drawOps(now) { if (onScreen("heartCv")) drawHeart(now); if (onScreen("opsPipeCv")) drawPipe(now); if (onScreen("opsCandle")) drawCandle(); if (onScreen("opsHeat")) drawHeat(); if (onScreen("opsBars")) drawBars(); if (onScreen("opsReps")) drawReps(); }
+function drawOps(now) { if (drawable("heartCv")) drawHeart(now); if (drawable("opsPipeCv")) drawPipe(now); if (drawable("opsCandle")) drawCandle(); if (drawable("opsHeat")) drawHeat(); if (drawable("opsBars")) drawBars(); if (drawable("opsReps")) drawReps(); }
 
 // ============================================================== the tensor lab: the engine's record, two arms × decisions × sixty muscles
 const TL = {yaw: -0.62, pitch: 0.38, drag: null, spin: true, deltaKey: "", deltaCv: null, eigKey: "", eig: null, narrAt: 0, narrPrev: []};
@@ -2593,7 +2622,7 @@ function tNarrate() {
   if (W.body === "harness") lines.push(`The engine's harness, ${W.hsec === "alone" ? "each muscle alone" : "one organism"}, run ${"ABC"[W.run]}, decision ${Math.min(W.t + 1, W.len)} of ${W.len}: past the line now, native ${$("lvN0").textContent} and Omni-Compass on top ${$("lvO0").textContent}; misses so far ${$("lvN1").textContent} and ${$("lvO1").textContent}; settings off native ${$("lvO2").textContent}.`);
   const html = lines.map((l, j) => `<div class="${l !== TL.narrPrev[j] ? "fresh" : ""}">${l}</div>`).join(""); TL.narrPrev = lines; $("tNarr").innerHTML = html || "<div>—</div>";
 }
-function drawLab(now) { if (onScreen("tCube")) drawCube(now); if (onScreen("tDelta")) drawDelta(); if (onScreen("tModes")) drawModes(); if (onScreen("tSankey")) drawSankey(); if (onScreen("tRadar")) drawRadar(); if (now - TL.narrAt > 1000) { TL.narrAt = now; tNarrate(); } }
+function drawLab(now) { if (drawable("tCube")) drawCube(now); if (drawable("tDelta")) drawDelta(); if (drawable("tModes")) drawModes(); if (drawable("tSankey")) drawSankey(); if (drawable("tRadar")) drawRadar(); if (now - TL.narrAt > 1000) { TL.narrAt = now; tNarrate(); } }
 function buildLab() {
   const cv = $("tCube");
   cv.addEventListener("pointerdown", e => { TL.drag = {x: e.clientX, y: e.clientY, yaw: TL.yaw, pitch: TL.pitch}; cv.setPointerCapture(e.pointerId); });
@@ -2787,6 +2816,86 @@ const onScreen = id => VIS.has(id) ? VIS.get(id) : true;
 if ("IntersectionObserver" in window) { const io = new IntersectionObserver(es => es.forEach(e => VIS.set(e.target.id, e.isIntersecting)), {rootMargin: "300px 0px"});
   document.querySelectorAll("canvas[id]").forEach(c => io.observe(c)); }
 
+// ============================================================== Omni-Compass inside this engine: the page's own renderer governed by the compass law
+// The muscles are the charts; each one's knob is the frames it waits between draws (1 is native: every frame). The reading is the
+// frame's drawing time against its budget; the law is the engine's own (CompassLaw above, omnicompass/compass_law.py).
+const GOV = {drawn: 0, mode: "pair", arm: "native", load: 0, budget: 12, law: new CompassLaw(1.0, 0.25, 0.5, 0, 33.4), shed: 0, gaps: [], gn: 0, trial: null, block: 0, log: [], d: {}, frame: 0, lastDec: 0, win: null, winStart: 0, WIN_MS: 3000,
+  work: [], hist: [], pairs: [], wins: {native: [], omni: []}, pos: 0, F: 0, last: 0};
+const drawable = id => { const ok = onScreen(id) && govAllow(id); if (ok) GOV.drawn++; return ok; };
+function govAllow(id) { if (GOV.arm === "native") return true; const d = GOV.d[id] || 1; if (d <= 1) return true;
+  let h = 0; for (let i = 0; i < id.length; i++) h = (h*31 + id.charCodeAt(i)) & 1023; return (GOV.frame + h) % d === 0; }
+function govDecide(now) {   // every quarter second: one decision of the law over the frame, every step a trial (the reflex rule)
+  const g = GOV.gaps.slice(-15); if (g.length < 5) return; const gap = g.slice().sort((x, y) => x - y)[g.length >> 1];
+  GOV.F = GOV.law.force(Math.min(2*33.4, gap)); GOV.pos = GOV.law.p;                     // the band: 0 to two frames; its center one frame at 60 Hz
+  const cap = 7*[...VIS.values()].filter(Boolean).length;                            // no layout read: the observer's own list
+  if (GOV.arm === "native") { GOV.shed = 0; GOV.trial = null; }
+  else if (GOV.trial) {                                                               // a trial runs to its full measurement, then is read
+    if (now - GOV.trial.t >= 1500) { const after = GOV.gaps.slice(-Math.max(5, Math.min(GOV.gaps.length, GOV.gn - GOV.trial.n))), m = after.reduce((x, y) => x + y, 0)/after.length;
+      if (m < GOV.trial.base*0.97) { GOV.log.unshift(`kept: holding ${GOV.shed} chart-frames shortened the frame ${(100*(1 - m/GOV.trial.base)).toFixed(0)}%`); GOV.trial = null; }
+      else { GOV.shed = GOV.trial.from; GOV.block = now + 6000; GOV.log.unshift(`refused: holding charts back did not shorten the frame; every chart handed back to native`); GOV.trial = null; }
+      GOV.log.length = Math.min(GOV.log.length, 6); } }
+  else if (GOV.F < -0.01 && GOV.shed > 0) GOV.shed = Math.max(0, GOV.shed - Math.ceil(-4*GOV.F));   // the pedal lifted: handed back toward native, no trial needed
+  else if (GOV.F > 0.01 && now >= GOV.block && GOV.shed < cap) {                    // the pedal pushed: one step, on its own trial
+    const before = GOV.gaps.slice(-60); GOV.trial = {t: now, from: GOV.shed, base: before.reduce((x, y) => x + y, 0)/before.length, n: GOV.gn};
+    GOV.shed = Math.min(cap, GOV.shed + Math.max(1, Math.ceil(4*GOV.F))); }
+  // the charts farthest from the middle of the screen wait first; every other chart is drawn every frame (native)
+  GOV.d = {}; if (!GOV.shed) return;                                                  // nothing held: every chart native, and nothing measured on the page
+  const mid = innerHeight/2, ord = [...document.querySelectorAll("canvas[id]")].filter(c => onScreen(c.id) && c.offsetParent !== null)
+    .map(c => { const r = c.getBoundingClientRect(); return [c.id, Math.abs((r.top + r.bottom)/2 - mid)]; }).sort((x, y) => y[1] - x[1]);
+  let left = GOV.shed; for (let round = 0; left > 0 && round < 7; round++) for (const [id] of ord) { if (left <= 0) break; GOV.d[id] = (GOV.d[id] || 1) + 1; left--; }
+}
+function govFrame(now, workMs, drawn) {
+  GOV.frame++; const gap = GOV.last ? now - GOV.last : 16.7; GOV.last = now; GOV.work.push(workMs); if (GOV.work.length > 120) GOV.work.shift(); GOV.gaps.push(gap); GOV.gn++; if (GOV.gaps.length > 240) GOV.gaps.shift();
+  if (!GOV.win || now - GOV.winStart >= GOV.WIN_MS) govWindow(now);
+  const W_ = GOV.win; W_.frames++; W_.work += workMs; W_.missed += Math.max(0, Math.round(gap/16.7) - 1); W_.longest = Math.max(W_.longest, gap); W_.draws += drawn;
+  GOV.hist.push([now, gap, GOV.arm]); if (GOV.hist.length > 600) GOV.hist.shift();
+  if (now - GOV.lastDec >= 250) { GOV.lastDec = now; govDecide(now); }
+}
+function govWindow(now) {   // close the window that ran, open the next; in paired mode the arms take turns, native first in each pair
+  const W_ = GOV.win;
+  if (W_ && W_.frames > 5) { const s = (now - GOV.winStart)/1000, rec = {fps: W_.frames/s, missed: W_.missed/s, longest: W_.longest, draws: W_.draws/s, work: W_.work/W_.frames, load: GOV.load};
+    GOV.wins[W_.arm].push(rec); if (GOV.mode === "pair" && W_.arm === "omni" && GOV.pend && GOV.pend.load === GOV.load) GOV.pairs.push([GOV.pend, rec]); if (W_.arm === "native") GOV.pend = rec; selfTable(); }
+  GOV.arm = GOV.mode === "pair" ? (W_ && W_.arm === "native" ? "omni" : "native") : GOV.mode; if (GOV.arm === "native") { GOV.shed = 0; GOV.d = {}; GOV.trial = null; }
+  GOV.win = {arm: GOV.arm, frames: 0, work: 0, missed: 0, longest: 0, draws: 0}; GOV.winStart = now;
+}
+const SELF_G = [["frames delivered per second", "fps", "up"], ["frames missed per second", "missed", "down"], ["the longest frame (ms)", "longest", "down"], ["chart draws per second", "draws", "up"], ["drawing time per frame (ms)", "work", "spent"]];
+function selfTable() {
+  const P = GOV.pairs.filter(p => p[0].load === GOV.load), n = P.length, last = a => GOV.wins[a].filter(w => w.load === GOV.load).slice(-5), avg = (xs, k) => xs.length ? xs.reduce((s, x) => s + x[k], 0)/xs.length : null;
+  $("selfTab").querySelector("tbody").innerHTML = SELF_G.map(([l, k, aim]) => { const a = avg(last("native"), k), o = avg(last("omni"), k); let rd = '<span class="word w-shown">reading…</span>';
+    if (n >= 4) { const d = P.map(p => p[1][k] - p[0][k]), m = d.reduce((s, x) => s + x, 0)/n, sd = Math.sqrt(d.reduce((s, x) => s + (x - m)**2, 0)/(n - 1)), h = tq(n - 1)*sd/Math.sqrt(n), lo = m - h, hi = m + h;
+      const base = Math.abs(P.reduce((s, p) => s + p[0][k], 0)/n) || 1, size = Math.abs(m)/base;
+      if (lo > 0 || hi < 0) { const up = m > 0, w = aim === "spent" ? (up ? ["power given", "w-given"] : ["GAIN", "w-gain"]) : aim === "up" ? (up ? ["GAIN", "w-gain"] : ["LOSS", "w-loss"]) : (up ? ["LOSS", "w-loss"] : ["GAIN", "w-gain"]); rd = `<span class="word ${w[1]}">${w[0]}</span> ${mag(size)}`; }
+      else rd = '<span class="word w-even">EVEN</span>'; }
+    const f = v => v === null ? "—" : fmtAxis(v); return `<tr><td>${l}</td><td class="nat">${f(a)}</td><td class="omni">${f(o)}</td><td>${rd}</td></tr>`; }).join("");
+  $("selfNote").textContent = `${n} paired windows at this load (native, then Omni-Compass on top, three seconds each)${n < 4 ? "; the reading starts at four pairs" : ""}. Each reading is the mean paired difference with its 95% interval (Student's t, exact), the word by the gauge's aim, the size without a sign; where there is room in the frame Omni-Compass leaves every chart native, so the two read EVEN. Read on this browser now, by the page's own code; no outside party has reviewed or approved it.`;
+}
+function selfUpdate() {
+  const cells = a => { const w = GOV.wins[a].filter(x => x.load === GOV.load).slice(-1)[0]; return w ? [["frames a second", w.fps.toFixed(0)], ["missed a second", w.missed.toFixed(1), w.missed > 0.5], ["longest frame", w.longest.toFixed(0) + " ms", w.longest > 50], ["drawing a frame", w.work.toFixed(1) + " ms"]] : [["frames a second", "—"], ["missed a second", "—"], ["longest frame", "—"], ["drawing a frame", "—"]]; };
+  liveCells("selfN", cells("native")); liveCells("selfO", cells("omni"));
+  const left = Math.max(0, GOV.WIN_MS - (performance.now() - GOV.winStart))/1000;
+  $("selfClock").innerHTML = `now: <b>${GOV.arm === "native" ? "native" : "Omni-Compass on top"}</b> · ${left.toFixed(1)} s left in this window · compass position <b>${GOV.pos === null || GOV.pos === undefined ? "—" : GOV.pos.toFixed(2)}</b> · pedal <b>${GOV.F > 0.01 ? "pushed" : GOV.F < -0.01 ? "lifted" : "still"}</b>`;
+  const ds = Object.entries(GOV.d).filter(([, d]) => d > 1);
+  $("selfChips").innerHTML = (GOV.arm === "native" ? "<span>native: every chart on screen drawn every frame</span>" : ds.length ? `<span>${GOV.trial ? "on trial" : "holding"}: ${ds.map(([id, d]) => `${id} every ${d} frames`).join(" · ")}; every other chart drawn every frame (native)</span>` : "<span>every chart native: drawn every frame (there is room in the frame, or holding charts back was refused by its trial)</span>")
+    + GOV.log.map(l => `<span>${l}</span>`).join("");
+}
+function drawSelf() {
+  const cv = $("selfCv"); if (!cv) return; const {g, w, h} = fit(cv, Math.min(0.5, 300/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  const H = GOV.hist; if (H.length < 2) return; const t1 = H[H.length - 1][0], t0 = t1 - 12000, ml = 40, mr = 8, top = 6, bot = h*0.7, X = t => ml + (t - t0)/(t1 - t0)*(w - ml - mr);
+  const hi = Math.min(100, Math.max(40, ...H.map(x => x[1]))) * 1.1, Y = v => bot - Math.min(v, hi)/hi*(bot - top);
+  g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(fmtAxis(hi/1.1) + " ms", ml - 4, Y(hi/1.1)); g.fillText("0", ml - 4, bot);
+  g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, bot); g.lineTo(w - mr, bot); g.stroke();
+  g.strokeStyle = css.bad; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(ml, Y(16.7)); g.lineTo(w - mr, Y(16.7)); g.stroke(); g.setLineDash([]);
+  H.forEach(([t, ms, arm]) => { if (t < t0) return; g.fillStyle = arm === "native" ? css.steel : css.brass; g.fillRect(X(t) - 1, Y(ms), 2, bot - Y(ms)); });
+  const pt = bot + 22, pb = h - 6; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "bottom"; g.fillText(`compass position ${GOV.pos !== null && GOV.pos !== undefined ? GOV.pos.toFixed(2) : "—"} · shed ${GOV.shed} chart-frames`, ml, pt - 2);
+  g.strokeStyle = css.rule; g.strokeRect(ml, pt, w - ml - mr, pb - pt); const p = Math.max(0, Math.min(1, GOV.pos || 0)); g.fillStyle = p >= 0.95 ? css.bad : p > 0.5 ? css.warn : css.ok; g.fillRect(ml, pt, (w - ml - mr)*p, pb - pt);
+  g.strokeStyle = css.ink; g.beginPath(); g.moveTo(ml + (w - ml - mr)*0.5, pt - 2); g.lineTo(ml + (w - ml - mr)*0.5, pb + 2); g.stroke();
+}
+function buildSelf() {
+  document.querySelectorAll("[data-sload]").forEach(b => b.addEventListener("click", () => { GOV.load = +b.dataset.sload; document.querySelectorAll("[data-sload]").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false")); GOV.pend = null; selfTable(); }));
+  document.querySelectorAll("[data-sgov]").forEach(b => b.addEventListener("click", () => { GOV.mode = b.dataset.sgov; document.querySelectorAll("[data-sgov]").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false")); GOV.pend = null; GOV.win = null; }));
+  selfTable(); setInterval(selfUpdate, 500);
+}
+
 // ============================================================== the clock
 let lastDecide = 0;
 function frame(now) {
@@ -2796,18 +2905,21 @@ function frame(now) {
   const phase = Math.min(6, Math.floor(W.frac*7));
   document.querySelectorAll("#cycle li").forEach(li => li.classList.toggle("act", W.speed <= 4 ? +li.dataset.i === phase : true));
   // every chart draws only while it is on screen (or within 300 px of it); the engine itself keeps stepping either way
-  const on = onScreen;
-  if (on("ringN")) drawRing(now, "nat"); if (on("ringO")) drawRing(now, "omni"); if (on("cluN")) drawCluster("nat"); if (on("cluO")) drawCluster("omni");
-  if (on("cStrip")) drawCStrip(); if (on("sStrip")) drawSStrip(); if (on("ruStrip")) drawRuStrip(); if (!FXW.drawn) { drawBenefit(); FXW.drawn = true; }
-  drawOps(now); drawLab(now); if (on("swarm")) drawSwarm(); if (on("band")) drawBand(); if (on("phaseN")) drawPhase("nat"); if (on("phaseO")) drawPhase("omni");
-  if (on("strip")) drawStrip(); if (on("cvU") || on("cvB")) drawBrain(); vTick(now); if (on("cvV")) drawVerdict();
+  const on2 = drawable, tw = performance.now(); GOV.drawn = 0;
+  if (on2("ringN")) drawRing(now, "nat"); if (on2("ringO")) drawRing(now, "omni"); if (on2("cluN")) drawCluster("nat"); if (on2("cluO")) drawCluster("omni");
+  if (on2("cStrip")) drawCStrip(); if (on2("sStrip")) drawSStrip(); if (on2("ruStrip")) drawRuStrip(); if (!FXW.drawn) { drawBenefit(); FXW.drawn = true; }
+  drawOps(now); drawLab(now); if (on2("swarm")) drawSwarm(); if (on2("band")) drawBand(); if (on2("phaseN")) drawPhase("nat"); if (on2("phaseO")) drawPhase("omni");
+  if (on2("strip")) drawStrip(); if (on2("cvU") || on2("cvB")) drawBrain(); vTick(now); if (on2("cvV")) drawVerdict();
+  if (drawable("selfCv")) drawSelf();
+  if (GOV.load) { const t = performance.now() + GOV.load; while (performance.now() < t) {} }   // the added load, the same in both arms
+  govFrame(now, performance.now() - tw, GOV.drawn);
   requestAnimationFrame(frame);
 }
 buildOrgans(); vLabels(); newDay(W.seed);
 document.getElementById("vMany").click();
 setBody("harness", "alone");   // open on the engine's own harness, each muscle alone, 120 frames into run A
 setCtl("selfpilot", 0); for (let k = 0; k < 120; k++) stepCtl(); updateCScore();
-buildInfo(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); buildFleet(); setRuns(0, 0, 0);
+buildInfo(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); buildFleet(); buildSelf(); setRuns(0, 0, 0);
 drawVerdict2();
 V.P = vParams(); for (let k = 0; k < V.P.min; k++) V.ref.push(vSample(false, V.P, V.rng)); for (let k = 0; k < V.P.min; k++) V.got.push(vSample(true, V.P, V.rng));
 V.running = true; V.lastAdd = 0;
