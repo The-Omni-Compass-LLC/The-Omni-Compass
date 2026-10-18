@@ -28,6 +28,20 @@ before the card.
 7. Support plan: **Basic support - Free**. Click **Complete sign up**, then **Go to the AWS Management Console** and sign in
    as the root user.
 
+## 1a. An account already on the Free plan: move it to the Paid plan
+
+An account that chose the Free plan cannot run these tests: Amazon puts a policy above every login of the account that
+refuses every machine read and every machine (on 18 October each Amazon set stopped there, at no cost, with "explicit deny
+in a service control policy"). Moving to the Paid plan removes it; the credits stay and still pay first.
+
+1. Sign in to the console as the root user (the e-mail and password of step 1).
+2. At the top of the console click **Upgrade plan** (beside the Free plan's credit and days left), or search
+   **Billing and Cost Management**, open it, and click **Upgrade plan** on its home page.
+3. Read the page, and click **Upgrade to paid plan** (or **Upgrade plan**) to confirm.
+
+Nothing else changes: the login made for GitHub (step 2) and the two secrets (step 3) stay as they are. Within the hour the
+conductor's check reads the account again and the sets start on their own.
+
 ## 2. A login for GitHub (an IAM user)
 
 1. In the search bar at the top of the console type **IAM** and open it.
@@ -49,8 +63,11 @@ before the card.
 2. **New repository secret**. Name: `AWS_ACCESS_KEY_ID`. Secret: the Access key. **Add secret**.
 3. **New repository secret**. Name: `AWS_SECRET_ACCESS_KEY`. Secret: the Secret access key. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v10` is kept in step with it), and no result goes up
-before it has been read.
+That is all. Within the hour the conductor runs Amazon's check at no cost (**Actions**, **cloud-check**, the run titled
+`cloud-check amazon`): the keys log in, the account can read and rent machines (not the Free plan), the instance type is
+offered and the processor quota holds a set. When it passes, the sets start on their own on the engine that stands (branch
+`main`; `v11` is kept in step with it), and no result goes up before it has been read. When it fails, it says which of
+these to fix, and nothing is built or billed.
 
 ## 4. What it costs
 
@@ -59,9 +76,11 @@ workers an arm, plus about $0.10 an hour for each cluster's control plane, about
 the big-organism machine (`m6i.2xlarge`) about $0.38 an hour, about $15 for its 39-hour ceiling. The credits pay first.
 Every cluster and machine is deleted when its run ends, whatever happens.
 
-If Amazon refuses a machine for "vCPU limit" (new accounts start with a small limit): in the console search **Service
-Quotas**, open **Amazon Elastic Compute Cloud (Amazon EC2)**, **Running On-Demand Standard (A, C, D, H, I, M, R, T, Z)
-instances**, **Request increase at account level**, ask for 64, **Request**. Amazon usually answers within a day.
+A set needs 10 processors at once (5 machines of 2). New accounts can start with less. When the check finds the quota
+short it asks Amazon for the increase itself (once; it waits for Amazon's answer before asking again), and Amazon usually
+answers within a day. To ask by hand: in the console search **Service Quotas**, open **Amazon Elastic Compute Cloud (Amazon
+EC2)**, **Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances**, **Request increase at account level**, ask for
+64, **Request**. The set is never shrunk to fit.
 
 ## 5. Afterwards
 
