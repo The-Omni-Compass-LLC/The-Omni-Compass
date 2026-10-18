@@ -32,7 +32,11 @@
   reading every refusal as "not offered"; the keys themselves are never printed.
 - **Google's queue paused until its key is stored whole** (`scripts/google_queue.txt`), so failed logins do not use up
   its A, B and C; the failed steady A is re-run in place once the key is right. Amazon stays on: its next set prints AWS's
-  own reason through the repaired pre-flight. The omni-v9 runs already started run to their end as omni-v9's record; nothing is cancelled.
+  own reason through the repaired pre-flight.
+- **Amazon's reason, read (06:31)**: "not authorized to perform ec2:DescribeInstanceTypes with an explicit deny in a
+  service control policy" of an AWS-run organization: the limit Amazon sets on an account on its Free plan. The queue is
+  paused until the account is on the Paid plan; the seven sets that failed at the pre-flight (four A, three B, all at no cost)
+  are re-run in place, then the switch goes back on. The omni-v9 runs already started run to their end as omni-v9's record; nothing is cancelled.
 - **Pages brought up to it**: README, CLAUDE.md, the state of play, the receipts, both manuals (rebuilt), the v7, v8 and v9 pages,
   the preregistration (an amendment, appended), the index's text. Retired words found and fixed on the way: the Owner's Manual
   and the README still named the 2022 robustness district's +0.11% unevenness, and the 2023 districts' ramping and highest peak,
