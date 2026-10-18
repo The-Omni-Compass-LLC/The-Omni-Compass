@@ -29,22 +29,45 @@ export AKS_MAX_NODES="$MAX" WORKER_SEL="omni-role=work"          # kind_bench.sh
 k=${#arms[@]}; off=$(( (REP - 1) % k ))
 order=( "${arms[@]:off}" "${arms[@]:0:off}" )
 echo "repetition $REP, order: ${order[*]}, work group $TYPE x up to $MAX in $REGION"
-# Pre-flight, before anything is built or billed: the instance type is offered in the region, and the on-demand vCPU
-# quota for standard instances (L-1216C47A) has room for the system machine and the whole work group.
+# Pre-flight, before anything is built or billed: the keys log in, the instance type is offered in the region, and the
+# on-demand vCPU quota for standard instances (L-1216C47A) has room for the system machine and the whole work group.
+# PREFLIGHT_ONLY=1 (.github/workflows/cloud-check.yml) stops after it; QUOTA_REQUEST=1 files the quota increase with
+# Amazon when the quota is short (the founder's order of 18 October: a quota is raised with the cloud, never shrunk to fit).
+aws sts get-caller-identity --query Arn --output text >/dev/null 2>/tmp/eks-preflight.err \
+  || { echo "pre-flight: Amazon refused the keys (AWS said: $(tr '\n' ' ' < /tmp/eks-preflight.err | cut -c1-400)): nothing built, nothing billed"; exit 2; }
 vcpu=$(aws ec2 describe-instance-types --region "$REGION" --instance-types "$TYPE" \
   --query 'InstanceTypes[0].VCpuInfo.DefaultVCpus' --output text 2>/tmp/eks-preflight.err || true)
 case "$vcpu" in ''|None)
   # Amazon's own words, so a refusal (a new account not yet verified, a region not enabled, a missing permission) is
   # never read as "not offered"; the keys are never printed, only the error AWS returns
   why=$(tr '\n' ' ' < /tmp/eks-preflight.err | cut -c1-400)
+  if grep -q "explicit deny in a service control policy" /tmp/eks-preflight.err; then
+    # the limit Amazon puts on an account on its Free plan (18 October): every machine read is denied above the keys
+    echo "pre-flight: the AWS account is on Amazon's Free plan, which denies every machine read; upgrade it to the Paid plan" \
+         "(docs/AMAZON_SETUP.md, section 1a; the credits still pay first). Nothing built, nothing billed. (AWS said: $why)"; exit 2
+  fi
   echo "pre-flight: AWS gave no $TYPE in $REGION${why:+ (AWS said: $why)}: nothing built, nothing billed"; exit 2;; esac
 quota=$(aws service-quotas get-service-quota --region "$REGION" --service-code ec2 --quota-code L-1216C47A \
-  --query 'Quota.Value' --output text 2>/dev/null | cut -d. -f1)
+  --query 'Quota.Value' --output text 2>/dev/null | cut -d. -f1 || true)     # unread: Amazon's own check decides it
 need=$(( (MAX + 1) * vcpu ))
 if [ -n "$quota" ] && [ "$quota" != None ] && [ "$quota" -lt "$need" ]; then
-  echo "pre-flight: needs $need on-demand vCPUs in $REGION, quota $quota: nothing built, nothing billed"; exit 2
+  asked=""
+  if [ "${QUOTA_REQUEST:-0}" = 1 ]; then
+    open=$(aws service-quotas list-requested-service-quota-change-history-by-quota --region "$REGION" --service-code ec2 \
+      --quota-code L-1216C47A --query "length(RequestedQuotas[?Status=='PENDING' || Status=='CASE_OPENED'])" --output text 2>/dev/null || echo 0)
+    if [ "${open:-0}" != 0 ] && [ "${open:-0}" != None ]; then
+      asked="; an increase is already asked of Amazon and waits for its answer"
+    elif aws service-quotas request-service-quota-increase --region "$REGION" --service-code ec2 --quota-code L-1216C47A \
+         --desired-value "$need" >/dev/null 2>/tmp/eks-quota.err; then
+      asked="; an increase to $need was asked of Amazon now (it usually answers within a day)"
+    else
+      asked="; the increase could not be asked ($(tr '\n' ' ' < /tmp/eks-quota.err | cut -c1-300)): docs/AMAZON_SETUP.md, section 4"
+    fi
+  fi
+  echo "pre-flight: needs $need on-demand vCPUs in $REGION, quota $quota$asked: nothing built, nothing billed"; exit 2
 fi
 echo "pre-flight: $TYPE ($vcpu vCPU) x $(( MAX + 1 )) needs $need vCPUs, quota ${quota:-unknown}: ok"
+if [ "${PREFLIGHT_ONLY:-0}" = 1 ]; then echo "pre-flight only: nothing built, nothing billed"; exit 0; fi
 gone() { eksctl delete cluster --name "$1" --region "$REGION" --wait >/dev/null 2>&1 || true; }
 for arm in "${order[@]}"; do
   name=$(echo "omni-$arm-$REP-$RUNID" | tr '[:upper:]_' '[:lower:]-' | cut -c1-60)

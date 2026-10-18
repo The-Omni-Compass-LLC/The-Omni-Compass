@@ -176,10 +176,14 @@ on omni-v11; the sets of earlier engines already started run to their end as the
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
 **Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
 `scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
-18 October (the Operator's Manual's appendices G and H, click by click). Both first sets stopped at the login at no cost, and
-both queues are paused so no A, B or C is spent on a login: Google's stored key was cut short when it was copied (it is stored
-again whole), and Amazon's account is on its Free plan, whose policy denies the machine reads (the account moves to its Paid
-plan). Then each failed set is run again in place and its sets run on omni-v11, one at a time in each machine-family queue.
+18 October (the Operator's Manual's appendices G and H, click by click). Their first sets, on omni-v10, stopped at the login at
+no cost and stay as its record: Google's stored key had been cut short when it was copied from Cloud Shell's screen, and
+Amazon's account is on its Free plan, whose policy denies every machine read. Both queues are on again behind a $0 check
+(`cloud-check`): the conductor starts a cloud's set only after that cloud's check passed (the key whole, the login, the plan,
+the machine type and every quota; a short Amazon quota is asked of Amazon by the check itself), so nothing more is spent on a
+login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, section 4);
+Amazon waits for its account on the Paid plan (appendix H, section 1a). Then the sets start on their own, A, B and C on
+omni-v11, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -203,8 +207,8 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
 3. **The kill test**: three omni-v7 runs on the fixed harness started 17 October (they finish and stand as omni-v7's record);
    its omni-v11 runs are in the queue.
 4. **The grid and Azure on omni-v11**: restarted on 18 October; nothing cancelled.
-5. **Google and Amazon**: paused until Google's key is stored whole and Amazon's account is on its Paid plan; then the failed
-   first sets run again in place and the four sets run A, B and C on omni-v11.
+5. **Google and Amazon**: on behind their $0 check; they start on their own once Google's key is stored whole and Amazon's
+   account is on its Paid plan, the four sets A, B and C on omni-v11.
 6. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 7. **Linux**: a machine on the metal for `cpu-power`.
 8. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October

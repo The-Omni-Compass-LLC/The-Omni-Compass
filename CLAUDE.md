@@ -207,11 +207,15 @@ the founder overrides one in the conversation.
   repository's secrets; both queues' `switch=` lines read on. The conductor starts their four sets, A, then B, then C, one
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
-  cloud, never shrunk to fit. The GPU on Lambda still waits for his word and one exact commit. Google's queue was paused the
-  same morning because its stored key was cut short when copied; it comes back on once the key is stored whole, and a
-  failed set is re-run in place (never started again under the same title), so A, B and C keep their meaning. Amazon's
-  queue was paused the same morning: its new account sits on the Free plan, whose organization policy denies every machine
-  read; it comes back on once the account is on the Paid plan.
+  cloud, never shrunk to fit. The GPU on Lambda still waits for his word and one exact commit. The same morning both first
+  sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
+  account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
+  record. That evening ("fix the Google and Amazon cloud. To work") both queues went back on behind a $0 check
+  (`.github/workflows/cloud-check.yml`, `tools/cloud_key_check.py`): the conductor starts a cloud's set only after that
+  cloud's newest check passed (the key whole, the login, the plan, the machine type, every quota; a short Amazon quota asked
+  of Amazon by the check itself), starts a check itself within the hour, and so never spends a set's A, B or C on a login.
+  Google starts once the key is stored whole (downloaded as a file, `docs/GOOGLE_SETUP.md` section 4), Amazon once the
+  account is on the Paid plan (`docs/AMAZON_SETUP.md` section 1a).
 
 - **Version 10: exploit all that can be, never raise the bill, hurt no one** (the founder's words: "Omni-Compass should be
   tuned to exploit all that can be and keep all healthy and never raise its bill ... whatever one can't be achieved doesn't
