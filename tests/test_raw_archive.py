@@ -78,6 +78,22 @@ class RawArchive(unittest.TestCase):
         self.assertFalse((raw / "run-1").exists())
         self.assertEqual(git(self.repo, "status", "--porcelain"), "")       # main never sees the worktree
 
+    def test_open_again_reaches_a_run_saved_since(self):
+        self.run_("sweep")
+        shutil.rmtree(self.repo / "results" / "live" / "raw")
+        self.assertEqual(self.run_("open", "/run-1/").returncode, 0)        # opened once, at the branch as it was then
+        other = Path(self.tmp.name) / "other"                               # another job saves a run afterwards
+        git(Path(self.tmp.name), "clone", "-q", str(self.bare), str(other))
+        o = other / "results" / "live" / "raw" / "run-5"
+        o.mkdir(parents=True)
+        (o / "SHA256SUMS_ALL.txt").write_text("five\n")
+        self.assertEqual(self.run_("save", "run-5", "run 5", cwd=other).returncode, 0)
+        out = self.run_("open", "/run-5/")
+        self.assertEqual(out.returncode, 0, out.stderr)
+        raw = self.repo / "results" / "live" / "raw"
+        self.assertEqual((raw / "run-5" / "SHA256SUMS_ALL.txt").read_text(), "five\n")   # 18 October: it stayed absent
+        self.assertEqual((raw / "run-1" / "SHA256SUMS_ALL.txt").read_text(), "one\n")
+
     def test_save_adds_a_run_on_the_newest_tip_and_never_twice(self):
         self.run_("sweep")
         d = self.repo / "results" / "live" / "raw" / "run-3"
