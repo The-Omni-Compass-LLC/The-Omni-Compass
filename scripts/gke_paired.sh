@@ -30,16 +30,48 @@ export AKS_MAX_NODES="$MAX" WORKER_SEL="omni-role=work"          # kind_bench.sh
 k=${#arms[@]}; off=$(( (REP - 1) % k ))
 order=( "${arms[@]:off}" "${arms[@]:0:off}" )
 echo "repetition $REP, order: ${order[*]}, work pool $MACHINE x up to $MAX in $ZONE (project $PROJECT)"
-# Pre-flight, before anything is built or billed: the machine type is offered in the zone, and the region's CPU quota
-# has room for the system machine and the whole work pool. One refusal ends the repetition here, in a minute.
-cpus=$(gcloud compute machine-types describe "$MACHINE" --zone "$ZONE" --project "$PROJECT" --format='value(guestCpus)' 2>/dev/null || true)
-[ -n "$cpus" ] || { echo "pre-flight: $MACHINE is not offered in $ZONE: nothing built, nothing billed"; exit 2; }
+# Pre-flight, before anything is built or billed: the machine type is offered in the zone, and Google's quotas have room
+# for the system machine and the whole work pool: the region's processors (CPUS), the project's processors in every region
+# (CPUS_ALL_REGIONS: Google's free trial holds it at 8, so the account's full activation comes first), the region's
+# solid-state disk (SSD_TOTAL_GB: each machine's boot disk is GKE's default, 100 GB balanced) and its external addresses
+# (IN_USE_ADDRESSES: one a machine and one for the load balancer). One refusal ends the repetition here, in a minute, with
+# Google's own words or every short quota named. PREFLIGHT_ONLY=1 (.github/workflows/cloud-check.yml) stops after it.
 region="${ZONE%-*}"
-need=$(( (MAX + 1) * cpus ))
-free=$(gcloud compute regions describe "$region" --project "$PROJECT" --format=json \
-  | python3 -c "import json,sys; q=[x for x in json.load(sys.stdin).get('quotas', []) if x['metric']=='CPUS']; print(int(q[0]['limit']-q[0]['usage']) if q else 0)")
-if [ "$free" -lt "$need" ]; then echo "pre-flight: needs $need vCPUs in $region, $free free: nothing built, nothing billed"; exit 2; fi
-echo "pre-flight: $MACHINE ($cpus vCPU) x $(( MAX + 1 )) needs $need of $free free vCPUs in $region: ok"
+cpus=$(gcloud compute machine-types describe "$MACHINE" --zone "$ZONE" --project "$PROJECT" --format='value(guestCpus)' 2>/tmp/gke-preflight.err || true)
+if [ -z "$cpus" ]; then
+  why=$(tr '\n' ' ' < /tmp/gke-preflight.err | cut -c1-400)     # Google's words: a refusal is never read as "not offered"
+  echo "pre-flight: Google gave no $MACHINE in $ZONE${why:+ (Google said: $why)}: nothing built, nothing billed"; exit 2
+fi
+gcloud compute regions describe "$region" --project "$PROJECT" --format=json > /tmp/gke-region.json 2>/tmp/gke-preflight.err \
+  && gcloud compute project-info describe --project "$PROJECT" --format=json > /tmp/gke-project.json 2>>/tmp/gke-preflight.err \
+  || { echo "pre-flight: Google's quotas could not be read (Google said: $(tr '\n' ' ' < /tmp/gke-preflight.err | cut -c1-400)): nothing built, nothing billed"; exit 2; }
+MACHINES=$(( MAX + 1 )) CPUS_EACH="$cpus" DISK_GB="${GKE_DISK_GB:-100}" REGION="$region" python3 - <<'PY_QUOTA' || exit 2
+import json, os
+m, c, d, region = int(os.environ["MACHINES"]), int(os.environ["CPUS_EACH"]), int(os.environ["DISK_GB"]), os.environ["REGION"]
+quotas = {("region", q["metric"]): q for q in json.load(open("/tmp/gke-region.json")).get("quotas", [])}
+quotas.update({("project", q["metric"]): q for q in json.load(open("/tmp/gke-project.json")).get("quotas", [])})
+needs = ((("region", "CPUS"), m * c, f"processors in {region}"), (("project", "CPUS_ALL_REGIONS"), m * c, "processors in all regions"),
+         (("region", "SSD_TOTAL_GB"), m * d, f"GB of solid-state disk in {region}"),
+         (("region", "IN_USE_ADDRESSES"), m + 1, f"external addresses in {region}"))
+short = []
+for key, need, what in needs:
+    q = quotas.get(key)
+    if q is None:
+        print(f"pre-flight: {key[1]} not reported by Google; Google's own check decides it")
+        continue
+    free = int(q["limit"] - q["usage"])
+    print(f"pre-flight: {key[1]}: needs {need} {what}, {free} free of {int(q['limit'])}: {'ok' if free >= need else 'SHORT'}")
+    if free < need:
+        short.append(f"{key[1]} needs {need}, {free} free of {int(q['limit'])}")
+if short:
+    hint = (" Google's free trial allows 8 processors at once: activate the full account (the credit stays and pays first)."
+            if quotas.get(("project", "CPUS_ALL_REGIONS"), {}).get("limit") == 8 else "")
+    print("pre-flight: short of Google's quota: " + "; ".join(short) + ". Nothing built, nothing billed. Raise it with Google "
+          "(docs/GOOGLE_SETUP.md, section 6), never shrink the set." + hint)
+    raise SystemExit(2)
+PY_QUOTA
+echo "pre-flight: $MACHINE ($cpus vCPU) x $(( MAX + 1 )) in $ZONE: ok"
+if [ "${PREFLIGHT_ONLY:-0}" = 1 ]; then echo "pre-flight only: nothing built, nothing billed"; exit 0; fi
 gone() { gcloud container clusters delete "$1" --zone "$ZONE" --project "$PROJECT" --quiet >/dev/null 2>&1 || true; }
 for arm in "${order[@]}"; do
   name=$(echo "omni-$arm-$REP-$RUNID" | tr '[:upper:]_' '[:lower:]-' | cut -c1-40)     # GKE: lowercase, at most 40 characters

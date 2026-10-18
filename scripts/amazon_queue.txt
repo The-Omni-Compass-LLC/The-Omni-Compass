@@ -14,13 +14,16 @@
 # AWS_SECRET_ACCESS_KEY secrets are in the repository, docs/AMAZON_SETUP.md) starts nothing. The founder turns it on;
 # nothing is rented before.
 # Switched on by the founder on 18 October ("Push the clouds ... I linked them up"), the secrets in the repository.
-# Paused on 18 October, 06:50: Amazon refuses every machine read with an explicit deny in a service control policy of an
-# AWS-run organization, the limit Amazon sets on an account on its Free plan; the account goes to the Paid plan (its credits
-# still pay first). Seven sets failed at the pre-flight at no cost: steady A 39098896187, burst 1 4 1 6 1 9 A 39099802847,
-# burst 1 6 1 8 1 6 A 39100691172, the real day A 39101579099, steady B 39102441574, burst 1 4 1 6 1 9 B 39103446883, burst
-# 1 6 1 8 1 6 B 39104347206. Once the account can rent, each is re-run in place (same run, same title), then the switch
-# goes back on, so A, B and C keep their meaning.
-switch=off
+# Paused on 18 October, 06:50: Amazon refused every machine read with an explicit deny in a service control policy of an
+# AWS-run organization, the limit Amazon sets on an account on its Free plan. The sets that failed at the pre-flight at no
+# cost (steady A 39098896187, burst 1 4 1 6 1 9 A 39099802847, burst 1 6 1 8 1 6 A 39100691172, the real day A 39101579099,
+# steady B 39102441574, burst 1 4 1 6 1 9 B 39103446883, burst 1 6 1 8 1 6 B 39104347206, the real day B 39105258741) ran on
+# omni-v10's commit and stay as its record; the sets of omni-v11 start fresh (AZURE_SINCE). On again the same evening behind the $0 check
+# (.github/workflows/cloud-check.yml): the conductor starts a set here only after Amazon's newest check passed (the keys, the
+# plan, the instance type and the processor quota, a short quota asked of Amazon by the check itself), so the Free plan
+# uses up no set's A, B or C, and once the account is on the Paid plan (docs/AMAZON_SETUP.md, section 1a; the credits still
+# pay first) the sets start on their own within the hour.
+switch=on
 steady|dial=save;replica_ceiling=0
 burst 1 4 1 6 1 9|load_steps=1 4 1 6 1 9;duration_s=1800;reps=5;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0
 burst 1 6 1 8 1 6|load_steps=1 6 1 8 1 6;duration_s=1800;reps=5;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0
