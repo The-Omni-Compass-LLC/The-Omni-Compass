@@ -116,8 +116,8 @@ district's monthly unevenness +0.11%, beside the bill −8.6% and the electricit
 time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs; KEDA's HTTP add-on, −57% to −58% mean,
 −71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, GAIN in all three; KEDA on the CPU target and
 the requests, −36% to −38% mean and −52% to −54% at the 95th percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN;
-machines EVEN in every one; parked-worker energy +1.1% to +2.3%, power given. The Omni index over the real tests: **+4.2% GAIN** on the
-resource reading and **+11.5% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+machines EVEN in every one; parked-worker energy +1.1% to +2.3%, power given. The Omni index over the real tests, every table on omni-v10: **+4.4% GAIN** on the
+resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
 
