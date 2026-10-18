@@ -245,7 +245,7 @@ Run 3 is recorded as invalid: a refused Kubernetes call stopped the controller a
 
 ## 8. Engineering verification
 
-`python verify.py` runs 89 checks (0 failures in the recorded log `results/VERIFY_LOG.txt`), including:
+`python verify.py` runs 89 checks (0 failures in the log recorded then, results/VERIFY_LOG.txt, removed on 18 October; the release check's receipt, `results/VERIFY_RECEIPT.txt`, stands in its place), including:
 
 - reference engine SHA-256
 - core parity vs reference engine and 500 fixtures
