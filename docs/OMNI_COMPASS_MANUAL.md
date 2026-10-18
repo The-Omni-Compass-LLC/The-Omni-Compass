@@ -5289,6 +5289,14 @@ The repository's secrets each workflow reads are `AZURE_CREDENTIALS` (Azure), `G
 settings, never printed, and used only to build and delete the run's own clusters; the governor inside the clusters
 never sees them (section 14.5).
 
+Before a Google Cloud or Amazon set starts, `cloud-check` runs for that cloud at no cost and stops before anything is built:
+the stored key's shape (for Google, its length and its missing parts only, never a character of it), the login, the
+account's plan, the machine type in the zone or region, and every quota a set needs (Google: processors in the region and
+in all regions, solid-state disk and external addresses; Amazon: the on-demand processor quota, which the check asks Amazon
+to raise when it is short). The conductor starts a set only after that cloud's newest check passed, and starts a check
+itself when there is none, the last one failed an hour ago or more, or the last pass is a day old; so a broken key, an
+account that cannot rent or a short quota spends no set, and what the check prints names what to fix (Appendices G and H).
+
 ### N.3 A second Azure workflow, for machines already paid for
 
 `aks-metered-full` runs the same paired design with the governor's full wiring on the service (the pod autoscaler's
