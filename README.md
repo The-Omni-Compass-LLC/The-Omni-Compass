@@ -65,8 +65,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-18 04:23 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V10_VS_V9.md) |  |
-| 2026-10-18 04:23 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-18 16:03 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V11_VS_V10.md) |  |
+| 2026-10-18 16:03 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -74,16 +74,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-18 14:39 | live-engine | cancelled | [39136960088](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39136960088) |
-| 2026-10-18 14:36 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 1+10 arms native compass split no window 1440 protocol 3 | success | [39127851714](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127851714) |
-| 2026-10-18 14:35 | six-kube x10 orgs spine reps 10+1 arms native compass split no window 960 protocol 3 | success | [39127820479](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127820479) |
-| 2026-10-18 14:30 | ycsb | success | [39125679730](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39125679730) |
-| 2026-10-18 14:28 | six x100 line orgs 6 runs 0+10 | success | [39127843838](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127843838) |
-| 2026-10-18 14:18 | sysbench | success | [39124646462](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39124646462) |
-| 2026-10-18 14:15 | six x1 line orgs 5 runs 10+90 | success | [39130070598](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39130070598) |
-| 2026-10-18 14:14 | six x100 line orgs 2 runs 0+10 | success | [39127828367](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127828367) |
-| 2026-10-18 14:14 | six x1 line orgs 6 runs 10+90 | success | [39130074542](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39130074542) |
-| 2026-10-18 14:13 | six x100 line orgs 4 runs 0+10 | success | [39127835930](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127835930) |
+| 2026-10-18 16:09 | big-organism-detached collect | success | [39143632870](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39143632870) |
+| 2026-10-18 16:04 | live-engine | cancelled | [39143344503](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39143344503) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
