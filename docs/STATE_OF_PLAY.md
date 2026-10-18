@@ -41,13 +41,13 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 | Redis, the cache's memory ceiling | omni-v7 | +0.2% | GAIN, power given | L |
 | Real Kubernetes, faults | omni-v7 | +35.0% | GAIN, power given | L |
 | Real Kubernetes, all four at once | omni-v7 | +37.4% | GAIN | L |
-| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v7 | +18.0% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v7 | +0.0% | EVEN | L |
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v10 | +57.6% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | +0.0% | EVEN | L |
 | Real Kubernetes, a queue of jobs | omni-v7 | +12.5% | GAIN | L |
 | Real Kubernetes, a public day of demand (Google 2011) | omni-v7 | +31.5% | GAIN, power given | L |
 | Real Kubernetes, a noisy neighbour | omni-v7 | +0.0% | EVEN | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +78.3% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +44.8% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v10 | +94.6% | GAIN AND LOSS | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v10 | +46.9% | GAIN, power given | L |
 | Power grids (SimBench), both load models | omni-v7 | +5.8% | GAIN, power given | S |
 | PostgreSQL, the pooler's pool size | omni-v7 | +0.0% | EVEN | L |
 | MySQL, the buffer pool's size | omni-v7 | +0.0% | EVEN | L |

@@ -14,8 +14,8 @@ The founder's order of 17 October: Omni-Compass is shown on top at every level, 
 |---|---|---|---:|---:|---:|---:|---:|---|
 | The muscle, alone (1,107 muscles, each on its own native controller, under its own load) | omni-v8 | S (our model) | 527 | 580 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
 | The organism, the stack: the seven organisms under three loads (own load, the climb, work waiting in line) | omni-v8 | S (our model) | 21 | 0 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
-| The cluster: real Kubernetes, native its own HPA and scheduler | omni-v7 | L | 22 | 86 | 3 | 0 | 0 | no LOSS; resources put in shown as power given |
-| The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v7 | L | 15 | 43 | 6 | 0 | 0 | no LOSS; resources put in shown as power given |
+| The cluster: real Kubernetes, native its own HPA and scheduler | omni-v10, omni-v7 | L | 22 | 86 | 3 | 0 | 0 | no LOSS; resources put in shown as power given |
+| The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v10 | L | 16 | 41 | 6 | 1 | 0 | **yes: 1, listed below** |
 | A muscle inside a running service: database, broker, cache | omni-v7 | L | 23 | 327 | 7 | 0 | 2 | **yes: 2, listed below** |
 | A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms | omni-v7 | independent simulator | 151 | 53 | 34 | 13 | 0 | **yes: 13, listed below** |
 | The organism with the real cluster inside (the grid, at 1, 10, 100 and on GitHub's machines 1,000 copies) | older engines' tables; the grid runs again on the engine that stands | L, the cluster; S, the organism | – | – | – | – | – | no table on the engine that stands yet; the grid's runs (results/grid_v8/) are going |
@@ -38,13 +38,17 @@ Tables: `results/realms_v5/REALMS_V5.md`.
 
 ### The cluster: real Kubernetes, native its own HPA and scheduler
 
-Native at this level: Kubernetes as shipped with the operator's HPA target. Engine: omni-v7. Evidence: L.
-Tables: `results/live/V7_ALL_FOUR.md`, `results/live/V7_BATCH.md`, `results/live/V7_CAPACITY.md`, `results/live/V7_FAIRNESS.md`, `results/live/V7_FAULTS.md`, `results/live/V7_TRACE_GOOGLE2011.md`, `results/live/V7_ROBUST_LONG.md`.
+Native at this level: Kubernetes as shipped with the operator's HPA target. Engine: omni-v10, omni-v7. Evidence: L.
+Tables: `results/live/V7_ALL_FOUR.md`, `results/live/V7_BATCH.md`, `results/live/V10_CAPACITY.md`, `results/live/V7_FAIRNESS.md`, `results/live/V7_FAULTS.md`, `results/live/V7_TRACE_GOOGLE2011.md`, `results/live/V7_ROBUST_LONG.md`.
 
 ### The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube
 
-Native at this level: Kubernetes with the add-on as shipped and as used, its own recommendations applied. Engine: omni-v7. Evidence: L.
-Tables: `results/live/V7_KEDA_REQUESTS.md`, `results/live/V7_KEDA_CPU_REQUESTS.md`, `results/live/V7_GOLDILOCKS.md`, `results/live/V7_CRUISEKUBE.md`.
+Native at this level: Kubernetes with the add-on as shipped and as used, its own recommendations applied. Engine: omni-v10. Evidence: L.
+Tables: `results/live/V10_KEDA_REQUESTS.md`, `results/live/V10_KEDA_CPU_REQUESTS.md`, `results/live/V10_GOLDILOCKS.md`, `results/live/V10_CRUISEKUBE.md`.
+
+Goes the other way:
+
+- V10_KEDA_REQUESTS.md: Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v10): pod start wait, mean (s) (LOSS)
 
 ### A muscle inside a running service: database, broker, cache
 
