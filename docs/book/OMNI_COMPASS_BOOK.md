@@ -1845,7 +1845,10 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
    left in place: every governor records, before its first write, the exact commands that put every setting back, and
    renews a lease every decision. Run `python3 tools/omni_switch.py watchdog` as its own service next to the governors:
    it hands back for any governor whose process is gone or whose lease has run out (a hung one is stopped first).
-   `status` names any governor that died without handing back.
+   `status` names any governor that died without handing back. The watchdog acts only on records its own user wrote
+   that no other user can change (run it as the governors' user, or name theirs with `--trust-uid`), and never
+   signals a process number the system has given to another process. Put the switch and the registry in a directory
+   only the governors' user can write (`OMNI_MASTER_OFF`, `OMNI_REGISTRY`); `status` warns when they are not.
 2. It records before it acts (annotations on Kubernetes objects; the `snapshot` line in the GPU audit).
 3. It watches before it writes.
 4. It never acts blind.
@@ -8205,7 +8208,11 @@ reported to its own maintainers.
   every setting back; a dead-man lease hands them back if the governor stops.
 - It runs under least privilege: on Kubernetes, a service account with `kubectl auth can-i` receipts for what it can and
   cannot do (`deploy/kind/rbac-omni.yaml`).
+- The watchdog acts only on registry records its own user wrote that no other user can change, and never signals a
+  process number the system gave to another process (`tools/omni_switch.py`). Put the switch and the registry in a
+  directory only the governors' user can write (`OMNI_MASTER_OFF`, `OMNI_REGISTRY`); `status` warns when they are not.
 - It contains no telemetry and makes no network connection of its own except to the systems an operator points it at.
+- The threats of misuse, the guards against each and what is still open are set out in `docs/THREAT_MODEL.md`.
 - Every release carries a software bill of materials (`sbom/`) and a seal of the engine and its twins (`results/SEAL.json`,
   `python3 verify.py`).
 - The capture script (`fleet/capture/kube_capture.sh`) is read-only; no component writes to a live cluster unless the
