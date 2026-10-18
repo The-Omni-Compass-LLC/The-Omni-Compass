@@ -1,0 +1,60 @@
+# The threat model: who could misuse a governor on top of native, through what, and what stands in the way
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+The safety case (`docs/SAFETY_CASE.md`) asks what happens when the governor is wrong or dies. This page asks what happens
+when someone wants it to do harm. It names what is worth protecting, where trust changes hands, each threat with the guard
+in the code that stands against it and the test that shows the guard holds, and what is still open. It is our own
+analysis: **no outside security review or penetration test has been made**, and nothing here stands in for one.
+
+## 1. What is worth protecting
+
+| Asset | Why it matters |
+|---|---|
+| The settings the governor writes (replicas, the autoscaler's target, a node's idle mark, a CPU limit, a power cap, a database pool) | Whoever controls them controls the service's capacity |
+| The governor's identity on the system (on Kubernetes its service account and token) | It carries every right the governor has |
+| The hand-back: the snapshot of native's settings, the registry of restore commands, the switch file | They put the system back when the governor stops; whoever can write them chooses what "back" means |
+| The engine's code (the 47 fingerprinted files of omni-v11) and the harness that measures it | A changed engine is a different product; a changed harness is a different result |
+| The audit lines and the raw receipts | They are the evidence for every result and every decision |
+| The cloud and GPU credentials (GitHub secrets) | They spend money and create machines |
+
+## 2. Where trust changes hands
+
+1. **The operator and the governor.** The operator starts the governor, grants its rights and sets its bounds. The
+   governor is trusted to act only inside them.
+2. **The governor's host.** The governor, the switch and the watchdog run as processes of one user on one machine (a pod,
+   a runner or a server). Every other local user is outside that boundary.
+3. **The governor and the system it governs.** It reads through the system's API (Kubernetes, `nvidia-smi`, a database's
+   own commands) and writes through the same API with a least-privilege identity. The readings are inputs it does not
+   control.
+4. **The repository and the machines that run it.** Code reaches a run through GitHub: a pushed commit, an action, a
+   Python package. Secrets reach a run only through GitHub's secret store.
+
+## 3. Threats, guards and evidence
+
+| # | Threat | Guard (where it lives) | Evidence | Still open |
+|---|---|---|---|---|
+| T1 | Another local user plants a record in the watchdog's registry, so the watchdog runs that user's command, or stops a process, with its own rights | The watchdog acts only on a record that it and the registry directory are owned by its own user (or root, or a uid named with `--trust-uid`), that is no symbolic link and that no other user can write. Each record is opened inside the directory without following a link and checked on the open file, so nothing can be swapped in between. Any other is refused, named, and left in place (`tools/omni_switch.py`: `trusted_records`, 18 October) | `tests/test_switch_trust.py` (a record anyone can write, a registry anyone can write, a record reached through a link, a record of another user: each refused; each fault reproduced on the tool as it stood) | A member of the governors' own group can still write a record the governors' umask leaves group-writable |
+| T2 | A governor dies, the system gives its process number to another process, and the watchdog takes that process for the governor, hung, and kills it | A process number is taken for the governor's only while the process holding it started before the governor registered (`governor_alive`, from `/proc`); otherwise the governor is gone, nothing is signalled, and its settings are handed back (18 October) | `tests/test_switch_trust.py` (the watchdog as it stood killed the process holding the number; now it hands back and the process lives); `tests/test_master_switch.py` (a hung governor is still stopped and handed back) | Systems without `/proc` keep the old reading |
+| T3 | A link planted at the switch file's path makes `off` overwrite another file | The switch file is opened without following a link; if it cannot be written, every governor is still signalled and the tool says so (`tools/omni_switch.py off`, 18 October) | `tests/test_switch_trust.py` (the file the link points at is left as it was) | — |
+| T4 | Anyone who can write the switch's directory, or a governor's own kill file, turns governing off, or keeps it off | Off is the safe direction: every setting goes back to native's (the kill switch's purpose). `status` warns when the switch's or the registry's directory can be written by another user | `tests/test_switch_trust.py` (the warning) | The default directory is `/tmp/omni-compass`, written in `omnicompass/master.py`, an engine file; until the next engine version moves it, set `OMNI_MASTER_OFF` and `OMNI_REGISTRY` to a directory only the governors' user can write. The cloud install keeps it inside the pod, where every container runs as one user (10001) |
+| T5 | The governor's identity is stolen | Least privilege: on Kubernetes the service account can read nodes, pods, metrics, autoscalers and workloads cluster-wide; patch nodes and evict pods (the eviction API honours disruption budgets); and, in the service's namespace, patch the one named autoscaler and Deployment, pods (their deletion cost and in-place resize) and Jobs, and read one named ConfigMap. It cannot delete an object directly, create a workload or read a Secret (`deploy/kind/rbac-omni.yaml`). Every arm records what the identity can and cannot do (`kubectl auth can-i`, `rbac_omni.txt`) | The receipts in every run folder on the branch `raw` | The rights it has are enough to cordon and drain nodes; whoever holds the token is limited by the role, not by the governor's floors |
+| T6 | Someone feeds the governor false readings (a lying metric, a stalled probe) | A reading with no machine in service holds the decision and writes nothing (omni-v11); a stale reading makes a muscle BLIND (`omnicompass/muscle_sdk.py`); every step is a paired trial on the system itself, refused if its cost rises more than 2% (`tools/knob_verdict.py`, `omnicompass/verdict.py`); every write stays inside the capability and safety contracts | `tests/test_blind_reading.py`, `tests/test_muscle_sdk.py`, `tests/test_knob_verdict.py`; the fault test's blind probe; the extended fault test's frozen API server and missing metrics server (queued) | A false reading that stays consistent and inside the bounds can steer the governor within the room the operator granted |
+| T7 | The engine's code is changed | The engine is fingerprinted: `OMNI_V11.json` names the digest of its 47 files, and `python3 tools/omni_version.py` names the engine a checkout carries, or what differs from every fingerprint. `python3 verify.py` holds every place that names the engine to the engine that stands (`tools/land_engine.py --check`) | `tests/` (the release manifest and the version tool); every run's receipt names the engine its commit carries | Releases are not signed artefacts, the repository's bots commit unsigned, and nothing checks the fingerprint when a governor starts |
+| T8 | A dependency is replaced (a Python package, a GitHub action) | Packages are pinned to exact versions (`requirements-lock.txt`), with a software bill of materials (`sbom/omni-compass.cdx.json`, `sbom/omni-compass.spdx.json`); Dependabot watches both the packages and the actions (`.github/dependabot.yml`) | The lock file and the SBOM in every release | The lock file pins versions, not hashes, and the workflows name actions by tag, not by commit (402 uses, none by commit) |
+| T9 | A secret leaks from a workflow | Secrets reach only workflows started on this repository (a push or a dispatch); no workflow runs on `pull_request_target`, so no fork's code ever runs with them. Secrets are kept in GitHub's store only, and GitHub masks them in every log | Every workflow names its token's rights; the 28 that only build, run and upload get `contents: read` and nothing else (18 October). `tests/test_workflow_permissions.py` fails a push that leaves any workflow on the repository's default, or gives a read-only token to a workflow that pushes, starts a run or reads another run's files | — |
+| T10 | A run spends money it should not | In a cloud, the governor works on the machines alone: it parks a machine the cloud already made and wakes it on a breach, and moves no pod, conveys no processor and caps no power (`OMNI_MACHINES_ONLY=1`). A cloud's set starts only after that cloud's $0 check passes (the key, the login, the plan, the machine type, every quota; `tools/cloud_key_check.py`). Nothing is rented for the grid | `results/live/AKS_BILL.md`; `tests/test_cloud_check.py` | The credentials in the secrets can create clusters; their scope is set in each cloud's console |
+| T11 | The evidence is changed after the run | Every archived run is kept byte for byte on the branch `raw` with its SHA-256 sums (`scripts/raw_archive.sh`); every table names its runs and is rebuilt by its own tool from them | `tests/test_raw_archive.py` | Audit lines are not signed when written; the sums protect them from the moment they are archived |
+| T12 | The system's control plane is taken away (the API server frozen, the metrics server gone) | The governor holds on a reading it cannot make; a failed decision writes nothing; its lease runs 300 s at a 60-second decision, so a short outage does not hand back what is working | The extended fault test (queued, A, B and C: `docs/K8S_COMPASS_PREREGISTRATION.md`) | Whatever the runs read is reported |
+
+## 4. What would close the open rows
+
+- An outside security review and a penetration test of the governor, the switch and the install.
+- In the next engine version, the switch and the registry in a private directory by default, created with no access for
+  any other user (T1, T4).
+- Release artefacts signed, and the fingerprint checked when a governor starts (T7).
+- Hashes in the lock file, and actions named by commit (T8).
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
