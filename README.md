@@ -51,13 +51,13 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v10, fingerprint `4bf39b0d707784de` (47 files); package 0.10.0.
+- **Engine on main:** omni-v11, fingerprint `745aa53ec8eeb67b` (47 files); package 0.11.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- Omni v10 stands on main (18 October): the CityLearn battery wire glides at the speed that cuts the bill most with no LOSS (0.0875 of its range an hour), proven on CityLearn itself and in the toy gate before it was pushed. Every benchmark runs again on it from `scripts/reruns.txt`; until its three runs land, its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on, and twenty-two of them carry omni-v7's three-run tables (`results/live/V7_*.md`). Every level on one page: [`docs/LEVELS.md`](docs/LEVELS.md). See [`docs/OMNI_V10.md`](docs/OMNI_V10.md).
+- Omni v11 stands on main (18 October): the Kubernetes governor reads a moment with no machine in service as blind, never as an overload (found in a real run, where omni-v10 divided by the empty reading), proven in a unit test that reproduces the fault and in the toy gate before it was pushed. Every benchmark runs again on it from `scripts/reruns.txt`; until its three runs land, its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on, and twenty-two of them carry omni-v7's three-run tables (`results/live/V7_*.md`). Every level on one page: [`docs/LEVELS.md`](docs/LEVELS.md). See [`docs/OMNI_V11.md`](docs/OMNI_V11.md).
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -74,24 +74,30 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-18 05:59 | grid | cancelled | [39102291257](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39102291257) |
-| 2026-10-18 05:52 | live-engine | cancelled | [39102031491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39102031491) |
-| 2026-10-18 05:48 | gke-metered burst 2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5 replica room 0 dial save us-central1-a e2-standard-2 | failure | [39101574903](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39101574903) |
-| 2026-10-18 05:48 | eks-metered burst 2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5 replica room 0 dial save us-east-1 m5.large | failure | [39101579099](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39101579099) |
-| 2026-10-18 05:33 | eks-metered burst 1 6 1 8 1 6 replica room 0 dial save us-east-1 m5.large | failure | [39100691172](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39100691172) |
-| 2026-10-18 05:32 | gke-metered burst 1 6 1 8 1 6 replica room 0 dial save us-central1-a e2-standard-2 | failure | [39100686388](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39100686388) |
-| 2026-10-18 05:17 | eks-metered burst 1 4 1 6 1 9 replica room 0 dial save us-east-1 m5.large | failure | [39099802847](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099802847) |
-| 2026-10-18 05:17 | gke-metered burst 1 4 1 6 1 9 replica room 0 dial save us-central1-a e2-standard-2 | failure | [39099797654](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099797654) |
-| 2026-10-18 05:08 | big-organism-detached collect | success | [39099525236](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099525236) |
+| 2026-10-18 14:39 | live-engine | cancelled | [39136960088](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39136960088) |
+| 2026-10-18 14:36 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 1+10 arms native compass split no window 1440 protocol 3 | success | [39127851714](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127851714) |
+| 2026-10-18 14:35 | six-kube x10 orgs spine reps 10+1 arms native compass split no window 960 protocol 3 | success | [39127820479](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127820479) |
+| 2026-10-18 14:30 | ycsb | success | [39125679730](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39125679730) |
+| 2026-10-18 14:28 | six x100 line orgs 6 runs 0+10 | success | [39127843838](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127843838) |
+| 2026-10-18 14:18 | sysbench | success | [39124646462](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39124646462) |
+| 2026-10-18 14:15 | six x1 line orgs 5 runs 10+90 | success | [39130070598](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39130070598) |
+| 2026-10-18 14:14 | six x100 line orgs 2 runs 0+10 | success | [39127828367](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127828367) |
+| 2026-10-18 14:14 | six x1 line orgs 6 runs 10+90 | success | [39130074542](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39130074542) |
+| 2026-10-18 14:13 | six x100 line orgs 4 runs 0+10 | success | [39127835930](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39127835930) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v10 (the max on every muscle, every muscle its own card, quota-aware conveyance, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most)
+## The engine that stands: omni-v11 (the max on every muscle, every muscle its own card, quota-aware conveyance, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held)
 
-The engine on main is **omni-v10** (`OMNI_V10.json`, fingerprint `4bf39b0d707784de`, 47 files; [`docs/OMNI_V10.md`](docs/OMNI_V10.md)), the
-engine that stands since 18 October by the founder's order. It is omni-v9 with the CityLearn battery wire's glide at 0.0875 of its
+The engine on main is **omni-v11** (`OMNI_V11.json`, fingerprint `745aa53ec8eeb67b`, 47 files; [`docs/OMNI_V11.md`](docs/OMNI_V11.md)), the
+engine that stands since 18 October by the founder's order (every fault found is fixed, none set aside). It is omni-v10 with one guard
+in the Kubernetes governor: a reading with no machine in service is blind, so the governor holds, says why in its audit, decides
+nothing from it and writes nothing. In the omni-v10 CruiseKube test every worker of the kind cluster left service for two minutes
+while the service answered every probe; omni-v10 read that as the highest overload and then divided by the empty capacity. A unit
+test reproduces the fault on omni-v10 and passes on omni-v11 (`tests/test_blind_reading.py`); the toy gate is in
+`results/toy_gate/V11_VS_V10.md`. **omni-v10** ([`docs/OMNI_V10.md`](docs/OMNI_V10.md)) set the CityLearn battery wire's glide at 0.0875 of its
 range an hour (omni-v9: 0.0625): the speed that cuts the bill most with no LOSS, read by the one key (a rise in the ramping or in the
 distance from net zero is power held, so power given, never a LOSS). Run on CityLearn itself before it was pushed, it cuts the bill
 8.4% to 20.1% in every district with a price and reads no LOSS against native in any district read before the push; the toy gate reads it identical to
@@ -101,14 +107,14 @@ the day (on omni-v8 the 2022 robustness district's monthly unevenness rose 0.11%
 95% interval exact (Student t), no published reading moved. **omni-v8** ([`docs/OMNI_V8.md`](docs/OMNI_V8.md)) was omni-v7 with one wire changed: on CityLearn a battery whose building
 simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
 of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
-native's numbers to the last digit). The other 45 engine files are omni-v7's bytes: the max on every muscle of the 1,107-muscle catalog,
-every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
+native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
+omni-v11's hold: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v10 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
+omni-v11 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
 **The engine before it, omni-v7** ([`docs/OMNI_V7.md`](docs/OMNI_V7.md), 16 to 17 October), has twenty-two three-run tables of its own
-(`results/live/V7_*.md`), native against Omni-Compass on top; they stand as omni-v7's until omni-v10's land. Twenty-one read no LOSS. The
+(`results/live/V7_*.md`), native against Omni-Compass on top; they stand as omni-v7's until omni-v11's land. Twenty-one read no LOSS. The
 one that did is CityLearn, in the 2023 districts (energy not served and discomfort), fixed in omni-v8 above; its 2022 robustness
 district's monthly unevenness +0.11%, beside the bill −8.6% and the electricity bought −14.7%, is power given by the key, cut in omni-v9. Among them: a service rightsized by Goldilocks, response
 time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs; KEDA's HTTP add-on, −57% to −58% mean,
@@ -301,7 +307,7 @@ the request logs, the Kafka consumer logs) gzipped; read one with `gunzip -c FIL
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **The engine that stands, omni-v10, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V10.md`](docs/OMNI_V10.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The engine that stands, omni-v11, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V11.md`](docs/OMNI_V11.md), [`docs/OMNI_V10.md`](docs/OMNI_V10.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | Every level on one page: the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud, a group of clusters; any level whose gauges go the other way, named | [`docs/LEVELS.md`](docs/LEVELS.md) (`python3 tools/levels.py`) |
