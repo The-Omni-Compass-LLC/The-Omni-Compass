@@ -244,6 +244,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 .kpi .vv b{font-family:var(--f-mono);font-weight:500;font-size:20px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .kpi .vv .n i,.kpi .vv .o i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
 .kpi .vv .n i{background:var(--steel)} .kpi .vv .o i{background:var(--brass)}
+.kpi .vv .n b{color:var(--steel)} .kpi .vv .o b{color:var(--brass)}
 .kpi canvas{height:34px}
 .kpi .rd{font-size:12px;color:var(--muted);min-height:20px}
 .chartbox{position:relative}
@@ -323,7 +324,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 <section class="panel" aria-label="The key: GAIN, EVEN and LOSS" style="border-top:3px solid var(--brass)">
   <h3>The key: GAIN, EVEN and LOSS</h3>
   <p style="max-width:100ch"><b>Two names, two sides, nothing else.</b> <b>Native</b> is the whole system running by itself: every autoscaler, scheduler, firmware, thermostat, orchestrator, sub-governor and controller it ships with, every muscle wired and moving by its own machinery. <b>Omni-Compass</b> always means <b>Omni-Compass on top of native</b>: the same whole system with all of that still running underneath, and Omni-Compass on top of all of it, its brain, nerves, spine, immune system and heart wired into the whole stack through the two-way plug. Nothing else differs, and no third side exists anywhere on this page.</p>
-  <p class="traffic" style="max-width:100ch"><b>The colours read like a traffic light, everywhere on this page.</b> <span class="word w-gain">GAIN</span> is green: go. <span class="word w-even">EVEN</span> is yellow: yield. <span class="word w-loss">LOSS</span> is red: stop. Every reading, in every table, chart, bar and tile, wears one of those three colours and no other. A resource that rose and bought something reads <span class="word w-given">power given</span>, in GAIN's green; one that rose and bought nothing reads <span class="word w-lost">power lost</span>, in LOSS's red. Two more colours name the sides, never a reading: <b style="color:var(--steel)">blue is Native</b> and <b style="color:var(--brass)">amber is Omni-Compass</b>, in every chart where the two run side by side.</p>
+  <p class="traffic" style="max-width:100ch"><b>The colours read like a traffic light, everywhere on this page.</b> <span class="word w-gain">GAIN</span> is green: go. <span class="word w-even">EVEN</span> is yellow: yield. <span class="word w-loss">LOSS</span> is red: stop. Every reading, in every table, chart, bar and tile, wears one of those three colours and no other. A resource that rose and bought something reads <span class="word w-given">power given</span>, in GAIN's green; one that rose and bought nothing reads <span class="word w-lost">power lost</span>, in LOSS's red. Two more colours name the sides, never a reading: <b style="color:var(--steel)">blue is Native</b> and <b style="color:var(--brass)">amber is Omni-Compass</b>. Every line, bar, tile and number that belongs to one side wears that side's colour, in every chart and table; every number that is a reading wears its word's colour. Every chart carries its colour key beneath it.</p>
   <p style="max-width:100ch">Every result on this page is one of three words. The word says which way it went for the work; the number beside it is only the size, never a direction. The word is decided by what the gauge is for, never by the plus or minus sign of its number.</p>
   <div class="keyGrid"><div class="tbl-wrap"><table class="who"><tbody>
     <tr><td><span class="word w-gain">GAIN</span></td><td><b>G</b> Growth (asset appreciation); <b>A</b> Advantage (risk reduction); <b>I</b> Improvement (margin expansion); <b>N</b> Net-positive (profitable outcome)</td><td>the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut</td></tr>
@@ -579,6 +580,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <div class="panel ringbox arm-nat"><div class="ringhead"><h3 class="t-steel big">Native</h3><span id="cNatSub">the HPA with the Cluster Autoscaler</span></div><canvas id="cluN" aria-label="The native cluster: machines and pods"></canvas></div>
     <div class="panel ringbox arm-omni"><div class="ringhead"><h3 class="t-brass big">Omni-Compass</h3><span id="cOmniSub">the controller on top of the HPA</span></div><canvas id="cluO" aria-label="The cluster with Omni-Compass: machines and pods"></canvas></div>
   </div>
+  <div class="legend"><span><i class="" style="background:var(--steel)"></i>Native</span><span><i class="" style="background:var(--brass)"></i>Omni-Compass</span><span><i class="sq" style="background:var(--muted)"></i>machines booting or parked</span><span><i class="sq" style="background:var(--bad)"></i>the response over its line</span></div>
   <div class="panel stack" style="gap:8px">
     <h3>This decision, brain to muscle, as the controller audited it</h3>
     <div class="chain" id="chain">
@@ -630,7 +632,8 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="panel stack chartbox" style="gap:8px">
     <h3>Where the benefit lives, gauge by gauge</h3>
     <p class="note">Every judged row of every newest three-run table (section 4's receipts), sorted into the family of gauge it measures: what a CTO reads (speed, the service level, failures, work), what a CFO reads (machines, energy, the bill), and what a plant engineer reads (peaks and swings, wear and accuracy, misses). Each bar counts the rows that read GAIN in all three runs; the size beside it is the median of those rows' own sizes (the middle of runs A, B and C). Power given and LOSS rows are counted beside them, never hidden.</p>
-    <canvas id="fxFam" aria-label="Stacked bar chart: in each family of gauge, the rows reading GAIN (green), power given (amber) and LOSS (red)"></canvas>
+    <canvas id="fxFam" aria-label="One bar per family of gauge: GAIN to the right in green, LOSS to the left in red, EVEN a yellow mark on zero"></canvas>
+    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN ▶ the family's rows, net, from 0</span><span><i class="sq" style="background:repeating-linear-gradient(135deg,var(--ok) 0 2px,rgba(80,200,120,.35) 2px 5px)"></i>GAIN · power given</span><span><i class="sq" style="background:var(--bad)"></i>◀ LOSS, when the family's LOSS rows outnumber its GAIN rows</span><span><i class="sq" style="background:var(--even)"></i>EVEN ◆ on 0</span><span>one bar per family: rows of the other word are named in its label, never drawn as a second bar</span></div>
     <div class="tbl-wrap"><table class="who" id="fxFamTab"><thead><tr><th>Family of gauge</th><th>Who reads it</th><th>GAIN rows</th><th>Median size of the GAIN rows</th><th>Largest</th><th>Power given</th><th>LOSS</th><th>The runs disagree</th><th>Where</th></tr></thead><tbody></tbody></table></div>
     <div class="opsTip" id="fxTipFam" hidden></div>
   </div>
@@ -735,7 +738,7 @@ section[aria-label^="The key"] h3{font-size:19px}
       <tr><td><b>Organism</b></td><td>sixty muscles in one body, nothing joining them</td><td>the same body, run as one: one state, one brain, one clock</td><td>the whole ring; the seven organisms of the runners</td></tr>
     </tbody></table></div>
   </div>
-  <div class="panel"><canvas id="swarm" aria-label="Each body part's muscles on the band, native above and Omni-Compass below"></canvas></div>
+  <div class="panel stack" style="gap:8px"><canvas id="swarm" aria-label="Each body part's muscles on the band, native above and Omni-Compass below"></canvas><div class="legend"><span><i class="" style="background:var(--steel)"></i>Native, the upper row of each part</span><span><i class="" style="background:var(--brass)"></i>Omni-Compass, the lower row</span><span><i class="sq" style="background:var(--even)"></i>the cushion near a wall (yield)</span><span><i class="sq" style="background:var(--bad)"></i>the line (stop)</span></div></div>
 </section>
 
 <section class="stack" id="s-lab" aria-label="The tensor lab and the AI analyst">
@@ -766,6 +769,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <div class="panel stack chartbox" style="gap:8px">
       <h3>The body's principal motions (the tensor's eigen-decomposition)</h3>
       <canvas id="tModes" aria-label="Bar chart of the share of the body's motion carried by each principal mode, native and Omni-Compass, and the first mode's time course"></canvas>
+      <div class="legend"><span><i class="" style="background:var(--steel)"></i>Native</span><span><i class="" style="background:var(--brass)"></i>Omni-Compass</span></div>
       <p class="note" id="tModesNote">—</p>
       <div class="opsTip" id="tTipModes" hidden></div>
     </div>
@@ -863,6 +867,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <div class="panel mcard stack" style="gap:10px" id="mcard">
       <div><div class="name" id="mName">—</div><div class="sub" id="mSub">—</div></div>
       <canvas id="band" height="86" aria-label="The followed muscle's compass band"></canvas>
+      <div class="legend"><span><i class="" style="background:var(--steel)"></i>Native's lever</span><span><i class="" style="background:var(--brass)"></i>Omni-Compass's lever</span><span><i class="sq" style="background:var(--even)"></i>the 5% cushions (yield)</span><span><i class="sq" style="background:var(--bad)"></i>the walls (stop)</span></div>
       <div class="kv">
         <div><span id="kv0">force F</span><b id="mF">—</b></div>
         <div><span id="kv1">lever, native</span><b id="mLn" style="color:var(--steel)">—</b></div>
@@ -908,6 +913,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <div class="panel stack" style="gap:6px"><h3>S in its potential Φ · eqs. (5)–(6)</h3><canvas id="cvS" aria-label="Stress S in its cubic potential"></canvas><p class="note">Φ(S) = α_s S²/2 + β_s S³/4 − δS. S rolls to S*; the senses pull it back each decision.</p></div>
     <div class="panel stack" style="gap:6px"><h3>The bath B · eq. (7)</h3><canvas id="cvB" aria-label="The bath oscillator B over the last decisions"></canvas><p class="note">B̈ = γ_c δ S − (ω_B/Q_B) Ḃ − ω_B² B. The slow tide of physical load.</p></div>
   </div>
+  <div class="legend"><span><i class="" style="background:var(--brass)"></i>Omni-Compass's live value, the ball</span><span><i class="" style="background:var(--muted)"></i>the potential it rolls in</span><span>Native has no brain state: nothing to draw</span></div>
   <div class="panel stack">
     <h3>The nerves: four scalars multiply into calm</h3>
     <p class="note">Native has no nerves: nothing grants or refuses a controller, and a blind sense or a security hold changes nothing it does.</p>
@@ -936,12 +942,14 @@ section[aria-label^="The key"] h3{font-size:19px}
       <div class="sl"><label for="vN">Pieces of work measured each side</label><input id="vN" type="range" min="30" max="200" step="10" value="200"><output id="vNO">200</output></div>
       <div class="row"><button id="vOne">Run one trial</button><button id="vMany">Run 300 trials</button><span class="note">a new trial starts on its own every few seconds</span></div>
       <canvas id="cvV" aria-label="One trial: reference and trial costs, and the 95% interval of the change"></canvas>
+      <div class="legend"><span><i class="" style="background:var(--steel)"></i>the reference, the knob at native</span><span><i class="" style="background:var(--brass)"></i>the trial, Omni-Compass one step out</span><span><i class="sq" style="background:rgba(80,200,120,.3)"></i>inside the allowance</span><span><i class="sq" style="background:var(--ok)"></i>interval left of 0: GAIN</span><span><i class="sq" style="background:var(--bad)"></i>interval right of 0: LOSS</span></div>
     </div>
     <div class="panel stack">
       <div class="row" style="justify-content:space-between;align-items:baseline"><h3>This trial</h3><span class="stamp" id="vStamp">—</span></div>
       <p class="mono" id="vLine" style="font-size:13px">—</p>
       <h3 style="margin-top:6px">Over many trials at this cost</h3>
       <canvas id="cvV2" aria-label="Share of trials allowed, medians alone against the omni-v11 rule"></canvas>
+      <div class="legend"><span><i class="sq" style="background:var(--muted)"></i>a rule of medians alone, for comparison</span><span><i class="sq" style="background:var(--brass)"></i>Omni-Compass's rule, the one it runs</span></div>
       <p class="note"><b>Native:</b> its knob never moves past its own setting, so there is no trial and nothing to judge; every step Omni-Compass takes past native has to pass this test first. The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v11 (the rule first written in omni-v7) also refuses any step whose interval sits wholly above zero, measures on while the interval is wider than the allowance (up to three times the pieces measured each side), and keeps a step only if both estimates are inside the allowance. Ported from <code>omnicompass/verdict.py</code>; the costs are modelled (class S).</p>
       <p class="note"><b>How each muscle wires it.</b> The Kubernetes controller measures 200 requests each side against a 2% allowance (<code>omni_controller/controller.py --verdict-samples 200 --allow 0.02</code>), the cost being each request's response time. The noise is measured on the real runs of the omni-v7 tables (<code>latency.csv</code>, the spread of the log of the response time over windows of 200 requests): about σ 0.05 on the Google 2011 day, about σ 0.25 with the load swinging 1 to 8 (the all-four run). The GPU card measures 30 requests (<code>gpu_compass.py --verdict-samples 30</code>); in its model the card's own time per request carries no noise. The toy gate measures 60 (<code>tools/toy_gate.py</code>, σ 0.25). <b>What the rule does there:</b> on a steady day a step whose true cost is LOSS 3% is refused every time, and one at LOSS 1% half the time; with the load swinging, a step at LOSS 3% still passes about a quarter of the time and one at LOSS 5% about one time in twenty; with no noise any LOSS it can read is refused, even 0.1%. Above the verdict the max never goes below native at all, so in the default it never runs (section 3c: no trial on top of the HPA).</p>
     </div>
@@ -1453,6 +1461,11 @@ function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yello
   g.textAlign = "left"; for (const p of parts) { if (!p) continue; g.fillStyle = wordCol(p) || base; g.fillText(p, cx, y); cx += g.measureText(p).width; }
   g.fillStyle = base; g.textAlign = al; }
 const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT"]);
+function armCols(t) {   // a table's Native column wears native's blue, its Omni-Compass column Omni-Compass's amber
+  if (!t || t.nodeName !== "TABLE" || !t.tHead) return; const hs = [...t.tHead.querySelectorAll("th")], idx = {};
+  hs.forEach((th, i) => { const x = th.textContent.trim(); if (/^native\b|[,:] native$/i.test(x)) idx[i] = "nat"; else if (/^omni-compass\b|[,:] omni-compass$/i.test(x)) idx[i] = "omni"; });
+  if (!Object.keys(idx).length) return; for (const tr of t.tBodies[0] ? t.tBodies[0].rows : []) [...tr.cells].forEach((c, i) => { if (idx[i] && !c.classList.contains(idx[i])) c.classList.add(idx[i]); }); }
+function paintArms(root) { const el = root.nodeType === 1 ? root : root.parentNode; if (!el) return; const t = el.closest && el.closest("table"); if (t) armCols(t); else if (el.querySelectorAll) el.querySelectorAll("table").forEach(armCols); }
 function paintWords(root) {   // every GAIN, EVEN and LOSS in the page's text wears its traffic-light colour, the ones written later included
   if (!root || root.nodeType === 3 && !root.parentNode) return;
   const start = root.nodeType === 3 ? root.parentNode : root;
@@ -1470,7 +1483,7 @@ function paintWords(root) {   // every GAIN, EVEN and LOSS in the page's text we
     if (last < t.length) f.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(f, n); } }
 const WORD_Q = new Set(); let wordRaf = 0;
 const WORD_WATCH = new MutationObserver(ms => { for (const m of ms) { if (m.type === "characterData") WORD_Q.add(m.target); else m.addedNodes.forEach(n => WORD_Q.add(n)); }
-  if (!wordRaf) wordRaf = requestAnimationFrame(() => { wordRaf = 0; const q = [...WORD_Q]; WORD_Q.clear(); q.forEach(n => { if (n.isConnected) paintWords(n); }); }); });
+  if (!wordRaf) wordRaf = requestAnimationFrame(() => { wordRaf = 0; const q = [...WORD_Q]; WORD_Q.clear(); q.forEach(n => { if (n.isConnected) { paintWords(n); paintArms(n); } }); }); });
 const posColor = (p) => p >= 1 ? css.bad : (p >= 0.95 || p <= 0.05) ? css.warn : css.ok;
 const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 
@@ -1852,7 +1865,7 @@ function drawVerdict() {
 }
 function drawVerdict2() {
   const cv = document.getElementById("cvV2"); const {g, w, h} = fit(cv, 0.42); g.clearRect(0, 0, w, h);
-  const ml = 130, mr = 50; const bars = V.stats ? [["medians alone", V.stats.m, css.steel], ["omni-v11, in words", V.stats.v, css.brass]] : [];
+  const ml = 130, mr = 50; const bars = V.stats ? [["medians alone", V.stats.m, css.muted], ["omni-v11, in words", V.stats.v, css.brass]] : [];
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
   if (!bars.length) { g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("Press “Run 300 trials” to see the share allowed.", 0, h/2); return; }
   bars.forEach(([t, v, col], k) => { const y = 20 + k*((h - 40)/2) + (h - 40)/4; g.fillStyle = css.muted; g.textAlign = "left"; g.fillText(t, 0, y);
@@ -3226,21 +3239,24 @@ function famRows() { const by = {}; SC.receipts.forEach(r => r.rows.forEach(x =>
     if (x.w === "GAIN") { const z = sizeOf(x.abc); if (z !== null) o.gain.push(z); else o.gain.push(0); } else if (x.w === "power given") o.given++; else if (x.w === "LOSS") o.loss++; else if (/disagree/.test(x.w)) o.dis++; o.where.add(r.title.split(":")[0]); }));
   return FAM.map(f => f[0]).concat(["other"]).filter(k => by[k]).map(k => { const o = by[k], g = o.gain.slice().sort((a, b) => a - b), d = FAM.find(f => f[0] === k);
     return {k, what: d ? d[1] : "everything else", who: d ? d[2] : "—", n: g.length, med: g.length ? g[g.length >> 1] : null, max: g.length ? g[g.length - 1] : null, given: o.given, loss: o.loss, dis: o.dis, where: [...o.where]}; }); }
-function drawFam() {   // per family: GAIN rows to the right in green (power given hatched green beside them), LOSS rows to the left in red
+function drawFam() {   // one family, one bar: its net reading picks the side (GAIN right in green, LOSS left in red, EVEN a yellow mark); rows of the other word are named in its label
   const cv = $("fxFam"); if (!cv) return; const F = famRows(), rowH = 30, hh = F.length*rowH + 30; cv.style.height = hh + "px"; const {g, w, h} = fit(cv, hh/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
-  const ml = Math.min(170, w*0.3), mr = Math.min(470, w*0.5), pw = w - ml - mr, hiL = Math.max(1, ...F.map(f => f.loss)), hiR = Math.max(1, ...F.map(f => f.n + f.given)), z = ml + pw*hiL/(hiL + hiR);
-  const XR = v => z + v/hiR*(w - mr - z), XL = v => z - v/hiL*(z - ml); FXW.famGeo = {rowH, top: 4, N: F.length};
+  const net = f => f.n + f.given - f.loss, ml = Math.min(170, w*0.3), mr = Math.min(470, w*0.5), pw = w - ml - mr;
+  const hiL = Math.max(1, ...F.filter(f => net(f) < 0).map(f => f.loss)), hiR = Math.max(1, ...F.filter(f => net(f) > 0).map(f => f.n + f.given)), anyL = F.some(f => net(f) < 0);
+  const z = ml + (anyL ? pw*hiL/(hiL + hiR) : 0.04*pw), XR = v => z + v/hiR*(w - mr - z), XL = v => z - v/hiL*(z - ml); FXW.famGeo = {rowH, top: 4, N: F.length};
   const hatch = (() => { const c = document.createElement("canvas"); c.width = c.height = 8; const q = c.getContext("2d"); q.fillStyle = alpha(css.ok, 0.35); q.fillRect(0, 0, 8, 8); q.strokeStyle = css.ok; q.lineWidth = 2; q.beginPath(); q.moveTo(0, 8); q.lineTo(8, 0); q.stroke(); return g.createPattern(c, "repeat"); })();
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
   g.strokeStyle = css.ink; g.beginPath(); g.moveTo(z, 2); g.lineTo(z, h - 22); g.stroke();
-  F.forEach((f, j) => { const y = 4 + j*rowH; if (FXW.famHov === j) { g.fillStyle = alpha(css.ink, 0.05); g.fillRect(0, y, w, rowH); }
+  F.forEach((f, j) => { const y = 4 + j*rowH, d = net(f); if (FXW.famHov === j) { g.fillStyle = alpha(css.ink, 0.05); g.fillRect(0, y, w, rowH); }
     g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(f.k, ml - 8, y + rowH/2);
-    if (f.n) { g.fillStyle = css.ok; g.fillRect(z + 1, y + 6, Math.max(2, XR(f.n) - z - 1), rowH - 12); }
-    if (f.given) { g.fillStyle = hatch; g.fillRect(XR(f.n) + 1, y + 6, Math.max(2, XR(f.n + f.given) - XR(f.n) - 1), rowH - 12); }
-    if (f.loss) { g.fillStyle = css.bad; g.fillRect(XL(f.loss), y + 6, Math.max(2, z - XL(f.loss) - 1), rowH - 12); }
-    if (!f.n && !f.given && !f.loss) { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); }
-    g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, `${f.n} GAIN${f.med !== null ? " (median " + f.med + "%)" : ""} · ${f.given} GAIN · power given · ${f.loss} LOSS`, XR(f.n + f.given) + 8, y + rowH/2); });
-  g.fillStyle = css.muted; g.textAlign = "left"; fillWords(g, "rows in all three runs, from 0: green GAIN ▶ · hatched green GAIN · power given ▶ · ◀ red LOSS", ml, h - 10);
+    let tx = z + 10, label;
+    if (d > 0) { if (f.n) { g.fillStyle = css.ok; g.fillRect(z + 1, y + 6, Math.max(2, XR(f.n) - z - 1), rowH - 12); } if (f.given) { g.fillStyle = hatch; g.fillRect(XR(f.n) + 1, y + 6, Math.max(2, XR(f.n + f.given) - XR(f.n) - 1), rowH - 12); }
+      tx = XR(f.n + f.given) + 8; label = `GAIN · ${f.n} rows${f.med !== null ? " (median " + f.med + "%)" : ""}${f.given ? ` + ${f.given} GAIN · power given` : ""}${f.loss ? ` · ${f.loss} LOSS rows inside` : ""}`; }
+    else if (d < 0) { g.fillStyle = css.bad; g.fillRect(XL(f.loss), y + 6, Math.max(2, z - XL(f.loss) - 1), rowH - 12);
+      label = `LOSS · ${f.loss} rows${f.n + f.given ? ` · ${f.n + f.given} GAIN rows inside` : ""}`; }
+    else { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); label = f.n || f.loss ? `EVEN · ${f.n} GAIN and ${f.loss} LOSS rows balance` : "EVEN · no row moved"; }
+    g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, label, tx, y + rowH/2); });
+  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("judged rows in all three runs, counted from the 0 line", ml, h - 10);
 }
 function tally() {   // one number for the whole board: one vote per category, the Omni index's own rule
   const all = fxAll(), landed = all.filter(r => r.pct !== null && /landed/.test(r.status) && r.dom !== "The headline"), gm = xs => xs.length ? Math.exp(xs.reduce((a, x) => a + Math.log(1 + x/100), 0)/xs.length) - 1 : null;
@@ -3311,7 +3327,7 @@ buildOrgans(); vLabels(); newDay(W.seed);
 document.getElementById("vMany").click();
 setBody("harness", "alone");   // open on the engine's own harness, each muscle alone, 120 frames into run A
 setCtl("selfpilot", 0); for (let k = 0; k < 120; k++) stepCtl(); updateCScore();
-requestAnimationFrame(() => { paintWords(document.body); WORD_WATCH.observe(document.body, {childList: true, subtree: true, characterData: true}); });
+requestAnimationFrame(() => { paintWords(document.body); paintArms(document.body); WORD_WATCH.observe(document.body, {childList: true, subtree: true, characterData: true}); });
 ["score", "cScore", "sScore", "ruTab", "selfTab", "cardTab"].forEach(id => { const t = $(id) && $(id).querySelector("tbody"); if (t) LOST_WATCH.observe(t, {childList: true}); });
 buildInfo(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); buildFleet(); buildSelf(); buildPlaces(); buildCard(); buildFamTable(); tally(); buildRegister(); setRuns(0, 0, 0); updateScan(); setInterval(updateScan, 1000);
 drawVerdict2();
