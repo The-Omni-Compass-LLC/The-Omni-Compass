@@ -119,7 +119,6 @@ class Sums:
 def serial(r):
     """The run's whole serial number: the full commit it ran (git), and the full SHA-256 fingerprint of the engine that
     commit carries (OMNI_V<n>.json), so anyone can rerun the same engine on the same commit and check every file."""
-    import re, subprocess
     out = {}
     c = str(r.get("commit") or "")
     if re.fullmatch(r"[0-9a-f]{7,40}", c):
@@ -128,7 +127,7 @@ def serial(r):
             if re.fullmatch(r"[0-9a-f]{40}", full):
                 out["commit_full"] = full
         except (OSError, subprocess.SubprocessError):
-            pass
+            pass                                          # no git here: the short commit the table names stands alone
     m = re.match(r"omni-v(\d+)", str(r.get("engine") or ""))
     f = ROOT / f"OMNI_V{m.group(1)}.json" if m else None
     if f and f.exists():
