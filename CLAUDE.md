@@ -466,6 +466,8 @@ the founder overrides one in the conversation.
   every clone had timed out on 36 GB). `scripts/raw_archive.sh open /run-<id>/` places a run at `results/live/raw/run-<id>/`
   (the path every table names); every workflow that archives raw files saves through `scripts/raw_archive.sh save`, and
   `raw-sweep.yml` moves any raw folder that still lands on main. `raw` is never merged with main, nor main into it.
+  The stale work branches of 27 September to 15 October are kept whole on `archive/stale-branches` (one commit whose
+  parents are their tips); their names may be removed without losing a commit.
 - Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. Clear
   `/tmp/tmp*` first, because test leftovers fill the disk. Keep the Python 3.12 environment outside `/tmp` (for example
   `/root/v312`), because a container reset wipes `/tmp`. After a push, check the GitHub verify run itself, not only the
