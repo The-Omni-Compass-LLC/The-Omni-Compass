@@ -22,7 +22,7 @@ env:
   KAFKA_VERSION: "3.9.1"
 jobs:
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs: {workloads: "${{ steps.w.outputs.workloads }}"}
     steps:
       - name: Legal notice at the top of this job's report
@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix: {workload: "${{ fromJSON(needs.plan.outputs.workloads) }}"}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150
     steps:
       - name: Legal notice at the top of this job's report
@@ -171,7 +171,7 @@ jobs:
   report:
     needs: run
     if: always() && needs.run.result != 'skipped'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
