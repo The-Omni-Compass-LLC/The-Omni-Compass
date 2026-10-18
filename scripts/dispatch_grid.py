@@ -28,6 +28,7 @@ nears GitHub's six-hour limit; each shard also stops starting runs at its deadli
 from __future__ import annotations
 
 import argparse
+import calendar
 import contextlib
 import hashlib
 import json
@@ -120,6 +121,15 @@ AZURE_WF = "aks-metered.yml"
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
           ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
           ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"))
+# Google Cloud and Amazon start a set only after their $0 check passed (.github/workflows/cloud-check.yml: the login, the
+# key's shape, the machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's
+# Free plan failed every set started there at the login, each using up its A or B). The conductor starts a check itself when the
+# cloud has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder
+# stores is so taken up within the hour, and a cloud that cannot rent never uses up a set. Azure's sets carry their own.
+CHECK_WF = "cloud-check.yml"
+CHECKS = {"Google Cloud": "google", "Amazon": "amazon"}
+CHECK_FRESH_H = 24
+CHECK_RETRY_MIN = 60
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
          "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
 
@@ -607,6 +617,31 @@ def cloud_switch(path):
     return True
 
 
+def check_state(runs, cloud, now=None):
+    """Whether a cloud's sets may start, from cloud-check.yml's runs (any order): ("go" | "wait" | "check", why). "go": its
+    newest check passed within CHECK_FRESH_H; "wait": a check runs, or the last failed under CHECK_RETRY_MIN ago; "check":
+    start one (none yet, the last failed or was cancelled long enough ago, or the last pass is stale). Only the cloud's own
+    title counts (cloud-check google | cloud-check amazon); a check of both, started by hand, is read by neither."""
+    title = f"{CHECK_WF[:-4]} {CHECKS[cloud]}"
+    mine = sorted((r for r in runs if (r.get("display_title") or "") == title), key=lambda r: r.get("created_at") or "")
+    if not mine:
+        return "check", "no $0 check yet"
+    r = mine[-1]
+    now = now or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    age = (calendar.timegm(time.strptime(now, "%Y-%m-%dT%H:%M:%SZ"))
+           - calendar.timegm(time.strptime(r.get("created_at") or now, "%Y-%m-%dT%H:%M:%SZ"))) / 60
+    link = r.get("html_url") or f"run {r.get('id')}"
+    if r.get("status") in ACTIVE:
+        return "wait", f"its $0 check runs ({link})"
+    if r.get("conclusion") == "success":
+        if age < CHECK_FRESH_H * 60:
+            return "go", f"its $0 check passed {age:.0f} minutes ago"
+        return "check", f"its last $0 check passed over {CHECK_FRESH_H} hours ago"
+    if age < CHECK_RETRY_MIN:
+        return "wait", f"its $0 check failed {age:.0f} minutes ago ({link}); checked again after {CHECK_RETRY_MIN} minutes"
+    return "check", f"its last $0 check did not pass ({link})"
+
+
 def azure_group(title):
     """A run's line at GitHub: its concurrency group's region or zone, the second-to-last word of its title (the machine size
     is not part of the group: two sizes in one region share one line)."""
@@ -841,6 +876,17 @@ def main(argv=None):
                 rerun_counts = reruns_started(rq)
             left = reruns_to_start(family_reruns, rerun_counts or {}) if family_reruns else []
             nxt = cloud_next(queue, azure_runs(wf)[0], left)
+            if nxt and cloud in CHECKS:
+                # Google and Amazon: a set starts only once the cloud's $0 check passed (CHECK_WF)
+                checks = api(f"repos/{REPO}/actions/workflows/{CHECK_WF}/runs?event=workflow_dispatch&per_page=30")
+                state, why = check_state(checks.get("workflow_runs", []), cloud)
+                if state == "check" and not a.dry:
+                    api(f"repos/{REPO}/actions/workflows/{CHECK_WF}/dispatches", method="POST",
+                        data={"ref": a.ref, "inputs": {"cloud": CHECKS[cloud]}})
+                if state != "go":
+                    azure.append(f"{cloud}: {why}; no set started there until it passes"
+                                 + ("; a new check started" if state == "check" else ""))
+                    continue
             if nxt:
                 run_wf, run, name, kv = nxt
                 if not a.dry:
@@ -891,7 +937,7 @@ def main(argv=None):
         for r in reruns:
             print(f"- rerun started on the engine that stands: {r}", file=out)
         for x in azure:
-            print(f"- Azure set started: {x}", file=out)
+            print(f"- the clouds: {x}", file=out)
     return 0
 
 
