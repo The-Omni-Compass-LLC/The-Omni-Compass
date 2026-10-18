@@ -207,7 +207,24 @@ def fleet() -> dict:
             disp = len(json.loads(stand.read_text(encoding="utf-8")).get("dispatches", []))
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
     out["register"] = register_places()
+    out["card"] = card_record()
     return _clean(out)
+
+
+def card_record():
+    """The newest real card run in the repository (results/gpu/run-*/GPU_REPS.json, metered by the card itself, class P):
+    its card, its date, its repetitions, the controller commit it froze, and every gauge's paired difference with its 95%
+    interval, as the run's own file holds them."""
+    runs = sorted((ROOT / "results" / "gpu").glob("run-*/GPU_REPS.json"))
+    if not runs:
+        return None
+    d = json.loads(runs[-1].read_text(encoding="utf-8"))
+    rc, fr = d.get("receipt", {}), d.get("freeze", {})
+    rows = [{"g": g, "n": v.get("native"), "o": v.get("omni"), "lo": (v.get("ci95") or [None, None])[0], "hi": (v.get("ci95") or [None, None])[1]}
+            for g, v in (d.get("paired", {}).get("omni") or {}).items() if isinstance(v, dict)]
+    stamp = runs[-1].parent.name.replace("run-", "")
+    return {"file": str(runs[-1].relative_to(ROOT)), "card": rc.get("gpu_name"), "reps": rc.get("reps"), "seconds": rc.get("duration_s"),
+            "limit_w": rc.get("power_limit_default_w"), "commit": (fr.get("commit") or "")[:12], "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows}
 
 
 def register_places() -> list:
