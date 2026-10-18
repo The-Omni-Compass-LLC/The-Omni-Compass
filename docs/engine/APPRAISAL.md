@@ -38,7 +38,7 @@ that names another engine than `tools/omni_version.py` reads.
 | Section 3, a GPU card | `realms/gpu_card.py` (omni-v9 fingerprint, the same bytes as omni-v7's), native and Omni-Compass on top, the card as shipped and under an operator's cap, AI and compute-bound work | `realms/gpu_card.run` untouched, every arm, seeds 5100, 5101 and 5102 | the run's own result identical; every second's energy and requests add up to it | `docs/engine/check_records.py` |
 | Section 3, Linux, one host | `tools/toy_gate.py`'s conveyance model, the shipped `Muscles.convey` and `quota.py` on the CFS quota | `tools/toy_gate.py worker_convey` untouched, seeds 3000, 3001 and 3002 | its own result line identical; requests and the host's busy share add up to it | `docs/engine/check_records.py` |
 | Section 3, every muscle on omni-v8 | the realms runner's own table of 1,107 muscles and seven organisms, native and the max | `results/realms_v5/REALMS_V5.json` (omni-v8, commit 9819a903c, seeds 3000 to 3009), read by `docs/engine/export_scenarios.py` | 527 GAIN, 159 the same as native, 421 at their limit on native, 0 LOSS; all seven organisms GAIN under all three loads | `docs/engine/export_scenarios.py` |
-| Section 3, the receipts | every judged row of the 22 omni-v7 receipts in `results/live/V7_*.md` | the receipts themselves, read row by row by `docs/engine/export_scenarios.py` | 210 GAIN, 38 power given, 509 EVEN, 25 LOSS, 11 the runs disagree | `docs/engine/export_scenarios.py` |
+| Section 3, the receipts | every judged row of the 22 omni-v7 receipts in `results/live/V7_*.md` | the receipts themselves, read row by row by `docs/engine/export_scenarios.py` | 210 GAIN, 50 power given, 509 EVEN, 13 LOSS, 11 the runs disagree | `docs/engine/export_scenarios.py` |
 
 ## Grades
 
@@ -68,7 +68,7 @@ that names another engine than `tools/omni_version.py` reads.
 | Linux, one host (the CFS-quota conveyance model) | requests served +64%; response time −53% mean and at the 95th percentile | alert minutes | host CPU +31%, limits +167%, pods +18%; **pod start wait +6% to +8%, LOSS** (the model's: a busier host starts pods slower; EVEN on real Kubernetes) |
 | Every muscle of the catalog on omni-v8, each alone (realms runner) | 527 muscles (493 faster, 409 fewer misses, 33 more work) | 159 the same as native, 421 at their limit on native | **0 LOSS** under any load |
 | The seven organisms on omni-v8 (realms runner) | all seven under all three loads: misses −1.1% to −8.8%; on the climb five also more work | work | energy +0.000% to +0.05% |
-| The 22 receipts of the omni-v7 tables (classes L and S) | 210 rows | 509 rows | 38 rows; **25 rows LOSS, all CityLearn** (7 small challenge districts: energy not served +2% to +10%, the hour-to-hour swings, discomfort, the highest peak); 11 rows where the runs disagree (drone swarms 9, Redis 1, MySQL 1) |
+| The 22 receipts of the omni-v7 tables (classes L and S) | 210 rows | 509 rows | 50 rows (CityLearn's peaks, swings and unevenness among them, read as power given under the one key of 17 October); **13 rows LOSS, all CityLearn** (the 2023 small challenge districts, the only ones that simulate outages: the energy not served and the time uncomfortable); 11 rows where the runs disagree (drone swarms 9, Redis 1, MySQL 1) |
 | Real Kubernetes, omni-v7 (class L, `docs/OMNI_V7.md`) | response time −52% to −75% at the 95th percentile on Goldilocks and KEDA; KEDA HTTP replicas −15% to −19% | machines, failed requests, pod start wait; CruiseKube and fixed capacity on every gauge | parked-worker energy +1.1% to +2.3% |
 
 ## Material findings for the owner
@@ -97,8 +97,9 @@ that names another engine than `tools/omni_version.py` reads.
    noise; it opened at 30 requests and σ 0.25 before, which read the engine weaker than it is wired. Any change to the
    rule is the next engine version, the owner's to order.
 6. **CityLearn carries the only LOSS rows of the omni-v7 tables; omni-v8 and omni-v9 are its repair (outage buildings' batteries left native; the wire reads the coming hour), proven in our own CityLearn runs, their three runs on GitHub queued.** In 7 of its 10 battery districts (the small challenge districts)
-   energy not served rises 2% to 10%, with more hour-to-hour swing and discomfort; the 17-building district reads one
-   LOSS (monthly unevenness), and the two 100-building districts read no LOSS (GAIN on 7 and 6 of their 11 scores, the
+   the energy not served and the time uncomfortable read LOSS (13 rows, the 2023 districts, the only ones that simulate
+   outages); their hour-to-hour swings, peaks and unevenness read power given under the one key of 17 October (power held,
+   as a cluster's peak power is), and the two 100-building districts read no LOSS (GAIN on 7 and 6 of their 11 scores, the
    rest EVEN). Under the founder's order a LOSS is root-caused, fixed and rerun.
 7. **The Linux model's pod start wait reads LOSS** (+6% to +8%, +8.8% in `results/toy_gate/TOY_GATE.md` over ten seeds):
    the raised limits keep the host busier and its start time is fitted to rise with the busy share. The two repairs
