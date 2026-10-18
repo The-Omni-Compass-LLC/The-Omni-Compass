@@ -30,6 +30,7 @@ its operator set, and can be switched off by one human action, everywhere at onc
 | H10 | It expands while a security hold is on | The shield: no expansion during a security hold (invariant I1), with a C++ twin checked against the Python (`omnicompass/shield.py`, `cpp/`) | `tests/test_shield_properties.py`, `tests/test_cpp_shield_parity.py`, `tests/test_cpp_shield_adversarial.py` |
 | H11 | In the cloud, it raises the bill | Machines alone (`--give-back-only`): no pod autoscaler moved, no processor conveyed, no power capped. It only parks a machine the cloud already made, after its own trial, and wakes it on a breach (`scripts/kind_bench.sh`, `OMNI_MACHINES_ONLY=1`) | Azure: no difference in the bill on the engine of 13 October (`results/live/AKS_BILL.md`); omni-v11's Azure sets are running. Google and Amazon: **undetermined**, not yet run. |
 | H12 | A test machine's limit is reported as the governor's effect | Paired arms on the same runner, rotated order, the refusal rules for an unhealthy window, and the kind rig's image pre-puller (`docs/POD_START_WAIT.md`). `tools/confirm_abc.py` marks any table whose runs differ in engine or rig | `tests/test_confirm_abc.py`, `tests/test_pod_phases.py`, `tests/test_release_campaign.py` |
+| H13 | The hand-back itself is turned against the system: a record another local user planted makes the watchdog run a command or stop a process, or a governor's pid given to another process gets that process stopped | The watchdog acts only on records of its own user that no other user can write, read without following a link; a pid counts as the governor's only while its process started before the governor registered (`tools/omni_switch.py`, 18 October). Every threat of misuse is set out in `docs/THREAT_MODEL.md` | `tests/test_switch_trust.py` (each fault reproduced on the tool as it stood, gone on the fix) |
 
 ## 3. The plug, as the code defines it
 
@@ -53,7 +54,7 @@ bounded, the value the system holds and the difference between the last two (`Mu
 
 ## 4. What this case does not yet cover
 
-- **No outside security review or penetration test.** H2, H9 and H10 rest on our own tests.
+- **No outside security review or penetration test.** H2, H9, H10 and H13 rest on our own tests; the threats still open are listed in `docs/THREAT_MODEL.md`, section 3.
 - **No formal proof of the whole controller.** The theorems in `docs/TRACKING_THEOREM.md` hold for the compass law's
   channel; global stability of the full six-state system is open (`docs/FORMAL_STATUS.md`).
 - **No production deployment.** Every hazard above is exercised on our own rigs (kind on GitHub runners, Azure's managed
