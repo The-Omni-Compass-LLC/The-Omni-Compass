@@ -436,7 +436,7 @@ def main(check=False):
         ("V3_ROBUST_KILL.json", "Robustness: the governor killed outright mid-run", "the whole window, a kill and a restart inside it; p95, machines, energy"),
         ("V7_ROBUST_LONG.json", "Robustness: the two-hour run", "the two-hour window; p95, machines, energy"),
     ]:
-        r = from_abc_table(fname, name, what)
+        r = from_abc_table(newest_table(fname), name, what)
         if r:
             rows.append(r)
     for fname, name, titles, what, *left in [
@@ -445,7 +445,7 @@ def main(check=False):
         ("V7_CITYLEARN.md", "Buildings and batteries (CityLearn), the districts with batteries", {"Districts with electric batteries": ""}, "every CityLearn score of every district, then the districts together"),
         ("V7_SWARM.md", "Drone swarms, the three untouched cells", {"Cells where Omni moved the cruise": ""}, "every judged gauge of every cell"),
     ]:
-        r = from_sim(fname, name, titles, what, left[0] if left else None)
+        r = from_sim(newest_table(fname), name, titles, what, left[0] if left else None)
         if r:
             rows.append(r)
     for fname, name, what in [
