@@ -97,6 +97,9 @@ class Sums:
         return data
 
 
+HIST_MS = [50, 100, 200, 300, 500, 1000, 2000]                     # the heatmap's bucket edges (ms); 500 ms is the line
+
+
 def pct(xs, q):
     if not xs:
         return None
@@ -151,13 +154,26 @@ def arm_k8s(s: Sums, rel: str, omni: bool, slo: float = 500.0) -> dict:
                 t, ms, ok = float(r["elapsed_seconds"]), float(r["latency_ms"]), r.get("ok", "1") == "1"
             except (KeyError, ValueError):
                 continue
-            b = bins.setdefault(int(t // BIN), [[], 0])
-            b[0].append(ms); allv.append(ms)
+            b = bins.setdefault(int(t // BIN), [[], 0, []])
+            b[0].append(ms); b[2].append((t, ms)); allv.append(ms)
             if not ok:
                 b[1] += 1; fails += 1
         last = max(bins) if bins else -1
-        out["lat"] = [[round(sum(bins[k][0]) / len(bins[k][0]), 1), round(pct(bins[k][0], 0.95), 1), len(bins[k][0]), bins[k][1]]
-                      if k in bins and bins[k][0] else [None, None, 0, 0] for k in range(last + 1)]
+        # each half minute: mean, 95th percentile, requests, failed; then the candle (the first, highest, lowest and last
+        # response of the window, in the order they were answered), the median, the 99th percentile, and the window's
+        # responses counted in the buckets of HIST_MS (for the heatmap)
+        def window(v, tv):
+            tv = sorted(tv)
+            return [round(sum(v) / len(v), 1), round(pct(v, 0.95), 1), len(v), None,
+                    round(tv[0][1], 1), round(max(v), 1), round(min(v), 1), round(tv[-1][1], 1),
+                    round(pct(v, 0.5), 1), round(pct(v, 0.99), 1), [sum(1 for x in v if lo <= x < hi) for lo, hi in zip([0] + HIST_MS, HIST_MS + [math.inf])]]
+        out["lat"] = []
+        for k in range(last + 1):
+            if k in bins and bins[k][0]:
+                row = window(bins[k][0], bins[k][2]); row[3] = bins[k][1]
+            else:
+                row = [None, None, 0, 0]
+            out["lat"].append(row)
         out["sum"] = {"requests": len(allv), "failed": fails, "mean_ms": round(sum(allv) / len(allv), 2) if allv else None,
                       "p95_ms": round(pct(allv, 0.95), 1) if allv else None, "p99_ms": round(pct(allv, 0.99), 1) if allv else None}
     cap = s.read(f"{rel}/capture.csv")
@@ -312,7 +328,7 @@ def main(out_path):
         ag = [r.get("official_agree") for r in runs if r.get("official_agree") is not None]
         print(f"runs {stem:22s} {len(runs)} runs, {ck} files read, {okk} match their run's SHA-256 list"
               + (f"; the scorer per repetition against the run's own result: largest relative difference {max(ag):.1e}" if ag else ""))
-    Path(out_path).write_text(json.dumps({"bin_s": BIN, "benchmarks": benches}, separators=(",", ":")), encoding="utf-8")
+    Path(out_path).write_text(json.dumps({"bin_s": BIN, "hist_ms": HIST_MS, "benchmarks": benches}, separators=(",", ":")), encoding="utf-8")
 
 
 if __name__ == "__main__":
