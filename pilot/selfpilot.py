@@ -115,7 +115,7 @@ def run_day(seed, omni, out, days, headroom=0.5):
     if omni:
         a = parser().parse_args(["--mode", "nodepool", "--interval", "0", "--audit", str(out / "audit.jsonl"), "--kill-file", str(out / "kill"),
                                  "--node-scale-cmd", "SIMSCALE {n}", "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.max_nodes),
-                                 "--headroom", str(headroom)])
+                                 "--headroom", str(headroom), "--no-api-proxy"])   # the model's cluster, never a kubectl proxy
         ctl = Controller(a); ctl.k = SimKube(sim, ctl.audit)
         real_run = __import__("subprocess").run
 

@@ -58,6 +58,7 @@ class KeyShape(unittest.TestCase):
         cases = {whole[whole.index('"private_key_id"'):]: "piece from inside the file",
                  json.loads(whole)["private_key"]: "private key alone",
                  SECRET[:600]: "encoded string",
+                 "ya29." + "a0AfB_xyZ-9q." * 45: "token",
                  "omni-compass-github@omni-compass-123456.iam.gserviceaccount.com": "account's address"}
         for raw, words in cases.items():
             with self.subTest(words=words):
