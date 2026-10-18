@@ -2,6 +2,27 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (night): Tightened after the move; the stale branches kept on one archive branch
+
+- **The Google key's shape, in plain words.** `tools/cloud_key_check.py` now says what a stored text that is not a key file
+  looks like, from its shape alone and never a character of it: a piece from inside the file (the copy started part of the
+  way in), the private key alone, an encoded string, or an account's address. Google's stored secret reads as 595
+  characters that do not start with `{`, an encoded string: not the key file.
+- **The clouds' refusals at the top of the run's page.** `cloud-check` repeats each pre-flight refusal (Google's quota,
+  Amazon's Free plan) as an annotation, so the reason shows without opening the log.
+- **The live engine's push.** A merged pull request changed the generated page while the bot pushed its rebuild, and every
+  attempt stopped on the same conflict (run 39147114754); the bot's rebuilt page now wins such a conflict (`-X theirs`),
+  and the next rebuild reads what landed.
+- **GitHub's code scanning** had a Go pass that found Go only inside the raw receipts; with them off main it stopped
+  ("no Go source"), and GitHub dropped the pass on its own. Nothing in the repository is Go.
+- **Dead weight.** The verify log of 27 September (results/VERIFY_LOG.txt), which nothing reads (the release check's receipt replaced it),
+  is removed. The 21 stale branches of 27 September to 15 October (the `xpass25`, `xpass26` and `codex` work branches,
+  `v4`, `gpu-omni-v8`, `gpu-omni-v9` and others) are kept whole on one branch, `archive/stale-branches` (one commit whose
+  parents are their tips, with each name and commit listed), so every commit stays reachable when their names are removed.
+- **Found on the way.** The Lambda launcher ships the commit's tree to the rented machine (`git archive HEAD`); until the
+  raw move that tree was 36 GB. It is 149 MB now.
+- The conductor's dry run says a check *would* start rather than that one started.
+
 ## 2026-10-18 (evening): The raw receipts on their own branch; main's tree is the code and the tables
 
 - **Why.** Main's tree carried 182,161 raw files (35.6 GB of archived runs) and Dependabot's every clone of it timed out after
