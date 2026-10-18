@@ -33,6 +33,15 @@
   token or a web-safe encoded string (an access token, for one, which expires within the hour): still not the key file.
   `docs/GOOGLE_SETUP.md` section 4 gains a new key file by clicks alone (Service Accounts, Keys, Add key, JSON), with no
   terminal; the Operator's Manual (Appendix G) is rebuilt with it.
+- **Every workflow pinned to `ubuntu-24.04`.** GitHub announced on the runs' own pages that `ubuntu-latest` moves to
+  Ubuntu 26 from 19 October. Every job (113 in 53 workflows) now names `ubuntu-24.04`, the image every run of the engine
+  that stands has used, so its A, B and C runs share one operating system; moving to Ubuntu 26 is a step of its own,
+  taken on purpose and written down, never a change under a running campaign.
+- **The two version 11 runs that failed, and why.** CruiseKube's run 39145612309 (started 16:34, before the raw move)
+  measured all ten repetitions and built its table; only its last step, which committed the folder into main's
+  `results/live/raw/` (no longer part of main's tree), failed. Its files are its artifacts and are queued for the branch
+  raw. Robustness run 39151686324: repetition 8 measured, then GitHub's artifact service timed out on the upload
+  ("Request timeout: CreateArtifact"); that one repetition is re-run in place.
 - **Azure.** The burst set `1 4 1 6 1 9` (run 39119345316, version 10) finished all five repetitions; it and the steady set
   of 17 October (39080133432) are queued for the branch raw (`.github/archive_request.txt`). The steady set started after
   it is running.
