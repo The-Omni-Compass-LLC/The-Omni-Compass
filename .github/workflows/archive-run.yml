@@ -5,9 +5,10 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: archive-run
 # Copies the raw files of finished live runs (every artifact: capture CSV, response-time CSV, audit log, controller
-# log, SHA-256 manifest per repetition, and the aggregate) into the repository under results/live/raw/run-<id>/, so
-# they live with the code and survive the artifact retention window. The run ids are read from
-# .github/archive_request.txt (one per line); pushing a change to that file starts this workflow.
+# log, SHA-256 manifest per repetition, and the aggregate) onto the branch raw as run-<id>/ (scripts/raw_archive.sh; opened,
+# the branch sits at results/live/raw/), so they live with the code and survive the artifact retention window, and main's
+# tree stays the code and the tables. The run ids are read from .github/archive_request.txt (one per line); pushing a
+# change to that file starts this workflow.
 on:
   push:
     paths: [".github/archive_request.txt"]
@@ -23,8 +24,8 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      # the archive is tens of gigabytes: the checkout leaves the archived runs out, and a run counts as archived when the
-      # repository holds its folder (git's index, not the disk)
+      # the archive is tens of gigabytes and lives on the branch raw: a run counts as archived when that branch holds its
+      # folder (read from the branch's trees, nothing downloaded)
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
@@ -39,7 +40,7 @@ jobs:
           # one run id per line (or separated by spaces); a run already archived is left as it is
           for run in $(cat .github/archive_request.txt); do
             d="results/live/raw/run-$run"
-            git cat-file -e "HEAD:$d" 2>/dev/null && { echo "::notice::run $run is already archived"; continue; }
+            bash scripts/raw_archive.sh has "run-$run" && { echo "::notice::run $run is already archived"; continue; }
             # only a finished run is copied: a run still going would leave a part of its files here, and the part would
             # then be taken for the whole (the directory is never touched again once it exists)
             state=$(gh run view "$run" -R "${{ github.repository }}" --json status,conclusion -q '.status + " " + .conclusion')
@@ -55,16 +56,10 @@ jobs:
             # (tests/test_archive_gzip.py holds the two lists apart)
             find "$d" -type f -size +1M \( -name '*.raw' -o -name 'requests.log' -o -name 'consumer-*.log' \) -exec gzip -n -9 {} \;
             ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
-            git add --sparse "$d"
-            git commit -q -m "Raw files of live run $run archived with the code"
+            # onto the branch raw, built on its newest tip (another job's save never conflicts with this one)
+            bash scripts/raw_archive.sh save "run-$run" "Raw files of live run $run archived with the code"
             echo "::notice::run $run archived: $(find "$d" -type f | wc -l) files"
           done
-          # the branch may have moved while the files were copied (another push landed): rebase and push again, up to six times
-          for attempt in 1 2 3 4 5 6; do
-            git pull -q --rebase && git push && exit 0
-            echo "::warning::push attempt $attempt failed (the branch moved); trying again"; sleep 15
-          done
-          echo "::error::the archived files could not be pushed after six attempts"; exit 1
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

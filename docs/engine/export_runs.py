@@ -16,7 +16,7 @@ against the run's own SHA256SUMS_ALL.txt, so what the page plays is the run itse
   the databases (class L) every repetition of every workload, both arms: the arm's own result (arm.json)
 
 Each benchmark's newest engine's table names its runs (results/live/V<n>_*.json). Raw files are read from the checkout
-where present, else from git (a sparse checkout leaves them out of the working tree). Usage:
+where present, else from git: main's tree while it carried them, else the branch raw (scripts/raw_archive.sh). Usage:
 python3 docs/engine/export_runs.py OUT.json
 """
 from __future__ import annotations
@@ -42,17 +42,35 @@ DB = ["REDIS", "REDIS_SERVICE", "PGBENCH", "SYSBENCH", "YCSB", "KAFKA", "KAFKA_S
 DB_GAUGES = ["work_inside_line_rps", "rps", "p95_ms", "p99_ms", "mean_ms", "failed", "hit_rate", "cpu_busy_share", "writes"]
 
 
+def raw_ref():
+    """Where the raw files are read from when not checked out: main's own tree while it carried them, else the branch raw
+    (fetched by scripts/raw_archive.sh fetch), whose root is what results/live/raw/ held: (ref, prefix inside that ref)."""
+    def has(spec):
+        return subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", spec], capture_output=True).returncode == 0
+    if has(f"HEAD:{RAW}"):
+        return "HEAD", RAW + "/"
+    for ref in ("refs/remotes/origin/raw", "refs/heads/raw"):
+        if has(ref):
+            return ref, ""
+    return "HEAD", RAW + "/"
+
+
 class Git:
-    """Raw files by path: from the working tree where checked out, else from HEAD through one git cat-file process."""
+    """Raw files by path: from the working tree where checked out, else from git (main's tree or the branch raw) through
+    one git cat-file process."""
     def __init__(self):
         self.p = subprocess.Popen(["git", "-C", str(ROOT), "cat-file", "--batch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         self.tree = None
+        self.ref, self.inside = raw_ref()
+
+    def spec(self, path: str) -> str:
+        return f"{self.ref}:{self.inside}{path[len(RAW) + 1:]}" if path.startswith(RAW + "/") else f"HEAD:{path}"
 
     def read(self, path: str):
         f = ROOT / path
         if f.is_file():
             return f.read_bytes()
-        self.p.stdin.write(f"HEAD:{path}\n".encode()); self.p.stdin.flush()
+        self.p.stdin.write(f"{self.spec(path)}\n".encode()); self.p.stdin.flush()
         head = self.p.stdout.readline().decode().split()
         if len(head) < 3 or head[1] == "missing":
             return None
@@ -61,9 +79,10 @@ class Git:
 
     def files(self, prefix: str) -> list:
         if self.tree is None:
-            out = subprocess.run(["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", "HEAD", RAW + "/"],
+            args = [self.ref, RAW + "/"] if self.inside else [self.ref]
+            out = subprocess.run(["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", *args],
                                  capture_output=True, text=True).stdout.split("\n")
-            self.tree = [x for x in out if x]
+            self.tree = [x if self.inside else f"{RAW}/{x}" for x in out if x]
         return [x for x in self.tree if x.startswith(prefix)]
 
 

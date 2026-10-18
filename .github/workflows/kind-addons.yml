@@ -11,8 +11,7 @@ name: kind-addons
 # law, on top of the same), whose autoscaler moves reach KEDA through the plug (scripts/kubectl_keda.py). Two native
 # setups, one job each: both (KEDA on the CPU target and the live requests in flight) and http (the requests in flight
 # alone). Started by hand, or by a pushed commit whose message contains [addons]; [smoke] makes it one short repetition
-# per setup (360 s) to prove the wiring. Every run's raw files and tables are committed back to the branch it ran on, main
-# included (results/live/raw/addons-run-<id>/); the three-run tables are built from them by tools/confirm_abc.py
+# per setup (360 s) to prove the wiring. Every run's raw files and tables are saved on the branch raw (results/live/raw/addons-run-<id>/); the three-run tables are built from them by tools/confirm_abc.py
 # (results/live/V3_KEDA_*.md), and the founder hears what a set of three says before its table goes up.
 on:
   workflow_dispatch:
@@ -268,22 +267,15 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: addons-reps, path: "${{ steps.omni_legal_export_2.outputs.paths }}"}
-      - name: The results, committed back to the branch the run ran on
+      - name: The results, saved on the branch raw
         if: always()
         run: |
           d="results/live/raw/addons-run-${{ github.run_id }}"
           mkdir -p "$d"
           for p in both http; do [ -d "reps-$p" ] && cp -r "reps-$p" "$d/$p"; done
           ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add --sparse "$d"
-          git commit -q -m "Add-on test, run ${{ github.run_id }}: raw files and tables"
-          for i in 1 2 3 4 5 6; do
-            git push origin "HEAD:${{ github.ref_name }}" && exit 0
-            sleep $((i * 5)); git pull --rebase -q origin "${{ github.ref_name }}" || true
-          done
-          echo "::error::the results could not be pushed after six attempts"; exit 1
+          # onto the branch raw, built on its newest tip (scripts/raw_archive.sh); main's tree keeps the code and the tables
+          bash scripts/raw_archive.sh save "${d#results/live/raw/}" "Add-on test, run ${{ github.run_id }}: raw files and tables"
       - name: Legal files beside the files this run hands out
         if: always()
         uses: actions/checkout@v4
