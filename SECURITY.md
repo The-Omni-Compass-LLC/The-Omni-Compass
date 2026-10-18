@@ -25,7 +25,11 @@ reported to its own maintainers.
   every setting back; a dead-man lease hands them back if the governor stops.
 - It runs under least privilege: on Kubernetes, a service account with `kubectl auth can-i` receipts for what it can and
   cannot do (`deploy/kind/rbac-omni.yaml`).
+- The watchdog acts only on registry records its own user wrote that no other user can change, and never signals a
+  process number the system gave to another process (`tools/omni_switch.py`). Put the switch and the registry in a
+  directory only the governors' user can write (`OMNI_MASTER_OFF`, `OMNI_REGISTRY`); `status` warns when they are not.
 - It contains no telemetry and makes no network connection of its own except to the systems an operator points it at.
+- The threats of misuse, the guards against each and what is still open are set out in `docs/THREAT_MODEL.md`.
 - Every release carries a software bill of materials (`sbom/`) and a seal of the engine and its twins (`results/SEAL.json`,
   `python3 verify.py`).
 - The capture script (`fleet/capture/kube_capture.sh`) is read-only; no component writes to a live cluster unless the

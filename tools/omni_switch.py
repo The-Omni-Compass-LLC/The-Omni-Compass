@@ -20,6 +20,17 @@ The master switch for the whole Omni-Compass harness (omnicompass/master.py).
       stopping a hung one first; run it as its own service next to the governors
 
 OMNI_MASTER_OFF sets the switch file (default /tmp/omni-compass/OFF); every governor and this tool must agree on it.
+
+The registry is trusted only as far as its files are (18 October). The watchdog runs the restore commands it finds there
+and stops a hung governor's process, so a record another user could write would be a command run, or a process stopped,
+with the watchdog's own rights. A record is acted on only when it and the registry directory are owned by this user (or
+root, or a uid given with --trust-uid), are not a symbolic link, and are writable by no other user; each record is opened
+inside the directory without following a link and checked on the open file, so nothing can be swapped in between. Any
+other is refused, named in the output and left where it is. A pid is taken for the governor's only while the process
+holding it started before the governor registered: a pid the system gave to another process after the governor died is
+never signalled, and the governor's settings are handed back as for any governor that died. Put the switch and the
+registry in a directory only the governors' user can write (OMNI_MASTER_OFF, OMNI_REGISTRY); `status` warns when they
+are not.
 """
 from __future__ import annotations
 
@@ -27,6 +38,7 @@ import argparse
 import json
 import os
 import signal
+import stat
 import subprocess
 import sys
 import time
@@ -36,12 +48,93 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from omnicompass import master  # noqa: E402
 
 
-def reclaim(stale):
-    """Run the recorded restore commands of every governor that died or hung; returns what was done."""
+def owners(extra=()):
+    """The uids whose registry files are trusted: this process's own, root's, and any given."""
+    return {os.geteuid(), 0, *extra}
+
+
+def untrusted(st, trust):
+    """Why a registry file may not be acted on, or '' when it may."""
+    if stat.S_ISLNK(st.st_mode):
+        return "a symbolic link"
+    if st.st_uid not in trust:
+        return f"owned by uid {st.st_uid}, not by {', '.join(map(str, sorted(trust)))}"
+    if st.st_mode & stat.S_IWOTH:
+        return "writable by every user"
+    return ""
+
+
+def trusted_records(trust):
+    """(records, refused): the registry's records that may be acted on, each with its path, and every one that may not,
+    with the reason. The directory is opened without following a link and checked on the open directory; each record is
+    opened inside it without following a link, checked on the open file and read from it."""
+    d = master.registry_dir()
+    try:
+        dfd = os.open(d, os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0))
+    except FileNotFoundError:
+        return [], []
+    except OSError as e:
+        return [], [{"path": d, "refused": f"the registry could not be opened as a directory without following a link ({e.strerror})"}]
+    out, refused = [], []
+    try:
+        why = untrusted(os.fstat(dfd), trust)
+        if why:
+            return [], [{"path": d, "refused": "the registry is " + why}]
+        for fn in sorted(os.listdir(dfd)):
+            if not fn.endswith(".json"):
+                continue
+            path = os.path.join(d, fn)
+            try:
+                fd = os.open(fn, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0), dir_fd=dfd)
+            except OSError as e:
+                refused.append({"path": path, "refused": f"not opened without following a link ({e.strerror})"})
+                continue
+            with os.fdopen(fd) as f:
+                why = untrusted(os.fstat(f.fileno()), trust)
+                if why:
+                    refused.append({"path": path, "refused": "the record is " + why})
+                    continue
+                try:
+                    rec = json.loads(f.read())
+                except ValueError:
+                    continue                       # a record being written: read again at the next pass
+            rec["_path"] = path
+            out.append(rec)
+    finally:
+        os.close(dfd)
+    return out, refused
+
+
+def started_at(pid):
+    """When the process now holding pid started (epoch seconds), or None where the system does not say (no /proc)."""
+    try:
+        fields = open(f"/proc/{int(pid)}/stat").read().rsplit(")", 1)[1].split()
+        boot = next(float(ln.split()[1]) for ln in open("/proc/stat") if ln.startswith("btime "))
+        return boot + float(fields[19]) / os.sysconf("SC_CLK_TCK")
+    except (OSError, ValueError, IndexError, StopIteration):
+        return None
+
+
+def governor_alive(r):
+    """True while the record's governor runs: its pid is alive and the process holding it started before the governor
+    registered (to the second /proc gives), so a pid the system gave to another process after the governor died is not
+    taken for the governor's."""
+    pid = r.get("pid", -1)
+    if not master._alive(pid):
+        return False
+    began = started_at(pid)
+    return began is None or began <= float(r.get("started", 0)) + 2.0
+
+
+def reclaim(stale, trust=None):
+    """Run the recorded restore commands of every governor that died or hung; returns what was done and what was refused."""
     done = []
     now = time.time()
-    for r in master.records():
-        alive = master._alive(r.get("pid", -1))
+    recs, refused = trusted_records(trust or owners())
+    for x in refused:
+        done.append({"watchdog": "refused", **x, "time": now})
+    for r in recs:
+        alive = governor_alive(r)
         limit = stale if stale is not None else r.get("stale_s", 60.0)
         if alive and now - r.get("lease", 0) <= limit:
             continue
@@ -68,6 +161,19 @@ def reclaim(stale):
     return done
 
 
+def shared_dirs(trust):
+    """The switch's and the registry's directories that another user could write, with the reason."""
+    out = []
+    for d in sorted({os.path.dirname(master.switch_path()) or ".", master.registry_dir()}):
+        try:
+            why = untrusted(os.lstat(d), trust)
+        except OSError:
+            continue
+        if why:
+            out.append((d, why))
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["off", "on", "status", "watchdog"])
@@ -76,21 +182,32 @@ def main(argv=None):
     ap.add_argument("--once", action="store_true", help="watchdog: one pass")
     ap.add_argument("--reason", default="turned off by hand")
     ap.add_argument("--wait", type=float, default=60.0)
+    ap.add_argument("--trust-uid", type=int, action="append", default=[],
+                    help="also act on registry records owned by this uid (a watchdog run as another user than the governors)")
     a = ap.parse_args(argv)
+    trust = owners(a.trust_uid)
     p = master.switch_path()
     if a.cmd == "watchdog":
         while True:
-            for r in reclaim(a.stale):
+            for r in reclaim(a.stale, trust):
                 print(json.dumps(r), flush=True)
             if a.once:
                 return 0
             time.sleep(a.every)
     if a.cmd == "status":
         print(f"master switch: {'OFF' if master.is_off() else 'ON'} ({p})")
-        for r in master.running():
-            print(f"  running: {r['name']} pid {r['pid']}")
-        for r in master.orphans():
-            print(f"  DIED OR HUNG WITHOUT HANDING BACK: {r['name']} pid {r['pid']} (run: omni_switch.py watchdog --once)")
+        recs, refused = trusted_records(trust)
+        now = time.time()
+        for r in recs:
+            if governor_alive(r):
+                print(f"  running: {r['name']} pid {r['pid']}")
+        for r in recs:
+            if not governor_alive(r) or now - r.get("lease", 0) > r.get("stale_s", 60.0):
+                print(f"  DIED OR HUNG WITHOUT HANDING BACK: {r['name']} pid {r['pid']} (run: omni_switch.py watchdog --once)")
+        for x in refused:
+            print(f"  REFUSED, NOT ACTED ON: {x['path']}: {x['refused']}")
+        for d, why in shared_dirs(trust):
+            print(f"  WARNING: {d} is {why}; set OMNI_MASTER_OFF and OMNI_REGISTRY to a directory only the governors' user can write")
         return 0
     if a.cmd == "on":
         try:
@@ -100,24 +217,32 @@ def main(argv=None):
         print(f"master switch: ON ({p}); governors may be started again")
         return 0
     os.makedirs(os.path.dirname(p) or ".", exist_ok=True)
-    with open(p, "w") as f:
-        json.dump({"reason": a.reason, "time": time.time()}, f)
-    procs = master.running()
+    try:                                           # never written through a link another user planted at the switch's path
+        fd = os.open(p, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0), 0o644)
+        with os.fdopen(fd, "w") as f:
+            json.dump({"reason": a.reason, "time": time.time()}, f)
+    except OSError as e:
+        print(f"  WARNING: the switch file {p} was not written ({e.strerror}); every governor is still signalled")
+    recs, refused = trusted_records(trust)
+    procs = [r for r in recs if governor_alive(r)]
     for r in procs:
         try:
             os.kill(int(r["pid"]), signal.SIGTERM)
         except OSError:
             pass
     print(f"master switch: OFF ({p}); signalled {len(procs)} governor(s)")
+    for x in refused:
+        print(f"  REFUSED, NOT SIGNALLED: {x['path']}: {x['refused']}")
     t0 = time.time()
     left = procs
     while left and time.time() - t0 < a.wait:
         time.sleep(0.5)
-        left = master.running()
+        left = [r for r in trusted_records(trust)[0] if governor_alive(r)]
     for r in left:
         print(f"  STILL RUNNING after {a.wait:.0f} s: {r['name']} pid {r['pid']}")
-    for r in reclaim(None):
-        print(f"  handed back for a governor that had died: {r['name']} pid {r['pid']}, ok {r['ok']}")
+    for r in reclaim(None, trust):
+        if r["watchdog"] == "handed back":
+            print(f"  handed back for a governor that had died: {r['name']} pid {r['pid']}, ok {r['ok']}")
     if not left:
         print("every governor has restored and exited")
     return 1 if left else 0
