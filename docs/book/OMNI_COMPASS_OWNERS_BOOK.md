@@ -2698,7 +2698,7 @@ its operator set, and can be switched off by one human action, everywhere at onc
 | H3 | A write is refused or silently fails, so the governor's belief and the system differ | Every write goes through the plug, which reads the value back (`omnicompass/muscle_sdk.py`: `execute`, then `readback`, then a receipt). At the end of every run the reset is read back against the snapshot, and the run fails if any record is left (`scripts/kind_bench.sh`) | `tests/test_muscle_sdk.py`; every three-run table prints "handed back to native's and read back at the end of every omni arm in every run: yes" |
 | H4 | It gives back too much, so service breaks when load returns | Floors read live: never below one replica, a pool never below two machines. A machine is given back only after its own trial shows the response time holds, and it wakes at once on a breach (`omni_controller/controller.py`) | `tests/test_node_release_gate.py`; the fault test (`results/live/V7_FAULTS.md`) |
 | H5 | On a shared host, one tenant's raise starves the others | No CPU limit is raised while the host is 75% busy or its reading is missing; conveyance stays inside each namespace's CPU quota, and an unreadable quota means no known budget, so Kubernetes admission decides (`omni_controller/capacity.py`, `omni_controller/quota.py`) | `tests/test_capacity.py`, `tests/test_kind_capacity.py`, `tests/test_quota_convey.py`; the noisy-neighbour test (`results/live/V7_FAIRNESS.md`, EVEN) |
-| H6 | It acts on a reading it cannot trust | A reading with no machine in service is blind: the decision holds, says why, and writes nothing (omni-v11, `omni_controller/controller.py`). A muscle whose reading is stale reports BLIND, and no command is executed (`omnicompass/muscle_sdk.py`: `MuscleStatus`) | `tests/test_blind_reading.py` (the fault reproduced on omni-v10, gone on omni-v11); `results/toy_gate/V11_VS_V10.md` |
+| H6 | It acts on a reading it cannot trust | A reading with no machine in service is blind: the decision holds, says why, and writes nothing (omni-v11, `omni_controller/controller.py`). A muscle whose reading is stale reports BLIND, and no command is executed (`omnicompass/muscle_sdk.py`: `MuscleStatus`) | `tests/test_blind_reading.py` (the fault reproduced on omni-v10, gone on omni-v11); `results/toy_gate/V11_VS_V10.md`; the extended fault test, the API server frozen and the metrics server gone (queued, A, B and C: `docs/K8S_COMPASS_PREREGISTRATION.md`) |
 | H7 | It keeps a step that hurts the system | One trial at a time, on the system itself: a reference phase at the deepest step already allowed, then one notch further. The step is refused if its median cost exceeds the reference's by more than 2%, or the cost first measured at the operator's setting. Refused steps wait 60 s; a trial is abandoned if the service swings (`tools/knob_verdict.py`) | `tests/test_knob_verdict.py`, `tests/test_verdict.py`, `tests/test_verdict_interval.py`; every database table prints each trial's count, allowance and refusal |
 | H8 | It writes outside what the operator allows | A capability contract (minimum, maximum, resolution, step and rate limits) and a safety contract (hard bounds, forbidden contexts, fail closed) on every muscle (`omnicompass/muscle_sdk.py`: `CapabilityContract`, `SafetyContract`) | `tests/test_muscle_sdk.py` |
 | H9 | It uses more privilege than its job needs | Least-privilege service account (`deploy/kind/rbac-omni.yaml`), and every arm records what it can and cannot do (`kubectl auth can-i`, `rbac_omni.txt` in each run's folder) | The receipts in every run folder on the branch `raw` |
@@ -10763,6 +10763,32 @@ rig before end as their own record, and `tools/confirm_abc.py` marks any table w
 rig is protocol 4 (`KUBE_PROTOCOL`, carried in each run's name), and only its runs fill a square; no omni-v11 run with the
 cluster inside had started on protocol 3. Expected before any run: a pod on an empty node
 starts in about the time one beside a serving pod takes, in both arms. Whatever the runs read is reported.
+
+### 58.48 Amendment (2026-10-18): the extended fault test, the two faults that blind a governor (written before its run)
+
+The fault test above meets four faults. None of them takes away what a governor reads or the path it writes through, and a
+governor's worst hour is the one in which it cannot see. The extended test (`FAULTS=2`, `scripts/kind_faults.sh`) keeps the
+four at their moments and adds two after them, the same in every arm:
+5. at 82% of the run, the API server is frozen for 30 s: its process in the control-plane node is stopped, then continued.
+   The service's own path (kube-proxy on every node) keeps carrying traffic; no controller, native's or Omni-Compass's, can
+   read the cluster or write to it.
+6. at 88%, the metrics server is scaled to none for two minutes, then back to one: every autoscaler reads no CPU metric.
+
+Each outage is written to `faults.log` only once it took hold; one that did not take hold is written as failed, and the
+report has no row for it. The report (`tools/live_reps.py`, "The fault test") reads the two like the four: the time to
+recover from the fault's start until responses stay under the line for 30 s straight, at most 300 s, and the share of
+samples over the line or failed in the 300 s after it, paired against native. The run's window is 2,500 s, so the second
+outage's 300 s end inside it (12% of 2,500 s is 300 s); the four keep their shares of the window, so they fall later in
+seconds than in the 900-second test, and its tables are not read beside this one's. Load (open, fixed rate), arms (native;
+native with Omni-Compass on top), the engine (omni-v11's digest), the rig (the pre-puller above), the gauges and the ten
+pairs are as written; three runs, A, B and C (`scripts/reruns.txt`, "kubernetes faults extended").
+
+Two readings are named before the run. While the API server is frozen, the capture's readings are not answered and are
+skipped (`fleet/capture/kube_capture.sh`), in both arms. While the metrics server is gone, the capture reads no CPU used:
+the column records 0 for those two minutes in both arms, so the CPU row's change is diluted by that share of the window and
+never reversed by it. Expected before any run: Omni-Compass on top holds every setting while it cannot read (omni-v11 holds
+on a blind reading; a decision whose read fails writes nothing, and its lease runs 300 s), so it recovers from both as fast
+as native or faster. Whatever the runs read is reported.
 
 ## 59. The Pod Start Wait on One Shared Host
 
