@@ -65,7 +65,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-17 22:21 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-18 04:23 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V10_VS_V9.md) |  |
+| 2026-10-18 04:23 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -73,10 +74,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-18 01:19 | mujoco | success | [39085988445](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39085988445) |
-| 2026-10-18 01:12 | grid | cancelled | [39082853013](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39082853013) |
-| 2026-10-18 01:10 | benchmark-reps | success | [39083070509](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39083070509) |
-| 2026-10-18 00:24 | big-organism-detached collect | success | [39082648794](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39082648794) |
+| 2026-10-18 05:08 | big-organism-detached collect | success | [39099525236](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099525236) |
+| 2026-10-18 05:08 | live-engine | cancelled | [39099496328](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099496328) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
