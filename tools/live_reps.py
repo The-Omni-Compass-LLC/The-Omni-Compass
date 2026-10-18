@@ -492,7 +492,7 @@ def arm_gauges(d):
 
 
 FAULTS = (("machine down", "machine back"), ("spike:", "spike over"), ("runaway pod started", "runaway pod removed"),
-          ("probe blind", "probe back"))
+          ("probe blind", "probe back"), ("api frozen", "api back"), ("metrics down", "metrics back"))   # the last two: faults=2
 
 
 def fault_windows(d, slo):
