@@ -2,6 +2,25 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (late night): The referee's summary, the safety case, every data store at the max, the book's last page
+
+- **The referee's summary** (`docs/REFEREE_SUMMARY.md`, bound into the Owner's Manual after "What Omni-Compass Is"): every
+  claim with its standing (shown, small or EVEN, modelled, partly proved, or undetermined), every number with its engine and
+  evidence class, and every Kubernetes gain beside what it cost. In the add-on tests the cost is the processor given to the
+  service: CPU used, the governor's own included, +29% to +57%, shown and not judged under the preregistrations. In the
+  stepping load and the public day, CPU fell slightly and the machines held. The bill, energy, the GPU and production are
+  written undetermined until their runs exist.
+- **The safety case** (`docs/SAFETY_CASE.md`, bound after "The Mechanism of Action"): twelve hazards of a governor on top of
+  native, each with the guard in the code that stands against it and the test or measured run that shows the guard holds.
+  Also the plug's interface as `omnicompass/muscle_sdk.py` defines it, and what the case does not yet cover (no outside
+  security review, no proof of the whole controller, no production deployment).
+- **Every data store at the max.** MySQL, MongoDB and PostgreSQL had run only at the tune-down (objective resource). There
+  the governor's paired trial refuses most steps that spend memory, so they read EVEN. Their runs at the max (objective
+  service, preregistered in each one's own preregistration) join the campaign's queue, A, B and C (`scripts/reruns.txt`).
+  `tests/test_release_campaign.py` now holds every data store to both objectives.
+- **The book's last page.** The end notice is kept whole, and the last chapter opens under a short space, so the notice no
+  longer spills four lines onto an almost empty last page.
+
 ## 2026-10-18 (night): The KEDA pod start wait root-caused to the test machine; the kind rig pre-pulls the served image
 
 - **Where the wait goes.** `tools/pod_phases.py` reads every serving pod started inside a measured window from the run's own
