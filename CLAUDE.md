@@ -190,7 +190,9 @@ the founder overrides one in the conversation.
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda still waits for his word and one exact commit. Google's queue was paused the
   same morning because its stored key was cut short when copied; it comes back on once the key is stored whole, and a
-  failed set is re-run in place (never started again under the same title), so A, B and C keep their meaning.
+  failed set is re-run in place (never started again under the same title), so A, B and C keep their meaning. Amazon's
+  queue was paused the same morning: its new account sits on the Free plan, whose organization policy denies every machine
+  read; it comes back on once the account is on the Paid plan.
 
 - **Version 10: exploit all that can be, never raise the bill, hurt no one** (the founder's words: "Omni-Compass should be
   tuned to exploit all that can be and keep all healthy and never raise its bill ... whatever one can't be achieved doesn't
