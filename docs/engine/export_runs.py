@@ -210,7 +210,7 @@ def arm_k8s(s: Sums, rel: str, omni: bool, slo: float = 500.0) -> dict:
     if omni:
         aud = s.read(f"{rel}/audit.jsonl")
         if aud:
-            dec, writes, t0 = [], 0, None
+            dec, writes, t0, beats, cores = [], 0, None, [], None
             for ln in aud.decode("utf-8", "replace").splitlines():
                 try:
                     a = json.loads(ln)
@@ -221,6 +221,10 @@ def arm_k8s(s: Sums, rel: str, omni: bool, slo: float = 500.0) -> dict:
                 t0 = a.get("time", t0) if t0 is None else t0
                 if "write" in a or "writes" in a:
                     writes += 1
+                if isinstance(a.get("decision_ms"), (int, float)) and isinstance(a.get("time"), (int, float)):
+                    beats.append([a["time"], a["decision_ms"]])          # the heart: one beat per decision, its own time
+                if isinstance(a.get("overhead"), dict) and isinstance(a["overhead"].get("cores_mean"), (int, float)):
+                    cores = a["overhead"]["cores_mean"]
                 d = a.get("decision") if isinstance(a, dict) else None
                 if isinstance(d, dict):
                     law = d.get("compass_law") if isinstance(d.get("compass_law"), dict) else {}
@@ -228,6 +232,10 @@ def arm_k8s(s: Sums, rel: str, omni: bool, slo: float = 500.0) -> dict:
                                 law.get("verdict_state")])
             step = max(1, len(dec) // 150)
             out["dec"], out["writes"] = dec[::step], writes
+            if beats and t0 is not None:
+                bs = max(1, len(beats) // 400)
+                out["beats"] = [[round(t - t0, 1), round(ms, 1)] for t, ms in beats][::bs]
+                out["beats_n"], out["heart_cores"] = len(beats), cores
     return out
 
 

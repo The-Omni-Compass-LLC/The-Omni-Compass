@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import math
 import os
 import re
 import shutil
@@ -161,6 +162,53 @@ def board(runs: list) -> list:
     return out
 
 
+def _clean(v):
+    """NaN and infinity, which JSON cannot carry, as null."""
+    if isinstance(v, float):
+        return v if math.isfinite(v) else None
+    if isinstance(v, dict):
+        return {k: _clean(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_clean(x) for x in v]
+    return v
+
+
+def fleet() -> dict:
+    """The benefit sheet (results/BENEFIT_SHEET.json, every benchmark's benefit in one row), the Omni index's headline
+    (results/OMNI_INDEX.md) and the grid (results/grid_v5/GRID.json, the newest grid with squares; the dispatches of the
+    engine that stands from results/grid_v<n>/DISPATCHED.json), each as the repository holds it."""
+    out = {"benefit": [], "index": None, "grid": None}
+    bs = ROOT / "results" / "BENEFIT_SHEET.json"
+    if bs.exists():
+        out["benefit"] = [{k: r.get(k) for k in ("date", "benchmark", "benefit", "pct", "gain", "loss", "given", "words", "what", "file", "engine")}
+                          for r in json.loads(bs.read_text(encoding="utf-8")).get("rows", [])]
+    oi = ROOT / "results" / "OMNI_INDEX.md"
+    if oi.exists():
+        t = oi.read_text(encoding="utf-8")
+        m = re.search(r"## Headline:([^\n]*)", t); m2 = re.search(r"## The second reading[^\n]*?: ([^\n]*)", t)
+        out["index"] = {"headline": m.group(1).strip() if m else None, "service": m2.group(1).strip() if m2 else None, "file": "results/OMNI_INDEX.md"}
+    grids = sorted((ROOT / "results").glob("grid_v*/GRID.json"), key=lambda q: int(re.sub(r"\D", "", q.parent.name)))
+    if grids:
+        gp = grids[-1]; md = gp.with_name("GRID.md"); eng = None
+        if md.exists():
+            m = re.search(r"engine (omni-v\d+)", md.read_text(encoding="utf-8")); eng = m.group(1) if m else None
+        g = json.loads(gp.read_text(encoding="utf-8"))
+        sq = {"modelled": {}, "kube": {}}
+        for k, v in g.get("modelled", {}).items():
+            sq["modelled"][k] = {n: {"label": c.get("label"), "runs": c.get("runs"), "viol_pp": (c.get("viol_pp") or [None])[0],
+                                     "work": (c.get("work") or [None])[0], "energy": (c.get("energy") or [None])[0]} for n, c in v.items() if isinstance(c, dict)}
+        for k, v in g.get("kube", {}).items():
+            sq["kube"][k] = {n: {"verdict": c.get("verdict"), "reps": c.get("repetitions"), "GAIN": c.get("GAIN"), "LOSS": c.get("LOSS"), "given": c.get("power given"),
+                                 "p95": {kk: c["rows"][kk].get(kk2) for kk in ["response time (ms), 95th percentile"] if kk in c.get("rows", {}) for kk2 in ["pct"]}.get("response time (ms), 95th percentile")}
+                             for n, c in v.items() if isinstance(c, dict)}
+        disp = None
+        stand = ROOT / "results" / f"grid_v{engine()[0].rsplit('v', 1)[-1]}" / "DISPATCHED.json"
+        if stand.exists():
+            disp = len(json.loads(stand.read_text(encoding="utf-8")).get("dispatches", []))
+        out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
+    return _clean(out)
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -176,7 +224,7 @@ def records(runs: bool) -> dict:
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
              "runs": github_runs() if runs else []}
     build["board"] = board(build["runs"])
-    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "build": build}
+    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build}
 
 
 def embedded(page: str, key: str):
@@ -212,10 +260,10 @@ def main() -> int:
               "write the new engine into the page's words, then build again")
         return 1
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen", "runs") if embedded(page, k) != rec[k]]
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet") if embedded(page, k) != rec[k]]
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "runs", "build"):
+    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     b = rec["build"]
