@@ -160,6 +160,15 @@ def verdict(k, rs):
     return in_all_three(signs[0] == -1, aim_of_row(k))
 
 
+def rig(d):
+    """The rig a run ran on, from its arms' preflight records: on kind, the served image pulled onto every worker before each
+    arm (amendment of 18 October, docs/POD_START_WAIT.md), or pulled by each node at each start (the rig before it, and every
+    cloud machine). Three runs on two rigs are never one table."""
+    seen = {next((ln.split("=", 1)[1] for ln in p.read_text(errors="replace").splitlines() if ln.startswith("images=")),
+                 "pulled by each node at each start") for p in Path(d).rglob("preflight.txt")}
+    return " / ".join(sorted(seen)) if seen else "not recorded"
+
+
 def engine(run):
     """The Omni version the run's commit carries (tools/omni_version.py), from the GitHub run record."""
     try:
@@ -207,8 +216,12 @@ def main(argv=None):
         off.append("A, B and C must be three separate runs")
     if len({m["engine"].split(" ")[0] for m in meta}) > 1:
         off.append("A, B and C are not all on the same engine: " + ", ".join(m["engine"].split(" ")[0] for m in meta))
+    for m, d in zip(meta, (a.a, a.b, a.c)):
+        m["rig"] = rig(d)
+    if len({m["rig"] for m in meta}) > 1:
+        off.append("A, B and C are not all on the same rig: " + "; ".join(f"{m['tag']} {m['rig']}" for m in meta))
     if off:
-        L[2:2] = [f"**Not one engine's three runs: {'; '.join(off)}.** The readings below compare runs on different engines.", ""]
+        L[2:2] = [f"**Not three runs of one engine on one rig: {'; '.join(off)}.** The readings below compare runs that differ.", ""]
     L += ["", "| Measure | A | B | C | Reading |", "|---|---|---|---|---|"]
     tally, rows = {}, {}
     for k in [CAPACITY] + KEYS:
