@@ -9,7 +9,7 @@ against the engine that stands, on the same seeds, before any real run is starte
 night). A change goes on to real runs only where it reads no LOSS here and shows promise; a LOSS here is root-caused and
 fixed in the model, never carried into a real run. A reading here is a model's, never a benchmark's result.
 
-  python3 tools/toy_gate.py --base <checkout> --cand <checkout> [--seeds 1-8] [--days 1] [--toys cluster,cluster15,verdict]
+  python3 tools/toy_gate.py --base <checkout> --cand <checkout> [--seeds 1-8] [--days 1] [--toys cluster,cluster15,cluster_blink,verdict]
 
 Each checkout is a working tree: one on the engine that stands, one on the candidate. Each runs in its own process with
 its own code, so the two never share a module.
@@ -21,7 +21,10 @@ its own code, so the two never share a module.
              (an M/M/1 delay on each pod's share, log-normal spread, the backlog's wait added). Native is the HPA with
              the Cluster Autoscaler on the same demand.
   cluster15  the same with a decision every 15 s: each rule's time at a shorter period.
-  verdict    the do-no-harm trigger (omnicompass/verdict.py) on noisy work: how often a give-back step that truly costs
+  cluster_blink  the cluster toy with every machine out of service in the governor's reading for two minutes every six
+             hours while the cluster serves on (the kind cluster of the CruiseKube test, 18 October): a decision or a
+             check that fails is recorded and skipped, as the shipped loop does.
+  verdict   the do-no-harm trigger (omnicompass/verdict.py) on noisy work: how often a give-back step that truly costs
              0 to 5% more is allowed against a 2% allowance, the candidate's verdict against the standing one.
 
 Gauges per seed (a day each): machine-hours, energy per used core-hour, pending-pod minutes an hour, HPA shortfall
@@ -45,9 +48,16 @@ ROOT = Path(__file__).resolve().parents[1]
 SLO_MS = 200.0                       # the toy service's line
 SERVICE_MS = 20.0                    # the bare service time of one request
 SAMPLES_PER_TICK = 20                # requests timed every 15 s
-sys.path.insert(0, str(ROOT))
-from omnicompass.student_t import T95  # noqa: E402  (keyed by degrees of freedom; the table it replaces was keyed by seeds
-#                                                        and read one row early)
+BLINK_EVERY, BLINK = 1440, (700, 708)  # the blink toy: two minutes (8 ticks of 15 s) out of service every six hours
+# after the checkout under test (a worker's PYTHONPATH), never before it: placed first, the gate's own tree shadowed the
+# checkout and both arms ran the gate tree's engine (18 October; from omni-v9's gate of 17 October on). Every worker now
+# names the tree its engine was imported from, and run() refuses a reading taken on the wrong one
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+try:   # the readings' table, keyed by degrees of freedom (the table it replaced was keyed by seeds and read one row early);
+    from omnicompass.student_t import T95  # noqa: E402
+except ImportError:   # a worker on a checkout from before omni-v9 has none, and needs none: only the parent reads
+    T95 = None
 # gauge -> (aim, a resource spent?)
 GAUGES = {"machine_hours": ("lower", True), "kwh_per_core_hour": ("lower", True),
           "pending_pod_minutes_per_hour": ("lower", False), "hpa_shortfall_minutes_per_hour": ("lower", False),
@@ -55,7 +65,7 @@ GAUGES = {"machine_hours": ("lower", True), "kwh_per_core_hour": ("lower", True)
 
 
 # ---- the worker: one arm, one seed, run inside one checkout --------------------------------------------------------
-def worker(arm, seed, days, period, out):
+def worker(arm, seed, days, period, out, blink=False):
     import csv
     from unittest import mock
     import numpy as np
@@ -124,7 +134,12 @@ def worker(arm, seed, days, period, out):
                 node = lambda i, taints: {"metadata": {"name": f"n{i}", "labels": {}},
                                           "spec": {"taints": taints}, "status": {"allocatable": {"cpu": str(p.cores)},
                                           "conditions": [{"type": "Ready", "status": "True"}]}}
-                return {"items": [node(i, []) for i in range(p.nodes)]
+                # the blink (omni-v11): four times a day every machine in service leaves service for two minutes in the
+                # governor's reading, while the toy cluster serves on, as the kind cluster of the CruiseKube test did on 18
+                # October (run 39120444653, repetition 8)
+                out_now = blink and BLINK[0] <= self.sim.t % BLINK_EVERY < BLINK[1]
+                gone = [{"key": "node.kubernetes.io/unreachable", "effect": "NoSchedule"}] if out_now else []
+                return {"items": [node(i, list(gone)) for i in range(p.nodes)]
                         + [node(p.nodes + j, [{"key": IDLE, "effect": "PreferNoSchedule"}]) for j in range(len(self.sim.parked))]}
             if args[:2] == ("get", "pods") and "-o" in args and args[args.index("-o") + 1] == "name":
                 c = self.sim.c
@@ -170,14 +185,21 @@ def worker(arm, seed, days, period, out):
                 sim.resize(int(cmd[1])); return subprocess.CompletedProcess(cmd, 0)
             return real_run(cmd, *kw_a, **kw)
         every = max(1, int(round(period / 15.0)))
+        from omni_controller import controller as shipped
+        fails = 0
         with mock.patch("omni_controller.controller.subprocess.run", side_effect=fake_run):
             while sim.t < sim.steps:
                 sim.tick(); sim.c.alloc = sim.c.pool.nodes * sim.c.pool.cores * ALLOC
                 time_requests(); billed.append(sim.billed())
+                # the shipped loop's own handling (omni_controller.controller.main): a failed decision is recorded and
+                # skipped, a failed floor check recorded, and the next one comes on time
                 if sim.t % every == 0:
-                    ctl.step()
+                    fails = shipped.safe_step(ctl, fails)
                 else:
-                    ctl.floor_step()
+                    try:
+                        ctl.floor_step()
+                    except Exception as e:
+                        ctl.audit({"error": "floor check: " + repr(e)[:500], "stderr": ""})
     else:
         while sim.t < sim.steps:
             sim.tick(); time_requests(); billed.append(sim.billed())
@@ -199,6 +221,8 @@ def worker(arm, seed, days, period, out):
         res["trials_abandoned"] = sum(1 for v in ev if v.startswith("trial abandoned"))
         res["machines_parked"] = sum(1 for r in recs if r.get("write", [None])[0] == "SIMSCALE")
         res["errors"] = sum(1 for r in recs if "error" in r)
+        res["readings_held"] = sum(1 for r in recs if str(r.get("decision", "")).startswith("held"))
+        res["engine_tree"] = engine_tree("omni_controller.controller")
     print(json.dumps(res))
 
 
@@ -343,6 +367,8 @@ def worker_convey(arm, seed, out, quota="none"):
            "requests_served": served, "starts": len(st), "busy_p95": sorted(busy_hist)[int(0.95 * len(busy_hist))],
            "pods_mean": pod_s / (t + 1),
            "starts_past_75": sum(1 for b in busy_hist if b >= 0.75)}
+    if arm != "native":
+        res["engine_tree"] = engine_tree("omni_controller.muscles")
     print(json.dumps(res))
 
 
@@ -365,17 +391,27 @@ def worker_verdict(seeds):
                     allowed += ev["verdict"] == "step allowed"
                     break
         out[f"{rise:.2f}"] = allowed / seeds
+    out["engine_tree"] = engine_tree("omnicompass.verdict")
     print(json.dumps(out))
 
 
 # ---- the parent: both checkouts, every seed, the readings -----------------------------------------------------------
+def engine_tree(module):
+    """The checkout a worker's engine module was imported from (the root above its package)."""
+    return str(Path(sys.modules[module].__file__).resolve().parents[1])
+
+
 def run(tree, args):
     env = {**os.environ, "PYTHONPATH": str(tree)}
     p = subprocess.run([sys.executable, str(Path(__file__).resolve()), *args], cwd=tree, env=env, capture_output=True,
                        text=True, timeout=7200)
     if p.returncode != 0:
         raise RuntimeError(f"{tree} {args}: {p.stderr[-2000:]}")
-    return json.loads(p.stdout.strip().splitlines()[-1])
+    r = json.loads(p.stdout.strip().splitlines()[-1])
+    got = r.pop("engine_tree", None) if isinstance(r, dict) else None
+    if got is not None and Path(got).resolve() != Path(tree).resolve():
+        raise RuntimeError(f"{args[:2]}: the engine was imported from {got}, not from the checkout under test {tree}")
+    return r
 
 
 def reading(gauge, diffs, base_vals, gauges=None):
@@ -455,13 +491,14 @@ def main(argv=None):
     ap.add_argument("--cand", help="checkout of the candidate")
     ap.add_argument("--seeds", default="1-8")
     ap.add_argument("--days", type=float, default=1.0)
-    ap.add_argument("--toys", default="cluster,cluster15,convey,convey_unreadable_quota,verdict")
+    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,verdict")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", default="")
     ap.add_argument("--worker", help=argparse.SUPPRESS)
     ap.add_argument("--seed", type=int, help=argparse.SUPPRESS)
     ap.add_argument("--period", type=float, default=60.0, help=argparse.SUPPRESS)
     ap.add_argument("--dir", help=argparse.SUPPRESS)
+    ap.add_argument("--blink", action="store_true", help=argparse.SUPPRESS)  # the cluster toy with its machines out of service a while
     ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota read: none (readable, empty) or unreadable
     a = ap.parse_args(argv)
     if a.render:
@@ -471,7 +508,7 @@ def main(argv=None):
     if a.worker in ("convey-native", "convey-omni"):
         return worker_convey(a.worker.split("-")[1], a.seed, a.dir, a.quota)
     if a.worker:
-        return worker(a.worker, a.seed, a.days, a.period, a.dir)
+        return worker(a.worker, a.seed, a.days, a.period, a.dir, a.blink)
     lo_s, _, hi_s = a.seeds.partition("-")
     seeds = list(range(int(lo_s), int(hi_s or lo_s) + 1))
     base, cand = Path(a.base).resolve(), Path(a.cand).resolve()
@@ -479,13 +516,14 @@ def main(argv=None):
     from concurrent.futures import ThreadPoolExecutor
     report = {"seeds": seeds, "days": a.days, "base": str(base), "cand": str(cand), "toys": {}}
     toys = a.toys.split(",")
-    for toy, period in (("cluster", 60.0), ("cluster15", 15.0)):
+    for toy, period in (("cluster", 60.0), ("cluster15", 15.0), ("cluster_blink", 60.0)):
         if toy not in toys:
             continue
         jobs = [(arm, tree, s) for s in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]
+        blink = ["--blink"] if toy == "cluster_blink" else []
         with ThreadPoolExecutor(a.jobs) as ex:
             got = list(ex.map(lambda j: run(j[1], ["--worker", "native" if j[0] == "native" else "omni", "--seed", str(j[2]),
-                                                    "--days", str(a.days), "--period", str(period),
+                                                    "--days", str(a.days), "--period", str(period), *blink,
                                                     "--dir", str(work / toy / f"{j[0]}-{j[2]}")]), jobs))
         res = {}
         for (arm, _, s), r in zip(jobs, got):
@@ -499,7 +537,7 @@ def main(argv=None):
                        "base_vs_native": reading(g, [b - n for b, n in zip(bv, nv)], nv),
                        "cand_vs_native": reading(g, [c - n for c, n in zip(cv, nv)], nv)}
         extra = {k: {arm: sum(res[arm][s].get(k, 0) for s in seeds) for arm in ("base", "cand")}
-                 for k in ("steps_allowed", "steps_refused", "trials_abandoned", "machines_parked", "errors")}
+                 for k in ("steps_allowed", "steps_refused", "trials_abandoned", "machines_parked", "errors", "readings_held")}
         report["toys"][toy] = {"period_s": period, "gauges": rows, "counts": extra, "per_seed": res}
     # the convey toy twice: the namespace's quota readable and empty, and unreadable (the governor's role cannot list
     # quotas on every kind test, and on any stack whose role withholds it; the first v7 trial read that as a zero budget)
