@@ -6,6 +6,12 @@
 # The omni-v11 campaign (the founder's order of 17 October: a new version means everything runs again on it): A of every
 # entry, then B, then C; released by the grid conductor from the moment omni-v11 landed on main. MySQL, Redis and MongoDB
 # run twice: native as the operator sets it (the preregistered setting) and native exactly as the vendor ships it.
+# Every data store runs at the tune-down (objective=resource) and at the max (objective=service, the default brain, 12
+# October): MySQL, MongoDB and PostgreSQL had run at the tune-down alone until 18 October (their runs at the max stand in
+# the block added that night, below).
+# A run is read back by its count in its workflow, in this file's order. An entry added once the campaign is under way goes
+# into a new block at the end, below an added=<UTC> line, never among the entries above it: there it would take the place of
+# a run already started (scripts/dispatch_grid.py, rerun_queue).
 # Google, Amazon and physical GPU jobs are prepared but excluded. Pool/report workflows run only with source runs.
 core benchmark|benchmark.yml|
 Kubernetes baseline|live-kind.yml|
@@ -45,3 +51,11 @@ buildings and batteries|citylearn.yml|datasets=untouched
 drone swarms|swarm.yml|cells=all
 robustness kill|robustness.yml|scenario=kill;reps=10;duration_s=900
 robustness long|robustness.yml|scenario=long;reps=3;duration_s=7200
+# Added on 18 October, night, once the campaign was under way: released after every entry above, A, B and C. The three data
+# stores at the max (their tune-down runs above had all started), and the extended fault test (FAULTS=2: the API server
+# frozen and the metrics server gone after the four faults; docs/K8S_COMPASS_PREREGISTRATION.md).
+added=2026-10-18T22:45:00Z
+mysql service|sysbench.yml|workloads=all;reps=3;step_s=30;objective=service
+mongodb service|ycsb.yml|workloads=all;reps=3;step_s=30;objective=service
+postgresql service|pgbench.yml|workloads=untouched;reps=3;step_s=30;objective=service
+kubernetes faults extended|benchmark-reps.yml|duration_s=2500;arms=native compass;loadgen=open;faults=2

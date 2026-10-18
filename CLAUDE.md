@@ -135,7 +135,9 @@ the founder overrides one in the conversation.
   run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what
   GitHub runs plus a margin; it starts nothing while an Azure run, a grid report or a verify waits for a runner (Azure
   first). It also releases the reruns of every benchmark on the engine that stands (`scripts/reruns.txt`; A of
-  every benchmark, then B, then C; a few a tick; read back by count, never started twice). It starts every Azure set from `scripts/azure_queue.txt` (A of every set, then B, then C; one at a time in each
+  every benchmark, then B, then C; a few a tick; read back by count, never started twice; an entry added once the
+  campaign is under way goes into a new block at the end, below an `added=<UTC>` line, never among entries already
+  started, where it would take a started run's place: 18 October). It starts every Azure set from `scripts/azure_queue.txt` (A of every set, then B, then C; one at a time in each
   machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 4 1 6 1 9`
   and `1 6 1 8 1 6`, and the real day (Google 2011) on 1 to 9, every one at the tune-down with native's cap (the founder's words of 14 October; the load generator alone
   reads a schedule, never the governor). Google Cloud and Amazon carry the same four sets from `scripts/google_queue.txt` and
