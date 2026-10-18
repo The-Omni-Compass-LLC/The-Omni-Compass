@@ -11,32 +11,32 @@
 | Gauge | native | omni |
 |---|---:|---:|
 | worker nodes in service, mean | 6 | 6 |
-| node-hours | 1.514 | 1.518 |
-| energy, parked workers still on at idle power (Wh, declared model) | 158.9 | 162.4 |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 158.9 | 162.4 |
+| node-hours | 1.515 | 1.518 |
+| energy, parked workers still on at idle power (Wh, declared model) | 159.1 | 162.5 |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 159.1 | 162.5 |
 | energy, the machine's own meter over the window (Wh; the processor's RAPL counters, class P) | nan | nan |
 | energy Kepler attributes to the service's pods (Wh; its split of the meter by each pod's CPU time: shown, not judged) | nan | nan |
 | energy, Kepler's reading of the same counters (Wh; Kepler 0.11.4: shown, not judged) | nan | nan |
-| response time (ms), mean | 157.3 | 96.01 |
-| response time (ms), 95th percentile | 309.3 | 152.6 |
-| response time (ms), 99th percentile | 438.8 | 189.3 |
-| time over the response line (% of samples) | 0.5138 | 0 |
+| response time (ms), mean | 157.5 | 95.9 |
+| response time (ms), 95th percentile | 310.3 | 152.3 |
+| response time (ms), 99th percentile | 443.5 | 188.9 |
+| time over the response line (% of samples) | 0.5137 | 0 |
 | failed requests (%) | 0 | 0 |
-| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | 0.1111 | 0 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | 0.1 | 0 |
 | settings commands the governor wrote on its own (no person touched either arm) | 0 | 17.1 |
 | governor's additions decided while the service was still inside its line (% of its additions) | nan | nan |
 | pods with no machine to take them (unschedulable) | 0 | 0 |
 | time pods had no machine to take them, pod-minutes | 0 | 0 |
-| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.3259 | 0.4167 |
-| utilisation (used / allocatable) | 0.03781 | 0.05167 |
-| CPU used (cores), mean | 0.9074 | 1.24 |
-| Omni's own CPU (cores), mean | 0 | 0.01344 |
-| CPU used with Omni's own (cores), mean | 0.9074 | 1.253 |
-| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 694.1 | 518.2 |
-| HPA replicas, mean | 8.988 | 9.261 |
-| pods started | 4.556 | 4.5 |
-| pod start wait, total (s) | 14 | 9.6 |
-| pod start wait, mean (s) | 2.656 | 2.05 |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.2933 | 0.4433 |
+| utilisation (used / allocatable) | 0.0379 | 0.05164 |
+| CPU used (cores), mean | 0.9095 | 1.239 |
+| Omni's own CPU (cores), mean | 0 | 0.01346 |
+| CPU used with Omni's own (cores), mean | 0.9095 | 1.253 |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 692.7 | 518.5 |
+| HPA replicas, mean | 8.991 | 9.252 |
+| pods started | 4.5 | 4.5 |
+| pod start wait, total (s) | 12.9 | 9.7 |
+| pod start wait, mean (s) | 2.465 | 2.07 |
 | host CPU busy, the real machine under kind (%) | 28.15 | 37.83 |
 | host cores (the real machine under kind) | 4 | 4 |
 
@@ -50,34 +50,34 @@ on-call page would be open. The commands are the settings the governor wrote on 
 its reason; the share decided inside the line counts its additions (a machine more, or a lower HPA target) made
 before the line was crossed. The alert minutes are judged; the commands and the share are shown, not judged.
 
-## omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool vs native, 9 paired repetitions
+## omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool vs native, 10 paired repetitions
 
 | Gauge | native | omni | Change | 95% interval of the difference | Significant |
 |---|---:|---:|---:|---:|---|
-| worker nodes in service, mean | 6 | 6 | +0.0% | -1.419e-16 to +1.721e-15 | EVEN, the same (under one part in a million) |
-| node-hours | 1.514 | 1.518 | +0.2% | -0.008161 to +0.01483 | no |
-| energy, parked workers still on at idle power (Wh, declared model) | 158.9 | 162.4 | +2.2% | +2.075 to +4.88 | yes: power given |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 158.9 | 162.4 | +2.2% | +2.075 to +4.88 | yes: power given |
-| response time (ms), mean | 157.3 | 95.75 | -39.1% | -65.45 to -57.6 | yes: GAIN |
-| response time (ms), 95th percentile | 309.3 | 151.8 | -50.9% | -167.1 to -147.8 | yes: GAIN |
-| response time (ms), 99th percentile | 438.8 | 187.9 | -57.2% | -280.4 to -221.2 | yes: GAIN |
-| time over the response line (% of samples) | 0.5138 | 0 | -100.0% | -0.7671 to -0.2605 | yes: GAIN |
+| worker nodes in service, mean | 6 | 6 | +0.0% | +4.108e-17 to +1.735e-15 | EVEN, the same (under one part in a million) |
+| node-hours | 1.515 | 1.518 | +0.2% | -0.007113 to +0.01311 | no |
+| energy, parked workers still on at idle power (Wh, declared model) | 159.1 | 162.5 | +2.2% | +2.192 to +4.664 | yes: power given |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 159.1 | 162.5 | +2.2% | +2.192 to +4.664 | yes: power given |
+| response time (ms), mean | 157.5 | 95.9 | -39.1% | -65.03 to -58.14 | yes: GAIN |
+| response time (ms), 95th percentile | 310.3 | 152.3 | -50.9% | -166.7 to -149.5 | yes: GAIN |
+| response time (ms), 99th percentile | 443.5 | 188.9 | -57.4% | -281.9 to -227.3 | yes: GAIN |
+| time over the response line (% of samples) | 0.5137 | 0 | -100.0% | -0.7359 to -0.2914 | yes: GAIN |
 | failed requests (%) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
-| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | 0.1111 | 0 | -100.0% | -0.3673 to +0.1451 | no |
-| settings commands the governor wrote on its own (no person touched either arm) | 0 | 17.11 | +17.1 (native is 0) | +16.85 to +17.37 | yes, up (shown, not judged) |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | 0.1 | 0 | -100.0% | -0.3262 to +0.1262 | no |
+| settings commands the governor wrote on its own (no person touched either arm) | 0 | 17.1 | +17.1 (native is 0) | +16.87 to +17.33 | yes, up (shown, not judged) |
 | pods with no machine to take them (unschedulable) | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
 | time pods had no machine to take them, pod-minutes | 0 | 0 | +0 (native is 0) | +0 to +0 | no |
-| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.3259 | 0.463 | +42.0% | -0.1691 to +0.4432 | no |
-| utilisation (used / allocatable) | 0.03781 | 0.05168 | +36.7% | +0.01296 to +0.01478 | yes, up (shown, not judged) |
-| CPU used (cores), mean | 0.9074 | 1.24 | +36.7% | +0.3111 to +0.3547 | yes, up (shown, not judged) |
-| Omni's own CPU (cores), mean | 0 | 0.01343 | +0.0134 (native is 0) | +0.01268 to +0.01418 | yes, up (shown, not judged) |
-| CPU used with Omni's own (cores), mean | 0.9074 | 1.254 | +38.2% | +0.324 to +0.3687 | yes, up (shown, not judged) |
-| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 694.1 | 518.1 | -25.4% | -183.3 to -168.8 | yes, down (shown, not judged) |
-| HPA replicas, mean | 8.988 | 9.257 | +3.0% | -0.05816 to +0.5963 | no |
-| pods started | 4.556 | 4.444 | -2.4% | -1.467 to +1.245 | no |
-| pod start wait, total (s) | 14 | 9.333 | -33.3% | -11.42 to +2.089 | no |
-| pod start wait, mean (s) | 2.656 | 2.011 | -24.3% | -1.745 to +0.4565 | no |
-| host CPU busy, the real machine under kind (%) | 28.15 | 37.81 | +34.3% | +9.075 to +10.24 | yes, up (shown, not judged) |
+| pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | 0.2933 | 0.4433 | +51.1% | -0.1202 to +0.4202 | no |
+| utilisation (used / allocatable) | 0.0379 | 0.05164 | +36.3% | +0.0129 to +0.01459 | yes, up (shown, not judged) |
+| CPU used (cores), mean | 0.9095 | 1.239 | +36.3% | +0.3096 to +0.3502 | yes, up (shown, not judged) |
+| Omni's own CPU (cores), mean | 0 | 0.01346 | +0.0135 (native is 0) | +0.0128 to +0.01412 | yes, up (shown, not judged) |
+| CPU used with Omni's own (cores), mean | 0.9095 | 1.253 | +37.7% | +0.3226 to +0.3641 | yes, up (shown, not judged) |
+| energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | 692.7 | 518.5 | -25.1% | -181.8 to -166.6 | yes, down (shown, not judged) |
+| HPA replicas, mean | 8.991 | 9.252 | +2.9% | -0.02632 to +0.549 | no |
+| pods started | 4.5 | 4.5 | +0.0% | -1.216 to +1.216 | no |
+| pod start wait, total (s) | 12.9 | 9.7 | -24.8% | -9.993 to +3.593 | no |
+| pod start wait, mean (s) | 2.465 | 2.07 | -16.0% | -1.514 to +0.7236 | no |
+| host CPU busy, the real machine under kind (%) | 28.15 | 37.83 | +34.4% | +9.167 to +10.2 | yes, up (shown, not judged) |
 | host cores (the real machine under kind) | 4 | 4 | +0.0% | +0 to +0 | no |
 
 ---
