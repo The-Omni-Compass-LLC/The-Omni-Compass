@@ -2,6 +2,32 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (late night): The watchdog trusts only its own registry; the threat model
+
+- **Three faults in the switch tool, found and fixed** (`tools/omni_switch.py`; no engine file changes, no decision of any
+  governor changes). (1) The watchdog ran every restore command it found in the registry, and stopped every hung
+  governor's process, so a record another local user could write (the default registry is under `/tmp`) was a command run
+  or a process stopped with the watchdog's rights. It now acts only on a record that it and the registry directory are
+  owned by its own user (or root, or a uid named with `--trust-uid`), that is no symbolic link and that no other user can
+  write; each record is opened inside the directory without following a link and checked on the open file. Any other is
+  refused, named and left in place. (2) A governor that died and whose process number the system gave to another process
+  was taken for hung, and that other process was killed. A number now counts as the governor's only while the process
+  holding it started before the governor registered (`/proc`); otherwise nothing is signalled and the governor's
+  settings are handed back. (3) `off` wrote the switch file through any link planted at its path; it no longer follows a
+  link, and every governor is still signalled if the file cannot be written. `status` names what it refused and warns
+  when the switch's or the registry's directory can be written by another user. `tests/test_switch_trust.py`
+  reproduces each fault on the tool as it stood (the old watchdog killed the process holding a reused number; the old
+  `off` overwrote the file a link pointed at) and passes on the fix. Every caller runs the governors and the tool as one
+  user (the cloud install's pod as 10001, the GPU scripts under sudo, the kind and KWOK rigs as the runner), so every
+  hand-back that worked still works.
+- **The threat model** (`docs/THREAT_MODEL.md`, bound into the Owner's Manual after the safety case): what is worth
+  protecting, where trust changes hands, twelve threats of misuse with the guard against each, its evidence and what is
+  still open, and what would close the open rows. Among them, stated plainly: no outside review or penetration test; the
+  default switch directory in `/tmp`, written in an engine file and so moved only by the next engine version; the lock
+  file pinning versions, not hashes; the workflows naming actions by tag (402 uses, none by commit); 28 of 53 workflows
+  without token permissions of their own. The safety case gains H13; `SECURITY.md`, both manuals and the integration
+  manual say how to keep the switch and the registry private.
+
 ## 2026-10-18 (late night): The extended fault test; entries added under way keep every started run in its place
 
 - **Two more faults, the ones that blind a governor** (`scripts/kind_faults.sh`, `FAULTS=2`; the amendment in
