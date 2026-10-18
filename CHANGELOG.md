@@ -2,6 +2,15 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (late night): Every workflow names its token's rights
+
+- **The 28 workflows that set no token permissions now read the code and nothing else** (`permissions: contents: read`).
+  None of them pushes, starts a run, reads another run's files or signs in through the token: they check out, build,
+  run, sign in to a cloud with its own key and upload their files, none of which needs more. Before, their token had the
+  repository's default rights. `tests/test_workflow_permissions.py` fails a push that leaves any workflow on the default,
+  or gives a read-only token to a workflow that pushes, starts a run or reads another run's files. The threat model's T9
+  row is closed.
+
 ## 2026-10-18 (late night): The watchdog trusts only its own registry; the threat model
 
 - **Three faults in the switch tool, found and fixed** (`tools/omni_switch.py`; no engine file changes, no decision of any
