@@ -123,7 +123,6 @@ def measure(row, m):
 def newest(fname):
     """The same test's table on the newest engine that has one (V<n>_<TEST>.json with the highest n); tables of two engines
     are never pooled, and a later engine's three runs take the test's place the moment their table lands."""
-    import re
     base = re.sub(r"^V\d+_", "", fname)
     found = sorted((int(m.group(1)), x.name) for x in LIVE.glob("V*_" + base) if (m := re.fullmatch(r"V(\d+)_" + re.escape(base), x.name)))
     return found[-1][1] if found else fname
