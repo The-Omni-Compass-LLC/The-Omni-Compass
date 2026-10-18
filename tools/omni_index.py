@@ -120,9 +120,19 @@ def measure(row, m):
     return {"native": row["runs"][0]["native"], "omni": row["runs"][0]["omni"], "ratio": g, "reading": reading}
 
 
+def newest(fname):
+    """The same test's table on the newest engine that has one (V<n>_<TEST>.json with the highest n); tables of two engines
+    are never pooled, and a later engine's three runs take the test's place the moment their table lands."""
+    import re
+    base = re.sub(r"^V\d+_", "", fname)
+    found = sorted((int(m.group(1)), x.name) for x in LIVE.glob("V*_" + base) if (m := re.fullmatch(r"V(\d+)_" + re.escape(base), x.name)))
+    return found[-1][1] if found else fname
+
+
 def tests():
     out = []
     for cat, name, f, measures, work in SOURCES:
+        f = newest(f)
         path = LIVE / f
         if not path.exists():
             continue
@@ -136,6 +146,7 @@ def tests():
         out.append({"category": cat, "test": name, "source": f"results/live/{f}", "runs": [x["run"] for x in data["runs"]],
                     "v1": bool(data.get("v1")), "measures": r})
     for cat, fname, label, measures_ in WORKLOAD_TABLES:
+      fname = newest(fname)
       db = LIVE / fname
       if not db.exists():
         continue
@@ -224,7 +235,7 @@ def main():
          "for work and speed, and power given for machines and energy (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). A test's index is the "
          "geometric mean of its ratios; a category is the geometric mean of its tests; the headline is the geometric "
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
-         "Every number is read from the test's own newest three-run table (`results/live/V7_*.json`, omni-v7's, made by "
+         "Every number is read from the test's own newest three-run table (`results/live/V<n>_*.json`, the newest engine with all three runs, made by "
          "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
          f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pct(head)}, "
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
