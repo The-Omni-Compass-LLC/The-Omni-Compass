@@ -501,25 +501,38 @@ def jobs_in_flight():
     return queued, running, first
 
 
-def rerun_queue(path=None):
-    """The queue in release order: [(run, name, workflow, inputs)], A of every benchmark, then B, then C."""
+def rerun_blocks(path=None):
+    """The queue file's entries, [[(name, workflow, inputs)]], one list per block. Every `added=<UTC>` line opens a new block:
+    the entries added once the campaign was under way."""
     path = Path(path or RERUNS)
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
     except OSError:
         return []
-    entries = []
+    blocks = [[]]
     for ln in lines:
         ln = ln.strip()
         if not ln or ln.startswith("#"):
+            continue
+        if ln.startswith("added="):
+            blocks.append([])
             continue
         name, wf, inputs = (ln.split("|") + ["", ""])[:3]
         kv = dict(x.split("=", 1) for x in inputs.split(";") if "=" in x)
         wf = wf.strip()
         if wf in {"gke-metered.yml", "eks-metered.yml", "gpu-bench.yml", "lambda-gpu.yml", "cloud-organism.yml"}:
             raise ValueError(f"{wf} is excluded from the approved non-GPU campaign")
-        entries.append((name.strip(), wf, kv))
-    return [(run, n, wf, kv) for run in "ABC" for n, wf, kv in entries]
+        blocks[-1].append((name.strip(), wf, kv))
+    return [b for b in blocks if b]
+
+
+def rerun_queue(path=None):
+    """The queue in release order: [(run, name, workflow, inputs)], A of every benchmark, then B, then C, block by block. A
+    run is read back by its count in its workflow, in this order, so an entry put among entries already started would take
+    the place of one of them (18 October: three data-store entries put among started ones would have run one entry's C twice
+    and another's A never). An entry added once the campaign is under way therefore stands in a block of its own, below an
+    `added=<UTC>` line, released after every entry above it, A, B and C, and every run already started keeps its place."""
+    return [(run, n, wf, kv) for block in rerun_blocks(path) for run in "ABC" for n, wf, kv in block]
 
 
 def reruns_to_start(queue, started):

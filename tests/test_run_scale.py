@@ -202,6 +202,21 @@ class Conductor(unittest.TestCase):
         self.assertEqual(g.reruns_to_start(q, {"w1.yml": 6, "w2.yml": 3}), [])
         self.assertTrue(g.rerun_queue(g.RERUNS))                      # the repository's own queue reads
 
+    def test_an_entry_added_under_way_keeps_every_started_run_in_its_place(self):
+        # 18 October: w1's two entries had all started (A, B and C); an entry put between them would have been read as
+        # started in their place, one entry's C run twice and the new entry's A never. In a block of its own it comes after.
+        g = self.g
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("x one|w1.yml|a=1\nx two|w2.yml|\nx three|w1.yml|a=3\n# added\nadded=2026-10-18T22:45:00Z\nx new|w1.yml|a=2\n")
+        self.assertEqual([[n for n, _, _ in b] for b in g.rerun_blocks(f.name)], [["x one", "x two", "x three"], ["x new"]])
+        q = g.rerun_queue(f.name)
+        self.assertEqual(len(q), 12)
+        self.assertEqual([(r, n) for r, n, _, _ in q[9:]], [("A", "x new"), ("B", "x new"), ("C", "x new")])
+        left = g.reruns_to_start(q, {"w1.yml": 6, "w2.yml": 3})
+        self.assertEqual([(r, n) for r, n, _, _ in left], [("A", "x new"), ("B", "x new"), ("C", "x new")])
+        self.assertEqual(left[0][3], {"a": "2"})
+
     def test_azure_sets_one_a_queue_a_then_b_then_c_never_twice(self):
         g = self.g
         import tempfile
