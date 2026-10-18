@@ -325,9 +325,10 @@ will find, the following discipline throughout, because it is the discipline the
 5. **Nothing read across engines.** The engine is frozen and fingerprinted (`OMNI_V1.json`, `OMNI_V2.json`,
    `OMNI_V3.json`, `OMNI_V5.json`, `OMNI_V6.json`, `OMNI_V7.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
    again on it. Every table made by rule checks the engine of each run it reads and refuses to mix them.
-6. **The raw files live with the code.** Every finished run's files are copied into `results/live/raw/run-<id>/` with one
-   SHA-256 manifest per repetition, and every table names the runs and the commit it was made from. Anyone with the
-   repository can recompute every table from the files it names.
+6. **The raw files live with the code.** Every finished run's files are copied into `run-<id>/` on the repository's branch
+   `raw` with one SHA-256 manifest per repetition (opened by `scripts/raw_archive.sh`, the branch sits at
+   `results/live/raw/`), and every table names the runs and the commit it was made from. Anyone with the repository can
+   recompute every table from the files it names.
 7. **Do no harm.** Omni-Compass moves a knob only where a paired trial on the muscle itself shows the muscle never behind for
    it (the verdict, `omnicompass/verdict.py`, with its 2% allowance). Where it cannot improve a knob, that knob stays
    native, and the result says "nothing for Omni to move".
@@ -3000,9 +3001,11 @@ a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on G
    loses, the first suspect is our own wiring, native setup or scoring; that is fixed and the test run again, and the
    loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut out.
 8. **The raw files live with the code.** Every finished run's files (capture, response times, audit log, controller
-   log, one SHA-256 manifest per repetition) are copied into `results/live/raw/run-<id>/` by the `archive-run`
+   log, one SHA-256 manifest per repetition) are copied into `run-<id>/` on the branch `raw` by the `archive-run`
    workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
-   every table names the runs and the commit it was made from.
+   every table names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
+   clone of it is small; `bash scripts/raw_archive.sh open /run-<id>/` places a run's files at `results/live/raw/run-<id>/`,
+   the path every table names.
 
 **How many repetitions, and why.** The width of a paired interval shrinks with the square root of the number of pairs,
 so going from five pairs to ten narrows it by about a third, and from ten to forty by half again. On GitHub's runners,
@@ -3839,7 +3842,7 @@ any one of the three can tell whether the files in front of them are the files t
 | `cpp/` | the C++20 twins |
 | `results/` | every published result, with its raw files and checksums |
 | `results/live/V1_*.md`, `V3_*.md` (+ `.json`) | the three-run tables, one per test, named by the engine they ran on |
-| `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition |
+| `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition (the branch `raw`, opened by `scripts/raw_archive.sh`) |
 | `results/grid_v5/GRID.md`, `results/realms_v5/REALMS_V5.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled muscles and organisms, the one combined number (the older engines' tables stay under their own names) |
 | `OMNI_V11.json` (the engine that stands), `OMNI_V10.json`, `OMNI_V9.json`, `OMNI_V8.json`, `OMNI_V7.json`, `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json`, `OMNI_V1.json` | the engines' fingerprints |
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
@@ -4087,7 +4090,8 @@ questions has a yes in this program or a disclosure naming the exception; the di
 
 **How to audit one result from this manual to its raw files.** Take any row of section 16. Its source column names a
 three-run table in `results/live/`; the table's head names the three GitHub run ids, the commit each ran on and the engine
-`tools/omni_version.py` reads at that commit. Each run id names a folder `results/live/raw/run-<id>/` holding every
+`tools/omni_version.py` reads at that commit. Each run id names a folder `results/live/raw/run-<id>/` (the branch `raw`,
+opened by `scripts/raw_archive.sh open /run-<id>/`) holding every
 repetition's files (the capture, the response times, the governor's audit and log, the per-request records, one SHA-256
 manifest per repetition). The table tool named in the table's text (`tools/confirm_abc.py` or its siblings) rebuilds the
 table from those folders; `tools/omni_index.py` rebuilds the index from the tables; `tools/dossier.py` rebuilds the
@@ -4126,7 +4130,8 @@ in order, with what each costs:
    `tests/`, including the rules of every three-run table on fixed cases, and ends `VERIFICATION: PASS`. About ten
    minutes on a laptop. `python3 tools/omni_version.py` then says which frozen engine the checkout carries.
 2. **Rebuild any table from its raw files.** Every three-run table names its three run ids; their files are in
-   `results/live/raw/run-<id>/`. `python3 tools/confirm_abc.py "<title>" results/live/raw/run-<A> results/live/raw/run-<B>
+   `results/live/raw/run-<id>/` once the branch `raw` is opened there (`bash scripts/raw_archive.sh open /run-<A>/ /run-<B>/
+   /run-<C>/`). `python3 tools/confirm_abc.py "<title>" results/live/raw/run-<A> results/live/raw/run-<B>
    results/live/raw/run-<C> --out /tmp/check.md` rebuilds a Kubernetes or Azure table; `tools/pgbench_abc.py`,
    `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py` and `citylearn_abc.py`
    the others, with the same arguments. Compare the result with the committed table: they are the same bytes below the legal notice. A
