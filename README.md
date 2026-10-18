@@ -74,8 +74,15 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-18 05:59 | grid | cancelled | [39102291257](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39102291257) |
+| 2026-10-18 05:52 | live-engine | cancelled | [39102031491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39102031491) |
+| 2026-10-18 05:48 | gke-metered burst 2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5 replica room 0 dial save us-central1-a e2-standard-2 | failure | [39101574903](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39101574903) |
+| 2026-10-18 05:48 | eks-metered burst 2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5 replica room 0 dial save us-east-1 m5.large | failure | [39101579099](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39101579099) |
+| 2026-10-18 05:33 | eks-metered burst 1 6 1 8 1 6 replica room 0 dial save us-east-1 m5.large | failure | [39100691172](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39100691172) |
+| 2026-10-18 05:32 | gke-metered burst 1 6 1 8 1 6 replica room 0 dial save us-central1-a e2-standard-2 | failure | [39100686388](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39100686388) |
+| 2026-10-18 05:17 | eks-metered burst 1 4 1 6 1 9 replica room 0 dial save us-east-1 m5.large | failure | [39099802847](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099802847) |
+| 2026-10-18 05:17 | gke-metered burst 1 4 1 6 1 9 replica room 0 dial save us-central1-a e2-standard-2 | failure | [39099797654](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099797654) |
 | 2026-10-18 05:08 | big-organism-detached collect | success | [39099525236](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099525236) |
-| 2026-10-18 05:08 | live-engine | cancelled | [39099496328](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39099496328) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
