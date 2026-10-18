@@ -2,6 +2,37 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (night): The KEDA pod start wait root-caused to the test machine; the kind rig pre-pulls the served image
+
+- **Where the wait goes.** `tools/pod_phases.py` reads every serving pod started inside a measured window from the run's own
+  files and splits it into scheduling, the node side and the app with its probe. It places each start by the host's busy
+  share and by whether its node already served, and splits the change in the mean between the arms exactly in two: the
+  shift of starts into other strata, and the wait in the same stratum. The receipt is `results/live/POD_START_PHASES.md`
+  (741 starts, five KEDA runs, omni-v10 and omni-v11). On a node already serving a start takes 1.3 to 1.7 s in both arms;
+  on an empty node it takes 7 to 12 s, because the image (`registry.k8s.io/hpa-example`) is downloaded and unpacked inside
+  the window on the one runner all kind nodes share. Under the http setup, all of the omni arm's rise in the mean (+1.42 s
+  on omni-v10, +0.65 s on omni-v11) is its starts' shift into a busier host (+1.57 s, +1.64 s), the processor its conveyance
+  keeps busy. At the same host load on the same kind of node, its starts were as fast or faster (−0.14 s, −0.98 s).
+  `docs/POD_START_WAIT.md` sets out the mechanism, the decomposition, the prediction for a fleet of separate machines and
+  the threats; it is bound into the Owner's Manual beside the Kubernetes preregistration.
+- **The rig fix, the same in both arms.** On kind, `scripts/kind_bench.sh` runs an image pre-puller before each arm
+  (`deploy/kind/prepull.yaml`: one pod on every worker pulls the served image), waits for it on every worker, deletes it,
+  and records `images=` and the digests in the arm's preflight record. A pre-puller that does not finish marks the arm
+  invalid. The operator's manifests, the engine (omni-v11's digest), the loads, the gauges and the cloud sets are
+  unchanged. Amendment in `docs/K8S_COMPASS_PREREGISTRATION.md`, written before any run on it.
+- **Never two rigs in one table.** The conductor counts a kind workflow's omni-v11 run only when the run's own commit
+  carries the pre-puller (`RIG_FILE` in `scripts/dispatch_grid.py`, read from GitHub once a commit; a read that fails for
+  any reason but a missing file stops the tick, so no run is counted on a rig it was not read on). The runs on the rig
+  before run to their end and stay as their own record. `tools/confirm_abc.py` reads each run's rig from its preflight
+  records and heads any table whose A, B and C differ in rig with that fact. In the grid with the real cluster inside the
+  amended rig is protocol 4 (`KUBE_PROTOCOL`, carried in each run's name by `six-kube` and `big-organism-detached`); no
+  omni-v11 run with the cluster inside had started on protocol 3.
+- **The raw archive opens runs saved since it was first opened.** `scripts/raw_archive.sh open` left an existing worktree at
+  the commit it was first opened on, so a run saved to the branch afterwards could not be opened (its folder stayed absent).
+  It now moves the worktree to the branch's newest commit, keeping any file written there and not yet saved; a clash with
+  such a file leaves the folder where it was and says so. `tests/test_raw_archive.py` reproduces the fault and passes on the
+  fix.
+
 ## 2026-10-18 (late): The Lambda launcher made safe before the first rental; the tests no check ran
 
 - **A give-back that cannot be lost to a moved address.** Lambda moved from lambdalabs.com to lambda.ai. Python's own
