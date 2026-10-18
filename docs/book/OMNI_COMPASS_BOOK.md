@@ -7312,7 +7312,8 @@ free trial.
 
 ### G.4 One paste: a login for GitHub
 
-Paste this whole block into that terminal and press **Enter** (it takes about a minute):
+Paste this whole block into that terminal and press **Enter** (it takes about a minute). It is safe to paste again: a
+login already made is kept, and a fresh key is made each time.
 
 ```bash
 P=$(gcloud config get-value project)
@@ -7322,31 +7323,55 @@ for r in roles/container.admin roles/compute.admin roles/iam.serviceAccountUser;
   gcloud projects add-iam-policy-binding "$P" --member "serviceAccount:omni-compass-github@$P.iam.gserviceaccount.com" --role "$r" --quiet >/dev/null
 done
 gcloud iam service-accounts keys create key.json --iam-account "omni-compass-github@$P.iam.gserviceaccount.com"
-cat key.json; rm key.json
+cloudshell download key.json
 ```
 
-It prints a block that starts with `{` and ends with `}`. Select all of it, from `{` to `}`, and copy it. That block is a
-password for this one purpose: never paste it anywhere but the GitHub secret below. (If the project picker showed no
-project, run `gcloud config set project YOUR-PROJECT-ID` first.)
+The browser asks to download **key.json**: click **Download**. Never copy the key from the terminal's screen: a block that
+long is cut short when it is selected there (on 18 October the stored key ended part of the way through, and every Google
+set failed at the login). Then:
+
+1. On the laptop, open the **Downloads** folder, right-click **key.json**, **Open with**, **Notepad** (on a Mac:
+   **TextEdit**).
+2. Press **Ctrl+A** (select all), then **Ctrl+C** (copy). The whole file is about 2,300 characters, from `{` to `}`.
+3. Back in Cloud Shell, type `rm key.json` and press **Enter**; on the laptop, delete **key.json** from **Downloads** once
+   the secret below is saved.
+
+That file is a password for this one purpose: never paste it anywhere but the GitHub secret below. (If the project picker
+showed no project, run `gcloud config set project YOUR-PROJECT-ID` first.)
 
 ### G.5 Put the two secrets in GitHub
 
 1. Open the repository on GitHub, click **Settings** (the repository's tab, at the top right), then on the left
    **Secrets and variables**, then **Actions**.
-2. **New repository secret**. Name: `GCP_CREDENTIALS`. Secret: paste the whole block from step 4. **Add secret**.
+2. **New repository secret** (or, when it is already there, the pencil beside it: **Update**). Name: `GCP_CREDENTIALS`.
+   Secret: click in the box, **Ctrl+V** (the whole file from step 4). **Add secret** (or **Update secret**).
 3. **New repository secret**. Name: `GCP_PROJECT`. Secret: the Project ID from step 2. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v10` is kept in step with it), and no result goes up
-before it has been read.
+That is all. Within the hour the conductor runs Google's check at no cost (**Actions**, **cloud-check**, the run titled
+`cloud-check google`): the key's shape (only its length and missing parts are ever printed, never a character of it), the
+login, the machine type and every quota a set needs. When it passes, the sets start on their own on the engine that stands
+(branch `main`; `v11` is kept in step with it), and no result goes up before it has been read. When it fails, it says which
+of these to fix, and nothing is built or billed.
 
-### G.6 What it costs
+### G.6 Google's limits (quotas)
+
+A set needs, at once, 5 machines of 2 processors (10 processors), their 5 boot disks of 100 GB (500 GB of solid-state disk)
+and 6 external addresses in `us-central1`. The check reads each of Google's limits and names any that is short:
+
+- **CPUS_ALL_REGIONS 8**: the free trial (8 processors at once). Activate the full account: at the top of the console
+  click **Activate** (or ☰, **Billing**, **Activate full account**) and confirm. The $300 credit stays and pays first.
+- **Any other limit short** (`CPUS`, `SSD_TOTAL_GB`, `IN_USE_ADDRESSES`): ☰, **IAM & Admin**, **Quotas & System Limits**;
+  search the name the check printed, tick it (region `us-central1` where it asks), **Edit**, ask for what the check said
+  is needed or more, **Submit**. Google usually answers within minutes to a day. The set is never shrunk to fit.
+
+### G.7 What it costs
 
 Google's list prices (us-central1, on demand): a worker of the Kubernetes test (`e2-standard-2`) about $0.067 an hour, up to
 4 workers an arm, about $5 to $15 for a full five-repetition set; the big-organism machine (`e2-standard-8`) about $0.27 an
 hour, about $10 for its 39-hour ceiling. All of it comes out of the $300 credit first. Every cluster and machine is
 deleted when its run ends, whatever happens.
 
-### G.7 Afterwards
+### G.8 Afterwards
 
 To remove GitHub's access: in the console menu ☰ **IAM & Admin**, **Service Accounts**, tick **omni-compass-github**,
 **Delete**; and delete the two secrets in GitHub.
@@ -7381,7 +7406,21 @@ before the card.
 7. Support plan: **Basic support - Free**. Click **Complete sign up**, then **Go to the AWS Management Console** and sign in
    as the root user.
 
-### H.2 A login for GitHub (an IAM user)
+### H.2 An account already on the Free plan: move it to the Paid plan
+
+An account that chose the Free plan cannot run these tests: Amazon puts a policy above every login of the account that
+refuses every machine read and every machine (on 18 October each Amazon set stopped there, at no cost, with "explicit deny
+in a service control policy"). Moving to the Paid plan removes it; the credits stay and still pay first.
+
+1. Sign in to the console as the root user (the e-mail and password of step 1).
+2. At the top of the console click **Upgrade plan** (beside the Free plan's credit and days left), or search
+   **Billing and Cost Management**, open it, and click **Upgrade plan** on its home page.
+3. Read the page, and click **Upgrade to paid plan** (or **Upgrade plan**) to confirm.
+
+Nothing else changes: the login made for GitHub (step 2) and the two secrets (step 3) stay as they are. Within the hour the
+conductor's check reads the account again and the sets start on their own.
+
+### H.3 A login for GitHub (an IAM user)
 
 1. In the search bar at the top of the console type **IAM** and open it.
 2. On the left, **Users**, then **Create user**. User name: `omni-compass-github`. Do **not** tick console access.
@@ -7395,28 +7434,33 @@ before the card.
 6. The page shows an **Access key** (starts with `AKIA`) and a **Secret access key**. Keep the page open for the next step;
    the secret is shown only once. These two are passwords for this one purpose: never paste them anywhere but GitHub.
 
-### H.3 Put the two secrets in GitHub
+### H.4 Put the two secrets in GitHub
 
 1. Open the repository on GitHub, click **Settings** (the repository's tab, at the top right), then on the left
    **Secrets and variables**, then **Actions**.
 2. **New repository secret**. Name: `AWS_ACCESS_KEY_ID`. Secret: the Access key. **Add secret**.
 3. **New repository secret**. Name: `AWS_SECRET_ACCESS_KEY`. Secret: the Secret access key. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v10` is kept in step with it), and no result goes up
-before it has been read.
+That is all. Within the hour the conductor runs Amazon's check at no cost (**Actions**, **cloud-check**, the run titled
+`cloud-check amazon`): the keys log in, the account can read and rent machines (not the Free plan), the instance type is
+offered and the processor quota holds a set. When it passes, the sets start on their own on the engine that stands (branch
+`main`; `v11` is kept in step with it), and no result goes up before it has been read. When it fails, it says which of
+these to fix, and nothing is built or billed.
 
-### H.4 What it costs
+### H.5 What it costs
 
 Amazon's list prices (us-east-1, on demand): a worker of the Kubernetes test (`m5.large`) about $0.096 an hour, up to 4
 workers an arm, plus about $0.10 an hour for each cluster's control plane, about $10 to $25 for a full five-repetition set;
 the big-organism machine (`m6i.2xlarge`) about $0.38 an hour, about $15 for its 39-hour ceiling. The credits pay first.
 Every cluster and machine is deleted when its run ends, whatever happens.
 
-If Amazon refuses a machine for "vCPU limit" (new accounts start with a small limit): in the console search **Service
-Quotas**, open **Amazon Elastic Compute Cloud (Amazon EC2)**, **Running On-Demand Standard (A, C, D, H, I, M, R, T, Z)
-instances**, **Request increase at account level**, ask for 64, **Request**. Amazon usually answers within a day.
+A set needs 10 processors at once (5 machines of 2). New accounts can start with less. When the check finds the quota
+short it asks Amazon for the increase itself (once; it waits for Amazon's answer before asking again), and Amazon usually
+answers within a day. To ask by hand: in the console search **Service Quotas**, open **Amazon Elastic Compute Cloud (Amazon
+EC2)**, **Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances**, **Request increase at account level**, ask for
+64, **Request**. The set is never shrunk to fit.
 
-### H.5 Afterwards
+### H.6 Afterwards
 
 To remove GitHub's access: in IAM, **Users**, tick **omni-compass-github**, **Delete**; and delete the two secrets in
 GitHub.
@@ -7822,6 +7866,14 @@ The repository's secrets each workflow reads are `AZURE_CREDENTIALS` (Azure), `G
 (Google Cloud), and `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (Amazon). They are set once in the repository's
 settings, never printed, and used only to build and delete the run's own clusters; the governor inside the clusters
 never sees them (section 15.5).
+
+Before a Google Cloud or Amazon set starts, `cloud-check` runs for that cloud at no cost and stops before anything is built:
+the stored key's shape (for Google, its length and its missing parts only, never a character of it), the login, the
+account's plan, the machine type in the zone or region, and every quota a set needs (Google: processors in the region and
+in all regions, solid-state disk and external addresses; Amazon: the on-demand processor quota, which the check asks Amazon
+to raise when it is short). The conductor starts a set only after that cloud's newest check passed, and starts a check
+itself when there is none, the last one failed an hour ago or more, or the last pass is a day old; so a broken key, an
+account that cannot rent or a short quota spends no set, and what the check prints names what to fix (Appendices G and H).
 
 ### N.3 A second Azure workflow, for machines already paid for
 
