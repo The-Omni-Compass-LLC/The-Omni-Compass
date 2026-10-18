@@ -74,10 +74,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-18 18:09 | cloud-check amazon | failure | [39152846977](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39152846977) |
-| 2026-10-18 18:09 | cloud-check google | failure | [39152842477](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39152842477) |
-| 2026-10-18 18:05 | live-engine | cancelled | [39152521003](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39152521003) |
-| 2026-10-18 18:00 | swarm | success | [39151682521](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39151682521) |
+| 2026-10-18 19:13 | cloud-check amazon | failure | [39157732354](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157732354) |
+| 2026-10-18 19:13 | cloud-check google | failure | [39157728598](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157728598) |
+| 2026-10-18 19:06 | live-engine | cancelled | [39157240584](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157240584) |
+| 2026-10-18 19:06 | raw-sweep | cancelled | [39157240579](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39157240579) |
+| 2026-10-18 18:56 | big-organism-detached collect | success | [39156455884](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39156455884) |
+| 2026-10-18 18:52 | lambda-gpu | success | [39156171203](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39156171203) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never

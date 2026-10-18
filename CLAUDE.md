@@ -207,7 +207,9 @@ the founder overrides one in the conversation.
   repository's secrets; both queues' `switch=` lines read on. The conductor starts their four sets, A, then B, then C, one
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
-  cloud, never shrunk to fit. The GPU on Lambda still waits for his word and one exact commit. The same morning both first
+  cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
+  from `gpu-omni-v11`, the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
   record. That evening ("fix the Google and Amazon cloud. To work") both queues went back on behind a $0 check
@@ -468,7 +470,8 @@ the founder overrides one in the conversation.
   `raw-sweep.yml` moves any raw folder that still lands on main. `raw` is never merged with main, nor main into it.
   The stale work branches of 27 September to 15 October are kept whole on `archive/stale-branches` (one commit whose
   parents are their tips); their names may be removed without losing a commit.
-- Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. Clear
+- Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. `verify.py` runs
+  every test, the files unittest never collects included (`tools/function_tests.py`, 18 October). Clear
   `/tmp/tmp*` first, because test leftovers fill the disk. Keep the Python 3.12 environment outside `/tmp` (for example
   `/root/v312`), because a container reset wipes `/tmp`. After a push, check the GitHub verify run itself, not only the
   local one.
