@@ -121,11 +121,16 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
+      - name: The key is whole (its shape only; not a character of it is printed)
+        env:
+          GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        run: python3 tools/cloud_key_check.py
       - uses: google-github-actions/auth@v2
         with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
       - uses: google-github-actions/setup-gcloud@v2
         with: {install_components: "kubectl,gke-gcloud-auth-plugin"}
-      - run: gcloud services enable container.googleapis.com compute.googleapis.com --project "$GCP_PROJECT"
+      - name: The services the sets use are on (costs nothing)
+        run: bash scripts/gcp_services.sh
       - name: Run the paired repetition
         run: |
           set +e

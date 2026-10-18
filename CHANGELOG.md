@@ -2,6 +2,31 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (evening): Google Cloud and Amazon back on, behind a $0 check
+
+- **Why they stopped.** Every Google set started that morning failed at Google's login ("unexpected end of JSON input"): the
+  stored `GCP_CREDENTIALS` had been selected from Cloud Shell's screen and was cut short. Every Amazon set failed at the
+  pre-flight: the account is on Amazon's Free plan, whose policy denies every machine read ("explicit deny in a service
+  control policy"). Nothing was built or billed; those runs (Google 4, Amazon 8) were on omni-v10's commit and stay as its
+  record. The founder's order: "fix the Google and Amazon cloud. To work".
+- **The $0 check** (`.github/workflows/cloud-check.yml`): the stored key's shape (`tools/cloud_key_check.py`: its length and
+  missing parts only, never a character of it), the login, the plan, the machine type and every quota a set needs, then it
+  stops. Google's pre-flight (`scripts/gke_paired.sh`) now reads the processors in the region and in all regions (the free
+  trial's 8 is named, with the fix), the solid-state disk and the external addresses, and gives Google's own words when a
+  read is refused; Amazon's (`scripts/eks_paired.sh`) logs in first, names the Free plan when Amazon's policy denies the
+  read, and, in the check, asks Amazon for a short processor quota itself (once; never shrunk to fit). The Google workflow
+  reads the key's shape before its login too. Found on the way: the Google workflow switched the project's services on with
+  a login whose roles carry no right to do so, so even a whole key would have stopped there; `scripts/gcp_services.sh` now
+  reads them and asks for one only when it is off, naming the fix when the login may not.
+- **The conductor waits for it** (`scripts/dispatch_grid.py`, `check_state`): a Google or Amazon set starts only after that
+  cloud's newest check passed within a day; the conductor starts a check itself when there is none, the last failed an hour
+  ago or more, or the last pass is a day old. Both queues are switched on again; a broken key or a plan that cannot rent
+  spends no set's A, B or C, and once the founder's two fixes are stored the sets start on their own within the hour.
+- **The setup pages** (bound into the Operator's Manual as appendices G and H): Google's key is now downloaded as a file
+  (`cloudshell download key.json`) and pasted whole, never copied from the screen; Google's quotas and the free trial's
+  activation have their own section; Amazon's page gains the move from the Free plan to the Paid plan (section 1a) and the
+  check's quota request. `tests/test_cloud_check.py`.
+
 ## 2026-10-18 (afternoon): Omni v11 stands (a reading with no machine in service is blind); every version lands in one command; the toy gate's arms each run their own engine
 
 - **omni-v11** (`OMNI_V11.json`, digest `745aa53ec8eeb67b`, 47 files; `docs/OMNI_V11.md`): omni-v10 with one guard in the Kubernetes
