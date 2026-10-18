@@ -2,6 +2,27 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (late night): The extended fault test; entries added under way keep every started run in its place
+
+- **Two more faults, the ones that blind a governor** (`scripts/kind_faults.sh`, `FAULTS=2`; the amendment in
+  `docs/K8S_COMPASS_PREREGISTRATION.md`, written before its run). After the four preregistered faults, which keep their
+  moments, the API server's process is stopped for 30 s at 82% of the run, and the metrics server is scaled to none for two
+  minutes at 88%, in both arms. Each outage is logged only once it took hold. The API server's process is found by its name
+  in `/proc`, so the fault needs nothing the node image may lack. `tools/live_reps.py` reads the two like the four, and a
+  four-fault run's table is unchanged.
+- **The campaign runs it, A, B and C** (`scripts/reruns.txt`, "kubernetes faults extended", 2,500 s a window so the last
+  outage's 300 s of recovery end inside it). `tests/test_faults_extended.py` holds the moments, the name lookup on a
+  stand-in process, the table and the window's length.
+- **Entries added once the campaign is under way keep every started run in its place** (`scripts/dispatch_grid.py`,
+  `rerun_blocks`). The conductor reads a workflow's started runs back by their count, in the queue's order. The three data
+  stores at the max, pushed earlier tonight among entries whose A, B and C had all started, would have been read as started
+  in their place: MySQL's and MongoDB's tune-down C run would have run twice and their runs at the max A and B never, and
+  PostgreSQL's likewise. The conductor reached none of them before the fix (they stood at place 17 and later in its list,
+  six a tick). An entry added under way now stands in a block of its own below an `added=<UTC>` line, released after every
+  entry above it, A, B and C; the block above is the queue byte for byte as it stood. `tests/test_release_campaign.py`
+  freezes every block as its runs began, so an entry put among them fails the push, and `tests/test_run_scale.py` shows
+  the started runs keeping their places.
+
 ## 2026-10-18 (late night): The referee's summary, the safety case, every data store at the max, the book's last page
 
 - **The referee's summary** (`docs/REFEREE_SUMMARY.md`, bound into the Owner's Manual after "What Omni-Compass Is"): every

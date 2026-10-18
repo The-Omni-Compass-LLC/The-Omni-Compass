@@ -29,9 +29,10 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 123)        # 41 benchmarks, A, B and C (the steady and wandering tests back since omni-v8;
+        self.assertEqual(len(queue), 126)        # 42 benchmarks, A, B and C (the steady and wandering tests back since omni-v8;
                                                  # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October;
-                                                 # every data store at the max beside the tune-down, 18 October)
+                                                 # every data store at the max beside the tune-down, 18 October;
+                                                 # the extended fault test, 18 October)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
         for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
             self.assertEqual({row[3].get('objective') for row in queue if row[2] == wf and row[3].get('native') != 'shipped'},
@@ -53,6 +54,25 @@ class ReleaseCampaign(unittest.TestCase):
                     grid.rerun_queue()
             finally:
                 grid.RERUNS = old
+
+    def test_every_block_stands_as_it_was_when_its_runs_began(self):
+        # a run is read back by its count in its workflow, so an entry put among entries already under way takes a started
+        # run's place (18 October); each block is frozen here as it stood, and an entry added later opens a new block
+        frozen = [
+            ['core benchmark', 'Kubernetes baseline', 'Kubernetes full controls', 'Kubernetes levers',
+             'Kubernetes observe-only check', 'Kubernetes CruiseKube', 'Kubernetes Goldilocks', 'Kubernetes fixed capacity',
+             'Kubernetes scale control plane', 'every catalog muscle', '1107 muscles and seven organisms',
+             'Linux CPU governor and meter capability', 'Azure full-control six-stage burst', 'large organisms on Azure',
+             'kubernetes steady', 'kubernetes wandering', 'kubernetes all four', 'kubernetes fairness', 'kubernetes faults',
+             'kubernetes batch', 'kubernetes google 2011 trace', 'kubernetes keda add-ons', 'redis resource', 'kafka resource',
+             'postgresql resource', 'mysql resource', 'mongodb resource', 'redis service', 'kafka service',
+             'mysql resource, native as shipped', 'redis resource, native as shipped', 'mongodb resource, native as shipped',
+             'robot arms', 'power grids', 'buildings and batteries', 'drone swarms', 'robustness kill', 'robustness long'],
+            ['mysql service', 'mongodb service', 'postgresql service', 'kubernetes faults extended'],   # added 18 October, night
+        ]
+        blocks = grid.rerun_blocks()
+        self.assertEqual([[n for n, _, _ in b] for b in blocks[:len(frozen)]], frozen)
+        self.assertTrue(all(len(b) > 0 for b in blocks))
 
     def test_started_work_is_not_queued_again(self):
         queue = grid.rerun_queue()
