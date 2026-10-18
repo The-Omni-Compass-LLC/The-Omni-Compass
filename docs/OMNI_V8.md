@@ -2,9 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v8 stood on main on 17 October; since later that day the engine that stands is Omni v9 (`docs/OMNI_V9.md`), omni-v8
-with the CityLearn battery wire reading the coming hour, which cuts the one row this page names (section 3; printed LOSS, power
-given by the key, `docs/OMNI_V9.md`, section 1). This page
+Omni v8 stood on main on 17 October; later that day it was followed by Omni v9 (`docs/OMNI_V9.md`), omni-v8 with the
+CityLearn battery wire reading the coming hour, which cuts the one row this page names (section 3; printed LOSS, power given by
+the key, `docs/OMNI_V9.md`, section 1), and on 18 October by Omni v10 (`docs/OMNI_V10.md`), the engine that stands. This page
 stays as omni-v8's record, read beside no other engine's.
 
 Omni v8 was the engine that stood on main from 17 October (the founder's order: "there's a new version 8 ... push in all and

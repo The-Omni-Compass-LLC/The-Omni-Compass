@@ -144,6 +144,22 @@ through `tools/readings.py`). No number moves; only the word beside it. Read aga
 score-rows GAIN, 20 power given and 13 LOSS, the 13 the energy not served and the time uncomfortable in the seven 2023 districts,
 repaired in omni-v8; the robustness district's monthly unevenness +0.11%, the row the amendment above answered, is power given.
 
+## Amendment of 18 October (omni-v10): the glide that cuts the bill most
+
+**What the rule changed.** The amendment of 17 October (omni-v9) set the glide at the fastest speed at which no score rose in any
+district, which counted a rise in the ramping or in the distance from net zero against the wire. Under the one key (the amendment
+above) those are power held: a rise is power given. The founder's rule for the tune: use everything that can be used, keep
+everything healthy, never raise the bill, hurt no one.
+
+**Amendment (one setting, one muscle):** the glide is 0.0875 of the command's range an hour, the speed on the omni-v9 ladder (0.05,
+0.0625, 0.075, 0.0875, 0.10) that cuts the bill most with no LOSS: at 0.10 the bill falls less in both districts that set the edge
+(the 2022 phases 2 and 3). The controller, the gain, the response, the reading of the coming hour, the band, the hand-back, the
+outage batteries and the water tanks are unchanged. Read before any GitHub run on the five 2022 districts
+with batteries (the two 100-building neighbourhoods were still running when it was pushed): no LOSS on any score; two rows of the 2022 phase 3 are power given (the ramping +6.18%, the net-zero shortfall +0.25%)
+(`docs/OMNI_V10.md`, section 2). A change that steered the outage buildings' batteries outside the outage hours was run on six of
+the seven 2023 districts and refused: energy not served +0.69% in one, a LOSS (`docs/OMNI_V10.md`, section 3). Every district has
+been seen, so the amendment is reported on all, every row, through `tools/citylearn_abc.py` A, B and C on the omni-v10 commit.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

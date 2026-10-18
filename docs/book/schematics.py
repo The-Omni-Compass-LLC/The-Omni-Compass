@@ -1029,7 +1029,7 @@ def f_conductor():
                   ("decision", "an Azure run, a grid report or a verify waiting for a runner?"),
                   ("box", "read every started run back from its name; never start one twice"),
                   ("box", "the reruns: A of every benchmark on the engine that stands, then B, then C; a few a tick (scripts/reruns.txt)"),
-                  ("box", "the cloud queues: the next set of each family's queue whose switch is on (Azure on; Google and Amazon off until their secrets are in)"),
+                  ("box", "the cloud queues: the next set of each family's queue whose switch is on (Azure, Google and Amazon on)"),
                   ("box", "the grid: every square not yet started, up to what GitHub runs plus a margin"),
                   ("end", "nothing cancelled; a problem found in a run is fixed and the run made again")],
                  decisions={1: ("yes", "start nothing this tick (Azure first)")}, w=6.8)
