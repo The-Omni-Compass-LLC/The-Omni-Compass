@@ -29,9 +29,13 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 114)        # 38 benchmarks, A, B and C (the steady and wandering tests back since omni-v8;
-                                                 # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October)
+        self.assertEqual(len(queue), 123)        # 41 benchmarks, A, B and C (the steady and wandering tests back since omni-v8;
+                                                 # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October;
+                                                 # every data store at the max beside the tune-down, 18 October)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
+        for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
+            self.assertEqual({row[3].get('objective') for row in queue if row[2] == wf and row[3].get('native') != 'shipped'},
+                             {'resource', 'service'}, wf)
         self.assertEqual({row[2] for row in shipped}, {'sysbench.yml', 'redis.yml', 'ycsb.yml'})
         self.assertEqual({row[0] for row in queue}, set('ABC'))
         workflows = {row[2] for row in queue}
