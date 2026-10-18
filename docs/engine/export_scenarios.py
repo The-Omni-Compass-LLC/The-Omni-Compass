@@ -1,0 +1,324 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""Records the stacks the live engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html) replays one at a time beside the
+live controller: each stack's own model in the repository, run as the repository runs it, native first and then
+Omni-Compass on top of native, the same load on the same seed, second by second.
+
+  gpu     realms/gpu_card.py (inside the omni-v7 fingerprint): one card on its own physics and its own firmware (boost a
+          bin while there is work, knocked down three while the draw is over the power limit). Native is the card as
+          shipped (150 W) or under an operator's cap (105 W); omni is the same card with the two-wire plug on top (the
+          clock ceiling and the power limit), the compass law and the verdict, as run() wires them. Two kinds of work:
+          AI token generation (memb 0.85) and compute-bound work (memb 0). Seeds 5100, 5101 and 5102 (runs A, B and C,
+          the model's untouched seeds). Every verdict event is recorded with the cost the trial measured.
+
+Readings: the paired change per second over blocks of 30 s, Student's t, in each run; the three-run rule
+(tools/readings.py), the word by the gauge's aim. Evidence class S (our own models). Usage:
+python3 docs/engine/export_scenarios.py OUT.json
+"""
+from __future__ import annotations
+
+import json
+import math
+import statistics as st
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
+import realms.gpu_card as G                                              # noqa: E402
+from omnicompass.verdict import Verdict                                  # noqa: E402
+
+GPU_SEEDS = (5100, 5101, 5102)
+from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
+
+
+def reading(runs, aim):
+    """The three-run rule (tools/readings.py): GAIN or LOSS only when every run is clear of zero the same way."""
+    if all(r["lo"] == r["hi"] == 0.0 for r in runs):
+        return "EVEN, the same"
+    if not all(r["lo"] > 0 or r["hi"] < 0 for r in runs):
+        return "EVEN"
+    ups = {r["change"] > 0 for r in runs}
+    if len(ups) > 1:
+        return "the runs disagree"
+    up = ups.pop()
+    if aim == "spent":
+        return "power given" if up else "GAIN"
+    return "GAIN" if (up if aim == "up" else not up) else "LOSS"
+
+
+def paired(a, b, block):
+    """The paired change of b against a, per sample, averaged over blocks, with its 95% interval, relative to a's mean."""
+    d = [y - x for x, y in zip(a, b)]
+    bl = [sum(d[i:i + block]) / block for i in range(0, len(d) - block + 1, block)]
+    m = st.mean(bl); sd = st.stdev(bl) if len(bl) > 1 else 0.0
+    half = _t95(len(bl) - 1) * sd / math.sqrt(len(bl))
+    base = st.mean(a) or 1e-12
+    return {"native": st.mean(a), "omni": st.mean(b), "change": m / base, "lo": (m - half) / base, "hi": (m + half) / base}
+
+
+# ---- the GPU card ----------------------------------------------------------------------------------------------------
+class AuditedVerdict(Verdict):
+    """realms/gpu_card.py's verdict, unchanged; every event it returns is kept for the page with the decision it came at."""
+    log = []
+
+    def tick(self, calm):
+        r = super().tick(calm)
+        if r[2]:
+            ev = dict(r[2]); ev["t"] = self.t
+            if "cost_native" in ev:
+                ev["rise"] = ev["cost_step"] / ev["cost_native"] - 1.0
+            AuditedVerdict.log.append(ev)
+        return r
+
+
+def gpu_run(seed, arm, memb):
+    """One run of realms/gpu_card.run, the card read every tick and kept per second (50 ticks)."""
+    per = int(round(1.0 / G.TICK))
+    acc = {"p": 0.0, "f": 0.0, "T": 0.0, "q": 0.0, "w": 0.0, "srv": 0.0, "over": 0}
+    sec = {k: [] for k in ("power", "clock", "ceiling", "limit", "temp", "queue", "resp_ms", "served", "over")}
+    orig = G.Card.tick
+
+    def tick(card):
+        s0 = card.m["served"]
+        orig(card)
+        w = card.resp[-1][0]
+        acc["p"] += card.last_p; acc["f"] += card.f; acc["T"] += card.T; acc["q"] += card.Q; acc["w"] += w
+        acc["srv"] += card.m["served"] - s0; acc["over"] += w > G.SLO_S
+        if card.k % per == 0:
+            sec["power"].append(round(acc["p"] / per, 2)); sec["clock"].append(round(acc["f"] / per, 4))
+            sec["temp"].append(round(acc["T"] / per, 2)); sec["queue"].append(round(acc["q"] / per, 3))
+            sec["resp_ms"].append(round(1000 * acc["w"] / per, 3)); sec["served"].append(round(acc["srv"], 3))
+            sec["over"].append(round(acc["over"] / per, 3))
+            sec["ceiling"].append(round(card.ceiling, 4)); sec["limit"].append(round(card.limit, 2))
+            for k in acc:
+                acc[k] = 0.0
+    G.Card.tick, G.Verdict = tick, AuditedVerdict
+    AuditedVerdict.log = []
+    try:
+        summary = G.run(seed, arm, 600.0, memb)
+    finally:
+        G.Card.tick, G.Verdict = orig, Verdict
+    sec["events"] = AuditedVerdict.log
+    sec["summary"] = {k: summary[k] for k in ("energy_j", "served", "work_per_kj", "p50_ms", "p95_ms", "p99_ms", "viol_share",
+                                              "hammer_per_s", "clock_mean", "t_peak", "writes", "restored")}
+    return sec
+
+
+GPU_GAUGES = {   # name: (aim, per-second series, label)
+    "work": ("up", "served", "requests served"),
+    "energy": ("spent", "power", "energy (the card's draw)"),
+    "resp": ("down", "resp_ms", "response time"),
+    "over": ("down", "over", "share of time over the service line"),
+}
+
+
+def gpu():
+    out = {"seeds": list(GPU_SEEDS), "slo_ms": 1000 * G.SLO_S, "kill_s": 0.9 * 600, "settings": {}}
+    for key, (base, top, memb) in {"ai": ("native", "omni", 0.85), "compute": ("native", "omni", 0.0),
+                                   "ai_cap": ("cap", "cap_omni", 0.85), "compute_cap": ("cap", "cap_omni", 0.0)}.items():
+        sec = {"memb": memb, "limit_w": G.LIMIT_MIN if base == "cap" else G.LIMIT_DEFAULT, "runs": {}, "readings": {}}
+        for sd in GPU_SEEDS:
+            n, o = gpu_run(sd, base, memb), gpu_run(sd, top, memb)
+            sec["runs"][str(sd)] = {"native": n, "omni": o}
+            for g, (aim, s, _) in GPU_GAUGES.items():
+                sec["readings"].setdefault(g, {"aim": aim, "runs": []})["runs"].append(paired(n[s], o[s], 30))
+            wpk = (o["summary"]["work_per_kj"] / n["summary"]["work_per_kj"]) - 1.0
+            sec["readings"].setdefault("wpk", {"aim": "up", "runs": []})["runs"].append(
+                {"native": n["summary"]["work_per_kj"], "omni": o["summary"]["work_per_kj"], "change": wpk, "lo": wpk, "hi": wpk})
+        for g, v in sec["readings"].items():
+            v["reading"] = reading(v["runs"], v["aim"])
+            print(f"gpu {key:12s} {g:7s} {v['reading']:16s} " + "  ".join(f"{r['change']*100:+.3f}%" for r in v["runs"]))
+        out["settings"][key] = sec
+    return out
+
+
+# ---- Linux: conveyance of the CFS quota on one host ------------------------------------------------------------------
+LINUX_SEEDS = (3000, 3001, 3002)
+LINUX_GAUGES = {   # name: (aim, per-second series)
+    "work": ("up", "lam"),
+    "resp": ("down", "ms"),
+    "busy": ("spent", "busy"),
+    "limit": ("spent", "limit_m"),
+    "pods": ("spent", "pods"),
+}
+
+
+def linux_run(seed, arm):
+    """One run of tools/toy_gate.py worker_convey, unchanged: its own locals read at the end of every one-second tick
+    (sys.settrace on the line that adds up the tick), and its own result line."""
+    import contextlib
+    import inspect
+    import io
+    import tempfile
+    from tools import toy_gate as TG
+    src, first = inspect.getsourcelines(TG.worker_convey)
+    mark = first + next(i for i, s in enumerate(src) if s.strip().startswith("busy_sum += busy"))
+    code = TG.worker_convey.__code__
+    sec = {k: [] for k in ("lam", "ms", "busy", "pods", "ready", "limit_m", "backlog")}
+
+    def local(frame, event, arg):
+        if event == "line" and frame.f_lineno == mark:
+            L = frame.f_locals
+            sec["lam"].append(round(L["lam"], 3)); sec["ms"].append(round(L["mean_ms"], 2)); sec["busy"].append(round(L["busy"], 4))
+            sec["pods"].append(len(L["pods"])); sec["ready"].append(sum(1 for p in L["pods"] if p["ready"]))
+            sec["limit_m"].append(sum(p["limit"] for p in L["pods"])); sec["backlog"].append(round(L["backlog"], 3))
+        return local
+
+    def call(frame, event, arg):
+        return local if frame.f_code is code else None
+    buf = io.StringIO()
+    with tempfile.TemporaryDirectory() as td, contextlib.redirect_stdout(buf):
+        sys.settrace(call)
+        try:
+            TG.worker_convey(arm, seed, td)
+        finally:
+            sys.settrace(None)
+    sec["summary"] = json.loads(buf.getvalue().strip().splitlines()[-1])
+    return sec
+
+
+def linux():
+    out = {"seeds": list(LINUX_SEEDS), "step_s": 150, "steps": [1, 2, 3, 1, 2, 1] * 4, "runs": {}, "readings": {}}
+    for sd in LINUX_SEEDS:
+        n, o = linux_run(sd, "native"), linux_run(sd, "omni")
+        out["runs"][str(sd)] = {"native": n, "omni": o}
+        for g, (aim, s) in LINUX_GAUGES.items():
+            out["readings"].setdefault(g, {"aim": aim, "runs": []})["runs"].append(paired(n[s], o[s], 150))
+        for g, aim in (("start_wait_s", "down"), ("p95_ms", "down"), ("alert_minutes", "down")):
+            a, b = n["summary"][g], o["summary"][g]
+            c = (b - a) / a if a else 0.0
+            out["readings"].setdefault(g, {"aim": aim, "runs": [], "single": True})["runs"].append(
+                {"native": a, "omni": b, "change": c, "lo": c, "hi": c})
+    for g, v in out["readings"].items():
+        v["reading"] = reading(v["runs"], v["aim"])
+        print(f"linux {g:14s} {v['reading']:16s} " + "  ".join(f"{r['change']*100:+.2f}%" for r in v["runs"]))
+    for sd in map(str, LINUX_SEEDS):                                   # the page draws every fifth second
+        for arm in ("native", "omni"):
+            r = out["runs"][sd][arm]
+            for k in ("lam", "ms", "busy", "pods", "ready", "limit_m", "backlog"):
+                r[k] = r[k][::5]
+    return out
+
+
+# ---- every receipt of the engine that stands ---------------------------------------------------------------------------
+RECEIPTS = [   # (file, stack, evidence class)
+    ("V7_GOLDILOCKS", "Kubernetes", "L"), ("V7_KEDA_REQUESTS", "Kubernetes", "L"), ("V7_KEDA_CPU_REQUESTS", "Kubernetes", "L"),
+    ("V7_ALL_FOUR", "Kubernetes", "L"), ("V7_TRACE_GOOGLE2011", "Kubernetes", "L"), ("V7_FAULTS", "Kubernetes", "L"),
+    ("V7_BATCH", "Kubernetes", "L"), ("V7_FAIRNESS", "Kubernetes", "L"), ("V7_CRUISEKUBE", "Kubernetes", "L"),
+    ("V7_CAPACITY", "Kubernetes", "L"), ("V7_ROBUST_LONG", "Kubernetes", "L"),
+    ("V7_REDIS", "Linux services", "L"), ("V7_REDIS_SERVICE", "Linux services", "L"), ("V7_PGBENCH", "Linux services", "L"),
+    ("V7_SYSBENCH", "Linux services", "L"), ("V7_YCSB", "Linux services", "L"), ("V7_KAFKA", "Linux services", "L"),
+    ("V7_KAFKA_SERVICE", "Linux services", "L"),
+    ("V7_PANDAPOWER", "Energy and the grid", "S"), ("V7_CITYLEARN", "Energy and the grid", "S"),
+    ("V7_MUJOCO", "Physics and robotics", "S"), ("V7_SWARM", "Physics and robotics", "S"),
+]
+
+
+def receipt_word(rd):
+    r = rd.replace("**", "").strip().lower()
+    for w, key in (("gain", "GAIN"), ("loss", "LOSS"), ("power given", "power given"), ("even", "EVEN")):
+        if r.startswith(w):
+            return key
+    if "disagree" in r or "runs differ" in r:
+        return "the runs disagree"
+    return "shown"
+
+
+def receipt(name):
+    """Every judged row of results/live/<name>.md as written: its table's heading, the gauge, runs A, B and C, the reading."""
+    import re
+    rows, hdr, sect, title = [], None, "", ""
+    for ln in (ROOT / "results" / "live" / f"{name}.md").read_text(encoding="utf-8").splitlines():
+        if ln.startswith("# ") and not title:
+            title = ln[2:].split(": the A/B/C")[0].strip()
+        if ln.startswith("#"):
+            sect, hdr = ln.lstrip("# ").strip(), None
+            continue
+        if not ln.startswith("|"):
+            continue
+        cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+        if cells[-1] == "Reading":
+            hdr = cells
+            continue
+        if hdr is None or re.fullmatch(r"[|\-: ]+", ln) or len(cells) != len(hdr):
+            continue
+        d = dict(zip(hdr, cells))
+        gauge = cells[0] if hdr[0] != "Cap (cores)" else f"cap {cells[0]} cores: {cells[1]}"
+        rows.append({"s": sect, "g": gauge.replace("`", ""), "abc": [d.get(k, "") for k in "ABC"],
+                     "r": d["Reading"].replace("**", ""), "w": receipt_word(d["Reading"])})
+    count = {}
+    for r in rows:
+        count[r["w"]] = count.get(r["w"], 0) + 1
+    text = (ROOT / "results" / "live" / f"{name}.md").read_text(encoding="utf-8")
+    for obj in ("service", "resource"):
+        if f"(the objective: {obj})" in text:
+            title += f" (the verdict's objective: {obj})"
+    return {"file": f"results/live/{name}.md", "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown")],
+            "count": count}
+
+
+def newest(name):
+    """The newest engine's table of a benchmark: V<n>_<BENCHMARK>.md with the highest n present (a later engine's three
+    runs replace an earlier engine's table on the page the moment they land; tables of two engines are never pooled)."""
+    import re
+    base = re.sub(r"^V\d+_", "", name)
+    found = sorted(((int(m.group(1)), f.stem) for f in (ROOT / "results" / "live").glob(f"V*_{base}.md")
+                    if (m := re.fullmatch(rf"V(\d+)_{re.escape(base)}", f.stem))), reverse=True)
+    return found[0] if found else (None, name)
+
+
+def receipts():
+    out = []
+    for name, stack, cls in RECEIPTS:
+        n, stem = newest(name)
+        r = receipt(stem); r.update(stack=stack, cls=cls, engine=f"omni-v{n}" if n else "unknown"); out.append(r)
+        print(f"receipt {stem:22s} {r['engine']} {r['count']}")
+    return out
+
+
+# ---- every muscle of the catalog and the seven organisms, on the engine that stands -----------------------------------
+ORGANISMS = {"spine": "The spine, the muscles every stack runs on", "compute_ai_cloud": "Compute / AI / Cloud",
+             "physics_robotics_autonomous": "Physics / Robotics / Autonomous", "energy_facility_industrial": "Energy / Facility / Industrial",
+             "distribution_specialized": "Distribution / Specialized", "stack": "The four stacked, every shared muscle in each",
+             "tower": "The whole tower, every muscle once"}
+REALM_CODE = {"compute_ai_cloud": "C", "physics_robotics_autonomous": "P", "energy_facility_industrial": "E", "distribution_specialized": "D"}
+
+
+def realms():
+    """results/realms_v5/REALMS_V5.json as the realms runner wrote it: the seven organisms under three loads and every
+    muscle alone under two, native against Omni-Compass on top, seeds 3000 to 3009."""
+    d = json.loads((ROOT / "results" / "realms_v5" / "REALMS_V5.json").read_text(encoding="utf-8"))
+    r4 = lambda x: round(x, 6)
+    orgs = {}
+    for load, by in d["organisms"].items():
+        orgs[load] = [{"key": k, "name": ORGANISMS[k], "n": v["n"], "label": v["label"], "viol_native": v["totals"]["viol_native"],
+                       "viol_max": v["totals"]["viol_max"], "steps": v["totals"]["steps"],
+                       "work": [r4(x) for x in v["summary"]["work"]], "energy": [r4(x) for x in v["summary"]["energy"]],
+                       "viol_pp": [r4(x) for x in v["summary"]["viol_pp"]], "flagged": len(v.get("plants_flagged") or [])}
+                      for k, v in by.items()]
+    musc = []
+    for m in d["muscles"]:
+        row, out = m["row"], []
+        for load in ("normal", "line"):
+            v = m["loads"][load]
+            ln = v.get("line") or [None, None, None, None]
+            out.append([v["label"], v["viol_native"], v["viol_max"], r4(v["summary"]["work"][0]), r4(v["summary"]["energy"][0]),
+                        ln[0], ln[1]])
+        musc.append([row["muscle"], row["family"], REALM_CODE[row["realm"]], row["template"], row["knob"], m["label"], out])
+    run = {k: d["run"][k] for k in ("started", "commit", "seeds", "engine", "engine_digest", "dial", "muscles")}
+    print(f"realms {run['engine']} {len(musc)} muscles, {len(orgs)} loads")
+    return {"run": run, "organisms": orgs, "muscles": musc}
+
+
+def main(out):
+    data = {"gpu": gpu(), "linux": linux(), "receipts": receipts(), "realms": realms()}
+    Path(out).write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1] if len(sys.argv) > 1 else "scenarios.json")

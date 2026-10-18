@@ -2,6 +2,34 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18: Omni v10 stands (the battery glide that cuts the bill most); the CityLearn receipt reads by the key
+
+- **omni-v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`): omni-v9 with one file changed, the
+  CityLearn runner. The battery wire's glide goes from 0.0625 to 0.0875 of the command's range an hour, the speed on omni-v9's
+  ladder that cuts the bill most with no LOSS, read by the one key (the founder's rule: use everything that can be used, keep
+  everything healthy, never raise the bill, hurt no one). Read on CityLearn 3.0.2 before any GitHub run: the bill −16.09% in the
+  robustness district, −20.05% in the tuning district, −19.17%, −8.43% and −16.08% in the 2022 phases 2, 3 and all (omni-v9:
+  −14.22%, −17.63%, −17.22%, −7.32%, −14.20%); no LOSS against native in any district read before the push (the two
+  100-building neighbourhoods were still running locally: no price, no outage, no score there that can read LOSS moves with
+  the glide; their three runs on GitHub decide). The trade, shown: the electricity bought,
+  the carbon and the peaks fall a little less than on omni-v9, every one still GAIN, and two rows of the 2022 phase 3 are power
+  given (the ramping +6.18%, the net-zero shortfall +0.25%).
+- **Refused before it**: steering the outage buildings' batteries outside the outage hours (native through each outage). On six
+  2023 districts it cut the energy not served in five, but raised it 0.69% in one (a LOSS) and raised the bill 0.19% in another;
+  those batteries stay native all year, as in omni-v8.
+- **The runner's own receipt reads by the one key**: `tools/run_citylearn.py` printed "same", "lower" and "higher" under "the aim
+  is lower", which read a higher peak as if it were a miss. Each row now reads GAIN, EVEN, LOSS (a miss that rose) or power given (a
+  resource spent or held that rose), and the across-districts table says which word a rise takes; `tests/test_citylearn_wire.py`
+  holds it there.
+- **The toy gate** (`results/toy_gate/V10_VS_V9.md`): the candidate against omni-v9 on seeds 1 to 8; no toy reads the CityLearn
+  wire.
+- **Everything runs again on it**: the conductor's campaign, reruns, grid (`results/grid_v10/`) and Azure sets from A; the package
+  is 0.10.0. The omni-v9 runs already started run to their end as omni-v9's record; nothing is cancelled.
+- **Pages brought up to it**: README, CLAUDE.md, the state of play, the receipts, both manuals (rebuilt), the v7, v8 and v9 pages,
+  the preregistration (an amendment, appended), the index's text. Retired words found and fixed on the way: the Owner's Manual
+  and the README still named the 2022 robustness district's +0.11% unevenness, and the 2023 districts' ramping and highest peak,
+  as LOSS (power given by the key); the state of play still said "SAME AS NATIVE" for EVEN.
+
 ## 2026-10-17 (night): one key for every gauge; every result read again; no LOSS on the engine that stands
 
 - **The founder's correction**: "a minus doesn't mean a loss and neither does a plus mean a gain if you don't understand what it's
