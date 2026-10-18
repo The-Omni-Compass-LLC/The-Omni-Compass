@@ -95,7 +95,7 @@ th:first-child,td:first-child{text-align:left;white-space:normal}
 th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 td.nat{color:var(--steel)} td.omni{color:var(--brass)}
 .word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor}
-.w-gain{color:var(--ok)} .w-even{color:var(--muted)} .w-loss{color:var(--bad)} .w-given{color:var(--brass)} .w-shown{color:var(--muted);border-color:transparent}
+.w-gain{color:var(--ok)} .w-even{color:var(--muted)} .w-loss{color:var(--bad)} .w-given{color:var(--brass)} .w-lost{color:var(--bad);text-decoration:underline dotted} .w-shown{color:var(--muted);border-color:transparent}
 .note{font-size:12px;color:var(--muted)}
 /* nerves */
 .meters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
@@ -287,6 +287,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <span class="chip">checked against the Python and the C++ <b>0 mismatches</b></span>
     <span class="chip">order <b>chips · cloud · Kubernetes · scale · organism · brain</b></span>
   </div>
+  <p class="plain" id="bEngRuns" style="max-width:100ch"></p>
 </header>
 
 <section class="panel" aria-label="The key: GAIN, EVEN and LOSS" style="border-top:3px solid var(--brass)">
@@ -298,6 +299,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <tr><td><span class="word w-even">EVEN</span></td><td><b>E</b> Equalized (zero variance); <b>V</b> Verified baseline (expected norm); <b>E</b> Equilibrium (balanced risk); <b>N</b> Neutral (no net change)</td><td>native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native</td></tr>
     <tr><td><span class="word w-loss">LOSS</span></td><td><b>L</b> Leakage (capital drain); <b>O</b> Off-track (adverse selection); <b>S</b> Setback (claim liability); <b>S</b> Subpar (negative variance)</td><td>the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures</td></tr>
     <tr><td><span class="word w-given">power given</span></td><td colspan="2">a resource spent or held (energy, machines, memory, processor time, a bill) that rose: what Omni put in to buy the work and the speed shown beside it, always shown and never called a loss; one that fell is a cut, and a cut is GAIN</td></tr>
+    <tr><td><span class="word w-lost">power lost</span></td><td colspan="2">a resource that rose and bought nothing: in the same comparison no gauge read GAIN (no more work, no shorter wait, no fewer misses or failures, no other resource cut). It is not assumed away: every comparison on this page is tested for it, and a power given row with nothing beside it reads power lost wherever it falls</td></tr>
   </tbody></table></div>
   <p class="note">The size is how far the gauge moved from native; the word says whether that move helped the work. So "Misses: GAIN 35%" means Omni-Compass had 35% fewer misses than native; "Pod start wait: LOSS 8%" means the pods waited 8% longer to start than on native; "Response time: GAIN 53%" means it answered 53% faster; "Energy: power given 0.01%" means it spent 0.01% more energy to do it. A miss is a decision where the work went over its line. The key is written once in <code>tools/readings.py</code> and stands at the top of the README, the reading guide and both manuals. GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results; the underwriting senses explain the words and are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.</p>
 </section>
@@ -609,7 +611,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="panel stack" style="gap:8px">
     <h3>Every receipt of the real runs in the repository, native against Omni-Compass, every row as written (each benchmark's newest engine's table)</h3>
     <p class="note" id="rcSum">—</p>
-    <div class="tbl-wrap"><table class="who" id="rcTbl"><thead><tr><th>Stack</th><th>Benchmark</th><th>Class</th><th>GAIN</th><th>Power given</th><th>EVEN</th><th>LOSS</th><th>The runs disagree</th></tr></thead><tbody></tbody></table></div>
+    <div class="tbl-wrap"><table class="who" id="rcTbl"><thead><tr><th>Stack</th><th>Benchmark</th><th>Class</th><th>GAIN</th><th>Power given</th><th>Power lost</th><th>EVEN</th><th>LOSS</th><th>The runs disagree</th></tr></thead><tbody></tbody></table></div>
     <p class="note">From <code>results/live/V7_*.md</code>, read row by row by <code>docs/engine/export_scenarios.py</code>; open a row to read every judged row that is not EVEN. Class L: the real software (Kubernetes on kind, the real databases and broker). Class S: the outside simulators run by our own runner (CityLearn, pandapower on SimBench, MuJoCo Menagerie, gym-pybullet-drones). Rows shown and not judged are left out of the counts; the counts take every table of a receipt, its tuning case included where it has one (a receipt's own summary line counts its untouched cases). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.</p>
   </div>
   <div class="panel stack" style="gap:8px" id="rmPanel">
@@ -2167,22 +2169,39 @@ function engineBanner() {   // a newer engine stands than the prose was written 
   const B = JSON.parse((document.getElementById("build") || {textContent: "{}"}).textContent || "{}"), prose = document.documentElement.dataset.prose;
   if (B.engine && prose && B.engine !== prose) { const e = $("engBanner"); e.hidden = false;
     e.innerHTML = `<b>The engine that stands is ${B.engine}.</b> Every record on this page (the runs, the readings, the models) was rebuilt on it at ${B.built_at}; the words around them were written for ${prose} and are being realigned. Where a sentence names ${prose} as the engine that stands, read ${B.engine}.`; } }
+const STANDS = () => (JSON.parse((document.getElementById("build") || {textContent: "{}"}).textContent || "{}").engine) || document.documentElement.dataset.engine;
+const engTag = e => !e || e === STANDS() ? (e || "") : `run on ${e}; its ${STANDS()} rerun pending`;   // a table older than the engine that stands says so wherever it is named
+function engRuns(B) {   // the engine that stands, and which engine each real run on the page was run on
+  const eng = [...new Set(SC.receipts.map(r => r.engine))].sort(), board = B.board || [], all = board.filter(r => r.group && /run again/.test(r.group));
+  const on = all.filter(r => r.now === "running now").length, q = all.filter(r => r.now === "queued on GitHub" || r.now === "in the reruns queue").length;
+  const older = eng.filter(e => e !== B.engine);
+  $("bEngRuns").innerHTML = `<b>The engine that stands is ${B.engine}.</b> Every model on this page runs on it. The real runs' tables are the newest whose three runs (A, B and C) have all landed: ${older.length ? `today those were run on <b>${older.join(", ")}</b>, and each is labelled with the engine it ran on` : `every one on ${B.engine}`}. A result is never read across engines, so no table is relabelled. Every benchmark is being run again on ${B.engine} (${all.length} benchmarks: ${on} running now, ${q} queued), and each table on this page switches to ${B.engine} by itself the moment its three runs land.`;
+}
 function buildInfo() { engineBanner();
   const B = JSON.parse((document.getElementById("build") || {textContent: "{}"}).textContent || "{}");
   if (B.engine) { $("bEngine").textContent = B.engine; $("bDigest").textContent = B.digest; }
+  engRuns(B);
   $("bBuilt").textContent = B.commit ? `${B.built_at} at ${B.commit.slice(0, 12)}` : "not yet built by the workflow";
   const runs = B.runs || [], box = $("ghRuns"); if (!box) return;
   const by = {}; runs.forEach(r => { (by[r.workflow] = by[r.workflow] || []).push(r); });
   $("ghRunsNote").textContent = B.commit ? (runs.length ? `${runs.length} runs on GitHub when the page was built (${B.built_at}): ${runs.filter(r => r.status === "in_progress").length} running, ${runs.filter(r => r.status === "queued").length} queued.` : `No run was running or queued on GitHub when the page was built (${B.built_at}).`) : "The workflow fills this in when it builds the page.";
   box.querySelector("tbody").innerHTML = Object.keys(by).sort().map(w => `<tr><td>${w}</td><td>${by[w].filter(r => r.status === "in_progress").length}</td><td>${by[w].filter(r => r.status === "queued").length}</td><td>${by[w].slice(0, 3).map(r => r.title).join("<br>")}</td></tr>`).join("");
 }
+function lostRows(rows) {   // power lost: a power given row in a comparison where nothing read GAIN
+  const by = {}; rows.forEach(x => (by[x.s] = by[x.s] || []).push(x));
+  const out = new Set(); for (const k in by) if (!by[k].some(x => x.w === "GAIN")) by[k].forEach(x => { if (x.w === "power given") out.add(x); });
+  return out; }
+function lostPass(tb) {   // the same test on a table of one comparison: power given with no GAIN beside it reads power lost
+  if (!tb || tb.querySelector(".w-gain")) return;
+  tb.querySelectorAll(".w-given").forEach(e => { e.classList.replace("w-given", "w-lost"); e.textContent = e.textContent.replace("power given", "power lost"); }); }
+const LOST_WATCH = new MutationObserver(ms => ms.forEach(m => lostPass(m.target)));
 function buildReceipts() {
-  const tot = {GAIN: 0, "power given": 0, EVEN: 0, LOSS: 0, "the runs disagree": 0};
-  $("rcTbl").querySelector("tbody").innerHTML = SC.receipts.map((r, ix) => { const c = r.count; for (const k in tot) tot[k] += c[k] || 0;
+  const tot = {GAIN: 0, "power given": 0, "power lost": 0, EVEN: 0, LOSS: 0, "the runs disagree": 0};
+  $("rcTbl").querySelector("tbody").innerHTML = SC.receipts.map((r, ix) => { const lost = lostRows(r.rows), c = Object.assign({}, r.count); c["power lost"] = lost.size; c["power given"] = (c["power given"] || 0) - lost.size; for (const k in tot) tot[k] += c[k] || 0;
     const cell = (k, cls) => `<td class="${(c[k] || 0) && cls ? cls : ""}">${c[k] || 0}</td>`;
-    const det = r.rows.length ? `<details><summary>${r.rows.length} rows not EVEN</summary><table class="who"><tbody>${r.rows.map(x => `<tr><td>${x.s === r.title || x.s.startsWith(r.title.slice(0, 20)) ? "" : x.s}</td><td>${x.g}</td><td>${x.abc.filter(Boolean).map((c, i) => "ABC"[i] + " " + (c.match(/[0-9][0-9.,e]*\s*(%|pp|req\/s|s|ms)?/) || [c])[0]).join(" · ")}</td><td><span class="word ${{GAIN: "w-gain", LOSS: "w-loss", "power given": "w-given", "the runs disagree": "w-dis"}[x.w] || "w-even"}">${x.r}</span></td></tr>`).join("")}</tbody></table></details>` : "";
-    return `<tr><td>${r.stack}</td><td>${r.title}<br><code>${r.file}</code>${det}</td><td>${r.cls}</td>${cell("GAIN", "w-gain")}${cell("power given", "w-given")}${cell("EVEN")}${cell("LOSS", "w-loss")}${cell("the runs disagree", "w-dis")}</tr>`; }).join("");
-  $("rcSum").innerHTML = `${SC.receipts.length} receipts of the real runs, each the newest engine's table (${[...new Set(SC.receipts.map(r => r.engine))].join(", ")}), three runs each: <b>${tot.GAIN}</b> rows GAIN in all three runs, <b>${tot["power given"]}</b> power given, <b>${tot.EVEN}</b> EVEN, <b style="color:var(--bad)">${tot.LOSS}</b> LOSS (every one in CityLearn's small challenge districts: energy not served, the hour-to-hour swings, discomfort, the highest peak), <b>${tot["the runs disagree"]}</b> where the runs disagree (the drone swarms' closest approach, tracking and cruise; one memory row each on Redis and MySQL). omni-v8, omni-v9 and omni-v10 repaired and tuned the CityLearn wire, the fix for those LOSS rows, which omni-v11 keeps; omni-v11's three runs are queued. No Azure, Google, Amazon or GPU receipt yet.`;
+    const det = r.rows.length ? `<details><summary>${r.rows.length} rows not EVEN</summary><table class="who"><tbody>${r.rows.map(x => `<tr><td>${x.s === r.title || x.s.startsWith(r.title.slice(0, 20)) ? "" : x.s}</td><td>${x.g}</td><td>${x.abc.filter(Boolean).map((c, i) => "ABC"[i] + " " + (c.match(/[0-9][0-9.,e]*\s*(%|pp|req\/s|s|ms)?/) || [c])[0]).join(" · ")}</td><td><span class="word ${lost.has(x) ? "w-lost" : {GAIN: "w-gain", LOSS: "w-loss", "power given": "w-given", "the runs disagree": "w-dis"}[x.w] || "w-even"}">${lost.has(x) ? x.r.replace("power given", "power lost") : x.r}</span></td></tr>`).join("")}</tbody></table></details>` : "";
+    return `<tr><td>${r.stack}</td><td>${r.title}<br><code>${engTag(r.engine)}</code> · <code>${r.file}</code>${det}</td><td>${r.cls}</td>${cell("GAIN", "w-gain")}${cell("power given", "w-given")}${cell("power lost", "w-lost")}${cell("EVEN")}${cell("LOSS", "w-loss")}${cell("the runs disagree", "w-dis")}</tr>`; }).join("");
+  $("rcSum").innerHTML = `${SC.receipts.length} receipts of the real runs, each the newest engine's table (${[...new Set(SC.receipts.map(r => r.engine))].join(", ")}), three runs each: <b>${tot.GAIN}</b> rows GAIN in all three runs, <b>${tot["power given"]}</b> power given, each with a GAIN beside it, <b>${tot["power lost"]}</b> power lost (a resource that rose with no GAIN beside it, tested on every comparison), <b>${tot.EVEN}</b> EVEN, <b style="color:var(--bad)">${tot.LOSS}</b> LOSS (every one in CityLearn's seven 2023 challenge districts on omni-v7: energy not served and time uncomfortable), <b>${tot["the runs disagree"]}</b> where the runs disagree (the drone swarms' closest approach, tracking and cruise; one memory row each on Redis and MySQL). omni-v8, omni-v9 and omni-v10 repaired and tuned the CityLearn wire, the fix for those LOSS rows, which omni-v11 keeps; omni-v11's three runs are queued. No Azure, Google, Amazon or GPU receipt yet.`;
 }
 $("sGpu").addEventListener("click", () => setStack("gpu")); $("sLinux").addEventListener("click", () => setStack("linux"));
 $("sKube").addEventListener("click", () => { setCtl("selfpilot"); updateCScore(); $("s-live").scrollIntoView({behavior: reduceMotion ? "auto" : "smooth"}); });
@@ -2355,7 +2374,7 @@ function buildBoard() {
   const tot = RU.benchmarks.reduce((a, b) => { b.runs.forEach(r => { a.c += r.checked; a.o += r.ok; }); return a; }, {c: 0, o: 0});
   if ($("blFiles")) $("blFiles").textContent = `${tot.o.toLocaleString("en-US")} of ${tot.c.toLocaleString("en-US")} files`;
   $("ruProof").textContent = `${RU.benchmarks.length} benchmarks, ${RU.benchmarks.reduce((a, b) => a + b.runs.length, 0)} official runs: ${tot.o.toLocaleString("en-US")} of ${tot.c.toLocaleString("en-US")} files read match their run's own SHA-256 list.`;
-  $("ruBench").innerHTML = RU.benchmarks.map((b, i) => `<option value="${i}">${b.kind === "k8s" ? "Kubernetes" : "Database"} · ${b.title} (${b.engine})</option>`).join("");
+  $("ruBench").innerHTML = RU.benchmarks.map((b, i) => `<option value="${i}">${b.kind === "k8s" ? "Kubernetes" : "Database"} · ${b.title} (${engTag(b.engine)})</option>`).join("");
 }
 $("ruBench").addEventListener("change", e => setRuns(+e.target.value, 0, 0));
 $("ruRep").addEventListener("change", e => setRuns(null, null, +e.target.value));
@@ -2528,7 +2547,7 @@ function drawPipe(now) {
     for (let k = 0; k < 2; k++) { const f = ((t*0.9 + k*0.5 + i*0.13) % 1); g.fillStyle = alpha(css.brass, 0.9); g.beginPath(); g.arc(x0 + f*(x1 - x0 - 5), y, 2.2, 0, 2*Math.PI); g.fill(); } }
 }
 function buildOps() {
-  $("opsBench").innerHTML = RU.benchmarks.map((b, i) => `<option value="${i}">${b.kind === "k8s" ? "Kubernetes" : "Database"} · ${b.title} (${b.engine})</option>`).join("");
+  $("opsBench").innerHTML = RU.benchmarks.map((b, i) => `<option value="${i}">${b.kind === "k8s" ? "Kubernetes" : "Database"} · ${b.title} (${engTag(b.engine)})</option>`).join("");
   const gh = OPS_BUILD.runs || [], tot = RU.benchmarks.reduce((a, b) => { b.runs.forEach(r => { a.c += r.checked; a.o += r.ok; a.r++; a.p += (r.reps || []).length; a.d += (r.rows || []).length;
     if (r.official_agree !== null && r.official_agree !== undefined) a.ag = Math.max(a.ag, r.official_agree); }); return a; }, {c: 0, o: 0, r: 0, p: 0, d: 0, ag: 0});
   const rc = {GAIN: 0, "power given": 0, EVEN: 0, LOSS: 0, "the runs disagree": 0}; SC.receipts.forEach(r => { for (const k in rc) rc[k] += r.count[k] || 0; });
@@ -3187,6 +3206,7 @@ buildOrgans(); vLabels(); newDay(W.seed);
 document.getElementById("vMany").click();
 setBody("harness", "alone");   // open on the engine's own harness, each muscle alone, 120 frames into run A
 setCtl("selfpilot", 0); for (let k = 0; k < 120; k++) stepCtl(); updateCScore();
+["score", "cScore", "sScore", "ruTab", "selfTab", "cardTab"].forEach(id => { const t = $(id) && $(id).querySelector("tbody"); if (t) LOST_WATCH.observe(t, {childList: true}); });
 buildInfo(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); buildFleet(); buildSelf(); buildPlaces(); buildCard(); buildFamTable(); tally(); buildRegister(); setRuns(0, 0, 0); updateScan(); setInterval(updateScan, 1000);
 drawVerdict2();
 V.P = vParams(); for (let k = 0; k < V.P.min; k++) V.ref.push(vSample(false, V.P, V.rng)); for (let k = 0; k < V.P.min; k++) V.got.push(vSample(true, V.P, V.rng));
