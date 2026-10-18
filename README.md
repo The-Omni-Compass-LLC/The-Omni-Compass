@@ -75,9 +75,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-18 22:36 | big-organism-detached collect | success | [39172977923](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39172977923) |
-| 2026-10-18 22:29 | live-engine | cancelled | [39172414925](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39172414925) |
-| 2026-10-18 22:29 | raw-sweep | cancelled | [39172414868](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39172414868) |
+| 2026-10-18 23:14 | raw-sweep | success | [39175634735](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39175634735) |
+| 2026-10-18 23:13 | live-engine | cancelled | [39175632869](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39175632869) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
