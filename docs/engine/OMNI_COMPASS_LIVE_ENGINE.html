@@ -633,7 +633,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <h3>Where the benefit lives, gauge by gauge</h3>
     <p class="note">Every judged row of every newest three-run table (section 4's receipts), sorted into the family of gauge it measures: what a CTO reads (speed, the service level, failures, work), what a CFO reads (machines, energy, the bill), and what a plant engineer reads (peaks and swings, wear and accuracy, misses). Each bar counts the rows that read GAIN in all three runs; the size beside it is the median of those rows' own sizes (the middle of runs A, B and C). Power given and LOSS rows are counted beside them, never hidden.</p>
     <canvas id="fxFam" aria-label="One bar per family of gauge: GAIN to the right in green, LOSS to the left in red, EVEN a yellow mark on zero"></canvas>
-    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN ▶ the family's rows, net, from 0</span><span><i class="sq" style="background:repeating-linear-gradient(135deg,var(--ok) 0 2px,rgba(80,200,120,.35) 2px 5px)"></i>GAIN · power given</span><span><i class="sq" style="background:var(--bad)"></i>◀ LOSS, when the family's LOSS rows outnumber its GAIN rows</span><span><i class="sq" style="background:var(--even)"></i>EVEN ◆ on 0</span><span>one bar per family: rows of the other word are named in its label, never drawn as a second bar</span></div>
+    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN ▶ most of the family's rows read GAIN (a resource that rose to buy work counts here as GAIN · power given)</span><span><i class="sq" style="background:var(--bad)"></i>◀ LOSS: most of its rows read LOSS</span><span><i class="sq" style="background:var(--even)"></i>EVEN ◆: no row moved</span><span>one family, one bar, one colour; the table below splits every count</span></div>
     <div class="tbl-wrap"><table class="who" id="fxFamTab"><thead><tr><th>Family of gauge</th><th>Who reads it</th><th>GAIN rows</th><th>Median size of the GAIN rows</th><th>Largest</th><th>Power given</th><th>LOSS</th><th>The runs disagree</th><th>Where</th></tr></thead><tbody></tbody></table></div>
     <div class="opsTip" id="fxTipFam" hidden></div>
   </div>
@@ -3244,19 +3244,19 @@ function drawFam() {   // one family, one bar: its net reading picks the side (G
   const net = f => f.n + f.given - f.loss, ml = Math.min(170, w*0.3), mr = Math.min(470, w*0.5), pw = w - ml - mr;
   const hiL = Math.max(1, ...F.filter(f => net(f) < 0).map(f => f.loss)), hiR = Math.max(1, ...F.filter(f => net(f) > 0).map(f => f.n + f.given)), anyL = F.some(f => net(f) < 0);
   const z = ml + (anyL ? pw*hiL/(hiL + hiR) : 0.04*pw), XR = v => z + v/hiR*(w - mr - z), XL = v => z - v/hiL*(z - ml); FXW.famGeo = {rowH, top: 4, N: F.length};
-  const hatch = (() => { const c = document.createElement("canvas"); c.width = c.height = 8; const q = c.getContext("2d"); q.fillStyle = alpha(css.ok, 0.35); q.fillRect(0, 0, 8, 8); q.strokeStyle = css.ok; q.lineWidth = 2; q.beginPath(); q.moveTo(0, 8); q.lineTo(8, 0); q.stroke(); return g.createPattern(c, "repeat"); })();
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
   g.strokeStyle = css.ink; g.beginPath(); g.moveTo(z, 2); g.lineTo(z, h - 22); g.stroke();
   F.forEach((f, j) => { const y = 4 + j*rowH, d = net(f); if (FXW.famHov === j) { g.fillStyle = alpha(css.ink, 0.05); g.fillRect(0, y, w, rowH); }
     g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(f.k, ml - 8, y + rowH/2);
     let tx = z + 10, label;
-    if (d > 0) { if (f.n) { g.fillStyle = css.ok; g.fillRect(z + 1, y + 6, Math.max(2, XR(f.n) - z - 1), rowH - 12); } if (f.given) { g.fillStyle = hatch; g.fillRect(XR(f.n) + 1, y + 6, Math.max(2, XR(f.n + f.given) - XR(f.n) - 1), rowH - 12); }
-      tx = XR(f.n + f.given) + 8; label = `GAIN · ${f.n} rows${f.med !== null ? " (median " + f.med + "%)" : ""}${f.given ? ` + ${f.given} GAIN · power given` : ""}${f.loss ? ` · ${f.loss} LOSS rows inside` : ""}`; }
+    const tot = f.n + f.given + f.loss;
+    if (d > 0) { g.fillStyle = css.ok; g.fillRect(z + 1, y + 6, Math.max(2, XR(f.n + f.given) - z - 1), rowH - 12);
+      tx = XR(f.n + f.given) + 8; label = `GAIN · ${f.n + f.given} of ${tot} rows`; }
     else if (d < 0) { g.fillStyle = css.bad; g.fillRect(XL(f.loss), y + 6, Math.max(2, z - XL(f.loss) - 1), rowH - 12);
-      label = `LOSS · ${f.loss} rows${f.n + f.given ? ` · ${f.n + f.given} GAIN rows inside` : ""}`; }
+      label = `LOSS · ${f.loss} of ${tot} rows`; }
     else { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); label = f.n || f.loss ? `EVEN · ${f.n} GAIN and ${f.loss} LOSS rows balance` : "EVEN · no row moved"; }
     g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, label, tx, y + rowH/2); });
-  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("judged rows in all three runs, counted from the 0 line", ml, h - 10);
+  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("each family's rows that read the same way in all three runs; the table below gives every count", ml, h - 10);
 }
 function tally() {   // one number for the whole board: one vote per category, the Omni index's own rule
   const all = fxAll(), landed = all.filter(r => r.pct !== null && /landed/.test(r.status) && r.dom !== "The headline"), gm = xs => xs.length ? Math.exp(xs.reduce((a, x) => a + Math.log(1 + x/100), 0)/xs.length) - 1 : null;
