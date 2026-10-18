@@ -24,7 +24,12 @@
 - **The toy gate** (`results/toy_gate/V10_VS_V9.md`): the candidate against omni-v9 on seeds 1 to 8; no toy reads the CityLearn
   wire.
 - **Everything runs again on it**: the conductor's campaign, reruns, grid (`results/grid_v10/`) and Azure sets from A; the package
-  is 0.10.0. The omni-v9 runs already started run to their end as omni-v9's record; nothing is cancelled.
+  is 0.10.0.
+- **Google and Amazon's first sets (18 October, 04:57)**: both clouds took their keys and spent nothing. Google's login refused
+  the stored key as incomplete JSON (the key block was cut short when copied; the founder stores it again whole). Amazon's
+  login worked, and its pre-flight found no machine type offered in us-east-1. That check had hidden Amazon's own reason,
+  so `scripts/eks_paired.sh` now prints AWS's error (a new account not yet verified, a region not enabled) instead of
+  reading every refusal as "not offered"; the keys themselves are never printed. The omni-v9 runs already started run to their end as omni-v9's record; nothing is cancelled.
 - **Pages brought up to it**: README, CLAUDE.md, the state of play, the receipts, both manuals (rebuilt), the v7, v8 and v9 pages,
   the preregistration (an amendment, appended), the index's text. Retired words found and fixed on the way: the Owner's Manual
   and the README still named the 2022 robustness district's +0.11% unevenness, and the 2023 districts' ramping and highest peak,
