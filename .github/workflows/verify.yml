@@ -13,14 +13,13 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      # the archive of raw runs is tens of gigabytes and verify.py reads one run of it (the manifest's): the rest stays out
+      # the raw receipts live on the branch raw (scripts/raw_archive.sh): main holds the code and the tables only
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /*
             !/results/live/raw/*
-            /results/live/raw/run-36366603505/
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

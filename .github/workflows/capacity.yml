@@ -10,7 +10,7 @@ name: capacity
 # a count. Both arms of a repetition on one runner, each on a fresh six-worker kind cluster, the order rotated
 # (scripts/kind_paired.sh). One job per cap level and repetition; the report (tools/capacity_report.py) writes one row per
 # cap level with its plain audit line, and what each step up in the cap gives each arm. Every run's raw files and table
-# are committed back to the branch it ran on (results/live/raw/capacity-run-<id>/); the three-run readings come from runs
+# are saved on the branch raw (results/live/raw/capacity-run-<id>/); the three-run readings come from runs
 # A, B and C, and the founder hears what they say before a table goes up.
 run-name: >-
   ${{ github.event_name != 'workflow_dispatch' && 'capacity' ||
@@ -262,7 +262,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: capacity, path: "${{ steps.omni_legal_export_2.outputs.paths }}"}
-      - name: The results, committed back to the branch the run ran on
+      - name: The results, saved on the branch raw
         if: always()
         run: |
           d="results/live/raw/capacity-run-${{ github.run_id }}"
@@ -272,15 +272,8 @@ jobs:
             '${{ github.event.inputs.caps }}' '${{ github.event.inputs.reps }}' "${{ github.event.inputs.rate_steps }}" \
             "${{ github.event.inputs.duration_s }}" "${{ github.event.inputs.slo_ms }}" "${{ github.sha }}" > "$d/RUN.txt"
           ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add --sparse "$d"
-          git commit -q -m "Capacity test ${{ github.event.inputs.label }}, run ${{ github.run_id }}: raw files and table"
-          for i in 1 2 3 4 5 6; do
-            git push origin "HEAD:${{ github.ref_name }}" && exit 0
-            sleep $((i * 5)); git pull --rebase -q origin "${{ github.ref_name }}" || true
-          done
-          echo "::error::the results could not be pushed after six attempts"; exit 1
+          # onto the branch raw, built on its newest tip (scripts/raw_archive.sh); main's tree keeps the code and the tables
+          bash scripts/raw_archive.sh save "${d#results/live/raw/}" "Capacity test ${{ github.event.inputs.label }}, run ${{ github.run_id }}: raw files and table"
       - name: Legal files beside the files this run hands out
         if: always()
         uses: actions/checkout@v4
