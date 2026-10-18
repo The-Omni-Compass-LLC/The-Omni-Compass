@@ -102,7 +102,7 @@ td.nat{color:var(--steel)} td.omni{color:var(--brass)}
 .word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor;white-space:nowrap}
 .w-gain{color:var(--ok)} .w-even{color:var(--even)} .w-loss{color:var(--bad)} .w-given{color:var(--ok)} .w-lost{color:var(--bad)}
 .word.w-even::before{content:"◆ "} .word.w-given::before{content:"GAIN · "} .word.w-lost::before{content:"LOSS · "}
-.tw-g{color:var(--ok);font-weight:600} .tw-e{color:var(--even);font-weight:600} .tw-l{color:var(--bad);font-weight:600}
+.ocw{color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.02em} .tw-g{color:var(--ok);font-weight:600} .tw-e{color:var(--even);font-weight:600} .tw-l{color:var(--bad);font-weight:600}
 .keyGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:900px){.keyGrid{grid-template-columns:1fr}}
 .keyWhy{border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;background:var(--panel2)}
@@ -1456,13 +1456,13 @@ function alpha(col, a) {
   if (col.startsWith("#")) { const n = parseInt(col.slice(1), 16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
   return col;
 }
-const WORD_RX = /(?:\b(?:GAIN|EVEN|LOSS)\b(?: · power given| · power lost)?|power given|power lost)(?:\s?[0-9][0-9.,]*\s?(?:%|pp|ms|s\b)?)?/g, WORD_CLS = {GAIN: "tw-g", EVEN: "tw-e", LOSS: "tw-l", "power given": "tw-g", "power lost": "tw-l"};
-const wordKey = m => /^GAIN|^power given/.test(m) ? (/power lost/.test(m) ? "power lost" : "GAIN") : /^LOSS|power lost/.test(m) ? "LOSS" : /^EVEN/.test(m) ? "EVEN" : null;   // a word and the size beside it wear one colour
-const wordCol = m => ({GAIN: css.ok, EVEN: css.even, LOSS: css.bad, "power lost": css.bad})[wordKey(m)];
+const WORD_RX = /(?:\b(?:GAIN|EVEN|LOSS)\b(?: · power given| · power lost)?|power given|power lost)(?:\s?[0-9][0-9.,]*\s?(?:%|pp|ms|s\b)?)?|\bOmni-Compass\b/g, WORD_CLS = {OC: "ocw", GAIN: "tw-g", EVEN: "tw-e", LOSS: "tw-l", "power given": "tw-g", "power lost": "tw-l"};
+const wordKey = m => m === "Omni-Compass" ? "OC" : /^GAIN|^power given/.test(m) ? (/power lost/.test(m) ? "power lost" : "GAIN") : /^LOSS|power lost/.test(m) ? "LOSS" : /^EVEN/.test(m) ? "EVEN" : null;   // a word and the size beside it wear one colour
+const wordCol = m => ({OC: "#ffffff", GAIN: css.ok, EVEN: css.even, LOSS: css.bad, "power lost": css.bad})[wordKey(m)];
 function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yellow and LOSS red wherever the word stands
   const parts = String(text).split(new RegExp("(" + WORD_RX.source + ")")), base = g.fillStyle, al = g.textAlign;
-  const tw = parts.reduce((a, p) => a + g.measureText(p).width, 0); let cx = al === "right" || al === "end" ? x - tw : al === "center" ? x - tw/2 : x;
-  g.textAlign = "left"; for (const p of parts) { if (!p) continue; g.fillStyle = wordCol(p) || base; g.fillText(p, cx, y); cx += g.measureText(p).width; }
+  const tw = parts.reduce((a, p) => a + g.measureText(p === "Omni-Compass" ? "OMNI-COMPASS" : p).width, 0); let cx = al === "right" || al === "end" ? x - tw : al === "center" ? x - tw/2 : x;
+  g.textAlign = "left"; const f0 = g.font; for (const p of parts) { if (!p) continue; const oc = p === "Omni-Compass", q = oc ? "OMNI-COMPASS" : p; if (oc) g.font = "700 " + f0.replace(/^\d{3} /, ""); g.fillStyle = wordCol(p) || base; g.fillText(q, cx, y); cx += g.measureText(q).width; g.font = f0; }
   g.fillStyle = base; g.textAlign = al; }
 const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT"]);
 function armCols(t) {   // a table's Native column wears native's amber, its Omni-Compass column Omni-Compass's blue
@@ -1474,9 +1474,9 @@ function paintArms(root) { const el = root.nodeType === 1 ? root : root.parentNo
 function paintWords(root) {   // every GAIN, EVEN and LOSS in the page's text wears its traffic-light colour, the ones written later included
   if (!root || root.nodeType === 3 && !root.parentNode) return;
   const start = root.nodeType === 3 ? root.parentNode : root;
-  for (let e = start; e && e !== document.body; e = e.parentNode) if (WORD_SKIP.has(e.nodeName) || e.classList && (e.classList.contains("word") || /\b(tw-[gel]|w-gain|w-even|w-loss|w-given|w-lost|w-dis)\b/.test(e.className))) return;
+  for (let e = start; e && e !== document.body; e = e.parentNode) if (WORD_SKIP.has(e.nodeName) || e.classList && (e.classList.contains("word") || /\b(ocw|tw-[gel]|w-gain|w-even|w-loss|w-given|w-lost|w-dis)\b/.test(e.className))) return;
   const walk = document.createTreeWalker(start, NodeFilter.SHOW_TEXT, {acceptNode: n => { WORD_RX.lastIndex = 0; if (!WORD_RX.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
-    for (let e = n.parentNode; e && e !== start.parentNode; e = e.parentNode) if (WORD_SKIP.has(e.nodeName) || e.classList && (e.classList.contains("word") || /\b(tw-[gel]|w-gain|w-even|w-loss|w-given|w-lost|w-dis)\b/.test(e.className))) return NodeFilter.FILTER_REJECT;
+    for (let e = n.parentNode; e && e !== start.parentNode; e = e.parentNode) if (WORD_SKIP.has(e.nodeName) || e.classList && (e.classList.contains("word") || /\b(ocw|tw-[gel]|w-gain|w-even|w-loss|w-given|w-lost|w-dis)\b/.test(e.className))) return NodeFilter.FILTER_REJECT;
     return NodeFilter.FILTER_ACCEPT; }});
   const hits = []; while (walk.nextNode()) hits.push(walk.currentNode);
   const tails = [], tw = document.createTreeWalker(start, NodeFilter.SHOW_TEXT); while (tw.nextNode()) { const n = tw.currentNode, pv = n.previousSibling;
@@ -1643,7 +1643,7 @@ function drawSwarm() {
     W.muscles.forEach((M, i) => { if (M.realm !== k) return;
       for (const [arm, col, dy] of [[W.nat, css.steel, 0.3], [W.omni, css.brass, 0.7]]) { const s = arm.m[i];
         g.fillStyle = alpha(col, 0.85); g.beginPath(); g.arc(X(s.p), y0 + rowH*dy + ((M.j % 3) - 1)*2, 3, 0, Math.PI*2); g.fill(); } }); });
-  g.textAlign = "right"; g.fillStyle = css.muted; g.fillText("each row: native above (amber), Omni-Compass below (blue)", w - mr, h - 7);
+  g.textAlign = "right"; g.fillStyle = css.muted; fillWords(g, "each row: native above (amber), Omni-Compass below (blue)", w - mr, h - 7);
 }
 
 // ---- the followed muscle's band
@@ -2141,7 +2141,7 @@ function drawCluster(armSel) {
   g.strokeStyle = css.bad; g.lineWidth = 2; g.beginPath(); g.moveTo(x0 + bw*scale(line), yr + 12); g.lineTo(x0 + bw*scale(line), yr + 32); g.stroke();
   g.fillStyle = css.muted; g.fillText(`response time ${ms} ms (the line ${line} ms)`, x0, yr);
 }
-function laneHeads(g, lanes) { g.font = `600 14px ${MONO}`; g.textBaseline = "top"; g.textAlign = "left"; lanes.forEach(L => { g.fillStyle = L.col; g.fillText(L.name, L.x0, 2); }); }
+function laneHeads(g, lanes) { g.font = `700 14px ${MONO}`; g.textBaseline = "top"; g.textAlign = "left"; lanes.forEach(L => { const oc = L.name === "Omni-Compass"; g.fillStyle = oc ? "#ffffff" : L.col; g.fillText(oc ? "OMNI-COMPASS" : L.name, L.x0, 2); if (oc) { g.fillStyle = L.col; g.fillRect(L.x0, 19, g.measureText("OMNI-COMPASS").width, 3); } }); }
 function mkLanes(w, ml, mr, gap, nat, omni) { const lw = (w - ml - mr - gap)/2; return [{name: "Native", A: nat, col: css.steel, x0: ml, lw}, {name: "Omni-Compass", A: omni, col: css.brass, x0: ml + lw + gap, lw}]; }
 function drawCStrip() {   // native (amber) and Omni-Compass (blue) each in its own lane on one scale
   const cv = $("cStrip"); const {g, w, h} = fit(cv, Math.min(0.5, 380/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
@@ -2243,7 +2243,7 @@ function drawSStrip() {   // native (amber) and Omni-Compass (blue) each in its 
   const panels = G ? [["the card's draw (W) · dashed: its power limit", a => a.power, null, a => a.limit], ["clock (MHz) · dashed: the clock ceiling", a => a.clock.map(v => v*MHZ), null, a => a.ceiling.map(v => v*MHZ)], ["response time (ms) · red: the response line", a => a.resp_ms, SC.gpu.slo_ms, null]]
     : [["response time, mean (ms) · red: the response line", a => a.ms, 500, null], ["requests a second", a => a.lam, null, null], ["CPU limits given (cores) · dashed: host busy (share of its 4 cores)", a => a.limit_m.map(v => v/1000), null, a => a.busy.map(v => 4*v)]];
   const head = 22, ph = (h - head - 18)/panels.length;
-  g.font = `600 14px ${MONO}`; g.textBaseline = "top"; lanes.forEach(([nm, , col, x0]) => { g.fillStyle = col; g.textAlign = "left"; g.fillText(nm, x0, 2); });
+  laneHeads(g, lanes.map(([name, A, col, x0]) => ({name, A, col, x0})));
   panels.forEach(([title, f, line, f2], k) => { const top = head + k*ph, bot = top + ph - 16;
     const all = f(R.native).concat(f(R.omni), f2 ? f2(R.native).concat(f2(R.omni)) : []); let lo = Math.min(...all), hi = Math.max(...all, line || 0);
     if (line && hi > 3*line) hi = 3*line; lo = lo > 0.6*hi ? lo*0.98 : 0; hi = hi*1.05 + 1e-9;
@@ -2567,7 +2567,7 @@ function drawCandle() {
   const ph = (h - 22)/2; OPS.geo.opsCandle = {ml, mr, w, N};
   [["native", P.native, css.steel], ["Omni-Compass", P.omni, css.brass]].forEach(([name, A, col], k) => {
     const top = 2 + k*ph, bot = top + ph - 6, Y = v => bot - (Math.log(v) - Math.log(lo))/(Math.log(hi) - Math.log(lo))*(bot - top - 16);
-    g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = col; g.fillText(name, ml, top);
+    g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = col; fillWords(g, name, ml, top);
     g.textAlign = "right"; g.textBaseline = "middle";
     for (let e = lo; e <= hi; e *= 10) { g.strokeStyle = alpha(css.rule, 0.9); g.beginPath(); g.moveTo(ml, Y(e)); g.lineTo(w - mr, Y(e)); g.stroke(); g.fillStyle = css.muted; g.fillText(e >= 1000 ? e/1000 + " s" : e + " ms", ml - 6, Y(e)); }
     g.strokeStyle = css.bad; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(ml, Y(500)); g.lineTo(w - mr, Y(500)); g.stroke(); g.setLineDash([]);
@@ -2587,7 +2587,7 @@ function drawHeat() {
   OPS.geo.opsHeat = {ml, mr, w, N};
   [["native", P.native, css.steel], ["Omni-Compass", P.omni, css.brass]].forEach(([name, A, col], k) => {
     const top = 2 + k*ph + 14, bot = 2 + k*ph + ph - 6, rh = (bot - top)/nb;
-    g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = col; g.fillText(name, ml, top - 14);
+    g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = col; fillWords(g, name, ml, top - 14);
     g.textAlign = "right"; g.textBaseline = "middle"; g.fillStyle = css.muted;
     for (let b = 0; b < nb; b++) if (rh >= 9 || b % 2 === 0) g.fillText(HIST_LBL[b].replace(" and over", "+"), ml - 6, bot - (b + 0.5)*rh);
     g.fillStyle = css.panel2; g.fillRect(ml, top, w - ml - mr, bot - top);
@@ -2818,7 +2818,7 @@ function drawSankey() {   // the service level and the error budget burned (the 
     const key = id === "tSlo" ? "lvl" : "burn", a = sn[key], o = so[key];
     let lo, hi; if (id === "tSlo") { const v = a.concat(o).filter(x => x !== null); lo = Math.max(0, Math.min(90, ...v) - 2); hi = 100; } else { lo = 0; hi = Math.max(10, a[N - 1] || 0, o[N - 1] || 0)*1.08; }
     const Y = v => bot - 6 - (v - lo)/(hi - lo)*(bot - top - 10); OPS.geo[id] = {ml, mr: w - ml - lanes[0].lw, w, N};
-    g.font = `12px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(id === "tSlo" ? "the service level: answered inside the line (%)" : "the error budget burned: requests over the line, added up", ml, 2); g.font = `600 13px ${MONO}`; lanes.forEach(L => { g.fillStyle = L.col; g.textAlign = "left"; g.fillText(L.name, L.x0, 20); }); g.font = `12px ${MONO}`;
+    g.font = `12px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(id === "tSlo" ? "the service level: answered inside the line (%)" : "the error budget burned: requests over the line, added up", ml, 2); g.font = `600 13px ${MONO}`; lanes.forEach(L => { const oc = L.name === "Omni-Compass"; g.font = `700 13px ${MONO}`; g.fillStyle = oc ? "#ffffff" : L.col; g.textAlign = "left"; g.fillText(oc ? "OMNI-COMPASS" : L.name, L.x0, 20); }); g.font = `12px ${MONO}`;
     g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(id === "tSlo" ? hi.toFixed(0) + "%" : num(Math.round(hi/1.08)), ml - 6, Y(id === "tSlo" ? hi : hi/1.08)); g.fillText(id === "tSlo" ? lo.toFixed(0) + "%" : "0", ml - 6, bot);
     lanes.forEach((L, li) => { const XL = i => L.x0 + (i + 0.5)/N*L.lw, ser = li ? o : a;
       g.strokeStyle = css.rule; g.beginPath(); g.moveTo(L.x0, bot); g.lineTo(L.x0 + L.lw, bot); g.stroke();
