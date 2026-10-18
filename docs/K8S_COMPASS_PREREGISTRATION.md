@@ -1238,6 +1238,32 @@ rig is protocol 4 (`KUBE_PROTOCOL`, carried in each run's name), and only its ru
 cluster inside had started on protocol 3. Expected before any run: a pod on an empty node
 starts in about the time one beside a serving pod takes, in both arms. Whatever the runs read is reported.
 
+## Amendment (2026-10-18): the extended fault test, the two faults that blind a governor (written before its run)
+
+The fault test above meets four faults. None of them takes away what a governor reads or the path it writes through, and a
+governor's worst hour is the one in which it cannot see. The extended test (`FAULTS=2`, `scripts/kind_faults.sh`) keeps the
+four at their moments and adds two after them, the same in every arm:
+5. at 82% of the run, the API server is frozen for 30 s: its process in the control-plane node is stopped, then continued.
+   The service's own path (kube-proxy on every node) keeps carrying traffic; no controller, native's or Omni-Compass's, can
+   read the cluster or write to it.
+6. at 88%, the metrics server is scaled to none for two minutes, then back to one: every autoscaler reads no CPU metric.
+
+Each outage is written to `faults.log` only once it took hold; one that did not take hold is written as failed, and the
+report has no row for it. The report (`tools/live_reps.py`, "The fault test") reads the two like the four: the time to
+recover from the fault's start until responses stay under the line for 30 s straight, at most 300 s, and the share of
+samples over the line or failed in the 300 s after it, paired against native. The run's window is 2,500 s, so the second
+outage's 300 s end inside it (12% of 2,500 s is 300 s); the four keep their shares of the window, so they fall later in
+seconds than in the 900-second test, and its tables are not read beside this one's. Load (open, fixed rate), arms (native;
+native with Omni-Compass on top), the engine (omni-v11's digest), the rig (the pre-puller above), the gauges and the ten
+pairs are as written; three runs, A, B and C (`scripts/reruns.txt`, "kubernetes faults extended").
+
+Two readings are named before the run. While the API server is frozen, the capture's readings are not answered and are
+skipped (`fleet/capture/kube_capture.sh`), in both arms. While the metrics server is gone, the capture reads no CPU used:
+the column records 0 for those two minutes in both arms, so the CPU row's change is diluted by that share of the window and
+never reversed by it. Expected before any run: Omni-Compass on top holds every setting while it cannot read (omni-v11 holds
+on a blind reading; a decision whose read fails writes nothing, and its lease runs 300 s), so it recovers from both as fast
+as native or faster. Whatever the runs read is reported.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
