@@ -618,14 +618,14 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="panel stack chartbox" style="gap:8px">
     <h3>The benefit board: every domain, native against Omni-Compass</h3>
     <canvas id="fxBen" aria-label="Bar chart of every benchmark's benefit, on a square-root scale, each bar labelled with its word"></canvas>
-    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN</span><span><i class="sq" style="background:var(--brass)"></i>GAIN with power given beside it</span><span><i class="sq" style="background:var(--muted)"></i>EVEN</span><span><i class="sq" style="background:var(--bad)"></i>a LOSS among its rows</span><span>the axis: 0, 10, 25, 50 and 100% on a square-root scale, so a small bar is seen; a bar past 100% runs to the edge and is marked</span></div>
+    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN, the bar</span><span><i class="sq" style="background:var(--brass)"></i>power given beside it: an amber cap on the bar's end</span><span><i class="sq" style="background:var(--bad)"></i>LOSS: a red bar, or a red cap where a LOSS stands beside a GAIN</span><span><i class="sq" style="background:var(--muted)"></i>EVEN</span><span>the axis: 0, 10, 25, 50 and 100% on a square-root scale, so a small bar is seen; a bar past 100% runs to the edge and is marked</span></div>
     <p class="note" id="fxBenNote">—</p>
     <div class="tbl-wrap"><table class="who" id="fxMatrix"><thead><tr><th>Domain</th><th>Benchmark</th><th>Evidence</th><th>Engine</th><th>Benefit</th><th>GAIN rows</th><th>Power given</th><th>EVEN</th><th>LOSS</th><th>Where it stands</th></tr></thead><tbody></tbody></table></div>
     <div class="opsTip" id="fxTipBen" hidden></div>
   <div class="panel stack chartbox" style="gap:8px">
     <h3>Where the benefit lives, gauge by gauge</h3>
     <p class="note">Every judged row of every newest three-run table (section 4's receipts), sorted into the family of gauge it measures: what a CTO reads (speed, the service level, failures, work), what a CFO reads (machines, energy, the bill), and what a plant engineer reads (peaks and swings, wear and accuracy, misses). Each bar counts the rows that read GAIN in all three runs; the size beside it is the median of those rows' own sizes (the middle of runs A, B and C). Power given and LOSS rows are counted beside them, never hidden.</p>
-    <canvas id="fxFam" aria-label="Bar chart: the rows reading GAIN in each family of gauge, with their median size, power given and LOSS beside"></canvas>
+    <canvas id="fxFam" aria-label="Stacked bar chart: in each family of gauge, the rows reading GAIN (green), power given (amber) and LOSS (red)"></canvas>
     <div class="tbl-wrap"><table class="who" id="fxFamTab"><thead><tr><th>Family of gauge</th><th>Who reads it</th><th>GAIN rows</th><th>Median size of the GAIN rows</th><th>Largest</th><th>Power given</th><th>LOSS</th><th>The runs disagree</th><th>Where</th></tr></thead><tbody></tbody></table></div>
     <div class="opsTip" id="fxTipFam" hidden></div>
   </div>
@@ -2970,7 +2970,8 @@ function fxAll() {   // every domain on one board: the index, the chips, the clo
   return out;
 }
 function fxRows() { const top = Math.max(0, ...FX.benefit.map(r => fxEngNum(r.engine))); return {top, rows: FX.benefit.filter(r => fxEngNum(r.engine) === top), road: FX.benefit.filter(r => fxEngNum(r.engine) !== top)}; }
-const fxCol = r => r.loss > 0 ? css.bad : r.pct > 0 && r.given > 0 ? css.brass : r.pct > 0 ? css.ok : css.muted;
+const fxCol = r => r.loss > 0 && !(r.gain > 0) ? css.bad : r.pct > 0 || r.gain > 0 ? css.ok : css.muted;   // the bar wears its word's color: GAIN green, LOSS red, EVEN grey; power given and a LOSS beside a GAIN are marked on the bar, never a second color for GAIN
+const fxWordHtml = r => r.loss > 0 ? (r.gain > 0 ? '<span class="word w-gain">GAIN</span> and <span class="word w-loss">LOSS</span>' : '<span class="word w-loss">LOSS</span>') : r.pct > 0 ? '<span class="word w-gain">GAIN</span>' + (r.given > 0 ? ', <span class="word w-given">power given</span>' : "") : '<span class="word w-even">EVEN</span>';   // each word in its own color, the same everywhere
 const fxWord = r => r.loss > 0 ? (r.gain > 0 ? "GAIN and LOSS" : "LOSS") : r.pct > 0 ? (r.given > 0 ? "GAIN, power given" : "GAIN") : "EVEN";
 function drawBenefit() {
   const cv = $("fxBen"); if (!cv) return; const rows = fxAll(), N = rows.length; if (!N) return;
@@ -2986,6 +2987,8 @@ function drawBenefit() {
     g.fillText(lab, ml - 8, y + rowH/2); const bh = rowH - 12;
     if (notRun) { g.strokeStyle = css.muted; g.setLineDash([3, 3]); g.strokeRect(ml + 0.5, y + 6.5, Math.max(24, (w - ml - mr)*0.06), bh); g.setLineDash([]); g.textAlign = "left"; g.fillStyle = css.muted; g.fillText(`0 · ${r.status}`, ml + Math.max(24, (w - ml - mr)*0.06) + 8, y + rowH/2); return; }
     const v = r.pct === null ? 0 : r.pct, x1 = X(v), col = fxCol(r); g.fillStyle = col; g.beginPath(); if (g.roundRect && x1 - ml > 4) g.roundRect(ml, y + 6, x1 - ml, bh, [0, 4, 4, 0]); else g.rect(ml, y + 6, Math.max(2, x1 - ml), bh); g.fill();
+    if (r.gain > 0 && r.given > 0) { g.fillStyle = css.brass; g.fillRect(Math.max(ml, x1 - 6), y + 6, 6, bh); }
+    if (r.gain > 0 && r.loss > 0) { g.fillStyle = css.bad; g.fillRect(Math.max(ml, x1 - (r.given > 0 ? 12 : 6)), y + 6, 6, bh); }
     if (v > 100) { g.fillStyle = css.ink; g.textAlign = "right"; g.fillText("▶", x1 - 3, y + rowH/2); }
     g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(r.pct === null ? `${r.gain} GAIN · ${r.even ?? 0} EVEN · ${r.loss} LOSS` : `${fxWord(r)} ${v > 0 ? (v >= 10 ? v.toFixed(1) : v.toFixed(2)) + "%" : ""}`, Math.max(x1, ml + 2) + 6, y + rowH/2); });
 }
@@ -2996,7 +2999,7 @@ function buildFleet() {
   const t = rows.filter(r => !/^Every real test/.test(r.benchmark)).reduce((a, r) => (a.g += r.gain, a.l += r.loss, a.p += r.given, a.e += r.pct > 0 || r.loss ? 0 : 1, a), {g: 0, l: 0, p: 0, e: 0});
   $("fxBenNote").innerHTML = `${rows.length - 1} benchmarks and the index on omni-v${top}, each its benefit sheet row: ${t.g} rows GAIN, ${t.p} power given, <b>${t.l} LOSS</b> (CityLearn's 2023 districts, repaired on the engine that stands), and ${t.e} benchmarks EVEN all through. ${road.length ? `${road.length} rows of earlier engines stay in the sheet as the road (${[...new Set(road.map(r => r.engine))].join(", ")}), each rerun on the engine that stands as its queue reaches it.` : ""} A bar is the benchmark's own benefit as its row computes it; hover a bar for every gauge behind it.`;
   $("fxMatrix").querySelector("tbody").innerHTML = (() => { let last = ""; return fxAll().map(r => { const first = r.dom && r.dom !== last; if (r.dom) last = r.dom;
-    const ben = r.pct === null ? (r.gain || r.loss || r.even ? "—" : "0") : `<span class="word ${r.loss ? "w-loss" : r.pct > 0 ? (r.given ? "w-given" : "w-gain") : "w-even"}">${fxWord(r)}</span> ${r.pct > 0 ? r.pct.toFixed(r.pct >= 10 ? 1 : 2) + "%" : ""}`;
+    const ben = r.pct === null ? (r.gain || r.loss || r.even ? "—" : "0") : fxWordHtml(r) + ` ${r.pct > 0 ? r.pct.toFixed(r.pct >= 10 ? 1 : 2) + "%" : ""}`;
     return `<tr><td>${first ? "<b>" + r.dom + "</b>" : ""}</td><td>${r.benchmark}<br><span class="note">${unsign(r.words || "")}</span></td><td>${r.ev}</td><td>${r.engine}</td><td>${ben}</td><td>${r.gain}</td><td>${r.given}</td><td>${r.even ?? "—"}</td><td class="${r.loss ? "w-loss" : ""}">${r.loss}</td><td>${r.status}</td></tr>`; }).join(""); })();
   const tip = $("fxTipBen"), cv = $("fxBen");
   cv.addEventListener("pointermove", e => { const G = FXW.geo; if (!G) return; const r = cv.getBoundingClientRect(), y = e.clientY - r.top, j = Math.floor((y - G.top)/G.rowH), R = fxAll()[j];
@@ -3180,13 +3183,13 @@ function famRows() { const by = {}; SC.receipts.forEach(r => r.rows.forEach(x =>
     return {k, what: d ? d[1] : "everything else", who: d ? d[2] : "—", n: g.length, med: g.length ? g[g.length >> 1] : null, max: g.length ? g[g.length - 1] : null, given: o.given, loss: o.loss, dis: o.dis, where: [...o.where]}; }); }
 function drawFam() {
   const cv = $("fxFam"); if (!cv) return; const F = famRows(), rowH = 30, hh = F.length*rowH + 30; cv.style.height = hh + "px"; const {g, w, h} = fit(cv, hh/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
-  const ml = Math.min(170, w*0.3), mr = Math.min(380, w*0.5), hi = Math.max(1, ...F.map(f => f.n)), X = v => ml + v/hi*(w - ml - mr); FXW.famGeo = {rowH, top: 4, N: F.length};
+  const ml = Math.min(170, w*0.3), mr = Math.min(380, w*0.5), hi = Math.max(1, ...F.map(f => f.n + f.given + f.loss)), X = v => ml + v/hi*(w - ml - mr); FXW.famGeo = {rowH, top: 4, N: F.length};
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
   F.forEach((f, j) => { const y = 4 + j*rowH; if (FXW.famHov === j) { g.fillStyle = alpha(css.ink, 0.05); g.fillRect(0, y, w, rowH); }
     g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(f.k, ml - 8, y + rowH/2);
-    g.fillStyle = css.ok; g.fillRect(ml, y + 6, Math.max(2, X(f.n) - ml), rowH - 12);
-    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`${f.n} GAIN${f.med !== null ? ", median " + f.med + "%" : ""} · ${f.given} power given · ${f.loss} LOSS`, X(f.n) + 8, y + rowH/2); });
-  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("rows reading GAIN in all three runs", ml, h - 10);
+    let x = ml; for (const [n, c] of [[f.n, css.ok], [f.given, css.brass], [f.loss, css.bad]]) if (n > 0) { const x2 = X(x === ml ? n : (x - ml)/(w - ml - mr)*hi + n); g.fillStyle = c; g.fillRect(x, y + 6, Math.max(2, x2 - x - 2), rowH - 12); x = x2; }
+    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`${f.n} GAIN${f.med !== null ? ", median " + f.med + "%" : ""} · ${f.given} power given · ${f.loss} LOSS`, x + 8, y + rowH/2); });
+  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("rows in all three runs: green GAIN · amber power given · red LOSS", ml, h - 10);
 }
 function tally() {   // one number for the whole board: one vote per category, the Omni index's own rule
   const all = fxAll(), landed = all.filter(r => r.pct !== null && /landed/.test(r.status) && r.dom !== "The headline"), gm = xs => xs.length ? Math.exp(xs.reduce((a, x) => a + Math.log(1 + x/100), 0)/xs.length) - 1 : null;
