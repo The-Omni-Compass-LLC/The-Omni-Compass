@@ -634,7 +634,12 @@ elif [ -z "$NATIVE" ]; then
     # with no write is valid when the governor recorded its decisions, each with its reasons in the audit, and the reset
     # below still checks every setting is the operator's; a governor that recorded no decisions was not running
     decisions=$(grep -c '"decision"' "$OUT_DIR/audit.jsonl" || true)
+    failed=$(grep -c '"consecutive_failures"' "$OUT_DIR/audit.jsonl" || true)
     want=$(( DURATION / 60 - 1 )); [ "$want" -ge 1 ] || want=1
+    # a decision that failed wrote nothing and left its error in the audit: the window is still refused, in the words of
+    # what happened (18 Oct, the CruiseKube test, run 39120444653, repetition 8: the cluster showed no machine in service
+    # for two minutes, two decisions failed on it, and the old words said the governor was not running)
+    [ "$decisions" -ge "$want" ] || [ "$failed" -eq 0 ] || { echo "Omni made no write and recorded $decisions decisions (at least $want expected); $failed more failed and wrote nothing, the last with $(grep '"consecutive_failures"' "$OUT_DIR/audit.jsonl" | tail -n 1 | jq -r .error)"; exit 1; }
     [ "$decisions" -ge "$want" ] || { echo "Omni made no write and recorded $decisions decisions (at least $want expected): the governor was not running"; exit 1; }
     echo "Omni-Compass stayed native: $decisions decisions recorded, no write" | tee "$OUT_DIR/omni_stayed_native.txt"
   fi
@@ -736,3 +741,8 @@ PY
     ! grep -q '"refused"\|"hpa_shows": false' "$pl" 2>/dev/null || { echo "INVALID RUN: a move of Omni-Compass did not reach the add-on whole ($pl)"; exit 1; }
   fi
 fi
+# a reading in which the cluster had no machine in service leaves the window's machine count wrong, in either arm (18 Oct,
+# the CruiseKube test, run 39120444653, repetition 8: every worker of the kind cluster left service for two minutes while
+# the service answered every probe): the window is refused, never scored. The nodes as they stood are in capture.csv.errors
+blank=$(awk -F, 'NR > 1 && $4 == 0' "$OUT_DIR/capture.csv" | wc -l)
+[ "$blank" -eq 0 ] || { echo "INVALID RUN: the cluster showed no machine in service in $blank of the window's readings"; exit 1; }

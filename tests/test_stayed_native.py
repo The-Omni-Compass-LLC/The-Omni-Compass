@@ -46,6 +46,18 @@ class StayedNative(unittest.TestCase):
         self.assertIn('tee "$OUT_DIR/omni_stayed_native.txt"', s)
         self.assertNotIn("Omni made no write, so the reset would prove nothing", s)
 
+    def test_a_failed_decision_is_named_and_a_window_with_no_machine_is_refused_in_either_arm(self):
+        s = BENCH.read_text()
+        # failed decisions are counted apart and named by their error, never read as a governor that was not running
+        self.assertIn('failed=$(grep -c \'"consecutive_failures"\' "$OUT_DIR/audit.jsonl" || true)', s)
+        self.assertIn('more failed and wrote nothing, the last with', s)
+        # the rule on readings with no machine in service stands after the arm's own checks, outside the omni-only block
+        tail = s[s.rindex("\nfi\n"):]
+        self.assertIn("awk -F, 'NR > 1 && $4 == 0' \"$OUT_DIR/capture.csv\"", tail)
+        self.assertIn("INVALID RUN: the cluster showed no machine in service", tail)
+        cap = (BENCH.parents[1] / "fleet" / "capture" / "kube_capture.sh").read_text()
+        self.assertIn('no machine in service; the nodes as they stood:', cap)
+
 
 if __name__ == "__main__":
     unittest.main()

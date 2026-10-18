@@ -137,6 +137,15 @@ CruiseKube's hour shortened to none, 1,500 s of learning and a 360 s window. It 
   with the count of windows it stayed native: on top of CruiseKube and KEDA at this load the service needed nothing
   more, and Omni-Compass did no harm.
 
+## Amendment 2: a window with no machine in service is refused in either arm (18 October, omni-v10 reruns)
+
+In run 39120444653, repetition 8, every worker of the kind cluster left service for two minutes while the service answered
+every probe. The omni arm's governor wrote nothing, and two of its fifteen decisions failed on the empty reading. The rig
+refused the window, but its words said the governor was not running. A window in which the capture shows no machine in
+service has a wrong machine count, so it is now refused in either arm. A failed decision is named by its error. The capture
+keeps each node's taints and conditions at that moment (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendment of 18 October).
+The repetition runs again in place. The load, the learning, the window, the pairs and the gauges are unchanged.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

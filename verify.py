@@ -323,6 +323,11 @@ def main():
     check("the standing block of the state of play (where things stand: the engine, the muscles, the grid, the index, every benchmark's number) "
           "matches the result files it is read from (tools/summary.py --check; every push realigns)", r.returncode == 0,
           (r.stdout + r.stderr)[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "land_engine.py"), "--check"], capture_output=True, text=True)
+    check("every place that names the engine that stands names the newest one (tools/land_engine.py --check: the version list, the "
+          "conductor's campaign, the grid's manifest and workflows, the package, the front page, CLAUDE.md, the manual, the live "
+          "engine's page; the founder's order of 18 October: version after version, nothing left behind)", r.returncode == 0,
+          (r.stdout + r.stderr)[-400:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "unicode_math.py"), "--check"], capture_output=True, text=True)
     check("every formula the two manuals print is written in Unicode, never LaTeX markup (the founder's order of 15 October; "
           "tools/unicode_math.py --check)", r.returncode == 0, (r.stdout + r.stderr)[-300:])
