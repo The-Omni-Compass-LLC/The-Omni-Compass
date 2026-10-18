@@ -42,6 +42,7 @@ h2{font-family:var(--f-serif);font-weight:600;letter-spacing:0;text-transform:no
 .plain{font-size:18px;line-height:1.6}
 .realDisclose{border:1px solid var(--accent);border-left:4px solid var(--accent);border-radius:6px;padding:14px 18px;font-family:var(--f-serif);font-size:17px;line-height:1.65;max-width:110ch;background:var(--panel)}
 .realDisclose b{letter-spacing:.03em}
+.serial{display:block;font-size:13px;line-height:1.6;word-break:break-all}.serial code{font-size:12.5px}
 h1{font-size:clamp(34px,5vw,58px);line-height:1}
 h1 .acc{color:var(--accent)}
 h2{font-size:26px;line-height:1.1}
@@ -2401,8 +2402,8 @@ function setRuns(b, run, rep) {
   if (RW.rep >= reps.length) RW.rep = 0; $("ruRep").value = String(RW.rep);
   const gh = `https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/${R.id}`;
   $("ruReceipt").innerHTML = [`<span><b>${B.title}</b> · run ${R.tag} · <a href="${gh}" target="_blank" rel="noopener">GitHub run ${R.id}</a></span>`,
-    `<span>engine ${R.engine || B.engine} · commit ${R.commit || "—"} · the table <code>${B.file}</code></span>`,
-    `<span>raw files <code>${R.dir}</code>; their list <code>SHA256SUMS_ALL.txt</code>, itself SHA-256 ${R.sums_sha256 ? R.sums_sha256.slice(0, 16) + "…" : "—"}</span>`,
+    `<span class="serial"><b>SERIAL NUMBER OF THIS RUN</b> · GitHub run <code>${R.id}</code> · commit <code>${R.commit_full || R.commit || "—"}</code> · engine ${(R.engine || B.engine).split(" ")[0]}, fingerprint SHA-256 <code>${R.engine_digest_full || "—"}</code> · raw-file list SHA-256 <code>${R.sums_sha256 || "—"}</code></span>`,
+    `<span>the table <code>${B.file}</code> · raw files <code>${R.dir}</code>, every file listed in its <code>SHA256SUMS_ALL.txt</code></span>`,
     `<span>${R.ok} of ${R.checked} files read match the run's own SHA-256 list${R.ok === R.checked ? " ✓" : ": " + (R.unmatched || []).join(", ")}</span>`,
     k8s && R.official_agree !== null && R.official_agree !== undefined ? `<span>the scorer per repetition against the run's own result (LIVE_REPS.json): largest relative difference ${R.official_agree.toExponential(1)} ✓</span>` : ""].join("");
   if (k8s) {

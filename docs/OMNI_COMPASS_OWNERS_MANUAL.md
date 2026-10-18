@@ -628,8 +628,8 @@ installed is a quarter off the bill.
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
 | Every real test together: the Omni index | omni-v7 | +4.2% | GAIN, power given | L |
-| Robustness: the two-hour run | omni-v7 | +0.0% | EVEN | L |
-| Robot arms (MuJoCo), the three untouched robots | omni-v7 | +3.8% | GAIN | S |
+| Robustness: the two-hour run | omni-v10 | +1.5% | GAIN, power given | L |
+| Robot arms (MuJoCo), the three untouched robots | omni-v10 | +3.8% | GAIN | S |
 | Redis, the cache's memory ceiling | omni-v7 | +0.2% | GAIN, power given | L |
 | Real Kubernetes, faults | omni-v7 | +35.0% | GAIN, power given | L |
 | Real Kubernetes, all four at once | omni-v7 | +37.4% | GAIN | L |
@@ -640,13 +640,13 @@ installed is a quarter off the bill.
 | Real Kubernetes, a noisy neighbour | omni-v7 | +0.0% | EVEN | L |
 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v10 | +94.6% | GAIN AND LOSS | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v10 | +46.9% | GAIN, power given | L |
-| Power grids (SimBench), both load models | omni-v7 | +5.8% | GAIN, power given | S |
+| Power grids (SimBench), both load models | omni-v10 | +5.8% | GAIN, power given | S |
 | PostgreSQL, the pooler's pool size | omni-v7 | +0.0% | EVEN | L |
 | MySQL, the buffer pool's size | omni-v7 | +0.0% | EVEN | L |
 | MongoDB, the storage engine's cache size | omni-v7 | +0.0% | EVEN | L |
 | Kafka, the consumer group's size | omni-v7 | +0.1% | GAIN | L |
-| Drone swarms, the three untouched cells | omni-v7 | +6.1% | GAIN | S |
-| Buildings and batteries (CityLearn), the districts with batteries | omni-v7 | +0.8% | GAIN AND LOSS | S |
+| Drone swarms, the three untouched cells | omni-v10 | +5.9% | GAIN | S |
+| Buildings and batteries (CityLearn), the districts with batteries | omni-v10 | +1.5% | GAIN, power given | S |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |

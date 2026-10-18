@@ -97,6 +97,26 @@ class Sums:
         return data
 
 
+def serial(r):
+    """The run's whole serial number: the full commit it ran (git), and the full SHA-256 fingerprint of the engine that
+    commit carries (OMNI_V<n>.json), so anyone can rerun the same engine on the same commit and check every file."""
+    import re, subprocess
+    out = {}
+    c = str(r.get("commit") or "")
+    if re.fullmatch(r"[0-9a-f]{7,40}", c):
+        try:
+            full = subprocess.run(["git", "rev-parse", "--verify", "--quiet", c + "^{commit}"], cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.strip()
+            if re.fullmatch(r"[0-9a-f]{40}", full):
+                out["commit_full"] = full
+        except (OSError, subprocess.SubprocessError):
+            pass
+    m = re.match(r"omni-v(\d+)", str(r.get("engine") or ""))
+    f = ROOT / f"OMNI_V{m.group(1)}.json" if m else None
+    if f and f.exists():
+        out["engine_digest_full"] = json.loads(f.read_text(encoding="utf-8")).get("digest")
+    return out
+
+
 HIST_MS = [50, 100, 200, 300, 500, 1000, 2000]                     # the heatmap's bucket edges (ms); 500 ms is the line
 
 
@@ -329,7 +349,7 @@ def main(out_path):
         for r in raw_runs:
             rec = k8s_run(g, r, K8S[base]) if kind == "k8s" else db_run(g, r)
             if rec:
-                runs.append({"tag": r.get("tag"), "id": str(r.get("run")), "commit": r.get("commit"), "engine": r.get("engine"), **rec})
+                runs.append({"tag": r.get("tag"), "id": str(r.get("run")), "commit": r.get("commit"), "engine": r.get("engine"), **serial(r), **rec})
         title = meta.get("title") or (ROOT / "results" / "live" / f"{stem}.md").read_text(encoding="utf-8").splitlines()[0].lstrip("# ").split(": the A/B/C")[0]
         benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs})
         ck, okk = sum(r["checked"] for r in runs), sum(r["ok"] for r in runs)
