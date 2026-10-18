@@ -47,7 +47,8 @@ If GitHub's machines don't allow changing the GPU power limit, the job stops in 
 ## C. A rented cloud GPU
 
 This costs roughly $10 to $25 in rented GPU time. You type a
-handful of commands; the machine does the rest.
+handful of commands; the machine does the rest. The same test on Lambda from one GitHub button (it rents the machine,
+checks the keys first at no cost, brings the results back and always gives the machine back) is `docs/LAMBDA_SETUP.md`.
 
 ## 1. Rent the right kind of machine
 

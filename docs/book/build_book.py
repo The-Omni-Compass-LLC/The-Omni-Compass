@@ -860,7 +860,7 @@ OWNER_OUTLINE = [
     ("Before You Start, and the Eight Levels", ("M", "Before You Start, and the Eight Levels")),
     ("Stack by Stack", ("M", "Stack by Stack")),
     ("The Integration Manual", ("F", "docs/INTEGRATION_MANUAL.md")),
-    ("Running the GPU Benchmark", ("F", "docs/GPU_RUN_GUIDE.md")),
+    ("Running the GPU Benchmark", ("FS", ["docs/GPU_RUN_GUIDE.md", "docs/LAMBDA_SETUP.md"])),
     ("PART", "Operating It",
      "The OFF switch, the rules the governor obeys, the log it keeps, and the care of a running installation."),
     ("The OFF Switch, the Rules, and the Log", ("M", "The OFF Switch, the Rules, and the Log")),
