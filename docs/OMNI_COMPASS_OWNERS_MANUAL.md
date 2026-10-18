@@ -1095,9 +1095,9 @@ neighbours (section 15).
 The modelled organisms are also run with a **real Kubernetes cluster inside** as one more muscle (`tools/run_kil.py`,
 workflows `six-kube`, `big-organism`, `big-organism-detached`): the organism's own compute demand drives a real load
 generator against a real service on a real cluster, and the cluster's watts come back into the organism as heat and load.
-At 1, 10 and 100 copies this runs on GitHub's machines under protocol 3 (the organism's model on the runner's last
+At 1, 10 and 100 copies this runs on GitHub's machines under protocol 4 (the organism's model on the runner's last
 core, the kind nodes on the others, the same in both arms; the window set from the heavier arm's step, timed before
-either arm), and the whole tower and the four stacked at 100 copies also run on eight-core Azure machines, detached from
+either arm; the served image pulled onto every worker before each arm, `docs/POD_START_WAIT.md`), and the whole tower and the four stacked at 100 copies also run on eight-core Azure machines, detached from
 the GitHub job that starts them. No 1,000-copy run is started from 12 October. These runs are evidence class L for the
 cluster and S for the organism around it, and are labelled "L + S".
 
@@ -2509,7 +2509,7 @@ tools, starts every repetition of every organism under `nohup` and leaves the ma
 artifact per cell and deletes the machine; `survey` lists which machine sizes and quotas a subscription may rent, region
 by region, and rents nothing. A machine older than `max_hours` is collected as it is and deleted, so nothing runs forever
 on the bill. The commit to run is an input, so a run is always tied to one engine. **The clock rule** (section 13) and
-protocol 3 decide the window for each size on each machine: the window is set from the heavier arm's step, timed on the
+the rig's protocol (3 from 13 October, 4 from 18 October) decide the window for each size on each machine: the window is set from the heavier arm's step, timed on the
 machine before either arm, so the organism keeps its clock (the tower at 100 copies on 14 October: 2,880 s windows on
 three machines, ten repetitions in all; the stack follows on the same three machines). No 1,000-copy run is started from
 12 October; earlier engines' 1,000-copy runs on this workflow stand as they were run, in their own tables.

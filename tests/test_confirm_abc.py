@@ -62,6 +62,15 @@ def main():
                                                        "capacity": {"native": {"capacity_rps": 18.6}, "compass": {"capacity_rps": 27.6, "change_pct": 48.4, "ci95": [6.0, 12.0]}}}))
         _, paired, _, _ = C.load(d.parent)
         assert paired[C.CAPACITY]["diff"] == 9.0 and paired[C.CAPACITY]["significant"], "the capacity block becomes a judged row"
+    with tempfile.TemporaryDirectory() as t:                # the rig each run ran on (amendment of 18 October): never two in one table
+        old, new = Path(t) / "run-1", Path(t) / "run-2"
+        for d, line in ((old, ""), (new, "images=pre-pulled on every worker before the arm (deploy/kind/prepull.yaml)\n")):
+            for arm in ("native", "compass"):
+                (d / f"bench-{arm}-1").mkdir(parents=True)
+                (d / f"bench-{arm}-1" / "preflight.txt").write_text("arm=" + arm + "\n" + line)
+        assert C.rig(old) == "pulled by each node at each start", C.rig(old)
+        assert C.rig(new) == "pre-pulled on every worker before the arm (deploy/kind/prepull.yaml)", C.rig(new)
+        assert C.rig(Path(t) / "none") == "not recorded"
     print("PASS  A/B/C three-run table rule: GAIN or LOSS in all three of our runs only with the same sign and every interval clear of zero in all three, "
           "the word by what the gauge is for (a resource spent that rose: power given); an interval over zero reads EVEN; clear runs pointing different ways read as a disagreement")
 
