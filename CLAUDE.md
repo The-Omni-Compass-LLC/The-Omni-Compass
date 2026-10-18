@@ -33,9 +33,19 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v10 stands (v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v11 stands (v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`) stands on main since 18 October, the
+- **Omni v11** (`OMNI_V11.json`, digest `745aa53ec8eeb67b`, 47 files; `docs/OMNI_V11.md`) stands on main since 18 October, the
+  founder's order that every fault found be fixed, none set aside: omni-v10 with one guard in the Kubernetes governor
+  (`omni_controller/controller.py`). A reading with no machine in service is blind, never an overload: the decision holds and
+  says why, nothing is decided from it or written, the floor check returns, and the last reading with machines stays the
+  conveyance's bound. Found in the omni-v10 CruiseKube test (run 39120444653, repetition 8: every kind worker out of service
+  for two minutes while the service answered every probe; omni-v10 fed the engine the highest overload, then divided by the
+  empty capacity). `tests/test_blind_reading.py` reproduces the fault on omni-v10 and passes on omni-v11; the toy gate
+  (`results/toy_gate/V11_VS_V10.md`, with a blink toy) before it was pushed. Every benchmark runs again on it; earlier tables
+  stand as their own engine's until each benchmark's three runs on v11 land. Its bookkeeping was landed by
+  `tools/land_engine.py`, the one command for every version from now on.
+- **Omni v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`) stood on main on 18 October, the
   founder's order ("Omni-Compass should be tuned to exploit all that can be and keep all healthy and never raise its bill";
   then "push, push in the bush"): omni-v9 with one file changed, the CityLearn runner. The battery wire's glide is 0.0875 of
   the command's range an hour (omni-v9: 0.0625), the speed that cuts the bill most with no LOSS read by the one key; the
@@ -83,7 +93,7 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
@@ -183,6 +193,15 @@ the founder overrides one in the conversation.
 
 ## Orders of 18 October
 
+- **Fix everything, and keep building, version after version** (the founder's words: every fault is to be fixed; and
+  "at some point ... version 10, 20, 30, 40 for all I know ... keep updating and moving and tightening and coding and writing
+  and building along the way to the full final destination organism ... leaving everything intact, only upgrading what keeps
+  moving ... It has to live better than it did natively ... We can't make an organism live great for one day and die the second
+  day"). No fault is set aside: each is root-caused and fixed, in the rig or, through the toy gate, in the next engine version.
+  A version lands with `python3 tools/land_engine.py vN --since <UTC>` (the fingerprint, the version list, the conductor's
+  campaign, the grid's manifest and workflows, the package, the root list, a release group), then the words a person writes;
+  `tools/land_engine.py --check`, run by `verify.py`, refuses a push where any of those places still names an older engine.
+  The real GitHub is brought up to the newest work every few hours.
 - **Google and Amazon on** (the founder's words, once the four secrets were in: "Push the clouds, let's see. The Google
   AWS, I linked them up"). `GCP_CREDENTIALS`, `GCP_PROJECT`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are in the
   repository's secrets; both queues' `switch=` lines read on. The conductor starts their four sets, A, then B, then C, one
@@ -198,7 +217,7 @@ the founder overrides one in the conversation.
   tuned to exploit all that can be and keep all healthy and never raise its bill ... whatever one can't be achieved doesn't
   get achieved. And the tuning stays where it doesn't ever hurt anyone"; then "push, push in the bush. Make sure everything's
   running"). Read by the one key, the battery glide moves to the speed that cuts the bill most with no LOSS (0.0875); a change
-  that raised a miss anywhere (the outage-hours hold) is refused, not carried. omni-v10 is on main and on the branch `v10`;
+  that raised a miss anywhere (the outage-hours hold) is refused, not carried. omni-v10 was on main and on the branch `v10`;
   every page, manual, table and queue points at it; every benchmark runs again on it.
 
 ## Orders of 17 October
@@ -433,8 +452,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v10` (the engine that stands, 18 October), stay in
-  sync, and `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v10`,
+  One version is always the main one; `main` and the working branch, `v11` (the engine that stands, 18 October), stay in
+  sync, and `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v11`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

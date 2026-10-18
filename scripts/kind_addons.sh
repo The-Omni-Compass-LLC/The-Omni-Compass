@@ -54,6 +54,14 @@ retry kubectl -n keda delete scaledobject keda-add-ons-http-interceptor --ignore
 for d in keda-add-ons-http-operator keda-add-ons-http-scaler keda-add-ons-http-interceptor; do kubectl -n keda patch deployment "$d" -p "$pin" >/dev/null; done
 kubectl -n keda scale deployment keda-add-ons-http-interceptor --replicas=1 >/dev/null
 for d in keda-add-ons-http-operator keda-add-ons-http-scaler keda-add-ons-http-interceptor; do kubectl -n keda rollout status deployment/"$d" --timeout=300s; done
+# a finished rollout can still leave the replaced pod stopping behind the service: KEDA's first call to the add-on's scaler
+# then meets a refused connection and the HPA is built without its HTTP metric (18 Oct, the KEDA test, run 39108180989,
+# profile both, repetition 2). The ScaledObject is applied only once the old pods are gone and the scaler has an address
+for i in $(seq 1 60); do
+  stopping=$(kubectl -n keda get pods --no-headers 2>/dev/null | grep -c Terminating || true)
+  [ "$stopping" = 0 ] && [ -n "$(kubectl -n keda get endpoints keda-add-ons-http-external-scaler -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null)" ] && break
+  sleep 2
+done
 
 echo "== the service's autoscaler handed to KEDA (profile $PROFILE)"
 kubectl delete hpa php-apache --ignore-not-found --wait=true >/dev/null
@@ -64,7 +72,11 @@ kubectl wait --for=condition=Ready scaledobject/php-apache --timeout=300s
 want_metrics=2; [ "$PROFILE" = http ] && want_metrics=1
 for i in $(seq 1 60); do
   n=$(kubectl get hpa php-apache -o json 2>/dev/null | jq '.spec.metrics | length' 2>/dev/null || echo 0)
-  [ "$n" = "$want_metrics" ] && break; sleep 5
+  [ "$n" = "$want_metrics" ] && break
+  # a reconcile that failed waits on KEDA's back-off: once a minute the ScaledObject is touched (an annotation of the
+  # harness, never a setting), so KEDA builds the HPA again from the same spec
+  [ $(( i % 12 )) -ne 0 ] || kubectl annotate scaledobject php-apache --overwrite "omni-harness/reconcile=$i" >/dev/null 2>&1 || true
+  sleep 5
 done
 [ "$n" = "$want_metrics" ] || { echo "KEDA did not build the HPA php-apache with $want_metrics metrics"; kubectl get hpa -A -o wide; \
   kubectl -n keda logs deployment/keda-operator --tail=60; exit 1; }

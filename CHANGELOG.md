@@ -2,6 +2,36 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (afternoon): Omni v11 stands (a reading with no machine in service is blind); every version lands in one command; the toy gate's arms each run their own engine
+
+- **omni-v11** (`OMNI_V11.json`, digest `745aa53ec8eeb67b`, 47 files; `docs/OMNI_V11.md`): omni-v10 with one guard in the Kubernetes
+  governor (`omni_controller/controller.py`). When the cluster's reading shows no machine in service, the decision holds: it is
+  recorded with its reason, nothing is decided from the reading, nothing is written, the floor check returns, and the last
+  reading with machines stays the bound on the conveyance. Found in the omni-v10 CruiseKube test (run 39120444653, repetition 8):
+  every kind worker left service for two minutes while the service answered every probe, and omni-v10 fed its engine the highest
+  overload, then divided by the empty capacity (two decisions and one floor check failed, each writing nothing).
+  `tests/test_blind_reading.py` reproduces the fault on omni-v10 and passes on omni-v11. The founder's order: every fault found is
+  fixed, none set aside.
+- **The toy gate** (`results/toy_gate/V11_VS_V10.md`): the candidate against omni-v10 on seeds 1 to 8, every toy, each arm proven to run its own checkout: every gauge and count identical (39 of 39 gauges), and in the new blink toy omni-v10's decision failed 64 times where omni-v11 held 64 times with no error. Four toy rows read LOSS against native on both engines alike (the pod start wait under conveyance +9.0%, the pending-pod minutes and response at a decision every 15 s, the blink toy's alert minutes +2.35%): the next version's work, in the gate first.
+- **The toy gate's own fault, found and fixed.** From omni-v9's gate (17 October) on, `tools/toy_gate.py` put its own tree ahead
+  of the checkout under test, so both arms imported the candidate's engine. omni-v9 and omni-v10 changed no file any toy runs,
+  so their "identical" readings hold by construction (a correction stands on each page). The gate now places the checkout
+  first, every worker names the tree its engine came from, and a reading taken on the wrong tree is refused
+  (`tests/test_toy_gate_tree.py`). It also gains the blink toy: the cluster toy with every machine out of service in the
+  governor's reading for two minutes every six hours, the failure the real run met.
+- **Version after version, nothing left behind** (the founder's order of 18 October: "version 10, 20, 30, 40 ... keep updating
+  and moving and tightening ... leaving everything intact, only upgrading what keeps moving"): `tools/land_engine.py vN --since
+  <UTC>` lands a version's bookkeeping in one command (the fingerprint, the version list, the conductor's campaign, the grid's
+  manifest and its three workflows, the reruns header, the package, the root list, a release group), and lists the words a
+  person writes next. `tools/land_engine.py --check`, run by `verify.py`, refuses a push in which any of those places, or the
+  front page, CLAUDE.md, the manual or the live engine's page, still names an older engine as the one that stands
+  (`tests/test_land_engine.py`). omni-v11 is the first version landed that way.
+- **Everything runs again on it**: the conductor's campaign, reruns, grid (`results/grid_v11/`) and Azure sets from A; the
+  omni-v10 runs already started run to their end as omni-v10's record (nothing is cancelled). The package is 0.11.0.
+- **Pages brought up to it**: README, CLAUDE.md, the state of play (which also still said Google and Amazon were running; both
+  queues are paused until Google's key is stored whole and Amazon's account is on its Paid plan), the receipts, both manuals
+  (rebuilt), the live engine's page and appraisal, the v10 page, the preregistration (an amendment).
+
 ## 2026-10-18: Omni v10 stands (the battery glide that cuts the bill most); the CityLearn receipt reads by the key
 
 - **omni-v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`): omni-v9 with one file changed, the
@@ -37,6 +67,22 @@
   service control policy" of an AWS-run organization: the limit Amazon sets on an account on its Free plan. The queue is
   paused until the account is on the Paid plan; the seven sets that failed at the pre-flight (four A, three B, all at no cost)
   are re-run in place, then the switch goes back on. The omni-v9 runs already started run to their end as omni-v9's record; nothing is cancelled.
+- **The day's failed repetitions, root-caused (14:30)**, each run again in place (same run, same commit):
+  - The CruiseKube test, run 39120444653, repetition 8: every worker of the kind cluster left service for two minutes while
+    the service answered every probe. The governor wrote nothing, and two of its decisions failed on the empty reading. A
+    window with no machine in service is now refused in either arm, because its machine count is wrong; the capture keeps
+    each node's taints and conditions at that moment; a failed decision is named by its error.
+  - The KEDA test, run 39108180989, profile both, repetition 2: the native arm's set-up met the HTTP add-on's scaler still
+    stopping after its rollout. The ScaledObject now waits for the scaler and is touched once a minute until KEDA builds the
+    autoscaler whole.
+  - The Azure steady A (omni-v10, run 39100680671), repetition 4: Azure's four new workers did not report Ready in ten
+    minutes, before either arm began. The workflow's clean-up deleted the cluster, so nothing was left billing; the other
+    four repetitions finished.
+  - The benchmark repetitions (run 39107180703, repetition 7): GitHub lost the runner.
+  - The organisms with the cluster inside, ×10 (run 39106236972, the spine): GitHub's artifact store timed out on the upload.
+  - For the next engine version, with the founder told first: when no machine is in service, the Kubernetes governor's
+    decision ends in a division by zero. It writes nothing either way, as the audit shows, but the decision should record
+    the reason in words. (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendment of 18 October.)
 - **Pages brought up to it**: README, CLAUDE.md, the state of play, the receipts, both manuals (rebuilt), the v7, v8 and v9 pages,
   the preregistration (an amendment, appended), the index's text. Retired words found and fixed on the way: the Owner's Manual
   and the README still named the 2022 robustness district's +0.11% unevenness, and the 2023 districts' ramping and highest peak,
