@@ -95,11 +95,30 @@ def tracked():
     return [p for p in out.splitlines() if p]
 
 
+def raw_branch():
+    """The raw receipts' files as the pages name them (results/live/raw/...), read from the branch raw's trees
+    (scripts/raw_archive.sh fetch), or None when the branch is not fetched."""
+    for ref in ("refs/remotes/origin/raw", "refs/heads/raw"):
+        r = subprocess.run(["git", "-c", "safe.directory=*", "ls-tree", "-r", "--name-only", ref], cwd=ROOT,
+                           capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout.strip():
+            return ["results/live/raw/" + x for x in r.stdout.splitlines() if x]
+    return None
+
+
 def main():
     files = tracked()
     present = set(files)
     dirs = {str(Path(p).parents[i]) for p in files for i in range(len(Path(p).parents) - 1)}
     problems = []
+    # a path a page names under results/live/raw/ is checked against the branch raw, where the receipts live (18 October)
+    raw = raw_branch()
+    if raw is None:
+        problems.append("raw: the branch raw is not fetched, so the receipts' paths cannot be checked (bash scripts/raw_archive.sh fetch)")
+        dirs.add("results/live/raw")
+    else:
+        present |= set(raw)
+        dirs |= {str(Path(p).parents[i]) for p in raw for i in range(len(Path(p).parents) - 1)}
     for top in sorted({p.split("/")[0] for p in files}):
         if top not in ROOT_ALLOWED:
             problems.append(f"root: {top} is not in the declared root set (move it under docs/, .github/ or a code folder)")
