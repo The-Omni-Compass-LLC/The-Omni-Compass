@@ -4,7 +4,7 @@
 
 Omni v7 stood on main from 16 to 17 October; on 17 October it was followed by Omni v8 (`docs/OMNI_V8.md`, the founder's
 order), omni-v7 with one wire changed (the CityLearn runner: a battery whose building simulates outages stays native), and the
-same day by Omni v9 (`docs/OMNI_V9.md`), the engine that stands. This page and
+same day by Omni v9 (`docs/OMNI_V9.md`), and on 18 October by Omni v10 (`docs/OMNI_V10.md`), the engine that stands. This page and
 v7's twenty-two three-run tables (`results/live/V7_*.md`) stay as that engine's record, read beside no other engine's.
 
 Omni v7 was the engine that stood on main from 16 October (the founder's order: everything on the newest engine). Every benchmark ran again on it (`scripts/reruns.txt`; the grid conductor's reruns, grid and Azure queues restarted on it the same day), and every earlier table stands as its own engine's result until its three runs on v7 land; results from two versions are never pooled. v7 is v6 with five changes, each found from a v6 run's own files or from the governing rules themselves:

@@ -51,13 +51,13 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v9, fingerprint `7379f3a79ff2c475` (47 files); package 0.9.0.
+- **Engine on main:** omni-v10, fingerprint `4bf39b0d707784de` (47 files); package 0.10.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- Omni v9 stands on main (17 October): the CityLearn battery wire reads the coming hour, proven on CityLearn itself and in the toy gate before it was pushed. Every benchmark runs again on it from `scripts/reruns.txt`; until its three runs land, its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on, and twenty-two of them carry omni-v7's three-run tables (`results/live/V7_*.md`). Every level on one page: [`docs/LEVELS.md`](docs/LEVELS.md). See [`docs/OMNI_V9.md`](docs/OMNI_V9.md).
+- Omni v10 stands on main (18 October): the CityLearn battery wire glides at the speed that cuts the bill most with no LOSS (0.0875 of its range an hour), proven on CityLearn itself and in the toy gate before it was pushed. Every benchmark runs again on it from `scripts/reruns.txt`; until its three runs land, its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on, and twenty-two of them carry omni-v7's three-run tables (`results/live/V7_*.md`). Every level on one page: [`docs/LEVELS.md`](docs/LEVELS.md). See [`docs/OMNI_V10.md`](docs/OMNI_V10.md).
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -82,27 +82,29 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v9 (the max on every muscle, every muscle its own card, quota-aware conveyance, every rule in seconds, the outage battery left native, the battery reading the coming hour)
+## The engine that stands: omni-v10 (the max on every muscle, every muscle its own card, quota-aware conveyance, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most)
 
-The engine on main is **omni-v9** (`OMNI_V9.json`, fingerprint `7379f3a79ff2c475`, 47 files; [`docs/OMNI_V9.md`](docs/OMNI_V9.md)), the
-engine that stands since 17 October by the founder's order. It is omni-v8 with the CityLearn battery wire reading the coming hour (the
-mean of the same hour over the past seven days) and gliding at up to 0.0625 an hour, the fastest glide at which no score rose in any district: the reading of the hour gone ran about five hours
-behind the day and left the batteries empty at each month's top hour (the 2022 robustness district's monthly unevenness rose 0.11%,
-printed LOSS then and power given by the key: an unevenness, like a peak, is power held). Run on CityLearn itself before it was pushed, it reads no LOSS against native in any district
-and the toy gate reads it identical to omni-v8 on every toy (`results/toy_gate/V9_VS_V8.md`); every 95% interval now uses the exact
-Student t quantile, no published reading moved. **omni-v8** ([`docs/OMNI_V8.md`](docs/OMNI_V8.md)) was omni-v7 with one wire changed: on CityLearn a battery whose building
+The engine on main is **omni-v10** (`OMNI_V10.json`, fingerprint `4bf39b0d707784de`, 47 files; [`docs/OMNI_V10.md`](docs/OMNI_V10.md)), the
+engine that stands since 18 October by the founder's order. It is omni-v9 with the CityLearn battery wire's glide at 0.0875 of its
+range an hour (omni-v9: 0.0625): the speed that cuts the bill most with no LOSS, read by the one key (a rise in the ramping or in the
+distance from net zero is power held, so power given, never a LOSS). Run on CityLearn itself before it was pushed, it cuts the bill
+8.4% to 20.1% in every district with a price and reads no LOSS against native in any district read before the push; the toy gate reads it identical to
+omni-v9 on every toy (`results/toy_gate/V10_VS_V9.md`). **omni-v9** ([`docs/OMNI_V9.md`](docs/OMNI_V9.md)) made the wire read the
+coming hour (the mean of the same hour over the past seven days), where the reading of the hour gone had run about five hours behind
+the day (on omni-v8 the 2022 robustness district's monthly unevenness rose 0.11%: power held, power given by the key), and made every
+95% interval exact (Student t), no published reading moved. **omni-v8** ([`docs/OMNI_V8.md`](docs/OMNI_V8.md)) was omni-v7 with one wire changed: on CityLearn a battery whose building
 simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
 of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
 native's numbers to the last digit). The other 45 engine files are omni-v7's bytes: the max on every muscle of the 1,107-muscle catalog,
 every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v9 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
+omni-v10 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
 **The engine before it, omni-v7** ([`docs/OMNI_V7.md`](docs/OMNI_V7.md), 16 to 17 October), has twenty-two three-run tables of its own
-(`results/live/V7_*.md`), native against Omni-Compass on top; they stand as omni-v7's until omni-v9's land. Twenty-one read no LOSS. The
-one that did is CityLearn: the 2023 districts, fixed in omni-v8 above, and one row of the 2022 robustness district, its monthly
-unevenness +0.11% beside the bill −8.6% and the electricity bought −14.7%, repaired in omni-v9. Among them: a service rightsized by Goldilocks, response
+(`results/live/V7_*.md`), native against Omni-Compass on top; they stand as omni-v7's until omni-v10's land. Twenty-one read no LOSS. The
+one that did is CityLearn, in the 2023 districts (energy not served and discomfort), fixed in omni-v8 above; its 2022 robustness
+district's monthly unevenness +0.11%, beside the bill −8.6% and the electricity bought −14.7%, is power given by the key, cut in omni-v9. Among them: a service rightsized by Goldilocks, response
 time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs; KEDA's HTTP add-on, −57% to −58% mean,
 −71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, GAIN in all three; KEDA on the CPU target and
 the requests, −36% to −38% mean and −52% to −54% at the 95th percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN;
@@ -293,7 +295,7 @@ the request logs, the Kafka consumer logs) gzipped; read one with `gunzip -c FIL
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **The engine that stands, omni-v9, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V9.md`](docs/OMNI_V9.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The engine that stands, omni-v10, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V10.md`](docs/OMNI_V10.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | Every level on one page: the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud, a group of clusters; any level whose gauges go the other way, named | [`docs/LEVELS.md`](docs/LEVELS.md) (`python3 tools/levels.py`) |

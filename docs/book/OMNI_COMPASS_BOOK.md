@@ -1225,8 +1225,8 @@ respect a limit the wires do not carry.
 
 ### 6.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v9** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
-quoted here ran on omni-v7, whose rules omni-v9 carries unchanged (omni-v8 and omni-v9 changed one wire, the CityLearn
+The engine that stands in this edition is **omni-v10** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
+quoted here ran on omni-v7, whose rules omni-v10 carries unchanged (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn
 battery, and the interval table). Its
 mechanism is the Owner's Manual's; five of its rules show in the wiring, the settings and the audit, and are stated here so
 that a line in the audit is read for what it is.
@@ -1338,7 +1338,7 @@ checked; install only a commit whose run passed.
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # the engine version (for example omni-v9), or every file that differs
+python3 tools/omni_version.py                  # the engine version (for example omni-v10), or every file that differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -1375,7 +1375,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v9 (digest 7379f3a79ff2c475, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v10 (digest 4bf39b0d707784de, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
 
 **Level 1 - Watch (read-only).**
 
@@ -7332,7 +7332,7 @@ project, run `gcloud config set project YOUR-PROJECT-ID` first.)
 2. **New repository secret**. Name: `GCP_CREDENTIALS`. Secret: paste the whole block from step 4. **Add secret**.
 3. **New repository secret**. Name: `GCP_PROJECT`. Secret: the Project ID from step 2. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v8` is kept in step with it), and no result goes up
+That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v10` is kept in step with it), and no result goes up
 before it has been read.
 
 ### G.6 What it costs
@@ -7398,7 +7398,7 @@ before the card.
 2. **New repository secret**. Name: `AWS_ACCESS_KEY_ID`. Secret: the Access key. **Add secret**.
 3. **New repository secret**. Name: `AWS_SECRET_ACCESS_KEY`. Secret: the Secret access key. **Add secret**.
 
-That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v8` is kept in step with it), and no result goes up
+That is all. The runs start from the repository's **Actions** tab on the engine that stands (branch `main`; `v10` is kept in step with it), and no result goes up
 before it has been read.
 
 ### H.4 What it costs
