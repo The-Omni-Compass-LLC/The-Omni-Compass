@@ -29,6 +29,12 @@
   output is thousands of lines, so a real run would have stopped there). The same pattern guarded the governor's permission
   checks (`! sed … | grep -q`), where a cut pipe could let a missing or forbidden permission pass. All eight now read the whole
   stream (`grep … >/dev/null`), and `tests/test_pipes.py` keeps any script from bringing the pattern back.
+- **Three stuck things unstuck (18 October, after midnight)**: (1) every grid run with the real cluster inside that carried the
+  spine failed at its report (`tools/six_kube_report.py` ordered six organisms, not seven: "'spine' is not in list"), so those
+  squares produced no table; the spine now leads the order, and `tests/test_six_kube.py` holds the report to the seven names.
+  (2) The front-page bot failed on its last two runs: the manifest refresh could not import `tools` when run as a script, and
+  the v9 page's closing notice was not in the standard form the legal fixer writes; both fixed. (3) The Azure burst of 17
+  October (run 39014972717, omni-v7, finished 23:43) is sent to the archive so its table can be built.
 
 ## 2026-10-17: Omni v9 stands (the battery reads the coming hour); native as shipped; every level on one page
 

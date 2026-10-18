@@ -19,6 +19,8 @@ import argparse, datetime, hashlib, json, subprocess, sys
 import re
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))   # `python tools/release_manifest.py` imports tools.legal (the front-page bot)
+
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "RELEASE_MANIFEST.json"
 RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
