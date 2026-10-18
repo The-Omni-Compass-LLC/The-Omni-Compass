@@ -14,7 +14,7 @@
 :root{
   --bg:#0e1316; --panel:#141b1f; --panel2:#1a2227; --ink:#e7e2d7; --muted:#8e9893; --rule:#27323a;
   --brass:#c08332; --brass-soft:rgba(192,131,50,.18); --steel:#4e97d1; --steel-soft:rgba(78,151,209,.18);
-  --ok:#62b98d; --warn:#e3b04b; --bad:#e2634f; --spine:#d3d7db;
+  --ok:#50c878; --warn:#f5c518; --bad:#e3212b; --even:#f5c518; --spine:#d3d7db;
   --div-hi:#c45aa0; --div-lo:#2fa59a; --div-mid:#3a454c;
   --blood:#9b7bf2; --r-compute:#aeb5bb; --r-physics:#8e969d; --r-energy:#c2c8cd; --r-dist:#9ea5ab;
   --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
@@ -99,13 +99,15 @@ th:first-child,td:first-child{text-align:left;white-space:normal}
 th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 td.nat{color:var(--steel)} td.omni{color:var(--brass)}
 .word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor}
-.w-gain{color:var(--ok)} .w-even{color:var(--muted)} .w-loss{color:var(--bad)} .w-given{color:var(--brass)} .w-lost{color:var(--bad);text-decoration:underline dotted}
+.w-gain{color:var(--ok)} .w-even{color:var(--even)} .w-loss{color:var(--bad)} .w-given{color:var(--ok)} .w-lost{color:var(--bad)}
+.word.w-given::before{content:"GAIN · "} .word.w-lost::before{content:"LOSS · "}
 .keyGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:900px){.keyGrid{grid-template-columns:1fr}}
 .keyWhy{border:1px solid var(--rule);border-left:3px solid var(--brass);border-radius:8px;padding:14px 16px;background:var(--panel2)}
 .keyWhy h4{margin:0 0 8px;font-size:17px}
 .keyWhy ul{margin:8px 0;padding-left:18px;line-height:1.6;font-size:16px}
-.keyGrid .word{white-space:nowrap}
+.keyGrid .word,.traffic .word{white-space:nowrap}
+.traffic{font-size:17px;line-height:1.7}
 .keyWhy li{margin:4px 0} .w-shown{color:var(--muted);border-color:transparent}
 .note{font-size:12px;color:var(--muted)}
 /* nerves */
@@ -169,7 +171,7 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 .partHead .pn{font-family:var(--f-serif);font-size:56px;font-weight:700;color:var(--brass);line-height:1}
 .partHead .pt{font-family:var(--f-serif);font-size:clamp(32px,4vw,46px);font-weight:600;line-height:1.1}
 h2 .sn{font-family:var(--f-serif);color:var(--brass);font-weight:700;margin-right:.45em}
-.word.w-dis{color:var(--warn)}
+.word.w-dis{color:var(--ink);border-style:dashed}
 .three small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 button:disabled{opacity:.45;cursor:not-allowed}
 .trio>.stack{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
@@ -230,7 +232,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 .live-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:3px 8px}
 .live-badge::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 var(--ok);animation:pulse 1.6s infinite}
 .live-badge.paused::before{background:var(--muted);animation:none}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(98,185,141,.6)}70%{box-shadow:0 0 0 8px rgba(98,185,141,0)}100%{box-shadow:0 0 0 0 rgba(98,185,141,0)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(80,200,120,.6)}70%{box-shadow:0 0 0 8px rgba(80,200,120,0)}100%{box-shadow:0 0 0 0 rgba(80,200,120,0)}}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 @media (max-width:980px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:460px){.kpis{grid-template-columns:minmax(0,1fr)}}
@@ -260,11 +262,11 @@ section[aria-label^="The key"] h3{font-size:19px}
 .blocks .bg>span{font-size:12px;color:var(--muted)}
 .blocks .cells{display:flex;flex-wrap:wrap;gap:4px}
 .blk{width:26px;height:26px;border-radius:3px;border:1px solid var(--rule);background:var(--panel2);display:grid;place-items:center;font-size:12px;font-family:var(--f-mono);color:var(--muted);cursor:default}
-.blk.landed{background:rgba(98,185,141,.22);border-color:var(--ok);color:var(--ok)}
-.blk.running{background:rgba(227,176,75,.22);border-color:var(--warn);color:var(--warn);animation:pulse2 1.4s infinite}
+.blk.landed{background:rgba(80,200,120,.22);border-color:var(--ok);color:var(--ok)}
+.blk.running{background:rgba(245,197,24,.22);border-color:var(--warn);color:var(--warn);animation:pulse2 1.4s infinite}
 .blk.queued{border-color:var(--muted);color:var(--ink)}
 .blk.off{opacity:.55;border-style:dashed}
-@keyframes pulse2{50%{background:rgba(227,176,75,.42)}}
+@keyframes pulse2{50%{background:rgba(245,197,24,.42)}}
 .pipe{position:relative}
 .pipe .chain{gap:22px 22px;position:relative;z-index:1}
 .pipe canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
@@ -287,9 +289,9 @@ section[aria-label^="The key"] h3{font-size:19px}
 .gtab .h{color:var(--muted);text-align:center;padding:2px 0;overflow-wrap:anywhere}
 .gtab .o{color:var(--ink);padding:4px 4px 4px 0;font-size:11px;line-height:1.3;overflow-wrap:normal;hyphens:auto}
 .gcell{border-radius:3px;min-height:34px;display:grid;place-items:center;text-align:center;line-height:1.2;padding:2px;cursor:default;border:1px solid transparent}
-.gcell.g-gain{background:rgba(98,185,141,.24);border-color:rgba(98,185,141,.6);color:var(--ink)}
-.gcell.g-even{background:var(--panel2);border-color:var(--rule);color:var(--muted)}
-.gcell.g-loss{background:rgba(226,99,79,.24);border-color:var(--bad);color:var(--ink)}
+.gcell.g-gain{background:rgba(80,200,120,.24);border-color:rgba(80,200,120,.6);color:var(--ink)}
+.gcell.g-even{background:rgba(245,197,24,.18);border-color:rgba(245,197,24,.6);color:var(--ink)}
+.gcell.g-loss{background:rgba(227,33,43,.24);border-color:var(--bad);color:var(--ink)}
 .gcell.g-one{background:transparent;border:1px dashed var(--rule);color:var(--muted)}
 .gcell.g-none{background:transparent;border:1px dashed var(--rule);color:var(--rule)}
 @media (max-width:560px){.gtab{font-size:10px}.gcell{min-height:28px}}
@@ -320,6 +322,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 <section class="panel" aria-label="The key: GAIN, EVEN and LOSS" style="border-top:3px solid var(--brass)">
   <h3>The key: GAIN, EVEN and LOSS</h3>
   <p style="max-width:100ch"><b>Two names, two sides, nothing else.</b> <b>Native</b> is the whole system running by itself: every autoscaler, scheduler, firmware, thermostat, orchestrator, sub-governor and controller it ships with, every muscle wired and moving by its own machinery. <b>Omni-Compass</b> always means <b>Omni-Compass on top of native</b>: the same whole system with all of that still running underneath, and Omni-Compass on top of all of it, its brain, nerves, spine, immune system and heart wired into the whole stack through the two-way plug. Nothing else differs, and no third side exists anywhere on this page.</p>
+  <p class="traffic" style="max-width:100ch"><b>The colours read like a traffic light, everywhere on this page.</b> <span class="word w-gain">GAIN</span> is green: go. <span class="word w-even">EVEN</span> is yellow: yield. <span class="word w-loss">LOSS</span> is red: stop. Every reading, in every table, chart, bar and tile, wears one of those three colours and no other. A resource that rose and bought something reads <span class="word w-given">power given</span>, in GAIN's green; one that rose and bought nothing reads <span class="word w-lost">power lost</span>, in LOSS's red. Two more colours name the sides, never a reading: <b style="color:var(--steel)">blue is Native</b> and <b style="color:var(--brass)">amber is Omni-Compass</b>, in every chart where the two run side by side.</p>
   <p style="max-width:100ch">Every result on this page is one of three words. The word says which way it went for the work; the number beside it is only the size, never a direction. The word is decided by what the gauge is for, never by the plus or minus sign of its number.</p>
   <div class="keyGrid"><div class="tbl-wrap"><table class="who"><tbody>
     <tr><td><span class="word w-gain">GAIN</span></td><td><b>G</b> Growth (asset appreciation); <b>A</b> Advantage (risk reduction); <b>I</b> Improvement (margin expansion); <b>N</b> Net-positive (profitable outcome)</td><td>the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut</td></tr>
@@ -327,6 +330,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <tr><td><span class="word w-loss">LOSS</span></td><td><b>L</b> Leakage (capital drain); <b>O</b> Off-track (adverse selection); <b>S</b> Setback (claim liability); <b>S</b> Subpar (negative variance)</td><td>the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures</td></tr>
     <tr><td><span class="word w-given">power given</span></td><td colspan="2">a resource spent or held (energy, machines, memory, processor time, a bill) that rose: what Omni put in to buy the work and the speed shown beside it, always shown and never called a loss; one that fell is a cut, and a cut is GAIN</td></tr>
     <tr><td><span class="word w-lost">power lost</span></td><td colspan="2">a resource that rose and bought nothing: in the same comparison no gauge read GAIN (no more work, no shorter wait, no fewer misses or failures, no other resource cut). It is not assumed away: every comparison on this page is tested for it, and a power given row with nothing beside it reads power lost wherever it falls</td></tr>
+    <tr><td><span class="word w-dis">the runs disagree</span></td><td colspan="2">the three runs pointed different ways, each clear of the noise: the test is unstable there and is looked into; shown in white with a dashed edge, because it is not yet a reading</td></tr>
   </tbody></table></div>
   <aside class="keyWhy">
     <h4>Why a minus can be a GAIN and a plus a LOSS</h4>
@@ -618,7 +622,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="panel stack chartbox" style="gap:8px">
     <h3>The benefit board: every domain, native against Omni-Compass</h3>
     <canvas id="fxBen" aria-label="Bar chart of every benchmark's benefit, on a square-root scale, each bar labelled with its word"></canvas>
-    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN, the bar</span><span><i class="sq" style="background:var(--brass)"></i>power given beside it: an amber cap on the bar's end</span><span><i class="sq" style="background:var(--bad)"></i>LOSS: a red bar, or a red cap where a LOSS stands beside a GAIN</span><span><i class="sq" style="background:var(--muted)"></i>EVEN</span><span>the axis: 0, 10, 25, 50 and 100% on a square-root scale, so a small bar is seen; a bar past 100% runs to the edge and is marked</span></div>
+    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN ▶ from zero, green (go)</span><span><i class="sq" style="background:var(--even)"></i>EVEN ◆ on zero, yellow (yield)</span><span><i class="sq" style="background:var(--bad)"></i>◀ LOSS from zero, red (stop): the median size of its LOSS rows</span><span><i class="sq" style="border:1px dashed var(--muted)"></i>not run yet</span><span>the axis: 10, 25, 50 and 100% each way on a square-root scale, so a small bar is seen; a bar past 100% runs to the edge and is marked</span></div>
     <p class="note" id="fxBenNote">—</p>
     <div class="tbl-wrap"><table class="who" id="fxMatrix"><thead><tr><th>Domain</th><th>Benchmark</th><th>Evidence</th><th>Engine</th><th>Benefit</th><th>GAIN rows</th><th>Power given</th><th>EVEN</th><th>LOSS</th><th>Where it stands</th></tr></thead><tbody></tbody></table></div>
     <div class="opsTip" id="fxTipBen" hidden></div>
@@ -649,7 +653,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="panel stack" style="gap:8px">
     <h3>Every receipt of the real runs in the repository, native against Omni-Compass, every row as written (each benchmark's newest engine's table)</h3>
     <p class="note" id="rcSum">—</p>
-    <div class="tbl-wrap"><table class="who" id="rcTbl"><thead><tr><th>Stack</th><th>Benchmark</th><th>Class</th><th>GAIN</th><th>Power given</th><th>Power lost</th><th>EVEN</th><th>LOSS</th><th>The runs disagree</th></tr></thead><tbody></tbody></table></div>
+    <div class="tbl-wrap"><table class="who" id="rcTbl"><thead><tr><th>Stack</th><th>Benchmark</th><th>Class</th><th>GAIN</th><th>GAIN · power given</th><th>LOSS · power lost</th><th>EVEN</th><th>LOSS</th><th>The runs disagree</th></tr></thead><tbody></tbody></table></div>
     <p class="note">From <code>results/live/V7_*.md</code>, read row by row by <code>docs/engine/export_scenarios.py</code>; open a row to read every judged row that is not EVEN. Class L: the real software (Kubernetes on kind, the real databases and broker). Class S: the outside simulators run by our own runner (CityLearn, pandapower on SimBench, MuJoCo Menagerie, gym-pybullet-drones). Rows shown and not judged are left out of the counts; the counts take every table of a receipt, its tuning case included where it has one (a receipt's own summary line counts its untouched cases). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.</p>
   </div>
   <div class="panel stack" style="gap:8px" id="rmPanel">
@@ -1424,7 +1428,7 @@ function decide() {
 // ============================================================== drawing
 const css = {};
 function readTokens() { const cs = getComputedStyle(document.documentElement);
-  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine","blood","r-compute","r-physics","r-energy","r-dist","div-hi","div-lo","div-mid"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
+  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","even","spine","blood","r-compute","r-physics","r-energy","r-dist","div-hi","div-lo","div-mid"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
 readTokens();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readTokens);
 new MutationObserver(readTokens).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
@@ -2249,7 +2253,7 @@ function buildReceipts() {
   $("rcTbl").querySelector("tbody").innerHTML = SC.receipts.map((r, ix) => { const lost = lostRows(r.rows), c = Object.assign({}, r.count); c["power lost"] = lost.size; c["power given"] = (c["power given"] || 0) - lost.size; for (const k in tot) tot[k] += c[k] || 0;
     const cell = (k, cls) => `<td class="${(c[k] || 0) && cls ? cls : ""}">${c[k] || 0}</td>`;
     const det = r.rows.length ? `<details><summary>${r.rows.length} rows not EVEN</summary><table class="who"><tbody>${r.rows.map(x => `<tr><td>${x.s === r.title || x.s.startsWith(r.title.slice(0, 20)) ? "" : x.s}</td><td>${x.g}</td><td>${x.abc.filter(Boolean).map((c, i) => "ABC"[i] + " " + (c.match(/[0-9][0-9.,e]*\s*(%|pp|req\/s|s|ms)?/) || [c])[0]).join(" · ")}</td><td><span class="word ${lost.has(x) ? "w-lost" : {GAIN: "w-gain", LOSS: "w-loss", "power given": "w-given", "the runs disagree": "w-dis"}[x.w] || "w-even"}">${lost.has(x) ? x.r.replace("power given", "power lost") : x.r}</span></td></tr>`).join("")}</tbody></table></details>` : "";
-    return `<tr><td>${r.stack}</td><td>${r.title}<br><code>${engTag(r.engine)}</code> · <code>${r.file}</code>${det}</td><td>${r.cls}</td>${cell("GAIN", "w-gain")}${cell("power given", "w-given")}${cell("power lost", "w-lost")}${cell("EVEN")}${cell("LOSS", "w-loss")}${cell("the runs disagree", "w-dis")}</tr>`; }).join("");
+    return `<tr><td>${r.stack}</td><td>${r.title}<br><code>${engTag(r.engine)}</code> · <code>${r.file}</code>${det}</td><td>${r.cls}</td>${cell("GAIN", "w-gain")}${cell("power given", "w-given")}${cell("power lost", "w-lost")}${cell("EVEN", "w-even")}${cell("LOSS", "w-loss")}${cell("the runs disagree", "w-dis")}</tr>`; }).join("");
   $("rcSum").innerHTML = `${SC.receipts.length} receipts of the real runs, each the newest engine's table (${[...new Set(SC.receipts.map(r => r.engine))].join(", ")}), three runs each: <b>${tot.GAIN}</b> rows GAIN in all three runs, <b>${tot["power given"]}</b> power given, each with a GAIN beside it, <b>${tot["power lost"]}</b> power lost (a resource that rose with no GAIN beside it, tested on every comparison), <b>${tot.EVEN}</b> EVEN, <b style="color:var(--bad)">${tot.LOSS}</b> LOSS (every one in CityLearn's seven 2023 challenge districts on omni-v7: energy not served and time uncomfortable), <b>${tot["the runs disagree"]}</b> where the runs disagree (the drone swarms' closest approach, tracking and cruise; one memory row each on Redis and MySQL). omni-v8, omni-v9 and omni-v10 repaired and tuned the CityLearn wire, the fix for those LOSS rows, which omni-v11 keeps; omni-v11's three runs are queued. No Azure, Google, Amazon or GPU receipt yet.`;
 }
 $("sGpu").addEventListener("click", () => setStack("gpu")); $("sLinux").addEventListener("click", () => setStack("linux"));
@@ -2885,7 +2889,7 @@ Rules of the report, which you must follow exactly:
 - Evidence classes: L is live software (the official runs), S is our own models; never present S as proof. Say that no outside party has reviewed or approved these results when you summarize results.
 - Plain words for a non-engineer, short paragraphs, no markdown headings, no tables. If the viewer asks to see a run, call show_run.`;
 function aiFormat(t) { const esc = t.replace(/[&<>]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;"}[c]));
-  return esc.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\b(GAIN|EVEN|LOSS)\b|power given/g, m => `<span class="${{GAIN: "w-gain", EVEN: "w-even", LOSS: "w-loss"}[m] || "w-given"}">${m}</span>`); }
+  return esc.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\b(GAIN|EVEN|LOSS)\b|power given|power lost/g, m => `<span class="${{GAIN: "w-gain", EVEN: "w-even", LOSS: "w-loss", "power lost": "w-lost"}[m] || "w-given"}">${m}</span>`); }
 const AI_ERR = {not_granted: "You did not allow Claude for this page, so the analyst stays off for this view.", rate_limited: "Too many questions at once; wait a moment and ask again.", cancelled: "Stopped.",
   prompt_too_large: "That was too much to send at once; ask a narrower question.", sampling_disabled: "Claude is switched off for this page by its settings.", capability_disabled: "Claude is switched off for this page by its settings."};
 async function aiAsk(q) {
@@ -2970,27 +2974,37 @@ function fxAll() {   // every domain on one board: the index, the chips, the clo
   return out;
 }
 function fxRows() { const top = Math.max(0, ...FX.benefit.map(r => fxEngNum(r.engine))); return {top, rows: FX.benefit.filter(r => fxEngNum(r.engine) === top), road: FX.benefit.filter(r => fxEngNum(r.engine) !== top)}; }
-const fxCol = r => r.loss > 0 && !(r.gain > 0) ? css.bad : r.pct > 0 || r.gain > 0 ? css.ok : css.muted;   // the bar wears its word's color: GAIN green, LOSS red, EVEN grey; power given and a LOSS beside a GAIN are marked on the bar, never a second color for GAIN
-const fxWordHtml = r => r.loss > 0 ? (r.gain > 0 ? '<span class="word w-gain">GAIN</span> and <span class="word w-loss">LOSS</span>' : '<span class="word w-loss">LOSS</span>') : r.pct > 0 ? '<span class="word w-gain">GAIN</span>' + (r.given > 0 ? ', <span class="word w-given">power given</span>' : "") : '<span class="word w-even">EVEN</span>';   // each word in its own color, the same everywhere
-const fxWord = r => r.loss > 0 ? (r.gain > 0 ? "GAIN and LOSS" : "LOSS") : r.pct > 0 ? (r.given > 0 ? "GAIN, power given" : "GAIN") : "EVEN";
-function drawBenefit() {
+const fxCol = r => r.loss > 0 && !(r.gain > 0) ? css.bad : r.pct > 0 || r.gain > 0 ? css.ok : css.even;   // the bar wears its word's color: GAIN green, LOSS red, EVEN grey; power given and a LOSS beside a GAIN are marked on the bar, never a second color for GAIN
+const fxWordHtml = r => r.loss > 0 ? (r.gain > 0 ? '<span class="word w-gain">GAIN</span> and <span class="word w-loss">LOSS</span>' : '<span class="word w-loss">LOSS</span>') : r.pct > 0 ? '<span class="word w-gain">' + (r.given > 0 ? "GAIN · power given" : "GAIN") + '</span>' : '<span class="word w-even">EVEN</span>';   // each word in its own color, the same everywhere
+const fxWord = r => r.loss > 0 ? (r.gain > 0 ? "GAIN and LOSS" : "LOSS") : r.pct > 0 ? (r.given > 0 ? "GAIN · power given" : "GAIN") : "EVEN";
+function lossSize(r) {   // the median size of a benchmark's LOSS rows, from its own three-run table
+  const R = SC.receipts.find(x => x.file === r.file); if (!R) return null;
+  const v = R.rows.filter(x => x.w === "LOSS").map(x => sizeOf(x.abc)).filter(x => x !== null).sort((a, b) => a - b);
+  return v.length ? v[v.length >> 1] : null; }
+function drawBenefit() {   // a diverging bar from zero: GAIN to the right in green, LOSS to the left in red, EVEN a yellow mark on zero
   const cv = $("fxBen"); if (!cv) return; const rows = fxAll(), N = rows.length; if (!N) return;
   const rowH = 30, hh = N*rowH + 34; cv.style.height = hh + "px"; const {g, w, h} = fit(cv, hh/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
-  const ml = Math.min(380, w*0.46), mr = 190, X = v => ml + Math.sqrt(Math.min(1, Math.max(0, v/100)))*(w - ml - mr); FXW.geo = {ml, rowH, top: 4, N};
+  const ml = Math.min(380, w*0.42), mr = 220, pw = w - ml - mr, z = ml + 0.26*pw, sq = v => Math.sqrt(Math.min(1, Math.max(0, v/100)));
+  const XR = v => z + sq(v)*(w - mr - z), XL = v => z - sq(v)*(z - ml); FXW.geo = {ml, rowH, top: 4, N};
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
-  for (const t of [0, 10, 25, 50, 100]) { g.strokeStyle = alpha(css.rule, 0.9); g.beginPath(); g.moveTo(X(t), 4); g.lineTo(X(t), h - 24); g.stroke(); g.fillStyle = css.muted; g.textAlign = "center"; g.fillText(t + "%", X(t), h - 12); }
+  for (const t of [10, 25, 50, 100]) { g.strokeStyle = alpha(css.rule, 0.9); g.beginPath(); g.moveTo(XR(t), 4); g.lineTo(XR(t), h - 24); g.stroke(); g.fillStyle = css.muted; g.textAlign = "center"; g.fillText(t + "%", XR(t), h - 12); }
+  for (const t of [10, 100]) { g.strokeStyle = alpha(css.rule, 0.9); g.beginPath(); g.moveTo(XL(t), 4); g.lineTo(XL(t), h - 24); g.stroke(); g.fillStyle = css.muted; g.textAlign = "center"; g.fillText(t + "%", XL(t), h - 12); }
+  g.strokeStyle = css.ink; g.lineWidth = 1.2; g.beginPath(); g.moveTo(z, 4); g.lineTo(z, h - 24); g.stroke(); g.lineWidth = 1; g.fillStyle = css.ink; g.textAlign = "center"; g.fillText("0", z, h - 12);
+  g.fillStyle = css.bad; g.textAlign = "right"; g.fillText("◀ LOSS", z - 6, h - 26); g.fillStyle = css.ok; g.textAlign = "left"; g.fillText("GAIN ▶", z + 6, h - 26);
   let lastDom = "";
-  rows.forEach((r, j) => { const y = 4 + j*rowH, notRun = r.pct === null && !r.gain && !r.even && !r.loss && !/landed|played/.test(r.status);
+  rows.forEach((r, j) => { const y = 4 + j*rowH, bh = rowH - 12, notRun = r.pct === null && !r.gain && !r.even && !r.loss && !/landed|played/.test(r.status);
     if (r.dom && r.dom !== lastDom) { g.strokeStyle = css.rule; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); lastDom = r.dom; }
     if (FXW.hov === j) { g.fillStyle = alpha(css.ink, 0.05); g.fillRect(0, y, w, rowH); }
     g.fillStyle = css.ink; g.textAlign = "right"; let lab = r.benchmark; while (g.measureText(lab).width > ml - 10 && lab.length > 8) lab = lab.slice(0, -2); if (lab !== r.benchmark) lab = lab.slice(0, -1) + "…";
-    g.fillText(lab, ml - 8, y + rowH/2); const bh = rowH - 12;
-    if (notRun) { g.strokeStyle = css.muted; g.setLineDash([3, 3]); g.strokeRect(ml + 0.5, y + 6.5, Math.max(24, (w - ml - mr)*0.06), bh); g.setLineDash([]); g.textAlign = "left"; g.fillStyle = css.muted; g.fillText(`0 · ${r.status}`, ml + Math.max(24, (w - ml - mr)*0.06) + 8, y + rowH/2); return; }
-    const v = r.pct === null ? 0 : r.pct, x1 = X(v), col = fxCol(r); g.fillStyle = col; g.beginPath(); if (g.roundRect && x1 - ml > 4) g.roundRect(ml, y + 6, x1 - ml, bh, [0, 4, 4, 0]); else g.rect(ml, y + 6, Math.max(2, x1 - ml), bh); g.fill();
-    if (r.gain > 0 && r.given > 0) { g.fillStyle = css.brass; g.fillRect(Math.max(ml, x1 - 6), y + 6, 6, bh); }
-    if (r.gain > 0 && r.loss > 0) { g.fillStyle = css.bad; g.fillRect(Math.max(ml, x1 - (r.given > 0 ? 12 : 6)), y + 6, 6, bh); }
-    if (v > 100) { g.fillStyle = css.ink; g.textAlign = "right"; g.fillText("▶", x1 - 3, y + rowH/2); }
-    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(r.pct === null ? `${r.gain} GAIN · ${r.even ?? 0} EVEN · ${r.loss} LOSS` : `${fxWord(r)} ${v > 0 ? (v >= 10 ? v.toFixed(1) : v.toFixed(2)) + "%" : ""}`, Math.max(x1, ml + 2) + 6, y + rowH/2); });
+    g.fillText(lab, ml - 8, y + rowH/2);
+    if (notRun) { g.strokeStyle = css.muted; g.setLineDash([3, 3]); g.strokeRect(z + 0.5, y + 6.5, 28, bh); g.setLineDash([]); g.textAlign = "left"; g.fillStyle = css.muted; g.fillText(`not run yet · ${r.status}`, z + 36, y + rowH/2); return; }
+    let gain = 0, loss = 0, text = "";
+    if (r.pct === null) { const n = (r.gain || 0) + (r.even || 0) + (r.loss || 0) || 1; gain = 100*(r.gain || 0)/n; loss = 100*(r.loss || 0)/n; text = `${r.gain} GAIN · ${r.even ?? 0} EVEN · ${r.loss} LOSS (shares)`; }
+    else { gain = Math.max(0, r.pct); if (r.loss > 0) loss = lossSize(r) || 0; text = fxWord(r) + (gain > 0 ? " " + (gain >= 10 ? gain.toFixed(1) : gain.toFixed(2)) + "%" : "") + (r.loss > 0 ? ` · LOSS ${loss ? loss + "% (median, " + r.loss + " rows)" : r.loss + " rows"}` : ""); }
+    if (gain > 0) { const x1 = XR(gain); g.fillStyle = css.ok; g.beginPath(); if (g.roundRect && x1 - z > 4) g.roundRect(z + 1, y + 6, x1 - z - 1, bh, [0, 4, 4, 0]); else g.rect(z + 1, y + 6, Math.max(2, x1 - z - 1), bh); g.fill(); if (gain > 100) { g.fillStyle = css.bg; g.textAlign = "right"; g.fillText("▶", x1 - 3, y + rowH/2); } }
+    if (loss > 0) { const x0 = XL(loss); g.fillStyle = css.bad; g.beginPath(); if (g.roundRect && z - x0 > 4) g.roundRect(x0, y + 6, z - x0 - 1, bh, [4, 0, 0, 4]); else g.rect(Math.min(x0, z - 3), y + 6, Math.max(2, z - x0 - 1), bh); g.fill(); }
+    if (gain <= 0 && loss <= 0) { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); }
+    g.textAlign = "left"; g.fillStyle = gain > 0 ? css.ok : loss > 0 ? css.bad : css.even; g.fillText(text, (gain > 0 ? XR(gain) : z + 8) + 6, y + rowH/2); });
 }
 function buildFleet() {
   const {top, rows, road} = fxRows(), I = FX.index;
@@ -3181,15 +3195,21 @@ function famRows() { const by = {}; SC.receipts.forEach(r => r.rows.forEach(x =>
     if (x.w === "GAIN") { const z = sizeOf(x.abc); if (z !== null) o.gain.push(z); else o.gain.push(0); } else if (x.w === "power given") o.given++; else if (x.w === "LOSS") o.loss++; else if (/disagree/.test(x.w)) o.dis++; o.where.add(r.title.split(":")[0]); }));
   return FAM.map(f => f[0]).concat(["other"]).filter(k => by[k]).map(k => { const o = by[k], g = o.gain.slice().sort((a, b) => a - b), d = FAM.find(f => f[0] === k);
     return {k, what: d ? d[1] : "everything else", who: d ? d[2] : "—", n: g.length, med: g.length ? g[g.length >> 1] : null, max: g.length ? g[g.length - 1] : null, given: o.given, loss: o.loss, dis: o.dis, where: [...o.where]}; }); }
-function drawFam() {
+function drawFam() {   // per family: GAIN rows to the right in green (power given hatched green beside them), LOSS rows to the left in red
   const cv = $("fxFam"); if (!cv) return; const F = famRows(), rowH = 30, hh = F.length*rowH + 30; cv.style.height = hh + "px"; const {g, w, h} = fit(cv, hh/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
-  const ml = Math.min(170, w*0.3), mr = Math.min(380, w*0.5), hi = Math.max(1, ...F.map(f => f.n + f.given + f.loss)), X = v => ml + v/hi*(w - ml - mr); FXW.famGeo = {rowH, top: 4, N: F.length};
+  const ml = Math.min(170, w*0.3), mr = Math.min(470, w*0.5), pw = w - ml - mr, hiL = Math.max(1, ...F.map(f => f.loss)), hiR = Math.max(1, ...F.map(f => f.n + f.given)), z = ml + pw*hiL/(hiL + hiR);
+  const XR = v => z + v/hiR*(w - mr - z), XL = v => z - v/hiL*(z - ml); FXW.famGeo = {rowH, top: 4, N: F.length};
+  const hatch = (() => { const c = document.createElement("canvas"); c.width = c.height = 8; const q = c.getContext("2d"); q.fillStyle = alpha(css.ok, 0.35); q.fillRect(0, 0, 8, 8); q.strokeStyle = css.ok; q.lineWidth = 2; q.beginPath(); q.moveTo(0, 8); q.lineTo(8, 0); q.stroke(); return g.createPattern(c, "repeat"); })();
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
+  g.strokeStyle = css.ink; g.beginPath(); g.moveTo(z, 2); g.lineTo(z, h - 22); g.stroke();
   F.forEach((f, j) => { const y = 4 + j*rowH; if (FXW.famHov === j) { g.fillStyle = alpha(css.ink, 0.05); g.fillRect(0, y, w, rowH); }
     g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(f.k, ml - 8, y + rowH/2);
-    let x = ml; for (const [n, c] of [[f.n, css.ok], [f.given, css.brass], [f.loss, css.bad]]) if (n > 0) { const x2 = X(x === ml ? n : (x - ml)/(w - ml - mr)*hi + n); g.fillStyle = c; g.fillRect(x, y + 6, Math.max(2, x2 - x - 2), rowH - 12); x = x2; }
-    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`${f.n} GAIN${f.med !== null ? ", median " + f.med + "%" : ""} · ${f.given} power given · ${f.loss} LOSS`, x + 8, y + rowH/2); });
-  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("rows in all three runs: green GAIN · amber power given · red LOSS", ml, h - 10);
+    if (f.n) { g.fillStyle = css.ok; g.fillRect(z + 1, y + 6, Math.max(2, XR(f.n) - z - 1), rowH - 12); }
+    if (f.given) { g.fillStyle = hatch; g.fillRect(XR(f.n) + 1, y + 6, Math.max(2, XR(f.n + f.given) - XR(f.n) - 1), rowH - 12); }
+    if (f.loss) { g.fillStyle = css.bad; g.fillRect(XL(f.loss), y + 6, Math.max(2, z - XL(f.loss) - 1), rowH - 12); }
+    if (!f.n && !f.given && !f.loss) { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); }
+    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`${f.n} GAIN${f.med !== null ? " (median " + f.med + "%)" : ""} · ${f.given} GAIN · power given · ${f.loss} LOSS`, XR(f.n + f.given) + 8, y + rowH/2); });
+  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("rows in all three runs, from 0: green GAIN ▶ · hatched green GAIN · power given ▶ · ◀ red LOSS", ml, h - 10);
 }
 function tally() {   // one number for the whole board: one vote per category, the Omni index's own rule
   const all = fxAll(), landed = all.filter(r => r.pct !== null && /landed/.test(r.status) && r.dom !== "The headline"), gm = xs => xs.length ? Math.exp(xs.reduce((a, x) => a + Math.log(1 + x/100), 0)/xs.length) - 1 : null;
