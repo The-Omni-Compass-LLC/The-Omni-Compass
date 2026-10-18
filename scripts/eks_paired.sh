@@ -32,8 +32,12 @@ echo "repetition $REP, order: ${order[*]}, work group $TYPE x up to $MAX in $REG
 # Pre-flight, before anything is built or billed: the instance type is offered in the region, and the on-demand vCPU
 # quota for standard instances (L-1216C47A) has room for the system machine and the whole work group.
 vcpu=$(aws ec2 describe-instance-types --region "$REGION" --instance-types "$TYPE" \
-  --query 'InstanceTypes[0].VCpuInfo.DefaultVCpus' --output text 2>/dev/null || true)
-case "$vcpu" in ''|None) echo "pre-flight: $TYPE is not offered in $REGION: nothing built, nothing billed"; exit 2;; esac
+  --query 'InstanceTypes[0].VCpuInfo.DefaultVCpus' --output text 2>/tmp/eks-preflight.err || true)
+case "$vcpu" in ''|None)
+  # Amazon's own words, so a refusal (a new account not yet verified, a region not enabled, a missing permission) is
+  # never read as "not offered"; the keys are never printed, only the error AWS returns
+  why=$(tr '\n' ' ' < /tmp/eks-preflight.err | cut -c1-400)
+  echo "pre-flight: AWS gave no $TYPE in $REGION${why:+ (AWS said: $why)}: nothing built, nothing billed"; exit 2;; esac
 quota=$(aws service-quotas get-service-quota --region "$REGION" --service-code ec2 --quota-code L-1216C47A \
   --query 'Quota.Value' --output text 2>/dev/null | cut -d. -f1)
 need=$(( (MAX + 1) * vcpu ))
