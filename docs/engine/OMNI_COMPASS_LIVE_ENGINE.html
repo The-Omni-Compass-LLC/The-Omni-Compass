@@ -15,6 +15,7 @@
   --bg:#0e1316; --panel:#141b1f; --panel2:#1a2227; --ink:#e7e2d7; --muted:#8e9893; --rule:#27323a;
   --brass:#c08332; --brass-soft:rgba(192,131,50,.18); --steel:#4e97d1; --steel-soft:rgba(78,151,209,.18);
   --ok:#62b98d; --warn:#e3b04b; --bad:#e2634f; --spine:#b99ac4;
+  --div-hi:#c45aa0; --div-lo:#2fa59a; --div-mid:#3a454c;
   --blood:#c4525f; --r-compute:#78a6d8; --r-physics:#68bba9; --r-energy:#d4b35f; --r-dist:#cf8fa9;
   --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -215,6 +216,20 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .pipe .chain{gap:22px 22px;position:relative;z-index:1}
 .pipe canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
 @media (max-width:980px){.pipe canvas{display:none}.pipe .chain{gap:8px}}
+/* the tensor lab and the AI analyst */
+.lab3{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px}
+@media (max-width:980px){.lab3{grid-template-columns:minmax(0,1fr)}}
+#tCube{cursor:grab;touch-action:none} #tCube:active{cursor:grabbing}
+.narr{font-family:var(--f-mono);font-size:13px;line-height:1.7;display:flex;flex-direction:column;gap:4px}
+.narr div{border-left:2px solid var(--rule);padding-left:10px;transition:border-color .4s}
+.narr div.fresh{border-left-color:var(--brass)}
+.ai{border-top:3px solid var(--spine)}
+.ai .chips button{font-size:12px;min-height:30px;padding:5px 10px}
+.ai textarea{width:100%;min-height:64px;resize:vertical;font:inherit;font-size:14px;background:var(--panel2);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:8px 10px}
+.ai textarea:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.aiOut{background:var(--panel2);border:1px solid var(--rule);border-radius:4px;padding:12px 14px;font-size:14px;line-height:1.65;white-space:pre-wrap;min-height:90px;overflow-wrap:anywhere}
+.aiOut .w-gain,.aiOut .w-loss,.aiOut .w-even,.aiOut .w-given{font-family:var(--f-mono);font-weight:500}
+.aiSteps{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 @media (prefers-reduced-motion: reduce){.live-badge::before,.blk.running,.tape li.new{animation:none}}
 </style>
 
@@ -275,7 +290,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 </section>
 
 <nav class="toc" aria-label="Contents"><b>Contents</b>
-  <a href="#s-ops">The operations center</a><a href="#s-engines">1 · The two engines</a><a href="#s-live">2 · The live controller</a><a href="#s-stacks">3 · Every stack</a><a href="#s-runs">4 · The official runs</a><a href="#s-decision">5 · One decision</a><a href="#s-plane">6 · The plane and the scoreboard</a><a href="#s-brain">7 · Inside the brain</a><a href="#s-verdict">8 · The verdict</a><a href="#s-math">9 · The math and the code</a><a href="#s-disclose">10 · Disclosures and contact</a>
+  <a href="#s-ops">The operations center</a><a href="#s-lab">The tensor lab and the AI analyst</a><a href="#s-engines">1 · The two engines</a><a href="#s-live">2 · The live controller</a><a href="#s-stacks">3 · Every stack</a><a href="#s-runs">4 · The official runs</a><a href="#s-decision">5 · One decision</a><a href="#s-plane">6 · The plane and the scoreboard</a><a href="#s-brain">7 · Inside the brain</a><a href="#s-verdict">8 · The verdict</a><a href="#s-math">9 · The math and the code</a><a href="#s-disclose">10 · Disclosures and contact</a>
 </nav>
 
 <section class="stack" id="s-ops" aria-label="The operations center: the official runs, streaming">
@@ -344,6 +359,67 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <div class="legend" id="opsBlkLeg"></div>
     <div class="blocks" id="opsBlocks"></div>
     <div class="opsTip" id="opsTipBlk" hidden></div>
+  </div>
+</section>
+<section class="stack" id="s-lab" aria-label="The tensor lab and the AI analyst">
+  <h2>The tensor lab and the AI analyst</h2>
+  <p class="lede" style="max-width:96ch">The engine's own record is a tensor: <b>two arms × every decision × sixty muscles</b>, each entry a muscle's compass position (0 calm, 0.5 the center of its band, 1 its line), recorded from <code>realms/harness.py</code> by <code>docs/engine/export_harness_trace.py</code> (class S, our own models). It fills in below decision by decision as section 1 plays, and the same numbers are read three more ways: the difference between the arms, the body's principal motions, and a running narration. Then the official runs (class L) are read as a flow and as a radar, and Claude itself answers questions about the screen, reading the page's own data through tools and steering the dashboard. No word on this panel is drawn from a picture: every GAIN, EVEN, LOSS and power given is a run's own reading.</p>
+
+  <div class="panel stack" style="gap:6px">
+    <h3>The live narrator</h3>
+    <div class="narr" id="tNarr" aria-live="polite"><div>—</div></div>
+  </div>
+
+  <div class="lab3">
+    <div class="panel stack" style="gap:8px">
+      <h3>The tensor, in three dimensions</h3>
+      <canvas id="tCube" aria-label="The engine's record as a three-dimensional tensor: decisions across, the sixty muscles up, native and Omni-Compass on top as two slabs; drag to turn it"></canvas>
+      <div class="legend"><span><i class="sq" style="background:var(--steel)"></i>native slab</span><span><i class="sq" style="background:var(--brass)"></i>Omni-Compass on top slab</span><span><i class="sq" style="background:var(--bad)"></i>past the line</span><span>brightness: the compass position · the frame: the decision playing now · drag to turn, release to let it spin</span></div>
+    </div>
+    <div class="panel stack chartbox" style="gap:8px">
+      <h3>The difference matrix: Omni-Compass on top against native</h3>
+      <canvas id="tDelta" aria-label="Heatmap of each muscle's compass position with Omni-Compass on top minus native, decision by decision"></canvas>
+      <div class="legend"><span><i class="sq" style="background:var(--div-hi)"></i>Omni-Compass's muscle rides closer to its line than native's (the max at work)</span><span><i class="sq" style="background:var(--div-lo)"></i>it sits calmer than native's</span><span><i class="sq" style="background:var(--div-mid)"></i>the same</span><span><i class="sq" style="background:var(--bad)"></i>a dot: past the line on that side only</span></div>
+      <div class="opsTip" id="tTipDelta" hidden></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel stack chartbox" style="gap:8px">
+      <h3>The body's principal motions (the tensor's eigen-decomposition)</h3>
+      <canvas id="tModes" aria-label="Bar chart of the share of the body's motion carried by each principal mode, native and Omni-Compass on top, and the first mode's time course"></canvas>
+      <p class="note" id="tModesNote">—</p>
+      <div class="opsTip" id="tTipModes" hidden></div>
+    </div>
+    <div class="panel stack" style="gap:8px">
+      <h3>The flow of every request in this repetition</h3>
+      <canvas id="tSankey" aria-label="Sankey diagram: every request of the official repetition, native and Omni-Compass on top, split into answered inside the 500 ms line and over it"></canvas>
+      <p class="note" id="tSankeyNote">—</p>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel stack chartbox" style="gap:8px">
+      <h3>The radar of this repetition: every gauge against native</h3>
+      <canvas id="tRadar" aria-label="Radar chart of this repetition's gauges, Omni-Compass on top drawn against native, native's ring at one"></canvas>
+      <div class="legend"><span><i class="sq" style="background:var(--steel)"></i>native (the ring at 1)</span><span><i class="sq" style="background:var(--brass)"></i>Omni-Compass on top of native, as a multiple of native</span><span>each spoke from the center: 0, the ring 1, the edge 2 (past 2 drawn at the edge and marked)</span></div>
+      <p class="note" id="tRadarNote">—</p>
+      <div class="opsTip" id="tTipRadar" hidden></div>
+    </div>
+    <div class="panel stack ai" style="gap:10px" id="aiPanel">
+      <h3>Ask Claude about this screen</h3>
+      <p class="note" id="aiAvail">Connecting to Claude…</p>
+      <div class="row chips" id="aiChips">
+        <button data-q="What is this screen telling me right now? Read the benchmark playing and its run's readings.">What is it telling me now?</button>
+        <button data-q="Where does Omni-Compass read LOSS anywhere on this page, and what is the cause written for each?">Where is there a LOSS, and why?</button>
+        <button data-q="Explain the run playing now to a buyer in plain words: what native is, what Omni-Compass on top did, and how it was proven.">Explain it to a buyer</button>
+        <button data-q="Find the benchmark with the largest GAIN in response time across the official runs, show it on the dashboard, and tell me its readings.">Show me the largest GAIN</button>
+      </div>
+      <textarea id="aiQ" placeholder="Ask anything about the engine, a run or a reading on this page" aria-label="Your question"></textarea>
+      <div class="row"><button id="aiAsk">Ask Claude</button><button id="aiStop" disabled>Stop</button><span class="aiSteps" id="aiSteps"></span></div>
+      <div class="aiOut" id="aiOut" aria-live="polite">Claude reads this page's own data through six tools (the screen, the benchmarks, a run's readings, the receipts, the board, and one that turns the dashboard to a run) and answers in the report's words. It runs on your own Claude account, asks your permission first, and writes nothing anywhere.</div>
+      <p class="note">© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only. Any commercialization or monetization requires a signed, paid Omni-Compass Enterprise License. Claude's answers are drawn from this page's data and are not reviewed by any outside party. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com</p>
+    </div>
   </div>
 </section>
 
@@ -1128,7 +1204,7 @@ function decide() {
 // ============================================================== drawing
 const css = {};
 function readTokens() { const cs = getComputedStyle(document.documentElement);
-  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine","blood","r-compute","r-physics","r-energy","r-dist"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
+  for (const k of ["bg","panel","panel2","ink","muted","rule","brass","brass-soft","steel","steel-soft","ok","warn","bad","spine","blood","r-compute","r-physics","r-energy","r-dist","div-hi","div-lo","div-mid"]) css[k] = cs.getPropertyValue("--"+k).trim(); }
 readTokens();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readTokens);
 new MutationObserver(readTokens).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
@@ -2325,6 +2401,256 @@ function opsHover(id, tipId, html) {
 }
 function drawOps(now) { drawPipe(now); drawCandle(); drawHeat(); drawBars(); drawReps(); }
 
+// ============================================================== the tensor lab: the engine's record, two arms × decisions × sixty muscles
+const TL = {yaw: -0.62, pitch: 0.38, drag: null, spin: true, deltaKey: "", deltaCv: null, eigKey: "", eig: null, narrAt: 0, narrPrev: []};
+const tOrder = () => W.muscles.map((m, i) => i).sort((a, b) => W.muscles[a].realm - W.muscles[b].realm || W.muscles[a].j - W.muscles[b].j);
+const tRec = () => TRD[W.hsec][HS().seeds[W.run]];
+function drawCube(now) {
+  const cv = $("tCube"); if (!cv || W.body !== "harness") { if (cv) { const {g, w, h} = fit(cv, 0.72); g.clearRect(0, 0, w, h); opsEmpty(g, w, h, "the tensor plays with the engine's harness (section 1)"); } return; }
+  const {g, w, h} = fit(cv, Math.min(0.72, 460/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  if (TL.spin && !TL.drag && !reduceMotion) TL.yaw += 0.0025;
+  const R = tRec(), n = W.muscles.length, S = HS().steps, K = Math.min(W.t, S - 1), ord = tOrder(), ds = Math.max(1, Math.ceil(S/110));
+  const cy = Math.cos(TL.yaw), sy = Math.sin(TL.yaw), cp = Math.cos(TL.pitch), sp = Math.sin(TL.pitch), sc = Math.min(w, h)*0.62;
+  const P3 = (x, y, z) => { const x1 = cy*x + sy*z, z1 = -sy*x + cy*z, y1 = cp*y - sp*z1, z2 = sp*y + cp*z1, f = 3/(3 + z2); return [w/2 + x1*sc*f, h/2 - y1*sc*f, z2]; };
+  const X = k => (k/S - 0.5)*1.5, Y = r => (r/n - 0.5), Z = a => a ? 0.28 : -0.28;
+  const edge = (a, b) => { const p = P3(...a), q = P3(...b); g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(q[0], q[1]); g.stroke(); };
+  g.strokeStyle = css.rule; g.lineWidth = 1;
+  const xs = [-0.75, 0.75], ys = [-0.5, 0.5], zs = [-0.36, 0.36];
+  for (const y of ys) for (const z of zs) edge([xs[0], y, z], [xs[1], y, z]);
+  for (const x of xs) for (const z of zs) edge([x, ys[0], z], [x, ys[1], z]);
+  for (const x of xs) for (const y of ys) edge([x, y, zs[0]], [x, y, zs[1]]);
+  const slabs = [[0, R.native, css.steel], [1, R.omni, css.brass]].sort((a, b) => P3(0, 0, Z(b[0]))[2] - P3(0, 0, Z(a[0]))[2]);
+  for (const [a, src, col] of slabs) {
+    const rgb = parseCol(col);
+    for (let k = 0; k <= K; k += ds) for (let r = 0; r < n; r++) { const i = ord[r], p = src.p[k*n + i]/1000, over = src.f[k*n + i] & 1;
+      const [px, py, pz] = P3(X(k), Y(r), Z(a)), s = 2.4*3/(3 + pz);
+      g.fillStyle = over ? css.bad : `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${(0.12 + 0.88*Math.min(1, Math.max(0, p))).toFixed(3)})`; g.fillRect(px - s/2, py - s/2, s, s); } }
+  g.strokeStyle = css.ink; g.lineWidth = 1.2; const xk = X(K);
+  g.beginPath(); [[xk, -0.5, -0.36], [xk, 0.5, -0.36], [xk, 0.5, 0.36], [xk, -0.5, 0.36], [xk, -0.5, -0.36]].forEach((p, j) => { const q = P3(...p); j ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke(); g.lineWidth = 1;
+  g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "middle";
+  const lab = (t, p) => { const q = P3(...p), tw = g.measureText(t).width; g.fillText(t, Math.max(4 + tw/2, Math.min(w - 4 - tw/2, q[0])), Math.max(10, Math.min(h - 8, q[1]))); };
+  lab("decisions →", [0, -0.62, -0.36]); lab("muscles ↑ (spine to distribution)", [-0.75, 0.6, -0.36]); lab("native", [0.82, -0.5, Z(0)]); lab("Omni-Compass", [0.86, -0.5, Z(1)]);
+  g.textAlign = "left"; g.textBaseline = "top"; g.fillText(`decision ${K + 1} of ${S} · ${W.hsec === "alone" ? "each muscle alone" : "one organism"} · run ${"ABC"[W.run]}`, 6, 4);
+}
+function deltaMatrix() {
+  const key = `${W.hsec}|${W.run}|${W.t}`; if (TL.deltaKey === key && TL.deltaCv) return TL.deltaCv;
+  const R = tRec(), n = W.muscles.length, S = HS().steps, K = Math.min(W.t, S - 1), ord = tOrder();
+  const c = TL.deltaCv || document.createElement("canvas"); c.width = S; c.height = n; const g = c.getContext("2d"), im = g.createImageData(S, n);
+  const hi = parseCol(css["div-hi"]), lo = parseCol(css["div-lo"]), mid = parseCol(css["div-mid"]), bad = parseCol(css.bad), bg = parseCol(css.panel2);
+  for (let r = 0; r < n; r++) { const i = ord[r]; for (let k = 0; k < S; k++) { const o = (r*S + k)*4; let col = bg;
+    if (k <= K) { const d = Math.max(-0.5, Math.min(0.5, (R.omni.p[k*n + i] - R.native.p[k*n + i])/1000)), t = Math.min(1, Math.abs(d)/0.5), e = d > 0 ? hi : lo;
+      col = [0, 1, 2].map(j => Math.round(mid[j] + (e[j] - mid[j])*Math.sqrt(t)));
+      if ((R.omni.f[k*n + i] & 1) !== (R.native.f[k*n + i] & 1)) col = bad; }
+    im.data[o] = col[0]; im.data[o + 1] = col[1]; im.data[o + 2] = col[2]; im.data[o + 3] = 255; } }
+  g.putImageData(im, 0, 0); TL.deltaCv = c; TL.deltaKey = key; return c;
+}
+function drawDelta() {
+  const cv = $("tDelta"); if (!cv) return; const {g, w, h} = fit(cv, Math.min(0.72, 460/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  if (W.body !== "harness") { opsEmpty(g, w, h, "the matrix plays with the engine's harness (section 1)"); OPS.geo.tDelta = null; return; }
+  const ml = 92, mr = 8, top = 6, bot = h - 22, S = HS().steps, n = W.muscles.length, ord = tOrder();
+  g.imageSmoothingEnabled = false; g.drawImage(deltaMatrix(), ml, top, w - ml - mr, bot - top);
+  g.font = `11px ${MONO}`; g.textAlign = "right"; g.textBaseline = "middle"; g.fillStyle = css.muted;
+  let r0 = 0; PARTS.forEach((pt, ri) => { const cnt = ord.filter(i => W.muscles[i].realm === ri).length; if (!cnt) return;
+    const y0 = top + r0/n*(bot - top), y1 = top + (r0 + cnt)/n*(bot - top); g.fillText(pt, ml - 6, (y0 + y1)/2);
+    g.strokeStyle = css.bg; g.beginPath(); g.moveTo(ml, y1); g.lineTo(w - mr, y1); g.stroke(); r0 += cnt; });
+  const X = k => ml + (k + 0.5)/S*(w - ml - mr); OPS.geo.tDelta = {ml, mr, w, N: S, top, bot, n};
+  g.strokeStyle = css.ink; g.beginPath(); g.moveTo(X(Math.min(W.t, S - 1)), top); g.lineTo(X(Math.min(W.t, S - 1)), bot); g.stroke();
+  g.fillStyle = css.muted; g.textBaseline = "top"; g.textAlign = "left"; g.fillText("decision 1", ml, bot + 4); g.textAlign = "right"; g.fillText(`decision ${S}`, w - mr, bot + 4);
+}
+function jacobiEig(A, n) {   // the eigenvalues and eigenvectors of a symmetric matrix, cyclic Jacobi rotations
+  const a = A.map(r => r.slice()), V = A.map((r, i) => r.map((_, j) => i === j ? 1 : 0));
+  for (let sweep = 0; sweep < 60; sweep++) { let off = 0; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) off += a[i][j]*a[i][j]; if (off < 1e-18) break;
+    for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) { if (Math.abs(a[p][q]) < 1e-15) continue;
+      const th = (a[q][q] - a[p][p])/(2*a[p][q]), t = Math.sign(th || 1)/(Math.abs(th) + Math.sqrt(th*th + 1)), c = 1/Math.sqrt(t*t + 1), s = t*c;
+      for (let k = 0; k < n; k++) { const akp = a[k][p], akq = a[k][q]; a[k][p] = c*akp - s*akq; a[k][q] = s*akp + c*akq; }
+      for (let k = 0; k < n; k++) { const apk = a[p][k], aqk = a[q][k]; a[p][k] = c*apk - s*aqk; a[q][k] = s*apk + c*aqk; }
+      for (let k = 0; k < n; k++) { const vkp = V[k][p], vkq = V[k][q]; V[k][p] = c*vkp - s*vkq; V[k][q] = s*vkp + c*vkq; } } }
+  return a.map((r, i) => ({l: Math.max(0, r[i]), v: V.map(row => row[i])})).sort((x, y) => y.l - x.l);
+}
+function tEig() {
+  const key = `${W.hsec}|${W.run}`; if (TL.eigKey === key) return TL.eig;
+  const R = tRec(), n = W.muscles.length, S = HS().steps, out = {};
+  for (const arm of ["native", "omni"]) { const src = R[arm], mu = new Array(n).fill(0);
+    for (let k = 0; k < S; k++) for (let i = 0; i < n; i++) mu[i] += Math.min(2, src.p[k*n + i]/1000)/S;
+    const C = mu.map(() => new Array(n).fill(0));
+    for (let k = 0; k < S; k++) { const x = mu.map((m, i) => Math.min(2, src.p[k*n + i]/1000) - m); for (let i = 0; i < n; i++) if (x[i]) for (let j = i; j < n; j++) C[i][j] += x[i]*x[j]/(S - 1); }
+    for (let i = 0; i < n; i++) for (let j = 0; j < i; j++) C[i][j] = C[j][i];
+    const E = jacobiEig(C, n), tot = E.reduce((s, e) => s + e.l, 0), sq = E.reduce((s, e) => s + e.l*e.l, 0);
+    const pc1 = []; for (let k = 0; k < S; k++) { let s = 0; for (let i = 0; i < n; i++) s += (Math.min(2, src.p[k*n + i]/1000) - mu[i])*E[0].v[i]; pc1.push(s); }
+    out[arm] = {share: E.slice(0, 8).map(e => tot > 0 ? e.l/tot : 0), pr: sq > 0 ? tot*tot/sq : 0, tot, pc1}; }
+  TL.eig = out; TL.eigKey = key;
+  const f = a => `the first mode carries ${(100*out[a].share[0]).toFixed(1)}% of its motion; its effective number of independent motions (the participation ratio (Σλ)²/Σλ²) is ${out[a].pr.toFixed(1)} of ${n}`;
+  $("tModesNote").textContent = `Over the whole of run ${"ABC"[W.run]} (${W.hsec === "alone" ? "each muscle alone" : "one organism"}): native, ${f("native")}; Omni-Compass on top, ${f("omni")}. The covariance of the sixty positions over every decision, decomposed by Jacobi rotations in this page; the lower panel streams each arm's first mode (its sign is arbitrary). A picture of how the body moves, class S, never a reading.`;
+  return out;
+}
+function drawModes() {
+  const cv = $("tModes"); if (!cv) return; const {g, w, h} = fit(cv, Math.min(0.62, 380/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  if (W.body !== "harness") { opsEmpty(g, w, h, "the modes are read from the engine's harness (section 1)"); OPS.geo.tModes = null; return; }
+  const E = tEig(), ml = 44, mr = 8, top = 16, mid = h*0.56, N = 8, X = i => ml + (i + 0.5)/N*(w - ml - mr), cw = (w - ml - mr)/N;
+  OPS.geo.tModes = {ml, mr, w, N}; g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText("the share of the body's motion in each mode (%)", ml, 0);
+  const hi = Math.max(0.05, ...E.native.share, ...E.omni.share)*1.1, Y = v => mid - v/hi*(mid - top - 4);
+  g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, mid); g.lineTo(w - mr, mid); g.stroke(); g.textAlign = "right"; g.textBaseline = "middle"; g.fillText((100*hi/1.1).toFixed(0), ml - 6, Y(hi/1.1)); g.fillText("0", ml - 6, mid);
+  const bw = Math.max(2, cw*0.34), r4 = Math.min(4, bw/2);
+  for (let i = 0; i < N; i++) [[E.native.share[i], css.steel, -1], [E.omni.share[i], css.brass, 1]].forEach(([v, col, s]) => { const x = X(i) + (s < 0 ? -1 - bw : 1), y = Y(v || 0);
+    g.fillStyle = col; g.beginPath(); if (g.roundRect && mid - y > r4) g.roundRect(x, y, bw, mid - y, [r4, r4, 0, 0]); else g.rect(x, y, bw, mid - y); g.fill(); });
+  g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top"; for (let i = 0; i < N; i++) g.fillText(String(i + 1), X(i), mid + 3);
+  const t0 = mid + 34, t1 = h - 4, S = HS().steps, K = Math.min(W.t, S - 1), all = E.native.pc1.concat(E.omni.pc1), m = Math.max(1e-6, ...all.map(Math.abs));
+  g.textAlign = "left"; g.fillText("the first mode, decision by decision", ml, mid + 18);
+  g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, (t0 + t1)/2); g.lineTo(w - mr, (t0 + t1)/2); g.stroke();
+  for (const [s, col] of [[E.native.pc1, css.steel], [E.omni.pc1, css.brass]]) { g.strokeStyle = col; g.lineWidth = 1.5; g.beginPath();
+    for (let k = 0; k <= K; k++) { const x = ml + k/(S - 1)*(w - ml - mr), y = (t0 + t1)/2 - s[k]/m*(t1 - t0)/2; k ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } g.lineWidth = 1;
+  const i = OPS.hov.tModes; if (i !== null && i !== undefined && i < N) { g.fillStyle = alpha(css.ink, 0.06); g.fillRect(X(i) - cw/2, top, cw, mid - top); }
+}
+function streamTotals(A, T) { let n = 0, over = 0, fail = 0; (A.lat || []).slice(0, T).forEach(r => { n += r[2] || 0; fail += r[3] || 0; if (r[10]) over += r[10].slice(HIST_OVER).reduce((a, b) => a + b, 0); }); return {n, over, fail, inside: n - over}; }
+function drawSankey() {
+  const cv = $("tSankey"); if (!cv) return; const {g, w, h} = fit(cv, Math.min(0.62, 380/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  const B = ruB(), P = ruP(); if (!P || B.kind !== "k8s") { opsEmpty(g, w, h, "a database run: no request log to flow"); $("tSankeyNote").textContent = "Pick a Kubernetes benchmark above to see its requests flow."; return; }
+  const T = opsT(), arms = [["native", streamTotals(P.native, T), css.steel], ["Omni-Compass on top", streamTotals(P.omni, T), css.brass]];
+  g.font = `11px ${MONO}`; const lw = Math.max(...arms.map(a => g.measureText(a[0]).width)) + 22, rw = Math.max(...arms.map(a => g.measureText(`inside the line: ${num(a[1].n)} (100.0%)`).width)) + 22;
+  const narrow = w - lw - rw < 120, tot = Math.max(1, ...arms.map(a => a[1].n)), gapY = narrow ? 40 : 26, avail = h - 3*gapY, sc = avail/(2*tot), x0 = narrow ? 18 : lw, x1 = narrow ? w - 18 : w - rw, nw = 10; let y = gapY;
+  arms.forEach(([name, s, col]) => { const hT = s.n*sc, hI = s.inside*sc, hO = s.over*sc;
+    g.fillStyle = col; g.fillRect(x0 - nw, y, nw, Math.max(1, hT));
+    if (narrow) { g.textAlign = "left"; g.textBaseline = "bottom"; g.fillStyle = css.ink; g.fillText(`${name}: ${num(s.n)} requests`, x0 - nw, y - 8); }
+    else { g.textAlign = "right"; g.textBaseline = "middle"; g.fillStyle = css.ink; g.fillText(name, x0 - nw - 6, y + hT/2 - 7); g.fillStyle = css.muted; g.fillText(`${num(s.n)} requests`, x0 - nw - 6, y + hT/2 + 7); }
+    const band = (ya, hh, yb, c) => { if (hh <= 0) return; g.fillStyle = c; g.beginPath(); g.moveTo(x0, ya); g.bezierCurveTo((x0 + x1)/2, ya, (x0 + x1)/2, yb, x1, yb);
+      g.lineTo(x1, yb + hh); g.bezierCurveTo((x0 + x1)/2, yb + hh, (x0 + x1)/2, ya + hh, x0, ya + hh); g.closePath(); g.fill(); };
+    const yI = y - 4, yO = y + hI + 6; band(y, hI, yI, alpha(col, 0.35)); band(y + hI, hO, yO, alpha(css.bad, 0.55));
+    g.fillStyle = col; g.fillRect(x1, yI, nw, Math.max(1, hI)); g.fillStyle = css.bad; g.fillRect(x1, yO, nw, Math.max(1, hO));
+    if (narrow) { g.textAlign = "right"; g.textBaseline = "middle"; g.fillStyle = css.ink; g.fillText(`inside the line ${num(s.inside)} · over ${num(s.over)}`, x1 - 6, yI + Math.max(hI, 1)/2); y += hT + gapY; return; }
+    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`inside the line: ${num(s.inside)} (${s.n ? (100*s.inside/s.n).toFixed(1) : "0.0"}%)`, x1 + nw + 6, yI + Math.max(hI, 1)/2);
+    g.fillText(`over the line: ${num(s.over)} (${s.n ? (100*s.over/s.n).toFixed(1) : "0.0"}%)`, x1 + nw + 6, yO + Math.max(hO, 2)/2 + 6);
+    y += hT + gapY; });
+  $("tSankeyNote").innerHTML = `Repetition ${P.n} of run ${ruR().tag}, ${Math.floor(T*RU.bin_s/60)} minutes streamed: every request either answered inside the 500 ms line or over it, counted from the SHA-256-checked request log (failed: native ${num(arms[0][1].fail)}, Omni-Compass on top ${num(arms[1][1].fail)}). The run's reading of the time over the line, all its repetitions: ${ruWord((ruR().official_paired || {})["time over the response line (% of samples)"], "down")}.`;
+}
+const T_RADAR = [["95th percentile", "response time (ms), 95th percentile"], ["mean", "response time (ms), mean"], ["99th percentile", "response time (ms), 99th percentile"],
+  ["over the line", "time over the response line (% of samples)"], ["failed", "failed requests (%)"], ["replicas", "HPA replicas, mean"], ["nodes", "worker nodes in service, mean"],
+  ["node-hours", "node-hours"], ["energy", "energy (Wh)"], ["host CPU", "host CPU busy, the real machine under kind (%)"]];
+function radarAxes() { const P = ruP(); if (!P || ruB().kind !== "k8s") return []; const a = P.native.official || {}, o = P.omni.official || {};
+  return T_RADAR.map(([l, k]) => ({l, k, n: a[k], o: o[k]})).filter(x => typeof x.n === "number" && x.n > 0 && typeof x.o === "number"); }
+function drawRadar() {
+  const cv = $("tRadar"); if (!cv) return; const {g, w, h} = fit(cv, Math.min(0.8, 420/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  const A = radarAxes(); if (A.length < 3) { opsEmpty(g, w, h, ruB() && ruB().kind === "k8s" ? "too few gauges with native above zero" : "a database run: see its repetitions above"); TL.radar = null; $("tRadarNote").textContent = ""; return; }
+  const cx = w/2, cy = h/2 + 4, Rr = Math.min(w, h)/2 - 46, ang = j => -Math.PI/2 + j*2*Math.PI/A.length, pt = (j, v) => [cx + Math.cos(ang(j))*Rr*Math.min(v, 2)/2, cy + Math.sin(ang(j))*Rr*Math.min(v, 2)/2];
+  TL.radar = {cx, cy, n: A.length};
+  g.strokeStyle = css.rule; g.lineWidth = 1; for (const v of [0.5, 1.5, 2]) { g.beginPath(); A.forEach((_, j) => { const [x, y] = pt(j, v); j ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.stroke(); }
+  A.forEach((_, j) => { const [x, y] = pt(j, 2); g.beginPath(); g.moveTo(cx, cy); g.lineTo(x, y); g.stroke(); });
+  g.strokeStyle = css.steel; g.lineWidth = 2; g.beginPath(); A.forEach((_, j) => { const [x, y] = pt(j, 1); j ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.stroke();
+  g.fillStyle = alpha(css.brass, 0.22); g.strokeStyle = css.brass; g.beginPath(); A.forEach((a, j) => { const [x, y] = pt(j, a.o/a.n); j ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.fill(); g.stroke(); g.lineWidth = 1;
+  A.forEach((a, j) => { const r = a.o/a.n, [x, y] = pt(j, r); g.fillStyle = css.brass; g.beginPath(); g.arc(x, y, r > 2 ? 5 : 3.5, 0, 2*Math.PI); g.fill(); if (r > 2) { g.strokeStyle = css.ink; g.stroke(); } });
+  g.font = `11px ${MONO}`; g.fillStyle = css.muted; A.forEach((a, j) => { const [x, y] = pt(j, 2.28); g.textAlign = Math.abs(x - cx) < 8 ? "center" : x > cx ? "left" : "right"; g.textBaseline = "middle"; g.fillText(a.l, x, y); });
+  const hv = TL.radarHov; if (hv !== null && hv !== undefined && hv < A.length) { const [x, y] = pt(hv, 2); g.strokeStyle = css.ink; g.setLineDash([2, 2]); g.beginPath(); g.moveTo(cx, cy); g.lineTo(x, y); g.stroke(); g.setLineDash([]); }
+  $("tRadarNote").textContent = `Repetition ${ruP().n} of run ${ruR().tag}, scored by the repository's own scorer; each spoke is Omni-Compass on top as a multiple of native on that gauge (native is the ring at 1). Gauges where native is zero are left off. Hover a spoke for the values and the run's own reading over all its repetitions.`;
+}
+function tNarrate() {
+  const lines = [], B = ruB(), R = ruR(), P = ruP();
+  if (B && R && P && B.kind === "k8s") { const T = opsT(), L = i => (P.native.lat[i] || []), M = i => (P.omni.lat[i] || []), i = T - 1, pr = R.official_paired || {};
+    lines.push(`Official run · ${B.title.split(":")[0]} · run ${R.tag} · repetition ${P.n} · minute ${Math.floor(T*RU.bin_s/60)}: this half minute's 95th percentile is ${L(i)[1] ?? "—"} ms on native and ${M(i)[1] ?? "—"} ms with Omni-Compass on top; the run reads it ${ruWord(pr["response time (ms), 95th percentile"], "down").replace(/<[^>]+>/g, "")} over all its repetitions.`);
+    const D = (P.omni.dec || []).filter(d => d[0] <= T*RU.bin_s), d = D[D.length - 1];
+    if (d) lines.push(`The governor's latest decision, at ${mmss(d[0])}: compass position ${d[1] === null ? "—" : (+d[1]).toFixed(2)}, ${d[2] > 0 ? "pedal pushed" : d[2] < 0 ? "pedal lifted" : "pedal still"}, ${d[3] ?? "—"} machines recommended, the give-back verdict "${d[4]}" (${D.length} decisions so far).`);
+  } else if (B && R) lines.push(`Official run · ${B.title.split(":")[0]} · run ${R.tag}: a database benchmark, scored repetition by repetition; ${R.ok} of ${R.checked} files SHA-256 ✓.`);
+  if (W.body === "harness") lines.push(`The engine's harness, ${W.hsec === "alone" ? "each muscle alone" : "one organism"}, run ${"ABC"[W.run]}, decision ${Math.min(W.t + 1, W.len)} of ${W.len}: past the line now, native ${$("lvN0").textContent} and Omni-Compass on top ${$("lvO0").textContent}; misses so far ${$("lvN1").textContent} and ${$("lvO1").textContent}; settings off native ${$("lvO2").textContent}.`);
+  const html = lines.map((l, j) => `<div class="${l !== TL.narrPrev[j] ? "fresh" : ""}">${l}</div>`).join(""); TL.narrPrev = lines; $("tNarr").innerHTML = html || "<div>—</div>";
+}
+function drawLab(now) { drawCube(now); drawDelta(); drawModes(); drawSankey(); drawRadar(); if (now - TL.narrAt > 1000) { TL.narrAt = now; tNarrate(); } }
+function buildLab() {
+  const cv = $("tCube");
+  cv.addEventListener("pointerdown", e => { TL.drag = {x: e.clientX, y: e.clientY, yaw: TL.yaw, pitch: TL.pitch}; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener("pointermove", e => { if (!TL.drag) return; TL.yaw = TL.drag.yaw + (e.clientX - TL.drag.x)*0.008; TL.pitch = Math.max(-1.3, Math.min(1.3, TL.drag.pitch + (e.clientY - TL.drag.y)*0.008)); });
+  const up = () => { TL.drag = null; }; cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+  // the matrix: its own pointer handler, for it reads the muscle row as well as the decision
+  const dv = $("tDelta"), dt = $("tTipDelta");
+  dv.addEventListener("pointermove", e => { const G = OPS.geo.tDelta; if (!G) return; const r = dv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    const k = Math.floor((x - G.ml)/(G.w - G.ml - G.mr)*G.N), row = Math.floor((y - G.top)/(G.bot - G.top)*G.n);
+    if (k < 0 || k >= G.N || row < 0 || row >= G.n || k > W.t) { dt.hidden = true; return; } const i = tOrder()[row], Rr = tRec(), n = W.muscles.length, m = W.muscles[i];
+    const pn = Rr.native.p[k*n + i]/1000, po = Rr.omni.p[k*n + i]/1000;
+    dt.innerHTML = `<b>${m.name}</b> · ${PARTS[m.realm]} · decision ${k + 1}<br><span class="tn">native</span> position ${pn.toFixed(3)}${Rr.native.f[k*n + i] & 1 ? " · past the line" : ""}<br><span class="to">Omni-Compass on top</span> position ${po.toFixed(3)}${Rr.omni.f[k*n + i] & 1 ? " · past the line" : ""}`;
+    dt.hidden = false; dt.style.left = Math.max(0, Math.min(dv.offsetLeft + x + 14, dv.parentElement.clientWidth - dt.offsetWidth - 4)) + "px"; dt.style.top = (dv.offsetTop + y + 14) + "px"; });
+  dv.addEventListener("pointerleave", () => dt.hidden = true);
+  opsHover("tModes", "tTipModes", i => { const E = TL.eig; if (!E) return ""; return `<b>mode ${i + 1}</b><br><span class="tn">native</span> ${(100*E.native.share[i]).toFixed(2)}% of the motion<br><span class="to">Omni-Compass on top</span> ${(100*E.omni.share[i]).toFixed(2)}%`; });
+  const rv = $("tRadar"), rt = $("tTipRadar");
+  rv.addEventListener("pointermove", e => { const G = TL.radar; if (!G) return; const r = rv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    let a = Math.atan2(y - G.cy, x - G.cx) + Math.PI/2; if (a < 0) a += 2*Math.PI; const j = Math.round(a/(2*Math.PI/G.n)) % G.n, A = radarAxes()[j]; if (!A) return; TL.radarHov = j;
+    rt.innerHTML = `<b>${A.k}</b><br><span class="tn">native</span> ${fmtAxis(A.n)} · <span class="to">Omni-Compass on top</span> ${fmtAxis(A.o)} (× ${(A.o/A.n).toFixed(3)})<br>the run's reading: ${ruWord((ruR().official_paired || {})[A.k], RU_AIM[A.k])}`;
+    rt.hidden = false; rt.style.left = Math.max(0, Math.min(rv.offsetLeft + x + 14, rv.parentElement.clientWidth - rt.offsetWidth - 4)) + "px"; rt.style.top = (rv.offsetTop + y + 14) + "px"; });
+  rv.addEventListener("pointerleave", () => { rt.hidden = true; TL.radarHov = null; });
+}
+
+// ============================================================== the AI analyst: Claude reads the page's own data through tools
+const AI = {sample: null, ctl: null};
+const wordText = (pr, aim) => ruWord(pr, aim).replace(/<[^>]+>/g, "").trim();
+function aiCap(o) {   // a tool's answer kept under Claude's 32 KB: the longest row lists cut first, and said so
+  let txt = JSON.stringify(o); if (txt.length < 30000) return o; const t = o.tables || [];
+  while (txt.length >= 30000) { const big = t.reduce((m, x) => x.rows.length > (m ? m.rows.length : 0) ? x : m, null); if (!big || big.rows.length < 2) break;
+    big.rows = big.rows.slice(0, Math.floor(big.rows.length/2)); big.rows_cut = true; txt = JSON.stringify(o); }
+  o.note = "some row lists were cut to fit; ask for one table to see all its rows"; return o; }
+const unsign = s => String(s).replace(/[+−-](?=\d)/g, "");
+const benchOf = v => { if (v === undefined || v === null || v === "") return RW.b; const s = String(v).toUpperCase(), i = RU.benchmarks.findIndex(b => b.key === s || b.title.toUpperCase().startsWith(s));
+  if (i >= 0) return i; const n = Number(v); if (Number.isInteger(n) && n >= 0 && n < RU.benchmarks.length) return n; throw new Error(`no benchmark "${v}"; call list_benchmarks`); };
+function aiRun(bi, tag) { const B = RU.benchmarks[bi], R = B.runs.find(r => r.tag === String(tag || "A").toUpperCase()) || B.runs[0], pr = R.official_paired || {};
+  const out = {benchmark: B.key, title: B.title, kind: B.kind, engine: R.engine || B.engine, table: B.file, run: R.tag, github_run: R.id, raw_files_checked: R.checked, raw_files_matching_sha256: R.ok};
+  if (B.kind === "k8s") { out.repetitions = (R.reps || []).length; out.readings = Object.keys(RU_AIM).filter(k => pr[k] || RU_AIM[k] === "shown").map(k => ({gauge: k, reading: wordText(pr[k], RU_AIM[k]),
+      native_mean: pr[k] ? pr[k].native : null, omni_mean: pr[k] ? pr[k].native + pr[k].diff : null}));
+    out.note = "Each reading is this run's paired difference over all its repetitions with its 95% interval (LIVE_REPS.json); the three-run reading across A, B and C is in get_receipts."; }
+  else { const by = {}; (R.rows || []).forEach(r => { const k = r.workload + "|" + r.arm; (by[k] = by[k] || []).push(r); });
+    out.workloads = Object.keys(by).map(k => { const [wl, arm] = k.split("|"), rs = by[k], m = g => { const v = rs.map(r => r[g]).filter(x => typeof x === "number"); return v.length ? v.reduce((a, b) => a + b, 0)/v.length : null; };
+      return {workload: wl, arm: arm === "omni" ? "Omni-Compass on top" : "native", repetitions: rs.length, p95_ms: m("p95_ms"), rps: m("rps"), work_inside_line_rps: m("work_inside_line_rps")}; });
+    out.note = "A database run's judged readings are in get_receipts (three runs, the reading rule)."; }
+  return out; }
+const AI_TOOLS = [
+  {name: "read_screen", description: "Returns what the dashboard shows right now: the official run playing (benchmark, run, repetition, minute, this half minute's numbers for both arms, the run's readings), the engine harness view and the build. Call it first for any question about 'now' or 'this'.",
+    execute: () => { const B = ruB(), R = ruR(), P = ruP(), T = opsT(), out = {page: "Omni-Compass Live Engine", engine: OPS_BUILD.engine, digest: OPS_BUILD.digest, built: OPS_BUILD.built_at, narrator: TL.narrPrev};
+      out.official = aiRun(RW.b, R.tag); if (P && B.kind === "k8s") { const i = T - 1, f = A => { const r = (A.lat || [])[i] || []; return {mean_ms: r[0], p95_ms: r[1], answered: r[2], failed: r[3]}; };
+        out.official.playing = {repetition: P.n, minute: Math.floor(T*RU.bin_s/60), of_minutes: Math.floor(opsN(P)*RU.bin_s/60), native_now: f(P.native), omni_now: f(P.omni)}; }
+      out.harness = W.body === "harness" ? {view: W.hsec === "alone" ? "each muscle alone" : "one organism", run: "ABC"[W.run], decision: W.t + 1, of: W.len, evidence: "class S, our own models"} : {view: "the stress-test model (class S)"}; return out; }},
+  {name: "list_benchmarks", description: "Lists every official benchmark the page plays back (class L): its key, title, kind (k8s or db), engine and runs.",
+    execute: () => RU.benchmarks.map((b, i) => ({index: i, key: b.key, title: b.title, kind: b.kind, engine: b.engine, runs: b.runs.map(r => r.tag)}))},
+  {name: "get_run_readings", description: "Returns one official run's readings in the report's words (GAIN, EVEN, LOSS, power given, shown), each with native's and Omni-Compass's means, and its SHA-256 file check. Input: benchmark (key, title start or index) and run (A, B or C).",
+    inputSchema: {type: "object", properties: {benchmark: {type: "string"}, run: {type: "string"}}, required: ["benchmark"]}, execute: inp => aiRun(benchOf(inp.benchmark), inp.run)},
+  {name: "get_receipts", description: "Returns the three-run tables of the real runs (class L and S as marked): each table's counts of GAIN, power given, EVEN, LOSS and the runs disagree, and its rows of one word with gauge, reading and size in runs A, B and C (sizes without sign; the word carries the direction). Input: word (GAIN, LOSS, power given or the runs disagree; default LOSS) and table (a title start or file, optional).",
+    inputSchema: {type: "object", properties: {word: {type: "string"}, table: {type: "string"}}},
+    execute: inp => { const word = String(inp.word || "LOSS"), tq = String(inp.table || "").toLowerCase();
+      const out = {word, rule: "GAIN or LOSS in all three runs: the same sign in all three and every 95% interval clear of zero; EVEN otherwise; power given: a resource spent that rose. No outside party has reviewed or approved these results.",
+        tables: SC.receipts.filter(r => !tq || r.title.toLowerCase().startsWith(tq) || r.file.toLowerCase().includes(tq)).map(r => ({stack: r.stack, title: r.title, file: r.file, engine: r.engine, evidence_class: r.cls, counts: r.count,
+          rows: r.rows.filter(x => x.w === word).map(x => ({gauge: x.g, A_B_C: x.abc.map(unsign)}))}))};
+      return aiCap(out); }},
+  {name: "get_board", description: "Returns every benchmark's place (landed, running, queued, switched off or not yet run) as the repository holds it.",
+    execute: () => (OPS_BUILD.board || []).map(r => ({group: r.group, name: r.name, workflow: r.workflow, tables: r.tables.map(t => t.file), now: r.now}))},
+  {name: "show_run", description: "Turns the dashboard to an official run so the viewer sees it streaming. Input: benchmark (key, title start or index), run (A, B or C), repetition (number, optional). Returns what is now on screen.",
+    inputSchema: {type: "object", properties: {benchmark: {type: "string"}, run: {type: "string"}, repetition: {type: "number"}}, required: ["benchmark"]},
+    execute: inp => { const bi = benchOf(inp.benchmark), B = RU.benchmarks[bi], ri = Math.max(0, B.runs.findIndex(r => r.tag === String(inp.run || "A").toUpperCase()));
+      let rep = 0; if (inp.repetition !== undefined && B.kind === "k8s") { const j = (B.runs[ri].reps || []).findIndex(p => p.n === Number(inp.repetition)); if (j >= 0) rep = j; }
+      setRuns(bi, ri, rep); $("s-ops").scrollIntoView({behavior: reduceMotion ? "auto" : "smooth"}); return {shown: B.title, run: B.runs[ri].tag, repetition: B.kind === "k8s" ? B.runs[ri].reps[rep].n : null}; }}];
+const AI_RULES = `You are the analyst built into the Omni-Compass Live Engine page. Answer the viewer's question from this page's data only, which you read through the tools; never invent a number.
+Rules of the report, which you must follow exactly:
+- Two sides only: "native" (the whole system with everything it ships with, everything but Omni-Compass) and "Omni-Compass on top" (the same system with Omni-Compass on top of native). Never call native a competitor or Omni-Compass standalone.
+- Every judged result is one of the words GAIN, EVEN, LOSS, or "power given" (a resource spent that rose), decided by what the gauge is for. Write the size as a plain number with no plus or minus sign; the word carries the direction. Never write better, worse, up, down, less, fewer, lower or higher as a verdict, and never "confirmed".
+- Report every LOSS you find with the cause the data gives; never hide one.
+- Evidence classes: L is live software (the official runs), S is our own models; never present S as proof. Say that no outside party has reviewed or approved these results when you summarize results.
+- Plain words for a non-engineer, short paragraphs, no markdown headings, no tables. If the viewer asks to see a run, call show_run.`;
+function aiFormat(t) { const esc = t.replace(/[&<>]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;"}[c]));
+  return esc.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\b(GAIN|EVEN|LOSS)\b|power given/g, m => `<span class="${{GAIN: "w-gain", EVEN: "w-even", LOSS: "w-loss"}[m] || "w-given"}">${m}</span>`); }
+const AI_ERR = {not_granted: "You did not allow Claude for this page, so the analyst stays off for this view.", rate_limited: "Too many questions at once; wait a moment and ask again.", cancelled: "Stopped.",
+  prompt_too_large: "That was too much to send at once; ask a narrower question.", sampling_disabled: "Claude is switched off for this page by its settings.", capability_disabled: "Claude is switched off for this page by its settings."};
+async function aiAsk(q) {
+  if (!AI.sample || !q.trim()) return; AI.ctl = new AbortController(); $("aiAsk").disabled = true; $("aiStop").disabled = false; $("aiOut").textContent = "Thinking…"; $("aiSteps").textContent = "";
+  const tools = AI_TOOLS.map(t => ({...t, execute: (inp, ctx) => { $("aiSteps").textContent = `reading: ${t.name.replace(/_/g, " ")}…`; return t.execute(inp || {}, ctx); }}));
+  try { const {text} = await AI.sample(`${AI_RULES}\n\nThe viewer asks: ${q.trim()}`, {tools, signal: AI.ctl.signal, modelTier: "default", cache: false, onText: ({text}) => { $("aiOut").innerHTML = aiFormat(text); }});
+    $("aiOut").innerHTML = aiFormat(text); $("aiSteps").textContent = "answered from this page's own data";
+  } catch (e) { const keep = e && e.text ? aiFormat(e.text) + "\n\n" : ""; $("aiOut").innerHTML = keep + (AI_ERR[e && e.code] || `Claude could not answer this time (${(e && e.code) || "error"}).`); $("aiSteps").textContent = "";
+    if (e && (e.code === "not_granted" || e.code === "sampling_disabled" || e.code === "capability_disabled")) aiOff(AI_ERR[e.code]);
+  } finally { $("aiAsk").disabled = !AI.sample; $("aiStop").disabled = true; AI.ctl = null; }
+}
+function aiOff(msg) { AI.sample = null; $("aiAvail").textContent = msg; ["aiChips", "aiQ", "aiAsk", "aiStop"].forEach(id => $(id).style.display = "none"); }
+function buildAI() {
+  $("aiChips").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { $("aiQ").value = b.dataset.q; aiAsk(b.dataset.q); }));
+  $("aiAsk").addEventListener("click", () => aiAsk($("aiQ").value)); $("aiStop").addEventListener("click", () => AI.ctl && AI.ctl.abort());
+  $("aiQ").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) aiAsk($("aiQ").value); });
+  $("aiAsk").disabled = true;
+  const off = () => aiOff("The AI analyst works when this page is opened in claude.ai with Claude allowed; everything else on the page runs without it.");
+  if (!window.claude || typeof window.claude.use !== "function") { off(); return; }
+  window.claude.use("sample").then(s => { if (!s) { off(); return; } AI.sample = s; $("aiAsk").disabled = false; $("aiAvail").textContent = "Ask in your own words, or pick a question. Claude asks your permission before the first answer."; }).catch(off);
+}
+
 // ============================================================== the clock
 let lastDecide = 0;
 function frame(now) {
@@ -2333,14 +2659,14 @@ function frame(now) {
   W.frac = W.paused ? W.frac : clamp((now - lastDecide)/period, 0, 1);
   const phase = Math.min(6, Math.floor(W.frac*7));
   document.querySelectorAll("#cycle li").forEach(li => li.classList.toggle("act", W.speed <= 4 ? +li.dataset.i === phase : true));
-  drawRing(now, "nat"); drawRing(now, "omni"); drawCluster("nat"); drawCluster("omni"); drawCStrip(); drawSStrip(); drawRuStrip(); drawOps(now); drawSwarm(); drawBand(); drawPhase("nat"); drawPhase("omni"); drawStrip(); drawBrain(); vTick(now); drawVerdict();
+  drawRing(now, "nat"); drawRing(now, "omni"); drawCluster("nat"); drawCluster("omni"); drawCStrip(); drawSStrip(); drawRuStrip(); drawOps(now); drawLab(now); drawSwarm(); drawBand(); drawPhase("nat"); drawPhase("omni"); drawStrip(); drawBrain(); vTick(now); drawVerdict();
   requestAnimationFrame(frame);
 }
 buildOrgans(); vLabels(); newDay(W.seed);
 document.getElementById("vMany").click();
 setBody("harness", "alone");   // open on the engine's own harness, each muscle alone, 120 frames into run A
 setCtl("selfpilot", 0); for (let k = 0; k < 120; k++) stepCtl(); updateCScore();
-buildInfo(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); setRuns(0, 0, 0);
+buildInfo(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); setRuns(0, 0, 0);
 drawVerdict2();
 V.P = vParams(); for (let k = 0; k < V.P.min; k++) V.ref.push(vSample(false, V.P, V.rng)); for (let k = 0; k < V.P.min; k++) V.got.push(vSample(true, V.P, V.rng));
 V.running = true; V.lastAdd = 0;
