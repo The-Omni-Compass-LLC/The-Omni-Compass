@@ -885,7 +885,7 @@ def main(argv=None):
                         data={"ref": a.ref, "inputs": {"cloud": CHECKS[cloud]}})
                 if state != "go":
                     azure.append(f"{cloud}: {why}; no set started there until it passes"
-                                 + ("; a new check started" if state == "check" else ""))
+                                 + (("; a check would start (dry run)" if a.dry else "; a new check started") if state == "check" else ""))
                     continue
             if nxt:
                 run_wf, run, name, kv = nxt
