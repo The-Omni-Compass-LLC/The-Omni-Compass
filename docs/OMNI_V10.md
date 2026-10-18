@@ -1,8 +1,10 @@
-# Omni v10: the battery glide at the speed that cuts the bill most (the engine that stands since 18 October)
+# Omni v10: the battery glide at the speed that cuts the bill most (the engine that stood on 18 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v10 has been the engine on main since 18 October. The founder's orders behind it: "Omni-Compass should be tuned to exploit all
+Omni v10 stood on main on 18 October; the same day it was followed by Omni v11 (`docs/OMNI_V11.md`), the engine that stands:
+omni-v10 with the Kubernetes governor's hold on a reading with no machine in service. This page stays as omni-v10's record,
+read beside no other engine's. The founder's orders behind it: "Omni-Compass should be tuned to exploit all
 that can be and keep all healthy and never raise its bill ... whatever one can't be achieved doesn't get achieved. And the tuning
 stays where it doesn't ever hurt anyone"; and, on 17 October, "a minus doesn't mean a loss and neither does a plus mean a gain if
 you don't understand what it's against". It is omni-v9 (`docs/OMNI_V9.md`) with one setting changed: the most the CityLearn battery
