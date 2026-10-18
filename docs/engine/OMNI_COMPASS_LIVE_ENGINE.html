@@ -104,7 +104,7 @@ td.nat{color:var(--steel)} td.omni{color:var(--brass)}
 .word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor;white-space:nowrap}
 .w-gain{color:var(--ok)} .w-even{color:var(--even)} .w-loss{color:var(--bad)} .w-given{color:var(--ok)} .w-lost{color:var(--bad)}
 .word.w-even::before{content:"◆ "} .word.w-given::before{content:"GAIN · "} .word.w-lost::before{content:"LOSS · "}
-.ocw{color:var(--brass);font-weight:700;font-style:italic;text-transform:uppercase;letter-spacing:.02em} .nw{color:var(--steel)}
+.ocw{color:var(--brass);font-weight:700;font-style:normal;text-transform:uppercase;letter-spacing:.02em} .nw{color:var(--steel)}
 span.ocw{color:var(--brass)!important} span.nw{color:var(--steel)!important}
 span.ocw,span.nw,span.tw-g,span.tw-e,span.tw-l{font-size:inherit!important;display:inline!important;margin:0!important;padding:0!important;border:0!important;background:none!important} .tw-g{color:var(--ok);font-weight:600} .tw-e{color:var(--even);font-weight:600} .tw-l{color:var(--bad);font-weight:600}
 .keyGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
@@ -1467,7 +1467,7 @@ const wordCol = m => ({OC: css.brass, NA: css.steel, GAIN: css.ok, EVEN: css.eve
 function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yellow and LOSS red wherever the word stands
   const parts = String(text).split(new RegExp("(" + WORD_RX.source + ")")), base = g.fillStyle, al = g.textAlign;
   const tw = parts.reduce((a, p) => a + g.measureText(p === "Omni-Compass" ? "OMNI-COMPASS" : p).width, 0); let cx = al === "right" || al === "end" ? x - tw : al === "center" ? x - tw/2 : x;
-  g.textAlign = "left"; const f0 = g.font; for (const p of parts) { if (!p) continue; const oc = p === "Omni-Compass", q = oc ? "OMNI-COMPASS" : p; if (oc) g.font = "italic 700 " + f0.replace(/^(italic )?\d{3} /, ""); g.fillStyle = wordCol(p) || base; g.fillText(q, cx, y); cx += g.measureText(q).width; g.font = f0; }
+  g.textAlign = "left"; const f0 = g.font; for (const p of parts) { if (!p) continue; const oc = p === "Omni-Compass", q = oc ? "OMNI-COMPASS" : p; if (oc) g.font = "700 " + f0.replace(/^(italic )?\d{3} /, ""); g.fillStyle = wordCol(p) || base; g.fillText(q, cx, y); cx += g.measureText(q).width; g.font = f0; }
   g.fillStyle = base; g.textAlign = al; }
 const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT"]);
 function armCols(t) {   // a table's Native column wears native's amber, its Omni-Compass column Omni-Compass's blue
@@ -2146,7 +2146,7 @@ function drawCluster(armSel) {
   g.strokeStyle = css.bad; g.lineWidth = 2; g.beginPath(); g.moveTo(x0 + bw*scale(line), yr + 12); g.lineTo(x0 + bw*scale(line), yr + 32); g.stroke();
   g.fillStyle = css.muted; g.fillText(`response time ${ms} ms (the line ${line} ms)`, x0, yr);
 }
-function laneHeads(g, lanes) { g.textBaseline = "top"; g.textAlign = "left"; lanes.forEach(L => { const oc = L.name === "Omni-Compass"; g.font = `${oc ? "italic " : ""}700 14px ${MONO}`; g.fillStyle = L.col; g.fillText(oc ? "OMNI-COMPASS" : L.name, L.x0, 2); if (oc) { g.fillStyle = L.col; g.fillRect(L.x0, 19, g.measureText("OMNI-COMPASS").width, 3); } }); }
+function laneHeads(g, lanes) { g.textBaseline = "top"; g.textAlign = "left"; lanes.forEach(L => { const oc = L.name === "Omni-Compass"; g.font = `700 14px ${MONO}`; g.fillStyle = L.col; g.fillText(oc ? "OMNI-COMPASS" : L.name, L.x0, 2); if (oc) { g.fillStyle = L.col; g.fillRect(L.x0, 19, g.measureText("OMNI-COMPASS").width, 3); } }); }
 function mkLanes(w, ml, mr, gap, nat, omni) { const lw = (w - ml - mr - gap)/2; return [{name: "Native", A: nat, col: css.steel, x0: ml, lw}, {name: "Omni-Compass", A: omni, col: css.brass, x0: ml + lw + gap, lw}]; }
 function drawCStrip() {   // native (amber) and Omni-Compass (blue) each in its own lane on one scale
   const cv = $("cStrip"); const {g, w, h} = fit(cv, Math.min(0.5, 380/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
@@ -2823,7 +2823,7 @@ function drawSankey() {   // the service level and the error budget burned (the 
     const key = id === "tSlo" ? "lvl" : "burn", a = sn[key], o = so[key];
     let lo, hi; if (id === "tSlo") { const v = a.concat(o).filter(x => x !== null); lo = Math.max(0, Math.min(90, ...v) - 2); hi = 100; } else { lo = 0; hi = Math.max(10, a[N - 1] || 0, o[N - 1] || 0)*1.08; }
     const Y = v => bot - 6 - (v - lo)/(hi - lo)*(bot - top - 10); OPS.geo[id] = {ml, mr: w - ml - lanes[0].lw, w, N};
-    g.font = `12px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(id === "tSlo" ? "the service level: answered inside the line (%)" : "the error budget burned: requests over the line, added up", ml, 2); g.font = `600 13px ${MONO}`; lanes.forEach(L => { const oc = L.name === "Omni-Compass"; g.font = `${oc ? "italic " : ""}700 13px ${MONO}`; g.fillStyle = L.col; g.textAlign = "left"; g.fillText(oc ? "OMNI-COMPASS" : L.name, L.x0, 20); }); g.font = `12px ${MONO}`;
+    g.font = `12px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(id === "tSlo" ? "the service level: answered inside the line (%)" : "the error budget burned: requests over the line, added up", ml, 2); g.font = `600 13px ${MONO}`; lanes.forEach(L => { const oc = L.name === "Omni-Compass"; g.font = `700 13px ${MONO}`; g.fillStyle = L.col; g.textAlign = "left"; g.fillText(oc ? "OMNI-COMPASS" : L.name, L.x0, 20); }); g.font = `12px ${MONO}`;
     g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(id === "tSlo" ? hi.toFixed(0) + "%" : num(Math.round(hi/1.08)), ml - 6, Y(id === "tSlo" ? hi : hi/1.08)); g.fillText(id === "tSlo" ? lo.toFixed(0) + "%" : "0", ml - 6, bot);
     lanes.forEach((L, li) => { const XL = i => L.x0 + (i + 0.5)/N*L.lw, ser = li ? o : a;
       g.strokeStyle = css.rule; g.beginPath(); g.moveTo(L.x0, bot); g.lineTo(L.x0 + L.lw, bot); g.stroke();
