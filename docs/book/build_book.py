@@ -813,6 +813,7 @@ OWNER_OUTLINE = [
      "Where Omni-Compass comes from: the closed circle, the four pieces, the compass, the basins and the reflex. The "
      "engineering in the rest of the book is this idea made exact."),
     ("What Omni-Compass Is", ("M", "What Omni-Compass Is")),
+    ("The Referee's Summary: Each Claim, Its Evidence, and What Is Undetermined", ("F", "docs/REFEREE_SUMMARY.md")),
     ("The Seat: One Governor over the Muscles", ("F", "docs/THE_SEAT.md")),
     ("The Unified Circle Principle", ("T", "The Unified Circle Principle")),
     ("The Four-Piece Engine", ("T", "The Four-Piece Engine")),
@@ -831,6 +832,7 @@ OWNER_OUTLINE = [
     ("Formal Status of the Mathematics", ("F", "docs/FORMAL_STATUS.md")),
     ("The Max, Formally: Definitions, Guarantees and Measures", ("F", "docs/FORMAL_V5.md")),
     ("The Mechanism of Action", ("F", "docs/MECHANISM_OF_ACTION.md")),
+    ("The Safety Case: Every Hazard, Its Guard, and the Evidence", ("F", "docs/SAFETY_CASE.md")),
     (f"The Engine That Stands: Omni {NEWEST}", ("F", f"docs/OMNI_{NEWEST.upper()}.md")),
     ("The Engines and Their Audit", ("FS", ["docs/ENGINES.md", "docs/history/ENGINE_AUDIT.md"])),
     ("PART", "The Physics: the Compass and the Nervous System",
@@ -1656,14 +1658,15 @@ def build():
         flow = chapter_flow(src, NUMBERERS[title])
         story += ([] if after_part else [ChapterBreak()]) + [Marker("chapter", title=title)]
         story += chapter_opener(num, title, None if num else ("APPENDIX" if title.startswith("Appendix") else "BACK MATTER"),
-                                top=0.25 * inch if after_part else 0.9 * inch)
+                                top=0.25 * inch if after_part or title == "Contact" else 0.9 * inch)   # the last chapter keeps the end notice on its page
         story += flow
         after_part = False
         md_parts += ["", f"## {str(num) + '. ' if num else ''}{title}", ""]
         md_parts += md_text(src, NUMBERERS[title])
     # the notice at the end of the book, as at its start
-    story += [FlushFloats(), Spacer(1, 24), GoldRule(FW, 1.2, 14),
-              Paragraph(inline(BANNER_MD[2:]), ParagraphStyle("end", parent=BODY, alignment=TA_LEFT))]
+    # whole, never split across a page: a page never opens on the last lines of a paragraph
+    story += [FlushFloats(), Spacer(1, 8), KeepTogether([GoldRule(FW, 1.2, 10),
+              Paragraph(inline(BANNER_MD[2:]), ParagraphStyle("end", parent=BODY, alignment=TA_LEFT))])]
     doc.multiBuild(story, canvasmaker=INDEX.getCanvasMaker())
     OUT_MD.write_text(normalize_markdown("\n".join(md_parts) + "\n")[0], encoding="utf-8")   # the notice on top and at the end
     seen = sorted(set(UNRESOLVED))
