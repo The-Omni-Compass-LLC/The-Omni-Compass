@@ -39,7 +39,7 @@ env:
 jobs:
   launch:
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     outputs:
       launched: ${{ steps.go.outputs.launched }}
@@ -160,7 +160,7 @@ jobs:
     # watch 1 of 7: about 5.7 hours each; each carries on where the one before stopped
     needs: launch
     if: always() && needs.launch.outputs.launched == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 355
     outputs: {state: "${{ steps.w.outputs.state }}"}
     steps:
@@ -295,7 +295,7 @@ jobs:
     # watch 2 of 7: about 5.7 hours each; each carries on where the one before stopped
     needs: [launch, watch1]
     if: always() && needs.launch.outputs.launched == 'true' && needs.watch1.result != 'skipped' && !contains('done deadline gone', needs.watch1.outputs.state || 'x')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 355
     outputs: {state: "${{ steps.w.outputs.state }}"}
     steps:
@@ -430,7 +430,7 @@ jobs:
     # watch 3 of 7: about 5.7 hours each; each carries on where the one before stopped
     needs: [launch, watch2]
     if: always() && needs.launch.outputs.launched == 'true' && needs.watch2.result != 'skipped' && !contains('done deadline gone', needs.watch2.outputs.state || 'x')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 355
     outputs: {state: "${{ steps.w.outputs.state }}"}
     steps:
@@ -565,7 +565,7 @@ jobs:
     # watch 4 of 7: about 5.7 hours each; each carries on where the one before stopped
     needs: [launch, watch3]
     if: always() && needs.launch.outputs.launched == 'true' && needs.watch3.result != 'skipped' && !contains('done deadline gone', needs.watch3.outputs.state || 'x')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 355
     outputs: {state: "${{ steps.w.outputs.state }}"}
     steps:
@@ -700,7 +700,7 @@ jobs:
     # watch 5 of 7: about 5.7 hours each; each carries on where the one before stopped
     needs: [launch, watch4]
     if: always() && needs.launch.outputs.launched == 'true' && needs.watch4.result != 'skipped' && !contains('done deadline gone', needs.watch4.outputs.state || 'x')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 355
     outputs: {state: "${{ steps.w.outputs.state }}"}
     steps:
@@ -835,7 +835,7 @@ jobs:
     # watch 6 of 7: about 5.7 hours each; each carries on where the one before stopped
     needs: [launch, watch5]
     if: always() && needs.launch.outputs.launched == 'true' && needs.watch5.result != 'skipped' && !contains('done deadline gone', needs.watch5.outputs.state || 'x')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 355
     outputs: {state: "${{ steps.w.outputs.state }}"}
     steps:
@@ -970,7 +970,7 @@ jobs:
     # watch 7 of 7: about 5.7 hours each; each carries on where the one before stopped
     needs: [launch, watch6]
     if: always() && needs.launch.outputs.launched == 'true' && needs.watch6.result != 'skipped' && !contains('done deadline gone', needs.watch6.outputs.state || 'x')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 355
     outputs: {state: "${{ steps.w.outputs.state }}"}
     steps:
@@ -1131,7 +1131,7 @@ jobs:
     # whatever happened above: the machine is given back (nothing runs on the bill after this workflow)
     needs: [launch, watch1, watch2, watch3, watch4, watch5, watch6, watch7]
     if: always() && needs.launch.outputs.launched == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Legal notice at the top of this job's report
