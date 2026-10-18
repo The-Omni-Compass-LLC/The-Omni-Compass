@@ -623,7 +623,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="panel stack chartbox" style="gap:8px">
     <h3>The benefit board: every domain, native against Omni-Compass</h3>
     <canvas id="fxBen" aria-label="Bar chart of every benchmark's benefit, on a square-root scale, each bar labelled with its word"></canvas>
-    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN ▶ from zero, green (go)</span><span><i class="sq" style="background:var(--even)"></i>EVEN ◆ on zero, yellow (yield)</span><span><i class="sq" style="background:var(--bad)"></i>◀ LOSS from zero, red (stop): the median size of its LOSS rows</span><span><i class="sq" style="border:1px dashed var(--muted)"></i>not run yet</span><span>the axis: 10, 25, 50 and 100% each way on a square-root scale, so a small bar is seen; a bar past 100% runs to the edge and is marked</span></div>
+    <div class="legend"><span><i class="sq" style="background:var(--ok)"></i>GAIN ▶ from zero, green (go)</span><span><i class="sq" style="background:var(--even)"></i>EVEN ◆ on zero, yellow (yield)</span><span><i class="sq" style="background:var(--bad)"></i>◀ LOSS from zero, red (stop)</span><span>one bar per row: its net reading picks the side; LOSS rows inside a net GAIN are named in its label</span><span><i class="sq" style="border:1px dashed var(--muted)"></i>not run yet</span><span>the axis: 10, 25, 50 and 100% each way on a square-root scale, so a small bar is seen; a bar past 100% runs to the edge and is marked</span></div>
     <p class="note" id="fxBenNote">—</p>
     <div class="tbl-wrap"><table class="who" id="fxMatrix"><thead><tr><th>Domain</th><th>Benchmark</th><th>Evidence</th><th>Engine</th><th>Benefit</th><th>GAIN rows</th><th>Power given</th><th>EVEN</th><th>LOSS</th><th>Where it stands</th></tr></thead><tbody></tbody></table></div>
     <div class="opsTip" id="fxTipBen" hidden></div>
@@ -2998,8 +2998,8 @@ function fxAll() {   // every domain on one board: the index, the chips, the clo
 }
 function fxRows() { const top = Math.max(0, ...FX.benefit.map(r => fxEngNum(r.engine))); return {top, rows: FX.benefit.filter(r => fxEngNum(r.engine) === top), road: FX.benefit.filter(r => fxEngNum(r.engine) !== top)}; }
 const fxCol = r => r.loss > 0 && !(r.gain > 0) ? css.bad : r.pct > 0 || r.gain > 0 ? css.ok : css.even;   // the bar wears its word's color: GAIN green, LOSS red, EVEN grey; power given and a LOSS beside a GAIN are marked on the bar, never a second color for GAIN
-const fxWordHtml = r => r.loss > 0 ? (r.gain > 0 ? '<span class="word w-gain">GAIN</span> and <span class="word w-loss">LOSS</span>' : '<span class="word w-loss">LOSS</span>') : r.pct > 0 ? '<span class="word w-gain">' + (r.given > 0 ? "GAIN · power given" : "GAIN") + '</span>' : '<span class="word w-even">EVEN</span>';   // each word in its own color, the same everywhere
-const fxWord = r => r.loss > 0 ? (r.gain > 0 ? "GAIN and LOSS" : "LOSS") : r.pct > 0 ? (r.given > 0 ? "GAIN · power given" : "GAIN") : "EVEN";
+const fxWordHtml = r => r.loss > 0 ? (r.pct > 0 ? '<span class="word w-gain">GAIN</span> <span class="note">(' + r.loss + ' LOSS rows inside it, run on ' + r.engine + ')</span>' : '<span class="word w-loss">LOSS</span>') : r.pct > 0 ? '<span class="word w-gain">' + (r.given > 0 ? "GAIN · power given" : "GAIN") + '</span>' : '<span class="word w-even">EVEN</span>';   // each word in its own color, the same everywhere
+const fxWord = r => r.loss > 0 ? (r.pct > 0 ? "GAIN" : "LOSS") : r.pct > 0 ? (r.given > 0 ? "GAIN · power given" : "GAIN") : "EVEN";
 function lossSize(r) {   // the median size of a benchmark's LOSS rows, from its own three-run table
   const R = SC.receipts.find(x => x.file === r.file); if (!R) return null;
   const v = R.rows.filter(x => x.w === "LOSS").map(x => sizeOf(x.abc)).filter(x => x !== null).sort((a, b) => a - b);
@@ -3007,7 +3007,7 @@ function lossSize(r) {   // the median size of a benchmark's LOSS rows, from its
 function drawBenefit() {   // a diverging bar from zero: GAIN to the right in green, LOSS to the left in red, EVEN a yellow mark on zero
   const cv = $("fxBen"); if (!cv) return; const rows = fxAll(), N = rows.length; if (!N) return;
   const rowH = 30, hh = N*rowH + 34; cv.style.height = hh + "px"; const {g, w, h} = fit(cv, hh/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
-  const ml = Math.min(380, w*0.42), mr = 220, pw = w - ml - mr, z = ml + 0.26*pw, sq = v => Math.sqrt(Math.min(1, Math.max(0, v/100)));
+  const ml = Math.min(380, w*0.42), mr = 300, pw = w - ml - mr, z = ml + 0.14*pw, sq = v => Math.sqrt(Math.min(1, Math.max(0, v/100)));
   const XR = v => z + sq(v)*(w - mr - z), XL = v => z - sq(v)*(z - ml); FXW.geo = {ml, rowH, top: 4, N};
   g.font = `12px ${MONO}`; g.textBaseline = "middle";
   for (const t of [10, 25, 50, 100]) { g.strokeStyle = alpha(css.rule, 0.9); g.beginPath(); g.moveTo(XR(t), 4); g.lineTo(XR(t), h - 24); g.stroke(); g.fillStyle = css.muted; g.textAlign = "center"; g.fillText(t + "%", XR(t), h - 12); }
@@ -3022,8 +3022,11 @@ function drawBenefit() {   // a diverging bar from zero: GAIN to the right in gr
     g.fillText(lab, ml - 8, y + rowH/2);
     if (notRun) { g.strokeStyle = css.muted; g.setLineDash([3, 3]); g.strokeRect(z + 0.5, y + 6.5, 28, bh); g.setLineDash([]); g.textAlign = "left"; g.fillStyle = css.muted; g.fillText(`not run yet · ${r.status}`, z + 36, y + rowH/2); return; }
     let gain = 0, loss = 0, text = "";
-    if (r.pct === null) { const n = (r.gain || 0) + (r.even || 0) + (r.loss || 0) || 1; gain = 100*(r.gain || 0)/n; loss = 100*(r.loss || 0)/n; text = `${r.gain} GAIN · ${r.even ?? 0} EVEN · ${r.loss} LOSS (shares)`; }
-    else { gain = Math.max(0, r.pct); if (r.loss > 0) loss = lossSize(r) || 0; text = fxWord(r) + (gain > 0 ? " " + (gain >= 10 ? gain.toFixed(1) : gain.toFixed(2)) + "%" : "") + (r.loss > 0 ? ` · LOSS ${loss ? loss + "% (median, " + r.loss + " rows)" : r.loss + " rows"}` : ""); }
+    // one row, one result, one bar: the row's net reading decides its side; LOSS rows inside a net GAIN are named in its label, never drawn as a second bar
+    if (r.pct === null) { const n = (r.gain || 0) + (r.even || 0) + (r.loss || 0) || 1, net = (r.gain || 0) - (r.loss || 0); if (net > 0) gain = 100*(r.gain || 0)/n; else if (net < 0) loss = 100*(r.loss || 0)/n;
+      text = `${net > 0 ? "GAIN" : net < 0 ? "LOSS" : "EVEN"} · ${r.gain} of ${n} read GAIN, ${r.even ?? 0} EVEN, ${r.loss} LOSS`; }
+    else { gain = Math.max(0, r.pct); if (gain <= 0 && r.loss > 0) loss = lossSize(r) || 0;
+      text = (gain > 0 ? (r.given > 0 ? "GAIN · power given " : "GAIN ") + (gain >= 10 ? gain.toFixed(1) : gain.toFixed(2)) + "%" : r.loss > 0 ? "LOSS " + (loss ? loss + "%" : "") : "EVEN") + (gain > 0 && r.loss > 0 ? ` · ${r.loss} LOSS rows inside it, run on ${r.engine}` : ""); }
     if (gain > 0) { const x1 = XR(gain); g.fillStyle = css.ok; g.beginPath(); if (g.roundRect && x1 - z > 4) g.roundRect(z + 1, y + 6, x1 - z - 1, bh, [0, 4, 4, 0]); else g.rect(z + 1, y + 6, Math.max(2, x1 - z - 1), bh); g.fill(); if (gain > 100) { g.fillStyle = css.bg; g.textAlign = "right"; g.fillText("▶", x1 - 3, y + rowH/2); } }
     if (loss > 0) { const x0 = XL(loss); g.fillStyle = css.bad; g.beginPath(); if (g.roundRect && z - x0 > 4) g.roundRect(x0, y + 6, z - x0 - 1, bh, [4, 0, 0, 4]); else g.rect(Math.min(x0, z - 3), y + 6, Math.max(2, z - x0 - 1), bh); g.fill(); }
     if (gain <= 0 && loss <= 0) { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); }
