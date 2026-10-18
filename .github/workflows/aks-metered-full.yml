@@ -54,7 +54,7 @@ env:
     this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 jobs:
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       reps: ${{ steps.r.outputs.reps }}
     steps:
@@ -95,7 +95,7 @@ jobs:
       max-parallel: 1
       matrix:
         rep: ${{ fromJSON(needs.plan.outputs.reps) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 180
     env:
       AZ_RG: omni-compass-full-${{ github.run_id }}-${{ matrix.rep }}
@@ -248,7 +248,7 @@ jobs:
   aggregate:
     needs: run
     if: always() && needs.run.result != 'skipped'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Legal notice at the top of this job's report
       run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

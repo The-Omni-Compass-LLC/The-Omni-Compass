@@ -49,7 +49,7 @@ env:
 jobs:
   plan:
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs: {reps: "${{ steps.r.outputs.reps }}"}
     steps:
       - name: Legal notice at the top of this job's report
@@ -78,7 +78,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix: {rep: "${{ fromJSON(needs.plan.outputs.reps) }}"}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:
       GCP_PROJECT: ${{ github.event.inputs.project || secrets.GCP_PROJECT }}
@@ -250,7 +250,7 @@ jobs:
   aggregate:
     needs: run
     if: always() && needs.run.result != 'skipped'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
