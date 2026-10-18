@@ -206,7 +206,29 @@ def fleet() -> dict:
         if stand.exists():
             disp = len(json.loads(stand.read_text(encoding="utf-8")).get("dispatches", []))
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
+    out["register"] = register_places()
     return _clean(out)
+
+
+def register_places() -> list:
+    """Every open benchmark still to run, in the register's own order (docs/REGISTER.md, section 4): its domain, the open
+    benchmark and its owner, the native it runs on top of, Omni-Compass's lever and its status, each as the register writes it
+    (markdown stripped), so the benefit board lays out every place that is supposed to be there before its result exists."""
+    reg = ROOT / "docs" / "REGISTER.md"
+    if not reg.exists():
+        return []
+    text = reg.read_text(encoding="utf-8")
+    sec = text[text.find("## 4."):] if "## 4." in text else ""
+    sec = sec[:sec.find("\n## ", 5)] if "\n## " in sec[5:] else sec
+    clean = lambda t: re.sub(r"\s+", " ", re.sub(r"\*\*|`|\[([^\]]*)\]\([^)]*\)", lambda m: m.group(1) or "", t)).strip()
+    out = []
+    for ln in sec.splitlines():
+        if not re.match(r"\|\s*\d+\s*\|", ln):
+            continue
+        c = [clean(x) for x in ln.strip().strip("|").split("|")]
+        if len(c) >= 6:
+            out.append({"n": int(c[0]), "domain": c[1], "bench": c[2][:220], "native": c[3][:160], "lever": c[4][:120], "status": c[5][:260]})
+    return out
 
 
 def records(runs: bool) -> dict:
