@@ -20,7 +20,7 @@ Every row names the engine its table ran on (read from the table). Results are n
 
 | Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |
 |---|---|---|---|---:|---|---|
-| 2026-10-17 | Every real test together: the Omni index | omni-v7 | **GAIN, power given** | **+4.2% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| 2026-10-18 | Every real test together: the Omni index | omni-v7 | **GAIN, power given** | **+4.2% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
 | 2026-10-18 | Robustness: the two-hour run | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_ROBUST_LONG.md` |
 | 2026-10-18 | Robot arms (MuJoCo), the three untouched robots | omni-v7 | **GAIN** | **+3.8% GAIN** | energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN) | `results/live/V7_MUJOCO.md` |
 | 2026-10-18 | Redis, the cache's memory ceiling | omni-v7 | **GAIN, power given** | **+0.2% GAIN** | memory ceiling held cut 2.3% to 2.5% (GAIN); memory used cut 1.0% to 1.3% (GAIN); work inside the line up 1.2% to 1.7% (GAIN); hit rate up 1.2% to 1.7% (GAIN); mean cut 1.8% to 7.9% (GAIN); memory ceiling held up 2.3% to 2.4% (power given); memory used up 1.8% to 2.1% (power given) | `results/live/V7_REDIS.md` |

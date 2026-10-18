@@ -1270,8 +1270,8 @@ respect a limit the wires do not carry.
 
 ### 5.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v9** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
-quoted here ran on omni-v7, whose rules omni-v9 carries unchanged (omni-v8 and omni-v9 changed one wire, the CityLearn
+The engine that stands in this edition is **omni-v10** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
+quoted here ran on omni-v7, whose rules omni-v10 carries unchanged (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn
 battery, and the interval table). Its
 mechanism is the Owner's Manual's; five of its rules show in the wiring, the settings and the audit, and are stated here so
 that a line in the audit is read for what it is.
@@ -1378,7 +1378,7 @@ checked; install only a commit whose run passed.
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # the engine version (for example omni-v9), or every file that differs
+python3 tools/omni_version.py                  # the engine version (for example omni-v10), or every file that differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -1415,7 +1415,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v9 (digest 7379f3a79ff2c475, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v10 (digest 4bf39b0d707784de, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
 
 **Level 1 - Watch (read-only).**
 

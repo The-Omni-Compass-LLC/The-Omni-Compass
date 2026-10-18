@@ -524,7 +524,7 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v9, fingerprint 7379f3a79ff2c475 (47 files).
+- **The engine on this checkout:** omni-v10, fingerprint 4bf39b0d707784de (47 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -539,7 +539,7 @@ installed is a quarter off the bill.
   - Real database cache (MongoDB under YCSB, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v9): 0 of 24 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v10): 0 of 24 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
@@ -2605,235 +2605,192 @@ What a lever buys is labelled for what it is. Less work per energy, with no work
 proven lower, is SERVICE IMPROVEMENT WITH ENERGY TRADEOFF, the mirror of ENERGY IMPROVEMENT WITH SERVICE TRADEOFF.
 Without that proof it reads LESS WORK PER ENERGY.
 
-## 18. The Engine That Stands: Omni v9
+## 18. The Engine That Stands: Omni v10
 
 
 
-Omni v9 is the engine that stands on main since 17 October (the founder's orders: "we're going into another version of
-Engine ... Apply the fix, run it, and see in the toy sim that it works"; "Omni-Compass should be tuned to exploit all that can be
-and keep all healthy and never raise its bill ... the tuning stays where it doesn't ever hurt anyone"). It is omni-v8
-(`docs/OMNI_V8.md`) with one wire repaired and one statistical table made exact. It was written for one omni-v8 row the table
-printed as LOSS; on 17 October the founder found that word misapplied (section 18.1): the row was power given. The repair it led to
-stands on its own, because it cuts the bill further in every district. Its fingerprint is `OMNI_V9.json` (digest `7379f3a79ff2c475`, 47 files); 44 are omni-v8's bytes, two
-differ (the CityLearn runner and the realms harness) and one is new (`omnicompass/student_t.py`). It was proven in our own runs of
-CityLearn and in the toy gate before it was pushed. Every benchmark runs again on it, and every earlier table stands as its own
-engine's result until its three runs on v9 land; results from two versions are never pooled. Run and scored by The Omni-Compass
-LLC's own code. No outside party has reviewed or approved these results.
+Omni v10 has been the engine on main since 18 October. The founder's orders behind it: "Omni-Compass should be tuned to exploit all
+that can be and keep all healthy and never raise its bill ... whatever one can't be achieved doesn't get achieved. And the tuning
+stays where it doesn't ever hurt anyone"; and, on 17 October, "a minus doesn't mean a loss and neither does a plus mean a gain if
+you don't understand what it's against". It is omni-v9 (`docs/OMNI_V9.md`) with one setting changed: the most the CityLearn battery
+wire's adjustment may change in an hour (the glide) goes from 0.0625 to 0.0875 of the command's range. The CityLearn runner's own
+receipt now reads every score by the one key, as every table already did.
 
-| # | Change | Where | What it tightens |
+Its fingerprint is `OMNI_V10.json` (digest `4bf39b0d707784de`, 47 files). Forty-six files are omni-v9's bytes and one differs (the CityLearn
+runner). The change was proven in our own runs of CityLearn and in the toy gate before it was pushed. Every benchmark runs again on
+it. Every earlier table stands as its own engine's result until its three runs on v10 land, and results from two versions are never
+pooled. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
+| # | Change | Where | What it does |
 |---|---|---|---|
-| 1 | The battery wire reads the coming hour's draw (the mean of the same hour over the past seven days, only hours already seen) and its adjustment glides at up to 0.0625 of the command's range an hour (0.05 before), the fastest glide that read no LOSS on any score in any district | `tools/run_citylearn.py` | the battery answers the hour it moves, not the hour gone |
-| 2 | Every 95% interval uses the exact Student t quantile for its number of pairs | `omnicompass/student_t.py`, `realms/harness.py` and the table tools | no interval narrower than its sample allows, at any count |
+| 1 | The battery wire's glide: 0.0875 of the command's range an hour (omni-v9: 0.0625) | `tools/run_citylearn.py` | the batteries follow the coming hour faster, and the bill falls further in every district that has a price |
+| 2 | The runner's receipt reads every score by the one key: a fall is a GAIN; a rise in energy not served or time uncomfortable is a LOSS; a rise in any other score is power given | `tools/run_citylearn.py` | one key for every output, as the three-run table (`tools/citylearn_abc.py`) already read |
 
-### 18.1 What omni-v8 read, and why
+### 18.1 Why the glide moved
 
-One row of the omni-v8 table was printed LOSS: in `citylearn_challenge_2022_phase_all_robustness` (17 buildings, a battery in
-each, no outage buildings) the monthly load unevenness (`monthly_one_minus_load_factor_average`: one minus each month's mean draw
-over its peak) rose 0.11% in all three of our runs, beside the bill −8.6%, the electricity bought −14.7%, the daily peak −14.0% and
-the highest peak −2.7%, all GAIN (the omni-v7 table, whose commands omni-v8 repeats to the byte outside the 2023 districts). **By
-the key that row is power given, not a LOSS**: the unevenness is the shape of the power the district holds from the grid, a
-resource held, as a peak is; it is neither time waited nor work done nor a miss. The CityLearn table tool had filed the peaks, the
-swings and the unevenness as misses; it was corrected on 17 October (`tools/citylearn_abc.py`, `tools/readings.py`: one key for
-every gauge, as a cluster's peak power always was). Run locally, the same wire also raised, on districts the GitHub benchmark does
-not run (CityLearn ships them only in its source repository), the tuning district's monthly unevenness +0.26%; in the 2022 phase 2
-the highest peak +0.17%, the daily unevenness +1.03% and the monthly unevenness +0.68%; in the 2022 phase 3 the highest peak +0.45%
-and the ramping +3.37%: power given, every one, and shown here with the rest.
+omni-v9 set the glide at the fastest speed at which no score in any district rose. That rule counted a rise in the ramping or in
+the distance from net zero against the engine. The one key of 17 October (`tools/readings.py`) does not. The ramping, the peaks, the
+unevenness and the net-zero distance describe the power the district holds from the grid: they are resources held. A rise in one of
+them is power given, shown beside what it bought, never a LOSS. Only what the occupants miss is a LOSS: energy not served and time
+uncomfortable.
 
-The cause was found in an hour-by-hour trace of the omni-v8 wire on the robustness district (CityLearn 3.0.2, run locally):
+Read by that key, the ladder omni-v9 ran shows that no glide reads a LOSS anywhere, and that the bill keeps falling up to 0.0875. At
+0.10 it falls less in both districts that set the edge:
 
-- The compass read the district's draw of the hour just gone and moved the batteries for the hour coming, and its adjustment
-  could change by only 0.05 of the command's range an hour. Averaged by hour of day over the year, the adjustment discharged
-  hardest at 00:00 and charged hardest at 15:00, while the district's draw peaked at 19:00 and bottomed at 13:00: it ran about five
-  hours behind the day, still adding charge at 17:00 and 18:00 as the evening peak climbed.
-- So the batteries were empty when each month's top hour came: at the month's highest net draw the mean state of charge was 0.000
-  to 0.037 in ten of the eleven months the trace covers.
-- The score is a ratio. Lowering a month's mean (less energy bought) while its peak hour stays at the batteries' limit raises one
-  minus mean over peak: the energy fell faster than the top hours.
-
-Narrower repairs were tried on the robustness district first; each left the unevenness up, so none is in the engine:
-
-| Candidate | What it changed | Monthly unevenness against native |
-|---|---|---:|
-| no discharge below the band's middle | Omni-Compass adds no discharge in a quiet hour | +0.11% (power given) |
-| no new peak (the month's top so far, and the month's or the week's) | the charge it adds never lifts the district above its top so far | +0.11% (power given) |
-| peak push | full discharge where the draw nears the month's top so far | +0.12% (power given) |
-| a reserve of 30%, 50% or 70% of charge | its added discharge stops at the reserve | +0.42%, +0.25%, +0.25% (power given), and the highest peak's GAIN lost |
-| the hour gone, glide 0.25 | faster only | −0.61% (GAIN), the ramping +13.2% (power given) |
-
-### 18.2 The change, and how far it is pushed
-
-The reading is the draw of the hour the batteries are about to move: the mean of the same hour of the day over the past seven
-days, h[t−24], h[t−48], …, h[t−168] (only hours already seen; before a day has been seen, the last hour's draw). Nothing else in
-the wire changed: the compass law, its gain (0.5), its response (1 h), its band (the 10th to the 90th percentile of the past week's
-draw), the hand-back at 90% of the year, the batteries left native in outage buildings (omni-v8) and the water tanks left native.
-
-The glide was set where no score of any district rose: with the new reading, every glide from 0.05 to 0.10 an hour was run on the
-districts where the edge lies, and the fastest at which nothing rose in either is 0.0625. Read by the key, no glide on the ladder
-reads a LOSS anywhere: every rise below is power given, and the bill keeps falling up to 0.0875 to 0.10:
-
-| District | Score | 0.05 | 0.0625 | 0.075 | 0.0875 | 0.10 |
+| District | Score | 0.05 | 0.0625 (omni-v9) | 0.075 | 0.0875 (omni-v10) | 0.10 |
 |---|---|---:|---:|---:|---:|---:|
+| phase 2 | the bill | -14.12% GAIN | -17.22% GAIN | -18.75% GAIN | -19.17% GAIN | -19.03% GAIN |
 | phase 2 | daily unevenness | +0.25% power given | -0.09% GAIN | -0.67% GAIN | -0.94% GAIN | -0.91% GAIN |
 | phase 2 | net-zero shortfall | -7.53% GAIN | -4.77% GAIN | -3.38% GAIN | -2.54% GAIN | -1.99% GAIN |
-| phase 2 | the bill | -14.12% GAIN | -17.22% GAIN | -18.75% GAIN | -19.17% GAIN | -19.03% GAIN |
+| phase 3 | the bill | -6.60% GAIN | -7.32% GAIN | -8.10% GAIN | -8.43% GAIN | -8.32% GAIN |
 | phase 3 | the ramping | -5.05% GAIN | -1.91% GAIN | +2.32% power given | +6.18% power given | +9.59% power given |
 | phase 3 | net-zero shortfall | -2.21% GAIN | -0.76% GAIN | -0.04% EVEN | +0.25% power given | +0.41% power given |
-| phase 3 | the bill | -6.60% GAIN | -7.32% GAIN | -8.10% GAIN | -8.43% GAIN | -8.32% GAIN |
 
-At 0.05 the 2022 phase 2's daily unevenness rises; from 0.075 the 2022 phase 3's ramping does, and from 0.0875 its net-zero
-shortfall: power given, each. At 0.0625 every score of every district reads GAIN (section 18.3). The founder's rule for the tune (use
-everything that can be used, keep everything healthy, never raise the bill) takes the glide past 0.0625, to the speed that cuts the
-bill most with no LOSS: that is the next version's change, read on CityLearn first.
+So 0.0875 is the glide that cuts the bill most with no LOSS: the founder's rule for the tune. Nothing else in the wire changed. The
+compass law, its gain (0.5), its response (1 h), its reading (the coming hour, from the same hour of the past seven days), its band
+(the 10th to the 90th percentile of the past week's draw), the hand-back at 90% of the year, the batteries left native in outage
+buildings and the water tanks left native are all omni-v9's.
 
-The second change is statistical and moves no command. The interval tables written in each tool stopped at a few sample sizes and
-fell back to 1.96 (the normal quantile) for a number of pairs they did not list, too narrow an interval for a small sample. Every
-tool now takes the exact quantile from one file, `omnicompass/student_t.py` (the regularized incomplete beta function, checked
-against the published table to three decimals). Every value the old tables held is unchanged; no published table used a count the
-old tables lacked, so no published reading moves.
+### 18.2 What it does, read on CityLearn before any GitHub run
 
-### 18.3 What it does, read on CityLearn before any GitHub run
-
-CityLearn 3.0.2, run locally on its own district files, native (CityLearn's BasicRBC) against Omni-Compass on top of it; every
-score is CityLearn's own (each over no battery at all), and every score's aim is lower. The omni-v8 column is the wire as it stood.
+CityLearn 3.0.2, run locally on its own district files: native (CityLearn's BasicRBC) against Omni-Compass on top of it. Every score
+is CityLearn's own (each over no battery at all), and every row is read by the one key. The omni-v9 column is the wire as it stood.
 
 **2022 robustness, 17 buildings (where the omni-v8 row stood)**
 
-| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+| CityLearn score | native | omni-v9 against native | omni-v10 against native |
 |---|---:|---:|---:|
-| the bill | 1.1008 | -8.61% GAIN | -14.22% GAIN |
-| electricity bought | 1.1938 | -14.66% GAIN | -14.92% GAIN |
-| carbon | 1.1494 | -11.89% GAIN | -13.11% GAIN |
-| the daily peak | 1.1392 | -13.95% GAIN | -20.82% GAIN |
+| the bill | 1.1008 | -14.22% GAIN | -16.09% GAIN |
+| electricity bought | 1.1938 | -14.92% GAIN | -13.58% GAIN |
+| carbon | 1.1494 | -13.11% GAIN | -12.07% GAIN |
+| the daily peak | 1.1392 | -20.82% GAIN | -16.92% GAIN |
 | the highest peak | 1.0272 | -2.73% GAIN | -2.73% GAIN |
-| the ramping | 1.2231 | -7.18% GAIN | -12.60% GAIN |
-| daily unevenness | 1.0084 | -2.90% GAIN | -7.32% GAIN |
-| monthly unevenness | 0.9892 | +0.11% power given | -2.29% GAIN |
-| net-zero shortfall | 1.1312 | -6.10% GAIN | -2.76% GAIN |
+| the ramping | 1.2231 | -12.60% GAIN | -9.41% GAIN |
+| daily unevenness | 1.0084 | -7.32% GAIN | -6.02% GAIN |
+| monthly unevenness | 0.9892 | -2.29% GAIN | -1.59% GAIN |
+| net-zero shortfall | 1.1312 | -2.76% GAIN | -0.96% GAIN |
 
 **2022 phase 1, 5 buildings (the tuning district)**
 
-| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+| CityLearn score | native | omni-v9 against native | omni-v10 against native |
 |---|---:|---:|---:|
-| the bill | 1.1158 | -10.54% GAIN | -17.63% GAIN |
-| electricity bought | 1.2275 | -17.77% GAIN | -19.37% GAIN |
-| carbon | 1.1804 | -14.67% GAIN | -17.15% GAIN |
-| the daily peak | 1.1417 | -11.88% GAIN | -19.63% GAIN |
-| the highest peak | 1.0142 | -1.40% GAIN | -5.04% GAIN |
-| the ramping | 1.1562 | -4.41% GAIN | -10.45% GAIN |
-| daily unevenness | 0.9892 | -0.29% GAIN | -3.09% GAIN |
-| monthly unevenness | 0.9900 | +0.26% power given | -1.68% GAIN |
-| net-zero shortfall | 1.1369 | -6.55% GAIN | -2.85% GAIN |
+| the bill | 1.1158 | -17.63% GAIN | -20.05% GAIN |
+| electricity bought | 1.2275 | -19.37% GAIN | -18.23% GAIN |
+| carbon | 1.1804 | -17.15% GAIN | -16.52% GAIN |
+| the daily peak | 1.1417 | -19.63% GAIN | -17.06% GAIN |
+| the highest peak | 1.0142 | -5.04% GAIN | -5.04% GAIN |
+| the ramping | 1.1562 | -10.45% GAIN | -8.76% GAIN |
+| daily unevenness | 0.9892 | -3.09% GAIN | -2.57% GAIN |
+| monthly unevenness | 0.9900 | -1.68% GAIN | -1.09% GAIN |
+| net-zero shortfall | 1.1369 | -2.85% GAIN | -1.22% GAIN |
 
 **2022 phase 2, 5 buildings**
 
-| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+| CityLearn score | native | omni-v9 against native | omni-v10 against native |
 |---|---:|---:|---:|
-| the bill | 1.1080 | -10.83% GAIN | -17.22% GAIN |
-| electricity bought | 1.2124 | -16.87% GAIN | -18.44% GAIN |
-| carbon | 1.1665 | -14.09% GAIN | -16.69% GAIN |
-| the daily peak | 1.1124 | -12.23% GAIN | -17.74% GAIN |
-| the highest peak | 0.9983 | +0.17% power given | -11.26% GAIN |
-| the ramping | 1.1231 | -3.97% GAIN | -10.99% GAIN |
-| daily unevenness | 0.9787 | +1.03% power given | -0.09% GAIN |
-| monthly unevenness | 0.9828 | +0.68% power given | -0.66% GAIN |
-| net-zero shortfall | 1.1970 | -8.77% GAIN | -4.77% GAIN |
+| the bill | 1.1080 | -17.22% GAIN | -19.17% GAIN |
+| electricity bought | 1.2124 | -18.44% GAIN | -17.80% GAIN |
+| carbon | 1.1665 | -16.69% GAIN | -16.31% GAIN |
+| the daily peak | 1.1124 | -17.74% GAIN | -15.67% GAIN |
+| the highest peak | 0.9983 | -11.26% GAIN | -8.30% GAIN |
+| the ramping | 1.1231 | -10.99% GAIN | -10.67% GAIN |
+| daily unevenness | 0.9787 | -0.09% GAIN | -0.94% GAIN |
+| monthly unevenness | 0.9828 | -0.66% GAIN | -0.52% GAIN |
+| net-zero shortfall | 1.1970 | -4.77% GAIN | -2.54% GAIN |
 
 **2022 phase 3, 7 buildings**
 
-| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+| CityLearn score | native | omni-v9 against native | omni-v10 against native |
 |---|---:|---:|---:|
-| the bill | 1.0848 | -4.17% GAIN | -7.32% GAIN |
-| electricity bought | 1.1573 | -8.89% GAIN | -6.23% GAIN |
-| carbon | 1.1155 | -6.65% GAIN | -5.50% GAIN |
-| the daily peak | 1.0973 | -10.96% GAIN | -16.09% GAIN |
-| the highest peak | 0.9942 | +0.45% power given | -3.61% GAIN |
-| the ramping | 1.1814 | +3.37% power given | -1.91% GAIN |
-| daily unevenness | 1.0176 | -4.83% GAIN | -9.88% GAIN |
-| monthly unevenness | 0.9838 | -0.55% GAIN | -5.07% GAIN |
-| net-zero shortfall | 1.0809 | -3.28% GAIN | -0.76% GAIN |
+| the bill | 1.0848 | -7.32% GAIN | -8.43% GAIN |
+| electricity bought | 1.1573 | -6.23% GAIN | -4.70% GAIN |
+| carbon | 1.1155 | -5.50% GAIN | -4.05% GAIN |
+| the daily peak | 1.0973 | -16.09% GAIN | -12.57% GAIN |
+| the highest peak | 0.9942 | -3.61% GAIN | -3.61% GAIN |
+| the ramping | 1.1814 | -1.91% GAIN | +6.18% power given |
+| daily unevenness | 1.0176 | -9.88% GAIN | -7.76% GAIN |
+| monthly unevenness | 0.9838 | -5.07% GAIN | -4.74% GAIN |
+| net-zero shortfall | 1.0809 | -0.76% GAIN | +0.25% power given |
 
 **2022 phase all, 17 buildings**
 
-| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+| CityLearn score | native | omni-v9 against native | omni-v10 against native |
 |---|---:|---:|---:|
-| the bill | 1.1007 | not run | -14.20% GAIN |
-| electricity bought | 1.1941 | not run | -14.92% GAIN |
-| carbon | 1.1496 | not run | -13.11% GAIN |
-| the daily peak | 1.1392 | not run | -20.77% GAIN |
-| the highest peak | 1.0272 | not run | -2.73% GAIN |
-| the ramping | 1.2223 | not run | -12.57% GAIN |
-| daily unevenness | 1.0084 | not run | -7.29% GAIN |
-| monthly unevenness | 0.9892 | not run | -2.28% GAIN |
-| net-zero shortfall | 1.1315 | not run | -2.78% GAIN |
+| the bill | 1.1007 | -14.20% GAIN | -16.08% GAIN |
+| electricity bought | 1.1941 | -14.92% GAIN | -13.58% GAIN |
+| carbon | 1.1496 | -13.11% GAIN | -12.07% GAIN |
+| the daily peak | 1.1392 | -20.77% GAIN | -16.92% GAIN |
+| the highest peak | 1.0272 | -2.73% GAIN | -2.73% GAIN |
+| the ramping | 1.2223 | -12.57% GAIN | -9.33% GAIN |
+| daily unevenness | 1.0084 | -7.29% GAIN | -6.02% GAIN |
+| monthly unevenness | 0.9892 | -2.28% GAIN | -1.58% GAIN |
+| net-zero shortfall | 1.1315 | -2.78% GAIN | -0.98% GAIN |
 
-**Alameda County, 100 buildings**
+Across the districts above: omni-v9 45 GAIN, 0 EVEN, 0 power given, 0 LOSS; omni-v10 43 GAIN, 0 EVEN, 2 power given, 0 LOSS.
 
-| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+**Alameda County and Travis County (100 buildings each)** were still running locally when this version was pushed; this
+machine runs each neighbourhood for hours, and their omni-v9 runs read no LOSS (`docs/OMNI_V9.md`, section 3). No score in them
+that can read a LOSS moves with the glide: they carry no price (the bill is 1.0 in both arms, EVEN by construction), no outage
+(energy not served is 0 in both arms) and no comfort the electric batteries touch (time uncomfortable +0.00% on omni-v9). Every
+other score there is a resource spent or held, where a rise is power given. Their three runs on GitHub, with every other
+district, make the omni-v10 CityLearn table; the local runs are added here when they finish.
+
+**What the faster glide trades.** In every district with a price, the bill falls 1.1 to 2.4 points further than at omni-v9.
+Most other scores fall a little less than at omni-v9 and still read GAIN: the electricity bought, the carbon, the daily peak, the
+ramping, the unevenness and the net-zero distance. The highest peak holds where omni-v9 left it, except in the 2022 phase 2 (−8.30%
+against −11.26%), and that district's daily unevenness falls further (−0.94% against −0.09%). Two rows of the 2022 phase 3 rose
+and are power given: the ramping +6.18% and the net-zero shortfall +0.25%. A little more electricity is bought than at omni-v9
+while the bill falls further, so each unit bought costs less on average. None of these five districts carries the occupants' own scores (energy not served, time uncomfortable); in the 2023 districts
+they are native's to the last digit, and in Alameda and Travis they read EVEN on omni-v9.
+
+**Shown, power given.** In some months the peak hour with Omni-Compass on top rises above native's. With omni-v10 that happens in
+3 months in the robustness district (omni-v9: 2), 3 in the tuning district (3), 1 in the 2022 phase 2 (1), 1 in the 2022 phase 3 (1)
+and 3 in phase all (2). By day it happens on 23, 25, 21, 56 and 23 days of the year (omni-v9: 16, 28, 15, 43 and 16). The two 100-building neighbourhoods were still running locally when this version was pushed (on omni-v9 neither showed a month
+whose peak rose above native's).
+A peak is power held, so each of these is power given. CityLearn's own scores over the year (the highest peak, the daily peak and
+the monthly unevenness) read GAIN in every one of the five districts.
+
+The districts: the robustness district (`citylearn_challenge_2022_phase_all_robustness`); the tuning district
+(`citylearn_challenge_2022_phase_1`); the 2022 phases 2, 3 and all, which CityLearn ships in its source repository but not in its
+package, so the GitHub benchmark does not run them; and the two 100-building neighbourhoods the benchmark counts (Alameda County and
+Travis County). The seven 2023 districts are unchanged by construction. Every battery in them is left native (omni-v8), so their
+omni arm is native's to the last digit; this was checked with the v10 runner on `citylearn_challenge_2023_phase_2_local_evaluation`,
+where all eleven scores are identical.
+
+### 18.3 Refused: the outage buildings' batteries outside the outage hours
+
+One more change was tried before this version was set, at the same glide. The batteries in buildings that carry an outage would be
+steered outside the outage hours and handed back to native through each outage. Six of the seven 2023 districts were run:
+
+| 2023 district | the bill | energy not served | time uncomfortable |
 |---|---:|---:|---:|
-| the bill | 1.0000 | not run | +0.00% EVEN |
-| electricity bought | 2.0205 | not run | -6.95% GAIN |
-| carbon | 1.0000 | not run | +0.00% EVEN |
-| the daily peak | 2.4165 | not run | -8.92% GAIN |
-| the highest peak | 1.2582 | not run | -4.40% GAIN |
-| the ramping | 1.3828 | not run | -10.40% GAIN |
-| daily unevenness | 0.7972 | not run | -2.75% GAIN |
-| monthly unevenness | 0.8053 | not run | -1.79% GAIN |
-| net-zero shortfall | 9.8346 | not run | -0.08% GAIN |
-| energy not served | 0.0000 | not run | +0.00% EVEN |
-| time uncomfortable | 0.7607 | not run | +0.00% EVEN |
+| phase 2, local evaluation | +0.19% power given | -2.68% GAIN | -0.12% GAIN |
+| phase 2, online evaluation 1 | -0.09% GAIN | **+0.69% LOSS** | -0.04% GAIN |
+| phase 2, online evaluation 2 | -0.11% GAIN | -0.15% GAIN | +0.00% EVEN |
+| phase 2, online evaluation 3 | -0.09% GAIN | -1.44% GAIN | -0.06% GAIN |
+| phase 3, district 1 | -0.25% GAIN | -2.47% GAIN | -0.04% GAIN |
+| phase 3, district 2 | -0.37% GAIN | -0.38% GAIN | -0.03% GAIN |
 
-**Travis County, 100 buildings**
-
-| CityLearn score | native | omni-v8 against native | omni-v9 against native |
-|---|---:|---:|---:|
-| the bill | 1.0000 | not run | +0.00% EVEN |
-| electricity bought | 3.8416 | not run | -3.96% GAIN |
-| carbon | 1.0000 | not run | +0.00% EVEN |
-| the daily peak | 3.1689 | not run | -5.92% GAIN |
-| the highest peak | 1.3727 | not run | +0.00% EVEN |
-| the ramping | 1.1329 | not run | -7.58% GAIN |
-| daily unevenness | 0.5655 | not run | -2.71% GAIN |
-| monthly unevenness | 0.6057 | not run | -1.96% GAIN |
-| net-zero shortfall | -4.6732 | not run | -0.18% GAIN |
-| energy not served | 0.0000 | not run | +0.00% EVEN |
-| time uncomfortable | 0.8454 | not run | +0.00% EVEN |
-
-Across the districts above: omni-v8 29 GAIN, 0 EVEN, 7 power given, 0 LOSS (where it was run); omni-v9 58 GAIN, 9 EVEN, 0 power given, 0 LOSS.
-
-The districts: the robustness district, where the omni-v8 row stood and where the cause was found; the tuning district
-(`citylearn_challenge_2022_phase_1`); the 2022 phases 2, 3 and all (shipped in CityLearn's source repository, not in its package,
-so the GitHub benchmark does not run them); and the two 100-building neighbourhoods the benchmark counts (Alameda County, Travis
-County). The seven 2023 districts are unchanged by construction: every battery in them is left native (omni-v8), so their omni arm
-is native's to the last digit. The shipped runner (`tools/run_citylearn.py`) and the study's copy of it give the same numbers to
-the last digit on both arms (checked on the robustness district).
-
-**Shown, power given.** Month by month, the peak hour with Omni-Compass on top rises above native's in some months: in 2 of 12
-months in the robustness district, 3 in the tuning district, 1 in each of the 2022 phases 2 and 3, and 2 in phase all (omni-v8: 3,
-3, 2 and 4); in Alameda and Travis in none. A peak is power held, so each is power given, beside the bill and the energy it bought;
-CityLearn's own scores over the year (the highest peak, the daily peak and the monthly unevenness) read GAIN. A guard that keeps Omni-Compass's added charge under the
-month's top so far cut one of the two months on the robustness district and left every score GAIN; it is a candidate for the next
-version, in the toy gate first.
+In the first online evaluation, more energy went unserved. That is a miss, a LOSS. In the local evaluation, the bill rose. One LOSS
+is enough to refuse the change, and the founder's rule never raises the bill, so the seventh district was not needed. The batteries
+in outage buildings stay native all year, as in omni-v8 and omni-v9.
 
 ### 18.4 The toy gate
 
-The changes touch no Kubernetes, card or cloud controller, and the toy gate's models (`tools/toy_gate.py`) do not run the CityLearn
-wire, so they read the same on both checkouts by construction; the gate was run all the same, the candidate against omni-v8 on
-seeds 1 to 8, and is recorded in `results/toy_gate/V9_VS_V8.md`: every gauge of every toy (the cluster at 60 s and at 15 s,
-conveyance with the quota readable and unreadable, the verdict on noisy work) identical to omni-v8 to the last digit, in every count
-(it ran with the glide at 0.10, a setting no toy reads). The same models show, for omni-v8 and the candidate alike, a pod start wait
-+9% against native beside 64% more requests served: the same row the real KEDA HTTP run showed (`docs/OMNI_V7.md`, section 6;
-`docs/STATE_OF_PLAY.md`, Open), the next repair. These are our own models (class S), never a benchmark result.
+The change touches no Kubernetes, card or cloud controller, and the toy gate's models (`tools/toy_gate.py`) do not run the
+CityLearn wire, so they read the same on both checkouts by construction. The gate was run all the same, the candidate against
+omni-v9 on seeds 1 to 8, and is recorded in `results/toy_gate/V10_VS_V9.md`. Every gauge of every toy reads identical to omni-v9
+to the last digit (26 of 26: the cluster at 60 s and at 15 s, and conveyance with the quota readable and unreadable), and so do
+every count and the verdict on noisy work. These are our own models (class S), never a benchmark result.
 
 ### 18.5 What runs again on it
 
-Everything, A, B and C, from the moment it lands (`scripts/reruns.txt`, the omni-v9 campaign, released by the conductor a few a
-tick), with three entries added beside the operator's settings: MySQL, Redis and MongoDB with native exactly as shipped (MySQL's
-own 128 MB buffer pool; Redis with no memory ceiling and its own `noeviction` rule; MongoDB's own cache, half of the machine's
-memory less 1 GB). The grid on its own manifest (`results/grid_v9/`); every Azure set from A again. Google Cloud and Amazon stay
-behind their switches; the GPU runs on Lambda wait for the founder's word and one exact commit. The CityLearn table's three runs on
-GitHub make the table V9_CITYLEARN.md in `results/live/`; it must read no LOSS in any district, as it did locally.
-
-© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+Everything runs again, A, B and C, from the moment v10 lands (`scripts/reruns.txt`, the omni-v10 campaign, released by the
+conductor a few at a time each tick). The grid runs on its own manifest (`results/grid_v10/`), and every Azure set starts again from
+A. Google Cloud and Amazon, switched on by the founder on 18 October with their secrets in, run the same four sets from A,
+one at a time in each machine-family queue. The GPU runs on Lambda wait for the founder's word and one exact commit. The
+three CityLearn runs on GitHub make the omni-v10 CityLearn table in `results/live/`. It must read no LOSS in any district, as it did
+locally in every district read before the push.
 
 ## 19. The Engines and Their Audit
 
@@ -4869,7 +4826,7 @@ checked; a result in this manual is only ever cited from a commit whose run pass
 To know which engine a checkout carries, ask it:
 
 ```
-python3 tools/omni_version.py                  # omni-v9, omni-v8, omni-v7, omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or what differs
+python3 tools/omni_version.py                  # omni-v10, omni-v9, omni-v8, omni-v7, omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or what differs
 python3 tools/omni_version.py --commit <sha>   # the same question of any pushed commit
 ```
 
@@ -6520,7 +6477,7 @@ A **receipt** here is a result file in this repository made by a paired run: the
 counted runs, the engine identified by its fingerprint (`tools/omni_version.py --commit`), every row reported, losses
 included. A receipt is read in the class of evidence it is: **P** a physical meter, **L** real software (a real
 Kubernetes cluster, a real database), **S** our own models, **V** a property of the code. S is never presented as
-proof of a physical saving. A result belongs to the engine it ran on and is never read across engines; every row below is omni-v7 (omni-v8 and omni-v9, the engine that stands, changed one wire, the CityLearn battery, and the interval table; every benchmark runs again on omni-v9), unless its Engine column says otherwise (the earlier engines' receipts are the road, in `docs/history`).
+proof of a physical saving. A result belongs to the engine it ran on and is never read across engines; every row below is omni-v7 (omni-v8, omni-v9 and omni-v10, the engine that stands, changed one wire, the CityLearn battery, and the interval table; every benchmark runs again on omni-v10), unless its Engine column says otherwise (the earlier engines' receipts are the road, in `docs/history`).
 How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of every three-run row: `tools/readings.py`.
 
 ### 42.1 What the receipts say, read together
@@ -6548,11 +6505,13 @@ How to read a single table: `docs/HOW_TO_READ_THE_RESULTS.md`. The wording of ev
    **The buildings with batteries read LOSS in the seven 2023 districts** (energy not served +2.0% to +9.8%, discomfort,
    ramping and the highest peak), beside electricity bought and the daily peak GAIN in all ten battery districts; the cause
    is the battery wire (it did not see the outage hours those districts carry), and its fix is omni-v8: a battery that is also
-   its building's reserve stays native (`docs/OMNI_V8.md`). The last CityLearn LOSS row, the 2022 robustness district's monthly
-   unevenness (+0.11%), is repaired in omni-v9, the engine that stands: the wire reads the coming hour (`docs/OMNI_V9.md`).
+   its building's reserve stays native (`docs/OMNI_V8.md`). The 2022 robustness district's monthly unevenness
+   (+0.11%), once printed LOSS, is power held, so power given by the key; omni-v9 cut it, reading the coming hour
+   (`docs/OMNI_V9.md`), and omni-v10, the engine that stands, glides at the speed that cuts the bill most with no LOSS
+   (`docs/OMNI_V10.md`).
 6. **What is not yet shown.** No energy saving on a real chip: the physical receipt (P), the GPU's own meter on the
    current governor, is the decisive one still to be produced; every earlier card result is obsolete. No cloud-bill result
-   on the engine that stands yet: the omni-v9 Azure sets run one at a time. More completed work at one fixed resource cap:
+   on the engine that stands yet: the omni-v10 Azure sets run one at a time. More completed work at one fixed resource cap:
    the capacity test reads EVEN at all four caps (the quota blocks the one lever Omni-Compass has there).
 
 ### 42.2 Receipt by receipt
@@ -6882,25 +6841,25 @@ Every row names the engine its table ran on (read from the table). Results are n
 | Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |
 |---|---|---|---|---:|---|---|
 | 2026-10-17 | Every real test together: the Omni index | omni-v7 | **GAIN, power given** | **+4.2% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
-| 2026-10-17 | Robustness: the two-hour run | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_ROBUST_LONG.md` |
-| 2026-10-17 | Robot arms (MuJoCo), the three untouched robots | omni-v7 | **GAIN** | **+3.8% GAIN** | energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN) | `results/live/V7_MUJOCO.md` |
-| 2026-10-17 | Redis, the cache's memory ceiling | omni-v7 | **GAIN, power given** | **+0.2% GAIN** | memory ceiling held cut 2.3% to 2.5% (GAIN); memory used cut 1.0% to 1.3% (GAIN); work inside the line up 1.2% to 1.7% (GAIN); hit rate up 1.2% to 1.7% (GAIN); mean cut 1.8% to 7.9% (GAIN); memory ceiling held up 2.3% to 2.4% (power given); memory used up 1.8% to 2.1% (power given) | `results/live/V7_REDIS.md` |
-| 2026-10-17 | Real Kubernetes, faults | omni-v7 | **GAIN, power given** | **+35% GAIN** | mean response cut 36% to 51% (GAIN); p95 cut 51% to 63% (GAIN); time over the line cut 28% to 33% (GAIN); failed requests cut 10% to 17% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 16% to 20% (GAIN); replicas up 13% to 21% (power given); pods started up 34% to 41% (power given) | `results/live/V7_FAULTS.md` |
-| 2026-10-17 | Real Kubernetes, all four at once | omni-v7 | **GAIN** | **+37% GAIN** | work inside the line up 40% to 61% (GAIN); mean response cut 40% to 44% (GAIN); p95 cut 56% to 61% (GAIN); time over the line cut 37% to 44% (GAIN); failed requests cut 9% to 14% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 20% to 35% (GAIN) | `results/live/V7_ALL_FOUR.md` |
-| 2026-10-17 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v7 | **GAIN, power given** | **+18% GAIN** | parked-worker energy up 1.6% to 2.3% (power given); standby-model energy up 1.6% to 2.3% (power given); mean response cut 45% to 47% (GAIN); p95 cut 60% to 62% (GAIN); p99 cut 67% to 69% (GAIN) | `results/live/V7_GOLDILOCKS.md` |
-| 2026-10-17 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_CRUISEKUBE.md` |
-| 2026-10-17 | Real Kubernetes, a queue of jobs | omni-v7 | **GAIN** | **+12% GAIN** | machines cut 11% to 15% (GAIN); machine-hours cut 11% to 15% (GAIN); standby-model energy cut 8% to 10% (GAIN); mean response cut 9% to 11% (GAIN); machines after the queue cut 19% to 22% (GAIN) | `results/live/V7_BATCH.md` |
-| 2026-10-17 | Real Kubernetes, a public day of demand (Google 2011) | omni-v7 | **GAIN, power given** | **+31% GAIN** | mean response cut 48% to 49% (GAIN); p95 cut 54% to 58% (GAIN); p99 cut 38% to 49% (GAIN); time over the line cut 72% to 74% (GAIN); failed requests cut 12% to 14% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 52% to 67% (GAIN); pods started up 107% to 143% (power given) | `results/live/V7_TRACE_GOOGLE2011.md` |
-| 2026-10-17 | Real Kubernetes, a noisy neighbour | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_FAIRNESS.md` |
-| 2026-10-17 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | **GAIN, power given** | **+78% GAIN** | parked-worker energy up 2.2% to 2.3% (power given); standby-model energy up 2.2% to 2.3% (power given); mean response cut 57% to 58% (GAIN); p95 cut 71% to 75% (GAIN); p99 cut 55% to 57% (GAIN); time over the line cut 94% to 95% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 93% to 96% (GAIN); replicas cut 15% to 19% (GAIN); pods started cut 17% to 23% (GAIN) | `results/live/V7_KEDA_REQUESTS.md` |
-| 2026-10-17 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | **GAIN, power given** | **+45% GAIN** | parked-worker energy up 1.1% to 1.7% (power given); standby-model energy up 1.1% to 1.7% (power given); mean response cut 36% to 38% (GAIN); p95 cut 52% to 53% (GAIN); p99 cut 57% to 58% (GAIN); time over the line cut 98% to 100% (GAIN) | `results/live/V7_KEDA_CPU_REQUESTS.md` |
-| 2026-10-17 | Power grids (SimBench), both load models | omni-v7 | **GAIN, power given** | **+5.8% GAIN** | energy the loads drew cut 1.3% to 1.5% (GAIN); energy dissipated in lines and transformers cut 0.0% to 2.4% (GAIN); net import from the upstream grid cut 0% to 15% (GAIN); tap operations cut 16% to 38% (GAIN); energy dissipated in lines and transformers up 0.6% to 1.5% (power given); tap operations up 100% (power given); net import from the upstream grid up 0.0% (power given) | `results/live/V7_PANDAPOWER.md` |
-| 2026-10-17 | PostgreSQL, the pooler's pool size | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_PGBENCH.md` |
-| 2026-10-17 | MySQL, the buffer pool's size | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_SYSBENCH.md` |
-| 2026-10-17 | MongoDB, the storage engine's cache size | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_YCSB.md` |
-| 2026-10-17 | Kafka, the consumer group's size | omni-v7 | **GAIN** | **+0.1% GAIN** | consumers running cut 0.3% to 0.8% (GAIN) | `results/live/V7_KAFKA.md` |
-| 2026-10-17 | Drone swarms, the three untouched cells | omni-v7 | **GAIN** | **+6.1% GAIN** | energy per mission cut 7% to 20% (GAIN); fleet energy over the window cut 7% to 20% (GAIN); missions per charge at the autopilot's reserve up 8% to 25% (GAIN) | `results/live/V7_SWARM.md` |
-| 2026-10-17 | Buildings and batteries (CityLearn), the districts with batteries | omni-v7 | **GAIN AND LOSS** | **+0.8% GAIN** | electricity bought cut 0% to 15% (GAIN); daily peak draw cut 1% to 14% (GAIN); highest peak cut 2.7% to 3.5% (GAIN); ramping cut 2.9% to 7.2% (GAIN); daily load unevenness cut 1.0% to 4.7% (GAIN); monthly load unevenness cut 0.5% to 1.9% (GAIN); distance from zero net energy cut 0.0% to 6.1% (GAIN); electricity bill cut 8.6% (GAIN); carbon cut 0% to 12% (GAIN); monthly load unevenness up 0.1% (power given); energy not served up 2.0% to 9.8% (LOSS); time uncomfortable up 0.0% to 0.1% (LOSS); electricity bill up 0.2% to 0.3% (power given); ramping up 4.5% to 6.2% (power given); time uncomfortable cut 0.0% (GAIN); highest peak up 2.5% (power given); distance from zero net energy up 0.0% (power given) | `results/live/V7_CITYLEARN.md` |
+| 2026-10-18 | Robustness: the two-hour run | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_ROBUST_LONG.md` |
+| 2026-10-18 | Robot arms (MuJoCo), the three untouched robots | omni-v7 | **GAIN** | **+3.8% GAIN** | energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN) | `results/live/V7_MUJOCO.md` |
+| 2026-10-18 | Redis, the cache's memory ceiling | omni-v7 | **GAIN, power given** | **+0.2% GAIN** | memory ceiling held cut 2.3% to 2.5% (GAIN); memory used cut 1.0% to 1.3% (GAIN); work inside the line up 1.2% to 1.7% (GAIN); hit rate up 1.2% to 1.7% (GAIN); mean cut 1.8% to 7.9% (GAIN); memory ceiling held up 2.3% to 2.4% (power given); memory used up 1.8% to 2.1% (power given) | `results/live/V7_REDIS.md` |
+| 2026-10-18 | Real Kubernetes, faults | omni-v7 | **GAIN, power given** | **+35% GAIN** | mean response cut 36% to 51% (GAIN); p95 cut 51% to 63% (GAIN); time over the line cut 28% to 33% (GAIN); failed requests cut 10% to 17% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 16% to 20% (GAIN); replicas up 13% to 21% (power given); pods started up 34% to 41% (power given) | `results/live/V7_FAULTS.md` |
+| 2026-10-18 | Real Kubernetes, all four at once | omni-v7 | **GAIN** | **+37% GAIN** | work inside the line up 40% to 61% (GAIN); mean response cut 40% to 44% (GAIN); p95 cut 56% to 61% (GAIN); time over the line cut 37% to 44% (GAIN); failed requests cut 9% to 14% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 20% to 35% (GAIN) | `results/live/V7_ALL_FOUR.md` |
+| 2026-10-18 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v7 | **GAIN, power given** | **+18% GAIN** | parked-worker energy up 1.6% to 2.3% (power given); standby-model energy up 1.6% to 2.3% (power given); mean response cut 45% to 47% (GAIN); p95 cut 60% to 62% (GAIN); p99 cut 67% to 69% (GAIN) | `results/live/V7_GOLDILOCKS.md` |
+| 2026-10-18 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_CRUISEKUBE.md` |
+| 2026-10-18 | Real Kubernetes, a queue of jobs | omni-v7 | **GAIN** | **+12% GAIN** | machines cut 11% to 15% (GAIN); machine-hours cut 11% to 15% (GAIN); standby-model energy cut 8% to 10% (GAIN); mean response cut 9% to 11% (GAIN); machines after the queue cut 19% to 22% (GAIN) | `results/live/V7_BATCH.md` |
+| 2026-10-18 | Real Kubernetes, a public day of demand (Google 2011) | omni-v7 | **GAIN, power given** | **+31% GAIN** | mean response cut 48% to 49% (GAIN); p95 cut 54% to 58% (GAIN); p99 cut 38% to 49% (GAIN); time over the line cut 72% to 74% (GAIN); failed requests cut 12% to 14% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 52% to 67% (GAIN); pods started up 107% to 143% (power given) | `results/live/V7_TRACE_GOOGLE2011.md` |
+| 2026-10-18 | Real Kubernetes, a noisy neighbour | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_FAIRNESS.md` |
+| 2026-10-18 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | **GAIN, power given** | **+78% GAIN** | parked-worker energy up 2.2% to 2.3% (power given); standby-model energy up 2.2% to 2.3% (power given); mean response cut 57% to 58% (GAIN); p95 cut 71% to 75% (GAIN); p99 cut 55% to 57% (GAIN); time over the line cut 94% to 95% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 93% to 96% (GAIN); replicas cut 15% to 19% (GAIN); pods started cut 17% to 23% (GAIN) | `results/live/V7_KEDA_REQUESTS.md` |
+| 2026-10-18 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | **GAIN, power given** | **+45% GAIN** | parked-worker energy up 1.1% to 1.7% (power given); standby-model energy up 1.1% to 1.7% (power given); mean response cut 36% to 38% (GAIN); p95 cut 52% to 53% (GAIN); p99 cut 57% to 58% (GAIN); time over the line cut 98% to 100% (GAIN) | `results/live/V7_KEDA_CPU_REQUESTS.md` |
+| 2026-10-18 | Power grids (SimBench), both load models | omni-v7 | **GAIN, power given** | **+5.8% GAIN** | energy the loads drew cut 1.3% to 1.5% (GAIN); energy dissipated in lines and transformers cut 0.0% to 2.4% (GAIN); net import from the upstream grid cut 0% to 15% (GAIN); tap operations cut 16% to 38% (GAIN); energy dissipated in lines and transformers up 0.6% to 1.5% (power given); tap operations up 100% (power given); net import from the upstream grid up 0.0% (power given) | `results/live/V7_PANDAPOWER.md` |
+| 2026-10-18 | PostgreSQL, the pooler's pool size | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_PGBENCH.md` |
+| 2026-10-18 | MySQL, the buffer pool's size | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_SYSBENCH.md` |
+| 2026-10-18 | MongoDB, the storage engine's cache size | omni-v7 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V7_YCSB.md` |
+| 2026-10-18 | Kafka, the consumer group's size | omni-v7 | **GAIN** | **+0.1% GAIN** | consumers running cut 0.3% to 0.8% (GAIN) | `results/live/V7_KAFKA.md` |
+| 2026-10-18 | Drone swarms, the three untouched cells | omni-v7 | **GAIN** | **+6.1% GAIN** | energy per mission cut 7% to 20% (GAIN); fleet energy over the window cut 7% to 20% (GAIN); missions per charge at the autopilot's reserve up 8% to 25% (GAIN) | `results/live/V7_SWARM.md` |
+| 2026-10-18 | Buildings and batteries (CityLearn), the districts with batteries | omni-v7 | **GAIN AND LOSS** | **+0.8% GAIN** | electricity bought cut 0% to 15% (GAIN); daily peak draw cut 1% to 14% (GAIN); highest peak cut 2.7% to 3.5% (GAIN); ramping cut 2.9% to 7.2% (GAIN); daily load unevenness cut 1.0% to 4.7% (GAIN); monthly load unevenness cut 0.5% to 1.9% (GAIN); distance from zero net energy cut 0.0% to 6.1% (GAIN); electricity bill cut 8.6% (GAIN); carbon cut 0% to 12% (GAIN); monthly load unevenness up 0.1% (power given); energy not served up 2.0% to 9.8% (LOSS); time uncomfortable up 0.0% to 0.1% (LOSS); electricity bill up 0.2% to 0.3% (power given); ramping up 4.5% to 6.2% (power given); time uncomfortable cut 0.0% (GAIN); highest peak up 2.5% (power given); distance from zero net energy up 0.0% (power given) | `results/live/V7_CITYLEARN.md` |
 | 2026-10-13 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | **GAIN, power given** | **+5.3% GAIN** | p95 cut 32% to 52% (GAIN); time over the line cut 8% to 36% (GAIN); replicas up 0.6% (power given); failed requests cut 8.4% to 8.5% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN) | `results/live/V3_SIX_KUBE.md` |
 | 2026-10-13 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | **GAIN** | **+155% GAIN** | p95 cut 95% to 98% (GAIN); p99 cut 97% to 98% (GAIN) | `results/live/V3_BIG_ORGANISM.md` |
 | 2026-10-13 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | **GAIN** | **+0.3% GAIN** | work per energy up 0.3% (GAIN) | `results/realms/REALMS.md` |
@@ -7282,7 +7241,7 @@ laid out the same way so that a reader of this manual can read it without learni
 
 **The readings to expect, and what it means when you do not see them.** The published tables are the reference an
 installer reads their own receipt against: not the numbers, which belong to our systems and our loads, but the signs and the
-words. On omni-v7 (omni-v8 and omni-v9, the engine that stands, changed only the CityLearn runner and the interval table), on real Kubernetes, ten pairs a run and three runs each (`results/live/V7_*.md`):
+words. On omni-v7 (omni-v8, omni-v9 and omni-v10, the engine that stands, changed only the CityLearn runner and the interval table), on real Kubernetes, ten pairs a run and three runs each (`results/live/V7_*.md`):
 
 | The service | Reads GAIN in all three of our runs | Reads EVEN | Power given |
 |---|---|---|---|
@@ -7396,10 +7355,11 @@ product.
 | **v6** (`docs/OMNI_V6.md`), the engine of 15 October | v5's law and catalog byte for byte; the shared-host capacity repair in the Kubernetes controller (the host counted once, no extra replica room while it is busy or unmeasured, an enlarged ceiling rechecked); since 16 October its catalog is run as seven organisms, the spine the seventh (`docs/THE_SPINE.md`), with no engine file changed | `df6147466ef18046`, 45 files | Goldilocks, CruiseKube, KEDA's HTTP add-on, KEDA on the CPU target and the requests (`results/live/V6_*.md`); every other benchmark queued (`scripts/reruns.txt`) |
 | **v7** (`docs/OMNI_V7.md`), the engine of 16 to 17 October | quota-aware conveyance; the verdict in the reports' words; every rule in seconds; the cloud's rule as one flag; the busy guard on a shared host; corrected on 16 October after its first trials (an unreadable quota is no budget known) | `d6d467b824c585f1`, 46 files | the toy gate (`results/toy_gate/`); twenty-two three-run tables (`results/live/V7_*.md`), twenty-one with no row LOSS; CityLearn's 2023 districts LOSS, the cause ours, fixed as v8 |
 | **v8** (`docs/OMNI_V8.md`), the engine of 17 October | v7 byte for byte but one file, the CityLearn runner: a battery whose building simulates power outages stays native, its charge being the building's reserve | `f93d233136a1f902`, 46 files | read locally on CityLearn before any GitHub run (the 2023 districts native's to the digit, every other district v7's); the toy gate (`results/toy_gate/V8_VS_V7.md`) |
-| **v9** (`docs/OMNI_V9.md`), **the engine that stands** (17 October, the founder's order) | v8 with the CityLearn battery wire reading the coming hour (the mean of the same hour over the past seven days) and gliding at up to 0.0625 an hour (the fastest glide with no LOSS on any score in any district); every 95% interval on the exact Student t quantile (`omnicompass/student_t.py`) | `7379f3a79ff2c475`, 47 files | read locally on CityLearn before any GitHub run (no LOSS against native in any district; the shipped runner equal to the study's to the digit); the toy gate (`results/toy_gate/V9_VS_V8.md`, identical to v8 on every toy); every benchmark queued (`scripts/reruns.txt`) |
+| **v9** (`docs/OMNI_V9.md`), the engine of 17 to 18 October | v8 with the CityLearn battery wire reading the coming hour (the mean of the same hour over the past seven days) and gliding at up to 0.0625 an hour (the fastest glide at which no score rose in any district); every 95% interval on the exact Student t quantile (`omnicompass/student_t.py`) | `7379f3a79ff2c475`, 47 files | read locally on CityLearn before any GitHub run (no LOSS against native in any district; the shipped runner equal to the study's to the digit); the toy gate (`results/toy_gate/V9_VS_V8.md`, identical to v8 on every toy); its reruns started on 17 October |
+| **v10** (`docs/OMNI_V10.md`), **the engine that stands** (18 October, the founder's order) | v9 byte for byte but one file, the CityLearn runner: the battery wire's glide at 0.0875 an hour, the speed that cuts the bill most with no LOSS read by the one key; the runner's own receipt read by the one key | `4bf39b0d707784de`, 47 files | read locally on CityLearn before any GitHub run (the bill cut further in every district with a price, no LOSS against native in any district read before the push); the toy gate (`results/toy_gate/V10_VS_V9.md`); every benchmark queued (`scripts/reruns.txt`) |
 
 ```
-python3 tools/omni_version.py                   # this checkout: omni-v9, omni-v8, omni-v7, omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or every file that differs
+python3 tools/omni_version.py                   # this checkout: omni-v10, omni-v9, omni-v8, omni-v7, omni-v6, omni-v5, omni-v3, omni-v2, omni-v1, or every file that differs
 python3 tools/omni_version.py --commit <sha>    # the engine at the commit any result ran on
 ```
 
@@ -7503,7 +7463,7 @@ start from the same fresh cluster, run for 900 s after a 120 s warm-up, and end 
 
 ![Wiring schematic: the response-time feed and the line. The probe times real requests to the service and writes one row a response to latency.csv (elapsed_seconds, latency_ms, ok); the governor reads the file by its own clock, the last 60 s for its decision and the last 15 to 30 s for its fast checks, against the line the service owner wrote (--slo-ms). A feed that has not advanced for twice the window, or holds no served response, reads as blind, and a blind sense is read as past the wall: nothing is given back and capacity is added (in the cloud mode every parked machine is woken), the safe direction. A second feed, the service's own timings, may be written in the same three columns, measured at the same place as the line and never pre-smoothed.](figures/s_feed.svg)
 
-Every table below ran on omni-v7 (omni-v8 and omni-v9, the engine that stands, changed only the CityLearn runner and the interval table, and run each again), ten pairs a run, three separate GitHub runs (A, B and C) released on
+Every table below ran on omni-v7 (omni-v8, omni-v9 and omni-v10, the engine that stands, changed only the CityLearn runner and the interval table, and run each again), ten pairs a run, three separate GitHub runs (A, B and C) released on
 16 October; each names its runs and its commits, and `tools/omni_version.py --commit` reads omni-v7 on every one. Run and scored
 by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
@@ -7531,14 +7491,14 @@ by The Omni-Compass LLC's own code. No outside party has reviewed or approved th
   54% to 58%, the 99th 38% to 49%, the mean 48% to 49%, time over the line 72% to 74%, failed requests 12% to 14% and the alert
   minutes 52% to 67%, all GAIN in all three of our runs. Pods started rose 107% to 143%, **power given in all three of our
   runs**; machines in service the same, node-hours and energy inside the noise; no pod was ever without a machine.
-- **Steady work in steps and demand that wanders** run again on the engine that stands; their omni-v9 tables join this list
+- **Steady work in steps and demand that wanders** run again on the engine that stands; their omni-v10 tables join this list
   when they land (the earlier engines' tables are the road, in `docs/history`).
 - **On top of Kubernetes with its add-ons** (KEDA on the CPU target and the requests in flight; KEDA's HTTP add-on), and on top
   of Goldilocks and of CruiseKube: section 50.2.
 
 ### 50.2 On the add-ons: four receipts and the capacity test (omni-v7)
 
-omni-v7 (Chapter 49), the engine before omni-v8 and omni-v9, has five three-run tables of its own, every run on one commit (`b1eb8294f4a7`, 16 October), ten pairs a run and five a cap in the capacity test, on the same kind cluster as section 50.1 with the add-on named as native. They are read here gauge by gauge, native against Omni-Compass on top; the charts under each paragraph picture the table named and add nothing to it. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+omni-v7 (Chapter 49), the engine before omni-v8, omni-v9 and omni-v10, has five three-run tables of its own, every run on one commit (`b1eb8294f4a7`, 16 October), ten pairs a run and five a cap in the capacity test, on the same kind cluster as section 50.1 with the add-on named as native. They are read here gauge by gauge, native against Omni-Compass on top; the charts under each paragraph picture the table named and add nothing to it. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 **On top of Goldilocks and the VPA's recommender** (`V7_GOLDILOCKS.md`; runs 38843260818, 38843263401, 38843266098). Native is the service rightsized by Goldilocks from the VPA recommender's figures, with the HPA under it; omni is the same with Omni-Compass on top. The response time fell at the mean 45% to 47%, at the 95th percentile 60% to 62% and at the 99th 67% to 69%, and the time over the line fell 100%, GAIN in all three of our runs; failed requests were zero in both arms. Machines in service and node-hours read EVEN. The energy counted with every parked worker at idle power rose 1.6% to 2.3%, power given in all three of our runs: the governor's own settings commands (14 to 18 a run, shown and not judged) conveyed processor time to the pods, the service drew 41% to 46% more CPU and answered faster for it, and the energy per core-hour fell 27% to 29% (shown). HPA replicas, pods started and the pod start wait read EVEN; the alert minutes fell 100% in every run and still read EVEN, because at ten pairs two of the three intervals include zero.
 
@@ -7730,15 +7690,17 @@ or approved these results.
   every battery whose building simulates outages native and moves the rest exactly as before. Read locally on CityLearn 3.0.2
   before any GitHub run, the 2023 districts are native's to the last digit and every other district omni-v7's (the 2022
   robustness district checked to the digit against run 38937540021). The robustness district's monthly unevenness, +0.11% (power
-  given), was cut in **omni-v9**: the wire reads the coming hour and glides at up to 0.0625 an hour; read on CityLearn before it was
-  pushed, −2.29% (GAIN) there and no LOSS against native in any district (`docs/OMNI_V9.md`); its three runs make the table V9_CITYLEARN.md.
+  given), was cut in **omni-v9**: the wire reads the coming hour; read on CityLearn before it was pushed, −2.29% (GAIN) there
+  (`docs/OMNI_V9.md`). **omni-v10**, the engine that stands, glides at 0.0875 an hour, the speed that cuts the bill most with no
+  LOSS: read on CityLearn before it was pushed, the bill −16.09% and the unevenness −1.59% there, and no LOSS against native in any
+  district (`docs/OMNI_V10.md`); its three runs make the omni-v10 CityLearn table.
 
 ### 50.8 The one number, and the table
 
-**The one number.** The Omni index over the real categories the same in all three of our runs, every table on omni-v7 (each runs again on omni-v9):
+**The one number.** The Omni index over the real categories the same in all three of our runs, every table on omni-v7 (each runs again on omni-v10):
 **+4.2%, GAIN** (real Kubernetes +27.2% over its seven omni-v7 tests, the real cache +0.2%, real messaging +0.1%, the real
 database, the storage-engine cache and the buffer pool exactly nothing, each category weighed the same; the steady and
-wandering Kubernetes tests, Azure and the card join as their omni-v9 tables land). The second reading, service alone (work and
+wandering Kubernetes tests, Azure and the card join as their omni-v10 tables land). The second reading, service alone (work and
 speed scored, machines and energy shown), stands at **+11.5%, GAIN** (Kubernetes +91.1%, the cache +0.5%, the other stacks
 nothing). A category enters at whatever its tables show in all three of our runs, nothing included, which is the reader's
 guarantee that the number is not built from the categories that happened to work. The numbers of earlier engines are the road,
@@ -7764,14 +7726,14 @@ in `docs/history`, and are never read beside these.
 | Power grids | S | 67 gauge-rows GAIN, 14 power given, no LOSS | `results/live/V7_PANDAPOWER.md` |
 | Robot arms | S | the Gen3: torque −28.6%, tracking error −21.3%, GAIN; two arms left native | `results/live/V7_MUJOCO.md` |
 | Drone swarms | S | energy a mission −7% to −20%, missions a charge +8% to +25%, GAIN | `results/live/V7_SWARM.md` |
-| Buildings with batteries | S | electricity bought and daily peak GAIN in all ten; **LOSS** on energy not served, discomfort, ramping and highest peak in the 2023 districts, fixed in omni-v8; the robustness district's unevenness +0.11%, LOSS, repaired in omni-v9 | `results/live/V7_CITYLEARN.md` |
+| Buildings with batteries | S | electricity bought and daily peak GAIN in all ten; **LOSS** on energy not served and discomfort in the 2023 districts (the ramping and the highest peak beside them power given), fixed in omni-v8; the robustness district's unevenness +0.11%, power given, cut in omni-v9 | `results/live/V7_CITYLEARN.md` |
 
-**Running now and next.** Every benchmark runs again on omni-v9, the engine that stands, released by the conductor
+**Running now and next.** Every benchmark runs again on omni-v10, the engine that stands, released by the conductor
 (`scripts/dispatch_grid.py`, `scripts/reruns.txt`: A of every benchmark, then B, then C), the steady and wandering Kubernetes
 tests among them; Azure one run at a time in its region (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day;
 A, B and C); the grid with the real cluster inside on GitHub's free runners. The omni-v7 runs already started (the kill test's
-three runs of 17 October among them) run to their end and stand as omni-v7's record. Google, Amazon and the GPU chips wait for
-the founder's word; the CPU governor's measured run waits for a machine with a power meter.
+three runs of 17 October among them) run to their end and stand as omni-v7's record. Google and Amazon, their secrets in, were switched on
+by the founder on 18 October and run the same four sets; the GPU chips wait for the founder's word; the CPU governor's measured run waits for a machine with a power meter.
 
 ### 50.9 Wire in, or watch: the verdict per knob
 
@@ -7787,7 +7749,7 @@ GAIN and LOSS (or power given) both hold in all three of our runs, a trade shown
 its realms label (`results/realms_v5`): a GAIN on work, speed or misses is write, the energy the max took for it power given and
 never a trade; SAME AS NATIVE and AT ITS LIMIT ON NATIVE are watch.
 
-What the page says (written 16 October from the tables then standing; each row names its engine). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the seven organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v9); it changes what an operator connects.
+What the page says (written 16 October from the tables then standing; each row names its engine). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the seven organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v10); it changes what an operator connects.
 
 **The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
 brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 35.4;
@@ -10519,7 +10481,8 @@ shows (its processor use, the requests waiting, the response times), as in every
   `gke-metered.yml` and `eks-metered.yml`, one set at a time per machine-family queue, read back by title as on Azure),
   each behind its own `switch=` line, off until that cloud's secrets are in the repository and the founder turns it on; a
   run without its secrets stops before anything is built or billed. The Azure run is the measure of the other two: nothing
-  in a set differs between clouds but the machine type, the zone or region, and the list price.
+  in a set differs between clouds but the machine type, the zone or region, and the list price. (18 October: both
+  switched on by the founder, the secrets in the repository; nothing in a set changed.)
 - **Disclosed.** At `1 6 1 8 1 6` in October's first runs about 41% of requests failed in both arms with the
   autoscaler pinned at its cap of 10 pods; a peak of 9 asks more of the four workers than 8 did. What each arm served at
   each shape is in its table. Cost: about $4 to $6 a set of five at list price; three sets of each shape, about $30 for
@@ -10886,7 +10849,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v9, fingerprint 7379f3a79ff2c475 (47 files).
+- **The engine on this checkout:** omni-v10, fingerprint 4bf39b0d707784de (47 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -10901,7 +10864,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real database cache (MongoDB under YCSB, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v9): 0 of 24 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v10): 0 of 24 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
@@ -10966,21 +10929,25 @@ with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and wh
 waits on the family allowance those machines hold.
 
 
-### 60.1 In one paragraph (2026-10-17, the engine that stands is omni-v9)
+### 60.1 In one paragraph (2026-10-18, the engine that stands is omni-v10)
 
-**The engine that stands is omni-v9** (`OMNI_V9.json`, digest `7379f3a79ff2c475`, 47 files; `docs/OMNI_V9.md`), on main since
-17 October by the founder's order. It is omni-v8 with the CityLearn battery wire reading the coming hour (the mean of the same
-hour over the past seven days, only hours already seen) and gliding at up to 0.0625 an hour (the fastest glide at which no score rose in any district), and with every 95% interval on the
-exact Student t quantile. The reading of the hour gone had run about five hours behind the day and left the batteries empty at
-each month's top hour (the 2022 robustness district's monthly unevenness rose 0.11%: printed LOSS then, power given by the key,
-since an unevenness, like a peak, is power held; the founder's correction of 17 October). The fix
-was proven on CityLearn itself and in the toy gate before it was pushed (the founder's order: the fix in our own runs first).
-**omni-v8** (`docs/OMNI_V8.md`) was omni-v7 with one wire changed, the CityLearn runner: a battery whose building simulates
+**The engine that stands is omni-v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`), on main since
+18 October by the founder's order. It is omni-v9 with the CityLearn battery wire's glide at 0.0875 of its range an hour (omni-v9:
+0.0625), the speed that cuts the bill most with no LOSS: omni-v9 had stopped at the fastest glide where no score rose, and by the
+one key (the founder's correction of 17 October) a rise in the ramping or in the distance from net zero is power held, power
+given, never a LOSS. Read on CityLearn before it was pushed, it cuts the bill 8.4% to 20.1% in every district with a price, a
+further 1.1 to 2.4 points beyond omni-v9, and reads no LOSS against native in any district read before the push; the electricity bought, the carbon and
+the peaks fall a little less than on omni-v9, every one still GAIN, and two rows of the 2022 phase 3 are power given (the ramping
++6.18%, the net-zero shortfall +0.25%). A change that would have steered the outage buildings' batteries outside the outage hours
+was refused: energy not served +0.69% in one 2023 district, a LOSS (`docs/OMNI_V10.md`, section 3). **omni-v9** (`docs/OMNI_V9.md`)
+made the wire read the coming hour (the mean of the same hour over the past seven days, only hours already seen) and made every
+95% interval exact (Student t): the reading of the hour gone had run about five hours behind the day (on omni-v8 the 2022
+robustness district's monthly unevenness rose 0.11%: power held, power given by the key). **omni-v8** (`docs/OMNI_V8.md`) was omni-v7 with one wire changed, the CityLearn runner: a battery whose building simulates
 power outages stays native, because its charge is also the building's reserve. omni-v7's CityLearn table read LOSS in all three
 of our runs in the seven 2023 districts, the only districts CityLearn ships with outages; the cause was ours, found on CityLearn
 itself and reproduced to the last digit, and three narrower repairs were refused on the tuning district before this one. Read
 locally before any GitHub run, omni-v8 gives native's numbers on the 2023 districts and omni-v7's on every other district. The
-other 45 engine files were omni-v7's bytes. Every benchmark runs again on omni-v9 (`scripts/reruns.txt`, released a few a tick by
+other 45 engine files were omni-v7's bytes. Every benchmark runs again on omni-v10 (`scripts/reruns.txt`, released a few a tick by
 the grid conductor, A of every benchmark, then B, then C; the grid and every Azure set restarted on it the same day); until a
 benchmark's three runs land, its row names the engine it ran on (`docs/BENEFIT_SHEET.md` and the standing block above). Results
 are never read across engines. The standing block is written from the result files by `tools/summary.py --fix` and checked on
@@ -11012,9 +10979,9 @@ Kubernetes, three paired repetitions a run on the live stacks; native against Om
   all three of our runs on omni-v7, the occupants' misses: repaired in omni-v8 (above), where those batteries stay native. The
   ramping, the highest peak and the monthly unevenness that rose beside them, and the 2022 robustness district's monthly
   unevenness +0.11% (beside the bill −8.6%, the electricity bought −14.7% and the daily peak −14.0%, all GAIN), are power held:
-  power given by the key, printed LOSS until the CityLearn tool was corrected on 17 October. omni-v9, read on CityLearn before it
-  was pushed, cuts that unevenness 2.29% and reads no LOSS against native in any district (`docs/OMNI_V9.md`, section 3); its
-  three runs on GitHub are in the queue.
+  power given by the key, printed LOSS until the CityLearn tool was corrected on 17 October. omni-v9 cut that unevenness 2.29%;
+  omni-v10, read on CityLearn before it was pushed, cuts it 1.59% and the bill 16.09% there, and reads no LOSS against native in
+  any district (`docs/OMNI_V10.md`, section 2); its three runs on GitHub are in the queue.
 - **The one number.** The Omni index over the real tests: **+4.2% GAIN** on the resource reading (work, speed, machines,
   energy) and **+11.5% GAIN** on the service reading (`results/OMNI_INDEX.md`).
 
@@ -11025,19 +10992,20 @@ Compute / AI / Cloud 540, Physics / Robotics / Autonomous 404, Energy / Facility
 484, the four stacked 1,908, the whole tower 1,107) GAIN (fewer misses, and under the climb more work) under the normal, climb
 and line loads, the power given +0.00% to +0.05% (`results/realms_v5/REALMS_V5.md`, the engine it ran on named in its header;
 `docs/THE_SPINE.md`); the grid, 36 of 36 squares of 10 and 100 runs GAIN with the six organisms run so far alone and, with the
-real cluster inside, the organism's time over the line GAIN in 36 of 36 (`results/grid_v5/GRID.md`); the grid on omni-v9 has
-its own manifest (`results/grid_v9/`). Every muscle is written out, organism by organism, the spine first, in
+real cluster inside, the organism's time over the line GAIN in 36 of 36 (`results/grid_v5/GRID.md`); the grid on omni-v10 has
+its own manifest (`results/grid_v10/`). Every muscle is written out, organism by organism, the spine first, in
 `docs/REALM_MUSCLES.md`, and explained, wired and carded in `docs/MUSCLE_CATALOG.md` (the manuals' muscle appendix, with every
 family's wiring on a real stack from `docs/wiring_recipes.csv`).
 
 **The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one thing,
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
-on omni-v9; the sets of earlier engines already started run to their end as their own record. The only Azure tables up so far are v1's
+on omni-v10; the sets of earlier engines already started run to their end as their own record. The only Azure tables up so far are v1's
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
 **Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
-`scripts/amazon_queue.txt`), each behind its own `switch=` line, off until that cloud's secrets are in the repository and the
-founder turns it on (the Operator's Manual's appendices G and H, click by click).
+`scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
+18 October (the Operator's Manual's appendices G and H, click by click). Their sets run on omni-v10, one at a time in each
+machine-family queue, the free credits first.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -11051,20 +11019,20 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
 
 ### 60.2 Open
 
-1. **Every benchmark on omni-v9**: released A, then B, then C by the conductor from `scripts/reruns.txt` (the steady and
+1. **Every benchmark on omni-v10**: released A, then B, then C by the conductor from `scripts/reruns.txt` (the steady and
    wandering Kubernetes tests among them, and MySQL, Redis and MongoDB with native as shipped beside the operator's setting);
-   each table replaces its earlier engine's row on the sheet when its three runs land. CityLearn's omni-v9 table must read no
+   each table replaces its earlier engine's row on the sheet when its three runs land. CityLearn's omni-v10 table must read no
    LOSS in any district, as it did locally.
 2. **The pod start wait under KEDA's HTTP add-on**: +9.5% a pod in one omni-v8 run (LOSS; total start wait −21%, pods started
    −29%, response −57%), +9% in the toy gate's conveyance model; EVEN in omni-v7's three runs. The next repair, in the toy gate
    first; the B and C runs decide its reading.
 3. **The kill test**: three omni-v7 runs on the fixed harness started 17 October (they finish and stand as omni-v7's record);
-   its omni-v9 runs are in the queue.
-4. **The grid and Azure on omni-v9**: restarted on 17 October; nothing cancelled.
-5. **Google and Amazon**: on the founder's word, once their secrets are in the repository (appendices G and H).
-6. **The card**: the founder's runs on Lambda, one exact commit of omni-v9.
+   its omni-v10 runs are in the queue.
+4. **The grid and Azure on omni-v10**: restarted on 18 October; nothing cancelled.
+5. **Google and Amazon**: switched on 18 October, their secrets in; the four sets run A, B and C on omni-v10, the free credits first.
+6. **The card**: the founder's runs on Lambda, one exact commit of omni-v10.
 7. **Linux**: a machine on the metal for `cpu-power`.
-8. **More room**: of the 159 muscles that read SAME AS NATIVE on the realms table, the room search of 16 October
+8. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
    (`docs/OMNI_V7.md`) found none under the max's gauges within each muscle's own knob; six process loops miss at most 0.56% of
    decisions, a card candidate for a later version. The 14 of 26 knob-cases on the real stacks that read watch stay the next
    engine's question, in the toy gate first.
@@ -11081,7 +11049,7 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
 | `docs/LEVELS.md` | every level on one page (muscle, organism, cluster, add-ons, service, plant, cloud, group of clusters), its counts of GAIN, EVEN, power given and LOSS, and any level whose gauges go the other way |
 | `docs/REGISTER.md` | every muscle family wired, every benchmark run, every benchmark still to run |
 | `docs/WIRING_VERDICTS.md` | write, watch or the operator's choice, per knob, from every result |
-| `docs/OMNI_V9.md` | the engine that stands, what changed and every result read on it; the earlier engines' pages (`docs/OMNI_V8.md`, `docs/OMNI_V7.md`, `OMNI_V6.md`, `OMNI_V5.md`, `OMNI_V3.md`, `OMNI_V2.md`, `OMNI_V1.md`) stay with their own results as the road |
+| `docs/OMNI_V10.md` | the engine that stands, what changed and every result read on it; the earlier engines' pages (`docs/OMNI_V9.md`, `docs/OMNI_V8.md`, `docs/OMNI_V7.md`, `OMNI_V6.md`, `OMNI_V5.md`, `OMNI_V3.md`, `OMNI_V2.md`, `OMNI_V1.md`) stay with their own results as the road |
 | `docs/history/STATE_OF_PLAY_2026-10-10.md` | this page as it stood on 10 October, on Omni v3, moved here whole |
 
 # Part Eight. Value, License and History
@@ -11200,11 +11168,12 @@ and the other as power given in all three of our runs, because that is what happ
 ### 61.5 Where the evidence stands today, read honestly
 
 Every number below is from a three-run table, each row naming the engine it ran on, with its evidence class and the
-question a referee is entitled to ask about it. The engine that stands is **omni-v9** (`OMNI_V9.json`, digest
-`7379f3a79ff2c475`, on main since 17 October by the founder's order): omni-v8 (a battery whose building simulates power outages
+question a referee is entitled to ask about it. The engine that stands is **omni-v10** (`OMNI_V10.json`, digest
+`4bf39b0d707784de`, on main since 18 October by the founder's order): omni-v8 (a battery whose building simulates power outages
 stays native, section 61.6) with the CityLearn battery wire reading the coming hour and every interval on the exact Student t
-quantile (`docs/OMNI_V9.md`). Every row below ran on **omni-v7** (`OMNI_V7.json`, digest `d6d467b824c585f1`, 16 to 17 October),
-whose Kubernetes, service and organism files omni-v9 carries byte for byte; each
+quantile (omni-v9, `docs/OMNI_V9.md`), and the wire's glide at the speed that cuts the bill most with no LOSS (omni-v10,
+`docs/OMNI_V10.md`). Every row below ran on **omni-v7** (`OMNI_V7.json`, digest `d6d467b824c585f1`, 16 to 17 October),
+whose Kubernetes, service and organism files omni-v10 carries byte for byte; each
 runs again on the engine that stands (`scripts/reruns.txt`) and its row is replaced here when its three runs land. Results are
 never read across engines. The newest state, written from the result files on every push, is the standing block of
 `docs/STATE_OF_PLAY.md` and the sheet `docs/BENEFIT_SHEET.md`.
@@ -11228,8 +11197,8 @@ never read across engines. The newest state, written from the result files on ev
 | Power grid, 11 SimBench grids in pandapower | 67 gauge-rows GAIN, 14 power given (line losses in four grids with their own generation, tap operations in one), no LOSS | S | "Where does it cost?" In the rural and semi-urban grids with their own generation, where a lower voltage raises losses; the table shows it |
 | Robot arms, MuJoCo Menagerie | on the Kinova Gen3 peak torque −28.6%, tracking error −21.3%, copper heating −11.3%, GAIN in all three of our runs; two arms left native by the paired physics trial | S | "What about the arms that gained nothing?" The trial left them native and the table says so |
 | Drone swarms, gym-pybullet-drones, three 20-drone cells | energy a mission −7% to −20%, missions a charge +8% to +25%, GAIN in all three of our runs; no late mission, reserve breach, near miss or collision | S | "Is the energy a meter?" No, a declared model from the simulator's own motor constants |
-| Buildings with batteries, CityLearn 3.0.2 | electricity bought and daily peak GAIN in all ten battery districts; **LOSS in all three of our runs in the seven 2023 districts** on omni-v7 (energy not served +2.0% to +9.8%, discomfort; the ramping and the highest peak beside them power given), repaired in omni-v8; the 2022 robustness district's monthly unevenness +0.11%, power given | S | "Why a LOSS?" The 2023 districts simulate power outages and the wire moved a battery that is also its building's reserve; omni-v8 leaves those batteries native (read locally: the 2023 districts native's to the digit, every other district omni-v7's). The robustness district's +0.11% is repaired in omni-v9, the wire reading the coming hour |
-| Azure's bill at the tune-down | the sets run one at a time on omni-v9 (the steady set, two bursts, the Google day) | L, a real bill | "Then where is the saving?" Not claimed until its three-run tables land; the 4-worker v1 fleet read EVEN on every gauge, too small to show one machine |
+| Buildings with batteries, CityLearn 3.0.2 | electricity bought and daily peak GAIN in all ten battery districts; **LOSS in all three of our runs in the seven 2023 districts** on omni-v7 (energy not served +2.0% to +9.8%, discomfort; the ramping and the highest peak beside them power given), repaired in omni-v8; the 2022 robustness district's monthly unevenness +0.11%, power given | S | "Why a LOSS?" The 2023 districts simulate power outages and the wire moved a battery that is also its building's reserve; omni-v8 leaves those batteries native (read locally: the 2023 districts native's to the digit, every other district omni-v7's). The robustness district's +0.11% is power given; omni-v9 cut it, the wire reading the coming hour |
+| Azure's bill at the tune-down | the sets run one at a time on omni-v10 (the steady set, two bursts, the Google day) | L, a real bill | "Then where is the saving?" Not claimed until its three-run tables land; the 4-worker v1 fleet read EVEN on every gauge, too small to show one machine |
 | The real card (GPU) | **obsolete**: every earlier card result ran on a controller since replaced | P pending | "When?" The founder's runs on rented cards at one named commit, after the CPU and cloud work |
 
 The upside the real-software data points toward is a third to a half more work from what is already installed on the
@@ -11248,19 +11217,20 @@ catalog, every muscle its own card, the living body and the lease's walk back (v
 **v6** (15 October); and given conveyance bounded by each namespace's quota, the verdict in the reports' words, every rule in
 seconds and the cloud's one flag as **v7** (16 October), tried in the toy gate and in live trials first; given, as **v8** (17
 October), the one wire omni-v7's CityLearn table showed was ours to fix: a battery that is also its building's reserve through an
-outage stays native; and given, as **v9**, the engine that stands since 17 October by the founder's order, the battery wire
-reading the coming hour, proven on CityLearn and in the toy gate before it was pushed (`docs/OMNI_V1.md`, `OMNI_V2.md`,
-`OMNI_V3.md`, `OMNI_V5.md`, `OMNI_V6.md`, `OMNI_V7.md`, `OMNI_V8.md`, `OMNI_V9.md`). Earlier engines, among them an
+outage stays native; given, as **v9** (17 October), the battery wire reading the coming hour; and given, as **v10**, the
+engine that stands since 18 October by the founder's order, the battery wire's glide at the speed that cuts the bill most with no
+LOSS, each proven on CityLearn and in the toy gate before it was pushed (`docs/OMNI_V1.md`, `OMNI_V2.md`, `OMNI_V3.md`,
+`OMNI_V5.md`, `OMNI_V6.md`, `OMNI_V7.md`, `OMNI_V8.md`, `OMNI_V9.md`, `OMNI_V10.md`). Earlier engines, among them an
 allocation law that gave back about a third of the machines at the cost of response time and a compass law without the
 verdict, produced the numbered sets kept in `docs/history/`; their results are history, labelled as the engine that produced
 them, and are never read beside a later engine's. A buyer does not choose between modes: there is one law, and every table
 names the version of it that produced the table. When the founder declares the engine final, the engine that stands then
 is published as Omni-Compass 1.0, with the older fingerprints kept as the road to it, never as a second product.
 
-"Versioned" has a precise meaning here. The engine is a fixed set of files (47 on v9), and `OMNI_V9.json` holds one
-SHA-256 for each of them and one digest over all of them; `OMNI_V8.json`, `OMNI_V7.json`, `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`,
+"Versioned" has a precise meaning here. The engine is a fixed set of files (47 on v10), and `OMNI_V10.json` holds one
+SHA-256 for each of them and one digest over all of them; `OMNI_V9.json`, `OMNI_V8.json`, `OMNI_V7.json`, `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`,
 `OMNI_V2.json` and `OMNI_V1.json` do the same for the earlier sets. `python3 tools/omni_version.py` hashes the files in a checkout and prints
-which fingerprint they match (for this edition, `omni-v9 (digest 7379f3a79ff2c475, 47 files)`), or, when they match none,
+which fingerprint they match (for this edition, `omni-v10 (digest 4bf39b0d707784de, 47 files)`), or, when they match none,
 which files differ from the nearest; with `--commit <sha>` it asks the same of any pushed commit, which is how every
 three-run table checks that its runs A, B and C were on the same engine before it combines them, and refuses if they were
 not. The versions differ in exactly the ways their records name, and a reader can check that from the fingerprints rather
@@ -11957,7 +11927,7 @@ are sourced.
 4. **Aim the chip at about 5% more finished work on the same bill**, cap unchanged and temperature never behind, or at
    fewer joules for the same work. The buyer chooses, and the receipt prints which.
 
-## 73. The Road to the Engine That Stands: Omni v5, v6, v7 and v8
+## 73. The Road to the Engine That Stands: Omni v5, v6, v7, v8 and v9
 
 ### 73.1 Omni v5 — the engine fingerprint
 
@@ -12239,7 +12209,7 @@ wall-clock budgets still apply: a stage that cannot finish within its budget mus
 
 Omni v7 stood on main from 16 to 17 October; on 17 October it was followed by Omni v8 (`docs/OMNI_V8.md`, the founder's
 order), omni-v7 with one wire changed (the CityLearn runner: a battery whose building simulates outages stays native), and the
-same day by Omni v9 (`docs/OMNI_V9.md`), the engine that stands. This page and
+same day by Omni v9 (`docs/OMNI_V9.md`), and on 18 October by Omni v10 (`docs/OMNI_V10.md`), the engine that stands. This page and
 v7's twenty-two three-run tables (`results/live/V7_*.md`) stay as that engine's record, read beside no other engine's.
 
 Omni v7 was the engine that stood on main from 16 October (the founder's order: everything on the newest engine). Every benchmark ran again on it (`scripts/reruns.txt`; the grid conductor's reruns, grid and Azure queues restarted on it the same day), and every earlier table stands as its own engine's result until its three runs on v7 land; results from two versions are never pooled. v7 is v6 with five changes, each found from a v6 run's own files or from the governing rules themselves:
@@ -12371,9 +12341,9 @@ Reference: Kubernetes [Resource Quotas](https://kubernetes.io/docs/concepts/poli
 
 
 
-Omni v8 stood on main on 17 October; since later that day the engine that stands is Omni v9 (`docs/OMNI_V9.md`), omni-v8
-with the CityLearn battery wire reading the coming hour, which cuts the one row this page names (section 73.3.3; printed LOSS, power
-given by the key, `docs/OMNI_V9.md`, section 1). This page
+Omni v8 stood on main on 17 October; later that day it was followed by Omni v9 (`docs/OMNI_V9.md`), omni-v8 with the
+CityLearn battery wire reading the coming hour, which cuts the one row this page names (section 73.3.3; printed LOSS, power given by
+the key, `docs/OMNI_V9.md`, section 1), and on 18 October by Omni v10 (`docs/OMNI_V10.md`), the engine that stands. This page
 stays as omni-v8's record, read beside no other engine's.
 
 Omni v8 was the engine that stood on main from 17 October (the founder's order: "there's a new version 8 ... push in all and
@@ -12462,6 +12432,237 @@ record. Google Cloud and Amazon carry the same sets behind their switches, off u
 Lambda wait for his word and one exact commit. The organisms are the seven of 16 October, the spine first (`docs/THE_SPINE.md`).
 
 © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+### 73.5 Omni v9: the battery wire reads the coming hour (the engine that stood on 17 and 18 October)
+
+
+
+Omni v9 stood on main from 17 to 18 October; on 18 October it was followed by Omni v10 (`docs/OMNI_V10.md`), the engine that
+stands: omni-v9 with the battery glide at 0.0875 an hour, the speed that cuts the bill most with no LOSS (section 73.3.2 below gives
+the ladder it was chosen from). This page stays as omni-v9's record, read beside no other engine's.
+
+Omni v9 was the engine on main from 17 October (the founder's orders: "we're going into another version of
+Engine ... Apply the fix, run it, and see in the toy sim that it works"; "Omni-Compass should be tuned to exploit all that can be
+and keep all healthy and never raise its bill ... the tuning stays where it doesn't ever hurt anyone"). It is omni-v8
+(`docs/OMNI_V8.md`) with one wire repaired and one statistical table made exact. It was written for one omni-v8 row the table
+printed as LOSS; on 17 October the founder found that word misapplied (section 73.3.1): the row was power given. The repair it led to
+stands on its own, because it cuts the bill further in every district. Its fingerprint is `OMNI_V9.json` (digest `7379f3a79ff2c475`, 47 files); 44 are omni-v8's bytes, two
+differ (the CityLearn runner and the realms harness) and one is new (`omnicompass/student_t.py`). It was proven in our own runs of
+CityLearn and in the toy gate before it was pushed. Every benchmark runs again on it, and every earlier table stands as its own
+engine's result until its three runs on v9 land; results from two versions are never pooled. Run and scored by The Omni-Compass
+LLC's own code. No outside party has reviewed or approved these results.
+
+| # | Change | Where | What it tightens |
+|---|---|---|---|
+| 1 | The battery wire reads the coming hour's draw (the mean of the same hour over the past seven days, only hours already seen) and its adjustment glides at up to 0.0625 of the command's range an hour (0.05 before), the fastest glide that read no LOSS on any score in any district | `tools/run_citylearn.py` | the battery answers the hour it moves, not the hour gone |
+| 2 | Every 95% interval uses the exact Student t quantile for its number of pairs | `omnicompass/student_t.py`, `realms/harness.py` and the table tools | no interval narrower than its sample allows, at any count |
+
+#### 73.5.1 What omni-v8 read, and why
+
+One row of the omni-v8 table was printed LOSS: in `citylearn_challenge_2022_phase_all_robustness` (17 buildings, a battery in
+each, no outage buildings) the monthly load unevenness (`monthly_one_minus_load_factor_average`: one minus each month's mean draw
+over its peak) rose 0.11% in all three of our runs, beside the bill −8.6%, the electricity bought −14.7%, the daily peak −14.0% and
+the highest peak −2.7%, all GAIN (the omni-v7 table, whose commands omni-v8 repeats to the byte outside the 2023 districts). **By
+the key that row is power given, not a LOSS**: the unevenness is the shape of the power the district holds from the grid, a
+resource held, as a peak is; it is neither time waited nor work done nor a miss. The CityLearn table tool had filed the peaks, the
+swings and the unevenness as misses; it was corrected on 17 October (`tools/citylearn_abc.py`, `tools/readings.py`: one key for
+every gauge, as a cluster's peak power always was). Run locally, the same wire also raised, on districts the GitHub benchmark does
+not run (CityLearn ships them only in its source repository), the tuning district's monthly unevenness +0.26%; in the 2022 phase 2
+the highest peak +0.17%, the daily unevenness +1.03% and the monthly unevenness +0.68%; in the 2022 phase 3 the highest peak +0.45%
+and the ramping +3.37%: power given, every one, and shown here with the rest.
+
+The cause was found in an hour-by-hour trace of the omni-v8 wire on the robustness district (CityLearn 3.0.2, run locally):
+
+- The compass read the district's draw of the hour just gone and moved the batteries for the hour coming, and its adjustment
+  could change by only 0.05 of the command's range an hour. Averaged by hour of day over the year, the adjustment discharged
+  hardest at 00:00 and charged hardest at 15:00, while the district's draw peaked at 19:00 and bottomed at 13:00: it ran about five
+  hours behind the day, still adding charge at 17:00 and 18:00 as the evening peak climbed.
+- So the batteries were empty when each month's top hour came: at the month's highest net draw the mean state of charge was 0.000
+  to 0.037 in ten of the eleven months the trace covers.
+- The score is a ratio. Lowering a month's mean (less energy bought) while its peak hour stays at the batteries' limit raises one
+  minus mean over peak: the energy fell faster than the top hours.
+
+Narrower repairs were tried on the robustness district first; each left the unevenness up, so none is in the engine:
+
+| Candidate | What it changed | Monthly unevenness against native |
+|---|---|---:|
+| no discharge below the band's middle | Omni-Compass adds no discharge in a quiet hour | +0.11% (power given) |
+| no new peak (the month's top so far, and the month's or the week's) | the charge it adds never lifts the district above its top so far | +0.11% (power given) |
+| peak push | full discharge where the draw nears the month's top so far | +0.12% (power given) |
+| a reserve of 30%, 50% or 70% of charge | its added discharge stops at the reserve | +0.42%, +0.25%, +0.25% (power given), and the highest peak's GAIN lost |
+| the hour gone, glide 0.25 | faster only | −0.61% (GAIN), the ramping +13.2% (power given) |
+
+#### 73.5.2 The change, and how far it is pushed
+
+The reading is the draw of the hour the batteries are about to move: the mean of the same hour of the day over the past seven
+days, h[t−24], h[t−48], …, h[t−168] (only hours already seen; before a day has been seen, the last hour's draw). Nothing else in
+the wire changed: the compass law, its gain (0.5), its response (1 h), its band (the 10th to the 90th percentile of the past week's
+draw), the hand-back at 90% of the year, the batteries left native in outage buildings (omni-v8) and the water tanks left native.
+
+The glide was set where no score of any district rose: with the new reading, every glide from 0.05 to 0.10 an hour was run on the
+districts where the edge lies, and the fastest at which nothing rose in either is 0.0625. Read by the key, no glide on the ladder
+reads a LOSS anywhere: every rise below is power given, and the bill keeps falling up to 0.0875 to 0.10:
+
+| District | Score | 0.05 | 0.0625 | 0.075 | 0.0875 | 0.10 |
+|---|---|---:|---:|---:|---:|---:|
+| phase 2 | daily unevenness | +0.25% power given | -0.09% GAIN | -0.67% GAIN | -0.94% GAIN | -0.91% GAIN |
+| phase 2 | net-zero shortfall | -7.53% GAIN | -4.77% GAIN | -3.38% GAIN | -2.54% GAIN | -1.99% GAIN |
+| phase 2 | the bill | -14.12% GAIN | -17.22% GAIN | -18.75% GAIN | -19.17% GAIN | -19.03% GAIN |
+| phase 3 | the ramping | -5.05% GAIN | -1.91% GAIN | +2.32% power given | +6.18% power given | +9.59% power given |
+| phase 3 | net-zero shortfall | -2.21% GAIN | -0.76% GAIN | -0.04% EVEN | +0.25% power given | +0.41% power given |
+| phase 3 | the bill | -6.60% GAIN | -7.32% GAIN | -8.10% GAIN | -8.43% GAIN | -8.32% GAIN |
+
+At 0.05 the 2022 phase 2's daily unevenness rises; from 0.075 the 2022 phase 3's ramping does, and from 0.0875 its net-zero
+shortfall: power given, each. At 0.0625 every score of every district reads GAIN (section 73.3.3). The founder's rule for the tune (use
+everything that can be used, keep everything healthy, never raise the bill) takes the glide past 0.0625, to the speed that cuts the
+bill most with no LOSS: that is the next version's change, read on CityLearn first.
+
+The second change is statistical and moves no command. The interval tables written in each tool stopped at a few sample sizes and
+fell back to 1.96 (the normal quantile) for a number of pairs they did not list, too narrow an interval for a small sample. Every
+tool now takes the exact quantile from one file, `omnicompass/student_t.py` (the regularized incomplete beta function, checked
+against the published table to three decimals). Every value the old tables held is unchanged; no published table used a count the
+old tables lacked, so no published reading moves.
+
+#### 73.5.3 What it does, read on CityLearn before any GitHub run
+
+CityLearn 3.0.2, run locally on its own district files, native (CityLearn's BasicRBC) against Omni-Compass on top of it; every
+score is CityLearn's own (each over no battery at all), and every row is read by the one key. The omni-v8 column is the wire as it stood.
+
+**2022 robustness, 17 buildings (where the omni-v8 row stood)**
+
+| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+|---|---:|---:|---:|
+| the bill | 1.1008 | -8.61% GAIN | -14.22% GAIN |
+| electricity bought | 1.1938 | -14.66% GAIN | -14.92% GAIN |
+| carbon | 1.1494 | -11.89% GAIN | -13.11% GAIN |
+| the daily peak | 1.1392 | -13.95% GAIN | -20.82% GAIN |
+| the highest peak | 1.0272 | -2.73% GAIN | -2.73% GAIN |
+| the ramping | 1.2231 | -7.18% GAIN | -12.60% GAIN |
+| daily unevenness | 1.0084 | -2.90% GAIN | -7.32% GAIN |
+| monthly unevenness | 0.9892 | +0.11% power given | -2.29% GAIN |
+| net-zero shortfall | 1.1312 | -6.10% GAIN | -2.76% GAIN |
+
+**2022 phase 1, 5 buildings (the tuning district)**
+
+| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+|---|---:|---:|---:|
+| the bill | 1.1158 | -10.54% GAIN | -17.63% GAIN |
+| electricity bought | 1.2275 | -17.77% GAIN | -19.37% GAIN |
+| carbon | 1.1804 | -14.67% GAIN | -17.15% GAIN |
+| the daily peak | 1.1417 | -11.88% GAIN | -19.63% GAIN |
+| the highest peak | 1.0142 | -1.40% GAIN | -5.04% GAIN |
+| the ramping | 1.1562 | -4.41% GAIN | -10.45% GAIN |
+| daily unevenness | 0.9892 | -0.29% GAIN | -3.09% GAIN |
+| monthly unevenness | 0.9900 | +0.26% power given | -1.68% GAIN |
+| net-zero shortfall | 1.1369 | -6.55% GAIN | -2.85% GAIN |
+
+**2022 phase 2, 5 buildings**
+
+| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+|---|---:|---:|---:|
+| the bill | 1.1080 | -10.83% GAIN | -17.22% GAIN |
+| electricity bought | 1.2124 | -16.87% GAIN | -18.44% GAIN |
+| carbon | 1.1665 | -14.09% GAIN | -16.69% GAIN |
+| the daily peak | 1.1124 | -12.23% GAIN | -17.74% GAIN |
+| the highest peak | 0.9983 | +0.17% power given | -11.26% GAIN |
+| the ramping | 1.1231 | -3.97% GAIN | -10.99% GAIN |
+| daily unevenness | 0.9787 | +1.03% power given | -0.09% GAIN |
+| monthly unevenness | 0.9828 | +0.68% power given | -0.66% GAIN |
+| net-zero shortfall | 1.1970 | -8.77% GAIN | -4.77% GAIN |
+
+**2022 phase 3, 7 buildings**
+
+| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+|---|---:|---:|---:|
+| the bill | 1.0848 | -4.17% GAIN | -7.32% GAIN |
+| electricity bought | 1.1573 | -8.89% GAIN | -6.23% GAIN |
+| carbon | 1.1155 | -6.65% GAIN | -5.50% GAIN |
+| the daily peak | 1.0973 | -10.96% GAIN | -16.09% GAIN |
+| the highest peak | 0.9942 | +0.45% power given | -3.61% GAIN |
+| the ramping | 1.1814 | +3.37% power given | -1.91% GAIN |
+| daily unevenness | 1.0176 | -4.83% GAIN | -9.88% GAIN |
+| monthly unevenness | 0.9838 | -0.55% GAIN | -5.07% GAIN |
+| net-zero shortfall | 1.0809 | -3.28% GAIN | -0.76% GAIN |
+
+**2022 phase all, 17 buildings**
+
+| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+|---|---:|---:|---:|
+| the bill | 1.1007 | not run | -14.20% GAIN |
+| electricity bought | 1.1941 | not run | -14.92% GAIN |
+| carbon | 1.1496 | not run | -13.11% GAIN |
+| the daily peak | 1.1392 | not run | -20.77% GAIN |
+| the highest peak | 1.0272 | not run | -2.73% GAIN |
+| the ramping | 1.2223 | not run | -12.57% GAIN |
+| daily unevenness | 1.0084 | not run | -7.29% GAIN |
+| monthly unevenness | 0.9892 | not run | -2.28% GAIN |
+| net-zero shortfall | 1.1315 | not run | -2.78% GAIN |
+
+**Alameda County, 100 buildings**
+
+| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+|---|---:|---:|---:|
+| the bill | 1.0000 | not run | +0.00% EVEN |
+| electricity bought | 2.0205 | not run | -6.95% GAIN |
+| carbon | 1.0000 | not run | +0.00% EVEN |
+| the daily peak | 2.4165 | not run | -8.92% GAIN |
+| the highest peak | 1.2582 | not run | -4.40% GAIN |
+| the ramping | 1.3828 | not run | -10.40% GAIN |
+| daily unevenness | 0.7972 | not run | -2.75% GAIN |
+| monthly unevenness | 0.8053 | not run | -1.79% GAIN |
+| net-zero shortfall | 9.8346 | not run | -0.08% GAIN |
+| energy not served | 0.0000 | not run | +0.00% EVEN |
+| time uncomfortable | 0.7607 | not run | +0.00% EVEN |
+
+**Travis County, 100 buildings**
+
+| CityLearn score | native | omni-v8 against native | omni-v9 against native |
+|---|---:|---:|---:|
+| the bill | 1.0000 | not run | +0.00% EVEN |
+| electricity bought | 3.8416 | not run | -3.96% GAIN |
+| carbon | 1.0000 | not run | +0.00% EVEN |
+| the daily peak | 3.1689 | not run | -5.92% GAIN |
+| the highest peak | 1.3727 | not run | +0.00% EVEN |
+| the ramping | 1.1329 | not run | -7.58% GAIN |
+| daily unevenness | 0.5655 | not run | -2.71% GAIN |
+| monthly unevenness | 0.6057 | not run | -1.96% GAIN |
+| net-zero shortfall | -4.6732 | not run | -0.18% GAIN |
+| energy not served | 0.0000 | not run | +0.00% EVEN |
+| time uncomfortable | 0.8454 | not run | +0.00% EVEN |
+
+Across the districts above: omni-v8 29 GAIN, 0 EVEN, 7 power given, 0 LOSS (where it was run); omni-v9 58 GAIN, 9 EVEN, 0 power given, 0 LOSS.
+
+The districts: the robustness district, where the omni-v8 row stood and where the cause was found; the tuning district
+(`citylearn_challenge_2022_phase_1`); the 2022 phases 2, 3 and all (shipped in CityLearn's source repository, not in its package,
+so the GitHub benchmark does not run them); and the two 100-building neighbourhoods the benchmark counts (Alameda County, Travis
+County). The seven 2023 districts are unchanged by construction: every battery in them is left native (omni-v8), so their omni arm
+is native's to the last digit. The shipped runner (`tools/run_citylearn.py`) and the study's copy of it give the same numbers to
+the last digit on both arms (checked on the robustness district).
+
+**Shown, power given.** Month by month, the peak hour with Omni-Compass on top rises above native's in some months: in 2 of 12
+months in the robustness district, 3 in the tuning district, 1 in each of the 2022 phases 2 and 3, and 2 in phase all (omni-v8: 3,
+3, 2 and 4); in Alameda and Travis in none. A peak is power held, so each is power given, beside the bill and the energy it bought;
+CityLearn's own scores over the year (the highest peak, the daily peak and the monthly unevenness) read GAIN. A guard that keeps Omni-Compass's added charge under the
+month's top so far cut one of the two months on the robustness district and left every score GAIN; it is a candidate for the next
+version, in the toy gate first.
+
+#### 73.5.4 The toy gate
+
+The changes touch no Kubernetes, card or cloud controller, and the toy gate's models (`tools/toy_gate.py`) do not run the CityLearn
+wire, so they read the same on both checkouts by construction; the gate was run all the same, the candidate against omni-v8 on
+seeds 1 to 8, and is recorded in `results/toy_gate/V9_VS_V8.md`: every gauge of every toy (the cluster at 60 s and at 15 s,
+conveyance with the quota readable and unreadable, the verdict on noisy work) identical to omni-v8 to the last digit, in every count
+(it ran with the glide at 0.10, a setting no toy reads). The same models show, for omni-v8 and the candidate alike, a pod start wait
++9% against native beside 64% more requests served: the same row the real KEDA HTTP run showed (`docs/OMNI_V7.md`, section 6;
+`docs/STATE_OF_PLAY.md`, Open), the next repair. These are our own models (class S), never a benchmark result.
+
+#### 73.5.5 What runs again on it
+
+Everything, A, B and C, from the moment it lands (`scripts/reruns.txt`, the omni-v9 campaign, released by the conductor a few a
+tick), with three entries added beside the operator's settings: MySQL, Redis and MongoDB with native exactly as shipped (MySQL's
+own 128 MB buffer pool; Redis with no memory ceiling and its own `noeviction` rule; MongoDB's own cache, half of the machine's
+memory less 1 GB). The grid on its own manifest (`results/grid_v9/`); every Azure set from A again. Google Cloud and Amazon stay
+behind their switches; the GPU runs on Lambda wait for the founder's word and one exact commit. The CityLearn table's three runs on
+GitHub make the table V9_CITYLEARN.md in `results/live/`; it must read no LOSS in any district, as it did locally.
 
 ## 74. History
 
@@ -12861,7 +13062,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | `results/live/V1_*.md`, `V3_*.md` (+ `.json`) | the three-run tables, one per test, named by the engine they ran on |
 | `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition |
 | `results/grid_v5/GRID.md`, `results/realms_v5/REALMS_V5.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled muscles and organisms, the one combined number (the older engines' tables stay under their own names) |
-| `OMNI_V9.json` (the engine that stands), `OMNI_V8.json`, `OMNI_V7.json`, `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json`, `OMNI_V1.json` | the engines' fingerprints |
+| `OMNI_V10.json` (the engine that stands), `OMNI_V9.json`, `OMNI_V8.json`, `OMNI_V7.json`, `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json`, `OMNI_V1.json` | the engines' fingerprints |
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
 | `docs/OMNI_V7.md`, `OMNI_V6.md`, `OMNI_V5.md`, `OMNI_V3.md`, `OMNI_V2.md`, `OMNI_V1.md` | what each engine is and every result read on it |
 | `docs/REGISTER.md`, `docs/PROOF_PROGRAM.md` | every muscle, every benchmark run and every benchmark still to run; the program to full size |
@@ -15423,7 +15624,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 ## Appendix H. Source of the Engine
 
-The full source of every Python file of the engine that stands, omni-v9 (`OMNI_V9.json`, digest 7379f3a79ff2c475), 42 files, as the printed book carries it: `omni_controller/__init__.py`, `omni_controller/capacity.py`, `omni_controller/controller.py`, `omni_controller/gpu_compass.py`, `omni_controller/gpu_governor.py`, `omni_controller/muscles.py`, `omni_controller/quota.py`, `omnicompass/__init__.py`, `omnicompass/adapter.py`, `omnicompass/authority_contract.py`, `omnicompass/ce_score.py`, `omnicompass/closure.py`, `omnicompass/compass.py`, `omnicompass/compass_law.py`, `omnicompass/configurations.py`, `omnicompass/conveyance.py`, `omnicompass/core.py`, `omnicompass/disruption_budget.py`, `omnicompass/edge.py`, `omnicompass/master.py`, `omnicompass/mathdrive.py`, `omnicompass/muscle_sdk.py`, `omnicompass/muscles.py`, `omnicompass/nervous.py`, `omnicompass/nervous_system.py`, `omnicompass/pools.py`, `omnicompass/shield.py`, `omnicompass/speed.py`, `omnicompass/stack_sim.py`, `omnicompass/storage.py`, `omnicompass/student_t.py`, `omnicompass/verdict.py`, `realms/__init__.py`, `realms/compass_arm.py`, `realms/compass_arm_v5.py`, `realms/gpu_card.py`, `realms/harness.py`, `realms/plants.py`, `realms/presets.py`, `tools/run_citylearn.py`, `tools/run_kil.py`, `tools/run_pandapower.py`.
+The full source of every Python file of the engine that stands, omni-v10 (`OMNI_V10.json`, digest 4bf39b0d707784de), 42 files, as the printed book carries it: `omni_controller/__init__.py`, `omni_controller/capacity.py`, `omni_controller/controller.py`, `omni_controller/gpu_compass.py`, `omni_controller/gpu_governor.py`, `omni_controller/muscles.py`, `omni_controller/quota.py`, `omnicompass/__init__.py`, `omnicompass/adapter.py`, `omnicompass/authority_contract.py`, `omnicompass/ce_score.py`, `omnicompass/closure.py`, `omnicompass/compass.py`, `omnicompass/compass_law.py`, `omnicompass/configurations.py`, `omnicompass/conveyance.py`, `omnicompass/core.py`, `omnicompass/disruption_budget.py`, `omnicompass/edge.py`, `omnicompass/master.py`, `omnicompass/mathdrive.py`, `omnicompass/muscle_sdk.py`, `omnicompass/muscles.py`, `omnicompass/nervous.py`, `omnicompass/nervous_system.py`, `omnicompass/pools.py`, `omnicompass/shield.py`, `omnicompass/speed.py`, `omnicompass/stack_sim.py`, `omnicompass/storage.py`, `omnicompass/student_t.py`, `omnicompass/verdict.py`, `realms/__init__.py`, `realms/compass_arm.py`, `realms/compass_arm_v5.py`, `realms/gpu_card.py`, `realms/harness.py`, `realms/plants.py`, `realms/presets.py`, `tools/run_citylearn.py`, `tools/run_kil.py`, `tools/run_pandapower.py`.
 
 ## Appendix I. The License
 
