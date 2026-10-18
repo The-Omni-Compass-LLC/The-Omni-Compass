@@ -95,7 +95,14 @@ th:first-child,td:first-child{text-align:left;white-space:normal}
 th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 td.nat{color:var(--steel)} td.omni{color:var(--brass)}
 .word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor}
-.w-gain{color:var(--ok)} .w-even{color:var(--muted)} .w-loss{color:var(--bad)} .w-given{color:var(--brass)} .w-lost{color:var(--bad);text-decoration:underline dotted} .w-shown{color:var(--muted);border-color:transparent}
+.w-gain{color:var(--ok)} .w-even{color:var(--muted)} .w-loss{color:var(--bad)} .w-given{color:var(--brass)} .w-lost{color:var(--bad);text-decoration:underline dotted}
+.keyGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.keyGrid{grid-template-columns:1fr}}
+.keyWhy{border:1px solid var(--rule);border-left:3px solid var(--brass);border-radius:8px;padding:14px 16px;background:var(--panel2)}
+.keyWhy h4{margin:0 0 8px;font-size:17px}
+.keyWhy ul{margin:8px 0;padding-left:18px;line-height:1.6;font-size:16px}
+.keyGrid .word{white-space:nowrap}
+.keyWhy li{margin:4px 0} .w-shown{color:var(--muted);border-color:transparent}
 .note{font-size:12px;color:var(--muted)}
 /* nerves */
 .meters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
@@ -138,10 +145,14 @@ input[type=range]{width:100%;accent-color:var(--brass)}
 .lk.hot{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass) inset}
 .lk.stop{border-color:var(--bad);box-shadow:0 0 0 1px var(--bad) inset}
 .lk.pulse{border-color:var(--blood)}
-.toc{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;align-items:baseline}
-.toc b{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:4px}
-.toc a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}
-.toc a:hover{border-color:var(--brass)}
+.toc{background:var(--panel);border:1px solid var(--rule);border-top:3px solid var(--brass);border-radius:10px;padding:20px 22px;box-shadow:0 6px 22px rgba(0,0,0,.12)}
+.tocH{margin:0 0 14px}
+.tocGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.toc a{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto 1fr;align-content:start;column-gap:10px;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;color:var(--ink);text-decoration:none;background:var(--bg)}
+.toc a:hover,.toc a:focus-visible{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass)}
+.toc .tn{grid-row:1/3;font-family:var(--f-mono);font-size:24px;font-weight:600;color:var(--brass);line-height:1.1}
+.toc .tt{font-weight:600;font-size:16px}
+.toc .td{font-size:14.7px;color:var(--muted);line-height:1.45}
 .word.w-dis{color:var(--warn)}
 .three small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 button:disabled{opacity:.45;cursor:not-allowed}
@@ -294,28 +305,40 @@ section[aria-label^="The key"] h3{font-size:19px}
   <h3>The key: GAIN, EVEN and LOSS</h3>
   <p style="max-width:100ch"><b>Two names, two sides, nothing else.</b> <b>Native</b> is the whole system running by itself: every autoscaler, scheduler, firmware, thermostat, orchestrator, sub-governor and controller it ships with, every muscle wired and moving by its own machinery. <b>Omni-Compass</b> always means <b>Omni-Compass on top of native</b>: the same whole system with all of that still running underneath, and Omni-Compass on top of all of it, its brain, nerves, spine, immune system and heart wired into the whole stack through the two-way plug. Nothing else differs, and no third side exists anywhere on this page.</p>
   <p style="max-width:100ch">Every result on this page is one of three words. The word says which way it went for the work; the number beside it is only the size, never a direction. The word is decided by what the gauge is for, never by the plus or minus sign of its number.</p>
-  <div class="tbl-wrap"><table class="who"><tbody>
+  <div class="keyGrid"><div class="tbl-wrap"><table class="who"><tbody>
     <tr><td><span class="word w-gain">GAIN</span></td><td><b>G</b> Growth (asset appreciation); <b>A</b> Advantage (risk reduction); <b>I</b> Improvement (margin expansion); <b>N</b> Net-positive (profitable outcome)</td><td>the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut</td></tr>
     <tr><td><span class="word w-even">EVEN</span></td><td><b>E</b> Equalized (zero variance); <b>V</b> Verified baseline (expected norm); <b>E</b> Equilibrium (balanced risk); <b>N</b> Neutral (no net change)</td><td>native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native</td></tr>
     <tr><td><span class="word w-loss">LOSS</span></td><td><b>L</b> Leakage (capital drain); <b>O</b> Off-track (adverse selection); <b>S</b> Setback (claim liability); <b>S</b> Subpar (negative variance)</td><td>the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures</td></tr>
     <tr><td><span class="word w-given">power given</span></td><td colspan="2">a resource spent or held (energy, machines, memory, processor time, a bill) that rose: what Omni put in to buy the work and the speed shown beside it, always shown and never called a loss; one that fell is a cut, and a cut is GAIN</td></tr>
     <tr><td><span class="word w-lost">power lost</span></td><td colspan="2">a resource that rose and bought nothing: in the same comparison no gauge read GAIN (no more work, no shorter wait, no fewer misses or failures, no other resource cut). It is not assumed away: every comparison on this page is tested for it, and a power given row with nothing beside it reads power lost wherever it falls</td></tr>
   </tbody></table></div>
+  <aside class="keyWhy">
+    <h4>Why a minus can be a GAIN and a plus a LOSS</h4>
+    <p>A number's sign says only which way it moved, not whether the move helped. Each gauge has an aim, and the word is read against that aim:</p>
+    <ul>
+      <li><b>Response time −20%</b> looks like a drop. The aim is a shorter wait, so it is a <span class="word w-gain">GAIN</span>.</li>
+      <li><b>Requests served −2%</b> also looks like a drop. The aim is more work, so it is a <span class="word w-loss">LOSS</span>.</li>
+      <li><b>Misses +5%</b> looks like growth. The aim is fewer misses, so it is a <span class="word w-loss">LOSS</span>.</li>
+      <li><b>Energy −3%</b> is a cut, a <span class="word w-gain">GAIN</span>.</li>
+      <li><b>Energy +3%</b> is not a loss on its own. If it bought more work, a shorter wait or fewer misses beside it, it is <span class="word w-given">power given</span>. If nothing beside it read GAIN, it is <span class="word w-lost">power lost</span>: a resource spent for nothing.</li>
+    </ul>
+    <p>This is why the page never prints "up", "down", "better" or "worse": a plus or a minus alone would mislead. The words GAIN, EVEN and LOSS, with power given and power lost for resources, carry the meaning, and the number beside them is only the size. The rule is one formula for every gauge, and every word can come out either way: none of them is assumed.</p>
+  </aside></div>
   <p class="note">The size is how far the gauge moved from native; the word says whether that move helped the work. So "Misses: GAIN 35%" means Omni-Compass had 35% fewer misses than native; "Pod start wait: LOSS 8%" means the pods waited 8% longer to start than on native; "Response time: GAIN 53%" means it answered 53% faster; "Energy: power given 0.01%" means it spent 0.01% more energy to do it. A miss is a decision where the work went over its line. The key is written once in <code>tools/readings.py</code> and stands at the top of the README, the reading guide and both manuals. GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results; the underwriting senses explain the words and are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.</p>
 </section>
 
 <section class="panel bottom" aria-label="The bottom line">
   <h3>The bottom line</h3>
   <ul class="bl">
-    <li><b>The headline: the Omni index, every real test weighed together, GAIN 4.2%</b> (work, speed, machines and energy; the same in all three runs; GAIN 11.5% on work and speed alone; section 4, the benefit board). Kubernetes carries most of it, about GAIN 30% typical; the databases read EVEN. The GPU on Lambda, the CPU on its own meter and the three clouds are not in it yet: their places stand in sections 1 and 2.</li>
+    <li><b>The headline: the Omni index, every real test weighed together, GAIN 4.2%</b> (work, speed, machines and energy; the same in all three runs; GAIN 11.5% on work and speed alone; section 6, the benefit board). Kubernetes carries most of it, about GAIN 30% typical; the databases read EVEN. The GPU on Lambda, the CPU on its own meter and the three clouds are not in it yet: their places stand in sections 1 and 2.</li>
     <li><b>The cloud</b> (section 2): Azure runs first at the tune-down on the machines alone, the bill its one gauge; Google Cloud and Amazon Web Services carry the same four sets. No cloud receipt on the engine that stands has landed yet; each place says where it is.</li>
     <li><b>Every stack, native and then with Omni-Compass (section 1, our own models).</b> <b>A GPU card</b>: every gauge EVEN. At the max the card's own limit is already its top; at the tune-down the verdict tries one step down, measures the card's time per request there at LOSS 0.14% (AI work) and LOSS 0.91% (compute-bound), and refuses the step, so the card stays native. Under an operator's 105 W cap, compute-bound work: response time <b>GAIN</b> 8% to 11%; energy EVEN. <b>Linux, one host</b>: requests served <b>GAIN</b> 64%, response time <b>GAIN</b> 53%; host processor power given 31%, processor limit power given 167%; <b>pod start wait LOSS 6% to 8%: the pods waited longer to start</b> (native 9.9 s, Omni-Compass 10.5 to 10.7 s; the raised limits keep the host busier, and this model starts a pod more slowly on a busier host; EVEN on real Kubernetes).</li>
     <li><b>The official runs, played back from their own files</b> (section 3, class L): every three-run table's runs A, B and C, native and Omni-Compass, repetition by repetition, second by second, read from the raw files GitHub archived; every file's SHA-256 matched against the run's own list (<span id="blFiles">every file</span>), and every Kubernetes repetition scored by the repository's own scorer, its mean equal to the run's own result to 3 × 10⁻¹⁶.</li>
-    <li><b>The receipts of the real runs</b> (22 benchmarks, three runs each, section 4; each the newest engine's table, today omni-v7's, whose Linux and database engine files omni-v11 keeps byte for byte and whose Kubernetes governor omni-v11 keeps but for its blind-reading guard; omni-v11's three runs replace each one as they land): 210 rows GAIN, 50 power given, 509 EVEN, <b>13 LOSS, every one in CityLearn's small challenge districts on omni-v7</b> (the energy not served and the time uncomfortable in the 2023 districts, the only ones that simulate outages), 11 where the runs disagree. One key for every gauge (17 October): a district's peaks, swings and unevenness are power held, so where they rose they read power given, as a cluster's peak power always did; no number moved, only the word beside it. On real Kubernetes (class L): 95th-percentile response time <b>GAIN</b> 52% to 75% on Goldilocks and KEDA and <b>GAIN</b> 54% to 58% on the Google 2011 day; EVEN on CruiseKube, fixed capacity and fairness. omni-v8, omni-v9 and omni-v10 repaired and tuned the CityLearn wire, which omni-v11 keeps (a battery whose building simulates outages stays native; the wire reads the coming hour; its glide is the one that cuts the bill most), the repair of those LOSS rows, proven in our own CityLearn runs and the toy gate; their three runs on GitHub are queued. No Azure, GPU or metal-CPU receipt yet.</li>
-    <li><b>Where the brain steers.</b> In the harness views the max acts muscle by muscle and the brain only reads the body. The brain steers every decision in the live controller (section 3c): on its toy cluster every gauge reads EVEN over three runs.</li>
-    <li><b>Every muscle of the catalog</b> (section 4; the realms table, run on omni-v8, whose harness omni-v11 keeps but for the exact t of its intervals; ten seeds each, our own models). Of 1,107 muscles: <b>527 GAIN</b> (493 on response time, 409 on misses, 33 on work), 159 EVEN (the same as native), 421 EVEN (at their limit on native), <b>0 LOSS</b> under any load. All seven organisms read <b>GAIN</b> under each of their three loads: misses GAIN 1% to 9%; on the climb five of them read work GAIN too; not one plant inside any organism read LOSS. By stack: GPU hardware 11 GAIN and 11 at their limit of 22; the Linux kernel 9 GAIN of 20; Kubernetes workload scaling 24 GAIN of 32; cloud machines and capacity 20 GAIN of 21.</li>
-    <li><b>The engine's own harness, sixty muscles</b> (section 5). Each muscle alone: misses <b>GAIN</b> 18% to 27% and the time to clear the waiting line <b>GAIN</b> 24% to 27%, in all three runs; work EVEN; 26 muscles move, 34 read EVEN (24 of them at their limit on native), none reads LOSS. One organism: misses <b>GAIN</b> 5% to 6%; everything else EVEN.</li>
-    <li><b>The immune system</b> (section 5, One organism; Omni-Compass, native has none): every room and machine pool carries a native twin, its memory of healthy. On run A the cooling pump's room (<code>pump_speed</code>, in the spine) stood warmer than its twin for 7 decisions; the body's signal, its heat debt, started at 1,109 W and faded to 21 W as the machine pools gave back (26 machines held over their twins down to none within three decisions), and the room stood healthy again. On runs B and C no room was inflamed. The body gave back what Omni-Compass had added on 156, 183 and 169 of 192 decisions, whenever its shared power and cooling lines were full.</li>
+    <li><b>The receipts of the real runs</b> (22 benchmarks, three runs each, section 6; each the newest engine's table, today omni-v7's, whose Linux and database engine files omni-v11 keeps byte for byte and whose Kubernetes governor omni-v11 keeps but for its blind-reading guard; omni-v11's three runs replace each one as they land): 210 rows GAIN, 50 power given, 509 EVEN, <b>13 LOSS, every one in CityLearn's small challenge districts on omni-v7</b> (the energy not served and the time uncomfortable in the 2023 districts, the only ones that simulate outages), 11 where the runs disagree. One key for every gauge (17 October): a district's peaks, swings and unevenness are power held, so where they rose they read power given, as a cluster's peak power always did; no number moved, only the word beside it. On real Kubernetes (class L): 95th-percentile response time <b>GAIN</b> 52% to 75% on Goldilocks and KEDA and <b>GAIN</b> 54% to 58% on the Google 2011 day; EVEN on CruiseKube, fixed capacity and fairness. omni-v8, omni-v9 and omni-v10 repaired and tuned the CityLearn wire, which omni-v11 keeps (a battery whose building simulates outages stays native; the wire reads the coming hour; its glide is the one that cuts the bill most), the repair of those LOSS rows, proven in our own CityLearn runs and the toy gate; their three runs on GitHub are queued. No Azure, GPU or metal-CPU receipt yet.</li>
+    <li><b>Where the brain steers.</b> In the harness views the max acts muscle by muscle and the brain only reads the body. The brain steers every decision in the live controller (section 5): on its toy cluster every gauge reads EVEN over three runs.</li>
+    <li><b>Every muscle of the catalog</b> (section 6; the realms table, run on omni-v8, whose harness omni-v11 keeps but for the exact t of its intervals; ten seeds each, our own models). Of 1,107 muscles: <b>527 GAIN</b> (493 on response time, 409 on misses, 33 on work), 159 EVEN (the same as native), 421 EVEN (at their limit on native), <b>0 LOSS</b> under any load. All seven organisms read <b>GAIN</b> under each of their three loads: misses GAIN 1% to 9%; on the climb five of them read work GAIN too; not one plant inside any organism read LOSS. By stack: GPU hardware 11 GAIN and 11 at their limit of 22; the Linux kernel 9 GAIN of 20; Kubernetes workload scaling 24 GAIN of 32; cloud machines and capacity 20 GAIN of 21.</li>
+    <li><b>The engine's own harness, sixty muscles</b> (section 7). Each muscle alone: misses <b>GAIN</b> 18% to 27% and the time to clear the waiting line <b>GAIN</b> 24% to 27%, in all three runs; work EVEN; 26 muscles move, 34 read EVEN (24 of them at their limit on native), none reads LOSS. One organism: misses <b>GAIN</b> 5% to 6%; everything else EVEN.</li>
+    <li><b>The immune system</b> (section 7, One organism; Omni-Compass, native has none): every room and machine pool carries a native twin, its memory of healthy. On run A the cooling pump's room (<code>pump_speed</code>, in the spine) stood warmer than its twin for 7 decisions; the body's signal, its heat debt, started at 1,109 W and faded to 21 W as the machine pools gave back (26 machines held over their twins down to none within three decisions), and the room stood healthy again. On runs B and C no room was inflamed. The body gave back what Omni-Compass had added on 156, 183 and 169 of 192 decisions, whenever its shared power and cooling lines were full.</li>
     <li><b>Every view runs native first, then Omni-Compass, on the same load and seed.</b> Each result below is written as the gauge, its word and its size (the key above).</li>
     <li><b>Native's numbers, measured</b> (<code>docs/engine/NATIVE_REGISTER.md</code>). The harness's native is round engineering figures, not product measurements. Against real defaults: power limits, CPU clocks and admission gates do ship at their top, so the max is right to leave them native there and their benefit is the same work for less energy (the GPU run on Lambda measures it); the HPA tolerance, its 300 s window and the cluster autoscaler's 10 minutes match; the harness's HPA target (70%) is tighter than the real runs' native (50%); axes, loops and batteries are not yet measured.</li>
   </ul>
@@ -330,14 +353,12 @@ section[aria-label^="The key"] h3{font-size:19px}
   </ol>
 </section>
 
-<nav class="toc" aria-label="Contents"><b>Contents, most valuable first</b>
-  <a href="#s-stacks">1 · GPU and CPU</a><a href="#s-cloud">2 · The cloud</a><a href="#s-ops">3 · Kubernetes, streaming</a><a href="#s-runs">3b · Each run</a><a href="#s-live">3c · The controller</a><a href="#s-fleet">4 · The scale</a><a href="#s-engines">5 · The organism</a><a href="#s-lab">5b · Tensor lab and AI</a><a href="#s-decision">6 · One decision</a><a href="#s-plane">6b · The plane</a><a href="#s-brain">6c · The brain</a><a href="#s-verdict">6d · The verdict</a><a href="#s-self">7 · Omni-Compass inside this engine</a><a href="#s-github">8 · GitHub now</a><a href="#s-math">9 · The mathematics</a><a href="#s-disclose">10 · Disclosures</a>
-</nav>
+<nav class="toc" aria-label="Contents"><h2 class="tocH">Contents</h2><div class="tocGrid"><a href="#s-stacks"><span class="tn">1</span><span class="tt">The chips</span><span class="td">GPU card and CPU host: where the metered runs land, and the card and host models live</span></a><a href="#s-cloud"><span class="tn">2</span><span class="tt">The cloud</span><span class="td">Azure, Google Cloud and Amazon Web Services: every set's place, read from its queue</span></a><a href="#s-ops"><span class="tn">3</span><span class="tt">Kubernetes, streaming</span><span class="td">the official runs as a live operations dashboard, half minute by half minute</span></a><a href="#s-runs"><span class="tn">4</span><span class="tt">Each official run</span><span class="td">every run and repetition played back from its SHA-256-checked files</span></a><a href="#s-live"><span class="tn">5</span><span class="tt">The shipped controller</span><span class="td">the Kubernetes and cloud controller, brain to muscle, decision by decision</span></a><a href="#s-fleet"><span class="tn">6</span><span class="tt">The scale</span><span class="td">the benefit board, the grid, the receipts, every muscle and the seven organisms</span></a><a href="#s-engines"><span class="tn">7</span><span class="tt">The organism</span><span class="td">native and Omni-Compass side by side: body scan, heart, immune system, anatomy</span></a><a href="#s-lab"><span class="tn">8</span><span class="tt">Tensor lab and AI analyst</span><span class="td">the body's numbers as tensors, and an analyst that answers from them</span></a><a href="#s-decision"><span class="tn">9</span><span class="tt">One decision</span><span class="td">one decision of the brain, and the controls that drive the page</span></a><a href="#s-plane"><span class="tn">10</span><span class="tt">The compass plane</span><span class="td">the band, the two forces, and the scoreboard of both sides</span></a><a href="#s-brain"><span class="tn">11</span><span class="tt">Inside the brain</span><span class="td">the six-state engine, integrated every decision</span></a><a href="#s-verdict"><span class="tn">12</span><span class="tt">The verdict</span><span class="td">how a trial is read GAIN, EVEN or LOSS against native</span></a><a href="#s-self"><span class="tn">13</span><span class="tt">Omni-Compass inside this engine</span><span class="td">the page's own renderer governed by the compass law, measured</span></a><a href="#s-github"><span class="tn">14</span><span class="tt">GitHub, now</span><span class="td">what is running and queued on GitHub at build time</span></a><a href="#s-math"><span class="tn">15</span><span class="tt">The mathematics</span><span class="td">every part of the engine, its equations, and its code</span></a><a href="#s-disclose"><span class="tn">16</span><span class="tt">Disclosures</span><span class="td">the law, the licence, the evidence classes and contact</span></a></div></nav>
 
 <section class="stack" id="s-stacks" aria-label="Every stack, native and then Omni-Compass">
   <h2>1 · The chips: the GPU card and the CPU host</h2>
   <p class="plain"><b>In plain words.</b> The most valuable place for Omni-Compass is the chip itself: the same work for less power. Below: where the real GPU and CPU runs will appear, then a model of one GPU card and one Linux host playing native beside Omni-Compass.</p>
-  <p class="lede" style="max-width:90ch">Each stack is run twice on the same load and the same seed: <b>native first</b>, then <b>Omni-Compass</b>. Left is native, right is Omni-Compass, and every table gives both columns and the difference. Each stack is its own model in the repository, run exactly as the repository runs it and recorded second by second by <code>docs/engine/export_scenarios.py</code> (class S, our own models). Kubernetes and the cloud follow in sections 2 and 3; every muscle of the catalog, the seven organisms and the receipts of the real runs are in section 4.</p>
+  <p class="lede" style="max-width:90ch">Each stack is run twice on the same load and the same seed: <b>native first</b>, then <b>Omni-Compass</b>. Left is native, right is Omni-Compass, and every table gives both columns and the difference. Each stack is its own model in the repository, run exactly as the repository runs it and recorded second by second by <code>docs/engine/export_scenarios.py</code> (class S, our own models). Kubernetes and the cloud follow in sections 2 and 3; every muscle of the catalog, the seven organisms and the receipts of the real runs are in section 6.</p>
   <div class="panel stack" style="gap:8px">
     <h3>The real chips: where their runs will stream</h3>
     <div class="places" id="gpuPlaces"></div>
@@ -350,7 +371,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   </details>
   <div class="row">
     <span class="ctl-label">Stack</span>
-    <div class="seg" role="group" aria-label="Stack"><button id="sGpu" aria-pressed="true">A GPU card</button><button id="sLinux" aria-pressed="false">Linux, one host</button><button id="sKube" aria-pressed="false">Kubernetes (section 3c)</button><button id="sCloud" aria-pressed="false">The cloud (section 3c)</button></div>
+    <div class="seg" role="group" aria-label="Stack"><button id="sGpu" aria-pressed="true">A GPU card</button><button id="sLinux" aria-pressed="false">Linux, one host</button><button id="sKube" aria-pressed="false">Kubernetes (section 5)</button><button id="sCloud" aria-pressed="false">The cloud (section 5)</button></div>
   </div>
   <div class="row" id="gpuRow">
     <span class="ctl-label">Work</span>
@@ -370,7 +391,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   </div>
   <div class="panel stack" style="gap:8px">
     <canvas id="sStrip" aria-label="The stack second by second, native against Omni-Compass"></canvas>
-    <div class="legend"><span><i style="background:var(--steel)"></i>native (dashed where it lies on Omni-Compass's line)</span><span><i style="background:var(--brass)"></i>Omni-Compass</span><span><i class="sq" style="background:var(--bad)"></i>the line</span><span><i class="sq" style="background:var(--blood)"></i>a verdict trial, a step allowed or refused</span></div>
+    <div class="legend"><span><i style="background:var(--steel)"></i>Native, left lane</span><span><i style="background:var(--brass)"></i>Omni-Compass, right lane, on the same scale</span><span><i class="sq" style="background:var(--bad)"></i>the line</span><span><i class="sq" style="background:var(--blood)"></i>a verdict trial, a step allowed or refused</span></div>
   </div>
   <div class="grid-2">
     <div class="panel stack" style="gap:8px">
@@ -393,7 +414,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="places" id="cloudPlaces"></div>
   <div class="panel stack" style="gap:8px">
     <h3>Until the cloud receipts land: the shipped controller in the cloud setting</h3>
-    <p class="note">The controller that runs in every cloud (<code>omni_controller/controller.py</code>, <code>--give-back-only</code>, machines alone) plays decision by decision on the repository's toy cluster in section 3c (class S). It is the same code the Azure, Google and Amazon sets run.</p>
+    <p class="note">The controller that runs in every cloud (<code>omni_controller/controller.py</code>, <code>--give-back-only</code>, machines alone) plays decision by decision on the repository's toy cluster in section 5 (class S). It is the same code the Azure, Google and Amazon sets run.</p>
     <div class="row"><button id="goCloud">Play the controller in the cloud setting</button></div>
   </div>
 </section>
@@ -403,7 +424,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <div class="stack" style="gap:6px">
       <h2>3 · Kubernetes: the official runs, streaming</h2>
   <p class="plain"><b>In plain words.</b> The real benchmark runs, played back as they happened: native's cluster and Omni-Compass's cluster, the same load, every half minute, every file checked.</p>
-      <p class="lede" style="max-width:96ch">A real-time operations dashboard over the benchmark runs themselves (class L), not a model. Every series below streams half minute by half minute out of the raw files GitHub archived, each file's SHA-256 matched before a byte is drawn: <b>native</b> (the whole cluster with everything it ships with, everything but Omni-Compass) against <b>Omni-Compass</b>, the same load, the same second. The tiles, the candles, the heatmap, the bars and the governor's ticker all move together with section 3b (pick a benchmark, a run or a repetition in either place). Every word is the run's own reading, never one drawn from the stream.</p>
+      <p class="lede" style="max-width:96ch">A real-time operations dashboard over the benchmark runs themselves (class L), not a model. Every series below streams half minute by half minute out of the raw files GitHub archived, each file's SHA-256 matched before a byte is drawn: <b>native</b> (the whole cluster with everything it ships with, everything but Omni-Compass) against <b>Omni-Compass</b>, the same load, the same second. The tiles, the candles, the heatmap, the bars and the governor's ticker all move together with section 4 (pick a benchmark, a run or a repetition in either place). Every word is the run's own reading, never one drawn from the stream.</p>
     </div>
     <span class="live-badge" id="opsLive">LIVE PLAYBACK</span>
   </div>
@@ -478,7 +499,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-runs" aria-label="The official runs, played back from their own files">
-  <h2>3b · Kubernetes and its services: each official run, repetition by repetition</h2>
+  <h2>4 · Kubernetes and its services: each official run, repetition by repetition</h2>
   <p class="plain"><b>In plain words.</b> One run at a time, second by second, with its receipt and every repetition's own score.</p>
   <p class="lede" style="max-width:90ch">These are the benchmark runs themselves, not a model: each three-run table's runs A, B and C, read back from the raw files GitHub archived (<code>results/live/raw</code>), native and Omni-Compass, repetition by repetition, played second by second. <b>Every file the page reads has its SHA-256 computed and matched against the run's own <code>SHA256SUMS_ALL.txt</code></b>, and every Kubernetes repetition is scored by the repository's own scorer (<code>tools/live_reps.py</code>), whose mean over the repetitions equals the run's own result. Class L: real Kubernetes on kind, real databases and a real broker.</p>
   <p class="note" id="ruProof">—</p>
@@ -522,7 +543,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-live" aria-label="The live controller, brain to muscle">
-  <h2>3c · The shipped controller, brain to muscle: Kubernetes and the cloud setting</h2>
+  <h2>5 · The shipped controller, brain to muscle: Kubernetes and the cloud setting</h2>
   <p class="plain"><b>In plain words.</b> The governor's own code deciding, one decision at a time: what it read, what it chose, what it wrote.</p>
   <p class="lede" style="max-width:90ch">This is the one place in the repository where the brain drives the muscles decision by decision: the shipped controller, <code>omni_controller/controller.py</code>, on the toy cluster of <code>pilot/selfpilot.py</code>, wired as the repository wires it. Each decision runs the chain left to right: the senses, the six-state brain, the nerves and the machine organ’s grant, the compass law on the service (cloud setting), the verdict’s trial, the release gate, the plug. Every value below is the controller’s own audit record of that decision, recorded by <code>docs/engine/export_controller_trace.py</code> on runs A, B and C (six hours each, a decision every 60 s, class S).</p>
   <div class="row">
@@ -573,7 +594,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-fleet" aria-label="The benefit board and the scale-out grid">
-  <h2>4 · The scale: every benchmark, the grid, every muscle and organism</h2>
+  <h2>6 · The scale: every benchmark, the grid, every muscle and organism</h2>
   <p class="plain"><b>In plain words.</b> Every benchmark's benefit in one place, where the benefit lives gauge by gauge, one honest total, every place still to run, the grid, and every one of the 1,107 muscles.</p>
   <p class="lede" style="max-width:96ch">Every benchmark's benefit in one place, as the repository's benefit sheet holds it (<code>results/BENEFIT_SHEET.json</code>), the Omni index that weighs them together (<code>results/OMNI_INDEX.md</code>), and the grid: every organism at 1, 10 and 100 copies, each at 1, 10 and 100 runs, modelled and with the real cluster inside. Each bar and square carries its own word; the size beside the word never carries a sign.</p>
   <div class="panel stack bottom" style="gap:6px" id="fxIndex"></div>
@@ -586,7 +607,7 @@ section[aria-label^="The key"] h3{font-size:19px}
     <div class="opsTip" id="fxTipBen" hidden></div>
   <div class="panel stack chartbox" style="gap:8px">
     <h3>Where the benefit lives, gauge by gauge</h3>
-    <p class="note">Every judged row of every newest three-run table (section 4's receipts), sorted into the family of gauge it measures: what a CTO reads (speed, the service level, failures, work), what a CFO reads (machines, energy, the bill), and what a plant engineer reads (peaks and swings, wear and accuracy, misses). Each bar counts the rows that read GAIN in all three runs; the size beside it is the median of those rows' own sizes (the middle of runs A, B and C). Power given and LOSS rows are counted beside them, never hidden.</p>
+    <p class="note">Every judged row of every newest three-run table (section 6's receipts), sorted into the family of gauge it measures: what a CTO reads (speed, the service level, failures, work), what a CFO reads (machines, energy, the bill), and what a plant engineer reads (peaks and swings, wear and accuracy, misses). Each bar counts the rows that read GAIN in all three runs; the size beside it is the median of those rows' own sizes (the middle of runs A, B and C). Power given and LOSS rows are counted beside them, never hidden.</p>
     <canvas id="fxFam" aria-label="Bar chart: the rows reading GAIN in each family of gauge, with their median size, power given and LOSS beside"></canvas>
     <div class="tbl-wrap"><table class="who" id="fxFamTab"><thead><tr><th>Family of gauge</th><th>Who reads it</th><th>GAIN rows</th><th>Median size of the GAIN rows</th><th>Largest</th><th>Power given</th><th>LOSS</th><th>The runs disagree</th><th>Where</th></tr></thead><tbody></tbody></table></div>
     <div class="opsTip" id="fxTipFam" hidden></div>
@@ -628,9 +649,9 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-engines" aria-label="The organism, live, twice">
-  <h2>5 · The organism, live: native and Omni-Compass</h2>
+  <h2>7 · The organism, live: native and Omni-Compass</h2>
   <p class="plain"><b>In plain words.</b> The whole system drawn as a living body: each dot a muscle, the ring its working range. Left runs by itself; right has Omni-Compass's brain, nerves, heart and immune system on top.</p>
-  <p class="lede" style="max-width:90ch"><b>Every view is run twice on the same body, the same load and the same seed: native (left), then Omni-Compass (right).</b> "One organism" is the sixty muscles in one body: the whole native organism on the left, the same organism with Omni-Compass on the right; "each muscle alone" runs each muscle native and then with Omni-Compass, one at a time. The counters under each ring and the scoreboard (section 6b) give both arms and the difference. <b>Where the two sides look the same, they are the same.</b> Under the max a muscle is moved only where it has room above native; a muscle already at its limit on native (24 of these sixty) is left native by design, and inside one organism the bone (the power and cooling the whole body shares) holds most moves back. A dashed white ring marks every muscle that differs between the two sides at that moment; the counter under each ring counts them. In these harness views the max acts muscle by muscle and the brain at the center reads the body without steering it, as in the realms harness itself; <a href="#s-live">section 3c</a> shows the live controller, where the brain steers every decision.</p>
+  <p class="lede" style="max-width:90ch"><b>Every view is run twice on the same body, the same load and the same seed: native (left), then Omni-Compass (right).</b> "One organism" is the sixty muscles in one body: the whole native organism on the left, the same organism with Omni-Compass on the right; "each muscle alone" runs each muscle native and then with Omni-Compass, one at a time. The counters under each ring and the scoreboard (section 10) give both arms and the difference. <b>Where the two sides look the same, they are the same.</b> Under the max a muscle is moved only where it has room above native; a muscle already at its limit on native (24 of these sixty) is left native by design, and inside one organism the bone (the power and cooling the whole body shares) holds most moves back. A dashed white ring marks every muscle that differs between the two sides at that moment; the counter under each ring counts them. In these harness views the max acts muscle by muscle and the brain at the center reads the body without steering it, as in the realms harness itself; <a href="#s-live">section 5</a> shows the live controller, where the brain steers every decision.</p>
   <div class="twin">
     <div class="panel ringbox arm-nat">
       <div class="ringhead"><h3 class="t-steel big">Native</h3><span>the whole organism with everything the world already runs on it, its sixty native controllers, everything but Omni-Compass</span></div>
@@ -677,7 +698,7 @@ section[aria-label^="The key"] h3{font-size:19px}
   <div class="panel stack" style="gap:8px">
     <h3>The anatomy, part by part, in the order of control: the brain first, the whole organism last</h3>
     <div class="tbl-wrap"><table class="who anat"><thead><tr><th>Part</th><th>Native</th><th>Omni-Compass</th><th>In the code</th></tr></thead><tbody>
-      <tr><td><b>Brain</b></td><td>none</td><td>the six-state engine at the center: E, U, I_U, S, B, Ḃ, integrated by RK4 every decision; it steers the live controller (section 3c) and, in the harness views, reads the body</td><td><code>core.macro_step</code>, <code>adapter.Governor.step</code></td></tr>
+      <tr><td><b>Brain</b></td><td>none</td><td>the six-state engine at the center: E, U, I_U, S, B, Ḃ, integrated by RK4 every decision; it steers the live controller (section 5) and, in the harness views, reads the body</td><td><code>core.macro_step</code>, <code>adapter.Governor.step</code></td></tr>
       <tr><td><b>Nervous system</b></td><td>a reflex arc per muscle: its own reading in, its own lever out (the short stubs)</td><td>afferent: nine senses read from the whole body (blue, inward); efferent: each write through the plug (gold, outward); the nerves grant or refuse each organ</td><td><code>adapter.observe_vector</code>, <code>nervous_system.authority</code>, <code>compass_law.Plug</code></td></tr>
       <tr><td><b>Heart</b></td><td>none: each native controller keeps its own clock (the pod autoscaler every 15 s, firmware, thermostats); no beat joins them</td><td>one heart: the governor's decision loop beats once per decision, pumping the readings in and the decision out; every beat renews its lease, and if the heart stops the watchdog walks every setting back to native (the ops center's heart monitor plays each official run's beats from its own audit)</td><td><code>controller.py</code> main loop, <code>master.heartbeat()</code>; <code>omni_switch.py watchdog</code></td></tr>
       <tr><td><b>Spine</b></td><td>the muscles every realm shares, each still on its own</td><td>the shared base, read and written like every other muscle</td><td>the inner ring; <code>docs/THE_SPINE.md</code></td></tr>
@@ -695,9 +716,9 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-lab" aria-label="The tensor lab and the AI analyst">
-  <h2>5b · The tensor lab and the AI analyst</h2>
+  <h2>8 · The tensor lab and the AI analyst</h2>
   <p class="plain"><b>In plain words.</b> The same record read four ways a data scientist would (a 3-D cube, a difference map, the main motions, a narrator), the service level as an SRE reads it, and Claude answering questions about the screen.</p>
-  <p class="lede" style="max-width:96ch">The engine's own record is a tensor: <b>two arms × every decision × sixty muscles</b>, each entry a muscle's compass position (0 calm, 0.5 the center of its band, 1 its line), recorded from <code>realms/harness.py</code> by <code>docs/engine/export_harness_trace.py</code> (class S, our own models). It fills in below decision by decision as section 5 plays, and the same numbers are read three more ways: the difference between the arms, the body's principal motions, and a running narration. Then the official runs (class L) are read as an SRE reads a service: the service level, the error budget burned and every gauge against native; and Claude itself answers questions about the screen, reading the page's own data through tools and steering the dashboard. No word on this panel is drawn from a picture: every GAIN, EVEN, LOSS and power given is a run's own reading.</p>
+  <p class="lede" style="max-width:96ch">The engine's own record is a tensor: <b>two arms × every decision × sixty muscles</b>, each entry a muscle's compass position (0 calm, 0.5 the center of its band, 1 its line), recorded from <code>realms/harness.py</code> by <code>docs/engine/export_harness_trace.py</code> (class S, our own models). It fills in below decision by decision as section 7 plays, and the same numbers are read three more ways: the difference between the arms, the body's principal motions, and a running narration. Then the official runs (class L) are read as an SRE reads a service: the service level, the error budget burned and every gauge against native; and Claude itself answers questions about the screen, reading the page's own data through tools and steering the dashboard. No word on this panel is drawn from a picture: every GAIN, EVEN, LOSS and power given is a run's own reading.</p>
 
   <div class="panel stack" style="gap:6px">
     <h3>The live narrator</h3>
@@ -762,7 +783,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="trio" id="s-decision" aria-label="The decision and the controls">
-  <h2 style="grid-column:1/-1">6 · One decision of the brain, and the controls</h2>
+  <h2 style="grid-column:1/-1">9 · One decision of the brain, and the controls</h2>
   <p class="plain"><b>In plain words.</b> Slow it down and watch one decision travel: what the brain sensed, what it decided, and which muscle it moved.</p>
   <div class="stack">
     <div class="panel stack" style="gap:10px">
@@ -828,7 +849,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-plane" aria-label="The compass plane and the two arms">
-  <div class="head"><h2>6b · The compass plane and the scoreboard</h2>
+  <div class="head"><h2>10 · The compass plane and the scoreboard</h2>
   <p class="plain"><b>In plain words.</b> Where every muscle sits and how fast it is moving, both sides at the same instant, and the running score.</p>
     <p class="lede" style="max-width:62ch"><b>How to read the plane.</b> It is a phase portrait, the picture control engineers use for a system's state: across, where each muscle sits in its band (p: 0 calm, 0.5 the center, 1 its line); up and down, how fast it is moving there (v, per decision). A muscle at rest sits on the middle line; one climbing toward its line moves up and right; past the right edge it is past its line. Each dot is a muscle at its position p in its band and the speed v it is moving, native on the left, Omni-Compass on the right, the same muscles at the same instant. In the realms harness each muscle answers to its own rule, so no single field is drawn; in the stress-test model the shading on the right is the force the compass law would apply there (copper adds capacity, steel hands it back; past the 0.95 wall the law fails up at once).</p></div>
   <div class="grid-2">
@@ -855,7 +876,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-brain" aria-label="Inside the brain">
-  <div class="head"><h2>6c · Inside the brain</h2>
+  <div class="head"><h2>11 · Inside the brain</h2>
   <p class="plain"><b>In plain words.</b> The brain's six internal readings drawn as landscapes: a ball resting in a valley is calm; a ball pushed toward a ridge is under strain.</p>
     <p class="lede" style="max-width:62ch">The same state the cycle panel prints, drawn as the physics it is. Each ball is a live value of the Omni-Compass arm, integrated by RK4 every decision. <b>Native has none of this:</b> no state, no memory of need, no stress, no tide; each controller sees only its own reading, one to three decisions late.</p></div>
   <div class="grid-3">
@@ -879,7 +900,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-verdict" aria-label="The verdict">
-  <div class="head"><h2>6d · The verdict</h2>
+  <div class="head"><h2>12 · The verdict</h2>
   <p class="plain"><b>In plain words.</b> How Omni-Compass decides a change is worth keeping: it tries it, measures it against native, and keeps it only if the measurement says GAIN.</p>
     <p class="lede" style="max-width:62ch">Before a knob moves one step past native, the step runs as a trial: costs at native first, then at the step. omni-v11 reads the change exactly as a report reads a row, on the log of each cost, with its 95% interval. Set what the step truly costs and watch the rule decide. It opens wired as the shipped Kubernetes controller is wired, on the noise the real runs measured.</p></div>
   <div class="grid-2">
@@ -898,13 +919,13 @@ section[aria-label^="The key"] h3{font-size:19px}
       <h3 style="margin-top:6px">Over many trials at this cost</h3>
       <canvas id="cvV2" aria-label="Share of trials allowed, medians alone against the omni-v11 rule"></canvas>
       <p class="note"><b>Native:</b> its knob never moves past its own setting, so there is no trial and nothing to judge; every step Omni-Compass takes past native has to pass this test first. The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v11 (the rule first written in omni-v7) also refuses any step whose interval sits wholly above zero, measures on while the interval is wider than the allowance (up to three times the pieces measured each side), and keeps a step only if both estimates are inside the allowance. Ported from <code>omnicompass/verdict.py</code>; the costs are modelled (class S).</p>
-      <p class="note"><b>How each muscle wires it.</b> The Kubernetes controller measures 200 requests each side against a 2% allowance (<code>omni_controller/controller.py --verdict-samples 200 --allow 0.02</code>), the cost being each request's response time. The noise is measured on the real runs of the omni-v7 tables (<code>latency.csv</code>, the spread of the log of the response time over windows of 200 requests): about σ 0.05 on the Google 2011 day, about σ 0.25 with the load swinging 1 to 8 (the all-four run). The GPU card measures 30 requests (<code>gpu_compass.py --verdict-samples 30</code>); in its model the card's own time per request carries no noise. The toy gate measures 60 (<code>tools/toy_gate.py</code>, σ 0.25). <b>What the rule does there:</b> on a steady day a step whose true cost is LOSS 3% is refused every time, and one at LOSS 1% half the time; with the load swinging, a step at LOSS 3% still passes about a quarter of the time and one at LOSS 5% about one time in twenty; with no noise any LOSS it can read is refused, even 0.1%. Above the verdict the max never goes below native at all, so in the default it never runs (section 3c: no trial on top of the HPA).</p>
+      <p class="note"><b>How each muscle wires it.</b> The Kubernetes controller measures 200 requests each side against a 2% allowance (<code>omni_controller/controller.py --verdict-samples 200 --allow 0.02</code>), the cost being each request's response time. The noise is measured on the real runs of the omni-v7 tables (<code>latency.csv</code>, the spread of the log of the response time over windows of 200 requests): about σ 0.05 on the Google 2011 day, about σ 0.25 with the load swinging 1 to 8 (the all-four run). The GPU card measures 30 requests (<code>gpu_compass.py --verdict-samples 30</code>); in its model the card's own time per request carries no noise. The toy gate measures 60 (<code>tools/toy_gate.py</code>, σ 0.25). <b>What the rule does there:</b> on a steady day a step whose true cost is LOSS 3% is refused every time, and one at LOSS 1% half the time; with the load swinging, a step at LOSS 3% still passes about a quarter of the time and one at LOSS 5% about one time in twenty; with no noise any LOSS it can read is refused, even 0.1%. Above the verdict the max never goes below native at all, so in the default it never runs (section 5: no trial on top of the HPA).</p>
     </div>
   </div>
 </section>
 
 <section class="stack" id="s-self" aria-label="Omni-Compass inside this engine: the page governs its own drawing">
-  <h2>7 · Omni-Compass inside this engine</h2>
+  <h2>13 · Omni-Compass inside this engine</h2>
   <p class="plain"><b>In plain words.</b> This page runs on Omni-Compass too: its own drawing is governed by the same law, measured live on your machine, native beside Omni-Compass.</p>
   <p class="lede" style="max-width:96ch">The engine that runs this page has Omni-Compass in it. <b>Native</b> is the browser's own loop: every chart on screen drawn on every frame, and when the frame overruns, whole frames dropped. <b>Omni-Compass</b> is the same loop with the engine's own compass law (<code>omnicompass/compass_law.py</code>, ported here and checked against the Python) governing it: each chart is a muscle whose knob is how many frames it waits between draws; the reading is the time between frames; below the band's center the pedal lifts and every chart is handed back to native (drawn every frame); toward the line it pushes, and the charts farthest from where you are looking wait a frame or more, so the frame itself stays inside its line. Every step is a trial run to its full measurement and kept only when the frame shortens; a step that buys nothing is refused and every chart handed back to native (the reflex rule: where a knob cannot bring a GAIN, it stays native). The reading is the time between frames, the band two frames wide with its center one frame at 60 Hz. The two arms take turns in paired windows of three seconds on this same page, on your own machine, and are read by the three-run rule's interval (class L: this browser, live; a reading of this page, never a benchmark of record).</p>
   <div class="row">
@@ -934,7 +955,7 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-github" aria-label="Where it runs: GitHub now">
-  <h2>8 · Where it runs: GitHub, now</h2>
+  <h2>14 · Where it runs: GitHub, now</h2>
   <p class="plain"><b>In plain words.</b> Every workflow GitHub was running or queuing when the page was built.</p>
   <div class="panel stack" style="gap:8px">
     <h3>What GitHub is running now</h3>
@@ -945,9 +966,9 @@ section[aria-label^="The key"] h3{font-size:19px}
 </section>
 
 <section class="stack" id="s-math" aria-label="The parts and the math">
-  <h2>9 · The parts and the mathematics</h2>
+  <h2>15 · The parts and the mathematics</h2>
   <p class="plain"><b>In plain words.</b> For the engineers and mathematicians: the parts, the equations and the code they come from, in Unicode as the repository writes them.</p>
-  <p class="lede" style="max-width:90ch">Items 1 to 5 and 8 are the engine’s code and run in every view. Items 6 and 7 as written (the compass law on each muscle, the plug’s lever) drive the stress-test model; in the harness views the max and the plants’ own overrides take their place, and the live controller runs the compass law on the service as section 3c shows.</p>
+  <p class="lede" style="max-width:90ch">Items 1 to 5 and 8 are the engine’s code and run in every view. Items 6 and 7 as written (the compass law on each muscle, the plug’s lever) drive the stress-test model; in the harness views the max and the plants’ own overrides take their place, and the live controller runs the compass law on the service as section 5 shows.</p>
   <ol class="parts">
     <li><span class="k">1</span><p><b>Senses.</b> The muscles' meters are read and normalised to nine observations: q, load, power, thermal, network, drift, stale, security, conflict. <code>adapter.observe_vector</code>. The inner arc of nine segments; steel particles run in along the wires.</p></li>
     <li><span class="k">2</span><p><b>Assimilate.</b> An observed state is formed and the engine is pulled toward it, x ← (1 − a)x + a·x_obs, a = 0.339. <code>adapter.assimilate</code>.</p></li>
@@ -1009,11 +1030,11 @@ kill     Lᵢ ← L* at once (native)</pre>
 </div>
 
 <section class="disclose" id="s-disclose" aria-label="Disclosures and contact">
-  <h2>10 · Disclosures, the law and contact</h2>
+  <h2>16 · Disclosures, the law and contact</h2>
   <h3>What this page is</h3>
   <p><b>A visual interpretation, nothing more.</b> This page is a monitor: a visual interpretation of the Omni-Compass engine and of the benchmark runs that GitHub ran, read from the repository's own files and code and played back so they can be watched moving instead of only read. It decides nothing about any result: every number comes from the run or the code it names, and every word (GAIN, EVEN, LOSS, power given) is that run's own reading under <code>tools/readings.py</code>. Where it plays the repository's own models (class S) it says so; models are never proof. The records of authority are the repository's result files, the raw files GitHub archived and their SHA-256 lists, the manuals and <code>DISCLOSURES.md</code>; where this page and those records ever differ, the records govern.</p>
   <p><b>Two names.</b> <b>Native</b> is the whole system running by itself with everything it ships with. <b>Omni-Compass</b> always means Omni-Compass on top of native: the same system, native still running underneath, Omni-Compass on top of all of it. It is a supervisory governor, never a standalone system and never a competitor to native.</p>
-  <p><b>Evidence classes.</b> P: a physical meter. L: live software (the official Kubernetes and database runs; this page's own renderer reading in section 7, on the viewer's machine). S: our own models. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.</p>
+  <p><b>Evidence classes.</b> P: a physical meter. L: live software (the official Kubernetes and database runs; this page's own renderer reading in section 13, on the viewer's machine). S: our own models. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.</p>
   <p><b>Owner, licence and law.</b> Omni-Compass, this page and every part of the repository are the property of The Omni-Compass LLC; all rights reserved; all patents, copyrights and trademarks filed in the USA. Use is evaluation and simulation only under <code>LICENSE</code> (LicenseRef-OmniCompass-Evaluation-1.0); any commercial use, commercialization, monetization, production use, redistribution or hosted service requires a signed, paid Omni-Compass Enterprise License (<code>ENTERPRISE_LICENSE.md</code>). The licence is governed by the laws of the State of Delaware and the federal laws of the United States, and the state courts of Delaware and the United States District Court for the District of Delaware have exclusive jurisdiction over any dispute arising out of or relating to it (<code>LICENSE</code>, sections 19.1 and 19.2). The notice, <code>LICENSE</code>, <code>NOTICE</code> and <code>DISCLOSURES.md</code> travel with every copy, export, screenshot and printout of this page.</p>
   <p><b>Where everything else lives.</b> The engine, its fingerprint and its source: the repository (<code>OMNI_V10.json</code>, <code>docs/OMNI_V10.md</code>). Every result: <code>results/</code> and <code>docs/STATE_OF_PLAY.md</code>. How to read them: <code>docs/HOW_TO_READ_THE_RESULTS.md</code>. Wiring and operation: the Operator's Manual; the whole mechanism: the Owner's Manual. This page's own appraisal: <code>docs/engine/APPRAISAL.md</code>. www.omni-compass.com.</p>
   <h3>Disclosures</h3>
@@ -1817,7 +1838,7 @@ function updateText() {
       : "Rows 1 to 5: the brain reading this body as the live controller computes it (the engine's code, checked); its grants are shown, and the max does not ask for them. Row 6: the max of realms/compass_arm_v5.py acting muscle by muscle inside the bone, recorded from the harness. Row 7: its writes.";
   } else {
   $("cy5").textContent = `${up} pushing, ${down} lifting off, ${hold} at the center · ${fail} failing up past 0.95`;
-  $("cycleNote").textContent = "Stress-test model: every row drives the body on this page; rows 1 to 6 are the engine's code, the lever rules and the body are this page's (written out in section 9).";
+  $("cycleNote").textContent = "Stress-test model: every row drives the body on this page; rows 1 to 6 are the engine's code, the lever rules and the body are this page's (written out in section 15).";
   $("cy6").textContent = W.killed ? `kill switch: every lever handed to native at once, no writes` : `${arm.lastWrites} writes this decision, each clipped to its cover · ${arm.tot.writes} so far, ${arm.tot.clipped} clipped · snapshot kept for reset`;
   }
   // the nerves
@@ -2140,29 +2161,32 @@ function updateStack() {
   }
 }
 function stepStack() { SW.k += sStep(); if (SW.k >= sLen()) { SW.run = (SW.run + 1) % 3; SW.k = 0; document.querySelectorAll("[data-srun]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.srun === SW.run ? "true" : "false")); } updateStack(); }
-function drawSStrip() {
-  const cv = $("sStrip"); const {g, w, h} = fit(cv, Math.min(0.45, 340/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
-  const R = sRun(), N = sLen(), T = Math.min(SW.k + 1, N), ml = 52, mr = 10, G = SW.stack === "gpu";
-  const X = t => ml + t/N*(w - ml - mr);
-  const panels = G ? [["the card's draw (W) · dashed: its power limit", a => a.power, null, a => a.limit], ["clock (MHz) · dashed: the clock ceiling", a => a.clock.map(v => v*MHZ), null, a => a.ceiling.map(v => v*MHZ)], ["response time (ms)", a => a.resp_ms, SC.gpu.slo_ms, null]]
-    : [["response time, mean (ms)", a => a.ms, 500, null], ["requests a second", a => a.lam, null, null], ["CPU limits given (cores) · dashed: host busy (share of its 4 cores)", a => a.limit_m.map(v => v/1000), null, a => a.busy.map(v => 4*v)]];
-  const ph = (h - 18)/panels.length;
-  panels.forEach(([title, f, line, f2], k) => { const top = 4 + k*ph, bot = top + ph - 16;
-    const sn = f(R.native).slice(0, T), so = f(R.omni).slice(0, T), d2n = f2 ? f2(R.native).slice(0, T) : [], d2o = f2 ? f2(R.omni).slice(0, T) : [];
+function drawSStrip() {   // native (blue) and Omni-Compass (amber) each in its own lane on one scale, so a line that sits on the other never hides it
+  const cv = $("sStrip"); const {g, w, h} = fit(cv, Math.min(0.62, 470/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  const R = sRun(), N = sLen(), T = Math.min(SW.k + 1, N), ml = 56, mr = 10, gap = 26, G = SW.stack === "gpu";
+  const lw = (w - ml - mr - gap)/2, lanes = [["Native", R.native, css.steel, ml], ["Omni-Compass", R.omni, css.brass, ml + lw + gap]];
+  const panels = G ? [["the card's draw (W) · dashed: its power limit", a => a.power, null, a => a.limit], ["clock (MHz) · dashed: the clock ceiling", a => a.clock.map(v => v*MHZ), null, a => a.ceiling.map(v => v*MHZ)], ["response time (ms) · red: the response line", a => a.resp_ms, SC.gpu.slo_ms, null]]
+    : [["response time, mean (ms) · red: the response line", a => a.ms, 500, null], ["requests a second", a => a.lam, null, null], ["CPU limits given (cores) · dashed: host busy (share of its 4 cores)", a => a.limit_m.map(v => v/1000), null, a => a.busy.map(v => 4*v)]];
+  const head = 22, ph = (h - head - 18)/panels.length;
+  g.font = `600 14px ${MONO}`; g.textBaseline = "top"; lanes.forEach(([nm, , col, x0]) => { g.fillStyle = col; g.textAlign = "left"; g.fillText(nm, x0, 2); });
+  panels.forEach(([title, f, line, f2], k) => { const top = head + k*ph, bot = top + ph - 16;
     const all = f(R.native).concat(f(R.omni), f2 ? f2(R.native).concat(f2(R.omni)) : []); let lo = Math.min(...all), hi = Math.max(...all, line || 0);
     if (line && hi > 3*line) hi = 3*line; lo = lo > 0.6*hi ? lo*0.98 : 0; hi = hi*1.05 + 1e-9;
-    const Y = v => bot - (Math.min(v, hi) - lo)/(hi - lo)*(bot - top - 12);
+    const Y = v => bot - (Math.min(v, hi) - lo)/(hi - lo)*(bot - top - 14);
     g.fillStyle = css.muted; g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(title, ml, top);
-    g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, bot); g.lineTo(w - mr, bot); g.stroke();
     g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(fmtAxis(hi/1.05), ml - 6, Y(hi/1.05)); g.fillText(fmtAxis(lo), ml - 6, bot);
-    if (line) { g.strokeStyle = css.bad; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(ml, Y(line)); g.lineTo(w - mr, Y(line)); g.stroke(); g.setLineDash([]); }
-    if (G && k === 0) R.omni.events.forEach(e => { if (e.t <= sSec(T - 1)) { g.fillStyle = alpha(css.blood, 0.8); g.fillRect(X(e.t - 1), top + 12, 2, bot - top - 12); } });
-    if (G) { g.strokeStyle = alpha(css.muted, 0.6); g.setLineDash([2, 4]); g.beginPath(); g.moveTo(X(539), top + 12); g.lineTo(X(539), bot); g.stroke(); g.setLineDash([]); }
-    const path = (s2, col, dash, lw) => { g.strokeStyle = col; g.lineWidth = lw; g.setLineDash(dash); g.beginPath(); s2.forEach((v, i) => i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))); g.stroke(); g.setLineDash([]); };
-    if (f2) { path(d2o, alpha(css.brass, 0.7), [4, 3], 1); path(d2n, alpha(css.steel, 0.7), [1, 3], 1); }
-    path(so, css.brass, [], 1.8); path(sn, css.steel, [5, 3], 1.4);
-    if (k === panels.length - 1) { g.fillStyle = css.muted; g.textBaseline = "top"; const span = G ? 600 : 3600, stp = G ? 100 : 600;
-      for (let sec = 0; sec <= span; sec += stp) { g.textAlign = sec === 0 ? "left" : sec === span ? "right" : "center"; g.fillText(G ? sec + " s" : sec/60 + " min", X(Math.max(0, (G ? sec : sec/5) - 1)), bot + 3); } }
+    lanes.forEach(([nm, A, col, x0]) => { const X = t => x0 + t/N*lw;
+      g.strokeStyle = css.rule; g.lineWidth = 1; g.beginPath(); g.moveTo(x0, bot); g.lineTo(x0 + lw, bot); g.stroke();
+      if (line) { g.strokeStyle = css.bad; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(x0, Y(line)); g.lineTo(x0 + lw, Y(line)); g.stroke(); g.setLineDash([]); }
+      if (G && k === 0 && A === R.omni) A.events.forEach(e => { if (e.t <= sSec(T - 1)) { g.fillStyle = alpha(css.blood, 0.8); g.fillRect(X(e.t - 1), top + 14, 2, bot - top - 14); } });
+      if (G) { g.strokeStyle = alpha(css.muted, 0.6); g.setLineDash([2, 4]); g.beginPath(); g.moveTo(X(539), top + 14); g.lineTo(X(539), bot); g.stroke(); g.setLineDash([]); }
+      const path = (s2, c, dash, wd) => { g.strokeStyle = c; g.lineWidth = wd; g.setLineDash(dash); g.beginPath(); s2.forEach((v, i) => i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))); g.stroke(); g.setLineDash([]); };
+      if (f2) path(f2(A).slice(0, T), alpha(col, 0.75), [4, 3], 1.2);
+      path(f(A).slice(0, T), col, [], 2.2);
+      const v = f(A)[T - 1]; if (v !== undefined) { g.fillStyle = col; g.beginPath(); g.arc(X(T - 1), Y(v), 4, 0, 7); g.fill(); }
+      if (k === panels.length - 1) { g.fillStyle = css.muted; g.textBaseline = "top"; const span = G ? 600 : 3600, stp = G ? 200 : 1200;
+        for (let sec = 0; sec <= span; sec += stp) { g.textAlign = sec === 0 ? "left" : sec === span ? "right" : "center"; g.fillText(G ? sec + " s" : sec/60 + " min", X(Math.max(0, (G ? sec : sec/5) - 1)), bot + 3); } }
+    });
   });
 }
 function engineBanner() {   // a newer engine stands than the prose was written for: the records are rebuilt on it, and the page says so
@@ -2312,7 +2336,7 @@ function setRuns(b, run, rep) {
     $("ruTab").querySelector("thead").innerHTML = `<tr><th>Workload · repetition</th>${G.map(g => `<th>${g.replace(/_/g, " ")}: native</th><th>Omni-Compass</th>`).join("")}</tr>`;
     const by = {}; rows.forEach(r => { (by[`${r.workload} · ${r.rep}`] = by[`${r.workload} · ${r.rep}`] || {})[r.arm] = r; });
     $("ruTab").querySelector("tbody").innerHTML = Object.keys(by).sort().map(k => `<tr><td>${k}</td>${G.map(g => `<td class="nat">${by[k].native && by[k].native[g] !== undefined ? fmtAxis(by[k].native[g]) : "—"}</td><td class="omni">${by[k].omni && by[k].omni[g] !== undefined ? fmtAxis(by[k].omni[g]) : "—"}</td>`).join("")}</tr>`).join("");
-    $("ruTabNote").textContent = "Each arm's own arm.json, SHA-256-checked; the table's readings are in section 4's receipts. The second-by-second request logs of these runs are in the raw folder.";
+    $("ruTabNote").textContent = "Each arm's own arm.json, SHA-256-checked; the table's readings are in section 6's receipts. The second-by-second request logs of these runs are in the raw folder.";
   }
   updateRuns(); opsSync();
 }
@@ -2414,10 +2438,10 @@ function opsSync() {
   $("opsRepG").innerHTML = G.map((g, i) => `<button data-opsg="${i}" aria-pressed="${i === OPS.gauge}">${g[0]}</button>`).join("");
   $("opsRepG").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { OPS.gauge = +b.dataset.opsg; opsSync(); }));
   const R = ruR(), pr = (R && R.official_paired) || {};
-  $("opsKpi").innerHTML = k8s ? OPS_KPI.map(([k, , , key], i) => `<div class="kpi"><span class="k">${k}</span><div class="vv"><div class="n"><span><i></i>native</span><b id="opsKn${i}">—</b></div><div class="o"><span><i></i>Omni-Compass</span><b id="opsKo${i}">—</b></div></div><canvas id="opsKs${i}" aria-hidden="true"></canvas><div class="rd">${key ? (pr[key] ? "the run's reading: " + ruWord(pr[key], RU_AIM[key]) : "the run's readings: its three-run table, section 4") : "the stream itself, both arms on the same load"}</div></div>`).join("")
-    : `<div class="kpi" style="grid-column:1/-1"><span class="k">a database benchmark</span><div class="rd">Each arm of a database run is scored per repetition in its own <code>arm.json</code> (SHA-256-checked); there is no half-minute stream to play. Every repetition of every workload is in the bars below, and the run's readings are in section 4's receipts.</div></div>`;
+  $("opsKpi").innerHTML = k8s ? OPS_KPI.map(([k, , , key], i) => `<div class="kpi"><span class="k">${k}</span><div class="vv"><div class="n"><span><i></i>native</span><b id="opsKn${i}">—</b></div><div class="o"><span><i></i>Omni-Compass</span><b id="opsKo${i}">—</b></div></div><canvas id="opsKs${i}" aria-hidden="true"></canvas><div class="rd">${key ? (pr[key] ? "the run's reading: " + ruWord(pr[key], RU_AIM[key]) : "the run's readings: its three-run table, section 6") : "the stream itself, both arms on the same load"}</div></div>`).join("")
+    : `<div class="kpi" style="grid-column:1/-1"><span class="k">a database benchmark</span><div class="rd">Each arm of a database run is scored per repetition in its own <code>arm.json</code> (SHA-256-checked); there is no half-minute stream to play. Every repetition of every workload is in the bars below, and the run's readings are in section 6's receipts.</div></div>`;
   $("opsRepNote").innerHTML = k8s ? `The run's reading of this gauge over all ${(R.reps || []).length} of its repetitions (its own LIVE_REPS.json, the paired difference and its 95% interval): ${ruWord(pr[G[OPS.gauge][1]], RU_AIM[G[OPS.gauge][1]])}. Each bar is one repetition scored by the repository's own scorer on its own files.`
-    : "Each bar is one repetition's own arm.json. A database run's readings are in section 4's receipts.";
+    : "Each bar is one repetition's own arm.json. A database run's readings are in section 6's receipts.";
   document.querySelectorAll(".opsTip").forEach(t => t.hidden = true);
   $("opsStream1").style.display = k8s ? "" : "none"; $("opsBarsBox").style.display = k8s ? "" : "none";
   $("opsStream2").style.gridTemplateColumns = k8s ? "" : "minmax(0,1fr)";
@@ -2607,7 +2631,7 @@ const TL = {yaw: -0.62, pitch: 0.38, drag: null, spin: true, deltaKey: "", delta
 const tOrder = () => W.muscles.map((m, i) => i).sort((a, b) => W.muscles[a].realm - W.muscles[b].realm || W.muscles[a].j - W.muscles[b].j);
 const tRec = () => TRD[W.hsec][HS().seeds[W.run]];
 function drawCube(now) {
-  const cv = $("tCube"); if (!cv || W.body !== "harness") { if (cv) { const {g, w, h} = fit(cv, 0.72); g.clearRect(0, 0, w, h); opsEmpty(g, w, h, "the tensor plays with the engine's harness (section 5)"); } return; }
+  const cv = $("tCube"); if (!cv || W.body !== "harness") { if (cv) { const {g, w, h} = fit(cv, 0.72); g.clearRect(0, 0, w, h); opsEmpty(g, w, h, "the tensor plays with the engine's harness (section 7)"); } return; }
   const {g, w, h} = fit(cv, Math.min(0.72, 460/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
   if (TL.spin && !TL.drag && !reduceMotion) TL.yaw += 0.0025;
   const R = tRec(), n = W.muscles.length, S = HS().steps, K = Math.min(W.t, S - 1), ord = tOrder(), ds = Math.max(1, Math.ceil(S/Math.min(110, w/5)));
@@ -2647,7 +2671,7 @@ function deltaMatrix() {
 }
 function drawDelta() {
   const cv = $("tDelta"); if (!cv) return; const {g, w, h} = fit(cv, Math.min(0.72, 460/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
-  if (W.body !== "harness") { opsEmpty(g, w, h, "the matrix plays with the engine's harness (section 5)"); OPS.geo.tDelta = null; return; }
+  if (W.body !== "harness") { opsEmpty(g, w, h, "the matrix plays with the engine's harness (section 7)"); OPS.geo.tDelta = null; return; }
   const ml = 92, mr = 8, top = 6, bot = h - 22, S = HS().steps, n = W.muscles.length, ord = tOrder();
   g.imageSmoothingEnabled = false; g.drawImage(deltaMatrix(), ml, top, w - ml - mr, bot - top);
   g.font = `12px ${MONO}`; g.textAlign = "right"; g.textBaseline = "middle"; g.fillStyle = css.muted;
@@ -2686,7 +2710,7 @@ function tEig() {
 }
 function drawModes() {
   const cv = $("tModes"); if (!cv) return; const {g, w, h} = fit(cv, Math.min(0.62, 380/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
-  if (W.body !== "harness") { opsEmpty(g, w, h, "the modes are read from the engine's harness (section 5)"); OPS.geo.tModes = null; return; }
+  if (W.body !== "harness") { opsEmpty(g, w, h, "the modes are read from the engine's harness (section 7)"); OPS.geo.tModes = null; return; }
   const E = tEig(), ml = 44, mr = 8, top = 16, mid = h*0.56, N = 8, X = i => ml + (i + 0.5)/N*(w - ml - mr), cw = (w - ml - mr)/N;
   OPS.geo.tModes = {ml, mr, w, N}; g.font = `12px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText("the share of the body's motion in each mode (%)", ml, 0);
   const hi = Math.max(0.05, ...E.native.share, ...E.omni.share)*1.1, Y = v => mid - v/hi*(mid - top - 4);
@@ -3103,7 +3127,7 @@ function updateScan() {
     rows.push(["Digestion (the stomach)", "the time the last decision took", "none", Bt.length ? Math.round(Bt[Bt.length - 1][1]) + " ms" : "—"]);
     rows.push(["Exhaust (the output)", "settings commands written in this repetition, every one read back", "none written by any governor", P.omni.writes !== undefined ? String(P.omni.writes) : "—"]);
   } else rows.push(["—", "a database run plays no half-minute stream; choose a Kubernetes benchmark in section 3", "—", "—"]);
-  if (W.body === "harness") { const im = W.imm; rows.splice(Math.min(4, rows.length), 0, ["Immune system", W.hsec === "organism" ? "rooms warmer than their native twins now · the body's heat debt (section 5)" : "the immune system reads one organism (section 5, One organism)", "none", W.hsec === "organism" ? (im ? `${im[1]} · ${im[0]} W` : "0 · 0 W") : "—"]); }
+  if (W.body === "harness") { const im = W.imm; rows.splice(Math.min(4, rows.length), 0, ["Immune system", W.hsec === "organism" ? "rooms warmer than their native twins now · the body's heat debt (section 7)" : "the immune system reads one organism (section 7, One organism)", "none", W.hsec === "organism" ? (im ? `${im[1]} · ${im[0]} W` : "0 · 0 W") : "—"]); }
   tb.querySelector("tbody").innerHTML = rows.map(([o, w, n, m]) => `<tr><td><b>${o}</b></td><td>${w}</td><td class="nat">${n}</td><td class="omni">${m}</td></tr>`).join("");
 }
 
