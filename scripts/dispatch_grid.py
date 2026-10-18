@@ -89,10 +89,12 @@ KUBE_BUILD = {1: 1, 10: 1, 100: 8, 1000: 80}         # minutes to build the orga
 # Oct): the governor at the organism's own CPU priority, never below the rig beside it; its decisions counted inside the
 # measured window; kind, kubectl and the metrics-server manifest tried again when a download is refused. Protocol 3 (13
 # Oct): the model of the organism on the runner's last core and the kind nodes on the others, the same in both arms; the
-# window lengthened (never shortened) from the heavier arm's step timed on that core before either arm. The runs of earlier
-# protocols are kept as they stand and counted in no square, so every square with the cluster inside is filled on
-# protocol 3 alone
-KUBE_PROTOCOL = "3"
+# window lengthened (never shortened) from the heavier arm's step timed on that core before either arm. Protocol 4 (18
+# Oct): protocol 3 with the served image pulled onto every kind worker before each arm (deploy/kind/prepull.yaml,
+# docs/POD_START_WAIT.md), so no pod started inside the window unpacks its image on the host every node shares. The runs of
+# earlier protocols are kept as they stand and counted in no square, so every square with the cluster inside is filled on
+# protocol 4 alone (no omni-v11 run with the cluster inside had started on protocol 3)
+KUBE_PROTOCOL = "4"
 MAX_TRIES = 3                      # a repetition whose job failed this many times is started no more (the report lists it)
 # the runs that go before the grid: Azure first (the founder's order of 13 October: Kubernetes on Azure is finished first),
 # the other clouds when he starts them, the push's verify and the archive of finished runs. While one of them waits for a
@@ -104,6 +106,13 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
 RERUN_SINCE = "2026-10-18T16:06:00Z"   # omni-v11: every benchmark runs again from the moment the engine landed on main (18 October)
+# the kind rig as amended on 18 October (scripts/kind_bench.sh pulls the served image onto every worker before each arm,
+# docs/POD_START_WAIT.md): a run of a workflow that builds a kind cluster counts only when its own commit carries the
+# pre-puller (RIG_FILE, read from GitHub at the run's head commit), so no table mixes the two rigs and no run is counted on
+# the wrong one; its runs on the rig before run to their end (nothing is cancelled) and stay as their own record
+RIG_FILE = "deploy/kind/prepull.yaml"
+RIG_WORKFLOWS = ("benchmark.yml", "benchmark-reps.yml", "big-organism.yml", "capacity.yml", "kind-addons.yml",
+                 "kind-cruisekube.yml", "kind-goldilocks.yml", "robustness.yml")
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
@@ -524,16 +533,36 @@ def reruns_to_start(queue, started):
     return out
 
 
+def on_rig(sha, seen):
+    """True when the commit carries RIG_FILE (the kind rig as amended on 18 October); read once a commit (seen caches it). A
+    missing file is GitHub's 404; any other failure raises, so a run is never counted on a rig it was not read on."""
+    if sha not in seen:
+        try:
+            api(f"repos/{REPO}/contents/{RIG_FILE}?ref={sha}")
+            seen[sha] = True
+        except urllib.error.HTTPError as e:
+            if e.code != 404:
+                raise
+            seen[sha] = False
+        except RuntimeError as e:
+            if "404" not in str(e):
+                raise
+            seen[sha] = False
+    return seen[sha]
+
+
 def reruns_started(queue):
-    """{workflow: runs dispatched since RERUN_SINCE and not cancelled}, read from GitHub. A cancelled run is not a run (the
-    founder's order of 16 October: nothing is cancelled; a run GitHub cancelled before it began is released again)."""
-    out = {}
+    """{workflow: runs dispatched since RERUN_SINCE and not cancelled (a kind workflow's: on a commit that carries RIG_FILE)},
+    read from GitHub. A cancelled run is not a run (the founder's order of 16 October: nothing is cancelled; a run GitHub
+    cancelled before it began is released again)."""
+    out, carries = {}, {}
     for wf in sorted({q[2] for q in queue}):
         n, page = 0, 1
         while page <= 5:
             d = api(f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={RERUN_SINCE}&per_page=100&page={page}")
             rs = d.get("workflow_runs", [])
-            n += sum(r.get("conclusion") != "cancelled" for r in rs)
+            n += sum(r.get("conclusion") != "cancelled" and (wf not in RIG_WORKFLOWS or on_rig(r.get("head_sha", ""), carries))
+                     for r in rs)
             if len(rs) < 100:
                 break
             page += 1
@@ -750,7 +779,8 @@ def report(cov, started, queued, running, target, out=sys.stdout, gave_up=None, 
         print(f"- {d['title']} ({d['jobs']} jobs, about {d['hours']} runner-hours)", file=out)
     print(f"\nWith the cluster inside, only runs of protocol {KUBE_PROTOCOL} count (12 Oct: the governor never below the "
           "organism's priority, its decisions counted inside the window; 13 Oct: the model on its own core, the kind nodes on "
-          "the others, the window set from the heavier arm's measured step); a repetition whose job failed is started again, "
+          "the others, the window set from the heavier arm's measured step; 18 Oct: the served image pulled onto every worker "
+          "before each arm); a repetition whose job failed is started again, "
           f"up to {MAX_TRIES} times.", file=out)
     for (size, o, x), n in sorted((gave_up or {}).items()):
         print(f"- not started again: {o} at {size:,} copies, repetition {x} (its job failed {n} times; listed, never "

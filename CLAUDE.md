@@ -143,9 +143,10 @@ the founder overrides one in the conversation.
   (16 October: the Azure run is the measure of the other two clouds, the same tuning, mechanism and harness). Each tick runs the conductor's newest
   code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
   paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
-  the cluster inside only runs of protocol 3 count (12 Oct: the governor never below the organism's CPU priority, its
+  the cluster inside only runs of protocol 4 count (12 Oct: the governor never below the organism's CPU priority, its
   decisions counted inside the window; 13 Oct: the model of the organism on the runner's last core and the kind nodes on
-  the others, the same in both arms); a repetition whose job fails runs again, up to three times, paired within one run,
+  the others, the same in both arms; 18 Oct: the served image pulled onto every worker before each arm); a repetition whose
+  job fails runs again, up to three times, paired within one run,
   and one that fails three times is listed. With the cluster inside, the window is set from the heavier arm's step,
   timed before either arm, so the max keeps the organism's clock.
 - Three loads: each organism's own load, the climb (the load stepping by one, 1 2 3 2 3 4 …) and work waiting in line
@@ -202,6 +203,11 @@ the founder overrides one in the conversation.
   campaign, the grid's manifest and workflows, the package, the root list, a release group), then the words a person writes;
   `tools/land_engine.py --check`, run by `verify.py`, refuses a push where any of those places still names an older engine.
   The real GitHub is brought up to the newest work every few hours.
+- **The kind rig pre-pulls the served image** (18 October, `docs/POD_START_WAIT.md`): the only LOSS row on the engine that
+  stands, the KEDA HTTP pod start wait, is the test machine (an empty node unpacked the image inside the window on the one
+  runner all kind nodes share; at the same host load omni's starts were as fast or faster). Every kind arm now pulls the
+  image onto every worker before it begins, the same in both arms; a kind run counts only on a commit that carries the
+  pre-puller (`RIG_FILE`); the grid's runs with the cluster inside are protocol 4; and `tools/confirm_abc.py` marks a table whose runs differ in rig.
 - **Google and Amazon on** (the founder's words, once the four secrets were in: "Push the clouds, let's see. The Google
   AWS, I linked them up"). `GCP_CREDENTIALS`, `GCP_PROJECT`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are in the
   repository's secrets; both queues' `switch=` lines read on. The conductor starts their four sets, A, then B, then C, one

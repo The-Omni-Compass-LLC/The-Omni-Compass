@@ -13,15 +13,16 @@ name: six-kube
 # order of 15 October; scripts/dispatch_grid.py, kept going by grid.yml until every square is full). Started with what =
 # runs, it runs one dispatch. The organism steps on the window's clock, so the window is set long enough for the max's arm
 # to make every step in time (a repetition more than 5% late is marked off the clock). With split = yes each arm of a
-# repetition runs on its own runner (for a window too long for both on one; the planner checks the full per-arm job budget). "protocol 3" in a run's
+# repetition runs on its own runner (for a window too long for both on one; the planner checks the full per-arm job budget). "protocol 4" in a run's
 # name: the test rig as amended on 12 Oct (scripts/kind_bench.sh: the governor never below the organism's CPU priority, its
-# decisions counted inside the window, refused downloads tried again) and on 13 Oct (the model of the organism on the
+# decisions counted inside the window, refused downloads tried again), on 13 Oct (the model of the organism on the
 # runner's last core, the kind nodes on the others; the window lengthened from the heavier arm's step timed before either
-# arm, scripts/kind_paired.sh); the grid counts these runs only.
+# arm, scripts/kind_paired.sh) and on 18 Oct (the served image pulled onto every worker before each arm,
+# deploy/kind/prepull.yaml, docs/POD_START_WAIT.md); the grid counts these runs only.
 run-name: >-
   ${{ github.event_name != 'workflow_dispatch' && 'six-kube' ||
       inputs.what != 'runs' && 'six-kube: start every square of the grid' ||
-      format('six-kube x{0} orgs {1} reps {2}+{3} arms {4} split {5} window {6} protocol 3', inputs.sizes, inputs.organisms,
+      format('six-kube x{0} orgs {1} reps {2}+{3} arms {4} split {5} window {6} protocol 4', inputs.sizes, inputs.organisms,
              inputs.rep_first, inputs.reps, inputs.arms, inputs.split, inputs.durations_s) }}
 on:
   workflow_dispatch:

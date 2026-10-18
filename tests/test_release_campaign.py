@@ -57,6 +57,42 @@ class ReleaseCampaign(unittest.TestCase):
             counts[wf] = counts.get(wf, 0) + 1
         self.assertEqual(grid.reruns_to_start(queue, counts), [])
 
+    def test_the_kind_rig_amendment_counts_only_runs_on_the_amended_rig(self):
+        # 18 October: the served image pre-pulled on every kind worker (docs/POD_START_WAIT.md); a kind workflow's run counts
+        # only when its own commit carries the pre-puller, every other workflow's as before, and an unreadable commit raises
+        queue = grid.rerun_queue()
+        workflows = {row[2] for row in queue}
+        self.assertTrue(set(grid.RIG_WORKFLOWS) <= workflows)
+        self.assertTrue((ROOT / grid.RIG_FILE).exists())
+        for wf in grid.RIG_WORKFLOWS:
+            self.assertRegex((ROOT / '.github' / 'workflows' / wf).read_text(), r'kind_paired\.sh|kind_bench\.sh', wf)
+        for wf in workflows - set(grid.RIG_WORKFLOWS):  # no other workflow that runs the kind bench is left on two rigs
+            text = (ROOT / '.github' / 'workflows' / wf).read_text()
+            self.assertNotRegex(text, r'kind_paired\.sh|kind_bench\.sh', f'{wf} runs the kind bench: it must count by rig too')
+        runs = [{'head_sha': 'old', 'conclusion': 'success'}, {'head_sha': 'new', 'conclusion': None},
+                {'head_sha': 'new', 'conclusion': 'cancelled'}, {'head_sha': 'new2', 'conclusion': 'failure'}]
+        asked = []
+
+        def api(url, **_):
+            asked.append(url)
+            if '/contents/' in url:
+                if url.endswith('ref=old'):
+                    raise RuntimeError('gh api ...: gh: Not Found (HTTP 404)')
+                return {'name': 'prepull.yaml'}
+            return {'workflow_runs': runs}
+        with unittest.mock.patch.object(grid, 'api', side_effect=api):
+            got = grid.reruns_started([('A', 'x', 'kind-addons.yml', {}), ('A', 'y', 'redis.yml', {})])
+        self.assertEqual(got, {'kind-addons.yml': 2, 'redis.yml': 3})   # the old commit's run, and the cancelled one, count for nothing
+        self.assertEqual(sum('/contents/' in u for u in asked), 3)        # each commit read once
+        self.assertTrue(all(f'created=>={grid.RERUN_SINCE}' in u for u in asked if '/runs?' in u))
+
+        def broken(url, **_):
+            if '/contents/' in url:
+                raise RuntimeError('gh api ...: connection reset')
+            return {'workflow_runs': runs}
+        with unittest.mock.patch.object(grid, 'api', side_effect=broken), self.assertRaises(RuntimeError):
+            grid.reruns_started([('A', 'x', 'kind-addons.yml', {})])     # never counted on a rig it was not read on
+
     def test_nothing_starts_before_the_campaign_opens(self):
         # every count reads from SINCE: a run the new conductor started before it would be counted in no campaign
         self.assertRegex(grid.SINCE, r'^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$')

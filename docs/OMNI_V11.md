@@ -62,7 +62,9 @@ measure moves; what moves is the record (a reason where there was an error) and 
 no longer reaches. Against native, the two engines read the same, and four rows read LOSS in both: the pod start wait under
 conveyance (+9.0% mean, +10.0% at the 95th percentile), the pending-pod minutes and the response time at a decision every 15 s
 (+111.7%, +0.33%; no run decides that often), and the alert minutes in the blink toy (+2.35%). They are not this change's; they
-are the next version's work, in the gate first. These are our own models (class S), never a benchmark result.
+are the next version's work, in the gate first. The first is the test machine, not the governor: the toy's pod start time was
+fitted to the empty-node image unpacking of the single kind host (`docs/POD_START_WAIT.md`, section 8), and the kind rig now
+pre-pulls the image. These are our own models (class S), never a benchmark result.
 
 ## 3. What runs again on it
 

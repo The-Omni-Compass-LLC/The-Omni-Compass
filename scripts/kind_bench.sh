@@ -164,7 +164,22 @@ kubectl -n kube-system patch deployment metrics-server -p "$pin"
 kubectl -n kube-system patch deployment coredns -p "$pin"
 kubectl -n kube-system rollout status deployment/metrics-server --timeout=300s
 kubectl -n kube-system rollout status deployment/coredns --timeout=300s
-fi   # AKS runs its own metrics-server and CoreDNS on the system pool
+# the served image pulled onto every worker before the arm, then the puller deleted, before the governor starts or the
+# window opens (deploy/kind/prepull.yaml; amendment of 18 October, docs/POD_START_WAIT.md): a serving pod started inside
+# the window no longer downloads and unpacks the image on the one machine every kind node shares. The same in every arm;
+# a puller not finished on every worker fails the arm's checks (marked invalid), so no arm runs on the other rig
+kubectl apply -f deploy/kind/prepull.yaml >/dev/null
+for t in 1 2 3; do
+  kubectl -n kube-system rollout status daemonset/rig-prepull --timeout=300s && break
+  [ "$t" = 3 ] && { echo "the image pre-puller did not finish on every worker (3 tries)"; exit 1; }
+  echo "image pre-puller not finished on every worker (try $t): waiting again"; sleep 20
+done
+echo "images=pre-pulled on every worker before the arm (deploy/kind/prepull.yaml)" | tee -a "$OUT_DIR/preflight.txt"
+echo "image_ids=$(kubectl -n kube-system get pods -l app=rig-prepull -o jsonpath='{range .items[*]}{.status.initContainerStatuses[0].imageID}{"\n"}{end}' | sort | uniq -c | tr -s ' \n' ' ')" \
+  | tee -a "$OUT_DIR/preflight.txt"
+kubectl -n kube-system delete daemonset rig-prepull --wait=true --timeout=120s >/dev/null
+kubectl -n kube-system wait --for=delete pod -l app=rig-prepull --timeout=120s >/dev/null 2>&1 || true
+fi   # AKS runs its own metrics-server and CoreDNS on the system pool; each cloud machine unpacks on its own processor
 if [ -n "${CAP_CPU_M:-}" ]; then
   # the capacity test (docs/CAPACITY_PREREGISTRATION.md): the same resource cap in every arm, set by the cluster itself, not
   # by either controller: a quota on the CPU limits of the served app's pods (CAP_CPU_M millicores in all), counted for the
