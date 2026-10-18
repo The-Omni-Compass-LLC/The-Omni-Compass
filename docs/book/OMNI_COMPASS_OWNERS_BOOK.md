@@ -133,9 +133,10 @@ will find, the following discipline throughout, because it is the discipline the
 5. **Nothing read across engines.** The engine is frozen and fingerprinted (`OMNI_V1.json`, `OMNI_V2.json`,
    `OMNI_V3.json`, `OMNI_V5.json`, `OMNI_V6.json`, `OMNI_V7.json`). Any change to a rule, gain, guard, preset or muscle makes the next version, and every result is run
    again on it. Every table made by rule checks the engine of each run it reads and refuses to mix them.
-6. **The raw files live with the code.** Every finished run's files are copied into `results/live/raw/run-<id>/` with one
-   SHA-256 manifest per repetition, and every table names the runs and the commit it was made from. Anyone with the
-   repository can recompute every table from the files it names.
+6. **The raw files live with the code.** Every finished run's files are copied into `run-<id>/` on the repository's branch
+   `raw` with one SHA-256 manifest per repetition (opened by `scripts/raw_archive.sh`, the branch sits at
+   `results/live/raw/`), and every table names the runs and the commit it was made from. Anyone with the repository can
+   recompute every table from the files it names.
 7. **Do no harm.** Omni-Compass moves a knob only where a paired trial on the muscle itself shows the muscle never behind for
    it (the verdict, `omnicompass/verdict.py`, with its 2% allowance). Where it cannot improve a knob, that knob stays
    native, and the result says "nothing for Omni to move".
@@ -7032,7 +7033,7 @@ The catalog (`realms/catalog.csv`): 945 muscles in 59 families, 430 in Compute /
 | `tools/run_pandapower.py`, `run_mujoco.py`, `run_citylearn.py` | Omni on top of an independent simulator's own controller | `results/live/V3_PANDAPOWER.md`, `V3_MUJOCO.md`, `V3_CITYLEARN.md` |
 | `tools/omni_index.py` | the one combined number, read only from the three-run tables | `results/OMNI_INDEX.md` |
 | `scripts/gpu_rented_run.sh`, `tools/gpu_wire_check.py` | one command on a rented card: wire check, smoke, the organisms with the card inside, the preregistered counted run | the founder's runs, to come |
-| workflow `archive-run` | every finished run's files copied with the code, one SHA-256 manifest per repetition | `results/live/raw/run-<id>/` |
+| workflow `archive-run` | every finished run's files copied with the code onto the branch `raw`, one SHA-256 manifest per repetition | `results/live/raw/run-<id>/` (opened by `scripts/raw_archive.sh`) |
 | `verify.py`, `tools/release_manifest.py` | everything above re-runs and checks itself; the manifest fingerprints the result | `results/VERIFY_RECEIPT.txt`, `RELEASE_MANIFEST.json` |
 
 The rules for each run were written and committed before it ran (`docs/*_PREREGISTRATION.md`); every row is reported, LOSS included; nothing is read across engine versions.
@@ -7092,9 +7093,11 @@ a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on G
    loses, the first suspect is our own wiring, native setup or scoring; that is fixed and the test run again, and the
    loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut out.
 8. **The raw files live with the code.** Every finished run's files (capture, response times, audit log, controller
-   log, one SHA-256 manifest per repetition) are copied into `results/live/raw/run-<id>/` by the `archive-run`
+   log, one SHA-256 manifest per repetition) are copied into `run-<id>/` on the branch `raw` by the `archive-run`
    workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
-   every table names the runs and the commit it was made from.
+   every table names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
+   clone of it is small; `bash scripts/raw_archive.sh open /run-<id>/` places a run's files at `results/live/raw/run-<id>/`,
+   the path every table names.
 
 **How many repetitions, and why.** The width of a paired interval shrinks with the square root of the number of pairs,
 so going from five pairs to ten narrows it by about a third, and from ten to forty by half again. On GitHub's runners,
@@ -10928,10 +10931,14 @@ on omni-v11; the sets of earlier engines already started run to their end as the
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
 **Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
 `scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
-18 October (the Operator's Manual's appendices G and H, click by click). Both first sets stopped at the login at no cost, and
-both queues are paused so no A, B or C is spent on a login: Google's stored key was cut short when it was copied (it is stored
-again whole), and Amazon's account is on its Free plan, whose policy denies the machine reads (the account moves to its Paid
-plan). Then each failed set is run again in place and its sets run on omni-v11, one at a time in each machine-family queue.
+18 October (the Operator's Manual's appendices G and H, click by click). Their first sets, on omni-v10, stopped at the login at
+no cost and stay as its record: Google's stored key had been cut short when it was copied from Cloud Shell's screen, and
+Amazon's account is on its Free plan, whose policy denies every machine read. Both queues are on again behind a $0 check
+(`cloud-check`): the conductor starts a cloud's set only after that cloud's check passed (the key whole, the login, the plan,
+the machine type and every quota; a short Amazon quota is asked of Amazon by the check itself), so nothing more is spent on a
+login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, its step 4);
+Amazon waits for its account on the Paid plan (appendix H, its step 1a). Then the sets start on their own, A, B and C on
+omni-v11, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -10955,8 +10962,8 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
 3. **The kill test**: three omni-v7 runs on the fixed harness started 17 October (they finish and stand as omni-v7's record);
    its omni-v11 runs are in the queue.
 4. **The grid and Azure on omni-v11**: restarted on 18 October; nothing cancelled.
-5. **Google and Amazon**: paused until Google's key is stored whole and Amazon's account is on its Paid plan; then the failed
-   first sets run again in place and the four sets run A, B and C on omni-v11.
+5. **Google and Amazon**: on behind their $0 check; they start on their own once Google's key is stored whole and Amazon's
+   account is on its Paid plan, the four sets A, B and C on omni-v11.
 6. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 7. **Linux**: a machine on the metal for `cpu-power`.
 8. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
@@ -13179,7 +13186,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | `cpp/` | the C++20 twins |
 | `results/` | every published result, with its raw files and checksums |
 | `results/live/V1_*.md`, `V3_*.md` (+ `.json`) | the three-run tables, one per test, named by the engine they ran on |
-| `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition |
+| `results/live/raw/run-<id>/` | every archived run's files, one SHA-256 manifest per repetition (the branch `raw`, opened by `scripts/raw_archive.sh`) |
 | `results/grid_v5/GRID.md`, `results/realms_v5/REALMS_V5.md`, `results/OMNI_INDEX.md` | the grid of copies and runs, the modelled muscles and organisms, the one combined number (the older engines' tables stay under their own names) |
 | `OMNI_V11.json` (the engine that stands), `OMNI_V10.json`, `OMNI_V9.json`, `OMNI_V8.json`, `OMNI_V7.json`, `OMNI_V6.json`, `OMNI_V5.json`, `OMNI_V3.json`, `OMNI_V2.json`, `OMNI_V1.json` | the engines' fingerprints |
 | `docs/` | this manual, the preregistrations, the evidence ledger, the theorem, the realm study |
@@ -13435,7 +13442,8 @@ questions has a yes in this program or a disclosure naming the exception; the di
 
 **How to audit one result from this manual to its raw files.** Take any row of Chapter 50. Its source column names a
 three-run table in `results/live/`; the table's head names the three GitHub run ids, the commit each ran on and the engine
-`tools/omni_version.py` reads at that commit. Each run id names a folder `results/live/raw/run-<id>/` holding every
+`tools/omni_version.py` reads at that commit. Each run id names a folder `results/live/raw/run-<id>/` (the branch `raw`,
+opened by `scripts/raw_archive.sh open /run-<id>/`) holding every
 repetition's files (the capture, the response times, the governor's audit and log, the per-request records, one SHA-256
 manifest per repetition). The table tool named in the table's text (`tools/confirm_abc.py` or its siblings) rebuilds the
 table from those folders; `tools/omni_index.py` rebuilds the index from the tables; `tools/dossier.py` rebuilds the
@@ -15760,7 +15768,8 @@ in order, with what each costs:
    `tests/`, including the rules of every three-run table on fixed cases, and ends `VERIFICATION: PASS`. About ten
    minutes on a laptop. `python3 tools/omni_version.py` then says which frozen engine the checkout carries.
 2. **Rebuild any table from its raw files.** Every three-run table names its three run ids; their files are in
-   `results/live/raw/run-<id>/`. `python3 tools/confirm_abc.py "<title>" results/live/raw/run-<A> results/live/raw/run-<B>
+   `results/live/raw/run-<id>/` once the branch `raw` is opened there (`bash scripts/raw_archive.sh open /run-<A>/ /run-<B>/
+   /run-<C>/`). `python3 tools/confirm_abc.py "<title>" results/live/raw/run-<A> results/live/raw/run-<B>
    results/live/raw/run-<C> --out /tmp/check.md` rebuilds a Kubernetes or Azure table; `tools/pgbench_abc.py`,
    `kafka_abc.py`, `redis_abc.py`, `ycsb_abc.py`, `swarm_abc.py`, `mujoco_abc.py`, `pandapower_abc.py` and `citylearn_abc.py`
    the others, with the same arguments. Compare the result with the committed table: they are the same bytes below the legal notice. A

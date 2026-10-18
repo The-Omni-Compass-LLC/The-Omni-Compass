@@ -2,6 +2,25 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-18 (evening): The raw receipts on their own branch; main's tree is the code and the tables
+
+- **Why.** Main's tree carried 182,161 raw files (35.6 GB of archived runs) and Dependabot's every clone of it timed out after
+  15 minutes (`job_repo_not_found`, "Timed out due to inactivity after 900 seconds"), so no dependency update has ever run; a
+  buyer's or a runner's clone carried the same weight.
+- **The move.** Every folder under `results/live/raw/` is on the branch `raw` by the same tree objects (nothing copied,
+  nothing changed: the branch's root tree is the one main held, `78b7ba5c`, with the capacity run committed meanwhile); main
+  keeps the code, the tables and the 20-set's checksum list (`results/live/SET20_RAW_SHA256SUMS_ALL.txt`). Main's tree went
+  from 184,734 files to 2,577.
+- **One helper** (`scripts/raw_archive.sh`): `open` places the branch at `results/live/raw/` as a worktree with only the
+  folders asked for (one run in about 2 seconds), so every path a table names reads as written; `has` and `save` work from
+  trees on the branch's newest tip (two jobs saving at once never conflict); `sweep` moves any raw folder main still carries,
+  keeping a second copy under one name beside the first. `archive-run`, `front-page`, `kind-addons`, `kind-cruisekube`,
+  `kind-goldilocks` and `capacity` save through it; `front-page` and `live-engine` open the folders they read
+  (`docs/engine/export_runs.py` reads the branch); `raw-sweep.yml` runs every hour and after each of those workflows, for
+  runs started before the move; `tools/export_zip.py --include-raw` and the grid page read or link the branch.
+  `tests/test_raw_archive.py`.
+- README, the Owner's Manual (rebuilt), the dossier and CLAUDE.md say where the receipts are and how to open them.
+
 ## 2026-10-18 (evening): Google Cloud and Amazon back on, behind a $0 check
 
 - **Why they stopped.** Every Google set started that morning failed at Google's login ("unexpected end of JSON input"): the

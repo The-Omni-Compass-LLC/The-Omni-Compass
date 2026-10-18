@@ -7,7 +7,7 @@ name: front-page
 # The repository keeps itself current (the founder's order of 10 October 2026: the newest result is always at the front, and
 # the repository, not a person, moves it there). Within minutes of every finished benchmark run, and every hour besides:
 #   1. a finished run of a live product (Redis, Kafka, PostgreSQL, MySQL, MongoDB) has its raw files archived with the code
-#      (results/live/raw/run-<id>/, the same copy the archive-run workflow makes);
+#      (run-<id>/ on the branch raw, opened at results/live/raw/; the same copy the archive-run workflow makes);
 #   2. tools/front_page.py rebuilds every table whose three newest runs are in (the superseded table goes whole into
 #      docs/history), then the index, the wiring page, the benefit sheet and the dossier;
 #   3. the front page's own blocks are written again: the engine on main and the index now, every result table by when it
@@ -52,11 +52,8 @@ jobs:
           sparse-checkout: |
             /*
             !/results/live/raw/*
-            /results/live/raw/*/redis-*/
-            /results/live/raw/*/kafka-*/
-            /results/live/raw/*/pgbench-*/
-            /results/live/raw/*/sysbench-*/
-            /results/live/raw/*/ycsb-*/
+      - name: The live products' raw folders the tables read, from the branch raw
+        run: bash scripts/raw_archive.sh open '/*/redis-*/' '/*/kafka-*/' '/*/pgbench-*/' '/*/sysbench-*/' '/*/ycsb-*/'
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
@@ -75,15 +72,16 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           [ -n "$RUN" ] || { echo "::notice::no run named: the refresh alone"; exit 0; }
           d="results/live/raw/run-$RUN"
-          if git cat-file -e "HEAD:$d" 2>/dev/null; then echo "::notice::run $RUN is already archived"; exit 0; fi
+          if bash scripts/raw_archive.sh has "run-$RUN"; then echo "::notice::run $RUN is already archived"; exit 0; fi
           state=$(gh run view "$RUN" -R "${{ github.repository }}" --json status,conclusion -q '.status + " " + .conclusion')
           case "$state" in completed*) ;; *) echo "::warning::run $RUN is not finished ($state)"; exit 0;; esac
           gh run download "$RUN" -R "${{ github.repository }}" -D "$d" || { echo "::warning::run $RUN: no files to copy"; exit 0; }
           find "$d" -type f -size +50M -exec gzip -n -9 {} \;
           ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
+          bash scripts/raw_archive.sh save "run-$RUN" "Raw files of live run $RUN archived with the code"
           grep -qx "$RUN" .github/archive_request.txt || echo "$RUN" >> .github/archive_request.txt
-          git add --sparse "$d" .github/archive_request.txt
-          git commit -q -m "Raw files of live run $RUN archived with the code"
+          git add .github/archive_request.txt
+          git commit -q -m "Live run $RUN archived on the branch raw"
           echo "::notice::run $RUN archived: $(find "$d" -type f | wc -l) files"
       - name: Rebuild what is complete, then the pages read from every table, then the front page's own blocks
         env:
