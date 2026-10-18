@@ -341,11 +341,11 @@ section[aria-label^="The key"] h3{font-size:19px}
     <div class="places" id="gpuPlaces"></div>
     <p class="note">The GPU runs on Lambda (class P: the card's own meter) and the CPU on its own machine (class P: the package's own energy counter, <code>tools/run_cpu_power.py</code>) are the most valuable receipts this engine will carry: the same work for less power on the chip itself. They are not hooked up yet: each place is written here as the repository holds it and fills in, played back from its raw files like every Kubernetes run, the moment its three runs land. Until then the views below are the repository's own models of one GPU card and one Linux host (class S), run native and then with Omni-Compass on the same load and seed.</p>
   </div>
-  <div class="panel stack" style="gap:8px" id="cardPanel">
-    <h3>The last real card run in the repository: metered by the card itself (class P)</h3>
+  <details class="panel stack" style="gap:8px" id="cardPanel">
+    <summary><b>History, obsolete: the card run of 2 October on the earlier card controller</b> (not the engine that stands; kept with every row)</summary>
     <p class="note" id="cardNote">—</p>
-    <div class="tbl-wrap"><table id="cardTab"><thead><tr><th>Gauge</th><th>Native</th><th>Omni-Compass</th><th>Reading (10 paired repetitions, one run)</th></tr></thead><tbody></tbody></table></div>
-  </div>
+    <div class="tbl-wrap"><table id="cardTab"><thead><tr><th>Gauge</th><th>Native</th><th>Earlier controller on native</th><th>Reading (10 paired repetitions, one run)</th></tr></thead><tbody></tbody></table></div>
+  </details>
   <div class="row">
     <span class="ctl-label">Stack</span>
     <div class="seg" role="group" aria-label="Stack"><button id="sGpu" aria-pressed="true">A GPU card</button><button id="sLinux" aria-pressed="false">Linux, one host</button><button id="sKube" aria-pressed="false">Kubernetes (section 3c)</button><button id="sCloud" aria-pressed="false">The cloud (section 3c)</button></div>
@@ -3161,7 +3161,7 @@ function buildCard() {
     return `<span class="word ${w[1]}">${w[0]}</span> ${mag(size)}`; };
   const rows = C.rows.filter(r => typeof r.n === "number" && isFinite(r.n));
   $("cardTab").querySelector("tbody").innerHTML = rows.map(r => `<tr><td>${r.g}</td><td class="nat">${fmtAxis(r.n)}</td><td class="omni">${fmtAxis(r.o)}</td><td>${word(r)}</td></tr>`).join("");
-  $("cardNote").innerHTML = `${C.card || "the card"} on Lambda, ${C.when}: ${C.reps} paired repetitions of ${C.seconds} s each, native against Omni-Compass, the card's own power limit ${C.limit_w} W, energy from the card's own counter (<code>${C.file}</code>). <b>It ran an earlier card controller</b> (commit ${C.commit}), which pulled the power limit down to save energy and paid for it in speed: the energy rows read GAIN and the response times LOSS. By the founder's order every GPU result before the current controller is obsolete and is rerun on Lambda; the current controller runs the card at the max, never below its own top, so it would hold the card where native holds it and give the speed back. Every row is shown as the run recorded it, the LOSS rows included. One run: its readings are this run's own paired intervals, not a three-run reading.`;
+  $("cardNote").innerHTML = `${C.card || "the card"} on Lambda, ${C.when}: ${C.reps} paired repetitions of ${C.seconds} s each, native against Omni-Compass, the card's own power limit ${C.limit_w} W, energy from the card's own counter (<code>${C.file}</code>). <b>This is not Omni-Compass as it stands.</b> It ran an earlier card controller (commit ${C.commit}) that pulled the card's power limit below its top to save energy; the card then answered slower, so the run's own file recorded the response times as a LOSS on that day ("GAIN AND LOSS (energy cut, service traded for it)", the 95th-percentile guardrail failed). That controller was retired for exactly this: the engine that stands never sets the card below its own top, so it cannot slow the card that way. By the founder's order every GPU result before the current controller is obsolete and is rerun on Lambda; until that run lands, the chips have no result on the engine that stands. Every row is kept here as the run recorded it. One run: its readings are this run's own paired intervals, not a three-run reading.`;
 }
 
 // ============================================================== the clock
