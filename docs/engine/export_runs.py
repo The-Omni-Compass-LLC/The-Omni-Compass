@@ -367,6 +367,10 @@ def main(out_path):
         for r in raw_runs:
             rec = k8s_run(g, r, K8S[base]) if kind == "k8s" else db_run(g, r)
             if rec:
+                if not r.get("commit") and rec.get("dir"):          # a table that names its runs by id alone: the run's own RUN.txt names its commit
+                    m = re.search(rb"^commit=([0-9a-f]{7,40})", g.read(f"{rec['dir']}/RUN.txt") or b"", re.M)
+                    if m:
+                        r = dict(r, commit=m.group(1).decode())
                 runs.append({"tag": r.get("tag"), "id": str(r.get("run")), "commit": r.get("commit"), "engine": r.get("engine"), **serial(r), **rec})
         title = meta.get("title") or (ROOT / "results" / "live" / f"{stem}.md").read_text(encoding="utf-8").splitlines()[0].lstrip("# ").split(": the A/B/C")[0]
         benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs})
