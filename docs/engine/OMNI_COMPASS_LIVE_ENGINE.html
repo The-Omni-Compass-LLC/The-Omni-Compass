@@ -101,6 +101,7 @@ td.nat{color:var(--steel)} td.omni{color:var(--brass)}
 .word{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 6px;border-radius:3px;border:1px solid currentColor}
 .w-gain{color:var(--ok)} .w-even{color:var(--even)} .w-loss{color:var(--bad)} .w-given{color:var(--ok)} .w-lost{color:var(--bad)}
 .word.w-given::before{content:"GAIN · "} .word.w-lost::before{content:"LOSS · "}
+.tw-g{color:var(--ok);font-weight:600} .tw-e{color:var(--even);font-weight:600} .tw-l{color:var(--bad);font-weight:600}
 .keyGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:900px){.keyGrid{grid-template-columns:1fr}}
 .keyWhy{border:1px solid var(--rule);border-left:3px solid var(--brass);border-radius:8px;padding:14px 16px;background:var(--panel2)}
@@ -1443,6 +1444,28 @@ function alpha(col, a) {
   if (col.startsWith("#")) { const n = parseInt(col.slice(1), 16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
   return col;
 }
+const WORD_RX = /\b(GAIN|EVEN|LOSS)\b|power given|power lost/g, WORD_CLS = {GAIN: "tw-g", EVEN: "tw-e", LOSS: "tw-l", "power given": "tw-g", "power lost": "tw-l"};
+const wordCol = m => ({GAIN: css.ok, EVEN: css.even, LOSS: css.bad, "power given": css.ok, "power lost": css.bad})[m];
+function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yellow and LOSS red wherever the word stands
+  const parts = String(text).split(/(\bGAIN\b|\bEVEN\b|\bLOSS\b|power given|power lost)/), base = g.fillStyle, al = g.textAlign;
+  const tw = parts.reduce((a, p) => a + g.measureText(p).width, 0); let cx = al === "right" || al === "end" ? x - tw : al === "center" ? x - tw/2 : x;
+  g.textAlign = "left"; for (const p of parts) { if (!p) continue; g.fillStyle = wordCol(p) || base; g.fillText(p, cx, y); cx += g.measureText(p).width; }
+  g.fillStyle = base; g.textAlign = al; }
+const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT"]);
+function paintWords(root) {   // every GAIN, EVEN and LOSS in the page's text wears its traffic-light colour, the ones written later included
+  if (!root || root.nodeType === 3 && !root.parentNode) return;
+  const start = root.nodeType === 3 ? root.parentNode : root;
+  for (let e = start; e && e !== document.body; e = e.parentNode) if (WORD_SKIP.has(e.nodeName) || e.classList && (e.classList.contains("word") || /\b(tw-[gel]|w-gain|w-even|w-loss|w-given|w-lost|w-dis)\b/.test(e.className))) return;
+  const walk = document.createTreeWalker(start, NodeFilter.SHOW_TEXT, {acceptNode: n => { WORD_RX.lastIndex = 0; if (!WORD_RX.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
+    for (let e = n.parentNode; e && e !== start.parentNode; e = e.parentNode) if (WORD_SKIP.has(e.nodeName) || e.classList && (e.classList.contains("word") || /\b(tw-[gel]|w-gain|w-even|w-loss|w-given|w-lost|w-dis)\b/.test(e.className))) return NodeFilter.FILTER_REJECT;
+    return NodeFilter.FILTER_ACCEPT; }});
+  const hits = []; while (walk.nextNode()) hits.push(walk.currentNode);
+  for (const n of hits) { const f = document.createDocumentFragment(), t = n.nodeValue; let last = 0; WORD_RX.lastIndex = 0; let m;
+    while ((m = WORD_RX.exec(t))) { if (m.index > last) f.appendChild(document.createTextNode(t.slice(last, m.index))); const sp = document.createElement("span"); sp.className = WORD_CLS[m[0]]; sp.textContent = m[0]; f.appendChild(sp); last = m.index + m[0].length; }
+    if (last < t.length) f.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(f, n); } }
+const WORD_Q = new Set(); let wordRaf = 0;
+const WORD_WATCH = new MutationObserver(ms => { for (const m of ms) { if (m.type === "characterData") WORD_Q.add(m.target); else m.addedNodes.forEach(n => WORD_Q.add(n)); }
+  if (!wordRaf) wordRaf = requestAnimationFrame(() => { wordRaf = 0; const q = [...WORD_Q]; WORD_Q.clear(); q.forEach(n => { if (n.isConnected) paintWords(n); }); }); });
 const posColor = (p) => p >= 1 ? css.bad : (p >= 0.95 || p <= 0.05) ? css.warn : css.ok;
 const MONO = '"IBM Plex Mono", ui-monospace, monospace';
 
@@ -1816,8 +1839,8 @@ function drawVerdict() {
   g.strokeStyle = css.rule; g.beginPath(); g.moveTo(ml, ay); g.lineTo(w - mr, ay); g.stroke();
   g.strokeStyle = css.ink; g.beginPath(); g.moveTo(X(0), ay - 16); g.lineTo(X(0), ay + 16); g.stroke();
   g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
-  for (const pc of [-0.1, -0.05, 0, 0.05, 0.1]) g.fillText(pc < 0 ? "GAIN " + Math.round(-pc*100) + "%" : pc > 0 ? "LOSS " + Math.round(pc*100) + "%" : "0", X(Math.log(1 + pc)), ay + 18);
-  g.textAlign = "left"; g.textBaseline = "bottom"; g.fillText("95% interval of the step's cost: left of 0 GAIN, right of 0 LOSS; green: inside the allowance", ml, ay - 16);
+  for (const pc of [-0.1, -0.05, 0, 0.05, 0.1]) fillWords(g, pc < 0 ? "GAIN " + Math.round(-pc*100) + "%" : pc > 0 ? "LOSS " + Math.round(pc*100) + "%" : "0", X(Math.log(1 + pc)), ay + 18);
+  g.textAlign = "left"; g.textBaseline = "bottom"; fillWords(g, "95% interval of the step's cost: left of 0 GAIN, right of 0 LOSS; green: inside the allowance", ml, ay - 16);
   if (V.ref.length >= 2 && V.got.length >= 2) { const [lo, hi] = interval(V.ref, V.got); const col = lo > 0 ? css.bad : hi < 0 ? css.ok : css.ink;
     g.strokeStyle = col; g.lineWidth = 4; g.beginPath(); g.moveTo(X(clamp(lo, -R, R)), ay); g.lineTo(X(clamp(hi, -R, R)), ay); g.stroke();
     g.fillStyle = col; g.beginPath(); g.arc(X(clamp((lo + hi)/2, -R, R)), ay, 5, 0, Math.PI*2); g.fill(); }
@@ -1830,7 +1853,7 @@ function drawVerdict2() {
   bars.forEach(([t, v, col], k) => { const y = 20 + k*((h - 40)/2) + (h - 40)/4; g.fillStyle = css.muted; g.textAlign = "left"; g.fillText(t, 0, y);
     g.fillStyle = css.panel2; g.fillRect(ml, y - 10, w - ml - mr, 20); g.fillStyle = col; g.fillRect(ml, y - 10, (w - ml - mr)*v, 20);
     g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(Math.round(v*100) + "%", w, y); });
-  g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(`share of 300 trials allowed when the step's true cost is ${V.stats.cost > 0 ? "LOSS " + (V.stats.cost*100).toFixed(1) + "%" : V.stats.cost < 0 ? "GAIN " + (-V.stats.cost*100).toFixed(1) + "%" : "EVEN"}`, 0, 0);
+  g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; fillWords(g, `share of 300 trials allowed when the step's true cost is ${V.stats.cost > 0 ? "LOSS " + (V.stats.cost*100).toFixed(1) + "%" : V.stats.cost < 0 ? "GAIN " + (-V.stats.cost*100).toFixed(1) + "%" : "EVEN"}`, 0, 0);
 }
 
 // ============================================================== text panels
@@ -3004,7 +3027,7 @@ function drawBenefit() {   // a diverging bar from zero: GAIN to the right in gr
     if (gain > 0) { const x1 = XR(gain); g.fillStyle = css.ok; g.beginPath(); if (g.roundRect && x1 - z > 4) g.roundRect(z + 1, y + 6, x1 - z - 1, bh, [0, 4, 4, 0]); else g.rect(z + 1, y + 6, Math.max(2, x1 - z - 1), bh); g.fill(); if (gain > 100) { g.fillStyle = css.bg; g.textAlign = "right"; g.fillText("▶", x1 - 3, y + rowH/2); } }
     if (loss > 0) { const x0 = XL(loss); g.fillStyle = css.bad; g.beginPath(); if (g.roundRect && z - x0 > 4) g.roundRect(x0, y + 6, z - x0 - 1, bh, [4, 0, 0, 4]); else g.rect(Math.min(x0, z - 3), y + 6, Math.max(2, z - x0 - 1), bh); g.fill(); }
     if (gain <= 0 && loss <= 0) { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); }
-    g.textAlign = "left"; g.fillStyle = gain > 0 ? css.ok : loss > 0 ? css.bad : css.even; g.fillText(text, (gain > 0 ? XR(gain) : z + 8) + 6, y + rowH/2); });
+    g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, text, (gain > 0 ? XR(gain) : z + 8) + 6, y + rowH/2); });
 }
 function buildFleet() {
   const {top, rows, road} = fxRows(), I = FX.index;
@@ -3208,8 +3231,8 @@ function drawFam() {   // per family: GAIN rows to the right in green (power giv
     if (f.given) { g.fillStyle = hatch; g.fillRect(XR(f.n) + 1, y + 6, Math.max(2, XR(f.n + f.given) - XR(f.n) - 1), rowH - 12); }
     if (f.loss) { g.fillStyle = css.bad; g.fillRect(XL(f.loss), y + 6, Math.max(2, z - XL(f.loss) - 1), rowH - 12); }
     if (!f.n && !f.given && !f.loss) { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); }
-    g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`${f.n} GAIN${f.med !== null ? " (median " + f.med + "%)" : ""} · ${f.given} GAIN · power given · ${f.loss} LOSS`, XR(f.n + f.given) + 8, y + rowH/2); });
-  g.fillStyle = css.muted; g.textAlign = "left"; g.fillText("rows in all three runs, from 0: green GAIN ▶ · hatched green GAIN · power given ▶ · ◀ red LOSS", ml, h - 10);
+    g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, `${f.n} GAIN${f.med !== null ? " (median " + f.med + "%)" : ""} · ${f.given} GAIN · power given · ${f.loss} LOSS`, XR(f.n + f.given) + 8, y + rowH/2); });
+  g.fillStyle = css.muted; g.textAlign = "left"; fillWords(g, "rows in all three runs, from 0: green GAIN ▶ · hatched green GAIN · power given ▶ · ◀ red LOSS", ml, h - 10);
 }
 function tally() {   // one number for the whole board: one vote per category, the Omni index's own rule
   const all = fxAll(), landed = all.filter(r => r.pct !== null && /landed/.test(r.status) && r.dom !== "The headline"), gm = xs => xs.length ? Math.exp(xs.reduce((a, x) => a + Math.log(1 + x/100), 0)/xs.length) - 1 : null;
@@ -3280,6 +3303,7 @@ buildOrgans(); vLabels(); newDay(W.seed);
 document.getElementById("vMany").click();
 setBody("harness", "alone");   // open on the engine's own harness, each muscle alone, 120 frames into run A
 setCtl("selfpilot", 0); for (let k = 0; k < 120; k++) stepCtl(); updateCScore();
+requestAnimationFrame(() => { paintWords(document.body); WORD_WATCH.observe(document.body, {childList: true, subtree: true, characterData: true}); });
 ["score", "cScore", "sScore", "ruTab", "selfTab", "cardTab"].forEach(id => { const t = $(id) && $(id).querySelector("tbody"); if (t) LOST_WATCH.observe(t, {childList: true}); });
 buildInfo(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); buildFleet(); buildSelf(); buildPlaces(); buildCard(); buildFamTable(); tally(); buildRegister(); setRuns(0, 0, 0); updateScan(); setInterval(updateScan, 1000);
 drawVerdict2();
