@@ -85,7 +85,7 @@ class Wiring(unittest.TestCase):
         env = step["env"]
         self.assertEqual((env["ADDONS"], env["ADDONS_PROFILE"], env["CRUISEKUBE"], env["ARMS"]),
                          ("keda", "http", "1", "native compass"))
-        commit = next(s for s in w["jobs"]["aggregate"]["steps"] if "committed back" in s.get("name", ""))
+        commit = next(s for s in w["jobs"]["aggregate"]["steps"] if "saved on the branch raw" in s.get("name", ""))
         self.assertIn("github.event.inputs.shakedown != 'yes'", commit["if"])   # a shakedown run is never counted
 
 

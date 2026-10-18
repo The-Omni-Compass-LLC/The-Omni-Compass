@@ -8,7 +8,7 @@ and every part carrying the legal papers.
 
   python3 tools/export_zip.py                     # HEAD, parts of at most 25 MB, into out/export/
   python3 tools/export_zip.py --commit <sha> --limit-mb 20 --out DIR
-  python3 tools/export_zip.py --include-raw       # also the archived run files (results/live/raw/), which are large
+  python3 tools/export_zip.py --include-raw       # also the archived run files (the branch raw), which are large
 
 Each part holds, at its root, README.md, LICENSE, NOTICE, DISCLOSURES.md, PATENTS.md and TRADEMARKS.md as they stand at
 that commit, and EXPORT_NOTICE.txt (the notice, the commit, the part's number and every part's name); the zip's own comment
@@ -34,7 +34,8 @@ def git(*args, binary=False):
 
 
 def files_at(commit: str, include_raw: bool):
-    """(path, blob sha, size) of every file at the commit."""
+    """(path, blob sha, size) of every file at the commit; with include_raw, the raw receipts too: from the commit while main
+    carried them, else from the branch raw (scripts/raw_archive.sh fetch), placed under results/live/raw/ as opened."""
     out = []
     for ln in git("ls-tree", "-r", "-l", commit).splitlines():
         meta, path = ln.split("\t", 1)
@@ -42,6 +43,18 @@ def files_at(commit: str, include_raw: bool):
         if kind != "blob" or (not include_raw and path.startswith("results/live/raw/")):
             continue
         out.append((path, sha, int(size) if size.isdigit() else 0))
+    if include_raw and not any(p.startswith("results/live/raw/") for p, _, _ in out):
+        for ref in ("refs/remotes/origin/raw", "refs/heads/raw"):
+            try:
+                listing = git("ls-tree", "-r", "-l", ref)
+            except subprocess.CalledProcessError:
+                continue
+            for ln in listing.splitlines():
+                meta, path = ln.split("\t", 1)
+                mode, kind, sha, size = meta.split()
+                if kind == "blob":
+                    out.append(("results/live/raw/" + path, sha, int(size) if size.isdigit() else 0))
+            break
     return out
 
 
