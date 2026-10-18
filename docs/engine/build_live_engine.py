@@ -206,7 +206,46 @@ def fleet() -> dict:
         if stand.exists():
             disp = len(json.loads(stand.read_text(encoding="utf-8")).get("dispatches", []))
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
+    out["register"] = register_places()
+    out["card"] = card_record()
     return _clean(out)
+
+
+def card_record():
+    """The newest real card run in the repository (results/gpu/run-*/GPU_REPS.json, metered by the card itself, class P):
+    its card, its date, its repetitions, the controller commit it froze, and every gauge's paired difference with its 95%
+    interval, as the run's own file holds them."""
+    runs = sorted((ROOT / "results" / "gpu").glob("run-*/GPU_REPS.json"))
+    if not runs:
+        return None
+    d = json.loads(runs[-1].read_text(encoding="utf-8"))
+    rc, fr = d.get("receipt", {}), d.get("freeze", {})
+    rows = [{"g": g, "n": v.get("native"), "o": v.get("omni"), "lo": (v.get("ci95") or [None, None])[0], "hi": (v.get("ci95") or [None, None])[1]}
+            for g, v in (d.get("paired", {}).get("omni") or {}).items() if isinstance(v, dict)]
+    stamp = runs[-1].parent.name.replace("run-", "")
+    return {"file": str(runs[-1].relative_to(ROOT)), "card": rc.get("gpu_name"), "reps": rc.get("reps"), "seconds": rc.get("duration_s"),
+            "limit_w": rc.get("power_limit_default_w"), "commit": (fr.get("commit") or "")[:12], "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows}
+
+
+def register_places() -> list:
+    """Every open benchmark still to run, in the register's own order (docs/REGISTER.md, section 4): its domain, the open
+    benchmark and its owner, the native it runs on top of, Omni-Compass's lever and its status, each as the register writes it
+    (markdown stripped), so the benefit board lays out every place that is supposed to be there before its result exists."""
+    reg = ROOT / "docs" / "REGISTER.md"
+    if not reg.exists():
+        return []
+    text = reg.read_text(encoding="utf-8")
+    sec = text[text.find("## 4."):] if "## 4." in text else ""
+    sec = sec[:sec.find("\n## ", 5)] if "\n## " in sec[5:] else sec
+    clean = lambda t: re.sub(r"\s+", " ", re.sub(r"\*\*|`|\[([^\]]*)\]\([^)]*\)", lambda m: m.group(1) or "", t)).strip()
+    out = []
+    for ln in sec.splitlines():
+        if not re.match(r"\|\s*\d+\s*\|", ln):
+            continue
+        c = [clean(x) for x in ln.strip().strip("|").split("|")]
+        if len(c) >= 6:
+            out.append({"n": int(c[0]), "domain": c[1], "bench": c[2][:220], "native": c[3][:160], "lever": c[4][:120], "status": c[5][:260]})
+    return out
 
 
 def records(runs: bool) -> dict:
@@ -256,9 +295,18 @@ def main() -> int:
     named = re.search(r'<html[^>]*data-engine="(omni-v\d+)"', page)
     rec = records(not a.no_runs and not a.check)
     if not named or named.group(1) != rec["build"]["engine"]:
-        print(f"the page names {named.group(1) if named else 'no engine'}, the repository stands on {rec['build']['engine']}: "
-              "write the new engine into the page's words, then build again")
-        return 1
+        # a new engine stands: the page adopts it at once (every record, the head's engine and the build line are rebuilt on
+        # it); its prose keeps naming the engine it was written for in data-prose, and the page says so in a banner until
+        # the prose is realigned (the build never stops the page on a new version)
+        old = named.group(1) if named else None
+        if a.check:
+            print(f"the page names {old}, the repository stands on {rec['build']['engine']}: the next build adopts it")
+            return 1
+        if 'data-prose="' not in page:
+            page = page.replace(f'data-engine="{old}"', f'data-engine="{old}" data-prose="{old}"', 1)
+        page = re.sub(r'data-engine="omni-v\d+"', f'data-engine="{rec["build"]["engine"]}"', page, count=1)
+        print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
+              "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet") if embedded(page, k) != rec[k]]
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
