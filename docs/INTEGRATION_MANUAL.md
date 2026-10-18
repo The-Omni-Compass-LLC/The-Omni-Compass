@@ -48,7 +48,8 @@ License from The Omni-Compass LLC. The copyright, patent and trademark notices, 
 1. **One OFF switch for the whole harness, in a human hand.** `python3 tools/omni_switch.py off` turns every
    Omni-Compass governor on the machine off at once: each returns every setting it changed to the value it recorded
    before it acted, reads each back and exits, and no governor starts again until `python3 tools/omni_switch.py on`
-   (`omnicompass/master.py`; the switch file is `OMNI_MASTER_OFF`, by default `/tmp/omni-compass/OFF`). Each governor
+   (`omnicompass/master.py`; the switch file is `OMNI_MASTER_OFF`, by default `/tmp/omni-compass/OFF`; set it, and
+   `OMNI_REGISTRY`, to a directory only the governors' user can write, `docs/THREAT_MODEL.md`). Each governor
    also has its own switch for one muscle at a time: creating its kill file (or setting `OMNI_KILL=1`).
    - Kubernetes controller: `--kill-file` (default `/tmp/omni.kill`).
    - GPU governor: `--kill-file` (default `/tmp/omni-gpu-kill`), or send it SIGTERM.
