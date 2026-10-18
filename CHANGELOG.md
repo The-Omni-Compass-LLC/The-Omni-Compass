@@ -37,6 +37,22 @@
   service control policy" of an AWS-run organization: the limit Amazon sets on an account on its Free plan. The queue is
   paused until the account is on the Paid plan; the seven sets that failed at the pre-flight (four A, three B, all at no cost)
   are re-run in place, then the switch goes back on. The omni-v9 runs already started run to their end as omni-v9's record; nothing is cancelled.
+- **The day's failed repetitions, root-caused (14:30)**, each run again in place (same run, same commit):
+  - The CruiseKube test, run 39120444653, repetition 8: every worker of the kind cluster left service for two minutes while
+    the service answered every probe. The governor wrote nothing, and two of its decisions failed on the empty reading. A
+    window with no machine in service is now refused in either arm, because its machine count is wrong; the capture keeps
+    each node's taints and conditions at that moment; a failed decision is named by its error.
+  - The KEDA test, run 39108180989, profile both, repetition 2: the native arm's set-up met the HTTP add-on's scaler still
+    stopping after its rollout. The ScaledObject now waits for the scaler and is touched once a minute until KEDA builds the
+    autoscaler whole.
+  - The Azure steady A (omni-v10, run 39100680671), repetition 4: Azure's four new workers did not report Ready in ten
+    minutes, before either arm began. The workflow's clean-up deleted the cluster, so nothing was left billing; the other
+    four repetitions finished.
+  - The benchmark repetitions (run 39107180703, repetition 7): GitHub lost the runner.
+  - The organisms with the cluster inside, ×10 (run 39106236972, the spine): GitHub's artifact store timed out on the upload.
+  - For the next engine version, with the founder told first: when no machine is in service, the Kubernetes governor's
+    decision ends in a division by zero. It writes nothing either way, as the audit shows, but the decision should record
+    the reason in words. (`docs/K8S_COMPASS_PREREGISTRATION.md`, amendment of 18 October.)
 - **Pages brought up to it**: README, CLAUDE.md, the state of play, the receipts, both manuals (rebuilt), the v7, v8 and v9 pages,
   the preregistration (an amendment, appended), the index's text. Retired words found and fixed on the way: the Owner's Manual
   and the README still named the 2022 robustness district's +0.11% unevenness, and the 2023 districts' ramping and highest peak,

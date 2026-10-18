@@ -34,6 +34,12 @@ while :; do
   names=$(echo "$nodes" | jq -r '[.items[].metadata.name] | join(" ")')
   ready=$(echo "$nodes" | jq '[.items[] | select(any(.status.conditions[]; .type=="Ready" and .status=="True"))] | length')
   total=$(echo "$nodes" | jq '.items | length')
+  if [ "$total" = 0 ]; then   # no machine in service: why each node left it, kept for the record (its taints and conditions)
+    { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) elapsed $el s: no machine in service; the nodes as they stood:"
+      kubectl get nodes -o json --request-timeout=20s 2>&1 | jq -c '.items[] | {name: .metadata.name, unschedulable: .spec.unschedulable,
+        taints: [.spec.taints[]? | .key + ":" + .effect], conditions: [.status.conditions[] | select(.status != "False" or .type == "Ready") | .type + "=" + .status]}' 2>&1
+    } >> "$OUT.errors"
+  fi
   alloc=$(echo "$nodes" | jq -r '.items[].status.allocatable.cpu' | to_m | awk '{s+=$1} END {printf "%.0f", s}')
   req=$(echo "$pods" | jq -r '.items[] | select(.status.phase=="Running") | .spec.containers[].resources.requests.cpu // "0"' | to_m | awk '{s+=$1} END {printf "%.0f", s}')
   pending=$(echo "$pods" | jq '[.items[] | select(.status.phase=="Pending")] | length')

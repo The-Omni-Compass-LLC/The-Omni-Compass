@@ -1185,6 +1185,25 @@ conductor starts its squares, reads them back and never starts one twice, as it 
 `six-kube`, `aks-metered`, `gke-metered`, `eks-metered` and `cloud-organism` accept `spine`. The results already written on
 six organisms stand as they were run; nothing is read across engines or across organism sets.
 
+## Amendment (2026-10-18): a window with no machine in service is refused in either arm; the add-on's set-up waits for its scaler
+
+Two repetitions of the omni-v10 reruns failed for causes outside Omni-Compass, and each is now caught in words that say so.
+Neither change touches the engine, a setting, a gauge or a scored window.
+
+- **No machine in service.** In the CruiseKube test (run 39120444653, repetition 8) every worker of the kind cluster left
+  service for two minutes (eight of the capture's readings show no machine in service), while the service answered every probe.
+  The omni arm's governor wrote nothing, and two of its fifteen decisions failed on that empty reading. The rig refused the
+  window, correctly, but its words said the governor was not running. A reading with no machine in service leaves the
+  window's machine count wrong in either arm, so such a window is now refused in both arms (`scripts/kind_bench.sh`). The
+  capture records each node's taints and conditions at that moment (`fleet/capture/kube_capture.sh`), and a decision that
+  failed is named by its error. The repetition runs again in place.
+- **The add-on's scaler not yet answering.** In the KEDA test (run 39108180989, profile both, repetition 2), the native arm's
+  set-up stopped before its window. KEDA's first call to the HTTP add-on's scaler met a pod still stopping after its rollout,
+  and KEDA built the autoscaler without its HTTP metric within five minutes. The ScaledObject is now applied only once no
+  KEDA pod is stopping and the scaler has an address. While the autoscaler lacks its metrics, the ScaledObject is touched
+  once a minute with an annotation of the harness (never a setting), so KEDA builds the autoscaler again from the same spec
+  (`scripts/kind_addons.sh`). The repetition runs again in place.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
