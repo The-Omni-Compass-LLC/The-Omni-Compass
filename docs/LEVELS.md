@@ -16,7 +16,7 @@ The founder's order of 17 October: Omni-Compass is shown on top at every level, 
 | The organism, the stack: the seven organisms under three loads (own load, the climb, work waiting in line) | omni-v8 | S (our model) | 21 | 0 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
 | The cluster: real Kubernetes, native its own HPA and scheduler | omni-v7 | L | 22 | 86 | 3 | 0 | 0 | no LOSS; resources put in shown as power given |
 | The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v7 | L | 15 | 43 | 6 | 0 | 0 | no LOSS; resources put in shown as power given |
-| A muscle inside a running service: database, broker, cache | omni-v7 | L | 23 | 327 | 7 | 0 | 2 | **yes: 2, listed below** |
+| A muscle inside a running service: database, broker, cache | omni-v10 | L | 22 | 330 | 6 | 0 | 1 | **yes: 1, listed below** |
 | A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms | omni-v7 | independent simulator | 151 | 53 | 34 | 13 | 0 | **yes: 13, listed below** |
 | The organism with the real cluster inside (the grid, at 1, 10, 100 and on GitHub's machines 1,000 copies) | older engines' tables; the grid runs again on the engine that stands | L, the cluster; S, the organism | – | – | – | – | – | no table on the engine that stands yet; the grid's runs (results/grid_v8/) are going |
 | The cluster in a cloud: Azure Kubernetes Service, the bill | single runs, omni-v5 to omni-v7 | L, the bill metered | – | – | – | – | – | no three-run table yet: eight single runs at the tune-down, machines billed −6.5% to +7.6%, every one EVEN; the fleet (about 1.9 of 4 machines busy) leaves no whole machine to give back |
@@ -48,13 +48,12 @@ Tables: `results/live/V7_KEDA_REQUESTS.md`, `results/live/V7_KEDA_CPU_REQUESTS.m
 
 ### A muscle inside a running service: database, broker, cache
 
-Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v7. Evidence: L.
-Tables: `results/live/V7_REDIS.md`, `results/live/V7_REDIS_SERVICE.md`, `results/live/V7_KAFKA.md`, `results/live/V7_KAFKA_SERVICE.md`, `results/live/V7_PGBENCH.md`, `results/live/V7_SYSBENCH.md`, `results/live/V7_YCSB.md`.
+Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v10. Evidence: L.
+Tables: `results/live/V10_REDIS.md`, `results/live/V10_REDIS_SERVICE.md`, `results/live/V10_KAFKA.md`, `results/live/V10_KAFKA_SERVICE.md`, `results/live/V10_PGBENCH.md`, `results/live/V10_SYSBENCH.md`, `results/live/V10_YCSB.md`.
 
 Goes the other way:
 
-- V7_REDIS_SERVICE.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: memory used, mean (MB) (the runs disagree)
-- V7_SYSBENCH.md: read_write: sysbench oltp_read_write, 18 statements a transaction, 200 a second offered; the transaction line 10.8 ms, 3 paired repetitions a run: pages holding data, mean (MB) (the runs disagree)
+- V10_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumers running, mean (the resources held) (the runs disagree)
 
 ### A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms
 

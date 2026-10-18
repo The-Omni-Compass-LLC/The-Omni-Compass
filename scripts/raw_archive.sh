@@ -55,6 +55,11 @@ open() {
     git -C "$W" sparse-checkout set --no-cone '!/*'
     git -C "$W" checkout -q
     [ -z "$aside" ] || { cp -a "$aside/." "$W/"; rm -rf "$aside"; }
+  elif [ "$(git -C "$W" rev-parse HEAD)" != "$(git rev-parse "$REF")" ]; then
+    # opened before: brought up to the newest raw, so a run saved since then can be opened too (files written in the
+    # folder and not yet saved stay; a clash with them leaves the folder where it was, and says so)
+    git -C "$W" checkout -q --detach "$REF" \
+      || echo "raw archive: results/live/raw/ kept at $(git -C "$W" rev-parse --short HEAD): files there clash with the newest raw" >&2
   fi
   if [ "$#" -gt 0 ]; then
     git -C "$W" sparse-checkout add "$@"

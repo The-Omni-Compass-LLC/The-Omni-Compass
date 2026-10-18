@@ -20,14 +20,15 @@ name: big-organism-detached
 # square on GitHub's own machines.
 # The commit the test runs is an input (default: the dispatching commit), so an older engine can be run again on the same
 # machine: the organism names must then be the ones that commit knows (v1: organism_656, stack_1226). A start on the
-# dispatching commit carries "protocol 3" in its name (the test rig as amended on 12 and 13 Oct, scripts/kind_bench.sh and
-# scripts/kind_paired.sh: the model on its own core, the window from the heavier arm's measured step); the grid's
+# dispatching commit carries "protocol 4" in its name (the test rig as amended on 12, 13 and 18 Oct, scripts/kind_bench.sh and
+# scripts/kind_paired.sh: the model on its own core, the window from the heavier arm's measured step, the served image
+# pulled onto every worker before each arm); the grid's
 # conductor counts only those in its squares with the cluster inside, and bills every machine started.
 run-name: >-
   ${{ github.event_name == 'schedule' && 'big-organism-detached collect' ||
       inputs.mode != 'start' && format('big-organism-detached {0} {1}', inputs.mode, inputs.group) ||
       format('big-organism-detached start {0} {1} x{2} reps {3}+{4} window {5}{6}', inputs.test, inputs.organisms, inputs.size,
-             inputs.rep_first, inputs.reps, inputs.duration_s, inputs.commit == '' && ' protocol 3' || '') }}
+             inputs.rep_first, inputs.reps, inputs.duration_s, inputs.commit == '' && ' protocol 4' || '') }}
 on:
   workflow_dispatch:
     inputs:

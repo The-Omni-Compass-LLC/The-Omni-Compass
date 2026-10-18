@@ -1216,6 +1216,28 @@ the law). A window in which the capture saw no machine in service is refused in 
 window carries a held decision that the capture also saw. Every setting, gauge, load, window and pair is unchanged; every test
 runs again on omni-v11.
 
+## Amendment (2026-10-18): on kind, the served image pulled onto every worker before each arm
+
+The KEDA add-on test's mean pod start wait read LOSS on omni-v10 under the http setup. The cause is the test machine
+(`docs/POD_START_WAIT.md`, the receipt `results/live/POD_START_PHASES.md`, 741 starts in five runs). A serving pod placed on
+a node that never served downloaded and unpacked its image (`registry.k8s.io/hpa-example`, untagged, pull policy Always)
+inside the window, on the one runner every kind node shares, and the unpacking took longer the busier that runner was. On a
+node already serving, a start took 1.3 to 1.7 s in both arms. On an empty node it took 7 to 12 s. Split exactly, the omni
+arm's rise in the mean (+1.42 s on omni-v10, +0.65 s on omni-v11) is the shift of its starts into a busier host (+1.57 s,
++1.64 s), the host its conveyed processor keeps busy. At the same host load on the same kind of node its starts were as fast
+or faster (−0.14 s, −0.98 s).
+
+From this amendment on, every kind arm runs an image pre-puller (`deploy/kind/prepull.yaml`) before the governor starts or
+the window opens. It is one pod on every worker, waited for on every worker and then deleted. A pre-puller that does not
+finish fails the arm's checks. Each arm's `preflight.txt` records `images=pre-pulled on every worker before the arm` and the
+digest each worker pulled. The rest stays as written: the operator's manifests, every setting, gauge, load, window and pair,
+the engine (omni-v11's digest), and the cloud sets, where every node is its own machine. The kind workflows' three runs on
+omni-v11 count only when their own commit carries the pre-puller (`RIG_FILE`, `scripts/dispatch_grid.py`). Their runs on the
+rig before end as their own record, and `tools/confirm_abc.py` marks any table whose runs differ in rig. In the grid with the real cluster inside this
+rig is protocol 4 (`KUBE_PROTOCOL`, carried in each run's name), and only its runs fill a square; no omni-v11 run with the
+cluster inside had started on protocol 3. Expected before any run: a pod on an empty node
+starts in about the time one beside a serving pod takes, in both arms. Whatever the runs read is reported.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
