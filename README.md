@@ -65,9 +65,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-17 16:00 | [The realms on omni-v8 at the max: 1107 muscles and seven organisms, native against Omni on top](results/realms_v5/REALMS_V5.md) |  |
-| 2026-10-17 15:39 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V8_VS_V7.md) |  |
-| 2026-10-17 15:39 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-17 22:21 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -75,16 +73,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-17 22:27 | six x100 line orgs 7 runs 0+10 | success | [39072983560](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39072983560) |
-| 2026-10-17 22:27 | kafka | success | [39068499573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39068499573) |
-| 2026-10-17 22:27 | six x100 line orgs 4 runs 0+10 | success | [39072972533](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39072972533) |
-| 2026-10-17 22:27 | all-benchmarks | success | [39075045645](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39075045645) |
-| 2026-10-17 22:27 | pgbench | success | [39068505291](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39068505291) |
-| 2026-10-17 22:24 | redis | success | [39068519505](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39068519505) |
-| 2026-10-17 22:17 | citylearn | success | [39069612182](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39069612182) |
-| 2026-10-17 22:12 | benchmark-reps | success | [39067409904](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39067409904) |
-| 2026-10-17 21:59 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 3 | failure | [39069694997](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39069694997) |
-| 2026-10-17 21:52 | robustness | success | [39069662532](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39069662532) |
+| 2026-10-18 01:19 | mujoco | success | [39085988445](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39085988445) |
+| 2026-10-18 01:12 | grid | cancelled | [39082853013](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39082853013) |
+| 2026-10-18 01:10 | benchmark-reps | success | [39083070509](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39083070509) |
+| 2026-10-18 00:24 | big-organism-detached collect | success | [39082648794](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39082648794) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never

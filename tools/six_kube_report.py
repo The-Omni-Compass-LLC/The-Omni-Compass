@@ -43,10 +43,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL, SAME_REL  # noqa: E402
 from tools.run_hil import NAMES, REALMS  # noqa: E402
+from tools.run_realms_v5 import SPINE  # noqa: E402  (the seventh organism, listed first)
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
 from tools.readings import word as gel_word, aim as gel_aim, receipt_key, WORK_PER  # noqa: E402  (the words every table uses)
 
-ORDER = list(REALMS) + [TOWER, STACK]
+ORDER = [SPINE] + list(REALMS) + [TOWER, STACK]      # the spine first (16 October); a report with the spine in it crashed without it
 OMNI = ("compass", "omni")
 CLUSTER = ["response time (ms), 95th percentile", "response time (ms), 99th percentile",
            "time over the response line (% of samples)", "failed requests (%)", "HPA replicas, mean", "pods started",

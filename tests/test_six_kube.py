@@ -38,6 +38,9 @@ class SixKube(unittest.TestCase):
         self.assertEqual(len(NAMES), 7)
         self.assertIn("spine", NAMES)
         self.assertEqual(sorted(run_kil.groups(1)), sorted(NAMES))
+        from tools import six_kube_report             # the report orders every organism a run can carry (the spine's
+        self.assertEqual(sorted(six_kube_report.ORDER), sorted(NAMES))   # reports crashed on 17 October without it)
+        self.assertEqual(six_kube_report.ORDER[0], "spine")
 
     def test_gzipped_record_reads_the_same(self):
         """The archive stores a raw file over 50 MB gzipped (GitHub refuses a file over 100 MB); the report reads it
