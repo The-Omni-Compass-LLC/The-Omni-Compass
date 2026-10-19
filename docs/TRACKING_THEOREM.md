@@ -88,6 +88,13 @@ every micro step of the 500 frozen fixtures is 0.00378 (nearest target), giving 
 long transient, which includes the 5 saturated steps) and the bound 0.20 is wider than the basin — a conservative
 bound; the fixtures still certify 500 of 500.
 
+**Proved since 19 October (T, computer-assisted; `docs/ENGINE_PROOFS.md`, claims U2 to U5).** Over the whole
+declared box, not the fixtures: every unsaturated micro step satisfies `|eₖ₊₁| ≤ (ρ + b)|eₖ| + a` with `a ≤ 0.006495`
+and `b ≤ 0.02399`. These are interval enclosures with outward rounding of the stage-to-stage drift differences, bounded
+by the mean value theorem. So the ball `|e| ≤ a / (1 − ρ − b) ≤ 0.0677` is entered and never left, inside `BASIN_TOL`.
+Every saturated step moves U toward σ by at least 0.0868 and never past it. From any admissible start the error is in
+the basin within 119 of the run's 200 micro steps. The fixtures' 0.0315 lies inside the proved 0.0677.
+
 What the discrete execution does **not** inherit: the continuous monotone decay. Within the band, `|e|` grew on 27 061
 of 100 000 micro steps and e changed sign 747 times — the sampled controller dithers inside `ε[h] / (1 − ρ)`.
 
@@ -108,12 +115,19 @@ Admissible set for a fixture with parameters p and initial state x0:
   (`s_admissibility` in `results/core_evidence.json`: 500 of 500 fixtures start above `S_minus`).
 - **Discrete (V).** For the executed map `F[h](x, C(x))`, every micro step of every fixture: `xₖ ∈ A` implied
   `xₖ₊₁ ∈ A` — 0 failures in 100 000 steps, target nearest or wrong. This is a finite verification on the frozen
-  fixtures, not a proof over the box. An interval-arithmetic proof over the whole box is **open (O)**.
+  fixtures.
+- **Discrete (T, since 19 October).** Over the whole box, for the executed RK4 step (`docs/ENGINE_PROOFS.md`):
+  - E stays in its interval (E1, exact linear arithmetic in z3), and so does every stage (E2);
+  - S moves toward S₊ and never past it (S1);
+  - U stays within `max(|U₀ − σ|, 0.0677)` of σ (U3, U4);
+  - I[U] stays in its interval for any bounded drive (I1).
 
 ## What remains open (O)
 
-- Global stability of the forced six-state system (E, I[U], S, B are not all covered above).
-- A proved (not computed) ε[h] over the declared box, and discrete invariance over the box.
+- Global stability of the forced six-state system. E, U, S and I[U] are proved bounded under the executed step
+  (`docs/ENGINE_PROOFS.md`). Not proved: the bath B, which nothing reads back, and convergence of E, I[U] and B to a set.
+- CERT-10 for every fixture in the box: the proved entry bound (119 micro steps) leaves 9 macro steps inside the basin,
+  not 10. Every one of the 500 fixtures certifies (V).
 - The inheritance / intertwining residual against an outside plant: instrumented (`tools/gpu_reps.py`,
   representation fidelity), not yet measured on a real card.
 - The printed configuration (`printed_eight_line`) is not covered by this page: its U drift is logistic, not the

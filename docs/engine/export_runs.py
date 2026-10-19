@@ -86,16 +86,44 @@ class Git:
         return [x for x in self.tree if x.startswith(prefix)]
 
 
-def run_dir(g: Git, run_id: str):
-    for d in {"/".join(x.split("/")[:4]) for x in g.files(RAW + "/") if run_id in x.split("/")[3]}:
-        return d
-    return None
+def run_dir(g: Git, run_id: str, pairs=None):
+    """The run's own folder. A run re-run in part can sit twice on the branch raw (the first attempt, and the re-run the
+    sweep kept under a suffixed name): the folder whose own LIVE_REPS.json holds the table's count of paired repetitions
+    is taken, else the one the branch received last; never one picked by the order of a set."""
+    found = sorted({"/".join(x.split("/")[:4]) for x in g.files(RAW + "/") if run_id in x.split("/")[3]})
+    if len(found) <= 1:
+        return found[0] if found else None
+
+    def held(d):                     # the paired repetitions the folder's own LIVE_REPS.json counts
+        n = 0
+        for x in g.files(d + "/"):
+            if x.endswith("LIVE_REPS.json"):
+                try:
+                    lr = json.loads((g.read(x) or b"{}").decode("utf-8").replace("NaN", "null"))
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    continue
+                reps = lr.get("repetitions") or {}
+                n = max(n, min(len(reps.get("native") or []), len(reps.get("compass") or reps.get("omni") or [])))
+        return n
+
+    def received(d):                 # when the branch received the folder (its newest commit there)
+        spec = f"{g.inside}{d[len(RAW) + 1:]}" if g.inside else d[len(RAW) + 1:]
+        out = subprocess.run(["git", "-C", str(ROOT), "log", "-1", "--format=%ct", g.ref, "--", spec],
+                             capture_output=True, text=True).stdout.strip()
+        return int(out) if out.isdigit() else 0
+
+    if pairs:
+        match = [d for d in found if held(d) == int(pairs)]
+        if len(match) == 1:
+            return match[0]
+        found = match or found
+    return max(found, key=lambda d: (received(d), d))
 
 
 class Sums:
     """A run's own SHA256SUMS_ALL.txt, and every file read checked against it."""
     def __init__(self, g: Git, d: str):
-        self.g, self.d, self.checked, self.ok, self.missing = g, d, 0, 0, []
+        self.g, self.d, self.checked, self.ok, self.missing, self.stale = g, d, 0, 0, [], set()
         raw = g.read(f"{d}/SHA256SUMS_ALL.txt") or b""
         self.sha_of_list = hashlib.sha256(raw).hexdigest() if raw else None
         self.table = {}
@@ -103,6 +131,11 @@ class Sums:
             parts = ln.split(None, 1)
             if len(parts) == 2:
                 self.table[parts[1].strip().lstrip("./")] = parts[0]
+
+    def listed(self, rel: str) -> bool:
+        """Whether the run's own SHA256SUMS_ALL.txt names the file (one it does not name is not the run's: a marker an
+        earlier attempt left, say, which a re-run's commit did not remove)."""
+        return rel in self.table
 
     def read(self, rel: str):
         data = self.g.read(f"{self.d}/{rel}")
@@ -163,6 +196,9 @@ def official(s: Sums, rel: str, slo: float) -> dict:
         d = Path(td) / rel.rsplit("/", 1)[-1]
         d.mkdir(parents=True)
         for x in s.g.files(f"{s.d}/{rel}/"):
+            if s.table and not s.listed(x[len(s.d) + 1:]):
+                s.stale.add(x[len(s.d) + 1:])                           # not the run's own file: left out, and said
+                continue
             data = s.read(x[len(s.d) + 1:])
             if data is not None:
                 (d / x.rsplit("/", 1)[-1]).write_bytes(data)
@@ -278,7 +314,7 @@ def arm_k8s(s: Sums, rel: str, omni: bool, slo: float = 500.0) -> dict:
 
 
 def k8s_run(g: Git, run: dict, sub: str):
-    d = run_dir(g, str(run["run"]))
+    d = run_dir(g, str(run["run"]), run.get("paired_repetitions"))
     if not d:
         return None
     s = Sums(g, d)
@@ -286,7 +322,7 @@ def k8s_run(g: Git, run: dict, sub: str):
     reps = {}
     for rel in arms:
         m = re.search(r"bench-(native|compass)-(\d+)$", rel)
-        if not m:
+        if not m or s.listed(f"{rel}/INVALID"):        # a repetition the run itself marked invalid is left out, as live_reps does
             continue
         group = rel[:m.start()].strip("/")
         reps.setdefault((group, int(m.group(2))), {})["omni" if m.group(1) == "compass" else "native"] = rel
@@ -315,11 +351,12 @@ def k8s_run(g: Git, run: dict, sub: str):
         agree = worst
     paired = {k: v for k, v in ((lr or {}).get("paired", {}).get("compass") or {}).items() if k in OFFICIAL}
     return {"dir": d, "sums_sha256": s.sha_of_list, "checked": s.checked, "ok": s.ok, "unmatched": s.missing[:5],
+            "outside_list": sorted(s.stale)[:5], "outside_list_n": len(s.stale),
             "official_paired": paired, "official_agree": agree, "reps": out}
 
 
 def db_run(g: Git, run: dict):
-    d = run_dir(g, str(run["run"]))
+    d = run_dir(g, str(run["run"]), None)
     if not d:
         return None
     s = Sums(g, d)
@@ -376,7 +413,9 @@ def main(out_path):
         benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs})
         ck, okk = sum(r["checked"] for r in runs), sum(r["ok"] for r in runs)
         ag = [r.get("official_agree") for r in runs if r.get("official_agree") is not None]
+        out_n = sum(r.get("outside_list_n") or 0 for r in runs)
         print(f"runs {stem:22s} {len(runs)} runs, {ck} files read, {okk} match their run's SHA-256 list"
+              + (f", {out_n} on the branch outside the run's own list left out" if out_n else "")
               + (f"; the scorer per repetition against the run's own result: largest relative difference {max(ag):.1e}" if ag else ""))
     Path(out_path).write_text(json.dumps({"bin_s": BIN, "hist_ms": HIST_MS, "benchmarks": benches}, separators=(",", ":")), encoding="utf-8")
 

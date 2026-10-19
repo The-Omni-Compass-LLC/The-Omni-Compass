@@ -358,14 +358,14 @@ def _workflow_plan(text: str):
             cond = "always() && strategy.job-index == 0" if jd.get("strategy") else "always()"
             tail += [f"{ind}- name: Legal files beside the files this run hands out",
                      f"{ind}  if: {cond}",
-                     f"{ind}  uses: actions/checkout@v4",
+                     f"{ind}  uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4",
                      f"{ind}  with:",
                      f"{ind}    path: _legal",
                      f"{ind}    sparse-checkout-cone-mode: false",
                      f"{ind}    sparse-checkout: |"] + [f"{ind}      {f}" for f in BUNDLE] + [
                      f"{ind}- name: Legal notice handed out with this run's files",
                      f"{ind}  if: {cond}",
-                     f"{ind}  uses: actions/upload-artifact@v4",
+                     f"{ind}  uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4",
                      f"{ind}  with:",
                      f"{ind}    name: {LEGAL_ARTIFACT}",
                      f"{ind}    overwrite: true",

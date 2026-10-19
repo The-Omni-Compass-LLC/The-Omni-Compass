@@ -32,6 +32,7 @@ How the number is made, the same rule as the Omni index (tools/omni_index.py):
 """
 from __future__ import annotations
 
+import datetime
 import json
 import math
 import re
@@ -210,6 +211,9 @@ def boundary():
 def updated(path):
     """The date the file was last changed in the repository (the day the result landed); None where the history is not here
     (in a shallow checkout, a file last touched by the commit the history stops at, or not yet committed)."""
+    st = subprocess.run(["git", "-c", "safe.directory=*", "status", "--porcelain", "--", str(path)], cwd=ROOT, capture_output=True, text=True)
+    if st.stdout.strip():                                          # new or changed in this working tree: it lands with the next commit, today
+        return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
     r = subprocess.run(["git", "-c", "safe.directory=*", "log", "-1", "--format=%H %cs", "--", str(path)], cwd=ROOT, capture_output=True, text=True)
     found = r.stdout.split()
     if not found:

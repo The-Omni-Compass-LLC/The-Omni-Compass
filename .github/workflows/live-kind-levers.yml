@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4: the code, not the archive of raw runs (25 GB, more than the machine's disk)
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -34,10 +34,10 @@ jobs:
           set -euo pipefail
           git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
           python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
-      - uses: helm/kind-action@v1
+      - uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1
         with: {cluster_name: omni-levers, config: deploy/kind/cluster-full.yaml}
       - run: bash scripts/kind_levers.sh
         env: {OUT_DIR: levers_out}
@@ -126,12 +126,12 @@ jobs:
           
           if __name__ == '__main__':
               main()
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with: {name: live-levers, path: "${{ steps.omni_legal_export_1.outputs.paths }}"}
       - name: Legal files beside the files this run hands out
         if: always()
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: _legal
           sparse-checkout-cone-mode: false
@@ -144,7 +144,7 @@ jobs:
             TRADEMARKS.md
       - name: Legal notice handed out with this run's files
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: legal-notice
           overwrite: true
