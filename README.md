@@ -66,8 +66,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
 | 2026-10-18 22:05 | [Where the pod start wait goes: every serving pod's start, phase by phase](results/live/POD_START_PHASES.md) |  |
+| 2026-10-18 19:22 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-18 16:03 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V11_VS_V10.md) |  |
-| 2026-10-18 16:03 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -75,16 +75,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-19 01:21 | raw-sweep | success | [39184951373](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39184951373) |
-| 2026-10-19 01:21 | live-engine | cancelled | [39184951006](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39184951006) |
-| 2026-10-19 01:14 | benchmark-reps | success | [39180240328](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39180240328) |
-| 2026-10-19 01:06 | kind-goldilocks | success | [39177950720](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177950720) |
-| 2026-10-19 01:03 | capacity A: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | success | [39179020367](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39179020367) |
-| 2026-10-19 00:54 | cloud-check google | failure | [39182844263](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39182844263) |
-| 2026-10-19 00:54 | robustness | success | [39177935888](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177935888) |
-| 2026-10-19 00:39 | cloud-check amazon | failure | [39181697621](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181697621) |
-| 2026-10-19 00:33 | big-organism-detached collect | success | [39181081105](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181081105) |
-| 2026-10-19 00:19 | benchmark | success | [39177942974](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177942974) |
+| 2026-10-19 05:20 | big-organism-detached collect | success | [39203978682](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39203978682) |
+| 2026-10-19 05:10 | cloud-check google | failure | [39203057003](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39203057003) |
+| 2026-10-19 05:08 | cloud-check amazon | failure | [39201696074](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39201696074) |
+| 2026-10-19 04:18 | grid | cancelled | [39197421039](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39197421039) |
+| 2026-10-19 04:04 | live-engine | failure | [39195098323](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39195098323) |
+| 2026-10-19 03:51 | raw-sweep | success | [39195098262](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39195098262) |
+| 2026-10-19 03:51 | six x1 line orgs 5 runs 10+90 | success | [39192863170](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39192863170) |
+| 2026-10-19 03:50 | six x1 line orgs 6 runs 10+90 | success | [39192867391](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39192867391) |
+| 2026-10-19 03:49 | six x1 line orgs 1 runs 10+90 | success | [39192846259](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39192846259) |
+| 2026-10-19 03:49 | six x1 line orgs 2 runs 10+90 | success | [39192850579](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39192850579) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
