@@ -194,6 +194,15 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 19 October
+
+- **Every cloud set gets its three-run reading, to the cap** (the founder's words: "I need a 3-run result ... the cap we can
+  run it to ... that's all we can run ... do all, give all, make it the best you can"). Every Azure set runs up to 100 paired
+  repetitions a run (the paid cap of 12 October) under the preregistered stopping rule (`tools/stop_rule.py`; looks at 10,
+  20, 40 and 70 with 99% intervals; it stops once the bill is read, never on a LOSS), counted apart by its title from the
+  runs at 5 repetitions (`docs/K8S_COMPASS_PREREGISTRATION.md`, 19 October). Both arms at once on twin clusters waits for
+  Azure's processor allowance for the machine family to be raised to 20.
+
 ## Orders of 18 October
 
 - **Fix everything, and keep building, version after version** (the founder's words: every fault is to be fixed; and

@@ -2,6 +2,22 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19: Every Azure set to the paid cap of 100 repetitions, with a preregistered stopping rule
+
+- **The founder's orders of 19 October** ("I need a 3-run result ... the cap we can run it to ... do all, give all"). The
+  twelve Azure runs measured to the end (5 paired repetitions each) swing about ±9% of native's bill, so a cut under about
+  9% read EVEN. Every Azure set (`scripts/azure_queue.txt`) now runs up to 100 paired repetitions, the founder's cap for
+  paid runs: at 100 a cut of about 3% reads GAIN eight times in ten.
+- **The stopping rule** (`tools/stop_rule.py`, `aks-metered.yml` input `stop_looks`): looks after 10, 20, 40 and 70
+  repetitions read the bill's paired change with its 99% interval and stop the run once it is read (GAIN, power given, or
+  EVEN within ±2% of native's bill); never while the 95th percentile or the failed requests read a LOSS. A stopped run's
+  remaining repetitions spend nothing on Azure; the aggregate carries every look (`STOP_RULE.txt`).
+- **Counted apart.** A run under the rule carries "to the cap, stopping rule" in its title, so the conductor counts its A,
+  B and C from zero; the omni-v11 steady run at 5 repetitions (39162654399, finished 01:46 UTC) stays its own record.
+- **Written before any run of it**: `docs/K8S_COMPASS_PREREGISTRATION.md`, the amendment of 19 October, with both arms at
+  once on twin clusters written for when Azure's processor allowance for the machine family is raised to 20.
+  `tests/test_stop_rule.py`.
+
 ## 2026-10-18 (late night): Every workflow names its token's rights
 
 - **The 28 workflows that set no token permissions now read the code and nothing else** (`permissions: contents: read`).
