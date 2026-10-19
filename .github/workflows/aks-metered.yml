@@ -34,6 +34,7 @@ on:
       load_max: {description: "Load-generator replicas at the organism's peak demand (organism test only)", default: "6"}
       organism_scale: {description: "Copies of the organism on one clock, the real cluster inside (1, 10 or 100)", default: "1"}
       replica_ceiling: {description: "Omni-Compass's replica room: the most replicas it may raise the app's cap to while the cap binds and the line is threatened, handed back once the demand holds still (the compass law; docs/AKS_REPLICA_ROOM_PREREGISTRATION.md); native keeps the operator's cap. 0: the operator's cap, never moved (the cloud sets: the bill at native's work); N: a ceiling of the operator's own; empty: read live (what the machines can hold, one pod under)", default: ""}
+      stop_looks: {description: "The preregistered stopping rule (tools/stop_rule.py, the amendment of 19 October): looks, in paired repetitions, at which the set stops once its bill is read (99% intervals; never on a LOSS); empty: every repetition runs", default: ""}
       dial: {description: "The dial of Omni-Compass on top: save, the tune-down (native's work on the least resource; the founder's order of 14 October for the cloud: the same work as native for a smaller bill), or max (the most work, faster, at any spend)", default: "save"}
 # one Azure set at a time per machine family and region (each family has its own 10-vCPU allowance): the default family
 # (Standard_D2s_v4 in eastus, and every multi-pool fleet, which uses it too) keeps the one queue it always had; a set on
@@ -115,10 +116,23 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4      # the repetitions this run has finished, for the stopping rule
+        if: github.event.inputs.stop_looks != ''
+        continue-on-error: true
+        with: {pattern: "aks-*", path: prior, merge-multiple: true}
+      - name: Does this repetition still run (the stopping rule)?
+        id: stop
+        run: |
+          if [ -z "${{ github.event.inputs.stop_looks }}" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          mkdir -p prior
+          python3 tools/stop_rule.py prior --rep "${{ matrix.rep }}" --looks "${{ github.event.inputs.stop_looks }}" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: azure/login@v2
+        if: steps.stop.outputs.run == 'true'
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - run: az provider register --namespace Microsoft.ContainerService --wait
+        if: steps.stop.outputs.run == 'true'
       - name: Run the paired repetition
+        if: steps.stop.outputs.run == 'true'
         run: |
           set +e
           bash scripts/aks_paired.sh > paired.log 2>&1
@@ -144,11 +158,11 @@ jobs:
           OMNI_MACHINES_ONLY: '1'
           AKS_WORKER_POOLS: ${{ github.event.inputs.worker_pools || '' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
-      - if: always()
+      - if: always() && steps.stop.outputs.run == 'true'
         run: python3 scripts/azure_capacity.py cleanup --group "$AZ_RG"
       - name: Attach README, licenses and disclosures to this artifact
         id: omni_legal_export_1
-        if: "always()"
+        if: "always() && steps.stop.outputs.run == 'true'"
         env:
           OMNI_EXPORT_PATHS: |
             bench-*-${{ matrix.rep }}
@@ -227,7 +241,7 @@ jobs:
           if __name__ == '__main__':
               main()
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.stop.outputs.run == 'true'
         with: {name: "aks-${{ matrix.rep }}", path: "${{ steps.omni_legal_export_1.outputs.paths }}"}
       - name: Legal notice at the end of this job's report
         if: always()
@@ -266,11 +280,15 @@ jobs:
       - run: ls reps && python tools/live_reps.py reps
         env: {PRICE_PER_NODE_HOUR: "${{ github.event.inputs.price_per_node_hour || '0.096' }}", POOL_PRICES: "${{ github.event.inputs.pool_prices || '' }}"}
       - run: cat reps/LIVE_REPS.md >> "$GITHUB_STEP_SUMMARY"
+      - name: The stopping rule's looks
+        if: github.event.inputs.stop_looks != ''
+        run: python3 tools/stop_rule.py reps --report --looks "${{ github.event.inputs.stop_looks }}" | tee reps/STOP_RULE.txt >> "$GITHUB_STEP_SUMMARY"
       - name: Attach README, licenses and disclosures to this artifact
         id: omni_legal_export_2
         env:
           OMNI_EXPORT_PATHS: |
             reps/LIVE_REPS.*
+            reps/STOP_RULE*
         shell: python
         run: |
           #!/usr/bin/env python3
