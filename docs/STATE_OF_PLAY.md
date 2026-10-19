@@ -31,10 +31,12 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v11): 12 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v11): 14 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
+| Robustness: the two-hour run | omni-v11 | +3.8% | GAIN, power given | L |
+| Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
 | Robot arms (MuJoCo), the three untouched robots | omni-v11 | +3.8% | GAIN | S |
 | Redis, the cache's memory ceiling | omni-v11 | +0.3% | GAIN | L |
 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | +72.9% | GAIN, power given | L |
@@ -48,7 +50,6 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 | Drone swarms, the three untouched cells | omni-v11 | +5.9% | GAIN | S |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN, power given | S |
 | Every real test together: the Omni index | omni-v10 and omni-v11 | +4.4% | GAIN, power given | L |
-| Robustness: the two-hour run | omni-v10 | +1.5% | GAIN, power given | L |
 | Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
 | Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
 | Real Kubernetes, demand that wanders | omni-v10 | +36.7% | GAIN | L |
@@ -60,7 +61,6 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
-| Robustness: the governor killed outright mid-run | omni-v3 | +8.6% | GAIN | L |
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
@@ -127,7 +127,7 @@ benchmark's three runs land, its row names the engine it ran on (`docs/BENEFIT_S
 are never read across engines. The standing block is written from the result files by `tools/summary.py --fix` and checked on
 every push; the prose below says the same in words.
 
-**On omni-v11, the engine that stands: eighteen three-run tables** (`results/live/V11_*.md`, 19 October; 854 judged rows,
+**On omni-v11, the engine that stands: twenty-three three-run tables** (`results/live/V11_*.md`, 19 October; 1,039 judged rows,
 **0 LOSS**), each rebuilt byte for byte from its raw receipts (`tools/reproduce.py`):
 
 - **Real Kubernetes (evidence class L), ten pairs a run.** On top of Goldilocks: response time −47% to −48% mean, −61% to −64%
@@ -139,9 +139,13 @@ every push; the prose below says the same in words.
   (`docs/TAIL_LATENCY.md`).
 - **The live stacks (L), three pairs a run.** Redis: work inside the 2 ms line and hit rate +1.3% to +1.6%, mean latency −1.7%
   to −7.3%, GAIN; memory +1.7% to +1.9% on `small`, power given; native as shipped EVEN. Kafka: consumers −0.8% on `burst`, GAIN
-  under both objectives. MongoDB: the cache −0.9% to −1.0% on `f`, GAIN. PostgreSQL: the most connections open +8% to +10%,
-  power given. MySQL: EVEN but its update throughput, where the runs disagree; from the factory pool the pool +5% to +16%, power
-  given.
+  under both objectives. MongoDB: the cache −0.9% to −1.0% on `f`, GAIN; at the max −0.4% to −0.8% on `b` and `f`, GAIN.
+  PostgreSQL: the most connections open +8% to +10%, power given; at the max the connections held −10% to −22%, GAIN. MySQL:
+  EVEN but its update throughput, where the runs disagree; from the factory pool the pool +5% to +16%, power given; at the max
+  EVEN on every row.
+- **Robustness (L), on the kind rig with the served image pre-pulled.** The governor killed outright: every setting back 8 to
+  11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one. The long run: no leak, no failed
+  decision, no slowing, everything handed back. No LOSS in either.
 - **The independent simulators (S, published models, never in the headline).** Power grids: 67 gauge-rows GAIN, 14 power given,
   no LOSS. Robot arms: on the Kinova Gen3 peak torque −28.6% and tracking error −21.3%, GAIN; two arms left native. CityLearn:
   27 score-rows GAIN, 1 power given, no LOSS; the outage districts' batteries native. Drone swarms: energy a mission −7% to −20%,
@@ -212,8 +216,10 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
    on 18 October to the test machine (`docs/POD_START_WAIT.md`): a pod on a node that never served unpacked its image inside
    the window on the one runner all kind nodes share. With the served image pre-pulled onto every worker before each arm, the
    same in both arms, it reads **EVEN** in omni-v11's three runs (`results/live/V11_KEDA_REQUESTS.md`). Closed.
-3. **The kill test**: three omni-v7 runs on the fixed harness ran 17 October and stand as omni-v7's record; its omni-v11
-   runs have finished and are archiving, and their table lands with the long run's and the extended faults'.
+3. **The kill test and the long run** on omni-v11 (`results/live/V11_ROBUST_KILL.md`, `V11_ROBUST_LONG.md`): every setting
+   back at the operator's 8 to 11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one; over
+   two hours no leak, no failed decision, no slowing, everything handed back; no LOSS in either. Closed; the extended faults'
+   table lands when its runs do.
 4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): the fix makes the next engine version,
    with every wire that holds a governor's rules taken into the fingerprint, on the founder's word
    (`docs/CHANGE_CONTROL.md`).
