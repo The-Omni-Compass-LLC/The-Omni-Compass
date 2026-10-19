@@ -298,10 +298,12 @@ def fleet() -> dict:
         oj = ROOT / "results" / "OMNI_INDEX.json"
         if oj.exists():   # each category's own reading, so the page can say what carries the headline
             out["index"]["categories"] = json.loads(oj.read_text(encoding="utf-8")).get("categories") or {}
-    # the grid of the engine that stands, and no other: a grid run on an earlier engine is history, never read across
+    # the grid: the engine that stands's own when its squares have landed, else the newest grid with squares, named by its
+    # own engine (never read as the engine that stands's), with the dispatches of the engine that stands beside it
     stand_n = engine()[0].rsplit("v", 1)[-1]
-    gp = ROOT / "results" / f"grid_v{stand_n}" / "GRID.json"
-    disp_f = gp.with_name("DISPATCHED.json")
+    disp_f = ROOT / "results" / f"grid_v{stand_n}" / "DISPATCHED.json"
+    grids = sorted((ROOT / "results").glob("grid_v*/GRID.json"), key=lambda q: int(re.sub(r"\D", "", q.parent.name)))
+    gp = disp_f.with_name("GRID.json") if disp_f.with_name("GRID.json").exists() else (grids[-1] if grids else disp_f.with_name("GRID.json"))
     disp = len(json.loads(disp_f.read_text(encoding="utf-8")).get("dispatches", [])) if disp_f.exists() else 0
     out["grid"] = {"file": None, "engine": engine()[0], "squares": {"modelled": {}, "kube": {}}, "dispatched_on_engine_that_stands": disp}
     if gp.exists():
