@@ -41,12 +41,25 @@ every judgement is returned to the caller for the audit.
             work this refuses a step that truly costs 3% more against a 2% allowance about a quarter less often than the
             medians alone allowed it, and one that costs 5% more about half as often, while a free step is kept almost
             as often (tests/test_verdict_interval.py). judge="median" keeps the engines before v7 (the medians alone).
+
+  upper end (Omni v12, judge="upper", the default) a step is kept only when the upper end of every 95% interval of its
+            change in cost is inside the allowance, d + 1.96 se ≤ τ, so a step whose cost could reach past the allowance is
+            never kept on its estimate alone (judge="interval" kept it when d ≤ τ, and at the noise of the omni-v10 data-store
+            tables a step that truly costs 3% was kept about 31% of the time). The reference is measured long enough, from its
+            own spread s (the standard deviation of its log costs), that a step costing nothing shows its whole interval inside
+            the allowance at least 95% of the time: n ≥ 2 s² (1.96 + 1.645)² / τ² pieces of work in each phase, never fewer than
+            min_samples. When the work arrives too slowly for both phases to measure that many inside the trial's time
+            (max_trial decisions each, at the rate the reference measured), the trial is not started: the knob stays where it
+            is allowed, the event says why, and it is tried again after probe_every decisions. The trial step is read once, at
+            its n, never measured on until it passes. A step that truly costs the whole allowance is kept at most 2.5% of the
+            time, one that costs more less often (tests/test_verdict_upper.py).
 """
 from __future__ import annotations
 
 import math
 
 Z95 = 1.96                       # the two-sided 95% interval every report reads (tools/readings.py)
+Z_FREE = 1.645                   # judge="upper": a step that costs nothing is kept at least 95% of the time (v12)
 
 
 def median(xs):
@@ -76,9 +89,19 @@ def change_interval(ref, got, z=Z95):
     return d - z * se, d + z * se
 
 
+def pieces_needed(xs, tolerance, min_samples, z=Z95, z_free=Z_FREE):
+    """judge="upper": the pieces of work each phase needs, from the spread of xs, for a step that costs nothing to show
+    its whole 95% interval inside the allowance at least 95% of the time: n ≥ 2 s² (z + z_free)² / τ² (equal phases)."""
+    st = log_stats(xs)
+    tau = math.log(1.0 + tolerance)
+    if st is None or not math.isfinite(st[1]) or tau <= 0.0:
+        return math.inf
+    return max(int(min_samples), math.ceil(2.0 * st[1] * (z + z_free) ** 2 / tau ** 2))
+
+
 class Verdict:
     def __init__(self, tolerance=0.005, min_samples=30, probe_every=120, recheck=1800, max_steps=60, max_trial=30,
-                 incremental=False, judge="interval"):
+                 incremental=False, judge="upper"):
         self.tol = tolerance
         self.judge = judge
         self.native_ref = None            # the costs measured at native (incremental, judge="interval")
@@ -94,6 +117,7 @@ class Verdict:
         self.phase = None                 # None, "ref" (knob at native) or "trial" (knob at the trial step)
         self.trial = None
         self.ref, self.got = [], []
+        self.need = None                  # judge="upper": the pieces of work each phase measures, from the reference's spread
         self.phase_t = 0
         self.t = 0
         self.last_probe = -10 ** 9
@@ -110,7 +134,7 @@ class Verdict:
             self.got.extend(costs)
 
     def _end(self):
-        self.phase, self.trial, self.ref, self.got = None, None, [], []
+        self.phase, self.trial, self.ref, self.got, self.need = None, None, [], [], None
 
     def tick(self, calm):
         """One decision. calm: the service is inside its compass and nothing waits (a trial is never run under stress).
@@ -122,16 +146,40 @@ class Verdict:
             event = {"verdict": "trial abandoned (service not calm)" if not calm else "trial abandoned (too little work)",
                      "step": self.trial}
             self._end()
-        elif self.phase == "ref" and len(self.ref) >= self.min_n:
+        elif self.phase == "ref" and self.judge == "upper" and len(self.ref) >= max(self.min_n, self.need or 0):
+            need = pieces_needed(self.ref, self.tol, self.min_n)
+            rate = len(self.ref) / max(1, self.t - self.phase_t)          # pieces of work a decision, as the reference saw
+            if need > rate * self.max_trial:
+                event = {"verdict": "trial not started: the work too noisy to read the step in a trial's time",
+                         "step": self.trial, "pieces_needed": need if math.isfinite(need) else None,
+                         "pieces_a_decision": round(rate, 3)}
+                self._end()
+            elif len(self.ref) >= need:
+                self.need, self.phase, self.phase_t = need, "trial", self.t
+            else:
+                self.need = need                                          # the reference measures on to its n
+        elif self.phase == "ref" and self.judge != "upper" and len(self.ref) >= self.min_n:
             self.phase, self.phase_t = "trial", self.t
-        elif self.phase == "trial" and len(self.got) >= self.min_n:
+        elif self.phase == "trial" and len(self.got) >= (self.need or self.min_n):
             m0, mk = median(self.ref), median(self.got)
             if self.incremental and self.allowed == 0:
                 self.native_cost = m0
                 self.native_ref = list(self.ref)
             bound = m0 if self.native_cost is None else min(m0, self.native_cost)
             within = mk <= bound * (1.0 + self.tol)
-            if self.judge == "interval":
+            if self.judge == "upper":
+                reading, ivs, _, _ = self._reading()
+                upper = self._upper()
+                if reading != "LOSS" and within and upper <= math.log(1.0 + self.tol):
+                    self.allowed = self.trial
+                    event = {"verdict": "step allowed", "step": self.trial, "cost_native": m0, "cost_step": mk,
+                             "reading": reading, "interval_ln": ivs, "pieces": len(self.got)}
+                else:
+                    self.refused_until[self.trial] = self.t + self.recheck
+                    event = {"verdict": "step refused: the muscle is slower there", "step": self.trial,
+                             "cost_native": m0, "cost_step": mk, "pieces": len(self.got),
+                             "reading": "LOSS" if reading == "LOSS" else "past the allowance", "interval_ln": ivs}
+            elif self.judge == "interval":
                 reading, ivs, wide, d_max = self._reading()
                 if reading != "LOSS" and wide and len(self.got) < 3 * self.min_n:
                     return self._stand()                         # the evidence is wider than the allowance: it measures on
@@ -166,6 +214,14 @@ class Verdict:
     def _stand(self):
         """The knob stays at the trial step for another decision (the trial measures on)."""
         return self.trial, True, None
+
+    def _upper(self):
+        """judge="upper": the largest upper end of the trial's 95% intervals, against the reference and, stepwise, native."""
+        ivs = [change_interval(self.ref, self.got)]
+        if self.incremental and self.native_ref:
+            ivs.append(change_interval(self.native_ref, self.got))
+        ivs = [iv for iv in ivs if iv is not None]
+        return max((hi for _, hi in ivs), default=math.inf)
 
     def _reading(self):
         """The trial's reading in the reports' words (tools/readings.py: a 95% interval wholly on one side of zero is a

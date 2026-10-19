@@ -178,9 +178,11 @@ class Drone:
         if self.law is not None and self.phase in ("out", "back"):
             f = self.law.force(err)
             want = clamp(O_MIN + (O_MAX - O_MIN) * (0.5 - 0.5 * f), O_MIN, O_MAX)
-            if err >= 0.95 * E_LINE or nearest < SEP_WALL:
-                want = O_MIN                                   # fail up: the planner's cruise at once (error at the wall, or a drone too close)
-            self.override += clamp(want - self.override, -SLEW, SLEW)
+            # the stopping distance grows with the square of the speed, so the reflex reaches out with it: at the planner's cruise it is SEP_WALL
+            if err >= 0.95 * E_LINE or nearest < SEP_WALL * self.override ** 2:
+                self.override = O_MIN                          # fail up: the planner's cruise at once, in this tick (error at the wall, or a drone too close), v12
+            else:
+                self.override += clamp(want - self.override, -SLEW, SLEW)
         self.ov.append(self.override)
         v = V_PLAN * self.override
         cx, cy, cz = self.carrot
