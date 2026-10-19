@@ -217,7 +217,7 @@ RECEIPTS = [   # (file, stack, evidence class)
     ("V7_GOLDILOCKS", "Kubernetes", "L"), ("V7_KEDA_REQUESTS", "Kubernetes", "L"), ("V7_KEDA_CPU_REQUESTS", "Kubernetes", "L"),
     ("V7_ALL_FOUR", "Kubernetes", "L"), ("V7_TRACE_GOOGLE2011", "Kubernetes", "L"), ("V7_FAULTS", "Kubernetes", "L"),
     ("V7_BATCH", "Kubernetes", "L"), ("V7_FAIRNESS", "Kubernetes", "L"), ("V7_CRUISEKUBE", "Kubernetes", "L"),
-    ("V7_CAPACITY", "Kubernetes", "L"), ("V7_ROBUST_LONG", "Kubernetes", "L"),
+    ("V7_CAPACITY", "Kubernetes", "L"), ("V7_ROBUST_KILL", "Kubernetes", "L"), ("V7_ROBUST_LONG", "Kubernetes", "L"),
     ("V7_REDIS", "Linux services", "L"), ("V7_REDIS_SERVICE", "Linux services", "L"), ("V7_PGBENCH", "Linux services", "L"),
     ("V7_SYSBENCH", "Linux services", "L"), ("V7_YCSB", "Linux services", "L"), ("V7_KAFKA", "Linux services", "L"),
     ("V7_KAFKA_SERVICE", "Linux services", "L"),

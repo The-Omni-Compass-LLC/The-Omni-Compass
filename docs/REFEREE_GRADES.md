@@ -24,7 +24,7 @@ measurement exists.
 | 10 | GPU | Undetermined | Undetermined | graded on its result | the Lambda runs from one exact commit, on the founder's word |
 | 11 | Modelled muscles | C− | **C−** | B | each plant model calibrated against a measured system, with its error stated |
 | 12 | Outside simulators | C+ | **B−** | A | the swarm's reflex fix in the next version and its three runs with draws beyond the fixed seeds (below), and BOPTEST beside CityLearn |
-| 13 | Robustness | B | **B** | A | the omni-v11 kill, long-run and extended-fault tables (their third runs are in), then a multi-machine cluster |
+| 13 | Robustness | B | **B+** | A | the omni-v11 kill and long-run tables are in (no LOSS, every hand-back inside its allowance); next the extended-fault table, a longer after-kill window, then a multi-machine cluster |
 | 14 | Reproducibility | B | **A** | A+ | an outside party rebuilding the tables from the receipts |
 | 15 | Honesty | A− | **A** | A+ | an outside audit of the receipts against the pages |
 | 16 | Manuals | C+ | **B−** | A | an editorial pass of both manuals at referee level, every figure and table against the code |
@@ -57,7 +57,7 @@ measurement exists.
    all four on omni-v11, each rebuilt byte for byte. Held at B− by a fault found in the swarm's wire: on a mission draw outside
    the preregistered seeds it let drones collide where native did not. The fix held every drone outside the keep-out on all
    ten cells and draws tried (`results/toy_gate/V12_SWARM_REFLEX.md`) and lands with the next version.
-14. **Reproducibility.** All 18 omni-v11 tables rebuilt from their raw receipts and identical to the byte
+14. **Reproducibility.** All 23 omni-v11 tables rebuilt from their raw receipts and identical to the byte
    (`tools/reproduce.py`, weekly in `reproduce.yml`); every package pinned with its hashes, every action by its commit.
 15. **Honesty.** The limitations page, the tail-latency page, the runs-disagree rows each explained, every row kept.
 16. **Manuals.** Eleven referee chapters bound into the Owner's Manual (the proofs, the coverage, the power, the deviations,
@@ -71,9 +71,10 @@ measurement exists.
 
 ## The blueprint
 
-**On GitHub already, at no cost.** The third runs of the seven Kubernetes sets, the robustness kill and long runs, and the
-data stores at the max are finishing or archiving; the CruiseKube rerun on the corrected recorder is running. Each lands as
-an omni-v11 table and raises categories 6, 7 and 13.
+**On GitHub already, at no cost.** The robustness kill test and long run and the three data stores at the max landed on 19
+October (no LOSS in any); the third runs of the seven Kubernetes sets, the extended fault test and the CruiseKube rerun on the
+corrected recorder are running, and the cost to match runs again from the campaign. Each lands as an omni-v11 table and
+raises categories 6, 7 and 13.
 
 **The next engine version, on the founder's word** (`docs/CHANGE_CONTROL.md`: any change to a rule or guard is the next
 version, and every benchmark runs again on it):
@@ -84,6 +85,22 @@ version, and every benchmark runs again on it):
 - a command with no pipe run without a shell;
 - the Redis harness's brain in its own process, as a deployment runs it;
 - the Kubernetes governor counting a worker an add-on marks while it serves, and keeping its clock under load.
+
+**What a buyer will ask for that is not here yet** (the founder's question of 19 October, answered from the repository):
+- *Proof*: a physical meter (every energy figure is a declared model; the GPU on Lambda or a metered machine closes it); a cloud
+  bill on the engine that stands (Azure running, Google's key and Amazon's plan pending); native at its best (the cost to match,
+  native tuned harder by its operator beside Omni-Compass on top, last run on 3 October on an engine long gone, runs again on
+  omni-v11 from the campaign); an outside party's rerun; a real multi-machine cluster (kind puts every node on one runner);
+  days to weeks on a real workload; each rule's share of the gain read on the live cluster, not only in our models.
+- *Gauges*: measured joules and grams of carbon; the cost of 1,000 requests; the 99.9th percentile (the probes are too sparse
+  for it); the operator's own terms (availability, error budget, burn rate) beside the alert minutes; the time to react and
+  to settle (moves and reversals an hour are now read for every omni-v11 Kubernetes table, `results/STEERING.md`); each
+  muscle's headroom to its own limit; the governor's own calls to the cluster's API.
+- *The operator's screen*: the gauges feed and a ready Grafana screen are in (`tools/omni_exporter.py`,
+  `deploy/grafana/omni-compass.json`, read-only). Still to build: one screen with the kill switch, the mode (autopilot,
+  watching, off), the dial (the max to the tune-down), a row per muscle with its hand-back and watch-only buttons, and the
+  live native-against-Omni panel; its buttons write settings, so they come with the next version, through the toy gate, behind
+  the cluster's own sign-in; and a one-line install (a Helm chart).
 
 **Mathematics.** CERT-10 for every fixture by entry bounds taken cell by cell instead of over the whole box; the bath's
 amplitude from a discrete Lyapunov function per cell.
