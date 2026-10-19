@@ -37,7 +37,7 @@ RAW = "results/live/raw"
 BIN = 30                     # seconds in a response-time window
 K8S = {   # benchmark file stem (without V<n>_) -> the sub-folder of its runs holding its arms ("" for the run itself)
     "GOLDILOCKS": "", "KEDA_REQUESTS": "http/", "KEDA_CPU_REQUESTS": "both/", "ALL_FOUR": "", "TRACE_GOOGLE2011": "",
-    "FAULTS": "", "BATCH": "", "FAIRNESS": "", "CRUISEKUBE": "", "CAPACITY": "", "ROBUST_LONG": ""}
+    "FAULTS": "", "BATCH": "", "FAIRNESS": "", "CRUISEKUBE": "", "CAPACITY": "", "ROBUST_LONG": "", "ROBUST_KILL": ""}
 DB = ["REDIS", "REDIS_SERVICE", "PGBENCH", "SYSBENCH", "YCSB", "KAFKA", "KAFKA_SERVICE"]
 DB_GAUGES = ["work_inside_line_rps", "rps", "p95_ms", "p99_ms", "mean_ms", "failed", "hit_rate", "cpu_busy_share", "writes"]
 
@@ -319,6 +319,10 @@ def k8s_run(g: Git, run: dict, sub: str):
         return None
     s = Sums(g, d)
     arms = sorted({x[len(d) + 1:].rsplit("/", 1)[0] for x in g.files(f"{d}/{sub}") if x.endswith("/latency.csv")})
+    if not arms and sub:   # the kind runs from omni-v11 on keep each add-on's arms in <name>-<add-on>-<n>/ folders, not in <add-on>/
+        stem = sub.strip("/")
+        arms = sorted({x[len(d) + 1:].rsplit("/", 1)[0] for x in g.files(d + "/") if x.endswith("/latency.csv")
+                       and re.match(rf"([^/]*-)?{re.escape(stem)}-\d+/", x[len(d) + 1:])})
     reps = {}
     for rel in arms:
         m = re.search(r"bench-(native|compass)-(\d+)$", rel)
@@ -333,7 +337,12 @@ def k8s_run(g: Git, run: dict, sub: str):
     # the run's own scored result, and the page's per-repetition scoring checked against it: the mean over repetitions of
     # the scorer's gauges must equal the run's LIVE_REPS.json means (the table's own numbers)
     lr = None
-    for cand in (f"{sub}LIVE_REPS.json", "LIVE_REPS.json", "live-reps/LIVE_REPS.json"):
+    # the run's own scored summary: beside its arms, at the run's root, in live-reps/, or (the kind runs from omni-v11 on) in
+    # the run's own <benchmark>-reps/ folder; one sub-folder's summary is preferred for a run whose arms sit in that sub-folder
+    stem = sub.strip("/")
+    found = sorted(k for k in s.table if k.endswith("LIVE_REPS.json"))
+    own = [k for k in found if re.search(rf"(^|[/-]){re.escape(stem)}(/|-|$)", k.rsplit("/", 1)[0])] if stem else found
+    for cand in [f"{sub}LIVE_REPS.json", "LIVE_REPS.json", "live-reps/LIVE_REPS.json"] + own:
         if cand in s.table:
             raw = s.read(cand)
             lr = json.loads(raw.decode("utf-8").replace("NaN", "null")) if raw else None

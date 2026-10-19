@@ -81,7 +81,11 @@ def run(rs, seed, arm):
     n, kill_at = len(b.plants), int(KILL_AT * ORGANISM_STEPS)
     bone = Bone(b, V5CFG) if arm == "omni" else None
     last = [None] * n
-    rec = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power_kw": [], "obs": [], "imm": []}
+    rec = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power_kw": [], "obs": [], "imm": [], "mach": [], "troom": []}
+    # each side's own pools and rooms, read the way the bone reads them: the machines in service and starting over every compute
+    # pool, and the warmest room; native's are its own controllers', Omni-Compass's carry what it added and gave back
+    pools = [i for i, (p, r) in enumerate(zip(b.plants, b.rows)) if p.template == "compute_pool" and r["knob"] not in ("power", "admission")]
+    rooms = [i for i, p in enumerate(b.plants) if p.template == "thermal_zone"]
     if bone is not None:                     # the bone's own reading of its lines, kept as max_body_step reads it (no extra call)
         seen = {}
         cls_room = bone.room
@@ -124,6 +128,8 @@ def run(rs, seed, arm):
         rec["p"].append(ps); rec["over"].append(ov); rec["wrote"].append(wrote)
         rec["held"].append([1 if p.override else 0 for p in b.plants]); rec["work"].append(wk)
         rec["power_kw"].append(round(b.all_w / 1000.0, 3))
+        rec["mach"].append(sum(machines(b.plants[i]) for i in pools))
+        rec["troom"].append(round(max((b.plants[i].T for i in rooms), default=0.0), 3))
         rec["obs"].append({k2: round(o[k2], 4) for k2 in ("queue_ratio", "load_ratio", "power_stress", "thermal",
                                                          "network_stress", "drift_ratio")})
     return rec
@@ -244,7 +250,8 @@ def pack(rec, n):
                for ro, rh, rw in zip(rec["over"], rec["held"], rec["wrote"]) for o, h, w in zip(ro, rh, rw))
     return {"p": base64.b64encode(pos.tobytes()).decode(), "f": base64.b64encode(fl).decode(), "kw": rec["power_kw"],
             "obs": [[o["queue_ratio"], o["load_ratio"], o["power_stress"], o["thermal"], o["network_stress"], o["drift_ratio"]]
-                    for o in rec["obs"]], **({"imm": rec["imm"]} if rec.get("imm") else {})}
+                    for o in rec["obs"]], **({"imm": rec["imm"]} if rec.get("imm") else {}),
+            **({"mach": rec["mach"], "troom": rec["troom"]} if rec.get("mach") else {})}
 
 
 def section(rs, runner, steps, kill_at):
