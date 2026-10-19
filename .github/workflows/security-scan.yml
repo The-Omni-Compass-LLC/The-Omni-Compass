@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: security-scan
+# The static security scan (tools/security_scan.py: Bandit over every Python file that runs, every finding of high or medium
+# severity fixed or reviewed by name in docs/SECURITY_SCAN.md) and the audit of every pinned dependency against the public
+# vulnerability databases (pip-audit over requirements-lock.txt). Either fails the run: a new finding no review names, a
+# review whose finding is gone, a page not current, or a known vulnerability in a pinned package. It writes nothing.
+on:
+  push:
+    branches: [main]
+    paths: ["**.py", "requirements-lock.txt", ".github/workflows/security-scan.yml"]
+  schedule:
+    - cron: "29 6 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12"}
+      - run: pip install -q bandit==1.9.4 pip-audit==2.9.0 PyYAML==6.0.3
+      - name: Static scan, every finding of high or medium severity reviewed
+        run: python3 tools/security_scan.py --check | tee scan.txt
+      - name: Every pinned dependency against the known vulnerabilities
+        run: |
+          set -o pipefail
+          python3 -m pip_audit -r requirements-lock.txt --no-deps --disable-pip --progress-spinner off | tee audit.txt
+      - name: The results and the legal notice at the end of this job's report
+        if: always()
+        run: |
+          { echo "## Static scan"; echo; echo '```'; cat scan.txt 2>/dev/null; echo '```'; echo
+            echo "## Pinned dependencies against the known vulnerabilities"; echo; echo '```'; cat audit.txt 2>/dev/null; echo '```'; echo
+            printf '%s\n' '---' "*$OMNI_NOTICE*"; } >> "$GITHUB_STEP_SUMMARY"

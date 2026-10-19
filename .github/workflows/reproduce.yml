@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: reproduce
+# Every three-run table of the engine that stands, rebuilt on a clean GitHub machine from its raw receipts (the branch raw)
+# with the same tool, and compared with the committed table byte for byte (tools/reproduce.py; the recipes are
+# results/live/RECIPES.json and the front page's own state). A difference fails the run and is printed in its report. It
+# writes nothing to the repository. Every Monday, and on the button.
+on:
+  schedule:
+    - cron: "41 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      table: {description: "One table (for example V11_GOLDILOCKS); every table of the engine that stands when empty", default: ""}
+permissions:
+  contents: read
+  actions: read
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  reproduce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12"}
+      - run: pip install -q -r requirements.txt
+      - name: The raw folders the tables were built from, from the branch raw
+        env:
+          TABLE: ${{ github.event.inputs.table }}
+        run: |
+          args=(); [ -n "$TABLE" ] && args=(--table "$TABLE")
+          # shellcheck disable=SC2046
+          bash scripts/raw_archive.sh open $(python3 tools/reproduce.py --patterns "${args[@]}")
+      - name: Rebuild every table and compare it byte for byte
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TABLE: ${{ github.event.inputs.table }}
+        run: |
+          args=(); [ -n "$TABLE" ] && args=(--table "$TABLE")
+          set -o pipefail
+          python3 tools/reproduce.py "${args[@]}" | tee reproduce.txt
+      - name: The comparison and the legal notice at the end of this job's report
+        if: always()
+        run: |
+          if [ -f reproduce.txt ]; then
+            { echo "## Every table rebuilt from its raw receipts"; echo; echo '```'; cat reproduce.txt; echo '```'; echo; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          printf '%s\n' '---' "*$OMNI_NOTICE*" >> "$GITHUB_STEP_SUMMARY"

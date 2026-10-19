@@ -20,13 +20,13 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4: the code, not the archive of raw runs (25 GB, more than the machine's disk)
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /*
             !/results/live/raw/*
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with: {pattern: "paired-*", path: reps, merge-multiple: true, run-id: "${{ inputs.run_id }}", github-token: "${{ secrets.GITHUB_TOKEN }}"}
       - run: python3 tools/pod_report.py reps | tee pod_report.txt
       - name: Attach README, licenses and disclosures to this artifact
@@ -107,11 +107,11 @@ jobs:
           
           if __name__ == '__main__':
               main()
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: {name: pod-report, path: "${{ steps.omni_legal_export_1.outputs.paths }}"}
       - name: Legal files beside the files this run hands out
         if: always()
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: _legal
           sparse-checkout-cone-mode: false
@@ -124,7 +124,7 @@ jobs:
             TRADEMARKS.md
       - name: Legal notice handed out with this run's files
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: legal-notice
           overwrite: true

@@ -2,6 +2,152 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19: The Redis 99th percentile, root-caused: the harness puts the brain inside the load generator
+
+- **The question** (the founder's, 19 October): why the 95th and 99th percentiles show red on the live page. No tail row
+  reads LOSS in any omni-v11 table. On real Kubernetes, Omni-Compass's 95th and 99th percentiles were below native's in all
+  90 paired repetitions. The single-run rises are Kafka's and MySQL's one-run excursions, and a small, consistent Redis rise of
+  about 6 µs (0.1%) at the 99th percentile (`docs/TAIL_LATENCY.md`).
+- **The cause of the Redis rise.** `tools/run_redis.py` runs the brain as a thread inside the load generator's own Python
+  process, so its once-a-second work shares the interpreter lock with the request threads. The test
+  (`tools/redis_brain_probe.py`, `results/REDIS_BRAIN_PROBE.json`) runs the harness's own application and brain with a
+  stand-in store and a plug that writes nowhere, so nothing differs between the arms but the brain thread. With the brain in
+  the process the 99th percentile rose 101 µs (95% interval +50 to +151 µs, 10 of 12 pairs) and the mean 5.4 µs (11 of 12).
+  In the set with native as shipped, where the brain computes nothing, no rise of consistent sign appears.
+- **What it means.** The rise is the harness's layout, and it weighs against Omni-Compass, because only the omni arm carries
+  the brain. No deployment runs the brain inside the application it governs, and the other data stores' load generators
+  already run as processes of their own.
+- **The fix.** The Redis harness runs the brain in a process of its own. It changes how the omni arm is measured, so it lands
+  with the next engine version's reruns (`docs/CHANGE_CONTROL.md`).
+
+## 2026-10-19: A fault found in the swarm's wire, beyond the counted cells; its fix waits for the next version
+
+- **What was found.** The swarm wire (`tools/run_swarm.py`) moves one knob, the cruise override. Its proximity reflex is
+  written to hand back the planner's cruise at once when another drone comes within 0.5 m. The code did something else: it
+  let the override fall by 0.01 a control tick, so a drone kept flying fast for about a second after it saw a neighbour.
+  - In the counted cells of the omni-v11 table this spent the margin without a judged miss. The closest approach, shown and
+    not judged, fell from native's 0.30 to 0.46 m to about 0.16 m. There was no near miss and no collision.
+  - On mission draws the wire was never run on, it did not hold. On the mixed cell with draw 214 two drones came within
+    0.083 m, with 5 near-miss ticks and 3 collision ticks, where native flew the same draw with none.
+- **The fix.** The reflex acts in the tick it is triggered, and its reach grows with the square of the override, as a drone's
+  stopping distance grows with the square of its speed. Flown on our own machine on the four preregistered cells and six untouched
+  draws, it held every drone at or outside the full 0.30 m keep-out (the least, 0.304 m), with no near miss and no collision. It
+  kept 49% to 92% of the energy cut. The record is `results/toy_gate/V12_SWARM_REFLEX.md` (class S, every flight in its
+  `.json`).
+- **Where it goes.** A change to a guard is the next engine version (`docs/CHANGE_CONTROL.md`, which now lists every change
+  waiting for it). It is shown to the founder before it is pushed. Its preregistration adds a judged collision row and draws
+  beyond the fixed seeds.
+- **Where it is written.** `docs/LIMITATIONS.md` (sections 3 and 4), the referee summary's "does no harm" row, the state of
+  play, the README, the grades (outside simulators held at B−), and the Owner's Manual (sections 3.5, 16.5 and 16.6).
+
+## 2026-10-19: Every page lined up with the newest table of each benchmark
+
+- **The Owner's Manual's results**, until now written from the omni-v7 tables, are read from each benchmark's newest table:
+  - section 3.5, the evidence table, names its engine row by row;
+  - section 16.1 is on omni-v10 (steady work, the wandering demand, all four, faults, the queue of jobs, the noisy neighbour,
+    the Google day; steady and wandering written in for the first time);
+  - section 16.1b is on omni-v11 (Goldilocks, KEDA two ways, fixed capacity), with CruiseKube on omni-v10;
+  - section 16.4 covers the data stores on omni-v11, native as shipped beside the operator's setting;
+  - section 16.4b has the two-hour run on omni-v10;
+  - section 16.5 has the outside simulators on omni-v11, with the swarm's fault;
+  - section 16.6 has the one number and the table.
+- **The receipt charts** (`docs/book/schematics.py`) picture the omni-v11 tables for Goldilocks, KEDA two ways and the capacity
+  test, and omni-v10's for CruiseKube.
+- **The Omni index's page** names each table's engine from the tables themselves (7 tests on omni-v11, 7 on omni-v10). It no
+  longer says every table ran on omni-v7.
+- **The benefit sheet** dates a table that is new in the working tree with the day it lands, where it had read "unknown" in a
+  shallow checkout.
+- The referee summary, the state of play and the README say the same, the pod start wait's open item is closed (EVEN on
+  omni-v11), and both books are rebuilt.
+
+## 2026-10-19: The referee's grades, category by category, with the pages behind them
+
+- **`docs/REFEREE_GRADES.md`** grades Omni-Compass in twenty categories, as a referee or an underwriter would. For each it
+  gives the grade on the morning of 19 October, the grade the evidence supports now, the highest grade the category can
+  reach, and what reaching it takes. A category with nothing measured yet (the cloud bill, energy, the GPU, production) is
+  **Undetermined**, never failed. These are our own grades; no outside party has graded them.
+- **New referee pages**, each bound into the Owner's Manual:
+  - `docs/RELATED_WORK.md`: the published ideas Omni-Compass is built from (supervisory control over regulatory loops,
+    reference governors, the Simplex fallback, online controlled experiments, shielding, feedback control of computing
+    systems), each with the work that stated it, and the combination that is the claim.
+  - `docs/CHANGE_CONTROL.md`: the rules by which the engine changes, the record of every version since omni-v5 (landed,
+    digest, files, why), and one gap: the wires that are not yet in the fingerprint.
+  - `docs/LIMITATIONS.md`: independence, internal, construct, statistical and external validity, and the engine's pace. A
+    false GAIN or LOSS under the three-run rule has probability 2 × 0.025³ ≈ 3.1 × 10⁻⁵ a row, about 0.03 over the 854 judged
+    rows of the omni-v11 tables.
+  - `docs/POWER.md` (`tools/power.py`): the smallest change each judged row can see, in one run and in all three, and the
+    repetitions a run would need to see 5%. `docs/DEVIATIONS.md` (`tools/deviations.py`): every amendment of every
+    preregistration with its timing (56 in 12; 41 before the runs they govern, 5 after runs began, 10 not stated).
+  - `docs/TAIL_LATENCY.md`: the founder's question on the 95th and 99th percentiles, answered from the receipts.
+- `verify.py` checks that the power page, the deviations register, the coverage page, the bill of materials and the
+  reproduction recipes are what their sources give.
+
+## 2026-10-19: Supply chain and security: every package hashed, every action pinned by commit, every finding reviewed
+
+- **Hash-checking.** `requirements-lock.txt` pins each of its 29 packages with the SHA-256 of every file PyPI serves for
+  it, so `pip install --require-hashes -r requirements-lock.txt` refuses a package whose bytes changed. The two packages
+  ReportLab and MuJoCo bring (charset-normalizer, websockets) are pinned with them.
+- **Actions by commit.** All 407 `uses:` lines in the workflows name the action by its 40-character commit, with the
+  version as a comment (`actions/checkout@11d5960… # v4`), so a moved tag cannot change what runs. `tools/legal.py` writes
+  its steps the same way. `tests/test_supply_chain.py` fails a push with an unpinned action or an unhashed package.
+  `docs/THREAT_MODEL.md`: T8 (the supply chain) is closed for what Omni-Compass installs.
+- **The bill of materials.** `tools/sbom.py` writes `sbom/omni-compass.cdx.json` (CycloneDX 1.5),
+  `sbom/omni-compass.spdx.json` (SPDX 2.3) and `docs/DEPENDENCY_LICENSES.md`: every package's license, its use, and a
+  gate that fails on any strong copyleft. All are permissive except Hypothesis (MPL-2.0), which is used by the tests alone.
+- **The static scan.** `tools/security_scan.py` runs Bandit over 34,657 lines of code that runs, and writes
+  `docs/SECURITY_SCAN.md`. It found 3 high and 34 medium findings; every one is fixed or reviewed with its reason, and a
+  new or stale one fails the check. Two fixes in `tools/run_pgbench.py`: PgBouncer's folder is owned by postgres and set
+  0o755 (it was world-writable), and the MD5 that PostgreSQL's own password method defines is marked as not used for
+  security. `security-scan.yml` runs the scan and `pip-audit` (0 known vulnerabilities in the 29 pins) on every push that
+  touches code or the lock, and weekly.
+
+## 2026-10-19: The engine's mathematics: the bath proved stable, 24 of 24; 81% of the engine run by the tests
+
+- **`tools/prove_engine.py`** proves, by the z3 solver and by mpmath's interval arithmetic, 24 claims about the algorithm
+  the engine executes, over every input in its declared set. The claims cover the compass law, the plug's clip, the
+  verdict, the invariance of E, I and S, the tracking bound inside the basin and the steps to reach it. New today: **B1**,
+  the bath's stability. For every quality factor Q ≥ ½ the engine's oscillators can take and every frequency on its grid,
+  the spectral radius of one Runge-Kutta micro step is below 1, so the bath decays. The bound is
+  |R(z)| ≤ exp(Re z) + |z|⁵/120 · exp(|z|), checked over 400 cells of ω with Re z = −hω/(2Q) and |z| = hω.
+  `docs/ENGINE_PROOFS.md` states each claim, its method and what is still open (CERT-10 for every fixture, the bath's
+  amplitude as a number). `tests/test_engine_proofs.py` fails a push where a claim is not proved, where a proof is vacuous,
+  or where the stored record differs. `tests/test_engine_properties.py` checks every proved property on several thousand
+  generated cases against the engine's own code.
+- **Coverage.** `tools/engine_coverage.py` measures line coverage of each of the 47 engine files under the whole test
+  suite. **81% of 6,519 statements run under the tests**; the files least covered are named first
+  (`docs/ENGINE_COVERAGE.md`).
+
+## 2026-10-19: Every omni-v11 table rebuilt from its raw receipts, identical to the byte
+
+- **`tools/reproduce.py`** opens a table's runs from the branch `raw`, runs the table's own tool on them in a scratch
+  folder, and compares the result with the table on main, byte for byte. The recipes are in `results/live/RECIPES.json` and
+  the front page's state. **All 18 omni-v11 tables come out identical.** `reproduce.yml` repeats it every week and on
+  request; `verify.py` checks that every omni-v11 table has a recipe.
+
+## 2026-10-19: The omni-v11 three-run tables: 18 tables, 854 judged rows, 0 LOSS
+
+- **Real Kubernetes** (kind, ten pairs a run):
+  - Goldilocks and the VPA: the 95th percentile cut 61% to 64%.
+  - KEDA's HTTP add-on: the 95th percentile cut 72% to 74%, alert minutes cut 100%.
+  - KEDA on CPU and requests: the 95th percentile cut 52% to 53%.
+  - Fixed capacity: EVEN at every cap.
+  - The omni-v10 LOSS, the pod start wait under KEDA's HTTP add-on, reads EVEN now that the rig pre-pulls the served image.
+  - In all 90 paired repetitions Omni-Compass's 95th and 99th percentiles were below native's.
+- **The data stores** (three pairs a run): Kafka at the max and at the service objective, PostgreSQL, Redis (the operator's
+  ceiling, native as shipped, the service objective), MySQL and MongoDB (the operator's setting and native as shipped):
+  0 LOSS. Redis at the operator's ceiling reads 4 GAIN at the tune-down and 6 at the max.
+- **Outside simulators:** CityLearn 27 GAIN, the power grids 67 GAIN, the robot arms 7 GAIN, the swarm 9 GAIN.
+- **Three faults found while building them, each fixed before any table carried it:**
+  - The front page grouped a data store's runs with native as shipped together with the runs at the operator's setting.
+    `tools/front_page.py` now keeps them apart (`V11_REDIS` and `V11_REDIS_SHIPPED`), and `tests/test_front_page.py`
+    fails a push that mixes them.
+  - The conductor started the capacity test's B and C runs without their letter, so each read "A". `scripts/dispatch_grid.py`
+    now passes the letter to every workflow that takes one, `tests/test_release_campaign.py` checks it, and the capacity
+    table notes the runs started before the fix.
+  - CityLearn's comfort score drifts by up to 3.6 × 10⁻⁵ between runs in both arms alike. The CityLearn table now notes
+    each row that reads "the runs differ" while its paired change is exactly zero in every run (`tools/citylearn_abc.py`).
+- `.github/archive_request.txt` lists the 17 runs these tables read, so their files are saved on `raw`.
+
 ## 2026-10-19: "Do no harm" has one meaning everywhere, and it is the organism's
 
 - **The founder's words of 19 October**: "its real goal is to strengthen the organism and keep it healthy in any form and
