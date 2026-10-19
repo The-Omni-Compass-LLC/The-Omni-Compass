@@ -136,16 +136,18 @@ Every benchmark since the engine was frozen runs three separate times, A, B and 
 shows all three beside each gauge, each with its own 95% interval. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
 in all three, every interval clear of zero; a resource spent that rose reads **power given**), **EVEN, no difference beyond the noise** (an interval over zero in at least one
 run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
-confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V7_` or `V8_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
+confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V10_` or `V11_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
 a table never mixes engines, and a reading is never carried from one engine to another. Every LOSS and every power given is in the table beside
-the GAINs: the database's host CPU-seconds, the grid's dissipated energy in four grids, the Panda's copper heating, CityLearn's bill (power given), CityLearn's energy not served and time uncomfortable (LOSS).
+the GAINs. On the omni-v11 tables there is no LOSS. Power given appears in the grid's dissipated energy in four grids, the tap
+operations in one, PgBouncer's connections, MySQL's pool from its factory size, Redis's memory and CityLearn's distance from net
+zero in one district. An earlier engine's LOSS stays in its own table, for example CityLearn's energy not served on omni-v7.
 
 **How often the rule reads a difference that is not there.** Under no true difference, one run's 95% interval falls
 wholly above zero with probability 0.025 and wholly below with 0.025. A row reads GAIN or LOSS only when all three
 independent runs fall on the same side, so its chance of a false reading is 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over a table of 30
 judged rows the chance that any one is false is at most 30 × 3.1 × 10⁻⁵ ≈ 0.09% (a union bound, as Bonferroni's), and over
-the 560 judged rows of the omni-v7 tables that carry noise (790 judged rows in 22 tables, less the 230 of the deterministic
-simulators) the expected number of false readings is 560 × 3.1 × 10⁻⁵ ≈ 0.02. The
+the 613 judged rows of the omni-v11 tables that carry noise (854 judged rows in 18 tables, less the 241 of the deterministic
+simulators) the expected number of false readings is 613 × 3.1 × 10⁻⁵ ≈ 0.02. The
 bound assumes the three runs independent; runs on the same kind of machine can share a bias, which three runs cannot
 remove and the bound does not cover. The price of the rule is power: a small true difference must clear the noise three
 times, so many EVEN rows are differences too small for a run's pairs to resolve (with 3 pairs a run, t = 4.303 and the

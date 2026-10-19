@@ -82,10 +82,13 @@ def _find(obj, key, depth=0):
 
 
 def describe(run_dir: Path):
-    """What one archived run is: (product, objective, engine version, workloads) or None when it is not a complete live
-    product run (no report directory, or no workload directory). The workloads are the run's own artifact directories
-    (`<product>-<workload>`); the objective and the engine are read from the records inside them, wherever each product keeps
-    them; a record that names neither reads as the resource objective on the engine the table was built for."""
+    """What one archived run is: (product, objective, engine version, workloads, native) or None when it is not a complete
+    live product run (no report directory, or no workload directory). The workloads are the run's own artifact directories
+    (`<product>-<workload>`); the objective, the engine and the native arm's setting are read from the records inside them,
+    wherever each product keeps them; a record that names none reads as the resource objective on the engine the table was
+    built for, against the operator's setting. The native setting is part of what a run is (19 October): native exactly as
+    the vendor ships it (`native: shipped`) and native at the operator's setting are two benchmarks, and three runs of one
+    are never read with runs of the other."""
     product = None
     for p in PRODUCTS:
         if (run_dir / f"{p}-report").is_dir():
@@ -93,12 +96,12 @@ def describe(run_dir: Path):
             break
     if product is None:
         return None
-    workloads, objective, engine = set(), None, None
+    workloads, objective, engine, native = set(), None, None, None
     for sub in sorted(run_dir.iterdir()):
         if not sub.is_dir() or not sub.name.startswith(f"{product}-") or sub.name == f"{product}-report":
             continue
         workloads.add(sub.name[len(product) + 1:])
-        if objective is not None and engine is not None:
+        if objective is not None and engine is not None and native is not None:
             continue
         for f in sorted(sub.rglob("*.json"))[:400]:
             try:
@@ -115,11 +118,16 @@ def describe(run_dir: Path):
                     engine = str(e["version"])
                 elif isinstance(e, str) and e.startswith("omni-v"):
                     engine = e
-            if objective is not None and engine is not None:
+            if native is None:
+                n = _find(d, "native")
+                if n in ("shipped", "operator"):
+                    native = n
+            if objective is not None and engine is not None and native is not None:
                 break
     if not workloads:
         return None
-    return product, objective or "resource", engine_version(engine or "omni-v3"), tuple(sorted(workloads))
+    return (product, objective or "resource", engine_version(engine or "omni-v3"), tuple(sorted(workloads)),
+            native or "operator")
 
 
 def engine_version(text):
@@ -129,11 +137,12 @@ def engine_version(text):
     return f"omni-v{m.group(1)}" if m else "unversioned"
 
 
-def table_name(product, objective, engine):
+def table_name(product, objective, engine, native="operator"):
     base = PRODUCTS[product][0]
     m = re.search(r"omni-v(\d+)", engine_version(engine))
     v = m.group(1) if m else "0"
-    return f"V{v}_{base}" + ("" if objective == "resource" else f"_{objective.upper().replace('-', '_')}")
+    return (f"V{v}_{base}" + ("" if objective == "resource" else f"_{objective.upper().replace('-', '_')}")
+            + ("_SHIPPED" if native == "shipped" else ""))
 
 
 def plan(root: Path = ROOT):
@@ -156,18 +165,18 @@ def plan(root: Path = ROOT):
             continue
         kinds.setdefault(desc, []).append(rid)
     out = []
-    for (product, objective, engine, workloads), ids in sorted(kinds.items()):
+    for (product, objective, engine, workloads, native), ids in sorted(kinds.items()):
         ids = sorted(ids)
         if len(ids) < 3:
             continue
         a, b, c = ids[-3:]
-        name = table_name(product, objective, engine)
+        name = table_name(product, objective, engine, native)
         built = state.get(name, {}).get("runs")
         table = root / "results" / "live" / f"{name}.md"
         if built == [a, b, c] and table.exists():
             continue
         out.append({"table": name, "product": product, "objective": objective, "engine": engine, "workloads": list(workloads),
-                    "runs": [a, b, c], "tool": PRODUCTS[product][1], "previous": built, "table_exists": table.exists()})
+                    "native": native, "runs": [a, b, c], "tool": PRODUCTS[product][1], "previous": built, "table_exists": table.exists()})
     return out
 
 
@@ -212,7 +221,8 @@ def apply(items, root: Path = ROOT):
                        "engine": it["engine"], "objective": it["objective"], "summary": summary}
         if it["engine"] == engine_now(root):              # the front page shows the engine that stands; an older engine's
             lines.append(f"- {state[name]['built']}: `{name}` rebuilt from runs {it['runs'][0]}, {it['runs'][1]}, "  # table
-                         f"{it['runs'][2]} ({it['product']}, the {it['objective']} objective, {it['engine']}): {summary}")
+                         f"{it['runs'][2]} ({it['product']}, the {it['objective']} objective"
+                         + (", native as shipped" if it.get("native") == "shipped" else "") + f", {it['engine']}): {summary}")
     if items:
         STATE.write_text(json.dumps(state, indent=1, sort_keys=True) + "\n", encoding="utf-8")
         for tool in AFTER:

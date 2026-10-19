@@ -69,6 +69,10 @@ def main(argv=None):
         engines.append(ver.split(" ")[0])
         pairs = sorted({r["pairs"] for r in rows.values()})
         L.append(f"| {tag} | {run} | {meta.get('label', '?')} | `{sha}` | {ver} | {', '.join(map(str, pairs))} |")
+    if any(meta.get("label") != tag for tag, (_, meta, _) in zip("ABC", runs)):
+        L += ["", "The label column is the run's own record of the label it was started with. The conductor started these "
+              "runs in order and, before 19 October, passed no label, so a run it started reads the workflow's default, A; "
+              "the Run column is the table's place for each run, in the order started."]
     if len(set(engines)) == 1:                       # the title names the engine the three runs were on
         L[0] += " (" + engines[0].replace("omni-v", "Omni v") + ")"
     if len(set(engines)) > 1 or len({r for r, _, _ in runs}) < 3:
