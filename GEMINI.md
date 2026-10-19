@@ -17,7 +17,9 @@ firmware, cooling, batteries, a grid's tap changer, a robot's servo, a database'
 standalone or presented as a competitor to it. Every benchmark has two arms only: **native** (the system as it runs on its
 own) and **omni** (Omni-Compass on top of native). Its law is the compass: each setting is held inside a band with 5%
 cushions and pushed toward the middle by two opposing forces, smoothly; where it cannot improve a setting, the setting
-stays native. The engine is frozen and fingerprinted by version (`python3 tools/omni_version.py`); no result is read
+stays native. Its first rule, do no harm, means the organism: it is never left turning out less than its native
+controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`,
+section 3). The engine is frozen and fingerprinted by version (`python3 tools/omni_version.py`); no result is read
 across engine versions.
 
 ## What you must not say or do
