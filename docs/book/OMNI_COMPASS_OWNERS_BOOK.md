@@ -7370,8 +7370,9 @@ a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on G
    loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut out.
 8. **The raw files live with the code.** Every finished run's files (capture, response times, audit log, controller
    log, one SHA-256 manifest per repetition) are copied into `run-<id>/` on the branch `raw` by the `archive-run`
-   workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
-   every table names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
+   workflow: every hour, by itself, every finished run of every workflow that hands in files, failed runs included (a
+   run id in `.github/archive_request.txt` goes first; a run still going is left for a later pass), and every table
+   names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
    clone of it is small; `bash scripts/raw_archive.sh open /run-<id>/` places a run's files at `results/live/raw/run-<id>/`,
    the path every table names.
 
@@ -10877,6 +10878,42 @@ of native's (the median half-width of its 95% interval, 1.5% to 36% run to run),
   5 repetitions (run 39162654399, finished 2026-10-19 01:46 UTC) and any set started before this landed stay as they ran,
   their own record; a set's three-run table pools only runs of one design and one engine.
 
+### 59.50 Amendment (2026-10-19): a worker held by an add-on's own mark while it serves is in service
+
+Three native repetitions of the omni-v11 CruiseKube test were refused for "no machine in service" while the service answered
+every probe: run 39171059299, repetitions 5 and 10, and run 39175670991, repetition 2. Each refused window's capture
+(`capture.csv.errors`) records the same cluster:
+- every node Ready, the control plane included;
+- every node marked `cruisekube.truefoundry.com/overloaded:NoSchedule`. CruiseKube 0.3.4 puts this mark on a node it judges
+  overloaded, so the scheduler sends that node no new pod; the pods already on it keep running.
+
+The recorder (`fleet/capture/kube_capture.sh`, `ACTIVE_ONLY=1`) took any NoSchedule mark as a machine out of service. It read
+0 machines, and the window was refused under the amendment of 18 October. The add-on's own mark is a scheduling hint, not a
+machine leaving service. The recorder now counts a node in service when any one of these holds:
+- it is open to new work;
+- it is closed (cordoned, or marked idle by the governor) and still carries work that is not a DaemonSet's;
+- it is Ready and carries such work, and its only marks are NoSchedule marks that are not Kubernetes' own.
+
+Kubernetes' own marks still take a node out of service: `node.kubernetes.io/*` (unreachable, not ready, under pressure) and
+the control plane's role mark `node-role.kubernetes.io/*`. Any NoExecute mark does too, and so does a node that carries no
+such work. The power capture (`scripts/kind_power.sh`) already counted such a worker as active, so both captures now agree.
+`tests/test_capture_in_service.py` runs the recorder on the cluster as the refused repetitions saw it: before this amendment
+it read (0, 0), now (2, 2). The test also checks what still takes a machine out of service, and that the governor's own marks
+read as before.
+
+- **Unchanged.** The same rule holds in both arms. A window with truly no machine in service is still refused in either arm.
+  Every setting, gauge, load, window and pair is unchanged, and no engine file changes.
+- **Earlier runs.** Windows refused before this amendment stay refused. The CruiseKube tables of earlier runs stand as their
+  own record. Where the add-on marked some workers, those runs' machine counts may read low in either arm: a stated threat to
+  their validity. Repetition 8 of the omni-v10 run 39120444653 (the cause behind omni-v11) ran before the capture recorded
+  marks, so its own files cannot say whether the same mark caused it; the same add-on was running.
+- **The governor.** The governor (`omni_controller/controller.py`, an engine file of omni-v11) counts its machines by the
+  recorder's old rule. Under the add-on's mark on every worker it reads no machine in service and holds; omni-v11 makes that
+  hold safe, but the governor is blind there. Counting such a worker in service in the governor changes the engine. That is
+  the next version's work, through the toy gate, after the founder is told; this amendment does not touch it.
+- **Run again.** The CruiseKube test runs again, A, B and C, on the corrected recorder (`scripts/reruns.txt`, block of
+  19 October). The three-run table pools only runs of one recorder.
+
 ## 60. The Pod Start Wait on One Shared Host
 
 
@@ -13688,7 +13725,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
 | Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
 | The big organisms, detached | workflow `big-organism-detached`: `mode` start / collect / survey, `organisms`, `size`, `duration_s`, `commit`, `max_hours` |
-| Archive a finished run with the code | add its id to `.github/archive_request.txt` and push (workflow `archive-run`) |
+| Archive a finished run with the code | nothing to do: workflow `archive-run` takes it within the hour; to take it at once, add its id to `.github/archive_request.txt` and push |
 | Verify before a push, as GitHub runs it | `python3 tools/release_manifest.py` under Python 3.12: 0 FAIL |
 
 
@@ -13916,7 +13953,7 @@ many pages it read, how many pods it started), not to be counted for or against 
 | Storage-engine cache: the compass only ever reads calm | the line is set far above the stack's own latencies (a 2 ms line over 0.15 to 0.45 ms reads) | set the line on the tuning workload's own figures so that a hit is calm and a full-cache miss is slow, and write the figures in the preregistration before any counted run |
 | Swarm: a cell reads "void" | two drones came within two collision radii in either arm | a task or simulator setting (keep-out, altitude stagger, depot spacing); fixed before any counted run and said in the preregistration |
 | Three-run table heads itself with a warning | a run's commit is not the engine it claims, or the three are not separate runs | run `tools/omni_version.py --commit <sha>` on each; make the table only from runs on one frozen engine |
-| Archive bot skips a run | the run was not finished when the bot passed | leave the id in `.github/archive_request.txt`; the next pass copies it |
+| Archive bot skips a run | the run was not finished when the bot passed, or the pass had taken its share of bytes | nothing to do: the next hourly pass copies it |
 
 
 ## Appendix F. Evidence Map

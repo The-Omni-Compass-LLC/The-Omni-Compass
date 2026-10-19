@@ -3007,8 +3007,9 @@ a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on G
    loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut out.
 8. **The raw files live with the code.** Every finished run's files (capture, response times, audit log, controller
    log, one SHA-256 manifest per repetition) are copied into `run-<id>/` on the branch `raw` by the `archive-run`
-   workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
-   every table names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
+   workflow: every hour, by itself, every finished run of every workflow that hands in files, failed runs included (a
+   run id in `.github/archive_request.txt` goes first; a run still going is left for a later pass), and every table
+   names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
    clone of it is small; `bash scripts/raw_archive.sh open /run-<id>/` places a run's files at `results/live/raw/run-<id>/`,
    the path every table names.
 
@@ -3831,7 +3832,7 @@ any one of the three can tell whether the files in front of them are the files t
 | The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
 | Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
 | The big organisms, detached | workflow `big-organism-detached`: `mode` start / collect / survey, `organisms`, `size`, `duration_s`, `commit`, `max_hours` |
-| Archive a finished run with the code | add its id to `.github/archive_request.txt` and push (workflow `archive-run`) |
+| Archive a finished run with the code | nothing to do: workflow `archive-run` takes it within the hour; to take it at once, add its id to `.github/archive_request.txt` and push |
 | Verify before a push, as GitHub runs it | `python3 tools/release_manifest.py` under Python 3.12: 0 FAIL |
 
 ## Appendix B - File Map
@@ -4051,7 +4052,7 @@ many pages it read, how many pods it started), not to be counted for or against 
 | Storage-engine cache: the compass only ever reads calm | the line is set far above the stack's own latencies (a 2 ms line over 0.15 to 0.45 ms reads) | set the line on the tuning workload's own figures so that a hit is calm and a full-cache miss is slow, and write the figures in the preregistration before any counted run |
 | Swarm: a cell reads "void" | two drones came within two collision radii in either arm | a task or simulator setting (keep-out, altitude stagger, depot spacing); fixed before any counted run and said in the preregistration |
 | Three-run table heads itself with a warning | a run's commit is not the engine it claims, or the three are not separate runs | run `tools/omni_version.py --commit <sha>` on each; make the table only from runs on one frozen engine |
-| Archive bot skips a run | the run was not finished when the bot passed | leave the id in `.github/archive_request.txt`; the next pass copies it |
+| Archive bot skips a run | the run was not finished when the bot passed, or the pass had taken its share of bytes | nothing to do: the next hourly pass copies it |
 
 ## Appendix F - Evidence Map
 
