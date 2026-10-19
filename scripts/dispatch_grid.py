@@ -626,10 +626,13 @@ def cloud_next(queue, started, reruns_left):
 def cloud_title(wf, kv):
     """The title a cloud workflow gives a run of these inputs (its run-name), so a started set is read back by it: what ran,
     the organism, the replica room, the dial, then the machine-family queue, the last two words (Azure: the region and the
-    machine size or 'pools'; Google: the zone and the machine type; Amazon: the region and the instance type)."""
+    machine size or 'pools'; Google: the zone and the machine type; Amazon: the region and the instance type). A set run to
+    the paid cap under the stopping rule (stop_looks; docs/K8S_COMPASS_PREREGISTRATION.md, 19 October) carries it in its
+    title, so its A, B and C are counted apart from the sets run at five repetitions before it."""
     what = f"burst {kv['load_steps']}" if kv.get("load_steps") else "steady"
     org = f" organism {kv['organism']} x{kv.get('organism_scale') or '1'}" if kv.get("organism") else ""
     room = f" replica room {kv['replica_ceiling']}" if kv.get("replica_ceiling") else ""
+    room += " to the cap, stopping rule" if kv.get("stop_looks") else ""   # a set run to the cap under the stopping rule counts on its own (19 October)
     dial = kv.get("dial") or "save"
     if wf == "gke-metered.yml":
         loc, fam = kv.get("zone") or "us-central1-a", kv.get("machine") or "e2-standard-2"
