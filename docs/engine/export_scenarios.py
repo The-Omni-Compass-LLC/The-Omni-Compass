@@ -229,6 +229,39 @@ def receipt_word(rd):
     return "shown"
 
 
+NUM = r"[-+\u2212]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"
+
+
+def even_reason(abc):
+    """Why an EVEN row is EVEN, read from its three runs' own cells (each 'change (low to high)', or a change alone): the
+    kind and the bound. 'same': every run reads zero with a zero-wide interval (Omni-Compass held it native); 'split': a run
+    is clear of zero but not all three the same way (EVEN by the three-run rule); else the largest change any run's interval
+    still allows: 'tight' within 2%, 'within' within 10%, 'wide' past 10% (too noisy to tell at these repetitions); a table
+    that prints no interval: 'changes', the largest change read."""
+    import re
+    f = lambda x: float(x.replace(",", "").replace("\u2212", "-"))
+    runs, pct = [], False
+    for c in abc:
+        if not c:
+            continue
+        m = re.match(rf"\s*({NUM})\s*(%?)\s*(?:[A-Za-z/]+\s*)?(?:\(({NUM})\s*to\s*({NUM})\))?", c)
+        if not m:
+            continue
+        pct = pct or bool(m.group(2))
+        runs.append((f(m.group(1)), f(m.group(3)) if m.group(3) else None, f(m.group(4)) if m.group(4) else None))
+    if not runs:
+        return {"kind": "unread", "bound": None, "pct": pct}
+    if all(ch == 0 and (lo in (None, 0) and hi in (None, 0)) for ch, lo, hi in runs):
+        return {"kind": "same", "bound": 0.0, "pct": pct}
+    if all(lo is not None for _, lo, _ in runs):
+        if any(lo > 0 or hi < 0 for _, lo, hi in runs):
+            return {"kind": "split", "bound": max(max(abs(lo), abs(hi)) for _, lo, hi in runs), "pct": pct}
+        b = max(max(abs(lo), abs(hi)) for _, lo, hi in runs)
+        kind = ("tight" if b <= 2 else "within" if b <= 10 else "wide") if pct else "within"
+        return {"kind": kind, "bound": b, "pct": pct}
+    return {"kind": "changes", "bound": max(abs(ch) for ch, _, _ in runs), "pct": pct}
+
+
 def receipt(name):
     """Every judged row of results/live/<name>.md as written: its table's heading, the gauge, runs A, B and C, the reading."""
     import re
@@ -258,8 +291,9 @@ def receipt(name):
     for obj in ("service", "resource"):
         if f"(the objective: {obj})" in text:
             title += f" (the verdict's objective: {obj})"
+    even = [{"s": r["s"], "g": r["g"], "abc": r["abc"], **even_reason(r["abc"])} for r in rows if r["w"] == "EVEN"]
     return {"file": f"results/live/{name}.md", "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown")],
-            "count": count}
+            "count": count, "even": even}
 
 
 def newest(name):

@@ -4,20 +4,39 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: archive-run
-# Copies the raw files of finished live runs (every artifact: capture CSV, response-time CSV, audit log, controller
-# log, SHA-256 manifest per repetition, and the aggregate) onto the branch raw as run-<id>/ (scripts/raw_archive.sh; opened,
-# the branch sits at results/live/raw/), so they live with the code and survive the artifact retention window, and main's
-# tree stays the code and the tables. The run ids are read from .github/archive_request.txt (one per line); pushing a
-# change to that file starts this workflow.
+# Copies the raw files of finished runs (every artifact: capture CSV, response-time CSV, audit log, controller log, SHA-256
+# manifest per repetition, and the aggregate) onto the branch raw as run-<id>/ (scripts/raw_archive.sh; opened, the branch
+# sits at results/live/raw/), so they live with the code and survive the artifact retention window, and main's tree stays
+# the code and the tables. Every hour it takes, by itself, every finished run (failed ones too: their files say why) of every
+# workflow that hands in raw files, from the moment the engine that stands landed (the founder's order of 19 October: a
+# run's files are his and belong in his repository, never left behind in GitHub's artifact store). Run ids listed in
+# .github/archive_request.txt (one per line) go first; pushing a change to that file starts a pass at once.
 on:
   push:
     paths: [".github/archive_request.txt"]
+  schedule:
+    - cron: "23 * * * *"
   workflow_dispatch:
 permissions:
   contents: write
   actions: read
+# one pass at a time; a pass waiting behind another is the same pass (GitHub keeps one waiting run per group)
+concurrency: {group: archive-run, cancel-in-progress: false}
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+  # every workflow whose runs hand in raw files (tests/test_archive_sweep.py: every workflow that uploads files is here, or
+  # among its reports and checks); a report or a check hands in no run of its own
+  ARCHIVE_WORKFLOWS: >-
+    aks-metered-full.yml aks-metered.yml benchmark-reps.yml benchmark.yml big-organism-detached.yml big-organism.yml
+    capacity.yml citylearn.yml cloud-organism.yml cpu-power.yml eks-metered.yml gke-metered.yml gpu-bench.yml kafka.yml
+    kind-addons.yml kind-cruisekube.yml kind-goldilocks.yml kwok-scale.yml lambda-gpu.yml live-kind-full.yml
+    live-kind-levers.yml live-kind.yml live-shadow.yml mujoco.yml pandapower.yml pgbench.yml quota-convey-trial.yml
+    realms-v5.yml realms.yml redis.yml restart-aks.yml robustness.yml six-kube-pool.yml six-kube.yml six-pool.yml six.yml
+    swarm.yml sysbench.yml ycsb.yml
+  ARCHIVE_SINCE: "2026-10-18T16:06:00Z"   # omni-v11 on main: every run on the engine that stands, and every run after it
+  # a pass stops starting runs once it has taken this much (artifact bytes as GitHub counts them), so the runner's disk
+  # always has room; the next pass, an hour later, goes on where it stopped
+  ARCHIVE_PASS_BYTES: "4000000000"
 jobs:
   archive:
     runs-on: ubuntu-24.04
@@ -32,20 +51,36 @@ jobs:
           sparse-checkout: |
             /*
             !/results/live/raw/*
-      - name: Copy every listed run's files
+      - name: Copy every finished run's files
         env: {GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # one run id per line (or separated by spaces); a run already archived is left as it is
-          for run in $(cat .github/archive_request.txt); do
-            d="results/live/raw/run-$run"
-            bash scripts/raw_archive.sh has "run-$run" && { echo "::notice::run $run is already archived"; continue; }
+          repo="${{ github.repository }}"
+          # the runs asked for by hand first, then every finished run of every listed workflow since ARCHIVE_SINCE, oldest
+          # first; a cancelled run handed in nothing
+          { tr ' ' '\n' < .github/archive_request.txt | grep -E '^[0-9]+$' || true
+            for wf in $ARCHIVE_WORKFLOWS; do
+              gh api --paginate "repos/$repo/actions/workflows/$wf/runs?status=completed&created=>=$ARCHIVE_SINCE&per_page=100" \
+                --jq '.workflow_runs[] | select(.conclusion != "cancelled" and .conclusion != "skipped") | .id' \
+                || echo "::warning::$wf: its runs could not be listed; the next pass lists them again" >&2
+            done | sort -n; } | awk '!seen[$0]++' > runs.txt
+          # the branch raw's tree is read once (nothing downloaded); a run counts as archived when the branch holds its folder
+          bash scripts/raw_archive.sh has run-0 || true
+          took=0; done_n=0; left=0
+          while read -r run; do
+            git cat-file -e "refs/remotes/origin/raw:run-$run" 2>/dev/null && continue
             # only a finished run is copied: a run still going would leave a part of its files here, and the part would
             # then be taken for the whole (the directory is never touched again once it exists)
-            state=$(gh run view "$run" -R "${{ github.repository }}" --json status,conclusion -q '.status + " " + .conclusion')
+            state=$(gh run view "$run" -R "$repo" --json status,conclusion -q '.status + " " + .conclusion') || state="unread"
             case "$state" in completed*) ;; *) echo "::warning::run $run is not finished ($state): left for a later pass"; continue;; esac
-            gh run download "$run" -R "${{ github.repository }}" -D "$d" || { echo "::warning::run $run: no files to copy"; continue; }
+            bytes=$(gh api --paginate "repos/$repo/actions/runs/$run/artifacts?per_page=100" \
+              --jq '.artifacts[] | select(.expired | not) | .size_in_bytes' | awk '{s += $1} END {print s + 0}') || bytes=0
+            [ "$bytes" -gt 0 ] || { echo "::notice::run $run handed in no files"; continue; }
+            if [ "$took" -gt 0 ] && [ $((took + bytes)) -gt "$ARCHIVE_PASS_BYTES" ]; then left=$((left + 1)); continue; fi
+            [ "$bytes" -lt 1800000000 ] || echo "::warning::run $run hands in $bytes bytes: near GitHub's 2 GB push limit"
+            d="results/live/raw/run-$run"
+            gh run download "$run" -R "$repo" -D "$d" || { echo "::warning::run $run: its files could not be copied; the next pass tries again"; rm -rf "$d"; continue; }
             # GitHub refuses a file over 100 MB: a raw file over 50 MB (the 1,000-copy organism records) is stored
             # gzipped (-n: the same bytes every time). Its repetition's SHA256SUMS.txt still holds the original's hash;
             # check it with: gunzip -c FILE.gz | sha256sum
@@ -57,9 +92,13 @@ jobs:
             find "$d" -type f -size +1M \( -name '*.raw' -o -name 'requests.log' -o -name 'consumer-*.log' \) -exec gzip -n -9 {} \;
             ( cd "$d" && find . -type f ! -name SHA256SUMS_ALL.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS_ALL.txt )
             # onto the branch raw, built on its newest tip (another job's save never conflicts with this one)
-            bash scripts/raw_archive.sh save "run-$run" "Raw files of live run $run archived with the code"
+            bash scripts/raw_archive.sh save "run-$run" "Raw files of run $run archived with the code" \
+              || { echo "::warning::run $run could not be saved; the next pass tries again"; rm -rf "$d"; continue; }
             echo "::notice::run $run archived: $(find "$d" -type f | wc -l) files"
-          done
+            rm -rf "$d"                                # its files are on the branch; the runner's disk is freed for the next
+            took=$((took + bytes)); done_n=$((done_n + 1))
+          done < runs.txt
+          echo "Archived this pass: $done_n runs, $((took / 1048576)) MB; left for the next pass: $left" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,36 @@
+# The capacity test, native and Omni-Compass on top at the same resource cap: the A/B/C three-run table (Omni v10)
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+<!-- how to read this receipt (tools/readings.py) -->
+**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss; work bought with each unit of a resource (work per energy) that fell is power given too. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+<!-- end: how to read this receipt -->
+
+Three separate GitHub runs of the same preregistered test on the same engine: A is the result, B and C are the replications. The cap is a quota on the served app's CPU, the same in both arms and enforced by the cluster; the load rises step by step past what the cap can serve. Each cell is omni against native at one cap, the paired change with its 95% interval (completed work in percent of native; capacity in requests a second). Every judged row gets one of three readings. **GAIN** or **LOSS in all three of our runs**: all three runs move the same way and every interval is clear of zero; completed work and capacity are work done, so more is GAIN and less is LOSS. **EVEN, no difference beyond the noise**: in the runs counted, the interval includes zero; that is the result. **The runs disagree**: runs clear of the noise point different ways. Every row is shown, LOSS included. Evidence class **L** (the real thing: a real Kubernetes cluster, real requests, every answer counted).
+
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+| Run | GitHub run | Label | Commit | Engine | Pairs per cap |
+|---|---|---|---|---|---:|
+| A | 39106193581 | A | `0454fdb0089f` | omni-v10 (digest 4bf39b0d707784de, 47 files) | 5 |
+| B | 39113190657 | A | `3b9fc76017ad` | omni-v10 (digest 4bf39b0d707784de, 47 files) | 5 |
+| C | 39120452371 | A | `faaaff3142e1` | omni-v10 (digest 4bf39b0d707784de, 47 files) | 5 |
+
+| Cap (cores) | Measure | A | B | C | Reading |
+|---:|---|---|---|---|---|
+| 1 | completed work (requests answered within the line over the window) | +1.0% (-4.0 to +5.9) | -0.3% (-12.5 to +11.9) | +4.8% (-11.3 to +20.8) | EVEN, no difference beyond the noise (all three runs) |
+| 1 | work inside the response line (requests a second; the capacity test's own gauge) | +0.80 req/s (-0.56 to +2.16) | +0.40 req/s (-1.68 to +2.48) | +0.40 req/s (-0.71 to +1.51) | EVEN, no difference beyond the noise (all three runs) |
+| 1.5 | completed work (requests answered within the line over the window) | +0.9% (-5.6 to +7.3) | +7.8% (-6.9 to +22.5) | +0.5% (-5.9 to +6.8) | EVEN, no difference beyond the noise (all three runs) |
+| 1.5 | work inside the response line (requests a second; the capacity test's own gauge) | +0.00 req/s (-1.76 to +1.76) | +0.40 req/s (-1.68 to +2.48) | -2.00 req/s (-3.76 to -0.24) | EVEN, no difference beyond the noise (2 of 3 runs) |
+| 2 | completed work (requests answered within the line over the window) | -0.5% (-5.3 to +4.3) | +1.1% (-3.6 to +5.8) | -0.5% (-3.8 to +2.7) | EVEN, no difference beyond the noise (all three runs) |
+| 2 | work inside the response line (requests a second; the capacity test's own gauge) | +0.00 req/s (+0.00 to +0.00) | -0.40 req/s (-1.51 to +0.71) | -0.40 req/s (-1.51 to +0.71) | EVEN, no difference beyond the noise (all three runs) |
+| 3 | completed work (requests answered within the line over the window) | -0.2% (-0.9 to +0.5) | +0.0% (-0.4 to +0.4) | +0.5% (-1.9 to +3.0) | EVEN, no difference beyond the noise (all three runs) |
+| 3 | work inside the response line (requests a second; the capacity test's own gauge) | +0.00 req/s (+0.00 to +0.00) | +0.00 req/s (+0.00 to +0.00) | -0.80 req/s (-2.16 to +0.56) | EVEN, no difference beyond the noise (all three runs) |
+
+Readings: 1 EVEN, no difference beyond the noise (2 of 3 runs), 7 EVEN, no difference beyond the noise (all three runs).
+
+How to read it: where the cap holds native back, a higher count for Omni-Compass on top at the same cap is more work from the same capacity, a GAIN; where neither arm can do more under the cap, the rows read EVEN, no difference beyond the noise, and that is the result. Each run's own table, with its audit lines and what each step up in the cap gives each arm: `CAPACITY.md` in its archived folder.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
