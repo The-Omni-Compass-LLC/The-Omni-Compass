@@ -98,6 +98,7 @@ def github_runs() -> list:
 LEDGER = {"aks-metered.yml": "Azure", "gke-metered.yml": "Google Cloud", "eks-metered.yml": "Amazon Web Services",
           "cloud-check.yml": "the $0 cloud check", "lambda-gpu.yml": "the GPU on Lambda", "cpu-power.yml": "the CPU package"}
 LEDGER_CACHE = HERE / "github_ledger.json"
+REPO = "The-Omni-Compass-LLC/The-Omni-Compass"
 LEDGER_GAUGES = ["machines billed, machine-hours", "compute bill at list price ($)", "worker nodes in service, mean", "response time (ms), 95th percentile",
                  "failed requests (%)", "time over the response line (% of samples)"]
 
@@ -124,7 +125,10 @@ def ledger() -> dict:
         if got:
             data = {"read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                     "source": "GitHub Actions, workflow_dispatch runs of each workflow, newest first", "workflows": got}
-            LEDGER_CACHE.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
+            # kept for a build without a token; GitHub's own rebuild reads the list fresh every time and commits only the page,
+            # so it never rewrites the cache (19 October: the rewritten cache, left uncommitted, stopped the job's push)
+            if os.environ.get("GITHUB_ACTIONS") != "true":
+                LEDGER_CACHE.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
     if data is None and LEDGER_CACHE.exists():
         data = json.loads(LEDGER_CACHE.read_text(encoding="utf-8"))
     if data is None:
@@ -145,7 +149,26 @@ def ledger() -> dict:
                 m = re.search(r"(omni-v\d+) \(digest", out)
                 eng[r["sha"]] = m.group(1) if m else None
             r["engine"] = eng[r["sha"]]
-            r["raw"] = f"run-{r['id']}" in raw
+            r["raw"] = any(f"run-{r['id']}" in x for x in raw)
+            if wf in ("aks-metered.yml", "gke-metered.yml", "eks-metered.yml") and r["status"] != "completed" and shutil.which("gh"):
+                # a cloud set runs its repetitions one at a time, and GitHub lists the whole run as queued while it does: its
+                # jobs say where it is (the repetitions measured to the end, the one running, how many it may take)
+                jobs, page = [], 1
+                while page < 5:
+                    got = subprocess.run(["gh", "api", f"repos/{REPO}/actions/runs/{r['id']}/jobs?filter=latest&per_page=100&page={page}"],
+                                         capture_output=True, text=True, cwd=ROOT)
+                    try:
+                        js = json.loads(got.stdout or "{}").get("jobs") or []
+                    except json.JSONDecodeError:
+                        break
+                    jobs += js
+                    if len(js) < 100:
+                        break
+                    page += 1
+                reps = [j for j in jobs if re.match(r"run \(\d+\)$", j.get("name") or "")]
+                if reps:
+                    r["progress"] = {"total": len(reps), "done": sum(j["status"] == "completed" and j["conclusion"] == "success" for j in reps),
+                                     "running": sum(j["status"] == "in_progress" for j in reps)}
             if wf == "aks-metered.yml" and r["raw"] and r["conclusion"] == "success":   # the bill as the run's own LIVE_REPS.json reads it
                 src = f"{ref}:{pre}run-{r['id']}/live-reps-aks/LIVE_REPS.json"
                 try:
@@ -156,6 +179,12 @@ def ledger() -> dict:
                 if arm:
                     r["result"] = {"reps": len((lr.get("repetitions") or {}).get("native") or []),
                                    "gauges": {g: {k: arm[g].get(k) for k in ("native", "omni", "ci95", "significant")} for g in LEDGER_GAUGES if g in arm}}
+    # the page shows the runs on omni-v8 and newer, each with its engine; the earlier engines' runs stay in GitHub's own list
+    # and in docs/history (the founder's order of 19 October: no version 7 on the page)
+    def recent(r):
+        m = re.match(r"omni-v(\d+)$", r.get("engine") or "")
+        return bool(m) and int(m.group(1)) >= 8
+    data["workflows"] = {wf: [r for r in rs if recent(r)] for wf, rs in data["workflows"].items()}
     queues = {}
     for wf, f in (("aks-metered.yml", "azure_queue.txt"), ("gke-metered.yml", "google_queue.txt"), ("eks-metered.yml", "amazon_queue.txt")):
         q = ROOT / "scripts" / f

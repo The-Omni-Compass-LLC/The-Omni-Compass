@@ -287,6 +287,21 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "levels.py"), "--check"], capture_output=True, text=True)
     check("every level on one page: docs/LEVELS.md is rebuilt from the tables it reads (tools/levels.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "power.py"), "--check"], capture_output=True, text=True)
+    check("every judged row's minimum detectable effect: docs/POWER.md is rebuilt from the tables it reads (tools/power.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "deviations.py"), "--check"], capture_output=True, text=True)
+    check("every change to a preregistration is in the register: docs/DEVIATIONS.md (tools/deviations.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "engine_coverage.py"), "--check"], capture_output=True, text=True)
+    check("how much of the engine the tests run: docs/ENGINE_COVERAGE.md is what its record gives (tools/engine_coverage.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "sbom.py"), "--check"], capture_output=True, text=True)
+    check("the bill of materials and every dependency's license are what the lock gives (tools/sbom.py; no strong copyleft)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "reproduce.py"), "--check-recipes"], capture_output=True, text=True)
+    check("every table of the engine that stands has the recipe it is rebuilt from (tools/reproduce.py; reproduce.yml rebuilds "
+          "them all and compares them byte for byte)", r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
     # GitHub refuses a workflow file that does not parse and never runs it; it records only a failed run named after the file,
     # which no local test saw for ten pushes on 10 October 2026 (an unquoted colon in a step name). Every workflow is parsed here.
     import yaml

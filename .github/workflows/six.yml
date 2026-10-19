@@ -44,7 +44,7 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: {sparse-checkout: "scripts\nresults/grid_v11\ntools\nrealms\nomnicompass\nomni_controller"}
       - name: Start every square of the modelled grid not yet started
         env: {GITHUB_TOKEN: "${{ github.token }}"}
@@ -59,7 +59,7 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: {sparse-checkout: scripts}
       - id: p
         env:
@@ -86,14 +86,14 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4      # only the code the run needs: the whole tree (82,000 result files) took 16 minutes
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4: only the code the run needs: the whole tree (82,000 result files) took 16 minutes
         with: {sparse-checkout: "realms\ntools\nomnicompass\nomni_controller"}
       - name: Engine and source receipt
         run: |
           set -euo pipefail
           git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
           python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
       - name: The runs (each kept as it finishes; none started past the deadline)
@@ -182,7 +182,7 @@ jobs:
           
           if __name__ == '__main__':
               main()
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with: {name: "part-${{ matrix.org }}-${{ matrix.first }}", path: "${{ steps.omni_legal_export_1.outputs.paths }}", if-no-files-found: warn}
       - name: Legal notice at the end of this job's report
@@ -195,12 +195,12 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: {sparse-checkout: "realms\ntools\nomnicompass\nomni_controller"}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with: {python-version: "3.12"}
       - run: pip install -r requirements.txt
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with: {path: parts, pattern: "part-*"}
       - run: python3 tools/pool_scale.py SIX.md "parts/*/SCALE.json" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Attach README, licenses and disclosures to this artifact
@@ -281,11 +281,11 @@ jobs:
           
           if __name__ == '__main__':
               main()
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: {name: six-receipts, path: "${{ steps.omni_legal_export_2.outputs.paths }}"}
       - name: Legal files beside the files this run hands out
         if: always()
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: _legal
           sparse-checkout-cone-mode: false
@@ -298,7 +298,7 @@ jobs:
             TRADEMARKS.md
       - name: Legal notice handed out with this run's files
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: legal-notice
           overwrite: true
