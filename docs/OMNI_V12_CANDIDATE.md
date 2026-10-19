@@ -72,8 +72,16 @@ Tests: `tests/test_verdict_upper.py`, on the study branch.
 
 ## 4. The toy gate against omni-v11
 
-The cluster toys (a decision every 60 s and every 15 s, and the blink toy) of the whole candidate against omni-v11 are
-running; their reading is written here and in `results/toy_gate/V12_VS_V11.md` before the candidate goes any further.
+`results/toy_gate/V12_VS_V11.md` (seeds 1 to 8; the cluster toys at 60 s and 15 s and with the blink, the three convey toys and
+the verdict toy at 20 and 200 pieces of work a decision): the two-fix candidate reads **identical to omni-v11 on every gauge of
+every toy but one**, the convey toy whose every raise is refused, where it writes 49.75 commands a day against 1,985.5 (−97.5%,
+GAIN). No reading of the candidate against omni-v11 is a LOSS. The standing engine's own readings against native in these toys
+are omni-v11's and unchanged by the candidate. The same record shows, under each cluster table, the candidate as first pushed
+with the verdict's upper end: identical to native, no give-back trial started (section 3).
+
+What landing needs, once the founder says "land v12": `tools/land_engine.py v12 --since <UTC>` (the fingerprint, the version
+list, the conductor's campaign, the package 0.12.0), `docs/OMNI_V12.md` from this page, the words on every page that names the
+engine, both manuals rebuilt, the release manifest at 0 FAIL, and every benchmark run again on it, A, B and C.
 
 ---
 
