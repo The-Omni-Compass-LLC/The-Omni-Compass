@@ -2,6 +2,44 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19: The robustness tables on omni-v11, no LOSS; the governor's gauges for Prometheus and Grafana; the receipts page on the newest tables; the cost to match runs again
+
+- **The kill test and the long run on omni-v11** (`results/live/V11_ROBUST_KILL.md`, `V11_ROBUST_LONG.md`, each with its recipe
+  in `results/live/RECIPES.json`). The counted runs of each are the first three on commits carrying the kind rig's pre-puller;
+  the earlier omni-v11 runs are kept on `raw`, and the three earlier kill runs read no LOSS either. The kill test: every setting
+  back at the operator's 8 to 11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one, the 120 s
+  after the kill EVEN, five service rows GAIN in all three runs, replicas +3% to +6% power given. The long run: memory up 2.3% at
+  most, 97.5% of the expected decisions, none failed, no slowing, everything handed back; three rows GAIN, replicas +49% to
+  +52% power given. With the three data stores at the max that landed the same evening (`V11_PGBENCH_SERVICE.md`,
+  `V11_SYSBENCH_SERVICE.md`, `V11_YCSB_SERVICE.md`: no LOSS, no single-run tail rise), 23 omni-v11 tables, 1,039 judged rows,
+  0 LOSS.
+- **The kill test's 99th percentile, read to the repetition.** It rose 25% in run A and fell in B and C (EVEN). In nine of run
+  A's ten repetitions both arms read the probe's 10-second timeout; in the fifth the omni arm's slowest answers reached 9.2 s 140
+  to 190 s after the kill, with every setting already handed back to native's, both arms at the HPA's cap of ten replicas, the
+  runner's processor 100% busy for 70 s and the second governor started 50 s before on the same four cores: the likely cause,
+  not proven, written in the preregistration's "On omni-v11" and `docs/TAIL_LATENCY.md`. The after-kill window widened to 300 s
+  goes on the next version's list.
+- **The governor's gauges** (`tools/omni_exporter.py`, `tests/test_omni_exporter.py`, `deploy/grafana/omni-compass.json`; the
+  Operator's Manual, section 22.2): its audit served to Prometheus at `/metrics`, read-only, with a ready Grafana screen. Read on
+  the omni-v11 long run's audit it showed the brain's recommended power cap switching between two values at 40 of its 41 moves
+  (not written on Kubernetes, where the power wire is off); a band on that gate goes on the next version's list, to be read on
+  the card's replay before any chip run (`docs/CHANGE_CONTROL.md`).
+- **How steadily the governor steers** (`tools/steering.py`, `results/STEERING.md`): every omni-v11 Kubernetes table's omni
+  arms read for their decisions, writes, moves and reversals an hour, shown and not judged. It found a fault: in the capacity
+  test the governor's role cannot read the namespace's quota, so admission is the authority (as written), and admission refused
+  every CPU-limit raise while the governor wrote it again at every fast check, about 970 to 1,000 writes an hour against 17 to
+  214 in every other test. Nothing changed on the service (the table reads EVEN), but a refused write repeated forever is
+  hammering. A refused raise held until the quota or the pod changes (an engine rule, `omni_controller/muscles.py`) and the
+  rig's governor role reading the quotas go on the next version's list.
+- **The receipts page** (`docs/THE_RECEIPTS.md`) had stayed on omni-v7's tables; every row now reads each test's newest table,
+  its engine named, the swarm's fault and the robustness tables included.
+- **The cost to match** (native tuned harder by its operator to HPA targets 40, 30 and 20, beside Omni-Compass on top) had run
+  once, on 3 October, on an engine long gone (`results/live/COST_TO_MATCH.md`: no native setting reached Omni-Compass's 95th
+  percentile). It goes into the campaign as a block of its own (`scripts/reruns.txt`), A, B and C on omni-v11, so whether native
+  is as good as it can be is answered on the engine that stands.
+- **What a buyer will ask for that is not here yet** (the founder's question of 19 October): written in the grades page's
+  blueprint, proof, gauges and the operator's screen, each with what closes it.
+
 ## 2026-10-19: The conductor counts only the jobs a run can start; the verdict's allowance rule goes on the next version's list
 
 - **The conductor** (`scripts/dispatch_grid.py`, found by the live-engine session). A 100-repetition Azure set runs one

@@ -146,8 +146,8 @@ zero in one district. An earlier engine's LOSS stays in its own table, for examp
 wholly above zero with probability 0.025 and wholly below with 0.025. A row reads GAIN or LOSS only when all three
 independent runs fall on the same side, so its chance of a false reading is 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over a table of 30
 judged rows the chance that any one is false is at most 30 × 3.1 × 10⁻⁵ ≈ 0.09% (a union bound, as Bonferroni's), and over
-the 613 judged rows of the omni-v11 tables that carry noise (854 judged rows in 18 tables, less the 241 of the deterministic
-simulators) the expected number of false readings is 613 × 3.1 × 10⁻⁵ ≈ 0.02. The
+the 798 judged rows of the omni-v11 tables that carry noise (1,039 judged rows in 23 tables, less the 241 of the deterministic
+simulators) the expected number of false readings is 798 × 3.1 × 10⁻⁵ ≈ 0.02. The
 bound assumes the three runs independent; runs on the same kind of machine can share a bias, which three runs cannot
 remove and the bound does not cover. The price of the rule is power: a small true difference must clear the noise three
 times, so many EVEN rows are differences too small for a run's pairs to resolve (with 3 pairs a run, t = 4.303 and the
@@ -174,7 +174,7 @@ PyBullet does not reproduce to the bit across machines; its amendment says so.
 
 `V3_OWN_COST.md` is Omni-Compass's own CPU, from the `overhead` record every omni arm's audit carries, by organism and
 copies, under the engine each run carried; it is shown and not judged, and it is a few thousandths of one core at every
-size. The robustness tables (`results/live/V3_ROBUST_KILL.md`, `V7_ROBUST_LONG.md`, and the newest engine's when they land) add rows that belong to the omni
+size. The robustness tables (`results/live/V11_ROBUST_KILL.md` and `V11_ROBUST_LONG.md` on the engine that stands; each earlier engine's are its own record) add rows that belong to the omni
 arm alone, since native has no governor to kill: the seconds from the kill until every setting was back at the operator's
 (the allowance is 60 s, declared before the run), whether a second governor started and governed to the end, and the
 governor's memory in the last ten minutes over the first ten (a quarter's growth is a leak, declared before the run); the
