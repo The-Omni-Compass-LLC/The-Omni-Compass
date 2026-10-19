@@ -114,6 +114,23 @@ thousand** (`tools/swarm_abc.py`, `REPRO_REL`), the readings stay by the sign of
 timing and its reason are stated here and in the table. Nothing in the task, the omni rule or the gauges changes; the runs
 are not rerun.
 
+## Amendment 2 (2026-10-19, before omni-v12's runs; written after the omni-v11 runs and the reflex study were seen, and said so)
+
+On a mission draw outside the counted cells the omni-v11 wire let two drones collide where native flew the same draw with
+none (`results/toy_gate/V12_SWARM_REFLEX.md`): a collision voided the cell under the rule above, so a collision Omni-Compass
+caused could only ever be read as a void cell, and a fixed set of seeds could not show it at all. From omni-v12's runs on,
+two readings change, nothing else:
+
+- **A judged collision row.** Control ticks with two drones under two collision radii are a judged gauge, any increase
+  marked: a collision with Omni-Compass on top where native has none reads **LOSS**. A cell is void only when native itself
+  collides (its task unsafe before Omni-Compass touches it). `tools/run_swarm.py` (`COLLISIONS`) and `tools/swarm_abc.py`
+  apply it to runs on omni-v12 and later; the earlier tables are rebuilt as they were scored.
+- **Draws never flown.** The three untouched swarms run also on fresh mission draws, the cell's seed plus 303 (**short-314**,
+  **mixed-315**, **long-316**), counted beside the first three. No wire was ever run on them: the reflex study used the seed
+  plus 101 and 202.
+
+The omni rule, its guards, the energy model and every other gauge stay as above.
+
 ## What the tuning swarm showed, said before the counted runs
 
 On one machine, five drones, four missions each: a faster mission is cheaper (498 J at the planner's cruise, 446 J at
