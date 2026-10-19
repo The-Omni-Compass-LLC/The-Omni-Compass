@@ -94,10 +94,12 @@ that names another engine than `tools/omni_version.py` reads.
    lies wholly above zero. Where the cost carries no noise (the GPU card's model) it refuses a step costing +0.14% a
    request, well inside the 2% allowance, so the card never leaves native at the tune-down and the recorded +3.4%
    requests per kJ (`results/sim/gpu_two_wire`, written under omni-v6's medians) does not stand on omni-v7, omni-v8, omni-v9, omni-v10 or omni-v11. Where the
-   cost is noisy (σ 0.25 of log response time, the load swinging, 200 requests a side as the Kubernetes controller
-   measures) a step costing +3% passes about a quarter of the time and +5% about one time in twenty; on a steady day
-   (σ 0.05) +3% never passes. The page's verdict lab now opens wired as the controller is (200 requests) on the measured
-   noise; it opened at 30 requests and σ 0.25 before, which read the engine weaker than it is wired. Any change to the
+   cost is noisy (σ 0.46 of log response time on the Google 2011 day and 0.43 with the load swinging, measured on 19
+   October inside each window of 200 requests of the omni-v10 runs' latency.csv; the omni-v7 runs read 0.45 and 0.42;
+   the σ 0.05 and 0.25 written here before did not come from those files and are withdrawn), with 200 requests a side
+   as the Kubernetes controller measures, a step costing +3% passes about 31% of the time (the medians alone: 45%),
+   +5% about 15% and +10% about 1%, while a free step is kept about 59% of the time (2,000 modelled trials each, class S).
+   The page's verdict lab opens on that measured noise. Any change to the
    rule is the next engine version, the owner's to order.
 6. **CityLearn carries the only LOSS rows of the omni-v7 tables; omni-v8, omni-v9 and omni-v10 are its repair, carried unchanged by omni-v11 (outage buildings' batteries left native; the wire reads the coming hour), proven in our own CityLearn runs, their three runs on GitHub queued.** In 7 of its 10 battery districts (the small challenge districts)
    the energy not served and the time uncomfortable read LOSS (13 rows, the 2023 districts, the only ones that simulate
