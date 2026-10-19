@@ -318,64 +318,9 @@ def fleet() -> dict:
             disp = len(json.loads(stand.read_text(encoding="utf-8")).get("dispatches", []))
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
     out["register"] = register_places()
-    out["card"] = card_record()
-    out["toy"] = toy_record()
     import brain_off   # what the brain's six-state equations change in the governor's decisions (class S, the fleet model)
     out["brain_off"] = brain_off.compare()
     return _clean(out)
-
-
-def card_record():
-    """The newest real card run in the repository (results/gpu/run-*/GPU_REPS.json, metered by the card itself, class P):
-    its card, its date, its repetitions, the controller commit it froze and the engine that commit stands on
-    (tools/omni_version.py --commit), and every gauge's paired difference with its 95% interval, as the run's own file
-    holds them."""
-    runs = sorted((ROOT / "results" / "gpu").glob("run-*/GPU_REPS.json"))
-    if not runs:
-        return None
-    d = json.loads(runs[-1].read_text(encoding="utf-8"))
-    rc, fr = d.get("receipt", {}), d.get("freeze", {})
-    rows = [{"g": g, "n": v.get("native"), "o": v.get("omni"), "lo": (v.get("ci95") or [None, None])[0], "hi": (v.get("ci95") or [None, None])[1]}
-            for g, v in (d.get("paired", {}).get("omni") or {}).items() if isinstance(v, dict)]
-    stamp = runs[-1].parent.name.replace("run-", "")
-    out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", fr.get("commit") or "HEAD"],
-                         capture_output=True, text=True, cwd=ROOT).stdout
-    m = re.search(r"(omni-v\d+) \(digest", out)
-    env = rc.get("envelope") or {}
-    return {"file": str(runs[-1].relative_to(ROOT)), "card": rc.get("gpu_name"), "reps": rc.get("reps"), "seconds": rc.get("duration_s"),
-            "limit_w": rc.get("power_limit_default_w"), "commit": (fr.get("commit") or "")[:12], "engine": m.group(1) if m else None,
-            "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows,
-            "envelope_w": [env.get("power_min_w"), env.get("power_max_w")] if env else None,
-            "p95_guard_held": (d.get("headline") or {}).get("guardrail_p95")}
-
-
-def toy_record():
-    """The toy gate that let the engine that stands through (results/toy_gate/V<n>_VS_V<n-1>.json, our own models, class
-    S): every toy's every gauge, the engine that stands against native, with its word as the gate read it, and the
-    verdict's keep rate at each true cost. A model's reading says where the engine may fall short before a real run, never
-    what a benchmark found."""
-    n = int(engine()[0].rsplit("v", 1)[-1])
-    f = ROOT / "results" / "toy_gate" / f"V{n}_VS_V{n - 1}.json"
-    if not f.exists():
-        found = sorted((ROOT / "results" / "toy_gate").glob("V*_VS_V*.json"), key=lambda q: int(re.match(r"V(\d+)", q.name).group(1)))
-        if not found:
-            return None
-        f = found[-1]
-    d = json.loads(f.read_text(encoding="utf-8"))
-    toys = {}
-    for name, t in (d.get("toys") or {}).items():
-        rows = []
-        for g, v in (t.get("gauges") or {}).items():
-            if not isinstance(v, dict) or "native" not in v:
-                continue
-            cv = v.get("cand_vs_native") or {}
-            rows.append({"g": g, "native": v.get("native"), "omni": v.get("cand"), "rel": cv.get("relative"),
-                         "ci": cv.get("ci95"), "word": cv.get("word")})
-        if rows:
-            toys[name] = {"period_s": t.get("period_s"), "rows": rows}
-    vd = (d.get("toys") or {}).get("verdict") or {}
-    return _clean({"file": str(f.relative_to(ROOT)), "seeds": len(d.get("seeds") or []), "days": d.get("days"), "toys": toys,
-                   "verdict_keep": vd.get("cand")})
 
 
 def register_places() -> list:
