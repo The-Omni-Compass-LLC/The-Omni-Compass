@@ -2,6 +2,29 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19: The conductor counts only the jobs a run can start; the verdict's allowance rule goes on the next version's list
+
+- **The conductor** (`scripts/dispatch_grid.py`, found by the live-engine session). A 100-repetition Azure set runs one
+  repetition at a time (max-parallel 1), and GitHub lists its other 99 jobs as queued for hours. The conductor counted them as
+  the repository's queue, so it held back every grid start behind them. A run's queued jobs now count only up to the slots its
+  own max-parallel leaves free (`max_parallel`). `tests/test_release_campaign.py` covers it. Writing that test found a second
+  fault in the same reader: it read a run's job list page after page until a page came back short, so a list that kept
+  answering full pages was read forever (the test's first version did exactly that and filled the memory). The reader now
+  stops at ten pages, more than the 256 jobs a run can hold, and a test holds it there.
+- **The release manifest** (`RELEASE_MANIFEST.json`) is written again. The supply-chain commit of 19 October pinned every
+  workflow's actions and the manifest was not rewritten after those edits, so GitHub's verify failed on 4d06bf58 and 0bc4e62d
+  (`release manifest: ... changed since the manifest`, every pinned workflow named).
+- **The verdict** (`omnicompass/verdict.py`, the same session's finding, read in the code). A step is kept when its estimated
+  cost is within the 2% allowance, even when the upper end of its 95% interval reaches past it. At the noise measured on the
+  omni-v10 tables, a give-back that truly costs 3% would be kept about 31% of the time. No table read a LOSS from it. The fix is
+  an engine rule: a step is kept only when the interval's upper end is inside the allowance, with a trial that could not be read
+  in its time never started. It goes on the next version's list with its price, said before any run: some data-store GAIN
+  rows may read EVEN, because there the muscle stays native (`docs/CHANGE_CONTROL.md`). Nothing in the engine changes here.
+- **The founder's order, written down** (`CLAUDE.md`, Orders of 19 October; `AGENTS.md`, for any other agent): nothing is
+  forced but the mechanism. No number is tuned to make a row read well; the code is made to do what its rule says and the
+  wire is fastened right, and the runs say what it does. Every fix on the next version's list is of that kind: the swarm's
+  reflex acting when its own rule says, the verdict judging by its interval, the Redis harness measuring as a deployment runs.
+
 ## 2026-10-19: The Redis 99th percentile, root-caused: the harness puts the brain inside the load generator
 
 - **The question** (the founder's, 19 October): why the 95th and 99th percentiles show red on the live page. No tail row
