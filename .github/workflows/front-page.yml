@@ -58,8 +58,8 @@ jobs:
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
       - name: Archive the finished run with the code
-        # a live product's successful run, or a run named by hand; every other benchmark's files stay in its own artifacts
-        # (or are archived on request through .github/archive_request.txt), so the repository does not outgrow GitHub
+        # a live product's successful run, or a run named by hand, at once (its tables are rebuilt from it in this job); every
+        # other finished run is taken onto the branch raw within the hour by archive-run.yml
         if: >-
           github.event_name == 'workflow_dispatch' ||
           (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' &&

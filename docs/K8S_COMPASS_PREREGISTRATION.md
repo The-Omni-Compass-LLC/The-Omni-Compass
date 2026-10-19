@@ -1294,6 +1294,42 @@ of native's (the median half-width of its 95% interval, 1.5% to 36% run to run),
   5 repetitions (run 39162654399, finished 2026-10-19 01:46 UTC) and any set started before this landed stay as they ran,
   their own record; a set's three-run table pools only runs of one design and one engine.
 
+## Amendment (2026-10-19): a worker held by an add-on's own mark while it serves is in service
+
+Three native repetitions of the omni-v11 CruiseKube test were refused for "no machine in service" while the service answered
+every probe: run 39171059299, repetitions 5 and 10, and run 39175670991, repetition 2. Each refused window's capture
+(`capture.csv.errors`) records the same cluster:
+- every node Ready, the control plane included;
+- every node marked `cruisekube.truefoundry.com/overloaded:NoSchedule`. CruiseKube 0.3.4 puts this mark on a node it judges
+  overloaded, so the scheduler sends that node no new pod; the pods already on it keep running.
+
+The recorder (`fleet/capture/kube_capture.sh`, `ACTIVE_ONLY=1`) took any NoSchedule mark as a machine out of service. It read
+0 machines, and the window was refused under the amendment of 18 October. The add-on's own mark is a scheduling hint, not a
+machine leaving service. The recorder now counts a node in service when any one of these holds:
+- it is open to new work;
+- it is closed (cordoned, or marked idle by the governor) and still carries work that is not a DaemonSet's;
+- it is Ready and carries such work, and its only marks are NoSchedule marks that are not Kubernetes' own.
+
+Kubernetes' own marks still take a node out of service: `node.kubernetes.io/*` (unreachable, not ready, under pressure) and
+the control plane's role mark `node-role.kubernetes.io/*`. Any NoExecute mark does too, and so does a node that carries no
+such work. The power capture (`scripts/kind_power.sh`) already counted such a worker as active, so both captures now agree.
+`tests/test_capture_in_service.py` runs the recorder on the cluster as the refused repetitions saw it: before this amendment
+it read (0, 0), now (2, 2). The test also checks what still takes a machine out of service, and that the governor's own marks
+read as before.
+
+- **Unchanged.** The same rule holds in both arms. A window with truly no machine in service is still refused in either arm.
+  Every setting, gauge, load, window and pair is unchanged, and no engine file changes.
+- **Earlier runs.** Windows refused before this amendment stay refused. The CruiseKube tables of earlier runs stand as their
+  own record. Where the add-on marked some workers, those runs' machine counts may read low in either arm: a stated threat to
+  their validity. Repetition 8 of the omni-v10 run 39120444653 (the cause behind omni-v11) ran before the capture recorded
+  marks, so its own files cannot say whether the same mark caused it; the same add-on was running.
+- **The governor.** The governor (`omni_controller/controller.py`, an engine file of omni-v11) counts its machines by the
+  recorder's old rule. Under the add-on's mark on every worker it reads no machine in service and holds; omni-v11 makes that
+  hold safe, but the governor is blind there. Counting such a worker in service in the governor changes the engine. That is
+  the next version's work, through the toy gate, after the founder is told; this amendment does not touch it.
+- **Run again.** The CruiseKube test runs again, A, B and C, on the corrected recorder (`scripts/reruns.txt`, block of
+  19 October). The three-run table pools only runs of one recorder.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

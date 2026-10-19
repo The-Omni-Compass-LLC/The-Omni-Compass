@@ -241,7 +241,7 @@ def from_index():
             s_["ratios"].append(1 + (c["resource_pct"] or 0.0) / 100.0); s_["gain"] += g; s_["loss"] += l_; s_["given"] += gv; s_["items"] += items
             s_["parts"].append({"case": c["workload"], "pct": c["resource_pct"] or 0.0, "benefit": benefit_word(g, l_, gv), "loss": l_, "words": in_words(items)})
     for f, s_ in stacks.items():
-        rows.append({"date": updated(LIVE / f), "benchmark": names.get(f, f), "benefit": benefit_word(s_["gain"], s_["loss"], s_["given"]), "pct": pct(gmean(s_["ratios"])),
+        rows.append({"date": updated(LIVE / f), "benchmark": names.get(re.sub(r"^V\d+_", "V7_", f), f), "benefit": benefit_word(s_["gain"], s_["loss"], s_["given"]), "pct": pct(gmean(s_["ratios"])),
                      "gain": s_["gain"], "loss": s_["loss"], "given": s_["given"], "words": in_words(s_["items"]),
                      "what": "the index's category: its untouched workloads together (work, p95, the resource held, host CPU)",
                      "file": f"results/live/{f}", "parts": s_["parts"]})
@@ -422,13 +422,21 @@ def from_realms():
             "what": "the tower's work per energy over ten paired seeds; a model, evidence class S", "file": "results/realms/REALMS.md"}
 
 
+def newest_table(fname):
+    """The same benchmark's table on the newest engine that has one (V<n>_<BENCHMARK>.json with the highest n), so a later
+    engine's three runs take the row the moment their table lands; tables of two engines are never pooled."""
+    base = re.sub(r"^V\d+_", "", fname)
+    found = sorted((int(m.group(1)), f.name) for f in LIVE.glob("V*_" + base) if (m := re.fullmatch(r"V(\d+)_" + re.escape(base), f.name)))
+    return found[-1][1] if found else fname
+
+
 def main(check=False):
     rows = from_index()
     for fname, name, what in [
         ("V3_ROBUST_KILL.json", "Robustness: the governor killed outright mid-run", "the whole window, a kill and a restart inside it; p95, machines, energy"),
         ("V7_ROBUST_LONG.json", "Robustness: the two-hour run", "the two-hour window; p95, machines, energy"),
     ]:
-        r = from_abc_table(fname, name, what)
+        r = from_abc_table(newest_table(fname), name, what)
         if r:
             rows.append(r)
     for fname, name, titles, what, *left in [
@@ -437,7 +445,7 @@ def main(check=False):
         ("V7_CITYLEARN.md", "Buildings and batteries (CityLearn), the districts with batteries", {"Districts with electric batteries": ""}, "every CityLearn score of every district, then the districts together"),
         ("V7_SWARM.md", "Drone swarms, the three untouched cells", {"Cells where Omni moved the cruise": ""}, "every judged gauge of every cell"),
     ]:
-        r = from_sim(fname, name, titles, what, left[0] if left else None)
+        r = from_sim(newest_table(fname), name, titles, what, left[0] if left else None)
         if r:
             rows.append(r)
     for fname, name, what in [
@@ -451,6 +459,7 @@ def main(check=False):
     if r:
         rows.append(r)
     for fname, name, what in NEWEST:
+        fname = newest_table(fname)
         r = from_abc_table(fname, name, what)
         if not r:
             continue
