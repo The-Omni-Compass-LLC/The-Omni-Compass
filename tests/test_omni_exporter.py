@@ -80,6 +80,21 @@ class Exporter(unittest.TestCase):
         self.assertEqual(value(p, "omni_recommended_moves_total", '{setting="hpa_target"}'), 5)
         self.assertEqual(value(p, "omni_recommended_reversals_total", '{setting="hpa_target"}'), 0)
 
+    def test_the_control_quality_figures(self):
+        lines = [decision(0, 0.70, pos=0.02), decision(60, 0.72, pos=0.5), decision(120, 0.70, pos=0.97),
+                 decision(180, 0.75, pos=1.0), decision(240, 0.75, pos=0.6), decision(300, 0.75, pos=0.99),
+                 decision(360, 0.75, pos=0.4),
+                 {"time": 361, "error": "convey resize rejected: CalledProcessError: exceeded quota", "pod": "default/web"}]
+        p = gauges(lines).page()
+        self.assertEqual(value(p, "omni_compass_decisions_total", '{zone="slack"}'), 1)
+        self.assertEqual(value(p, "omni_compass_decisions_total", '{zone="band"}'), 3)
+        self.assertEqual(value(p, "omni_compass_decisions_total", '{zone="wall"}'), 3)
+        self.assertEqual(value(p, "omni_wall_recovery_seconds_count"), 2)        # two visits to the wall, each recovered
+        self.assertAlmostEqual(value(p, "omni_wall_recovery_seconds_sum"), 120 + 60)
+        self.assertAlmostEqual(value(p, "omni_wall_recovery_seconds_max"), 120)
+        self.assertAlmostEqual(value(p, "omni_recommended_travel_total", '{setting="hpa_target"}'), 0.02 + 0.02 + 0.05)
+        self.assertEqual(value(p, "omni_errors_total", '{kind="convey resize rejected"}'), 1)
+
     def test_a_broken_line_is_counted_never_fatal(self):
         p = gauges(["{not json", "[1, 2]", "", json.dumps(decision(1, 0.7))]).page()
         self.assertEqual(value(p, "omni_audit_unreadable_total"), 2)

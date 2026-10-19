@@ -1,0 +1,85 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+#
+# The governor's alert rules for Prometheus: load with `rule_files:` (or wrap the `groups:` list in a PrometheusRule for the
+# Prometheus Operator). Every expression reads only gauges that tools/omni_exporter.py (job omni-exporter) or the control
+# panel, tools/omni_control.py (job omni-control), serve; tests/test_alert_rules.py checks that. The thresholds assume the
+# governor's full decision every 60 s (--interval 60); scale the "for" windows and the staleness bound with the interval.
+groups:
+  - name: omni-compass-governor
+    rules:
+      - alert: OmniGovernorStale
+        expr: time() - omni_last_decision_timestamp_seconds > 180 and omni_master_switch == 1
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: "No governor decision for more than three intervals while it is meant to be governing."
+          action: "Check the governor's process and its log; if it hung, its lease hands every setting back (tools/omni_switch.py watchdog)."
+      - alert: OmniGovernorOrphaned
+        expr: omni_control_orphans > 0
+        for: 1m
+        labels: {severity: critical}
+        annotations:
+          summary: "A governor died or hung without handing its settings back."
+          action: "Run tools/omni_switch.py watchdog --once (or confirm the watchdog service is running); it runs the recorded restore commands."
+      - alert: OmniWritesHammering
+        expr: sum(rate(omni_writes_total[15m])) * 3600 > 300
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: "The governor is writing more than 300 settings commands an hour."
+          action: "Read omni_writes_total by reason and omni_errors_total; a refused write repeated at every check is the usual cause."
+      - alert: OmniWriteErrors
+        expr: sum(increase(omni_errors_total[15m])) > 5
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "More than five governor errors in 15 minutes."
+          action: "Read omni_errors_total by kind and the audit's error records."
+      - alert: OmniRecommendationOscillating
+        expr: increase(omni_recommended_reversals_total[1h]) > 20
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "A recommended setting turned back the other way more than 20 times in an hour."
+          action: "Read the setting's omni_recommended trace; a value switching between two levels at one threshold needs a band."
+      - alert: OmniSenseBlind
+        expr: max(omni_sense_blind) == 1
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "A sense has been blind for five minutes; the governor holds and decides nothing from it."
+          action: "Restore the reading (the metrics server, the latency file, the power meter) named in the sense label."
+      - alert: OmniAtTheLine
+        expr: sum(increase(omni_compass_decisions_total{zone="wall"}[30m])) / clamp_min(sum(increase(omni_compass_decisions_total[30m])), 1) > 0.10
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: "More than 10% of decisions in 30 minutes found the service at or past its line."
+          action: "Compare omni_wall_recovery_seconds with the native controller's own response; check the line and the capacity."
+      - alert: OmniMasterSwitchOff
+        expr: omni_control_master_switch_on == 0
+        for: 0m
+        labels: {severity: info}
+        annotations:
+          summary: "The master switch is OFF: every governor has handed back and none starts."
+          action: "Two holders of the security role arm it again when the cause is cleared (POST /v1/arm)."
+      - alert: OmniAuditUnreadable
+        expr: increase(omni_audit_unreadable_total[10m]) > 0
+        for: 0m
+        labels: {severity: warning}
+        annotations:
+          summary: "The governor's audit carries lines that are not one JSON record."
+          action: "Check the disk and the writer; the audit is the record every decision is judged by."
+      - alert: OmniOwnCpuHigh
+        expr: omni_own_cpu_cores > 0.5
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "The governor's own processor use is above half a core."
+          action: "Read omni_decision_seconds; the governor's cost counts in the body's load."
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
