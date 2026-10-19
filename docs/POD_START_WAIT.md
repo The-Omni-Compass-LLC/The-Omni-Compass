@@ -103,7 +103,7 @@ and the digest each worker pulled.
 - **The same in both arms.** Every worker carries the image before either arm is told apart.
 - **The operator's manifests are left as written.** `deploy/kind/demo.yaml` still names the image without a tag, so the
   kubelet still asks the registry for its digest at every start, in both arms. It then finds every layer on the node.
-- **Not the engine.** No fingerprinted file changes. omni-v11's digest stands (`python3 tools/omni_version.py`).
+- **Not the engine.** No fingerprinted file changes: the pre-puller is the rig's, and it moved no engine's digest (`python3 tools/omni_version.py`).
 - **Not the clouds.** On AKS, GKE and EKS every node is its own machine and unpacks on its own processor. Their sets keep
   `demo.yaml` and their rig as their A, B and C started.
 - **Never two rigs in one table.** A kind workflow's run on omni-v11 counts toward its three only when the run's own commit

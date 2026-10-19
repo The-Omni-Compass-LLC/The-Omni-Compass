@@ -49,8 +49,11 @@ def measure() -> dict:
         for ln in listed:
             parts = ln.split()
             if len(parts) == 2 and parts[1].startswith("tests/") and parts[1].endswith(".py"):
-                subprocess.run(py[:3] + ["--append", f"--include={inc}", "tools/function_tests.py", "--one", parts[1]],
-                               cwd=ROOT, env=env, capture_output=True, text=True, timeout=900)
+                # `coverage run --append`: without `run` coverage refuses the option and the file runs untraced
+                r = subprocess.run(py[:4] + ["--append", f"--include={inc}", "tools/function_tests.py", "--one", parts[1]],
+                                   cwd=ROOT, env=env, capture_output=True, text=True, timeout=900)
+                if "no such option" in r.stderr or "Unknown command" in r.stderr:
+                    raise SystemExit(f"coverage refused the command for {parts[1]}: {r.stderr.strip()[:200]}")
         out = Path(t) / "cov.json"
         subprocess.run([sys.executable, "-m", "coverage", "json", "-o", str(out)], cwd=ROOT, env=env, capture_output=True)
         rep = json.loads(out.read_text())
