@@ -12,14 +12,24 @@ the founder overrides one in the conversation.
   competitor to native.
 - Every benchmark has exactly two arms, **native** and **omni** (omni means Omni on top of native). There is no other
   arm and no other name.
-- **Do no harm.** Omni must never cause a LOSS against native. Where it can't bring a knob a GAIN,
-  that knob stays native. The 2%
-  verdict (`omnicompass/verdict.py`) is the engine's trigger, not a stamp on a report. Gains are uncapped.
+- **Do no harm** (its meaning, the founder's words of 19 October; it has no other, `DISCLOSURES.md` section 3): Omni's one
+  goal is to strengthen the organism and keep it healthy, working at the best state its own muscles can carry; what is fed
+  in (its nutrients: work, data, energy) goes through its muscles to the most and best output it can make. Harm is judged
+  at the organism: less output than native (less work; more time waited, missed or failed) or less health (a muscle past
+  its own limit, a service over its own line, anything made to fail). Every muscle only as far as it can go, never past.
+  The muscles are offset and engaged as one body: one may be used less, left native or rested so another carries more,
+  when the whole comes out ahead and every muscle stays healthy; which to drive and which to leave native is the brain's
+  live decision. Reactive and proactive, like an immune system. Every row is still shown. The engine that stands keeps
+  the strictest form: every muscle judged on itself, never below native, nothing traded between muscles; where it can't
+  bring a knob a GAIN, that knob stays native. The 2% verdict (`omnicompass/verdict.py`) is the engine's trigger, not a
+  stamp on a report. The trade between muscles, judged on the organism, is the next version's work (the toy gate first).
+  Gains are uncapped.
 - Headline: more work, faster, on fewer machines, with less energy. One combined number: the Omni index.
 - **The max is the default brain** (12 October): every muscle runs at its own limit, never past it and never below
   native; it rides the edge, not the middle. "We're never looking to shave energy": the energy it takes is **power
-  given**, shown beside the work, the speed and the wear it bought, never called a loss; the max never takes from one
-  muscle to give to another. Results are judged on work, speed, misses and failures. Anyone can tune it down from the
+  given**, shown beside the work, the speed and the wear it bought, never called a loss; on the engine that stands the
+  max takes nothing from one muscle to give to another (a muscle giving way for the organism's whole output is the next
+  version's, under do no harm above). Results are judged on work, speed, misses and failures. Anyone can tune it down from the
   max (the dial: the tune-down, `V5SAVE`). A knob native already runs at the top of its range is "at its limit on native".
 - The word is **compass**, never "bowl". The law is `omnicompass/compass_law.py` (`CompassLaw`): a band with 5%
   cushions, two antagonist forces, smooth (tanh), not hammering.
@@ -196,6 +206,14 @@ the founder overrides one in the conversation.
 
 ## Orders of 19 October
 
+- **Do no harm means the organism** (the founder's words: "its real goal is to strengthen the organism and keep it healthy
+  in any form and keep it working in its most optimal state that the organism can live within its own muscles ... If that
+  means decreasing a muscle to push another muscle, but in the whole end makes the organism produce a better output, well,
+  that was the goal in the beginning, is the output ... You make sure in the terminology in the live engine's content and
+  disclosures that's how do no harm is meant to mean"). Its meaning is written once, in `DISCLOSURES.md` section 3, and the
+  key (`tools/readings.py`), both manuals, the README, the safety case and the theory carry it; the engine that stands
+  keeps its strictest form, and the engine's own words and the trade between muscles come with the next version, through
+  the toy gate.
 - **Every cloud set gets its three-run reading, to the cap** (the founder's words: "I need a 3-run result ... the cap we can
   run it to ... that's all we can run ... do all, give all, make it the best you can"). Every Azure set runs up to 100 paired
   repetitions a run (the paid cap of 12 October) under the preregistered stopping rule (`tools/stop_rule.py`; looks at 10,

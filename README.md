@@ -39,7 +39,7 @@ Some preregistrations name their outcome with a label written before the runs (f
 
 A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are **EVEN, no difference beyond the noise** (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** (clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting).
 
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
 Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
@@ -75,16 +75,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-19 14:01 | live-engine | failure | [39264077277](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39264077277) |
+| 2026-10-19 15:43 | cloud-organism | cancelled | [39278661742](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39278661742) |
+| 2026-10-19 14:52 | live-engine | failure | [39270657106](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39270657106) |
+| 2026-10-19 14:46 | cloud-check google | failure | [39271895619](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39271895619) |
+| 2026-10-19 14:38 | raw-sweep | success | [39270657315](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39270657315) |
+| 2026-10-19 14:30 | cloud-check amazon | failure | [39269525043](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39269525043) |
+| 2026-10-19 14:13 | grid | success | [39231844838](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39231844838) |
 | 2026-10-19 13:57 | big-organism-detached collect | success | [39264574795](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39264574795) |
 | 2026-10-19 13:49 | six x100 line orgs 3 runs 10+90 | success | [39224034803](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224034803) |
 | 2026-10-19 13:47 | six x100 line orgs 1 runs 10+90 | success | [39224020999](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224020999) |
-| 2026-10-19 13:41 | cloud-check google | failure | [39262312182](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39262312182) |
 | 2026-10-19 13:38 | six x100 line orgs 4 runs 10+90 | success | [39224041783](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224041783) |
-| 2026-10-19 13:26 | cloud-check amazon | failure | [39260085707](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39260085707) |
-| 2026-10-19 13:24 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 61+40 arms native compass split no window 1440 protocol 4 | success | [39243908751](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39243908751) |
-| 2026-10-19 13:19 | six x100 line orgs 6 runs 10+90 | success | [39224056111](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224056111) |
-| 2026-10-19 13:05 | six x100 line orgs 5 runs 10+90 | success | [39224048866](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224048866) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
