@@ -21,7 +21,7 @@
   9% of decisions and came back within a decision (61 to 62 s); in the capacity test and the two robustness tests the load
   holds the service near its line in both arms (54% to 79% at the line), and their alert minutes, the comparison with native,
   read GAIN. The capacity test's 940 to 967 errors an hour are the refused raises fixed in the v12 candidate.
-- **The v12 candidate** (branch `v12-candidate`, `docs/OMNI_V12_CANDIDATE.md`): two fixes, the refused raise held until
+- **The v12 candidate** (branch `v12-candidate`, its page OMNI_V12_CANDIDATE.md on that branch): two fixes, the refused raise held until
   something changes (the toy: 97.5% fewer writes, every other gauge identical) and the swarm's reflex at once with a reach that
   grows with the square of the speed. The stricter verdict (a step kept only when its whole 95% interval is inside the
   allowance) was taken out of it and kept on the branch `v12-verdict-study`: in the toy cluster set from a real run's regime
