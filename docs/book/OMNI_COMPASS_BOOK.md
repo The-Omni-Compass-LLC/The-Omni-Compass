@@ -2975,7 +2975,7 @@ machines is the gain; it is never used in a cloud, and a run of the max in a clo
 ### 20.4 The cloud image and the governing Deployment
 
 The cloud image adds five things to the shipped one: `jq` (the machine lever reads the cluster's JSON with it), the
-machine lever's script, the probe, the Prometheus feed adapter (section 23.7), and the switch tool that the in-pod
+machine lever's script, the probe, the Prometheus feed adapter (section 23.8), and the switch tool that the in-pod
 watchdog runs (section 21.2). It is
 `deploy/Dockerfile.cloud`:
 
@@ -3009,7 +3009,7 @@ kubectl -n omni-compass rollout status deployment/omni-compass
 
 **Dry run first.** The manifest ships with `--dry-run` on the governor's command line: it decides as it will, writes
 nothing, and records every command it would have run as a `write` record marked `"dry_run": true`. Read a day of its
-audit (section 23.6 traces one decision) before removing `--dry-run`. A dry run checks the commands, not their effect:
+audit (section 23.7 traces one decision) before removing `--dry-run`. A dry run checks the commands, not their effect:
 because no machine is parked, a trial during a dry run compares the service with itself, and its `step allowed` is no
 evidence that the service holds without the machine. That evidence is the paired run's (phase 5). The first write after
 `--dry-run` is removed is the first machine the governor parks, in its audit with the trial that allowed it.
@@ -3327,7 +3327,7 @@ the quantile q is `histogram_quantile(q, sum by (le) (increase(nginx_ingress_con
 A histogram's buckets bound the precision of every quantile: a service whose line is 500 ms needs buckets around 250, 400,
 500 and 750 ms, or the quantiles jump between bucket edges and the governor reads steps that are not there. A service
 mesh (Istio, Linkerd) exports the same two series under its own names; the application's own histogram is the closest measurement of all
-when the line is written at the application. Section 23.7 gives an adapter that does all of this.
+when the line is written at the application. Section 23.8 gives an adapter that does all of this.
 
 **What the adapter must not do.** It must not average across windows, carry a value forward when a window is empty (an
 empty window is no row; a feed with no new row for twice the governor's window reads as blind, which is the correct
@@ -3373,10 +3373,20 @@ python3 tools/omni_exporter.py once --audit audit.jsonl      # a finished run's 
 | `omni_recommended{setting}`, `omni_recommended_moves_total`, `omni_recommended_reversals_total` | what its last decision recommends, how often that moved and how often it turned back; a recommendation is not a write |
 | `omni_nodes_observed` | the machines it saw in service |
 | `omni_own_cpu_cores` | its own processor, from its last overhead record |
+| `omni_compass_decisions_total{zone}` | decisions by where the service stood against its line: `slack` (under the lower cushion), `band`, `wall` (at or past the line); the share in `band` is the time-in-band figure |
+| `omni_wall_recovery_seconds_sum`, `_count`, `omni_wall_recovery_seconds_max` | from the first decision at the line to the first back inside the band: the settling time after each excursion |
+| `omni_recommended_travel_total{setting}` | the summed size of every change of each recommendation (actuator travel) |
+| `omni_errors_total{kind}` | the errors the governor recorded, by the head of the error (a refused write, an unreadable sense) |
+
+The zone, recovery and travel gauges describe the governor's own steering and are not judged: native has no governor to read
+them from. The judged comparison of time over the line is the paired receipt's alert-minutes row (section 20.6). A test whose
+load holds the service near its line in both arms shows a large `wall` share in the governor's gauges while its alert minutes,
+the comparison with native, read GAIN.
 
 `deploy/grafana/omni-compass.json` is a ready Grafana screen of these gauges: import it and choose the Prometheus data
 source. Its top row is the heartbeat, the switch, the verdict and the blind senses; below them the decisions, the writes by
-reason, the recommendations and their reversals, the machines and the governor's own processor.
+reason, the recommendations and their reversals, the machines and the governor's own processor, and at the foot the zones,
+the recovery time, the errors and the travel. Its links include the control panel's console (section 23.5).
 
 ### 23.3 A dashboard an on-call engineer can read in ten seconds
 
@@ -3396,11 +3406,60 @@ Four panels, on the service's own dashboard, beside the service's own response t
 
 The alarms of section 21.5 are written once in the company's alerting system (Prometheus Alertmanager, Azure Monitor
 alerts, Google Cloud alerting policies, CloudWatch alarms, Datadog monitors) against the series above, and routed to the
-same on-call rotation as the service. The alert that matters most is not the governor's: it is the service's own line.
+same on-call rotation as the service. For Prometheus they are written already: `deploy/prometheus/omni-compass-rules.yaml`
+(load it with `rule_files:`, or wrap its `groups:` in a PrometheusRule for the Prometheus Operator) carries ten rules, each
+with its severity, its meaning and the action to take: the governor stale (no decision for three intervals while
+governing; critical), a governor orphaned (died or hung without handing back; critical), writes hammering (more than 300
+settings commands an hour), write errors, a recommendation oscillating (more than 20 reversals an hour), a sense blind for
+five minutes, the service at its line in more than 10% of decisions, the master switch off (information), the audit
+unreadable, and the governor's own processor above half a core. The thresholds assume a decision every 60 s; scale the
+windows with `--interval`. The alert that matters most is not the governor's: it is the service's own line.
 An installation in the cloud mode is judged first by whether that alert fires more often with the governor than without
 it, and the paired receipt's alert-minutes row (section 20.6) is the same measure taken under control.
 
-### 23.5 The bill, from the provider's own records
+### 23.5 The control panel: the buttons, behind sign-in, every press logged
+
+`tools/omni_control.py` runs the governor as its child and serves its buttons over an authenticated HTTP API, with a console
+page for a browser. It writes no setting itself. The governor takes its mode and its dial when it starts, and when its own kill
+file appears it hands every setting it wrote back to the snapshot it took at its start, reads each one back and exits. So every
+press that changes the mode or the dial is carried out in four steps: the kill file is set, the governor's exit is awaited, the
+file is removed, and the governor is started again with the new arguments. Every change passes through native, and nothing is
+changed under a running governor.
+
+```
+python3 tools/omni_control.py token --name alice --roles operator --tokens /etc/omni/tokens.json     # printed once
+python3 tools/omni_control.py token --name sam --roles security --tokens /etc/omni/tokens.json
+python3 tools/omni_control.py serve --tokens /etc/omni/tokens.json --audit /var/log/omni/audit.jsonl \
+    --log /var/log/omni/control.jsonl --state /var/lib/omni/control.json \
+    --governor "python3 -m omni_controller.controller --mode nodepool --audit /var/log/omni/audit.jsonl --interval 60"
+```
+
+| Button | Request | Role | What happens |
+|---|---|---|---|
+| Autopilot | `POST /v1/mode {"mode": "autopilot"}` | operator | the governor runs and writes |
+| Watch | `POST /v1/mode {"mode": "watch"}` | operator | the governor runs, decides and audits every decision, and writes nothing (its `--dry-run`) |
+| Off | `POST /v1/mode {"mode": "off"}` | operator | every setting handed back; the governor stops |
+| Max, tune-down | `POST /v1/dial {"dial": "max" or "save"}` | operator | the governor handed back and started again on the new dial |
+| Reset | `POST /v1/reset {"reason": ...}` | operator | every setting handed back to native; mode off until the next press |
+| Kill switch | `POST /v1/kill {"reason": ...}` | security | the master switch OFF for every Omni-Compass governor on the machine; each restores and exits; none starts while it is OFF |
+| Arm | `POST /v1/arm {"reason": ...}` | security | the master switch ON again once two different holders of the security role press it within ten minutes |
+
+The reads need the viewer role, which every token holds: `GET /v1/status` (the switch and its reason, the mode and dial the
+panel holds, the governor's process and its exit code, the registry with each lease's age, the governors orphaned, the age of
+the last decision), `GET /v1/presses` (the last presses, refused ones included) and `GET /metrics` (the panel's counters:
+presses by button and outcome, the mode, whether the governor is up, the master switch, the orphans). `GET /` is the console and
+`GET /v1/openapi.json` the OpenAPI 3 document; neither carries data, and every call the console makes carries the token typed
+into it. Reset, kill and arm need a reason, and every press, refused or done, is one JSON line in the control log: the time,
+the holder, the button, the reason, the outcome.
+
+Security: the panel binds to 127.0.0.1 unless `--bind` says otherwise, and refuses a bind beyond the loopback without `--cert`
+and `--key` (HTTPS, TLS 1.2 or later). Tokens are stored as SHA-256 digests only, in a file only its owner can read; a request
+without a valid token is answered 401, one whose holder lacks the role 403. A governor that exits on its own is not restarted
+by the panel: its lease hands back what it wrote (`tools/omni_switch.py watchdog`), and a new start would take a new snapshot
+over settings not yet handed back; the status shows it as exited and the next press starts it. The kill switch stays on the
+command line and as a file as well (chapter 9), so the panel being down never stops anyone from switching Omni-Compass off.
+
+### 23.6 The bill, from the provider's own records
 
 The receipt's bill is the machines the cluster held, counted every 15 seconds, at list price (chapter 12). In service, the
 company reads the same thing from the provider's own billing records, and should, because list price is not what every
@@ -3417,7 +3476,7 @@ into service, in machine-hours of the governed pools, with the load (requests se
 because traffic fell is not the governor's saving, and the paired receipt, run on the same day for both arms, exists to
 remove exactly that doubt.
 
-### 23.6 Tracing a single decision end to end
+### 23.7 Tracing a single decision end to end
 
 An auditor's or an engineer's question about one moment ("why was this machine parked at 03:12?") is answered from the
 audit alone, in this order: the `verdict` record that allowed the step (the trial's response times with and without the
@@ -3426,7 +3485,7 @@ seen and recommended); the `write` record (the command, its reason, whether it w
 `authority` record, whose `proprioception` shows whether the command landed. If any of the four is missing, the governor did not park the machine, and
 the cause is elsewhere (the cluster autoscaler's own scale-down, a person, another controller).
 
-### 23.7 A complete adapter: Prometheus to the feed
+### 23.8 A complete adapter: Prometheus to the feed
 
 The repository's `tools/prom_feed.py` is the adapter of section 23.1 for any metrics system that answers Prometheus's
 HTTP query API (Prometheus itself, Thanos, Cortex, Grafana Mimir, and the managed services of the three clouds that
@@ -4609,7 +4668,7 @@ cluster): every parked machine woken and every mark removed within 60 seconds; t
 | When | What is read | Expected |
 |---|---|---|
 | Every morning, first week | the dashboard of section 23.3 | machines parked overnight and woken before the morning's rise; the two response-time lines agree; no blind decisions |
-| Each weekly peak | alert minutes on the checkout's line | none caused by the governor; any alert minute is traced with section 23.6 to its cause |
+| Each weekly peak | alert minutes on the checkout's line | none caused by the governor; any alert minute is traced with section 23.7 to its cause |
 | End of week one | the drills of section 29.2, numbers 1, 2, 3 and 5 | each passes as written |
 | End of month one | the provider's billing records for the work pool (section 23.5) against the same weeks before installation, with requests served beside them | machine-hours lower in the hours the plan found room (chapter 25); higher only where traffic was higher |
 | End of month one | the API server's audit against the governor's (section 27.6) | every patch by the service account matched by a `write` record |
@@ -4857,7 +4916,7 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | Cloud mode: machines parked now | `kubectl get nodes -l omni-role=work -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints[*].key` |
 | Cloud mode: the last decisions | `kubectl -n omni-compass exec deploy/omni-compass -c controller -- tail -n 20 /var/log/omni/audit.jsonl` |
 | Planning: the room on a cluster | the sampling loop and the arithmetic of section 25.3 |
-| A feed from the company's own Prometheus | `python3 tools/prom_feed.py --prometheus <url> --served <q> --failed <q> --quantile <q> --out <feed>` (section 23.7) |
+| A feed from the company's own Prometheus | `python3 tools/prom_feed.py --prometheus <url> --served <q> --failed <q> --quantile <q> --out <feed>` (section 23.8) |
 | The paired run on a cloud, from GitHub | the `aks-metered`, `gke-metered` or `eks-metered` workflow (Appendix N) |
 
 
@@ -4873,7 +4932,7 @@ Every copy, export or printout carries the legal notice at its head and foot, wi
 | `deploy/install/omni-compass-cloud.yaml` | the cloud mode's governing Deployment: the governor, its probe and its watchdog in one pod, shipped with `--dry-run` (chapter 20, Appendix I) |
 | `deploy/Dockerfile.cloud` | the cloud image: the shipped image with `jq`, the machine script, the probe, the Prometheus feed adapter and the switch tool |
 | `scripts/kind_nodepool.sh` | the machine script: keeps `{n}` machines in service by the idle taint alone; never creates, deletes, cordons or uncordons a machine, and never moves a pod |
-| `tools/prom_feed.py` | the response-time feed from the company's own Prometheus (section 23.7) |
+| `tools/prom_feed.py` | the response-time feed from the company's own Prometheus (section 23.8) |
 | `deploy/rbac-target.yaml`, `deploy/kind/rbac-omni.yaml` | the permissions of levels 2 and 3, exactly the verbs each level needs |
 | `scripts/latency_probe.py` | the response-time feed against any HTTP endpoint |
 | `scripts/kind_paired.sh`, `tools/live_reps.py`, `tools/confirm_abc.py` | the paired runs, the receipt and the three-run table on Kubernetes |

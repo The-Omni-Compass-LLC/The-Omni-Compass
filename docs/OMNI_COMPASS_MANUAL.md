@@ -3372,10 +3372,20 @@ python3 tools/omni_exporter.py once --audit audit.jsonl      # a finished run's 
 | `omni_recommended{setting}`, `omni_recommended_moves_total`, `omni_recommended_reversals_total` | what its last decision recommends, how often that moved and how often it turned back; a recommendation is not a write |
 | `omni_nodes_observed` | the machines it saw in service |
 | `omni_own_cpu_cores` | its own processor, from its last overhead record |
+| `omni_compass_decisions_total{zone}` | decisions by where the service stood against its line: `slack` (under the lower cushion), `band`, `wall` (at or past the line); the share in `band` is the time-in-band figure |
+| `omni_wall_recovery_seconds_sum`, `_count`, `omni_wall_recovery_seconds_max` | from the first decision at the line to the first back inside the band: the settling time after each excursion |
+| `omni_recommended_travel_total{setting}` | the summed size of every change of each recommendation (actuator travel) |
+| `omni_errors_total{kind}` | the errors the governor recorded, by the head of the error (a refused write, an unreadable sense) |
+
+The zone, recovery and travel gauges describe the governor's own steering and are not judged: native has no governor to read
+them from. The judged comparison of time over the line is the paired receipt's alert-minutes row (section 19.6). A test whose
+load holds the service near its line in both arms shows a large `wall` share in the governor's gauges while its alert minutes,
+the comparison with native, read GAIN.
 
 `deploy/grafana/omni-compass.json` is a ready Grafana screen of these gauges: import it and choose the Prometheus data
 source. Its top row is the heartbeat, the switch, the verdict and the blind senses; below them the decisions, the writes by
-reason, the recommendations and their reversals, the machines and the governor's own processor.
+reason, the recommendations and their reversals, the machines and the governor's own processor, and at the foot the zones,
+the recovery time, the errors and the travel. Its links include the control panel's console (section 22.5).
 
 ### 22.3 A dashboard an on-call engineer can read in ten seconds
 
@@ -3395,9 +3405,58 @@ Four panels, on the service's own dashboard, beside the service's own response t
 
 The alarms of section 20.5 are written once in the company's alerting system (Prometheus Alertmanager, Azure Monitor
 alerts, Google Cloud alerting policies, CloudWatch alarms, Datadog monitors) against the series above, and routed to the
-same on-call rotation as the service. The alert that matters most is not the governor's: it is the service's own line.
+same on-call rotation as the service. For Prometheus they are written already: `deploy/prometheus/omni-compass-rules.yaml`
+(load it with `rule_files:`, or wrap its `groups:` in a PrometheusRule for the Prometheus Operator) carries ten rules, each
+with its severity, its meaning and the action to take: the governor stale (no decision for three intervals while
+governing; critical), a governor orphaned (died or hung without handing back; critical), writes hammering (more than 300
+settings commands an hour), write errors, a recommendation oscillating (more than 20 reversals an hour), a sense blind for
+five minutes, the service at its line in more than 10% of decisions, the master switch off (information), the audit
+unreadable, and the governor's own processor above half a core. The thresholds assume a decision every 60 s; scale the
+windows with `--interval`. The alert that matters most is not the governor's: it is the service's own line.
 An installation in the cloud mode is judged first by whether that alert fires more often with the governor than without
 it, and the paired receipt's alert-minutes row (section 19.6) is the same measure taken under control.
+
+### 22.5 The control panel: the buttons, behind sign-in, every press logged
+
+`tools/omni_control.py` runs the governor as its child and serves its buttons over an authenticated HTTP API, with a console
+page for a browser. It writes no setting itself. The governor takes its mode and its dial when it starts, and when its own kill
+file appears it hands every setting it wrote back to the snapshot it took at its start, reads each one back and exits. So every
+press that changes the mode or the dial is carried out in four steps: the kill file is set, the governor's exit is awaited, the
+file is removed, and the governor is started again with the new arguments. Every change passes through native, and nothing is
+changed under a running governor.
+
+```
+python3 tools/omni_control.py token --name alice --roles operator --tokens /etc/omni/tokens.json     # printed once
+python3 tools/omni_control.py token --name sam --roles security --tokens /etc/omni/tokens.json
+python3 tools/omni_control.py serve --tokens /etc/omni/tokens.json --audit /var/log/omni/audit.jsonl \
+    --log /var/log/omni/control.jsonl --state /var/lib/omni/control.json \
+    --governor "python3 -m omni_controller.controller --mode nodepool --audit /var/log/omni/audit.jsonl --interval 60"
+```
+
+| Button | Request | Role | What happens |
+|---|---|---|---|
+| Autopilot | `POST /v1/mode {"mode": "autopilot"}` | operator | the governor runs and writes |
+| Watch | `POST /v1/mode {"mode": "watch"}` | operator | the governor runs, decides and audits every decision, and writes nothing (its `--dry-run`) |
+| Off | `POST /v1/mode {"mode": "off"}` | operator | every setting handed back; the governor stops |
+| Max, tune-down | `POST /v1/dial {"dial": "max" or "save"}` | operator | the governor handed back and started again on the new dial |
+| Reset | `POST /v1/reset {"reason": ...}` | operator | every setting handed back to native; mode off until the next press |
+| Kill switch | `POST /v1/kill {"reason": ...}` | security | the master switch OFF for every Omni-Compass governor on the machine; each restores and exits; none starts while it is OFF |
+| Arm | `POST /v1/arm {"reason": ...}` | security | the master switch ON again once two different holders of the security role press it within ten minutes |
+
+The reads need the viewer role, which every token holds: `GET /v1/status` (the switch and its reason, the mode and dial the
+panel holds, the governor's process and its exit code, the registry with each lease's age, the governors orphaned, the age of
+the last decision), `GET /v1/presses` (the last presses, refused ones included) and `GET /metrics` (the panel's counters:
+presses by button and outcome, the mode, whether the governor is up, the master switch, the orphans). `GET /` is the console and
+`GET /v1/openapi.json` the OpenAPI 3 document; neither carries data, and every call the console makes carries the token typed
+into it. Reset, kill and arm need a reason, and every press, refused or done, is one JSON line in the control log: the time,
+the holder, the button, the reason, the outcome.
+
+Security: the panel binds to 127.0.0.1 unless `--bind` says otherwise, and refuses a bind beyond the loopback without `--cert`
+and `--key` (HTTPS, TLS 1.2 or later). Tokens are stored as SHA-256 digests only, in a file only its owner can read; a request
+without a valid token is answered 401, one whose holder lacks the role 403. A governor that exits on its own is not restarted
+by the panel: its lease hands back what it wrote (`tools/omni_switch.py watchdog`), and a new start would take a new snapshot
+over settings not yet handed back; the status shows it as exited and the next press starts it. The kill switch stays on the
+command line and as a file as well (chapter 8), so the panel being down never stops anyone from switching Omni-Compass off.
 
 ### 22.5 The bill, from the provider's own records
 
