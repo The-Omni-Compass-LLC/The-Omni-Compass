@@ -68,7 +68,7 @@ cost mk ≤ min(m₀, m[native]) (1 + tol), and the largest estimated change is 
 The engine does not run the continuous law. Per micro step h = 0.01 it:
 1. computes the command u[k] from x[k];
 2. holds u[k] through the four stages of one RK4 step;
-3. takes x[k+1] = F[h](x[k], u[k]).
+3. takes x[k+1] = Fₕ(x[k], u[k]).
 
 Theorems E1 to B1 are about that map, over the declared box:
 - every parameter in `PARAMETER_RANGES`;
@@ -91,7 +91,7 @@ Theorems E1 to B1 are about that map, over the declared box:
 | B1 | the bath (B, B′), a linear damped oscillator driven by S, x′ = A x + (0, γ[c] δ S) with A = [[0, 1], [−ω[B]², −ω[B]/Q[B]]]: for every (ω[B], Q[B]) in the box the spectral radius of its RK4 step R(hA) is at most 0.99995, so it shrinks by at least 5.0 × 10⁻⁵ every micro step, stays bounded under the bounded S, and forgets its start | intervals and the remainder of eˣ | proved |
 
 **How U2 is proved.** Unsaturated, the command cancels the drift at x[k] exactly, so k₁ = −K[P] e[k] and
-e[k+1] = ρ e[k] + (h/6)(2 D₂ + 2 D₃ + D₄), where D[i] = f[U](stage i) − f[U](x[k]). By the mean value theorem on the
+e[k+1] = ρ e[k] + (h/6)(2 D₂ + 2 D₃ + D₄), where D[i] is f[U] at stage i less f[U] at x[k]. By the mean value theorem on the
 segment to each stage:
 
     abs(D[i]) ≤ g[U] abs(ΔU[i]) + g[E] abs(ΔE[i]) + g[S] abs(ΔS[i]) + g[t] abs(Δt[i])
