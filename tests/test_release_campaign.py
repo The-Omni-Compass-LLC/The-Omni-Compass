@@ -211,6 +211,38 @@ class ReleaseCampaign(unittest.TestCase):
                     run_hil.main(["--out", "/tmp/omni-paid-rejected", *args])
                 self.assertEqual(cm.exception.code, 2)
 
+    def test_jobs_held_by_a_runs_own_max_parallel_are_not_counted_as_queue(self):
+        """A 100-repetition Azure set at max-parallel 1 lists 99 jobs queued that wait for its own slot, not for a runner;
+        counted as queue they held every grid dispatch back. Only the slots its max-parallel leaves free count."""
+        runs = {"workflow_runs": [{"id": 1, "path": ".github/workflows/aks-metered.yml", "name": "aks-metered",
+                                   "display_title": "aks-metered"}]}
+        jobs = {"jobs": [{"status": "in_progress"}] + [{"status": "queued"}] * 99}
+        def api(url):
+            if "/jobs" in url:                          # a full first page of 100, then the empty page GitHub returns
+                return jobs if "page=1" in url.split("&") or url.endswith("page=1") else {"jobs": []}
+            return runs if "status=queued" in url else {"workflow_runs": []}
+        with unittest.mock.patch.object(grid, "api", side_effect=api), \
+             unittest.mock.patch.object(grid, "waits_for_a_runner", return_value=False):
+            queued, running, _ = grid.jobs_in_flight()
+        self.assertEqual(grid.max_parallel(".github/workflows/aks-metered.yml"), 1)
+        self.assertEqual((queued, running), (0, 1))
+
+    def test_a_job_list_that_never_ends_stops_at_ten_pages(self):
+        """A list that hands back a full page every time (a broken answer) once read forever and filled the memory; the
+        reader stops at ten pages, more than the 256 jobs a run can hold."""
+        runs = {"workflow_runs": [{"id": 2, "path": ".github/workflows/grid.yml", "name": "grid", "display_title": "grid"}]}
+        calls = []
+        def api(url):
+            if "/jobs" in url:
+                calls.append(url)
+                return {"jobs": [{"status": "in_progress"}] * 100}
+            return runs if "status=queued" in url else {"workflow_runs": []}
+        with unittest.mock.patch.object(grid, "api", side_effect=api), \
+             unittest.mock.patch.object(grid, "waits_for_a_runner", return_value=False):
+            _, running, _ = grid.jobs_in_flight()
+        self.assertEqual(len(calls), 10)
+        self.assertEqual(running, 1000)
+
 
 if __name__ == '__main__':
     unittest.main()
