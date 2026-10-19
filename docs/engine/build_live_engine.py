@@ -298,9 +298,14 @@ def fleet() -> dict:
         oj = ROOT / "results" / "OMNI_INDEX.json"
         if oj.exists():   # each category's own reading, so the page can say what carries the headline
             out["index"]["categories"] = json.loads(oj.read_text(encoding="utf-8")).get("categories") or {}
-    grids = sorted((ROOT / "results").glob("grid_v*/GRID.json"), key=lambda q: int(re.sub(r"\D", "", q.parent.name)))
-    if grids:
-        gp = grids[-1]; md = gp.with_name("GRID.md"); eng = None
+    # the grid of the engine that stands, and no other: a grid run on an earlier engine is history, never read across
+    stand_n = engine()[0].rsplit("v", 1)[-1]
+    gp = ROOT / "results" / f"grid_v{stand_n}" / "GRID.json"
+    disp_f = gp.with_name("DISPATCHED.json")
+    disp = len(json.loads(disp_f.read_text(encoding="utf-8")).get("dispatches", [])) if disp_f.exists() else 0
+    out["grid"] = {"file": None, "engine": engine()[0], "squares": {"modelled": {}, "kube": {}}, "dispatched_on_engine_that_stands": disp}
+    if gp.exists():
+        md = gp.with_name("GRID.md"); eng = None
         if md.exists():
             m = re.search(r"engine (omni-v\d+)", md.read_text(encoding="utf-8")); eng = m.group(1) if m else None
         g = json.loads(gp.read_text(encoding="utf-8"))
@@ -312,10 +317,6 @@ def fleet() -> dict:
             sq["kube"][k] = {n: {"verdict": c.get("verdict"), "reps": c.get("repetitions"), "GAIN": c.get("GAIN"), "LOSS": c.get("LOSS"), "given": c.get("power given"),
                                  "p95": {kk: c["rows"][kk].get(kk2) for kk in ["response time (ms), 95th percentile"] if kk in c.get("rows", {}) for kk2 in ["pct"]}.get("response time (ms), 95th percentile")}
                              for n, c in v.items() if isinstance(c, dict)}
-        disp = None
-        stand = ROOT / "results" / f"grid_v{engine()[0].rsplit('v', 1)[-1]}" / "DISPATCHED.json"
-        if stand.exists():
-            disp = len(json.loads(stand.read_text(encoding="utf-8")).get("dispatches", []))
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
     out["register"] = register_places()
     import brain_off   # what the brain's six-state equations change in the governor's decisions (class S, the fleet model)
