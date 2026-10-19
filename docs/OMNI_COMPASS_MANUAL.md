@@ -3351,6 +3351,32 @@ governor:
 | decision time | each `decision_ms` | the governor keeping its period |
 | own cost | the last `overhead` record | the governor's processor over its life |
 
+Without a log store, `tools/omni_exporter.py` serves the same series to Prometheus. It follows the audit file the governor
+writes, answers `GET /metrics` on one port (9464 unless `--port` says otherwise, bound to 127.0.0.1 unless `--bind` says
+otherwise) and writes nothing anywhere: it has no button, so a monitoring system that scrapes it can see everything and change
+nothing. Run it beside the governor, pointed at the same audit:
+
+```
+python3 tools/omni_exporter.py serve --audit /var/log/omni/audit.jsonl --port 9464 --bind 0.0.0.0
+python3 tools/omni_exporter.py once --audit audit.jsonl      # a finished run's audit, read once
+```
+
+| Gauge | What it shows |
+|---|---|
+| `omni_last_decision_timestamp_seconds` | the heartbeat: alert when `time()` less it passes three minutes |
+| `omni_master_switch` | 1 while governing, 0 once the kill switch has handed every setting back |
+| `omni_verdict_state{state}` | where the trial of a step stands: left native, trial, kept, given back |
+| `omni_sense_blind{sense}` | 1 while a feed is blind; the governor then holds |
+| `omni_decisions_total`, `omni_decision_seconds_sum`, `_count`, `_last` | its pace, and the time each decision took |
+| `omni_writes_total{why}` | every settings command it wrote on its own, by the head of its reason |
+| `omni_recommended{setting}`, `omni_recommended_moves_total`, `omni_recommended_reversals_total` | what its last decision recommends, how often that moved and how often it turned back; a recommendation is not a write |
+| `omni_nodes_observed` | the machines it saw in service |
+| `omni_own_cpu_cores` | its own processor, from its last overhead record |
+
+`deploy/grafana/omni-compass.json` is a ready Grafana screen of these gauges: import it and choose the Prometheus data
+source. Its top row is the heartbeat, the switch, the verdict and the blind senses; below them the decisions, the writes by
+reason, the recommendations and their reversals, the machines and the governor's own processor.
+
 ### 22.3 A dashboard an on-call engineer can read in ten seconds
 
 Four panels, on the service's own dashboard, beside the service's own response time:

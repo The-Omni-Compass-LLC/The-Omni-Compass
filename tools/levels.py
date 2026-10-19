@@ -39,7 +39,7 @@ REALMS = ROOT / "results" / "realms_v5"
 # (level, evidence class, the tables' stems in results/live/, what native is at that level)
 TABLE_LEVELS = [
     ("The cluster: real Kubernetes, native its own HPA and scheduler", "L",
-     ["ALL_FOUR", "BATCH", "CAPACITY", "FAIRNESS", "FAULTS", "TRACE_GOOGLE2011", "ROBUST_LONG"],
+     ["ALL_FOUR", "BATCH", "CAPACITY", "FAIRNESS", "FAULTS", "TRACE_GOOGLE2011", "ROBUST_KILL", "ROBUST_LONG"],
      "Kubernetes as shipped with the operator's HPA target"),
     ("The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube", "L",
      ["KEDA_REQUESTS", "KEDA_CPU_REQUESTS", "GOLDILOCKS", "CRUISEKUBE"],

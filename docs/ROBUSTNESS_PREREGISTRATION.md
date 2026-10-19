@@ -201,6 +201,36 @@ pid alive two seconds after), and a second test checks that every variable the r
 old list). Nothing in the scenario, its gauges or its limits changed; the three runs are kept in the record as invalid and
 three new kill runs are released on the fixed harness, read as A, B and C.
 
+## On omni-v11 (19 October): both scenarios, three runs each, on the rules above unchanged
+
+Each scenario's counted runs are the first three on omni-v11 whose commit carries the kind rig's pre-puller (the amendment of
+18 October, `docs/POD_START_WAIT.md`): kill runs 39173416105, 39177935888 and 39182898753, long runs 39173420146, 39177939062
+and 39182902844 (commits `8de24035`, `0d11e5ab` and `bc2eb38f`, each omni-v11 by `tools/omni_version.py --commit`). The runs of
+each scenario released earlier on omni-v11 (kill 39151686324, 39160286874 and 39169881155; long 39152893052 and 39160291116)
+ran on commits without the pre-puller, so by that amendment they are not counted; they are kept on the branch `raw`, and the
+three earlier kill runs, read together the same way, show no LOSS either.
+
+**Scenario 1** (`results/live/V11_ROBUST_KILL.md`): every setting back at the operator's 8 to 11 s after the kill in 30 of 30
+repetitions (the runs' means 10, 9 and 8 s), a second governor to the end in every one, the 120 s after the kill no difference
+beyond the noise against native in all three runs. Over the whole window the mean response, the 95th percentile, the time over
+the line, failed requests and the alert minutes read GAIN in all three of our runs; HPA replicas +3% to +6%, power given;
+machines and energy EVEN. The 99th percentile rose 25.2% in run A (interval +7.7 to +42.7) and fell 27.3% and 24.5% in B and
+C with intervals including zero: EVEN by the rule. It is one repetition's (run A's fifth): in the other nine both arms' 99th
+percentile is the probe's 10-second timeout. In that repetition the omni arm's slowest answers reached 9.2 s 140 to 190 s after
+the kill, at the load's peak, after the hand-back had put every setting at native's and with both arms at the HPA's cap of ten
+replicas; the runner's processor was 100% busy for 70 s (native's arm 96% to 100% at the same point), and the second governor
+had started 50 s before on the same four cores. That is the likely cause and is not proven. The 120 s window declared above
+ends before it; the next version's preregistration of this scenario is proposed to read 300 s after the kill, declared before
+its runs. The mean pod start wait rose 32.6% in run C alone: EVEN.
+
+**Scenario 2** (`results/live/V11_ROBUST_LONG.md`): the governor's resident memory, the last ten minutes over the first ten, at
+most 1.023, 1.015 and 1.023: no leak. Decisions made: at least 97.5% of the 120 predicted in every repetition: valid. Failed
+decisions: none in any repetition. Decision time, the last hour over the first: at most 1.12, 1.13 and 0.94: no growth. Every
+setting handed back at the end and read back at the operator's, no record left, in every repetition. The whole window: mean
+response, time over the line and alert minutes GAIN in all three of our runs; HPA replicas +49% to +52%, power given; machines,
+node-hours and energy EVEN; the 95th and 99th percentiles and failed requests EVEN (three pairs give wide intervals). The
+governor's own CPU 0.0104 to 0.0108 of a core.
+
 ## What is declared before the first run
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per
