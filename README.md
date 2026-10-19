@@ -113,7 +113,7 @@ rule counted in seconds, the verdict reading a trial in the reports' words, the 
 omni-v11 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
-**On omni-v11, eighteen three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
+**On omni-v11, twenty three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
 receipts by [`tools/reproduce.py`](tools/reproduce.py)). On real Kubernetes, ten pairs a run: on top of Goldilocks the 95th percentile
 −61% to −64%; on top of KEDA's HTTP add-on −72% to −74%, replicas −11% to −20%, and the pod start wait, omni-v10's one LOSS, EVEN with
 the served image pre-pulled; on top of KEDA on the CPU target and the requests −52% to −53%; fixed capacity EVEN; every one GAIN in all

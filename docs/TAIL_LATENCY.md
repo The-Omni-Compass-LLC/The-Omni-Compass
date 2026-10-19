@@ -10,7 +10,7 @@ results.
 ## 1. No tail reads LOSS
 
 By the preregistered rule (a gauge reads LOSS only when it moves away from its aim in all three of our runs, every 95%
-interval clear of zero), **no 95th- or 99th-percentile row reads LOSS in any omni-v11 table** (18 tables), and none read
+interval clear of zero), **no 95th- or 99th-percentile row reads LOSS in any omni-v11 table** (20 tables), and none read
 LOSS in the omni-v10 tables before them. The one omni-v10 LOSS, the pod start wait under KEDA's HTTP add-on, was the test
 machine (an empty node unpacking the image inside the window); since the kind rig pulls the served image onto every worker
 before each arm, it reads EVEN on omni-v11 (`docs/POD_START_WAIT.md`, `results/live/V11_KEDA_REQUESTS.md`).
@@ -26,9 +26,9 @@ ten pairs in each of runs A, B and C), each scored from its own raw files by `to
 | KEDA's HTTP add-on | 30 | 0 | 0 | cut 72% to 74%, GAIN |
 | KEDA on CPU and requests | 30 | 0 | 0 | cut 52% to 53%, GAIN |
 
-## 3. Where a single run's tail rose: the data stores
+## 3. Where a single run's tail rose: the data stores and the kill test
 
-Five tail rows on omni-v11 have one or two runs whose interval lies wholly above zero. None holds in all three runs, so each
+Six tail rows on omni-v11 have one or two runs whose interval lies wholly above zero. None holds in all three runs, so each
 reads EVEN; a page that colours each run's cell on its own shows them red.
 
 | Table, workload | Gauge | A | B | C | What it is |
@@ -37,12 +37,19 @@ reads EVEN; a page that colours each run's cell on its own shows them red.
 | MySQL at the tune-down, read and write | latency, 95th percentile | +11.4% (+6.9 to +15.9) | −3.6% (−57.6 to +50.4) | +0.2% (−76.5 to +76.9) | one run up, the other two within wide noise |
 | Redis at the tune-down, small values | latency, 99th percentile | +0.1% (+0.1 to +0.2) | +0.1% (−0.2 to +0.4) | +0.2% (−0.1 to +0.5) | about 6 µs on 5,600 µs, consistent in sign |
 | Redis at the max, small values | latency, 99th percentile | +0.1% (−0.5 to +0.6) | +0.2% (+0.1 to +0.4) | +0.2% (+0.1 to +0.3) | the same |
+| The governor killed outright mid-run (robustness) | response time, 99th percentile | +25.2% (+7.7 to +42.7) | −27.3% (−60.1 to +5.5) | −24.5% (−55.7 to +6.8) | one repetition of run A (below) |
 | Redis at the max, the tuning workload | latency, 99th percentile | +0.3% (−0.0 to +0.5) | +0.2% (+0.1 to +0.2) | +0.0% (−0.2 to +0.3) | the same (the tuning workload, not counted) |
 
 **The Kafka and MySQL rows are single-run excursions.** In each, one run rose and the others fell or sat inside a wide
 interval; the three-run rule exists to keep such a run from being read as a result. On MySQL's read-and-write workload the
 three runs' intervals are ±4.5, ±54 and ±77 points wide: with three pairs a run, the test cannot resolve a tail change of
 under about 10% of native (`docs/POWER.md`).
+
+**The kill test's row is one repetition.** In nine of run A's ten repetitions both arms' 99th percentile is the probe's
+10-second timeout. In the fifth, the omni arm's slowest answers reached 9.2 s 140 to 190 s after the kill, at the load's peak,
+with every setting already handed back to native's and both arms at the same ten replicas; the runner's processor was 100% busy
+for 70 s, and the second governor had started 50 s before on the same four cores. That is the likely cause, not proven
+(`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v11").
 
 **The Redis rows are a real, tiny, consistent rise: about 6 µs at the 99th percentile.** Pooled over the 27 counted pairs
 of each set, Omni-Compass's 99th percentile is +5.8 µs (standard deviation 8.9 µs) at the tune-down and +7.1 µs (8.9 µs) at
