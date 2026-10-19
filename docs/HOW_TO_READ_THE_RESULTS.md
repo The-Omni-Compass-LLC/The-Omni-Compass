@@ -146,8 +146,8 @@ zero in one district. An earlier engine's LOSS stays in its own table, for examp
 wholly above zero with probability 0.025 and wholly below with 0.025. A row reads GAIN or LOSS only when all three
 independent runs fall on the same side, so its chance of a false reading is 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over a table of 30
 judged rows the chance that any one is false is at most 30 × 3.1 × 10⁻⁵ ≈ 0.09% (a union bound, as Bonferroni's), and over
-the 647 judged rows of the omni-v11 tables that carry noise (888 judged rows in 20 tables, less the 241 of the deterministic
-simulators) the expected number of false readings is 647 × 3.1 × 10⁻⁵ ≈ 0.02. The
+the 798 judged rows of the omni-v11 tables that carry noise (1,039 judged rows in 23 tables, less the 241 of the deterministic
+simulators) the expected number of false readings is 798 × 3.1 × 10⁻⁵ ≈ 0.02. The
 bound assumes the three runs independent; runs on the same kind of machine can share a bias, which three runs cannot
 remove and the bound does not cover. The price of the rule is power: a small true difference must clear the noise three
 times, so many EVEN rows are differences too small for a run's pairs to resolve (with 3 pairs a run, t = 4.303 and the

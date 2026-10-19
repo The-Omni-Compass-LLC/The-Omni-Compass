@@ -10,7 +10,7 @@ results.
 ## 1. No tail reads LOSS
 
 By the preregistered rule (a gauge reads LOSS only when it moves away from its aim in all three of our runs, every 95%
-interval clear of zero), **no 95th- or 99th-percentile row reads LOSS in any omni-v11 table** (20 tables), and none read
+interval clear of zero), **no 95th- or 99th-percentile row reads LOSS in any omni-v11 table** (23 tables), and none read
 LOSS in the omni-v10 tables before them. The one omni-v10 LOSS, the pod start wait under KEDA's HTTP add-on, was the test
 machine (an empty node unpacking the image inside the window); since the kind rig pulls the served image onto every worker
 before each arm, it reads EVEN on omni-v11 (`docs/POD_START_WAIT.md`, `results/live/V11_KEDA_REQUESTS.md`).

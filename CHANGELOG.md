@@ -10,7 +10,9 @@
   back at the operator's 8 to 11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one, the 120 s
   after the kill EVEN, five service rows GAIN in all three runs, replicas +3% to +6% power given. The long run: memory up 2.3% at
   most, 97.5% of the expected decisions, none failed, no slowing, everything handed back; three rows GAIN, replicas +49% to
-  +52% power given. 20 omni-v11 tables, 888 judged rows, 0 LOSS.
+  +52% power given. With the three data stores at the max that landed the same evening (`V11_PGBENCH_SERVICE.md`,
+  `V11_SYSBENCH_SERVICE.md`, `V11_YCSB_SERVICE.md`: no LOSS, no single-run tail rise), 23 omni-v11 tables, 1,039 judged rows,
+  0 LOSS.
 - **The kill test's 99th percentile, read to the repetition.** It rose 25% in run A and fell in B and C (EVEN). In nine of run
   A's ten repetitions both arms read the probe's 10-second timeout; in the fifth the omni arm's slowest answers reached 9.2 s 140
   to 190 s after the kill, with every setting already handed back to native's, both arms at the HPA's cap of ten replicas, the

@@ -840,7 +840,7 @@ hands every setting back to native's value when it stops, dies or is switched of
 | Claim | Standing | Evidence |
 |---|---|---|
 | It sits on top of native and never replaces it | **Shown** | Every live test runs native, and Omni-Compass on top of the same native; the setting is read back at native's value at the end of every arm |
-| It does no harm: never a LOSS against native | **Shown on the counted runs; one fault found beyond them, its fix waiting for the next version** | 0 LOSS rows in the 20 omni-v11 three-run tables (888 judged rows: Kubernetes, the robustness kill test and long run, the five data stores, four outside simulators); the omni-v10 LOSS, the pod start wait under KEDA's HTTP add-on, reads EVEN on omni-v11 now that the kind rig pre-pulls the served image (`docs/POD_START_WAIT.md`); on real Kubernetes Omni-Compass's 95th and 99th percentiles were below native's in all 90 paired repetitions (`docs/TAIL_LATENCY.md`). The fault: in the drone swarm (class S) the omni-v11 wire spent the closest-approach margin in the counted cells (no near miss, no collision) and, on a mission draw outside them, let drones collide where native did not; its proximity reflex slowed over a second instead of at once. The fix held every drone outside the keep-out on every draw tried and makes the next version (`docs/LIMITATIONS.md`, section 3; `results/toy_gate/V12_SWARM_REFLEX.md`) |
+| It does no harm: never a LOSS against native | **Shown on the counted runs; one fault found beyond them, its fix waiting for the next version** | 0 LOSS rows in the 23 omni-v11 three-run tables (1,039 judged rows: Kubernetes, the robustness kill test and long run, the five data stores, four outside simulators); the omni-v10 LOSS, the pod start wait under KEDA's HTTP add-on, reads EVEN on omni-v11 now that the kind rig pre-pulls the served image (`docs/POD_START_WAIT.md`); on real Kubernetes Omni-Compass's 95th and 99th percentiles were below native's in all 90 paired repetitions (`docs/TAIL_LATENCY.md`). The fault: in the drone swarm (class S) the omni-v11 wire spent the closest-approach margin in the counted cells (no near miss, no collision) and, on a mission draw outside them, let drones collide where native did not; its proximity reflex slowed over a second instead of at once. The fix held every drone outside the keep-out on every draw tried and makes the next version (`docs/LIMITATIONS.md`, section 3; `results/toy_gate/V12_SWARM_REFLEX.md`) |
 | More work, faster, on real Kubernetes | **Shown** (L, omni-v10 and omni-v11, each test on its newest table) | See section 2.3 |
 | More work, faster, on databases and caches | **Small or EVEN** (L, omni-v11) | Redis at the operator's ceiling: 4 gauge-rows GAIN at the tune-down, 6 at the max (work inside the line and hit rate up about 1%, for about 2% memory); Kafka 1 GAIN at each objective; MongoDB 1; PostgreSQL and MySQL 0, with every other gauge EVEN; native exactly as shipped: 0 GAIN, 0 LOSS (the knob at its limit on native or untouched). MySQL's update workload reads "the runs disagree" on throughput (±0.4%, a run-level effect: `docs/LIMITATIONS.md`). The runs at the max for MySQL, MongoDB and PostgreSQL are archiving |
 | Fewer machines | **Shown in one test** (L, omni-v10) | A queue of jobs: machines in service and node-hours cut 6% to 14%, the machines after the queue finished 10% to 22%, the queue finished EVEN |
@@ -950,7 +950,7 @@ measurement exists.
    all four on omni-v11, each rebuilt byte for byte. Held at B− by a fault found in the swarm's wire: on a mission draw outside
    the preregistered seeds it let drones collide where native did not. The fix held every drone outside the keep-out on all
    ten cells and draws tried (`results/toy_gate/V12_SWARM_REFLEX.md`) and lands with the next version.
-14. **Reproducibility.** All 20 omni-v11 tables rebuilt from their raw receipts and identical to the byte
+14. **Reproducibility.** All 23 omni-v11 tables rebuilt from their raw receipts and identical to the byte
    (`tools/reproduce.py`, weekly in `reproduce.yml`); every package pinned with its hashes, every action by its commit.
 15. **Honesty.** The limitations page, the tail-latency page, the runs-disagree rows each explained, every row kept.
 16. **Manuals.** Eleven referee chapters bound into the Owner's Manual (the proofs, the coverage, the power, the deviations,
@@ -964,9 +964,10 @@ measurement exists.
 
 ### 3.3 The blueprint
 
-**On GitHub already, at no cost.** The third runs of the seven Kubernetes sets, the robustness kill and long runs, and the
-data stores at the max are finishing or archiving; the CruiseKube rerun on the corrected recorder is running. Each lands as
-an omni-v11 table and raises categories 6, 7 and 13.
+**On GitHub already, at no cost.** The robustness kill test and long run and the three data stores at the max landed on 19
+October (no LOSS in any); the third runs of the seven Kubernetes sets, the extended fault test and the CruiseKube rerun on the
+corrected recorder are running, and the cost to match runs again from the campaign. Each lands as an omni-v11 table and
+raises categories 6, 7 and 13.
 
 **The next engine version, on the founder's word** (`docs/CHANGE_CONTROL.md`: any change to a rule or guard is the next
 version, and every benchmark runs again on it):
@@ -3474,7 +3475,7 @@ mixing results.
 
 A version is stable for a benchmark when its three runs on that version have landed with no change in between. omni-v11
 has stood since 18 October 16:03 UTC; its campaign of 129 runs is under way, and its three-run tables are in
-`results/live/V11_*.md` as they land (20 on 19 October). The engine's proofs (`docs/ENGINE_PROOFS.md`), its coverage
+`results/live/V11_*.md` as they land (23 on 19 October). The engine's proofs (`docs/ENGINE_PROOFS.md`), its coverage
 (`docs/ENGINE_COVERAGE.md`) and its reproducibility check (`tools/reproduce.py`) are run on every push, so a version that
 stands is also a version that is re-proved, re-tested and re-built from its receipts each time anything else changes.
 
@@ -7327,7 +7328,7 @@ reviewed or approved these results.
 | Capacity at a fixed cap (four caps) | omni-v11 | HPA under a CPU quota | — | EVEN at every cap | no harm under a cap | more work under the cap | `results/live/V11_CAPACITY.md` |
 | Redis | omni-v11 | the operator's 64 MB ceiling; also as shipped | work inside the 2 ms line and hit rate +1.3% to +1.6%; mean latency −1.7% to −7.3%; ceiling −2.3% to −2.6% on `burst`; memory +1.7% to +1.9% on `small` | GAIN in all three; memory power given on `small`; as shipped EVEN (at its limit on native) | a faster cache, its price shown | a tail gain (the 99th percentile EVEN, `docs/TAIL_LATENCY.md`) | `results/live/V11_REDIS.md`, `V11_REDIS_SERVICE.md`, `V11_REDIS_SHIPPED.md` |
 | Kafka | omni-v11 | the operator's 2 consumers | consumers −0.8% on `burst` | GAIN in all three under both objectives; the rest EVEN | no harm, a fraction given back | a service gain | `results/live/V11_KAFKA.md`, `V11_KAFKA_SERVICE.md` |
-| PostgreSQL, MySQL, MongoDB | omni-v11 | the operators' pool, buffer pool and cache; MySQL and MongoDB also as shipped | MongoDB's cache −0.9% to −1.0% on `f`; PgBouncer's most connections open +8% to +10%; MySQL as shipped: the pool +5% to +16% | GAIN and power given as named; EVEN on every other judged row but MySQL's update throughput (the runs disagree) | no harm under the verdict | memory given back on the pool and the buffer pool | `results/live/V11_PGBENCH.md`, `V11_SYSBENCH*.md`, `V11_YCSB*.md` |
+| PostgreSQL, MySQL, MongoDB | omni-v11 | the operators' pool, buffer pool and cache; MySQL and MongoDB also as shipped | MongoDB's cache −0.9% to −1.0% on `f`; PgBouncer's most connections open +8% to +10%; MySQL as shipped: the pool +5% to +16%; at the max, PgBouncer's connections held −10% to −22% and MongoDB's cache −0.4% to −0.8% | GAIN and power given as named; EVEN on every other judged row but MySQL's update throughput (the runs disagree) | no harm under the verdict | memory given back on the pool and the buffer pool | `results/live/V11_PGBENCH*.md`, `V11_SYSBENCH*.md`, `V11_YCSB*.md` |
 | On top of CruiseKube | omni-v10 | CruiseKube 0.3.4 | — | EVEN on every row; no command written | no harm on a rightsized service | a gain there | `results/live/V10_CRUISEKUBE.md` |
 | Steady work in steps | omni-v10 | HPA | p95 −64% to −65%; p99 −69% to −73%; time over the line −98% to −100%; alert minutes −100% | GAIN in all three; machines and energy EVEN | a faster service on the same machines | fewer machines | `results/live/V10_STEADY.md` |
 | Demand that wanders | omni-v10 | HPA | p95 −57% to −66%; time over the line −38% to −45%; alert minutes −21% to −32%; energy −0.3% to −0.4% | GAIN in all three | service held through wandering demand | a measured energy saving (model) | `results/live/V10_WANDERING.md` |
@@ -7521,8 +7522,8 @@ zero in one district. An earlier engine's LOSS stays in its own table, for examp
 wholly above zero with probability 0.025 and wholly below with 0.025. A row reads GAIN or LOSS only when all three
 independent runs fall on the same side, so its chance of a false reading is 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over a table of 30
 judged rows the chance that any one is false is at most 30 × 3.1 × 10⁻⁵ ≈ 0.09% (a union bound, as Bonferroni's), and over
-the 647 judged rows of the omni-v11 tables that carry noise (888 judged rows in 20 tables, less the 241 of the deterministic
-simulators) the expected number of false readings is 647 × 3.1 × 10⁻⁵ ≈ 0.02. The
+the 798 judged rows of the omni-v11 tables that carry noise (1,039 judged rows in 23 tables, less the 241 of the deterministic
+simulators) the expected number of false readings is 798 × 3.1 × 10⁻⁵ ≈ 0.02. The
 bound assumes the three runs independent; runs on the same kind of machine can share a bias, which three runs cannot
 remove and the bound does not cover. The price of the rule is power: a small true difference must clear the noise three
 times, so many EVEN rows are differences too small for a run's pairs to resolve (with 3 pairs a run, t = 4.303 and the
@@ -7776,13 +7777,13 @@ No run at this level yet, real or modelled, on the engine that stands (`k8s_flee
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `da7ef0b04`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `14c1bd956`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 56.1 The mechanism, and proof that it is the one that ran
 
 | Check | Result | Where |
 |---|---|---|
-| The whole repository re-runs and checks itself (`python3 verify.py`) | **see results/VERIFY_RECEIPT.txt** | `results/VERIFY_RECEIPT.txt` |
+| The whole repository re-runs and checks itself (`python3 verify.py`) | **PASS** | `results/VERIFY_RECEIPT.txt` |
 | The eight-line engine and its six states, fingerprinted (`omnicompass/core.py`) | sha256 `bd615f156169f679…` | `RELEASE_MANIFEST.json` |
 | Python and C++20 twins of every law, proven equal and sealed | seal intact: 9 Python/C++ twins | `results/SEAL.json` |
 | The mechanism's identity against the code | mechanism identity matches the code | `results/MECHANISM_IDENTITY.json` |
@@ -8408,7 +8409,9 @@ code. No outside party has reviewed or approved these results.
   `select`, `simple_update` and `tpcb_hot`. 35 judged rows read EVEN and one power given: on `simple_update` the most server
   connections open at once rose 8% to 10% in all three runs while the mean held open, the work inside the line, the latency
   and the host's CPU stayed inside the noise. Nothing measurable was bought with it, and the table shows it. Every pool was
-  handed back.
+  handed back. **At the max** (`V11_PGBENCH_SERVICE.md`; runs 39182915425, 39184166001, 39185403353): the server connections
+  held open fell 18% to 22% on `select` and 10% to 16% on `tpcb_hot`, GAIN in all three of our runs; the other 34 judged rows
+  EVEN.
 - **MySQL 8.0 under sysbench** (`V11_SYSBENCH.md`; runs 39149259396, 39157795408, 39166382450): the InnoDB buffer pool on four
   untouched workloads. 46 judged rows EVEN and two where the runs disagree: on `update_index` the throughput (transactions and
   queries a second, one measure counted twice) moved −0.02%, +0.26% and −0.35%, two runs clear of zero in opposite directions,
@@ -8417,10 +8420,12 @@ code. No outside party has reviewed or approved these results.
   (`V11_SYSBENCH_SHIPPED.md`; runs 39150486066, 39159004803, 39167578494): from the factory's 128 MB pool Omni-Compass raised
   the pool 5% to 9% on `read_only` and `read_write` and the pages in use 4% to 16% on three workloads, power given in all three
   of our runs, with work, latency and failures EVEN: at this load the larger pool bought nothing measurable, and the table
-  says so.
+  says so. **At the max** (`V11_SYSBENCH_SERVICE.md`; runs 39182906799, 39184157413, 39184175254): all 48 judged rows EVEN.
 - **MongoDB under YCSB** (`V11_YCSB.md`; runs 39149263618, 39158992412, 39167564949): the storage engine's cache on `b`, `c`,
   `f` and `burst`. 43 judged rows EVEN and one GAIN: on `f` the cache held fell 0.9% to 1.0% in all three runs, with work,
-  latency and reads into the cache inside the noise. **Native as shipped** (`V11_YCSB_SHIPPED.md`; runs 39150495654,
+  latency and reads into the cache inside the noise. **At the max** (`V11_YCSB_SERVICE.md`; runs 39182911063, 39184161631,
+  39184179710): the cache held fell 0.4% to 0.8% on `b` and 0.6% to 0.8% on `f`, GAIN in all three of our runs; the other 42
+  judged rows EVEN. **Native as shipped** (`V11_YCSB_SHIPPED.md`; runs 39150495654,
   39160201436, 39169863638): the server's own cache (about 7.5 GB) is above the cover's top, the knob is at its limit on native,
   and all 44 judged rows read EVEN. Every cache handed back.
 - **Apache Kafka 3.9.1** (`V11_KAFKA.md`, objective resource; `V11_KAFKA_SERVICE.md`, objective service; runs 39149249969,
@@ -8558,7 +8563,7 @@ happened to work. The numbers of earlier engines are the road, in `docs/history`
 | Real Kubernetes on Goldilocks, KEDA (two ways) and fixed capacity (omni-v11); on CruiseKube (omni-v10) | L | section 60.2 | `results/live/V11_GOLDILOCKS.md`, `V11_KEDA_*.md`, `V11_CAPACITY.md`, `V10_CRUISEKUBE.md` |
 | Robustness, the governor killed outright (omni-v11) | L | every setting back at the operator's 8 to 11 s after the kill in 30 of 30 repetitions; p95 −39% to −58%, failed requests −7% to −12%, alert minutes −16% to −23%, GAIN; replicas +3% to +6%, power given | `results/live/V11_ROBUST_KILL.md` |
 | Robustness, the two-hour run (omni-v11) | L | no leak, decisions valid, no failed decision, every setting handed back; mean response −34% to −36%, GAIN; replicas +49% to +52%, power given | `results/live/V11_ROBUST_LONG.md` |
-| PostgreSQL, MySQL, MongoDB (omni-v11) | L | EVEN on every judged row but four: MongoDB's cache on `f` −0.9% to −1.0%, GAIN; PgBouncer's most connections open +8% to +10%, power given; MySQL's update throughput, the runs disagree; native as shipped: MySQL's pool +5% to +16%, power given, MongoDB EVEN | `results/live/V11_PGBENCH.md`, `V11_SYSBENCH*.md`, `V11_YCSB*.md` |
+| PostgreSQL, MySQL, MongoDB (omni-v11) | L | EVEN on every judged row but four: MongoDB's cache on `f` −0.9% to −1.0%, GAIN; PgBouncer's most connections open +8% to +10%, power given; MySQL's update throughput, the runs disagree; native as shipped: MySQL's pool +5% to +16%, power given, MongoDB EVEN; at the max: PgBouncer's connections held −10% to −22% and MongoDB's cache −0.4% to −0.8%, GAIN, MySQL EVEN | `results/live/V11_PGBENCH*.md`, `V11_SYSBENCH*.md`, `V11_YCSB*.md` |
 | Kafka (omni-v11) | L | consumers −0.8% on `burst`, GAIN under both objectives; the rest EVEN | `results/live/V11_KAFKA.md`, `V11_KAFKA_SERVICE.md` |
 | Redis (omni-v11) | L | work inside the line and hit rate +1.3% to +1.6%, mean latency −1.7% to −7.3%, GAIN; memory +1.7% to +1.9% on `small`, power given; native as shipped EVEN | `results/live/V11_REDIS.md`, `V11_REDIS_SERVICE.md`, `V11_REDIS_SHIPPED.md` |
 | The 1,107 muscles and seven organisms | S | 527 GAIN, 580 EVEN, none LOSS; every organism GAIN under three loads | `results/realms_v5/REALMS_V5.md` |
@@ -11745,7 +11750,7 @@ results.
 ### 68.1 No tail reads LOSS
 
 By the preregistered rule (a gauge reads LOSS only when it moves away from its aim in all three of our runs, every 95%
-interval clear of zero), **no 95th- or 99th-percentile row reads LOSS in any omni-v11 table** (20 tables), and none read
+interval clear of zero), **no 95th- or 99th-percentile row reads LOSS in any omni-v11 table** (23 tables), and none read
 LOSS in the omni-v10 tables before them. The one omni-v10 LOSS, the pod start wait under KEDA's HTTP add-on, was the test
 machine (an empty node unpacking the image inside the window); since the kind rig pulls the served image onto every worker
 before each arm, it reads EVEN on omni-v11 (`docs/POD_START_WAIT.md`, `results/live/V11_KEDA_REQUESTS.md`).
@@ -12325,7 +12330,7 @@ code. No outside party has reviewed or approved these results.
 
 - **The three-run rule is strict.** A row reads GAIN or LOSS only when three separate runs all move the same way with every
   95% interval clear of zero. With no true change, and runs independent, one run's interval is clear of zero on a given side
-  with probability 0.025, so a false GAIN or LOSS in a row has probability 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over the 888 judged
+  with probability 0.025, so a false GAIN or LOSS in a row has probability 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over the 1,039 judged
   rows of the omni-v11 tables the expected number of false readings is at most 0.03. Of those rows, 613 are in tests that
   carry noise; the other 241 are in deterministic simulators, which reproduce to the digit. Over the 613 the expectation is
   0.02. Runs share the harness, so they are not fully independent of it; the number is a guide, not a guarantee.
@@ -12716,7 +12721,7 @@ benchmark's three runs land, its row names the engine it ran on (`docs/BENEFIT_S
 are never read across engines. The standing block is written from the result files by `tools/summary.py --fix` and checked on
 every push; the prose below says the same in words.
 
-**On omni-v11, the engine that stands: twenty three-run tables** (`results/live/V11_*.md`, 19 October; 888 judged rows,
+**On omni-v11, the engine that stands: twenty-three three-run tables** (`results/live/V11_*.md`, 19 October; 1,039 judged rows,
 **0 LOSS**), each rebuilt byte for byte from its raw receipts (`tools/reproduce.py`):
 
 - **Real Kubernetes (evidence class L), ten pairs a run.** On top of Goldilocks: response time −47% to −48% mean, −61% to −64%
@@ -12728,9 +12733,13 @@ every push; the prose below says the same in words.
   (`docs/TAIL_LATENCY.md`).
 - **The live stacks (L), three pairs a run.** Redis: work inside the 2 ms line and hit rate +1.3% to +1.6%, mean latency −1.7%
   to −7.3%, GAIN; memory +1.7% to +1.9% on `small`, power given; native as shipped EVEN. Kafka: consumers −0.8% on `burst`, GAIN
-  under both objectives. MongoDB: the cache −0.9% to −1.0% on `f`, GAIN. PostgreSQL: the most connections open +8% to +10%,
-  power given. MySQL: EVEN but its update throughput, where the runs disagree; from the factory pool the pool +5% to +16%, power
-  given.
+  under both objectives. MongoDB: the cache −0.9% to −1.0% on `f`, GAIN; at the max −0.4% to −0.8% on `b` and `f`, GAIN.
+  PostgreSQL: the most connections open +8% to +10%, power given; at the max the connections held −10% to −22%, GAIN. MySQL:
+  EVEN but its update throughput, where the runs disagree; from the factory pool the pool +5% to +16%, power given; at the max
+  EVEN on every row.
+- **Robustness (L), on the kind rig with the served image pre-pulled.** The governor killed outright: every setting back 8 to
+  11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one. The long run: no leak, no failed
+  decision, no slowing, everything handed back. No LOSS in either.
 - **The independent simulators (S, published models, never in the headline).** Power grids: 67 gauge-rows GAIN, 14 power given,
   no LOSS. Robot arms: on the Kinova Gen3 peak torque −28.6% and tracking error −21.3%, GAIN; two arms left native. CityLearn:
   27 score-rows GAIN, 1 power given, no LOSS; the outage districts' batteries native. Drone swarms: energy a mission −7% to −20%,

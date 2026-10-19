@@ -127,7 +127,7 @@ benchmark's three runs land, its row names the engine it ran on (`docs/BENEFIT_S
 are never read across engines. The standing block is written from the result files by `tools/summary.py --fix` and checked on
 every push; the prose below says the same in words.
 
-**On omni-v11, the engine that stands: twenty three-run tables** (`results/live/V11_*.md`, 19 October; 888 judged rows,
+**On omni-v11, the engine that stands: twenty-three three-run tables** (`results/live/V11_*.md`, 19 October; 1,039 judged rows,
 **0 LOSS**), each rebuilt byte for byte from its raw receipts (`tools/reproduce.py`):
 
 - **Real Kubernetes (evidence class L), ten pairs a run.** On top of Goldilocks: response time −47% to −48% mean, −61% to −64%
@@ -139,9 +139,13 @@ every push; the prose below says the same in words.
   (`docs/TAIL_LATENCY.md`).
 - **The live stacks (L), three pairs a run.** Redis: work inside the 2 ms line and hit rate +1.3% to +1.6%, mean latency −1.7%
   to −7.3%, GAIN; memory +1.7% to +1.9% on `small`, power given; native as shipped EVEN. Kafka: consumers −0.8% on `burst`, GAIN
-  under both objectives. MongoDB: the cache −0.9% to −1.0% on `f`, GAIN. PostgreSQL: the most connections open +8% to +10%,
-  power given. MySQL: EVEN but its update throughput, where the runs disagree; from the factory pool the pool +5% to +16%, power
-  given.
+  under both objectives. MongoDB: the cache −0.9% to −1.0% on `f`, GAIN; at the max −0.4% to −0.8% on `b` and `f`, GAIN.
+  PostgreSQL: the most connections open +8% to +10%, power given; at the max the connections held −10% to −22%, GAIN. MySQL:
+  EVEN but its update throughput, where the runs disagree; from the factory pool the pool +5% to +16%, power given; at the max
+  EVEN on every row.
+- **Robustness (L), on the kind rig with the served image pre-pulled.** The governor killed outright: every setting back 8 to
+  11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one. The long run: no leak, no failed
+  decision, no slowing, everything handed back. No LOSS in either.
 - **The independent simulators (S, published models, never in the headline).** Power grids: 67 gauge-rows GAIN, 14 power given,
   no LOSS. Robot arms: on the Kinova Gen3 peak torque −28.6% and tracking error −21.3%, GAIN; two arms left native. CityLearn:
   27 score-rows GAIN, 1 power given, no LOSS; the outage districts' batteries native. Drone swarms: energy a mission −7% to −20%,

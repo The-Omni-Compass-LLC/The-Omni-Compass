@@ -57,7 +57,7 @@ measurement exists.
    all four on omni-v11, each rebuilt byte for byte. Held at B− by a fault found in the swarm's wire: on a mission draw outside
    the preregistered seeds it let drones collide where native did not. The fix held every drone outside the keep-out on all
    ten cells and draws tried (`results/toy_gate/V12_SWARM_REFLEX.md`) and lands with the next version.
-14. **Reproducibility.** All 20 omni-v11 tables rebuilt from their raw receipts and identical to the byte
+14. **Reproducibility.** All 23 omni-v11 tables rebuilt from their raw receipts and identical to the byte
    (`tools/reproduce.py`, weekly in `reproduce.yml`); every package pinned with its hashes, every action by its commit.
 15. **Honesty.** The limitations page, the tail-latency page, the runs-disagree rows each explained, every row kept.
 16. **Manuals.** Eleven referee chapters bound into the Owner's Manual (the proofs, the coverage, the power, the deviations,
@@ -71,9 +71,10 @@ measurement exists.
 
 ## The blueprint
 
-**On GitHub already, at no cost.** The third runs of the seven Kubernetes sets, the robustness kill and long runs, and the
-data stores at the max are finishing or archiving; the CruiseKube rerun on the corrected recorder is running. Each lands as
-an omni-v11 table and raises categories 6, 7 and 13.
+**On GitHub already, at no cost.** The robustness kill test and long run and the three data stores at the max landed on 19
+October (no LOSS in any); the third runs of the seven Kubernetes sets, the extended fault test and the CruiseKube rerun on the
+corrected recorder are running, and the cost to match runs again from the campaign. Each lands as an omni-v11 table and
+raises categories 6, 7 and 13.
 
 **The next engine version, on the founder's word** (`docs/CHANGE_CONTROL.md`: any change to a rule or guard is the next
 version, and every benchmark runs again on it):

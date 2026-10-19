@@ -64,7 +64,7 @@ code. No outside party has reviewed or approved these results.
 
 - **The three-run rule is strict.** A row reads GAIN or LOSS only when three separate runs all move the same way with every
   95% interval clear of zero. With no true change, and runs independent, one run's interval is clear of zero on a given side
-  with probability 0.025, so a false GAIN or LOSS in a row has probability 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over the 888 judged
+  with probability 0.025, so a false GAIN or LOSS in a row has probability 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over the 1,039 judged
   rows of the omni-v11 tables the expected number of false readings is at most 0.03. Of those rows, 613 are in tests that
   carry noise; the other 241 are in deterministic simulators, which reproduce to the digit. Over the 613 the expectation is
   0.02. Runs share the harness, so they are not fully independent of it; the number is a guide, not a guarantee.

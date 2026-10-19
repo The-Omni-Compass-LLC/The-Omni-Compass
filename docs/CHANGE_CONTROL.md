@@ -48,7 +48,7 @@ mixing results.
 
 A version is stable for a benchmark when its three runs on that version have landed with no change in between. omni-v11
 has stood since 18 October 16:03 UTC; its campaign of 129 runs is under way, and its three-run tables are in
-`results/live/V11_*.md` as they land (20 on 19 October). The engine's proofs (`docs/ENGINE_PROOFS.md`), its coverage
+`results/live/V11_*.md` as they land (23 on 19 October). The engine's proofs (`docs/ENGINE_PROOFS.md`), its coverage
 (`docs/ENGINE_COVERAGE.md`) and its reproducibility check (`tools/reproduce.py`) are run on every push, so a version that
 stands is also a version that is re-proved, re-tested and re-built from its receipts each time anything else changes.
 
