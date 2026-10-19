@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19: The repository credits its making to The Omni-Compass LLC alone
+
+- Four live lines named an AI tool as the maker of part of the work, and now say nothing of who typed them:
+  - the governor's role file (`deploy/kind/rbac-omni.yaml`);
+  - the v7 candidate's line in this changelog;
+  - two rows of `docs/HISTORY.md`;
+  - one step of `docs/METAL_KIT.md`.
+  The authorship records already named the company: `codemeta.json`, `pyproject.toml` and `CITATION.cff`, and the © notice
+  on every file. Where an AI tool read the results (`results/external_review/`, named as readers that never produce
+  results), and in the review records and the branch names, the record stays as it was written.
+
 ## 2026-10-19: Every Azure set to the paid cap of 100 repetitions, with a preregistered stopping rule
 
 - **The founder's orders of 19 October** ("I need a 3-run result ... the cap we can run it to ... do all, give all"). The
@@ -827,7 +838,7 @@
   ⌈R(1+h)/r⌉), leaving code, prices and constant names untouched; `verify.py` now fails a push in which any formula a
   manual prints is in LaTeX. Both PDFs rebuilt: the Operator's Manual 434 pages, the Owner's 820; neither prints a
   backslash command or a braced subscript.
-- **The v7 candidate** (branch `v7-candidate`, docs/OMNI_V7.md on that branch): ChatGPT's quota-aware conveyance (pull request #13);
+- **The v7 candidate** (branch `v7-candidate`, docs/OMNI_V7.md on that branch): the quota-aware conveyance (pull request #13);
   the verdict reading a give-back trial in the reports' own words (a clear rise refused, the evidence measured on while
   it is wider than the allowance); every rule of the governor stated in seconds; the cloud's rule as one flag,
   `--give-back-only`; and on a shared host no limit raised while the machine is 75% busy or unread. The founder's order
