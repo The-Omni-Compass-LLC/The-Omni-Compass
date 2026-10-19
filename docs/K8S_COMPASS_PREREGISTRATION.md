@@ -1289,8 +1289,10 @@ of native's (the median half-width of its 95% interval, 1.5% to 36% run to run),
   and four workers of `Standard_D2s_v4`) is the whole 10-vCPU allowance of that machine family in `eastus`, so twins need it
   raised to 20 (asked of Azure, never shrunk to fit). It is written here before any run of it and switched on only by a
   further amendment once the allowance is raised.
-- **The runs on omni-v11 already started at 5 repetitions** stay as they ran, their own record; a set's three-run table
-  pools only runs of one design and one engine.
+- **Counted apart.** A run under the rule carries "to the cap, stopping rule" in its title (`aks-metered.yml` run-name,
+  `scripts/dispatch_grid.py` `cloud_title`), so the conductor counts its A, B and C from zero. The omni-v11 steady run at
+  5 repetitions (run 39162654399, finished 2026-10-19 01:46 UTC) and any set started before this landed stay as they ran,
+  their own record; a set's three-run table pools only runs of one design and one engine.
 
 ---
 

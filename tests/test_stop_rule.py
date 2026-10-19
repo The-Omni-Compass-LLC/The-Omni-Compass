@@ -59,5 +59,15 @@ class StopRule(unittest.TestCase):
         self.assertTrue(S.decide(nat, omni, 11)[0])
 
 
+class Title(unittest.TestCase):
+    def test_a_set_under_the_rule_is_counted_apart(self):
+        from scripts import dispatch_grid as G
+        kv = {"replica_ceiling": "0", "dial": "save"}
+        old, new = G.azure_title(kv), G.azure_title({**kv, "stop_looks": "10,20,40,70"})
+        self.assertNotEqual(old, new)
+        self.assertEqual(new, "aks-metered steady replica room 0 to the cap, stopping rule dial save eastus Standard_D2s_v4")
+        self.assertEqual(G.azure_group(new), G.azure_group(old))     # the same machine-family queue
+
+
 if __name__ == "__main__":
     unittest.main()

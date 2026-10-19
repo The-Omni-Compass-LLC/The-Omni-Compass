@@ -137,7 +137,9 @@ def ledger() -> dict:
         for r in rs:
             if r["sha"] not in eng:
                 if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", r["sha"] + "^{commit}"], capture_output=True).returncode:
-                    subprocess.run(["git", "-C", str(ROOT), "fetch", "-q", "--depth", "1", "origin", r["sha"]], capture_output=True)   # a shallow checkout: fetch that one commit
+                    # fetch that one commit; --depth only where the checkout is already shallow (a full clone given --depth turns shallow)
+                    shallow = git("rev-parse", "--is-shallow-repository") == "true"
+                    subprocess.run(["git", "-C", str(ROOT), "fetch", "-q", *(["--depth", "1"] if shallow else []), "origin", r["sha"]], capture_output=True)
                 out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", r["sha"]],
                                      capture_output=True, text=True, cwd=ROOT).stdout
                 m = re.search(r"(omni-v\d+) \(digest", out)

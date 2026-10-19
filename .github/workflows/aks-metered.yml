@@ -10,11 +10,12 @@
 # group is deleted at the end whatever happens.
 name: aks-metered
 run-name: >-
-  ${{ format('aks-metered {0}{1}{2} dial {5} {3} {4}', github.event.inputs.load_steps != '' && format('burst {0}', github.event.inputs.load_steps) || 'steady',
+  ${{ format('aks-metered {0}{1}{2}{6} dial {5} {3} {4}', github.event.inputs.load_steps != '' && format('burst {0}', github.event.inputs.load_steps) || 'steady',
      github.event.inputs.organism != '' && format(' organism {0} x{1}', github.event.inputs.organism, github.event.inputs.organism_scale) || '',
      github.event.inputs.replica_ceiling != '' && format(' replica room {0}', github.event.inputs.replica_ceiling) || '',
      github.event.inputs.location || 'eastus', github.event.inputs.worker_pools != '' && 'pools' || (github.event.inputs.vm_size || 'Standard_D2s_v4'),
-     github.event.inputs.dial || 'save') }}
+     github.event.inputs.dial || 'save',
+     github.event.inputs.stop_looks != '' && ' to the cap, stopping rule' || '') }}
 on:
   workflow_dispatch:
     inputs:
