@@ -75,8 +75,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-18 23:14 | raw-sweep | success | [39175634735](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39175634735) |
-| 2026-10-18 23:13 | live-engine | cancelled | [39175632869](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39175632869) |
+| 2026-10-19 00:54 | benchmark-reps | success | [39179024544](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39179024544) |
+| 2026-10-19 00:54 | cloud-check google | failure | [39182844263](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39182844263) |
+| 2026-10-19 00:54 | robustness | success | [39177935888](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177935888) |
+| 2026-10-19 00:54 | kind-addons | success | [39176842679](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39176842679) |
+| 2026-10-19 00:46 | raw-sweep | success | [39181361067](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181361067) |
+| 2026-10-19 00:39 | cloud-check amazon | failure | [39181697621](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181697621) |
+| 2026-10-19 00:39 | live-engine | success | [39181361033](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181361033) |
+| 2026-10-19 00:33 | big-organism-detached collect | success | [39181081105](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181081105) |
+| 2026-10-19 00:19 | benchmark | success | [39177942974](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177942974) |
+| 2026-10-19 00:19 | grid | cancelled | [39177576225](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177576225) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
