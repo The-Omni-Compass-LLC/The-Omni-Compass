@@ -1676,7 +1676,7 @@ function paintWords(root) {   // every GAIN, EVEN and LOSS in the page's text we
   const tails = [], tw = document.createTreeWalker(start, NodeFilter.SHOW_TEXT); while (tw.nextNode()) { const n = tw.currentNode, pv = n.previousSibling;
     if (pv && pv.nodeType === 1 && /\b(w-gain|w-even|w-loss|w-given|w-lost|tw-[gel])\b/.test(pv.className) && /^\s?[0-9]/.test(n.nodeValue) && !(n.parentNode.classList && /\btw-/.test(n.parentNode.className))) tails.push([n, pv]); }
   for (const [n, pv] of tails) { const m = n.nodeValue.match(/^\s?[0-9][0-9.,]*\s?(?:%|pp|ms|s\b)?/); if (!m) continue; const cls = /w-loss|w-lost|tw-l/.test(pv.className) ? "tw-l" : /w-even|tw-e/.test(pv.className) ? "tw-e" : "tw-g";
-    const sp = document.createElement("span"); sp.className = cls; sp.textContent = m[0]; const rest = document.createTextNode(n.nodeValue.slice(m[0].length)); n.parentNode.insertBefore(sp, n); n.parentNode.replaceChild(rest, n); }
+    const sp = document.createElement("span"); sp.className = cls; sp.textContent = m[0]; const rest = document.createTextNode(n.nodeValue.slice(m[0].length)); n.parentNode.insertBefore(sp, n); n.parentNode.replaceChild(rest, n); const k = hits.indexOf(n); if (k >= 0) hits[k] = rest; }
   for (const n of hits) { const f = document.createDocumentFragment(), t = n.nodeValue; let last = 0; WORD_RX.lastIndex = 0; let m;
     while ((m = WORD_RX.exec(t))) { if (m.index > last) f.appendChild(document.createTextNode(t.slice(last, m.index))); const sp = document.createElement("span"); sp.className = WORD_CLS[wordKey(m[0])]; sp.textContent = m[0]; f.appendChild(sp); last = m.index + m[0].length; }
     if (last < t.length) f.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(f, n); } }
@@ -2527,13 +2527,39 @@ const EVEN_WHY = {same: () => "identical in all three runs, to the printed digit
   split: () => "a run clear of zero, but not all three the same way: EVEN by the three-run rule",
   changes: (e, u) => `no interval printed; the largest change read ±${e.bound}${u}`, unread: () => "its cells carry no number to read"};
 const EVEN_ORDER = [["same", "identical in every run"], ["tight", "measured tight (±2%)"], ["within", "within ±10%"], ["wide", "too noisy to tell yet"], ["split", "runs split"], ["changes", "no interval printed"], ["unread", "unread"]];
+// A table cell read in words: the reading set by what the gauge is for, the size and its 95% interval with no sign. The digits are
+// the table's own; only the sign is read into a word (a minus on a response time is a shorter wait, a GAIN, never a negative).
+const AIM_HIGH = /^work\b|\bwork (done|inside)|completed work|throughput|requests (a second|served|answered)|answered within|\bserved\b(?! late)|hit rate|goodput|missions|jobs (done|finished)|transactions a second|operations a second/i;
+const AIM_LOW = /response|latency|wait|delay|time over|over the (response )?line|alert|error|miss(es|ed)?\b|unschedul|pending|evict|restart|timeout|dropped|reject|\blag\b|queue|percentile|shortfall|not served|violation|stall|start wait|unmet|late/i;
+const AIM_SPENT = /energy|power|watt|\bwh\b|kwh|cpu|processor|core|memory|machine|node|replica|\bpods?\b|consumer|connection|bill|cost|\$|peak|ramp|swing|uneven|carbon|electricity|wear|torque|cap\b|limit|bought|spend/i;
+function aimOfRow(x) {   // the gauge's aim: from the row's own judged word and the sign of its runs, else from the gauge's name
+  const v = (x.abc || []).map(cellNum).filter(y => y !== null && y !== 0), sg = v.length ? Math.sign(v.reduce((a, y) => a + Math.sign(y), 0)) : 0;
+  if (x.w === "power given") return "spent";
+  if ((x.w === "GAIN" || x.w === "LOSS") && sg) { const up = sg > 0; if (x.w === "GAIN" && up) return "up"; if (x.w === "LOSS" && !up) return "up"; if (AIM_SPENT.test(x.g) && !AIM_LOW.test(x.g)) return "spent"; return "down"; }
+  const g = x.g || ""; return AIM_HIGH.test(g) ? "up" : AIM_LOW.test(g) ? "down" : AIM_SPENT.test(g) ? "spent" : null; }
+function cellWords(c, aim, shown) {   // one run's cell, e.g. "−33.0% (−50.2 to −15.7)" on a response time: "GAIN, 33.0% less (15.7% to 50.2%)"
+  const t = String(c || "").trim(); if (!t || t === "—") return "—";
+  const m = t.match(/^([-+−]?)(\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?)\s*(%|pp)?\s*(?:\(([-+−]?)(\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?)\s*to\s*([-+−]?)(\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?)\))?/);
+  if (!m) return ESC(unsign(t));
+  const u = m[3] || "", num = (sg, d) => (sg === "-" || sg === "−" ? -1 : 1)*+d.replace(/,/g, ""), v = num(m[1], m[2]);
+  if (m[4] === undefined && m[5] === undefined) { if (v === 0) return "no change"; const z = m[2] + u; return shown || !aim ? `${v > 0 ? "rose" : "fell"} ${z}` : runWord(v, aim, z, ""); }
+  const lo = num(m[4], m[5]), hi = num(m[6], m[7]), a = [m[5], m[7]], z = m[2] + u;
+  if (lo <= 0 && hi >= 0) { const w = Math.abs(lo) >= Math.abs(hi) ? m[5] : m[7]; return +w.replace(/,/g, "") === 0 && v === 0 ? (shown ? "no change" : "EVEN, no change") : `${shown ? "no change beyond the noise" : "EVEN"}, inside ${w}${u}`; }
+  const [p, q] = Math.abs(lo) <= Math.abs(hi) ? a : [a[1], a[0]], iv = ` (${p}${u} to ${q}${u})`;
+  return shown || !aim ? `${v > 0 ? "rose" : "fell"} ${z}${iv}` : runWord(v, aim, z, iv); }
+function runWord(v, aim, z, iv) {
+  const up = v > 0, W = (w, cls, txt) => `<span class="word ${cls}">${w}</span> ${txt}`;
+  if (aim === "up") return up ? W("GAIN", "w-gain", `${z} more${iv}`) : W("LOSS", "w-loss", `${z} less${iv}`);
+  if (aim === "down") return up ? W("LOSS", "w-loss", `${z} more${iv}`) : W("GAIN", "w-gain", `${z} less${iv}`);
+  return up ? W("power given", "w-given", `${z} more${iv}`) : W("GAIN", "w-gain", `${z} cut${iv}`); }
+const abcWords = (x, shown) => { const aim = shown ? null : aimOfRow(x); return (x.abc || []).map((c, i) => c ? `${"ABC"[i]}: ${cellWords(c, aim, shown)}` : "").filter(Boolean).join(" · "); };
 function evenWhy(e) { return (EVEN_WHY[e.kind] || EVEN_WHY.unread)(e, e.pct ? "%" : ""); }
 function buildReceipts() {
   const tot = {GAIN: 0, "power given": 0, "power loss": 0, EVEN: 0, LOSS: 0, "the runs disagree": 0};
   $("rcTbl").querySelector("tbody").innerHTML = SC.receipts.map((r, ix) => { const lost = lostRows(r.rows), c = Object.assign({}, r.count); c["power loss"] = lost.size; c["power given"] = (c["power given"] || 0) - lost.size; for (const k in tot) tot[k] += c[k] || 0;
     const cell = (k, cls) => `<td class="${(c[k] || 0) && cls ? cls : ""}">${c[k] || 0}</td>`;
-    const det = r.rows.length ? `<details><summary>${r.rows.length} rows not EVEN</summary><table class="who"><tbody>${r.rows.map(x => `<tr><td>${x.s === r.title || x.s.startsWith(r.title.slice(0, 20)) ? "" : x.s}</td><td>${x.g}</td><td>${x.abc.filter(Boolean).map((c, i) => "ABC"[i] + " " + (c.match(/[0-9][0-9.,e]*\s*(%|pp|req\/s|s|ms)?/) || [c])[0]).join(" · ")}</td><td><span class="word ${lost.has(x) ? "w-lost" : {GAIN: "w-gain", LOSS: "w-loss", "power given": "w-given", "the runs disagree": "w-dis"}[x.w] || "w-even"}">${lost.has(x) ? x.r.replace("power given", "power loss") : x.r}</span></td></tr>`).join("")}</tbody></table></details>` : "";
-    const ev = (r.even || []), evd = ev.length ? `<details><summary>${ev.length} rows EVEN, each with its reason</summary><table class="who"><tbody>${ev.map(x => `<tr><td>${x.s === r.title || x.s.startsWith(r.title.slice(0, 20)) ? "" : x.s}</td><td>${x.g}</td><td>${x.abc.filter(Boolean).map((c, i) => "ABC"[i] + " " + c).join(" · ")}</td><td><span class="word w-even">EVEN</span> ${evenWhy(x)}</td></tr>`).join("")}</tbody></table></details>` : "";
+    const det = r.rows.length ? `<details><summary>${r.rows.length} rows not EVEN</summary><table class="who"><tbody>${r.rows.map(x => `<tr><td>${x.s === r.title || x.s.startsWith(r.title.slice(0, 20)) ? "" : x.s}</td><td>${x.g}</td><td>${abcWords(x)}</td><td><span class="word ${lost.has(x) ? "w-lost" : {GAIN: "w-gain", LOSS: "w-loss", "power given": "w-given", "the runs disagree": "w-dis"}[x.w] || "w-even"}">${lost.has(x) ? x.r.replace("power given", "power loss") : x.r}</span></td></tr>`).join("")}</tbody></table></details>` : "";
+    const ev = (r.even || []), evd = ev.length ? `<details><summary>${ev.length} rows EVEN, each with its reason</summary><table class="who"><tbody>${ev.map(x => `<tr><td>${x.s === r.title || x.s.startsWith(r.title.slice(0, 20)) ? "" : x.s}</td><td>${x.g}</td><td>${abcWords(x)}</td><td><span class="word w-even">EVEN</span> ${evenWhy(x)}</td></tr>`).join("")}</tbody></table></details>` : "";
     return `<tr><td>${r.stack}</td><td>${r.title}<br><code>${engTag(r.engine)}</code> · <code>${r.file}</code>${det}${evd}</td><td>${r.cls}</td>${cell("GAIN", "w-gain")}${cell("power given", "w-given")}${cell("power loss", "w-lost")}${cell("EVEN", "w-even")}${cell("LOSS", "w-loss")}${cell("the runs disagree", "w-dis")}</tr>`; }).join("");
   const eb = {}; SC.receipts.forEach(r => (r.even || []).forEach(e => { eb[e.kind] = (eb[e.kind] || 0) + 1; }));
   $("rcSum").innerHTML = `${SC.receipts.length} three-run tables (${SC.receipts.filter(r => r.cls === "L").length} of real software, class L; ${SC.receipts.filter(r => r.cls === "S").length} of outside simulators run by our own runner, class S: ${(() => { const L = rcTally("L"), S = rcTally("S"); return `class L ${L.GAIN} GAIN, ${L["power given"]} power given, ${L.LOSS} LOSS, ${L["the runs disagree"]} disagree; class S ${S.GAIN} GAIN, ${S["power given"]} power given, ${S.LOSS} LOSS, ${S["the runs disagree"]} disagree`; })()}), each the newest engine's table (${[...new Set(SC.receipts.map(r => r.engine))].join(", ")}), three runs each: <b>${tot.GAIN}</b> rows GAIN in all three runs, <b>${tot["power given"]}</b> power given, each with a GAIN beside it, <b>${tot["power loss"]}</b> power loss (a resource that rose with no GAIN beside it, tested on every comparison), <b>${tot.EVEN}</b> EVEN, <b style="color:var(--bad)">${tot.LOSS}</b> LOSS (${lossWhere()}), <b>${tot["the runs disagree"]}</b> where the runs disagree. <b>Why each EVEN is EVEN</b>, read from its own three runs: ${EVEN_ORDER.filter(([k]) => eb[k]).map(([k, n]) => `<b>${eb[k]}</b> ${n}`).join(", ")}. "Identical in every run": every run reads zero to the printed digit, nothing moved either way; "measured tight": every run's interval sits within ±2%, so any difference is smaller than that; "too noisy to tell yet": an interval reaches past ±10%, and more repetitions would narrow it; "runs split": a run cleared zero but not all three the same way. Open a table's rows below for each one.`;
@@ -3667,7 +3693,7 @@ function updC4() { const R = CR.settings.cloud.runs[String(CR.seeds[C4.run])], t
   const cell = (lbl, a, b) => `<div><span>${lbl}</span><b><span class="n">${a}</span> · <span class="o">${b}</span></b></div>`, d = R.dec[C4.k] || [];
   $("c4Mon").innerHTML = cell("machines in service now", R.native.nodes[t], R.omni.nodes[t]) + cell("machines parked now", R.native.parked[t], R.omni.parked[t])
     + cell("pods waiting for a place", R.native.pending[t], R.omni.pending[t]) + cell("response time now (ms)", R.native.ms[t], R.omni.ms[t])
-    + cell("the bill so far: machine-ticks in service", bn, bo) + `<div><span>the bill so far, Omni-Compass against native</span><b>${bn ? ((bo - bn)/bn*100 >= 0 ? "+" : "") + ((bo - bn)/bn*100).toFixed(1) + "%" : "—"}</b></div>`; }
+    + cell("the bill so far: machine-ticks in service", bn, bo) + `<div><span>the bill so far, Omni-Compass against native</span><b>${bn ? (Math.abs((bo - bn)/bn*100) < 0.05 ? "EVEN, the same" : bo < bn ? "GAIN, " + ((bn - bo)/bn*100).toFixed(1) + "% cut" : "power given, " + ((bo - bn)/bn*100).toFixed(1) + "% more") : "—"}</b></div>`; }
 const LEDGER = OPS_BUILD.ledger || {workflows: {}};
 const ldWord = c => ({failure: "stopped short of its end", cancelled: "cancelled", success: "measured to the end", startup_failure: "did not start", timed_out: "ran out of its time"})[c] || c;
 const ldDate = iso => iso ? iso.replace("T", " ").slice(5, 16) : "—";
@@ -3853,7 +3879,7 @@ function hbAlarms() {   // every alarm and watch item, worst first; each with wh
       (c ? `root cause: <code>${c.file}</code>, ${ESC(c.title)}` : `the table's own reading: ${ESC(x.r)}`), "s-fleet"); }));
 
   SC.receipts.forEach(r => r.rows.filter(x => x.w === "the runs disagree").forEach(x => add(4, "dis", `${x.g}: ${r.title.split(":")[0]}`, "the runs disagree", "w-dis",
-    `<code>${r.file}</code> (${r.engine}, class ${r.cls})`, `the table's own reading: ${ESC(x.r)}; runs ${x.abc.map((c, i) => "ABC"[i] + " " + (c || "—")).join(" · ")}`, "s-fleet")));
+    `<code>${r.file}</code> (${r.engine}, class ${r.cls})`, `the table's own reading: ${ESC(x.r)}; run by run, ${abcWords(x)}`, "s-fleet")));
   const k3 = vkRate(0.03), k5 = vkRate(0.05);
   add(5, "guard", "The verdict can keep a step that costs a little more", "open", "w-dis", "<code>omnicompass/verdict.py</code>, the engine that stands",
     `at the noise the real runs measured (σ 0.46, 200 requests a side) this page's port keeps a step that truly costs 3% more ${pct0(k3)} and 5% more ${pct0(k5)} of the trials (${VK.n} at each cost): it keeps a step unless its measurement reads LOSS or its estimate passes the 2% allowance; requiring the interval's top inside the allowance is the next engine version's work, through the toy gate`, "s-verdict");
@@ -3987,7 +4013,7 @@ function buildFail() {
   $("fmNote").innerHTML = `Each guard is named where it lives in the code, and how far it reaches is said as the code and the repository's own runs show it. A button puts the live engine (the stress-test model, class S) through that way on both sides at once; a record has no live form. The engine that stands keeps do no harm in its strictest form: no muscle below native, nothing taken from one muscle to give to another; where a lever has no trial, its bounds and the three-run tables are what hold it.`;
   const st = $("shTab").querySelector("tbody");
   const shDraw = f => { const rs = f === "res" ? shownRows(true) : shownRows(false);
-    st.innerHTML = rs.map(({r, x}) => `<tr><td>${r.title.split(":")[0]} <code>${r.engine}</code> (class ${r.cls})</td><td>${ESC(x.g)}</td><td>${x.abc.map((c, i) => "ABC"[i] + " " + ESC(c || "—")).join(" · ")}</td><td>${ESC(x.r)}</td></tr>`).join("") || `<tr><td colspan="4">none</td></tr>`;
+    st.innerHTML = rs.map(({r, x}) => `<tr><td>${r.title.split(":")[0]} <code>${r.engine}</code> (class ${r.cls})</td><td>${ESC(x.g)}</td><td>${abcWords(x, true)}</td><td>${ESC(x.r)}</td></tr>`).join("") || `<tr><td colspan="4">none</td></tr>`;
     $("shNote").innerHTML = `${shownRows(false).length} rows of the three-run tables are shown and not judged, by each table's own preregistered rule; ${shownRows(true).length} of them are a resource that rose clear of zero in all three runs, the price of the work beside it. They are never read as GAIN, EVEN or LOSS here, because their table does not read them; they are listed so their size is seen.`; };
   shDraw("res");
   document.querySelectorAll("[data-shf]").forEach(b => b.addEventListener("click", () => { press([...document.querySelectorAll("[data-shf]")], b); shDraw(b.dataset.shf); }));
