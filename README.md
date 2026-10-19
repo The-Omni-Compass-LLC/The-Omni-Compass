@@ -66,8 +66,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
 | 2026-10-18 22:05 | [Where the pod start wait goes: every serving pod's start, phase by phase](results/live/POD_START_PHASES.md) |  |
+| 2026-10-18 19:22 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-18 16:03 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V11_VS_V10.md) |  |
-| 2026-10-18 16:03 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -75,16 +75,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-19 01:21 | raw-sweep | success | [39184951373](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39184951373) |
-| 2026-10-19 01:21 | live-engine | cancelled | [39184951006](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39184951006) |
-| 2026-10-19 01:14 | benchmark-reps | success | [39180240328](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39180240328) |
-| 2026-10-19 01:06 | kind-goldilocks | success | [39177950720](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177950720) |
-| 2026-10-19 01:03 | capacity A: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | success | [39179020367](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39179020367) |
-| 2026-10-19 00:54 | cloud-check google | failure | [39182844263](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39182844263) |
-| 2026-10-19 00:54 | robustness | success | [39177935888](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177935888) |
-| 2026-10-19 00:39 | cloud-check amazon | failure | [39181697621](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181697621) |
-| 2026-10-19 00:33 | big-organism-detached collect | success | [39181081105](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39181081105) |
-| 2026-10-19 00:19 | benchmark | success | [39177942974](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39177942974) |
+| 2026-10-19 14:01 | live-engine | failure | [39264077277](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39264077277) |
+| 2026-10-19 13:57 | big-organism-detached collect | success | [39264574795](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39264574795) |
+| 2026-10-19 13:49 | six x100 line orgs 3 runs 10+90 | success | [39224034803](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224034803) |
+| 2026-10-19 13:47 | six x100 line orgs 1 runs 10+90 | success | [39224020999](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224020999) |
+| 2026-10-19 13:41 | cloud-check google | failure | [39262312182](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39262312182) |
+| 2026-10-19 13:38 | six x100 line orgs 4 runs 10+90 | success | [39224041783](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224041783) |
+| 2026-10-19 13:26 | cloud-check amazon | failure | [39260085707](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39260085707) |
+| 2026-10-19 13:24 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 61+40 arms native compass split no window 1440 protocol 4 | success | [39243908751](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39243908751) |
+| 2026-10-19 13:19 | six x100 line orgs 6 runs 10+90 | success | [39224056111](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224056111) |
+| 2026-10-19 13:05 | six x100 line orgs 5 runs 10+90 | success | [39224048866](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224048866) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
@@ -121,8 +121,8 @@ district's monthly unevenness +0.11%, beside the bill −8.6% and the electricit
 time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs; KEDA's HTTP add-on, −57% to −58% mean,
 −71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, GAIN in all three; KEDA on the CPU target and
 the requests, −36% to −38% mean and −52% to −54% at the 95th percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN;
-machines EVEN in every one; parked-worker energy +1.1% to +2.3%, power given. The Omni index over the real tests: **+4.2% GAIN** on the
-resource reading and **+11.5% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+machines EVEN in every one; parked-worker energy +1.1% to +2.3%, power given. The Omni index over the real tests, every table on omni-v10: **+4.4% GAIN** on the
+resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
 

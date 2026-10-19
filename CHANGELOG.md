@@ -2,6 +2,40 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19: Every finished run's files land in the repository by themselves
+
+- **The founder's order of 19 October** ("it's mine ... it should have been in my shit"). Until now only the five live
+  products' runs were copied onto the branch `raw` by themselves. Every other run's files stayed in GitHub's artifact
+  store, where they expire and this session cannot open them, unless its id was listed by hand. That is how the files
+  of the failed six-kube repetition (run 39214993403, the distribution organism at 10 copies, repetition 57) were out
+  of reach.
+- **The fix.** `archive-run.yml` now runs every hour by itself. Each pass takes every finished run, failed ones
+  included, of every workflow that hands in files since omni-v11 landed (2026-10-18 16:06 UTC). It saves each one on
+  `raw` as `run-<id>/`, then frees the runner's disk, up to about 4 GB a pass; the next pass goes on from there. A run id
+  in `.github/archive_request.txt` still goes first, and this push lists the three failed six-kube runs and the three
+  omni-v11 CruiseKube runs.
+- `tests/test_archive_sweep.py` fails a push that leaves any workflow that uploads files off the list. The Owner's
+  Manual and `CLAUDE.md` say so.
+
+## 2026-10-19: The recorder counts a worker held by an add-on's own mark while it serves
+
+- **Why two CruiseKube runs read failed.** Three native repetitions of the omni-v11 CruiseKube test (run 39171059299,
+  repetitions 5 and 10; run 39175670991, repetition 2) were refused for "no machine in service" while the service answered
+  every probe. In each, CruiseKube had marked every node `cruisekube.truefoundry.com/overloaded:NoSchedule`, every node Ready.
+  That mark tells the scheduler to send the node no new pod; the pods already on it keep serving. The recorder
+  (`fleet/capture/kube_capture.sh`) took any NoSchedule mark as a machine out of service, read 0, and the rig refused the
+  window. The runs aggregated their other 9 pairs.
+- **The fix.** A Ready worker that carries work and is held only by an add-on's own NoSchedule mark is in service, as the
+  power capture already counted it. Kubernetes' own marks, the control plane's role mark and any NoExecute mark still take a
+  node out. The same rule holds in both arms, and the refusal stands for a window with truly no machine in service.
+  `tests/test_capture_in_service.py` runs the recorder on the cluster as those repetitions saw it: it read (0, 0) before the
+  fix and (2, 2) after.
+- **Run again.** The CruiseKube test runs again, A, B and C, on the corrected recorder (`scripts/reruns.txt`, the block of
+  19 October). Its earlier runs stay their own record.
+- **For the next engine.** The governor (`omni_controller/controller.py`, an engine file) counts machines by the old rule.
+  Under the add-on's mark on every worker it holds, safely but blind. That changes in the next version, through the toy gate.
+  `docs/K8S_COMPASS_PREREGISTRATION.md`, the amendment of 19 October.
+
 ## 2026-10-19: The repository credits its making to The Omni-Compass LLC alone
 
 - Four live lines named an AI tool as the maker of part of the work, and now say nothing of who typed them:

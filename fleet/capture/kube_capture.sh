@@ -23,13 +23,23 @@ while :; do
     sleep "$INTERVAL"; continue
   fi
   if [ "${ACTIVE_ONLY:-0}" = "1" ]; then
-    # in service: open to new work, or closed (idle mark or cordon) but still carrying work (not a DaemonSet's)
+    # in service: open to new work, or closed (idle mark or cordon) but still carrying work (not a DaemonSet's), or held
+    # by an add-on's own mark while still serving: a Ready worker carrying work whose only taints are NoSchedule marks
+    # that are not Kubernetes' own (CruiseKube's cruisekube.truefoundry.com/overloaded, 19 October: it marks every worker
+    # under load, and the workers kept serving every probe, so a reading of "no machine in service" was the recorder's
+    # count, not the cluster). Kubernetes' own marks (node.kubernetes.io/*: unreachable, not ready, under pressure) and the
+    # control plane's role mark still take a node out, as does any NoExecute mark.
     carrying=$(echo "$pods" | jq -r '[.items[] | select(.status.phase=="Running" or .status.phase=="Pending")
       | select(all(.metadata.ownerReferences[]?; .kind != "DaemonSet")) | .spec.nodeName // empty] | unique | join(" ")')
     nodes=$(echo "$nodes" | jq --arg c " $carrying " '.items |= map(select(
       ((.spec.unschedulable == true or any(.spec.taints[]?; .key == "omnicompass.io/idle")) as $closed
-       | ($closed | not) and ([.spec.taints[]? | select(.effect=="NoSchedule")] | length) == 0
-         or (.metadata.name as $n | $closed and ($c | contains(" " + $n + " "))))))')
+       | (.metadata.name as $n | $c | contains(" " + $n + " ")) as $carrying
+       | [.spec.taints[]? | select(.effect=="NoSchedule" or .effect=="NoExecute")] as $held
+       | ($closed | not) and ($held | length) == 0
+         or ($closed and $carrying)
+         or (($closed | not) and $carrying and ($held | length) > 0
+             and all($held[]; .effect == "NoSchedule" and (.key | test("^node(-role)?[.]kubernetes[.]io/") | not))
+             and any(.status.conditions[]?; .type == "Ready" and .status == "True")))))')
   fi
   names=$(echo "$nodes" | jq -r '[.items[].metadata.name] | join(" ")')
   ready=$(echo "$nodes" | jq '[.items[] | select(any(.status.conditions[]; .type=="Ready" and .status=="True"))] | length')

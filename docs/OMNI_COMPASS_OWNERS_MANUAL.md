@@ -616,38 +616,40 @@ installed is a quarter off the bill.
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
   - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v7, each named in its table): +4.2% GAIN on the resource reading (work, speed, machines, energy), +11.5% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
-  - Real Kubernetes (GitHub): +27.2% GAIN
-  - Real cache (Redis, GitHub): +0.2% GAIN
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10, each named in its table): +4.4% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+  - Real Kubernetes (GitHub): +28.6% GAIN
+  - Real database (PostgreSQL behind PgBouncer, GitHub): +0.7% GAIN
+  - Real database cache (MongoDB under YCSB, GitHub): +0.1% GAIN
+  - Real cache (Redis, GitHub): +0.1% GAIN
   - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
-  - Real database cache (MongoDB under YCSB, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v11): 0 of 24 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v11): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v7 | +4.2% | GAIN, power given | L |
-| Robustness: the two-hour run | omni-v7 | +0.0% | EVEN | L |
-| Robot arms (MuJoCo), the three untouched robots | omni-v7 | +3.8% | GAIN | S |
-| Redis, the cache's memory ceiling | omni-v7 | +0.2% | GAIN, power given | L |
-| Real Kubernetes, faults | omni-v7 | +35.0% | GAIN, power given | L |
-| Real Kubernetes, all four at once | omni-v7 | +37.4% | GAIN | L |
-| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v7 | +18.0% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v7 | +0.0% | EVEN | L |
-| Real Kubernetes, a queue of jobs | omni-v7 | +12.5% | GAIN | L |
-| Real Kubernetes, a public day of demand (Google 2011) | omni-v7 | +31.5% | GAIN, power given | L |
-| Real Kubernetes, a noisy neighbour | omni-v7 | +0.0% | EVEN | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +78.3% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v7 | +44.8% | GAIN, power given | L |
-| Power grids (SimBench), both load models | omni-v7 | +5.8% | GAIN, power given | S |
-| PostgreSQL, the pooler's pool size | omni-v7 | +0.0% | EVEN | L |
-| MySQL, the buffer pool's size | omni-v7 | +0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | omni-v7 | +0.0% | EVEN | L |
-| Kafka, the consumer group's size | omni-v7 | +0.1% | GAIN | L |
-| Drone swarms, the three untouched cells | omni-v7 | +6.1% | GAIN | S |
-| Buildings and batteries (CityLearn), the districts with batteries | omni-v7 | +0.8% | GAIN AND LOSS | S |
+| Every real test together: the Omni index | omni-v10 | +4.4% | GAIN AND LOSS | L |
+| Robustness: the two-hour run | omni-v10 | +1.5% | GAIN, power given | L |
+| Robot arms (MuJoCo), the three untouched robots | omni-v10 | +3.8% | GAIN | S |
+| Redis, the cache's memory ceiling | omni-v10 | +0.1% | GAIN, power given | L |
+| Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
+| Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
+| Real Kubernetes, demand that wanders | omni-v10 | +36.7% | GAIN | L |
+| Real Kubernetes, all four at once | omni-v10 | +39.7% | GAIN | L |
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v10 | +57.6% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | +0.0% | EVEN | L |
+| Real Kubernetes, a queue of jobs | omni-v10 | +10.2% | GAIN | L |
+| Real Kubernetes, a public day of demand (Google 2011) | omni-v10 | +35.4% | GAIN, power given | L |
+| Real Kubernetes, a noisy neighbour | omni-v10 | +0.0% | GAIN | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v10 | +94.6% | GAIN AND LOSS | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v10 | +46.9% | GAIN, power given | L |
+| Power grids (SimBench), both load models | omni-v10 | +5.8% | GAIN, power given | S |
+| PostgreSQL, the pooler's pool size | omni-v10 | +0.7% | GAIN | L |
+| MySQL, the buffer pool's size | omni-v10 | +0.0% | EVEN | L |
+| MongoDB, the storage engine's cache size | omni-v10 | +0.1% | GAIN | L |
+| Kafka, the consumer group's size | omni-v10 | +0.1% | GAIN | L |
+| Drone swarms, the three untouched cells | omni-v10 | +5.9% | GAIN | S |
+| Buildings and batteries (CityLearn), the districts with batteries | omni-v10 | +1.5% | GAIN, power given | S |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -3005,8 +3007,9 @@ a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on G
    loss stays in the record. A benchmark may be left unpublished; it is never published with rows cut out.
 8. **The raw files live with the code.** Every finished run's files (capture, response times, audit log, controller
    log, one SHA-256 manifest per repetition) are copied into `run-<id>/` on the branch `raw` by the `archive-run`
-   workflow (one run id per line in `.github/archive_request.txt`; a run still going is left for a later pass), and
-   every table names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
+   workflow: every hour, by itself, every finished run of every workflow that hands in files, failed runs included (a
+   run id in `.github/archive_request.txt` goes first; a run still going is left for a later pass), and every table
+   names the runs and the commit it was made from. Main's tree carries the code and the tables only, so a
    clone of it is small; `bash scripts/raw_archive.sh open /run-<id>/` places a run's files at `results/live/raw/run-<id>/`,
    the path every table names.
 
@@ -3829,7 +3832,7 @@ any one of the three can tell whether the files in front of them are the files t
 | The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
 | Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
 | The big organisms, detached | workflow `big-organism-detached`: `mode` start / collect / survey, `organisms`, `size`, `duration_s`, `commit`, `max_hours` |
-| Archive a finished run with the code | add its id to `.github/archive_request.txt` and push (workflow `archive-run`) |
+| Archive a finished run with the code | nothing to do: workflow `archive-run` takes it within the hour; to take it at once, add its id to `.github/archive_request.txt` and push |
 | Verify before a push, as GitHub runs it | `python3 tools/release_manifest.py` under Python 3.12: 0 FAIL |
 
 ## Appendix B - File Map
@@ -4049,7 +4052,7 @@ many pages it read, how many pods it started), not to be counted for or against 
 | Storage-engine cache: the compass only ever reads calm | the line is set far above the stack's own latencies (a 2 ms line over 0.15 to 0.45 ms reads) | set the line on the tuning workload's own figures so that a hit is calm and a full-cache miss is slow, and write the figures in the preregistration before any counted run |
 | Swarm: a cell reads "void" | two drones came within two collision radii in either arm | a task or simulator setting (keep-out, altitude stagger, depot spacing); fixed before any counted run and said in the preregistration |
 | Three-run table heads itself with a warning | a run's commit is not the engine it claims, or the three are not separate runs | run `tools/omni_version.py --commit <sha>` on each; make the table only from runs on one frozen engine |
-| Archive bot skips a run | the run was not finished when the bot passed | leave the id in `.github/archive_request.txt`; the next pass copies it |
+| Archive bot skips a run | the run was not finished when the bot passed, or the pass had taken its share of bytes | nothing to do: the next hourly pass copies it |
 
 ## Appendix F - Evidence Map
 
