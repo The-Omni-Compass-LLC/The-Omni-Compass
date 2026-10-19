@@ -93,14 +93,19 @@ version, and every benchmark runs again on it):
   omni-v11 from the campaign); an outside party's rerun; a real multi-machine cluster (kind puts every node on one runner);
   days to weeks on a real workload; each rule's share of the gain read on the live cluster, not only in our models.
 - *Gauges*: measured joules and grams of carbon; the cost of 1,000 requests; the 99.9th percentile (the probes are too sparse
-  for it); the operator's own terms (availability, error budget, burn rate) beside the alert minutes; the time to react and
-  to settle (moves and reversals an hour are now read for every omni-v11 Kubernetes table, `results/STEERING.md`); each
-  muscle's headroom to its own limit; the governor's own calls to the cluster's API.
-- *The operator's screen*: the gauges feed and a ready Grafana screen are in (`tools/omni_exporter.py`,
-  `deploy/grafana/omni-compass.json`, read-only). Still to build: one screen with the kill switch, the mode (autopilot,
-  watching, off), the dial (the max to the tune-down), a row per muscle with its hand-back and watch-only buttons, and the
-  live native-against-Omni panel; its buttons write settings, so they come with the next version, through the toy gate, behind
-  the cluster's own sign-in; and a one-line install (a Helm chart).
+  for it); the operator's own terms (availability, error budget, burn rate) beside the alert minutes; each muscle's headroom to
+  its own limit; the governor's own calls to the cluster's API. Now read for every omni-v11 Kubernetes table
+  (`results/STEERING.md`): moves, reversals and distance travelled an hour, the share of decisions with the compass in its
+  band and at the line, the time from the line back into the band, and errors an hour.
+- *The operator's screen*: in. The gauges feed and a Grafana screen (`tools/omni_exporter.py`,
+  `deploy/grafana/omni-compass.json`, read-only); ten alert rules (`deploy/prometheus/omni-compass-rules.yaml`); and the control
+  panel (`tools/omni_control.py`): an authenticated API with an OpenAPI document and a console with the buttons (mode autopilot,
+  watch or off; the dial, max or tune-down; reset to native; the kill switch for every governor on the machine; the two-person
+  arm), roles on every button and every press logged. It writes no setting itself: every change goes through the governor's own
+  hand-back and a restart with the new arguments, so the engine does not change for it (`docs/OBSERVABILITY.md`). Still to
+  build: a row per muscle with its own hand-back and watch-only buttons (the engine that stands takes its mode for the whole
+  governor, so that comes with the next version, through the toy gate); the live native-against-Omni panel; a one-line install
+  (a Helm chart); two governors with leader election.
 
 **Mathematics.** CERT-10 for every fixture by entry bounds taken cell by cell instead of over the whole box; the bath's
 amplitude from a discrete Lyapunov function per cell.
