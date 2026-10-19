@@ -35,7 +35,7 @@ Type `yes` the first time, then the password from the provider's email.
 
 ## Step 3. Get the code at the exact commit
 
-Copy and paste these lines one at a time (the commit is the one Claude gives you; the archive of raw runs stays out, so
+Copy and paste these lines one at a time (the commit is the exact one named for the run; the archive of raw runs stays out, so
 the download is small):
 
 ```bash
