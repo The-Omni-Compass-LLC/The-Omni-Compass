@@ -114,6 +114,9 @@ RIG_FILE = "deploy/kind/prepull.yaml"
 RIG_WORKFLOWS = ("benchmark.yml", "benchmark-reps.yml", "big-organism.yml", "capacity.yml", "kind-addons.yml",
                  "kind-cruisekube.yml", "kind-goldilocks.yml", "robustness.yml")
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
+# the workflows whose run records the label it was started with (A, B or C): the conductor passes the rerun's own letter
+# (19 October; before, a run it started read the workflow's default, A, in its own record)
+LABELLED = ("capacity.yml",)
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
 # October): scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
@@ -956,7 +959,8 @@ def main(argv=None):
                 if inflight >= target:
                     break
                 if not a.dry:
-                    api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
+                    inputs = {**kv, "label": run} if wf in LABELLED else kv
+                    api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": inputs})
                     time.sleep(2)
                 reruns.append(f"{name} {run}")
                 inflight += RERUN_JOBS

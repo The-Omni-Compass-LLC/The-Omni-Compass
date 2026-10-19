@@ -168,6 +168,16 @@ def main(argv=None):
         if not t:
             continue
         L.append(f"| {KPI_NAMES.get(k, k)} | {across_cells(t, aim_of(k))} |")
+    # a score that did not reproduce while native and omni were equal in every run: CityLearn's own value moved between runs
+    # by the same amount in both arms, so the row says nothing about Omni (its reading stays the preregistered one)
+    drift = [(d, k, max(abs(r[arm]["kpis"][k] - recs[0][arm]["kpis"][k]) for r in recs for arm in ("native", "omni")))
+             for d, recs in ran for k in KPIS
+             if verdict(recs, k) == "**the runs differ**" and all(change(r, k) == 0 for r in recs)]
+    if drift:
+        L += ["", "Where **the runs differ** above with native and omni equal in every run, CityLearn's own value moved between "
+              "the runs by the same amount in both arms; the paired change is exactly zero in A, B and C, so the row says nothing "
+              "about Omni-Compass, and it stays as the preregistered rule reads it: "
+              + "; ".join(f"{d}, {KPI_NAMES.get(k, k)} (moved by at most {m:.2g} between runs)" for d, k, m in drift) + "."]
     L += ["", "## Districts with no electric battery: nothing for Omni to move", "",
           "The runner changes only `electrical_storage` commands, so in these districts omni applied nothing. Any difference "
           "between the arms is CityLearn's own run-to-run variation and says nothing about Omni; where the two arms agree, the "

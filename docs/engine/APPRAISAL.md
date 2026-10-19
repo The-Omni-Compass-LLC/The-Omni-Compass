@@ -9,15 +9,15 @@ repository's own code by an independent path and compared, value by value. Run a
 code. No outside party has reviewed or approved these results.
 
 **Engine.** The engine that stands is **omni-v11** (`OMNI_V11.json`, digest `745aa53ec8eeb67b`, 47 files, since 18 October).
-From omni-v7 it changes `tools/run_citylearn.py` (outage buildings' batteries stay native, omni-v8; the wire reads the coming
-hour, omni-v9; the glide that cuts the bill most, omni-v10), the realms harness's t table and the Kubernetes governor (a reading
-with no machine in service is held, never read as an overload, omni-v11), and adds `omnicompass/student_t.py` (the exact Student
-t); every other engine file is omni-v7's bytes. Every record on the page was made again on the omni-v9 tree, whose bytes omni-v11
-keeps in every file the page reads but the governor, whose new guard acts only on a reading with no machine in service (the
-page's controller trace has none), and its workflow rebuilds them on omni-v11: every run, tick and
-decision is identical to the one it replaced, and the intervals are drawn with the exact t (the waiting line's interval
-widens in its fourth digit; every word stays). The receipts of the real runs are each benchmark's newest engine's table,
-today omni-v7's, replaced as omni-v11's three runs land.
+Since omni-v8 it has changed `tools/run_citylearn.py` (outage buildings' batteries stay native, omni-v8; the wire reads the
+coming hour, omni-v9; the glide that cuts the bill most, omni-v10), the realms harness's t table and the Kubernetes governor (a
+reading with no machine in service is held, never read as an overload, omni-v11), and added `omnicompass/student_t.py` (the
+exact Student t); every other engine file is unchanged since omni-v8. Every record on the page was made again on the omni-v9
+tree, whose bytes omni-v11 keeps in every file the page reads but the governor, whose new guard acts only on a reading with no
+machine in service (the page's controller trace has none), and its workflow rebuilds them on omni-v11: every run, tick and
+decision is identical to the one it replaced, and the intervals are drawn with the exact t (the waiting line's interval widens
+in its fourth digit; every word stays). The receipts of the real runs are each benchmark's newest engine's table, today
+omni-v10's, replaced as omni-v11's three runs land.
 
 **Wired to the engine.** The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`,
 `docs/engine/build_live_engine.py`) on every change to the engine, a model, a harness or a result on main, after every
@@ -38,10 +38,10 @@ that names another engine than `tools/omni_version.py` reads.
 | Section 2, on top of the HPA | the shipped controller as `pilot/selfpilot.py run_day` wires it | `pilot/selfpilot.py run_day`, seeds 3000 and 3001 | machines and pods waiting identical on every one of 1,440 ticks; writes identical (25) | `docs/engine/check_records.py` |
 | Section 1, the immune system | Omni-Compass's organism reading its own immune system: every room against its twin, the heat debt, the body giving back | the same run of `realms/harness.py`'s organism with the readings taken as `max_body_step` reads them (read only: the organism's record is identical with and without them) | run A: 7 decisions with an inflamed room (`pump_speed`), heat debt 1,109 W fading to 21 W, the pools' 26 extra machines handed back; runs B and C: none | `docs/engine/export_harness_trace.py` |
 | Section 4, the official runs | each three-run table's runs A, B and C played back from their raw files (`docs/engine/export_runs.py`) | every file's SHA-256 against the run's own `SHA256SUMS_ALL.txt`; every Kubernetes repetition scored by `tools/live_reps.py arm_gauges` on its own files, the mean over repetitions against the run's own `LIVE_REPS.json` | 18 benchmarks, 54 runs: 20,231 of 20,231 files match; the scorer's means equal each run's result to 3.1 × 10⁻¹⁶ | `docs/engine/build_live_engine.py --check` |
-| Section 3, a GPU card | `realms/gpu_card.py` (omni-v11 fingerprint, the same bytes as omni-v7's), native and Omni-Compass on top, the card as shipped and under an operator's cap, AI and compute-bound work | `realms/gpu_card.run` untouched, every arm, seeds 5100, 5101 and 5102 | the run's own result identical; every second's energy and requests add up to it | `docs/engine/check_records.py` |
+| Section 3, a GPU card | `realms/gpu_card.py` (inside the omni-v11 fingerprint, unchanged since omni-v8), native and Omni-Compass on top, the card as shipped and under an operator's cap, AI and compute-bound work | `realms/gpu_card.run` untouched, every arm, seeds 5100, 5101 and 5102 | the run's own result identical; every second's energy and requests add up to it | `docs/engine/check_records.py` |
 | Section 3, Linux, one host | `tools/toy_gate.py`'s conveyance model, the shipped `Muscles.convey` and `quota.py` on the CFS quota | `tools/toy_gate.py worker_convey` untouched, seeds 3000, 3001 and 3002 | its own result line identical; requests and the host's busy share add up to it | `docs/engine/check_records.py` |
 | Section 3, every muscle on omni-v8 | the realms runner's own table of 1,107 muscles and seven organisms, native and the max | `results/realms_v5/REALMS_V5.json` (omni-v8, commit 9819a903c, seeds 3000 to 3009), read by `docs/engine/export_scenarios.py` | 527 GAIN, 159 the same as native, 421 at their limit on native, 0 LOSS; all seven organisms GAIN under all three loads | `docs/engine/export_scenarios.py` |
-| Section 3, the receipts | every judged row of the 22 omni-v7 receipts in `results/live/V7_*.md` | the receipts themselves, read row by row by `docs/engine/export_scenarios.py` | 210 GAIN, 50 power given, 509 EVEN, 13 LOSS, 11 the runs disagree | `docs/engine/export_scenarios.py` |
+| Section 3, the receipts | every judged row of the 22 receipts of each benchmark's newest table (`results/live/V10_*.md`) | the receipts themselves, read row by row by `docs/engine/export_scenarios.py` | 176 GAIN, 30 power given, 584 EVEN, 1 LOSS, 14 the runs disagree (201 rows shown, not judged) | `docs/engine/export_scenarios.py` |
 
 ## Grades
 
@@ -71,8 +71,8 @@ that names another engine than `tools/omni_version.py` reads.
 | Linux, one host (the CFS-quota conveyance model) | requests served +64%; response time −53% mean and at the 95th percentile | alert minutes | host CPU +31%, limits +167%, pods +18%; **pod start wait +6% to +8%, LOSS** (the model's: a busier host starts pods slower; EVEN on real Kubernetes) |
 | Every muscle of the catalog on omni-v8, each alone (realms runner) | 527 muscles (493 faster, 409 fewer misses, 33 more work) | 159 the same as native, 421 at their limit on native | **0 LOSS** under any load |
 | The seven organisms on omni-v8 (realms runner) | all seven under all three loads: misses −1.1% to −8.8%; on the climb five also more work | work | energy +0.000% to +0.05% |
-| The 22 receipts of the omni-v7 tables (classes L and S) | 210 rows | 509 rows | 50 rows (CityLearn's peaks, swings and unevenness among them, read as power given under the one key of 17 October); **13 rows LOSS, all CityLearn** (the 2023 small challenge districts, the only ones that simulate outages: the energy not served and the time uncomfortable); 11 rows where the runs disagree (drone swarms 9, Redis 1, MySQL 1) |
-| Real Kubernetes, omni-v7 (class L, `docs/OMNI_V7.md`) | response time −52% to −75% at the 95th percentile on Goldilocks and KEDA; KEDA HTTP replicas −15% to −19% | machines, failed requests, pod start wait; CruiseKube and fixed capacity on every gauge | parked-worker energy +1.1% to +2.3% |
+| The 22 receipts of the omni-v10 tables (classes L and S) | 176 rows | 584 rows | 30 rows; **1 row LOSS**, the KEDA HTTP add-on's pod start wait (+13% to +21%, the test machine: `docs/POD_START_WAIT.md`); 14 rows where the runs disagree |
+| Real Kubernetes, omni-v10 (class L, `results/live/V10_GOLDILOCKS.md`, `V10_KEDA_REQUESTS.md`, `V10_KEDA_CPU_REQUESTS.md`, `V10_CRUISEKUBE.md`, `V10_CAPACITY.md`) | response time −51% to −73% at the 95th percentile on Goldilocks and both KEDA setups; KEDA HTTP replicas −13% to −19%, pods started −17% to −24% | machines, failed requests; CruiseKube and fixed capacity on every gauge | parked-worker energy +1.4% to +2.4%; LOSS: the KEDA HTTP pod start wait |
 
 ## Material findings for the owner
 
@@ -90,25 +90,25 @@ that names another engine than `tools/omni_version.py` reads.
 4. **`pilot/selfpilot.py` no longer runs its omni day on a machine without `kubectl`**: the controller now starts a
    `kubectl proxy` when it builds its reader. The check stubs that one call; the simulated cluster answers every read.
    A one-line repair (`--no-api-proxy` in its arguments) is the owner's to make.
-5. **The verdict's rule depends on the noise more than on the cost.** omni-v11 (the rule of omni-v7, unchanged) refuses any step whose interval of cost
+5. **The verdict's rule depends on the noise more than on the cost.** omni-v11 refuses any step whose interval of cost
    lies wholly above zero. Where the cost carries no noise (the GPU card's model) it refuses a step costing +0.14% a
    request, well inside the 2% allowance, so the card never leaves native at the tune-down and the recorded +3.4%
-   requests per kJ (`results/sim/gpu_two_wire`, written under omni-v6's medians) does not stand on omni-v7, omni-v8, omni-v9, omni-v10 or omni-v11. Where the
+   requests per kJ (`results/sim/gpu_two_wire`, written under omni-v6's medians) does not stand on any engine since. Where the
    cost is noisy (σ 0.46 of log response time on the Google 2011 day and 0.43 with the load swinging, measured on 19
-   October inside each window of 200 requests of the omni-v10 runs' latency.csv; the omni-v7 runs read 0.45 and 0.42;
+   October inside each window of 200 requests of the omni-v10 runs' latency.csv;
    the σ 0.05 and 0.25 written here before did not come from those files and are withdrawn), with 200 requests a side
    as the Kubernetes controller measures, a step costing +3% passes about 31% of the time (the medians alone: 45%),
    +5% about 15% and +10% about 1%, while a free step is kept about 59% of the time (2,000 modelled trials each, class S).
    The page's verdict lab opens on that measured noise. Any change to the
    rule is the next engine version, the owner's to order.
-6. **CityLearn carries the only LOSS rows of the omni-v7 tables; omni-v8, omni-v9 and omni-v10 are its repair, carried unchanged by omni-v11 (outage buildings' batteries left native; the wire reads the coming hour), proven in our own CityLearn runs, their three runs on GitHub queued.** In 7 of its 10 battery districts (the small challenge districts)
-   the energy not served and the time uncomfortable read LOSS (13 rows, the 2023 districts, the only ones that simulate
-   outages); their hour-to-hour swings, peaks and unevenness read power given under the one key of 17 October (power held,
-   as a cluster's peak power is), and the two 100-building districts read no LOSS (GAIN on 7 and 6 of their 11 scores, the
-   rest EVEN). Under the founder's order a LOSS is root-caused, fixed and rerun.
+6. **CityLearn's LOSS rows were root-caused and repaired, and its omni-v10 table reads no LOSS** (88 EVEN, 27 GAIN, 1 power
+   given, 3 where the runs disagree). The earlier table read LOSS on the energy not served and the time uncomfortable in the
+   2023 small challenge districts, the only ones that simulate outages; the repair leaves an outage building's battery native
+   (its charge is its building's reserve), reads the coming hour and glides at the speed that cuts the bill most with no LOSS
+   (omni-v8 to omni-v10, `docs/OMNI_V10.md`).
 7. **The Linux model's pod start wait reads LOSS** (+6% to +8%, +8.8% in `results/toy_gate/TOY_GATE.md` over ten seeds):
    the raised limits keep the host busier and its start time is fitted to rise with the busy share. The two repairs
-   written for it were refused by the toy gate. On real Kubernetes the start wait reads EVEN.
+   written for it were refused by the toy gate. On real Kubernetes it reads EVEN on KEDA on CPU and requests and LOSS on KEDA's HTTP add-on (+13% to +21%, the test machine, `docs/POD_START_WAIT.md`; the kind rig pre-pulls the image from 18 October).
 8. **The page replays recorded runs.** The harness and controller views are the repository's runs, recorded on seeds
    3000, 3001 and 3002 and replayed; they cannot be stressed by hand. The stress-test model can (native alone and Omni-Compass on top of the same native, side by side), and is labelled as drawn.
 
