@@ -19,7 +19,8 @@ Every record the page replays is made again here by the repository's own code on
              conveyance), every muscle and organism of the realms table (results/realms_v5) and every judged row of the
              newest engine's receipts (results/live/V<n>_*.md)
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
-             token is present, the runs GitHub is running now (gh run list)
+             token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
+             clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
 
 The page names the engine it stands on (data-engine on its <html>); the build refuses to write a page whose engine is not
 the one tools/omni_version.py reads, so a new engine version is always written into the page's words by a person first.
@@ -92,6 +93,81 @@ def github_runs() -> list:
             pass
     return [{"id": r["databaseId"], "workflow": r["workflowName"], "title": r["displayTitle"][:140], "status": r["status"],
              "since": r["createdAt"], "branch": r["headBranch"]} for r in out]
+
+
+LEDGER = {"aks-metered.yml": "Azure", "gke-metered.yml": "Google Cloud", "eks-metered.yml": "Amazon Web Services",
+          "cloud-check.yml": "the $0 cloud check", "lambda-gpu.yml": "the GPU on Lambda", "cpu-power.yml": "the CPU package"}
+LEDGER_CACHE = HERE / "github_ledger.json"
+LEDGER_GAUGES = ["machines billed, machine-hours", "compute bill at list price ($)", "worker nodes in service, mean", "response time (ms), 95th percentile",
+                 "failed requests (%)", "time over the response line (% of samples)"]
+
+
+def ledger() -> dict:
+    """Every run GitHub was asked to start for the chips and the clouds (gh run list --event workflow_dispatch, newest
+    first), each with the engine its commit stands on (tools/omni_version.py --commit) and whether its raw files are on the
+    branch raw. Read from GitHub where a token is present, and kept in docs/engine/github_ledger.json; without a token the
+    last reading kept there is used, and the page says when it was read."""
+    data = None
+    if shutil.which("gh") and (os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")):
+        got = {}
+        for wf in LEDGER:
+            r = subprocess.run(["gh", "run", "list", "--workflow", wf, "--event", "workflow_dispatch", "--limit", "60", "--json",
+                                "databaseId,displayTitle,status,conclusion,createdAt,updatedAt,headSha,headBranch"],
+                               capture_output=True, text=True, cwd=ROOT)
+            try:
+                got[wf] = [{"id": x["databaseId"], "title": x["displayTitle"], "status": x["status"], "conclusion": x["conclusion"] or None,
+                            "created": x["createdAt"], "updated": x["updatedAt"], "sha": x["headSha"], "branch": x["headBranch"]}
+                           for x in json.loads(r.stdout or "[]")]
+            except json.JSONDecodeError:
+                got = None
+                break
+        if got:
+            data = {"read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "source": "GitHub Actions, workflow_dispatch runs of each workflow, newest first", "workflows": got}
+            LEDGER_CACHE.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
+    if data is None and LEDGER_CACHE.exists():
+        data = json.loads(LEDGER_CACHE.read_text(encoding="utf-8"))
+    if data is None:
+        return {"read_at": None, "workflows": {}}
+    import export_runs as XR
+    ref, pre = XR.raw_ref()
+    raw = set(git("ls-tree", "--name-only", f"{ref}:{pre.rstrip('/')}" if pre else ref).split())
+    eng = {}
+    for wf, rs in data["workflows"].items():
+        for r in rs:
+            if r["sha"] not in eng:
+                if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", r["sha"] + "^{commit}"], capture_output=True).returncode:
+                    # fetch that one commit; --depth only where the checkout is already shallow (a full clone given --depth turns shallow)
+                    shallow = git("rev-parse", "--is-shallow-repository") == "true"
+                    subprocess.run(["git", "-C", str(ROOT), "fetch", "-q", *(["--depth", "1"] if shallow else []), "origin", r["sha"]], capture_output=True)
+                out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", r["sha"]],
+                                     capture_output=True, text=True, cwd=ROOT).stdout
+                m = re.search(r"(omni-v\d+) \(digest", out)
+                eng[r["sha"]] = m.group(1) if m else None
+            r["engine"] = eng[r["sha"]]
+            r["raw"] = f"run-{r['id']}" in raw
+            if wf == "aks-metered.yml" and r["raw"] and r["conclusion"] == "success":   # the bill as the run's own LIVE_REPS.json reads it
+                src = f"{ref}:{pre}run-{r['id']}/live-reps-aks/LIVE_REPS.json"
+                try:
+                    lr = json.loads(git("show", src) or "{}")
+                except json.JSONDecodeError:
+                    lr = {}
+                arm = next(iter((lr.get("paired") or {}).values()), {})
+                if arm:
+                    r["result"] = {"reps": len((lr.get("repetitions") or {}).get("native") or []),
+                                   "gauges": {g: {k: arm[g].get(k) for k in ("native", "omni", "ci95", "significant")} for g in LEDGER_GAUGES if g in arm}}
+    queues = {}
+    for wf, f in (("aks-metered.yml", "azure_queue.txt"), ("gke-metered.yml", "google_queue.txt"), ("eks-metered.yml", "amazon_queue.txt")):
+        q = ROOT / "scripts" / f
+        sets = []
+        for x in (q.read_text(encoding="utf-8").splitlines() if q.exists() else []):
+            if "|" in x and not x.startswith("#"):
+                label, kv = x.split("|", 1)
+                steps = dict(p.split("=", 1) for p in kv.split(";") if "=" in p).get("load_steps")
+                sets.append({"label": label, "key": f"burst {steps}" if steps else label})
+        queues[wf] = sets
+    data["queues"] = queues
+    return data
 
 
 TABLE_OF = {   # a benchmark in scripts/reruns.txt -> its three-run table(s) in results/live (V<n>_<stem>.md)
@@ -213,8 +289,9 @@ def fleet() -> dict:
 
 def card_record():
     """The newest real card run in the repository (results/gpu/run-*/GPU_REPS.json, metered by the card itself, class P):
-    its card, its date, its repetitions, the controller commit it froze, and every gauge's paired difference with its 95%
-    interval, as the run's own file holds them."""
+    its card, its date, its repetitions, the controller commit it froze and the engine that commit stands on
+    (tools/omni_version.py --commit), and every gauge's paired difference with its 95% interval, as the run's own file
+    holds them."""
     runs = sorted((ROOT / "results" / "gpu").glob("run-*/GPU_REPS.json"))
     if not runs:
         return None
@@ -223,8 +300,12 @@ def card_record():
     rows = [{"g": g, "n": v.get("native"), "o": v.get("omni"), "lo": (v.get("ci95") or [None, None])[0], "hi": (v.get("ci95") or [None, None])[1]}
             for g, v in (d.get("paired", {}).get("omni") or {}).items() if isinstance(v, dict)]
     stamp = runs[-1].parent.name.replace("run-", "")
+    out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", fr.get("commit") or "HEAD"],
+                         capture_output=True, text=True, cwd=ROOT).stdout
+    m = re.search(r"(omni-v\d+) \(digest", out)
     return {"file": str(runs[-1].relative_to(ROOT)), "card": rc.get("gpu_name"), "reps": rc.get("reps"), "seconds": rc.get("duration_s"),
-            "limit_w": rc.get("power_limit_default_w"), "commit": (fr.get("commit") or "")[:12], "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows}
+            "limit_w": rc.get("power_limit_default_w"), "commit": (fr.get("commit") or "")[:12], "engine": m.group(1) if m else None,
+            "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows}
 
 
 def register_places() -> list:
@@ -263,6 +344,7 @@ def records(runs: bool) -> dict:
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
              "runs": github_runs() if runs else []}
     build["board"] = board(build["runs"])
+    build["ledger"] = ledger()
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build}
 
 
