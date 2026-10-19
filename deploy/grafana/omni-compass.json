@@ -17,7 +17,7 @@
  ],
  "timezone": "utc",
  "schemaVersion": 39,
- "version": 1,
+ "version": 2,
  "refresh": "30s",
  "time": {
   "from": "now-6h",
@@ -522,6 +522,143 @@
     "overrides": []
    },
    "options": {}
+  },
+  {
+   "id": 14,
+   "title": "Where the compass stood: share of decisions in the last hour",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "description": "Each decision's compass position: slack (under the lower cushion: the service far from its line), band, or wall (at or past the line). Time in band is the control-quality figure; any share at the wall is looked into.",
+   "gridPos": {
+    "x": 0,
+    "y": 34,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "expr": "increase(omni_compass_decisions_total[1h]) / ignoring(zone) group_left sum(increase(omni_compass_decisions_total[1h]))",
+     "legendFormat": "{{zone}}"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 15,
+   "title": "Time from the line back into the band",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "description": "From the first decision at the wall to the first back inside it (the settling time), mean over the last hour and the longest so far, seconds.",
+   "gridPos": {
+    "x": 12,
+    "y": 34,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "expr": "increase(omni_wall_recovery_seconds_sum[1h]) / clamp_min(increase(omni_wall_recovery_seconds_count[1h]), 1)",
+     "legendFormat": "mean, last hour"
+    },
+    {
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "expr": "omni_wall_recovery_seconds_max",
+     "legendFormat": "longest"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 16,
+   "title": "Errors an hour, by kind",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "description": "Errors the governor recorded, by the head of the error (a refused write, an unreadable sense). A refused write repeated at every check shows here and in the writes panel.",
+   "gridPos": {
+    "x": 0,
+    "y": 42,
+    "w": 12,
+    "h": 7
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "expr": "increase(omni_errors_total[1h])",
+     "legendFormat": "{{kind}}"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 17,
+   "title": "Distance each recommendation travelled, an hour",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "description": "The summed size of every change of each recommended setting within the hour (actuator travel).",
+   "gridPos": {
+    "x": 12,
+    "y": 42,
+    "w": 12,
+    "h": 7
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "expr": "increase(omni_recommended_travel_total[1h])",
+     "legendFormat": "{{setting}}"
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
   }
  ],
  "links": [
@@ -529,6 +666,12 @@
    "title": "How to read it: docs/OBSERVABILITY.md",
    "type": "link",
    "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/OBSERVABILITY.md"
+  },
+  {
+   "title": "The buttons: the control panel's console (tools/omni_control.py, default http://127.0.0.1:9465/)",
+   "type": "link",
+   "url": "http://127.0.0.1:9465/",
+   "targetBlank": true
   }
  ]
 }

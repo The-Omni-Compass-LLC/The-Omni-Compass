@@ -2,6 +2,34 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19 (night): the control panel, the alert rules, the control-quality figures; the v12 candidate narrowed to two fixes
+
+- **The control panel** (`tools/omni_control.py`, `tests/test_omni_control.py`; the Operator's Manual, section 22.5;
+  `docs/OBSERVABILITY.md`): the governor's buttons behind a bearer-token HTTP API with an OpenAPI 3 document and a browser
+  console. Mode (autopilot, watch, off), dial (max, tune-down) and reset to native for the operator role; the kill switch for
+  every governor on the machine and the two-person arm for the security role; every press, refused ones included, logged with
+  its holder and reason; tokens kept as SHA-256 digests; HTTPS required beyond the loopback. It writes no setting itself: every
+  change goes through the governor's own hand-back (its kill file) and a restart with the new arguments, so the engine and its
+  fingerprint do not change. A governor that exits on its own is never restarted by the panel; its lease hands back first.
+- **The alert rules** (`deploy/prometheus/omni-compass-rules.yaml`, `tests/test_alert_rules.py`): ten Prometheus rules, each
+  with severity, meaning and action, reading only series the exporter and the panel serve: governor stale, governor orphaned,
+  writes hammering, write errors, a recommendation oscillating, a sense blind, the service at its line, the master switch off,
+  the audit unreadable, the governor's own processor high.
+- **The control-quality figures** (`tools/omni_exporter.py`, `tools/steering.py`, `results/STEERING.md`, four new Grafana
+  panels): decisions by zone (slack, band, wall), the time from the line back into the band, the distance each recommendation
+  travelled, errors by kind. Read on every omni-v11 Kubernetes table: in the add-on tests the compass sat at the line in 4% to
+  9% of decisions and came back within a decision (61 to 62 s); in the capacity test and the two robustness tests the load
+  holds the service near its line in both arms (54% to 79% at the line), and their alert minutes, the comparison with native,
+  read GAIN. The capacity test's 940 to 967 errors an hour are the refused raises fixed in the v12 candidate.
+- **The v12 candidate** (branch `v12-candidate`, its page OMNI_V12_CANDIDATE.md on that branch): two fixes, the refused raise held until
+  something changes (the toy: 97.5% fewer writes, every other gauge identical) and the swarm's reflex at once with a reach that
+  grows with the square of the speed. The stricter verdict (a step kept only when its whole 95% interval is inside the
+  allowance) was taken out of it and kept on the branch `v12-verdict-study`: in the toy cluster set from a real run's regime
+  the governor reads about 80 requests a decision and the rule needs about 4,000 a phase, so no give-back trial started and the
+  candidate read identical to native, the machine-hour cut gone; on the data stores it would leave every knob native. The fault
+  it answers (a step whose interval reaches past the allowance kept on its estimate) stays on the next version's list until a
+  trial design that can read a 2% step in a trial's time is shown in the toy gate.
+
 ## 2026-10-19: The robustness tables on omni-v11, no LOSS; the governor's gauges for Prometheus and Grafana; the receipts page on the newest tables; the cost to match runs again
 
 - **The kill test and the long run on omni-v11** (`results/live/V11_ROBUST_KILL.md`, `V11_ROBUST_LONG.md`, each with its recipe

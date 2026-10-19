@@ -32,6 +32,12 @@ The gauges (names as Prometheus shows them):
   omni_verdict_state{state}                                                             1 for the verdict's current state
   omni_master_switch                                                                    1 while governing, 0 once switched off
   omni_own_cpu_cores                                                                    its own processor, from its last overhead record
+  omni_compass_decisions_total{zone}                                                    decisions by where the compass stood: slack (under
+                                                                                         the lower cushion), band, wall (at or past the line)
+  omni_wall_recovery_seconds_sum/_count, omni_wall_recovery_seconds_max                  from the first decision at the wall to the first
+                                                                                         back inside it: the time to recover (settling time)
+  omni_recommended_travel_total{setting}                                                the distance each recommendation travelled, summed
+  omni_errors_total{kind}                                                               the errors the governor recorded, by their head
   omni_audit_records_total, omni_audit_unreadable_total                                 the audit itself
 """
 from __future__ import annotations
@@ -71,6 +77,11 @@ class Gauges:
         self.verdict_state = None
         self.switch = 1
         self.own_cpu = None
+        self.zones = {"slack": 0, "band": 0, "wall": 0}
+        self._wall_since = None
+        self.recovery_sum, self.recovery_count, self.recovery_max = 0.0, 0, None
+        self.travel: dict[str, float] = {}
+        self.errors: dict[str, int] = {}
 
     def feed(self, line: str):
         line = line.strip()
@@ -103,6 +114,7 @@ class Gauges:
             law = d.get("compass_law") if isinstance(d.get("compass_law"), dict) else {}
             self.position = _num(law.get("position")) if "position" in law else self.position
             self.force = _num(law.get("force")) if "force" in law else self.force
+            self._zone(_num(law.get("position")), _num(law.get("wall")), t)
             for name, (_, key) in SETTINGS.items():
                 self._setting(name, _num(d.get(key)))
         elif isinstance(d, str) and re.search(r"master switch: OFF", d):
@@ -122,6 +134,26 @@ class Gauges:
         o = r.get("overhead")
         if isinstance(o, dict) and _num(o.get("cores_mean")) is not None:
             self.own_cpu = o["cores_mean"]
+        if r.get("error"):
+            kind = str(r["error"]).split(":", 1)[0].strip()[:40] or "unstated"
+            self.errors[kind] = self.errors.get(kind, 0) + 1
+
+    def _zone(self, pos, wall, t):
+        """Where the compass stood at a decision, and the time from the first decision at the wall to the first back inside."""
+        if pos is None:
+            return
+        wall = 0.95 if wall is None else wall
+        zone = "wall" if pos >= wall else ("slack" if pos < 1.0 - wall else "band")
+        self.zones[zone] += 1
+        if zone == "wall":
+            if self._wall_since is None:
+                self._wall_since = t
+        elif self._wall_since is not None:
+            if t is not None:
+                rec = t - self._wall_since
+                self.recovery_sum += rec; self.recovery_count += 1
+                self.recovery_max = rec if self.recovery_max is None else max(self.recovery_max, rec)
+            self._wall_since = None
 
     def _setting(self, name: str, v):
         if v is None:
@@ -131,6 +163,7 @@ class Gauges:
         if old is None or v == old:
             return
         self.moves[name] = self.moves.get(name, 0) + 1
+        self.travel[name] = self.travel.get(name, 0.0) + abs(v - old)
         way = 1 if v > old else -1
         if self._last_dir.get(name, way) != way:           # it moved one way, then the other: a reversal
             self.reversals[name] = self.reversals.get(name, 0) + 1
@@ -175,6 +208,17 @@ class Gauges:
               [({}, self.switch)])
             g("omni_own_cpu_cores", "gauge", "The governor's own processor, mean cores, from its last overhead record.",
               [({}, self.own_cpu)])
+            g("omni_compass_decisions_total", "counter", "Decisions by where the compass stood: slack (under the lower "
+              "cushion), band, or wall (at or past the line).", [({"zone": k}, v) for k, v in self.zones.items()])
+            g("omni_wall_recovery_seconds", "summary", "From the first decision at the wall to the first back inside it, seconds.", [])
+            out.append(f"omni_wall_recovery_seconds_sum {self.recovery_sum:.6g}")
+            out.append(f"omni_wall_recovery_seconds_count {self.recovery_count}")
+            g("omni_wall_recovery_seconds_max", "gauge", "The longest recovery from the wall so far, seconds.",
+              [({}, self.recovery_max)])
+            g("omni_recommended_travel_total", "counter", "The distance each recommended setting travelled, summed.",
+              [({"setting": k}, self.travel.get(k, 0.0)) for k in sorted(self.setting)])
+            g("omni_errors_total", "counter", "Errors the governor recorded, by the head of the error.",
+              [({"kind": k}, v) for k, v in sorted(self.errors.items())])
             g("omni_audit_records_total", "counter", "Audit lines read.", [({}, self.records)])
             g("omni_audit_unreadable_total", "counter", "Audit lines that were not one JSON record.", [({}, self.unreadable)])
             return "\n".join(out) + "\n"
