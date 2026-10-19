@@ -224,30 +224,34 @@ def judge_rows(rows, names, keys_order=None):
 
 def real_stacks(index):
     cases = []
+    # every test is read on the newest engine's table that holds it (omni_index.newest, as the index reads it); the names and
+    # the notes stay keyed by the test's first file
     for name, f in K8S_TESTS:
-        p = LIVE / f
+        fn = omni_index.newest(f)
+        p = LIVE / fn
         if not p.exists():
             continue
         d = json.loads(p.read_text())
         j = judge_rows(d["rows"], K8S_GAUGE)
         v = verdict(len(j["gain"]), len(away_of(j)))
-        res, svc = index.get((f, None), (None, None))
+        res, svc = index.get((fn, None), (None, None))
         why = k8s_why(f, j, v)
         cases.append({"kind": "real knob", "domain": "Real Kubernetes (GitHub, kind)", "knob": K8S_KNOB, "case": K8S_NAMES.get(f, name),
                       "counted": True, "judged": j, "verdict": v, "resource_pct": res, "service_pct": svc, "why": why,
-                      "source": f"results/live/{f.replace('.json', '.md')}", "runs": [r["run"] for r in d["runs"]]})
+                      "source": f"results/live/{fn.replace('.json', '.md')}", "runs": [r["run"] for r in d["runs"]]})
     for cat, f, knob, names in WORKLOAD_STACKS:
-        p = LIVE / f
+        fn = omni_index.newest(f)
+        p = LIVE / fn
         if not p.exists():
             continue
         d = json.loads(p.read_text())
         for wl, gauges in d["workloads"].items():
             j = judge_rows(gauges, names)
             v = verdict(len(j["gain"]), len(away_of(j)))
-            res, svc = index.get((f, wl), (None, None))
+            res, svc = index.get((fn, wl), (None, None))
             cases.append({"kind": "real knob", "domain": cat, "knob": knob, "case": wl + (" (tuning workload: shown, never counted)" if wl == "tuning" else ""),
                           "counted": wl != "tuning", "judged": j, "verdict": v, "resource_pct": res, "service_pct": svc,
-                          "why": stack_why(f, wl, j, v, res, svc), "source": f"results/live/{f.replace('.json', '.md')}",
+                          "why": stack_why(f, wl, j, v, res, svc), "source": f"results/live/{fn.replace('.json', '.md')}",
                           "runs": [r["run"] for r in d["runs"]], "stack": STACK_SHORT[f], "workload": wl})
     return cases
 

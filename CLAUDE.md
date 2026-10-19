@@ -485,6 +485,11 @@ the founder overrides one in the conversation.
   every clone had timed out on 36 GB). `scripts/raw_archive.sh open /run-<id>/` places a run at `results/live/raw/run-<id>/`
   (the path every table names); every workflow that archives raw files saves through `scripts/raw_archive.sh save`, and
   `raw-sweep.yml` moves any raw folder that still lands on main. `raw` is never merged with main, nor main into it.
+  **Every finished run's files land there by themselves** (the founder's order of 19 October: "it's mine ... it should
+  have been in my shit"): `archive-run.yml` takes every hour every finished run, failed ones included, of every workflow
+  that hands in files, since omni-v11 landed (`tests/test_archive_sweep.py` fails a workflow left off its list), and a run
+  id in `.github/archive_request.txt` goes first. A run's files are read from `raw` (the contents API, or
+  `scripts/raw_archive.sh open`), never said to be out of reach.
   The stale work branches of 27 September to 15 October are kept whole on `archive/stale-branches` (one commit whose
   parents are their tips); their names may be removed without losing a commit.
 - Verify before every push: `tools/release_manifest.py` under Python 3.12 (as GitHub runs it), 0 FAIL. `verify.py` runs
