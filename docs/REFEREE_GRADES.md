@@ -23,7 +23,7 @@ measurement exists.
 | 9 | Energy | Undetermined | Undetermined | graded on its result | a physical meter: Kepler and the machine's own meter on a bare-metal machine |
 | 10 | GPU | Undetermined | Undetermined | graded on its result | the Lambda runs from one exact commit, on the founder's word |
 | 11 | Modelled muscles | C− | **C−** | B | each plant model calibrated against a measured system, with its error stated |
-| 12 | Outside simulators | C+ | **B−** | A | the swarm's reflex fix in the next version and its three runs with draws beyond the fixed seeds (below), and BOPTEST beside CityLearn |
+| 12 | Outside simulators | C+ | **B−** | A | the swarm's three runs on omni-v12, which carries the reflex fix, with its judged collision row and draws beyond the fixed seeds (below), and BOPTEST beside CityLearn |
 | 13 | Robustness | B | **B+** | A | the omni-v11 kill and long-run tables are in (no LOSS, every hand-back inside its allowance); next the extended-fault table, a longer after-kill window, then a multi-machine cluster |
 | 14 | Reproducibility | B | **A** | A+ | an outside party rebuilding the tables from the receipts |
 | 15 | Honesty | A− | **A** | A+ | an outside audit of the receipts against the pages |
@@ -37,7 +37,7 @@ measurement exists.
 
 1. **Concept.** Where the idea comes from and what it adds, against supervisory control, reference governors, the
    Simplex fallback and online experiments (`docs/RELATED_WORK.md`).
-2. **Engine code.** 81% of the engine's 6,519 statements run under the tests (`docs/ENGINE_COVERAGE.md`); every proved
+2. **Engine code.** 82% of the engine's 6,531 statements run under the tests (`docs/ENGINE_COVERAGE.md`, measured again on the omni-v12 tree); every proved
    property checked on thousands of generated cases (`tests/test_engine_properties.py`); every static-scan finding fixed or
    reviewed (`docs/SECURITY_SCAN.md`). Held at B by a fault found in the swarm's wire, whose code did not do what its own
    comment says (`docs/LIMITATIONS.md`, section 3), and by the wires outside the fingerprint (`docs/CHANGE_CONTROL.md`).
@@ -56,7 +56,7 @@ measurement exists.
 12. **Outside simulators.** CityLearn 27 GAIN, the power grids 67 GAIN, the robot arms 7 GAIN, the swarm 9 GAIN, 0 LOSS in
    all four on omni-v11, each rebuilt byte for byte. Held at B− by a fault found in the swarm's wire: on a mission draw outside
    the preregistered seeds it let drones collide where native did not. The fix held every drone outside the keep-out on all
-   ten cells and draws tried (`results/toy_gate/V12_SWARM_REFLEX.md`) and lands with the next version.
+   ten cells and draws tried (`results/toy_gate/V12_SWARM_REFLEX.md`) and landed in omni-v12; the grade moves when its three runs land.
 14. **Reproducibility.** All 23 omni-v11 tables rebuilt from their raw receipts and identical to the byte
    (`tools/reproduce.py`, weekly in `reproduce.yml`); every package pinned with its hashes, every action by its commit.
 15. **Honesty.** The limitations page, the tail-latency page, the runs-disagree rows each explained, every row kept.
