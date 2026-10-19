@@ -213,6 +213,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .live b{font-family:var(--f-mono);font-weight:500;font-size:20px;font-variant-numeric:tabular-nums}
 .arm-nat .live b{color:var(--steel)} .arm-omni .live b{color:var(--brass)}
 .live b.hot{color:var(--bad)}
+.live em{font-style:normal} .live em.ln{color:var(--steel)} .live em.lo{color:var(--brass)} .live em.sep{color:var(--muted)} .live em.hot{color:var(--bad)}
+.arm-both .live b{font-size:16px}
 @media (max-width:520px){.live{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ringbox .overlay{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion: reduce){.bar>i{transition:none}}
@@ -562,13 +564,13 @@ body{padding-bottom:96px}
     <p class="note">As a scan reads a living body organ by organ, this reads the system playing in section 8a (the benchmark, run and repetition chosen there), organ by organ, half minute by half minute, from its own SHA-256-checked files: native beside Omni-Compass. Where native has no such organ the cell says so.</p>
     <div class="tbl-wrap"><table id="scanTab"><thead><tr><th>Organ</th><th>What it reads</th><th>Native</th><th>Omni-Compass</th></tr></thead><tbody></tbody></table></div>
   </div>
-  <div class="panel stack arm-omni" style="gap:8px" id="immPanel">
-    <h3>The immune system, live (Omni-Compass; native has none)</h3>
+  <div class="panel stack arm-both" style="gap:8px" id="immPanel">
+    <h3>The immune system, live: native beside Omni-Compass (the immune system is Omni-Compass's; native runs on its own controllers)</h3>
     <p class="note">The body keeps itself healthy the way a human body does. Every room and every machine pool has a native twin: the same muscle under its own controller, on native's heat and load, the body's memory of healthy. A room that stands warmer than its twin is inflamed. Where its own knob can cool it, it is cured on the spot; where it cannot, it sends the whole body a signal, its heat debt, like a cytokine calling for help, and the other muscles answer: the machine pools give back what Omni-Compass added until the room stands no warmer than native's. The skeleton (the bone: the power and cooling lines the whole body shares) grants nothing it cannot carry; a cooling setting is walked back, never snapped; a pool never loses a machine its queue needs; a battery is timed for its line; no sense is locked. On the ring a pulsing red circle marks the inflamed muscle, and red signals run from it to every machine pool that answers it.</p>
     <div class="row"><button id="immGo">Play one organism: the immune system acts in it</button><span class="ctl-label">Run</span><div class="seg" role="group" aria-label="Immune record run"><button data-irun="0" aria-pressed="true">A</button><button data-irun="1" aria-pressed="false">B</button><button data-irun="2" aria-pressed="false">C</button></div></div>
     <div class="live" id="immLive"></div>
-    <canvas id="immCv" aria-label="The immune system over one organism's whole run: the heat debt, the machines held over their twins and every give-back, native beside Omni-Compass"></canvas>
-    <div class="legend"><span><i style="background:var(--steel)"></i>Native, left lane: no twin, no signal, no give-back</span><span><i style="background:var(--brass)"></i>Omni-Compass, right lane</span><span><i class="sq" style="background:var(--bad)"></i>a room inflamed: warmer than its native twin</span><span><i class="sq" style="background:var(--ok)"></i>the body gives back</span><span><i style="background:var(--ink)"></i>now, while one organism plays</span></div>
+    <canvas id="immCv" aria-label="One organism's run, native beside Omni-Compass: each side's own body heat and power drawn, with every inflamed room and every give-back marked on Omni-Compass's side"></canvas>
+    <div class="legend"><span><i style="background:var(--steel)"></i>Native, left lane: its own heat and power, on its own controllers alone</span><span><i style="background:var(--brass)"></i>Omni-Compass, right lane: its heat and power, with its immune acts marked</span><span><i style="background:var(--muted)"></i>dashed: the lease, every setting walked back to native</span><span><i class="sq" style="background:var(--bad)"></i>a room inflamed: warmer than its native twin</span><span><i class="sq" style="background:var(--ok)"></i>the body gives back</span><span><i style="background:var(--ink)"></i>now, while one organism plays</span></div>
     <p class="note" id="immTot">—</p>
     <div class="lk" id="immLog" style="min-height:60px"><span>—</span></div>
   </div>
@@ -1459,7 +1461,7 @@ class Arm {
       const c0 = M.d[0]/NAT_TARGET;
       return {c: c0, L: c0, b: 0, hist: [], rq: [], law: new CompassLaw(M.tau), p: 0.5, v: 0, F: 0, Lnat: c0, snapshot: c0, written: false};
     });
-    this.tot = {served: 0, over: 0, failed: 0, wait: 0, capT: 0, writes: 0, clipped: 0};
+    this.tot = {served: 0, over: 0, failed: 0, wait: 0, capT: 0, writes: 0, clipped: 0, moves: 0};
     this.hist = {over: [], spread: [], cap: [], dem: [], served: [], failed: [], wait: []};
     this.lastWrites = 0;
   }
@@ -1612,6 +1614,7 @@ function stepArm(arm, brainOut) {
     const Lc = clamp(L, M.cmin, M.cmax);
     if (arm.kind === "omni" && !W.killed) { if (Lc !== L) arm.tot.clipped++; }
     if (Math.abs(Lc - s.L) > 0.02*s.L && arm.kind === "omni" && !W.killed && Math.abs(Lc - Lnat) > 0.02*Lnat) { writes++; s.written = true; } else s.written = false;
+    if (Math.abs(Lc - s.L) > 0.02*s.L) arm.tot.moves++;   // a setting moved by this side's own controller (native's, or Omni-Compass on top of it)
     s.L = Lc; s.held = arm.kind === "omni" && Math.abs(Lc - Lnat) > 0.02*Lnat; if (s.held) held++;
     arm.tot.served += served; arm.tot.failed += failed; arm.tot.wait += s.b; arm.tot.capT += s.c; sv += served; fl += failed; wt += s.b;
     if (r > 1) over++;
@@ -2171,41 +2174,52 @@ function updateText() {
   updateScore(); updateCard(); updateLive();
 }
 const IMW = {run: 0};
-function immRec() { const sd = TR.organism.seeds[W.body === "harness" && W.hsec === "organism" ? W.run : IMW.run]; return TRD.organism[sd] && TRD.organism[sd].omni.imm ? TRD.organism[sd].omni.imm : (TR.organism.runs[String(sd)].omni.imm || []); }
-function drawImm() {   // the whole organism run's immune record: Omni-Compass's heat debt and machines held over their twins; native has none of it
-  const cv = $("immCv"), {g, w, h} = fit(cv, Math.min(0.42, 260/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
-  const I = immRec(), N = I.length || 1, ml = 44, mr = 8, head = 22, lanes = mkLanes(w, ml, mr, 18, null, null); laneHeads(g, lanes);
-  const panels = [{t: "the body's signal: heat debt (W)", f: r => r[0]}, {t: "machines held over the pools' twins", f: r => r[5]}], ph = (h - head - 16)/2;
-  const live = W.body === "harness" && W.hsec === "organism", now = live ? W.t : Math.floor(performance.now()/90) % N;
-  g.font = `12px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "right"; g.textBaseline = "top"; g.fillText(`${live ? "live" : "replaying the record"}: decision ${now + 1} of ${N}`, w - mr, 2);
-  panels.forEach((P, pi) => { const top = head + pi*ph, bot = top + ph - 16; let mx = 0; I.forEach(r => mx = Math.max(mx, P.f(r))); mx = mx > 0 ? mx*1.1 : 1; const Y = v => bot - v/mx*(bot - top - 14);
-    g.fillStyle = css.muted; g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(P.t, ml, top);
-    g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(fmtAxis(mx/1.1), ml - 4, Y(mx/1.1)); g.fillText("0", ml - 4, bot);
-    lanes.forEach((L, li) => { const X = k => L.x0 + k/N*L.lw; g.strokeStyle = css.rule; g.lineWidth = 1; g.beginPath(); g.moveTo(L.x0, bot); g.lineTo(L.x0 + L.lw, bot); g.stroke();
-      if (li === 0) { g.strokeStyle = L.col; g.lineWidth = 2; g.beginPath(); g.moveTo(L.x0, bot); g.lineTo(L.x0 + L.lw, bot); g.stroke(); if (pi === 0) { g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "bottom"; g.fillText("none: no immune system", L.x0 + 4, bot - 4); } return; }
-      I.forEach((r, k) => { if (r[1] > 0) { g.fillStyle = alpha(css.bad, 0.35); g.fillRect(X(k), top + 14, Math.max(1, L.lw/N), bot - top - 14); } if (pi === 1 && r[4]) { g.fillStyle = css.ok; g.fillRect(X(k), bot + 2, Math.max(1, L.lw/N), 4); } });
-      g.strokeStyle = L.col; g.lineWidth = 2; g.beginPath(); I.forEach((r, k) => k ? g.lineTo(X(k), Y(P.f(r))) : g.moveTo(X(k), Y(P.f(r)))); g.stroke();
-      if (now >= 0) { g.strokeStyle = css.ink; g.beginPath(); g.moveTo(X(now), top + 14); g.lineTo(X(now), bot); g.stroke(); } });
-  });
-}
-function updateImmune() {
-  const box = $("immLive"); if (!box) return;
-  if (W.body === "harness" && W.hsec === "organism") {
-    const im = W.imm, T = W.immTot || {inflamed: 0, gave: 0, log: []};
-    const cells = im ? [["rooms inflamed now (warmer than their native twin)", im[1], im[1] > 0], ["the body's signal (heat debt)", im[0] > 0 ? Math.round(im[0]).toLocaleString("en-US") + " W" : "none", im[0] > 0],
-      ["the body gives back now (the bone's lines full, or a heat debt)", im[4] ? "yes" : "no", false], ["machines Omni-Compass holds over the pools' twins", im[5], false]]
-      : [["the immune system", W.t > HS().kill_at ? "the lease: the brain is silent, every setting walks back to native" : "waiting for the first decision", false]];
-    box.innerHTML = cells.map(([k, v, hot]) => `<div><span>${k}</span><b class="${hot ? "hot" : ""}">${v}</b></div>`).join("");
-    $("immTot").textContent = `this run so far: ${T.inflamed} decisions with an inflamed room, every one answered by the body's signal; ${T.gave} decisions on which the body gave back what Omni-Compass had added`;
-    $("immLog").innerHTML = T.log.length ? T.log.map(x => `<span>${x}</span>`).join("") : "<span>no room inflamed yet in this run: every room stands at or cooler than its native twin</span>";
-  } else {   // not playing one organism: the whole record of one organism's run, read from the same file the harness view plays
-    const I = immRec(), inf = I.filter(r => r[1] > 0).length, gave = I.filter(r => r[4]).length, mx = Math.max(0, ...I.map(r => r[0])), held = Math.max(0, ...I.map(r => r[5]));
-    box.innerHTML = [["decisions with a room inflamed, run " + "ABC"[IMW.run], inf, inf > 0], ["decisions the body gave back", gave, false], ["the largest heat debt", mx > 0 ? Math.round(mx).toLocaleString("en-US") + " W" : "none", mx > 0], ["most machines held over their twins", held, false], ["native", "<span style=\"color:var(--steel)\">none of it: no twin, no signal</span>", false]]
-      .map(([k, v, hot]) => `<div><span>${k}</span><b class="${hot ? "hot" : ""}">${v}</b></div>`).join("");
-    $("immTot").textContent = (W.body === "harness" ? "Each muscle alone carries its own twin, its memory of native, and is never held below it; the body-wide signals need a body." : "The stress-test model carries the nerves and the compass law; the immune system lives in the engine's own body.") + ` Shown: one organism's whole run ${"ABC"[IMW.run]} from its record (seed ${TR.organism.seeds[IMW.run]}); press Play one organism to watch it act decision by decision.`;
-    $("immLog").innerHTML = "";
-  }
-}
+function immSeed() { return TR.organism.seeds[W.body === "harness" && W.hsec === "organism" ? W.run : IMW.run]; }
+function immRec() {   // Omni-Compass's immune record of that run (none while the master switch is OFF: the immune system is Omni-Compass's)
+  if (MASTER.off) return []; const sd = immSeed(), R = TRD.organism[sd]; return (R && R._omni && R._omni.imm) || (TR.organism.runs[String(sd)].omni.imm || []); }
+function immArms() { const R = TRD.organism[immSeed()]; return {nat: R.native, omni: R.omni}; }   // each side's own record; the master switch OFF reads native's on both
+function drawImm() {   // the immune system over one organism's run: each side's own heat and power, native beside Omni-Compass, the immune acts marked on Omni-Compass's lane
+  const cv = $("immCv"), {g, w, h} = fit(cv, Math.min(0.46, 290/Math.max(cv.clientWidth, 1))); g.clearRect(0, 0, w, h);
+  const A = immArms(), I = immRec(), N = TR.organism.steps, KA = TR.organism.kill_at, ml = 48, mr = 8, head = 22, lanes = mkLanes(w, ml, mr, 18, A.nat, A.omni); laneHeads(g, lanes);
+  const live = W.body === "harness" && W.hsec === "organism", now = live ? Math.min(Math.max(W.t - 1, 0), N - 1) : Math.floor(performance.now()/90) % N;
+  const panels = [{t: "the body's heat: its thermal stress, its own", f: (a, k) => a.obs && a.obs[k] ? a.obs[k][3] : null}, {t: "power drawn (MW), its own", f: (a, k) => a.kw && a.kw[k] !== undefined ? a.kw[k]/1000 : null}], ph = (h - head - 18)/2;
+  panels.forEach((P, pi) => { const top = head + pi*ph, bot = top + ph - 16; let mx = -Infinity, mn = Infinity;
+    for (const a of [A.nat, A.omni]) for (let k = 0; k < N; k++) { const v = P.f(a, k); if (v !== null) { mx = Math.max(mx, v); mn = Math.min(mn, v); } }
+    if (!isFinite(mn)) { mn = 0; mx = 1; } const pad = (mx - mn)*0.08 || Math.abs(mx)*0.02 || 0.01, lo = Math.max(0, mn - pad), hi = mx + pad, Y = v => bot - (v - lo)/(hi - lo)*(bot - top - 14);
+    g.fillStyle = css.muted; g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; fillWords(g, P.t, ml, top);
+    g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(fmtAxis(hi), ml - 4, Y(hi)); g.fillText(fmtAxis(lo), ml - 4, bot);
+    lanes.forEach((L, li) => { const X = k => L.x0 + k/(N - 1)*L.lw; g.strokeStyle = css.rule; g.lineWidth = 1; g.beginPath(); g.moveTo(L.x0, bot); g.lineTo(L.x0 + L.lw, bot); g.stroke();
+      if (li === 1) { I.forEach((r, k) => { if (pi === 0 && r[1] > 0) { g.fillStyle = alpha(css.bad, 0.30); g.fillRect(X(k), top + 14, Math.max(1, L.lw/N), bot - top - 14); }
+          if (pi === 1 && r[4]) { g.fillStyle = css.ok; g.fillRect(X(k), bot + 2, Math.max(1, L.lw/N), 4); } });
+        if (!MASTER.off && KA < N) { g.strokeStyle = alpha(css.muted, 0.8); g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(KA), top + 14); g.lineTo(X(KA), bot); g.stroke(); g.setLineDash([]);
+          if (pi === 0) { g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; fillWords(g, "the lease", X(KA) + 3, top + 14); } } }
+      // the whole run faint, the part played so far solid: both sides drawn the same way, each from its own record
+      for (const [k1, alp] of [[N - 1, 0.28], [now, 1]]) { g.strokeStyle = alpha(L.col, alp); g.lineWidth = alp < 1 ? 1.2 : 2; g.beginPath(); let on = false;
+        for (let k = 0; k <= k1; k++) { const v = P.f(L.A, k); if (v === null) { on = false; continue; } const x = X(k), y = Y(v); on ? g.lineTo(x, y) : g.moveTo(x, y); on = true; } g.stroke(); }
+      const v = P.f(L.A, now); if (v !== null) { g.fillStyle = L.col; g.beginPath(); g.arc(X(now), Y(v), 3.5, 0, Math.PI*2); g.fill(); }
+      g.strokeStyle = alpha(css.ink, 0.55); g.lineWidth = 1; g.beginPath(); g.moveTo(X(now), top + 14); g.lineTo(X(now), bot); g.stroke(); }); });
+  g.font = `12px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "right"; g.textBaseline = "bottom"; fillWords(g, `${live ? "live" : "replaying run " + "ABC"[IMW.run]}: decision ${now + 1} of ${N}`, w - mr, h - 1);
+  if (now !== IMW.k) { IMW.k = now; if (!live) updateImmune(); } }
+function updateImmune() {   // native beside Omni-Compass at the decision on screen: each side's own heat and power; the immune system's readings, Omni-Compass's
+  const box = $("immLive"); if (!box) return; const live = W.body === "harness" && W.hsec === "organism", N = TR.organism.steps, KA = TR.organism.kill_at;
+  const k = live ? Math.min(Math.max(W.t - 1, 0), N - 1) : (IMW.k || 0), A = immArms(), I = immRec(), im = live ? W.imm : (I[k] || null);
+  const th = a => a.obs && a.obs[k] ? a.obs[k][3].toFixed(3) : "—", kw = a => a.kw && a.kw[k] !== undefined ? (a.kw[k]/1000).toFixed(1) + " MW" : "—";
+  const om = (v, fall) => MASTER.off ? "off at the switch" : k >= KA ? "the lease: walking back" : im ? v : fall;
+  const pair = (n, o, hot) => `<em class="ln">${n}</em> <em class="sep">·</em> <em class="lo${hot ? " hot" : ""}">${o}</em>`;
+  const cells = [[`decision ${k + 1} of ${N}${live ? ", one organism live" : ", run " + "ABC"[IMW.run] + " replaying"}`, pair("native", "Omni-Compass")],
+    ["the body's heat now (its thermal stress)", pair(th(A.nat), th(A.omni))],
+    ["power drawn now", pair(kw(A.nat), kw(A.omni))],
+    ["rooms warmer than native's twin", pair("0, it is the twin", om(im && im[1], "0"), !!(im && im[1] > 0) && !MASTER.off)],
+    ["the body's signal (heat debt)", pair("none: no immune system", om(im && im[0] > 0 ? Math.round(im[0]).toLocaleString("en-US") + " W" : "none", "none"), !!(im && im[0] > 0) && !MASTER.off)],
+    ["the body gives back now", pair("no immune system", om(im && im[4] ? "yes" : "no", "no"))],
+    ["machines over the pools' twins", pair("0, it is the twin", om(im ? im[5] : 0, "0"))]];
+  box.innerHTML = cells.map(([t, v]) => `<div><span>${t}</span><b>${v}</b></div>`).join("");
+  if (live) { const T = W.immTot || {inflamed: 0, gave: 0, log: []};
+    $("immTot").textContent = `this run so far: ${T.inflamed} decisions with an inflamed room, every one answered by the body's signal; ${T.gave} decisions on which the body gave back what Omni-Compass had added. Native beside it runs on its own controllers alone: its heat and its power drawn are its own, read from the same organism's record.`;
+    $("immLog").innerHTML = T.log.length ? T.log.map(x => `<span>${x}</span>`).join("") : "<span>no room inflamed yet in this run: every room stands at or cooler than its native twin</span>"; }
+  else { const inf = I.filter(r => r[1] > 0).length, gave = I.filter(r => r[4]).length, mx = Math.max(0, ...I.map(r => r[0])), held = Math.max(0, ...I.map(r => r[5]));
+    $("immTot").textContent = `Run ${"ABC"[IMW.run]} (seed ${TR.organism.seeds[IMW.run]}), replayed from its record, native beside Omni-Compass: ${MASTER.off ? "the master switch is OFF, so the immune system is off and both sides read native's own" : `${inf} decisions with a room inflamed, ${gave} on which the body gave back, the largest heat debt ${mx > 0 ? Math.round(mx).toLocaleString("en-US") + " W" : "none"}, at most ${held} machines over their twins; from decision ${KA + 1} the lease walks every setting back to native`}. Press Play one organism to watch it act decision by decision.`;
+    $("immLog").innerHTML = ""; } }
 function updateLive() {
   updateImmune();
   for (const [arm, k] of [[W.nat, "N"], [W.omni, "O"]]) {
@@ -2269,10 +2283,10 @@ function updateScore() {
     ["Muscle-decisions past the line", n.over, o.over, "down", "", 0, "over", "over"],
     ["Energy (kWh, the body's electrical power)", n.energy, o.energy, "", "spent", 3, "cap", "power"],
     ...(W.hsec === "alone" ? [["Time to clear the waiting line (share of each muscle's run, mean)", lineMean("native"), lineMean("omni"), "down", "", 3, null, "line"]] : []),
-    ["Muscle-decisions where the two sides differ", NaN, W.differTot || 0, "", "shown", 0, null, null],
+    ["Muscle-decisions where the two sides differ (one count, shared by the pair)", W.differTot || 0, W.differTot || 0, "", "shown", 0, null, null],
     ["Spread of positions (s.d. of p), mean", mean(NH.spread), mean(OH.spread), "", "shown", 3, "spread", "spread"],
-    ["Settings held off native (muscle-decisions)", n.held, o.held, "", "shown", 0, null, null],
-    ["Plug writes", 0, o.writes, "", "shown", 0, null, null]]
+    ["Settings held off native (muscle-decisions; native's settings are native's own, 0 by construction)", n.held, o.held, "", "shown", 0, null, null],
+    ["Plug writes (native has no plug: 0 by construction)", 0, o.writes, "", "shown", 0, null, null]]
   : [
     ["Work served (units)", n.served, o.served, "up", "", 0, "served", "served"],
     ["Muscle-decisions past the line (r > 1)", n.over, o.over, "down", "", 0, "over", "over"],
@@ -2280,7 +2294,8 @@ function updateScore() {
     ["Work waiting (unit-decisions)", n.wait, o.wait, "down", "", 1, "wait", "wait"],
     ["Capacity held (unit-decisions)", n.capT, o.capT, "", "spent", 0, "cap", "cap"],
     ["Spread of positions (s.d. of p), mean", mean(NH.spread), mean(OH.spread), "", "shown", 3, "spread", "spread"],
-    ["Plug writes (moves over 2%, off native)", 0, o.writes, "", "shown", 0, null, null]];
+    ["Setting moves over 2% by each side's own controller (native's own controllers; Omni-Compass on top of them)", n.moves || 0, o.moves || 0, "", "shown", 0, null, null],
+    ["Plug writes (moves over 2%, off native; native has no plug: 0 by construction)", 0, o.writes, "", "shown", 0, null, null]];
   $("score").querySelector("tbody").innerHTML = rows.map(([t, a, b, aim, kind, dp, key, rkey]) => {
     const chg = a > 1e-12 ? (b - a)/a : (b > 1e-12 ? Infinity : 0);
     let [wd, cl] = pairedReading(key ? NH[key] : [], key ? OH[key] : [], aim, kind);
@@ -3549,18 +3564,22 @@ function updateScan() {
     const inside = A => { const r = L(A); return r[10] ? r[10].slice(0, HIST_OVER).reduce((a, b) => a + b, 0) : null; }, D = (P.omni.dec || []).filter(d => d[0] <= T*RU.bin_s), Bt = (P.omni.beats || []).filter(b => b[0] <= T*RU.bin_s);
     const f = v => v === null || v === undefined ? "—" : v;
     const pw = A => { const v = C(A)[5]; return v === null || v === undefined ? "—" : Math.round(v) + " W"; };
-    rows.push(["Brain", "the compass position now (0 calm, 1 at the line)", "none", D.length && D[D.length - 1][1] !== null ? (+D[D.length - 1][1]).toFixed(2) : "—"]);
-    rows.push(["Nervous system", "decisions carried, brain to muscle", "none: each reading to its own lever", `${D.length} decisions`]);
-    rows.push(["Heart", "the beat that keeps it moving", "each controller its own clock (the pod autoscaler every 15 s)", Bt.length ? `${Bt.length} beats, the last taking ${Math.round(Bt[Bt.length - 1][1])} ms` : "—"]);
+    const capN = (P.native.cap || []).filter(r => r[0] <= T*RU.bin_s), moves = capN.reduce((a, r, j) => a + (j && (r[1] !== capN[j - 1][1] || r[3] !== capN[j - 1][3]) ? 1 : 0), 0);
+    const lastMove = (() => { for (let j = capN.length - 1; j > 0; j--) if (capN[j][1] !== capN[j - 1][1] || capN[j][3] !== capN[j - 1][3]) return capN[j][0]; return null; })(), tS = T*RU.bin_s;
+    const busyN = hb(P.native), busyTxt = busyN === undefined || busyN === null ? "—" : (100*busyN).toFixed(0) + "%";
+    rows.push(["Brain", "the compass position now (0 calm, 1 at the line)", `none; its autoscaler reads the processor: the host ${busyTxt} busy now`, D.length && D[D.length - 1][1] !== null ? (+D[D.length - 1][1]).toFixed(2) : "—"]);
+    rows.push(["Nervous system", "decisions carried, brain to muscle", `none: each reading to its own lever; its own controllers changed replicas or nodes ${moves} time${moves === 1 ? "" : "s"} so far`, `${D.length} decisions`]);
+    rows.push(["Heart", "the beat that keeps it moving", `each controller its own clock: the pod autoscaler every 15 s, ${Math.floor(tS/15)} syncs so far`, Bt.length ? `${Bt.length} beats, the last taking ${Math.round(Bt[Bt.length - 1][1])} ms` : "—"]);
     rows.push(["Muscles", "replicas · worker nodes now", `${f(C(P.native)[1])} · ${f(C(P.native)[3])}`, `${f(C(P.omni)[1])} · ${f(C(P.omni)[3])}`]);
     rows.push(["Blood", "requests answered inside the 500 ms line, this half minute", f(inside(P.native)), f(inside(P.omni))]);
     rows.push(["Power: electricity", "the cluster's electrical draw now (declared model)", pw(P.native), pw(P.omni)]);
     rows.push(["Power: oxygen", "the host's processor headroom", hb(P.native) === undefined || hb(P.native) === null ? "—" : (100 - 100*hb(P.native)).toFixed(0) + "%", hb(P.omni) === undefined || hb(P.omni) === null ? "—" : (100 - 100*hb(P.omni)).toFixed(0) + "%"]);
     rows.push(["Intake (the mouth)", "requests taken in, this half minute", f(L(P.native)[2]), f(L(P.omni)[2])]);
-    rows.push(["Digestion (the stomach)", "the time the last decision took", "none", Bt.length ? Math.round(Bt[Bt.length - 1][1]) + " ms" : "—"]);
-    rows.push(["Exhaust (the output)", "settings commands written in this repetition, every one read back", "none written by any governor", P.omni.writes !== undefined ? String(P.omni.writes) : "—"]);
+    rows.push(["Digestion (the stomach)", "the time the last decision took", `no decision computed; its own controllers last changed the cluster ${lastMove === null ? "not yet in this repetition" : Math.round(tS - lastMove) + " s ago"}`, Bt.length ? Math.round(Bt[Bt.length - 1][1]) + " ms" : "—"]);
+    rows.push(["Exhaust (the output)", "settings commands written in this repetition, every one read back", `none written by any governor; its own controllers' changes so far: ${moves}`, P.omni.writes !== undefined ? String(P.omni.writes) : "—"]);
   } else rows.push(["—", "a database run plays no half-minute stream; choose a Kubernetes benchmark in section 8a", "—", "—"]);
-  if (W.body === "harness") { const im = W.imm; rows.splice(Math.min(4, rows.length), 0, ["Immune system", W.hsec === "organism" ? "rooms warmer than their native twins now · the body's heat debt (section 4a)" : "the immune system reads one organism (section 4a, One organism)", "none", W.hsec === "organism" ? (im ? `${im[1]} · ${im[0]} W` : "0 · 0 W") : "—"]); }
+  if (W.body === "harness") { const im = W.imm; const ob = W.hsec === "organism" ? (TRD.organism[HS().seeds[W.run]] || {}).native : null, thN = ob && ob.obs && ob.obs[Math.max(0, W.t - 1)] ? ob.obs[Math.max(0, W.t - 1)][3].toFixed(3) : null;
+    rows.splice(Math.min(4, rows.length), 0, ["Immune system", W.hsec === "organism" ? "rooms warmer than their native twins now · the body's heat debt (section 4a)" : "the immune system reads one organism (section 4a, One organism)", W.hsec === "organism" ? `none; the body's own heat now ${thN === null ? "—" : thN} (thermal stress)` : "none", W.hsec === "organism" ? (MASTER.off ? "off at the master switch" : im ? `${im[1]} · ${im[0]} W` : "0 · 0 W") : "—"]); }
   tb.querySelector("tbody").innerHTML = rows.map(([o, w, n, m]) => `<tr><td><b>${o}</b></td><td>${w}</td><td class="nat">${n}</td><td class="omni">${m}</td></tr>`).join("");
 }
 
