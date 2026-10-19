@@ -299,8 +299,11 @@ def receipt(name):
         if f"(the objective: {obj})" in text:
             title += f" (the verdict's objective: {obj})"
     even = [{"s": r["s"], "g": r["g"], "abc": r["abc"], **even_reason(r["abc"])} for r in rows if r["w"] == "EVEN"]
+    # the rows a table shows and does not judge (its preregistration's own rule), kept so their sizes are seen: a resource a
+    # table only shows, CPU used beside a response time, is the price of the work
+    shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"]} for r in rows if r["w"] == "shown"]
     return {"file": f"results/live/{name}.md", "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown")],
-            "count": count, "even": even}
+            "count": count, "even": even, "shown": shown}
 
 
 def newest(name):
@@ -313,11 +316,37 @@ def newest(name):
     return found[0] if found else (None, name)
 
 
+COMMON = {"Kubernetes", "Omni-Compass", "Omni", "The", "With", "Native", "Real", "Linux", "GitHub"}
+
+
+def causes(r):
+    """The repository's own pages on the cause of a table's LOSS rows: a page in docs/ whose title names the gauge and whose
+    text names the benchmark (a word of the table's title that only it carries, as KEDA), as docs/POD_START_WAIT.md is for
+    the pod start wait under KEDA's HTTP add-on. Read from the pages themselves; a row with no such page names none."""
+    import re
+    docs = []
+    for f in sorted((ROOT / "docs").glob("*.md")):
+        t = f.read_text(encoding="utf-8")
+        h = next((ln[2:].strip() for ln in t.splitlines() if ln.startswith("# ")), "")
+        docs.append((f, h, t))
+    tokens = {w for w in re.findall(r"[A-Z][A-Za-z0-9-]{2,}", r["title"]) if w not in COMMON}
+    out = []
+    for row in r["rows"]:
+        if row["w"] != "LOSS":
+            continue
+        base = re.split(r"[,(]", row["g"])[0].strip()
+        for f, h, t in docs:
+            if base.lower() in h.lower() and any(tok in t for tok in tokens):
+                out.append({"gauge": base, "file": str(f.relative_to(ROOT)), "title": h})
+                break
+    return out
+
+
 def receipts():
     out = []
     for name, stack, cls in RECEIPTS:
         n, stem = newest(name)
-        r = receipt(stem); r.update(stack=stack, cls=cls, engine=f"omni-v{n}" if n else "unknown"); out.append(r)
+        r = receipt(stem); r.update(stack=stack, cls=cls, engine=f"omni-v{n}" if n else "unknown", causes=causes(r)); out.append(r)
         print(f"receipt {stem:22s} {r['engine']} {r['count']}")
     return out
 

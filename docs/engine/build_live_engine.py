@@ -103,13 +103,16 @@ LEDGER_GAUGES = ["machines billed, machine-hours", "compute bill at list price (
                  "failed requests (%)", "time over the response line (% of samples)"]
 
 
+CHECKING = False      # --check: a check reads and compares, it never fetches or writes anything
+
+
 def ledger() -> dict:
     """Every run GitHub was asked to start for the chips and the clouds (gh run list --event workflow_dispatch, newest
     first), each with the engine its commit stands on (tools/omni_version.py --commit) and whether its raw files are on the
     branch raw. Read from GitHub where a token is present, and kept in docs/engine/github_ledger.json; without a token the
-    last reading kept there is used, and the page says when it was read."""
+    last reading kept there is used, and the page says when it was read. Under --check only the kept reading is used."""
     data = None
-    if shutil.which("gh") and (os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")):
+    if not CHECKING and shutil.which("gh") and (os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")):
         got = {}
         for wf in LEDGER:
             r = subprocess.run(["gh", "run", "list", "--workflow", wf, "--event", "workflow_dispatch", "--limit", "60", "--json",
@@ -292,6 +295,9 @@ def fleet() -> dict:
         t = oi.read_text(encoding="utf-8")
         m = re.search(r"## Headline:([^\n]*)", t); m2 = re.search(r"## The second reading[^\n]*?: ([^\n]*)", t)
         out["index"] = {"headline": m.group(1).strip() if m else None, "service": m2.group(1).strip() if m2 else None, "file": "results/OMNI_INDEX.md"}
+        oj = ROOT / "results" / "OMNI_INDEX.json"
+        if oj.exists():   # each category's own reading, so the page can say what carries the headline
+            out["index"]["categories"] = json.loads(oj.read_text(encoding="utf-8")).get("categories") or {}
     grids = sorted((ROOT / "results").glob("grid_v*/GRID.json"), key=lambda q: int(re.sub(r"\D", "", q.parent.name)))
     if grids:
         gp = grids[-1]; md = gp.with_name("GRID.md"); eng = None
@@ -313,6 +319,9 @@ def fleet() -> dict:
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
     out["register"] = register_places()
     out["card"] = card_record()
+    out["toy"] = toy_record()
+    import brain_off   # what the brain's six-state equations change in the governor's decisions (class S, the fleet model)
+    out["brain_off"] = brain_off.compare()
     return _clean(out)
 
 
@@ -332,9 +341,41 @@ def card_record():
     out = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", fr.get("commit") or "HEAD"],
                          capture_output=True, text=True, cwd=ROOT).stdout
     m = re.search(r"(omni-v\d+) \(digest", out)
+    env = rc.get("envelope") or {}
     return {"file": str(runs[-1].relative_to(ROOT)), "card": rc.get("gpu_name"), "reps": rc.get("reps"), "seconds": rc.get("duration_s"),
             "limit_w": rc.get("power_limit_default_w"), "commit": (fr.get("commit") or "")[:12], "engine": m.group(1) if m else None,
-            "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows}
+            "when": f"{stamp[:4]}-{stamp[4:6]}-{stamp[6:8]}", "rows": rows,
+            "envelope_w": [env.get("power_min_w"), env.get("power_max_w")] if env else None,
+            "p95_guard_held": (d.get("headline") or {}).get("guardrail_p95")}
+
+
+def toy_record():
+    """The toy gate that let the engine that stands through (results/toy_gate/V<n>_VS_V<n-1>.json, our own models, class
+    S): every toy's every gauge, the engine that stands against native, with its word as the gate read it, and the
+    verdict's keep rate at each true cost. A model's reading says where the engine may fall short before a real run, never
+    what a benchmark found."""
+    n = int(engine()[0].rsplit("v", 1)[-1])
+    f = ROOT / "results" / "toy_gate" / f"V{n}_VS_V{n - 1}.json"
+    if not f.exists():
+        found = sorted((ROOT / "results" / "toy_gate").glob("V*_VS_V*.json"), key=lambda q: int(re.match(r"V(\d+)", q.name).group(1)))
+        if not found:
+            return None
+        f = found[-1]
+    d = json.loads(f.read_text(encoding="utf-8"))
+    toys = {}
+    for name, t in (d.get("toys") or {}).items():
+        rows = []
+        for g, v in (t.get("gauges") or {}).items():
+            if not isinstance(v, dict) or "native" not in v:
+                continue
+            cv = v.get("cand_vs_native") or {}
+            rows.append({"g": g, "native": v.get("native"), "omni": v.get("cand"), "rel": cv.get("relative"),
+                         "ci": cv.get("ci95"), "word": cv.get("word")})
+        if rows:
+            toys[name] = {"period_s": t.get("period_s"), "rows": rows}
+    vd = (d.get("toys") or {}).get("verdict") or {}
+    return _clean({"file": str(f.relative_to(ROOT)), "seeds": len(d.get("seeds") or []), "days": d.get("days"), "toys": toys,
+                   "verdict_keep": vd.get("cand")})
 
 
 def register_places() -> list:
@@ -402,6 +443,8 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="rebuild in memory; exit 1 if any record differs from the page")
     ap.add_argument("--no-runs", action="store_true", help="leave out GitHub's running and queued runs")
     a = ap.parse_args()
+    global CHECKING
+    CHECKING = a.check
     page = PAGE.read_text(encoding="utf-8")
     named = re.search(r'<html[^>]*data-engine="(omni-v\d+)"', page)
     rec = records(not a.no_runs and not a.check)
