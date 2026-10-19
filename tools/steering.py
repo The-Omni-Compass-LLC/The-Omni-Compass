@@ -56,10 +56,16 @@ def arm(audit: Path) -> dict | None:
     out = {"hours": hours, "decisions_h": g.decisions / hours, "writes_h": sum(g.writes.values()) / hours,
            "writes_by_why": {k: v / hours for k, v in g.writes.items()},
            "decision_s_mean": statistics.mean(ms) if ms else None, "decision_s_max": max(ms) if ms else None,
-           "own_cpu": g.own_cpu}
+           "own_cpu": g.own_cpu, "errors_h": sum(g.errors.values()) / hours}
+    zoned = sum(g.zones.values())
+    for z in ("slack", "band", "wall"):
+        out[f"share_{z}"] = 100.0 * g.zones[z] / zoned if zoned else None
+    out["recovery_s_mean"] = g.recovery_sum / g.recovery_count if g.recovery_count else None
+    out["recovery_s_max"] = g.recovery_max
     for s in SETTINGS:
         out[f"moves_h_{s}"] = g.moves.get(s, 0) / hours
         out[f"reversals_h_{s}"] = g.reversals.get(s, 0) / hours
+        out[f"travel_h_{s}"] = g.travel.get(s, 0.0) / hours
     return out
 
 
@@ -103,6 +109,14 @@ def main(argv=None):
             ("machines recommendation: reversals an hour", "reversals_h_nodes", 1),
             ("power cap recommendation: moves an hour (not written on Kubernetes)", "moves_h_power_cap", 1),
             ("power cap recommendation: reversals an hour (not written on Kubernetes)", "reversals_h_power_cap", 1),
+            ("HPA target recommendation: distance travelled an hour", "travel_h_hpa_target", 3),
+            ("machines recommendation: distance travelled an hour", "travel_h_nodes", 2),
+            ("decisions with the compass in its band (%)", "share_band", 1),
+            ("decisions with the compass under its lower cushion, the service far from its line (%)", "share_slack", 1),
+            ("decisions with the compass at or past the line (%)", "share_wall", 1),
+            ("time from the line back into the band, mean (s)", "recovery_s_mean", 0),
+            ("time from the line back into the band, longest (s)", "recovery_s_max", 0),
+            ("errors recorded an hour", "errors_h", 1),
             ("decision time, mean (s)", "decision_s_mean", 2), ("decision time, longest (s)", "decision_s_max", 2),
             ("the governor's own processor (cores)", "own_cpu", 4)]
     for key, title in TESTS:
