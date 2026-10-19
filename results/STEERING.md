@@ -18,6 +18,14 @@ Runs 39171064099, 39175675418, 39177950720; 10, 10 and 10 omni repetitions.
 | machines recommendation: reversals an hour | 0.0 | 0.0 | 0.0 |
 | power cap recommendation: moves an hour (not written on Kubernetes) | 1.7 | 0.0 | 2.5 |
 | power cap recommendation: reversals an hour (not written on Kubernetes) | 0.8 | 0.0 | 1.3 |
+| HPA target recommendation: distance travelled an hour | 0.000 | 0.000 | 0.000 |
+| machines recommendation: distance travelled an hour | 0.00 | 0.00 | 0.00 |
+| decisions with the compass in its band (%) | 78.0 | 54.0 | 48.0 |
+| decisions with the compass under its lower cushion, the service far from its line (%) | 14.0 | 40.0 | 43.3 |
+| decisions with the compass at or past the line (%) | 8.0 | 6.0 | 8.7 |
+| time from the line back into the band, mean (s) | 61 | 61 | 61 |
+| time from the line back into the band, longest (s) | 62 | 61 | 61 |
+| errors recorded an hour | 0.0 | 0.0 | 0.0 |
 | decision time, mean (s) | 0.36 | 0.35 | 0.32 |
 | decision time, longest (s) | 0.63 | 0.54 | 0.57 |
 | the governor's own processor (cores) | 0.0082 | 0.0079 | 0.0074 |
@@ -38,6 +46,14 @@ Runs 39173411511, 39176842679, 39180252225; 10, 10 and 10 omni repetitions.
 | machines recommendation: reversals an hour | 0.0 | 0.0 | 0.0 |
 | power cap recommendation: moves an hour (not written on Kubernetes) | 0.8 | 0.0 | 0.0 |
 | power cap recommendation: reversals an hour (not written on Kubernetes) | 0.4 | 0.0 | 0.0 |
+| HPA target recommendation: distance travelled an hour | 0.000 | 0.000 | 0.000 |
+| machines recommendation: distance travelled an hour | 0.00 | 0.00 | 0.00 |
+| decisions with the compass in its band (%) | 66.7 | 49.3 | 69.3 |
+| decisions with the compass under its lower cushion, the service far from its line (%) | 26.7 | 44.7 | 24.7 |
+| decisions with the compass at or past the line (%) | 6.7 | 6.0 | 6.0 |
+| time from the line back into the band, mean (s) | 61 | 61 | 61 |
+| time from the line back into the band, longest (s) | 61 | 61 | 61 |
+| errors recorded an hour | 0.0 | 0.0 | 0.0 |
 | decision time, mean (s) | 0.52 | 0.45 | 0.48 |
 | decision time, longest (s) | 1.21 | 0.76 | 0.73 |
 | the governor's own processor (cores) | 0.0097 | 0.0087 | 0.0094 |
@@ -58,6 +74,14 @@ Runs 39173411511, 39176842679, 39180252225; 10, 10 and 10 omni repetitions.
 | machines recommendation: reversals an hour | 0.0 | 0.0 | 0.0 |
 | power cap recommendation: moves an hour (not written on Kubernetes) | 3.4 | 0.8 | 0.0 |
 | power cap recommendation: reversals an hour (not written on Kubernetes) | 1.7 | 0.4 | 0.0 |
+| HPA target recommendation: distance travelled an hour | 0.000 | 0.000 | 0.000 |
+| machines recommendation: distance travelled an hour | 0.00 | 0.00 | 0.00 |
+| decisions with the compass in its band (%) | 53.3 | 58.7 | 68.0 |
+| decisions with the compass under its lower cushion, the service far from its line (%) | 39.3 | 36.0 | 28.0 |
+| decisions with the compass at or past the line (%) | 7.3 | 5.3 | 4.0 |
+| time from the line back into the band, mean (s) | 62 | 62 | 62 |
+| time from the line back into the band, longest (s) | 62 | 62 | 62 |
+| errors recorded an hour | 0.0 | 0.0 | 0.0 |
 | decision time, mean (s) | 0.62 | 0.61 | 0.61 |
 | decision time, longest (s) | 2.51 | 2.22 | 2.16 |
 | the governor's own processor (cores) | 0.0113 | 0.0117 | 0.0120 |
@@ -78,6 +102,14 @@ Runs 39171068872, 39175679247, 39179020367; 20, 20 and 20 omni repetitions.
 | machines recommendation: reversals an hour | 0.0 | 0.0 | 0.0 |
 | power cap recommendation: moves an hour (not written on Kubernetes) | 5.8 | 7.7 | 6.6 |
 | power cap recommendation: reversals an hour (not written on Kubernetes) | 3.2 | 4.8 | 3.7 |
+| HPA target recommendation: distance travelled an hour | 0.000 | 0.000 | 0.000 |
+| machines recommendation: distance travelled an hour | 0.00 | 0.00 | 0.00 |
+| decisions with the compass in its band (%) | 35.0 | 41.0 | 39.0 |
+| decisions with the compass under its lower cushion, the service far from its line (%) | 11.5 | 1.8 | 5.2 |
+| decisions with the compass at or past the line (%) | 53.5 | 57.2 | 55.8 |
+| time from the line back into the band, mean (s) | 65 | 64 | 66 |
+| time from the line back into the band, longest (s) | 74 | 68 | 71 |
+| errors recorded an hour | 940.0 | 966.9 | 961.1 |
 | decision time, mean (s) | 0.59 | 0.62 | 0.60 |
 | decision time, longest (s) | 1.06 | 1.10 | 0.99 |
 | the governor's own processor (cores) | 0.0222 | 0.0232 | 0.0227 |
@@ -98,6 +130,14 @@ Runs 39173416105, 39177935888, 39182898753; 10, 10 and 10 omni repetitions.
 | machines recommendation: reversals an hour | 0.0 | 0.0 | 0.0 |
 | power cap recommendation: moves an hour (not written on Kubernetes) | 13.9 | 13.5 | 12.6 |
 | power cap recommendation: reversals an hour (not written on Kubernetes) | 9.6 | 9.6 | 8.3 |
+| HPA target recommendation: distance travelled an hour | 0.000 | 0.000 | 0.000 |
+| machines recommendation: distance travelled an hour | 0.00 | 0.00 | 0.00 |
+| decisions with the compass in its band (%) | 26.2 | 30.0 | 32.3 |
+| decisions with the compass under its lower cushion, the service far from its line (%) | 4.6 | 6.9 | 12.3 |
+| decisions with the compass at or past the line (%) | 69.2 | 63.1 | 55.4 |
+| time from the line back into the band, mean (s) | 128 | 159 | 132 |
+| time from the line back into the band, longest (s) | 192 | 256 | 205 |
+| errors recorded an hour | 0.0 | 0.0 | 0.0 |
 | decision time, mean (s) | 1.61 | 1.46 | 1.30 |
 | decision time, longest (s) | 3.67 | 3.30 | 3.21 |
 | the governor's own processor (cores) | 0.0133 | 0.0126 | 0.0132 |
@@ -118,6 +158,14 @@ Runs 39173420146, 39177939062, 39182902844; 3, 3 and 3 omni repetitions.
 | machines recommendation: reversals an hour | 0.0 | 0.0 | 0.0 |
 | power cap recommendation: moves an hour (not written on Kubernetes) | 20.9 | 19.6 | 21.4 |
 | power cap recommendation: reversals an hour (not written on Kubernetes) | 20.4 | 19.1 | 20.9 |
+| HPA target recommendation: distance travelled an hour | 0.169 | 0.087 | 0.051 |
+| machines recommendation: distance travelled an hour | 0.00 | 0.00 | 0.00 |
+| decisions with the compass in its band (%) | 34.5 | 31.1 | 21.0 |
+| decisions with the compass under its lower cushion, the service far from its line (%) | 3.1 | 3.4 | 0.0 |
+| decisions with the compass at or past the line (%) | 62.4 | 65.6 | 79.0 |
+| time from the line back into the band, mean (s) | 337 | 317 | 406 |
+| time from the line back into the band, longest (s) | 607 | 647 | 777 |
+| errors recorded an hour | 0.0 | 0.0 | 0.0 |
 | decision time, mean (s) | 1.48 | 1.54 | 1.82 |
 | decision time, longest (s) | 4.30 | 4.46 | 4.91 |
 | the governor's own processor (cores) | 0.0104 | 0.0108 | 0.0107 |
