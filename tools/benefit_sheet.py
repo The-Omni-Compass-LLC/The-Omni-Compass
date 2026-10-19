@@ -241,7 +241,7 @@ def from_index():
             s_["ratios"].append(1 + (c["resource_pct"] or 0.0) / 100.0); s_["gain"] += g; s_["loss"] += l_; s_["given"] += gv; s_["items"] += items
             s_["parts"].append({"case": c["workload"], "pct": c["resource_pct"] or 0.0, "benefit": benefit_word(g, l_, gv), "loss": l_, "words": in_words(items)})
     for f, s_ in stacks.items():
-        rows.append({"date": updated(LIVE / f), "benchmark": names.get(f, f), "benefit": benefit_word(s_["gain"], s_["loss"], s_["given"]), "pct": pct(gmean(s_["ratios"])),
+        rows.append({"date": updated(LIVE / f), "benchmark": names.get(re.sub(r"^V\d+_", "V7_", f), f), "benefit": benefit_word(s_["gain"], s_["loss"], s_["given"]), "pct": pct(gmean(s_["ratios"])),
                      "gain": s_["gain"], "loss": s_["loss"], "given": s_["given"], "words": in_words(s_["items"]),
                      "what": "the index's category: its untouched workloads together (work, p95, the resource held, host CPU)",
                      "file": f"results/live/{f}", "parts": s_["parts"]})
