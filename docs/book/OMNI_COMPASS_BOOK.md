@@ -29,10 +29,14 @@ muscles you already run. It never replaces them and it never competes with them.
 writes one setting at a time through a two-way plug: one wire in, one wire out. Before it writes anything, it takes a
 snapshot. When it stops, every setting goes back to that snapshot.
 
-**The rule I will not bend: do no harm.** Omni-Compass must never cause a LOSS against the system's own native
-controller. Where it cannot bring a muscle a gain, that muscle stays native. Before a slow setting moves, the governor tries
-the step on that muscle and keeps it only if the muscle's own work costs no more for it. A step that costs more is
-undone.
+**The rule I will not bend: do no harm.** Its real goal is the organism you wire it onto: to strengthen it and keep it
+healthy, working at the best state its own muscles can carry, turning what is fed into it (its work, its data, its
+energy) into the most and best output it can make. Harm is the organism turning out less than its native controllers make
+it turn out, or made less healthy: a muscle pushed past its own limit, a service over its own line, anything made to
+fail. Omni-Compass never does either, and it pushes a muscle only as far as that muscle itself can go (`DISCLOSURES.md`,
+Chapter 4). The engine that stands keeps the rule in its strictest form: where it cannot bring a muscle a gain, that
+muscle stays native, and before a slow setting moves, the governor tries the step on that muscle and keeps it only if the
+muscle's own work costs no more for it. A step that costs more is undone.
 
 **The max is the factory setting.** Omni-Compass ships tuned the way I tuned it: every muscle runs up to its own limit,
 read live from the system, never past it and never below what native gives. The energy it takes to do more work is
@@ -113,9 +117,10 @@ should show, the following discipline throughout:
    the run is repeated and the loss stays in the record.
 5. **Nothing read across engine versions.** Each engine version is fingerprinted (`python3 tools/omni_version.py`). A
    receipt names the version it ran on and is never read against a receipt of another.
-6. **Do no harm.** Omni-Compass moves a slow knob only where a paired trial on the muscle itself shows the muscle never
-   behind for it (section 1.2). Where it cannot bring a knob a gain, that knob stays native, and the receipt says
-   "nothing for Omni to move".
+6. **Do no harm.** The organism is never left turning out less than native, nor less healthy, and every muscle works only
+   as far as its own limit (`DISCLOSURES.md`, section 3). On the engine that stands, Omni-Compass moves a slow knob only
+   where a paired trial on the muscle itself shows the muscle never behind for it (section 1.2). Where it cannot bring a
+   knob a gain, that knob stays native, and the receipt says "nothing for Omni to move".
 
 
 ## Prelude: A Night on the Cluster
@@ -239,8 +244,9 @@ installer to.
 
 **The promise, in three parts.**
 
-1. **Do no harm.** A step stays only where the muscle loses nothing for it, measured on the muscle itself. Where
-   Omni-Compass cannot bring a gain, the muscle stays native.
+1. **Do no harm.** The organism is never left turning out less than native, nor less healthy, and no muscle is pushed past
+   its own limit. On the engine that stands, a step stays only where the muscle loses nothing for it, measured on the
+   muscle itself; where Omni-Compass cannot bring a gain, the muscle stays native.
 2. **Everything comes back.** Every setting is saved before the first write and restored when Omni-Compass stops. If
    the governor crashes, its lease runs out and the settings walk home on their own. A separate kill switch stops
    everything at once.
@@ -301,7 +307,7 @@ Some preregistrations name their outcome with a label written before the runs (f
 
 A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are **EVEN, no difference beyond the noise** (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** (clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting).
 
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
 Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
@@ -516,7 +522,10 @@ is therefore always "what the governor added on top of what the native controlle
 
 ### 1.2 Do no harm: the paired trial on the muscle
 
-The second design decision is that Omni-Compass must never cause a LOSS. Before Omni-Compass moves a slow knob (a machine
+The second design decision is do no harm, and its meaning is the organism's (`DISCLOSURES.md`, section 3): the organism is
+never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as
+far as its own limit. The engine that stands keeps it in its strictest form: Omni-Compass must never cause a LOSS on any
+muscle, judged on the muscle itself, and takes nothing from one muscle to give to another. Before Omni-Compass moves a slow knob (a machine
 given back, a card's clock ceiling, a robot axis's speed, a drone's cruise override), it runs a **paired trial on the
 muscle itself**: the muscle's own cost per piece of work is measured at the deepest step already allowed and at one step
 past it, under the same traffic, with a set number of pieces of work on each side (two hundred response times on
@@ -810,9 +819,9 @@ muscle on the setting that was found for it, every muscle wired, nothing switche
 
 The factory setting is **the max**: every muscle runs up to its own limit, read live from the system, never past it and
 never below what native gives. It rides the edge of each muscle's range, not the middle. The energy it takes to do more
-work is **power given**, shown beside the work, the speed and the wear it bought, never called a loss; the max never
-takes from one muscle to give to another. A knob that native already runs at the top of its range is "at its limit on
-native", and the max leaves it there.
+work is **power given**, shown beside the work, the speed and the wear it bought, never called a loss; on the engine that
+stands the max takes nothing from one muscle to give to another. A knob that native already runs at the top of its range
+is "at its limit on native", and the max leaves it there.
 
 The **dial** turns the max down. It has two positions, the same on every live controller:
 
