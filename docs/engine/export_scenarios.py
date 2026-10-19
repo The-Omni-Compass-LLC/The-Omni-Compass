@@ -48,6 +48,8 @@ def reading(runs, aim):
     up = ups.pop()
     if aim == "spent":
         return "power given" if up else "GAIN"
+    if aim == "per":         # work bought with each unit of a resource (tools/readings.py WORK_PER): a fall is power given
+        return "GAIN" if up else "power given"
     return "GAIN" if (up if aim == "up" else not up) else "LOSS"
 
 
@@ -128,7 +130,7 @@ def gpu():
             for g, (aim, s, _) in GPU_GAUGES.items():
                 sec["readings"].setdefault(g, {"aim": aim, "runs": []})["runs"].append(paired(n[s], o[s], 30))
             wpk = (o["summary"]["work_per_kj"] / n["summary"]["work_per_kj"]) - 1.0
-            sec["readings"].setdefault("wpk", {"aim": "up", "runs": []})["runs"].append(
+            sec["readings"].setdefault("wpk", {"aim": "per", "runs": []})["runs"].append(
                 {"native": n["summary"]["work_per_kj"], "omni": o["summary"]["work_per_kj"], "change": wpk, "lo": wpk, "hi": wpk})
         for g, v in sec["readings"].items():
             v["reading"] = reading(v["runs"], v["aim"])
