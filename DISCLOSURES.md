@@ -40,15 +40,44 @@ and every report point here. Where any other page seems to say more than this pa
 6. No result is a promise of a saving on any other system. No dollar figure in this repository is a measured result.
    Nothing here is a vendor certification, a safety certification, legal advice or investment advice.
 
-## 3. The rule Omni-Compass keeps on every muscle
+## 3. Do no harm, and the rule Omni-Compass keeps on every muscle
 
-Omni-Compass sits on top of a muscle that already works. By default it moves the muscle's settings toward more work,
-faster, up to the muscle's own limit and never past it (the max); on the dial anyone can tune it down toward the same
-work with less (the tune-down). Either way it keeps a step only where the muscle is never behind native for it: a step
-that costs the muscle more for each piece of work, or loses more than **2%** in any measure (work done, response time at
-the median, p95 or p99, time over the service line, or the machine's own cost of running Omni-Compass), is undone. A
-resource spent that rose is **power given**, shown beside the work, the speed and the wear it bought, never called a
-loss. Where no move passes that test, Omni-Compass leaves the muscle exactly as it runs alone.
+**What "do no harm" means** (the founder's words of 19 October 2026; this is its meaning everywhere in Omni-Compass, and
+it has no other). Omni-Compass has one goal: to strengthen the organism it governs and keep it healthy, working at the
+best state its own muscles can carry. Whatever is fed into the organism (its work, its data, its energy: its nutrients)
+passes through its muscles and comes out as its output. Omni-Compass's brain drives the organism toward the most and the
+best output it can make from what it is fed (the most work, done fastest, with the fewest misses and failures) while it
+keeps every muscle healthy.
+
+- **Harm is judged at the organism.** Harm is the organism turning out less than its native controllers make it turn out
+  (less work done; more time waited, missed or failed), or the organism made less healthy: a muscle pushed past its own
+  limit, a service pushed over its own line, or anything made to fail. Omni-Compass does neither.
+- **Every muscle only as far as it can go.** Omni-Compass can push a muscle only as far as that muscle itself can be
+  pushed: its own limit, read live from the system, never past it. It finds the room each muscle already has and uses
+  all of it. Whether its mathematics can draw a little more out of a muscle than the muscle was built to give is an open
+  question; a measurement answers it before anything is claimed.
+- **The muscles work as one body.** Where one muscle's strength cannot be used without straining another, the brain
+  offsets and engages the muscles together to bring the whole organism to its best state. It may use one muscle less,
+  leave it native, or rest it, so that another can carry more, whenever the organism's whole output comes out ahead and
+  every muscle stays healthy. Which muscles to drive and which to leave native is the brain's live decision, at every
+  moment and in every run.
+- **Reactive and proactive.** Like an immune system, the brain answers a breach at once, and it acts before a line is
+  crossed.
+- **Every row is still shown.** Each muscle's and each gauge's reading stays in every table beside the organism's, LOSS
+  included. Nothing is cut.
+
+**How the engine that stands keeps it.** The engine that stands keeps do no harm in its strictest form. By default it moves each
+muscle's settings toward more work, faster, up to the muscle's own limit and never past it (the max); on the dial anyone
+can tune it down toward the same work with less (the tune-down). Either way it keeps a step only where the muscle is
+never behind native for it: a step that costs the muscle more for each piece of work, or loses more than **2%** in any
+measure (work done, response time at the median, p95 or p99, time over the service line, or the machine's own cost of
+running Omni-Compass), is undone. A resource spent that rose is **power given**, shown beside the work, the speed and the
+wear it bought, never called a loss. Where no move passes that test, Omni-Compass leaves the muscle exactly as it runs
+alone. It takes nothing from one muscle to give to another: that form never harms the organism, but it leaves
+unused any gain that needs one muscle to give way to another. Letting one muscle give way so that the organism's whole
+output comes out ahead, judged on the organism and on every muscle's health, is the next engine version's work. It is
+built and proven in our own models first (the toy gate), every benchmark is run again on it, and no result claims it
+before its runs exist.
 
 **The factory tune.** The engine in this repository is presented as The Omni-Compass LLC tuned it and ships it: a
 self-running engine, set at the factory. Every muscle in the catalog is wired, and each runs on the setting found for it:

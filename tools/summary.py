@@ -32,8 +32,10 @@ from tools.readings import (OWN_RUNS, GAIN, EVEN, LOSS, GIVEN, key_lines, key_te
 WHAT = ("Omni-Compass is a supervisory governor. It always sits on top of a system's own native controller (the Kubernetes "
         "autoscaler, a database's pool, a GPU's firmware, a building's battery controller, a robot's servo) and is never "
         "standalone. It reads every gauge of the system and moves the native controller's own settings, one pedal: push for "
-        "more, lift off for less, and lifting hands every setting back toward native. Its first rule is do no harm: no "
-        "gauge may be moved past native away from its aim, and a setting it cannot improve stays native. Its default brain is "
+        "more, lift off for less, and lifting hands every setting back toward native. Its first rule is do no harm: the "
+        "organism it governs is never left turning out less than native, nor less healthy, and every muscle works only as far "
+        "as its own limit (DISCLOSURES.md, section 3); on the engine that stands no gauge may be moved past native away from "
+        "its aim, and a setting it cannot improve stays native. Its default brain is "
         "the max: every muscle rides its own limit, never past it and never below native; the energy that takes is shown as "
         "power given, beside the work and the speed it bought. Every benchmark has exactly two arms, native and omni (Omni on "
         "top of native), and every result runs three times (A, B and C).")

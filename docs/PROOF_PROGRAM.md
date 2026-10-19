@@ -12,7 +12,9 @@ register (`docs/REGISTER.md`) and a chapter in the manual (`docs/OMNI_COMPASS_MA
 
 1. **Two arms, no third.** Native is the system on its own controller, as shipped or as its operator set it. Omni is
    Omni-Compass on top of that same controller. Omni never replaces native and is never run alone.
-2. **Do no harm.** Where Omni cannot improve a knob, the knob stays native. The 2% verdict is the engine's trigger.
+2. **Do no harm.** The organism is never left turning out less than native, nor less healthy (`DISCLOSURES.md`, section 3).
+   On the engine that stands, where Omni cannot improve a knob, the knob stays native. The 2% verdict is the engine's
+   trigger.
 3. **The engine is frozen.** Omni v3 (`OMNI_V3.json`, digest `b53d05449ee04c4b`). Nothing in this program changes a
    rule, a gain, a guard, a preset or a muscle. A change would make the next version and every result would run again.
 4. **Preregistered.** Rules frozen on one tuning case, written down and pushed before the untouched cases run.
