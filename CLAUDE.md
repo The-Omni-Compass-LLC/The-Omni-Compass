@@ -43,9 +43,22 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v11 stands (v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v12 stands (v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v11** (`OMNI_V11.json`, digest `745aa53ec8eeb67b`, 47 files; `docs/OMNI_V11.md`) stands on main since 18 October, the
+- **Omni v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`) stands on main since 19 October, night,
+  the founder's order ("Of course I want you to land version 12 ... every time you do that ... it becomes a new version"):
+  omni-v11 with two faults fixed, both found on the omni-v11 runs. A CPU-limit raise the cluster's admission refuses is held
+  until the pod's limit changes, the raise shrinks or a wait passes (5 minutes, doubled up to an hour;
+  `omni_controller/muscles.py`), where omni-v11 wrote it again at every fast check (the capacity test, about 970 to 1,000
+  refused writes an hour); and the swarm's proximity reflex hands back the planner's cruise in the tick it is triggered, its
+  reach growing with the square of the speed (`tools/run_swarm.py`, outside the fingerprint's scope, declared with v12). The
+  toy gate (`results/toy_gate/V12_VS_V11.md`): identical to omni-v11 on every gauge of every toy but the refused writes,
+  −97.5%, GAIN; no LOSS. The stricter verdict built with it (a step kept only when its whole 95% interval is inside the
+  allowance) was refused by the same gate (no give-back trial could start in the cloud toy) and is kept on the branch
+  `v12-verdict-study`. The swarm's preregistration takes amendment 2 with it (a collision with Omni-Compass on top is a judged
+  LOSS row, a cell void only when native collides, three mission draws never flown). Every benchmark runs again on it from
+  00:30 UTC on 20 October; earlier tables stand as their own engine's until each benchmark's three runs on v12 land.
+- **Omni v11** (`OMNI_V11.json`, digest `745aa53ec8eeb67b`, 47 files; `docs/OMNI_V11.md`) stood on main 18 to 19 October, the
   founder's order that every fault found be fixed, none set aside: omni-v10 with one guard in the Kubernetes governor
   (`omni_controller/controller.py`). A reading with no machine in service is blind, never an overload: the decision holds and
   says why, nothing is decided from it or written, the floor check returns, and the last reading with machines stays the
@@ -53,8 +66,8 @@ the founder overrides one in the conversation.
   for two minutes while the service answered every probe; omni-v10 fed the engine the highest overload, then divided by the
   empty capacity). `tests/test_blind_reading.py` reproduces the fault on omni-v10 and passes on omni-v11; the toy gate
   (`results/toy_gate/V11_VS_V10.md`, with a blink toy) before it was pushed. Every benchmark runs again on it; earlier tables
-  stand as their own engine's until each benchmark's three runs on v11 land. Its bookkeeping was landed by
-  `tools/land_engine.py`, the one command for every version from now on.
+  stood as their own engine's until each benchmark's three runs on v11 landed (its 23 tables are its own). Its bookkeeping
+  was landed by `tools/land_engine.py`, the one command for every version from now on.
 - **Omni v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`) stood on main on 18 October, the
   founder's order ("Omni-Compass should be tuned to exploit all that can be and keep all healthy and never raise its bill";
   then "push, push in the bush"): omni-v9 with one file changed, the CityLearn runner. The battery wire's glide is 0.0875 of
@@ -109,7 +122,8 @@ the founder overrides one in the conversation.
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
   1.0, never as a second product.
 - Any change to a rule, gain, guard, preset or muscle makes **the next version**, and every result is run again on it. Never read a result across
-  versions. Never change the engine without telling the founder first.
+  versions. Never change the engine without telling the founder first; telling is not asking (19 October, night): a version
+  that passes the toy gate with no LOSS lands, and he hears what it changed.
 - Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
   readings: GAIN or LOSS in all three of our runs (the same sign in all three, every 95% interval clear of zero, the word
   set by the gauge's aim; a resource spent that rose is power given); EVEN, no difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
@@ -206,6 +220,14 @@ the founder overrides one in the conversation.
 
 ## Orders of 19 October
 
+- **Every fix lands as the next version, told, not asked** (the founder's words, the night of 19 October: "Of course I want you
+  to land a version 12. I want you to keep fixing and building and straightening and enhancing and benchmarking and
+  defensibility, and every time you do that to a new version, it becomes a new version ... What you asking me"). A change to
+  the engine is built on its own branch, tried in the toy gate against the engine that stands, and, when it reads no LOSS,
+  landed at once with `tools/land_engine.py`: the fingerprint, the words on every page, both manuals, the manifest, the push,
+  the branches leveled and every benchmark run again on it. The founder is told what changed and what it read, never asked
+  whether to land it. A change that reads a LOSS in the gate is fixed in the model first, or kept on its study branch with the
+  reason written (`docs/CHANGE_CONTROL.md`).
 - **Nothing is forced but the mechanism** (the founder's words: "We don't force anything. The only thing we force is the code
   and the mechanism and the correct mechanism. Because once the correct mechanism is enforced and wired correctly, it will do
   the physics and the math will do the work"). A result is never pushed toward GAIN: no number is tuned to make a row read
@@ -249,7 +271,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from `gpu-omni-v11`, the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v12` since 19 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -499,8 +521,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v11` (the engine that stands, 18 October), stay in
-  sync, and `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v11`,
+  One version is always the main one; `main` and the working branch, `v12` (the engine that stands, 19 October), stay in
+  sync, and `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v12`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

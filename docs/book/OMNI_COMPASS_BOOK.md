@@ -1234,9 +1234,10 @@ respect a limit the wires do not carry.
 
 ### 6.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v11** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
-quoted here ran on omni-v7, whose rules omni-v11 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
-and the interval table; omni-v11 added one guard to the Kubernetes governor). The guard shows in the audit: when the cluster's
+The engine that stands in this edition is **omni-v12** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
+quoted here ran on omni-v7, whose rules omni-v12 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
+and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
+refused until something changes, and the swarm's wire acts on a neighbour at once). The guard shows in the audit: when the cluster's
 reading shows no machine in service (every worker cordoned, tainted NoSchedule or unreachable at once), the decision is recorded
 as `held: the cluster's reading shows no machine in service; nothing decided, nothing written`, and the governor takes up again
 at the first reading with machines. A held decision is never an error and needs no action from anyone; several in a row point
@@ -1388,7 +1389,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v11 (digest 745aa53ec8eeb67b, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v12 (digest d38b58fbe28939b8, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
 
 **Level 1 - Watch (read-only).**
 

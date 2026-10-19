@@ -25,7 +25,8 @@ its own code, so the two never share a module.
              hours while the cluster serves on (the kind cluster of the CruiseKube test, 18 October): a decision or a
              check that fails is recorded and skipped, as the shipped loop does.
   verdict   the do-no-harm trigger (omnicompass/verdict.py) on noisy work: how often a give-back step that truly costs
-             0 to 5% more is allowed against a 2% allowance, the candidate's verdict against the standing one.
+             0 to 5% more is allowed against a 2% allowance, the candidate's verdict against the standing one, at 20 and at
+             200 pieces of work a decision (slow work, and work fast enough to read a 2% step in a trial's time).
 
 Gauges per seed (a day each): machine-hours, energy per used core-hour, pending-pod minutes an hour, HPA shortfall
 minutes an hour, the 95th-percentile response time, and alert minutes (minutes whose 95th percentile is over the line).
@@ -233,7 +234,7 @@ CAL = {"cost_s": 0.06, "clients": 1.0, "think_s": 0.05, "other_cores": 0.55, "lo
 CAL.update(json.loads(os.environ.get("TOY_CAL", "{}")))        # a heavier or lighter load for one run, without a code change
 CONVEY_GAUGES = {"requests_served": ("higher", False), "start_wait_s": ("lower", False), "start_wait_p95_s": ("lower", False), "p95_ms": ("lower", False),
                  "alert_minutes": ("lower", False), "host_busy": ("lower", True), "limit_given_m": ("lower", True),
-                 "pod_seconds": ("lower", True)}
+                 "pod_seconds": ("lower", True), "writes": ("lower", True)}
 
 
 def start_time(busy):
@@ -260,6 +261,7 @@ def worker_convey(arm, seed, out, quota="none"):
     HOST, REQ_M, LIM_M, COST = 4.0, 200, 500, CAL["cost_s"]
     nodes = ["w0", "w1", "w2"]
     pods, ann, nid, busy = [], {}, [0], 0.3
+    writes = [0]                                                       # every settings command the governor sent, refused ones included
 
     def new_pod():
         counts = {n: sum(1 for p in pods if p["node"] == n) for n in nodes}
@@ -291,12 +293,18 @@ def worker_convey(arm, seed, out, quota="none"):
                                  "template": {"spec": {"containers": [{"name": "php", "resources": {
                                      "requests": {"cpu": f"{REQ_M}m"}, "limits": {"cpu": f"{LIM_M}m"}}}]}}}}
             if args[:2] == ("get", "resourcequota"):
-                if quota == "unreadable":                            # the governor's role cannot list quotas (every kind test)
+                if quota in ("unreadable", "refused"):               # the governor's role cannot list quotas (every kind test)
                     raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="resourcequotas is forbidden")
                 return {"items": []}
             raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy host")
 
         def write(self, args, why):
+            writes[0] += 1
+            if quota == "refused" and args[0] == "patch" and "resize" in args \
+                    and int(str(json.loads(args[args.index("-p") + 1])[0]["value"]).rstrip("m")) > LIM_M:
+                # the capacity test's namespace: a quota at the operator's limits, which the governor cannot read; admission
+                # refuses every raise above it (exceeded quota: omni-cap), as on the omni-v11 capacity runs
+                raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="pods is forbidden: exceeded quota: omni-cap")
             if args[0] == "annotate":
                 k, _, v = args[-1].partition("="); ann[k] = v
             elif args[0] == "patch" and "resize" in args:
@@ -365,7 +373,7 @@ def worker_convey(arm, seed, out, quota="none"):
            "p95_ms": lat[int(0.95 * len(lat))], "alert_minutes": sum(1 for v in minute_ms.values() if sorted(v)[int(0.95 * len(v))] > 500.0),
            "host_busy": busy_sum / (t + 1), "limit_given_m": limit_sum / (t + 1), "pod_seconds": pod_s,
            "requests_served": served, "starts": len(st), "busy_p95": sorted(busy_hist)[int(0.95 * len(busy_hist))],
-           "pods_mean": pod_s / (t + 1),
+           "pods_mean": pod_s / (t + 1), "writes": writes[0],
            "starts_past_75": sum(1 for b in busy_hist if b >= 0.75)}
     if arm != "native":
         res["engine_tree"] = engine_tree("omni_controller.muscles")
@@ -373,26 +381,36 @@ def worker_convey(arm, seed, out, quota="none"):
 
 
 # ---- the verdict toy: the trigger alone on noisy work, in one checkout ---------------------------------------------
+VERDICT_RATES = (20, 200)
+
+
 def worker_verdict(seeds):
     import random
     from omnicompass.verdict import Verdict
     out = {}
-    for rise in (0.0, 0.01, 0.02, 0.03, 0.05):
-        allowed = 0
-        for s in range(seeds):
-            rng = random.Random(s)
-            v = Verdict(tolerance=0.02, min_samples=60, probe_every=1, recheck=10 ** 6, max_trial=40)
-            step = 0
-            for _ in range(60):
-                base = 10.0 * (1.0 + rise * step)
-                v.observe([base * rng.lognormvariate(0.0, 0.25) for _ in range(20)])
-                step, _, ev = v.tick(True)
-                if ev and str(ev.get("verdict", "")).startswith("step"):
-                    allowed += ev["verdict"] == "step allowed"
-                    break
-        out[f"{rise:.2f}"] = allowed / seeds
+    for rate in VERDICT_RATES:                     # pieces of work a decision: slow work, and work fast enough to read a 2% step
+        out[str(rate)] = {}
+        for rise in (0.0, 0.01, 0.02, 0.03, 0.05):
+            allowed = 0
+            for s in range(seeds):
+                rng = random.Random(s)
+                v = Verdict(tolerance=0.02, min_samples=60, probe_every=1, recheck=10 ** 6, max_trial=40)
+                step = 0
+                for _ in range(120):
+                    base = 10.0 * (1.0 + rise * step)
+                    v.observe([base * rng.lognormvariate(0.0, 0.25) for _ in range(rate)])
+                    step, _, ev = v.tick(True)
+                    if ev and str(ev.get("verdict", "")).startswith(("step", "trial not started")):
+                        allowed += ev["verdict"] == "step allowed"
+                        break
+            out[str(rate)][f"{rise:.2f}"] = allowed / seeds
     out["engine_tree"] = engine_tree("omnicompass.verdict")
     print(json.dumps(out))
+
+
+def verdict_rates(r):
+    """The verdict toy's readings by pieces of work a decision; a checkout whose toy ran one rate (20) is read as that rate."""
+    return r if all(isinstance(v, dict) for v in r.values()) else {"20": r}
 
 
 # ---- the parent: both checkouts, every seed, the readings -----------------------------------------------------------
@@ -463,9 +481,14 @@ def render(report_path, out_md):
         period = f" (a decision every {t['period_s']:.0f} s)" if "period_s" in t else ""
         lines += [f"## {toy}{period}", ""]
         if toy == "verdict":
-            lines += ["| True extra cost of a give-back step | Allowed, standing | Allowed, candidate |", "|---|---|---|"]
-            lines += [f"| +{100 * float(k):.0f}% | {100 * t['base'][k]:.0f}% | {100 * t['cand'][k]:.0f}% |" for k in t["base"]]
-            lines.append(""); continue
+            for rate, b in verdict_rates(t["base"]).items():
+                c = verdict_rates(t["cand"]).get(rate, {})
+                lines += [f"{rate} pieces of work a decision, their log spread 0.25:", "",
+                          "| True extra cost of a give-back step | Allowed, standing | Allowed, candidate |", "|---|---|---|"]
+                lines += [f"| +{100 * float(k):.0f}% | {100 * b[k]:.0f}% | "
+                          f"{(f'{100 * c[k]:.0f}%') if k in c else 'not run'} |" for k in b]
+                lines.append("")
+            continue
         lines += ["| Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |",
                   "|---|---:|---:|---:|---|---|---|"]
         cell = lambda d: f"{100 * d['relative']:+.2f}% {d['word']}" if d["relative"] == d["relative"] else d["word"]
@@ -491,7 +514,7 @@ def main(argv=None):
     ap.add_argument("--cand", help="checkout of the candidate")
     ap.add_argument("--seeds", default="1-8")
     ap.add_argument("--days", type=float, default=1.0)
-    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,verdict")
+    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,convey_refused,verdict")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", default="")
     ap.add_argument("--worker", help=argparse.SUPPRESS)
@@ -499,7 +522,7 @@ def main(argv=None):
     ap.add_argument("--period", type=float, default=60.0, help=argparse.SUPPRESS)
     ap.add_argument("--dir", help=argparse.SUPPRESS)
     ap.add_argument("--blink", action="store_true", help=argparse.SUPPRESS)  # the cluster toy with its machines out of service a while
-    ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota read: none (readable, empty) or unreadable
+    ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota: none (readable, empty), unreadable, or refused (unreadable, every raise refused)
     a = ap.parse_args(argv)
     if a.render:
         return render(*a.render)
@@ -541,7 +564,8 @@ def main(argv=None):
         report["toys"][toy] = {"period_s": period, "gauges": rows, "counts": extra, "per_seed": res}
     # the convey toy twice: the namespace's quota readable and empty, and unreadable (the governor's role cannot list
     # quotas on every kind test, and on any stack whose role withholds it; the first v7 trial read that as a zero budget)
-    for toy, quota in (("convey", "none"), ("convey_unreadable_quota", "unreadable")):
+    # and a third time with every raise refused by a quota the governor cannot read (the capacity test, v12)
+    for toy, quota in (("convey", "none"), ("convey_unreadable_quota", "unreadable"), ("convey_refused", "refused")):
         if toy not in toys:
             continue
         jobs = [(arm, tree, s) for s in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]
@@ -570,8 +594,12 @@ def main(argv=None):
         print(f"\n== {toy}" + (f" (a decision every {r['period_s']:.0f} s)" if "period_s" in r else ""))
         if toy == "verdict":
             print("share of give-back steps allowed, by the step's true extra cost (2% allowance, noisy work):")
-            for k in r["base"]:
-                print(f"  +{100 * float(k):.0f}%: standing {100 * r['base'][k]:.0f}%  candidate {100 * r['cand'][k]:.0f}%")
+            for rate, b in verdict_rates(r["base"]).items():
+                c = verdict_rates(r["cand"]).get(rate, {})
+                print(f" {rate} pieces of work a decision:")
+                for k in b:
+                    print(f"  +{100 * float(k):.0f}%: standing {100 * b[k]:.0f}%  candidate "
+                          f"{(f'{100 * c[k]:.0f}%') if k in c else 'not run'}")
             continue
         print(f"{'gauge':32s} {'native':>10s} {'standing':>10s} {'candidate':>10s}  candidate vs standing         standing vs native   candidate vs native")
         for g, x in r["gauges"].items():

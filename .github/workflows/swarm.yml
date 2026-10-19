@@ -6,14 +6,14 @@
 name: swarm
 # Omni-Compass on top of a drone swarm's own autopilots (docs/SWARM_PREREGISTRATION.md): gym-pybullet-drones (University
 # of Toronto, DSL; MIT) integrates every Crazyflie 2.x and flies it with the position controller it ships with. One job per
-# cell (the tuning swarm of 5 drones; the untouched swarms of 20: short, mixed and long missions), native and omni on the
-# same missions; one report (SWARM.md) and one JSON per cell. The package is installed from its repository at a pinned
+# cell (the tuning swarm of 5 drones; the untouched swarms of 20: short, mixed and long missions, and from omni-v12 the same
+# three on mission draws never flown, amendment 2), native and omni on the same missions; one report (SWARM.md) and one JSON per cell. The package is installed from its repository at a pinned
 # commit (it is not on PyPI) without its learning extras, which the controller does not need.
 on:
   workflow_dispatch:
     inputs:
       cells:
-        description: "Cells, comma separated: tuning, short, mixed, long; 'all' runs every cell"
+        description: "Cells, comma separated: tuning, short, mixed, long, short-314, mixed-315, long-316 (fresh draws, amendment 2); 'all' runs every cell"
         default: "all"
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
@@ -31,7 +31,7 @@ jobs:
       - id: c
         run: |
           if [ "${{ github.event.inputs.cells }}" = all ] || [ -z "${{ github.event.inputs.cells }}" ]; then
-            cells='["tuning","short","mixed","long"]'
+            cells='["tuning","short","mixed","long","short-314","mixed-315","long-316"]'
           else
             cells=$(python3 -c "import json; print(json.dumps('${{ github.event.inputs.cells }}'.split(',')))")
           fi
