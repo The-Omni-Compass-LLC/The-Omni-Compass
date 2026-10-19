@@ -10,9 +10,12 @@ mechanisms that are already there. Section 3 is the plug's interface, as the cod
 
 ## 1. The claim this page supports
 
-**Do no harm.** Omni-Compass never leaves a setting other than native's after it stops, never acts on a reading it cannot
-trust, never takes a step that a paired trial on the system itself showed costs more, never exceeds a bound the system or
-its operator set, and can be switched off by one human action, everywhere at once.
+**Do no harm** (its meaning, `DISCLOSURES.md` section 3): the organism Omni-Compass governs is never left turning out less
+than its native controllers make it turn out, nor less healthy (no muscle past its own limit, no service over its own line,
+nothing made to fail). On the engine that stands, that means: Omni-Compass never leaves a setting other than native's after
+it stops, never acts on a reading it cannot trust, never takes a step that a paired trial on the system itself showed
+costs more, never exceeds a bound the system or its operator set, and can be switched off by one human action, everywhere
+at once.
 
 ## 2. Hazards, guards and evidence
 
