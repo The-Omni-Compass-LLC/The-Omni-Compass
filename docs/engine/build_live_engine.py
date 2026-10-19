@@ -320,6 +320,8 @@ def fleet() -> dict:
                                  "p95": {kk: c["rows"][kk].get(kk2) for kk in ["response time (ms), 95th percentile"] if kk in c.get("rows", {}) for kk2 in ["pct"]}.get("response time (ms), 95th percentile")}
                              for n, c in v.items() if isinstance(c, dict)}
         out["grid"] = {"file": str(gp.relative_to(ROOT)), "engine": eng, "squares": sq, "dispatched_on_engine_that_stands": disp}
+    sp = ROOT / "results" / "STEERING.json"   # how steadily the governor steered: its own moves on every Kubernetes table of the engine that stands
+    out["steering"] = json.loads(sp.read_text(encoding="utf-8")) if sp.exists() else None
     out["register"] = register_places()
     import brain_off   # what the brain's six-state equations change in the governor's decisions (class S, the fleet model)
     out["brain_off"] = brain_off.compare()
