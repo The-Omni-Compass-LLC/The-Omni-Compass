@@ -1613,11 +1613,31 @@ function alpha(col, a) {
 const WORD_RX = /(?:\b(?:GAIN|EVEN|LOSS)\b(?: · power given| · power loss)?|power given|power loss)(?:\s?[0-9][0-9.,]*\s?(?:%|pp|ms|s\b)?)?|\bOmni-Compass\b|\b[Nn]ative\b/g, WORD_CLS = {OC: "ocw", NA: "nw", GAIN: "tw-g", EVEN: "tw-e", LOSS: "tw-l", "power given": "tw-g", "power loss": "tw-l"};
 const wordKey = m => m === "Omni-Compass" ? "OC" : /^[Nn]ative$/.test(m) ? "NA" : /^GAIN|^power given/.test(m) ? (/power loss/.test(m) ? "power loss" : "GAIN") : /^LOSS|power loss/.test(m) ? "LOSS" : /^EVEN/.test(m) ? "EVEN" : null;   // a word and the size beside it wear one colour
 const wordCol = m => ({OC: css.brass, NA: css.steel, GAIN: css.ok, EVEN: css.even, LOSS: css.bad, "power loss": css.bad})[wordKey(m)];
-function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yellow and LOSS red wherever the word stands
-  const parts = String(text).split(new RegExp("(" + WORD_RX.source + ")")), base = g.fillStyle, al = g.textAlign;
-  const tw = parts.reduce((a, p) => a + g.measureText(p === "Omni-Compass" ? "OMNI-COMPASS" : p).width, 0); let cx = al === "right" || al === "end" ? x - tw : al === "center" ? x - tw/2 : x;
-  g.textAlign = "left"; const f0 = g.font; for (const p of parts) { if (!p) continue; const oc = p === "Omni-Compass", q = oc ? "OMNI-COMPASS" : p; if (oc) g.font = "700 " + f0.replace(/^(italic )?\d{3} /, ""); g.fillStyle = wordCol(p) || base; g.fillText(q, cx, y); cx += g.measureText(q).width; g.font = f0; }
-  g.fillStyle = base; g.textAlign = al; }
+// every label fits its canvas: text that would run past an edge is drawn narrower (to no less than 80% of its width), and
+// past that it is cut at a word and ends in "…"; nothing is ever drawn half off the canvas, where it would be misread
+const FILL_RAW = CanvasRenderingContext2D.prototype.fillText;
+function roomFor(g, x, al) { const cw = g.canvas.width/((g.getTransform && g.getTransform().a) || 1); return al === "center" ? 2*Math.min(x, cw - x) - 4 : al === "right" || al === "end" ? x - 2 : cw - x - 2; }
+function cutToFit(g, s, room) { let c = s; while (c.length > 1 && 0.8*g.measureText(c + "…").width > room) { const k = c.lastIndexOf(" "); c = (k > 0 ? c.slice(0, k) : c.slice(0, -1)).replace(/[\s·:;,(]+$/, ""); } return c + "…"; }
+CanvasRenderingContext2D.prototype.fillText = function (t, x, y, mw) {
+  if (mw !== undefined || this.__raw) return FILL_RAW.call(this, t, x, y, mw);
+  const T = this.getTransform && this.getTransform(); if (T && Math.abs(T.b) > 1e-6) return FILL_RAW.call(this, t, x, y);   // a turned label is drawn as it is
+  const s = String(t), al = this.textAlign, w = this.measureText(s).width, cw = this.canvas.width/((T && T.a) || 1);
+  const l = al === "center" ? x - w/2 : al === "right" || al === "end" ? x - w : x, over = Math.max(l + w - (cw - 2), 2 - l);
+  if (over > 0 && over <= 30 && w <= cw - 4) return FILL_RAW.call(this, s, x + (l < 2 ? 2 - l : cw - 2 - (l + w)), y);   // a few pixels over: it steps inside
+  const room = roomFor(this, x, al);
+  if (w <= room || room <= 8) return FILL_RAW.call(this, s, x, y);
+  if (0.8*w <= room) return FILL_RAW.call(this, s, x, y, room);
+  return FILL_RAW.call(this, cutToFit(this, s, room), x, y, room); };
+function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yellow and LOSS red wherever the word stands, fitted to its canvas
+  const base = g.fillStyle, al = g.textAlign, f0 = g.font, room = roomFor(g, x, al), split = t => String(t).split(new RegExp("(" + WORD_RX.source + ")"));
+  const wOf = p => { if (p !== "Omni-Compass") return g.measureText(p).width; g.font = "700 " + f0.replace(/^(italic )?\d{3} /, ""); const v = g.measureText("OMNI-COMPASS").width; g.font = f0; return v; };
+  let parts = split(text), tw = parts.reduce((a, p) => a + (p ? wOf(p) : 0), 0);
+  if (room > 8 && 0.8*tw > room) { parts = split(cutToFit(g, String(text), room)); tw = parts.reduce((a, p) => a + (p ? wOf(p) : 0), 0); }
+  const sx = room > 8 && tw > room ? Math.max(0.8, room/tw) : 1, dw = tw*sx;
+  const cx = al === "right" || al === "end" ? x - dw : al === "center" ? x - dw/2 : x;
+  g.save(); g.translate(cx, y); g.scale(sx, 1); g.textAlign = "left"; g.__raw = true; let px = 0;
+  for (const p of parts) { if (!p) continue; const oc = p === "Omni-Compass", q = oc ? "OMNI-COMPASS" : p; if (oc) g.font = "700 " + f0.replace(/^(italic )?\d{3} /, ""); g.fillStyle = wordCol(p) || base; g.fillText(q, px, 0); px += g.measureText(q).width; g.font = f0; }
+  g.__raw = false; g.restore(); g.fillStyle = base; g.textAlign = al; }
 const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT"]);
 function armCols(t) {   // a table's Native column wears native's amber, its Omni-Compass column Omni-Compass's blue
   if (!t || t.nodeName !== "TABLE" || !t.tHead) return; const hs = [...t.tHead.querySelectorAll("th")], idx = {};
@@ -2029,7 +2049,7 @@ function drawVerdict() {
   g.strokeStyle = css.ink; g.beginPath(); g.moveTo(X(0), ay - 16); g.lineTo(X(0), ay + 16); g.stroke();
   g.fillStyle = css.muted; g.textAlign = "center"; g.textBaseline = "top";
   for (const pc of [-0.1, -0.05, 0, 0.05, 0.1]) fillWords(g, pc < 0 ? "GAIN " + Math.round(-pc*100) + "%" : pc > 0 ? "LOSS " + Math.round(pc*100) + "%" : "0", X(Math.log(1 + pc)), ay + 18);
-  g.textAlign = "left"; g.textBaseline = "bottom"; fillWords(g, "95% interval of the step's cost: left of 0 GAIN, right of 0 LOSS; grey: where its midpoint must sit to be kept", ml, ay - 16);
+  g.textAlign = "left"; g.textBaseline = "bottom"; fillWords(g, "the step's 95% interval: left of 0 GAIN, right of 0 LOSS; grey: the midpoint's allowance", ml, ay - 16);
   if (V.ref.length >= 2 && V.got.length >= 2) { const [lo, hi] = interval(V.ref, V.got); const col = lo > 0 ? css.bad : hi < 0 ? css.ok : css.even;
     g.strokeStyle = col; g.lineWidth = 4; g.beginPath(); g.moveTo(X(clamp(lo, -R, R)), ay); g.lineTo(X(clamp(hi, -R, R)), ay); g.stroke();
     g.fillStyle = col; g.beginPath(); g.arc(X(clamp((lo + hi)/2, -R, R)), ay, 5, 0, Math.PI*2); g.fill(); }
@@ -3044,6 +3064,12 @@ function drawRadar() {   // every gauge of this repetition against native: nativ
   g.fillStyle = css.bad; g.textAlign = "right"; g.fillText("◀ LOSS", z - 6, h - 28); g.fillStyle = css.ok; g.textAlign = "left"; g.fillText("GAIN ▶", z + 6, h - 28); g.fillStyle = css.steel; g.textAlign = "left"; g.fillText("0 = native", z + 64, h - 28);
   // the side and colour come from the run's own reading over all its repetitions (each with its 95% interval), never from this one repetition; the bar's length is this repetition's move
   const runW = a => wordText(pr[a.k], RU_AIM[a.k] || "shown"), anyGain = A.some(a => /^GAIN/.test(runW(a)));
+  // one form of label on every row: the longest that fits the room every row leaves (the run's word, then this repetition's move)
+  const FORMS = [(wd, m) => `${wd} (the run) · this repetition ${m}`, (wd, m) => `${wd} · this rep. ${m}`, (wd, m) => `${wd.replace("GAIN · ", "")} · ${m}`];
+  const wordOf = a => { let rw = runW(a); if (/^power given/.test(rw) && !anyGain) rw = rw.replace(/^power given/, "power loss");
+    return /^LOSS|^power loss/.test(rw) ? (/^power loss/.test(rw) ? "LOSS · power loss" : "LOSS") : /^GAIN|^power given/.test(rw) ? (/^power given/.test(rw) ? "GAIN · power given" : "GAIN") : (RU_AIM[a.k] || "shown") === "shown" ? "shown, not judged" : "EVEN"; };
+  const startOf = a => { const sz = Math.abs(a.o/a.n - 1), wd = wordOf(a); return /^GAIN/.test(wd) ? Math.max(XR(sz) + 8, z + 10) : z + 10; };
+  const form = FORMS.find(F => A.every(a => g.measureText(F(wordOf(a), mag(a.o/a.n - 1))).width <= w - startOf(a) - 4)) || FORMS[2];
   A.forEach((a, j) => { const y = 6 + j*rowH, ch = a.o/a.n - 1, size = Math.abs(ch), aim = RU_AIM[a.k] || "shown";
     if (TL.radarHov === j) { g.fillStyle = alpha(css.ink, 0.06); g.fillRect(0, y, w, rowH); }
     g.fillStyle = css.ink; g.textAlign = "right"; g.fillText(a.l, ml - 8, y + rowH/2);
@@ -3054,7 +3080,7 @@ function drawRadar() {   // every gauge of this repetition against native: nativ
     else if (side > 0) { g.fillStyle = css.ok; g.fillRect(z + 1, y + 7, Math.max(2, XR(size) - z - 1), rowH - 14); tx = XR(size) + 8; }
     else { g.fillStyle = css.bad; g.fillRect(XL(size), y + 7, Math.max(2, z - XL(size) - 1), rowH - 14); }
     if (size > 1 && side) { g.fillStyle = css.bg; g.textAlign = side > 0 ? "right" : "left"; g.fillText(side > 0 ? "▶" : "◀", side > 0 ? XR(size) - 3 : XL(size) + 3, y + rowH/2); }
-    g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, `${word} · this repetition moved ${mag(ch)}`, Math.max(tx, z + 10), y + rowH/2); });
+    g.textAlign = "left"; g.fillStyle = css.ink; fillWords(g, form(word, mag(ch)), Math.max(tx, z + 10), y + rowH/2); });
   $("tRadarNote").textContent = `Repetition ${ruP().n} of run ${ruR().tag}, scored by the repository's own scorer. Native is the 0 line. Each gauge's word, side and colour are the run's own reading over all its repetitions, each with its paired 95% interval: to the right in green for GAIN (a shorter wait, fewer failures, a resource cut, or GAIN · power given where a resource rose to buy it), to the left in red for LOSS, a yellow mark for EVEN (the interval includes zero). The bar's length is how far this one repetition moved from native, the size unsigned; a single repetition is never judged on its own. A resource that rose while no gauge read GAIN reads LOSS · power loss. Gauges where native is zero are left off; past 100% a bar runs to the edge and is marked.`;
 }
 function tNarrate() {
@@ -3266,7 +3292,7 @@ function drawBenefit() {   // a diverging bar from zero: GAIN to the right in gr
     if (r.pct === null) { const n = (r.gain || 0) + (r.even || 0) + (r.loss || 0) || 1, net = (r.gain || 0) - (r.loss || 0); if (net > 0) gain = 100*(r.gain || 0)/n; else if (net < 0) loss = 100*(r.loss || 0)/n;
       text = `${net > 0 ? "GAIN" : net < 0 ? "LOSS" : "EVEN"} · ${r.gain} of ${n} read GAIN, ${r.even ?? 0} EVEN, ${r.loss} LOSS`; }
     else { gain = Math.max(0, r.pct); if (gain <= 0 && r.loss > 0) loss = lossSize(r) || 0;
-      text = (gain > 0 ? "GAIN " + (gain >= 10 ? gain.toFixed(1) : gain.toFixed(2)) + "%" + (r.given > 0 ? ` · ${r.given} power given row${r.given === 1 ? "" : "s"} inside it` : "") : r.loss > 0 ? "LOSS " + (loss ? loss + "%" : "") : "EVEN") + (gain > 0 && r.loss > 0 ? ` · ${r.loss} LOSS row${r.loss === 1 ? "" : "s"} inside it, run on ${r.engine}` : ""); }
+      text = (gain > 0 ? "GAIN " + (gain >= 10 ? gain.toFixed(1) : gain.toFixed(2)) + "%" + (r.given > 0 ? ` · ${r.given} power given inside` : "") : r.loss > 0 ? "LOSS " + (loss ? loss + "%" : "") : "EVEN") + (gain > 0 && r.loss > 0 ? ` · ${r.loss} LOSS inside (${r.engine})` : ""); }
     if (gain > 0) { const x1 = XR(gain); g.fillStyle = css.ok; g.beginPath(); if (g.roundRect && x1 - z > 4) g.roundRect(z + 1, y + 6, x1 - z - 1, bh, [0, 4, 4, 0]); else g.rect(z + 1, y + 6, Math.max(2, x1 - z - 1), bh); g.fill(); if (gain > 100) { g.fillStyle = css.bg; g.textAlign = "right"; g.fillText("▶", x1 - 3, y + rowH/2); } }
     if (loss > 0) { const x0 = XL(loss); g.fillStyle = css.bad; g.beginPath(); if (g.roundRect && z - x0 > 4) g.roundRect(x0, y + 6, z - x0 - 1, bh, [4, 0, 0, 4]); else g.rect(Math.min(x0, z - 3), y + 6, Math.max(2, z - x0 - 1), bh); g.fill(); }
     if (gain <= 0 && loss <= 0) { g.fillStyle = css.even; g.beginPath(); g.moveTo(z, y + 6); g.lineTo(z + 6, y + rowH/2); g.lineTo(z, y + rowH - 6); g.lineTo(z - 6, y + rowH/2); g.closePath(); g.fill(); }
