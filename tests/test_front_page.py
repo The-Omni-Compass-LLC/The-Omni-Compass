@@ -62,9 +62,28 @@ class TestFrontPage(unittest.TestCase):
                     (w / "rep-1" / "omni").mkdir(parents=True)
                     (w / f"{wl}.json").write_text(json.dumps({"engine": {"version": "omni-v3", "digest": "x"}, "reps": []}))
                     (w / "rep-1" / "omni" / "arm.json").write_text(json.dumps({"verdict": {"objective": "service", "state": "acting"}}))
-            self.assertEqual(fp.describe(raw / "run-501"), ("pgbench", "service", "omni-v3", ("select", "tpcb_hot")))
+            self.assertEqual(fp.describe(raw / "run-501"), ("pgbench", "service", "omni-v3", ("select", "tpcb_hot"), "operator"))
             items = fp.plan(root)
             self.assertEqual([(it["table"], it["runs"]) for it in items], [("V3_PGBENCH_SERVICE", [501, 502, 503])])
+
+    def test_native_as_shipped_and_the_operators_setting_are_never_one_table(self):
+        # 19 October: the omni-v11 Redis runs were the operator's setting and native as shipped, A, B and C of each, both on
+        # the resource objective; the three newest of the six are two of one and one of the other, never one benchmark
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            raw = root / "results" / "live" / "raw"
+            for rid, native in ((601, "operator"), (602, "shipped"), (603, "operator"), (604, "shipped"), (605, "operator"),
+                                (606, "shipped")):
+                d = raw / f"run-{rid}"
+                (d / "redis-report").mkdir(parents=True)
+                for wl in ("small", "large"):
+                    w = d / f"redis-{wl}" / f"redis-{wl}"
+                    w.mkdir(parents=True)
+                    (w / f"{wl}.json").write_text(json.dumps({"engine": "omni-v11 (digest x, 47 files)", "objective": "resource",
+                                                               "native": native}))
+            self.assertEqual(fp.describe(raw / "run-602")[4], "shipped")
+            items = sorted((it["table"], it["runs"]) for it in fp.plan(root))
+            self.assertEqual(items, [("V11_REDIS", [601, 603, 605]), ("V11_REDIS_SHIPPED", [602, 604, 606])])
 
     def test_a_table_built_from_its_newest_runs_is_not_rebuilt(self):
         with tempfile.TemporaryDirectory() as t:
@@ -84,6 +103,7 @@ class TestFrontPage(unittest.TestCase):
     def test_table_names_follow_the_engine_and_the_objective(self):
         self.assertEqual(fp.table_name("redis", "resource", "omni-v3"), "V3_REDIS")
         self.assertEqual(fp.table_name("redis", "service", "omni-v3"), "V3_REDIS_SERVICE")
+        self.assertEqual(fp.table_name("redis", "resource", "omni-v11", "shipped"), "V11_REDIS_SHIPPED")
         self.assertEqual(fp.table_name("pgbench", "per-work", "omni-v4"), "V4_PGBENCH_PER_WORK")
         # the records carry the whole version line; only the version counts, and a record on no declared version never joins
         self.assertEqual(fp.table_name("kafka", "resource", "omni-v3 (digest b53d05449ee04c4b, 40 files)"), "V3_KAFKA")

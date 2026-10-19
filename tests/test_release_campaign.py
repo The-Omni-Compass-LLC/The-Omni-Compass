@@ -76,6 +76,16 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertEqual([[n for n, _, _ in b] for b in blocks[:len(frozen)]], frozen)
         self.assertTrue(all(len(b) > 0 for b in blocks))
 
+    def test_a_labelled_run_is_started_with_its_own_letter(self):
+        # 19 October: a workflow whose run records its label is passed the rerun's own A, B or C; every other is passed
+        # the queue's inputs alone, which it would refuse with an input it does not declare
+        queued = {row[2] for row in grid.rerun_queue()}
+        for wf in sorted(queued):
+            inputs = yaml.safe_load((ROOT / ".github" / "workflows" / wf).read_text())
+            declared = set(((inputs.get("on") or inputs.get(True) or {}).get("workflow_dispatch") or {}).get("inputs") or {})
+            with self.subTest(workflow=wf):
+                self.assertEqual(wf in grid.LABELLED, "label" in declared)
+
     def test_started_work_is_not_queued_again(self):
         queue = grid.rerun_queue()
         counts = {}

@@ -263,8 +263,10 @@ class Console:
                 if code == 3:
                     self._send(b"p", self.password.encode() + b"\0"); continue
                 if code == 5:
-                    inner = hashlib.md5(self.password.encode() + self.user.encode()).hexdigest()
-                    self._send(b"p", ("md5" + hashlib.md5(inner.encode() + body[4:8]).hexdigest()).encode() + b"\0"); continue
+                    # the digest PostgreSQL's md5 method itself defines (its wire protocol), not a hash chosen for security
+                    inner = hashlib.md5(self.password.encode() + self.user.encode(), usedforsecurity=False).hexdigest()
+                    self._send(b"p", ("md5" + hashlib.md5(inner.encode() + body[4:8], usedforsecurity=False).hexdigest()).encode()
+                               + b"\0"); continue
                 raise ConnectionError(f"the console asked for authentication method {code}, which this client does not speak")
             if kind == b"E":
                 raise ConnectionError(self.error_text(body))
@@ -348,8 +350,9 @@ class Bouncer:
         self.dir, self.port, self.user = workdir, port, user
         self.dir.mkdir(parents=True, exist_ok=True)
         self.as_postgres = os.geteuid() == 0           # PgBouncer refuses to run as root
-        if self.as_postgres:
-            os.chmod(self.dir, 0o777)
+        if self.as_postgres:                            # its folder is postgres's to write (log, pid, socket); never world-writable
+            shutil.chown(self.dir, user="postgres")
+            os.chmod(self.dir, 0o755)
         (self.dir / "userlist.txt").write_text(f'"{user}" "{password}"\n')
         self.ini = self.dir / "pgbouncer.ini"
         self.ini.write_text("\n".join([

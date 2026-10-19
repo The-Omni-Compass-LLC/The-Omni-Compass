@@ -14,10 +14,10 @@ The founder's order of 17 October: Omni-Compass is shown on top at every level, 
 |---|---|---|---:|---:|---:|---:|---:|---|
 | The muscle, alone (1,107 muscles, each on its own native controller, under its own load) | omni-v8 | S (our model) | 527 | 580 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
 | The organism, the stack: the seven organisms under three loads (own load, the climb, work waiting in line) | omni-v8 | S (our model) | 21 | 0 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
-| The cluster: real Kubernetes, native its own HPA and scheduler | omni-v10 | L | 26 | 82 | 3 | 0 | 0 | no LOSS; resources put in shown as power given |
-| The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v10 | L | 16 | 41 | 6 | 1 | 0 | **yes: 1, listed below** |
-| A muscle inside a running service: database, broker, cache | omni-v10 | L | 22 | 330 | 6 | 0 | 1 | **yes: 1, listed below** |
-| A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms | omni-v10 | independent simulator | 113 | 131 | 15 | 0 | 0 | no LOSS; resources put in shown as power given |
+| The cluster: real Kubernetes, native its own HPA and scheduler | omni-v10, omni-v11 | L | 26 | 82 | 3 | 0 | 0 | no LOSS; resources put in shown as power given |
+| The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v10, omni-v11 | L | 17 | 40 | 7 | 0 | 0 | no LOSS; resources put in shown as power given |
+| A muscle inside a running service: database, broker, cache | omni-v11 | L | 17 | 335 | 5 | 0 | 2 | **yes: 2, listed below** |
+| A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms | omni-v11 | independent simulator | 113 | 132 | 15 | 0 | 0 | no LOSS; resources put in shown as power given |
 | The organism with the real cluster inside (the grid, at 1, 10, 100 and on GitHub's machines 1,000 copies) | older engines' tables; the grid runs again on the engine that stands | L, the cluster; S, the organism | – | – | – | – | – | no table on the engine that stands yet; the grid's runs (results/grid_v8/) are going |
 | The cluster in a cloud: Azure Kubernetes Service, the bill | single runs, omni-v5 to omni-v7 | L, the bill metered | – | – | – | – | – | no three-run table yet: eight single runs at the tune-down, machines billed −6.5% to +7.6%, every one EVEN; the fleet (about 1.9 of 4 machines busy) leaves no whole machine to give back |
 | A group of clusters | not run | none yet | – | – | – | – | – | no run at this level yet, real or modelled, on the engine that stands (`k8s_fleet/` holds a model of an earlier engine) |
@@ -38,31 +38,28 @@ Tables: `results/realms_v5/REALMS_V5.md`.
 
 ### The cluster: real Kubernetes, native its own HPA and scheduler
 
-Native at this level: Kubernetes as shipped with the operator's HPA target. Engine: omni-v10. Evidence: L.
-Tables: `results/live/V10_ALL_FOUR.md`, `results/live/V10_BATCH.md`, `results/live/V10_CAPACITY.md`, `results/live/V10_FAIRNESS.md`, `results/live/V10_FAULTS.md`, `results/live/V10_TRACE_GOOGLE2011.md`, `results/live/V10_ROBUST_LONG.md`.
+Native at this level: Kubernetes as shipped with the operator's HPA target. Engine: omni-v10, omni-v11. Evidence: L.
+Tables: `results/live/V10_ALL_FOUR.md`, `results/live/V10_BATCH.md`, `results/live/V11_CAPACITY.md`, `results/live/V10_FAIRNESS.md`, `results/live/V10_FAULTS.md`, `results/live/V10_TRACE_GOOGLE2011.md`, `results/live/V10_ROBUST_LONG.md`.
 
 ### The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube
 
-Native at this level: Kubernetes with the add-on as shipped and as used, its own recommendations applied. Engine: omni-v10. Evidence: L.
-Tables: `results/live/V10_KEDA_REQUESTS.md`, `results/live/V10_KEDA_CPU_REQUESTS.md`, `results/live/V10_GOLDILOCKS.md`, `results/live/V10_CRUISEKUBE.md`.
-
-Goes the other way:
-
-- V10_KEDA_REQUESTS.md: Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v10): pod start wait, mean (s) (LOSS)
+Native at this level: Kubernetes with the add-on as shipped and as used, its own recommendations applied. Engine: omni-v10, omni-v11. Evidence: L.
+Tables: `results/live/V11_KEDA_REQUESTS.md`, `results/live/V11_KEDA_CPU_REQUESTS.md`, `results/live/V11_GOLDILOCKS.md`, `results/live/V10_CRUISEKUBE.md`.
 
 ### A muscle inside a running service: database, broker, cache
 
-Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v10. Evidence: L.
-Tables: `results/live/V10_REDIS.md`, `results/live/V10_REDIS_SERVICE.md`, `results/live/V10_KAFKA.md`, `results/live/V10_KAFKA_SERVICE.md`, `results/live/V10_PGBENCH.md`, `results/live/V10_SYSBENCH.md`, `results/live/V10_YCSB.md`.
+Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v11. Evidence: L.
+Tables: `results/live/V11_REDIS.md`, `results/live/V11_REDIS_SERVICE.md`, `results/live/V11_KAFKA.md`, `results/live/V11_KAFKA_SERVICE.md`, `results/live/V11_PGBENCH.md`, `results/live/V11_SYSBENCH.md`, `results/live/V11_YCSB.md`.
 
 Goes the other way:
 
-- V10_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumers running, mean (the resources held) (the runs disagree)
+- V11_SYSBENCH.md: update_index: sysbench oltp_update_index, 1 statements a transaction, 1000 a second offered; the transaction line 0.6 ms, 3 paired repetitions a run: throughput (transactions a second) (the runs disagree)
+- V11_SYSBENCH.md: update_index: sysbench oltp_update_index, 1 statements a transaction, 1000 a second offered; the transaction line 0.6 ms, 3 paired repetitions a run: queries a second (the runs disagree)
 
 ### A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms
 
-Native at this level: the simulator's own controller, unchanged. Engine: omni-v10. Evidence: independent simulator.
-Tables: `results/live/V10_CITYLEARN.md`, `results/live/V10_PANDAPOWER.md`, `results/live/V10_MUJOCO.md`, `results/live/V10_SWARM.md`.
+Native at this level: the simulator's own controller, unchanged. Engine: omni-v11. Evidence: independent simulator.
+Tables: `results/live/V11_CITYLEARN.md`, `results/live/V11_PANDAPOWER.md`, `results/live/V11_MUJOCO.md`, `results/live/V11_SWARM.md`.
 
 ### The organism with the real cluster inside (the grid, at 1, 10, 100 and on GitHub's machines 1,000 copies)
 
