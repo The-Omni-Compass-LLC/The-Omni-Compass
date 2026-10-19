@@ -37,15 +37,20 @@ from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-si
 
 
 def reading(runs, aim):
-    """The three-run rule (tools/readings.py): GAIN or LOSS only when every run is clear of zero the same way."""
+    """The three-run rule (tools/readings.py, tools/confirm_abc.py): GAIN or LOSS only when every run is clear of zero the same
+    way."""
     if all(r["lo"] == r["hi"] == 0.0 for r in runs):
         return "EVEN, the same"
-    if not all(r["lo"] > 0 or r["hi"] < 0 for r in runs):
+    # as the tables read it (tools/confirm_abc.py verdict): clear runs pointing different ways disagree, whatever the
+    # others read; then any run whose interval holds zero makes the row EVEN
+    if not runs:
         return "EVEN"
-    ups = {r["change"] > 0 for r in runs}
-    if len(ups) > 1:
+    clear = [r for r in runs if r["lo"] > 0 or r["hi"] < 0]
+    if len({r["change"] > 0 for r in clear}) > 1:
         return "the runs disagree"
-    up = ups.pop()
+    if len(clear) < len(runs):
+        return "EVEN"
+    up = clear[0]["change"] > 0
     if aim == "spent":
         return "power given" if up else "GAIN"
     if aim == "per":         # work bought with each unit of a resource (tools/readings.py WORK_PER): a fall is power given
