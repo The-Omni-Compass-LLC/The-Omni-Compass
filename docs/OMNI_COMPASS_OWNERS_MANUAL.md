@@ -44,7 +44,7 @@ Some preregistrations name their outcome with a label written before the runs (f
 
 A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are **EVEN, no difference beyond the noise** (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** (clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting).
 
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
 Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
@@ -209,10 +209,16 @@ that band, with a cushion of 5% at each edge. It works with two forces that pull
 and one toward less, and it moves smoothly, never hammering. A system that is closed, bounded and pulled toward a
 center cannot run away. That one idea is the root of the whole engine, and the first part of this book explains it.
 
-**The rule I will not bend: do no harm.** Omni-Compass must never cause a LOSS against the system's own native
-controller. Where it cannot bring a muscle a gain, that muscle stays native. This is not a promise on paper. It is a
-trigger in the code (`omnicompass/verdict.py`), checked on the muscle itself, step after step. A step that costs the
-muscle more for each piece of work is undone.
+**The rule I will not bend: do no harm.** Its real goal is the organism: to strengthen it and keep it healthy, working
+at the best state its own muscles can carry. Whatever is fed into it, its work, its data, its energy, goes through its
+muscles and comes out as its output, and Omni-Compass drives it toward the most and best output it can make. Harm is the
+organism turning out less than its native controllers make it turn out, or made less healthy: a muscle pushed past its
+own limit, a service over its own line, anything made to fail. Omni-Compass never does either. It can push a muscle only
+as far as that muscle itself can go; it may use one muscle less, or leave it native, so that another can carry more,
+whenever the whole organism comes out ahead and every muscle stays healthy (`DISCLOSURES.md`, section 3). The engine that
+stands keeps the rule in its strictest form, a trigger in the code (`omnicompass/verdict.py`), checked on the muscle
+itself, step after step: a step that costs the muscle more for each piece of work is undone, and where it cannot bring a
+muscle a gain, that muscle stays native.
 
 **The max is the default.** Most tuning tools try to shave a little off. Omni-Compass rides the edge instead: every
 muscle runs up to its own limit, read live from the system, never past it and never below what native gives. The energy
@@ -329,9 +335,11 @@ will find, the following discipline throughout, because it is the discipline the
    `raw` with one SHA-256 manifest per repetition (opened by `scripts/raw_archive.sh`, the branch sits at
    `results/live/raw/`), and every table names the runs and the commit it was made from. Anyone with the repository can
    recompute every table from the files it names.
-7. **Do no harm.** Omni-Compass moves a knob only where a paired trial on the muscle itself shows the muscle never behind for
-   it (the verdict, `omnicompass/verdict.py`, with its 2% allowance). Where it cannot improve a knob, that knob stays
-   native, and the result says "nothing for Omni to move".
+7. **Do no harm.** The organism is never left turning out less than native, nor less healthy, and every muscle works only
+   as far as its own limit (`DISCLOSURES.md`, section 3). On the engine that stands, Omni-Compass moves a knob only where
+   a paired trial on the muscle itself shows the muscle never behind for it (the verdict, `omnicompass/verdict.py`, with
+   its 2% allowance). Where it cannot improve a knob, that knob stays native, and the result says "nothing for Omni to
+   move".
 
 **How this manual is organised.** Part I says what the governor is and where its value comes from, with the arithmetic
 that turns "more work" into "a smaller bill". Part II is the mechanism: the engine's eight equations and its control
@@ -481,8 +489,9 @@ native telemetry stream as a measurement, and governs the whole body from above.
 
 **The promise, in three parts.**
 
-1. **Do no harm.** A step stays only where the muscle takes no LOSS from it, measured on the muscle itself. Where
-   Omni-Compass cannot bring a gain, the muscle stays native.
+1. **Do no harm.** The organism is never left turning out less than native, nor less healthy, and no muscle is pushed past
+   its own limit. On the engine that stands, a step stays only where the muscle takes no LOSS from it, measured on the
+   muscle itself; where Omni-Compass cannot bring a gain, the muscle stays native.
 2. **Everything comes back.** Every setting is saved before the first write and restored when Omni-Compass stops. If
    the governor crashes, its lease runs out and the settings walk home on their own. A separate kill switch stops
    everything at once.
@@ -773,8 +782,14 @@ every native controller in this manual is a good controller that the governor si
 
 ### 1.2 Do no harm: the verdict
 
-The second design decision is that Omni-Compass must never cause a LOSS. This is not a slogan printed on a
-report; it is a trigger inside the engine. Before Omni-Compass moves a slow knob (a machine given back, a card's clock
+The second design decision is do no harm, and its meaning is the organism's (the founder's words of 19 October 2026,
+`DISCLOSURES.md` section 3): the organism Omni-Compass governs is never left turning out less than its native controllers
+make it turn out, nor less healthy (no muscle past its own limit, no service over its own line, nothing made to fail),
+and within that the brain drives the whole organism to the most and best output its own muscles can carry, using one
+muscle less, or leaving it native, where that lets another carry more and the whole comes out ahead. The engine that
+stands keeps the rule in its strictest form: Omni-Compass must never cause a LOSS on any muscle, judged on the muscle
+itself, and takes nothing from one muscle to give to another; the trade between muscles, judged on the organism, is the
+next engine version's work. This is not a slogan printed on a report; it is a trigger inside the engine. Before Omni-Compass moves a slow knob (a machine given back, a card's clock
 ceiling, a robot axis's speed, a drone's cruise override), it runs a **paired trial on the muscle itself**
 (`omnicompass/verdict.py`): the muscle's own cost per piece of work is measured at the deepest step already allowed
 (on a card, at native) and at one step past it, under the same traffic, with a set number of pieces of work on each side

@@ -2,6 +2,36 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19: "Do no harm" has one meaning everywhere, and it is the organism's
+
+- **The founder's words of 19 October**: "its real goal is to strengthen the organism and keep it healthy in any form and
+  keep it working in its most optimal state that the organism can live within its own muscles ... If that means
+  decreasing a muscle to push another muscle, but in the whole end makes the organism produce a better output, well, that
+  was the goal in the beginning, is the output".
+- **The meaning, written once** in `DISCLOSURES.md` section 3:
+  - Harm is judged at the organism. It is the organism turning out less than its native controllers make it turn out
+    (less work done; more time waited, missed or failed), or the organism made less healthy: a muscle past its own limit,
+    a service over its own line, anything made to fail.
+  - Every muscle works only as far as its own limit, never past it.
+  - The muscles are one body: one may be used less, left native or rested so that another carries more, whenever the
+    whole organism comes out ahead and every muscle stays healthy.
+  - The brain answers a breach at once and acts before a line is crossed.
+  - Every row is still shown.
+- **Where it is carried:**
+  - the key (`tools/readings.py`), and through it the README, the reading guide and both manuals;
+  - both manuals' front matter and their section 1.2;
+  - `CLAUDE.md`, the safety case, the proof program and the theory chapter;
+  - `tools/summary.py`;
+  - the four AI instruction files and `llms.txt`.
+
+  Both books are rebuilt.
+- **The engine that stands is unchanged.** It keeps do no harm in its strictest form: every muscle judged on itself by
+  the 2% verdict, never below native, nothing traded between muscles. Every page says so. Three things come with the next
+  engine version, through the toy gate, after the founder is told:
+  - the trade between muscles, judged on the organism;
+  - the governor's count of the machines an add-on marks;
+  - the engine's own words.
+
 ## 2026-10-19: Every finished run's files land in the repository by themselves
 
 - **The founder's order of 19 October** ("it's mine ... it should have been in my shit"). Until now only the five live

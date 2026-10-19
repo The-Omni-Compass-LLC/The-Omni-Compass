@@ -258,6 +258,17 @@ the body's cost: the Omni index's own arithmetic over all the work, all the spee
 On top of the body's total stands a guard for every part. A step is refused if any one service read LOSS beyond its cushion,
 even when the total improved. Pushing one thing to a LOSS to move another toward its own is refused by rule, not by luck.
 
+That guard is do no harm in its strictest form, and it is the form the engine that stands keeps. The founder's words of
+19 October 2026 give do no harm its meaning (`DISCLOSURES.md`, section 3): the real goal is the organism, to strengthen it
+and keep it healthy, working at the best state its own muscles can carry, turning whatever is fed into it into the most
+and best output it can make. Harm is the organism turning out less than native makes it turn out, or made less healthy: a
+muscle past its own limit, a service over its own line, anything made to fail. Within that, the muscles are one body: where
+one muscle's strength cannot be used without straining another, the brain offsets and engages them together, and it may
+use one muscle less, or leave it native, so that another can carry more, whenever the whole organism comes out ahead and
+every muscle stays healthy. The guard above refuses every such trade, the good with the bad; the next engine version
+replaces it with that judgment of the whole organism and of every muscle's health, through the toy gate first, and every
+result is run again on it.
+
 ## One trial at a time, nothing permanent, the wall belongs to the body
 
 If two muscles move together, the brain cannot tell which one caused what it feels. Inside a body, one new trial runs at a
