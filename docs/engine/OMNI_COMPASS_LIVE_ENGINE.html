@@ -246,6 +246,11 @@ section[aria-label^="The key"] h3{font-size:19px}
 .monitor div{background:var(--panel2);border:1px solid var(--rule);border-radius:4px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
 .monitor span{font-size:12px;color:var(--muted)} .monitor b{font-family:var(--f-mono);font-size:17px;font-weight:500}
 .monitor b .n{color:var(--steel)} .monitor b .o{color:var(--brass)}
+.feedgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+.evlog{font-family:var(--f-mono);font-size:12px;max-height:280px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.ev{display:grid;grid-template-columns:64px 104px 52px 120px minmax(0,1fr);gap:8px;padding:3px 8px;border-left:3px solid var(--rule);background:var(--panel2)}
+.ev b{font-weight:600} .ev-alert{border-left-color:var(--bad)} .ev-alert b{color:var(--bad)} .ev-warn{border-left-color:var(--accent)} .ev-warn b{color:var(--accent)} .ev-info{border-left-color:var(--brass)}
+@media (max-width:640px){.ev{grid-template-columns:auto auto 1fr}.ev span:nth-child(4),.ev span:nth-child(5){grid-column:1/-1}}
 .hb{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}
 .hb .tile{background:var(--panel);border:1px solid var(--rule);border-left:5px solid var(--muted);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
 .hb .tile h4{margin:0;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
@@ -382,6 +387,14 @@ body{padding-bottom:96px}
     <div class="tbl-wrap"><table class="who" id="hbAlarms"><thead><tr><th>Item</th><th>Reading</th><th>Source</th><th>Repository record</th><th>Link</th></tr></thead><tbody></tbody></table></div>
     <p class="note" id="hbNote">—</p>
   </div>
+  <div class="panel stack" style="gap:8px"><h3>Golden-signal feed, live: the last 240 decisions, native beside Omni-Compass</h3><div class="feedgrid"><div class="stack" style="gap:4px"><canvas id="feed0" aria-label="Errors per decision"></canvas><div class="note" id="feedL0">—</div></div><div class="stack" style="gap:4px"><canvas id="feed1" aria-label="Throughput per decision"></canvas><div class="note" id="feedL1">—</div></div><div class="stack" style="gap:4px"><canvas id="feed2" aria-label="Latency per decision"></canvas><div class="note" id="feedL2">—</div></div><div class="stack" style="gap:4px"><canvas id="feed3" aria-label="Saturation per decision"></canvas><div class="note" id="feedL3">—</div></div></div>
+    <p class="note">One point per decision streamed from the live engine, gapless, each signal on its own axis, with each arm's last, mean and maximum as a time-series dashboard reports them; a kill-switch window is shaded red. Native in amber, Omni-Compass in blue, the same demand on both.</p></div>
+  <div class="panel stack" style="gap:8px"><div class="row" style="justify-content:space-between;align-items:baseline"><h3>Engine event log, newest first</h3><div class="seg" role="group" aria-label="Log level"><button data-evf="all" aria-pressed="true">All</button><button data-evf="ALERT" aria-pressed="false">ALERT</button><button data-evf="WARN" aria-pressed="false">WARN</button><button data-evf="INFO" aria-pressed="false">INFO</button></div></div>
+    <div class="evlog" id="evLog"></div>
+    <p class="note">The live engine's own events as it emits them, with the wall-clock time and the decision: a threshold breach and its clearing on either arm, every injected fault and its end, the kill switch, the dial, a new day, and the brain's calm crossing the grant threshold. ALERT, WARN and INFO as an operations log grades them.</p></div>
+  <div class="panel stack" style="gap:8px"><div class="row" style="justify-content:space-between;align-items:baseline"><h3>OpenMetrics exposition: the live metrics, ready for Prometheus and Grafana</h3><button id="omCopy">Copy the exposition</button></div>
+    <pre class="math" id="omExpo" style="max-height:280px;overflow:auto;font-size:12px">—</pre>
+    <p class="note">The live engine's metrics in the OpenMetrics text format (the CNCF exposition format Prometheus scrapes and Grafana charts), refreshed every two seconds: engagement, the decision index, breaches, work, band time, actuator moves and reversals per arm, frame time, the verdict's keep ratio at each true cost, the three-run tables' rows by class and reading, and the build's engine, digest and commit.</p></div>
   <p class="note">The board is laid out the way an operations monitor is. The switch and the engine come first. Next come the live organism's signals, native beside Omni-Compass, in the four a service is watched by (site reliability practice: latency, traffic, errors and saturation): here the work waiting, the work done, the decisions past their line and the capacity held. Then every reading of the real and modelled runs that went against native, worst first. Last come GitHub and the age of this page. A tile's word is its reading against native by the key (section 2). A tile with no reading says what it shows.</p>
 </section>
 
@@ -461,6 +474,7 @@ body{padding-bottom:96px}
     <div class="knob"><span class="kl">Faults</span><div class="kr"><select id="kRealm" aria-label="Body part"><option value="1">Compute · AI · cloud</option><option value="0">The spine</option><option value="2">Physics · robotics</option><option value="3">Energy · facility</option><option value="4">Distribution</option></select><button id="kSurge">Surge ×2</button><button id="kLost">Lose half its machines</button></div><div class="kr"><button id="kBlind">A sense goes blind</button><button id="kSec">Security hold</button></div><p class="kd">Each lasts 40 decisions, on both sides. A surge doubles that body part's demand; a lost pool halves its capacity in service; a blind sense forbids any hand-back; a security hold forbids any addition.</p></div>
     <div class="knob"><span class="kl">Time</span><div class="kr"><button id="kPause" aria-pressed="false">Pause</button><button id="kStep">One decision</button><div class="seg" role="group" aria-label="Speed"><button data-kspeed="1" aria-pressed="true">1×</button><button data-kspeed="4" aria-pressed="false">4×</button><button data-kspeed="16" aria-pressed="false">16×</button><button data-kspeed="60" aria-pressed="false">60×</button></div></div><div class="kr"><button id="kAgain">The same day again</button><button id="kNew">A new day</button><button id="kZero">Every knob to its start</button></div><p class="kd">A decision every 0.9 s at 1×. The same day replays the seed with the knobs as set; every knob to its start returns demand, noise and delay to the day as written.</p></div>
     <div class="knob"><span class="kl">Frame load</span><div class="kr"><div class="seg" role="group" aria-label="Frame load"><button data-kload="0" aria-pressed="true">as it is</button><button data-kload="8" aria-pressed="false">+8 ms</button><button data-kload="16" aria-pressed="false">+16 ms</button></div></div><p class="kd">Burns the stated time inside every frame of this page, both arms alike: the renderer's governor (section 10) must hold the time between frames inside its line.</p></div>
+    <div class="knob"><span class="kl">Load profile</span><div class="kr"><select id="kProf" aria-label="Load profile" style="max-width:100%;min-width:0"><option value="day">the day as written</option><option value="step">a step: ×1.6 from the next decision</option><option value="ramp">a ramp: ×1 to ×2 over 120 decisions</option><option value="sine">a sine: ±40%, period 60 decisions</option><option value="burst">bursts 1 4 1 6 1 9 (the Azure burst set)</option><option value="real">the real day on 1 to 9 (Google 2011, the Azure set)</option><option value="custom">a sequence of my own</option></select><input id="kProfSeq" type="text" hidden placeholder="multipliers, e.g. 1, 2, 0.5, 3" aria-label="Custom sequence of multipliers" style="flex:1;min-width:140px;font:inherit;font-size:13px;padding:5px 6px;background:var(--panel2);color:var(--ink);border:1px solid var(--rule);border-radius:4px"><button id="kProfGo">Inject</button></div><p class="kd">Injects a demand profile into the live engine, the same multiplier on every muscle and both arms. A sequence holds each value for 20 decisions and is scaled to its own mean, so the day's mean load is kept; the Azure sets' sequences are read from the conductor's queue in this build.</p></div>
   </div>
   <div class="monitor" id="deskMon"></div>
   <div class="grid-2">
@@ -470,6 +484,7 @@ body{padding-bottom:96px}
       <div class="legend"><span><i class="sq" style="background:var(--steel)"></i>a frame drawn by native's loop</span><span><i class="sq" style="background:var(--brass)"></i>a frame drawn under Omni-Compass's governor</span><span><i class="sq" style="background:var(--bad)"></i>one frame at 60 Hz, 16.7 ms</span></div></div>
   </div>
   <div class="panel stack" style="gap:6px"><h3>Control event log, newest first</h3><div class="lk" id="deskLog" style="min-height:40px"><span>nothing turned yet</span></div></div>
+  <div class="panel stack" style="gap:8px"><h3>Control-loop performance assessment, this day (live)</h3><div class="tbl-wrap"><table class="who" id="cqTab"><thead><tr><th>Measure</th><th>Native</th><th>Omni-Compass</th><th>Reading</th></tr></thead><tbody></tbody></table></div><p class="note" id="cqNote">—</p></div>
 </section>
 
 <div class="dock" id="dock" role="region" aria-label="The control desk, docked">
@@ -1501,7 +1516,7 @@ function newDay(seed) {
 const active = (k) => W.stress[k] >= 0 && W.t - W.stress[k] < 40;
 
 function demandAt(M, t) {   // the day's demand, then the desk's knobs, the same for both arms (one noise draw per muscle per decision)
-  let d = M.d[Math.min(t, DAY)]*W.loadMul*(W.nz ? W.nz[M.id] : 1);
+  let d = M.d[Math.min(t, DAY)]*W.loadMul*profMul(t)*(W.nz ? W.nz[M.id] : 1);
   if (active("surge") && M.realm === W.surgeRealm) d *= 2.0;
   return d;
 }
@@ -1639,7 +1654,7 @@ function fillWords(g, text, x, y) {   // canvas text with GAIN green, EVEN yello
   g.save(); g.translate(cx, y); g.scale(sx, 1); g.textAlign = "left"; g.__raw = true; let px = 0;
   for (const p of parts) { if (!p) continue; const oc = p === "Omni-Compass", q = oc ? "OMNI-COMPASS" : p; if (oc) g.font = "700 " + f0.replace(/^(italic )?\d{3} /, ""); g.fillStyle = wordCol(p) || base; g.fillText(q, px, 0); px += g.measureText(q).width; g.font = f0; }
   g.__raw = false; g.restore(); g.fillStyle = base; g.textAlign = al; }
-const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT"]);
+const WORD_SKIP = new Set(["SCRIPT", "STYLE", "TEXTAREA", "OPTION", "SELECT", "TITLE", "CANVAS", "svg", "INPUT", "PRE"]);   // a <pre> is machine text: equations, the OpenMetrics exposition
 function armCols(t) {   // a table's Native column wears native's amber, its Omni-Compass column Omni-Compass's blue
   if (!t || t.nodeName !== "TABLE" || !t.tHead) return; const hs = [...t.tHead.querySelectorAll("th")], idx = {};
   hs.forEach((th, i) => { const x = th.textContent.trim(); if (/^native\b|[,:] native$/i.test(x)) idx[i] = "nat"; else if (/^omni-compass\b|[,:] omni-compass$/i.test(x)) idx[i] = "omni";
@@ -2766,8 +2781,9 @@ function drawSpark(cv, sn, so, N, T) {
   const all = sn.concat(so).filter(v => v !== null && v !== undefined && isFinite(v)); if (!all.length) return;
   let lo = Math.min(...all), hi = Math.max(...all); if (hi - lo < 1e-9) { lo -= 1; hi += 1; }
   const X = i => 1 + i/Math.max(1, N - 1)*(w - 2), Y = v => h - 2 - (v - lo)/(hi - lo)*(h - 4);
-  for (const [s, col] of [[sn, css.steel], [so, css.brass]]) { g.strokeStyle = col; g.lineWidth = 1.5; g.beginPath(); let on = false;
-    s.slice(0, T).forEach((v, i) => { if (v === null || v === undefined) { on = false; return; } on ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v)); on = true; }); g.stroke(); }
+  // the whole repetition as a faint trace, the part played so far drawn solid over it: a sparkline is never empty
+  for (const [upto, a] of [[N, 0.22], [T, 1]]) for (const [s, col] of [[sn, css.steel], [so, css.brass]]) { g.strokeStyle = alpha(col, a); g.lineWidth = a < 1 ? 1 : 1.5; g.beginPath(); let on = false;
+    s.slice(0, upto).forEach((v, i) => { if (v === null || v === undefined) { on = false; return; } on ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v)); on = true; }); g.stroke(); }
   g.strokeStyle = alpha(css.ink, 0.35); g.beginPath(); g.moveTo(X(T - 1), 0); g.lineTo(X(T - 1), h); g.stroke();
 }
 function opsEmpty(g, w, h, msg) { g.fillStyle = css.muted; g.font = `12px ${MONO}`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(msg, w/2, h/2); }
@@ -3571,7 +3587,7 @@ function buildDesk() { buildImm();
   $("kSurge").addEventListener("click", () => knobFault("surge")); $("kLost").addEventListener("click", () => knobFault("lost")); $("kBlind").addEventListener("click", () => knobFault("blind")); $("kSec").addEventListener("click", () => knobFault("sec"));
   $("dSurge").addEventListener("click", () => knobFault("surge")); $("dLost").addEventListener("click", () => knobFault("lost"));
   $("kPause").addEventListener("click", () => setPause(!W.paused)); $("dPause").addEventListener("click", () => setPause(!W.paused));
-  $("kStep").addEventListener("click", () => { setPause(true); decide(); stepCtl(); stepStack(); stepRuns(); stepC4(); });
+  $("kStep").addEventListener("click", () => { setPause(true); engineStep(); });
   document.querySelectorAll("[data-kspeed]").forEach(b => b.addEventListener("click", () => setSpeed(+b.dataset.kspeed)));
   $("kAgain").addEventListener("click", () => { ensureModel(); newDay(W.seed); decide(); logKnob(`the same day again (seed ${W.seed}), the knobs as set`); });
   $("kNew").addEventListener("click", () => { ensureModel(); newDay(W.seed + 1); decide(); logKnob(`a new day (seed ${W.seed})`); });
@@ -3734,7 +3750,7 @@ let lastDecide = 0;
 function frame(now) {
   if (DESK.last) { DESK.fr.push([now - DESK.last, GOV.arm]); if (DESK.fr.length > 300) DESK.fr.shift(); } DESK.last = now;
   const period = 900/W.speed;
-  if (!W.paused && now - lastDecide >= period) { const k = W.speed >= 60 ? 2 : 1; for (let j = 0; j < k; j++) { decide(); stepCtl(); stepStack(); stepRuns(); stepC4(); } lastDecide = now; }
+  // decisions step on the engine's own clock (simTick), never on this drawing loop: the mechanism runs whatever is on screen
   W.frac = W.paused ? W.frac : clamp((now - lastDecide)/period, 0, 1);
   const phase = Math.min(6, Math.floor(W.frac*7));
   document.querySelectorAll("#cycle li").forEach(li => li.classList.toggle("act", W.speed <= 4 ? +li.dataset.i === phase : true));
@@ -3746,7 +3762,7 @@ function frame(now) {
   if (on2("strip")) drawStrip(); if (on2("cvU") || on2("cvB")) drawBrain(); vTick(now); if (on2("cvV")) drawVerdict();
   if (drawable("selfCv")) drawSelf();
   if (on2("immCv")) drawImm(); if (on2("deskCv")) drawDeskCv(); if (on2("frameCv")) drawFrameCv(); if (on2("c4N")) drawCluster("nat", "c4N", C4); if (on2("c4O")) drawCluster("omni", "c4O", C4);
-  if (now - DESK.syncAt > 250) { DESK.syncAt = now; deskSync(); hbTick(); const lb = $("labBody"); if (lb) lb.hidden = W.body === "harness"; }
+  drawInstruments(); if (now - DESK.syncAt > 250) { DESK.syncAt = now; deskSync(); hbTick(); const lb = $("labBody"); if (lb) lb.hidden = W.body === "harness"; }
   if (GOV.load) { const t = performance.now() + GOV.load; while (performance.now() < t) {} }   // the added load, the same in both arms
   govFrame(now, performance.now() - tw, GOV.drawn);
   requestAnimationFrame(frame);
@@ -3973,13 +3989,137 @@ function buildFail() {
   document.querySelectorAll("[data-shf]").forEach(b => b.addEventListener("click", () => { press([...document.querySelectorAll("[data-shf]")], b); shDraw(b.dataset.shf); }));
 }
 
+// ============================================================== the instruments: the engine's own clock, its control-loop performance,
+// its golden-signal feed, its event log, injected load profiles and its OpenMetrics exposition. Every value is read from the
+// live engine's state each decision; nothing is typed in.
+// ---- the engine's own clock: decisions step on a timer, apart from drawing, so the mechanism runs whatever is on screen
+// (a browser holds a hidden tab's timers to about one tick a second; the engine keeps stepping at that rate)
+function engineStep() { decide(); stepCtl(); stepStack(); stepRuns(); stepC4(); cqTick(); }
+function simTick() { const now = performance.now(), period = 900/W.speed;
+  if (!W.paused && now - lastDecide >= period) { const k = W.speed >= 60 ? 2 : 1; for (let j = 0; j < k; j++) engineStep(); lastDecide = now; } }
+
+// ---- load profiles injected into the live engine: the same multiplier on every muscle's demand, both arms alike
+const PROF = {kind: "day", seq: null, seg: 20, t0: 0};
+function profileSeq(kind) {
+  if (kind === "burst") return [1, 4, 1, 6, 1, 9];
+  if (kind === "real") { const q = ((LEDGER.queues || {})["aks-metered.yml"] || []).find(x => /real day/.test(x.label));
+    const v = q ? q.key.replace(/^burst /, "").split(/\s+/).map(Number).filter(x => isFinite(x) && x > 0) : null; return v && v.length ? v : null; }
+  if (kind === "custom") { const v = String($("kProfSeq").value || "").split(/[\s,;]+/).map(Number).filter(x => isFinite(x) && x >= 0); return v.length ? v : null; }
+  return null; }
+function profMul(t) {   // the demand multiplier of the injected profile at decision t (1 when none is injected)
+  const k = t - PROF.t0; if (PROF.kind === "day" || k < 0) return 1;
+  if (PROF.kind === "step") return 1.6;
+  if (PROF.kind === "ramp") return 1 + Math.min(1, k/120);
+  if (PROF.kind === "sine") return 1 + 0.4*Math.sin(2*Math.PI*k/60);
+  if (!PROF.seq) return 1; const m = PROF.seq.reduce((a, b) => a + b, 0)/PROF.seq.length || 1;   // a sequence keeps the day's mean load: each value over the sequence's mean
+  return PROF.seq[Math.floor(k/PROF.seg) % PROF.seq.length]/m; }
+function injectProfile() { ensureModel(); const kind = $("kProf").value, seq = ["burst", "real", "custom"].includes(kind) ? profileSeq(kind) : null;
+  if (["burst", "real", "custom"].includes(kind) && !seq) { logKnob(kind === "custom" ? "no custom profile injected: the sequence holds no number" : "no profile injected: its sequence is not in this build's records"); return; }
+  Object.assign(PROF, {kind, seq, t0: W.t}); logKnob(kind === "day" ? "load profile: the day as written" : `load profile injected: ${$("kProf").selectedOptions[0].textContent}${seq ? ` (${seq.join(" ")}, each held ${PROF.seg} decisions, scaled to the day's mean)` : ""}`); evLog("INFO", "console", `load profile injected: ${kind}`); }
+
+// ---- control-loop performance assessment, both arms, this day
+const CQ = {key: "", a: null, feed: [], log: [], lastFault: null, prevStress: {}};
+function cqArm() { return {n: 0, dec: 0, inBand: 0, iae: 0, peak: -1, moves: 0, rev: 0, over: 0, served: 0, rec: null, prevP: [], prevD: [], prevL: [], breaching: false}; }
+function cqReset() { CQ.a = {nat: cqArm(), omni: cqArm()}; CQ.feed = []; CQ.lastFault = null; }
+function cqTick() {
+  const key = `${W.body}|${W.hsec}|${W.seed}|${W.run}`; if (key !== CQ.key || !CQ.a || W.t < (CQ.lastT || 0)) { if (CQ.key) evLog("INFO", "engine", `a new day: ${W.body === "model" ? "the stress-test model, seed " + W.seed : W.hsec === "alone" ? "the harness, each muscle alone, run " + "ABC"[W.run] : "the harness, one organism, run " + "ABC"[W.run]}`); CQ.key = key; cqReset(); }
+  CQ.lastT = W.t;
+  for (const [k, arm] of [["nat", W.nat], ["omni", W.omni]]) { const A = CQ.a[k]; A.dec++;
+    arm.m.forEach((s, i) => { const p = s.p; A.n++; if (p >= 0.05 && p <= 0.95) A.inBand++; A.iae += Math.abs(p - 0.5); if (p > A.peak) A.peak = p;
+      const d = A.prevP[i] === undefined ? 0 : p - A.prevP[i]; if (A.prevD[i] !== undefined && Math.abs(d) > 0.01 && Math.abs(A.prevD[i]) > 0.01 && Math.sign(d) !== Math.sign(A.prevD[i])) A.rev++;
+      if (Math.abs(d) > 0.01) A.prevD[i] = d; A.prevP[i] = p;
+      if (s.L !== undefined) { if (A.prevL[i] !== undefined && Math.abs(s.L - A.prevL[i]) > 0.02*Math.max(Math.abs(A.prevL[i]), 1e-9)) A.moves++; A.prevL[i] = s.L; } else if (s.written) A.moves++; });
+    A.over += arm.lastOver || 0; A.served += W.body === "model" ? (arm.hist.served[arm.hist.served.length - 1] || 0) : (arm.hist.work[arm.hist.work.length - 1] || 0);
+    const br = (arm.lastOver || 0) > 0; if (br && !A.breaching) evLog("WARN", k === "nat" ? "native" : "omni-compass", `threshold breach: ${arm.lastOver} muscle${arm.lastOver === 1 ? "" : "s"} over the line`);
+    if (!br && A.breaching) evLog("INFO", k === "nat" ? "native" : "omni-compass", "breach cleared: every muscle back inside its line"); A.breaching = br;
+    if (CQ.lastFault !== null && A.rec === null && W.t >= CQ.lastFault && !br) A.rec = W.t - CQ.lastFault; }
+  // faults: their start and their end, and the recovery clock that starts at the end
+  for (const [kd, t0] of Object.entries(W.stress)) { const on = t0 >= 0 && W.t - t0 < 40, was = CQ.prevStress[kd];
+    if (on && !was) evLog("ALERT", "fault injection", `${({surge: "demand surge ×2", lost: "half a pool's machines lost", blind: "a sensor blacked out", sec: "security hold"})[kd]}${kd === "surge" || kd === "lost" ? " on " + REALM_NAME[kd === "surge" ? W.surgeRealm : W.lostRealm] : " across the whole body"}, 40 decisions`);
+    if (!on && was) { evLog("INFO", "fault injection", `${kd} ended; recovery clock started`); CQ.lastFault = W.t; CQ.a.nat.rec = null; CQ.a.omni.rec = null; }
+    CQ.prevStress[kd] = on; }
+  if (W.killed !== CQ.prevKill) { if (CQ.prevKill !== undefined) evLog(W.killed ? "ALERT" : "INFO", "kill switch", W.killed ? "governing off: every setting handed to native's own controller" : "re-armed: Omni-Compass governs on top of native"); CQ.prevKill = W.killed; }
+  if (W.dial !== CQ.prevDial) { if (CQ.prevDial !== undefined) evLog("INFO", "dial", `set to ${W.dial === "save" ? "the tune-down" : "the max"}`); CQ.prevDial = W.dial; }
+  if (W.brainHist.length) { const b = W.brainHist[W.brainHist.length - 1], calm = b.calm; if (calm !== undefined) { const lo = calm < 0.5; if (lo !== CQ.brainLo && CQ.brainLo !== undefined) evLog(lo ? "WARN" : "INFO", "brain", lo ? `calm fell to ${calm.toFixed(2)}: contraction grants withheld` : `calm back to ${calm.toFixed(2)}: grants open`); CQ.brainLo = lo; } }
+  // the golden-signal feed, one point a decision, both arms
+  const last = (a, k) => a.hist[k] && a.hist[k].length ? a.hist[k][a.hist[k].length - 1] : 0;
+  CQ.feed.push({t: W.t, e: [W.nat.lastOver || 0, W.omni.lastOver || 0], w: W.body === "model" ? [last(W.nat, "served"), last(W.omni, "served")] : [last(W.nat, "work"), last(W.omni, "work")],
+    l: W.body === "model" ? [last(W.nat, "wait"), last(W.omni, "wait")] : [last(W.nat, "spread"), last(W.omni, "spread")], s: [last(W.nat, "cap"), last(W.omni, "cap")]});
+  if (CQ.feed.length > 240) CQ.feed.shift();
+}
+function evLog(level, comp, msg) { CQ.log.push({t: W.t, level, comp, msg, at: new Date().toISOString().slice(11, 19)}); if (CQ.log.length > 400) CQ.log.shift(); CQ.logDirty = true; }
+
+// ---- the readouts: the control-loop table, the feed panels, the log and the exposition, drawn while on screen
+function cqWord(aim, n, o) { if (n === null || o === null || !isFinite(n) || !isFinite(o)) return ["—", "w-shown"]; if (aim === "shown") return ["shown", "w-shown"];
+  const nz = aim === "count" ? 2*Math.sqrt(n + o) : 1e-9*Math.max(Math.abs(n), 1);   // counts: beyond 2σ of their difference
+  if (Math.abs(o - n) <= nz) return ["EVEN", "w-even"]; const up = o > n;
+  return aim === "spent" ? (up ? ["power given", "w-given"] : ["GAIN", "w-gain"]) : aim === "lower" || aim === "count" ? (up ? ["LOSS", "w-loss"] : ["GAIN", "w-gain"]) : (up ? ["GAIN", "w-gain"] : ["LOSS", "w-loss"]); }
+function cqRender() {
+  const tb = $("cqTab") && $("cqTab").querySelector("tbody"); if (!tb || !CQ.a) return; const N = CQ.a.nat, O = CQ.a.omni, pc = (x, n) => n ? (100*x/n).toFixed(1) + "%" : "—";
+  const rec = A => CQ.lastFault === null ? null : A.rec === null ? NaN : A.rec;
+  const rows = [
+    ["Threshold breaches (muscle-decisions over the line)", N.over, O.over, num(N.over), num(O.over), "count"],
+    ["Recovery time after the last injected fault (decisions to no breach)", rec(N), rec(O), CQ.lastFault === null ? "no fault yet" : N.rec === null ? "not yet" : N.rec, CQ.lastFault === null ? "no fault yet" : O.rec === null ? "not yet" : O.rec, CQ.lastFault === null || N.rec === null || O.rec === null ? "shown" : "lower"],
+    ["Throughput (work served, this day)", N.served, O.served, fmtAxis(N.served), fmtAxis(O.served), W.body === "model" ? "count" : "higher"],
+    ["Time inside the operating band, p in [0.05, 0.95]", N.inBand/Math.max(N.n, 1), O.inBand/Math.max(O.n, 1), pc(N.inBand, N.n), pc(O.inBand, O.n), "shown"],
+    ["Mean absolute deviation from the band centre, |p − ½| (IAE per muscle-decision)", N.iae/Math.max(N.n, 1), O.iae/Math.max(O.n, 1), (N.iae/Math.max(N.n, 1)).toFixed(3), (O.iae/Math.max(O.n, 1)).toFixed(3), "shown"],
+    ["Peak band position (1 is the line)", N.peak, O.peak, N.peak.toFixed(2), O.peak.toFixed(2), "shown"],
+    ["Actuator moves (a lever changed by over 2%)", N.moves, O.moves, W.body === "model" ? num(N.moves) : "—", num(O.moves), W.body === "model" ? "spent" : "shown"],
+    ["Direction reversals of p (oscillation, actuator wear)", N.rev, O.rev, num(N.rev), num(O.rev), "spent"]];
+  const html = rows.map(([g, n, o, ns, os, aim]) => { const [w, c] = cqWord(aim, n, o); return `<tr><td>${g}</td><td class="nat">${ns}</td><td class="omni">${os}</td><td><span class="word ${c}">${w}</span></td></tr>`; }).join("");
+  if (tb.innerHTML !== html) tb.innerHTML = html;
+  $("cqNote").textContent = `${num(N.dec)} decisions of ${W.body === "model" ? "the stress-test model" : W.hsec === "alone" ? "the harness, each muscle alone" : "the harness, one organism"}, ${num(W.muscles.length)} muscles each, both arms on the same demand. The aim of every judged row is the key's: a breach count and a recovery time aim lower, work aims higher, actuator moves and reversals are a resource (wear) spent; counts read EVEN within twice the standard deviation of their difference. Band statistics are shown, not judged: the max rides each muscle closer to its own line by design. Class S, our own models.`; }
+const FEED = [["e", "Errors: muscles over the line, per decision", false], ["w", "Throughput: work served per decision", false], ["l", "Latency: work queued (model) · spread of p (harness)", false], ["s", "Saturation: capacity in service (model) · electrical power, kW (harness)", false]];
+function drawFeed() {
+  FEED.forEach(([k, title], idx) => { const cv = $("feed" + idx); if (!cv || !drawable("feed" + idx)) return;
+    const {g, w, h} = fit(cv, 150/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h); const F = CQ.feed, ml = 44, mr = 8, mt = 18, mb = 16;
+    g.font = `11px ${MONO}`; g.fillStyle = css.muted; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(title, 0, 0);
+    if (F.length < 2) { g.fillText("waiting for decisions…", ml, h/2); return; }
+    const vals = F.flatMap(p => p[k]); let lo = Math.min(...vals), hi = Math.max(...vals); if (hi - lo < 1e-9) { hi += 1; lo = Math.max(0, lo - 1); }
+    const X = i => ml + i/(F.length - 1)*(w - ml - mr), Y = v => mt + (1 - (v - lo)/(hi - lo))*(h - mt - mb);
+    g.strokeStyle = alpha(css.rule, 0.8); g.lineWidth = 1; g.textAlign = "right"; g.textBaseline = "middle"; g.fillStyle = css.muted;
+    for (let q = 0; q <= 2; q++) { const v = lo + q*(hi - lo)/2, y = Y(v); g.beginPath(); g.moveTo(ml, y); g.lineTo(w - mr, y); g.stroke(); g.fillText(fmtAxis(v), ml - 4, y); }
+    // fault and kill windows shaded, as a dashboard annotates incidents
+    F.forEach((p, i) => { if (W.killT.includes(p.t)) { g.fillStyle = "rgba(227,33,43,.16)"; g.fillRect(X(i) - 1, mt, Math.max(2, (w - ml - mr)/F.length), h - mt - mb); } });
+    for (const [j, col] of [[0, css.steel], [1, css.brass]]) { g.strokeStyle = col; g.lineWidth = 1.6; g.beginPath(); F.forEach((p, i) => i ? g.lineTo(X(i), Y(p[k][j])) : g.moveTo(X(i), Y(p[k][j]))); g.stroke(); }
+    g.textAlign = "left"; g.textBaseline = "bottom"; g.fillStyle = css.muted; g.fillText(`decision ${F[0].t}`, ml, h); g.textAlign = "right"; g.fillText(`decision ${F[F.length - 1].t}`, w - mr, h);
+    const st = j => { const v = F.map(p => p[k][j]); return {last: v[v.length - 1], mean: v.reduce((a, b) => a + b, 0)/v.length, max: Math.max(...v)}; }, a = st(0), b = st(1);
+    const lg = $("feedL" + idx); if (lg) lg.innerHTML = `<span class="nw">native</span> last ${fmtAxis(a.last)} · mean ${fmtAxis(a.mean)} · max ${fmtAxis(a.max)} &nbsp; <span style="color:var(--brass)">Omni-Compass</span> last ${fmtAxis(b.last)} · mean ${fmtAxis(b.mean)} · max ${fmtAxis(b.max)}`; }); }
+function drawLog() {
+  const box = $("evLog"); if (!box || !CQ.logDirty) return; CQ.logDirty = false; const f = CQ.logF || "all";
+  const rows = CQ.log.slice().reverse().filter(e => f === "all" || e.level === f).slice(0, 80);
+  box.innerHTML = rows.map(e => `<div class="ev ev-${e.level.toLowerCase()}"><span>${e.at}</span><span>decision ${e.t}</span><b>${e.level}</b><span>${e.comp}</span><span>${ESC(e.msg)}</span></div>`).join("") || `<div class="ev"><span>no event yet</span></div>`; }
+function openMetrics() {   // the live engine's metrics in the OpenMetrics text format (the exposition format Prometheus scrapes and Grafana charts)
+  const L = [], m = (name, type, help, rows) => { L.push(`# HELP ${name} ${help}`, `# TYPE ${name} ${type}`); rows.forEach(([lab, v]) => L.push(`${name}${type === "counter" ? "_total" : ""}${lab ? "{" + lab + "}" : ""} ${Number.isFinite(v) ? +v.toFixed(6) : "NaN"}`)); };   // a counter's samples end in _total (OpenMetrics)
+  const arms = [["native", W.nat, CQ.a && CQ.a.nat], ["omni_compass", W.omni, CQ.a && CQ.a.omni]], rc = (cls, w) => SC.receipts.filter(r => r.cls === cls).reduce((a, r) => a + ((r.count || {})[w] || 0), 0);
+  m("omni_engaged", "gauge", "1 while Omni-Compass governs on top of native, 0 with the kill switch on", [["", W.killed ? 0 : 1]]);
+  m("omni_decision", "gauge", "the live engine's decision index in its current day", [["", W.t]]);
+  m("omni_threshold_breaches", "counter", "muscle-decisions over the line this day", arms.map(([a, , A]) => [`arm="${a}"`, A ? A.over : 0]));
+  m("omni_breaching_muscles", "gauge", "muscles over the line at the last decision", arms.map(([a, arm]) => [`arm="${a}"`, arm.lastOver || 0]));
+  m("omni_work_served", "counter", "work served this day", arms.map(([a, , A]) => [`arm="${a}"`, A ? A.served : 0]));
+  m("omni_band_time_ratio", "gauge", "share of muscle-decisions inside the band [0.05, 0.95]", arms.map(([a, , A]) => [`arm="${a}"`, A ? A.inBand/Math.max(A.n, 1) : NaN]));
+  m("omni_actuator_moves", "counter", "lever changes over 2% this day", arms.map(([a, , A]) => [`arm="${a}"`, A ? A.moves : 0]));
+  m("omni_reversals", "counter", "direction reversals of the band position this day", arms.map(([a, , A]) => [`arm="${a}"`, A ? A.rev : 0]));
+  m("omni_frame_seconds", "gauge", "mean time between this page's frames, last 60", [["", DESK.fr.length ? DESK.fr.slice(-60).reduce((s, x) => s + x[0], 0)/Math.min(60, DESK.fr.length)/1000 : NaN]]);
+  m("omni_verdict_keep_ratio", "gauge", "share of trials the verdict keeps at each true cost (this page's port of verdict.py, sigma 0.46, 200 a side)", Object.keys(VK.done).map(c => [`cost="${c}"`, vkRate(+c) ?? NaN]));
+  m("omni_three_run_rows", "gauge", "judged rows of the newest three-run tables, by evidence class and reading", ["L", "S"].flatMap(cl => ["GAIN", "power given", "EVEN", "LOSS", "the runs disagree"].map(w => [`class="${cl}",reading="${w}"`, rc(cl, w)])));
+  m("omni_build_info", "gauge", "the engine that stands and the commit the page was built from", [[`engine="${OPS_BUILD.engine || ""}",digest="${OPS_BUILD.digest || ""}",commit="${(OPS_BUILD.commit || "").slice(0, 12)}"`, 1]]);
+  L.push("# EOF"); return L.join("\n"); }
+function drawInstruments() { if (drawable("cqTab")) cqRender(); drawFeed(); if (drawable("evLog")) drawLog(); if (drawable("omExpo") && (!CQ.omAt || performance.now() - CQ.omAt > 2000)) { CQ.omAt = performance.now(); $("omExpo").textContent = openMetrics(); } }
+function buildInstruments() {
+  $("kProfGo").addEventListener("click", injectProfile); $("kProf").addEventListener("change", () => { $("kProfSeq").hidden = $("kProf").value !== "custom"; });
+  document.querySelectorAll("[data-evf]").forEach(b => b.addEventListener("click", () => { CQ.logF = b.dataset.evf; press([...document.querySelectorAll("[data-evf]")], b); CQ.logDirty = true; drawLog(); }));
+  $("omCopy").addEventListener("click", () => { const t = openMetrics(); (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { $("omCopy").textContent = "Copied"; setTimeout(() => $("omCopy").textContent = "Copy the exposition", 1500); }, () => { $("omExpo").textContent = t; }); });
+  cqReset(); evLog("INFO", "engine", `${OPS_BUILD.engine || STANDS()} running in this page: the brain, compass law, verdict and nerves on the live engine's own clock`);
+  setInterval(simTick, 50); }
+
 buildOrgans(); vLabels(); newDay(W.seed);
 document.getElementById("vMany").click();
 setBody("harness", "alone");   // open on the engine's own harness, each muscle alone, 120 frames into run A
 setCtl("selfpilot", 0); for (let k = 0; k < 120; k++) stepCtl(); updateCScore();
 requestAnimationFrame(() => { paintWords(document.body); paintArms(document.body); WORD_WATCH.observe(document.body, {childList: true, subtree: true, characterData: true}); });
 ["score", "cScore", "sScore", "ruTab", "selfTab", "chipLedger", "cloudLedger", "billTab"].forEach(id => { const t = $(id) && $(id).querySelector("tbody"); if (t) LOST_WATCH.observe(t, {childList: true}); });
-buildInfo(); buildBottom(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); buildFleet(); buildSelf(); buildPlaces(); buildLedgers(); buildMech(); buildDesk(); buildFamTable(); tally(); buildRegister(); setRuns(0, 0, 0); updateScan(); setInterval(updateScan, 1000); buildHealth(); buildFail();
+buildInfo(); buildBottom(); buildReceipts(); buildRealms(); setStack("gpu", 0); buildBoard(); buildOps(); buildLab(); buildAI(); buildFleet(); buildSelf(); buildPlaces(); buildLedgers(); buildMech(); buildDesk(); buildFamTable(); tally(); buildRegister(); setRuns(0, 0, 0); updateScan(); setInterval(updateScan, 1000); buildHealth(); buildFail(); buildInstruments();
 drawVerdict2();
 V.P = vParams(); for (let k = 0; k < V.P.min; k++) V.ref.push(vSample(false, V.P, V.rng)); for (let k = 0; k < V.P.min; k++) V.got.push(vSample(true, V.P, V.rng));
 V.running = true; V.lastAdd = 0;
