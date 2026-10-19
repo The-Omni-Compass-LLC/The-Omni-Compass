@@ -52,7 +52,7 @@ class VerdictInWords(unittest.TestCase):
     def test_wide_evidence_measures_on(self):
         """Very noisy work: the interval is wider than the allowance at min_samples, so the trial measures on (up to
         three times min_samples) before it decides."""
-        v = Verdict(tolerance=0.02, min_samples=30, probe_every=1, recheck=10 ** 6, max_trial=40, judge="interval")
+        v = Verdict(tolerance=0.02, min_samples=30, probe_every=1, recheck=10 ** 6, max_trial=40)
         rng, step, decided_at = random.Random(5), 0, None
         for t in range(40):
             v.observe([10.0 * rng.lognormvariate(0.0, 1.5) for _ in range(30)])
