@@ -217,6 +217,20 @@ def index_word(x, service=None):
     return LOSS if service is not None and service < 1.0 else GIVEN
 
 
+def engines_sentence(ts):
+    """Which engine each test's table ran on, counted from the tables themselves: a test is read from its newest table, so
+    while a version's runs land some tests stand on it and the rest on the engine before; no test's table is pooled."""
+    by = {}
+    for t in ts:
+        m = re.match(r"results/live/V(\d+)_", t["source"])
+        by.setdefault(int(m.group(1)) if m else 0, set()).add(t["test"].split(" `")[0])
+    parts = [f"{len(v)} on omni-v{k}" for k, v in sorted(by.items(), reverse=True)]
+    return ("Each test is read from its own newest three-run table: " + ", ".join(parts) + " (omni-v8, omni-v9 and omni-v10 changed only the "
+            "CityLearn runner and the interval table, omni-v11 the Kubernetes governor's hold on a reading with no machine in service); "
+            "a test stands on an older engine's table only until its omni-v11 runs land, no table is pooled across engines, and every row "
+            "below names its table.")
+
+
 def main():
     ts = tests()
     cats = {}
@@ -240,9 +254,7 @@ def main():
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
          "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
-         "nothing inside the noise is claimed either way. Every table in it ran on omni-v7 (omni-v8, omni-v9 and omni-v10 changed the CityLearn runner and the interval table; "
-         "omni-v11, the engine that stands, added the Kubernetes governor's hold on a reading with no machine in service; every test runs again on omni-v11); no table of another engine is read beside them "
-         "(those stay in `docs/history`). Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
+         "nothing inside the noise is claimed either way. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
          "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v11 runs land, Azure and the card as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. Each table names the engine it ran on.", "",

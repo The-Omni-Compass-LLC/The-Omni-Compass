@@ -206,6 +206,12 @@ the founder overrides one in the conversation.
 
 ## Orders of 19 October
 
+- **Nothing is forced but the mechanism** (the founder's words: "We don't force anything. The only thing we force is the code
+  and the mechanism and the correct mechanism. Because once the correct mechanism is enforced and wired correctly, it will do
+  the physics and the math will do the work"). A result is never pushed toward GAIN: no number is tuned to make a row read
+  well and no row is steered. What is held to the letter is the mechanism: the code does what its rule says, the wire is
+  fastened right, the harness measures as a deployment runs. A LOSS is answered by finding where the mechanism or its wiring
+  is wrong and correcting that; the runs then say what the corrected mechanism does.
 - **Do no harm means the organism** (the founder's words: "its real goal is to strengthen the organism and keep it healthy
   in any form and keep it working in its most optimal state that the organism can live within its own muscles ... If that
   means decreasing a muscle to push another muscle, but in the whole end makes the organism produce a better output, well,

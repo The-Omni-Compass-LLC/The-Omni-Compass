@@ -38,15 +38,15 @@ jobs:
         run: |
           echo "::error::GCP_CREDENTIALS and GCP_PROJECT are not both in this repository's secrets: docs/GOOGLE_SETUP.md, sections 4 and 5."
           exit 2
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: {sparse-checkout: "scripts\ntools"}
       - name: The key is whole (its shape only; not a character of it is printed)
         env:
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
         run: python3 tools/cloud_key_check.py
-      - uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with: {credentials_json: "${{ secrets.GCP_CREDENTIALS }}"}
-      - uses: google-github-actions/setup-gcloud@v2
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
       - name: The services the sets use are on (costs nothing)
         run: bash scripts/gcp_services.sh
       - name: The sets' pre-flight, then stop
@@ -80,9 +80,9 @@ jobs:
         run: |
           echo "::error::AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are not both in this repository's secrets: docs/AMAZON_SETUP.md, sections 2 and 3."
           exit 2
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: {sparse-checkout: "scripts\ntools"}
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

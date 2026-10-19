@@ -20,28 +20,34 @@ hands every setting back to native's value when it stops, dies or is switched of
 | Claim | Standing | Evidence |
 |---|---|---|
 | It sits on top of native and never replaces it | **Shown** | Every live test runs native, and Omni-Compass on top of the same native; the setting is read back at native's value at the end of every arm |
-| It does no harm: never a LOSS against native | **Shown on what has run** | 0 LOSS rows in the seven database tables (omni-v10, L); the one Kubernetes LOSS (the pod start wait under KEDA's HTTP add-on) traces to the test machine, not the governor (`docs/POD_START_WAIT.md`) |
-| More work, faster, on real Kubernetes | **Shown** (L, omni-v7) | See section 3 |
-| More work, faster, on databases and caches | **Small or EVEN** (L, omni-v10) | Redis: work inside the line +1.3%, hit rate +1.3%, for +2.3% memory; Kafka: 1 to 2 gauges GAIN; PostgreSQL 1, MongoDB 1, MySQL 0 of their gauges GAIN; every other gauge EVEN. MySQL, MongoDB and PostgreSQL ran at the tune-down alone, where the governor refuses most trials; their runs at the max are queued (18 October) |
-| Fewer machines | **Shown in one test** (L, omni-v7) | A queue of jobs: machines in service and node-hours cut 11.5% to 15.2%, the queue finished EVEN |
+| It does no harm: never a LOSS against native | **Shown on the counted runs; one fault found beyond them, its fix waiting for the next version** | 0 LOSS rows in the 18 omni-v11 three-run tables (854 judged rows: Kubernetes, the five data stores, four outside simulators); the omni-v10 LOSS, the pod start wait under KEDA's HTTP add-on, reads EVEN on omni-v11 now that the kind rig pre-pulls the served image (`docs/POD_START_WAIT.md`); on real Kubernetes Omni-Compass's 95th and 99th percentiles were below native's in all 90 paired repetitions (`docs/TAIL_LATENCY.md`). The fault: in the drone swarm (class S) the omni-v11 wire spent the closest-approach margin in the counted cells (no near miss, no collision) and, on a mission draw outside them, let drones collide where native did not; its proximity reflex slowed over a second instead of at once. The fix held every drone outside the keep-out on every draw tried and makes the next version (`docs/LIMITATIONS.md`, section 3; `results/toy_gate/V12_SWARM_REFLEX.md`) |
+| More work, faster, on real Kubernetes | **Shown** (L, omni-v10 and omni-v11, each test on its newest table) | See section 3 |
+| More work, faster, on databases and caches | **Small or EVEN** (L, omni-v11) | Redis at the operator's ceiling: 4 gauge-rows GAIN at the tune-down, 6 at the max (work inside the line and hit rate up about 1%, for about 2% memory); Kafka 1 GAIN at each objective; MongoDB 1; PostgreSQL and MySQL 0, with every other gauge EVEN; native exactly as shipped: 0 GAIN, 0 LOSS (the knob at its limit on native or untouched). MySQL's update workload reads "the runs disagree" on throughput (±0.4%, a run-level effect: `docs/LIMITATIONS.md`). The runs at the max for MySQL, MongoDB and PostgreSQL are archiving |
+| Fewer machines | **Shown in one test** (L, omni-v10) | A queue of jobs: machines in service and node-hours cut 6% to 14%, the machines after the queue finished 10% to 22%, the queue finished EVEN |
 | A smaller cloud bill | **Undetermined** | Azure, the engine of 13 October: no difference in the bill (`results/live/AKS_BILL.md`); omni-v11's Azure sets are running; Google and Amazon have not run |
 | Less energy | **Undetermined** | No physical meter yet; every energy figure in a live test is a declared model, not a measurement |
 | More work per watt on a GPU | **Undetermined** | No run on the engine that stands |
 | One governor over every muscle and organism | **Modelled** (S) | 1,107 muscles in our own models: 527 GAIN, 580 EVEN, 0 LOSS (`results/realms_v5/REALMS_V5.md`); a few dozen knobs on real systems |
-| Its mathematics | **Partly proved** | Theorems 1 to 4 hold for the compass law's channel; global stability of the full six-state system is open (`docs/FORMAL_STATUS.md`) |
+| Its mathematics | **Machine-checked where stated** | 24 of 24 theorems proved by SMT and interval arithmetic on the engine as it executes: the compass law, the plug's clip, the verdict, the invariance of E, I and S, the tracking bound inside the basin and the steps to reach it, the bath's stability (`docs/ENGINE_PROOFS.md`); open: CERT-10 for every fixture, convergence of the whole six-state system (`docs/FORMAL_STATUS.md`) |
 
-## 3. Real Kubernetes, each gain beside its cost (L, omni-v7, three runs of ten pairs, kind on one GitHub runner)
+## 3. Real Kubernetes, each gain beside its cost (L, three runs of ten pairs, kind on one GitHub runner)
+
+The rows marked omni-v11 are the engine that stands; the others are omni-v10's tables, shown until each test's three runs on omni-v11 land (the conductor is running them).
 
 | Test | Gain, the same in all three of our runs | What it cost |
 |---|---|---|
-| The load stepping up and down (all four at once) | Work inside the response line +41% to +61%; 95th percentile cut 56% to 62% | Machines and node-hours EVEN; CPU used, the governor's own included, −0.8% to −3.2% |
-| A public day of demand (Google 2011) | 95th percentile cut 54% to 58% | Machines EVEN; CPU used, the governor's own included, −2.6% to −3.9% |
-| Faults injected | 95th percentile cut 51% to 63% | Replicas +13% to +21% (power given) |
-| KEDA's HTTP add-on underneath | 95th percentile cut 71% to 75%; time over the line cut 94% to 95% | CPU used, the governor's own included, +54% to +57% (shown, not judged: idle processor given to the service) |
-| KEDA on CPU and requests underneath | 95th percentile cut 52% to 54% | CPU used, the governor's own included, +29% to +34% (shown, not judged) |
-| Goldilocks and the VPA underneath | 95th percentile cut 60% to 62% | CPU used, the governor's own included, +42% to +47% (shown, not judged) |
-| A queue of jobs | Machines cut 11.5% to 15.2% | Queue finish time EVEN |
-| A noisy neighbour; fixed capacity; CruiseKube underneath | EVEN | — |
+| Steady work in steps | 95th percentile cut 64% to 65%; time over the line cut 98% to 100%; alert minutes cut 100% | Machines and node-hours EVEN; CPU used, the governor's own included, −4.3% to −5.2% |
+| Demand that wanders | 95th percentile cut 57% to 66%; time over the line cut 38% to 45%; energy cut 0.3% to 0.4% | Machines EVEN; CPU used, the governor's own included, −1.3% to −2.1% |
+| The load stepping up and down (all four at once) | Work inside the response line +47% to +79%; 95th percentile cut 56% to 61% | Machines and node-hours EVEN; CPU used, the governor's own included, −0.5% to −2.6% |
+| A public day of demand (Google 2011) | 95th percentile cut 56% to 62%; time over the line cut 74% to 77% | Machines EVEN; pods started +120% to +193% (power given); CPU used, the governor's own included, −3.1% to −3.3% |
+| Faults injected | 95th percentile cut 54% to 63%; 99th cut 43% to 51% | Replicas +14% to +20% (power given) |
+| KEDA's HTTP add-on underneath (omni-v11) | 95th percentile cut 72% to 74%; time over the line cut 98% to 99%; alert minutes cut 100%; replicas cut 11% to 20% | CPU used, the governor's own included, +49% to +57% (shown, not judged: idle processor given to the service); the pod start wait EVEN |
+| KEDA on CPU and requests underneath (omni-v11) | 95th percentile cut 52% to 53%; time over the line cut 97% to 100% | CPU used, the governor's own included, +29% to +31% (shown, not judged); replicas +2% to +3% (power given) |
+| Goldilocks and the VPA underneath (omni-v11) | 95th percentile cut 61% to 64%; time over the line cut 98% to 100%; alert minutes cut 100%; pods started cut 53% to 61% | CPU used, the governor's own included, +44% to +52% (shown, not judged); parked-worker energy +1.7% to +2.3% (power given) |
+| A queue of jobs | Machines cut 6% to 14%; machines after the queue finished cut 10% to 22% | Queue finish time EVEN |
+| Fixed capacity (omni-v11) | EVEN at every cap | — |
+| A noisy neighbour | Time over the line cut 11%; the neighbour's own rows EVEN | — |
+| CruiseKube underneath | EVEN | — |
 
 The processor given in the add-on tests was idle on machines already running. Where machines are billed by the hour, idle
 processor put to work costs nothing more unless it raises the machine count, and in these tests the machine count did not

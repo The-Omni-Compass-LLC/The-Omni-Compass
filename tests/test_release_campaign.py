@@ -76,6 +76,16 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertEqual([[n for n, _, _ in b] for b in blocks[:len(frozen)]], frozen)
         self.assertTrue(all(len(b) > 0 for b in blocks))
 
+    def test_a_labelled_run_is_started_with_its_own_letter(self):
+        # 19 October: a workflow whose run records its label is passed the rerun's own A, B or C; every other is passed
+        # the queue's inputs alone, which it would refuse with an input it does not declare
+        queued = {row[2] for row in grid.rerun_queue()}
+        for wf in sorted(queued):
+            inputs = yaml.safe_load((ROOT / ".github" / "workflows" / wf).read_text())
+            declared = set(((inputs.get("on") or inputs.get(True) or {}).get("workflow_dispatch") or {}).get("inputs") or {})
+            with self.subTest(workflow=wf):
+                self.assertEqual(wf in grid.LABELLED, "label" in declared)
+
     def test_started_work_is_not_queued_again(self):
         queue = grid.rerun_queue()
         counts = {}
@@ -200,6 +210,38 @@ class ReleaseCampaign(unittest.TestCase):
                 with self.subTest(args=args), self.assertRaises(SystemExit) as cm:
                     run_hil.main(["--out", "/tmp/omni-paid-rejected", *args])
                 self.assertEqual(cm.exception.code, 2)
+
+    def test_jobs_held_by_a_runs_own_max_parallel_are_not_counted_as_queue(self):
+        """A 100-repetition Azure set at max-parallel 1 lists 99 jobs queued that wait for its own slot, not for a runner;
+        counted as queue they held every grid dispatch back. Only the slots its max-parallel leaves free count."""
+        runs = {"workflow_runs": [{"id": 1, "path": ".github/workflows/aks-metered.yml", "name": "aks-metered",
+                                   "display_title": "aks-metered"}]}
+        jobs = {"jobs": [{"status": "in_progress"}] + [{"status": "queued"}] * 99}
+        def api(url):
+            if "/jobs" in url:                          # a full first page of 100, then the empty page GitHub returns
+                return jobs if "page=1" in url.split("&") or url.endswith("page=1") else {"jobs": []}
+            return runs if "status=queued" in url else {"workflow_runs": []}
+        with unittest.mock.patch.object(grid, "api", side_effect=api), \
+             unittest.mock.patch.object(grid, "waits_for_a_runner", return_value=False):
+            queued, running, _ = grid.jobs_in_flight()
+        self.assertEqual(grid.max_parallel(".github/workflows/aks-metered.yml"), 1)
+        self.assertEqual((queued, running), (0, 1))
+
+    def test_a_job_list_that_never_ends_stops_at_ten_pages(self):
+        """A list that hands back a full page every time (a broken answer) once read forever and filled the memory; the
+        reader stops at ten pages, more than the 256 jobs a run can hold."""
+        runs = {"workflow_runs": [{"id": 2, "path": ".github/workflows/grid.yml", "name": "grid", "display_title": "grid"}]}
+        calls = []
+        def api(url):
+            if "/jobs" in url:
+                calls.append(url)
+                return {"jobs": [{"status": "in_progress"}] * 100}
+            return runs if "status=queued" in url else {"workflow_runs": []}
+        with unittest.mock.patch.object(grid, "api", side_effect=api), \
+             unittest.mock.patch.object(grid, "waits_for_a_runner", return_value=False):
+            _, running, _ = grid.jobs_in_flight()
+        self.assertEqual(len(calls), 10)
+        self.assertEqual(running, 1000)
 
 
 if __name__ == '__main__':

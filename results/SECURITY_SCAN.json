@@ -1,0 +1,328 @@
+{
+ "lines_scanned": 34657,
+ "high": 3,
+ "medium": 34,
+ "low": 335,
+ "low_by_kind": {
+  "B603 subprocess_without_shell_equals_true": 145,
+  "B404 blacklist": 62,
+  "B607 start_process_with_partial_path": 58,
+  "B101 assert_used": 50,
+  "B311 blacklist": 12,
+  "B110 try_except_pass": 4,
+  "B105 hardcoded_password_string": 2,
+  "B606 start_process_with_no_shell": 1,
+  "B107 hardcoded_password_default": 1
+ },
+ "reviewed": [
+  {
+   "test": "B103",
+   "file": "tools/run_pgbench.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    355
+   ],
+   "what": "Chmod setting a permissive mask 0o755 on file (dir).",
+   "why": "PgBouncer's folder on the benchmark machine is owned by postgres and set 0o755: others may read and enter it, never write it"
+  },
+  {
+   "test": "B108",
+   "file": "k8s_controlplane/mechanism_harness.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    166
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
+  },
+  {
+   "test": "B108",
+   "file": "omni_controller/controller.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    1103
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a default file name for the audit log in the working folder, not /tmp; the operator sets --audit"
+  },
+  {
+   "test": "B108",
+   "file": "omni_controller/gpu_compass.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    394
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a default file name for the audit log, as above"
+  },
+  {
+   "test": "B108",
+   "file": "omni_controller/gpu_governor.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    475
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a default file name for the audit log, as above"
+  },
+  {
+   "test": "B108",
+   "file": "omnicompass/master.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    44
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "the switch's registry folder under the operator's runtime folder; the watchdog trusts only its own registry (docs/THREAT_MODEL.md, T4)"
+  },
+  {
+   "test": "B108",
+   "file": "scripts/dispatch_grid.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    418
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
+  },
+  {
+   "test": "B108",
+   "file": "tools/gpu_actuator_watchdog.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    65
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
+  },
+  {
+   "test": "B108",
+   "file": "tools/run_kafka.py",
+   "severity": "MEDIUM",
+   "count": 4,
+   "lines": [
+    501,
+    501,
+    506,
+    508
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
+  },
+  {
+   "test": "B108",
+   "file": "tools/run_redis.py",
+   "severity": "MEDIUM",
+   "count": 2,
+   "lines": [
+    481,
+    483
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
+  },
+  {
+   "test": "B310",
+   "file": "omni_controller/controller.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    163
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the operator's metrics endpoint)"
+  },
+  {
+   "test": "B310",
+   "file": "scripts/aks_kubectl.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    33
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data"
+  },
+  {
+   "test": "B310",
+   "file": "scripts/dispatch_grid.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    382
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the GitHub API)"
+  },
+  {
+   "test": "B310",
+   "file": "scripts/latency_probe.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    17
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the service under test)"
+  },
+  {
+   "test": "B310",
+   "file": "scripts/restart_aks.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    38
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the GitHub API)"
+  },
+  {
+   "test": "B310",
+   "file": "tools/artifact_legal.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    62
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (raw.githubusercontent.com)"
+  },
+  {
+   "test": "B310",
+   "file": "tools/llm_workload.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    35
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the model server under test)"
+  },
+  {
+   "test": "B310",
+   "file": "tools/prom_feed.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    53
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the operator's Prometheus)"
+  },
+  {
+   "test": "B310",
+   "file": "tools/run_ycsb.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    534
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the YCSB release, checked against its published digest)"
+  },
+  {
+   "test": "B310",
+   "file": "tools/trace_schedule.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    61
+   ],
+   "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+   "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the public trace)"
+  },
+  {
+   "test": "B323",
+   "file": "tools/wall_meter.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    48
+   ],
+   "what": "By default, Python will create a secure, verified ssl context for use in such classes as HTTPSConnection. However, it still allows using an insecure context via the _create_unverified_context that  reverts to the previous behavior that does not validate certificates or perform hostname checks.",
+   "why": "an unverified TLS context only when the operator sets REDFISH_INSECURE=1 for a management controller with its own self-signed certificate"
+  },
+  {
+   "test": "B506",
+   "file": "scripts/restart_aks.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    84
+   ],
+   "what": "Use of unsafe yaml load. Allows instantiation of arbitrary objects. Consider yaml.safe_load().",
+   "why": "yaml.load with BaseLoader, which builds strings only (stricter than SafeLoader), on the repository's own workflow files"
+  },
+  {
+   "test": "B602",
+   "file": "omni_controller/controller.py",
+   "severity": "HIGH",
+   "count": 1,
+   "lines": [
+    810
+   ],
+   "what": "subprocess call with shell=True identified, security issue.",
+   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (the site power reading, --power-cmd; engine file: the next version runs it without a shell when it holds no pipe)"
+  },
+  {
+   "test": "B602",
+   "file": "omni_controller/muscles.py",
+   "severity": "HIGH",
+   "count": 1,
+   "lines": [
+    134
+   ],
+   "what": "subprocess call with shell=True identified, security issue.",
+   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a muscle's read command in the operator's wiring file; engine file, as above)"
+  },
+  {
+   "test": "B602",
+   "file": "tools/wall_meter.py",
+   "severity": "HIGH",
+   "count": 1,
+   "lines": [
+    72
+   ],
+   "what": "subprocess call with shell=True identified, security issue.",
+   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a wall meter read by a command, `cmd:` in the meter's address)"
+  },
+  {
+   "test": "B608",
+   "file": "tools/run_pgbench.py",
+   "severity": "MEDIUM",
+   "count": 2,
+   "lines": [
+    770,
+    773
+   ],
+   "what": "Possible SQL injection vector through string-based query construction.",
+   "why": "SQL built from the benchmark's own fixed names to create its throwaway database, never from input"
+  },
+  {
+   "test": "B610",
+   "file": "tools/live_reps.py",
+   "severity": "MEDIUM",
+   "count": 6,
+   "lines": [
+    750,
+    750,
+    751,
+    752,
+    752,
+    752
+   ],
+   "what": "Use of extra potential SQL attack vector.",
+   "why": "not Django: a local function named extra() inside an f-string"
+  }
+ ],
+ "unreviewed": [],
+ "stale": []
+}

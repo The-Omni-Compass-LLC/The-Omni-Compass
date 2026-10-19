@@ -114,6 +114,9 @@ RIG_FILE = "deploy/kind/prepull.yaml"
 RIG_WORKFLOWS = ("benchmark.yml", "benchmark-reps.yml", "big-organism.yml", "capacity.yml", "kind-addons.yml",
                  "kind-cruisekube.yml", "kind-goldilocks.yml", "robustness.yml")
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
+# the workflows whose run records the label it was started with (A, B or C): the conductor passes the rerun's own letter
+# (19 October; before, a run it started read the workflow's default, A, in its own record)
+LABELLED = ("capacity.yml",)
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
 # October): scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
@@ -471,9 +474,21 @@ def waits_for_a_runner(path, jobs):
     return wf in ("six.yml", "six-kube.yml") and any((x.get("name") or "").startswith("report") for x in open_)
 
 
+def max_parallel(path):
+    """The largest max-parallel any job of a workflow sets, or None. A matrix job's jobs beyond it wait for their own run's
+    slots, not for a runner (a 100-repetition Azure set at max-parallel 1 lists 99 jobs queued for hours)."""
+    try:
+        text = (ROOT / path).read_text(encoding="utf-8")
+    except (OSError, TypeError):
+        return None
+    vals = [int(v) for v in re.findall(r"^\s*max-parallel:\s*(\d+)", text, re.M)]
+    return max(vals) if vals else None
+
+
 def jobs_in_flight():
     """(queued, running, waiting first) jobs across every workflow of the repository right now; waiting first: the runs
-    that go before the grid and wait for a runner (waits_for_a_runner)."""
+    that go before the grid and wait for a runner (waits_for_a_runner). A run's queued jobs count only up to the slots its
+    own max-parallel leaves free: the rest wait for the run, not for a runner, and counting them starved the grid."""
     queued = running = 0
     first, seen = [], set()
     for st in ("queued", "in_progress", "waiting", "pending", "requested"):
@@ -490,11 +505,16 @@ def jobs_in_flight():
                     print(f"run {r['id']}: jobs not readable ({str(e)[:80]}); not counted", file=sys.stderr)
                     break
                 jobs += j.get("jobs", [])
-                if len(j.get("jobs", [])) < 100:
+                if len(j.get("jobs", [])) < 100 or page >= 10:   # a run holds at most 256 jobs; a list that never ends stops
                     break
                 page += 1
-            queued += sum(x["status"] in ("queued", "waiting", "pending", "requested") for x in jobs)
-            running += sum(x["status"] == "in_progress" for x in jobs)
+            q = sum(x["status"] in ("queued", "waiting", "pending", "requested") for x in jobs)
+            on = sum(x["status"] == "in_progress" for x in jobs)
+            mp = max_parallel(r.get("path"))
+            if mp is not None:
+                q = min(q, max(0, mp - on))
+            queued += q
+            running += on
             if waits_for_a_runner(r.get("path"), jobs):
                 name, title = r.get("name") or "", r.get("display_title") or str(r["id"])
                 first.append(title if title.startswith(name) else f"{name}: {title}")
@@ -956,7 +976,8 @@ def main(argv=None):
                 if inflight >= target:
                     break
                 if not a.dry:
-                    api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": kv})
+                    inputs = {**kv, "label": run} if wf in LABELLED else kv
+                    api(f"repos/{REPO}/actions/workflows/{wf}/dispatches", method="POST", data={"ref": a.ref, "inputs": inputs})
                     time.sleep(2)
                 reruns.append(f"{name} {run}")
                 inflight += RERUN_JOBS

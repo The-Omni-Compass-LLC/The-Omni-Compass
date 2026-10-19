@@ -43,6 +43,13 @@ across engine versions.
 - The notice closes with the filing sentence and the website, and nothing after it: "All patents, copyrights and
   trademarks filed in the USA. www.omni-compass.com"
 
+## Working on the code
+
+Anyone changing this repository works by the founder's standing orders in `CLAUDE.md`. Among them: nothing is forced but the
+mechanism. No number is tuned to make a result read well; the code is made to do what its rule says, the wire is fastened
+right, and the runs then say what it does. A change to a rule, gain, guard, preset or muscle is the next engine version, goes
+through the toy gate first (`tools/toy_gate.py`) and is told to the founder before it is pushed.
+
 ## Where to look
 
 - `README.md`: the front page, newest results first (kept current by the repository itself).
