@@ -23,11 +23,13 @@ Energy is a declared model (evidence class S), the same for both arms: each moto
 own thrust and torque constants (torque = KM rpm^2, power = torque x angular speed), divided by a declared motor
 efficiency, plus a declared avionics draw for every drone over the whole fleet window, flying or landed. The battery is
 the Crazyflie's (250 mAh at 3.7 V); the autopilot's own reserve rule (20% left at landing) decides a reserve breach.
-Collisions are read from the simulator: any two drones closer than two collision radii. A cell with a collision in
-either arm is void and says so. Every row is reported, LOSS included.
+Collisions are read from the simulator: any two drones closer than two collision radii. A cell where native itself
+collides is void and says so; a collision with Omni-Compass on top is a judged row, any increase a LOSS (amendment 2,
+from omni-v12's runs on). Every row is reported, LOSS included.
 
   python3 tools/run_swarm.py --cell tuning --out DIR        # the tuning swarm (5 drones, mixed distances)
-  python3 tools/run_swarm.py --cell short --out DIR         # an untouched cell: short | mixed | long (20 drones)
+  python3 tools/run_swarm.py --cell short --out DIR         # an untouched cell: short | mixed | long (20 drones), and
+                                                            # short-314 | mixed-315 | long-316 (draws never flown)
   python3 tools/run_swarm.py --cell all --out DIR           # every cell, one after the other
   python3 tools/run_swarm.py --report-only DIR              # the report from DIR's swarm-<cell>.json files
 """
@@ -81,6 +83,10 @@ CELLS = {
     "short": (20, 4, (3.0, 3.0), 11, False),
     "mixed": (20, 4, (3.0, 8.0), 12, False),
     "long": (20, 4, (8.0, 8.0), 13, False),
+    # amendment 2 (19 October, before omni-v12's runs): the same three cells on mission draws never flown, the seed plus 303
+    "short-314": (20, 4, (3.0, 3.0), 314, False),
+    "mixed-315": (20, 4, (3.0, 8.0), 315, False),
+    "long-316": (20, 4, (8.0, 8.0), 316, False),
 }
 
 GAUGES = [("energy_per_mission_j", "energy per mission (J, declared model: motors and avionics over the fleet window)", "spent"),
@@ -94,6 +100,15 @@ GAUGES = [("energy_per_mission_j", "energy per mission (J, declared model: motor
           ("mission_s", "mission time (s)", "shown"),
           ("airborne_s", "seconds airborne per mission", "shown"),
           ("override_mean", "cruise override, mean", "shown")]
+# judged from omni-v12 on (amendment 2): a collision with Omni-Compass on top where native has none is a LOSS; only a cell where
+# native itself collides is void, its task unsafe before Omni-Compass touches it
+COLLISIONS = ("collisions", "control ticks with two drones under two collision radii (collisions)", "never more")
+
+
+def with_collisions(gauges):
+    """The gauges with the judged collision row after the near misses (amendment 2)."""
+    i = [k for k, _, _ in gauges].index("near_miss_ticks") + 1
+    return gauges[:i] + [COLLISIONS] + gauges[i:]
 
 
 def depot(i):
@@ -178,9 +193,11 @@ class Drone:
         if self.law is not None and self.phase in ("out", "back"):
             f = self.law.force(err)
             want = clamp(O_MIN + (O_MAX - O_MIN) * (0.5 - 0.5 * f), O_MIN, O_MAX)
-            if err >= 0.95 * E_LINE or nearest < SEP_WALL:
-                want = O_MIN                                   # fail up: the planner's cruise at once (error at the wall, or a drone too close)
-            self.override += clamp(want - self.override, -SLEW, SLEW)
+            # the stopping distance grows with the square of the speed, so the reflex reaches out with it: at the planner's cruise it is SEP_WALL
+            if err >= 0.95 * E_LINE or nearest < SEP_WALL * self.override ** 2:
+                self.override = O_MIN                          # fail up: the planner's cruise at once, in this tick (error at the wall, or a drone too close), v12
+            else:
+                self.override += clamp(want - self.override, -SLEW, SLEW)
         self.ov.append(self.override)
         v = V_PLAN * self.override
         cx, cy, cz = self.carrot
@@ -315,9 +332,11 @@ def run_cell(name, out: Path):
             r["arm"] = arm
         all_rows += rows
         g["seconds"] = round(time.time() - t0, 1); rec[arm] = g
-    rec["void"] = rec["native"]["collisions"] > 0 or rec["omni"]["collisions"] > 0
+    rec["void"] = rec["native"]["collisions"] > 0          # amendment 2: void only when native itself collides
     if rec["void"]:
-        print("   COLLISION in an arm: the cell is void", flush=True)
+        print("   COLLISION in the native arm: the cell is void", flush=True)
+    elif rec["omni"]["collisions"] > 0:
+        print("   COLLISION with Omni-Compass on top: a judged LOSS row", flush=True)
     out.mkdir(parents=True, exist_ok=True)
     (out / f"swarm-{name}.json").write_text(json.dumps(rec, indent=1) + "\n")
     with (out / f"swarm-{name}_missions.csv").open("w", newline="") as f:
@@ -329,7 +348,8 @@ def report(res: dict, out: Path):
     L = ["# Drone swarms: Omni-Compass on top of each drone's own autopilot (gym-pybullet-drones, Crazyflie 2.x)", "",
          "native: every drone's shipped position controller at the planner's cruise; omni: the same, with the compass law on the "
          "cruise override inside the autopilot's limits, spending tracking slack as speed. Energy is a declared model (evidence class "
-         "S) computed the same way for both arms. A cell with a collision in either arm is void. Every row is reported.", ""]
+         "S) computed the same way for both arms. A cell where native itself collides is void; a collision with Omni-Compass on top is "
+         "a judged row, any increase a LOSS (amendment 2). Every row is reported.", ""]
     for name, rec in res.items():
         L += [f"## {name}: {rec['drones']} drones x {rec['missions_per_drone']} missions, {rec['distance_m'][0]:.0f} to {rec['distance_m'][1]:.0f} m"
               + (" (the tuning swarm)" if rec.get("tuning") else ""), ""]
@@ -339,13 +359,13 @@ def report(res: dict, out: Path):
               + ("a faster mission is cheaper and inside the safe error, so omni may move the cruise." if rec["omni_moves"] else
                  "**not cheaper or not inside the safe error: nothing for Omni to move; the omni arm is native.**"), ""]
         if rec.get("void"):
-            L += ["**VOID: a collision in an arm.** Collisions: native "
+            L += ["**VOID: native collided.** Collisions: native "
                   f"{rec['native']['collisions']}, omni {rec['omni']['collisions']}.", ""]
         L += ["| Gauge | native | omni | change | direction |", "|---|---:|---:|---:|---|"]
-        for key, label, direction in GAUGES:
+        for key, label, direction in with_collisions(GAUGES):
             a, b = rec["native"][key], rec["omni"][key]
             ch = "" if a == 0 else f"{100 * (b - a) / abs(a):+.2f}%"
-            if key in ("late_share", "reserve_breaches", "near_miss_ticks"):
+            if key in ("late_share", "reserve_breaches", "near_miss_ticks", "collisions"):
                 ch = f"{b - a:+.3f}"
             L.append(f"| {label} | {a:.4g} | {b:.4g} | {ch} | {direction} |")
         L += ["", f"Missions flown: native {rec['native']['missions_flown']}, omni {rec['omni']['missions_flown']}; cut off: "
@@ -357,7 +377,7 @@ def report(res: dict, out: Path):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--cell", default="tuning", help="tuning | short | mixed | long | all")
+    ap.add_argument("--cell", default="tuning", help="tuning | short | mixed | long | short-314 | mixed-315 | long-316 | all")
     ap.add_argument("--out", default="")
     ap.add_argument("--report-only", default="")
     a = ap.parse_args(argv)
