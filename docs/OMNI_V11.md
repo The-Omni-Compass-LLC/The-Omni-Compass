@@ -1,9 +1,11 @@
-# Omni v11: a reading with no machine in service is blind, never an overload (the engine that stands since 18 October)
+# Omni v11: a reading with no machine in service is blind, never an overload (the engine that stood 18 to 19 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v11 has been the engine on main since 18 October. The founder's order behind it: every fault found is fixed, none set
-aside. It is omni-v10 (`docs/OMNI_V10.md`) with one guard added to the Kubernetes governor. When the cluster's reading shows no
+Omni v11 stood on main from 18 to 19 October; on the night of 19 October Omni v12 (`docs/OMNI_V12.md`) took its place, which
+is omni-v11 with a refused raise held and the swarm's reflex acting at once. This page stays as omni-v11's
+record, read beside no other engine's; its 23 three-run tables (`results/live/V11_*.md`) are its own. The founder's order behind
+it: every fault found is fixed, none set aside. It is omni-v10 (`docs/OMNI_V10.md`) with one guard added to the Kubernetes governor. When the cluster's reading shows no
 machine in service, the governor holds. It records why, decides nothing from that reading, writes nothing, and keeps the last
 reading that had machines. Every setting, gain, preset and muscle is omni-v10's, and so is every rule but this guard.
 
