@@ -89,7 +89,7 @@ jobs:
           if inputs.get('reps'):
               assert 1 <= int(inputs['reps']) <= 100, 'paid repetitions must be between 1 and 100'
           PY_LIMITS
-      - uses: actions/checkout@v4      # the code, not the archive of raw runs (25 GB, more than the machine's disk)
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4: the code, not the archive of raw runs (25 GB, more than the machine's disk)
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -100,7 +100,7 @@ jobs:
           set -euo pipefail
           git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
           python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
-      - uses: azure/login@v2
+      - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
       - name: Rent the machine
         run: |
@@ -237,7 +237,7 @@ jobs:
           
           if __name__ == '__main__':
               main()
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with: {name: "six-${{ matrix.cell.organism }}-x${{ github.event.inputs.size || '100' }}-${{ matrix.cell.rep }}", path: "${{ steps.omni_legal_export_1.outputs.paths }}"}
       - name: Delete the machine
@@ -245,7 +245,7 @@ jobs:
         run: python3 scripts/azure_capacity.py cleanup --group "$RG"
       - name: Legal files beside the files this run hands out
         if: always() && strategy.job-index == 0
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: _legal
           sparse-checkout-cone-mode: false
@@ -258,7 +258,7 @@ jobs:
             TRADEMARKS.md
       - name: Legal notice handed out with this run's files
         if: always() && strategy.job-index == 0
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: legal-notice
           overwrite: true

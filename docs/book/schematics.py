@@ -1416,10 +1416,10 @@ def shown_chart(rel, title):
     return fig_svg(fig)
 
 
-RECEIPTS = {"goldilocks": ("results/live/V7_GOLDILOCKS.md", "On top of Goldilocks and the VPA's recommender (omni-v7)"),
-            "keda_http": ("results/live/V7_KEDA_REQUESTS.md", "On top of KEDA's HTTP add-on (omni-v7)"),
-            "keda_cpu": ("results/live/V7_KEDA_CPU_REQUESTS.md", "On top of KEDA on the CPU target and requests in flight (omni-v7)"),
-            "cruisekube": ("results/live/V7_CRUISEKUBE.md", "On top of CruiseKube applying its own recommendations (omni-v7)")}
+RECEIPTS = {"goldilocks": ("results/live/V11_GOLDILOCKS.md", "On top of Goldilocks and the VPA's recommender (omni-v11)"),
+            "keda_http": ("results/live/V11_KEDA_REQUESTS.md", "On top of KEDA's HTTP add-on (omni-v11)"),
+            "keda_cpu": ("results/live/V11_KEDA_CPU_REQUESTS.md", "On top of KEDA on the CPU target and requests in flight (omni-v11)"),
+            "cruisekube": ("results/live/V10_CRUISEKUBE.md", "On top of CruiseKube applying its own recommendations (omni-v10)")}
 
 
 def r_goldilocks():
@@ -1455,7 +1455,7 @@ def r_cruisekube_shown():
 
 
 def r_capacity():
-    rows = read_table("results/live/V7_CAPACITY.md", "Cap (cores)")
+    rows = read_table("results/live/V11_CAPACITY.md", "Cap (cores)")
     data = [(r[0], r[1], [NUM.search(x) for x in r[2:5]], r[5]) for r in rows if len(r) >= 6]
     data = [(cap, name, [(_num(m.group(1)), _num(m.group(3)), _num(m.group(4))) for m in ms], word) for cap, name, ms, word in data if all(ms)]
     fig = mpl_fig(0.5 * len(data) + 1.6)
@@ -1468,13 +1468,13 @@ def r_capacity():
     ax.axvline(0, color=NAVY, lw=1)
     ax.set_yticks(range(len(data))); ax.set_yticklabels([f"cap {cap} cores:\n" + ("completed work, %" if "completed" in name else "work inside the line, req/s") for cap, name, _, _ in reversed(data)])
     ax.set_xlabel("paired change (percent, or requests a second),\nruns A, B, C from top; every row EVEN")
-    fig.suptitle("The capacity test: four caps, five pairs a cap, three runs (omni-v7)", x=0.01, ha="left", fontsize=PT)
+    fig.suptitle("The capacity test: four caps, five pairs a cap, three runs (omni-v11)", x=0.01, ha="left", fontsize=PT)
     return fig_svg(fig)
 
 
 def r_mechanism():
     """The inputs the governor wrote beside the outputs the service showed, from the Goldilocks table (A, B, C)."""
-    rows = read_table("results/live/V7_GOLDILOCKS.md", "Measure")
+    rows = read_table("results/live/V11_GOLDILOCKS.md", "Measure")
     want_in = [("settings commands the governor wrote", "settings commands written"), ("host CPU busy", "host CPU busy (%)"),
                ("utilisation", "utilisation (used / allocatable)"), ("CPU used (cores)", "CPU used (cores)"), ("Omni's own CPU", "the governor's own CPU (cores)")]
     want_out = [("response time (ms), mean", "response time, mean"), ("response time (ms), 95th", "response time, 95th"),

@@ -57,7 +57,14 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- Omni v11 stands on main (18 October): the Kubernetes governor reads a moment with no machine in service as blind, never as an overload (found in a real run, where omni-v10 divided by the empty reading), proven in a unit test that reproduces the fault and in the toy gate before it was pushed. Every benchmark runs again on it from `scripts/reruns.txt`; until its three runs land, its row on [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) names the engine it ran on, and twenty-two of them carry omni-v7's three-run tables (`results/live/V7_*.md`). Every level on one page: [`docs/LEVELS.md`](docs/LEVELS.md). See [`docs/OMNI_V11.md`](docs/OMNI_V11.md).
+- 2026-10-19 16:28 UTC: `V11_YCSB_SHIPPED` rebuilt from runs 39150495654, 39160201436, 39169863638 (ycsb, the resource objective, native as shipped, omni-v11): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 44 EVEN, 0 disagree
+- 2026-10-19 16:28 UTC: `V11_YCSB` rebuilt from runs 39149263618, 39158992412, 39167564949 (ycsb, the resource objective, omni-v11): 4 untouched workloads; 1 GAIN, 0 LOSS, 0 power given, 43 EVEN, 0 disagree
+- 2026-10-19 16:28 UTC: `V11_SYSBENCH_SHIPPED` rebuilt from runs 39150486066, 39159004803, 39167578494 (sysbench, the resource objective, native as shipped, omni-v11): 4 untouched workloads; 0 GAIN, 0 LOSS, 5 power given, 43 EVEN, 0 disagree
+- 2026-10-19 16:28 UTC: `V11_SYSBENCH` rebuilt from runs 39149259396, 39157795408, 39166382450 (sysbench, the resource objective, omni-v11): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 46 EVEN, 2 disagree
+- 2026-10-19 16:28 UTC: `V11_REDIS_SERVICE` rebuilt from runs 39149267883, 39158996767, 39167569649 (redis, the service objective, omni-v11): 3 untouched workloads; 6 GAIN, 0 LOSS, 2 power given, 28 EVEN, 0 disagree
+- 2026-10-19 16:28 UTC: `V11_REDIS_SHIPPED` rebuilt from runs 39150490855, 39159008310, 39167582853 (redis, the resource objective, native as shipped, omni-v11): 3 untouched workloads; 0 GAIN, 0 LOSS, 1 power given, 35 EVEN, 0 disagree
+- 2026-10-19 16:28 UTC: `V11_REDIS` rebuilt from runs 39149244903, 39157782849, 39166371110 (redis, the resource objective, omni-v11): 3 untouched workloads; 4 GAIN, 0 LOSS, 0 power given, 32 EVEN, 0 disagree
+- 2026-10-19 16:28 UTC: `V11_PGBENCH` rebuilt from runs 39149254727, 39157791268, 39166378754 (pgbench, the resource objective, omni-v11): 3 workloads; 0 GAIN, 0 LOSS, 1 power given, 35 EVEN, 0 disagree
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -65,8 +72,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-19 16:28 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-18 22:05 | [Where the pod start wait goes: every serving pod's start, phase by phase](results/live/POD_START_PHASES.md) |  |
-| 2026-10-18 19:22 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-18 16:03 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V11_VS_V10.md) |  |
 <!-- front-page:tables:end -->
 
@@ -75,16 +82,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-19 15:43 | cloud-organism | cancelled | [39278661742](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39278661742) |
-| 2026-10-19 14:52 | live-engine | failure | [39270657106](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39270657106) |
-| 2026-10-19 14:46 | cloud-check google | failure | [39271895619](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39271895619) |
-| 2026-10-19 14:38 | raw-sweep | success | [39270657315](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39270657315) |
-| 2026-10-19 14:30 | cloud-check amazon | failure | [39269525043](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39269525043) |
-| 2026-10-19 14:13 | grid | success | [39231844838](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39231844838) |
-| 2026-10-19 13:57 | big-organism-detached collect | success | [39264574795](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39264574795) |
-| 2026-10-19 13:49 | six x100 line orgs 3 runs 10+90 | success | [39224034803](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224034803) |
-| 2026-10-19 13:47 | six x100 line orgs 1 runs 10+90 | success | [39224020999](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224020999) |
-| 2026-10-19 13:38 | six x100 line orgs 4 runs 10+90 | success | [39224041783](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39224041783) |
+| 2026-10-19 16:27 | raw-sweep | cancelled | [39284016517](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39284016517) |
+| 2026-10-19 16:27 | live-engine | cancelled | [39283955168](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39283955168) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
@@ -114,15 +113,21 @@ rule counted in seconds, the verdict reading a trial in the reports' words, the 
 omni-v11 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it the same day); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
-**The engine before it, omni-v7** ([`docs/OMNI_V7.md`](docs/OMNI_V7.md), 16 to 17 October), has twenty-two three-run tables of its own
-(`results/live/V7_*.md`), native against Omni-Compass on top; they stand as omni-v7's until omni-v11's land. Twenty-one read no LOSS. The
-one that did is CityLearn, in the 2023 districts (energy not served and discomfort), fixed in omni-v8 above; its 2022 robustness
-district's monthly unevenness +0.11%, beside the bill −8.6% and the electricity bought −14.7%, is power given by the key, cut in omni-v9. Among them: a service rightsized by Goldilocks, response
-time −45% to −47% mean and −60% to −62% at the 95th percentile, GAIN in all three of our runs; KEDA's HTTP add-on, −57% to −58% mean,
-−71% to −75% at the 95th percentile, alert minutes −93% to −96%, replicas −15% to −19%, GAIN in all three; KEDA on the CPU target and
-the requests, −36% to −38% mean and −52% to −54% at the 95th percentile, GAIN in all three; CruiseKube and the fixed-capacity caps EVEN;
-machines EVEN in every one; parked-worker energy +1.1% to +2.3%, power given. The Omni index over the real tests, every table on omni-v10: **+4.4% GAIN** on the
-resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+**On omni-v11, eighteen three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
+receipts by [`tools/reproduce.py`](tools/reproduce.py)). On real Kubernetes, ten pairs a run: on top of Goldilocks the 95th percentile
+−61% to −64%; on top of KEDA's HTTP add-on −72% to −74%, replicas −11% to −20%, and the pod start wait, omni-v10's one LOSS, EVEN with
+the served image pre-pulled; on top of KEDA on the CPU target and the requests −52% to −53%; fixed capacity EVEN; every one GAIN in all
+three of our runs where written so, parked-worker energy +1.1% to +2.3% power given. On the live stacks: Redis work and hit rate
++1.3% to +1.6%, Kafka consumers −0.8%, MongoDB's cache −0.9% to −1.0%, GAIN; native as shipped EVEN where the knob is at its limit on
+native. The outside simulators: power grids 67 GAIN, CityLearn 27 GAIN, robot arms 7 GAIN, drone swarms 9 GAIN, 0 LOSS. **A fault
+found beyond the counted cells**: on a mission draw outside the swarm's preregistered seeds, the omni-v11 wire let drones collide where
+native did not (its proximity reflex slowed over a second instead of at once); the fix held every drone outside the keep-out on
+every draw tried and makes the next engine version ([`results/toy_gate/V12_SWARM_REFLEX.md`](results/toy_gate/V12_SWARM_REFLEX.md),
+[`docs/LIMITATIONS.md`](docs/LIMITATIONS.md)). **On omni-v10, until their omni-v11 runs land** (`results/live/V10_*.md`): steady work,
+the demand that wanders, all four in one run (work inside the line **+47% to +79%**), faults, a queue of jobs (machines **−6% to −14%**),
+a noisy neighbour, the Google day of 2011, CruiseKube and the two-hour run. The Omni index over the real tests, each test on its newest
+table: **+4.4% GAIN** on the resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+How every one of these was graded, category by category, is in [`docs/REFEREE_GRADES.md`](docs/REFEREE_GRADES.md).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
 
