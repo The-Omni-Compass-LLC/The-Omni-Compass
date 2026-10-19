@@ -426,8 +426,10 @@ def key_lines():
           "Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as "
           "surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never "
           "to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no "
-          "harm, so **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own "
-          "wiring first, then native's setup, then the scoring) and the test is run again.", "",
+          "harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less "
+          "than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit "
+          "(`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause "
+          "is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.", "",
           "Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention "
           "for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or "
           "insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs "
