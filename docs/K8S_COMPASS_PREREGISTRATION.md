@@ -1264,6 +1264,36 @@ never reversed by it. Expected before any run: Omni-Compass on top holds every s
 on a blind reading; a decision whose read fails writes nothing, and its lease runs 300 s), so it recovers from both as fast
 as native or faster. Whatever the runs read is reported.
 
+## Amendment (2026-10-19): a paid cloud set runs to its cap and stops when its bill is read (written before any run of it)
+
+The founder's orders of 19 October: every cloud set gets a three-run reading, A, B and C on one engine, measured as finely as
+the cap allows ("the cap we can run it to ... that's all we can run"), at the least cost that still tells what Omni-Compass
+can do. Measured from the twelve Azure runs measured to the end (5 paired repetitions each), a run's bill swings about ±9%
+of native's (the median half-width of its 95% interval, 1.5% to 36% run to run), so a cut under about 9% read EVEN.
+
+- **Repetitions.** Every Azure set (the steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9) runs
+  up to 100 paired repetitions a run, the founder's cap for paid runs (12 October). At 100 the bill's interval is about ±2%:
+  a cut of about 3% reads GAIN eight times in ten.
+- **The stopping rule** (`tools/stop_rule.py`, `aks-metered.yml` input `stop_looks`, set to `10,20,40,70`). At each look, on
+  repetitions 1 to that look only, the bill's paired change is read with its 99% interval (four looks at 1% each keep the
+  rule's error under 5%). The run stops at the first look where the interval clears zero (a cut: GAIN; a rise: power given),
+  or holds zero within ±2% of native's bill (EVEN, measured to that precision). It never stops while its 95th percentile or
+  its failed requests read a LOSS at that look: a LOSS is measured to the cap. A stopped run's remaining repetitions start,
+  read the rule, and spend nothing on Azure. The table is read as every table is (95% intervals, `tools/live_reps.py`); the
+  run's summary carries every look (`STOP_RULE.txt`).
+- **Unchanged.** The arms (native, then Omni-Compass on top at the tune-down, the machines alone, native's replica cap), the
+  sets' loads and windows, the machine family and region, the control plane's tier (standard: amendment 4's way past the
+  free tier's capacity refusals; about $0.10 an hour a cluster, not in the bill), and the three-run rule.
+- **Both arms at once, on twin clusters,** would remove most of the swing (today the arms run one after the other on fresh
+  clusters, each meeting Azure at a different moment). It waits for Azure's processor allowance: one cluster (a system machine
+  and four workers of `Standard_D2s_v4`) is the whole 10-vCPU allowance of that machine family in `eastus`, so twins need it
+  raised to 20 (asked of Azure, never shrunk to fit). It is written here before any run of it and switched on only by a
+  further amendment once the allowance is raised.
+- **Counted apart.** A run under the rule carries "to the cap, stopping rule" in its title (`aks-metered.yml` run-name,
+  `scripts/dispatch_grid.py` `cloud_title`), so the conductor counts its A, B and C from zero. The omni-v11 steady run at
+  5 repetitions (run 39162654399, finished 2026-10-19 01:46 UTC) and any set started before this landed stay as they ran,
+  their own record; a set's three-run table pools only runs of one design and one engine.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
