@@ -438,6 +438,11 @@ body{padding-bottom:96px}
   <div class="secknobs" data-kind="live"><b>Controls.</b> Live: the kill switch, the faults and the filters act at once, and every tile is read again four times a second.</div>
   <p class="plain"><b>Summary.</b> The system's operational status: whether Omni-Compass is engaged, which signals are out of tolerance, and where. Every LOSS is raised as an alarm and ranked first, with its source record and the repository's root-cause document where one exists. No value on the board is hard-coded: each tile is computed at runtime from the live engine or from the repository records embedded at build time.</p>
   <div class="hb" id="hbTiles"></div>
+  <div class="panel stack" style="gap:8px" id="wallPanel">
+    <div class="row" style="justify-content:space-between;align-items:baseline;gap:10px"><h3>The monitor wall: every live monitor of this page in one view, native beside Omni-Compass; click a tile to go to it</h3><span class="note" id="wallNote">—</span></div>
+    <canvas id="wallCv" aria-label="Every monitor of this page drawn small in one wall: the same canvases, live"></canvas>
+    <p class="note">The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section 10) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, and a tile with the accent border is a monitor on screen now.</p>
+  </div>
   <div class="panel stack" style="gap:8px" id="masterPanel"><div class="row" style="justify-content:space-between;align-items:baseline;gap:10px"><h3>The master switch, wired at the top of the organism: switch, brain, organism, every muscle</h3><button class="mKill" data-mkill aria-pressed="false">Kill switch: Omni-Compass ON</button></div>
     <canvas id="masterCv" aria-label="The wiring: the master switch above the brain, the brain above the organism, the organism above every muscle, and native's own controllers under every muscle, never switched"></canvas>
     <pre class="note mono" id="mStatus" style="white-space:pre-wrap;overflow-wrap:anywhere;margin:0">—</pre>
@@ -1272,6 +1277,7 @@ body{padding-bottom:96px}
     <li><span class="k">6</span><p><b>Compass.</b> Each muscle's reading is placed in its band, p = (r − lo)/(hi − lo), and the force is F = A·tanh((k_p(p − ½) + k_d v)/A). It fails up past 0.95 and never hands back while it climbs above the center. k_d defaults to critical damping from the muscle's own τ, and every governor that runs the law sets it at three times that: the push, so a rising load is met before it reaches the wall. <code>compass_law.CompassLaw</code>.</p></li>
     <li><span class="k">7</span><p><b>Plug.</b> One wire in, one wire out: each write is clipped to the cover; the snapshot taken once at the start is what reset restores. The engine’s plug also reads each write back and stops if someone else moved the lever; the page’s model takes every write as landed. The kill switch hands every lever to native at once. <code>compass_law.Plug</code>, <code>master.py</code>.</p></li>
     <li><span class="k">8</span><p><b>The verdict.</b> In the live controller it is the trigger on a step that gives something back. The step is kept unless its trial reads LOSS or its estimated cost (the median and the mean of the log costs) passes the 2% allowance. So on noisy work an EVEN step that costs a little more can be kept; section 6d shows how often. In the realms harness the same rule is kept by the twin and the bone: nothing below native, nothing past the line’s room. A raise carries no trial (section 7). <code>verdict.Verdict</code>, <code>judge="interval"</code>.</p></li>
+    <li><span class="k">9</span><p><b>The whole organism.</b> Omni-Compass at every layer of a stack, each layer measured against its own native with the layer under it as native runs it. A gauge's ratio is oriented toward its aim so that above 1 is a GAIN at every layer alike; the layers compose by the product law, every interval carried in logarithms; two readings of the same numbers (every measured piece; the strict reading, the index's rule) and the separability assumption tested on the governors' four ways. Two ways a stack is bought, on-site bare metal (software × bare metal) and through the cloud (cloud × bare metal × software), are the same law over different sets of layers (section 11). <code>tools/whole_system.py</code>, <code>docs/engine/export_whole.py</code>.</p></li>
   </ol>
   <pre class="math">x_obs   E = 0.25q + 0.18(load − 0.85)⁺ + 0.16 power + 0.13 thermal + 0.10 net + 0.08 drift + 0.06 conflict + 0.04 stale
         U = 1 − (0.27q + 0.18 power + 0.16 thermal + 0.12 net + 0.12 drift + 0.10 conflict + 0.05 stale)
@@ -1287,6 +1293,10 @@ p = (r − lo)/(hi − lo),  v = s·v + (1 − s)(p − p₋)/dt
 F = A                         if p ≥ 0.95
 F = A·tanh((k_p(p − ½) + k_d v)/A),  k_d = max(0, 2√(k_p τ/dt) − 1)·dt
 verdict: d = mean ln c_trial − mean ln c_ref ± 1.96·√(s²_ref/n_ref + s²_trial/n_trial),  τ = ln(1 + tolerance)
+the whole organism: R[ℓ](g) = o[ℓ]/n[ℓ] (work, aim higher);  R[ℓ](g) = n[ℓ]/o[ℓ] (a wait, a resource, the bill)
+R(g) = ∏[ℓ] R[ℓ](g),  log R = Σ[ℓ] log R[ℓ],  G(g) = R(g) − 1;   SE(log R[ℓ]) = SE(d)/o,  SE(d) = (hi − lo)/(2·t₀.₉₇₅,ₙ₋₁)
+runs A, B, C pooled by inverse variance: μ = Σwᵢμᵢ/Σwᵢ, Var = 1/Σwᵢ, wᵢ = 1/σᵢ²;   Var(log R) = Σ[ℓ] Var[ℓ];   95%: exp(μ ± 1.96σ)
+the one number: mean of the gauge logs; bounds: gauges independent Var = Σσ²/k², correlated σ = Σσ/k;   on site: ℓ ∈ {software, bare metal}; through the cloud: ℓ ∈ {cloud, bare metal, software}
 α_E 3.487 · μ 3.782 · E_max 2 · σ₁ 0.38 · δ 0.705 · λ_I 0.719 · α_s 0.12 · β_s 0.10 · ω_B 1 · Q_B 2.5 · λ₀ −0.40 · λ₁ 1.55 · λ₂ 1.15
 ρ₀ 0.914 · ρ_min 0.627 · k_I 0.252 · k_E 0.297 · push_release 0.005 · U_gate 0.481 · θ pods .5 nodes .7 cpufreq .3 gpu .3 power .3 routing .5</pre>
   <h3>The stress-test model, written out (class S, drawn for this page)</h3>
@@ -4184,6 +4194,29 @@ function mechSame() {   // the status line over the twins: does Omni-Compass hol
 
 // ============================================================== the last real card run: every gauge, the run's own paired interval, the word by the gauge's aim, and the version it ran on
 
+// ============================================================== the monitor wall (section 1a): every live monitor of this page, small, in one view
+// The tiles are the sections' own canvases copied small: the same pixels, never a second drawing from other data. The page's own
+// governor leaves an off-screen monitor resting, so while the wall is in view one resting monitor is drawn each frame, in turn.
+const WALL = {at: 0, rr: 0, tiles: [], note: "", reg: [["masterCv", n => drawMaster(n)], ["ringN", n => drawRing(n, "nat")], ["ringO", n => drawRing(n, "omni")], ["cluN", () => drawCluster("nat")], ["cluO", () => drawCluster("omni")],
+  ["immCv", () => drawImm()], ["cStrip", () => drawCStrip()], ["sStrip", () => drawSStrip()], ["ruStrip", () => drawRuStrip()], ["swarm", () => drawSwarm()], ["band", () => drawBand()], ["phaseN", () => drawPhase("nat")], ["phaseO", () => drawPhase("omni")],
+  ["strip", () => drawStrip()], ["cvU", () => drawBrain()], ["cvNat6c", () => drawNat6c()], ["cvV", () => drawVerdict()], ["cvV2", () => drawVerdict2()], ["deskCv", () => drawDeskCv()], ["frameCv", () => drawFrameCv()],
+  ["c4N", () => drawCluster("nat", "c4N", C4)], ["c4O", () => drawCluster("omni", "c4O", C4)], ["orchCv", n => drawOrch(n)], ["orchRoad", n => drawOrchRoad(n)], ["selfCv", () => drawSelf()], ["whCv", n => drawWhole(n)]]};
+function drawWall(now) {
+  const cv = $("wallCv"); if (!cv) return;
+  const srcs = WALL.reg.map(([id, fn]) => ({id, fn, el: $(id)})).filter(t => t.el && t.el.offsetParent !== null && t.el.width > 8);
+  if (srcs.length) { const t = srcs[WALL.rr % srcs.length]; WALL.rr++; if (!onScreen(t.id)) { try { t.fn(now); } catch (e) { console.warn("wall", t.id, e); } } }
+  if (now - WALL.at < 250) return; WALL.at = now;
+  const cols = cv.clientWidth < 560 ? 2 : cv.clientWidth < 900 ? 3 : 4, rows = Math.max(1, Math.ceil(srcs.length/cols)), cw = Math.max(1, cv.clientWidth)/cols, th = cw*0.62 + 26;
+  const {g, w, h} = fit(cv, (rows*th)/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h); WALL.tiles = []; const tw = w/cols; let live = 0;
+  srcs.forEach((t, i) => { const x = (i % cols)*tw + 4, y = Math.floor(i/cols)*th + 4, iw = tw - 8, ih = th - 34, on = onScreen(t.id); if (on) live++;
+    g.fillStyle = alpha(css.panel, 1); g.fillRect(x, y, iw, ih + 26); try { g.drawImage(t.el, x, y, iw, ih); } catch (e) {}
+    g.strokeStyle = on ? css.accent : css.rule; g.lineWidth = on ? 1.5 : 1; g.strokeRect(x + 0.5, y + 0.5, iw - 1, ih + 25);
+    const sec = t.el.closest("section"), sn = sec && sec.querySelector("h2 .sn") ? sec.querySelector("h2 .sn").textContent : "", pn = t.el.closest(".panel"), hd = pn && pn.querySelector("h3") ? pn.querySelector("h3").textContent : (t.el.getAttribute("aria-label") || t.id);
+    g.font = `600 11px ${MONO}`; g.textAlign = "left"; g.textBaseline = "middle"; g.fillStyle = css.ink; g.fillText(cutToFit(g, `${sn ? sn + " · " : ""}${hd}`, iw - 8), x + 4, y + ih + 13, iw - 8);
+    WALL.tiles.push({x, y, w: iw, h: ih + 26, el: t.el}); });
+  const note = `${srcs.length} monitors on the wall · ${live} on screen now · the rest drawn in turn while the wall is in view`; if (note !== WALL.note) { WALL.note = note; const n = $("wallNote"); if (n) n.textContent = note; }
+}
+{ const cv = $("wallCv"); if (cv) cv.addEventListener("click", e => { const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; const t = WALL.tiles.find(t => x >= t.x && x <= t.x + t.w && y >= t.y && y <= t.y + t.h); if (t) t.el.scrollIntoView({behavior: "auto", block: "center"}); }); }
 // ============================================================== the clock
 let lastDecide = 0;
 function frame(now) {
@@ -4194,7 +4227,7 @@ function frame(now) {
   const phase = Math.min(6, Math.floor(W.frac*7));
   document.querySelectorAll("#cycle li").forEach(li => li.classList.toggle("act", W.speed <= 4 ? +li.dataset.i === phase : true));
   // every chart draws only while it is on screen (or within 300 px of it); the engine itself keeps stepping either way
-  const on2 = drawable, tw = performance.now(); GOV.drawn = 0;
+  const on2 = drawable, tw = performance.now(); GOV.drawn = 0; if (on2("wallCv")) drawWall(now);
   if (on2("ringN")) drawRing(now, "nat"); if (on2("ringO")) drawRing(now, "omni"); if (on2("cluN")) drawCluster("nat"); if (on2("cluO")) drawCluster("omni");
   if (on2("cStrip")) drawCStrip(); if (on2("sStrip")) drawSStrip(); if (on2("ruStrip")) drawRuStrip(); if (!FXW.drawn) { drawBenefit(); FXW.drawn = true; } fxCursor(tw); if (on2("cvV2")) { if (!VACC.idle) { VACC.idle = true; idle(dl => { VACC.idle = false; vAccStep(dl); }, 120); } drawVerdict2(); }   // the trials in the browser's idle time, never inside a frame
   drawOps(now); drawLab(now); if (on2("swarm")) drawSwarm(); if (on2("band")) drawBand(); if (on2("phaseN")) drawPhase("nat"); if (on2("phaseO")) drawPhase("omni");
