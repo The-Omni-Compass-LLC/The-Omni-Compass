@@ -5,8 +5,9 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # One job of the batch stream (scripts/kind_batch_queue.sh, PHASE=submit fills every name and number): BATCH_COMPLETIONS
 # pods, BATCH_PARALLELISM at a time, each hashing a fixed amount of data (real CPU work, the same in every arm), sent to
-# the queueing system under test: Kueue's LocalQueue by its label, or Volcano by its scheduler's name. Placed on the
-# measured workers, never the control plane.
+# the queueing system under test: Kueue's LocalQueue by the job's label, Volcano by its scheduler's name, or the KAI
+# scheduler by its scheduler's name and its queue's label on the job and on every pod. Placed on the measured workers,
+# never the control plane.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -18,7 +19,7 @@ spec:
   parallelism: BATCH_PARALLELISM
   backoffLimit: 20
   template:
-    metadata: {labels: {app: omni-batch-stream}}
+    metadata: {labels: {app: omni-batch-stream, POD_QUEUE_LABEL}}
     spec:
       SCHEDULER_LINE
       restartPolicy: Never
