@@ -58,7 +58,10 @@ GOVERNORS = [
      "the Gödel scheduler built from its pinned source and deployed by its own manifests, its placement as shipped, on "
      "Kubernetes 1.24.17 (it supports 1.21.4 to 1.24.6)",
      "the batch stream placed by Gödel, four ways (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 8)"),
-    ("armada", "Armada", 94, "multi-cluster batch", "its queues and fair share across clusters", "not yet written"),
+    ("armada", "Armada", 94, "multi-cluster batch",
+     "Armada v0.22.14 as its own local stack runs it (its server, scheduler, ingesters, Pulsar, Redis and PostgreSQL as "
+     "containers on the runner, one executor per member cluster), one queue, each batch of the stream a job set of its pods",
+     "the batch stream sent to a group of two clusters through Armada's queue, four ways (`docs/GROUP_PREREGISTRATION.md`, amendment 2)"),
     ("karmada", "Karmada", 95, "multi-cluster placement",
      "Karmada v1.19.0 on a cluster of its own, two member clusters joined, its placement of the stream as shipped with the "
      "operator's one propagation policy",
@@ -105,7 +108,8 @@ FOUR_WAYS = (("TOP", "compass", "Omni-Compass on top of it, against it as shippe
              ("BOTH", "compass|nativebare", "Omni-Compass on top of it, against the organism alone"))
 FOUR_SYSTEMS = (("kai", "The KAI scheduler"), ("koordinator", "Koordinator"), ("kueue", "Kueue"), ("volcano", "Volcano"),
                 ("binpack", "The scheduler's bin-packing profile"), ("kuberay", "KubeRay"), ("crane", "Crane"),
-                ("godel", "The Gödel scheduler"), ("karmada", "Karmada"), ("ocm", "Open Cluster Management"))
+                ("godel", "The Gödel scheduler"), ("karmada", "Karmada"), ("ocm", "Open Cluster Management"),
+                ("armada", "Armada"))
 
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 
