@@ -28,6 +28,11 @@ c = json.loads(sys.argv[1]); print(int(math.ceil(c["steps_in_window"] * c["step_
   if [ "$need" -gt "${DURATION:-1200}" ]; then export DURATION="$need"; fi
   export CALIBRATION
 fi
+# the cluster of every kind set; Koordinator's test alone runs the kubelet's cgroup root at /, as Koordinator's own kind
+# configuration sets it, in both arms (deploy/kind/cluster-koordinator.yaml; docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 4)
+cluster=deploy/kind/cluster-full.yaml
+[ "${BATCH_QUEUE:-}" = koordinator ] && cluster=deploy/kind/cluster-koordinator.yaml
+echo "kind cluster configuration: $cluster"
 k=${#arms[@]}; off=$(( (REP - 1) % k ))
 order=( "${arms[@]:off}" "${arms[@]:0:off}" )
 echo "repetition $REP, order: ${order[*]}"
@@ -36,11 +41,12 @@ for arm in "${order[@]}"; do
   # Ready in time) is cleared and tried again, twice, before the job gives up
   for t in 1 2 3; do
     kind delete cluster --name omni-bench >/dev/null 2>&1 || true
-    kind create cluster --name omni-bench --config deploy/kind/cluster-full.yaml --wait 120s && break
+    kind create cluster --name omni-bench --config "$cluster" --wait 120s && break
     [ "$t" = 3 ] && { echo "the kind cluster could not be created (3 tries)"; exit 1; }
     echo "kind cluster not created (try $t): trying again in 30 s"; sleep 30
   done
   echo "######## ARM $arm (repetition $REP)"
+  mkdir -p "bench-$arm-$REP" && echo "$cluster" > "bench-$arm-$REP/kind_cluster.txt"
   if ! ARM="$arm" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
     # a run that fails its own checks is recorded as invalid and left out of the table, never silently counted
     echo "ARM $arm (repetition $REP) FAILED its checks: marked invalid" | tee "bench-$arm-$REP/INVALID"; fail=1
