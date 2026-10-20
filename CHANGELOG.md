@@ -2,6 +2,21 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: the KAI scheduler under the batch stream, in a workflow of its own
+
+- **The KAI scheduler, register row 91** (the founder's list of 19 October, night): the row 63 rig with a third queueing
+  system (`BATCH_QUEUE=kai`): KAI's chart v0.18.6 from its own registry, the archive's SHA-256 pinned and refused otherwise,
+  installed by Helm with the chart's own placement setting so its operator puts every component on the control plane
+  (`deploy/kind/kai-values.yaml`), any deployment the setting does not reach placed there after install, every serving pod
+  checked; the jobs sent to its default queue by its scheduler's name and the queue's label on the job and on every pod
+  (`deploy/kind/batch-stream-job.yaml`, `POD_QUEUE_LABEL`, substituted before the job's label it contains). Preregistered as
+  amendment 1 before any run (`docs/BATCH_QUEUE_PREREGISTRATION.md`).
+- **`kind-orchestrators.yml`**: the same rig in a workflow of its own, so an orchestrator's A, B and C started together never
+  take the place of a campaign run of `benchmark-reps.yml` (the conductor reads runs back by their count in a workflow); it
+  records its letter (`LABELLED`), counts only on the rig's commits (`RIG_WORKFLOWS`) and hands its files to the raw branch
+  (`archive-run.yml`). KAI's entry stands in its own block of `scripts/reruns.txt`; `tests/test_batch_queue.py`,
+  `tests/test_release_campaign.py`.
+
 ## 2026-10-19 (night): the governors and orchestrators: Kueue and Volcano built and in the omni-v12 campaign; every other one has its place
 
 - **Kueue and Volcano, register row 63** (the founder's list of 19 October, night): the batch test's work arrives as a stream
