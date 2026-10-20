@@ -786,11 +786,12 @@ def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
     import export_scenarios as XS
+    import export_whole as XW
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
         import export_runs as XR
-        XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json")); XR.main(str(t / "r.json"))
-        h, c, s, rr = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json"))
+        XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json")); XR.main(str(t / "r.json")); XW.main(str(t / "w.json"))
+        h, c, s, rr, wh = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json", "w.json"))
     name, digest = engine()
     now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     gh = github_runs() if runs else None
@@ -802,7 +803,7 @@ def records(runs: bool) -> dict:
              "runs": gh or [], "runs_read_at": now() if gh is not None else None}
     build["board"] = board(build["runs"], camp)
     build["ledger"] = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
-    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build}
+    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh}
 
 
 def embedded(page: str, key: str):
@@ -853,7 +854,7 @@ def main() -> int:
         print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet") if embedded(page, k) != rec[k]]
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole") if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
         # the ledger, the commit and the time) is a reading with its own read time, not rebuilt by a check
@@ -863,7 +864,7 @@ def main() -> int:
             bad.append("build")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build"):
+    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     b = rec["build"]
