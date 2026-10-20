@@ -2,6 +2,49 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: the whole system, every layer composed by the product law; Gödel's rig on 1.24; the CPU power harness seeded
+
+- **The whole system** (`results/WHOLE_SYSTEM.md`, `tools/whole_system.py`; the founder's question of 20 October: the cloud is
+  the wire, Omni-Compass at both ends, what is the total). Every layer's own table, each measured with the layer under it as
+  native runs it (the card, the cluster with its add-ons and governors, the services on it, the cloud's bill), composed by the
+  product law Rℓ(g) = oℓ/nℓ or nℓ/oℓ toward the gauge's aim, R(g) = ∏ℓ Rℓ(g), with every interval carried through (the delta
+  method on each run's paired interval, the runs pooled by inverse variance, the layers added in the log), read two ways (by
+  the index's rule, an EVEN or one-run gauge counting as exactly 1; and with every interval carried), and the separability the
+  product assumes tested on the governors' four ways (Omni-Compass on the organism alone against on top of the orchestrator, in
+  the same repetitions). The composition is class S over class P and L tables and across engines, said so on the page; the
+  stacked run is named as the measurement that would replace it. The modelled organisms and the omni-v3 organisms with the
+  cluster inside stand beside the total, never inside it.
+- **Gödel's rig** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 10): on Kubernetes 1.24 the control plane carries two
+  taints and the rig's metrics-server pod tolerated one, so it stayed Pending and every arm of Gödel's A, B and C was marked
+  invalid before any stream ran; the pod now tolerates both (`scripts/kind_bench.sh`), the same on every rig, and Gödel's three
+  runs start again. KubeRay A lost a runner in one repetition and Karmada A lost GitHub's checkout in one; both carry nine.
+- **Crane, KubeRay and Karmada, the four ways, three runs each** (`results/live/V12_CRANE_4W_*.md`, `V12_KUBERAY_4W_*.md`,
+  `V12_KARMADA_4W_*.md`; register rows 90, 92 and 95; KubeRay A and Karmada A carry nine repetitions, amendment 10). Omni-Compass
+  on top of Crane: machines and energy EVEN, the 95th percentile EVEN, and one LOSS, the total pod start wait +54% to +104%, the
+  per-pod wait EVEN and the pods started +50% to +67% (power given): the sum of a wait over more pods, read by the key as it
+  stands and left for the metric-aims audit to rule on in writing before it is ever re-read. On top of KubeRay: every judged row
+  EVEN; KubeRay as shipped against the organism alone: 8 LOSS (the Ray cluster's own cost); Omni-Compass on the organism alone
+  on KubeRay's rig: machines −14% to −19% and the mean response −7% to −10% (GAIN) with the queue finished +0.6% to +0.8% and
+  the 99th percentile +4% to +13% (LOSS), the engine's to fix in the next version (the give-back trial on a batch queue counts
+  the queue's finish and the tail), through the toy gate. On top of Karmada: every judged row EVEN; Karmada as shipped against
+  the group alone: 6 LOSS (its own cost); Omni-Compass on the group alone against Karmada as shipped: 6 GAIN.
+- **The CPU power harness** (`tools/run_cpu_power.py`): the modelled service's spread of service times drew from Python's
+  unseeded global generator; verify's run of its test read "0 notches allowed" once and passed when run again. Every worker's
+  spread is now seeded from the arm's seed, so no draw in the harness is unseeded and the same requests meet the same service
+  in both arms and in every run.
+
+## 2026-10-20: Open Cluster Management on the group of clusters, preregistered (amendment 1), four ways
+
+- **OCM on the group rig** (`docs/GROUP_PREREGISTRATION.md`, amendment 1; register row 96; the founder's list): its hub
+  installed by its own CLI on the orchestrator's cluster (`clusteradm` v1.4.0 pinned by SHA-256, bundle 1.4.0), both members
+  registered by `clusteradm join` and accepted, the default cluster set bound; for every job of the stream a Placement of its
+  own with OCM's default prioritizers (Steady and Balance), and once OCM has decided, the job as a ManifestWork in the chosen
+  member's namespace, which OCM's work agent applies there (`scripts/kind_group_orch.sh`, `ORCH=ocm`). Every ManifestWork
+  and every PlacementDecision are the arm's record of what OCM did; the hub's images and the members' agents' are recorded
+  with their digests.
+- The members' clean-cluster check allows the orchestrator's agent namespaces (`GROUP_AGENT_NS`, several, in
+  `scripts/kind_bench.sh`); `kind-group.yml` takes `orch=ocm`; `tests/test_group_rig.py`; the governors page.
+
 ## 2026-10-20: what the three trials found in the rigs, fixed before the counted runs
 
 - **Crane** (`docs/CRANE_PREREGISTRATION.md`, amendment 1): Crane's override values name a kube-state-metrics image on

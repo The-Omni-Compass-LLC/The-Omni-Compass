@@ -93,6 +93,11 @@ class GodelRig(unittest.TestCase):
         self.assertEqual(dep["containers"][0]["image"], "registry.k8s.io/metrics-server/metrics-server:v0.5.2")
         self.assertEqual(dep["containers"][0]["args"], ["--cert-dir=/tmp", "--kubelet-insecure-tls"])
         self.assertEqual(dep["nodeSelector"], {"node-role.kubernetes.io/control-plane": ""})
+        # amendment 10: kubeadm 1.24 taints the control plane twice (control-plane and master); a pod tolerating only the first
+        # stays Pending and the rollout never finishes (runs 39438395275, 39438412522, 39438430198: every arm invalid)
+        self.assertEqual({t["key"] for t in dep["tolerations"]},
+                         {"node-role.kubernetes.io/control-plane", "node-role.kubernetes.io/master"})
+        self.assertTrue(all(t["operator"] == "Exists" and t["effect"] == "NoSchedule" for t in dep["tolerations"]))
         self.assertEqual(len(docs), 2)                                          # every other document untouched
 
 
