@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Armada's event ingester on the group rig (scripts/kind_group_orch.sh, ORCH=armada): the settings Armada's own local stack
+# gives it at v0.22.14 (_local/eventingester/config.yaml), every service on the runner's own network, tracing off.
+redis:
+  addrs:
+    - localhost:6379
+  db: 1
+  poolSize: 1000
+pulsar:
+  URL: "pulsar://localhost:6650"
+  restURL: "http://localhost:8090"
+  jobsetEventsTopic: "events"
+subscriptionName: "events-ingester"
+metricsPort: 9004
+observability:
+  enabled: false
+metrics:
+  redis:
+    enabled: true
+    collectionInterval: 30s
+    topN: 100
+    scanBatchSize: 1000
+    pipelineBatchSize: 500
+    interBatchDelay: 0ms
+    memoryUsageSamples: 5
+    leader:
+      mode: "standalone"
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

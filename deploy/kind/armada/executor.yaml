@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Armada's executor, one per member cluster, on the group rig (scripts/kind_group_orch.sh, ORCH=armada): the settings
+# Armada's own local stack gives it at v0.22.14 (_local/executor/config.yaml), the scheduler on the runner's own network
+# and its tracing exporter off. The cluster's name, its ports and its kubeconfig come from the script, one set per member
+# (ARMADA_APPLICATION_CLUSTERID, ARMADA_HTTPPORT, ARMADA_METRIC_PORT, KUBECONFIG).
+httpPort: 8082
+executorApiConnection:
+  armadaUrl: "localhost:50052"
+  forceNoTls: true
+observability:
+  enabled: false
+metric:
+  port: 9002
+kubernetes:
+  toleratedTaints:
+    - node-tests
+  trackedNodeLabels:
+    - armadaproject.io/node-pool
+application:
+  clusterId: "member"
+  pool: "default"
+  errorCategories:
+    enabled: true
+    defaultCategory: uncategorized
+    categories:
+      - name: oom
+        action: Delete
+        rules:
+          - onConditions: ["OOMKilled"]
+      - name: user_error
+        action: Delete
+        rules:
+          - onExitCodes:
+              operator: In
+              values: [1, 2, 126, 127]
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
