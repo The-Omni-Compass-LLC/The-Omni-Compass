@@ -625,7 +625,9 @@ def main(argv=None):
     L.append("- **Every cluster and service table on omni-v12**: the campaign (`scripts/reruns.txt`) reruns every benchmark; each row above is replaced by "
              "its omni-v12 table as it lands, and this page is rebuilt (`python3 tools/whole_system.py`).")
     L.append("- **The stacked run**: Omni-Compass at every layer at once against native at every layer, the one measurement that makes the total class L "
-             "and P instead of a composition. Its place is written here before its result exists.")
+             "and P instead of a composition. Preregistered before any run in `docs/WHOLE_SYSTEM_PREREGISTRATION.md` (three stacks: the cluster and "
+             "its services on GitHub's machines; the cloud at the tune-down on Azure; the card beside the cluster on Lambda); its place is written "
+             "here before its result exists.")
     L.append("")
     L.append("Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were "
              "written down in our own repository before the runs; nothing was filed with any outside body.")

@@ -100,6 +100,23 @@ class GodelRig(unittest.TestCase):
         self.assertTrue(all(t["operator"] == "Exists" and t["effect"] == "NoSchedule" for t in dep["tolerations"]))
         self.assertEqual(len(docs), 2)                                          # every other document untouched
 
+    def test_every_pod_pinned_to_the_control_plane_tolerates_both_taints_of_1_24(self):
+        # amendment 10, second finding (run 39479725812): the load generator stayed Pending behind the master taint
+        import glob
+        for f in sorted(glob.glob(str(ROOT / "deploy" / "kind" / "*.yaml"))) + [str(ROOT / "scripts" / "kind_batch_queue.sh"), str(ROOT / "scripts" / "kind_bench.sh")]:
+            text = Path(f).read_text()
+            for pat in ("{key: node-role.kubernetes.io/control-plane, operator: Exists",       # a toleration in a manifest or chart values
+                        '"key": "node-role.kubernetes.io/control-plane", "operator": "Exists"',  # the bench's patch (Python)
+                        '"key":"node-role.kubernetes.io/control-plane","operator":"Exists"'):   # the batch rig's patch (JSON)
+                at = 0
+                while (i := text.find(pat, at)) >= 0:
+                    self.assertIn("node-role.kubernetes.io/master", text[i:i + 400],
+                                  f"{f}: a control-plane toleration without the master taint beside it")
+                    at = i + len(pat)
+        for f in ("loadgen.yaml", "loadgen-open.yaml", "noisy.yaml"):
+            text = (ROOT / "deploy" / "kind" / f).read_text()
+            self.assertIn("node-role.kubernetes.io/master, operator: Exists, effect: NoSchedule", text, f)
+
 
 if __name__ == "__main__":
     unittest.main()
