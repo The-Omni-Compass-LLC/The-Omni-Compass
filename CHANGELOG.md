@@ -2,6 +2,16 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: Koordinator under the batch stream
+
+- **Koordinator, register row 89** (the founder's "coordinator with a K"): the row 63 rig with a fourth system
+  (`BATCH_QUEUE=koordinator`): its chart 1.8.0 from its charts repository's release, the archive's SHA-256 pinned and refused
+  otherwise, installed by Helm as its guide installs it, colocation on as shipped, with the operator's two settings for one
+  control plane (`deploy/kind/koordinator-values.yaml`: its images from its GitHub registry; manager, scheduler and
+  descheduler one replica each on the control plane); koordlet on every node as shipped; the jobs best effort on batch
+  resources by the operator's colocation profile (`deploy/kind/koordinator-colocation.yaml`), its webhook proven to mutate a
+  labelled pod before the window. Preregistered as amendment 2 before any run; A, B and C in `kind-orchestrators.yml`.
+
 ## 2026-10-20: the KAI scheduler under the batch stream, in a workflow of its own
 
 - **The KAI scheduler, register row 91** (the founder's list of 19 October, night): the row 63 rig with a third queueing

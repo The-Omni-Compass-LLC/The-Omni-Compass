@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The operator's colocation profile, as Koordinator's own colocation guide writes it (scripts/kind_batch_queue.sh,
+# BATCH_QUEUE=koordinator): a pod labelled for colocation, in a namespace labelled for it, is made best effort (BE) at the
+# batch priority and handed to koord-scheduler, its processor and memory asked of the batch resources koord-manager
+# computes on every node from what the latency-sensitive pods leave unused. The service (php-apache) carries no such label
+# and is not touched by it.
+apiVersion: config.koordinator.sh/v1alpha1
+kind: ClusterColocationProfile
+metadata:
+  name: omni-batch-stream
+spec:
+  namespaceSelector:
+    matchLabels: {koordinator.sh/enable-colocation: "true"}
+  selector:
+    matchLabels: {koordinator.sh/enable-colocation: "true"}
+  qosClass: BE
+  priorityClassName: koord-batch
+  koordinatorPriority: 1000
+  schedulerName: koord-scheduler
+  labels: {koordinator.sh/mutated: "true"}
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
