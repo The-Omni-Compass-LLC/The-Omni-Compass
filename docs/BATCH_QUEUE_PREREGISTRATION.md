@@ -98,6 +98,30 @@ machines or less energy, with no LOSS anywhere?
 - The other orchestrators of the founder's list take this rig one at a time, each with its own page before its runs
   (register rows 88 to 98).
 
+## Amendment 1: the KAI scheduler (written before its first run, 20 October 2026)
+
+The KAI scheduler (`NVIDIA/KAI-Scheduler`, NVIDIA, from Run:ai; Apache-2.0; register row 91) joins the rig as a third
+queueing system (`batch_queue=kai`). It places pods by its own queues: a pod that names it (`schedulerName:
+kai-scheduler`) and carries a queue's label (`kai.scheduler/queue`) is grouped with its job's other pods and placed by
+KAI's scheduler under the queue's quota, limit and over-quota weight.
+
+- **Native** is KAI's chart as published, installed by Helm, with the two default queues its chart makes on install
+  (`default-parent-queue` and `default-queue`: quota 0, no limit, over-quota weight 1). The jobs go to `default-queue`.
+- **Frozen**: the chart `oci://ghcr.io/kai-scheduler/kai-scheduler/kai-scheduler` at v0.18.6 (released 15 October 2026),
+  its archive's SHA-256 `dff53248c4a044249a1f62ca8d35bd8dfc02719b99e302b35c69f946f4c5b7ff` pinned and refused otherwise.
+- **Placement**: the chart's own setting places KAI's components (its operator applies it to the scheduler, the binder,
+  the pod grouper, the queue and pod-group controllers and the admission webhook): every one on the control plane
+  (`deploy/kind/kai-values.yaml`); any deployment the setting does not reach is placed there after install; the run checks
+  every serving pod of KAI is on the control plane.
+- **What it is not**: KAI's GPU sharing and topology placement need cards; this test is its queues and gang placement on
+  CPU work. The cards wait for the GPU kit on Lambda.
+
+- **Its runs**: in a workflow of its own (`kind-orchestrators.yml`, the same rig), whose A, B and C are started together,
+  so they never take the place of a campaign run of `benchmark-reps.yml` (`scripts/reruns.txt` reads runs back by their
+  count in a workflow).
+
+Everything else is as written above: the stream, the window, the gauges and how they are read.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
