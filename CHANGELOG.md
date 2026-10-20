@@ -2,6 +2,18 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: Open Cluster Management on the group of clusters, preregistered (amendment 1), four ways
+
+- **OCM on the group rig** (`docs/GROUP_PREREGISTRATION.md`, amendment 1; register row 96; the founder's list): its hub
+  installed by its own CLI on the orchestrator's cluster (`clusteradm` v1.4.0 pinned by SHA-256, bundle 1.4.0), both members
+  registered by `clusteradm join` and accepted, the default cluster set bound; for every job of the stream a Placement of its
+  own with OCM's default prioritizers (Steady and Balance), and once OCM has decided, the job as a ManifestWork in the chosen
+  member's namespace, which OCM's work agent applies there (`scripts/kind_group_orch.sh`, `ORCH=ocm`). Every ManifestWork
+  and every PlacementDecision are the arm's record of what OCM did; the hub's images and the members' agents' are recorded
+  with their digests.
+- The members' clean-cluster check allows the orchestrator's agent namespaces (`GROUP_AGENT_NS`, several, in
+  `scripts/kind_bench.sh`); `kind-group.yml` takes `orch=ocm`; `tests/test_group_rig.py`; the governors page.
+
 ## 2026-10-20: what the three trials found in the rigs, fixed before the counted runs
 
 - **Crane** (`docs/CRANE_PREREGISTRATION.md`, amendment 1): Crane's override values name a kube-state-metrics image on

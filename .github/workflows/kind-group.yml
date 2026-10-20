@@ -9,14 +9,15 @@ name: kind-group
 # stream sent to the group, run the four ways of 20 October in every repetition (the group alone, its orchestrator as
 # shipped on a cluster of its own beside the members, Omni-Compass on top of each member of the group alone, and on top of
 # each member under the orchestrator), back to back on the same runner on fresh clusters, in an order rotated by repetition
-# (scripts/kind_group.sh), the governors on their own core in every arm. The members' records are merged into each arm's
-# files (tools/merge_group.py); the run's files are saved on the branch raw by archive-run.yml; the three-run tables are
-# built by tools/confirm_abc.py.
+# (scripts/kind_group.sh; every member runs the batch rig's bench, scripts/kind_bench.sh, on the amended kind rig with the
+# served image pre-pulled, so the conductor counts this workflow's runs by rig), the governors on their own core in every
+# arm. The members' records are merged into each arm's files (tools/merge_group.py); the run's files are saved on the branch
+# raw by archive-run.yml; the three-run tables are built by tools/confirm_abc.py.
 run-name: "group: ${{ inputs.orch }} ${{ inputs.label }} (${{ inputs.arms }})"
 on:
   workflow_dispatch:
     inputs:
-      orch: {description: "The group's orchestrator: karmada", default: "karmada"}
+      orch: {description: "The group's orchestrator: karmada or ocm", default: "karmada"}
       duration_s: {description: "Measured seconds per run", default: "1500"}
       reps: {description: "Repetitions, as a JSON list", default: "[1,2,3,4,5,6,7,8,9,10]"}
       arms: {description: "Arms, in rotation order (native: the orchestrator as shipped; compass: Omni-Compass on top of each member under it; nativebare and compassbare: the group alone without and with Omni-Compass)", default: "nativebare native compassbare compass"}
