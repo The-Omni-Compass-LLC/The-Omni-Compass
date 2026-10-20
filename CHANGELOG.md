@@ -2,6 +2,15 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: the governors and orchestrators on one page
+
+- **`results/live/GOVERNORS.md`** (`tools/governors_page.py`, the founder's word of 20 October: "I need to see what the
+  results are of those governors"): every governor and orchestrator he named, what it governs, what native is under it,
+  where its test stands, and once its three runs are in, its readings by the one key, every row counted, losses included,
+  each line read only from its own three-run table (`results/live/V12_<NAME>.json`), never a number before. The runs started
+  are listed in `results/live/governors_runs.json`; `verify.py` fails a push where the page is not what the tables and runs
+  give; `tests/test_governors_page.py`.
+
 ## 2026-10-20: Koordinator under the batch stream
 
 - **Koordinator, register row 89** (the founder's "coordinator with a K"): the row 63 rig with a fourth system

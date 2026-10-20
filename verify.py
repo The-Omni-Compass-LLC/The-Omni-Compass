@@ -338,6 +338,10 @@ def main():
     check("the standing block of the state of play (where things stand: the engine, the muscles, the grid, the index, every benchmark's number) "
           "matches the result files it is read from (tools/summary.py --check; every push realigns)", r.returncode == 0,
           (r.stdout + r.stderr)[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "governors_page.py"), "--check"], capture_output=True, text=True)
+    check("the governors and orchestrators the founder named stand on one page, every line read from its own three-run table or "
+          "saying where its runs stand (results/live/GOVERNORS.md, tools/governors_page.py --check)", r.returncode == 0,
+          (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "land_engine.py"), "--check"], capture_output=True, text=True)
     check("every place that names the engine that stands names the newest one (tools/land_engine.py --check: the version list, the "
           "conductor's campaign, the grid's manifest and workflows, the package, the front page, CLAUDE.md, the manual, the live "
