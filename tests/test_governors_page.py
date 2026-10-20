@@ -29,7 +29,8 @@ class GovernorsPage(unittest.TestCase):
         self.assertIn("www.omni-compass.com", text.rstrip().splitlines()[-1])  # and at the end
 
     def test_a_line_reads_only_from_its_table(self):
-        table = {"runs": ["1", "2", "3"], "engines": ["omni-v12"] * 3, "rows": {
+        table = {"runs": [{"tag": x, "run": i, "engine": "omni-v12 (digest d38b58fbe28939b8, 47 files)", "paired_repetitions": 10}
+                          for x, i in zip("ABC", ("1", "2", "3"))], "rows": {
             "queue: job wait, submitted to its first pod running, mean (s)": {"reading": "GAIN in all three of our runs"},
             "queue: jobs unfinished at the window's end": {"reading": "LOSS in all three of our runs"},
             "machines in service, mean": {"reading": "power given in all three of our runs"},
@@ -45,6 +46,8 @@ class GovernorsPage(unittest.TestCase):
         koord = next(l for l in text.splitlines() if l.startswith("| Koordinator"))
         self.assertIn("runs not yet finished", koord)
         self.assertIn("LOSS in all three of our runs", text)                  # every row counted and shown, losses included
+        self.assertIn("A [1](", text); self.assertIn("(10 pairs)", text)      # the runs as tools/confirm_abc.py records them
+        self.assertIn("omni-v12 (digest d38b58fbe28939b8, 47 files)", text)
 
     def test_the_scheduler_reads_each_setting_from_its_own_table(self):
         table = {"runs": ["1", "2", "3"], "engines": ["omni-v12"] * 3,
@@ -59,6 +62,28 @@ class GovernorsPage(unittest.TestCase):
         self.assertIn("bin-packing profile: 0 GAIN, 1 LOSS", line)
         self.assertIn("(V12_BINPACK.md)", line)
         self.assertIn("- **Readings (as shipped)**: none yet", text)
+
+    def test_the_four_ways_read_each_comparison_from_its_own_table(self):
+        table = {"runs": ["1", "2", "3"], "engines": ["omni-v12"] * 3,
+                 "rows": {"queue: job wait, submitted to its first pod running, mean (s)": {"reading": "GAIN in all three of our runs"}}}
+        with tempfile.TemporaryDirectory() as t:
+            live = Path(t) / "results" / "live"; live.mkdir(parents=True)
+            (live / "V12_KAI_4W_ORCH.json").write_text(json.dumps(table))
+            with mock.patch.object(G, "ROOT", Path(t)):
+                text = G.render(runs={"kai4": {"A": "4", "B": "5", "C": "6"}})
+        section = text.split("## The four ways")[1].split("\n## ")[0]
+        kai = next(l for l in section.splitlines() if l.startswith("| The KAI scheduler"))
+        cells = [c.strip() for c in kai.strip().strip("|").split("|")]
+        self.assertIn("[A](", cells[1])
+        self.assertEqual(cells[2], "runs not yet finished")              # Omni-Compass on top of it: no table yet
+        self.assertTrue(cells[3].startswith("1 GAIN, 0 LOSS"))           # it as shipped against the organism alone
+        self.assertIn("(V12_KAI_4W_ORCH.md)", cells[3])
+        volcano = next(l for l in section.splitlines() if l.startswith("| Volcano"))
+        self.assertIn("not yet started", volcano)
+        with mock.patch.object(G, "ROOT", Path(tempfile.mkdtemp())):
+            text = G.render(runs={"kueue4": {"A": "7"}})
+        kueue = next(l for l in text.splitlines() if l.startswith("| Kueue"))     # its line in the governors' table
+        self.assertIn("running four ways (below)", kueue)
 
     def test_no_number_before_the_runs(self):
         text = G.render(runs={})
