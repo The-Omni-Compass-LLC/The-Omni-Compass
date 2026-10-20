@@ -2,7 +2,8 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-What the measurements of the engine that stands (omni-v11) can and cannot support, written the way a referee reads a
+What the newest three-run tables (omni-v11's; omni-v12, the engine that stands since 19 October, runs every benchmark again)
+can and cannot support, written the way a referee reads a
 study: who ran it, what could bias a comparison, what a gauge really measures, how often the reading rule could be fooled,
 and how far a result travels. Each limitation names what would remove it. Run and scored by The Omni-Compass LLC's own
 code. No outside party has reviewed or approved these results.
@@ -57,8 +58,9 @@ code. No outside party has reviewed or approved these results.
 - **The fix**: the reflex at once, reaching out with the square of the speed, as the stopping distance does. In our own
   flights it held every drone at or outside the full keep-out (the least, 0.304 m), with no near miss and no collision, on all
   ten cells and draws tried, the four preregistered cells and six untouched draws. It kept 49% to 92% of the energy cut.
-- **What comes with it.** The fix is the next engine version's (`docs/CHANGE_CONTROL.md`) and is shown to the founder before
-  it is pushed. The same version's preregistration adds a judged collision row and draws beyond the preregistered seeds.
+- **What came with it.** The fix landed in omni-v12 (`docs/OMNI_V12.md`), and the same version's preregistration amendment
+  (`docs/SWARM_PREREGISTRATION.md`, amendment 2, written before its runs) makes a collision with Omni-Compass on top a judged
+  LOSS row, voids a cell only when native itself collides, and adds three mission draws no wire was ever run on.
 
 ## 4. Statistical conclusion validity: how often could the reading rule be fooled?
 
@@ -75,8 +77,8 @@ code. No outside party has reviewed or approved these results.
   (CityLearn's own drift; the paired change exactly zero), and the drone swarm's closest approach, tracking error and
   cruise override (PyBullet's reproduction; the first is the margin of section 3, the other two are shown, not judged).
 - **A fixed set of seeds is a sample, not a guarantee.** Every preregistered test runs on seeds written before its runs, so a
-  reading holds for those draws. The swarm's collisions (section 3) appeared only on a draw outside them. The next version's
-  preregistrations add draws beyond the fixed seeds wherever a test is cheap enough to run them.
+  reading holds for those draws. The swarm's collisions (section 3) appeared only on a draw outside them. The swarm's omni-v12
+  runs add three draws never flown (amendment 2); the other tests still run on their fixed seeds alone.
 
 ## 5. External validity: how far does a result travel?
 
@@ -89,7 +91,7 @@ code. No outside party has reviewed or approved these results.
 
 ## 6. The engine changed often
 
-Seven versions in seven days (omni-v5 to omni-v11, `docs/CHANGE_CONTROL.md`), each a fault found in a real run and fixed.
+Eight versions in nine days (omni-v5 to omni-v12, `docs/CHANGE_CONTROL.md`), each a fault found in a real run and fixed.
 No table mixes engines, and each benchmark runs again on every version; the cost is that each version's three-run tables
 take a day or more to land, so the newest tables of some benchmarks are an older engine's until they do.
 

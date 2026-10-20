@@ -2,6 +2,54 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19 (late night): Omni v12 stands (a refused raise is held; the swarm's reflex acts at once); every fix lands as the next version
+
+- **omni-v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`): omni-v11 with two faults fixed, both
+  found on the omni-v11 runs of 19 October. (1) The Kubernetes governor's conveyance (`omni_controller/muscles.py`): a CPU-limit
+  raise the cluster's admission refuses is not written again until the pod's limit changes, the raise shrinks, or a wait passes
+  (5 minutes, doubled at each refusal up to an hour); an accepted raise clears the hold, and the audit records each hold and its
+  wait (`held_s`). In the omni-v11 capacity test admission refused every raise (`exceeded quota: omni-cap`) and the governor
+  wrote it again at every fast check, 970 to 1,000 refused writes an hour (`results/STEERING.md`); `tests/test_refused_raise.py`.
+  (2) The swarm's wire (`tools/run_swarm.py`, outside the digest's scope, declared with the version): the proximity reflex hands
+  back the planner's cruise in the tick it is triggered, its reach growing with the square of the speed (0.5 m at the planner's
+  cruise, as before). The omni-v11 reflex let the override fall 0.01 a tick, and on a mission draw outside the counted cells
+  two drones came within 0.083 m (`results/toy_gate/V12_SWARM_REFLEX.md`).
+- **The mechanism identity recorded again** (`results/MECHANISM_IDENTITY.json`, `tools/mechanism_identity.py`): its actuator
+  component M_act holds the governor's muscles, so both configurations' mechanism ids move with omni-v12 (symmetric_verified
+  `3161bef0a669625b`, printed_eight_line `d3b21fb8f9a25c9d`); every other component is omni-v11's. The deviations register lists
+  the swarm's amendment 2 (`docs/DEVIATIONS.md`, 57 amendments), and the bill of materials names the package 0.12.0.
+- **The toy gate** (`results/toy_gate/V12_VS_V11.md`, seeds 1 to 8: the cluster toys at 60 s, at 15 s and with the blink, the
+  three convey toys, the verdict toy at 20 and 200 pieces of work a decision): identical to omni-v11 on every gauge of every toy
+  but one, the convey toy whose every raise is refused, where omni-v12 writes 49.75 commands a day against 1,985.5 (−97.5%,
+  GAIN). No reading against omni-v11 is a LOSS. The swarm's fix held every drone at or outside the keep-out on all ten cells
+  and draws tried and kept 49% to 92% of the energy cut (class S, our own runs of an outside simulator).
+- **Studied and left out: the verdict's upper end** (branch `v12-verdict-study`). It answers a real fault, but on the toy
+  cluster set from a real run's regime no give-back trial could start (about 80 requests a decision against about 4,000
+  needed a phase), so omni-v11's machine-hour and energy cuts would be gone, and on the data stores every knob would stay
+  native. Refused as written; the row stays on the next version's list (`docs/CHANGE_CONTROL.md`) until a trial design that
+  reads a 2% step in a trial's time is shown in the toy gate.
+- **Every fix lands as the next version, told, not asked** (the founder's order, the night of 19 October: "Of course I want you
+  to land version 12 ... every time you do that ... it becomes a new version"): CLAUDE.md and `docs/CHANGE_CONTROL.md`, rule 6.
+- **The swarm's preregistration, amendment 2** (`docs/SWARM_PREREGISTRATION.md`, written before omni-v12's runs): a collision
+  with Omni-Compass on top where native has none is a judged LOSS row (until now it voided the cell), a cell is void only when
+  native itself collides, and three mission draws no wire was ever run on (`short-314`, `mixed-315`, `long-316`, the seed plus
+  303) are counted beside the first three cells. `tools/run_swarm.py`, `tools/swarm_abc.py` (the earlier tables rebuild as
+  they were scored), `.github/workflows/swarm.yml`, `tests/test_swarm_abc.py`.
+- **Everything runs again on it**: the conductor's campaign, the reruns, the grid (`results/grid_v12/`) and the Azure sets
+  from A, from 00:30 UTC on 20 October (the conductor starts nothing before it); the omni-v11 runs already started run to
+  their end as omni-v11's record (nothing is cancelled). The package is 0.12.0.
+- **A fault in the coverage tool, found and fixed.** `tools/engine_coverage.py` started each file `tools/function_tests.py`
+  runs as `coverage --append`, which coverage refuses ("no such option"), so those files ran untraced and a measurement
+  counted the unittest suite alone (51% on the omni-v12 tree). It now starts them with `coverage run --append` and stops if
+  coverage refuses a command (`tests/test_engine_coverage.py`). Measured again on the omni-v12 tree: 82% of the engine's
+  6,531 statements run under the tests (`docs/ENGINE_COVERAGE.md`; 81% of 6,519 recorded on omni-v11).
+- **Pages brought up to it**: README, CLAUDE.md, the state of play, the receipts, the referee summary and grades, the
+  limitations, the safety case, the change control record, the Omni index, both manuals (rebuilt), the v11 page, and the live
+  engine's page and appraisal: the page's words name omni-v12, its table of the real Kubernetes runs is read from the omni-v11
+  tables that replaced four of the five it quoted (no LOSS: the KEDA pod start wait reads EVEN with the image pulled first),
+  its banner shows only when a newer engine stands than its words were written for, and its controller trace, recorded again
+  on the omni-v12 tree, is identical to the one on the page.
+
 ## 2026-10-19 (night): the control panel, the alert rules, the control-quality figures; the v12 candidate narrowed to two fixes
 
 - **The control panel** (`tools/omni_control.py`, `tests/test_omni_control.py`; the Operator's Manual, section 22.5;
@@ -21,7 +69,7 @@
   9% of decisions and came back within a decision (61 to 62 s); in the capacity test and the two robustness tests the load
   holds the service near its line in both arms (54% to 79% at the line), and their alert minutes, the comparison with native,
   read GAIN. The capacity test's 940 to 967 errors an hour are the refused raises fixed in the v12 candidate.
-- **The v12 candidate** (branch `v12-candidate`, its page OMNI_V12_CANDIDATE.md on that branch): two fixes, the refused raise held until
+- **The v12 candidate** (branch `v12-candidate`, landed the same night as omni-v12, `docs/OMNI_V12.md`): two fixes, the refused raise held until
   something changes (the toy: 97.5% fewer writes, every other gauge identical) and the swarm's reflex at once with a reach that
   grows with the square of the speed. The stricter verdict (a step kept only when its whole 95% interval is inside the
   allowance) was taken out of it and kept on the branch `v12-verdict-study`: in the toy cluster set from a real run's regime

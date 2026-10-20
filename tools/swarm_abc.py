@@ -11,8 +11,9 @@ from one GitHub machine to the next; amendment 1 of the preregistration, made af
 so): a gauge reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the gauge is
 for, never by its sign; energy is a resource spent, so a rise reads power given), EVEN when the change is under one part in a
 million, and "the runs differ" when they do not reproduce. A cell whose paired physics trial left the cruise native is listed
-as "nothing for Omni to move"; a cell with a collision in either arm is void and listed as such. Every row is reported, LOSS
-included.
+as "nothing for Omni to move"; a cell with a collision in either arm is void and listed as such. From omni-v12's runs on
+(amendment 2, written before them) a cell is void only when native itself collides, and a collision with Omni-Compass on top
+is a judged row, any increase a LOSS. Every row is reported, LOSS included.
 Usage: python tools/swarm_abc.py A_DIR B_DIR C_DIR --out results/live/V3_SWARM.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding swarm-<cell>/swarm-<cell>.json"""
 from __future__ import annotations
@@ -26,11 +27,11 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
-from tools.run_swarm import GAUGES, TRIAL_OVERRIDE
+from tools.run_swarm import GAUGES, TRIAL_OVERRIDE, with_collisions
 
 SAME_REL = 1e-6
 REPRO_REL = 1e-3        # PyBullet reproduces to about one part in a thousand across GitHub's machines, not to the bit (amendment 1)
-COUNTS = {"late_share", "reserve_breaches", "near_miss_ticks"}      # differences, not ratios
+COUNTS = {"late_share", "reserve_breaches", "near_miss_ticks", "collisions"}      # differences, not ratios
 
 
 def load(d):
@@ -124,6 +125,13 @@ def main(argv=None):
     L[0] = L[0].replace("(Omni v3)", f"({label})")
     if len({r for r, _ in runs}) < 3:
         off.append("A, B and C must be three separate runs")
+    # amendment 2 holds from omni-v12's runs on; the earlier tables are rebuilt as they were scored
+    amend2 = all(s.startswith("omni-v") and s[6:].isdigit() and int(s[6:]) >= 12 for s in seen)
+    gauges = with_collisions(GAUGES) if amend2 else GAUGES
+    if amend2:
+        L[2] = L[2].replace("a cell with a collision in either arm is void.", "a cell where native itself collides is void, and a collision "
+                            "with Omni-Compass on top is a judged row, any increase a **LOSS** (the preregistration's amendment 2, written "
+                            "before omni-v12's runs).")
     if off:
         L[2:2] = [f"**Not three runs on one frozen engine: {'; '.join(off)}.**", ""]
     cells = sorted(set().union(*(set(r) for _, r in runs)), key=lambda c: (c != "tuning", c))
@@ -133,7 +141,10 @@ def main(argv=None):
         recs = [r.get(c) for _, r in runs]
         if any(x is None for x in recs):
             void.append((c, "missing from a run")); continue
-        if any(x.get("void") for x in recs):
+        if amend2 and any(x["native"]["collisions"] > 0 for x in recs):
+            void.append((c, "native collided, its task unsafe before Omni-Compass touches it: native "
+                         + "/".join(str(x["native"]["collisions"]) for x in recs) + ", omni " + "/".join(str(x["omni"]["collisions"]) for x in recs))); continue
+        if not amend2 and any(x.get("void") for x in recs):
             void.append((c, "a collision in an arm: native " + "/".join(str(x["native"]["collisions"]) for x in recs)
                          + ", omni " + "/".join(str(x["omni"]["collisions"]) for x in recs))); continue
         if not all(x.get("omni_moves") for x in recs):
@@ -142,7 +153,7 @@ def main(argv=None):
         L += [f"### {c}: {r0['drones']} drones x {r0['missions_per_drone']} missions, {r0['distance_m'][0]:.0f} to {r0['distance_m'][1]:.0f} m"
               + (" (the tuning swarm)" if r0.get("tuning") else "") + f"; handed back: {'yes' if all(x['omni'].get('handed_back') for x in recs) else 'NO'}", "",
               "| Gauge | native (A) | omni (A) | A | B | C | Reading |", "|---|---:|---:|---:|---:|---:|---|"]
-        for k, name, direction in GAUGES:
+        for k, name, direction in gauges:
             v = verdict(recs, k, direction)
             if v == "no value":
                 continue
@@ -152,7 +163,7 @@ def main(argv=None):
                      f"{pct(change(recs[2], k), k)} | {v} |")
         L.append("")
     L += ["## Across the untouched cells Omni moved", "", f"| Gauge | {ACROSS_HEAD} |", ACROSS_RULE]
-    for k, name, direction in GAUGES:
+    for k, name, direction in gauges:
         t = tally.get(k)
         if not t:
             continue
@@ -164,14 +175,14 @@ def main(argv=None):
           "| Cell | Energy a mission at the planner's cruise (J) | At the trial speed (J) | Reproduced over A, B, C |", "|---|---:|---:|---|"]
     for c, recs in idle:
         t0 = recs[0]["physics_trial"]; f, s = t0["planner_cruise"], [v for kk, v in t0.items() if kk.startswith("override_")][0]
-        rep = all(reproduced(recs, k) for k, _, _ in GAUGES)
+        rep = all(reproduced(recs, k) for k, _, _ in gauges)
         L.append(f"| {c} | {f['energy_per_mission_j']:.1f} | {s['energy_per_mission_j']:.1f} | {'yes' if rep else 'no'} |")
     L += ["", "## Void cells", "", "| Cell | Why |", "|---|---|"]
     for c, e in void:
         L.append(f"| {c} | {e} |")
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
-    ng, nl, nv, nd = across_counts(tally, {k: d for k, _, d in GAUGES}.get)
+    ng, nl, nv, nd = across_counts(tally, {k: d for k, _, d in gauges}.get)
     print(f"{out}: {len(cells) - len(idle) - len(void)} cells moved ({ng} gauge-rows GAIN in all three of our runs, {nl} LOSS, {nv} power given, {nd} where the runs differ, "
           f"the tuning cell shown and not counted), {len(idle)} nothing to move, {len(void)} void")
     return 0

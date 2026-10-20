@@ -63,6 +63,9 @@ REPL_ANN = "omnicompass.io/original-replicas"
 PACE_ANN = "omnicompass.io/paced-by-omni"
 QUOTA = "omni-containment"
 LIM_ANN = "omnicompass.io/original-limits"
+# a raise the cluster's admission refused is not written again until the pod's limit changes or this wait passes, doubled at
+# each refusal up to the last (v12): the refusal is the authority's answer, and asking again every fast check is hammering
+REFUSED_WAIT_S = (300.0, 3600.0)
 
 
 def milli(v):
@@ -79,6 +82,7 @@ class Muscles:
     def __init__(self, k, a, audit):
         self.k, self.a, self.audit = k, a, audit
         self.gain = {}       # (ns, deployment) -> mean conveyed CPU limit / operator's limit
+        self.refused = {}    # "ns/pod" -> (limit when refused, the raise refused, retry at (s), wait (s)), v12
         self.base = {}       # (ns, deployment) -> operator's CPU limit (millicores)
         self.thermal = 0.32  # harness initial thermal state
         self.gpu_min_w = 0.0     # the card's own minimum power limit, read live (0 until the card reports it)
@@ -470,19 +474,30 @@ class Muscles:
                     permitted, reservations = budget.limit(ns, p, cur, want)
                     if abs(permitted - cur) < self.a.cap_min_change_m:
                         got.append(cur); continue
+                    key = f"{ns}/{p['metadata']['name']}"
+                    r = self.refused.get(key)
+                    if r is not None and (cur != r[0] or permitted < r[1]):
+                        self.refused.pop(key); r = None             # the pod or the raise changed: the refusal is spent
+                    if r is not None and permitted > cur and time.time() < r[2]:
+                        got.append(cur); continue                   # held: admission refused this raise and nothing changed
                     try:
                         self._resize(p, ns, f"{permitted}m", f"convey: {node} idle CPU to its {len(ps)} serving pod(s), limit {permitted}m in place"
                                      if engaged else f"convey: response time calm, operator's limit {permitted}m in place")
                     except Exception as error:
                         # Admission can race another writer. Never advertise a rejected increase to the HPA.
+                        wait = REFUSED_WAIT_S[0] if r is None else min(REFUSED_WAIT_S[1], 2.0 * r[3])
+                        if permitted > cur:
+                            self.refused[key] = (cur, permitted, time.time() + wait, wait)
                         self.audit({"error": f"convey resize rejected: {type(error).__name__}: {str(getattr(error, 'stderr', '') or error).strip()[:400]}",
-                                    "pod": f"{ns}/{p['metadata']['name']}", "accepted_limit_m": cur})
+                                    "pod": key, "accepted_limit_m": cur,
+                                    "held_s": wait if permitted > cur else 0.0})
                         got.append(cur)
                         # Do not reuse uncertain headroom for other pods in this decision.
                         budget.reserve(reservations, cur, permitted)
                         continue
                     budget.reserve(reservations, cur, permitted)
-                    out[f"{ns}/{p['metadata']['name']}"] = permitted; got.append(permitted)
+                    self.refused.pop(key, None)
+                    out[key] = permitted; got.append(permitted)
             # the gain g = mean conveyed limit / operator's limit: the replica organ reads it to keep the operator's
             # promise in queue terms (target x request / limit) while the limit is larger
             self.gain[(ns, name)] = (sum(got) / len(got) / base) if got and base > 0 else 1.0

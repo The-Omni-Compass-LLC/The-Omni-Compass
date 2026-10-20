@@ -62,8 +62,27 @@ def main():
         across = txt[txt.index("## Across the untouched cells"):txt.index("## Cells where the paired trial")]
         assert "| energy per mission (J, declared model: motors and avionics over the fleet window) | 1 | 0 | 0 | 0 | 0 |" in across, "the tuning cell is not counted"
         assert "Not three runs on one frozen engine" in txt
+        assert "collisions)" not in txt, "the tables before omni-v12 are rebuilt as they were scored, with no collision row"
+    # amendment 2, from omni-v12's runs on: only a cell where native collides is void; a collision Omni-Compass adds is a judged LOSS
+    from unittest import mock
+    crash = rec(energy_per_mission_j=380.0, fleet_energy_j=7700.0, missions_per_charge=7.0, collisions=2)
+    with tempfile.TemporaryDirectory() as t, mock.patch.object(M, "engine", return_value=("0123456789ab", "omni-v12 (digest d38b58fbe28939b8, 47 files)")):
+        dirs = []
+        for i in (1, 2, 3):
+            d = Path(t) / f"run-{i}"
+            for name, r in (("mixed", crash), ("long", rec("long", void=True))):
+                (d / f"swarm-{name}").mkdir(parents=True); (d / f"swarm-{name}" / f"swarm-{name}.json").write_text(json.dumps(r))
+            dirs.append(str(d))
+        out = Path(t) / "V12.md"
+        assert M.main(dirs + ["--out", str(out)]) == 0
+        txt = out.read_text()
+        assert "(Omni v12)" in txt and "amendment 2" in txt
+        assert "| control ticks with two drones under two collision radii (collisions) | 0 | 2 | +2.000 | +2.000 | +2.000 | **LOSS in all three of our runs** |" in txt, \
+            "a collision with Omni-Compass on top is a judged LOSS, not a void cell"
+        assert "| long | native collided" in txt, "a cell where native itself collides is void"
     print("PASS  drone swarms A/B/C rule: reproduced runs read GAIN, EVEN or LOSS by what each gauge is for, a run that differs is a finding, a late mission, "
-          "a reserve breach or a near miss added is a LOSS, a cell left native is nothing to move, a collision voids the cell, the tuning cell is not counted")
+          "a reserve breach or a near miss added is a LOSS, a cell left native is nothing to move, a collision voids the cell, the tuning cell is not counted; "
+          "from omni-v12 on a collision Omni-Compass adds is a judged LOSS and only native's own collision voids a cell")
 
 
 if __name__ == "__main__":
