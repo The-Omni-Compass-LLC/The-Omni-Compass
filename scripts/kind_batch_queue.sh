@@ -97,11 +97,15 @@ install)
   done
   got=$(sha256sum "$W/chart.tgz" | cut -d' ' -f1)
   [ "$got" = "$KOORD_SHA256" ] || { echo "INVALID RUN: Koordinator's chart is not the one pinned (sha256 $got, pinned $KOORD_SHA256)"; exit 1; }
+  # koordlet's own words when it does not stand, kept in the run's files (the last start's and the one before)
+  koordlet_logs() { { kubectl -n "$NS" logs daemonset/koordlet --previous --tail=80 2>&1 || true
+                      kubectl -n "$NS" logs daemonset/koordlet --tail=80 2>&1 || true; } > "$OUT_DIR/koordlet.log"
+                    tail -30 "$OUT_DIR/koordlet.log"; }
   helm install koordinator "$W/chart.tgz" -f deploy/kind/koordinator-values.yaml --wait --timeout 15m \
-    > "$OUT_DIR/koord_helm.log" 2>&1 || { tail -40 "$OUT_DIR/koord_helm.log"; kubectl get pods -n "$NS" -o wide; exit 1; }
+    > "$OUT_DIR/koord_helm.log" 2>&1 || { tail -40 "$OUT_DIR/koord_helm.log"; kubectl get pods -n "$NS" -o wide; koordlet_logs; exit 1; }
   kubectl wait -n "$NS" --for=condition=Available deploy --all --timeout=600s >/dev/null
   kubectl -n "$NS" rollout status daemonset/koordlet --timeout=600s >/dev/null \
-    || { echo "INVALID RUN: koordlet did not run on every node"; kubectl get pods -n "$NS" -o wide; exit 1; }
+    || { echo "INVALID RUN: koordlet did not run on every node"; kubectl get pods -n "$NS" -o wide; koordlet_logs; exit 1; }
   placed "$OUT_DIR/koord_placement.txt"
   # the operator's colocation profile, as Koordinator's colocation guide writes it, on the namespace the jobs run in
   kubectl label namespace default koordinator.sh/enable-colocation=true --overwrite >/dev/null

@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: Koordinator's runs repeated on the kubelet's cgroup root its own tests use
+
+- **Koordinator's first A, B and C are invalid**, kept in the raw files and not counted: koordlet crash-looped on every kind
+  node in every repetition, its install ran out of time and no window opened. kind starts the kubelet with its cgroup root at
+  `/kubelet`, where koordlet finds no pod cgroups; Koordinator's own kind tests set it to `/`. Its runs are repeated on that
+  cluster in both arms (`deploy/kind/cluster-koordinator.yaml`, chosen by `scripts/kind_paired.sh` for Koordinator alone; each
+  arm's files name the cluster it ran on), koordlet's own log kept when it does not stand; written first as amendment 4 of
+  `docs/BATCH_QUEUE_PREREGISTRATION.md`; docs/REGISTER.md row 89.
+- **The Kubernetes scheduler's six runs** stand in their own block of `scripts/reruns.txt`, written after they were started
+  so the conductor never starts one of them itself; their ids are on the governors page.
+
 ## 2026-10-20: the Kubernetes scheduler alone, as shipped and with its bin-packing profile; every governor's muscles named
 
 - **The Kubernetes scheduler, register row 88** (the founder's "kubernetes schedulers, vanilla"): the row 63 stream placed by

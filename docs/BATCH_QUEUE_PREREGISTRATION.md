@@ -180,6 +180,20 @@ the jobs and the nodes, in two settings, each its own table.
 
 Everything else is as written above: the stream, the window, the gauges and how they are read.
 
+## Amendment 4: Koordinator's runs repeated on the kubelet's cgroup root its own tests use (written before they were repeated, 20 October 2026)
+
+Koordinator's first three runs (A 39352904186, B 39352911037 and C 39352918048, at commit 99c3002b3) are invalid, kept in the
+raw files and not counted: in every repetition, in both arms, koordlet, Koordinator's node agent, crash-looped on every node,
+its chart's install ran out of its fifteen minutes and no window opened, so nothing was measured. The cause is the cluster,
+not Koordinator's setting: kind starts each node's kubelet with its cgroup root at `/kubelet`, where koordlet does not find the
+pods' cgroups it reads; Koordinator's own tests on kind set the kubelet's cgroup root to `/` (`test/kind-conf.yaml` at v1.8.0).
+
+- Koordinator's runs are repeated on that cluster (`deploy/kind/cluster-koordinator.yaml`: the same control plane and six
+  workers, Koordinator's two patches copied as written), in both arms; every other set keeps kind's default. Each arm's files
+  name the cluster it ran on (`kind_cluster.txt`).
+- When koordlet does not stand, its own log is kept in the run's files (`koordlet.log`).
+- Everything else is as amendment 2 writes it.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

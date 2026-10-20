@@ -150,6 +150,17 @@ class KoordinatorFiles(unittest.TestCase):
         roles = {d["roleRef"]["name"] for d in docs if d["kind"] in ("ClusterRoleBinding", "RoleBinding")}
         self.assertEqual(roles, {"system:kube-scheduler", "system:volume-scheduler", "extension-apiserver-authentication-reader"})
 
+    def test_koordinators_cluster_is_the_rigs_with_the_cgroup_root_its_own_tests_use(self):
+        full = yaml.safe_load((ROOT / "deploy" / "kind" / "cluster-full.yaml").read_text())
+        koord = yaml.safe_load((ROOT / "deploy" / "kind" / "cluster-koordinator.yaml").read_text())
+        self.assertEqual(koord["nodes"], full["nodes"])                               # one control plane, six workers
+        patch = list(yaml.safe_load_all(koord["kubeadmConfigPatches"][0]))
+        self.assertEqual({d["kind"]: d for d in patch}["KubeletConfiguration"]["cgroupRoot"], "/")
+        self.assertNotIn("kubeadmConfigPatches", full)                               # every other set: kind's default
+        paired = (ROOT / "scripts" / "kind_paired.sh").read_text()
+        self.assertIn('[ "${BATCH_QUEUE:-}" = koordinator ] && cluster=deploy/kind/cluster-koordinator.yaml', paired)
+        self.assertIn('--config "$cluster"', paired)
+
     def test_kai_values_place_every_component_on_the_control_plane(self):
         v = yaml.safe_load((ROOT / "deploy" / "kind" / "kai-values.yaml").read_text())
         self.assertEqual(v["global"]["nodeSelector"], {"node-role.kubernetes.io/control-plane": ""})

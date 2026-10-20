@@ -10,11 +10,11 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 
 | Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |
 |---|---|---:|---|---|
-| The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: built; its runs come in the campaign; bin-packing profile: built; its runs come in the campaign | as shipped: not yet run; bin-packing profile: not yet run |
+| The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356571014) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356586356) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356601235); bin-packing profile: running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356578556) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356594135) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356608147) | as shipped: runs not yet finished; bin-packing profile: runs not yet finished |
 | Kueue | batch admission (a job at a time, by queue quota) | 63 | built; its runs come in the campaign | not yet run |
 | Volcano | batch scheduling (queues, gangs) | 63 | built; its runs come in the campaign | not yet run |
 | KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350900880) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350907916) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350915166) | runs not yet finished |
-| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39352904186) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39352911037) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39352918048) | runs not yet finished |
+| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | built; its runs come in the campaign | not yet run |
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
 | Crane | predictive autoscaling and resource governance | 90 | its rig is not yet built | not yet run |
 | KubeRay | Ray clusters (the Ray autoscaler) | 92 | its rig is not yet built | not yet run |
