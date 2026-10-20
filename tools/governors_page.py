@@ -19,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.legal import stamp  # noqa: E402
-from tools.readings import receipt_key  # noqa: E402
+from tools.readings import labelled, receipt_key  # noqa: E402
 
 OUT = ROOT / "results" / "live" / "GOVERNORS.md"
 RUNS = ROOT / "results" / "live" / "governors_runs.json"
@@ -82,6 +82,16 @@ CATALOG = {
 # A governor read in more than one setting: one three-run table for each (V12_<SETTING>.json), its runs listed by setting
 SETTINGS = {"scheduler": (("vanilla", "as shipped"), ("binpack", "bin-packing profile"))}
 
+# The four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6; the founder's order of 20 October): every comparison's
+# three-run table, V12_<SYSTEM>_4W_<TAG>.json (tools/confirm_abc.py --pair), its column on the page, in this order
+FOUR_WAYS = (("TOP", "compass", "Omni-Compass on top of it, against it as shipped"),
+             ("ORCH", "native|nativebare", "it as shipped, against the organism alone"),
+             ("BARE", "compassbare|nativebare", "Omni-Compass on the organism alone, against the organism alone"),
+             ("VS", "compassbare|native", "Omni-Compass on the organism alone, against it as shipped"),
+             ("BOTH", "compass|nativebare", "Omni-Compass on top of it, against the organism alone"))
+FOUR_SYSTEMS = (("kai", "The KAI scheduler"), ("koordinator", "Koordinator"), ("kueue", "Kueue"), ("volcano", "Volcano"),
+                ("binpack", "The scheduler's bin-packing profile"))
+
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 
 
@@ -108,6 +118,11 @@ def table_of(slug: str):
     return json.loads(p.read_text())
 
 
+def four_way_table(system: str, tag: str):
+    """One comparison of the four ways, as tools/confirm_abc.py --pair wrote it, or None."""
+    return table_of(f"{system}_4W_{tag}")
+
+
 def counts(table) -> dict:
     out = {w: 0 for w in WORDS}
     for row in (table.get("rows") or {}).values():
@@ -115,12 +130,33 @@ def counts(table) -> dict:
     return out
 
 
-def key_rows(table, limit=8):
-    """The rows a reader looks at first: the queue's own gauges, then machines and energy; each with its reading."""
+# after the queue's own gauges, the rows a reader looks at next: machines, energy, speed, failures (in this order)
+KEY = ("worker nodes in service", "node-hours", "energy", "response time (ms), mean", "response time (ms), 95th",
+       "failed requests", "alert minutes")
+
+
+def key_rows(table, limit=14):
+    """The rows a reader looks at first: the queue's own gauges, then machines, energy, speed and failures; each with its
+    reading."""
     rows = table.get("rows") or {}
     first = [k for k in rows if k.startswith("queue:")] + [k for k in rows if k.startswith("batch:")]
-    rest = [k for k in rows if ("machines" in k or "energy" in k) and k not in first]
-    return [(k, rows[k].get("reading", "")) for k in (first + rest)[:limit]]
+    rest = [k for key in KEY for k in rows if k.startswith(key) and k not in first]
+    seen = list(dict.fromkeys(first + rest))
+    return [(k, rows[k].get("reading", "")) for k in seen[:limit]]
+
+
+def runs_line(table):
+    """The table's runs as the page names them ("A [id](link) (10 pairs), ..."), and the engines they ran on."""
+    out, engines = [], set(table.get("engines", []))
+    for r in table.get("runs", []):
+        if isinstance(r, dict):
+            pairs = f" ({r['paired_repetitions']} pairs)" if r.get("paired_repetitions") else ""
+            out.append(f"{r.get('tag', '?')} [{r.get('run')}]({REPO_RUNS}{r.get('run')}){pairs}")
+            if r.get("engine"):
+                engines.add(r["engine"])
+        else:
+            out.append(str(r))
+    return ", ".join(out), ", ".join(sorted(engines)) or ENGINE
 
 
 def catalog_line(slug) -> str:
@@ -132,6 +168,23 @@ def catalog_line(slug) -> str:
     where = "the spine and every realm" if rows and len(rows[0]["realms"].split(";")) == 4 else "its realm and the whole tower"
     return (f"- **In the catalog (modelled, class S)**: family {fid}, {fam} ({len(rows)} muscles, in {where}): "
             + ", ".join(f"`{m}`" for m in muscles) + ".")
+
+
+LOAD_WORDS = {"normal": "own load", "climb": "the climb", "line": "work in line"}
+
+
+def orchestra():
+    """The orchestra, the eighth organism (tools/run_orchestra.py): every governor's muscles as a body of its own and all of
+    them together, native and with Omni-Compass on top, modelled; or None before its table is committed."""
+    try:
+        return json.loads((ROOT / "results" / "orchestra" / "ORCHESTRA.json").read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def orchestra_readings(orch, body):
+    return [labelled(orch["bodies"][load][body]["label"]) if body in orch["bodies"].get(load, {}) else "not run"
+            for load in LOAD_WORDS]
 
 
 def settings_of(slug):
@@ -167,20 +220,65 @@ def render(runs=None) -> str:
                 wheres.append(f"{tag}three runs in")
             elif started:
                 readings.append(f"{tag}runs not yet finished"); wheres.append(f"{tag}running: {started}")
+            elif runs_of(f"{key}4", runs):
+                readings.append(f"{tag}runs not yet finished"); wheres.append(f"{tag}running four ways (below)")
             elif test.startswith("not yet"):
                 readings.append(f"{tag}not yet run"); wheres.append(f"{tag}its rig is not yet built")
             else:
                 readings.append(f"{tag}not yet run"); wheres.append(f"{tag}built; its runs come in the campaign")
         L.append(f"| {name} | {field} | {row} | {'; '.join(wheres)} | {'; '.join(readings)} |")
     L.append("")
+    L += ["## The four ways (the founder's order of 20 October)", "",
+          "Each system runs four ways in every repetition, each way on a fresh cluster of the same configuration, back to back "
+          "on one runner, the governor on its own core (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendments 5 and 6): the "
+          "organism alone (the stream placed by Kubernetes' own scheduler, no orchestrator installed), the orchestrator as its "
+          "project ships it, Omni-Compass on top of the organism alone, and Omni-Compass on top of the orchestrator. Each "
+          "column is one comparison, the first against the second, paired within the repetition and read by the one key for "
+          "the first; each cell reads only from its own three-run table. Omni-Compass never places a pod or admits a job: on "
+          "the organism alone it sits on top of Kubernetes' own scheduler.", "",
+          "| System | Runs (A, B and C) | " + " | ".join(t for _, _, t in FOUR_WAYS) + " |",
+          "|---|---|" + "---|" * len(FOUR_WAYS)]
+    for system, name in FOUR_SYSTEMS:
+        started = runs_of(f"{system}4", runs)
+        cells = []
+        for tag, _, _ in FOUR_WAYS:
+            t = four_way_table(system, tag)
+            if t:
+                c = counts(t)
+                cells.append(f"{c['GAIN']} GAIN, {c['LOSS']} LOSS, {c['power given']} power given, {c['EVEN']} EVEN, "
+                             f"{c['the runs disagree']} where the runs disagree ([table](V12_{system.upper()}_4W_{tag}.md))")
+            else:
+                cells.append("runs not yet finished" if started else "not yet run")
+        L.append(f"| {name} | {started or 'not yet started'} | " + " | ".join(cells) + " |")
+    L.append("")
+    orch = orchestra()
+    L += ["## The orchestra, the eighth organism (modelled, class S)", ""]
+    if orch:
+        L += [f"The founder's word of 19 October, night: the governors in a catalog group, an organism of their own. Every "
+              f"catalog muscle that stands for a governor's knob (below, under each governor) runs in the modelled organisms "
+              f"as the seven do: each governor's muscles as a body of its own, then all of them together as one body, the "
+              f"orchestra, native and then with Omni-Compass on top at the max, on {orch['run']['engine']}, seeds "
+              f"{orch['run']['seeds'][0]}-{orch['run']['seeds'][-1]}. A model, not a measurement of the governor itself; "
+              f"every row: [`results/orchestra/ORCHESTRA.md`](../orchestra/ORCHESTRA.md).", "",
+              "| Body | Muscles | Own load | The climb | Work in line |", "|---|---:|---|---|---|"]
+        for slug, name, *_ in GOVERNORS:
+            L.append(f"| {name} | {len(orch['run']['bodies'][slug])} | " + " | ".join(orchestra_readings(orch, slug)) + " |")
+        L.append(f"| **The orchestra, every governor's muscle once** | {len(orch['run']['bodies']['orchestra'])} | "
+                 + " | ".join(f"**{r}**" for r in orchestra_readings(orch, "orchestra")) + " |")
+    else:
+        L.append("Not yet run (`tools/run_orchestra.py`).")
+    L.append("")
     for slug, name, row, field, native, test in GOVERNORS:
         L += [f"## {name}", "", f"- **Native**: {native}.", f"- **Its test on real Kubernetes (class L)**: {test}; register row {row}.",
               catalog_line(slug)]
+        if orch:
+            L.append("- **Its muscles as a body in the orchestra (modelled, class S)**: "
+                     + "; ".join(f"{w}: {r}" for w, r in zip(LOAD_WORDS.values(), orchestra_readings(orch, slug))) + ".")
         for key, label in settings_of(slug):
             t, head = table_of(key), (f" ({label})" if label else "")
             if t:
-                L.append(f"- **Runs{head}**: {', '.join(t.get('runs', []))}; engine "
-                         f"{', '.join(sorted(set(t.get('engines', [])))) or ENGINE}.")
+                runs, engines = runs_line(t)
+                L.append(f"- **Runs{head}**: {runs}; engine {engines}.")
                 L += ["", "| Gauge | Reading |", "|---|---|"] + [f"| {k} | {r} |" for k, r in key_rows(t)]
                 L += ["", f"Every row of the run: [`results/live/V12_{key.upper()}.md`](V12_{key.upper()}.md).", ""]
             else:

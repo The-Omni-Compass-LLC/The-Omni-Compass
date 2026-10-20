@@ -194,6 +194,61 @@ pods' cgroups it reads; Koordinator's own tests on kind set the kubelet's cgroup
 - When koordlet does not stand, its own log is kept in the run's files (`koordlet.log`).
 - Everything else is as amendment 2 writes it.
 
+## Amendment 5: the governor's own core (written before any run on it, 20 October 2026)
+
+The first three-run tables of the batch rig on omni-v12 carry one row against Omni-Compass. A job's mean turnaround rose
+0.9% to 1.4% in all three runs of the Kubernetes scheduler as shipped and of its bin-packing profile (`results/live/V12_VANILLA.md`,
+`V12_BINPACK.md`: LOSS), and 1.5% in run A of the KAI scheduler (`V12_KAI.md`; within the noise in B and C). The raw files
+give the cause. In both arms the stream's pods went to the same nodes (six of six in the scheduler as shipped) and waited
+the same 0.03 s to start; what grew was each pod's hashing, 1.3% to 1.5% longer with Omni-Compass on top (10.56 s → 10.70 s,
+9.59 s → 9.74 s, 10.14 s → 10.28 s, the mean over each run's 2,400 pods), while the runner's processors were 1.3% to 2.8% busier.
+On kind every node is a container on the one runner, and the governor, a process on that runner, competes with the node
+containers as a peer group: its niceness ranks it only inside its own group. Its own work, its commands and the API
+server's answers to them came out of the measured pods' processor time. On a real cluster the governor runs on its own
+machine, and none of that reaches the workers.
+
+- **The change, on the batch rig, the same in every arm**: the kind nodes on every core of the runner but the last (Docker's
+  processor set, written once each node stands) and the governor alone on the last (`taskset`); in a native arm that core
+  carries no governor. Each arm's preflight names the cores (`scripts/kind_bench.sh`, "the governor's own core"), and the
+  three-run tool names a table's rig from it, so runs on the two rigs are never one table.
+- **The runs before it stand as their own record**, read as written, LOSS rows included: the scheduler's two settings and
+  the KAI scheduler (three runs each), and Koordinator's repeated runs. The governors' runs from here on are on this rig.
+
+## Amendment 6: the four ways (written before their first run, 20 October 2026)
+
+The founder's order of 20 October: "We can show what they do natively on top of the system organism. And show what
+OmniCompass does on the organism without the orchestrator compare that. As well as put OmniCompass on top of the
+orchestrator that's on top of the whole organism and benchmark that." Each orchestrator now runs four ways, all four in
+every repetition, each on a fresh cluster of the same configuration, in an order rotated by repetition, on the governor's
+own core (amendment 5):
+
+- **nativebare**, the organism alone: the stream placed by the cluster's own default scheduler, no orchestrator installed;
+- **native**, the orchestrator on the organism as its project ships it;
+- **compassbare**, Omni-Compass on top of the organism alone (the default scheduler still places every pod; Omni-Compass
+  works its own levers on top of it, as everywhere);
+- **compass**, Omni-Compass on top of the orchestrator on top of the organism.
+
+Each comparison is the first arm against the second, paired within the repetition, read by the one key for the first arm:
+
+| Comparison | What it shows |
+|---|---|
+| compass against native | Omni-Compass on top of the orchestrator (the benchmark of the two-arm runs) |
+| native against nativebare | what the orchestrator does on its own, natively, on the organism |
+| compassbare against nativebare | what Omni-Compass does on the organism without the orchestrator |
+| compassbare against native | Omni-Compass on the organism without the orchestrator, against the orchestrator |
+| compass against nativebare | the two together, against the organism alone |
+
+- **The systems**: the KAI scheduler, Koordinator (on its own kind configuration, amendment 4, in all four arms), Kueue,
+  Volcano and the scheduler's bin-packing profile; the scheduler as shipped is the organism alone itself.
+- **Its runs**: `kind-orchestrators.yml` with the arms `nativebare native compassbare compass`, ten repetitions a run, A, B
+  and C started together, each orchestrator's in a block of its own in `scripts/reruns.txt`; one job holds the four arms
+  (up to 330 minutes). The three-run tables are written per comparison (`tools/confirm_abc.py --pair first|second`).
+- **What it is not**: a contest between Omni-Compass and an orchestrator for the same job. Omni-Compass never places a pod
+  or admits a job; on the organism alone it sits on top of Kubernetes' own scheduler, and on the orchestrator it sits on top
+  of the orchestrator. The comparisons show what each layer adds to the organism, each against the same organism.
+
+Everything else is as written above: the stream, the window, the gauges and how they are read.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
