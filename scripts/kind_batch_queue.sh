@@ -169,13 +169,19 @@ install)
     || { echo "INVALID RUN: the Ray image could not be loaded into the cluster's nodes"; tail -20 "$OUT_DIR/ray_image_load.log"; exit 1; }
   # the stream's job script on the head, then the one Ray cluster: KubeRay's own autoscaling sample with the operator's
   # settings (deploy/kind/kuberay-cluster.yaml), its worker group's ceiling the workers' allocatable processors over one
-  # worker pod's half, read live; it stands once its head answers
+  # worker pod's half, and no more workers of 1 GiB each than the one machine has free less 3 GiB kept for the head and the
+  # systems, both read live (every kind node reports the whole machine's memory as its own, so Kubernetes alone would admit
+  # more workers than the machine holds: the trial of 20 October took the runner down, amendment 9); it stands once its head
+  # answers
   kubectl create configmap omni-ray-stream --from-file=stream_job.py=deploy/kind/kuberay_stream_job.py --dry-run=client -o yaml \
     | kubectl apply -f - >/dev/null
   max=$(kubectl get nodes -l '!node-role.kubernetes.io/control-plane' -o json | python3 -c '
 import json, sys
 def cpu(v): return float(v[:-1]) / 1000 if v.endswith("m") else float(v)
-print(int(sum(cpu(x["status"]["allocatable"]["cpu"]) for x in json.load(sys.stdin)["items"]) / 0.5))')
+by_cpu = int(sum(cpu(x["status"]["allocatable"]["cpu"]) for x in json.load(sys.stdin)["items"]) / 0.5)
+free_gib = next(int(l.split()[1]) for l in open("/proc/meminfo") if l.startswith("MemAvailable:")) / 2 ** 20
+by_mem = int(free_gib - 3)                       # a worker is 1 GiB; 3 GiB stay for the head and the systems
+print(max(1, min(by_cpu, by_mem)))')
   for t in $(seq 1 20); do
     sed "s/MAX_WORKERS/${max}/" deploy/kind/kuberay-cluster.yaml | kubectl apply -f - >/dev/null 2>&1 && break
     [ "$t" = 20 ] && { echo "INVALID RUN: the Ray cluster was refused"; exit 1; }; sleep 6

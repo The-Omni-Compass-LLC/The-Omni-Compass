@@ -2,6 +2,21 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: what the three trials found in the rigs, fixed before the counted runs
+
+- **Crane** (`docs/CRANE_PREREGISTRATION.md`, amendment 1): Crane's override values name a kube-state-metrics image on
+  Tencent's registry, which the chart composes under `registry.k8s.io`, where it does not exist; the trial's Prometheus
+  install waited ten minutes on it in both arms. The rig's values name the chart's own image
+  (`deploy/kind/crane-prometheus-values.yaml`); nothing else of the override changes.
+- **Gödel** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 9): metrics-server's pinned manifest is applied once with the
+  rig's settings written in (one rollout; its image named by `registry.k8s.io`, where the old name redirects), in place of an
+  apply and two patches, whose second rollout left the first pod terminating past the wait on Kubernetes 1.24. Every kind rig
+  applies it this way (`scripts/kind_bench.sh`).
+- **KubeRay** (amendment 9): the Ray worker group's ceiling is bounded by the machine's free memory as well as by the workers'
+  processors (a kind node reports the whole machine's memory as its own; 48 workers of 1 GiB took the trial's runner down).
+- **Kueue C** (run 39368401852): repetition 5's runner was lost by GitHub; the run's nine other repetitions are read and the
+  table says so.
+
 ## 2026-10-20: the group of clusters (Karmada first), preregistered, four ways
 
 - **A group of two clusters as one organism** (`docs/GROUP_PREREGISTRATION.md`; register row 95; the founder's list): two of

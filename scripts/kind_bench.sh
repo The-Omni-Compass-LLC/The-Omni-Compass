@@ -184,11 +184,26 @@ fi
 cp "$ms_cache" "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null || cp "$ms_cache.part" "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null || true
 actual_sha=$(sha256sum "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null | cut -d' ' -f1 || true)
 [ "$actual_sha" = "$METRICS_SERVER_SHA256" ] || { echo "metrics-server manifest SHA-256 mismatch: $actual_sha"; exit 1; }
-kubectl apply -f "$OUT_DIR/metrics-server-components.yaml"
-kubectl -n kube-system patch deployment metrics-server --type=json \
-  -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+# the pinned manifest applied once with the rig's settings written into it, so the server rolls out once: the kubelet's
+# certificate unverified (kind's nodes have no CA-signed one), the server on the control plane beside the other systems'
+# controllers, and its image by the registry that serves it (the 0.5 line's manifest names k8s.gcr.io, which only redirects
+# to registry.k8s.io). Patching the applied manifest twice made two rollouts, and on Kubernetes 1.24 the first pod, deleted
+# while its image was still coming through the redirect, stayed terminating past the wait (the Gödel trial of 20 October).
+python3 - "$OUT_DIR/metrics-server-components.yaml" > "$OUT_DIR/metrics-server-rig.yaml" <<'EOF'
+import sys, yaml
+docs = [d for d in yaml.safe_load_all(open(sys.argv[1])) if d]
+for d in docs:
+    if d.get("kind") == "Deployment" and d["metadata"]["name"] == "metrics-server":
+        spec = d["spec"]["template"]["spec"]
+        c = spec["containers"][0]
+        c["args"] = list(c.get("args", [])) + ["--kubelet-insecure-tls"]
+        c["image"] = c["image"].replace("k8s.gcr.io/", "registry.k8s.io/")
+        spec["nodeSelector"] = {"node-role.kubernetes.io/control-plane": ""}
+        spec["tolerations"] = [{"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"}]
+print(yaml.safe_dump_all(docs, sort_keys=False))
+EOF
+kubectl apply -f "$OUT_DIR/metrics-server-rig.yaml"
 pin='{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]}}}}'
-kubectl -n kube-system patch deployment metrics-server -p "$pin"
 kubectl -n kube-system patch deployment coredns -p "$pin"
 kubectl -n kube-system rollout status deployment/metrics-server --timeout=300s
 kubectl -n kube-system rollout status deployment/coredns --timeout=300s
