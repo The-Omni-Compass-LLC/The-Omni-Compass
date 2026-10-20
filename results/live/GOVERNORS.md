@@ -19,7 +19,7 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | Crane | predictive autoscaling and resource governance | 90 | running four ways (below) | runs not yet finished |
 | KubeRay | Ray clusters (the Ray autoscaler) | 92 | running four ways (below) | runs not yet finished |
 | Gödel scheduler | unified online and offline scheduling | 93 | running four ways (below) | runs not yet finished |
-| Armada | multi-cluster batch | 94 | its rig is not yet built | not yet run |
+| Armada | multi-cluster batch | 94 | built; its runs come in the campaign | not yet run |
 | Karmada | multi-cluster placement | 95 | running four ways (below) | runs not yet finished |
 | Open Cluster Management | multi-cluster management | 96 | running four ways (below) | runs not yet finished |
 | KubeEdge | edge nodes | 97 | its rig is not yet built | not yet run |
@@ -41,6 +41,7 @@ Each system runs four ways in every repetition, each way on a fresh cluster of t
 | The Gödel scheduler | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479741832) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479757911) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479773633) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
 | Karmada | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438525862) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438541616) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438559009) | 0 GAIN, 0 LOSS, 0 power given, 22 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_TOP.md)) | 0 GAIN, 6 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_ORCH.md)) | 0 GAIN, 0 LOSS, 1 power given, 21 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_BARE.md)) | 6 GAIN, 0 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_VS.md)) | 0 GAIN, 8 LOSS, 1 power given, 13 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_BOTH.md)) |
 | Open Cluster Management | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479807336) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479824367) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479840381) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
+| Armada | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 
 ## The orchestra, the eighth organism (modelled, class S)
 
@@ -219,8 +220,8 @@ Every row of the run: [`results/live/V12_KOORDINATOR.md`](V12_KOORDINATOR.md).
 
 ## Armada
 
-- **Native**: its queues and fair share across clusters.
-- **Its test on real Kubernetes (class L)**: not yet written; register row 94.
+- **Native**: Armada v0.22.14 as its own local stack runs it (its server, scheduler, ingesters, Pulsar, Redis and PostgreSQL as containers on the runner, one executor per member cluster), one queue, each batch of the stream a job set of its pods.
+- **Its test on real Kubernetes (class L)**: the batch stream sent to a group of two clusters through Armada's queue, four ways (`docs/GROUP_PREREGISTRATION.md`, amendment 2); register row 94.
 - **In the catalog (modelled, class S)**: family 39, Cross-Cluster, Multi-Region & Edge (18 muscles, in its realm and the whole tower): `multi_cluster_dispatch`, `federation_quota`, `global_admission`.
 - **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.

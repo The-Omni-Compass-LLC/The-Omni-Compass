@@ -54,10 +54,11 @@ def merge_jobs(d: Path, members: list, orch: str) -> list:
     for m in members:
         for j in items(m / "jobs.json"):
             parts.setdefault(j["metadata"]["name"], []).append(j)
-    sent = {}
-    if orch != "none":                                     # the orchestrator's own record: when each job was sent to it
-        for j in items(d / "orch_jobs.json"):
+    sent, orch_done = {}, {}
+    if orch != "none":                                     # the orchestrator's own record: when each job was sent to it, and,
+        for j in items(d / "orch_jobs.json"):              # where its jobs are pods and not Jobs (Armada), when its last pod ended
             sent[j["metadata"]["name"]] = ts(j["metadata"]["creationTimestamp"])
+            orch_done[j["metadata"]["name"]] = (j.get("status") or {}).get("completionTime")
     names = sorted(set(parts) | set(sent))
     out = []
     for n in names:
@@ -67,6 +68,8 @@ def merge_jobs(d: Path, members: list, orch: str) -> list:
             continue
         ends = [(p.get("status") or {}).get("completionTime") for p in ps]
         done = max(ts(e) for e in ends) if ps and all(ends) else None
+        if done is None and not ps and orch_done.get(n):
+            done = ts(orch_done[n])
         j = {"metadata": {"name": n, "creationTimestamp": iso(sub)}, "status": {"parts": len(ps)}}
         if done is not None:
             j["status"]["completionTime"] = iso(done)

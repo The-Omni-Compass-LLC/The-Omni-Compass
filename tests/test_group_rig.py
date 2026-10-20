@@ -9,6 +9,8 @@ machines summed at each moment, an unfinished part leaving its job unfinished); 
 the members in turn; Karmada's release is pinned; a member's bench opens its window with the others' and sends no stream."""
 import csv
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -137,10 +139,51 @@ class GroupWiring(unittest.TestCase):
         self.assertIn('rm -f "$W/join.sh"', self.ORCH)
         self.assertIn('kind: ManagedClusterSetBinding', self.ORCH)
         group = (ROOT / "scripts" / "kind_group.sh").read_text()
-        self.assertIn("karmada|ocm) ;;", group)
+        self.assertIn("karmada|ocm|armada) ;;", group)
         self.assertIn('agent_ns="open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon"', group)
         self.assertIn("IN($qs[])", self.BENCH)                                              # several agent namespaces allowed
         self.assertIn('"orch=ocm"', (ROOT / "docs" / "GROUP_PREREGISTRATION.md").read_text().replace("`orch=ocm`", '"orch=ocm"'))
+
+    def test_armada_is_pinned_and_takes_every_batch_as_a_job_set_of_its_pods(self):
+        # amendment 2: armadactl and every image pinned (the images by digest); a batch is one job set of COMPLETIONS jobs,
+        # each the stream's pod with its labels and requests equal to limits (Armada's rule); its control plane on the
+        # runner's own network, not on a cluster; the members' kubeconfigs copied outside the run's files and removed
+        self.assertRegex(self.ORCH, r'ARMADACTL_SHA256="\$\{ARMADACTL_SHA256:-[0-9a-f]{64}\}"')
+        for var in ("ARMADA_BUNDLE", "ARMADA_LOOKOUT", "ARMADA_REDIS", "ARMADA_POSTGRES", "ARMADA_PULSAR"):
+            self.assertRegex(self.ORCH, var + r'="[a-z/-]+@sha256:[0-9a-f]{64}"')
+        sub = self.ORCH[self.ORCH.index("armada_submit() {"):self.ORCH.index("armada_done() {")]
+        code = sub[sub.index("<<'PY'\n") + 7:sub.index("\nPY\n")]
+        out = subprocess.run([sys.executable, "-c", code, "omni-batch-007", "10", "3000"], capture_output=True, text=True, check=True).stdout
+        spec = yaml.safe_load(out)
+        self.assertEqual((spec["queue"], spec["jobSetId"], len(spec["jobs"])), ("omni", "omni-batch-007", 10))
+        job = spec["jobs"][0]
+        self.assertEqual(job["labels"]["job-name"], "omni-batch-007")
+        res = job["podSpecs"][0]["containers"][0]["resources"]
+        self.assertEqual(res["requests"], res["limits"])
+        self.assertIn("count=3000", job["podSpecs"][0]["containers"][0]["command"][2])
+        self.assertNotIn("&id", out)                                                        # ten jobs written out, no aliases
+        self.assertIn('--network host --cpuset-cpus "$cores"', self.ORCH)
+        self.assertIn('cp "$D/kubeconfig-m$i" "$AR/kubeconfig-m$i"', self.ORCH)
+        self.assertIn('AR="$W/armada"', self.ORCH)
+        group = (ROOT / "scripts" / "kind_group.sh").read_text()
+        self.assertIn("karmada|ocm|armada) ;;", group)
+        self.assertIn("case \"$orch\" in none|armada) ;;", group)                              # no omni-host for Armada
+
+    def test_a_batch_whose_jobs_are_pods_reads_its_end_from_the_orchestrators_record(self):
+        # Armada runs pods, not Jobs: a member has no Job of the batch's name, so the merger takes the end Armada's record
+        # carries (its tenth pod's end), and none where the record carries none
+        d = Path(tempfile.mkdtemp()) / "bench-native-1"; d.mkdir(parents=True)
+        (d / "stream_start.txt").write_text(f"{T0}\n")
+        done = job("omni-batch-001", T0, T0 + 120); done["status"]["pods"] = 10
+        (d / "orch_jobs.json").write_text(json.dumps({"items": [done, job("omni-batch-002", T0 + 30)]}))
+        member(d, "m1", [], [pod("omni-batch-001", T0 + 4)], [6, 6])
+        member(d, "m2", [], [pod("omni-batch-002", T0 + 35)], [6, 6])
+        MG.main(d, 2, "armada")
+        jobs = {j["metadata"]["name"]: j for j in json.loads((d / "jobs.json").read_text())["items"]}
+        self.assertEqual(jobs["omni-batch-001"]["status"]["completionTime"], iso(T0 + 120))
+        self.assertNotIn("completionTime", jobs["omni-batch-002"]["status"])
+        g = LR.job_stream(d)
+        self.assertEqual(g["queue: jobs unfinished at the window's end"], 1.0)
 
 
 if __name__ == "__main__":
