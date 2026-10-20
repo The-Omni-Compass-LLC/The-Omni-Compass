@@ -11,8 +11,8 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |
 |---|---|---:|---|---|
 | The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: three runs in; bin-packing profile: three runs in | as shipped: 5 GAIN, 1 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_VANILLA.md)); bin-packing profile: 5 GAIN, 1 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_BINPACK.md)) |
-| Kueue | batch admission (a job at a time, by queue quota) | 63 | built; its runs come in the campaign | not yet run |
-| Volcano | batch scheduling (queues, gangs) | 63 | built; its runs come in the campaign | not yet run |
+| Kueue | batch admission (a job at a time, by queue quota) | 63 | running four ways (below) | runs not yet finished |
+| Volcano | batch scheduling (queues, gangs) | 63 | running four ways (below) | runs not yet finished |
 | KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | three runs in | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_KAI.md)) |
 | Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | three runs in | 3 GAIN, 0 LOSS, 0 power given, 19 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR.md)) |
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
@@ -31,11 +31,11 @@ Each system runs four ways in every repetition, each way on a fresh cluster of t
 
 | System | Runs (A, B and C) | Omni-Compass on top of it, against it as shipped | it as shipped, against the organism alone | Omni-Compass on the organism alone, against the organism alone | Omni-Compass on the organism alone, against it as shipped | Omni-Compass on top of it, against the organism alone |
 |---|---|---|---|---|---|---|
-| The KAI scheduler | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
-| Koordinator | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
-| Kueue | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
-| Volcano | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
-| The scheduler's bin-packing profile | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| The KAI scheduler | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368344021) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368351097) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368358521) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
+| Koordinator | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368366066) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368373713) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368380786) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
+| Kueue | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368387821) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368394823) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368401852) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
+| Volcano | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368409208) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368415819) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368422189) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
+| The scheduler's bin-packing profile | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368428763) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368435483) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368442002) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
 
 ## The orchestra, the eighth organism (modelled, class S)
 

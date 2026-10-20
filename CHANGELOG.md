@@ -25,7 +25,10 @@
   orchestrator as shipped, Omni-Compass on the organism alone and Omni-Compass on top of the orchestrator, all four in every
   repetition (`scripts/kind_paired.sh`: an arm named ...bare runs on the organism alone); `tools/live_reps.py` pairs each
   comparison within the repetition and `tools/confirm_abc.py --pair` writes its three-run table; `kind-orchestrators.yml`
-  holds four arms in a job; `tests/test_four_ways.py`. CLAUDE.md carries the order.
+  holds four arms in a job; `tests/test_four_ways.py`. CLAUDE.md carries the order. **Started at 04:12 UTC**: the A, B and
+  C of the KAI scheduler, Koordinator, Kueue, Volcano and the bin-packing profile (15 runs, ten repetitions of four arms
+  each, $0 on GitHub's machines), in a block of their own in `scripts/reruns.txt`, their ids in
+  `results/live/governors_runs.json`; the governors page carries the four ways, one cell per comparison.
 
 ## 2026-10-20: the KAI scheduler's three-run table on omni-v12: 5 GAIN, no LOSS
 

@@ -220,6 +220,8 @@ def render(runs=None) -> str:
                 wheres.append(f"{tag}three runs in")
             elif started:
                 readings.append(f"{tag}runs not yet finished"); wheres.append(f"{tag}running: {started}")
+            elif runs_of(f"{key}4", runs):
+                readings.append(f"{tag}runs not yet finished"); wheres.append(f"{tag}running four ways (below)")
             elif test.startswith("not yet"):
                 readings.append(f"{tag}not yet run"); wheres.append(f"{tag}its rig is not yet built")
             else:

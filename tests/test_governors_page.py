@@ -80,6 +80,10 @@ class GovernorsPage(unittest.TestCase):
         self.assertIn("(V12_KAI_4W_ORCH.md)", cells[3])
         volcano = next(l for l in section.splitlines() if l.startswith("| Volcano"))
         self.assertIn("not yet started", volcano)
+        with mock.patch.object(G, "ROOT", Path(tempfile.mkdtemp())):
+            text = G.render(runs={"kueue4": {"A": "7"}})
+        kueue = next(l for l in text.splitlines() if l.startswith("| Kueue"))     # its line in the governors' table
+        self.assertIn("running four ways (below)", kueue)
 
     def test_no_number_before_the_runs(self):
         text = G.render(runs={})
