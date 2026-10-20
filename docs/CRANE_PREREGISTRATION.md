@@ -146,6 +146,17 @@ amendment before the counted runs.
 - The older Kubernetes (above): no in-place resize, so no power cap and no conveyance in any arm; the tables are read among the
   four arms of this test only.
 
+## Amendment 1: what the trial found in the rig (written after the trial of 20 October 2026, before the counted runs)
+
+The trial (run 39376930525, one repetition, native and compass) stood up the 1.25 cluster, its metrics-server and the service
+in both arms and failed in both at the same place: the Prometheus install waited ten minutes on kube-state-metrics, in
+ImagePullBackOff, while the server and every node exporter ran. Crane's override values name a kube-state-metrics image on
+Tencent's registry (`ccr.ccs.tencentyun.com/tkeimages/kube-state-metrics:2.2.4`), and the chart composes that name under its
+own registry (`registry.k8s.io`), where no such image exists. The rig's values file (`deploy/kind/crane-prometheus-values.yaml`)
+now names the chart's own kube-state-metrics image (`registry.k8s.io/kube-state-metrics/kube-state-metrics`, the chart's
+v2.10.1), the same in every arm that carries Crane; nothing else of Crane's override changes, and its SHA-256 pin stands. No
+reading was taken; the trial counts in no table.
+
 ## What it is not
 
 A contest between Omni-Compass and Crane for the same job. Omni-Compass never builds Crane's HPA and never writes Crane's

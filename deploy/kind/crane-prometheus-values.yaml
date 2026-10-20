@@ -6,7 +6,10 @@
 # The Prometheus Crane reads its history from (scripts/kind_addons_crane.sh; docs/CRANE_PREREGISTRATION.md), installed as
 # Crane's own installation guide installs it (the prometheus-community chart, Crane's override values for its scrape and
 # recording rules, the alert manager and the push gateway off, no persistent volume), with the chart's placement settings
-# putting the server and kube-state-metrics on the control plane; the node exporter runs on every node, as shipped.
+# putting the server and kube-state-metrics on the control plane; the node exporter runs on every node, as shipped. Crane's
+# override names a kube-state-metrics image on Tencent's registry (ccr.ccs.tencentyun.com/tkeimages/kube-state-metrics:2.2.4),
+# which the chart composes under registry.k8s.io, where no such image exists (the trial of 20 October: ImagePullBackOff in both
+# arms, the install timed out; docs/CRANE_PREREGISTRATION.md, amendment 1): the chart's own image stands, nothing else changes.
 alertmanager:
   enabled: false
 prometheus-pushgateway:
@@ -19,6 +22,10 @@ server:
   tolerations:
     - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
 kube-state-metrics:
+  image:
+    registry: registry.k8s.io
+    repository: kube-state-metrics/kube-state-metrics
+    tag: ""   # the chart's own: v2.10.1, its appVersion
   nodeSelector:
     node-role.kubernetes.io/control-plane: ""
   tolerations:
