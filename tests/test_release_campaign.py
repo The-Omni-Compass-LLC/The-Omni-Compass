@@ -29,12 +29,13 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 132)        # 44 entries, A, B and C (the steady and wandering tests back since omni-v8;
+        self.assertEqual(len(queue), 138)        # 46 entries, A, B and C (the steady and wandering tests back since omni-v8;
                                                  # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October;
                                                  # every data store at the max beside the tune-down, 18 October;
                                                  # the extended fault test, 18 October; CruiseKube on the recorder that
                                                  # counts the add-on's marked workers in service, 19 October;
-                                                 # the cost to match, native tuned harder beside Omni on top, 19 October)
+                                                 # the cost to match, native tuned harder beside Omni on top, 19 October;
+                                                 # the batch stream through Kueue and through Volcano, 19 October, night)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
         for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
             self.assertEqual({row[3].get('objective') for row in queue if row[2] == wf and row[3].get('native') != 'shipped'},
@@ -69,9 +70,11 @@ class ReleaseCampaign(unittest.TestCase):
              'kubernetes batch', 'kubernetes google 2011 trace', 'kubernetes keda add-ons', 'redis resource', 'kafka resource',
              'postgresql resource', 'mysql resource', 'mongodb resource', 'redis service', 'kafka service',
              'mysql resource, native as shipped', 'redis resource, native as shipped', 'mongodb resource, native as shipped',
-             'robot arms', 'power grids', 'buildings and batteries', 'drone swarms', 'robustness kill', 'robustness long'],
+             'robot arms', 'power grids', 'buildings and batteries', 'drone swarms', 'robustness kill', 'robustness long',
+             'kubernetes batch through kueue', 'kubernetes batch through volcano'],   # written before the omni-v12 campaign opened
             ['mysql service', 'mongodb service', 'postgresql service', 'kubernetes faults extended'],   # added 18 October, night
             ['Kubernetes CruiseKube, recorder in service'],                                               # added 19 October
+            ['kubernetes cost to match'],                                                                 # added 19 October, evening
         ]
         blocks = grid.rerun_blocks()
         self.assertEqual([[n for n, _, _ in b] for b in blocks[:len(frozen)]], frozen)
