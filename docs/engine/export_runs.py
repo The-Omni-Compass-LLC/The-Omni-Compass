@@ -25,6 +25,7 @@ import csv
 import hashlib
 import io
 import json
+import statistics
 import math
 import re
 import subprocess
@@ -35,6 +36,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(Path(__file__).resolve().parent))
 RAW = "results/live/raw"
 BIN = 30                     # seconds in a response-time window
+NOISE_N = 200   # requests in the verdict's own window (omni_controller/controller.py --verdict-samples 200)
 K8S = {   # benchmark file stem (without V<n>_) -> the sub-folder of its runs holding its arms ("" for the run itself)
     "GOLDILOCKS": "", "KEDA_REQUESTS": "http/", "KEDA_CPU_REQUESTS": "both/", "ALL_FOUR": "", "TRACE_GOOGLE2011": "",
     "FAULTS": "", "BATCH": "", "FAIRNESS": "", "CRUISEKUBE": "", "CAPACITY": "", "ROBUST_LONG": "", "ROBUST_KILL": ""}
@@ -250,6 +252,11 @@ def arm_k8s(s: Sums, rel: str, omni: bool, slo: float = 500.0) -> dict:
             out["lat"].append(row)
         out["sum"] = {"requests": len(allv), "failed": fails, "mean_ms": round(sum(allv) / len(allv), 2) if allv else None,
                       "p95_ms": round(pct(allv, 0.95), 1) if allv else None, "p99_ms": round(pct(allv, 0.99), 1) if allv else None}
+        # the noise a give-back trial meets on this arm: every run of NOISE_N requests in the order they were sent, the standard
+        # deviation of the log of their response times (the verdict's own window: omni_controller --verdict-samples 200);
+        # gathered over the table's runs by main() into its median, never written into the page per arm
+        seq = [ms for _, ms in sorted(tv for b in bins.values() for tv in b[2]) if ms > 0]
+        out["_noise"] = [statistics.stdev(math.log(x) for x in seq[i:i + NOISE_N]) for i in range(0, len(seq) - NOISE_N + 1, NOISE_N)]
     cap = s.read(f"{rel}/capture.csv")
     if cap:
         rows = list(csv.DictReader(io.StringIO(cap.decode("utf-8", "replace"))))
@@ -410,16 +417,22 @@ def main(out_path):
             eng = meta.get("engines") or [None] * len(raw_runs)
             raw_runs = [{"tag": "ABC"[i] if i < 3 else str(i + 1), "run": x, "engine": eng[i] if i < len(eng) else None}
                         for i, x in enumerate(raw_runs)]
+        sds = []
         for r in raw_runs:
             rec = k8s_run(g, r, K8S[base]) if kind == "k8s" else db_run(g, r)
             if rec:
+                for rep in rec.get("reps") or []:
+                    for arm in ("native", "omni"):
+                        sds += (rep.get(arm) or {}).pop("_noise", None) or []
                 if not r.get("commit") and rec.get("dir"):          # a table that names its runs by id alone: the run's own RUN.txt names its commit
                     m = re.search(rb"^commit=([0-9a-f]{7,40})", g.read(f"{rec['dir']}/RUN.txt") or b"", re.M)
                     if m:
                         r = dict(r, commit=m.group(1).decode())
                 runs.append({"tag": r.get("tag"), "id": str(r.get("run")), "commit": r.get("commit"), "engine": r.get("engine"), **serial(r), **rec})
         title = meta.get("title") or (ROOT / "results" / "live" / f"{stem}.md").read_text(encoding="utf-8").splitlines()[0].lstrip("# ").split(": the A/B/C")[0]
-        benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs})
+        benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs,
+                        # the noise measured on this table's own requests, both arms, runs A, B and C: the median over every window
+                        "noise": {"sigma": round(statistics.median(sds), 3), "windows": len(sds), "window": NOISE_N} if sds else None})
         ck, okk = sum(r["checked"] for r in runs), sum(r["ok"] for r in runs)
         ag = [r.get("official_agree") for r in runs if r.get("official_agree") is not None]
         out_n = sum(r.get("outside_list_n") or 0 for r in runs)
