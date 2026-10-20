@@ -125,6 +125,51 @@ orchestrator (`kind-group.yml`, `orch=ocm`), the four ways above, with the same 
 - **Tried first**: one repetition (`kind-group.yml`, `orch=ocm`, label `trial`), never counted; a fault in the rig is
   fixed in the rig and written here before the counted runs.
 
+## Amendment 2: Armada, frozen (written before its first run, 20 October 2026)
+
+The founder's list names Armada (`armadaproject/armada`, G-Research, the CNCF, Apache-2.0), a multi-cluster batch scheduler:
+jobs are submitted to its queues, its scheduler assigns each to a cluster and a node, and an executor in each cluster creates
+the pods. Register row 94. It runs on this rig as its third orchestrator (`kind-group.yml`, `orch=armada`), the four ways
+above, with the same stream, members, measure and tables.
+
+- **Armada as its project ships it**: release v0.22.14 (its images tagged `0.22.14`, each pinned here by its digest;
+  `armadactl_0.22.14_linux_amd64.tar.gz`, SHA-256 `38fb81fe5b372400baa9c65096013fd44de0d1ab9e7178eb51f4c569bc40280e`), run
+  as its own local stack runs it (`_local/compose` at v0.22.14): Redis 7.4, PostgreSQL 17 and a Pulsar 4.1.0 standalone
+  broker, the scheduler and lookout databases laid out by its own migrations, then its scheduler, scheduler ingester, server
+  and event ingester from its bundle image, every one a container on the runner's own network (so its local configuration,
+  which names every service at localhost, stands unchanged) and on the cluster cores; its components' settings are its local
+  stack's (`deploy/kind/armada/*.yaml`: anonymous access, the executor list read every second as its containerized stack
+  sets it, tracing off because there is no collector here). Armada's control plane needs no cluster of its own; `omni-host`
+  is not created in its arms.
+- **One executor per member**, run as its local stack runs it, on the runner, reaching its member by the member's own
+  kubeconfig (`clusterId omni-m1`, `omni-m2`; pool `default`), so each member is one of Armada's worker clusters; Armada's
+  two priority classes (`armada-default`, `armada-preemptible`, as its local kind setup applies them) are applied in every
+  member before its executor starts. The kubeconfigs stay outside the run's files.
+- **The operator's one setting**: one queue, `omni`, created with `armadactl create queue` and nothing else set (its priority
+  factor the default, 1).
+- **The stream, the same work, as Armada takes work**: Armada's unit is a pod, not a Kubernetes Job, so each batch of the
+  stream (10 pods hashing 3,000 MB) is submitted as one job set (`jobSetId` the batch's name) of 10 jobs, each the batch's pod
+  with the stream's labels (`app`, `job-name`, `omni-stream`), by `armadactl submit`, one batch every 30 s as on every other
+  system. Two things differ, both Armada's own and said here: Armada requires a pod's requests to equal its limits, so its
+  pods ask for the stream pod's limit, one processor (the Kubernetes Job's pods ask for half and may use one); and a job set
+  has no "5 at a time", so how many of a batch's pods run at once is Armada's scheduler's decision within the members'
+  capacity, as on every system the pods' admission is the orchestrator's. A batch is done when 10 of its pods have
+  succeeded; `job wait` is the batch's first pod running after it was submitted, as everywhere.
+- **Its records**: every batch as it was sent (`orch_jobs.json`: the job set's name and the moment `armadactl submit`
+  returned, done when its tenth pod ended, read from the members' pods), where its pods ran (`orch_end.json`), its scheduler's
+  and server's last words, and every image by the digest it was pulled by (`orch.txt`); the merger reads a batch's end from
+  Armada's record where a member has no Job of that name (`tools/merge_group.py`).
+- **What runs on the runner is part of "the orchestrator on its own"**: Armada's control plane and its two executors take
+  processor time on the cluster cores in its two arms (`native`, `compass`); its cost to the group is Armada's, and "Armada as
+  shipped against the group alone" shows it. Pulsar's heap is bounded (1 GiB) so the stack fits beside fifteen kind nodes;
+  a stack that does not come up fails the arm (marked invalid), never the measure.
+- **Known limit, said before the result**: Armada is built for many clusters and long queues; here it has two members and 24
+  job sets. Its fair share and preemption never engage (one queue, one priority); what is measured is its placement and the
+  path a pod takes through it (submit, Pulsar, scheduler, lease, executor, pod), against the group alone and with
+  Omni-Compass on top of each member.
+- **Tried first**: one repetition (`kind-group.yml`, `orch=armada`, label `trial`), never counted; a fault in the rig is fixed
+  in the rig and written here before the counted runs.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
