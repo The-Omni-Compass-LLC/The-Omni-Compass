@@ -87,10 +87,12 @@ def github_runs() -> list | None:
     for status in ("in_progress", "queued"):
         r = subprocess.run(["gh", "run", "list", "--status", status, "--limit", "100", "--json",
                             "databaseId,workflowName,displayTitle,status,createdAt,headBranch"], capture_output=True, text=True, cwd=ROOT)
+        if r.returncode != 0:
+            return None          # GitHub not read: never an empty list under a fresh stamp
         try:
             out += json.loads(r.stdout or "[]")
         except json.JSONDecodeError:
-            pass
+            return None
     return [{"id": r["databaseId"], "workflow": r["workflowName"], "title": r["displayTitle"][:140], "status": r["status"],
              "since": r["createdAt"], "branch": r["headBranch"]} for r in out]
 
@@ -106,7 +108,7 @@ LEDGER_GAUGES = ["machines billed, machine-hours", "compute bill at list price (
 CHECKING = False      # --check: a check reads and compares, it never fetches or writes anything
 
 
-def ledger() -> dict:
+def ledger(camp: dict | None = None) -> dict:
     """Every run GitHub was asked to start for the chips and the clouds (gh run list --event workflow_dispatch, newest
     first), each with the engine its commit stands on (tools/omni_version.py --commit) and whether its raw files are on the
     branch raw. Read from GitHub where a token is present, and kept in docs/engine/github_ledger.json; without a token the
@@ -118,6 +120,9 @@ def ledger() -> dict:
             r = subprocess.run(["gh", "run", "list", "--workflow", wf, "--event", "workflow_dispatch", "--limit", "60", "--json",
                                 "databaseId,displayTitle,status,conclusion,createdAt,updatedAt,headSha,headBranch"],
                                capture_output=True, text=True, cwd=ROOT)
+            if r.returncode != 0:            # not read: the last reading kept stands, with its own time
+                got = None
+                break
             try:
                 got[wf] = [{"id": x["databaseId"], "title": x["displayTitle"], "status": x["status"], "conclusion": x["conclusion"] or None,
                             "created": x["createdAt"], "updated": x["updatedAt"], "sha": x["headSha"], "branch": x["headBranch"]}
@@ -128,7 +133,7 @@ def ledger() -> dict:
         if got:
             data = {"read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                     "source": "GitHub Actions, workflow_dispatch runs of each workflow, newest first", "workflows": got,
-                    "campaign": campaign_reading(), "grid": grid_reading()}
+                    "campaign": camp if camp is not None else campaign_reading(), "grid": grid_reading()}
             # kept for a build without a token; GitHub's own rebuild reads the list fresh every time and commits only the page,
             # so it never rewrites the cache (19 October: the rewritten cache, left uncommitted, stopped the job's push)
             if os.environ.get("GITHUB_ACTIONS") != "true":
@@ -222,10 +227,50 @@ TABLE_OF = {   # a benchmark in scripts/reruns.txt -> the file name of its three
     "redis resource, native as shipped": ["REDIS_SHIPPED"], "mongodb resource, native as shipped": ["YCSB_SHIPPED"],
     "mysql service": ["SYSBENCH_SERVICE"], "mongodb service": ["YCSB_SERVICE"], "postgresql service": ["PGBENCH_SERVICE"],
     "robot arms": ["MUJOCO"], "power grids": ["PANDAPOWER"], "buildings and batteries": ["CITYLEARN"],
-    "drone swarms": ["SWARM"], "robustness kill": ["ROBUST_KILL"], "robustness long": ["ROBUST_LONG"]}
+    "drone swarms": ["SWARM"], "robustness kill": ["ROBUST_KILL"], "robustness long": ["ROBUST_LONG"],
+    # the governors (tools/governors_page.py: a governor's table V12_<SETTING>.json, its four ways V12_<SYSTEM>_4W_<TAG>.json)
+    "kubernetes batch through kueue": ["KUEUE"], "kubernetes batch through volcano": ["VOLCANO"], "kubernetes batch through kai": ["KAI"],
+    "kubernetes batch through koordinator, on the cgroup root its own tests use": ["KOORDINATOR"],
+    "kubernetes batch through the default scheduler": ["VANILLA"], "kubernetes batch through the bin-packing scheduler": ["BINPACK"],
+    **{f"kubernetes batch four ways through {who}": [f"{sys_}_4W_{tag}" for tag in ("TOP", "ORCH", "BARE", "VS", "BOTH")]
+       for who, sys_ in (("the KAI scheduler", "KAI"), ("Koordinator", "KOORDINATOR"), ("Kueue", "KUEUE"), ("Volcano", "VOLCANO"),
+                         ("the bin-packing scheduler", "BINPACK"))}}
+
+# an entry whose runs were declared invalid and repeated under a later entry: what the register says of it, quoted, and the
+# words its row must still hold (the build fails when the register stops saying so)
+SUPERSEDED = {"kubernetes batch through koordinator": (89, "its first A, B and C invalid",
+              "its first A, B and C invalid (koordlet could not start on kind's kubelet cgroup root; no window opened, nothing "
+              "measured), repeated on the cgroup root Koordinator's own kind tests use (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 4)")}
 
 
-def board(runs: list) -> list:
+RUN_STATE = {"in_progress": "running", "queued": "waiting", "waiting": "waiting", "pending": "waiting", "requested": "waiting"}
+
+
+def entry_runs(camp, started: dict) -> dict:
+    """{(entry name, run letter): (run id, state)} for every entry of the campaign, from the campaign's runs read from GitHub:
+    a governor's runs by the ids the repository lists for them (results/live/governors_runs.json, keyed by its batch queue,
+    "4" after it for the four ways), every other run by its count in its workflow in release order, as the conductor reads
+    them back (scripts/dispatch_grid.py rerun_queue). The state is "measured" (finished to the end), "stopped short",
+    "running" or "waiting"; an entry's run not yet started is absent."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import dispatch_grid as D
+    out, seen = {}, {}
+    for run, name, wf, kv in D.rerun_queue():
+        k = seen.get(wf, 0); seen[wf] = k + 1
+        rs = (camp.get("workflows") or {}).get(wf) or []
+        q = kv if isinstance(kv, dict) else dict(p.split("=", 1) for p in str(kv).split(";") if "=" in p)
+        key = str(q.get("batch_queue", "")) + ("4" if "nativebare" in str(q.get("arms", "")) else "")
+        if key and key in started:
+            rid = (started.get(key) or {}).get(run)
+            r = next((x for x in rs if str(x["id"]) == str(rid)), None) if rid else None
+        else:
+            r = rs[k] if k < len(rs) else None
+        if r:
+            out[(name, run)] = (r["id"], RUN_STATE.get(r["status"]) or ("measured" if r["conclusion"] == "success" else "stopped short"))
+    return out
+
+
+def board(runs: list, camp: dict | None = None) -> list:
     """Every benchmark the repository holds a place for, and where it stands: its newest three-run table and that table's
     engine, whether GitHub is running it now, or that it is queued, switched off or not yet launched. Read from
     scripts/reruns.txt, the cloud queues, the GPU campaign's profiles and the results themselves; nothing is written here
@@ -243,11 +288,18 @@ def board(runs: list) -> list:
         n = wf_name.get(wf, wf.removesuffix(".yml"))
         return "running now" if n in live else "queued on GitHub" if n in waiting else None
     found = {t["base"]: t for t in XS.tables()}
+    stands = engine()[0]
+    gr = ROOT / "results" / "live" / "governors_runs.json"
+    er = entry_runs(camp, json.loads(gr.read_text(encoding="utf-8")) if gr.exists() else {}) if camp else None
     names = [ln.split("|")[0] for ln in (ROOT / "scripts" / "reruns.txt").read_text(encoding="utf-8").splitlines()
              if ln.strip() and not ln.startswith("#") and "|" in ln]
     gone = sorted(set(TABLE_OF) - set(names))
     if gone:
         raise SystemExit(f"TABLE_OF names benchmarks scripts/reruns.txt no longer holds: {gone}")
+    reg = {r["n"]: r for r in register_places(limit=False)}
+    for name, (row, must, _) in SUPERSEDED.items():
+        if name not in names or must not in (reg.get(row) or {}).get("status", ""):
+            raise SystemExit(f"SUPERSEDED: '{name}' is no longer in scripts/reruns.txt, or register row {row} no longer says '{must}'")
     for ln in (ROOT / "scripts" / "reruns.txt").read_text(encoding="utf-8").splitlines():
         if not ln.strip() or ln.startswith("#") or "|" not in ln:
             continue
@@ -261,8 +313,25 @@ def board(runs: list) -> list:
             rj = ROOT / "results" / "realms_v5" / "REALMS_V5.json"
             if rj.exists():
                 tables.append({"file": "results/realms_v5/REALMS_V5.md", "engine": json.loads(rj.read_text(encoding="utf-8"))["run"]["engine"]})
+        if name in SUPERSEDED and not tables:
+            out.append({"group": "every benchmark, run again on the engine that stands", "name": name, "workflow": wf, "tables": [],
+                        "now": f"run, then set aside: {SUPERSEDED[name][2]} (register row {SUPERSEDED[name][0]})"})
+            continue
+        if er is None:     # the campaign's runs not read at this build: GitHub's run list for the workflow as a whole
+            now, abc = state(wf) or ("in the reruns queue" if not tables else None), None
+        else:              # its own A, B and C, read from GitHub
+            abc = {L: list(er[(name, L)]) for L in "ABC" if (name, L) in er}
+            sts = [v[1] for v in abc.values()]
+            now = ("running now" if "running" in sts else "queued on GitHub" if "waiting" in sts
+                   else None if any(t["engine"] == stands for t in tables)
+                   else "run: its three-run table not yet written" if len(sts) == 3 else "in the reruns queue")
         out.append({"group": "every benchmark, run again on the engine that stands", "name": name, "workflow": wf,
-                    "tables": tables, "now": state(wf) or ("in the reruns queue" if not tables else None)})
+                    "tables": tables, "now": now, **({"abc": abc} if abc is not None else {})})
+        if name == "1107 muscles and seven organisms":    # the eighth organism, the orchestra, beside the seven: its own runner
+            oj = ROOT / "results" / "orchestra" / "ORCHESTRA.json"
+            out.append({"group": "every benchmark, run again on the engine that stands", "name": "the orchestra, the eighth organism (modelled)",
+                        "workflow": "orchestra.yml", "tables": ([{"file": "results/orchestra/ORCHESTRA.md", "engine": json.loads(oj.read_text(encoding="utf-8"))["run"]["engine"]}]
+                                                               if oj.exists() else []), "now": state("orchestra.yml") or (None if oj.exists() else "not yet run")})
     for t in found.values():   # a three-run table no campaign entry names: listed all the same, never left out
         out.append({"group": "every benchmark, run again on the engine that stands", "name": XS.table_title(t["stem"]), "workflow": "",
                     "tables": [{"file": f"results/live/{t['stem']}.md", "engine": f"omni-v{t['n']}"}], "now": None})
@@ -346,6 +415,7 @@ def fleet() -> dict:
     out["steering"] = json.loads(sp.read_text(encoding="utf-8")) if sp.exists() else None
     out["register"] = register_places()
     out["orchestrators"] = orchestrators()
+    out["orchestra"] = orchestra()
     import brain_off   # what the brain's six-state equations change in the governor's decisions (class S, the fleet model)
     out["brain_off"] = brain_off.compare()
     return _clean(out)
@@ -407,20 +477,32 @@ def campaign_reading() -> dict | None:
     of these is the run of the workflow's k-th entry in the line. Read from GitHub; None where it cannot be read."""
     sys.path.insert(0, str(ROOT / "scripts"))
     import dispatch_grid as D
-    wfs = sorted({c["wf"] for cs in orch_campaign().values() for c in cs})
-    got = {}
+    wfs = sorted({wf for _, _, wf, _ in D.rerun_queue()})       # every workflow of the campaign, the governors' among them
+    got, carries = {}, {}
     for wf in wfs:
-        r = subprocess.run(["gh", "api", f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={D.RERUN_SINCE}&per_page=100"],
-                           capture_output=True, text=True, cwd=ROOT)
+        rs, page = [], 1
+        while page <= 5:
+            r = subprocess.run(["gh", "api", f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={D.RERUN_SINCE}&per_page=100&page={page}"],
+                               capture_output=True, text=True, cwd=ROOT)
+            try:
+                got_page = json.loads(r.stdout or "").get("workflow_runs")
+            except (json.JSONDecodeError, AttributeError):
+                return None
+            if r.returncode != 0 or got_page is None:
+                return None
+            rs += got_page
+            if len(got_page) < 100:
+                break
+            page += 1
+        # counted as the conductor counts them (scripts/dispatch_grid.py reruns_started): a cancelled run is no run, and a kind
+        # workflow's run counts only on a commit that carries the rig (RIG_FILE)
         try:
-            rs = json.loads(r.stdout or "").get("workflow_runs")
-        except (json.JSONDecodeError, AttributeError):
-            return None
-        if rs is None:
+            keep = [x for x in rs if x.get("conclusion") != "cancelled" and (wf not in D.RIG_WORKFLOWS or D.on_rig(x.get("head_sha", ""), carries))]
+        except Exception:
             return None
         got[wf] = [{"id": x["id"], "status": x["status"], "conclusion": x.get("conclusion"), "created": x["created_at"],
                     "updated": x["updated_at"], "sha": (x.get("head_sha") or "")[:12], "title": (x.get("display_title") or "")[:120]}
-                   for x in sorted(rs, key=lambda x: x["created_at"]) if x.get("conclusion") != "cancelled"]
+                   for x in sorted(keep, key=lambda x: x["created_at"])]
     return {"since": D.RERUN_SINCE, "read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "workflows": got}
 
 
@@ -564,7 +646,64 @@ def orchestrators() -> list:
                     "settings": [{"key": k, "label": lb, "started": started.get(k) or {}} for k, lb in GP.settings_of(slug)],
                     "catalog": {"family": fam_id, "name": fam[0]["family"] if fam else None, "n": len(fam), "muscles": muscles},
                     "register": [{"n": r0["n"], "domain": r0["domain"], "bench": r0["bench"], "native": r0["native"], "lever": r0["lever"], "status": r0["status"]}] if r0 else [],
-                    "prereg": prereg, "rig": rig, "workflows": wfs, "campaign": camp.get(slug, [])})
+                    "prereg": prereg, "rig": rig, "workflows": wfs, "campaign": camp.get(slug, []), "four": four_ways(GP, slug)})
+    return out
+
+
+def orchestra() -> dict | None:
+    """The orchestra, the eighth organism (tools/run_orchestra.py, results/orchestra/ORCHESTRA.md): every governor's catalog
+    muscles as a body of its own and all of them together, native and with Omni-Compass on top, modelled (class S); each load's
+    table as the file writes it, row by row, and the run that made it. None before its table is committed."""
+    md, js = ROOT / "results" / "orchestra" / "ORCHESTRA.md", ROOT / "results" / "orchestra" / "ORCHESTRA.json"
+    if not (md.exists() and js.exists()):
+        return None
+    run = json.loads(js.read_text(encoding="utf-8"))["run"]
+    clean = lambda t: re.sub(r"\s+", " ", re.sub(r"\*\*|`", "", t)).strip()
+    loads, cur = [], None
+    for ln in md.read_text(encoding="utf-8").splitlines():
+        if ln.startswith("## "):
+            cur = {"title": clean(ln[3:]), "note": "", "head": [], "rows": []}; loads.append(cur)
+        elif cur is not None and ln.startswith("|") and not re.match(r"\|\s*-", ln):
+            cells = [clean(x) for x in ln.strip().strip("|").split("|")]
+            if not cur["head"]:
+                cur["head"] = cells
+            else:
+                cur["rows"].append(cells)
+        elif cur is not None and ln.strip() and not cur["head"] and not cur["note"]:
+            cur["note"] = clean(ln)
+    loads = [x for x in loads if x["head"] and x["rows"]]
+    # each body's row named by its governor (the file writes the bodies in the run's order, the orchestra last): checked by its
+    # muscle count, else left unnamed
+    slugs = list(run.get("bodies") or {})
+    for x in loads:
+        if x["head"][:2] == ["Body", "Muscles"] and len(x["rows"]) == len(slugs) and all(r[1] == str(len(run["bodies"][sl])) for r, sl in zip(x["rows"], slugs)):
+            x["slugs"] = slugs
+    title = clean(md.read_text(encoding="utf-8").splitlines()[0].lstrip("# "))
+    return {"file": "results/orchestra/ORCHESTRA.md", "title": title, "engine": run.get("engine"), "commit": (run.get("commit") or "")[:12],
+            "started": run.get("started"), "seeds": run.get("seeds"), "dial": run.get("dial"),
+            "bodies": {k: len(v) for k, v in (run.get("bodies") or {}).items()}, "loads": loads}
+
+
+def four_ways(GP, slug: str) -> list:
+    """The governor's four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6; tools/governors_page.py FOUR_WAYS): for each of
+    its systems, the A, B and C started (results/live/governors_runs.json, <system>4) and each comparison's three-run table
+    (V12_<SYSTEM>_4W_<TAG>.md) with its counts, or None while its runs are still to finish."""
+    import export_scenarios as XS
+    keys = {k for k, _ in GP.settings_of(slug)} | {slug}
+    started = json.loads(GP.RUNS.read_text(encoding="utf-8")) if GP.RUNS.exists() else {}
+    out = []
+    for system, name in getattr(GP, "FOUR_SYSTEMS", ()):
+        if system not in keys:
+            continue
+        ways = []
+        for tag, arms, label in GP.FOUR_WAYS:
+            stem = f"V12_{system.upper()}_4W_{tag}"
+            t = None
+            if (ROOT / "results" / "live" / f"{stem}.md").exists():
+                rc = XS.receipt(stem)
+                t = {"file": rc["file"], "count": rc["count"], "rows": [{"g": x["g"], "abc": x["abc"], "w": x["w"]} for x in rc["rows"]]}
+            ways.append({"tag": tag, "arms": arms, "label": label, "table": t})
+        out.append({"system": system, "name": name, "started": started.get(f"{system}4") or {}, "ways": ways})
     return out
 
 
@@ -602,13 +741,14 @@ def records(runs: bool) -> dict:
     name, digest = engine()
     now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     gh = github_runs() if runs else None
+    camp = campaign_reading() if gh is not None else None      # the campaign's runs, read with the run list
     build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"),
              "built_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
              # GitHub's running and queued runs, with the moment they were read; None where this build did not read them (no token)
              "runs": gh or [], "runs_read_at": now() if gh is not None else None}
-    build["board"] = board(build["runs"])
-    build["ledger"] = None if CHECKING else ledger()   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
+    build["board"] = board(build["runs"], camp)
+    build["ledger"] = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build}
 
 
@@ -661,7 +801,7 @@ def main() -> int:
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
         # the ledger, the commit and the time) is a reading with its own read time, not rebuilt by a check
         pb, keep = embedded(page, "build") or {}, ("engine", "digest", "realms_engine", "receipts_engines")
-        strip = lambda bd: [{k: v for k, v in x.items() if k != "now"} for x in (bd or [])]
+        strip = lambda bd: [{k: v for k, v in x.items() if k not in ("now", "abc")} for x in (bd or [])]
         if any(pb.get(k) != rec["build"][k] for k in keep) or strip(pb.get("board")) != strip(rec["build"]["board"]):
             bad.append("build")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
