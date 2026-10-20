@@ -72,13 +72,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-20 05:45 | [The governors and orchestrators: native under them, Omni-Compass on top](results/live/GOVERNORS.md) |  |
-| 2026-10-20 04:12 | [The Kubernetes scheduler as shipped under the batch stream: Omni-Compass on top of the default scheduler alone (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_VANILLA.md) |  |
-| 2026-10-20 04:12 | [Koordinator under the batch stream: Omni-Compass on top of its colocation (register row 89): the A/B/C three-run table (Omni v12)](results/live/V12_KOORDINATOR.md) |  |
-| 2026-10-20 04:12 | [The Kubernetes scheduler with the operator's bin-packing profile under the batch stream: Omni-Compass on top (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_BINPACK.md) |  |
-| 2026-10-20 03:17 | [The orchestra, the eighth organism: the governors' muscles, native and with Omni-Compass on top (modelled)](results/orchestra/ORCHESTRA.md) |  |
-| 2026-10-20 03:17 | [The KAI scheduler under the batch stream: Omni-Compass on top of KAI's queues (register row 91): the A/B/C three-run table (Omni v12)](results/live/V12_KAI.md) |  |
-| 2026-10-19 23:41 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-20 19:24 | [The governors and orchestrators: native under them, Omni-Compass on top](results/live/GOVERNORS.md) |  |
+| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on the organism alone against KubeRay as shipped (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_VS.md) |  |
+| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on top of KubeRay against KubeRay as shipped (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_TOP.md) |  |
+| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: KubeRay as shipped against the organism alone (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_ORCH.md) |  |
+| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on top of KubeRay against the organism alone (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_BOTH.md) |  |
+| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on the organism alone against the organism alone (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_BARE.md) |  |
+| 2026-10-20 18:45 | [Karmada on the group of two clusters under the batch stream, the four ways: Omni-Compass on the organism alone against Karmada as shipped (register row 95): the A/B/C three-run table (Omni v12)](results/live/V12_KARMADA_4W_VS.md) |  |
+| 2026-10-20 18:45 | [Karmada on the group of two clusters under the batch stream, the four ways: Omni-Compass on top of Karmada against Karmada as shipped (register row 95): the A/B/C three-run table (Omni v12)](results/live/V12_KARMADA_4W_TOP.md) |  |
+| 2026-10-20 18:45 | [Karmada on the group of two clusters under the batch stream, the four ways: Karmada as shipped against the organism alone (register row 95): the A/B/C three-run table (Omni v12)](results/live/V12_KARMADA_4W_ORCH.md) |  |
+| 2026-10-20 18:45 | [Karmada on the group of two clusters under the batch stream, the four ways: Omni-Compass on top of Karmada against the organism alone (register row 95): the A/B/C three-run table (Omni v12)](results/live/V12_KARMADA_4W_BOTH.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -86,16 +89,11 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-20 17:35 | live-engine | success | [39466517370](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466517370) |
-| 2026-10-20 17:35 | raw-sweep | success | [39467387250](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39467387250) |
-| 2026-10-20 17:31 | big-organism-detached collect | success | [39466841010](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466841010) |
-| 2026-10-20 17:28 | benchmark-reps | success | [39452221655](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39452221655) |
-| 2026-10-20 17:27 | cloud-check amazon | failure | [39466145477](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466145477) |
-| 2026-10-20 17:27 | cloud-check google | failure | [39466133594](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466133594) |
-| 2026-10-20 17:18 | swarm | success | [39463907059](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39463907059) |
-| 2026-10-20 17:11 | mujoco | success | [39463729880](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39463729880) |
-| 2026-10-20 17:10 | grid | cancelled | [39440275095](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39440275095) |
-| 2026-10-20 16:50 | kind-addons | success | [39454568217](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39454568217) |
+| 2026-10-20 20:41 | peek | success | [39494029108](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39494029108) |
+| 2026-10-20 20:39 | cloud-check amazon | failure | [39493850357](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39493850357) |
+| 2026-10-20 20:39 | cloud-check google | failure | [39493840626](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39493840626) |
+| 2026-10-20 20:34 | live-engine | success | [39491294017](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39491294017) |
+| 2026-10-20 20:21 | raw-sweep | success | [39491293989](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39491293989) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
