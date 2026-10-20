@@ -236,37 +236,25 @@ TABLE_OF = {   # a benchmark in scripts/reruns.txt -> the file name of its three
        for who, sys_ in (("the KAI scheduler", "KAI"), ("Koordinator", "KOORDINATOR"), ("Kueue", "KUEUE"), ("Volcano", "VOLCANO"),
                          ("the bin-packing scheduler", "BINPACK"))}}
 
-# an entry whose runs were declared invalid and repeated under a later entry: what the register says of it, quoted, and the
-# words its row must still hold (the build fails when the register stops saying so)
-SUPERSEDED = {"kubernetes batch through koordinator": (89, "its first A, B and C invalid",
-              "its first A, B and C invalid (koordlet could not start on kind's kubelet cgroup root; no window opened, nothing "
-              "measured), repeated on the cgroup root Koordinator's own kind tests use (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 4)")}
-
 
 RUN_STATE = {"in_progress": "running", "queued": "waiting", "waiting": "waiting", "pending": "waiting", "requested": "waiting"}
 
 
-def entry_runs(camp, started: dict) -> dict:
+def entry_runs(camp) -> dict:
     """{(entry name, run letter): (run id, state)} for every entry of the campaign, from the campaign's runs read from GitHub:
-    a governor's runs by the ids the repository lists for them (results/live/governors_runs.json, keyed by its batch queue,
-    "4" after it for the four ways), every other run by its count in its workflow in release order, as the conductor reads
-    them back (scripts/dispatch_grid.py rerun_queue). The state is "measured" (finished to the end), "stopped short",
-    "running" or "waiting"; an entry's run not yet started is absent."""
-    sys.path.insert(0, str(ROOT / "scripts"))
-    import dispatch_grid as D
-    out, seen = {}, {}
-    for run, name, wf, kv in D.rerun_queue():
-        k = seen.get(wf, 0); seen[wf] = k + 1
-        rs = (camp.get("workflows") or {}).get(wf) or []
-        q = kv if isinstance(kv, dict) else dict(p.split("=", 1) for p in str(kv).split(";") if "=" in p)
-        key = str(q.get("batch_queue", "")) + ("4" if "nativebare" in str(q.get("arms", "")) else "")
-        if key and key in started:
-            rid = (started.get(key) or {}).get(run)
-            r = next((x for x in rs if str(x["id"]) == str(rid)), None) if rid else None
+    a run whose workflow titles it from its inputs by that title (the k-th entry of a title is its k-th run), every other by
+    its count in its workflow in release order, as the conductor reads them back (scripts/dispatch_grid.py rerun_queue). The
+    state is "measured" (finished to the end), "stopped short", "running" or "waiting"; a run not yet started is absent."""
+    out = {}
+    for c in campaign_places():
+        rs = (camp.get("workflows") or {}).get(c["wf"]) or []
+        if c["title"]:
+            same = [x for x in rs if x.get("title") == c["title"]]
+            r = same[c["occ"]] if c["occ"] < len(same) else None
         else:
-            r = rs[k] if k < len(rs) else None
+            r = rs[c["pos"]] if c["pos"] < len(rs) else None
         if r:
-            out[(name, run)] = (r["id"], RUN_STATE.get(r["status"]) or ("measured" if r["conclusion"] == "success" else "stopped short"))
+            out[(c["name"], c["run"])] = (r["id"], RUN_STATE.get(r["status"]) or ("measured" if r["conclusion"] == "success" else "stopped short"))
     return out
 
 
@@ -289,17 +277,12 @@ def board(runs: list, camp: dict | None = None) -> list:
         return "running now" if n in live else "queued on GitHub" if n in waiting else None
     found = {t["base"]: t for t in XS.tables()}
     stands = engine()[0]
-    gr = ROOT / "results" / "live" / "governors_runs.json"
-    er = entry_runs(camp, json.loads(gr.read_text(encoding="utf-8")) if gr.exists() else {}) if camp else None
+    er = entry_runs(camp) if camp else None
     names = [ln.split("|")[0] for ln in (ROOT / "scripts" / "reruns.txt").read_text(encoding="utf-8").splitlines()
              if ln.strip() and not ln.startswith("#") and "|" in ln]
     gone = sorted(set(TABLE_OF) - set(names))
     if gone:
         raise SystemExit(f"TABLE_OF names benchmarks scripts/reruns.txt no longer holds: {gone}")
-    reg = {r["n"]: r for r in register_places(limit=False)}
-    for name, (row, must, _) in SUPERSEDED.items():
-        if name not in names or must not in (reg.get(row) or {}).get("status", ""):
-            raise SystemExit(f"SUPERSEDED: '{name}' is no longer in scripts/reruns.txt, or register row {row} no longer says '{must}'")
     for ln in (ROOT / "scripts" / "reruns.txt").read_text(encoding="utf-8").splitlines():
         if not ln.strip() or ln.startswith("#") or "|" not in ln:
             continue
@@ -313,10 +296,6 @@ def board(runs: list, camp: dict | None = None) -> list:
             rj = ROOT / "results" / "realms_v5" / "REALMS_V5.json"
             if rj.exists():
                 tables.append({"file": "results/realms_v5/REALMS_V5.md", "engine": json.loads(rj.read_text(encoding="utf-8"))["run"]["engine"]})
-        if name in SUPERSEDED and not tables:
-            out.append({"group": "every benchmark, run again on the engine that stands", "name": name, "workflow": wf, "tables": [],
-                        "now": f"run, then set aside: {SUPERSEDED[name][2]} (register row {SUPERSEDED[name][0]})"})
-            continue
         if er is None:     # the campaign's runs not read at this build: GitHub's run list for the workflow as a whole
             now, abc = state(wf) or ("in the reruns queue" if not tables else None), None
         else:              # its own A, B and C, read from GitHub
@@ -324,7 +303,8 @@ def board(runs: list, camp: dict | None = None) -> list:
             sts = [v[1] for v in abc.values()]
             now = ("running now" if "running" in sts else "queued on GitHub" if "waiting" in sts
                    else None if any(t["engine"] == stands for t in tables)
-                   else "run: its three-run table not yet written" if len(sts) == 3 else "in the reruns queue")
+                   else ("run: every run stopped short" if "measured" not in sts else "run: its three-run table not yet written") if len(sts) == 3
+                   else "in the reruns queue")
         out.append({"group": "every benchmark, run again on the engine that stands", "name": name, "workflow": wf,
                     "tables": tables, "now": now, **({"abc": abc} if abc is not None else {})})
         if name == "1107 muscles and seven organisms":    # the eighth organism, the orchestra, beside the seven: its own runner
@@ -452,6 +432,38 @@ def _norm(x: str) -> str:
     return re.sub(r"[-_]+", " ", x.lower())
 
 
+def run_title(wf: str, kv: dict, run: str) -> str | None:
+    """The title GitHub gives an entry's run, rendered from its workflow's own run-name (.github/workflows/<wf>), with the
+    entry's inputs and, for a workflow the conductor labels (scripts/dispatch_grid.py LABELLED), the run's letter as its
+    label; None where the run-name is not a plain template of inputs (the run is then read back by its count)."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import dispatch_grid as D
+    y = ROOT / ".github" / "workflows" / wf
+    m = re.search(r'^run-name:\s*"([^"\n]*)"\s*$', y.read_text(encoding="utf-8"), re.M) if y.exists() else None
+    if not m:
+        return None
+    vals = {**{k: str(v) for k, v in kv.items()}, **({"label": run} if wf in D.LABELLED else {})}
+    parts = re.split(r"\$\{\{\s*inputs\.(\w+)\s*\}\}", m.group(1))
+    if any(name not in vals for name in parts[1::2]):
+        return None
+    return "".join(p if i % 2 == 0 else vals[p] for i, p in enumerate(parts))
+
+
+def campaign_places() -> list:
+    """Every run of the campaign in release order (scripts/dispatch_grid.py rerun_queue): its letter, entry, workflow and
+    inputs, its count in its workflow (how the conductor reads a run back) and, where the workflow titles its runs from their
+    inputs, the title it carries and which run of that title it is (the k-th entry of a title is its k-th run)."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import dispatch_grid as D
+    seen, occ, out = {}, {}, []
+    for run, name, wf, kv in D.rerun_queue():
+        pos = seen.get(wf, 0); seen[wf] = pos + 1
+        title = run_title(wf, kv, run)
+        k = (wf, title); n = occ.get(k, 0); occ[k] = n + 1
+        out.append({"run": run, "name": name, "wf": wf, "kv": kv, "pos": pos, "title": title, "occ": n if title else None})
+    return out
+
+
 def orch_campaign() -> dict:
     """{governor slug: [its entries in the campaign of the engine that stands]}: each entry of scripts/reruns.txt whose name or
     inputs name the governor, with its run letter and its place in its workflow's own line (the conductor reads a run back by
@@ -460,14 +472,14 @@ def orch_campaign() -> dict:
     import dispatch_grid as D
     GP = _governors()
     pats = {slug: _orch_pattern(_orch_alias(GP, slug, name)) for slug, name, *_ in GP.GOVERNORS}
-    queue, seen, out = D.rerun_queue(), {}, {}
-    for run, name, wf, kv in queue:
-        pos = seen.get(wf, 0); seen[wf] = pos + 1
-        text = _norm(name + " " + " ".join(f"{k} {v}" for k, v in kv.items()))
+    out = {}
+    for c in campaign_places():
+        text = _norm(c["name"] + " " + " ".join(f"{k} {v}" for k, v in c["kv"].items()))
         for slug, pat in pats.items():
             if pat.search(text):
-                out.setdefault(slug, []).append({"run": run, "name": name, "wf": wf, "pos": pos,
-                                                 "inputs": ";".join(f"{k}={v}" for k, v in kv.items())})
+                out.setdefault(slug, []).append({"run": c["run"], "name": c["name"], "wf": c["wf"], "pos": c["pos"],
+                                                 "inputs": ";".join(f"{k}={v}" for k, v in c["kv"].items()),
+                                                 **({"title": c["title"], "occ": c["occ"]} if c["title"] else {})})
     return out
 
 
@@ -780,6 +792,10 @@ def main() -> int:
     global CHECKING
     CHECKING = a.check
     page = PAGE.read_text(encoding="utf-8")
+    if re.search(r'prefers-color-scheme:\s*light|data-theme="light"\]', page):
+        # the founder's orders of 17 and 20 October: the live engine is black on every viewer's theme, never white
+        print("the page carries a light palette: the live engine renders dark on every viewer's theme")
+        return 1
     named = re.search(r'<html[^>]*data-engine="(omni-v\d+)"', page)
     rec = records(not a.no_runs and not a.check)
     if not named or named.group(1) != rec["build"]["engine"]:
