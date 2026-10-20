@@ -323,9 +323,54 @@ def fleet() -> dict:
     sp = ROOT / "results" / "STEERING.json"   # how steadily the governor steered: its own moves on every Kubernetes table of the engine that stands
     out["steering"] = json.loads(sp.read_text(encoding="utf-8")) if sp.exists() else None
     out["register"] = register_places()
+    out["orchestrators"] = orchestrators()
     import brain_off   # what the brain's six-state equations change in the governor's decisions (class S, the fleet model)
     out["brain_off"] = brain_off.compare()
     return _clean(out)
+
+
+# The governors and orchestrators the founder named for the benchmark of omni-v13 (19 October), in his order. Each is a place on the
+# page before its result exists: what it is and who ships it (public facts), then everything the repository holds for it, read at
+# every build (a register row naming it, its newest three-run table results/live/V<n>_<KEY>.md, its workflow on GitHub). Nothing of
+# a run is written here: its runs fill the place the moment they land.
+ORCHESTRATORS = [
+    ("VOLCANO", "Volcano", "the CNCF", "batch scheduling for AI and HPC jobs: gang scheduling, job queues and fair share", ("volcano",)),
+    ("KUEUE", "Kueue", "Kubernetes SIG Scheduling", "job queueing: quotas and admission through cluster and local queues", ("kueue",)),
+    ("CRANE", "Crane", "gocrane, Tencent", "FinOps on Kubernetes: resource recommendations, predictive pod autoscaling and QoS ensurance", ("gocrane", "finops crane", "crane scheduler", "crane ehpa")),
+    ("OCM", "Open Cluster Management", "the CNCF", "multi-cluster management: placement of work across clusters", ("ocm", "open cluster management", "open-cluster-management")),
+    ("GODEL", "Gödel scheduler", "kubewharf, ByteDance", "one scheduler for online and offline workloads at scale", ("godel", "gödel")),
+    ("ARMADA", "Armada", "G-Research, CNCF sandbox", "batch job scheduling across many clusters", ("armada",)),
+    ("KARMADA", "Karmada", "the CNCF", "multi-cluster orchestration: propagation, placement and failover of workloads", ("karmada",)),
+    ("KUBE_SCHEDULER", "the Kubernetes scheduler, vanilla", "Kubernetes SIG Scheduling", "the default pod scheduler with its plugins, as shipped", ("kube-scheduler", "kube scheduler", "vanilla scheduler", "default scheduler")),
+    ("KAI", "KAI Scheduler", "NVIDIA", "GPU-aware scheduling for AI workloads: queues, fair share and GPU sharing", ("kai-scheduler", "kai scheduler", "kai_scheduler")),
+    ("NEPHIO", "Nephio", "the Linux Foundation", "intent-based automation of network functions on Kubernetes", ("nephio",)),
+    ("KUBEEDGE", "KubeEdge", "the CNCF", "orchestration from the cloud to edge nodes and devices", ("kubeedge",)),
+    ("KUBERAY", "KubeRay", "the Ray project", "Ray clusters on Kubernetes with the Ray autoscaler", ("kuberay",)),
+    ("KOORDINATOR", "Koordinator", "koordinator-sh", "QoS-based scheduling: latency-sensitive and batch work on the same nodes", ("koordinator",)),
+    ("CRUISEKUBE", "CruiseKube", "TrueFoundry", "rightsizing: its own recommendations applied in place", ("cruisekube",))]
+
+
+def orchestrators() -> list:
+    """Each governor's place: what it is, and what the repository holds for it now (its register rows, its newest three-run table
+    with every judged row as written, its workflows); empty fields mean the repository holds nothing for it yet."""
+    import export_scenarios as XS
+    norm = lambda x: re.sub(r"[-_]+", " ", x.lower())
+    reg = register_places()
+    flows = sorted(p.name for p in (ROOT / ".github" / "workflows").glob("*.yml"))
+    out = []
+    for key, name, owner, role, alias in ORCHESTRATORS:
+        pat = re.compile(r"(?<![a-z0-9])(" + "|".join(re.escape(norm(a)) for a in alias) + r")(?![a-z0-9])")
+        n, stem = XS.newest(f"V7_{key}")
+        table = None
+        if n is not None:
+            rc = XS.receipt(stem)
+            table = {"file": rc["file"], "title": rc["title"], "engine": f"omni-v{n}", "count": rc["count"],
+                     "rows": [{"g": x["g"], "abc": x["abc"], "w": x["w"], "r": x["r"]} for x in rc["rows"]][:60]}
+        out.append({"key": key, "name": name, "owner": owner, "role": role, "table": table,
+                    "register": [{"n": r["n"], "bench": r["bench"], "native": r["native"], "lever": r["lever"], "status": r["status"]}
+                                 for r in reg if pat.search(norm(r["bench"]))][:3],
+                    "workflows": [f for f in flows if pat.search(norm(f[:-4]))]})
+    return out
 
 
 def register_places() -> list:
