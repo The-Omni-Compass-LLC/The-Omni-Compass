@@ -81,12 +81,13 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # default): every other set, unchanged
 ADDONS="${ADDONS:-}"
 case "$ADDONS" in ""|keda|goldilocks) ;; *) echo "ADDONS must be empty, keda or goldilocks (got $ADDONS)"; exit 1;; esac
-# BATCH_QUEUE=kueue, volcano or kai, with WORKLOAD=batch (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 91): the batch
-# test's work arrives as a stream of jobs and a queueing system of its own admits and places it, installed from its own
-# release in every arm before the arms are told apart (scripts/kind_batch_queue.sh); Omni-Compass sits on top with its own
-# levers and never writes the queueing system's objects. Empty: the batch test's one Job on Kubernetes alone
+# BATCH_QUEUE=kueue, volcano, kai or koordinator, with WORKLOAD=batch (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows
+# 63, 89, 91): the batch test's work arrives as a stream of jobs and a queueing system of its own admits and places it,
+# installed from its own release in every arm before the arms are told apart (scripts/kind_batch_queue.sh); Omni-Compass
+# sits on top with its own levers and never writes the queueing system's objects. Empty: the batch test's one Job on
+# Kubernetes alone
 BATCH_QUEUE="${BATCH_QUEUE:-}"
-case "$BATCH_QUEUE" in ""|kueue|volcano|kai) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano or kai (got $BATCH_QUEUE)"; exit 1;; esac
+case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai or koordinator (got $BATCH_QUEUE)"; exit 1;; esac
 [ -z "$BATCH_QUEUE" ] || { [ "${WORKLOAD:-web}" = batch ] && [ -z "$ADDONS" ]; } \
   || { echo "BATCH_QUEUE=$BATCH_QUEUE runs the batch test (WORKLOAD=batch) with no other add-on"; exit 1; }
 CRUISEKUBE="${CRUISEKUBE:-}"
@@ -336,7 +337,7 @@ if [ -n "$KEDA" ]; then   # the add-on's own pods, all on the control plane (scr
 elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's controller; the VPA's recommender is in kube-system (both on the control plane)
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","goldilocks") | not)] | length')
 else   # with a queueing system, its own namespace too (scripts/kind_batch_queue.sh checks its pods are on the control plane)
-qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler
+qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system
 foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or (. == $q)) | not)] | length')
 fi
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }
