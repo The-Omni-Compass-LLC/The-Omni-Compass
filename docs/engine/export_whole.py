@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The whole organism, two ways, for the live engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html, section 11).
@@ -53,9 +53,15 @@ GROUPS = [
     ("hardware", "The bare metal: the card (the chip) and the machine (the kernel, bare metal, Kepler)", (1, 2)),
     ("cloud", "The cloud: the machines it bills, metered", (5,)),
 ]
+# every way a stack is bought (the founder's order of 20 October): on-site bare metal; through the cloud (three pieces, and the
+# cloud as two pieces beside it); in the device (the bare metal alone: Omni-Compass built into the card and the machine, nothing
+# else wired); as a service (the software alone: the owner has neither the bare metal nor the cloud account, Omni-Compass sits in
+# the software run for them). Each sums the layers of the pieces it names; a piece with no factor counts as exactly 1.
 SCENARIOS = [
-    ("onsite", "On-site bare metal: the software on the bare metal", ("software", "hardware"), None),
+    ("onsite", "On-site bare metal: the software on the owner's own bare metal", ("software", "hardware"), None),
     ("cloud", "Through the cloud: the cloud's build, its bare metal at the back end, the software", ("cloud", "hardware", "software"), ("cloud", "software")),
+    ("device", "In the device: the bare metal alone, Omni-Compass built into the card and the machine", ("hardware",), None),
+    ("service", "As a service: the software alone, run for an owner with neither bare metal nor a cloud account", ("software",), None),
 ]
 NOT_RUN = {2: "the machine (the kernel, bare metal, Kepler): not yet run (register row 79), enters as exactly 1"}
 Z95 = 1.959963984540054
