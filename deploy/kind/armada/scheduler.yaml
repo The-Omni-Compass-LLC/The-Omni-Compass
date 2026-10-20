@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Armada's scheduler on the group rig (scripts/kind_group_orch.sh, ORCH=armada; docs/GROUP_PREREGISTRATION.md, amendment 2):
+# the settings Armada's own local stack gives its scheduler at v0.22.14 (_local/scheduler/config.yaml), every service on the
+# runner's own network (localhost), the executor list refreshed every second as Armada's containerized stack sets it, and
+# its tracing exporter off (there is no collector here). Everything else is the image's own default configuration.
+queueRefreshPeriod: 3s
+grpc:
+  port: 50052
+  tls:
+    enabled: false
+http:
+  port: 8080
+observability:
+  enabled: false
+auth:
+  anonymousAuth: true
+  permissionGroupMapping:
+    execute_jobs: ["everyone"]
+pulsar:
+  URL: "pulsar://localhost:6650"
+armadaApi:
+  armadaUrl: "localhost:50051"
+  forceNoTls: true
+postgres:
+  connection:
+    host: localhost
+    port: 5432
+    user: postgres
+    password: psw
+    dbname: scheduler
+    sslmode: disable
+scheduling:
+  indexedNodeLabels:
+    - "kubernetes.io/hostname"
+  executorUpdateFrequency: 1s
+  retryPolicy:
+    enabled: true
+    globalMaxRetries: 5
+metrics:
+  port: 9001
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

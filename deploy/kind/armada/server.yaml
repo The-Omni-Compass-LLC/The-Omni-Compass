@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Armada's server (its job submission API) on the group rig (scripts/kind_group_orch.sh, ORCH=armada): the settings Armada's
+# own local stack gives it at v0.22.14 (_local/server/config.yaml), every service on the runner's own network (localhost),
+# anonymous access as there (the runner is the only client), and its tracing exporter off.
+httpPort: 8081
+grpcPort: 50051
+metricsPort: 9009
+observability:
+  enabled: false
+auth:
+  anonymousAuth: true
+  permissionGroupMapping:
+    update_executor_settings: ["everyone"]
+    submit_any_jobs: ["everyone"]
+    create_queue: ["everyone"]
+    create_retry_policy: ["everyone"]
+    update_retry_policy: ["everyone"]
+    delete_retry_policy: ["everyone"]
+    delete_queue: ["everyone"]
+    cancel_any_jobs: ["everyone"]
+    reprioritize_any_jobs: ["everyone"]
+    preempt_any_jobs: ["everyone"]
+    watch_all_events: ["everyone"]
+eventsApiRedis:
+  addrs:
+    - localhost:6379
+  db: 1
+postgres:
+  connection:
+    host: localhost
+    port: 5432
+    user: postgres
+    password: psw
+    dbname: lookout
+    sslmode: disable
+queryapi:
+  postgres:
+    connection:
+      host: localhost
+      port: 5432
+      user: postgres
+      password: psw
+      dbname: lookout
+      sslmode: disable
+pulsar:
+  URL: "pulsar://localhost:6650"
+redis:
+  addrs:
+    - localhost:6379
+schedulerApiConnection:
+  armadaUrl: "localhost:50052"
+  forceNoTls: true
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
