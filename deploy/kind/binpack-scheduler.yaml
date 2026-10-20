@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The Kubernetes scheduler with the operator's bin-packing profile (scripts/kind_batch_queue.sh, BATCH_QUEUE=binpack;
+# docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 3): a second scheduler from the cluster's own release (the kube-scheduler
+# image the control plane already runs; KUBE_SCHEDULER_IMAGE is filled in by the script), as Kubernetes' own pages write
+# one ("Configure Multiple Schedulers", "Resource Bin Packing"): one profile, binpack-scheduler, whose NodeResourcesFit
+# scores a node higher the fuller it is (MostAllocated, processor and memory weighted alike). Every other plugin is the
+# release's default. On the control plane; the cluster's default scheduler is left as it is for every other pod.
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: omni-binpack-scheduler, namespace: kube-system}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: omni-binpack-scheduler-as-kube-scheduler}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: "system:kube-scheduler"}
+subjects: [{kind: ServiceAccount, name: omni-binpack-scheduler, namespace: kube-system}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: omni-binpack-scheduler-as-volume-scheduler}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: "system:volume-scheduler"}
+subjects: [{kind: ServiceAccount, name: omni-binpack-scheduler, namespace: kube-system}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: omni-binpack-scheduler-auth-reader, namespace: kube-system}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: "extension-apiserver-authentication-reader"}
+subjects: [{kind: ServiceAccount, name: omni-binpack-scheduler, namespace: kube-system}]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: omni-binpack-scheduler-config, namespace: kube-system}
+data:
+  config.yaml: |
+    apiVersion: kubescheduler.config.k8s.io/v1
+    kind: KubeSchedulerConfiguration
+    leaderElection: {leaderElect: false}
+    profiles:
+      - schedulerName: binpack-scheduler
+        pluginConfig:
+          - name: NodeResourcesFit
+            args:
+              scoringStrategy:
+                type: MostAllocated
+                resources:
+                  - {name: cpu, weight: 1}
+                  - {name: memory, weight: 1}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: omni-binpack-scheduler, namespace: kube-system, labels: {app: omni-binpack-scheduler}}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: omni-binpack-scheduler}}
+  template:
+    metadata: {labels: {app: omni-binpack-scheduler}}
+    spec:
+      serviceAccountName: omni-binpack-scheduler
+      priorityClassName: system-cluster-critical
+      nodeSelector: {node-role.kubernetes.io/control-plane: ""}
+      tolerations: [{key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}]
+      containers:
+        - name: kube-scheduler
+          image: KUBE_SCHEDULER_IMAGE
+          imagePullPolicy: IfNotPresent
+          command: ["kube-scheduler", "--config=/etc/binpack/config.yaml", "--v=2"]
+          livenessProbe: {httpGet: {path: /healthz, port: 10259, scheme: HTTPS}, initialDelaySeconds: 15}
+          readinessProbe: {httpGet: {path: /healthz, port: 10259, scheme: HTTPS}}
+          resources: {requests: {cpu: 100m, memory: 64Mi}}
+          volumeMounts: [{name: config, mountPath: /etc/binpack, readOnly: true}]
+      volumes: [{name: config, configMap: {name: omni-binpack-scheduler-config}}]
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

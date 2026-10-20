@@ -46,10 +46,33 @@ class GovernorsPage(unittest.TestCase):
         self.assertIn("runs not yet finished", koord)
         self.assertIn("LOSS in all three of our runs", text)                  # every row counted and shown, losses included
 
+    def test_the_scheduler_reads_each_setting_from_its_own_table(self):
+        table = {"runs": ["1", "2", "3"], "engines": ["omni-v12"] * 3,
+                 "rows": {"queue: jobs unfinished at the window's end": {"reading": "LOSS in all three of our runs"}}}
+        with tempfile.TemporaryDirectory() as t:
+            live = Path(t) / "results" / "live"; live.mkdir(parents=True)
+            (live / "V12_BINPACK.json").write_text(json.dumps(table))
+            with mock.patch.object(G, "ROOT", Path(t)):
+                text = G.render(runs={"vanilla": {"A": "7", "B": "8", "C": "9"}})
+        line = next(l for l in text.splitlines() if l.startswith("| The Kubernetes scheduler"))
+        self.assertIn("as shipped: runs not yet finished", line)
+        self.assertIn("bin-packing profile: 0 GAIN, 1 LOSS", line)
+        self.assertIn("(V12_BINPACK.md)", line)
+        self.assertIn("- **Readings (as shipped)**: none yet", text)
+
     def test_no_number_before_the_runs(self):
         text = G.render(runs={})
         crane = next(l for l in text.splitlines() if l.startswith("| Crane"))
         self.assertTrue(crane.endswith("| not yet run |"))
+
+    def test_every_catalog_muscle_named_is_in_the_catalog(self):
+        import csv
+        rows = list(csv.DictReader((ROOT / "realms" / "catalog_v5.csv").open()))
+        for slug, (fid, muscles) in G.CATALOG.items():
+            family = {r["muscle"] for r in rows if r["family_id"] == str(fid)}
+            for m in muscles:
+                self.assertIn(m, family, f"{slug}: {m} is not in family {fid}")
+        self.assertEqual(set(G.CATALOG), {g[0] for g in G.GOVERNORS})
 
 
 if __name__ == "__main__":
