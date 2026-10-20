@@ -345,6 +345,38 @@ machine. Each is fixed where it was found, the same in every arm, before the cou
   no log). The run's other nine repetitions landed whole and are read; its three-run table says C carries nine. No rig changed
   for it.
 
+## Amendment 10: what the counted runs of 20 October found (written after those runs, before the Gödel runs start again)
+
+- **Gödel's rig: metrics-server never came up on Kubernetes 1.24** (runs 39438395275, 39438412522 and 39438430198, A, B
+  and C; every arm of every repetition marked invalid before any stream ran: "0 of 1 updated replicas are available" for the
+  whole five-minute wait, the same in all forty arms). The cause is in the rig, not in Gödel: kubeadm 1.24 taints the control
+  plane twice, `node-role.kubernetes.io/control-plane:NoSchedule` and the older `node-role.kubernetes.io/master:NoSchedule`
+  (1.25 drops the second), and the rig's metrics-server pod, pinned to the control plane, tolerated only the first, so it
+  stayed Pending and the rollout never finished. On 1.25 (Crane) and 1.35 (every other rig) only the first taint exists, and
+  the same pod ran. The pod now tolerates both (`scripts/kind_bench.sh`, the manifest patch and the coredns pin alike), the
+  same in every arm and on every rig; nothing else of the rig changes. Gödel's three runs start again on the fixed rig; the
+  three that failed stand as the record of the fault and count in no table.
+- **The test machine, twice more** (no rig changed for either): KubeRay A (run 39438462925, repetition 2) lost its runner
+  three hours in, no log kept, after the memory bound of amendment 9 was in place; the other nine repetitions landed whole and
+  are read, and the table says A carries nine. Karmada A (run 39438525862, repetition 3) never started: GitHub's checkout of
+  the repository failed after seven minutes, before any cluster was made; the other nine landed whole and are read, and the
+  table says A carries nine.
+- **Two LOSS rows, reported as they stand, their mechanism named, nothing re-aimed after the fact.** (1) Crane, Omni-Compass
+  on top of it against it as shipped (`results/live/V12_CRANE_4W_TOP.md`): the total pod start wait rose 54% to 104% in all
+  three runs, LOSS, while the pods started rose 50% to 67% (power given), the replicas 14% to 18% (power given) and the wait per
+  pod read EVEN (+0.9% to +21%, intervals across zero in two runs): the total is the per-pod wait, unchanged, summed over the
+  pods Omni-Compass chose to start; the same gauge read the same way in the KEDA runs of 18 October (`docs/POD_START_WAIT.md`).
+  Whether a sum of a resource (pods started) and a wait (the wait per pod) is a wait or a resource is for the metric-aims audit
+  to decide in writing before any run is read by it; this table is read by the key as it stands, and the row stays LOSS. (2)
+  KubeRay's rig, Omni-Compass on the organism alone against the organism alone (`results/live/V12_KUBERAY_4W_BARE.md`): the
+  queue finished 0.6% to 0.8% later and the 99th percentile rose 4% to 13% in all three runs, LOSS, while the machines in
+  service fell 14% to 19%, the machines left after the queue 25% to 33% and the mean response 7% to 10% (GAIN), the 95th
+  percentile, the time over the line, the failures and the jobs unfinished EVEN. The governor gave machines back during the
+  queue on its trial's own gauges, and the queue's last jobs and the tail paid for it. On the engine that stands no muscle may
+  fall below native, so this is the engine's to fix, not the table's: the give-back trial on a batch queue must count the
+  queue's finish and the tail among the gauges it judges before a machine is parked, in the next version, through the toy gate
+  first (`docs/CHANGE_CONTROL.md`). The rows stand until that version's three runs replace them.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

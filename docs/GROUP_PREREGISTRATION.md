@@ -32,7 +32,8 @@ the simplest placement a group without an orchestrator has.
 
 - **nativebare**, the group alone: no orchestrator; the jobs go to the members in turn; Omni-Compass is not started.
 - **native**, the orchestrator as its project ships it, on a one-node cluster of its own beside the members
-  (`deploy/kind/cluster-host.yaml`), every job sent to it; Omni-Compass is not started.
+  (`deploy/kind/cluster-host.yaml`; OCM's agents also in the members, amendment 1), every job sent to it; Omni-Compass is
+  not started.
 - **compassbare**, Omni-Compass on top of each member of the group alone (one governor per member, each wired to its own
   cluster only, as on one cluster).
 - **compass**, Omni-Compass on top of each member, the orchestrator on top of the group.
@@ -88,6 +89,41 @@ fix is written here as an amendment before the counted runs.
 
 A contest between Omni-Compass and the orchestrator for the same job: Omni-Compass places no job and writes nothing of the
 orchestrator's; on the group alone it sits on top of each member's own scheduler, under the orchestrator on top of the same.
+
+## Amendment 1: Open Cluster Management, frozen (written before its first run, 20 October 2026)
+
+The founder's list names Open Cluster Management (`open-cluster-management-io/ocm`, the CNCF, Apache-2.0), a hub that
+registers clusters, decides placements and distributes work to them. Register row 96. It runs on this rig as its second
+orchestrator (`kind-group.yml`, `orch=ocm`), the four ways above, with the same stream, members, measure and tables.
+
+- **OCM as its project ships it**: its hub (the cluster manager) installed by its own CLI on the orchestrator's cluster
+  (`clusteradm init` on `omni-host`, the components of its default bundle 1.4.0; `clusteradm` v1.4.0 from its release,
+  `clusteradm_linux_amd64.tar.gz`, SHA-256 `aa94241caf353a515a0778e0ce608b4c68ced9b3e7f6fb5fe23f48393926153b`, a file that
+  does not match its pin fails the arm); each member registered by `clusteradm join` (its klusterlet, the registration and
+  work agents, in the member's own namespaces `open-cluster-management` and `open-cluster-management-agent`, on the workers
+  as OCM places them) by the address its agents reach the hub at, and accepted on the hub (`clusteradm accept`); the arm
+  waits until the hub reports both members Available. The bootstrap token stays outside the run's files. Every image, with
+  the digest it resolved to, is recorded in `orch.txt` (the hub's, and one member's agents').
+- **The operator's one setting**: the default cluster set (every joined cluster is in it) bound to the `default` namespace,
+  and for every job of the stream a Placement of its own in that namespace, asking for one cluster of the set with OCM's
+  default prioritizers (Steady, which keeps a decision once made, and Balance, which spreads the decisions among the
+  clusters), the way OCM's documentation distributes workloads: a Placement each, the hub deciding. Once OCM has decided
+  (`PlacementDecision`), the harness writes the job as a `ManifestWork` in the chosen member's namespace on the hub, and
+  OCM's work agent applies it in that member. Which member each job goes to is OCM's; the harness waits up to 120 s for a
+  decision and tries a job's placement twice.
+- **What runs in the members is part of "the orchestrator on its own"**: OCM's klusterlet runs in each member in both of
+  its arms (`native`, `compass`), on the workers, as Karmada in push mode runs nothing there; its cost to the group is
+  OCM's, and "OCM as shipped against the group alone" shows it.
+- **Its records**: every `ManifestWork` as sent (`orch_jobs.json`: the job's name and the moment it was sent to the hub),
+  every `PlacementDecision` (`orch_end.json`: each job and the member OCM chose), and the hub's placement, registration and
+  work controllers' last words; a job is done when its Job in the member is done, as on the group alone.
+- **Known limit, said before the result**: OCM is a placement engine, not a job scheduler. Its decision reads what it
+  knows of each cluster (its allocatable resources, and the balance of decisions already made), never the member's live
+  load; on two identical members, Balance alternates the jobs between them much as the group alone does in turn. Where
+  that is what OCM does, the tables will say so, and "Omni-Compass on top of OCM against OCM as shipped" is read on the
+  same placements.
+- **Tried first**: one repetition (`kind-group.yml`, `orch=ocm`, label `trial`), never counted; a fault in the rig is
+  fixed in the rig and written here before the counted runs.
 
 ---
 
