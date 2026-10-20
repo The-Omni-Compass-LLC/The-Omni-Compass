@@ -40,7 +40,7 @@ repetitions a run, three runs A, B and C (`tools/confirm_abc.py`).
    card bench (`scripts/gpu_paired.sh`) while the same machine hosts a kind cluster of stack 1; the card's governor and the
    cluster's governor are one body (one registry, one kill switch). Gauges: the card's primary (served requests per kJ),
    its energy, its 95th percentile, and stack 1's gauges. Starts only after the CPU side is done and on the founder's word,
-   from one exact commit of `gpu-omni-v12`.
+   from one exact commit of `gpu-omni-v13`.
 
 The machine layer (bare metal, Kepler and the machine's own meter; register row 79) joins stack 3 when its own benchmark
 has run; until then it enters the composition as exactly 1 and the stacked run does not claim it.
