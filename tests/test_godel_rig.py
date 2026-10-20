@@ -71,10 +71,29 @@ class GodelRig(unittest.TestCase):
         self.assertEqual(k["spec"]["template"]["metadata"]["labels"]["kai.scheduler/queue"], "default-queue")
 
     def test_the_bench_takes_godel_its_namespace_and_its_metrics_server(self):
-        self.assertIn("|kuberay|godel|vanilla|binpack)", BENCH)
+        self.assertRegex(BENCH, r'case "\$BATCH_QUEUE" in ""\|[a-z|]*\|godel\|[a-z|]*binpack\)')   # Gödel among the queues
         self.assertIn('[ "$BATCH_QUEUE" = godel ] && qns=godel-system', BENCH)
         self.assertIn("v0.5.*) ms_floor=8 ;;", BENCH)
         self.assertIn("godel) NS=godel-system ;;", QUEUE)
+
+    def test_metrics_server_is_applied_once_with_the_rigs_settings_and_by_the_registry_that_serves_it(self):
+        # amendment 9: one rollout (two left the first pod terminating past the wait on 1.24); k8s.gcr.io only redirects
+        self.assertNotIn("patch deployment metrics-server", BENCH)
+        code = BENCH[BENCH.index("<<'EOF'\nimport sys, yaml") + len("<<'EOF'\n"):BENCH.index("\nEOF\nkubectl apply -f \"$OUT_DIR/metrics-server-rig.yaml\"")]
+        manifest = ("apiVersion: v1\nkind: ServiceAccount\nmetadata: {name: metrics-server, namespace: kube-system}\n---\n"
+                    "apiVersion: apps/v1\nkind: Deployment\nmetadata: {name: metrics-server, namespace: kube-system}\n"
+                    "spec:\n  template:\n    spec:\n      containers:\n      - name: metrics-server\n"
+                    "        image: k8s.gcr.io/metrics-server/metrics-server:v0.5.2\n        args: [--cert-dir=/tmp]\n")
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False) as f:
+            f.write(manifest)
+        out = subprocess.run(["python3", "-", f.name], input=code, capture_output=True, text=True, check=True).stdout
+        docs = list(yaml.safe_load_all(out))
+        dep = next(d for d in docs if d["kind"] == "Deployment")["spec"]["template"]["spec"]
+        self.assertEqual(dep["containers"][0]["image"], "registry.k8s.io/metrics-server/metrics-server:v0.5.2")
+        self.assertEqual(dep["containers"][0]["args"], ["--cert-dir=/tmp", "--kubelet-insecure-tls"])
+        self.assertEqual(dep["nodeSelector"], {"node-role.kubernetes.io/control-plane": ""})
+        self.assertEqual(len(docs), 2)                                          # every other document untouched
 
 
 if __name__ == "__main__":
