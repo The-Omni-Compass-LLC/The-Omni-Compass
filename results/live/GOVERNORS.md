@@ -20,7 +20,7 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | KubeRay | Ray clusters (the Ray autoscaler) | 92 | built; its runs come in the campaign | not yet run |
 | Gödel scheduler | unified online and offline scheduling | 93 | built; its runs come in the campaign | not yet run |
 | Armada | multi-cluster batch | 94 | its rig is not yet built | not yet run |
-| Karmada | multi-cluster placement | 95 | its rig is not yet built | not yet run |
+| Karmada | multi-cluster placement | 95 | built; its runs come in the campaign | not yet run |
 | Open Cluster Management | multi-cluster management | 96 | its rig is not yet built | not yet run |
 | KubeEdge | edge nodes | 97 | its rig is not yet built | not yet run |
 | Nephio | network-function automation | 98 | its rig is not yet built | not yet run |
@@ -39,6 +39,7 @@ Each system runs four ways in every repetition, each way on a fresh cluster of t
 | KubeRay | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 | Crane | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 | The Gödel scheduler | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| Karmada | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 
 ## The orchestra, the eighth organism (modelled, class S)
 
@@ -225,8 +226,8 @@ Every row of the run: [`results/live/V12_KOORDINATOR.md`](V12_KOORDINATOR.md).
 
 ## Karmada
 
-- **Native**: its propagation and replica division.
-- **Its test on real Kubernetes (class L)**: not yet written; register row 95.
+- **Native**: Karmada v1.19.0 on a cluster of its own, two member clusters joined, its placement of the stream as shipped with the operator's one propagation policy.
+- **Its test on real Kubernetes (class L)**: the batch stream sent to a group of two clusters, four ways (`docs/GROUP_PREREGISTRATION.md`); register row 95.
 - **In the catalog (modelled, class S)**: family 39, Cross-Cluster, Multi-Region & Edge (18 muscles, in its realm and the whole tower): `multi_cluster_dispatch`, `region_dispatch`, `global_failover`, `cross_cluster_replication`.
 - **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (more work + fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.

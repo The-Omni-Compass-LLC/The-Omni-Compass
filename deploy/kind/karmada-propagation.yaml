@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The operator's one propagation policy for the batch stream on Karmada (scripts/kind_group_orch.sh;
+# docs/GROUP_PREREGISTRATION.md): every job of the stream may go to any member, and Karmada divides each job's pods among
+# them by its Aggregated preference, as its own documentation writes it for work that should run on as few clusters as its
+# available resources allow; how it picks the cluster is Karmada's. MEMBER_CLUSTERS is filled with the members' names.
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: omni-batch-stream
+  namespace: default
+spec:
+  resourceSelectors:
+    - apiVersion: batch/v1
+      kind: Job
+      labelSelector:
+        matchLabels:
+          app: omni-batch-stream
+  placement:
+    clusterAffinity:
+      clusterNames: MEMBER_CLUSTERS
+    replicaScheduling:
+      replicaSchedulingType: Divided
+      replicaDivisionPreference: Aggregated
