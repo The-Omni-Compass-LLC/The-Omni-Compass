@@ -5,9 +5,10 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 #
-# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91):
+# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92):
 # Kueue (Kubernetes SIG Scheduling, Apache-2.0), Volcano (the CNCF, Apache-2.0), the KAI scheduler (NVIDIA, Apache-2.0)
-# or Koordinator (the CNCF, Apache-2.0) admits and places a stream of jobs, or the Kubernetes scheduler alone places it,
+# or Koordinator (the CNCF, Apache-2.0) admits and places a stream of jobs, KubeRay (the Ray project, Apache-2.0) runs the
+# same work as Ray jobs on one Ray cluster that the Ray autoscaler scales, or the Kubernetes scheduler alone places it,
 # as shipped (vanilla) or with the operator's bin-packing profile (binpack), the same in every arm, installed from its own release on the fresh cluster of each
 # arm before the arms are told apart. Native is the queueing system as its project ships it, on Kubernetes alone;
 # Omni-Compass sits on top with its own levers and never writes the queueing system's objects.
@@ -15,29 +16,36 @@
 #                  workers carry only the work, as with every add-on), wait until it answers; (Kueue) the operator's
 #                  queue: one ClusterQueue whose quota is the workers' allocatable CPU and memory, read live, and one
 #                  LocalQueue; (Volcano, KAI) its default queues as shipped; (Koordinator) the operator's colocation
-#                  profile, the jobs best effort on batch resources; the stream's image pulled onto every worker
+#                  profile, the jobs best effort on batch resources; (KubeRay) its operator, the Ray image loaded into
+#                  every node, and the one Ray cluster, KubeRay's own autoscaling sample with the operator's settings,
+#                  its head ready; the stream's image pulled onto every worker
 #   PHASE=submit   the stream: BATCH_JOBS jobs of BATCH_COMPLETIONS pods, BATCH_PARALLELISM at a time, one every
 #                  BATCH_EVERY_S seconds from the window's opening, each pod hashing BATCH_MB MB; batch_done.txt when the
 #                  last job has succeeded
-#   PHASE=end      every job's and every pod's times (jobs.json, pods.json) and the queueing system's own objects
-#                  (batch_queue_end.json)
+#   PHASE=end      every job's and every pod's times (jobs.json, pods.json; KubeRay: every Ray job's, rayjobs.json, and
+#                  its first and last task's, from its own driver's last line, ray_times.json) and the queueing system's
+#                  own objects (batch_queue_end.json)
 set -euo pipefail
 OUT_DIR="${OUT_DIR:?}"
-Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai, koordinator, vanilla or binpack}"
+Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, vanilla or binpack}"
 KUEUE_VERSION="${KUEUE_VERSION:-v0.20.2}"       # released 15 October 2026
 VOLCANO_VERSION="${VOLCANO_VERSION:-v1.16.0}"   # released 14 October 2026
 KAI_VERSION="${KAI_VERSION:-v0.18.6}"           # released 15 October 2026 (its chart, oci://ghcr.io/kai-scheduler/...)
 KOORD_VERSION="${KOORD_VERSION:-1.8.0}"         # released 16 April 2026 (its chart, from its charts repository's release)
+KUBERAY_VERSION="${KUBERAY_VERSION:-1.7.1}"     # released 18 September 2026 (its operator's chart, from kuberay-helm's release)
+RAY_IMAGE="rayproject/ray:2.52.0"               # the Ray its autoscaling sample names (rayVersion 2.52.0), amd64 893 MB packed
+RAY_DIGEST="sha256:5c31da4180403f2d5f4590d05fbd46c1345e91e8d33dd4ff616de2702b611b31"   # that tag's index, pinned
 # each release file's SHA-256, pinned when this test was preregistered (a different version names its own)
 KUEUE_SHA256="${KUEUE_SHA256:-1ab14ecd590575ac57f50fa4cbcf529766bc2c32ba974bda1614381281ec52b4}"     # manifests.yaml, v0.20.2
 VOLCANO_SHA256="${VOLCANO_SHA256:-9aa62e15541f5e955d73353da9321ab233a2cbe0f8fbac4b4a4d38ba497303ee}" # volcano-development.yaml, v1.16.0
 KAI_SHA256="${KAI_SHA256:-dff53248c4a044249a1f62ca8d35bd8dfc02719b99e302b35c69f946f4c5b7ff}"         # the chart archive, v0.18.6
 KOORD_SHA256="${KOORD_SHA256:-766011e7c797a5b2ea0ed2091b31efb4eb16ba14699189db304022336fc48e06}"     # the chart archive, 1.8.0
+KUBERAY_SHA256="${KUBERAY_SHA256:-fd057c207a6be038f2fe1475abb87f43a8c091b77f1f563b4e8547a2404b5bc8}" # the chart archive, 1.7.1
 JOBS="${BATCH_JOBS:-24}"; COMPLETIONS="${BATCH_COMPLETIONS:-10}"; PARALLELISM="${BATCH_PARALLELISM:-5}"
 EVERY="${BATCH_EVERY_S:-30}"; MB="${BATCH_MB:-3000}"
 case "$Q" in kueue) NS=kueue-system ;; volcano) NS=volcano-system ;; kai) NS=kai-scheduler ;; koordinator) NS=koordinator-system ;;
-  vanilla|binpack) NS=kube-system ;;
-  *) echo "BATCH_QUEUE must be kueue, volcano, kai, koordinator, vanilla or binpack (got $Q)"; exit 1 ;; esac
+  kuberay) NS=kuberay-system ;; vanilla|binpack) NS=kube-system ;;
+  *) echo "BATCH_QUEUE must be kueue, volcano, kai, koordinator, kuberay, vanilla or binpack (got $Q)"; exit 1 ;; esac
 # every serving pod of a Helm-installed system on the control plane: a pod a move replaced is given two minutes to finish
 # on its worker; a finished install hook and a node agent of a DaemonSet are not counted, the same in both arms
 off() { kubectl get pods -n "$NS" -o json | jq -r --argjson term "$1" '[.items[]
@@ -127,6 +135,50 @@ install)
     sleep 10
   done
   echo "colocation probe (scheduler, QoS class, batch-cpu asked): $m" >> "$OUT_DIR/koord_placement.txt"
+  elif [ "$Q" = kuberay ]; then
+  # KubeRay's operator chart at its pinned version, the release archive checked against its pinned SHA-256, installed by Helm
+  # with the chart's own placement settings (deploy/kind/kuberay-values.yaml)
+  url="https://github.com/ray-project/kuberay-helm/releases/download/kuberay-operator-${KUBERAY_VERSION}/kuberay-operator-${KUBERAY_VERSION}.tgz"
+  for t in 1 2 3; do
+    curl -fsSL --retry 3 -o "$W/chart.tgz" "$url" && break
+    [ "$t" = 3 ] && { echo "INVALID RUN: KubeRay's chart could not be fetched ($url)"; exit 1; }; sleep 10
+  done
+  got=$(sha256sum "$W/chart.tgz" | cut -d' ' -f1)
+  [ "$got" = "$KUBERAY_SHA256" ] || { echo "INVALID RUN: KubeRay's chart is not the one pinned (sha256 $got, pinned $KUBERAY_SHA256)"; exit 1; }
+  helm install kuberay-operator "$W/chart.tgz" --namespace "$NS" --create-namespace -f deploy/kind/kuberay-values.yaml --wait --timeout 10m \
+    > "$OUT_DIR/kuberay_helm.log" 2>&1 || { tail -40 "$OUT_DIR/kuberay_helm.log"; kubectl get pods -n "$NS" -o wide; exit 1; }
+  placed "$OUT_DIR/kuberay_placement.txt"
+  # the Ray image by its pinned digest, pulled once by this runner (the first arm that needs it), then loaded into every
+  # node of this arm's fresh cluster: no node downloads it, so a job's wait is never a download on the one shared machine
+  docker image inspect "rayproject/ray@${RAY_DIGEST}" >/dev/null 2>&1 || {
+    for t in 1 2 3; do docker pull -q "rayproject/ray@${RAY_DIGEST}" > "$OUT_DIR/ray_image_pull.log" 2>&1 && break
+      [ "$t" = 3 ] && { echo "INVALID RUN: the Ray image could not be pulled ($RAY_DIGEST)"; cat "$OUT_DIR/ray_image_pull.log"; exit 1; }; sleep 20
+    done; }
+  docker tag "rayproject/ray@${RAY_DIGEST}" "$RAY_IMAGE"
+  kind load docker-image "$RAY_IMAGE" --name "${KIND_CLUSTER:-omni-bench}" > "$OUT_DIR/ray_image_load.log" 2>&1 \
+    || { echo "INVALID RUN: the Ray image could not be loaded into the cluster's nodes"; tail -20 "$OUT_DIR/ray_image_load.log"; exit 1; }
+  # the stream's job script on the head, then the one Ray cluster: KubeRay's own autoscaling sample with the operator's
+  # settings (deploy/kind/kuberay-cluster.yaml), its worker group's ceiling the workers' allocatable processors over one
+  # worker pod's half, read live; it stands once its head answers
+  kubectl create configmap omni-ray-stream --from-file=stream_job.py=deploy/kind/kuberay_stream_job.py --dry-run=client -o yaml \
+    | kubectl apply -f - >/dev/null
+  max=$(kubectl get nodes -l '!node-role.kubernetes.io/control-plane' -o json | python3 -c '
+import json, sys
+def cpu(v): return float(v[:-1]) / 1000 if v.endswith("m") else float(v)
+print(int(sum(cpu(x["status"]["allocatable"]["cpu"]) for x in json.load(sys.stdin)["items"]) / 0.5))')
+  for t in $(seq 1 20); do
+    sed "s/MAX_WORKERS/${max}/" deploy/kind/kuberay-cluster.yaml | kubectl apply -f - >/dev/null 2>&1 && break
+    [ "$t" = 20 ] && { echo "INVALID RUN: the Ray cluster was refused"; exit 1; }; sleep 6
+  done
+  for t in $(seq 1 60); do
+    head=$(kubectl get pods -l ray.io/cluster=omni-ray,ray.io/node-type=head -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+    [ -n "$head" ] && kubectl wait --for=condition=Ready "pod/$head" --timeout=10s >/dev/null 2>&1 \
+      && kubectl exec "$head" -c ray-head -- ray status > "$OUT_DIR/ray_status_start.txt" 2>&1 && break
+    [ "$t" = 60 ] && { echo "INVALID RUN: the Ray cluster's head did not answer in 10 minutes"; kubectl get raycluster,pods -o wide; exit 1; }
+    sleep 10
+  done
+  node=$(kubectl get "pod/$head" -o jsonpath='{.spec.nodeName}')
+  case "$node" in *control-plane*) ;; *) echo "INVALID RUN: the Ray head is not on the control plane ($node)"; exit 1 ;; esac
   elif [ "$Q" = vanilla ]; then
   # the Kubernetes scheduler as shipped: nothing is installed; the cluster's own default scheduler places the stream
   url="the cluster's own default scheduler"
@@ -226,6 +278,9 @@ EOF
     echo "koordinator ${KOORD_VERSION}; the operator's colocation profile (deploy/kind/koordinator-colocation.yaml), the jobs best effort on batch resources" > "$OUT_DIR/batch_queue.txt"
     kubectl get nodes -o json | jq '[.items[] | {node: .metadata.name, batch_cpu: .status.allocatable["kubernetes.io/batch-cpu"], batch_memory: .status.allocatable["kubernetes.io/batch-memory"]}]' \
       > "$OUT_DIR/koord_batch_allocatable_start.json" || true
+  elif [ "$Q" = kuberay ]; then
+    echo "kuberay ${KUBERAY_VERSION}; one Ray cluster (Ray 2.52.0, $(docker image inspect "$RAY_IMAGE" --format '{{index .RepoDigests 0}}')), KubeRay's autoscaling sample, its worker group up to ${max} pods" > "$OUT_DIR/batch_queue.txt"
+    kubectl get raycluster omni-ray -o json > "$OUT_DIR/raycluster_start.json"
   elif [ "$Q" = kai ]; then
     echo "kai ${KAI_VERSION}; its chart's default queues as shipped ($(kubectl get queues.scheduling.run.ai -o jsonpath='{range .items[*]}{.metadata.name} {end}'))" > "$OUT_DIR/batch_queue.txt"
     kubectl get queues.scheduling.run.ai -o json > "$OUT_DIR/kai_queues.json"
@@ -268,6 +323,23 @@ EOF
   ;;
 submit)
   START=$(date -u +%s); label=""; podlabel=""; sched=""
+  if [ "$Q" = kuberay ]; then
+    # the same stream as Ray jobs: one RayJob of the same tasks every BATCH_EVERY_S seconds, sent to the one Ray cluster by
+    # KubeRay's operator (deploy/kind/kuberay-job.yaml); batch_done.txt once every Ray job has succeeded
+    for i in $(seq 1 "$JOBS"); do
+      sed -e "s/JOB_NAME/omni-ray-$(printf %03d "$i")/" -e "s/BATCH_COMPLETIONS/${COMPLETIONS}/" -e "s/BATCH_PARALLELISM/${PARALLELISM}/" \
+          -e "s/BATCH_MB/${MB}/" deploy/kind/kuberay-job.yaml > "$OUT_DIR/job.yaml"
+      for t in 1 2 3 4 5 6; do kubectl apply -f "$OUT_DIR/job.yaml" --request-timeout=20s >/dev/null && break; sleep 5; done
+      echo "$(date -u +%s) submitted omni-ray-$(printf %03d "$i")" >> "$OUT_DIR/batch_submit.log"
+      [ "$i" = "$JOBS" ] || sleep "$EVERY"
+    done
+    until [ "$(kubectl get rayjobs -l app=omni-ray-stream -o json --request-timeout=20s 2>/dev/null \
+              | jq '[.items[] | select(.status.jobStatus == "SUCCEEDED")] | length')" = "$JOBS" ]; do
+      [ "$(date -u +%s)" -lt "$(( START + ${DURATION:?} ))" ] || exit 0; sleep 5
+    done
+    date -u +%s > "$OUT_DIR/batch_done.txt"
+    exit 0
+  fi
   [ "$Q" = kueue ] && label="kueue.x-k8s.io/queue-name: omni-queue"
   [ "$Q" = volcano ] && sched="schedulerName: volcano"
   [ "$Q" = kai ] && { label="kai.scheduler/queue: default-queue"; podlabel="$label"; sched="schedulerName: kai-scheduler"; }
@@ -291,6 +363,38 @@ submit)
   date -u +%s > "$OUT_DIR/batch_done.txt"
   ;;
 end)
+  if [ "$Q" = kuberay ]; then
+    # every Ray job as KubeRay recorded it, and each one's first and last task from its own driver's last line (the head's
+    # job logs), in ray_times.json; the cluster as the window left it
+    kubectl get rayjobs -l app=omni-ray-stream -o json > "$OUT_DIR/rayjobs.json" 2>/dev/null || echo '{"items": []}' > "$OUT_DIR/rayjobs.json"
+    kubectl get raycluster omni-ray -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
+    kubectl get pods -l ray.io/cluster=omni-ray -o json > "$OUT_DIR/ray_pods.json" 2>/dev/null || echo '{"items": []}' > "$OUT_DIR/ray_pods.json"
+    head=$(kubectl get pods -l ray.io/cluster=omni-ray,ray.io/node-type=head -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+    : > "$OUT_DIR/ray_job_logs.txt"
+    for id in $(jq -r '.items[] | .status.jobId // empty' "$OUT_DIR/rayjobs.json"); do
+      echo "== $id" >> "$OUT_DIR/ray_job_logs.txt"
+      kubectl exec "$head" -c ray-head -- ray job logs --address http://127.0.0.1:8265 "$id" 2>&1 | tail -5 >> "$OUT_DIR/ray_job_logs.txt" || true
+    done
+    python3 - "$OUT_DIR" <<'PY'
+import json, sys
+from pathlib import Path
+d = Path(sys.argv[1]); times, cur = {}, None
+for ln in (d / "ray_job_logs.txt").read_text(errors="replace").splitlines():
+    if ln.startswith("== "):
+        cur = ln[3:].strip()
+    elif cur and ln.startswith("OMNI_TIMES "):
+        times[cur] = json.loads(ln[len("OMNI_TIMES "):])
+out = []
+for j in json.loads((d / "rayjobs.json").read_text()).get("items", []):
+    st = j.get("status") or {}
+    t = times.get(st.get("jobId") or "", {})
+    out.append({"name": j["metadata"]["name"], "submitted": j["metadata"]["creationTimestamp"], "status": st.get("jobStatus"),
+                "end": st.get("endTime"), "first_task": t.get("first"), "last_task": t.get("last"), "tasks": t.get("tasks")})
+(d / "ray_times.json").write_text(json.dumps({"items": out}, indent=1) + "\n")
+PY
+    echo '{"items": []}' > "$OUT_DIR/jobs.json"; echo '{"items": []}' > "$OUT_DIR/pods.json"
+    exit 0
+  fi
   kubectl get jobs -l app=omni-batch-stream -o json > "$OUT_DIR/jobs.json" 2>/dev/null || echo '{"items": []}' > "$OUT_DIR/jobs.json"
   kubectl get pods -l app=omni-batch-stream -o json > "$OUT_DIR/pods.json" 2>/dev/null || echo '{"items": []}' > "$OUT_DIR/pods.json"
   if [ "$Q" = kueue ]; then

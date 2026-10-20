@@ -17,7 +17,7 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | three runs in | 3 GAIN, 0 LOSS, 0 power given, 19 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR.md)) |
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
 | Crane | predictive autoscaling and resource governance | 90 | its rig is not yet built | not yet run |
-| KubeRay | Ray clusters (the Ray autoscaler) | 92 | its rig is not yet built | not yet run |
+| KubeRay | Ray clusters (the Ray autoscaler) | 92 | built; its runs come in the campaign | not yet run |
 | Gödel scheduler | unified online and offline scheduling | 93 | its rig is not yet built | not yet run |
 | Armada | multi-cluster batch | 94 | its rig is not yet built | not yet run |
 | Karmada | multi-cluster placement | 95 | its rig is not yet built | not yet run |
@@ -198,8 +198,8 @@ Every row of the run: [`results/live/V12_KOORDINATOR.md`](V12_KOORDINATOR.md).
 
 ## KubeRay
 
-- **Native**: the Ray autoscaler as shipped.
-- **Its test on real Kubernetes (class L)**: not yet written; register row 92.
+- **Native**: KubeRay 1.7.1 and one Ray cluster (Ray 2.52.0) from KubeRay's own autoscaling sample, the Ray autoscaler as shipped.
+- **Its test on real Kubernetes (class L)**: the batch stream as Ray jobs (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 7); register row 92.
 - **In the catalog (modelled, class S)**: family 12, AI Training (18 muscles, in its realm and the whole tower): `training_workers`, `elastic_worker_count`, `training_gang_size`.
 - **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
 - **Readings**: none yet; nothing is written here before its three runs are in.

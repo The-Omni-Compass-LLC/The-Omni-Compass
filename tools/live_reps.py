@@ -299,29 +299,39 @@ def job_stream(d):
     its submission to its first pod running (the queueing system's admission and the scheduler's placement together, the
     same measure for Kueue, which holds the job, and Volcano, which holds its pods), and to its last pod done; a job not
     started or not done by the window's end counts the window's end, so an unfinished job never reads quick; and how many
-    were unfinished. From jobs.json and pods.json; absent from every other test."""
+    were unfinished. From jobs.json and pods.json; on KubeRay (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 7) the same
+    measures of every Ray job, from ray_times.json: its submission, its first task begun (its own driver's record) and its
+    end as KubeRay recorded it, a job that did not succeed counted unfinished. Absent from every other test."""
     import datetime as _dt
+    ts = lambda s: _dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=_dt.timezone.utc).timestamp()
     try:
         t1 = float((d / "window_end.txt").read_text().split()[0])
-        jobs = json.loads((d / "jobs.json").read_text()).get("items", [])
-        pods = json.loads((d / "pods.json").read_text()).get("items", [])
-    except (OSError, ValueError, IndexError):
+        if (d / "ray_times.json").exists():
+            rows = []   # (submitted, first started, done or None)
+            for r in json.loads((d / "ray_times.json").read_text()).get("items", []):
+                done = ts(r["end"]) if r.get("end") and r.get("status") == "SUCCEEDED" else None
+                rows.append((ts(r["submitted"]), r["first_task"] if r.get("first_task") is not None else t1, done))
+        else:
+            jobs = json.loads((d / "jobs.json").read_text()).get("items", [])
+            pods = json.loads((d / "pods.json").read_text()).get("items", [])
+            first = {}
+            for p in pods:
+                job = (p.get("metadata", {}).get("labels", {}) or {}).get("job-name")
+                start = (p.get("status") or {}).get("startTime")
+                if job and start:
+                    first[job] = min(first.get(job, float("inf")), ts(start))
+            rows = []
+            for j in jobs:
+                st = j.get("status") or {}
+                rows.append((ts(j["metadata"]["creationTimestamp"]), first.get(j["metadata"]["name"], t1),
+                             ts(st["completionTime"]) if st.get("completionTime") else None))
+    except (OSError, ValueError, IndexError, KeyError):
         return {}
-    if not jobs:
+    if not rows:
         return {}
-    ts = lambda s: _dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=_dt.timezone.utc).timestamp()
-    first = {}
-    for p in pods:
-        job = (p.get("metadata", {}).get("labels", {}) or {}).get("job-name")
-        start = (p.get("status") or {}).get("startTime")
-        if job and start:
-            first[job] = min(first.get(job, float("inf")), ts(start))
     waits, turns, unfinished = [], [], 0
-    for j in jobs:
-        name, sub = j["metadata"]["name"], ts(j["metadata"]["creationTimestamp"])
-        st = j.get("status") or {}
-        done = ts(st["completionTime"]) if st.get("completionTime") else None
-        waits.append(min(first.get(name, t1), t1) - sub)
+    for sub, started, done in rows:
+        waits.append(min(started, t1) - sub)
         if done is not None and done <= t1:
             turns.append(done - sub)
         else:
