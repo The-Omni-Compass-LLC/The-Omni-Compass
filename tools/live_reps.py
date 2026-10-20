@@ -41,6 +41,13 @@ BILL = {"machines billed, machine-hours", "compute bill at list price ($)"}   # 
 SECOND = {k for k in KEYS if k.startswith("second app: ")}                     # the fairness test only (TWO_APP=1)
 HOST = {"host CPU busy, the real machine under kind (%)", "host cores (the real machine under kind)"}   # kind only
 BATCH = {"batch: queue finished (s)", "batch: worker machines in service after the queue finished, mean"}   # the batch test only
+QUEUE = {"queue: job wait, submitted to its first pod running, mean (s)",
+         "queue: job wait, submitted to its first pod running, 95th percentile (s)",
+         "queue: job turnaround, submitted to done, mean (s)",
+         "queue: jobs unfinished at the window's end"}   # the batch stream under a queueing system only (BATCH_QUEUE)
+KEYS[KEYS.index("batch: worker machines in service after the queue finished, mean") + 1:KEYS.index("batch: worker machines in service after the queue finished, mean") + 1] = [
+    "queue: job wait, submitted to its first pod running, mean (s)", "queue: job wait, submitted to its first pod running, 95th percentile (s)",
+    "queue: job turnaround, submitted to done, mean (s)", "queue: jobs unfinished at the window's end"]
 # the robustness test only (ROBUST=kill, scripts/kind_robust.sh): the same 120 s after the kill mark in both arms
 ROBUST = {"robust: time over the line in the 120 s after the kill (% of samples)", "robust: failed requests in the 120 s after the kill (%)"}
 KEYS += sorted(ROBUST)
@@ -280,6 +287,46 @@ def batch(d):
     return g
 
 
+def job_stream(d):
+    """The batch stream under a queueing system (BATCH_QUEUE, scripts/kind_batch_queue.sh): for every job, the seconds from
+    its submission to its first pod running (the queueing system's admission and the scheduler's placement together, the
+    same measure for Kueue, which holds the job, and Volcano, which holds its pods), and to its last pod done; a job not
+    started or not done by the window's end counts the window's end, so an unfinished job never reads quick; and how many
+    were unfinished. From jobs.json and pods.json; absent from every other test."""
+    import datetime as _dt
+    try:
+        t1 = float((d / "window_end.txt").read_text().split()[0])
+        jobs = json.loads((d / "jobs.json").read_text()).get("items", [])
+        pods = json.loads((d / "pods.json").read_text()).get("items", [])
+    except (OSError, ValueError, IndexError):
+        return {}
+    if not jobs:
+        return {}
+    ts = lambda s: _dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=_dt.timezone.utc).timestamp()
+    first = {}
+    for p in pods:
+        job = (p.get("metadata", {}).get("labels", {}) or {}).get("job-name")
+        start = (p.get("status") or {}).get("startTime")
+        if job and start:
+            first[job] = min(first.get(job, float("inf")), ts(start))
+    waits, turns, unfinished = [], [], 0
+    for j in jobs:
+        name, sub = j["metadata"]["name"], ts(j["metadata"]["creationTimestamp"])
+        st = j.get("status") or {}
+        done = ts(st["completionTime"]) if st.get("completionTime") else None
+        waits.append(min(first.get(name, t1), t1) - sub)
+        if done is not None and done <= t1:
+            turns.append(done - sub)
+        else:
+            turns.append(t1 - sub); unfinished += 1
+    waits.sort()
+    p95 = waits[min(len(waits) - 1, int(math.ceil(0.95 * len(waits))) - 1)]
+    return {"queue: job wait, submitted to its first pod running, mean (s)": sum(waits) / len(waits),
+            "queue: job wait, submitted to its first pod running, 95th percentile (s)": p95,
+            "queue: job turnaround, submitted to done, mean (s)": sum(turns) / len(turns),
+            "queue: jobs unfinished at the window's end": float(unfinished)}
+
+
 def robust_marks(d):
     """The robustness test's time marks (robust.log, scripts/kind_robust.sh): the kill mark (both arms), the seconds from the
     kill until every setting was back at the operator's (inf: never), whether the second governor started, the mode."""
@@ -487,7 +534,7 @@ def arm_gauges(d):
         own = float("nan")
     g["Omni's own CPU (cores), mean"] = own
     g["CPU used with Omni's own (cores), mean"] = g.get("CPU used (cores), mean", float("nan")) + own
-    g.update(bill(d)); g.update(second_app(d)); g.update(batch(d)); g.update(meter(d))
+    g.update(bill(d)); g.update(second_app(d)); g.update(batch(d)); g.update(job_stream(d)); g.update(meter(d))
     return g
 
 
@@ -658,7 +705,9 @@ def main(root):
     host = any(not math.isnan(m.get("host cores (the real machine under kind)", float("nan"))) for m in out["means"].values())
     bat = any(not math.isnan(m.get("batch: queue finished (s)", float("nan"))) for m in out["means"].values())
     rob = any(not math.isnan(m.get("robust: failed requests in the 120 s after the kill (%)", float("nan"))) for m in out["means"].values())
-    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat) and (k not in ROBUST or rob)]
+    que = any(not math.isnan(m.get("queue: jobs unfinished at the window's end", float("nan"))) for m in out["means"].values())
+    keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat) and (k not in ROBUST or rob)
+            and (k not in QUEUE or que)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
