@@ -321,6 +321,30 @@ concurrency, and its binder binds them, with units and gangs (PodGroups) as its 
   or of its quotas; Omni-Compass never writes Gödel's objects, never places or binds a pod, and sits on top with its own
   levers, as everywhere.
 
+## Amendment 9: what the trials of 20 October found in the rigs (written after the trials, before the counted runs)
+
+Three rigs were tried once each on 20 October (label `trial`, never counted); two faults were in the rig and one in the test
+machine. Each is fixed where it was found, the same in every arm, before the counted runs start.
+
+- **Gödel's rig: metrics-server rolled out twice** (run 39376949793, both arms). The bench applied metrics-server's pinned
+  manifest and then patched the deployment twice (the kubelet's certificate unverified; the server on the control plane), two
+  rollouts in a row; on Kubernetes 1.24 the first pod, deleted while its image was still coming through k8s.gcr.io's redirect,
+  stayed terminating past the five-minute wait, and both arms were marked invalid before any stream ran. The bench now writes
+  the rig's three settings into the pinned manifest and applies it once (one rollout; `scripts/kind_bench.sh`), naming the
+  image by the registry that serves it (`registry.k8s.io`, the same image the old name redirects to). The manifest's SHA-256
+  is checked on the file as fetched, as before; every rig, 1.35 included, applies metrics-server this way from now on.
+- **KubeRay's rig: more workers than the machine holds** (run 39371908460). The trial's runner died 58 minutes in, mid-arm,
+  and GitHub kept no log of it. The worker group's ceiling was the workers' allocatable processors over half a processor, 48 on
+  this rig; each worker is 1 GiB, and a kind node reports the whole machine's memory as its own, so Kubernetes would admit 48
+  workers of 1 GiB on a 16 GiB machine. The ceiling is now also bounded by the machine: no more 1 GiB workers than it has free
+  at install, less 3 GiB kept for the head and the systems, both read live (`scripts/kind_batch_queue.sh`,
+  `deploy/kind/kuberay-cluster.yaml`); the processor bound stands where it is the smaller. Where the ceiling bites, the Ray
+  stream queues tasks in Ray rather than pods in Kubernetes, and the tables say which bound stood in each arm
+  (`batch_queue.txt`).
+- **The test machine: a runner lost mid-repetition** (Kueue C, run 39368401852, repetition 5; its runner died 80 minutes in,
+  no log). The run's other nine repetitions landed whole and are read; its three-run table says C carries nine. No rig changed
+  for it.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
