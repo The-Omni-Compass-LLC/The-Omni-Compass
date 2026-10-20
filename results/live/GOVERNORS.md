@@ -14,7 +14,7 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | Kueue | batch admission (a job at a time, by queue quota) | 63 | built; its runs come in the campaign | not yet run |
 | Volcano | batch scheduling (queues, gangs) | 63 | built; its runs come in the campaign | not yet run |
 | KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350900880) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350907916) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350915166) | runs not yet finished |
-| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | built; its runs come in the campaign | not yet run |
+| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359085965) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359094679) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359103518) | runs not yet finished |
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
 | Crane | predictive autoscaling and resource governance | 90 | its rig is not yet built | not yet run |
 | KubeRay | Ray clusters (the Ray autoscaler) | 92 | its rig is not yet built | not yet run |

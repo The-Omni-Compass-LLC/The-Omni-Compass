@@ -29,7 +29,7 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 150)        # 50 entries, A, B and C (the steady and wandering tests back since omni-v8;
+        self.assertEqual(len(queue), 153)        # 51 entries, A, B and C (the steady and wandering tests back since omni-v8;
                                                  # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October;
                                                  # every data store at the max beside the tune-down, 18 October;
                                                  # the extended fault test, 18 October; CruiseKube on the recorder that
@@ -38,7 +38,8 @@ class ReleaseCampaign(unittest.TestCase):
                                                  # the batch stream through Kueue and through Volcano, 19 October, night;
                                                  # through the KAI scheduler and through Koordinator, in their own workflow,
                                                  # 20 October; through the Kubernetes scheduler alone, as shipped and with
-                                                 # its bin-packing profile, 20 October)
+                                                 # its bin-packing profile, 20 October; Koordinator again, on the
+                                                 # kubelet's cgroup root its own tests use, 20 October)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
         for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
             self.assertEqual({row[3].get('objective') for row in queue if row[2] == wf and row[3].get('native') != 'shipped'},
@@ -82,6 +83,7 @@ class ReleaseCampaign(unittest.TestCase):
             ['kubernetes batch through koordinator'],                                                     # added 20 October
             ['kubernetes batch through the default scheduler',
              'kubernetes batch through the bin-packing scheduler'],                                       # added 20 October
+            ['kubernetes batch through koordinator, on the cgroup root its own tests use'],              # added 20 October
         ]
         blocks = grid.rerun_blocks()
         self.assertEqual([[n for n, _, _ in b] for b in blocks[:len(frozen)]], frozen)
