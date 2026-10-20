@@ -6,7 +6,7 @@
 """The batch stream under a queueing system (BATCH_QUEUE: Kueue or Volcano; docs/BATCH_QUEUE_PREREGISTRATION.md): every
 job's wait runs from its submission to its first pod running, the same measure whether the queueing system holds the job
 (Kueue) or its pods (Volcano); a job not started or not done by the window's end counts the window's end, never less; and
-the stream's job template renders for both systems."""
+the stream's job template renders for every system (Kueue, Volcano, the KAI scheduler)."""
 import json
 import subprocess
 import sys
@@ -65,22 +65,38 @@ class JobStream(unittest.TestCase):
 
 
 class Template(unittest.TestCase):
-    def render(self, label, sched):
+    def render(self, label, sched, podlabel='omni-stream: "1"'):
+        # in the order the script substitutes them: the pod's label first, whose placeholder holds the job's
         text = (ROOT / "deploy" / "kind" / "batch-stream-job.yaml").read_text()
         for a, b in (("JOB_NAME", "omni-batch-001"), ("BATCH_COMPLETIONS", "10"), ("BATCH_PARALLELISM", "5"), ("BATCH_MB", "3000"),
-                     ("QUEUE_LABEL", label), ("SCHEDULER_LINE", sched)):
+                     ("POD_QUEUE_LABEL", podlabel), ("QUEUE_LABEL", label), ("SCHEDULER_LINE", sched)):
             text = text.replace(a, b)
         return yaml.safe_load(text)
 
-    def test_kueue_and_volcano(self):
+    def test_kueue_volcano_and_kai(self):
         k = self.render("kueue.x-k8s.io/queue-name: omni-queue", "terminationGracePeriodSeconds: 30")
         self.assertEqual(k["metadata"]["labels"]["kueue.x-k8s.io/queue-name"], "omni-queue")
+        self.assertNotIn("kueue.x-k8s.io/queue-name", k["spec"]["template"]["metadata"]["labels"])   # the job's, never a pod's
         self.assertNotIn("schedulerName", k["spec"]["template"]["spec"])
         v = self.render('omni-stream: "1"', "schedulerName: volcano")
         self.assertEqual(v["spec"]["template"]["spec"]["schedulerName"], "volcano")
-        for j in (k, v):
+        a = self.render("kai.scheduler/queue: default-queue", "schedulerName: kai-scheduler", "kai.scheduler/queue: default-queue")
+        self.assertEqual(a["spec"]["template"]["spec"]["schedulerName"], "kai-scheduler")
+        self.assertEqual(a["metadata"]["labels"]["kai.scheduler/queue"], "default-queue")
+        self.assertEqual(a["spec"]["template"]["metadata"]["labels"]["kai.scheduler/queue"], "default-queue")
+        for j in (k, v, a):
             self.assertEqual((j["spec"]["completions"], j["spec"]["parallelism"]), (10, 5))
             self.assertEqual(j["spec"]["template"]["metadata"]["labels"]["app"], "omni-batch-stream")
+
+    def test_the_script_substitutes_the_pod_label_before_the_job_label(self):
+        # QUEUE_LABEL is inside POD_QUEUE_LABEL: substituted the other way round, the pod's line would read POD_<label>
+        text = (ROOT / "scripts" / "kind_batch_queue.sh").read_text()
+        self.assertLess(text.index('"s|POD_QUEUE_LABEL|'), text.index('"s|QUEUE_LABEL|'))
+
+    def test_every_release_is_pinned(self):
+        text = (ROOT / "scripts" / "kind_batch_queue.sh").read_text()
+        for name in ("KUEUE_SHA256", "VOLCANO_SHA256", "KAI_SHA256"):
+            self.assertRegex(text, name + r'="\$\{' + name + r':-[0-9a-f]{64}\}"')
 
     def test_the_script_parses(self):
         r = subprocess.run(["bash", "-n", str(ROOT / "scripts" / "kind_batch_queue.sh")], capture_output=True, text=True)
