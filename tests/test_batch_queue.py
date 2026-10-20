@@ -6,7 +6,7 @@
 """The batch stream under a queueing system (BATCH_QUEUE: Kueue or Volcano; docs/BATCH_QUEUE_PREREGISTRATION.md): every
 job's wait runs from its submission to its first pod running, the same measure whether the queueing system holds the job
 (Kueue) or its pods (Volcano); a job not started or not done by the window's end counts the window's end, never less; and
-the stream's job template renders for every system (Kueue, Volcano, the KAI scheduler)."""
+the stream's job template renders for every system (Kueue, Volcano, the KAI scheduler, Koordinator)."""
 import json
 import subprocess
 import sys
@@ -73,7 +73,7 @@ class Template(unittest.TestCase):
             text = text.replace(a, b)
         return yaml.safe_load(text)
 
-    def test_kueue_volcano_and_kai(self):
+    def test_kueue_volcano_kai_and_koordinator(self):
         k = self.render("kueue.x-k8s.io/queue-name: omni-queue", "terminationGracePeriodSeconds: 30")
         self.assertEqual(k["metadata"]["labels"]["kueue.x-k8s.io/queue-name"], "omni-queue")
         self.assertNotIn("kueue.x-k8s.io/queue-name", k["spec"]["template"]["metadata"]["labels"])   # the job's, never a pod's
@@ -84,7 +84,12 @@ class Template(unittest.TestCase):
         self.assertEqual(a["spec"]["template"]["spec"]["schedulerName"], "kai-scheduler")
         self.assertEqual(a["metadata"]["labels"]["kai.scheduler/queue"], "default-queue")
         self.assertEqual(a["spec"]["template"]["metadata"]["labels"]["kai.scheduler/queue"], "default-queue")
-        for j in (k, v, a):
+        c = self.render('koordinator.sh/enable-colocation: "true"', "terminationGracePeriodSeconds: 30",
+                        'koordinator.sh/enable-colocation: "true"')                  # the colocation profile sets the rest
+        self.assertEqual(c["metadata"]["labels"]["koordinator.sh/enable-colocation"], "true")
+        self.assertEqual(c["spec"]["template"]["metadata"]["labels"]["koordinator.sh/enable-colocation"], "true")
+        self.assertNotIn("schedulerName", c["spec"]["template"]["spec"])
+        for j in (k, v, a, c):
             self.assertEqual((j["spec"]["completions"], j["spec"]["parallelism"]), (10, 5))
             self.assertEqual(j["spec"]["template"]["metadata"]["labels"]["app"], "omni-batch-stream")
 
@@ -95,12 +100,29 @@ class Template(unittest.TestCase):
 
     def test_every_release_is_pinned(self):
         text = (ROOT / "scripts" / "kind_batch_queue.sh").read_text()
-        for name in ("KUEUE_SHA256", "VOLCANO_SHA256", "KAI_SHA256"):
+        for name in ("KUEUE_SHA256", "VOLCANO_SHA256", "KAI_SHA256", "KOORD_SHA256"):
             self.assertRegex(text, name + r'="\$\{' + name + r':-[0-9a-f]{64}\}"')
 
     def test_the_script_parses(self):
         r = subprocess.run(["bash", "-n", str(ROOT / "scripts" / "kind_batch_queue.sh")], capture_output=True, text=True)
         self.assertEqual(r.returncode, 0, r.stderr)
+
+
+class KoordinatorFiles(unittest.TestCase):
+    def test_values_and_profile(self):
+        v = yaml.safe_load((ROOT / "deploy" / "kind" / "koordinator-values.yaml").read_text())
+        self.assertEqual(v["imageRepositoryHost"], "ghcr.io")
+        for part in ("manager", "scheduler", "descheduler"):
+            self.assertEqual(v[part]["replicas"], 1)
+            self.assertEqual(v[part]["nodeSelector"], {"node-role.kubernetes.io/control-plane": ""})
+        p = yaml.safe_load((ROOT / "deploy" / "kind" / "koordinator-colocation.yaml").read_text())
+        self.assertEqual((p["spec"]["qosClass"], p["spec"]["schedulerName"], p["spec"]["priorityClassName"]),
+                         ("BE", "koord-scheduler", "koord-batch"))
+        self.assertEqual(p["spec"]["selector"]["matchLabels"], {"koordinator.sh/enable-colocation": "true"})
+
+    def test_kai_values_place_every_component_on_the_control_plane(self):
+        v = yaml.safe_load((ROOT / "deploy" / "kind" / "kai-values.yaml").read_text())
+        self.assertEqual(v["global"]["nodeSelector"], {"node-role.kubernetes.io/control-plane": ""})
 
 
 if __name__ == "__main__":

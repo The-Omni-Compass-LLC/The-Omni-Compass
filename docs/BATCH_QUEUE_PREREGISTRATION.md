@@ -122,6 +122,35 @@ KAI's scheduler under the queue's quota, limit and over-quota weight.
 
 Everything else is as written above: the stream, the window, the gauges and how they are read.
 
+## Amendment 2: Koordinator (written before its first run, 20 October 2026)
+
+Koordinator (`koordinator-sh/koordinator`, the CNCF; Apache-2.0; register row 89) joins the rig as a fourth system
+(`batch_queue=koordinator`). It runs work by quality of service: its manager computes, on every node, the batch processor
+and memory the latency-sensitive pods leave unused (its colocation, on by default); its scheduler places best-effort pods
+on those batch resources; its node agent, koordlet, holds each node's best-effort work back when the latency-sensitive
+pods need the processor.
+
+- **Native** is Koordinator's chart as published, installed by Helm as its own guide installs it, colocation on as
+  shipped, with the operator's two settings for a cluster with one control plane (`deploy/kind/koordinator-values.yaml`):
+  its images from its GitHub registry (the chart's default is its Beijing registry; the same images), and its manager,
+  scheduler and descheduler one replica each on the control plane (two each would ask the one control-plane node for three
+  processors, more than it has free). koordlet runs on every node, the measured workers included, as shipped, in both arms.
+  The jobs reach it by the operator's colocation profile, as Koordinator's colocation guide writes it
+  (`deploy/kind/koordinator-colocation.yaml`): a labelled pod in a labelled namespace becomes best effort at the batch
+  priority, for its scheduler, on batch resources. The service is not labelled and is not touched.
+- **Checked before the window**: a server-side dry run of a labelled pod must come back best effort, for koord-scheduler,
+  asking batch processor (its webhook fails open, so an unready one would let the stream through as ordinary pods); the
+  answer is kept in the run's record.
+- **Frozen**: the chart 1.8.0 from its charts repository's release, the archive's SHA-256
+  `766011e7c797a5b2ea0ed2091b31efb4eb16ba14699189db304022336fc48e06` pinned and refused otherwise (the repository's index
+  lists another digest for the same version; the archive the release serves is the one pinned and recorded).
+- **What it is not**: Koordinator's purpose is a loaded latency-sensitive service and best-effort work on the same
+  machines. Here the service stands idle, as in every batch test; the colocation of the two under load is its own test,
+  written before it runs (register row 89).
+- **Its runs**: in `kind-orchestrators.yml`, its A, B and C started together, as the KAI scheduler's.
+
+Everything else is as written above: the stream, the window, the gauges and how they are read.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
