@@ -8,7 +8,11 @@
 import json, os, sys
 st_path, log_path = os.environ["FAKE_KUBE_STATE"], os.environ["FAKE_KUBE_LOG"]
 st = json.load(open(st_path)); a = sys.argv[1:]
-def save(): json.dump(st, open(st_path, "w"))
+def save():   # written whole, then renamed into place, so a reader never sees a half-written state (20 Oct: the master
+    tmp = f"{st_path}.{os.getpid()}"   # switch test read it empty while a decision was being written)
+    with open(tmp, "w") as f:
+        json.dump(st, f)
+    os.replace(tmp, st_path)
 def log(): open(log_path, "a").write(json.dumps(a) + "\n")
 if a[:2] == ["get", "nodes"]: print(json.dumps({"items": st["nodes"]}))
 elif a[:2] == ["get", "pods"]:
