@@ -13,7 +13,7 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356571014) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356586356) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356601235); bin-packing profile: running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356578556) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356594135) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356608147) | as shipped: runs not yet finished; bin-packing profile: runs not yet finished |
 | Kueue | batch admission (a job at a time, by queue quota) | 63 | built; its runs come in the campaign | not yet run |
 | Volcano | batch scheduling (queues, gangs) | 63 | built; its runs come in the campaign | not yet run |
-| KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350900880) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350907916) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350915166) | runs not yet finished |
+| KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | three runs in | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_KAI.md)) |
 | Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359085965) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359094679) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359103518) | runs not yet finished |
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
 | Crane | predictive autoscaling and resource governance | 90 | its rig is not yet built | not yet run |
@@ -27,13 +27,32 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 
 ## The orchestra, the eighth organism (modelled, class S)
 
-Not yet run (`tools/run_orchestra.py`).
+The founder's word of 19 October, night: the governors in a catalog group, an organism of their own. Every catalog muscle that stands for a governor's knob (below, under each governor) runs in the modelled organisms as the seven do: each governor's muscles as a body of its own, then all of them together as one body, the orchestra, native and then with Omni-Compass on top at the max, on omni-v12, seeds 3000-3009. A model, not a measurement of the governor itself; every row: [`results/orchestra/ORCHESTRA.md`](../orchestra/ORCHESTRA.md).
+
+| Body | Muscles | Own load | The climb | Work in line |
+|---|---:|---|---|---|
+| The Kubernetes scheduler (vanilla, and its bin-packing profile) | 12 | GAIN (fewer misses) | GAIN (fewer misses) | GAIN (fewer misses) |
+| Kueue | 5 | EVEN (the same as native) | EVEN (the same as native) | EVEN (the same as native) |
+| Volcano | 5 | EVEN (the same as native) | EVEN (the same as native) | EVEN (the same as native) |
+| KAI scheduler | 4 | EVEN (the same as native) | EVEN (the same as native) | EVEN (the same as native) |
+| Koordinator | 4 | EVEN (the same as native) | EVEN (the same as native) | EVEN (the same as native) |
+| CruiseKube | 4 | GAIN (fewer misses) | GAIN (fewer misses) | GAIN (fewer misses) |
+| Crane | 5 | GAIN (fewer misses) | GAIN (fewer misses) | GAIN (fewer misses) |
+| KubeRay | 3 | EVEN (the same as native) | EVEN (the same as native) | EVEN (the same as native) |
+| Gödel scheduler | 4 | EVEN (the same as native) | EVEN (the same as native) | EVEN (the same as native) |
+| Armada | 3 | GAIN (fewer misses) | GAIN (more work + fewer misses) | GAIN (fewer misses) |
+| Karmada | 4 | GAIN (more work + fewer misses) | GAIN (more work + fewer misses) | GAIN (fewer misses) |
+| Open Cluster Management | 3 | GAIN (more work + fewer misses) | GAIN (more work + fewer misses) | GAIN (more work + fewer misses) |
+| KubeEdge | 4 | GAIN (fewer misses) | GAIN (more work + fewer misses) | GAIN (fewer misses) |
+| Nephio | 4 | GAIN (fewer misses) | GAIN (more work + fewer misses) | GAIN (fewer misses) |
+| **The orchestra, every governor's muscle once** | 55 | **GAIN (more work + fewer misses)** | **GAIN (more work + fewer misses)** | **GAIN (more work + fewer misses)** |
 
 ## The Kubernetes scheduler (vanilla, and its bin-packing profile)
 
 - **Native**: the default scheduler of Kubernetes 1.35 as shipped, which places every pod of every Kubernetes set; and the same release's scheduler with the operator's bin-packing profile (NodeResourcesFit, MostAllocated).
 - **Its test on real Kubernetes (class L)**: the batch stream placed by the scheduler alone, in each setting (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 3); register row 88.
 - **In the catalog (modelled, class S)**: family 4, Kubernetes Placement & Scheduling (21 muscles, in the spine and every realm): `node_selector`, `node_affinity`, `pod_anti_affinity`, `topology_spread`, `taint_toleration`, `priority_class`, `preemption_policy`, `scheduler_backoff`, `scheduler_scoring_strategy`, `scheduler_plugin_weights`, `scheduling_gates`, `deschedule`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (fewer misses); work in line: GAIN (fewer misses).
 - **Readings (as shipped)**: none yet; nothing is written here before its three runs are in.
 - **Readings (bin-packing profile)**: none yet; nothing is written here before its three runs are in.
 
@@ -42,6 +61,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: Kueue v0.20.2 with the operator's single ClusterQueue sized to the workers.
 - **Its test on real Kubernetes (class L)**: `docs/BATCH_QUEUE_PREREGISTRATION.md`; register row 63.
 - **In the catalog (modelled, class S)**: family 1, Work Admission & Demand Shaping (19 muscles, in its realm and the whole tower): `job_admission`, `batch_admission`, `queue_concurrency`, `queue_backpressure`, `tenant_admission`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## Volcano
@@ -49,6 +69,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: Volcano v1.16.0 with its default queue as shipped.
 - **Its test on real Kubernetes (class L)**: `docs/BATCH_QUEUE_PREREGISTRATION.md`; register row 63.
 - **In the catalog (modelled, class S)**: family 14, Distributed Cluster Managers (15 muscles, in its realm and the whole tower): `gang_schedule`, `queue_fairness`, `task_priority`, `task_preemption`, `binpack_pressure`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## KAI scheduler
@@ -56,13 +77,35 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: the KAI scheduler v0.18.6 with its chart's default queues.
 - **Its test on real Kubernetes (class L)**: `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 1; register row 91.
 - **In the catalog (modelled, class S)**: family 14, Distributed Cluster Managers (15 muscles, in its realm and the whole tower): `gang_schedule`, `queue_fairness`, `cluster_quota`, `task_preemption`.
-- **Readings**: none yet; nothing is written here before its three runs are in.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
+- **Runs**: A [39350900880](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350900880) (10 pairs), B [39350907916](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350907916) (10 pairs), C [39350915166](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39350915166) (10 pairs); engine omni-v12 (digest d38b58fbe28939b8, 47 files).
+
+| Gauge | Reading |
+|---|---|
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) |
+| queue: jobs unfinished at the window's end | EVEN, the same |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs |
+| worker nodes in service, mean | GAIN in all three of our runs |
+| node-hours | GAIN in all three of our runs |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy (Wh) | GAIN in all three of our runs |
+| energy per core-hour (Wh) | shown, not judged |
+| response time (ms), mean | GAIN in all three of our runs |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) |
+| failed requests (%) | EVEN, the same |
+
+Every row of the run: [`results/live/V12_KAI.md`](V12_KAI.md).
+
 
 ## Koordinator
 
 - **Native**: Koordinator 1.8.0, colocation on as shipped, the operator's colocation profile.
 - **Its test on real Kubernetes (class L)**: `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 2; register row 89.
 - **In the catalog (modelled, class S)**: family 14, Distributed Cluster Managers (15 muscles, in its realm and the whole tower): `oversubscription`, `resource_reclaim`, `binpack_pressure`, `spread_pressure`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## CruiseKube
@@ -70,6 +113,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: CruiseKube applying its own recommendations as shipped.
 - **Its test on real Kubernetes (class L)**: `docs/CRUISEKUBE_PREREGISTRATION.md`; register row 81.
 - **In the catalog (modelled, class S)**: family 3, Container Resources (25 muscles, in the spine and every realm): `cruisekube_request_rightsizing`, `in_place_resize`, `cpu_request`, `memory_request`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## Crane
@@ -77,6 +121,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: its Effective HPA in auto mode.
 - **Its test on real Kubernetes (class L)**: not yet written; register row 90.
 - **In the catalog (modelled, class S)**: family 2, Kubernetes Workload Scaling (32 muscles, in the spine and every realm): `hpa_cpu_target`, `hpa_custom_target`, `hpa_scaling_rate_policies`, `hpa_min_replicas`, `hpa_max_replicas`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## KubeRay
@@ -84,6 +129,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: the Ray autoscaler as shipped.
 - **Its test on real Kubernetes (class L)**: not yet written; register row 92.
 - **In the catalog (modelled, class S)**: family 12, AI Training (18 muscles, in its realm and the whole tower): `training_workers`, `elastic_worker_count`, `training_gang_size`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## Gödel scheduler
@@ -91,6 +137,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: its placement of units and gangs as shipped.
 - **Its test on real Kubernetes (class L)**: not yet written; register row 93.
 - **In the catalog (modelled, class S)**: family 14, Distributed Cluster Managers (15 muscles, in its realm and the whole tower): `gang_schedule`, `task_admission`, `binpack_pressure`, `resource_reservation`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## Armada
@@ -98,6 +145,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: its queues and fair share across clusters.
 - **Its test on real Kubernetes (class L)**: not yet written; register row 94.
 - **In the catalog (modelled, class S)**: family 39, Cross-Cluster, Multi-Region & Edge (18 muscles, in its realm and the whole tower): `multi_cluster_dispatch`, `federation_quota`, `global_admission`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## Karmada
@@ -105,6 +153,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: its propagation and replica division.
 - **Its test on real Kubernetes (class L)**: not yet written; register row 95.
 - **In the catalog (modelled, class S)**: family 39, Cross-Cluster, Multi-Region & Edge (18 muscles, in its realm and the whole tower): `multi_cluster_dispatch`, `region_dispatch`, `global_failover`, `cross_cluster_replication`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (more work + fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## Open Cluster Management
@@ -112,6 +161,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: its Placement and ManifestWork.
 - **Its test on real Kubernetes (class L)**: not yet written; register row 96.
 - **In the catalog (modelled, class S)**: family 39, Cross-Cluster, Multi-Region & Edge (18 muscles, in its realm and the whole tower): `multi_cluster_dispatch`, `workload_migrate_region`, `federation_quota`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (more work + fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (more work + fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## KubeEdge
@@ -119,6 +169,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: its edge sync and offline autonomy.
 - **Its test on real Kubernetes (class L)**: not yet written; register row 97.
 - **In the catalog (modelled, class S)**: family 39, Cross-Cluster, Multi-Region & Edge (18 muscles, in its realm and the whole tower): `edge_dispatch`, `edge_offload`, `edge_sync_interval`, `edge_site_node_pool`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ## Nephio
@@ -126,6 +177,7 @@ Not yet run (`tools/run_orchestra.py`).
 - **Native**: its intent-driven deployment and scaling.
 - **Its test on real Kubernetes (class L)**: not yet written (a candidate: its sandbox asks more than a free runner gives); register row 98.
 - **In the catalog (modelled, class S)**: family 66, Telecom RAN & Edge Radio (12 muscles, in its realm and the whole tower): `ran_slice_resource_budget`, `ran_du_cu_placement`, `ran_cell_sleep`, `ran_carrier_enable`.
+- **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
 
 ---

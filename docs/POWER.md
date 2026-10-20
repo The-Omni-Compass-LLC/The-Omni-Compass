@@ -167,6 +167,33 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 14.7% | 18.1% | 131 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
+## Kai (omni-v12, `V12_KAI.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 13.4% | 16.5% | 109 |
+| node-hours | GAIN in all three of our runs | 13.7% | 16.8% | 113 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 9.3% | 11.5% | 53 |
+| response time (ms), mean | GAIN in all three of our runs | 8.9% | 10.9% | 48 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 23.4% | 28.8% | 331 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 24.4% | 30.0% | 360 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 74.5% | 91.6% | 3357 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 142.9% | 175.6% | 12331 |
+| pending pods, pod-minutes | shown, not judged | 26.7% | 32.8% | 431 |
+| utilisation (used / allocatable) | shown, not judged | 20.9% | 25.7% | 265 |
+| CPU used (cores), mean | shown, not judged | 5.8% | 7.1% | 21 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 5.4% | 6.6% | 18 |
+| energy per core-hour (Wh) | shown, not judged | 13.6% | 16.7% | 112 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 16.2% | 19.9% | 159 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.4% | 2.9% | 4 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 0.5% | 0.6% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 24.9% | 30.6% | 374 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 12.2% | 15.1% | 91 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 41.9% | 51.5% | 1063 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 10.8% | 13.2% | 70 |
+
 ## Keda Cpu Requests (omni-v11, `V11_KEDA_CPU_REQUESTS.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
@@ -349,7 +376,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 
 ## What the EVEN rows mean
 
-107 rows read EVEN. In 55 of them the test could not resolve a change under 10% of native in all three runs, so EVEN there means "no change larger than the MDE shown", and nothing finer is claimed.
+117 rows read EVEN. In 63 of them the test could not resolve a change under 10% of native in all three runs, so EVEN there means "no change larger than the MDE shown", and nothing finer is claimed.
 
 ---
 

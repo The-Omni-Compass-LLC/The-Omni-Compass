@@ -29,7 +29,8 @@ class GovernorsPage(unittest.TestCase):
         self.assertIn("www.omni-compass.com", text.rstrip().splitlines()[-1])  # and at the end
 
     def test_a_line_reads_only_from_its_table(self):
-        table = {"runs": ["1", "2", "3"], "engines": ["omni-v12"] * 3, "rows": {
+        table = {"runs": [{"tag": x, "run": i, "engine": "omni-v12 (digest d38b58fbe28939b8, 47 files)", "paired_repetitions": 10}
+                          for x, i in zip("ABC", ("1", "2", "3"))], "rows": {
             "queue: job wait, submitted to its first pod running, mean (s)": {"reading": "GAIN in all three of our runs"},
             "queue: jobs unfinished at the window's end": {"reading": "LOSS in all three of our runs"},
             "machines in service, mean": {"reading": "power given in all three of our runs"},
@@ -45,6 +46,8 @@ class GovernorsPage(unittest.TestCase):
         koord = next(l for l in text.splitlines() if l.startswith("| Koordinator"))
         self.assertIn("runs not yet finished", koord)
         self.assertIn("LOSS in all three of our runs", text)                  # every row counted and shown, losses included
+        self.assertIn("A [1](", text); self.assertIn("(10 pairs)", text)      # the runs as tools/confirm_abc.py records them
+        self.assertIn("omni-v12 (digest d38b58fbe28939b8, 47 files)", text)
 
     def test_the_scheduler_reads_each_setting_from_its_own_table(self):
         table = {"runs": ["1", "2", "3"], "engines": ["omni-v12"] * 3,

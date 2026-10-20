@@ -115,12 +115,33 @@ def counts(table) -> dict:
     return out
 
 
-def key_rows(table, limit=8):
-    """The rows a reader looks at first: the queue's own gauges, then machines and energy; each with its reading."""
+# after the queue's own gauges, the rows a reader looks at next: machines, energy, speed, failures (in this order)
+KEY = ("worker nodes in service", "node-hours", "energy", "response time (ms), mean", "response time (ms), 95th",
+       "failed requests", "alert minutes")
+
+
+def key_rows(table, limit=14):
+    """The rows a reader looks at first: the queue's own gauges, then machines, energy, speed and failures; each with its
+    reading."""
     rows = table.get("rows") or {}
     first = [k for k in rows if k.startswith("queue:")] + [k for k in rows if k.startswith("batch:")]
-    rest = [k for k in rows if ("machines" in k or "energy" in k) and k not in first]
-    return [(k, rows[k].get("reading", "")) for k in (first + rest)[:limit]]
+    rest = [k for key in KEY for k in rows if k.startswith(key) and k not in first]
+    seen = list(dict.fromkeys(first + rest))
+    return [(k, rows[k].get("reading", "")) for k in seen[:limit]]
+
+
+def runs_line(table):
+    """The table's runs as the page names them ("A [id](link) (10 pairs), ..."), and the engines they ran on."""
+    out, engines = [], set(table.get("engines", []))
+    for r in table.get("runs", []):
+        if isinstance(r, dict):
+            pairs = f" ({r['paired_repetitions']} pairs)" if r.get("paired_repetitions") else ""
+            out.append(f"{r.get('tag', '?')} [{r.get('run')}]({REPO_RUNS}{r.get('run')}){pairs}")
+            if r.get("engine"):
+                engines.add(r["engine"])
+        else:
+            out.append(str(r))
+    return ", ".join(out), ", ".join(sorted(engines)) or ENGINE
 
 
 def catalog_line(slug) -> str:
@@ -216,8 +237,8 @@ def render(runs=None) -> str:
         for key, label in settings_of(slug):
             t, head = table_of(key), (f" ({label})" if label else "")
             if t:
-                L.append(f"- **Runs{head}**: {', '.join(t.get('runs', []))}; engine "
-                         f"{', '.join(sorted(set(t.get('engines', [])))) or ENGINE}.")
+                runs, engines = runs_line(t)
+                L.append(f"- **Runs{head}**: {runs}; engine {engines}.")
                 L += ["", "| Gauge | Reading |", "|---|---|"] + [f"| {k} | {r} |" for k, r in key_rows(t)]
                 L += ["", f"Every row of the run: [`results/live/V12_{key.upper()}.md`](V12_{key.upper()}.md).", ""]
             else:
