@@ -59,7 +59,10 @@ GOVERNORS = [
      "Kubernetes 1.24.17 (it supports 1.21.4 to 1.24.6)",
      "the batch stream placed by Gödel, four ways (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 8)"),
     ("armada", "Armada", 94, "multi-cluster batch", "its queues and fair share across clusters", "not yet written"),
-    ("karmada", "Karmada", 95, "multi-cluster placement", "its propagation and replica division", "not yet written"),
+    ("karmada", "Karmada", 95, "multi-cluster placement",
+     "Karmada v1.19.0 on a cluster of its own, two member clusters joined, its placement of the stream as shipped with the "
+     "operator's one propagation policy",
+     "the batch stream sent to a group of two clusters, four ways (`docs/GROUP_PREREGISTRATION.md`)"),
     ("ocm", "Open Cluster Management", 96, "multi-cluster management", "its Placement and ManifestWork", "not yet written"),
     ("kubeedge", "KubeEdge", 97, "edge nodes", "its edge sync and offline autonomy", "not yet written"),
     ("nephio", "Nephio", 98, "network-function automation", "its intent-driven deployment and scaling",
@@ -99,7 +102,7 @@ FOUR_WAYS = (("TOP", "compass", "Omni-Compass on top of it, against it as shippe
              ("BOTH", "compass|nativebare", "Omni-Compass on top of it, against the organism alone"))
 FOUR_SYSTEMS = (("kai", "The KAI scheduler"), ("koordinator", "Koordinator"), ("kueue", "Kueue"), ("volcano", "Volcano"),
                 ("binpack", "The scheduler's bin-packing profile"), ("kuberay", "KubeRay"), ("crane", "Crane"),
-                ("godel", "The Gödel scheduler"))
+                ("godel", "The Gödel scheduler"), ("karmada", "Karmada"))
 
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 
