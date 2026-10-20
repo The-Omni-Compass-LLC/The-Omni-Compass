@@ -211,7 +211,8 @@ ChatGPT and Grok read the results to analyse them, never to produce them: `resul
 ## 4. Every open benchmark still to run, in order (one or two at a time)
 
 Each has a recognised open benchmark with its own native controller, so Omni-Compass can sit on top of something that
-is not ours.
+is not ours. The governors and orchestrators the founder named on 19 October (rows 63, 81 and 88 to 98) stand on one page,
+each line read from its own three-run table or saying where its runs stand: `results/live/GOVERNORS.md`.
 
 Excluded by rule, whatever the gain would read (`docs/COVERAGE_MAP.md`, section 3): safety reserves (section 2, row 27), clinical
 dosing controllers, trading decisions, weapons, a person's command, solvers without a controller (row 37), and consensus and
