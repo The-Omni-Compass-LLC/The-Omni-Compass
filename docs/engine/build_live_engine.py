@@ -349,7 +349,7 @@ ORCHESTRATORS = [
     ("ARMADA", "Armada", "G-Research, CNCF sandbox", "batch job scheduling across many clusters", ("armada",)),
     ("KARMADA", "Karmada", "the CNCF", "multi-cluster orchestration: propagation, placement and failover of workloads", ("karmada",)),
     ("KUBE_SCHEDULER", "the Kubernetes scheduler, vanilla", "Kubernetes SIG Scheduling", "the default pod scheduler with its plugins, as shipped", ("kube-scheduler", "kube scheduler", "vanilla scheduler", "default scheduler")),
-    ("KAI", "KAI Scheduler", "NVIDIA", "GPU-aware scheduling for AI workloads: queues, fair share and GPU sharing", ("kai-scheduler", "kai scheduler", "kai_scheduler")),
+    ("KAI", "KAI Scheduler", "NVIDIA", "GPU-aware scheduling for AI workloads: queues, fair share and GPU sharing", ("kai-scheduler", "kai scheduler", "kai_scheduler", "kai")),
     ("NEPHIO", "Nephio", "the Linux Foundation", "intent-based automation of network functions on Kubernetes", ("nephio",)),
     ("KUBEEDGE", "KubeEdge", "the CNCF", "orchestration from the cloud to edge nodes and devices", ("kubeedge",)),
     ("KUBERAY", "KubeRay", "the Ray project", "Ray clusters on Kubernetes with the Ray autoscaler", ("kuberay",)),
@@ -401,7 +401,7 @@ def campaign_reading() -> dict | None:
         if rs is None:
             return None
         got[wf] = [{"id": x["id"], "status": x["status"], "conclusion": x.get("conclusion"), "created": x["created_at"],
-                    "updated": x["updated_at"], "sha": (x.get("head_sha") or "")[:12]}
+                    "updated": x["updated_at"], "sha": (x.get("head_sha") or "")[:12], "title": (x.get("display_title") or "")[:120]}
                    for x in sorted(rs, key=lambda x: x["created_at"]) if x.get("conclusion") != "cancelled"]
     return {"since": D.RERUN_SINCE, "read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "workflows": got}
 
