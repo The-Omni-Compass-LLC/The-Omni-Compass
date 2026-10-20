@@ -632,9 +632,12 @@ def orchestrators() -> list:
         # governor's slug or one of its settings (V10_CRUISEKUBE.md)
         table = None
         keys = [k for k, _ in GP.settings_of(slug)]
-        cands = [(max(ns), -len(st), st) for st, ns in tables.items() if any(k.upper() in st.split("_") for k in keys)]
+        # a governor's own table is its setting's (V12_KAI), else its four ways' TOP table (Omni-Compass on top of it against it as
+        # shipped); the other four-ways tables (ORCH, BARE, VS, BOTH) compare other pairs of arms and never stand as the governor's reading
+        cands = [(max(ns), 0 if "_4W_" not in st else -1, -len(st), st) for st, ns in tables.items()
+                 if any(k.upper() in st.split("_") for k in keys) and ("_4W_" not in st or st.endswith("_4W_TOP"))]
         if cands:
-            n, _, st = max(cands)
+            n, _, _, st = max(cands)
             rc = XS.receipt(f"V{n}_{st}")
             # every row as written: the judged ones that moved, the EVEN ones (no difference beyond the noise) and the rows shown unjudged
             table = {"file": rc["file"], "title": rc["title"], "engine": f"omni-v{n}", "count": rc["count"],
