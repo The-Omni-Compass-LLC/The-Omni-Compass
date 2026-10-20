@@ -145,6 +145,15 @@ the founder overrides one in the conversation.
   (`tools/run_realms_v5.py`, `run_scale.py`, `run_hil.py`, `run_kil.py`), never in a fingerprinted engine file; the spine is
   `spine`, organism 7 in the numbered runners, and listed first on every page. Earlier catalogs' counts stay with their
   results in `docs/history`.
+- **The orchestra, an eighth organism** (the founder's words of 19 October, night: "governors and orchestrators in their own
+  category or catalog group organism ... benchmark them on the organism native, and then Omni on top of them on top of the
+  organism"): every catalog muscle that stands for a knob of the governors and orchestrators he named (the Kubernetes
+  scheduler, Kueue, Volcano, the KAI scheduler, Koordinator, CruiseKube, Crane, KubeRay, Gödel, Armada, Karmada, Open Cluster
+  Management, KubeEdge, Nephio; the mapping in `tools/governors_page.py`), each governor's muscles a body of its own and all
+  of them together one body, native and with Omni-Compass on top, modelled (`tools/run_orchestra.py`,
+  `results/orchestra/ORCHESTRA.md`, its A, B and C in `orchestra.yml`); a grouping of catalog rows like the seven, never in a
+  fingerprinted engine file. The governors themselves run live on real Kubernetes, each as its project ships it with
+  Omni-Compass on top (`kind-orchestrators.yml`, `results/live/GOVERNORS.md`).
 - The organisms are named `tower`, `stack` and `spine` in code and workflows (never by a count); the old names `organism_656`
   and `stack_1226` are read as aliases.
 - The grid: each organism runs native and omni at clustered copies × runs: 63 squares (seven organisms) at 1, 10 and 100 copies × 1, 10

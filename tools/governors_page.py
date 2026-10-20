@@ -19,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.legal import stamp  # noqa: E402
-from tools.readings import receipt_key  # noqa: E402
+from tools.readings import labelled, receipt_key  # noqa: E402
 
 OUT = ROOT / "results" / "live" / "GOVERNORS.md"
 RUNS = ROOT / "results" / "live" / "governors_runs.json"
@@ -134,6 +134,23 @@ def catalog_line(slug) -> str:
             + ", ".join(f"`{m}`" for m in muscles) + ".")
 
 
+LOAD_WORDS = {"normal": "own load", "climb": "the climb", "line": "work in line"}
+
+
+def orchestra():
+    """The orchestra, the eighth organism (tools/run_orchestra.py): every governor's muscles as a body of its own and all of
+    them together, native and with Omni-Compass on top, modelled; or None before its table is committed."""
+    try:
+        return json.loads((ROOT / "results" / "orchestra" / "ORCHESTRA.json").read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def orchestra_readings(orch, body):
+    return [labelled(orch["bodies"][load][body]["label"]) if body in orch["bodies"].get(load, {}) else "not run"
+            for load in LOAD_WORDS]
+
+
 def settings_of(slug):
     return SETTINGS.get(slug, ((slug, ""),))
 
@@ -173,9 +190,29 @@ def render(runs=None) -> str:
                 readings.append(f"{tag}not yet run"); wheres.append(f"{tag}built; its runs come in the campaign")
         L.append(f"| {name} | {field} | {row} | {'; '.join(wheres)} | {'; '.join(readings)} |")
     L.append("")
+    orch = orchestra()
+    L += ["## The orchestra, the eighth organism (modelled, class S)", ""]
+    if orch:
+        L += [f"The founder's word of 19 October, night: the governors in a catalog group, an organism of their own. Every "
+              f"catalog muscle that stands for a governor's knob (below, under each governor) runs in the modelled organisms "
+              f"as the seven do: each governor's muscles as a body of its own, then all of them together as one body, the "
+              f"orchestra, native and then with Omni-Compass on top at the max, on {orch['run']['engine']}, seeds "
+              f"{orch['run']['seeds'][0]}-{orch['run']['seeds'][-1]}. A model, not a measurement of the governor itself; "
+              f"every row: [`results/orchestra/ORCHESTRA.md`](../orchestra/ORCHESTRA.md).", "",
+              "| Body | Muscles | Own load | The climb | Work in line |", "|---|---:|---|---|---|"]
+        for slug, name, *_ in GOVERNORS:
+            L.append(f"| {name} | {len(orch['run']['bodies'][slug])} | " + " | ".join(orchestra_readings(orch, slug)) + " |")
+        L.append(f"| **The orchestra, every governor's muscle once** | {len(orch['run']['bodies']['orchestra'])} | "
+                 + " | ".join(f"**{r}**" for r in orchestra_readings(orch, "orchestra")) + " |")
+    else:
+        L.append("Not yet run (`tools/run_orchestra.py`).")
+    L.append("")
     for slug, name, row, field, native, test in GOVERNORS:
         L += [f"## {name}", "", f"- **Native**: {native}.", f"- **Its test on real Kubernetes (class L)**: {test}; register row {row}.",
               catalog_line(slug)]
+        if orch:
+            L.append("- **Its muscles as a body in the orchestra (modelled, class S)**: "
+                     + "; ".join(f"{w}: {r}" for w, r in zip(LOAD_WORDS.values(), orchestra_readings(orch, slug))) + ".")
         for key, label in settings_of(slug):
             t, head = table_of(key), (f" ({label})" if label else "")
             if t:

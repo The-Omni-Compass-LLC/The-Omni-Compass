@@ -25,6 +25,10 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | KubeEdge | edge nodes | 97 | its rig is not yet built | not yet run |
 | Nephio | network-function automation | 98 | its rig is not yet built | not yet run |
 
+## The orchestra, the eighth organism (modelled, class S)
+
+Not yet run (`tools/run_orchestra.py`).
+
 ## The Kubernetes scheduler (vanilla, and its bin-packing profile)
 
 - **Native**: the default scheduler of Kubernetes 1.35 as shipped, which places every pod of every Kubernetes set; and the same release's scheduler with the operator's bin-packing profile (NodeResourcesFit, MostAllocated).
