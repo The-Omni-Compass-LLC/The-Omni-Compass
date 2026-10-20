@@ -2,6 +2,33 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20 (evening): Omni v13 stands (no other muscle's room is conveyed)
+
+- **omni-v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`): omni-v12 with one fault fixed in the
+  Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone, whose
+  three-run table read two LOSS rows (the queue finished 0.6% to 0.8% later, the web's 99th percentile 4% to 13% higher). The
+  29 repetitions' own files, read job by job and pod by pod, name the mechanism (`docs/BATCH_QUEUE_PREREGISTRATION.md`,
+  amendment 11, which replaces amendment 10's reading that it was the give-back): in the 16 repetitions whose slower runner
+  saturated the kind cores, the web pods' CPU limits were raised to 3,700m at 33 s, on a busy reading that caught the dip as the
+  stream's first pods started, and kept through the queue (omni-v7's guard holds a new raise at the host's top, never one
+  already given); the batch pods hashed 7.6% slower (63.1 s against 59.2 s) while the web served no faster; no machine was
+  parked during a saturated queue. Now, on a shared host at its top (busy at or over 75%) while another workload there has
+  room of its own (a pod whose limit is above its request), every limit given goes back to the operator's and is conveyed again
+  only under 70%; and every other pod on a machine is counted by its own limit, where omni-v12 counted requests.
+  `tests/test_convey_handback.py`; the shared-host tests' coredns carries no room of its own, as kind's does not.
+- **The toy gate** (`results/toy_gate/V13_VS_V12.md`, seeds 1 to 8): a new toy, `convey_batch`, sets KubeRay's batch muscle
+  beside the serving one on the batch rig's host (the kind nodes on 3 of 4 cores, the governor on the fourth, the stream of
+  24 jobs, the kernel's request-weighted share, the pods' measured start lag, the governor's own windowed reading, and the
+  batch pods' loss of work under a lifted quota taken from the saturated repetitions themselves). Against omni-v12 no reading is a LOSS in any toy: the cluster, verdict and web-only convey toys identical to the last digit;
+  in `convey_batch` the queue 1.48% sooner, the job turnaround 9.59% shorter and the web's 95th percentile 17.4% lower (GAIN).
+  Against native omni-v13 reads the queue identical, and three LOSS rows: the turnaround +0.05% (one raise on the queue's opening
+  reading, handed back 15 s later; on the next version's list) and the requests served and alert minutes, which both engines read
+  the same way with no batch at all on that 3-core host while the real runs read more requests (the toy's web model, on the list).
+- **Recorded with it**: the deviations register (71 amendments), the next version's list (`docs/CHANGE_CONTROL.md`: the toy's
+  web model on the 3-core host, where both engines read fewer requests served than native while the real runs read more after
+  the queue), the mechanism identity and the engine coverage measured again on the omni-v13 tree, the Lambda branch
+  `gpu-omni-v13`. Every benchmark runs again on omni-v13; omni-v12's tables stand as its record.
+
 ## 2026-10-20: the whole system, every layer composed by the product law; Gödel's rig on 1.24; the CPU power harness seeded
 
 - **The whole system** (`results/WHOLE_SYSTEM.md`, `tools/whole_system.py`; the founder's question of 20 October: the cloud is

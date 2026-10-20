@@ -8,7 +8,7 @@ the omni-v12 runs of KubeRay's rig on 20 October: the governor's conveyance, whi
 serving pods on it, kept handing it on a shared host after the host had none left, and the batch muscle beside the web paid.
 Every setting, gain, preset and muscle is omni-v12's, and so is every rule but this one.
 
-Its fingerprint is `OMNI_V13.json` (47 files). Forty-six files are omni-v12's bytes; one differs, the governor's muscles
+Its fingerprint is `OMNI_V13.json` (digest `0088837333c6f0fc`, 47 files). Forty-six files are omni-v12's bytes; one differs, the governor's muscles
 (`omni_controller/muscles.py`). The change was proven in its tests (`tests/test_convey_handback.py`) and in the toy gate before
 it landed (`results/toy_gate/V13_VS_V12.md`). Every benchmark runs again on omni-v13, A, B and C. Every earlier table stands as
 its own engine's result until its three runs on v13 land, and results from two versions are never pooled. The readings from
@@ -67,7 +67,26 @@ finishes where the saturated runners' did (834 s), the processor shared between 
 pods' measured start lag (2.66 s) and the governor's own windowed reading of the host. The batch pods' loss of work while a
 serving pod's quota is lifted on a host at its top is the saturated repetitions' own (+7.6% hashing time, 0.071 of the work).
 
-GATE_READINGS
+Against omni-v12, on the same seeds, **no reading is a LOSS in any toy**:
+
+- The three cluster toys (a decision every 60 s, every 15 s, and with the machines blinking out of the reading) and the
+  verdict toy at 20 and 200 pieces of work a decision: identical to omni-v12 on every gauge, to the last digit. The cloud
+  setting conveys nothing, and the verdict is omni-v11's byte for byte.
+- The three web-only convey toys (the quota readable and empty, unreadable, and refusing every raise): identical on every
+  gauge. No other workload there has room of its own, so omni-v7's rule holds unchanged.
+- `convey_batch`: against omni-v12, the batch queue finishes **1.48% sooner** and the job turnaround is **9.59% shorter**
+  (GAIN), the web's 95th percentile **17.4% lower**, the requests served 0.43% more, the pod start wait 1.46% shorter, the
+  commands written 15% fewer, the CPU given 1.2% less and the host's busy share 0.5% less (GAIN); the pod-seconds +0.84%,
+  power given; the alert minutes identical.
+
+Against native in `convey_batch`, omni-v12 read LOSS on six gauges: the queue +1.50%, the job turnaround +10.7%, the 95th
+percentile +14.8%, the requests served −2.5%, the pod start wait +1.9% and the alert minutes +9.8%. omni-v13 reads the queue
+identical to native's, the 95th percentile (−5.3%) and the start wait EVEN, and three LOSS rows. The job turnaround +0.05%
+(0.04 to 0.17 s a job): the queue's first reading spans the seconds before the batch pods ran, so the web's limits are raised
+once and handed back 15 s later; the rule that closes it is on the next version's list. The requests served −2.1% and the
+alert minutes +9.8%: both engines read the same way with no batch at all on this 3-core host, while the real KubeRay runs
+served 4% more after the queue, so the toy's web model is out of its regime there (section 4). These are our own models,
+class S.
 
 ## 4. What stays omni-v12's
 

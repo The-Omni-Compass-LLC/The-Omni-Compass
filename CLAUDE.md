@@ -43,9 +43,21 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v12 stands (v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v13 stands (v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`) stands on main since 19 October, night,
+- **Omni v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`) stands on main since 20 October, evening, the
+  founder's order that every fault found be fixed and every fix land as the next version, told, not asked: omni-v12 with one fault
+  fixed in the Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone (the
+  queue 0.6% to 0.8% later and the web's 99th percentile 4% to 13% higher, LOSS in all three runs). The web pods' limits were raised
+  to 3,700m in the queue's first half minute and kept through the saturated queue (omni-v7's guard holds a new raise at the host's
+  top, never one already given): the batch pods hashed 7.6% slower and the web served no faster while the queue ran; no machine was
+  parked during a saturated queue (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11). Now, on a shared host at its top (busy at or
+  over 75%) beside another workload's room (a pod whose limit is above its request), every limit given goes back to the operator's,
+  conveyed again only under 70%; and every other pod on a machine is counted by its own limit, where omni-v12 counted requests. The
+  toy gate (`results/toy_gate/V13_VS_V12.md`, with a batch toy set from the KubeRay runs' own files): no LOSS against omni-v12 in
+  any toy, the web-only toys identical; in the batch toy the queue and the job turnaround back at native's. Every benchmark runs
+  again on it.
+- **Omni v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`) stood on main 19 to 20 October, landed the night of 19 October,
   the founder's order ("Of course I want you to land version 12 ... every time you do that ... it becomes a new version"):
   omni-v11 with two faults fixed, both found on the omni-v11 runs. A CPU-limit raise the cluster's admission refuses is held
   until the pod's limit changes, the raise shrinks or a wait passes (5 minutes, doubled up to an hour;
@@ -116,7 +128,7 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
@@ -291,7 +303,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v12` since 19 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v13` since 20 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -541,8 +553,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v12` (the engine that stands, 19 October), stay in
-  sync, and `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v12`,
+  One version is always the main one; `main` and the working branch, `v13` (the engine that stands, 20 October), stay in
+  sync, and `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v13`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.
