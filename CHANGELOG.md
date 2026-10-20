@@ -2,6 +2,20 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: the Gödel scheduler's rig, preregistered (amendment 8), four ways, on Kubernetes 1.24
+
+- **Gödel on the batch rig** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 8; register row 93; the founder's list):
+  Gödel publishes no release, so each runner builds its image once from its source at the pinned commit with the project's
+  own Dockerfile (`scripts/kind_godel_build.sh`), and every arm checks the commit and the image's ID before loading it into
+  its control plane and applying Gödel's own manifests (`BATCH_QUEUE=godel` in `scripts/kind_batch_queue.sh` and
+  `scripts/kind_bench.sh`). The stream's pods go to Gödel by its scheduler's name with the three annotations its guide puts
+  on every pod; on every other system the job file is the same as before.
+- **Kubernetes 1.24 for this system alone** (Gödel supports 1.21.4 to 1.24.6): kind v0.22.0 with the pinned 1.24.17 node
+  image, kubectl v1.24.17 and metrics-server v0.5.2 (`kind-godel.yml`; the bench's metrics-server floor now knows the 0.5
+  line); no in-place resize, so no power cap or conveyance in any arm, as on Crane's 1.25.
+- `kind-godel.yml` (four arms by default; archived by `archive-run.yml`; the label passed by the conductor),
+  `tests/test_godel_rig.py`, register row 93, the governors page.
+
 ## 2026-10-20: Crane's rig, preregistered, four ways, on Kubernetes 1.25
 
 - **Crane on the serving rig** (`docs/CRANE_PREREGISTRATION.md`; register row 90; the founder's list): Crane 0.11.0 and the

@@ -6,7 +6,7 @@
 **How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss; work bought with each unit of a resource (work per energy) that fell is power given too. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end: how to read this receipt -->
 
-The founder's list of 19 October, night: every governor and orchestrator he named runs with the organism native under it, then with Omni-Compass on top of it, on the engine that stands (omni-v12). The organism is a six-worker real Kubernetes cluster (kind v0.31.0, Kubernetes v1.35.0) on GitHub's machines, each arm on a fresh cluster, the two arms back to back on one runner, ten paired repetitions a run, three runs (A, B and C) for a reading. Native is the governor as its project ships it; Omni-Compass sits on top with its own levers (the node pool, the service's autoscaler and processor limit, cruise and idle) and never writes the governor's objects, but where the governor owns the service's autoscaler (Crane): there its autoscaler moves reach the autoscaler through the governor's own object, by a plug, as on KEDA. Crane alone runs on Kubernetes 1.25.16 (its HPA is an API 1.26 removed), where no pod is resized in place, so no processor limit is moved in any of its arms. Cost: $0 (GitHub's free machines). A governor's line reads only from its own three-run table; until then it says where its runs stand.
+The founder's list of 19 October, night: every governor and orchestrator he named runs with the organism native under it, then with Omni-Compass on top of it, on the engine that stands (omni-v12). The organism is a six-worker real Kubernetes cluster (kind v0.31.0, Kubernetes v1.35.0) on GitHub's machines, each arm on a fresh cluster, the two arms back to back on one runner, ten paired repetitions a run, three runs (A, B and C) for a reading. Native is the governor as its project ships it; Omni-Compass sits on top with its own levers (the node pool, the service's autoscaler and processor limit, cruise and idle) and never writes the governor's objects, but where the governor owns the service's autoscaler (Crane): there its autoscaler moves reach the autoscaler through the governor's own object, by a plug, as on KEDA. Crane runs on Kubernetes 1.25.16 (its HPA is an API 1.26 removed) and Gödel on 1.24.17 (its supported range), where no pod is resized in place, so no processor limit is moved in any of their arms. Cost: $0 (GitHub's free machines). A governor's line reads only from its own three-run table; until then it says where its runs stand.
 
 | Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |
 |---|---|---:|---|---|
@@ -18,7 +18,7 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
 | Crane | predictive autoscaling and resource governance | 90 | built; its runs come in the campaign | not yet run |
 | KubeRay | Ray clusters (the Ray autoscaler) | 92 | built; its runs come in the campaign | not yet run |
-| Gödel scheduler | unified online and offline scheduling | 93 | its rig is not yet built | not yet run |
+| Gödel scheduler | unified online and offline scheduling | 93 | built; its runs come in the campaign | not yet run |
 | Armada | multi-cluster batch | 94 | its rig is not yet built | not yet run |
 | Karmada | multi-cluster placement | 95 | its rig is not yet built | not yet run |
 | Open Cluster Management | multi-cluster management | 96 | its rig is not yet built | not yet run |
@@ -38,6 +38,7 @@ Each system runs four ways in every repetition, each way on a fresh cluster of t
 | The scheduler's bin-packing profile | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368428763) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368435483) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368442002) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
 | KubeRay | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 | Crane | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| The Gödel scheduler | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 
 ## The orchestra, the eighth organism (modelled, class S)
 
@@ -208,8 +209,8 @@ Every row of the run: [`results/live/V12_KOORDINATOR.md`](V12_KOORDINATOR.md).
 
 ## Gödel scheduler
 
-- **Native**: its placement of units and gangs as shipped.
-- **Its test on real Kubernetes (class L)**: not yet written; register row 93.
+- **Native**: the Gödel scheduler built from its pinned source and deployed by its own manifests, its placement as shipped, on Kubernetes 1.24.17 (it supports 1.21.4 to 1.24.6).
+- **Its test on real Kubernetes (class L)**: the batch stream placed by Gödel, four ways (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 8); register row 93.
 - **In the catalog (modelled, class S)**: family 14, Distributed Cluster Managers (15 muscles, in its realm and the whole tower): `gang_schedule`, `task_admission`, `binpack_pressure`, `resource_reservation`.
 - **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
 - **Readings**: none yet; nothing is written here before its three runs are in.
