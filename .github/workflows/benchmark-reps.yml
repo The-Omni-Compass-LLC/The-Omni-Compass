@@ -19,6 +19,7 @@ on:
       replica_ceiling: {description: "The most replicas Omni-Compass may raise the HPA's cap to while it binds (compass law; empty: the cap is never moved)", default: ""}
       faults: {description: "1: the fault test (a machine dies, a traffic spike, a runaway pod, a blind probe; scripts/kind_faults.sh); 2: those four, then the API server frozen and the metrics server gone", default: ""}
       workload: {description: "web (the service under load) or batch (a queue of jobs: deploy/kind/batch-jobs.yaml)", default: "web"}
+      batch_queue: {description: "With workload batch: kueue or volcano, a queueing system of its own admitting a stream of jobs (docs/BATCH_QUEUE_PREREGISTRATION.md); empty: Kubernetes alone", default: ""}
   push:
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
@@ -70,6 +71,7 @@ jobs:
           TWO_APP: ${{ github.event.inputs.two_app || '' }}
           REPLICA_CEILING: ${{ github.event.inputs.replica_ceiling || '' }}
           WORKLOAD: ${{ github.event.inputs.workload || 'web' }}
+          BATCH_QUEUE: ${{ github.event.inputs.batch_queue || '' }}
           LOADGEN: ${{ github.event.inputs.loadgen || (contains(github.event.head_commit.message, '[open-load]') && 'open' || 'closed') }}
       - name: Attach README, licenses and disclosures to this artifact
         id: omni_legal_export_1

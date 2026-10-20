@@ -72,16 +72,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-19 20:21 | [Robustness: the long run, 7,200 s an arm, the governor's memory and decisions watched: the A/B/C three-run table (Omni v11)](results/live/V11_ROBUST_LONG.md) |  |
-| 2026-10-19 20:21 | [Robustness: the governor killed outright mid-run (the lease), real Kubernetes, 10 pairs: the A/B/C three-run table (Omni v11)](results/live/V11_ROBUST_KILL.md) |  |
-| 2026-10-19 20:21 | [How steadily the governor steered: its own moves on every omni-v11 Kubernetes table](results/STEERING.md) |  |
-| 2026-10-19 20:19 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V11_YCSB_SERVICE.md) | Across 4 untouched workloads: 2 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 42 EVEN, 0 where the runs disagree. |
-| 2026-10-19 20:19 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V11_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 48 EVEN, 0 where the runs disagree. |
-| 2026-10-19 20:19 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V11_PGBENCH_SERVICE.md) | Across 3 workloads: 2 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 34 EVEN, 0 where the runs disagree. |
-| 2026-10-19 18:29 | [The swarm's proximity reflex: the omni-v11 wire against the fix, native beside both](results/toy_gate/V12_SWARM_REFLEX.md) |  |
-| 2026-10-19 18:04 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V11_YCSB_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 44 EVEN, 0 where the runs disagree. |
-| 2026-10-19 18:04 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V11_YCSB.md) | Across 4 untouched workloads: 1 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 43 EVEN, 0 where the runs disagree. |
-| 2026-10-19 18:04 | [sysbench on MySQL, a database's buffer pool as shipped: the A/B/C three-run table](results/live/V11_SYSBENCH_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 5 power given, 43 EVEN, 0 where the runs disagree. |
+| 2026-10-19 23:41 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -89,9 +80,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-19 21:14 | raw-sweep | success | [39325883833](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39325883833) |
-| 2026-10-19 21:14 | live-engine | cancelled | [39325882273](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39325882273) |
-| 2026-10-19 21:12 | cloud-check google | failure | [39325572578](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39325572578) |
+| 2026-10-19 23:56 | big-organism-detached collect | success | [39344570823](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39344570823) |
+| 2026-10-19 23:54 | live-engine | success | [39343278537](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39343278537) |
+| 2026-10-19 23:43 | raw-sweep | success | [39343278468](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39343278468) |
+| 2026-10-19 23:42 | lambda-gpu | cancelled | [39343239141](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39343239141) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
