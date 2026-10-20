@@ -56,6 +56,11 @@ jobs:
     concurrency: {group: live-engine, cancel-in-progress: false}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    defaults:
+      run:
+        # bash with -e and -o pipefail: a check whose output is piped into tee still fails its step, and a failed check stops
+        # the page from being committed (the default shell without "shell: bash" drops a failure in front of a pipe)
+        shell: bash
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -83,7 +88,7 @@ jobs:
       - name: The page's engine against the Python and the C++; every record against the repository's own runs
         run: |
           python docs/engine/check_live_engine.py | tee -a "$GITHUB_STEP_SUMMARY"
-          python docs/engine/check_records.py --seed 3000 | tee -a "$GITHUB_STEP_SUMMARY"
+          python docs/engine/check_records.py --seed 3000 3001 3002 | tee -a "$GITHUB_STEP_SUMMARY"
           python docs/engine/build_live_engine.py --check | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Legal notice checked, the page committed
         run: |

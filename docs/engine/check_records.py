@@ -17,7 +17,8 @@
 
 pilot/selfpilot.py's omni day builds the controller's own kubectl reader, which starts a kubectl proxy; where no kubectl
 is installed the proxy is stubbed for that one call (the simulated cluster answers every read either way).
-Usage: python3 docs/engine/check_records.py [--seed 3000]. Exit 0 when every comparison is identical.
+Usage: python3 docs/engine/check_records.py [--seed 3000 3001 3002]. Exit 0 when every comparison is identical (every seed
+named; by default the three seeds of runs A, B and C).
 """
 from __future__ import annotations
 
@@ -122,6 +123,9 @@ def stacks(seed):
         with tempfile.TemporaryDirectory() as td, contextlib.redirect_stdout(buf):
             TG.worker_convey(arm, seed, td)
         ref = json.loads(buf.getvalue().strip().splitlines()[-1])
+        got = ref.pop("engine_tree", None)          # the checkout the engine came from: this one (a path, never part of the record)
+        if got is not None and Path(got).resolve() != ROOT.resolve():
+            bad.append(f"linux {arm}: the engine was imported from {got}, not from this checkout")
         if rec["summary"] != ref:
             bad.append(f"linux {arm}: the recorded run differs from tools/toy_gate.py worker_convey")
         if abs(sum(rec["lam"]) - ref["requests_served"]) > 0.0005 * len(rec["lam"]):            # kept to 0.001 each second
@@ -132,9 +136,12 @@ def stacks(seed):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--seed", type=int, default=3000); a = ap.parse_args()
-    bad = harness(a.seed) + controller(a.seed) + stacks(a.seed)
-    print("\n".join(bad) if bad else f"seed {a.seed}: every record identical to the repository's own run")
+    ap = argparse.ArgumentParser(); ap.add_argument("--seed", type=int, nargs="+", default=[3000, 3001, 3002]); a = ap.parse_args()
+    bad = []
+    for sd in a.seed:
+        b = [f"seed {sd}: {x}" for x in harness(sd) + controller(sd) + stacks(sd)]
+        print("\n".join(b) if b else f"seed {sd}: every record identical to the repository's own run")
+        bad += b
     return 1 if bad else 0
 
 

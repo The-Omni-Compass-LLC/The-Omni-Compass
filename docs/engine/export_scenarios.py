@@ -39,6 +39,8 @@ from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-si
 def reading(runs, aim):
     """The three-run rule (tools/readings.py, tools/confirm_abc.py): GAIN or LOSS only when every run is clear of zero the same
     way."""
+    if aim == "shown":       # declared shown only, never judged (tools/readings.py SHOWN)
+        return "shown, not judged"
     if all(r["lo"] == r["hi"] == 0.0 for r in runs):
         return "EVEN, the same"
     # as the tables read it (tools/confirm_abc.py verdict): clear runs pointing different ways disagree, whatever the
@@ -135,7 +137,8 @@ def gpu():
             for g, (aim, s, _) in GPU_GAUGES.items():
                 sec["readings"].setdefault(g, {"aim": aim, "runs": []})["runs"].append(paired(n[s], o[s], 30))
             wpk = (o["summary"]["work_per_kj"] / n["summary"]["work_per_kj"]) - 1.0
-            sec["readings"].setdefault("wpk", {"aim": "per", "runs": []})["runs"].append(
+            # requests per kJ: the ratio of two judged rows, one number a run with no interval of its own, so shown, not judged
+            sec["readings"].setdefault("wpk", {"aim": "shown", "runs": []})["runs"].append(
                 {"native": n["summary"]["work_per_kj"], "omni": o["summary"]["work_per_kj"], "change": wpk, "lo": wpk, "hi": wpk})
         for g, v in sec["readings"].items():
             v["reading"] = reading(v["runs"], v["aim"])
@@ -186,6 +189,11 @@ def linux_run(seed, arm):
         finally:
             sys.settrace(None)
     sec["summary"] = json.loads(buf.getvalue().strip().splitlines()[-1])
+    # the checkout the engine was imported from, as tools/toy_gate.py checks it: this one, checked here and never recorded (a
+    # machine's own path would make the record differ from one machine to the next)
+    got = sec["summary"].pop("engine_tree", None)
+    if got is not None and Path(got).resolve() != ROOT.resolve():
+        raise RuntimeError(f"the engine was imported from {got}, not from this checkout {ROOT}")
     return sec
 
 
@@ -212,18 +220,53 @@ def linux():
     return out
 
 
-# ---- every receipt of the engine that stands ---------------------------------------------------------------------------
-RECEIPTS = [   # (file, stack, evidence class)
-    ("V7_GOLDILOCKS", "Kubernetes", "L"), ("V7_KEDA_REQUESTS", "Kubernetes", "L"), ("V7_KEDA_CPU_REQUESTS", "Kubernetes", "L"),
-    ("V7_ALL_FOUR", "Kubernetes", "L"), ("V7_TRACE_GOOGLE2011", "Kubernetes", "L"), ("V7_FAULTS", "Kubernetes", "L"),
-    ("V7_BATCH", "Kubernetes", "L"), ("V7_FAIRNESS", "Kubernetes", "L"), ("V7_CRUISEKUBE", "Kubernetes", "L"),
-    ("V7_CAPACITY", "Kubernetes", "L"), ("V7_ROBUST_KILL", "Kubernetes", "L"), ("V7_ROBUST_LONG", "Kubernetes", "L"),
-    ("V7_REDIS", "Linux services", "L"), ("V7_REDIS_SERVICE", "Linux services", "L"), ("V7_PGBENCH", "Linux services", "L"),
-    ("V7_SYSBENCH", "Linux services", "L"), ("V7_YCSB", "Linux services", "L"), ("V7_KAFKA", "Linux services", "L"),
-    ("V7_KAFKA_SERVICE", "Linux services", "L"),
-    ("V7_PANDAPOWER", "Energy and the grid", "S"), ("V7_CITYLEARN", "Energy and the grid", "S"),
-    ("V7_MUJOCO", "Physics and robotics", "S"), ("V7_SWARM", "Physics and robotics", "S"),
-]
+# ---- every three-run table, found by itself ----------------------------------------------------------------------------
+FIRST_ENGINE = 8   # tables from omni-v8 on; older engines' tables are the road (docs/history), never on the page
+SIM_STACK = {"CITYLEARN": "Energy and the grid", "PANDAPOWER": "Energy and the grid", "MUJOCO": "Physics and robotics",
+             "SWARM": "Physics and robotics"}   # the outside simulators' stacks, by the simulator a table names in its file name
+STACK_ORDER = ("Kubernetes", "Linux services", "Energy and the grid", "Physics and robotics", "Other")
+
+
+def tables():
+    """Every benchmark's newest three-run table (results/live/V<n>_<BENCHMARK>.md, n from FIRST_ENGINE), found by itself, with
+    its stack and evidence class read from its own files: a table whose JSON holds its workloads is a Linux service and one
+    whose JSON holds its rows is Kubernetes (both real software, class L); a table with no JSON beside it is an outside
+    simulator driven by our own runner (class S). Nothing is listed by hand: a table that lands is on the page at the next
+    build, and a later engine's table replaces an earlier one's the moment it lands (two engines are never pooled)."""
+    import re
+    best = {}
+    for f in (ROOT / "results" / "live").glob("V*_*.md"):
+        m = re.fullmatch(r"V(\d+)_([A-Z0-9_]+)", f.stem)
+        if not m or int(m.group(1)) < FIRST_ENGINE or "three-run table" not in f.read_text(encoding="utf-8").split("\n", 1)[0]:
+            continue
+        n, base = int(m.group(1)), m.group(2)
+        if base not in best or n > best[base][0]:
+            best[base] = (n, f.stem)
+    out = []
+    for base, (n, stem) in best.items():
+        j = ROOT / "results" / "live" / f"{stem}.json"
+        meta = json.loads(j.read_text(encoding="utf-8")) if j.exists() else None
+        if isinstance(meta, dict) and "workloads" in meta:
+            stack, cls, kind = "Linux services", "L", "db"
+        elif isinstance(meta, dict) and "rows" in meta:
+            stack, cls, kind = "Kubernetes", "L", "k8s"
+        else:
+            stack, cls, kind = SIM_STACK.get(base, "Other"), "S", None
+        out.append({"base": base, "n": n, "stem": stem, "stack": stack, "cls": cls, "kind": kind})
+    return sorted(out, key=lambda t: (STACK_ORDER.index(t["stack"]), t["base"]))
+
+
+def table_title(stem):
+    """A table's own title, with what tells two tables of one benchmark apart: the verdict's objective it names, and native
+    exactly as the vendor ships it (a _SHIPPED table)."""
+    text = (ROOT / "results" / "live" / f"{stem}.md").read_text(encoding="utf-8")
+    title = text.splitlines()[0].lstrip("# ").split(": the A/B/C")[0].strip()
+    for obj in ("service", "resource"):
+        if f"(the objective: {obj})" in text:
+            title += f" (the verdict's objective: {obj})"
+    if stem.endswith("_SHIPPED") and "as shipped" not in title:
+        title += " (native exactly as the vendor ships it)"
+    return title
 
 
 def receipt_word(rd):
@@ -231,8 +274,10 @@ def receipt_word(rd):
     for w, key in (("gain", "GAIN"), ("loss", "LOSS"), ("power given", "power given"), ("even", "EVEN")):
         if r.startswith(w):
             return key
-    if "disagree" in r or "runs differ" in r:
-        return "the runs disagree"
+    if "disagree" in r:
+        return "the runs disagree"     # clear runs pointing different ways: the test is unstable there
+    if "runs differ" in r:
+        return "the runs differ"       # a deterministic simulator's runs did not reproduce (tools/readings.py DIFFER)
     return "shown"
 
 
@@ -272,12 +317,13 @@ def even_reason(abc):
 def receipt(name):
     """Every judged row of results/live/<name>.md as written: its table's heading, the gauge, runs A, B and C, the reading."""
     import re
-    rows, hdr, sect, title = [], None, "", ""
+    rows, hdr, sect, title, tuning = [], None, "", "", False
     for ln in (ROOT / "results" / "live" / f"{name}.md").read_text(encoding="utf-8").splitlines():
         if ln.startswith("# ") and not title:
             title = ln[2:].split(": the A/B/C")[0].strip()
         if ln.startswith("#"):
             sect, hdr = ln.lstrip("# ").strip(), None
+            tuning = bool(re.search(r"not counted|\(the tuning", sect))   # the case the rules were frozen on: shown, never counted
             continue
         if not ln.startswith("|"):
             continue
@@ -289,31 +335,21 @@ def receipt(name):
             continue
         d = dict(zip(hdr, cells))
         gauge = cells[0] if hdr[0] != "Cap (cores)" else f"cap {cells[0]} cores: {cells[1]}"
+        w = receipt_word(d["Reading"])
         rows.append({"s": sect, "g": gauge.replace("`", ""), "abc": [d.get(k, "") for k in "ABC"],
-                     "r": d["Reading"].replace("**", ""), "w": receipt_word(d["Reading"])})
+                     "r": ("the tuning case, shown and not counted: " if tuning else "") + d["Reading"].replace("**", ""),
+                     "w": "tuning" if tuning else w})
     count = {}
     for r in rows:
         count[r["w"]] = count.get(r["w"], 0) + 1
-    text = (ROOT / "results" / "live" / f"{name}.md").read_text(encoding="utf-8")
-    for obj in ("service", "resource"):
-        if f"(the objective: {obj})" in text:
-            title += f" (the verdict's objective: {obj})"
+    title = table_title(name)
     even = [{"s": r["s"], "g": r["g"], "abc": r["abc"], **even_reason(r["abc"])} for r in rows if r["w"] == "EVEN"]
     # the rows a table shows and does not judge (its preregistration's own rule), kept so their sizes are seen: a resource a
     # table only shows, CPU used beside a response time, is the price of the work
-    shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"]} for r in rows if r["w"] == "shown"]
-    return {"file": f"results/live/{name}.md", "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown")],
+    shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **({"tuning": True} if r["w"] == "tuning" else {})}
+             for r in rows if r["w"] in ("shown", "tuning")]
+    return {"file": f"results/live/{name}.md", "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown", "tuning")],
             "count": count, "even": even, "shown": shown}
-
-
-def newest(name):
-    """The newest engine's table of a benchmark: V<n>_<BENCHMARK>.md with the highest n present (a later engine's three
-    runs replace an earlier engine's table on the page the moment they land; tables of two engines are never pooled)."""
-    import re
-    base = re.sub(r"^V\d+_", "", name)
-    found = sorted(((int(m.group(1)), f.stem) for f in (ROOT / "results" / "live").glob(f"V*_{base}.md")
-                    if (m := re.fullmatch(rf"V(\d+)_{re.escape(base)}", f.stem))), reverse=True)
-    return found[0] if found else (None, name)
 
 
 COMMON = {"Kubernetes", "Omni-Compass", "Omni", "The", "With", "Native", "Real", "Linux", "GitHub"}
@@ -344,10 +380,9 @@ def causes(r):
 
 def receipts():
     out = []
-    for name, stack, cls in RECEIPTS:
-        n, stem = newest(name)
-        r = receipt(stem); r.update(stack=stack, cls=cls, engine=f"omni-v{n}" if n else "unknown", causes=causes(r)); out.append(r)
-        print(f"receipt {stem:22s} {r['engine']} {r['count']}")
+    for t in tables():
+        r = receipt(t["stem"]); r.update(stack=t["stack"], cls=t["cls"], engine=f"omni-v{t['n']}", causes=causes(r)); out.append(r)
+        print(f"receipt {t['stem']:22s} {r['engine']} {t['stack']:20s} {r['count']}")
     return out
 
 

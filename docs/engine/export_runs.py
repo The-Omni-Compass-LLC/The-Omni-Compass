@@ -37,10 +37,11 @@ sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(Path(__file__).resolve().p
 RAW = "results/live/raw"
 BIN = 30                     # seconds in a response-time window
 NOISE_N = 200   # requests in the verdict's own window (omni_controller/controller.py --verdict-samples 200)
-K8S = {   # benchmark file stem (without V<n>_) -> the sub-folder of its runs holding its arms ("" for the run itself)
-    "GOLDILOCKS": "", "KEDA_REQUESTS": "http/", "KEDA_CPU_REQUESTS": "both/", "ALL_FOUR": "", "TRACE_GOOGLE2011": "",
-    "FAULTS": "", "BATCH": "", "FAIRNESS": "", "CRUISEKUBE": "", "CAPACITY": "", "ROBUST_LONG": "", "ROBUST_KILL": ""}
-DB = ["REDIS", "REDIS_SERVICE", "PGBENCH", "SYSBENCH", "YCSB", "KAFKA", "KAFKA_SERVICE"]
+# The tables played back are found by export_scenarios.tables(): every newest three-run table of real Kubernetes (its JSON
+# holds its rows) and of the Linux services (its JSON holds its workloads). One run of KEDA's add-ons holds both native setups,
+# each in its own sub-folder (.github/workflows/kind-addons.yml): the HTTP add-on in http/, the CPU target with the requests in
+# flight in both/; every other run holds its arms at its own root.
+ADDON_SETUP = {"KEDA_REQUESTS": "http/", "KEDA_CPU_REQUESTS": "both/"}
 DB_GAUGES = ["work_inside_line_rps", "rps", "p95_ms", "p99_ms", "mean_ms", "failed", "hit_rate", "cpu_busy_share", "writes"]
 
 
@@ -391,12 +392,32 @@ def db_run(g: Git, run: dict):
     return {"dir": d, "sums_sha256": s.sha_of_list, "checked": s.checked, "ok": s.ok, "unmatched": s.missing[:5], "rows": rows}
 
 
+def table_commits(stem: str) -> dict:
+    """The commit each run of a table names in the table's own run list (| Run | GitHub run | ... | Commit | ...), by run id."""
+    out, hdr = {}, None
+    for ln in (ROOT / "results" / "live" / f"{stem}.md").read_text(encoding="utf-8").splitlines():
+        if not ln.startswith("|"):
+            hdr = None if not ln.strip() else hdr
+            continue
+        cells = [c.strip().strip("`") for c in ln.strip().strip("|").split("|")]
+        if "GitHub run" in cells and "Commit" in cells:
+            hdr = cells
+            continue
+        if hdr and len(cells) == len(hdr) and re.fullmatch(r"\d+", cells[hdr.index("GitHub run")]):
+            c = cells[hdr.index("Commit")]
+            if re.fullmatch(r"[0-9a-f]{7,40}", c):
+                out[cells[hdr.index("GitHub run")]] = c
+    return out
+
+
 def needed_dirs() -> list:
     """The raw folders the page plays back: the runs every benchmark's newest table names (for a sparse checkout)."""
     import export_scenarios as XS
     g, out = Git(), []
-    for base in list(K8S) + DB:
-        n, stem = XS.newest(f"V7_{base}")
+    for t in XS.tables():
+        if not t["kind"]:
+            continue
+        stem = t["stem"]
         meta = json.loads((ROOT / "results" / "live" / f"{stem}.json").read_text(encoding="utf-8"))
         for r in meta.get("runs", []):
             d = run_dir(g, str(r.get("run") if isinstance(r, dict) else r))
@@ -409,8 +430,10 @@ def main(out_path):
     import export_scenarios as XS
     g = Git()
     benches = []
-    for base, kind in [(b, "k8s") for b in K8S] + [(b, "db") for b in DB]:
-        n, stem = XS.newest(f"V7_{base}")
+    for t in XS.tables():
+        if not t["kind"]:
+            continue
+        base, kind, n, stem = t["base"], t["kind"], t["n"], t["stem"]
         meta = json.loads((ROOT / "results" / "live" / f"{stem}.json").read_text(encoding="utf-8"))
         runs, raw_runs = [], meta.get("runs", [])
         if raw_runs and not isinstance(raw_runs[0], dict):            # a table that lists its runs by id alone
@@ -419,17 +442,18 @@ def main(out_path):
                         for i, x in enumerate(raw_runs)]
         sds = []
         for r in raw_runs:
-            rec = k8s_run(g, r, K8S[base]) if kind == "k8s" else db_run(g, r)
+            rec = k8s_run(g, r, ADDON_SETUP.get(base, "")) if kind == "k8s" else db_run(g, r)
             if rec:
                 for rep in rec.get("reps") or []:
                     for arm in ("native", "omni"):
                         sds += (rep.get(arm) or {}).pop("_noise", None) or []
-                if not r.get("commit") and rec.get("dir"):          # a table that names its runs by id alone: the run's own RUN.txt names its commit
-                    m = re.search(rb"^commit=([0-9a-f]{7,40})", g.read(f"{rec['dir']}/RUN.txt") or b"", re.M)
-                    if m:
-                        r = dict(r, commit=m.group(1).decode())
+                if not r.get("commit") and rec.get("dir"):          # a table that names its runs by id alone: its own run list, else the run's RUN.txt, names its commit
+                    c = table_commits(stem).get(str(r.get("run")))
+                    m = None if c else re.search(rb"^commit=([0-9a-f]{7,40})", g.read(f"{rec['dir']}/RUN.txt") or b"", re.M)
+                    if c or m:
+                        r = dict(r, commit=c or m.group(1).decode())
                 runs.append({"tag": r.get("tag"), "id": str(r.get("run")), "commit": r.get("commit"), "engine": r.get("engine"), **serial(r), **rec})
-        title = meta.get("title") or (ROOT / "results" / "live" / f"{stem}.md").read_text(encoding="utf-8").splitlines()[0].lstrip("# ").split(": the A/B/C")[0]
+        title = XS.table_title(stem)
         benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs,
                         # the noise measured on this table's own requests, both arms, runs A, B and C: the median over every window
                         "noise": {"sigma": round(statistics.median(sds), 3), "windows": len(sds), "window": NOISE_N} if sds else None})

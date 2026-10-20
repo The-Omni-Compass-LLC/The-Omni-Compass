@@ -79,10 +79,10 @@ def engine() -> tuple:
     return (m.group(1), m.group(2)) if m else ("unknown", "")
 
 
-def github_runs() -> list:
-    """The runs GitHub is running or queueing now (gh run list), where a token is present; an empty list otherwise."""
+def github_runs() -> list | None:
+    """The runs GitHub is running or queueing now (gh run list), where a token is present; None otherwise (not read)."""
     if not (shutil.which("gh") and (os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN"))):
-        return []
+        return None
     out = []
     for status in ("in_progress", "queued"):
         r = subprocess.run(["gh", "run", "list", "--status", status, "--limit", "100", "--json",
@@ -150,7 +150,7 @@ def ledger() -> dict:
     for wf, rs in data["workflows"].items():
         for r in rs:
             if r["sha"] not in eng:
-                if subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", r["sha"] + "^{commit}"], capture_output=True).returncode:
+                if not CHECKING and subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", r["sha"] + "^{commit}"], capture_output=True).returncode:
                     # fetch that one commit; --depth only where the checkout is already shallow (a full clone given --depth turns shallow)
                     shallow = git("rev-parse", "--is-shallow-repository") == "true"
                     subprocess.run(["git", "-C", str(ROOT), "fetch", "-q", *(["--depth", "1"] if shallow else []), "origin", r["sha"]], capture_output=True)
@@ -160,7 +160,7 @@ def ledger() -> dict:
                 eng[r["sha"]] = m.group(1) if m else None
             r["engine"] = eng[r["sha"]]
             r["raw"] = any(f"run-{r['id']}" in x for x in raw)
-            if wf in ("aks-metered.yml", "gke-metered.yml", "eks-metered.yml") and r["status"] != "completed" and shutil.which("gh"):
+            if wf in ("aks-metered.yml", "gke-metered.yml", "eks-metered.yml") and r["status"] != "completed" and shutil.which("gh") and not CHECKING:
                 # a cloud set runs its repetitions one at a time, and GitHub lists the whole run as queued while it does: its
                 # jobs say where it is (the repetitions measured to the end, the one running, how many it may take)
                 jobs, page = [], 1
@@ -209,14 +209,20 @@ def ledger() -> dict:
     return data
 
 
-TABLE_OF = {   # a benchmark in scripts/reruns.txt -> its three-run table(s) in results/live (V<n>_<stem>.md)
+TABLE_OF = {   # a benchmark in scripts/reruns.txt -> the file name of its three-run table(s) in results/live (V<n>_<stem>.md), as the
+    # person who ran tools/confirm_abc.py (or the benchmark's own *_abc.py) named it; a table no entry names is still listed
+    # (board() below), and an entry no longer in scripts/reruns.txt fails the build
     "Kubernetes CruiseKube": ["CRUISEKUBE"], "Kubernetes Goldilocks": ["GOLDILOCKS"], "Kubernetes fixed capacity": ["CAPACITY"],
+    "kubernetes steady": ["STEADY"], "kubernetes wandering": ["WANDERING"],
     "kubernetes all four": ["ALL_FOUR"], "kubernetes fairness": ["FAIRNESS"], "kubernetes faults": ["FAULTS"],
     "kubernetes batch": ["BATCH"], "kubernetes google 2011 trace": ["TRACE_GOOGLE2011"],
     "kubernetes keda add-ons": ["KEDA_REQUESTS", "KEDA_CPU_REQUESTS"], "redis resource": ["REDIS"], "redis service": ["REDIS_SERVICE"],
     "kafka resource": ["KAFKA"], "kafka service": ["KAFKA_SERVICE"], "postgresql resource": ["PGBENCH"], "mysql resource": ["SYSBENCH"],
-    "mongodb resource": ["YCSB"], "robot arms": ["MUJOCO"], "power grids": ["PANDAPOWER"], "buildings and batteries": ["CITYLEARN"],
-    "drone swarms": ["SWARM"], "robustness long": ["ROBUST_LONG"]}
+    "mongodb resource": ["YCSB"], "mysql resource, native as shipped": ["SYSBENCH_SHIPPED"],
+    "redis resource, native as shipped": ["REDIS_SHIPPED"], "mongodb resource, native as shipped": ["YCSB_SHIPPED"],
+    "mysql service": ["SYSBENCH_SERVICE"], "mongodb service": ["YCSB_SERVICE"], "postgresql service": ["PGBENCH_SERVICE"],
+    "robot arms": ["MUJOCO"], "power grids": ["PANDAPOWER"], "buildings and batteries": ["CITYLEARN"],
+    "drone swarms": ["SWARM"], "robustness kill": ["ROBUST_KILL"], "robustness long": ["ROBUST_LONG"]}
 
 
 def board(runs: list) -> list:
@@ -236,21 +242,30 @@ def board(runs: list) -> list:
     def state(wf):
         n = wf_name.get(wf, wf.removesuffix(".yml"))
         return "running now" if n in live else "queued on GitHub" if n in waiting else None
+    found = {t["base"]: t for t in XS.tables()}
+    names = [ln.split("|")[0] for ln in (ROOT / "scripts" / "reruns.txt").read_text(encoding="utf-8").splitlines()
+             if ln.strip() and not ln.startswith("#") and "|" in ln]
+    gone = sorted(set(TABLE_OF) - set(names))
+    if gone:
+        raise SystemExit(f"TABLE_OF names benchmarks scripts/reruns.txt no longer holds: {gone}")
     for ln in (ROOT / "scripts" / "reruns.txt").read_text(encoding="utf-8").splitlines():
         if not ln.strip() or ln.startswith("#") or "|" not in ln:
             continue
         name, wf = ln.split("|")[:2]
         tables = []
         for stem in TABLE_OF.get(name, []):
-            n, st = XS.newest(f"V7_{stem}")
-            if n:
-                tables.append({"file": f"results/live/{st}.md", "engine": f"omni-v{n}"})
+            t = found.pop(stem, None)
+            if t:
+                tables.append({"file": f"results/live/{t['stem']}.md", "engine": f"omni-v{t['n']}"})
         if name == "1107 muscles and seven organisms":
             rj = ROOT / "results" / "realms_v5" / "REALMS_V5.json"
             if rj.exists():
                 tables.append({"file": "results/realms_v5/REALMS_V5.md", "engine": json.loads(rj.read_text(encoding="utf-8"))["run"]["engine"]})
         out.append({"group": "every benchmark, run again on the engine that stands", "name": name, "workflow": wf,
                     "tables": tables, "now": state(wf) or ("in the reruns queue" if not tables else None)})
+    for t in found.values():   # a three-run table no campaign entry names: listed all the same, never left out
+        out.append({"group": "every benchmark, run again on the engine that stands", "name": XS.table_title(t["stem"]), "workflow": "",
+                    "tables": [{"file": f"results/live/{t['stem']}.md", "engine": f"omni-v{t['n']}"}], "now": None})
     for cloud, f, wf in (("Azure", "azure_queue.txt", "aks-metered.yml"), ("Google Cloud", "google_queue.txt", "gke-metered.yml"),
                          ("Amazon Web Services", "amazon_queue.txt", "eks-metered.yml")):
         q = ROOT / "scripts" / f
@@ -340,21 +355,22 @@ def fleet() -> dict:
 # page before its result exists: what it is and who ships it (public facts), then everything the repository holds for it, read at
 # every build (a register row naming it, its newest three-run table results/live/V<n>_<KEY>.md, its workflow on GitHub). Nothing of
 # a run is written here: its runs fill the place the moment they land.
-ORCHESTRATORS = [
-    ("VOLCANO", "Volcano", "the CNCF", "batch scheduling for AI and HPC jobs: gang scheduling, job queues and fair share", ("volcano",)),
-    ("KUEUE", "Kueue", "Kubernetes SIG Scheduling", "job queueing: quotas and admission through cluster and local queues", ("kueue",)),
-    ("CRANE", "Crane", "gocrane, Tencent", "FinOps on Kubernetes: resource recommendations, predictive pod autoscaling and QoS ensurance", ("gocrane", "finops crane", "crane scheduler", "crane ehpa")),
-    ("OCM", "Open Cluster Management", "the CNCF", "multi-cluster management: placement of work across clusters", ("ocm", "open cluster management", "open-cluster-management")),
-    ("GODEL", "Gödel scheduler", "kubewharf, ByteDance", "one scheduler for online and offline workloads at scale", ("godel", "gödel")),
-    ("ARMADA", "Armada", "G-Research, CNCF sandbox", "batch job scheduling across many clusters", ("armada",)),
-    ("KARMADA", "Karmada", "the CNCF", "multi-cluster orchestration: propagation, placement and failover of workloads", ("karmada",)),
-    ("KUBE_SCHEDULER", "the Kubernetes scheduler, vanilla", "Kubernetes SIG Scheduling", "the default pod scheduler with its plugins, as shipped", ("kube-scheduler", "kube scheduler", "vanilla scheduler", "default scheduler")),
-    ("KAI", "KAI Scheduler", "NVIDIA", "GPU-aware scheduling for AI workloads: queues, fair share and GPU sharing", ("kai-scheduler", "kai scheduler", "kai_scheduler", "kai")),
-    ("NEPHIO", "Nephio", "the Linux Foundation", "intent-based automation of network functions on Kubernetes", ("nephio",)),
-    ("KUBEEDGE", "KubeEdge", "the CNCF", "orchestration from the cloud to edge nodes and devices", ("kubeedge",)),
-    ("KUBERAY", "KubeRay", "the Ray project", "Ray clusters on Kubernetes with the Ray autoscaler", ("kuberay",)),
-    ("KOORDINATOR", "Koordinator", "koordinator-sh", "QoS-based scheduling: latency-sensitive and batch work on the same nodes", ("koordinator",)),
-    ("CRUISEKUBE", "CruiseKube", "TrueFoundry", "rightsizing: its own recommendations applied in place", ("cruisekube",))]
+def _governors():
+    """The governors and orchestrators as the repository's own governors page holds them (tools/governors_page.py: the
+    founder's list of 19 October, night, each with what it governs, native under it, its test, its catalog muscles and the
+    settings it is read in)."""
+    sys.path.insert(0, str(ROOT))
+    from tools import governors_page as GP
+    return GP
+
+
+def _orch_alias(GP, slug: str, name: str) -> tuple:
+    """The words that name a governor in the register, the campaign and a file's path: its slug, its name without what is
+    in brackets, and the settings it is read in (the scheduler's vanilla and bin-packing runs)."""
+    base = re.sub(r"\s*\(.*?\)", "", name).replace("The Kubernetes scheduler", "kube-scheduler").strip()
+    extra = {"scheduler": ("default scheduler", "bin-packing scheduler", "kube-scheduler"), "ocm": ("open cluster management", "open-cluster-management"),
+             "godel": ("gödel", "godel-scheduler"), "kai": ("kai-scheduler", "kai scheduler"), "crane": ("gocrane",)}.get(slug, ())
+    return tuple(dict.fromkeys(x.lower() for x in (slug, base, *extra, *(k for k, _ in GP.settings_of(slug) if k != slug)) if x))
 
 
 def _orch_pattern(alias) -> "re.Pattern":
@@ -367,19 +383,21 @@ def _norm(x: str) -> str:
 
 
 def orch_campaign() -> dict:
-    """{governor key: [its entries in the campaign of the engine that stands]}: each entry of scripts/reruns.txt whose name or
+    """{governor slug: [its entries in the campaign of the engine that stands]}: each entry of scripts/reruns.txt whose name or
     inputs name the governor, with its run letter and its place in its workflow's own line (the conductor reads a run back by
     its count in its workflow, in release order: scripts/dispatch_grid.py rerun_queue)."""
     sys.path.insert(0, str(ROOT / "scripts"))
     import dispatch_grid as D
+    GP = _governors()
+    pats = {slug: _orch_pattern(_orch_alias(GP, slug, name)) for slug, name, *_ in GP.GOVERNORS}
     queue, seen, out = D.rerun_queue(), {}, {}
     for run, name, wf, kv in queue:
         pos = seen.get(wf, 0); seen[wf] = pos + 1
         text = _norm(name + " " + " ".join(f"{k} {v}" for k, v in kv.items()))
-        for key, _n, _o, _r, alias in ORCHESTRATORS:
-            if _orch_pattern(alias).search(text):
-                out.setdefault(key, []).append({"run": run, "name": name, "wf": wf, "pos": pos,
-                                                "inputs": ";".join(f"{k}={v}" for k, v in kv.items())})
+        for slug, pat in pats.items():
+            if pat.search(text):
+                out.setdefault(slug, []).append({"run": run, "name": name, "wf": wf, "pos": pos,
+                                                 "inputs": ";".join(f"{k}={v}" for k, v in kv.items())})
     return out
 
 
@@ -479,31 +497,48 @@ def _prereg(path: Path) -> dict:
             "measure": bullets(meas, 10), "limits": bullets(lim, 6), "amendments": [clean(h) for h in amend][:8]}
 
 
+def _owner(bench: str, pat) -> dict:
+    """A governor's project, owner and licence as its register row names them: the bracket after its name,
+    (org/repo, owner; licence); the owner is the repository's organisation where the row names none."""
+    m = pat.search(_norm(bench))
+    tail = bench[m.start():] if m else bench
+    b = re.search(r"\(`?([\w.-]+/[\w.-]+)`?(?:,\s*([^;)]+?))?(?:;\s*([^)]+?))?\)", tail)   # the register's markdown is stripped: no backticks
+    if not b:
+        return {"repo": None, "owner": None, "licence": None}
+    return {"repo": b.group(1), "owner": (b.group(2) or b.group(1).split("/")[0]).strip(), "licence": (b.group(3) or "").strip() or None}
+
+
 def orchestrators() -> list:
-    """Each governor's place: what it is, and what the repository holds for it now, read at every build: its register rows
-    (whole), its stage, its preregistration (the question, what is measured, the known limits), the rig and workflow the
-    preregistration names, its entries in the campaign of the engine that stands (scripts/reruns.txt, A, B and C, with their
-    place in their workflow's line), and its newest three-run table with every judged row as written. Empty fields mean the
-    repository holds nothing for it yet; the campaign's runs themselves are read from GitHub into the build (ledger)."""
+    """Each governor as the repository's own governors page holds it (tools/governors_page.py: the founder's list of 19
+    October, night, what it governs, native under it, its test, its catalog muscles, the settings it is read in), and what the
+    repository holds for it now, read at every build: its register row (whole; its project, owner and licence as the row names
+    them), its preregistration (the question, what is measured, the known limits), its own rig files (a file of a shared rig
+    that names another governor is that one's) and its own workflows (those its campaign entries run, or whose name names it),
+    its entries in the campaign of the engine that stands, the runs started (results/live/governors_runs.json) and its newest
+    three-run table with every judged row as written. Empty fields mean the repository holds nothing for it yet."""
+    import csv
     import export_scenarios as XS
-    reg = register_places(limit=False)
+    GP = _governors()
+    reg = {r["n"]: r for r in register_places(limit=False)}
     flows = sorted(p.name for p in (ROOT / ".github" / "workflows").glob("*.yml"))
-    pre = sorted((ROOT / "docs").glob("*_PREREGISTRATION.md"))
-    titles = {q: next((ln for ln in q.read_text(encoding="utf-8").splitlines() if ln.startswith("# ")), "") for q in pre}
-    camp = orch_campaign()
+    camp, started = orch_campaign(), (json.loads(GP.RUNS.read_text(encoding="utf-8")) if GP.RUNS.exists() else {})
+    with GP.CATALOG_FILE.open(encoding="utf-8") as f:
+        cat = list(csv.DictReader(f))
+    pats = {slug: _orch_pattern(_orch_alias(GP, slug, name)) for slug, name, *_ in GP.GOVERNORS}
     tables = {}
     for f in (ROOT / "results" / "live").glob("V*_*.md"):
         m = re.fullmatch(r"V(\d+)_(.+)", f.stem)
         if m:
             tables.setdefault(m.group(2), []).append(int(m.group(1)))
     out = []
-    for key, name, owner, role, alias in ORCHESTRATORS:
-        pat = _orch_pattern(alias)
-        rows = [r for r in reg if pat.search(_norm(r["bench"]))][:3]
-        # its newest three-run table: V<n>_<stem>.md whose stem's words hold the governor's key (V12_BATCH_KUEUE.md, V10_CRUISEKUBE.md)
-        kt = key.split("_")
-        cands = [(max(ns), -len(st), st) for st, ns in tables.items() if all(k in st.split("_") for k in kt)]
+    for slug, name, row, field, native, test in GP.GOVERNORS:
+        pat, r0 = pats[slug], reg.get(row)
+        own = lambda path: (lambda hit: not hit or slug in hit)({k for k, q in pats.items() if q.search(_norm(path))})
+        # its newest three-run table: the governors page's own (V12_<SETTING>.json), else the newest table whose name holds the
+        # governor's slug or one of its settings (V10_CRUISEKUBE.md)
         table = None
+        keys = [k for k, _ in GP.settings_of(slug)]
+        cands = [(max(ns), -len(st), st) for st, ns in tables.items() if any(k.upper() in st.split("_") for k in keys)]
         if cands:
             n, _, st = max(cands)
             rc = XS.receipt(f"V{n}_{st}")
@@ -512,20 +547,24 @@ def orchestrators() -> list:
                      "rows": ([{"g": x["g"], "abc": x["abc"], "w": x["w"], "r": x["r"]} for x in rc["rows"]]
                               + [{"g": x["g"], "abc": x["abc"], "w": "EVEN", "r": x.get("kind")} for x in rc["even"]]
                               + [{"g": x["g"], "abc": x["abc"], "w": "shown", "r": x["r"]} for x in rc["shown"]])[:60]}
-        # the preregistration: the one its register row names, else one whose title names it
-        named = sorted({m for r in rows for m in re.findall(r"docs/[A-Z0-9_]+_PREREGISTRATION\.md", r["status"] + " " + r["bench"] + " " + r["lever"])})
-        pp = [ROOT / x for x in named if (ROOT / x).exists()] or [q for q in pre if pat.search(_norm(titles[q]))]
+        named = re.findall(r"docs/[A-Z0-9_]+_PREREGISTRATION\.md", test + " " + (r0["status"] if r0 else ""))
+        pp = [ROOT / x for x in named if (ROOT / x).exists()]
         prereg = _prereg(pp[0]) if pp else None
-        text = " ".join(r["status"] for r in rows) + " " + (pp[0].read_text(encoding="utf-8") if pp else "")
-        rig = sorted({x for x in re.findall(r"(?:scripts|deploy/kind)/[\w./-]+\.(?:sh|py|ya?ml)", text) if (ROOT / x).exists()})
-        wfs = sorted({f for f in flows if pat.search(_norm(f[:-4]))} | {x for x in re.findall(r"[\w-]+\.yml", text) if x in flows}
-                     | {c["wf"] for c in camp.get(key, [])})
-        st0 = (rows[0]["status"].lower() if rows else "")
-        stage = ("measured" if table else "built" if st0.startswith("built") else "under" if st0.startswith("under every")
-                 else "candidate" if "candidate" in st0[:40] else "queued" if rows else "none")
-        out.append({"key": key, "name": name, "owner": owner, "role": role, "table": table, "stage": stage,
-                    "register": [{"n": r["n"], "domain": r["domain"], "bench": r["bench"], "native": r["native"], "lever": r["lever"], "status": r["status"]} for r in rows],
-                    "prereg": prereg, "rig": rig, "workflows": wfs, "campaign": camp.get(key, [])})
+        text = (r0["status"] if r0 else "") + " " + (pp[0].read_text(encoding="utf-8") if pp else "")
+        rig = sorted({x for x in re.findall(r"(?:scripts|deploy/kind)/[\w./-]+\.(?:sh|py|ya?ml)", text) if (ROOT / x).exists() and own(x)})
+        wfs = sorted({c["wf"] for c in camp.get(slug, [])} | {f for f in flows if pat.search(_norm(f[:-4]))})
+        st0 = (r0["status"].lower() if r0 else "")
+        stage = ("measured" if table else "candidate" if "candidate" in test or "candidate" in st0[:40] else
+                 "built" if pp and (rig or wfs) else "under" if st0.startswith("under every") else "queued" if r0 else "none")
+        fam_id, muscles = GP.CATALOG.get(slug, (None, []))
+        fam = [c for c in cat if c["family_id"] == str(fam_id)]
+        who = _owner(r0["bench"], pat) if r0 else {"repo": None, "owner": None, "licence": None}
+        out.append({"key": slug.upper(), "name": name, "owner": who["owner"] or "—", "repo": who["repo"], "licence": who["licence"],
+                    "role": field, "native": native, "test": test, "table": table, "stage": stage,
+                    "settings": [{"key": k, "label": lb, "started": started.get(k) or {}} for k, lb in GP.settings_of(slug)],
+                    "catalog": {"family": fam_id, "name": fam[0]["family"] if fam else None, "n": len(fam), "muscles": muscles},
+                    "register": [{"n": r0["n"], "domain": r0["domain"], "bench": r0["bench"], "native": r0["native"], "lever": r0["lever"], "status": r0["status"]}] if r0 else [],
+                    "prereg": prereg, "rig": rig, "workflows": wfs, "campaign": camp.get(slug, [])})
     return out
 
 
@@ -561,12 +600,15 @@ def records(runs: bool) -> dict:
         XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json")); XR.main(str(t / "r.json"))
         h, c, s, rr = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json"))
     name, digest = engine()
+    now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    gh = github_runs() if runs else None
     build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"),
              "built_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
-             "runs": github_runs() if runs else []}
+             # GitHub's running and queued runs, with the moment they were read; None where this build did not read them (no token)
+             "runs": gh or [], "runs_read_at": now() if gh is not None else None}
     build["board"] = board(build["runs"])
-    build["ledger"] = ledger()
+    build["ledger"] = None if CHECKING else ledger()   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build}
 
 
@@ -615,6 +657,13 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet") if embedded(page, k) != rec[k]]
+        # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
+        # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
+        # the ledger, the commit and the time) is a reading with its own read time, not rebuilt by a check
+        pb, keep = embedded(page, "build") or {}, ("engine", "digest", "realms_engine", "receipts_engines")
+        strip = lambda bd: [{k: v for k, v in x.items() if k != "now"} for x in (bd or [])]
+        if any(pb.get(k) != rec["build"][k] for k in keep) or strip(pb.get("board")) != strip(rec["build"]["board"]):
+            bad.append("build")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build"):
