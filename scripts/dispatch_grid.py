@@ -112,7 +112,8 @@ RERUN_SINCE = "2026-10-20T00:30:00Z"   # omni-v12: every benchmark runs again fr
 # the wrong one; its runs on the rig before run to their end (nothing is cancelled) and stay as their own record
 RIG_FILE = "deploy/kind/prepull.yaml"
 RIG_WORKFLOWS = ("benchmark.yml", "benchmark-reps.yml", "big-organism.yml", "capacity.yml", "kind-addons.yml",
-                 "kind-cruisekube.yml", "kind-goldilocks.yml", "kind-orchestrators.yml", "robustness.yml")
+                 "kind-crane.yml", "kind-cruisekube.yml", "kind-godel.yml", "kind-goldilocks.yml", "kind-group.yml",
+                 "kind-orchestrators.yml", "robustness.yml")
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 # the workflows whose run records the label it was started with (A, B or C): the conductor passes the rerun's own letter
 # (19 October; before, a run it started read the workflow's default, A, in its own record)

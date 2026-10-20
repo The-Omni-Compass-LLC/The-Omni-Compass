@@ -122,7 +122,7 @@ def main(d: Path, n: int, orch: str) -> str:
     (d / "window_end.txt").write_text(f"{t1:.0f}\n")
     pre = [f"group: {n} members ({', '.join('omni-' + m.name for m in members)}), orchestrator {orch}; each member the batch rig's cluster"]
     if (d / "orch.txt").exists():
-        pre += [ln for ln in (d / "orch.txt").read_text().splitlines() if ln.startswith(("orchestrator=", "members:", "propagation policy:"))]
+        pre += [ln for ln in (d / "orch.txt").read_text().splitlines() if ln.startswith(("orchestrator=", "members:", "propagation policy:", "placement:"))]
     pre += (members[0] / "preflight.txt").read_text().splitlines()
     (d / "preflight.txt").write_text("\n".join(pre) + "\n")
     jobs = merge_jobs(d, members, orch)

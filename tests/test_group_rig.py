@@ -121,6 +121,27 @@ class GroupWiring(unittest.TestCase):
         self.assertLess(i, self.BENCH.index('date -u +%s > "$OUT_DIR/window_start.txt"'))
         self.assertIn("|godel|group|vanilla|binpack)", self.BENCH)
 
+    def test_ocm_is_pinned_and_places_every_job_by_a_placement_of_its_own(self):
+        # amendment 1: clusteradm and its bundle pinned; a Placement per job (one cluster of the default set, OCM's default
+        # prioritizers), the job as a ManifestWork where OCM decided; the token never in the run's files
+        self.assertRegex(self.ORCH, r'CLUSTERADM_SHA256="\$\{CLUSTERADM_SHA256:-[0-9a-f]{64}\}"')
+        self.assertIn('OCM_BUNDLE="${OCM_BUNDLE:-1.4.0}"', self.ORCH)
+        self.assertIn('--bundle-version "$OCM_BUNDLE"', self.ORCH)
+        place = self.ORCH[self.ORCH.index("ocm_place() {"):self.ORCH.index('case "${PHASE:?')]
+        self.assertIn("kind: Placement", place)
+        self.assertIn("numberOfClusters: 1", place)
+        self.assertIn("clusterSets: [default]", place)
+        self.assertNotIn("prioritizerPolicy", place)                                       # OCM's own default prioritizers
+        self.assertIn('"kind": "ManifestWork"', place)
+        self.assertIn('"namespace": sys.argv[3]', place)                                   # the member OCM decided
+        self.assertIn('rm -f "$W/join.sh"', self.ORCH)
+        self.assertIn('kind: ManagedClusterSetBinding', self.ORCH)
+        group = (ROOT / "scripts" / "kind_group.sh").read_text()
+        self.assertIn("karmada|ocm) ;;", group)
+        self.assertIn('agent_ns="open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon"', group)
+        self.assertIn("IN($qs[])", self.BENCH)                                              # several agent namespaces allowed
+        self.assertIn('"orch=ocm"', (ROOT / "docs" / "GROUP_PREREGISTRATION.md").read_text().replace("`orch=ocm`", '"orch=ocm"'))
+
 
 if __name__ == "__main__":
     unittest.main()
