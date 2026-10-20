@@ -72,7 +72,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-20 05:30 | [The governors and orchestrators: native under them, Omni-Compass on top](results/live/GOVERNORS.md) |  |
+| 2026-10-20 05:45 | [The governors and orchestrators: native under them, Omni-Compass on top](results/live/GOVERNORS.md) |  |
 | 2026-10-20 04:12 | [The Kubernetes scheduler as shipped under the batch stream: Omni-Compass on top of the default scheduler alone (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_VANILLA.md) |  |
 | 2026-10-20 04:12 | [Koordinator under the batch stream: Omni-Compass on top of its colocation (register row 89): the A/B/C three-run table (Omni v12)](results/live/V12_KOORDINATOR.md) |  |
 | 2026-10-20 04:12 | [The Kubernetes scheduler with the operator's bin-packing profile under the batch stream: Omni-Compass on top (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_BINPACK.md) |  |
@@ -86,16 +86,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-20 12:12 | big-organism-detached collect | success | [39420451917](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39420451917) |
-| 2026-10-20 12:10 | live-engine | success | [39419567415](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39419567415) |
-| 2026-10-20 12:08 | raw-sweep | success | [39420005968](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39420005968) |
-| 2026-10-20 12:08 | cloud-check amazon | failure | [39419927683](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39419927683) |
-| 2026-10-20 12:07 | cloud-check google | failure | [39419919406](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39419919406) |
-| 2026-10-20 12:05 | redis | success | [39408770553](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39408770553) |
-| 2026-10-20 11:43 | swarm | success | [39416176869](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39416176869) |
-| 2026-10-20 11:41 | ycsb | failure | [39410606870](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39410606870) |
-| 2026-10-20 11:37 | mujoco | success | [39416154901](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39416154901) |
-| 2026-10-20 11:35 | robustness | success | [39386284652](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39386284652) |
+| 2026-10-20 17:35 | live-engine | success | [39466517370](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466517370) |
+| 2026-10-20 17:35 | raw-sweep | success | [39467387250](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39467387250) |
+| 2026-10-20 17:31 | big-organism-detached collect | success | [39466841010](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466841010) |
+| 2026-10-20 17:28 | benchmark-reps | success | [39452221655](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39452221655) |
+| 2026-10-20 17:27 | cloud-check amazon | failure | [39466145477](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466145477) |
+| 2026-10-20 17:27 | cloud-check google | failure | [39466133594](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466133594) |
+| 2026-10-20 17:18 | swarm | success | [39463907059](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39463907059) |
+| 2026-10-20 17:11 | mujoco | success | [39463729880](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39463729880) |
+| 2026-10-20 17:10 | grid | cancelled | [39440275095](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39440275095) |
+| 2026-10-20 16:50 | kind-addons | success | [39454568217](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39454568217) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
@@ -143,6 +143,10 @@ every draw tried and is in omni-v12, whose swarm runs judge a collision as a LOS
 the demand that wanders, all four in one run (work inside the line **+47% to +79%**), faults, a queue of jobs (machines **−6% to −14%**),
 a noisy neighbour, the Google day of 2011, CruiseKube and the two-hour run. The Omni index over the real tests, each test on its newest
 table: **+4.4% GAIN** on the resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+The whole system, every layer composed by the product law from its own table (the card, the cluster with its add-ons and
+governors, the services on it, the cloud's bill), with every interval carried and the product's assumption tested on the
+governors' four ways, is [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md): a modelled composition (class S) of the class P and L
+tables, remade as each layer's omni-v12 runs land.
 How every one of these was graded, category by category, is in [`docs/REFEREE_GRADES.md`](docs/REFEREE_GRADES.md).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
