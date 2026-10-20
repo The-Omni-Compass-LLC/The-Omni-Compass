@@ -47,7 +47,12 @@ for arm in "${order[@]}"; do
   done
   echo "######## ARM $arm (repetition $REP)"
   mkdir -p "bench-$arm-$REP" && echo "$cluster" > "bench-$arm-$REP/kind_cluster.txt"
-  if ! ARM="$arm" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
+  # the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6): an arm named ...bare runs on the organism alone, the
+  # stream placed by the cluster's own default scheduler and no orchestrator installed, native (nativebare) or with
+  # Omni-Compass on top (compassbare); the same cluster as the orchestrator's arms, in the same repetition
+  base="${arm%bare}"; queue="${BATCH_QUEUE:-}"
+  [ "$base" = "$arm" ] || queue=vanilla
+  if ! ARM="$base" BATCH_QUEUE="$queue" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
     # a run that fails its own checks is recorded as invalid and left out of the table, never silently counted
     echo "ARM $arm (repetition $REP) FAILED its checks: marked invalid" | tee "bench-$arm-$REP/INVALID"; fail=1
   fi

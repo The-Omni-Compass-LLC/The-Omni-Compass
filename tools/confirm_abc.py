@@ -29,6 +29,11 @@ from tools.readings import OWN_RUNS, receipt_key, in_all_three, word, aim, EVEN_
 from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
+# --pair: one comparison of the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6), "first|second" as
+# tools/live_reps.py keys it, each cell the first against the second; unset, the Omni arm against native
+PAIR = None
+PAIR_WORDS = {"nativebare": "the organism alone", "compassbare": "Omni-Compass on the organism alone",
+              "native": "the orchestrator as shipped", "compass": "Omni-Compass on top of the orchestrator"}
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge)"
 from tools.omni_index import CAPACITY as CAPACITY_RECORDED  # noqa: E402  (the same row's name in the tables written before 13 October)
 AIM_HIGHER = {CAPACITY, CAPACITY_RECORDED}
@@ -104,14 +109,15 @@ def load(d):
     if f is None:
         raise SystemExit(f"{d}: no LIVE_REPS.json")
     j = json.loads(f.read_text())
-    arm = next((a for a in ARMS if a in j["paired"]), None)
-    if arm is None:
-        raise SystemExit(f"{f}: no compass arm in the paired table ({sorted(j['paired'])})")
+    arm = PAIR if PAIR else next((a for a in ARMS if a in j["paired"]), None)
+    if arm is None or arm not in j["paired"]:
+        raise SystemExit(f"{f}: no {PAIR or 'compass'} comparison in the paired table ({sorted(j['paired'])})")
     # the run id from the run's own folder: run-<id>, or addons-run-<id> with one folder per native setup inside it
     run = next((q.name.rsplit("run-", 1)[1] for q in [Path(d).resolve(), *Path(d).resolve().parents]
                 if q.name.rsplit("run-", 1)[-1].isdigit() and "run-" in q.name), Path(d).resolve().name.replace("run-", ""))
     reps = j.get("repetitions") or {}
-    n = len(set(reps.get("native", [])) & set(reps.get(arm, []))) if isinstance(reps, dict) else reps
+    first, second = arm.split("|") if "|" in arm else (arm, "native")
+    n = len(set(reps.get(second, [])) & set(reps.get(first, []))) if isinstance(reps, dict) else reps
     paired = dict(j["paired"][arm])
     cap = j.get("capacity")                                # the capacity test (a rising load): its own block in the run file
     if cap and arm in cap and "capacity_rps" in cap.get("native", {}):
@@ -164,8 +170,13 @@ def rig(d):
     """The rig a run ran on, from its arms' preflight records: on kind, the served image pulled onto every worker before each
     arm (amendment of 18 October, docs/POD_START_WAIT.md), or pulled by each node at each start (the rig before it, and every
     cloud machine). Three runs on two rigs are never one table."""
-    seen = {next((ln.split("=", 1)[1] for ln in p.read_text(errors="replace").splitlines() if ln.startswith("images=")),
-                 "pulled by each node at each start") for p in Path(d).rglob("preflight.txt")}
+    seen = set()
+    for p in Path(d).rglob("preflight.txt"):
+        lines = p.read_text(errors="replace").splitlines()
+        img = next((ln.split("=", 1)[1] for ln in lines if ln.startswith("images=")), "pulled by each node at each start")
+        # the batch rig's cores (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 5): the governor on its own core, or not
+        core = "; the governor on its own core" if any(ln.startswith("cores: ") and "governor alone" in ln for ln in lines) else ""
+        seen.add(img + core)
     return " / ".join(sorted(seen)) if seen else "not recorded"
 
 
@@ -187,7 +198,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("title"); ap.add_argument("a"); ap.add_argument("b"); ap.add_argument("c")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--pair", default=None, help="one comparison of the four ways, first|second (tools/live_reps.py)")
     a = ap.parse_args(argv)
+    global PAIR
+    PAIR = a.pair
     runs = [load(d) for d in (a.a, a.b, a.c)]
     title = re.sub(r":\s*the A/B/C (?:confirmation|three-run table) \(Omni v\d\)\s*$", "", a.title)   # never twice
     L = [f"# {title}: the A/B/C three-run table (Omni v1)", "", *receipt_key(), "",
@@ -199,8 +213,14 @@ def main(argv=None):
          "a GAIN, and one that rose is **power given**, never a loss: the key, `docs/HOW_TO_READ_THE_RESULTS.md`). **EVEN, no "
          "difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told "
          "apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so "
-         "the test itself is unstable there. Every row is shown, LOSS included.", "", OWN_RUNS, "",
-         "| Run | GitHub run | Commit | Engine | Paired repetitions |", "|---|---|---|---|---:|"]
+         "the test itself is unstable there. Every row is shown, LOSS included.", "", OWN_RUNS, ""]
+    if PAIR and "|" in PAIR:                               # one comparison of the four ways: the cells name its two arms
+        first, second = PAIR.split("|")
+        L += [f"**The comparison.** In this table \"omni\" stands for {PAIR_WORDS.get(first, first)} and \"native\" for "
+              f"{PAIR_WORDS.get(second, second)}: each cell is the first against the second, paired within one repetition "
+              "(the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6), and each word is read by the gauge's aim "
+              "for the first.", ""]
+    L += ["| Run | GitHub run | Commit | Engine | Paired repetitions |", "|---|---|---|---|---:|"]
     off, meta = [], []
     for tag, (run, _, n, _) in zip("ABC", runs):
         sha, ver = engine(run)
