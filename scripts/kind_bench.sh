@@ -89,7 +89,7 @@ case "$ADDONS" in ""|keda|goldilocks|crane) ;; *) echo "ADDONS must be empty, ke
 # sits on top with its own levers and never writes the queueing system's objects. Empty: the batch test's one Job on
 # Kubernetes alone
 BATCH_QUEUE="${BATCH_QUEUE:-}"
-case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|kuberay|godel|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
+case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|kuberay|godel|group|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, kuberay, godel, group, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
 [ -z "$BATCH_QUEUE" ] || { [ "${WORKLOAD:-web}" = batch ] && [ -z "$ADDONS" ]; } \
   || { echo "BATCH_QUEUE=$BATCH_QUEUE runs the batch test (WORKLOAD=batch) with no other add-on"; exit 1; }
 CRUISEKUBE="${CRUISEKUBE:-}"
@@ -184,11 +184,26 @@ fi
 cp "$ms_cache" "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null || cp "$ms_cache.part" "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null || true
 actual_sha=$(sha256sum "$OUT_DIR/metrics-server-components.yaml" 2>/dev/null | cut -d' ' -f1 || true)
 [ "$actual_sha" = "$METRICS_SERVER_SHA256" ] || { echo "metrics-server manifest SHA-256 mismatch: $actual_sha"; exit 1; }
-kubectl apply -f "$OUT_DIR/metrics-server-components.yaml"
-kubectl -n kube-system patch deployment metrics-server --type=json \
-  -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+# the pinned manifest applied once with the rig's settings written into it, so the server rolls out once: the kubelet's
+# certificate unverified (kind's nodes have no CA-signed one), the server on the control plane beside the other systems'
+# controllers, and its image by the registry that serves it (the 0.5 line's manifest names k8s.gcr.io, which only redirects
+# to registry.k8s.io). Patching the applied manifest twice made two rollouts, and on Kubernetes 1.24 the first pod, deleted
+# while its image was still coming through the redirect, stayed terminating past the wait (the Gödel trial of 20 October).
+python3 - "$OUT_DIR/metrics-server-components.yaml" > "$OUT_DIR/metrics-server-rig.yaml" <<'EOF'
+import sys, yaml
+docs = [d for d in yaml.safe_load_all(open(sys.argv[1])) if d]
+for d in docs:
+    if d.get("kind") == "Deployment" and d["metadata"]["name"] == "metrics-server":
+        spec = d["spec"]["template"]["spec"]
+        c = spec["containers"][0]
+        c["args"] = list(c.get("args", [])) + ["--kubelet-insecure-tls"]
+        c["image"] = c["image"].replace("k8s.gcr.io/", "registry.k8s.io/")
+        spec["nodeSelector"] = {"node-role.kubernetes.io/control-plane": ""}
+        spec["tolerations"] = [{"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"}]
+print(yaml.safe_dump_all(docs, sort_keys=False))
+EOF
+kubectl apply -f "$OUT_DIR/metrics-server-rig.yaml"
 pin='{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]}}}}'
-kubectl -n kube-system patch deployment metrics-server -p "$pin"
 kubectl -n kube-system patch deployment coredns -p "$pin"
 kubectl -n kube-system rollout status deployment/metrics-server --timeout=300s
 kubectl -n kube-system rollout status deployment/coredns --timeout=300s
@@ -380,6 +395,7 @@ elif [ -n "$CRANE" ]; then   # Crane and its Prometheus (scripts/kind_addons_cra
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","crane-system") | not)] | length')
 else   # with a queueing system, its own namespace too (scripts/kind_batch_queue.sh checks its pods are on the control plane)
 qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system; [ "$BATCH_QUEUE" = kuberay ] && qns=kuberay-system; [ "$BATCH_QUEUE" = godel ] && qns=godel-system
+[ "$BATCH_QUEUE" = group ] && qns="${GROUP_AGENT_NS:-}"   # a group member: the orchestrator's agent, where it runs one here
 foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or (. == $q)) | not)] | length')
 fi
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }
@@ -466,6 +482,14 @@ if [ -n "${ORGANISM:-}" ]; then
   kil_pid=$!
 fi
 echo "== warm-up ${WARMUP}s (both arms)"; sleep "$WARMUP"
+if [ -n "${GROUP_BARRIER:-}" ]; then
+  # a member of a group of clusters (scripts/kind_group.sh): every member opens its window together, so the group's stream,
+  # sent when the last member is ready, falls inside every member's window; a member not ready in 30 minutes fails the arm
+  touch "$GROUP_BARRIER/ready-${KIND_CLUSTER:?}"
+  for i in $(seq 1 360); do [ "$(find "$GROUP_BARRIER" -name 'ready-*' | wc -l)" -ge "${GROUP_SIZE:?}" ] && break; sleep 5; done
+  [ "$(find "$GROUP_BARRIER" -name 'ready-*' | wc -l)" -ge "$GROUP_SIZE" ] || { echo "INVALID RUN: the group's other members did not open their windows"; exit 1; }
+  echo "group: member $KIND_CLUSTER of $GROUP_SIZE, the windows opened together at $(date -u +%s)" | tee -a "$OUT_DIR/preflight.txt"
+fi
 if [ -n "$kil_pid" ]; then
   # a large organism (100 copies) may take longer to build than the warm-up: the window opens when it is built
   until [ -f "$OUT_DIR/organism.ready" ] || ! kill -0 "$kil_pid" 2>/dev/null; do sleep 5; done

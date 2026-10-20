@@ -2,6 +2,35 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: what the three trials found in the rigs, fixed before the counted runs
+
+- **Crane** (`docs/CRANE_PREREGISTRATION.md`, amendment 1): Crane's override values name a kube-state-metrics image on
+  Tencent's registry, which the chart composes under `registry.k8s.io`, where it does not exist; the trial's Prometheus
+  install waited ten minutes on it in both arms. The rig's values name the chart's own image
+  (`deploy/kind/crane-prometheus-values.yaml`); nothing else of the override changes.
+- **Gödel** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 9): metrics-server's pinned manifest is applied once with the
+  rig's settings written in (one rollout; its image named by `registry.k8s.io`, where the old name redirects), in place of an
+  apply and two patches, whose second rollout left the first pod terminating past the wait on Kubernetes 1.24. Every kind rig
+  applies it this way (`scripts/kind_bench.sh`).
+- **KubeRay** (amendment 9): the Ray worker group's ceiling is bounded by the machine's free memory as well as by the workers'
+  processors (a kind node reports the whole machine's memory as its own; 48 workers of 1 GiB took the trial's runner down).
+- **Kueue C** (run 39368401852): repetition 5's runner was lost by GitHub; the run's nine other repetitions are read and the
+  table says so.
+
+## 2026-10-20: the group of clusters (Karmada first), preregistered, four ways
+
+- **A group of two clusters as one organism** (`docs/GROUP_PREREGISTRATION.md`; register row 95; the founder's list): two of
+  the batch rig's six-worker kind clusters on one runner, each running the batch rig's bench unchanged as a member
+  (`BATCH_QUEUE=group`: the stream comes from the group, and every member opens its window with the others, `GROUP_BARRIER`
+  in `scripts/kind_bench.sh`), the stream sent to the group (`scripts/kind_group.sh`, `scripts/kind_group_orch.sh`), the
+  members' records merged into the arm's own files (`tools/merge_group.py`), which the table tool reads as any arm.
+- **Karmada v1.19.0**, installed by its own CLI on a cluster of its own (`deploy/kind/cluster-host.yaml`), its CLI and CRDs
+  pinned by SHA-256, both members joined in push mode, the operator's one propagation policy
+  (`deploy/kind/karmada-propagation.yaml`); on the group alone the harness sends the jobs to the members in turn. Karmada's
+  certificates and the members' credentials never enter the run's files.
+- `kind-group.yml` (four arms by default; archived by `archive-run.yml`; the label passed by the conductor),
+  `tests/test_group_rig.py`, register row 95, the governors page.
+
 ## 2026-10-20: the Gödel scheduler's rig, preregistered (amendment 8), four ways, on Kubernetes 1.24
 
 - **Gödel on the batch rig** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 8; register row 93; the founder's list):

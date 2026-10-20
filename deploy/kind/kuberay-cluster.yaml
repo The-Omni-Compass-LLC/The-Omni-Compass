@@ -12,8 +12,9 @@
 #   - each worker pod the processor size of one pod of the Kubernetes stream (deploy/kind/batch-stream-job.yaml: half a
 #     processor asked, one at most; its memory the sample's 1 GiB, which Ray's own processes need) and one Ray processor,
 #     so one task runs on one worker pod as one job's pod runs on Kubernetes;
-#   - the worker group's ceiling sized to the workers (MAX_WORKERS: their allocatable processors over one pod's half, read
-#     live at install), as Kueue's queue is sized to them; the sample's 10 was written for no cluster in particular.
+#   - the worker group's ceiling sized to the workers (MAX_WORKERS: their allocatable processors over one pod's half, and no
+#     more 1 GiB workers than the one machine has free less 3 GiB for the head and the systems, both read live at install;
+#     amendment 9), as Kueue's queue is sized to them; the sample's 10 was written for no cluster in particular.
 # The stream's job script reaches the head from a ConfigMap (omni-ray-stream), in place of the sample's two example scripts.
 apiVersion: ray.io/v1
 kind: RayCluster

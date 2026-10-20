@@ -101,7 +101,7 @@ class Template(unittest.TestCase):
         self.assertEqual(b["spec"]["template"]["spec"]["schedulerName"], "binpack-scheduler")
         text = (ROOT / "scripts" / "kind_batch_queue.sh").read_text()
         self.assertIn('[ "$Q" = binpack ] && sched="schedulerName: binpack-scheduler"', text)
-        self.assertIn("vanilla|binpack) NS=kube-system", text)
+        self.assertRegex(text, r"vanilla\|binpack(\|[a-z]+)*\) NS=kube-system")   # the group's members read kube-system too
 
     def test_the_script_substitutes_the_pod_label_before_the_job_label(self):
         # QUEUE_LABEL is inside POD_QUEUE_LABEL: substituted the other way round, the pod's line would read POD_<label>
