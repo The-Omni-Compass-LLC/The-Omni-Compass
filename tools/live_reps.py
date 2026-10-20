@@ -67,6 +67,13 @@ LABEL = {"energy, parked workers still on at idle power (Wh)": "energy, parked w
          "energy, the machine's own meter (Wh)": "energy, the machine's own meter over the window (Wh; the processor's RAPL counters, class P)",
          "energy, Kepler's reading of the machine's meter (Wh)": "energy, Kepler's reading of the same counters (Wh; Kepler 0.11.4: shown, not judged)",
          "energy Kepler attributes to the service's pods (Wh)": "energy Kepler attributes to the service's pods (Wh; its split of the meter by each pod's CPU time: shown, not judged)"}
+# the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6): the organism alone (nativebare), the orchestrator on it as
+# shipped (native), Omni-Compass on the organism alone (compassbare) and Omni-Compass on top of the orchestrator (compass),
+# all four in every repetition; each comparison is the first arm against the second, paired within the repetition
+FOUR_WAYS = (("native", "nativebare", "the orchestrator as shipped vs the organism alone (what the orchestrator does on its own)"),
+             ("compassbare", "nativebare", "omni on the organism alone vs the organism alone (Omni-Compass without the orchestrator)"),
+             ("compassbare", "native", "omni on the organism alone vs the orchestrator as shipped"),
+             ("compass", "nativebare", "omni on top of the orchestrator vs the organism alone"))
 NEUTRAL = {"CPU used (cores), mean", "utilisation (used / allocatable)", "Omni's own CPU (cores), mean",
            "CPU used with Omni's own (cores), mean", "energy per core-hour (Wh)", "pending pods, pod-minutes",
            COMMANDS, AHEAD} | HOST | KEPLER
@@ -711,8 +718,10 @@ def main(root):
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
-    cols = [a for a in ("native",) if a in runs] + tuned + [a for a in ("watch", "omni", "compass", "strict") if a in runs]
+    cols = ([a for a in ("nativebare", "native") if a in runs] + tuned
+            + [a for a in ("watch", "omni", "compassbare", "compass", "strict") if a in runs])
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",
+             "nativebare": "the organism alone (no orchestrator)", "compassbare": "omni on the organism alone",
              **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned}}
     L += ["## All columns, mean over repetitions", "", "| Gauge | " + " | ".join(names[a] for a in cols) + " |",
           "|---|" + "---:|" * len(cols)]
@@ -730,37 +739,41 @@ def main(root):
         L += ["**This run carries the machine's own meter.** The processor's RAPL counters (its packages and its memory) were",
               "read every 2 s over the measured window: the energy the whole machine under the cluster drew, Omni-Compass's own",
               "process included (evidence class P). The declared-model rows stay beside it; Kepler's rows read the same counters.", ""]
-    for a in ("watch", "omni", "compass", "strict"):
-        if a not in runs or "native" not in runs:
+    # every comparison: the arm, the arm it is read against, its key in the paired table, and its title; the four ways
+    # (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6) add the organism alone, without and with Omni-Compass on top
+    pairs = [(a, "native", a, None) for a in ("watch", "omni", "compass", "strict")] + [(a, b, f"{a}|{b}", t) for a, b, t in FOUR_WAYS]
+    for a, base, key, four in pairs:
+        if a not in runs or base not in runs:
             continue
-        reps = sorted(set(runs[a]) & set(runs["native"]))
-        out["paired"][a] = {}
-        title = {"watch": "omni, watching (dry run, writes nothing: the cost of being there)", "omni": "omni (allocation law, earlier sets)",
+        reps = sorted(set(runs[a]) & set(runs[base]))
+        out["paired"][key] = {}
+        title = four or {"watch": "omni, watching (dry run, writes nothing: the cost of being there)", "omni": "omni (allocation law, earlier sets)",
                  "compass": ("omni (compass law, the cloud mode): Omni-Compass on top of native, on the machines alone (no pod "
                              "autoscaler moved, no processor conveyed, no power capped)") if machines_only else
                             "omni (compass law): Omni-Compass on top of native, push and pull on the HPA target and the node pool",
                  "strict": "omni alone (not on top: earlier sets only)"}[a]
-        kept = sorted(native_kept.get(a, set()) & set(reps), key=lambda r: int(r) if str(r).isdigit() else 0)
-        L += [f"## {title} vs native, {len(reps)} paired repetitions", ""]
+        kept = [] if four else sorted(native_kept.get(a, set()) & set(reps), key=lambda r: int(r) if str(r).isdigit() else 0)
+        L += [f"## {title} vs native, {len(reps)} paired repetitions" if not four else f"## {title}, {len(reps)} paired repetitions", ""]
         if kept:
             out.setdefault("stayed_native", {})[a] = kept           # beside the paired table, never inside it
             L += [f"Omni-Compass stayed native in {len(kept)} of {len(reps)} repetitions (repetition{'s' if len(kept) > 1 else ''} "
                   f"{', '.join(str(r) for r in kept)}): its governor decided at every step, each decision in the audit with its "
                   "reasons, and made no write; those repetitions count as they ran.", ""]
-        L += ["| Gauge | native | omni | Change | 95% interval of the difference | Significant |", "|---|---:|---:|---:|---:|---|"]
+        heads = (names.get(base, base), names.get(a, a)) if four else ("native", "omni")
+        L += [f"| Gauge | {heads[0]} | {heads[1]} | Change | 95% interval of the difference | Significant |", "|---|---:|---:|---:|---:|---|"]
         for k in KEYS:
-            d = np.array([runs[a][r].get(k, np.nan) - runs["native"][r].get(k, np.nan) for r in reps], float)
+            d = np.array([runs[a][r].get(k, np.nan) - runs[base][r].get(k, np.nan) for r in reps], float)
             d = d[~np.isnan(d)]
             if len(d) == 0:
                 continue
-            nb = float(np.nanmean([runs["native"][r].get(k, np.nan) for r in reps])); ob = nb + float(d.mean())
+            nb = float(np.nanmean([runs[base][r].get(k, np.nan) for r in reps])); ob = nb + float(d.mean())
             half = T95.get(len(d) - 1, 1.96) * (d.std(ddof=1) / math.sqrt(len(d))) if len(d) > 1 else float("nan")
             sig = len(d) > 1 and (d.mean() - half > 0 or d.mean() + half < 0)
             # a change under one part in a million of the value is rounding, not a difference: read "same" (SAME_REL)
             same = abs(d.mean()) <= SAME_REL * max(abs(nb), 1e-12)
             sig = sig and not same
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
-            out["paired"][a][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
+            out["paired"][key][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
             ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"
             L.append(f"| {LABEL.get(k, k)} | {nb:.4g} | {ob:.4g} | {ch_s} | {d.mean() - half:+.4g} to {d.mean() + half:+.4g} | "
                      f"{'EVEN, the same (under one part in a million)' if same and d.mean() != 0 else sig_word(k, d.mean()) if sig else 'no'} |")

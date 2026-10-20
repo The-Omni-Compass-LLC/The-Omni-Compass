@@ -10,11 +10,11 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 
 | Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |
 |---|---|---:|---|---|
-| The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356571014) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356586356) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356601235); bin-packing profile: running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356578556) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356594135) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356608147) | as shipped: runs not yet finished; bin-packing profile: runs not yet finished |
+| The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: three runs in; bin-packing profile: three runs in | as shipped: 5 GAIN, 1 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_VANILLA.md)); bin-packing profile: 5 GAIN, 1 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_BINPACK.md)) |
 | Kueue | batch admission (a job at a time, by queue quota) | 63 | built; its runs come in the campaign | not yet run |
 | Volcano | batch scheduling (queues, gangs) | 63 | built; its runs come in the campaign | not yet run |
 | KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | three runs in | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_KAI.md)) |
-| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | running: [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359085965) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359094679) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359103518) | runs not yet finished |
+| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | three runs in | 3 GAIN, 0 LOSS, 0 power given, 19 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR.md)) |
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
 | Crane | predictive autoscaling and resource governance | 90 | its rig is not yet built | not yet run |
 | KubeRay | Ray clusters (the Ray autoscaler) | 92 | its rig is not yet built | not yet run |
@@ -24,6 +24,18 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | Open Cluster Management | multi-cluster management | 96 | its rig is not yet built | not yet run |
 | KubeEdge | edge nodes | 97 | its rig is not yet built | not yet run |
 | Nephio | network-function automation | 98 | its rig is not yet built | not yet run |
+
+## The four ways (the founder's order of 20 October)
+
+Each system runs four ways in every repetition, each way on a fresh cluster of the same configuration, back to back on one runner, the governor on its own core (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendments 5 and 6): the organism alone (the stream placed by Kubernetes' own scheduler, no orchestrator installed), the orchestrator as its project ships it, Omni-Compass on top of the organism alone, and Omni-Compass on top of the orchestrator. Each column is one comparison, the first against the second, paired within the repetition and read by the one key for the first; each cell reads only from its own three-run table. Omni-Compass never places a pod or admits a job: on the organism alone it sits on top of Kubernetes' own scheduler.
+
+| System | Runs (A, B and C) | Omni-Compass on top of it, against it as shipped | it as shipped, against the organism alone | Omni-Compass on the organism alone, against the organism alone | Omni-Compass on the organism alone, against it as shipped | Omni-Compass on top of it, against the organism alone |
+|---|---|---|---|---|---|---|
+| The KAI scheduler | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| Koordinator | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| Kueue | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| Volcano | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| The scheduler's bin-packing profile | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 
 ## The orchestra, the eighth organism (modelled, class S)
 
@@ -53,8 +65,48 @@ The founder's word of 19 October, night: the governors in a catalog group, an or
 - **Its test on real Kubernetes (class L)**: the batch stream placed by the scheduler alone, in each setting (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 3); register row 88.
 - **In the catalog (modelled, class S)**: family 4, Kubernetes Placement & Scheduling (21 muscles, in the spine and every realm): `node_selector`, `node_affinity`, `pod_anti_affinity`, `topology_spread`, `taint_toleration`, `priority_class`, `preemption_policy`, `scheduler_backoff`, `scheduler_scoring_strategy`, `scheduler_plugin_weights`, `scheduling_gates`, `deschedule`.
 - **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (fewer misses); the climb: GAIN (fewer misses); work in line: GAIN (fewer misses).
-- **Readings (as shipped)**: none yet; nothing is written here before its three runs are in.
-- **Readings (bin-packing profile)**: none yet; nothing is written here before its three runs are in.
+- **Runs (as shipped)**: A [39356571014](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356571014) (10 pairs), B [39356586356](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356586356) (10 pairs), C [39356601235](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356601235) (10 pairs); engine omni-v12 (digest d38b58fbe28939b8, 47 files).
+
+| Gauge | Reading |
+|---|---|
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, the same |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs |
+| queue: jobs unfinished at the window's end | EVEN, the same |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs |
+| worker nodes in service, mean | GAIN in all three of our runs |
+| node-hours | GAIN in all three of our runs |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy (Wh) | GAIN in all three of our runs |
+| energy per core-hour (Wh) | shown, not judged |
+| response time (ms), mean | GAIN in all three of our runs |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) |
+| failed requests (%) | EVEN, the same |
+
+Every row of the run: [`results/live/V12_VANILLA.md`](V12_VANILLA.md).
+
+- **Runs (bin-packing profile)**: A [39356578556](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356578556) (10 pairs), B [39356594135](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356594135) (10 pairs), C [39356608147](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39356608147) (10 pairs); engine omni-v12 (digest d38b58fbe28939b8, 47 files).
+
+| Gauge | Reading |
+|---|---|
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs |
+| queue: jobs unfinished at the window's end | EVEN, the same |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs |
+| worker nodes in service, mean | GAIN in all three of our runs |
+| node-hours | GAIN in all three of our runs |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy (Wh) | GAIN in all three of our runs |
+| energy per core-hour (Wh) | shown, not judged |
+| response time (ms), mean | GAIN in all three of our runs |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) |
+| failed requests (%) | EVEN, the same |
+
+Every row of the run: [`results/live/V12_BINPACK.md`](V12_BINPACK.md).
+
 
 ## Kueue
 
@@ -106,7 +158,27 @@ Every row of the run: [`results/live/V12_KAI.md`](V12_KAI.md).
 - **Its test on real Kubernetes (class L)**: `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 2; register row 89.
 - **In the catalog (modelled, class S)**: family 14, Distributed Cluster Managers (15 muscles, in its realm and the whole tower): `oversubscription`, `resource_reclaim`, `binpack_pressure`, `spread_pressure`.
 - **Its muscles as a body in the orchestra (modelled, class S)**: own load: EVEN (the same as native); the climb: EVEN (the same as native); work in line: EVEN (the same as native).
-- **Readings**: none yet; nothing is written here before its three runs are in.
+- **Runs**: A [39359085965](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359085965) (10 pairs), B [39359094679](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359094679) (10 pairs), C [39359103518](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39359103518) (10 pairs); engine omni-v12 (digest d38b58fbe28939b8, 47 files).
+
+| Gauge | Reading |
+|---|---|
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: jobs unfinished at the window's end | EVEN, no difference beyond the noise (all three runs) |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (all three runs) |
+| worker nodes in service, mean | EVEN, no difference beyond the noise (all three runs) |
+| node-hours | EVEN, no difference beyond the noise (all three runs) |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy per core-hour (Wh) | shown, not judged |
+| response time (ms), mean | GAIN in all three of our runs |
+| response time (ms), 95th percentile | GAIN in all three of our runs |
+| failed requests (%) | EVEN, the same |
+
+Every row of the run: [`results/live/V12_KOORDINATOR.md`](V12_KOORDINATOR.md).
+
 
 ## CruiseKube
 

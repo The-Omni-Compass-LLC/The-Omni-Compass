@@ -82,6 +82,16 @@ CATALOG = {
 # A governor read in more than one setting: one three-run table for each (V12_<SETTING>.json), its runs listed by setting
 SETTINGS = {"scheduler": (("vanilla", "as shipped"), ("binpack", "bin-packing profile"))}
 
+# The four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6; the founder's order of 20 October): every comparison's
+# three-run table, V12_<SYSTEM>_4W_<TAG>.json (tools/confirm_abc.py --pair), its column on the page, in this order
+FOUR_WAYS = (("TOP", "compass", "Omni-Compass on top of it, against it as shipped"),
+             ("ORCH", "native|nativebare", "it as shipped, against the organism alone"),
+             ("BARE", "compassbare|nativebare", "Omni-Compass on the organism alone, against the organism alone"),
+             ("VS", "compassbare|native", "Omni-Compass on the organism alone, against it as shipped"),
+             ("BOTH", "compass|nativebare", "Omni-Compass on top of it, against the organism alone"))
+FOUR_SYSTEMS = (("kai", "The KAI scheduler"), ("koordinator", "Koordinator"), ("kueue", "Kueue"), ("volcano", "Volcano"),
+                ("binpack", "The scheduler's bin-packing profile"))
+
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 
 
@@ -106,6 +116,11 @@ def table_of(slug: str):
     if not p.exists():
         return None
     return json.loads(p.read_text())
+
+
+def four_way_table(system: str, tag: str):
+    """One comparison of the four ways, as tools/confirm_abc.py --pair wrote it, or None."""
+    return table_of(f"{system}_4W_{tag}")
 
 
 def counts(table) -> dict:
@@ -210,6 +225,29 @@ def render(runs=None) -> str:
             else:
                 readings.append(f"{tag}not yet run"); wheres.append(f"{tag}built; its runs come in the campaign")
         L.append(f"| {name} | {field} | {row} | {'; '.join(wheres)} | {'; '.join(readings)} |")
+    L.append("")
+    L += ["## The four ways (the founder's order of 20 October)", "",
+          "Each system runs four ways in every repetition, each way on a fresh cluster of the same configuration, back to back "
+          "on one runner, the governor on its own core (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendments 5 and 6): the "
+          "organism alone (the stream placed by Kubernetes' own scheduler, no orchestrator installed), the orchestrator as its "
+          "project ships it, Omni-Compass on top of the organism alone, and Omni-Compass on top of the orchestrator. Each "
+          "column is one comparison, the first against the second, paired within the repetition and read by the one key for "
+          "the first; each cell reads only from its own three-run table. Omni-Compass never places a pod or admits a job: on "
+          "the organism alone it sits on top of Kubernetes' own scheduler.", "",
+          "| System | Runs (A, B and C) | " + " | ".join(t for _, _, t in FOUR_WAYS) + " |",
+          "|---|---|" + "---|" * len(FOUR_WAYS)]
+    for system, name in FOUR_SYSTEMS:
+        started = runs_of(f"{system}4", runs)
+        cells = []
+        for tag, _, _ in FOUR_WAYS:
+            t = four_way_table(system, tag)
+            if t:
+                c = counts(t)
+                cells.append(f"{c['GAIN']} GAIN, {c['LOSS']} LOSS, {c['power given']} power given, {c['EVEN']} EVEN, "
+                             f"{c['the runs disagree']} where the runs disagree ([table](V12_{system.upper()}_4W_{tag}.md))")
+            else:
+                cells.append("runs not yet finished" if started else "not yet run")
+        L.append(f"| {name} | {started or 'not yet started'} | " + " | ".join(cells) + " |")
     L.append("")
     orch = orchestra()
     L += ["## The orchestra, the eighth organism (modelled, class S)", ""]

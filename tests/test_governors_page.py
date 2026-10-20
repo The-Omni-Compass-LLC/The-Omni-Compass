@@ -63,6 +63,24 @@ class GovernorsPage(unittest.TestCase):
         self.assertIn("(V12_BINPACK.md)", line)
         self.assertIn("- **Readings (as shipped)**: none yet", text)
 
+    def test_the_four_ways_read_each_comparison_from_its_own_table(self):
+        table = {"runs": ["1", "2", "3"], "engines": ["omni-v12"] * 3,
+                 "rows": {"queue: job wait, submitted to its first pod running, mean (s)": {"reading": "GAIN in all three of our runs"}}}
+        with tempfile.TemporaryDirectory() as t:
+            live = Path(t) / "results" / "live"; live.mkdir(parents=True)
+            (live / "V12_KAI_4W_ORCH.json").write_text(json.dumps(table))
+            with mock.patch.object(G, "ROOT", Path(t)):
+                text = G.render(runs={"kai4": {"A": "4", "B": "5", "C": "6"}})
+        section = text.split("## The four ways")[1].split("\n## ")[0]
+        kai = next(l for l in section.splitlines() if l.startswith("| The KAI scheduler"))
+        cells = [c.strip() for c in kai.strip().strip("|").split("|")]
+        self.assertIn("[A](", cells[1])
+        self.assertEqual(cells[2], "runs not yet finished")              # Omni-Compass on top of it: no table yet
+        self.assertTrue(cells[3].startswith("1 GAIN, 0 LOSS"))           # it as shipped against the organism alone
+        self.assertIn("(V12_KAI_4W_ORCH.md)", cells[3])
+        volcano = next(l for l in section.splitlines() if l.startswith("| Volcano"))
+        self.assertIn("not yet started", volcano)
+
     def test_no_number_before_the_runs(self):
         text = G.render(runs={})
         crane = next(l for l in text.splitlines() if l.startswith("| Crane"))
