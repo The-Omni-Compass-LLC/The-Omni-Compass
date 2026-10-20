@@ -5,10 +5,11 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 #
-# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92):
-# Kueue (Kubernetes SIG Scheduling, Apache-2.0), Volcano (the CNCF, Apache-2.0), the KAI scheduler (NVIDIA, Apache-2.0)
-# or Koordinator (the CNCF, Apache-2.0) admits and places a stream of jobs, KubeRay (the Ray project, Apache-2.0) runs the
-# same work as Ray jobs on one Ray cluster that the Ray autoscaler scales, or the Kubernetes scheduler alone places it,
+# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92,
+# 93): Kueue (Kubernetes SIG Scheduling, Apache-2.0), Volcano (the CNCF, Apache-2.0), the KAI scheduler (NVIDIA, Apache-2.0),
+# Koordinator (the CNCF, Apache-2.0) or the Gödel scheduler (ByteDance, Apache-2.0) admits and places a stream of jobs, KubeRay
+# (the Ray project, Apache-2.0) runs the same work as Ray jobs on one Ray cluster that the Ray autoscaler scales, or the
+# Kubernetes scheduler alone places it,
 # as shipped (vanilla) or with the operator's bin-packing profile (binpack), the same in every arm, installed from its own release on the fresh cluster of each
 # arm before the arms are told apart. Native is the queueing system as its project ships it, on Kubernetes alone;
 # Omni-Compass sits on top with its own levers and never writes the queueing system's objects.
@@ -18,7 +19,9 @@
 #                  LocalQueue; (Volcano, KAI) its default queues as shipped; (Koordinator) the operator's colocation
 #                  profile, the jobs best effort on batch resources; (KubeRay) its operator, the Ray image loaded into
 #                  every node, and the one Ray cluster, KubeRay's own autoscaling sample with the operator's settings,
-#                  its head ready; the stream's image pulled onto every worker
+#                  its head ready; (Gödel) its image, built by this runner from its pinned source
+#                  (scripts/kind_godel_build.sh), loaded into the control plane and its own manifests applied; the
+#                  stream's image pulled onto every worker
 #   PHASE=submit   the stream: BATCH_JOBS jobs of BATCH_COMPLETIONS pods, BATCH_PARALLELISM at a time, one every
 #                  BATCH_EVERY_S seconds from the window's opening, each pod hashing BATCH_MB MB; batch_done.txt when the
 #                  last job has succeeded
@@ -27,7 +30,7 @@
 #                  own objects (batch_queue_end.json)
 set -euo pipefail
 OUT_DIR="${OUT_DIR:?}"
-Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, vanilla or binpack}"
+Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack}"
 KUEUE_VERSION="${KUEUE_VERSION:-v0.20.2}"       # released 15 October 2026
 VOLCANO_VERSION="${VOLCANO_VERSION:-v1.16.0}"   # released 14 October 2026
 KAI_VERSION="${KAI_VERSION:-v0.18.6}"           # released 15 October 2026 (its chart, oci://ghcr.io/kai-scheduler/...)
@@ -35,6 +38,10 @@ KOORD_VERSION="${KOORD_VERSION:-1.8.0}"         # released 16 April 2026 (its ch
 KUBERAY_VERSION="${KUBERAY_VERSION:-1.7.1}"     # released 18 September 2026 (its operator's chart, from kuberay-helm's release)
 RAY_IMAGE="rayproject/ray:2.52.0"               # the Ray its autoscaling sample names (rayVersion 2.52.0), amd64 893 MB packed
 RAY_DIGEST="sha256:5c31da4180403f2d5f4590d05fbd46c1345e91e8d33dd4ff616de2702b611b31"   # that tag's index, pinned
+# Gödel publishes no release: its source at this commit (its main branch on 20 October 2026), built by the runner from the
+# project's own Dockerfile (scripts/kind_godel_build.sh, into GODEL_SRC, which records the image it built)
+GODEL_COMMIT="${GODEL_COMMIT:-90de2d0dd7e8e4dc99ef36b34b91a30fc171b368}"
+GODEL_SRC="${GODEL_SRC:-${RUNNER_TEMP:-/tmp}/godel-src}"
 # each release file's SHA-256, pinned when this test was preregistered (a different version names its own)
 KUEUE_SHA256="${KUEUE_SHA256:-1ab14ecd590575ac57f50fa4cbcf529766bc2c32ba974bda1614381281ec52b4}"     # manifests.yaml, v0.20.2
 VOLCANO_SHA256="${VOLCANO_SHA256:-9aa62e15541f5e955d73353da9321ab233a2cbe0f8fbac4b4a4d38ba497303ee}" # volcano-development.yaml, v1.16.0
@@ -44,8 +51,8 @@ KUBERAY_SHA256="${KUBERAY_SHA256:-fd057c207a6be038f2fe1475abb87f43a8c091b77f1f56
 JOBS="${BATCH_JOBS:-24}"; COMPLETIONS="${BATCH_COMPLETIONS:-10}"; PARALLELISM="${BATCH_PARALLELISM:-5}"
 EVERY="${BATCH_EVERY_S:-30}"; MB="${BATCH_MB:-3000}"
 case "$Q" in kueue) NS=kueue-system ;; volcano) NS=volcano-system ;; kai) NS=kai-scheduler ;; koordinator) NS=koordinator-system ;;
-  kuberay) NS=kuberay-system ;; vanilla|binpack) NS=kube-system ;;
-  *) echo "BATCH_QUEUE must be kueue, volcano, kai, koordinator, kuberay, vanilla or binpack (got $Q)"; exit 1 ;; esac
+  kuberay) NS=kuberay-system ;; godel) NS=godel-system ;; vanilla|binpack) NS=kube-system ;;
+  *) echo "BATCH_QUEUE must be kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack (got $Q)"; exit 1 ;; esac
 # every serving pod of a Helm-installed system on the control plane: a pod a move replaced is given two minutes to finish
 # on its worker; a finished install hook and a node agent of a DaemonSet are not counted, the same in both arms
 off() { kubectl get pods -n "$NS" -o json | jq -r --argjson term "$1" '[.items[]
@@ -179,6 +186,25 @@ print(int(sum(cpu(x["status"]["allocatable"]["cpu"]) for x in json.load(sys.stdi
   done
   node=$(kubectl get "pod/$head" -o jsonpath='{.spec.nodeName}')
   case "$node" in *control-plane*) ;; *) echo "INVALID RUN: the Ray head is not on the control plane ($node)"; exit 1 ;; esac
+  elif [ "$Q" = godel ]; then
+  # Gödel as its own setup guide installs it on a cluster of its own: the image built from the pinned source (the same image
+  # in every arm of the job) loaded into the control plane, where its own manifests place every one of its components (its
+  # scheduler, dispatcher, binder and controller manager), then its CRDs, roles and deployments applied from that source
+  # (kustomize, manifests/base), as shipped; it stands once every component is available
+  [ "$(git -C "$GODEL_SRC" rev-parse HEAD 2>/dev/null)" = "$GODEL_COMMIT" ] || { echo "INVALID RUN: Gödel's source is not the pinned commit $GODEL_COMMIT"; exit 1; }
+  img=$(docker image inspect godel-local:latest --format '{{.Id}}' 2>/dev/null || true)
+  [ -n "$img" ] && [ "$img" = "$(cat "$GODEL_SRC/IMAGE_ID" 2>/dev/null)" ] \
+    || { echo "INVALID RUN: the image godel-local:latest is not the one built from the pinned source (${img:-none})"; exit 1; }
+  kind load docker-image godel-local:latest --name "${KIND_CLUSTER:-omni-bench}" --nodes "${KIND_CLUSTER:-omni-bench}-control-plane" \
+    > "$OUT_DIR/godel_image_load.log" 2>&1 || { echo "INVALID RUN: Gödel's image could not be loaded into the control plane"; tail -20 "$OUT_DIR/godel_image_load.log"; exit 1; }
+  for t in 1 2 3; do   # server-side: its custom resource definitions are larger than a client-side apply may annotate
+    kubectl apply --server-side -k "$GODEL_SRC/manifests/base" > "$OUT_DIR/godel_apply.log" 2>&1 && break
+    [ "$t" = 3 ] && { echo "INVALID RUN: Gödel's manifests could not be applied"; tail -20 "$OUT_DIR/godel_apply.log"; exit 1; }; sleep 10
+  done
+  kubectl wait -n "$NS" --for=condition=Available deploy --all --timeout=600s >/dev/null \
+    || { echo "INVALID RUN: Gödel's components did not all stand"; kubectl get deploy,pods -n "$NS" -o wide; exit 1; }
+  placed "$OUT_DIR/godel_placement.txt"
+  url="kubewharf/godel-scheduler at $GODEL_COMMIT, built from its own docker/godel-local.Dockerfile"; got="$img"
   elif [ "$Q" = vanilla ]; then
   # the Kubernetes scheduler as shipped: nothing is installed; the cluster's own default scheduler places the stream
   url="the cluster's own default scheduler"
@@ -281,6 +307,8 @@ EOF
   elif [ "$Q" = kuberay ]; then
     echo "kuberay ${KUBERAY_VERSION}; one Ray cluster (Ray 2.52.0, $(docker image inspect "$RAY_IMAGE" --format '{{index .RepoDigests 0}}')), KubeRay's autoscaling sample, its worker group up to ${max} pods" > "$OUT_DIR/batch_queue.txt"
     kubectl get raycluster omni-ray -o json > "$OUT_DIR/raycluster_start.json"
+  elif [ "$Q" = godel ]; then
+    echo "godel ${GODEL_COMMIT}; its scheduler, dispatcher, binder and controller manager as its own manifests deploy them" > "$OUT_DIR/batch_queue.txt"
   elif [ "$Q" = kai ]; then
     echo "kai ${KAI_VERSION}; its chart's default queues as shipped ($(kubectl get queues.scheduling.run.ai -o jsonpath='{range .items[*]}{.metadata.name} {end}'))" > "$OUT_DIR/batch_queue.txt"
     kubectl get queues.scheduling.run.ai -o json > "$OUT_DIR/kai_queues.json"
@@ -294,6 +322,7 @@ EOF
   case "$Q" in
     vanilla) ;;
     binpack) echo "the scheduler's manifest: $url; its SHA-256 $got" >> "$OUT_DIR/batch_queue.txt" ;;
+    godel) echo "source $url; image $got" >> "$OUT_DIR/batch_queue.txt" ;;
     *) echo "release $url sha256 $got (the pinned file)" >> "$OUT_DIR/batch_queue.txt" ;;
   esac
   # the stream's image on every worker before the window, as the served image is (deploy/kind/prepull.yaml): a job's wait is
@@ -322,7 +351,7 @@ EOF
   cat "$OUT_DIR/batch_queue.txt"
   ;;
 submit)
-  START=$(date -u +%s); label=""; podlabel=""; sched=""
+  START=$(date -u +%s); label=""; podlabel=""; sched=""; podann=""
   if [ "$Q" = kuberay ]; then
     # the same stream as Ray jobs: one RayJob of the same tasks every BATCH_EVERY_S seconds, sent to the one Ray cluster by
     # KubeRay's operator (deploy/kind/kuberay-job.yaml); batch_done.txt once every Ray job has succeeded
@@ -345,9 +374,13 @@ submit)
   [ "$Q" = kai ] && { label="kai.scheduler/queue: default-queue"; podlabel="$label"; sched="schedulerName: kai-scheduler"; }
   [ "$Q" = koordinator ] && { label='koordinator.sh/enable-colocation: "true"'; podlabel="$label"; }   # the profile sets the rest
   [ "$Q" = binpack ] && sched="schedulerName: binpack-scheduler"
+  # Gödel: its scheduler's name and the three annotations its own guide puts on every pod it schedules
+  [ "$Q" = godel ] && { sched="schedulerName: godel-scheduler"
+    podann=", annotations: {godel.bytedance.com/pod-state: pending, godel.bytedance.com/pod-resource-type: guaranteed, godel.bytedance.com/pod-launcher: kubelet}"; }
   for i in $(seq 1 "$JOBS"); do
     sed -e "s/JOB_NAME/omni-batch-$(printf %03d "$i")/" -e "s/BATCH_COMPLETIONS/${COMPLETIONS}/" -e "s/BATCH_PARALLELISM/${PARALLELISM}/" \
-        -e "s/BATCH_MB/${MB}/" -e "s|POD_QUEUE_LABEL|${podlabel:-omni-stream: \"1\"}|" -e "s|QUEUE_LABEL|${label:-omni-stream: \"1\"}|" \
+        -e "s/BATCH_MB/${MB}/" -e "s|, POD_QUEUE_LABEL}}|, POD_QUEUE_LABEL}${podann}}|" \
+        -e "s|POD_QUEUE_LABEL|${podlabel:-omni-stream: \"1\"}|" -e "s|QUEUE_LABEL|${label:-omni-stream: \"1\"}|" \
         -e "s|SCHEDULER_LINE|${sched:-terminationGracePeriodSeconds: 30}|" \
         deploy/kind/batch-stream-job.yaml > "$OUT_DIR/job.yaml"
     for t in 1 2 3 4 5 6; do kubectl apply -f "$OUT_DIR/job.yaml" --request-timeout=20s >/dev/null && break; sleep 5; done
@@ -401,6 +434,11 @@ PY
     kubectl get clusterqueues,localqueues,workloads -A -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
   elif [ "$Q" = kai ]; then
     kubectl get queues.scheduling.run.ai,podgroups.scheduling.run.ai -A -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
+  elif [ "$Q" = godel ]; then   # where Gödel put every pod, node by node, and its components' last words
+    jq '[.items[] | .spec.nodeName] | group_by(.) | map({node: .[0], pods: length})' "$OUT_DIR/pods.json" > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
+    for d in scheduler dispatcher binder controller-manager; do
+      kubectl -n "$NS" logs "deployment/$d" --tail=200 --request-timeout=20s > "$OUT_DIR/godel_$d.log" 2>&1 || true
+    done
   elif [ "$Q" = vanilla ] || [ "$Q" = binpack ]; then   # where the scheduler put every pod, node by node
     jq '[.items[] | .spec.nodeName] | group_by(.) | map({node: .[0], pods: length})' "$OUT_DIR/pods.json" > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
   elif [ "$Q" = koordinator ]; then   # every node's batch resources as the window left them, and koordlet's own node metrics

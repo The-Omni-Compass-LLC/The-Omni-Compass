@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The Prometheus Crane reads its history from (scripts/kind_addons_crane.sh; docs/CRANE_PREREGISTRATION.md), installed as
+# Crane's own installation guide installs it (the prometheus-community chart, Crane's override values for its scrape and
+# recording rules, the alert manager and the push gateway off, no persistent volume), with the chart's placement settings
+# putting the server and kube-state-metrics on the control plane; the node exporter runs on every node, as shipped.
+alertmanager:
+  enabled: false
+prometheus-pushgateway:
+  enabled: false
+server:
+  persistentVolume:
+    enabled: false
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+kube-state-metrics:
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
