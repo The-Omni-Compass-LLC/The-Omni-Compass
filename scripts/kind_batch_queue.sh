@@ -5,15 +5,16 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 #
-# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63 and 91):
-# Kueue (Kubernetes SIG Scheduling, Apache-2.0), Volcano (the CNCF, Apache-2.0) or the KAI scheduler (NVIDIA, Apache-2.0)
-# admits and places a stream of jobs, the same in every arm, installed from its own release on the fresh cluster of each
+# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 89, 91):
+# Kueue (Kubernetes SIG Scheduling, Apache-2.0), Volcano (the CNCF, Apache-2.0), the KAI scheduler (NVIDIA, Apache-2.0)
+# or Koordinator (the CNCF, Apache-2.0) admits and places a stream of jobs, the same in every arm, installed from its own release on the fresh cluster of each
 # arm before the arms are told apart. Native is the queueing system as its project ships it, on Kubernetes alone;
 # Omni-Compass sits on top with its own levers and never writes the queueing system's objects.
 #   PHASE=install  install it from its release (its SHA-256 pinned), every piece of it on the control plane (the measured
 #                  workers carry only the work, as with every add-on), wait until it answers; (Kueue) the operator's
 #                  queue: one ClusterQueue whose quota is the workers' allocatable CPU and memory, read live, and one
-#                  LocalQueue; (Volcano, KAI) its default queues as shipped; the stream's image pulled onto every worker
+#                  LocalQueue; (Volcano, KAI) its default queues as shipped; (Koordinator) the operator's colocation
+#                  profile, the jobs best effort on batch resources; the stream's image pulled onto every worker
 #   PHASE=submit   the stream: BATCH_JOBS jobs of BATCH_COMPLETIONS pods, BATCH_PARALLELISM at a time, one every
 #                  BATCH_EVERY_S seconds from the window's opening, each pod hashing BATCH_MB MB; batch_done.txt when the
 #                  last job has succeeded
@@ -21,18 +22,33 @@
 #                  (batch_queue_end.json)
 set -euo pipefail
 OUT_DIR="${OUT_DIR:?}"
-Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano or kai}"
+Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai or koordinator}"
 KUEUE_VERSION="${KUEUE_VERSION:-v0.20.2}"       # released 15 October 2026
 VOLCANO_VERSION="${VOLCANO_VERSION:-v1.16.0}"   # released 14 October 2026
 KAI_VERSION="${KAI_VERSION:-v0.18.6}"           # released 15 October 2026 (its chart, oci://ghcr.io/kai-scheduler/...)
+KOORD_VERSION="${KOORD_VERSION:-1.8.0}"         # released 16 April 2026 (its chart, from its charts repository's release)
 # each release file's SHA-256, pinned when this test was preregistered (a different version names its own)
 KUEUE_SHA256="${KUEUE_SHA256:-1ab14ecd590575ac57f50fa4cbcf529766bc2c32ba974bda1614381281ec52b4}"     # manifests.yaml, v0.20.2
 VOLCANO_SHA256="${VOLCANO_SHA256:-9aa62e15541f5e955d73353da9321ab233a2cbe0f8fbac4b4a4d38ba497303ee}" # volcano-development.yaml, v1.16.0
 KAI_SHA256="${KAI_SHA256:-dff53248c4a044249a1f62ca8d35bd8dfc02719b99e302b35c69f946f4c5b7ff}"         # the chart archive, v0.18.6
+KOORD_SHA256="${KOORD_SHA256:-766011e7c797a5b2ea0ed2091b31efb4eb16ba14699189db304022336fc48e06}"     # the chart archive, 1.8.0
 JOBS="${BATCH_JOBS:-24}"; COMPLETIONS="${BATCH_COMPLETIONS:-10}"; PARALLELISM="${BATCH_PARALLELISM:-5}"
 EVERY="${BATCH_EVERY_S:-30}"; MB="${BATCH_MB:-3000}"
-case "$Q" in kueue) NS=kueue-system ;; volcano) NS=volcano-system ;; kai) NS=kai-scheduler ;;
-  *) echo "BATCH_QUEUE must be kueue, volcano or kai (got $Q)"; exit 1 ;; esac
+case "$Q" in kueue) NS=kueue-system ;; volcano) NS=volcano-system ;; kai) NS=kai-scheduler ;; koordinator) NS=koordinator-system ;;
+  *) echo "BATCH_QUEUE must be kueue, volcano, kai or koordinator (got $Q)"; exit 1 ;; esac
+# every serving pod of a Helm-installed system on the control plane: a pod a move replaced is given two minutes to finish
+# on its worker; a finished install hook and a node agent of a DaemonSet are not counted, the same in both arms
+off() { kubectl get pods -n "$NS" -o json | jq -r --argjson term "$1" '[.items[]
+    | select(.status.phase == "Running" or .status.phase == "Pending")
+    | select(([.metadata.ownerReferences[]?.kind] | index("DaemonSet")) | not)
+    | select($term or .metadata.deletionTimestamp == null)
+    | select((.spec.nodeName // "") | test("control-plane") | not) | .metadata.name] | join(" ")'; }
+placed() {   # $1 the record file
+  for _ in $(seq 1 24); do [ -z "$(off true)" ] && break; sleep 5; done
+  away=$(off false)
+  [ -z "$away" ] || { echo "INVALID RUN: $Q's pods on a measured worker: $away"; kubectl get pods -n "$NS" -o wide; exit 1; }
+  kubectl get pods -n "$NS" -o wide >> "$1"
+}
 
 case "${PHASE:?set PHASE=install, submit or end}" in
 install)
@@ -68,17 +84,43 @@ install)
     kubectl rollout status -n "$NS" "deployment/$dep" --timeout=300s >/dev/null
     echo "placed on the control plane after install: $dep" >> "$OUT_DIR/kai_placement.txt"
   done
-  # every serving pod of KAI on the control plane (a pod a move replaced is given two minutes to finish on its worker; a
-  # finished install hook and a node agent of a DaemonSet are recorded, the same in both arms)
-  off() { kubectl get pods -n "$NS" -o json | jq -r --argjson term "$1" '[.items[]
-      | select(.status.phase == "Running" or .status.phase == "Pending")
-      | select(([.metadata.ownerReferences[]?.kind] | index("DaemonSet")) | not)
-      | select($term or .metadata.deletionTimestamp == null)
-      | select((.spec.nodeName // "") | test("control-plane") | not) | .metadata.name] | join(" ")'; }
-  for _ in $(seq 1 24); do [ -z "$(off true)" ] && break; sleep 5; done
-  away=$(off false)
-  [ -z "$away" ] || { echo "INVALID RUN: KAI's pods on a measured worker: $away"; kubectl get pods -n "$NS" -o wide; exit 1; }
-  kubectl get pods -n "$NS" -o wide >> "$OUT_DIR/kai_placement.txt"
+  placed "$OUT_DIR/kai_placement.txt"
+  elif [ "$Q" = koordinator ]; then
+  # Koordinator's chart at its pinned version, the release archive checked against its pinned SHA-256, installed by Helm as
+  # its own guide installs it, with the operator's two settings for one control plane (deploy/kind/koordinator-values.yaml)
+  url="https://github.com/koordinator-sh/charts/releases/download/koordinator-${KOORD_VERSION}/koordinator-${KOORD_VERSION}.tgz"
+  for t in 1 2 3; do
+    curl -fsSL --retry 3 -o "$W/chart.tgz" "$url" && break
+    [ "$t" = 3 ] && { echo "INVALID RUN: Koordinator's chart could not be fetched ($url)"; exit 1; }; sleep 10
+  done
+  got=$(sha256sum "$W/chart.tgz" | cut -d' ' -f1)
+  [ "$got" = "$KOORD_SHA256" ] || { echo "INVALID RUN: Koordinator's chart is not the one pinned (sha256 $got, pinned $KOORD_SHA256)"; exit 1; }
+  helm install koordinator "$W/chart.tgz" -f deploy/kind/koordinator-values.yaml --wait --timeout 15m \
+    > "$OUT_DIR/koord_helm.log" 2>&1 || { tail -40 "$OUT_DIR/koord_helm.log"; kubectl get pods -n "$NS" -o wide; exit 1; }
+  kubectl wait -n "$NS" --for=condition=Available deploy --all --timeout=600s >/dev/null
+  kubectl -n "$NS" rollout status daemonset/koordlet --timeout=600s >/dev/null \
+    || { echo "INVALID RUN: koordlet did not run on every node"; kubectl get pods -n "$NS" -o wide; exit 1; }
+  placed "$OUT_DIR/koord_placement.txt"
+  # the operator's colocation profile, as Koordinator's colocation guide writes it, on the namespace the jobs run in
+  kubectl label namespace default koordinator.sh/enable-colocation=true --overwrite >/dev/null
+  for t in $(seq 1 20); do
+    kubectl apply -f deploy/kind/koordinator-colocation.yaml >/dev/null 2>&1 && break
+    [ "$t" = 20 ] && { echo "INVALID RUN: Koordinator's colocation profile was refused"; exit 1; }; sleep 6
+  done
+  # its webhook mutates before the window opens: a server-side dry run of a labelled pod comes back best effort, for
+  # koord-scheduler, on batch resources (the webhook fails open, so an unready one would let the stream through untouched)
+  printf '%s\n' 'apiVersion: v1' 'kind: Pod' \
+    'metadata: {name: omni-colocation-probe, namespace: default, labels: {koordinator.sh/enable-colocation: "true"}}' \
+    'spec: {containers: [{name: probe, image: "busybox:1.36", resources: {requests: {cpu: 500m, memory: 64Mi}, limits: {cpu: "1", memory: 64Mi}}}]}' \
+    > "$W/probe.yaml"
+  for t in $(seq 1 30); do
+    m=$( { kubectl create --dry-run=server -o json -f "$W/probe.yaml" 2>/dev/null \
+           | jq -r '[.spec.schedulerName, (.metadata.labels["koordinator.sh/qosClass"] // "-"), (.spec.containers[0].resources.requests["kubernetes.io/batch-cpu"] // "-")] | join(" ")'; } || true )
+    case "$m" in "koord-scheduler BE "[0-9]*) break ;; esac
+    [ "$t" = 30 ] && { echo "INVALID RUN: Koordinator's colocation profile did not mutate a labelled pod (got: $m)"; exit 1; }
+    sleep 10
+  done
+  echo "colocation probe (scheduler, QoS class, batch-cpu asked): $m" >> "$OUT_DIR/koord_placement.txt"
   else
   # the project's own release file, fetched whole and checked against its pinned SHA-256; every Deployment and Job of the
   # queueing system is placed on the control plane before the file is applied (Volcano's certificate Job ships with no
@@ -154,6 +196,10 @@ EOF
       [ "$t" = 20 ] && { echo "INVALID RUN: Kueue's queue objects were refused"; exit 1; }; sleep 6
     done
     echo "kueue ${KUEUE_VERSION} (${ver}); ClusterQueue quota cpu ${cpu}, memory ${mem}" > "$OUT_DIR/batch_queue.txt"
+  elif [ "$Q" = koordinator ]; then
+    echo "koordinator ${KOORD_VERSION}; the operator's colocation profile (deploy/kind/koordinator-colocation.yaml), the jobs best effort on batch resources" > "$OUT_DIR/batch_queue.txt"
+    kubectl get nodes -o json | jq '[.items[] | {node: .metadata.name, batch_cpu: .status.allocatable["kubernetes.io/batch-cpu"], batch_memory: .status.allocatable["kubernetes.io/batch-memory"]}]' \
+      > "$OUT_DIR/koord_batch_allocatable_start.json" || true
   elif [ "$Q" = kai ]; then
     echo "kai ${KAI_VERSION}; its chart's default queues as shipped ($(kubectl get queues.scheduling.run.ai -o jsonpath='{range .items[*]}{.metadata.name} {end}'))" > "$OUT_DIR/batch_queue.txt"
     kubectl get queues.scheduling.run.ai -o json > "$OUT_DIR/kai_queues.json"
@@ -195,6 +241,7 @@ submit)
   [ "$Q" = kueue ] && label="kueue.x-k8s.io/queue-name: omni-queue"
   [ "$Q" = volcano ] && sched="schedulerName: volcano"
   [ "$Q" = kai ] && { label="kai.scheduler/queue: default-queue"; podlabel="$label"; sched="schedulerName: kai-scheduler"; }
+  [ "$Q" = koordinator ] && { label='koordinator.sh/enable-colocation: "true"'; podlabel="$label"; }   # the profile sets the rest
   for i in $(seq 1 "$JOBS"); do
     sed -e "s/JOB_NAME/omni-batch-$(printf %03d "$i")/" -e "s/BATCH_COMPLETIONS/${COMPLETIONS}/" -e "s/BATCH_PARALLELISM/${PARALLELISM}/" \
         -e "s/BATCH_MB/${MB}/" -e "s|POD_QUEUE_LABEL|${podlabel:-omni-stream: \"1\"}|" -e "s|QUEUE_LABEL|${label:-omni-stream: \"1\"}|" \
@@ -219,6 +266,10 @@ end)
     kubectl get clusterqueues,localqueues,workloads -A -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
   elif [ "$Q" = kai ]; then
     kubectl get queues.scheduling.run.ai,podgroups.scheduling.run.ai -A -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
+  elif [ "$Q" = koordinator ]; then   # every node's batch resources as the window left them, and koordlet's own node metrics
+    kubectl get nodes -o json | jq '[.items[] | {node: .metadata.name, batch_cpu: .status.allocatable["kubernetes.io/batch-cpu"], batch_memory: .status.allocatable["kubernetes.io/batch-memory"]}]' \
+      > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
+    kubectl get nodemetrics.slo.koordinator.sh -o json > "$OUT_DIR/koord_nodemetrics_end.json" 2>/dev/null || true
   else
     kubectl get queues,podgroups -A -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
   fi
