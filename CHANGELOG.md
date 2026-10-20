@@ -28,6 +28,14 @@
   the 99th percentile +4% to +13% (LOSS), the engine's to fix in the next version (the give-back trial on a batch queue counts
   the queue's finish and the tail), through the toy gate. On top of Karmada: every judged row EVEN; Karmada as shipped against
   the group alone: 6 LOSS (its own cost); Omni-Compass on the group alone against Karmada as shipped: 6 GAIN.
+- **The stacked run, preregistered** (`docs/WHOLE_SYSTEM_PREREGISTRATION.md`): Omni-Compass at every layer at once against
+  native at every layer, the measurement that replaces the whole-system composition; three stacks in order (the cluster and
+  its services on GitHub's machines; the cloud at the tune-down on Azure, the bill metered; the card beside the cluster on
+  Lambda, on the founder's word), the gauges, the arms and the reading written before any run; the whole-system page names it.
+- **Gödel's three runs started again on the fixed rig, OCM's and Armada's four ways started** (trial, A, B and C each; 20
+  October, 19:00 and 19:18 UTC); their ids on the governors page. The Gödel trial then found the same 1.24 taint on the load
+  generator, pinned to the control plane with one toleration: every pod the rig pins to the control plane now tolerates both
+  taints (`deploy/kind/*.yaml`, `scripts/kind_batch_queue.sh`; amendment 10), and Gödel's trial runs before its A, B and C.
 - **The CPU power harness** (`tools/run_cpu_power.py`): the modelled service's spread of service times drew from Python's
   unseeded global generator; verify's run of its test read "0 notches allowed" once and passed when run again. Every worker's
   spread is now seeded from the arm's seed, so no draw in the harness is unseeded and the same requests meet the same service
