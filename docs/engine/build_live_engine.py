@@ -799,7 +799,8 @@ def records(runs: bool) -> dict:
     now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     gh = github_runs() if runs else None
     camp = campaign_reading() if gh is not None else None      # the campaign's runs, read with the run list
-    build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"),
+    from tools.readings import SIZE_FLOOR
+    build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"), "floor": SIZE_FLOOR,
              "built_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
              # GitHub's running and queued runs, with the moment they were read; None where this build did not read them (no token)

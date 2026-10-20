@@ -163,7 +163,8 @@ def verdict(k, rs):
     if not all(clear):
         n = sum(1 for c in clear if not c)
         return even_noise("all three runs") if n == len(rs) else even_noise(f"{n} of {len(rs)} runs")
-    return in_all_three(signs[0] == -1, aim_of_row(k))
+    sizes = [abs(r["diff"]) / abs(r["native"]) for r in rs if r["native"]]
+    return in_all_three(signs[0] == -1, aim_of_row(k), max(sizes) if len(sizes) == len(rs) else None)
 
 
 def rig(d):
