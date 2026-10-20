@@ -2,6 +2,20 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: Armada on the group of clusters, preregistered (amendment 2), four ways
+
+- **Armada on the group rig** (`docs/GROUP_PREREGISTRATION.md`, amendment 2; register row 94; the founder's list): Armada
+  v0.22.14 as its own local stack runs it, its server, scheduler, scheduler ingester, event ingester, Pulsar, Redis and
+  PostgreSQL as containers on the runner's own network and on the cluster cores (every image pinned by digest, `armadactl` by
+  SHA-256, its components' settings its local stack's: `deploy/kind/armada/`), one executor per member reaching its member by
+  the member's kubeconfig, Armada's two priority classes in every member, one queue; each batch of the stream submitted as one
+  job set of its pods (requests equal to limits, as Armada requires), done when its tenth pod has succeeded
+  (`scripts/kind_group_orch.sh`, `ORCH=armada`; no `omni-host` cluster in its arms). Its record of every batch, where its
+  pods ran and its scheduler's and server's last words are the arm's; the merger reads a batch's end from the orchestrator's
+  record where a member has no Job of that name (`tools/merge_group.py`).
+- `kind-group.yml` takes `orch=armada`; `tests/test_group_rig.py`; the governors page; the campaign's queue (its entry in a
+  block of its own).
+
 ## 2026-10-20: Open Cluster Management on the group of clusters, preregistered (amendment 1), four ways
 
 - **OCM on the group rig** (`docs/GROUP_PREREGISTRATION.md`, amendment 1; register row 96; the founder's list): its hub

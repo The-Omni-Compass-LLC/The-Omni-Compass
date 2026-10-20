@@ -10,8 +10,9 @@
 # group. Every arm runs on fresh clusters, back to back on the same runner, in an order rotated by repetition, as
 # scripts/kind_paired.sh runs one cluster's arms:
 #   nativebare   the group alone: no orchestrator; the harness sends the stream's jobs to the members in turn
-#   native       the orchestrator as its project ships it (ORCH: karmada or ocm), on a cluster of its own beside the members,
-#                every job sent to it and placed by it (OCM's agents run in the members, in their own namespaces)
+#   native       the orchestrator as its project ships it (ORCH: karmada or ocm, on a cluster of its own beside the members;
+#                armada, as containers on the runner with one executor per member), every job sent to it and placed by it
+#                (OCM's agents run in the members, in their own namespaces)
 #   compassbare  Omni-Compass on top of each member of the group alone (one governor per member, each on its own cluster)
 #   compass      Omni-Compass on top of each member, the orchestrator on top of the group
 # Every member runs the batch rig's bench (scripts/kind_bench.sh, BATCH_QUEUE=group) side by side, its window opened with the
@@ -19,11 +20,11 @@
 # orchestrator's are merged into the arm's own files (tools/merge_group.py), which tools/live_reps.py reads as any arm.
 set -euo pipefail
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-nativebare native compassbare compass}"
-ORCH="${ORCH:?set ORCH=karmada or ocm}"
+ORCH="${ORCH:?set ORCH=karmada, ocm or armada}"
 N="${GROUP_MEMBERS:-2}"
-case "$ORCH" in karmada|ocm) ;; *) echo "ORCH must be karmada or ocm (got $ORCH)"; exit 1 ;; esac
+case "$ORCH" in karmada|ocm|armada) ;; *) echo "ORCH must be karmada, ocm or armada (got $ORCH)"; exit 1 ;; esac
 # the namespaces the orchestrator's agents run in on a member (its pods allowed there by the bench's clean-cluster check):
-# Karmada in push mode runs nothing in a member; OCM's klusterlet runs in its own
+# Karmada in push mode runs nothing in a member, Armada's executors run on the runner; OCM's klusterlet runs in its own
 agent_ns=""; [ "$ORCH" != ocm ] || agent_ns="open-cluster-management open-cluster-management-agent open-cluster-management-agent-addon"
 export WORKLOAD=batch
 # the metrics-server manifest every member applies, fetched once before the members start (the bench caches it per runner;
@@ -56,7 +57,7 @@ for arm in "${order[@]}"; do
   clear_all
   ok=1
   for i in $(seq 1 "$N"); do make_cluster "omni-m$i" deploy/kind/cluster-full.yaml "$D/kubeconfig-m$i" || ok=0; done
-  [ "$orch" = none ] || make_cluster omni-host deploy/kind/cluster-host.yaml "$D/kubeconfig-host" || ok=0
+  case "$orch" in none|armada) ;; *) make_cluster omni-host deploy/kind/cluster-host.yaml "$D/kubeconfig-host" || ok=0 ;; esac   # Armada's control plane runs on the runner, not on a cluster
   [ "$ok" = 1 ] || { echo "ARM $arm (repetition $REP): a cluster could not be created: marked invalid" | tee "$D/INVALID"; fail=1; continue; }
   # the orchestrator on its own cluster and every member joined to it, before any member's bench starts
   if [ "$orch" != none ] && ! D="$D" ORCH="$orch" N="$N" PHASE=install bash scripts/kind_group_orch.sh > "$D/orch_install.log" 2>&1; then
