@@ -8,8 +8,9 @@ governs, what native is under it and what Omni-Compass does on top, where its te
 its readings by the one key, every row counted, losses included (results/live/GOVERNORS.md).
 
 A governor's result is its three-run table on the engine that stands (tools/confirm_abc.py writes results/live/V12_<NAME>.md
-and .json); until the table exists the page says where the runs stand, never a number. The runs started are listed in
-results/live/governors_runs.json, written when they are started.
+and .json), one table for each setting it is read in (the Kubernetes scheduler: as shipped and with the operator's
+bin-packing profile); until the table exists the page says where the runs stand, never a number. The runs started are listed
+in results/live/governors_runs.json by setting, written when they are started.
 Usage: python3 tools/governors_page.py [--check]"""
 from __future__ import annotations
 
@@ -22,15 +23,17 @@ from tools.readings import receipt_key  # noqa: E402
 
 OUT = ROOT / "results" / "live" / "GOVERNORS.md"
 RUNS = ROOT / "results" / "live" / "governors_runs.json"
+CATALOG_FILE = ROOT / "realms" / "catalog_v5.csv"
 ENGINE = "omni-v12"
 REPO_RUNS = "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/"
 
 # (slug, name, register row, what it governs, native under it, its test) in the founder's order of naming, the
 # Kubernetes scheduler first because every other one stands on it
 GOVERNORS = [
-    ("scheduler", "The Kubernetes scheduler as shipped (vanilla)", 88, "pod placement",
-     "the default scheduler of Kubernetes 1.35, as shipped: it places every pod of every Kubernetes set",
-     "under every Kubernetes set of the campaign (its own bin-packing set queued)"),
+    ("scheduler", "The Kubernetes scheduler (vanilla, and its bin-packing profile)", 88, "pod placement",
+     "the default scheduler of Kubernetes 1.35 as shipped, which places every pod of every Kubernetes set; and the same "
+     "release's scheduler with the operator's bin-packing profile (NodeResourcesFit, MostAllocated)",
+     "the batch stream placed by the scheduler alone, in each setting (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 3)"),
     ("kueue", "Kueue", 63, "batch admission (a job at a time, by queue quota)",
      "Kueue v0.20.2 with the operator's single ClusterQueue sized to the workers",
      "`docs/BATCH_QUEUE_PREREGISTRATION.md`"),
@@ -54,6 +57,30 @@ GOVERNORS = [
     ("nephio", "Nephio", 98, "network-function automation", "its intent-driven deployment and scaling",
      "not yet written (a candidate: its sandbox asks more than a free runner gives)"),
 ]
+
+# The muscles of the catalog (realms/catalog_v5.csv) that stand for each governor's knobs in the modelled organisms (class S):
+# they run in the realms, the spine and the whole tower, native and with Omni-Compass on top (results/realms_v5/REALMS_V5.md)
+CATALOG = {
+    "scheduler": (4, ["node_selector", "node_affinity", "pod_anti_affinity", "topology_spread", "taint_toleration",
+                      "priority_class", "preemption_policy", "scheduler_backoff", "scheduler_scoring_strategy",
+                      "scheduler_plugin_weights", "scheduling_gates", "deschedule"]),
+    "kueue": (1, ["job_admission", "batch_admission", "queue_concurrency", "queue_backpressure", "tenant_admission"]),
+    "volcano": (14, ["gang_schedule", "queue_fairness", "task_priority", "task_preemption", "binpack_pressure"]),
+    "kai": (14, ["gang_schedule", "queue_fairness", "cluster_quota", "task_preemption"]),
+    "koordinator": (14, ["oversubscription", "resource_reclaim", "binpack_pressure", "spread_pressure"]),
+    "cruisekube": (3, ["cruisekube_request_rightsizing", "in_place_resize", "cpu_request", "memory_request"]),
+    "crane": (2, ["hpa_cpu_target", "hpa_custom_target", "hpa_scaling_rate_policies", "hpa_min_replicas", "hpa_max_replicas"]),
+    "kuberay": (12, ["training_workers", "elastic_worker_count", "training_gang_size"]),
+    "godel": (14, ["gang_schedule", "task_admission", "binpack_pressure", "resource_reservation"]),
+    "armada": (39, ["multi_cluster_dispatch", "federation_quota", "global_admission"]),
+    "karmada": (39, ["multi_cluster_dispatch", "region_dispatch", "global_failover", "cross_cluster_replication"]),
+    "ocm": (39, ["multi_cluster_dispatch", "workload_migrate_region", "federation_quota"]),
+    "kubeedge": (39, ["edge_dispatch", "edge_offload", "edge_sync_interval", "edge_site_node_pool"]),
+    "nephio": (66, ["ran_slice_resource_budget", "ran_du_cu_placement", "ran_cell_sleep", "ran_carrier_enable"]),
+}
+
+# A governor read in more than one setting: one three-run table for each (V12_<SETTING>.json), its runs listed by setting
+SETTINGS = {"scheduler": (("vanilla", "as shipped"), ("binpack", "bin-packing profile"))}
 
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 
@@ -96,6 +123,21 @@ def key_rows(table, limit=8):
     return [(k, rows[k].get("reading", "")) for k in (first + rest)[:limit]]
 
 
+def catalog_line(slug) -> str:
+    import csv
+    fid, muscles = CATALOG[slug]
+    with CATALOG_FILE.open(encoding="utf-8") as f:
+        rows = [r for r in csv.DictReader(f) if r["family_id"] == str(fid)]
+    fam = rows[0]["family"] if rows else f"family {fid}"
+    where = "the spine and every realm" if rows and len(rows[0]["realms"].split(";")) == 4 else "its realm and the whole tower"
+    return (f"- **In the catalog (modelled, class S)**: family {fid}, {fam} ({len(rows)} muscles, in {where}): "
+            + ", ".join(f"`{m}`" for m in muscles) + ".")
+
+
+def settings_of(slug):
+    return SETTINGS.get(slug, ((slug, ""),))
+
+
 def runs_of(slug, runs):
     r = runs.get(slug) or {}
     return " ".join(f"[{letter}]({REPO_RUNS}{rid})" for letter, rid in sorted(r.items()) if rid)
@@ -114,30 +156,35 @@ def render(runs=None) -> str:
           f"machines). A governor's line reads only from its own three-run table; until then it says where its runs stand.", ""]
     L += ["| Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |", "|---|---|---:|---|---|"]
     for slug, name, row, field, native, test in GOVERNORS:
-        t = table_of(slug)
-        started = runs_of(slug, runs)
-        if t:
-            c = counts(t)
-            reading = (f"{c['GAIN']} GAIN, {c['LOSS']} LOSS, {c['power given']} power given, {c['EVEN']} EVEN, "
-                       f"{c['the runs disagree']} where the runs disagree ([table](V12_{slug.upper()}.md))")
-            where = "three runs in"
-        elif started:
-            reading, where = "runs not yet finished", f"running: {started}"
-        elif test.startswith("not yet"):
-            reading, where = "not yet run", "its rig is not yet built"
-        else:
-            reading, where = "not yet run", "built; its runs come in the campaign"
-        L.append(f"| {name} | {field} | {row} | {where} | {reading} |")
+        wheres, readings = [], []
+        for key, label in settings_of(slug):
+            tag = f"{label}: " if label else ""
+            t, started = table_of(key), runs_of(key, runs)
+            if t:
+                c = counts(t)
+                readings.append(f"{tag}{c['GAIN']} GAIN, {c['LOSS']} LOSS, {c['power given']} power given, {c['EVEN']} EVEN, "
+                                f"{c['the runs disagree']} where the runs disagree ([table](V12_{key.upper()}.md))")
+                wheres.append(f"{tag}three runs in")
+            elif started:
+                readings.append(f"{tag}runs not yet finished"); wheres.append(f"{tag}running: {started}")
+            elif test.startswith("not yet"):
+                readings.append(f"{tag}not yet run"); wheres.append(f"{tag}its rig is not yet built")
+            else:
+                readings.append(f"{tag}not yet run"); wheres.append(f"{tag}built; its runs come in the campaign")
+        L.append(f"| {name} | {field} | {row} | {'; '.join(wheres)} | {'; '.join(readings)} |")
     L.append("")
     for slug, name, row, field, native, test in GOVERNORS:
-        t = table_of(slug)
-        L += [f"## {name}", "", f"- **Native**: {native}.", f"- **Its test**: {test}; register row {row}."]
-        if t:
-            L.append(f"- **Runs**: {', '.join(t.get('runs', []))}; engine {', '.join(sorted(set(t.get('engines', [])))) or ENGINE}.")
-            L += ["", "| Gauge | Reading |", "|---|---|"] + [f"| {k} | {r} |" for k, r in key_rows(t)]
-            L += ["", f"Every row of the run: [`results/live/V12_{slug.upper()}.md`](V12_{slug.upper()}.md)."]
-        else:
-            L.append("- **Readings**: none yet; nothing is written here before its three runs are in.")
+        L += [f"## {name}", "", f"- **Native**: {native}.", f"- **Its test on real Kubernetes (class L)**: {test}; register row {row}.",
+              catalog_line(slug)]
+        for key, label in settings_of(slug):
+            t, head = table_of(key), (f" ({label})" if label else "")
+            if t:
+                L.append(f"- **Runs{head}**: {', '.join(t.get('runs', []))}; engine "
+                         f"{', '.join(sorted(set(t.get('engines', [])))) or ENGINE}.")
+                L += ["", "| Gauge | Reading |", "|---|---|"] + [f"| {k} | {r} |" for k, r in key_rows(t)]
+                L += ["", f"Every row of the run: [`results/live/V12_{key.upper()}.md`](V12_{key.upper()}.md).", ""]
+            else:
+                L.append(f"- **Readings{head}**: none yet; nothing is written here before its three runs are in.")
         L.append("")
     return "\n".join(stamp(L)) + "\n"
 

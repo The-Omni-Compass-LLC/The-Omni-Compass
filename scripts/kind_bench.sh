@@ -81,13 +81,14 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # default): every other set, unchanged
 ADDONS="${ADDONS:-}"
 case "$ADDONS" in ""|keda|goldilocks) ;; *) echo "ADDONS must be empty, keda or goldilocks (got $ADDONS)"; exit 1;; esac
-# BATCH_QUEUE=kueue, volcano, kai or koordinator, with WORKLOAD=batch (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows
-# 63, 89, 91): the batch test's work arrives as a stream of jobs and a queueing system of its own admits and places it,
+# BATCH_QUEUE=kueue, volcano, kai, koordinator, vanilla or binpack, with WORKLOAD=batch (docs/BATCH_QUEUE_PREREGISTRATION.md;
+# register rows 63, 88, 89, 91): the batch test's work arrives as a stream of jobs and a queueing system of its own admits
+# and places it (vanilla: the Kubernetes scheduler alone; binpack: with the operator's bin-packing profile),
 # installed from its own release in every arm before the arms are told apart (scripts/kind_batch_queue.sh); Omni-Compass
 # sits on top with its own levers and never writes the queueing system's objects. Empty: the batch test's one Job on
 # Kubernetes alone
 BATCH_QUEUE="${BATCH_QUEUE:-}"
-case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai or koordinator (got $BATCH_QUEUE)"; exit 1;; esac
+case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
 [ -z "$BATCH_QUEUE" ] || { [ "${WORKLOAD:-web}" = batch ] && [ -z "$ADDONS" ]; } \
   || { echo "BATCH_QUEUE=$BATCH_QUEUE runs the batch test (WORKLOAD=batch) with no other add-on"; exit 1; }
 CRUISEKUBE="${CRUISEKUBE:-}"
