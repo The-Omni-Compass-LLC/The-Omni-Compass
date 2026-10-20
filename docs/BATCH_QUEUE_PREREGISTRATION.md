@@ -355,7 +355,15 @@ machine. Each is fixed where it was found, the same in every arm, before the cou
   stayed Pending and the rollout never finished. On 1.25 (Crane) and 1.35 (every other rig) only the first taint exists, and
   the same pod ran. The pod now tolerates both (`scripts/kind_bench.sh`, the manifest patch and the coredns pin alike), the
   same in every arm and on every rig; nothing else of the rig changes. Gödel's three runs start again on the fixed rig; the
-  three that failed stand as the record of the fault and count in no table.
+  three that failed stand as the record of the fault and count in no table. **The same taint, found again on the trial of the
+  fixed rig** (run 39479725812, 19:00 UTC; the runs 39479741832, 39479757911 and 39479773633 started with it): metrics-server
+  rolled out, and then the load generator, pinned to the control plane with the same single toleration, stayed Pending in both
+  arms ("1 node(s) had taint {node-role.kubernetes.io/master: }, that the pod didn't tolerate"). Every pod the rig pins to the
+  control plane now tolerates both taints: the load generators (`deploy/kind/loadgen*.yaml`), the noisy neighbour, the
+  orchestrators' own deployments the batch rig moves onto the control plane (`scripts/kind_batch_queue.sh`), and the chart
+  values of Crane, KAI, Koordinator, KubeRay, CruiseKube and the bin-packing profile; on 1.25 and 1.35, where the second taint
+  does not exist, a toleration for it changes nothing. Gödel's trial runs first on this rig and its A, B and C start only once
+  the trial has run both arms whole; the second set of three stands as the record of the second fault and counts in no table.
 - **The test machine, twice more** (no rig changed for either): KubeRay A (run 39438462925, repetition 2) lost its runner
   three hours in, no log kept, after the memory bound of amendment 9 was in place; the other nine repetitions landed whole and
   are read, and the table says A carries nine. Karmada A (run 39438525862, repetition 3) never started: GitHub's checkout of

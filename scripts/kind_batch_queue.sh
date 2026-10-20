@@ -100,7 +100,7 @@ install)
   done
   # a deployment the chart's setting does not reach is placed on the control plane after install, as CruiseKube's are
   for dep in $(kubectl get deploy -n "$NS" -o json | jq -r '.items[] | select((.spec.template.spec.nodeSelector // {}) | has("node-role.kubernetes.io/control-plane") | not) | .metadata.name'); do
-    kubectl patch -n "$NS" "deployment/$dep" --type=merge -p '{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]}}}}' >/dev/null
+    kubectl patch -n "$NS" "deployment/$dep" --type=merge -p '{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"},{"key":"node-role.kubernetes.io/master","operator":"Exists","effect":"NoSchedule"}]}}}}' >/dev/null
     kubectl rollout status -n "$NS" "deployment/$dep" --timeout=300s >/dev/null
     echo "placed on the control plane after install: $dep" >> "$OUT_DIR/kai_placement.txt"
   done
@@ -256,7 +256,8 @@ for d in docs:
         spec = d["spec"]["template"]["spec"]
         spec["nodeSelector"] = {**(spec.get("nodeSelector") or {}), "node-role.kubernetes.io/control-plane": ""}
         spec["tolerations"] = (spec.get("tolerations") or []) + [
-            {"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"}]
+            {"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"},
+            {"key": "node-role.kubernetes.io/master", "operator": "Exists", "effect": "NoSchedule"}]
 print(yaml.safe_dump_all(docs, sort_keys=False), end="")
 PY
   for t in 1 2 3; do   # server-side: the custom resource definitions are larger than a client-side apply may annotate
