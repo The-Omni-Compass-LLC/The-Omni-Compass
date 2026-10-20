@@ -72,6 +72,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-20 04:52 | [The governors and orchestrators: native under them, Omni-Compass on top](results/live/GOVERNORS.md) |  |
+| 2026-10-20 04:12 | [The Kubernetes scheduler as shipped under the batch stream: Omni-Compass on top of the default scheduler alone (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_VANILLA.md) |  |
+| 2026-10-20 04:12 | [Koordinator under the batch stream: Omni-Compass on top of its colocation (register row 89): the A/B/C three-run table (Omni v12)](results/live/V12_KOORDINATOR.md) |  |
+| 2026-10-20 04:12 | [The Kubernetes scheduler with the operator's bin-packing profile under the batch stream: Omni-Compass on top (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_BINPACK.md) |  |
+| 2026-10-20 03:17 | [The orchestra, the eighth organism: the governors' muscles, native and with Omni-Compass on top (modelled)](results/orchestra/ORCHESTRA.md) |  |
+| 2026-10-20 03:17 | [The KAI scheduler under the batch stream: Omni-Compass on top of KAI's queues (register row 91): the A/B/C three-run table (Omni v12)](results/live/V12_KAI.md) |  |
 | 2026-10-19 23:41 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
@@ -80,8 +86,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-20 00:27 | raw-sweep | success | [39347709721](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39347709721) |
-| 2026-10-20 00:27 | live-engine | cancelled | [39347705387](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39347705387) |
+| 2026-10-20 05:20 | live-engine | success | [39373776547](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39373776547) |
+| 2026-10-20 05:17 | big-organism-detached collect | success | [39374103258](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39374103258) |
+| 2026-10-20 05:17 | raw-sweep | success | [39374068844](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39374068844) |
+| 2026-10-20 05:04 | grid | cancelled | [39372207250](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39372207250) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
