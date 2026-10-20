@@ -112,11 +112,11 @@ RERUN_SINCE = "2026-10-20T00:30:00Z"   # omni-v12: every benchmark runs again fr
 # the wrong one; its runs on the rig before run to their end (nothing is cancelled) and stay as their own record
 RIG_FILE = "deploy/kind/prepull.yaml"
 RIG_WORKFLOWS = ("benchmark.yml", "benchmark-reps.yml", "big-organism.yml", "capacity.yml", "kind-addons.yml",
-                 "kind-cruisekube.yml", "kind-goldilocks.yml", "robustness.yml")
+                 "kind-cruisekube.yml", "kind-goldilocks.yml", "kind-orchestrators.yml", "robustness.yml")
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 # the workflows whose run records the label it was started with (A, B or C): the conductor passes the rerun's own letter
 # (19 October; before, a run it started read the workflow's default, A, in its own record)
-LABELLED = ("capacity.yml",)
+LABELLED = ("capacity.yml", "kind-orchestrators.yml")
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
 # October): scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
