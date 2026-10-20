@@ -81,15 +81,15 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # default): every other set, unchanged
 ADDONS="${ADDONS:-}"
 case "$ADDONS" in ""|keda|goldilocks|crane) ;; *) echo "ADDONS must be empty, keda, goldilocks or crane (got $ADDONS)"; exit 1;; esac
-# BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, vanilla or binpack, with WORKLOAD=batch
-# (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92): the batch test's work arrives as a stream of jobs
+# BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack, with WORKLOAD=batch
+# (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92, 93): the batch test's work arrives as a stream of jobs
 # and a queueing system of its own admits and places it (kuberay: the same work as Ray jobs on one Ray cluster, scaled by
 # the Ray autoscaler; vanilla: the Kubernetes scheduler alone; binpack: with the operator's bin-packing profile),
 # installed from its own release in every arm before the arms are told apart (scripts/kind_batch_queue.sh); Omni-Compass
 # sits on top with its own levers and never writes the queueing system's objects. Empty: the batch test's one Job on
 # Kubernetes alone
 BATCH_QUEUE="${BATCH_QUEUE:-}"
-case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|kuberay|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, kuberay, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
+case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|kuberay|godel|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
 [ -z "$BATCH_QUEUE" ] || { [ "${WORKLOAD:-web}" = batch ] && [ -z "$ADDONS" ]; } \
   || { echo "BATCH_QUEUE=$BATCH_QUEUE runs the batch test (WORKLOAD=batch) with no other add-on"; exit 1; }
 CRUISEKUBE="${CRUISEKUBE:-}"
@@ -148,8 +148,9 @@ SITE_LIMIT_W=$(( WORKERS * (IDLE_W + DYN_W) ))
 METRICS_SERVER_VERSION="${METRICS_SERVER_VERSION:-v0.9.0}"
 METRICS_SERVER_SHA256="${METRICS_SERVER_SHA256:-1cec29a5267809306a2c6ec74a3e449abbb705b4a8beed0c8a1963910f72c79b}"
 server_minor=$(kubectl version -o json | jq -r '.serverVersion.minor' | tr -cd '0-9')
-# the oldest Kubernetes each metrics-server line supports, from its own compatibility table (the Crane rig runs 1.25 with v0.6.4)
-case "$METRICS_SERVER_VERSION" in v0.6.*) ms_floor=25 ;; v0.7.*) ms_floor=27 ;; v0.8.*) ms_floor=31 ;; *) ms_floor=34 ;; esac
+# the oldest Kubernetes each metrics-server line supports, from its own compatibility table (the Crane rig runs 1.25 with v0.6.4,
+# Gödel's 1.24 with v0.5.2)
+case "$METRICS_SERVER_VERSION" in v0.5.*) ms_floor=8 ;; v0.6.*) ms_floor=25 ;; v0.7.*) ms_floor=27 ;; v0.8.*) ms_floor=31 ;; *) ms_floor=34 ;; esac
 [ "$PLATFORM" = aks ] || { [ -n "$server_minor" ] && [ "$server_minor" -ge "$ms_floor" ]; } || { echo "metrics-server $METRICS_SERVER_VERSION needs Kubernetes 1.$ms_floor+ (minor=$server_minor)"; exit 1; }
 # the power cap and the processor conveyance resize the serving pods in place (the pods/resize subresource); a cluster that
 # does not serve it (the Crane rig's Kubernetes 1.25, docs/CRANE_PREREGISTRATION.md) has neither lever, so both are off in
@@ -378,7 +379,7 @@ elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's controller; the VPA's rec
 elif [ -n "$CRANE" ]; then   # Crane and its Prometheus (scripts/kind_addons_crane.sh checks where they run)
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","crane-system") | not)] | length')
 else   # with a queueing system, its own namespace too (scripts/kind_batch_queue.sh checks its pods are on the control plane)
-qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system; [ "$BATCH_QUEUE" = kuberay ] && qns=kuberay-system
+qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system; [ "$BATCH_QUEUE" = kuberay ] && qns=kuberay-system; [ "$BATCH_QUEUE" = godel ] && qns=godel-system
 foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or (. == $q)) | not)] | length')
 fi
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }

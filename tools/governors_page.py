@@ -54,8 +54,10 @@ GOVERNORS = [
     ("kuberay", "KubeRay", 92, "Ray clusters (the Ray autoscaler)",
      "KubeRay 1.7.1 and one Ray cluster (Ray 2.52.0) from KubeRay's own autoscaling sample, the Ray autoscaler as shipped",
      "the batch stream as Ray jobs (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 7)"),
-    ("godel", "Gödel scheduler", 93, "unified online and offline scheduling", "its placement of units and gangs as shipped",
-     "not yet written"),
+    ("godel", "Gödel scheduler", 93, "unified online and offline scheduling",
+     "the Gödel scheduler built from its pinned source and deployed by its own manifests, its placement as shipped, on "
+     "Kubernetes 1.24.17 (it supports 1.21.4 to 1.24.6)",
+     "the batch stream placed by Gödel, four ways (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 8)"),
     ("armada", "Armada", 94, "multi-cluster batch", "its queues and fair share across clusters", "not yet written"),
     ("karmada", "Karmada", 95, "multi-cluster placement", "its propagation and replica division", "not yet written"),
     ("ocm", "Open Cluster Management", 96, "multi-cluster management", "its Placement and ManifestWork", "not yet written"),
@@ -96,7 +98,8 @@ FOUR_WAYS = (("TOP", "compass", "Omni-Compass on top of it, against it as shippe
              ("VS", "compassbare|native", "Omni-Compass on the organism alone, against it as shipped"),
              ("BOTH", "compass|nativebare", "Omni-Compass on top of it, against the organism alone"))
 FOUR_SYSTEMS = (("kai", "The KAI scheduler"), ("koordinator", "Koordinator"), ("kueue", "Kueue"), ("volcano", "Volcano"),
-                ("binpack", "The scheduler's bin-packing profile"), ("kuberay", "KubeRay"), ("crane", "Crane"))
+                ("binpack", "The scheduler's bin-packing profile"), ("kuberay", "KubeRay"), ("crane", "Crane"),
+                ("godel", "The Gödel scheduler"))
 
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 
@@ -213,8 +216,8 @@ def render(runs=None) -> str:
           f"the governor as its project ships it; Omni-Compass sits on top with its own levers (the node pool, the service's "
           f"autoscaler and processor limit, cruise and idle) and never writes the governor's objects, but where the governor owns "
           f"the service's autoscaler (Crane): there its autoscaler moves reach the autoscaler through the governor's own object, "
-          f"by a plug, as on KEDA. Crane alone runs on Kubernetes 1.25.16 (its HPA is an API 1.26 removed), where no pod is "
-          f"resized in place, so no processor limit is moved in any of its arms. Cost: $0 (GitHub's free "
+          f"by a plug, as on KEDA. Crane runs on Kubernetes 1.25.16 (its HPA is an API 1.26 removed) and Gödel on 1.24.17 (its "
+          f"supported range), where no pod is resized in place, so no processor limit is moved in any of their arms. Cost: $0 (GitHub's free "
           f"machines). A governor's line reads only from its own three-run table; until then it says where its runs stand.", ""]
     L += ["| Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |", "|---|---|---:|---|---|"]
     for slug, name, row, field, native, test in GOVERNORS:
