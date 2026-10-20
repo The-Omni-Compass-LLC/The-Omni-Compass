@@ -56,6 +56,18 @@ class KubeRayRig(unittest.TestCase):
         for image in [head["template"]["spec"]["containers"][0]["image"], w["template"]["spec"]["containers"][0]["image"]]:
             self.assertEqual(image, "rayproject/ray:2.52.0")
 
+    def test_the_worker_ceiling_is_bounded_by_the_machines_memory_as_well(self):
+        # amendment 9: a kind node reports the whole machine's memory as its own; 48 workers of 1 GiB took the trial's runner down
+        code = SCRIPT[SCRIPT.index("python3 -c '\nimport json, sys\ndef cpu(v)") + len("python3 -c '\n"):]
+        code = code[:code.index("')")]
+        self.assertIn('MemAvailable', code)
+        self.assertEqual(res_limit := yaml.safe_load((ROOT / "deploy" / "kind" / "kuberay-cluster.yaml").read_text())
+                         ["spec"]["workerGroupSpecs"][0]["template"]["spec"]["containers"][0]["resources"]["limits"]["memory"], "1Gi")
+        nodes = json.dumps({"items": [{"status": {"allocatable": {"cpu": "4"}}} for _ in range(6)]})
+        out = subprocess.run([sys.executable, "-c", code], input=nodes, capture_output=True, text=True, check=True).stdout
+        free_gib = next(int(l.split()[1]) for l in open("/proc/meminfo") if l.startswith("MemAvailable:")) / 2 ** 20
+        self.assertEqual(int(out), max(1, min(48, int(free_gib - 3))))          # 48 by the processors; the machine's free memory less 3 GiB
+
     def test_the_stream_is_the_same_work(self):
         rj = yaml.safe_load((ROOT / "deploy" / "kind" / "kuberay-job.yaml").read_text())
         self.assertEqual(rj["spec"]["submissionMode"], "HTTPMode")                                    # no submitter pod
