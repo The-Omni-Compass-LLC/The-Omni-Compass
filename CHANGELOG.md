@@ -2,6 +2,26 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-19 (night): the governors and orchestrators: Kueue and Volcano built and in the omni-v12 campaign; every other one has its place
+
+- **Kueue and Volcano, register row 63** (the founder's list of 19 October, night): the batch test's work arrives as a stream
+  of 24 jobs (one every 30 s, 10 pods each, 5 at a time; the batch test's 240 pods of 3,000 MB in all) and a queueing system
+  of its own admits and places it, installed from its own release in every arm before the arms are told apart: Kueue v0.20.2
+  with the operator's single ClusterQueue sized to the workers (read live), or Volcano v1.16.0 with its default queue, each
+  release file SHA-256 pinned and refused otherwise, every piece of it on the control plane (Volcano's certificate Job ships
+  with no placement and is placed there before the file is applied), the stream's image pulled onto every worker before the
+  window (`scripts/kind_batch_queue.sh`, `deploy/kind/batch-stream-job.yaml`; `scripts/kind_bench.sh` with `BATCH_QUEUE`;
+  `benchmark-reps.yml` input `batch_queue`). Native is the queueing system as shipped; omni is Omni-Compass on top with the
+  batch test's live muscles, writing nothing of either project's and nothing of the jobs. Four judged gauges
+  (`tools/live_reps.py`, `job_stream`): a job's wait from its submission to its first pod running (mean and 95th percentile),
+  its turnaround, and the jobs unfinished at the window's end, a job not started or not done counting the window's end;
+  `tests/test_batch_queue.py`. Preregistered before any run (`docs/BATCH_QUEUE_PREREGISTRATION.md`); both close the first
+  block of the omni-v12 campaign, written before it opened (`scripts/reruns.txt`), so their A, B and C are the campaign's own.
+- **Every other orchestrator named has its place** (`docs/REGISTER.md`, rows 88 to 98, each marked not yet run): the
+  Kubernetes scheduler as shipped (under every Kubernetes set already; its own bin-packing set queued), Koordinator, Crane,
+  the KAI scheduler, KubeRay, the Gödel scheduler, Armada, Karmada, Open Cluster Management, KubeEdge and Nephio (a candidate:
+  its sandbox asks more than a free runner gives). CruiseKube stands at row 81.
+
 ## 2026-10-19 (late night): Omni v12 stands (a refused raise is held; the swarm's reflex acts at once); every fix lands as the next version
 
 - **omni-v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`): omni-v11 with two faults fixed, both
