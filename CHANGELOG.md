@@ -2,6 +2,29 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: Crane's rig, preregistered, four ways, on Kubernetes 1.25
+
+- **Crane on the serving rig** (`docs/CRANE_PREREGISTRATION.md`; register row 90; the founder's list): Crane 0.11.0 and the
+  Prometheus it reads, installed as its installation guide installs them (each chart and Crane's override values pinned by
+  SHA-256, `scripts/kind_addons_crane.sh`), its controllers on the control plane; the service's HPA handed to Crane's own
+  Effective HPA example in auto mode (`deploy/kind/crane-ehpa.yaml`), from which Crane builds and owns the HPA
+  `ehpa-php-apache`. Run the four ways in every repetition (`kind-crane.yml`): the organism alone, Crane as shipped,
+  Omni-Compass on the organism alone and on top of Crane, the governor on its own core (`GOV_CORE=1`).
+- **Kubernetes 1.25 for this test alone**: Crane builds its HPA as `autoscaling/v2beta2`, which Kubernetes removed in 1.26, so
+  its four arms run kind v0.24.0 with the pinned 1.25.16 node image (`KIND_NODE_IMAGE`, read by `scripts/kind_paired.sh`),
+  kubectl v1.25.16 and metrics-server v0.6.4. `scripts/kind_bench.sh` now takes metrics-server's floor from its pinned line
+  (its own compatibility table) and reads the cluster's API for in-place resize before every arm: where it is not served,
+  the power cap and the conveyance are off in every arm and the preflight says so (a failed read stops the arm, never
+  switches a lever off).
+- **The plug** (`scripts/kubectl_crane.py`, `tests/test_kubectl_crane.py` against a stand-in that rebuilds the HPA as Crane
+  does, `tests/fake_crane/kubectl`): Omni-Compass's moves to the HPA's processor target and range carried to Crane's EHPA,
+  its records kept on the EHPA and the HPA (Crane's own `--ehpa-propagation-annotation-prefixes=omnicompass.io/`, the one
+  setting of Crane's changed, `deploy/kind/crane-values.yaml`); its identity may get and patch that one EHPA
+  (`deploy/kind/rbac-omni-crane.yaml`); every reset reads back the operator's settings on the EHPA and on Crane's HPA.
+- **The four ways on the serving rig**: an arm named `...bare` carries no add-on (`scripts/kind_paired.sh`; on the batch rig
+  it keeps the stream on the default scheduler as before), `tests/test_four_ways.py` running the runner's own lines.
+- The governors page names Crane's rig and lists KubeRay and Crane among the four-way systems.
+
 ## 2026-10-20: KubeRay's rig, preregistered (amendment 7), and a trial workflow for every new rig
 
 - **KubeRay on the batch rig** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 7; register row 92; the founder's list):
