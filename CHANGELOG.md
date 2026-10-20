@@ -2,6 +2,61 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: the scheduler's two three-run tables, the governor's own core, and the four ways
+
+- **`results/live/V12_KOORDINATOR.md`** (Koordinator 1.8.0, colocation as shipped, its repeated runs on the cgroup root its own kind tests use: amendment 4; ten paired repetitions a run, omni-v12, on the rig before amendment 5): GAIN in all three of our runs on the service's response time (mean −36% to −37%, 95th percentile −22% to −25%, 99th percentile −8% to −15%); EVEN on the machines, the machine-hours, the energy, the jobs' wait, turnaround and unfinished jobs, and the failures (none); **no LOSS**. Koordinator gives the batch jobs only what the service leaves unused, so five to eleven of the 24 jobs are still running when the window closes, in both arms alike. Recipe added.
+- **`results/live/V12_VANILLA.md` and `V12_BINPACK.md`** (the Kubernetes scheduler as shipped, and with its bin-packing
+  profile; ten paired repetitions a run, omni-v12): GAIN in all three of our runs on the machines in service (−12% to −19%
+  as shipped, −24% to −28% bin-packing), the machine-hours, the energy at the declared standby (−8% to −13%, −17% to −19%), the
+  service's mean response (−21% to −25%, −25% to −29%) and the workers kept after the queue (−22% to −30%, −42% to −48%); EVEN
+  on a job's wait, the failures (none) and the jobs unfinished (none); and **LOSS in all three of our runs on a job's mean
+  turnaround, +0.9% to +1.4%** in both. Reported as it reads; its cause found and fixed in the rig below.
+- **The governor's own core** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 5): the raw files show the same placement and
+  the same start waits in both arms and each pod's hashing 1.3% to 1.5% longer with Omni-Compass on top: on kind the
+  governor shares the one runner with every node and competes with them as a peer group, whatever its niceness. From now on,
+  on the batch rig, in every arm, the kind nodes run on every core but the last and the governor alone on the last, as it runs
+  on its own machine on a real cluster (`scripts/kind_bench.sh`); `tools/confirm_abc.py` names a table's rig from it. A
+  governor restarted by the kill test inherits the same core (`GOV_PIN` exported with the rest of its wiring:
+  `tests/test_robust_restart.py` caught it missing before any run).
+- **The test cluster's state written whole** (`tests/fake_cluster/kubectl`): the fake kubectl rewrote its state file in
+  place, so the master switch test once read it empty while a decision was being written; it now writes a whole file and
+  renames it into place.
+- **The four ways** (amendment 6; the founder's order of 20 October): each orchestrator runs with the organism alone, the
+  orchestrator as shipped, Omni-Compass on the organism alone and Omni-Compass on top of the orchestrator, all four in every
+  repetition (`scripts/kind_paired.sh`: an arm named ...bare runs on the organism alone); `tools/live_reps.py` pairs each
+  comparison within the repetition and `tools/confirm_abc.py --pair` writes its three-run table; `kind-orchestrators.yml`
+  holds four arms in a job; `tests/test_four_ways.py`. CLAUDE.md carries the order. **Started at 04:12 UTC**: the A, B and
+  C of the KAI scheduler, Koordinator, Kueue, Volcano and the bin-packing profile (15 runs, ten repetitions of four arms
+  each, $0 on GitHub's machines), in a block of their own in `scripts/reruns.txt`, their ids in
+  `results/live/governors_runs.json`; the governors page carries the four ways, one cell per comparison.
+
+## 2026-10-20: the KAI scheduler's three-run table on omni-v12: 5 GAIN, no LOSS
+
+- **`results/live/V12_KAI.md`** (`tools/confirm_abc.py`; runs 39350900880, 39350907916 and 39350915166, ten paired
+  repetitions each, one commit, omni-v12): the batch stream through KAI's queues as shipped, then Omni-Compass on top. GAIN
+  in all three of our runs: worker machines in service −11% to −16%, machine-hours −11% to −16%, the energy at the declared
+  25 W standby −7.5% to −11%, the service's mean response time −21% to −23%, and the workers kept after the queue finished
+  −20% to −30%. EVEN in all three: a job's wait (mean and 95th percentile), the 95th and 99th percentile responses, the
+  alert minutes, failed requests (none) and unfinished jobs (none). Two rows read EVEN by the three-run rule with a clear
+  difference in some runs, shown as they are: the queue finished 0.2% to 0.4% later (about 5 s in 22 minutes; clear of the
+  noise in A and B, not in C), and a job's mean turnaround rose 1.5% in A (B and C within the noise). No LOSS row.
+- **The governors page** reads a three-run table as `tools/confirm_abc.py` records it (its runs with their ids, engines and
+  pairs) and shows, after the queue's gauges, the machines, energy, speed and failures.
+
+## 2026-10-20: the orchestra, the eighth organism: the governors' muscles, native and with Omni-Compass on top (modelled)
+
+- **`results/orchestra/ORCHESTRA.md`** (`tools/run_orchestra.py`; the founder's word of 19 October, night: the governors and
+  orchestrators in their own catalog group, an organism, benchmarked native and then with Omni-Compass on top): the 55
+  catalog muscles that stand for the knobs of the fourteen governors he named, each governor's muscles a body of its own and
+  all of them together one body, native against Omni-Compass on top at the max, seeds 3000-3009, modelled (class S). The
+  orchestra reads GAIN (more work and fewer misses) under its own load, the climb and work waiting in line (decisions over
+  the line 1.82% → 0.81%, 3.20% → 1.14% and 1.43% → 0.62%; work +0.04%, +0.14% and +0.02%; power given +25%, +55% and
+  +42%). Eight governors' bodies read GAIN (the scheduler, CruiseKube, Crane, Armada, Karmada, Open Cluster Management,
+  KubeEdge, Nephio) and six EVEN (Kueue, Volcano, KAI, Koordinator, KubeRay, Gödel: their natives miss nothing in the model
+  and their work stays as it is); no LOSS, and no plant inside any body did less work or missed its line more often. Its
+  A, B and C on GitHub's machines (`orchestra.yml`) must each reproduce the committed table; `tests/test_orchestra.py`; the
+  governors page carries the orchestra and each governor's body beside its live test; CLAUDE.md names the eighth organism.
+
 ## 2026-10-20: Koordinator's runs repeated on the kubelet's cgroup root its own tests use
 
 - **Koordinator's first A, B and C are invalid**, kept in the raw files and not counted: koordlet crash-looped on every kind

@@ -226,6 +226,22 @@ if [ -n "$TUNE" ]; then
   kubectl patch hpa php-apache --type=json -p "[{\"op\":\"replace\",\"path\":\"/spec/metrics/0/resource/target/averageUtilization\",\"value\":$TUNE}]"
   echo "native tuned by the operator: HPA target $TUNE (no Omni-Compass)" | tee "$OUT_DIR/tuned.txt"
 fi
+# the governor's own core on the batch rig (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 5), the same in every arm: the
+# kind nodes on every core but the last, the governor alone on the last. On a real cluster it runs on its own machine;
+# here every node is a container on one runner and the governor's group competes with them as a peer (its niceness ranks
+# it only inside its own group), so its own work and its commands came out of the measured pods' processor time (the
+# scheduler's first runs: the same placement and the same start waits in both arms, each pod's hashing 1.4% longer with
+# Omni-Compass on top)
+GOV_PIN=""
+if [ -n "$BATCH_QUEUE" ] && [ "$PLATFORM" = kind ] && [ "$(nproc)" -ge 2 ] && command -v taskset >/dev/null 2>&1; then
+  ncpu=$(nproc); gov_cpu=$((ncpu - 1)); cluster_cpus="0-$((ncpu - 2))"; pinned=0
+  for node in $(kind get nodes --name "${KIND_CLUSTER:-omni-bench}" 2>/dev/null); do
+    docker update --cpuset-cpus "$cluster_cpus" "$node" >/dev/null && pinned=$((pinned + 1))
+  done
+  [ "$pinned" -gt 0 ] || { echo "INVALID RUN: no kind node could be placed on its cores"; exit 1; }
+  GOV_PIN="taskset -c $gov_cpu"
+  echo "cores: the $pinned kind nodes on cores $cluster_cpus, the governor alone on core $gov_cpu (of $ncpu), in every arm" | tee -a "$OUT_DIR/preflight.txt"
+fi
 kubectl apply -f deploy/kind/bench-serving.yaml
 kubectl rollout status deployment/php-apache --timeout=300s
 if [ -n "$KEDA" ]; then
@@ -533,7 +549,7 @@ omni_pid=""
 export OMNI_INTERVAL="${OMNI_INTERVAL:-60}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file
-  nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval "$OMNI_FLOOR_INTERVAL" --reflex-window-s 15 \
+  $GOV_PIN nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval "$OMNI_FLOOR_INTERVAL" --reflex-window-s 15 \
     --iterations "$1" --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
     --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
     ${OMNI_POWER_CMD:+--power-cmd "$OMNI_POWER_CMD"} --site-limit-w "$SITE_LIMIT_W" \
@@ -584,8 +600,9 @@ if [ -n "${ROBUST:-}" ]; then
     # function and what it reads are exported before the script starts
     export -f start_controller
     # (17 Oct: GIVE_BACK_ONLY, added on 15 October, was missing here, so the second governor stopped on an unbound variable
-    # before it began and every kill run of omni-v7 was marked invalid; tests/test_robust_restart.py now checks the list)
-    export CAP_ARGS DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD GIVE_BACK_ONLY
+    # before it began and every kill run of omni-v7 was marked invalid; tests/test_robust_restart.py now checks the list,
+    # and caught GOV_PIN, the governor's own core, on 20 October before any run)
+    export CAP_ARGS DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD GIVE_BACK_ONLY GOV_PIN
   fi
   OUT_DIR="$OUT_DIR" DURATION="$DURATION" ROBUST="$ROBUST" OMNI_PID="$omni_pid" WORKERS="$WORKERS" HPA_RANGE="$HPA_RANGE" \
     WORKER_SEL="$WORKER_SEL" NATIVE="$NATIVE" bash scripts/kind_robust.sh > "$OUT_DIR/robust.out" 2>&1 &
