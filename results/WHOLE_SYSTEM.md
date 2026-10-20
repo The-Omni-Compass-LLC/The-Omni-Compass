@@ -1,0 +1,191 @@
+# The whole system: Omni-Compass at every layer, composed by the product law
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+<!-- how to read this receipt (tools/readings.py) -->
+**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart (the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear) that fell is a cut, a GAIN; one that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and never called a loss; work bought with each unit of a resource (work per energy) that fell is power given too. So a minus can read GAIN (a response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+<!-- end: how to read this receipt -->
+
+The founder's question of 20 October 2026: the cloud is the wire between the chip at one end and the software at the other; Omni-Compass sits at both ends and at every layer between; what is the total? This page answers it from the tables that stand, by one rule written once in `tools/whole_system.py`, which rebuilds the page and `results/WHOLE_SYSTEM.json` from them. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
+## 1. The equation
+
+For a gauge g with its declared aim a(g) (higher for work; lower for a wait; spent for a resource or a bill) and a layer ℓ measured native nℓ and with Omni-Compass oℓ, the layer's ratio is oriented toward the aim, so that above 1 is a GAIN at every layer alike:
+
+  Rℓ(g) = oℓ / nℓ when a(g) is higher;  Rℓ(g) = nℓ / oℓ when a(g) is lower or spent.
+
+Each layer is measured with the layer under it running as native runs it (the cluster's tests against the HPA; the governors' against the orchestrator as shipped; the cloud's against Azure's own autoscaler; the card's against the card's own limiter). The layers compose by multiplication, because each ratio is taken on what the layer under it hands up:
+
+  R(g) = ∏ℓ Rℓ(g),   G(g) = R(g) − 1,   log R(g) = Σℓ log Rℓ(g).
+
+The interval. A table gives, per run, the paired difference d = o − n with its 95% interval [lo, hi] over n paired repetitions (the exact Student t), so SE(d) = (hi − lo) / (2 t₀.₉₇₅,ₙ₋₁), and by the delta method SE(log R) = SE(d) / o. The three runs A, B and C of one test are pooled by inverse variance (μ = Σwᵢμᵢ / Σwᵢ, Var = 1 / Σwᵢ, wᵢ = 1/σᵢ²). A layer with k tests takes the mean of their log ratios (the geometric mean of the ratios, the Omni index's rule), Var = Σσᵢ² / k². The layers add in the log and their variances add, because every layer was measured in its own runs. The total's 95% interval is exp(μ ± 1.96 σ). The index over the gauges is the mean of the gauge logs; its interval is given under two bounds, the gauges independent (Var = Σσ² / k²) and the gauges perfectly correlated inside a run (σ = Σσ / k).
+
+Two readings of the same numbers. **By the index's rule** a gauge of a test enters only when its three-run reading is GAIN, LOSS or power given in all three of our runs; an EVEN gauge, a disagreement, or a table of one run enters as exactly 1 with no variance (nothing inside the noise is claimed either way). **With every interval carried**, every measured gauge enters with its pooled estimate and its variance whatever its reading, and the total's interval says what the noise allows.
+
+What the composition is, and is not. No run here stacked the layers: each factor is one layer's own measurement with the layer under it native. The product is a modelled composition (**class S**) of class P and class L measurements, under the assumption that a layer's ratio does not change when the layers under or over it also carry Omni-Compass (separability). Section 4 tests that assumption where the tables can (the governors' four ways). The stacked run, Omni-Compass at every layer at once against native at every layer, is the measurement that would replace this composition; until it exists this page is the answer the standing tables give, with its assumptions in the open. The layers also stand on different engines (the card on the controller of 2 October, the cluster tests on omni-v10 and omni-v11, the governors on omni-v12), so the composition is across engines, said so here, and remade as each layer's omni-v12 three runs land.
+
+## 2. The layers, each from its own table
+
+| Layer | Tests | Gauge | By the index's rule | With every interval carried | Word (carried) |
+|---|---:|---|---|---|---|
+| 1. the card (the chip), class P | 1 | work (more) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0000 (+0.00%; +0.00% to +0.00%) | EVEN |
+|  |  | speed (the 95th percentile response, lower) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.6309 (-36.9%; -40.6% to -33.0%) | LOSS |
+|  |  | energy (less) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0359 (+3.6%; +2.8% to +4.4%) | GAIN |
+| 3. the cluster (Kubernetes, its add-ons, its governors), class L | 20 | work (more) | ×1.2447 (+24.5%; +21.4% to +27.6%) | ×1.2447 (+24.5%; +21.4% to +27.6%) | GAIN |
+|  |  | speed (the 95th percentile response, lower) | ×1.4649 (+46.5%; +43.0% to +50.0%) | ×1.4537 (+45.4%; +41.8% to +49.1%) | GAIN |
+|  |  | machines (fewer) | ×1.0333 (+3.3%; +2.7% to +4.0%) | ×1.0441 (+4.4%; +3.6% to +5.2%) | GAIN |
+|  |  | energy (less) | ×1.0147 (+1.5%; +1.1% to +1.8%) | ×1.0276 (+2.8%; +2.2% to +3.3%) | GAIN |
+| 4. the services on the cluster, class L | 17 | work (more) | ×1.0010 (+0.1%; +0.1% to +0.1%) | ×1.0010 (+0.1%; -0.6% to +0.8%) | EVEN |
+|  |  | speed (the 95th percentile response, lower) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0012 (+0.1%; -0.7% to +0.9%) | EVEN |
+|  |  | machines (fewer) | ×1.0025 (+0.2%; +0.2% to +0.3%) | ×1.0136 (+1.4%; +0.6% to +2.2%) | GAIN |
+|  |  | energy (less) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9843 (-1.6%; -3.0% to -0.2%) | power given |
+| 5. the cloud (Azure, the bill metered), class L | 3 | speed (the 95th percentile response, lower) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0440 (+4.4%; -21.5% to +38.8%) | EVEN |
+|  |  | machines (fewer) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9761 (-2.4%; -10.0% to +5.8%) | EVEN |
+|  |  | the bill (smaller) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9918 (-0.8%; -18.8% to +21.2%) | EVEN |
+| 2. the machine (the kernel, bare metal, Kepler) | 0 | every gauge | not yet run (register row 79): enters as exactly 1 | not yet run | not measured |
+
+The card's primary gauge, work per energy (served requests per kJ): ×1.0359 (+3.6%; +2.8% to +4.4%) in its one run, native 50.79 → 52.62, GAIN by the one key (work bought with each unit of energy rose); the same run read the 95th percentile response +58.5% (LOSS) and the energy drawn -3.5% (GAIN). That controller was replaced (the orders of 12 October: every earlier GPU result is obsolete); the card's omni-v12 run on Lambda replaces this row the day it lands. It is carried here because it is the only real-meter measurement of the chip layer, and the totals are given with and without it.
+
+### Every test behind the layers
+
+**1. the card (the chip), class P**
+
+- NVIDIA A10, the card's own meter, Omni-Compass writing the power limit, 10 paired repetitions, one run (2 October, the replaced controller) (the card controller of commit c908054 (2 October), replaced since; `results/gpu/run-20261002T082232Z/GPU_REPS.md`): work: ×1.0000 (+0.00%; +0.00% to +0.00%), one run: the interval includes zero; speed: ×0.6309 (-36.9%; -40.6% to -33.0%), one run: clear of the noise; energy: ×1.0359 (+3.6%; +2.8% to +4.4%), one run: clear of the noise
+
+**3. the cluster (Kubernetes, its add-ons, its governors), class L**
+
+- Steady same work: the load in steps at a fixed rate, ten pairs, three runs (omni-v10; `results/live/V10_STEADY.json`): work: the same by design; speed: ×2.8203 (+182.0%; +126.8% to +250.7%), GAIN in all three of our runs; machines: ×1.0000 (+0.00%; +0.00% to +0.00%), EVEN, the same; energy: ×1.0027 (+0.3%; +0.1% to +0.4%), EVEN, no difference beyond the noise
+- Demand that wanders: up and down one step at a time, ten pairs, three runs (omni-v10; `results/live/V10_WANDERING.json`): speed: ×2.4182 (+141.8%; +119.6% to +166.3%), GAIN in all three of our runs; machines: ×1.0000 (+0.00%; -0.00% to +0.00%), EVEN, the same; energy: ×1.0038 (+0.4%; +0.3% to +0.5%), GAIN in all three of our runs
+- All four in one run: load up and down one step at a time, ten pairs, three runs (omni-v10; `results/live/V10_ALL_FOUR.json`): work: ×1.5492 (+54.9%; +47.3% to +62.9%), GAIN in all three of our runs; speed: ×2.3751 (+137.5%; +98.3% to +184.4%), GAIN in all three of our runs; machines: ×1.0000 (+0.00%; -0.00% to +0.00%), EVEN, the same; energy: ×1.0028 (+0.3%; +0.2% to +0.3%), EVEN, no difference beyond the noise
+- Fairness: a noisy neighbour, ten pairs, three runs (omni-v10; `results/live/V10_FAIRNESS.json`): speed: ×1.0614 (+6.1%; -0.6% to +13.3%), EVEN, no difference beyond the noise; machines: ×1.0000 (+0.00%; +0.00% to +0.00%), EVEN, the same; energy: ×0.9995 (-0.1%; -0.2% to +0.1%), EVEN, no difference beyond the noise
+- Faults: machine down, spike, runaway pod, blind probe, ten pairs, three runs (omni-v10; `results/live/V10_FAULTS.json`): speed: ×2.3195 (+131.9%; +105.2% to +162.2%), GAIN in all three of our runs; machines: ×1.0000 (+0.00%; -0.01% to +0.02%), EVEN, no difference beyond the noise; energy: ×1.0036 (+0.4%; +0.1% to +0.6%), EVEN, no difference beyond the noise
+- A queue of jobs: cruise, then the emergency brake, ten pairs, three runs (omni-v10; `results/live/V10_BATCH.json`): speed: ×1.1260 (+12.6%; +10.8% to +14.4%), GAIN in all three of our runs; machines: ×1.0958 (+9.6%; +5.8% to +13.5%), GAIN in all three of our runs; energy: ×1.0640 (+6.4%; +3.9% to +8.9%), GAIN in all three of our runs
+- A public day of demand: the Google cluster trace of 2011 replayed one step at a time, ten pairs, three runs (omni-v10; `results/live/V10_TRACE_GOOGLE2011.json`): speed: ×2.4057 (+140.6%; +99.6% to +190.0%), GAIN in all three of our runs; machines: ×1.0000 (+0.00%; +0.00% to +0.00%), EVEN, the same; energy: ×1.0034 (+0.3%; +0.2% to +0.4%), GAIN in all three of our runs
+- With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs (omni-v11; `results/live/V11_KEDA_CPU_REQUESTS.json`): speed: ×2.1154 (+111.5%; +87.5% to +138.6%), GAIN in all three of our runs; machines: ×1.0000 (-0.00%; -0.00% to -0.00%), EVEN, the same; energy: ×0.9870 (-1.3%; -1.6% to -1.0%), power given in all three of our runs
+- With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs (omni-v11; `results/live/V11_KEDA_REQUESTS.json`): speed: ×3.5967 (+259.7%; +186.9% to +350.9%), GAIN in all three of our runs; machines: ×1.0000 (-0.00%; -0.00% to +0.00%), EVEN, the same; energy: ×0.9802 (-2.0%; -2.3% to -1.6%), power given in all three of our runs
+- Goldilocks and the VPA's recommender, Omni-Compass on top (omni-v11; `results/live/V11_GOLDILOCKS.json`): speed: ×2.6727 (+167.3%; +129.9% to +210.7%), GAIN in all three of our runs; machines: ×1.0000 (+0.00%; -0.00% to +0.00%), EVEN, the same; energy: ×0.9802 (-2.0%; -2.3% to -1.7%), power given in all three of our runs
+- CruiseKube applying its own recommendations, Omni-Compass on top (omni-v10; `results/live/V10_CRUISEKUBE.json`): speed: ×0.9896 (-1.0%; -2.1% to +0.1%), EVEN, no difference beyond the noise; machines: ×1.0000 (+0.00%; +0.00% to +0.00%), EVEN, the same; energy: ×0.9978 (-0.2%; -0.5% to +0.1%), EVEN, no difference beyond the noise
+- Omni-Compass on top of the Kubernetes scheduler as shipped (omni-v12; `results/live/V12_VANILLA.json`): speed: ×0.9536 (-4.6%; -7.1% to -2.1%), EVEN, no difference beyond the noise; machines: ×1.1623 (+16.2%; +10.0% to +22.8%), GAIN in all three of our runs; energy: ×1.1099 (+11.0%; +6.8% to +15.3%), GAIN in all three of our runs
+- Omni-Compass on top of Kueue (the four ways, compass against native) (omni-v12; `results/live/V12_KUEUE_4W_TOP.json`): speed: ×0.9884 (-1.2%; -4.8% to +2.6%), EVEN, no difference beyond the noise; machines: ×1.1172 (+11.7%; +6.1% to +17.6%), GAIN in all three of our runs; energy: ×1.0785 (+7.9%; +4.2% to +11.6%), GAIN in all three of our runs
+- Omni-Compass on top of Volcano (the four ways, compass against native) (omni-v12; `results/live/V12_VOLCANO_4W_TOP.json`): speed: ×0.9183 (-8.2%; -16.3% to +0.7%), EVEN, no difference beyond the noise; machines: ×1.1738 (+17.4%; +9.1% to +26.3%), GAIN in all three of our runs; energy: ×1.1146 (+11.5%; +6.2% to +17.0%), EVEN, no difference beyond the noise
+- Omni-Compass on top of the KAI scheduler (the four ways, compass against native) (omni-v12; `results/live/V12_KAI_4W_TOP.json`): speed: ×0.9667 (-3.3%; -7.0% to +0.5%), EVEN, no difference beyond the noise; machines: ×1.0861 (+8.6%; +4.5% to +12.9%), EVEN, no difference beyond the noise; energy: ×1.0584 (+5.8%; +3.1% to +8.7%), EVEN, no difference beyond the noise
+- Omni-Compass on top of Koordinator (the four ways, compass against native) (omni-v12; `results/live/V12_KOORDINATOR_4W_TOP.json`): speed: ×1.0746 (+7.5%; +5.1% to +9.9%), EVEN, no difference beyond the noise; machines: ×1.0055 (+0.6%; -0.1% to +1.2%), EVEN, no difference beyond the noise; energy: ×1.0046 (+0.5%; +0.1% to +0.9%), EVEN, no difference beyond the noise
+- Omni-Compass on top of the scheduler's bin-packing profile (the four ways, compass against native) (omni-v12; `results/live/V12_BINPACK_4W_TOP.json`): speed: ×1.0108 (+1.1%; -2.5% to +4.8%), EVEN, no difference beyond the noise; machines: ×1.1523 (+15.2%; +8.1% to +22.9%), GAIN in all three of our runs; energy: ×1.1004 (+10.0%; +5.5% to +14.8%), GAIN in all three of our runs
+- Omni-Compass on top of Crane (the four ways, compass against native) (omni-v12; `results/live/V12_CRANE_4W_TOP.json`): speed: ×1.0105 (+1.0%; -0.5% to +2.6%), EVEN, no difference beyond the noise; machines: ×1.0000 (+0.00%; +0.00% to +0.00%), EVEN, the same; energy: ×0.9963 (-0.4%; -0.6% to -0.1%), EVEN, no difference beyond the noise
+- Omni-Compass on top of KubeRay (the four ways, compass against native) (omni-v12; `results/live/V12_KUBERAY_4W_TOP.json`): speed: ×0.9754 (-2.5%; -6.3% to +1.6%), EVEN, no difference beyond the noise; machines: ×1.0134 (+1.3%; +0.4% to +2.3%), EVEN, no difference beyond the noise; energy: ×1.0085 (+0.9%; +0.2% to +1.5%), EVEN, no difference beyond the noise
+- Omni-Compass on top of Karmada (the four ways, compass against native) (omni-v12; `results/live/V12_KARMADA_4W_TOP.json`): speed: ×0.9125 (-8.8%; -13.6% to -3.7%), EVEN, no difference beyond the noise; machines: ×1.1118 (+11.2%; +4.5% to +18.3%), EVEN, no difference beyond the noise; energy: ×1.0743 (+7.4%; +2.9% to +12.2%), EVEN, no difference beyond the noise
+
+**4. the services on the cluster, class L**
+
+- pgbench `select`: the pooler's pool size, three paired repetitions, three runs (omni-v11; `results/live/V11_PGBENCH.json`): work: ×0.9997 (-0.03%; -0.1% to -0.01%), EVEN, no difference beyond the noise; speed: ×1.0280 (+2.8%; -4.9% to +11.1%), EVEN, no difference beyond the noise; machines: ×1.0626 (+6.3%; +5.3% to +7.2%), EVEN, no difference beyond the noise; energy: ×0.9984 (-0.2%; -0.6% to +0.2%), EVEN, no difference beyond the noise
+- pgbench `simple_update`: the pooler's pool size, three paired repetitions, three runs (omni-v11; `results/live/V11_PGBENCH.json`): work: ×1.0032 (+0.3%; -0.4% to +1.0%), EVEN, no difference beyond the noise; speed: ×1.0539 (+5.4%; -3.6% to +15.2%), EVEN, no difference beyond the noise; machines: ×1.0278 (+2.8%; +2.0% to +3.6%), EVEN, no difference beyond the noise; energy: ×1.0017 (+0.2%; +0.04% to +0.3%), EVEN, no difference beyond the noise
+- pgbench `tpcb_hot`: the pooler's pool size, three paired repetitions, three runs (omni-v11; `results/live/V11_PGBENCH.json`): work: ×0.9981 (-0.2%; -0.2% to -0.1%), EVEN, no difference beyond the noise; speed: ×0.9923 (-0.8%; -5.2% to +3.8%), EVEN, no difference beyond the noise; machines: ×1.0551 (+5.5%; +5.3% to +5.8%), EVEN, no difference beyond the noise; energy: ×1.0022 (+0.2%; -0.4% to +0.9%), EVEN, no difference beyond the noise
+- Kafka `burst`: the consumer group's size, three paired repetitions, three runs (omni-v11; `results/live/V11_KAFKA.json`): work: ×0.9974 (-0.3%; -0.3% to -0.2%), EVEN, no difference beyond the noise; speed: ×1.0009 (+0.1%; -1.2% to +1.4%), EVEN, no difference beyond the noise; machines: ×1.0084 (+0.8%; +0.8% to +0.8%), GAIN in all three of our runs; energy: ×1.0065 (+0.7%; -0.5% to +1.8%), EVEN, no difference beyond the noise
+- Kafka `heavy`: the consumer group's size, three paired repetitions, three runs (omni-v11; `results/live/V11_KAFKA.json`): work: ×0.9997 (-0.03%; -0.04% to -0.01%), EVEN, no difference beyond the noise; speed: ×0.9959 (-0.4%; -1.9% to +1.1%), EVEN, no difference beyond the noise; machines: ×1.0033 (+0.3%; +0.3% to +0.3%), EVEN, no difference beyond the noise; energy: ×1.0032 (+0.3%; -0.4% to +1.0%), EVEN, no difference beyond the noise
+- Kafka `light`: the consumer group's size, three paired repetitions, three runs (omni-v11; `results/live/V11_KAFKA.json`): work: ×0.9998 (-0.02%; -0.1% to +0.1%), EVEN, no difference beyond the noise; speed: ×0.9978 (-0.2%; -1.0% to +0.6%), EVEN, no difference beyond the noise; machines: ×0.9242 (-7.6%; -13.5% to -1.3%), EVEN, no difference beyond the noise; energy: ×0.9844 (-1.6%; -2.7% to -0.4%), EVEN, no difference beyond the noise
+- Redis `burst`: the cache's memory ceiling, three paired repetitions, three runs (omni-v11; `results/live/V11_REDIS.json`): work: ×0.9991 (-0.1%; -0.1% to -0.1%), EVEN, no difference beyond the noise; speed: ×1.0002 (+0.02%; -0.1% to +0.1%), EVEN, no difference beyond the noise; machines: ×1.0246 (+2.5%; +2.3% to +2.6%), GAIN in all three of our runs; energy: ×1.0465 (+4.7%; -6.7% to +17.4%), EVEN, no difference beyond the noise
+- Redis `large`: the cache's memory ceiling, three paired repetitions, three runs (omni-v11; `results/live/V11_REDIS.json`): work: ×1.0163 (+1.6%; +1.6% to +1.6%), GAIN in all three of our runs; speed: ×1.0017 (+0.2%; +0.1% to +0.2%), EVEN, no difference beyond the noise; machines: ×0.9868 (-1.3%; -1.7% to -0.9%), EVEN, no difference beyond the noise; energy: ×0.9447 (-5.5%; -11.0% to +0.3%), EVEN, no difference beyond the noise
+- Redis `small`: the cache's memory ceiling, three paired repetitions, three runs (omni-v11; `results/live/V11_REDIS.json`): work: ×1.0124 (+1.2%; +1.2% to +1.3%), EVEN, no difference beyond the noise; speed: ×0.9997 (-0.03%; -0.05% to -0.00%), EVEN, no difference beyond the noise; machines: ×0.9781 (-2.2%; -2.4% to -2.0%), EVEN, no difference beyond the noise; energy: ×0.8829 (-11.7%; -16.1% to -7.1%), EVEN, no difference beyond the noise
+- YCSB `b`: the storage engine's cache size, three paired repetitions, three runs (omni-v11; `results/live/V11_YCSB.json`): work: ×0.9992 (-0.1%; -0.1% to -0.05%), EVEN, no difference beyond the noise; speed: ×0.9995 (-0.1%; -1.3% to +1.2%), EVEN, no difference beyond the noise; machines: ×1.0061 (+0.6%; +0.4% to +0.8%), EVEN, no difference beyond the noise; energy: ×1.0981 (+9.8%; +1.0% to +19.4%), EVEN, no difference beyond the noise
+- YCSB `burst`: the storage engine's cache size, three paired repetitions, three runs (omni-v11; `results/live/V11_YCSB.json`): work: ×1.0000 (-0.00%; -0.03% to +0.03%), EVEN, no difference beyond the noise; speed: ×1.0157 (+1.6%; +1.0% to +2.1%), EVEN, no difference beyond the noise; machines: ×1.0259 (+2.6%; +1.9% to +3.3%), EVEN, no difference beyond the noise; energy: ×0.7750 (-22.5%; -31.9% to -11.8%), EVEN, no difference beyond the noise
+- YCSB `c`: the storage engine's cache size, three paired repetitions, three runs (omni-v11; `results/live/V11_YCSB.json`): work: ×0.9994 (-0.1%; -0.1% to -0.02%), EVEN, no difference beyond the noise; speed: ×0.9909 (-0.9%; -2.8% to +1.1%), EVEN, no difference beyond the noise; machines: ×1.0044 (+0.4%; +0.4% to +0.5%), EVEN, no difference beyond the noise; energy: ×1.0224 (+2.2%; -5.6% to +10.7%), EVEN, no difference beyond the noise
+- YCSB `f`: the storage engine's cache size, three paired repetitions, three runs (omni-v11; `results/live/V11_YCSB.json`): work: ×0.9998 (-0.02%; -0.3% to +0.2%), EVEN, no difference beyond the noise; speed: ×0.9980 (-0.2%; -0.6% to +0.2%), EVEN, no difference beyond the noise; machines: ×1.0090 (+0.9%; +0.8% to +1.0%), GAIN in all three of our runs; energy: ×1.0205 (+2.0%; +0.3% to +3.8%), EVEN, no difference beyond the noise
+- sysbench `burst`: the buffer pool's size, three paired repetitions, three runs (omni-v11; `results/live/V11_SYSBENCH.json`): work: ×1.0021 (+0.2%; +0.1% to +0.3%), EVEN, no difference beyond the noise; speed: ×1.0264 (+2.6%; +1.8% to +3.5%), EVEN, no difference beyond the noise; machines: ×1.0859 (+8.6%; +0.8% to +17.0%), EVEN, no difference beyond the noise; energy: ×0.9937 (-0.6%; -1.7% to +0.5%), EVEN, no difference beyond the noise
+- sysbench `read_only`: the buffer pool's size, three paired repetitions, three runs (omni-v11; `results/live/V11_SYSBENCH.json`): work: ×0.9983 (-0.2%; -0.4% to +0.1%), EVEN, no difference beyond the noise; speed: ×1.0325 (+3.2%; +2.5% to +4.0%), EVEN, no difference beyond the noise; machines: ×0.9767 (-2.3%; -7.3% to +2.9%), EVEN, no difference beyond the noise; energy: ×1.0292 (+2.9%; +2.4% to +3.4%), EVEN, no difference beyond the noise
+- sysbench `read_write`: the buffer pool's size, three paired repetitions, three runs (omni-v11; `results/live/V11_SYSBENCH.json`): work: ×0.9932 (-0.7%; -1.4% to +0.04%), EVEN, no difference beyond the noise; speed: ×0.8986 (-10.1%; -11.8% to -8.5%), EVEN, no difference beyond the noise; machines: ×1.0213 (+2.1%; -2.7% to +7.2%), EVEN, no difference beyond the noise; energy: ×0.9781 (-2.2%; -3.3% to -1.0%), EVEN, no difference beyond the noise
+- sysbench `update_index`: the buffer pool's size, three paired repetitions, three runs (omni-v11; `results/live/V11_SYSBENCH.json`): work: ×0.9992 (-0.1%; -11.7% to +13.0%), EVEN, no difference beyond the noise; speed: ×0.9959 (-0.4%; -4.0% to +3.4%), EVEN, no difference beyond the noise; machines: ×1.0426 (+4.3%; -1.2% to +10.0%), EVEN, no difference beyond the noise; energy: ×0.9900 (-1.0%; -9.6% to +8.4%), EVEN, no difference beyond the noise
+
+**5. the cloud (Azure, the bill metered), class L**
+
+- Azure Kubernetes Service, Azure's own cluster autoscaler underneath, the compass law, 4 paired repetitions, one run (the engine of commit 5b2832f (4 October 2026); `results/live/AKS_BILL.md`): speed: ×1.2537 (+25.4%; -24.3% to +107.6%), one run: the interval includes zero; machines: ×0.9918 (-0.8%; -18.8% to +21.2%), one run: the interval includes zero; bill: ×0.9918 (-0.8%; -18.8% to +21.2%), one run: the interval includes zero
+- Azure Kubernetes Service, a 4-worker fleet, the steady set, 5 paired repetitions, one run (omni-v1; `results/live/V1_AKS_STEADY.json`): speed: ×1.0215 (+2.2%; -20.9% to +32.0%), one run: the interval includes zero; machines: ×0.9623 (-3.8%; -15.6% to +9.7%), one run: the interval includes zero
+- Azure Kubernetes Service, a 4-worker fleet, the burst, 5 paired repetitions, one run (omni-v1; `results/live/V1_AKS_BURST.json`): speed: ×0.8884 (-11.2%; -53.2% to +68.7%), one run: the interval includes zero; machines: ×0.9744 (-2.6%; -6.0% to +1.0%), one run: the interval includes zero
+
+## 3. The total
+
+| Scope | Reading | Gauge | R(g) | G(g), 95% interval | Word |
+|---|---|---|---:|---|---|
+| with the card's one run | by the index's rule | work (more) | ×1.2458 | +24.6% (+21.5% to +27.7%) | GAIN |
+| with the card's one run | by the index's rule | speed (the 95th percentile response, lower) | ×1.4649 | +46.5% (+43.0% to +50.0%) | GAIN |
+| with the card's one run | by the index's rule | machines (fewer) | ×1.0358 | +3.6% (+2.9% to +4.2%) | GAIN |
+| with the card's one run | by the index's rule | energy (less) | ×1.0147 | +1.5% (+1.1% to +1.8%) | GAIN |
+| with the card's one run | by the index's rule | the bill (smaller) | ×1.0000 | +0.00% (+0.00% to +0.00%) | EVEN |
+| with the card's one run | by the index's rule | **the index over the gauges** | **×1.1391** | **+13.9%** (gauges independent +13.1% to +14.7%; gauges correlated +12.6% to +15.3%) | GAIN |
+| with the card's one run | every interval carried | work (more) | ×1.2459 | +24.6% (+21.4% to +27.9%) | GAIN |
+| with the card's one run | every interval carried | speed (the 95th percentile response, lower) | ×0.9585 | -4.1% (-28.5% to +28.4%) | EVEN |
+| with the card's one run | every interval carried | machines (fewer) | ×1.0330 | +3.3% (-4.8% to +12.1%) | EVEN |
+| with the card's one run | every interval carried | energy (less) | ×1.0478 | +4.8% (+3.0% to +6.6%) | GAIN |
+| with the card's one run | every interval carried | the bill (smaller) | ×0.9918 | -0.8% (-18.8% to +21.2%) | EVEN |
+| with the card's one run | every interval carried | **the index over the gauges** | **×1.0509** | **+5.1%** (gauges independent -2.3% to +13.1%; gauges correlated -7.1% to +18.9%) | EVEN |
+| without the card (the cluster, the services and the cloud) | by the index's rule | work (more) | ×1.2458 | +24.6% (+21.5% to +27.7%) | GAIN |
+| without the card (the cluster, the services and the cloud) | by the index's rule | speed (the 95th percentile response, lower) | ×1.4649 | +46.5% (+43.0% to +50.0%) | GAIN |
+| without the card (the cluster, the services and the cloud) | by the index's rule | machines (fewer) | ×1.0358 | +3.6% (+2.9% to +4.2%) | GAIN |
+| without the card (the cluster, the services and the cloud) | by the index's rule | energy (less) | ×1.0147 | +1.5% (+1.1% to +1.8%) | GAIN |
+| without the card (the cluster, the services and the cloud) | by the index's rule | the bill (smaller) | ×1.0000 | +0.00% (+0.00% to +0.00%) | EVEN |
+| without the card (the cluster, the services and the cloud) | by the index's rule | **the index over the gauges** | **×1.1391** | **+13.9%** (gauges independent +13.1% to +14.7%; gauges correlated +12.6% to +15.3%) | GAIN |
+| without the card (the cluster, the services and the cloud) | every interval carried | work (more) | ×1.2459 | +24.6% (+21.4% to +27.9%) | GAIN |
+| without the card (the cluster, the services and the cloud) | every interval carried | speed (the 95th percentile response, lower) | ×1.5194 | +51.9% (+14.1% to +102.3%) | GAIN |
+| without the card (the cluster, the services and the cloud) | every interval carried | machines (fewer) | ×1.0330 | +3.3% (-4.8% to +12.1%) | EVEN |
+| without the card (the cluster, the services and the cloud) | every interval carried | energy (less) | ×1.0115 | +1.1% (-0.4% to +2.7%) | EVEN |
+| without the card (the cluster, the services and the cloud) | every interval carried | the bill (smaller) | ×0.9918 | -0.8% (-18.8% to +21.2%) | EVEN |
+| without the card (the cluster, the services and the cloud) | every interval carried | **the index over the gauges** | **×1.1443** | **+14.4%** (gauges independent +6.5% to +23.0%; gauges correlated +1.3% to +29.3%) | GAIN |
+
+Read: the headline is the row **without the card, by the index's rule**: it counts only what held the same way in all three of our runs, on real machines (class L), and composes the cluster, the services on it and the cloud: **+13.9%** over the gauges, speed +46.5%, machines +3.6%, energy +1.5%, work +24.6%, the bill +0.00%. With every interval carried the same layers read **+14.4%** (gauges correlated: +1.3% to +29.3%); the cloud's wide one-run intervals (4 and 5 paired repetitions) are what widen it. With the card's one old run carried the chip's speed LOSS of that run pulls the index to **+5.1%** and its energy GAIN adds to the energy row; the card's omni-v12 run replaces that row.
+
+The cloud is the wire, and it has its own factor: the bill. On Azure's own autoscaler the bill read EVEN (×1.000 inside the noise, four paired repetitions on the compass law; the v1 fleet's steady set and burst EVEN too), so the cloud layer multiplies the total by 1 so far: the benefit measured is at the two ends and the layers between, and the cloud carries it without adding or taking. The omni-v12 Azure sets at the tune-down (the bill at native's work, `scripts/azure_queue.txt`) are the measurement of that factor; the bill row here changes the day their three-run tables land.
+
+## 4. The assumption tested where the tables allow: separability, from the governors' four ways
+
+Omni-Compass on the organism alone (compassbare against nativebare) and on top of the orchestrator (compass against native), in the same repetitions, on omni-v12. If the layers did not interact the two ratios would agree; a difference clear of the noise says the orchestrator changes what Omni-Compass has to work with (a layer's factor is not a constant of the layer alone).
+
+| Governor | Gauge | On top of the orchestrator (TOP) | On the organism alone (BARE) | TOP ÷ BARE, 95% interval | Agree within the noise |
+|---|---|---|---|---|---|
+| Kueue | speed (the 95th percentile response, lower) | ×0.9884 (-1.2%; -4.8% to +2.6%) | ×0.9696 (-3.0%; -6.2% to +0.3%) | ×1.0194 (-3.1% to +7.2%) | yes |
+| Kueue | machines (fewer) | ×1.1172 (+11.7%; +6.1% to +17.6%) | ×1.1308 (+13.1%; +8.0% to +18.4%) | ×0.9879 (-7.8% to +5.9%) | yes |
+| Kueue | energy (less) | ×1.0785 (+7.9%; +4.2% to +11.6%) | ×1.0855 (+8.5%; +5.3% to +11.9%) | ×0.9936 (-5.1% to +4.1%) | yes |
+| Volcano | speed (the 95th percentile response, lower) | ×0.9183 (-8.2%; -16.3% to +0.7%) | ×0.9467 (-5.3%; -8.3% to -2.3%) | ×0.9699 (-12.0% to +7.0%) | yes |
+| Volcano | machines (fewer) | ×1.1738 (+17.4%; +9.1% to +26.3%) | ×1.1748 (+17.5%; +11.2% to +24.1%) | ×0.9991 (-8.8% to +9.5%) | yes |
+| Volcano | energy (less) | ×1.1146 (+11.5%; +6.2% to +17.0%) | ×1.1139 (+11.4%; +7.4% to +15.5%) | ×1.0006 (-5.8% to +6.3%) | yes |
+| the KAI scheduler | speed (the 95th percentile response, lower) | ×0.9667 (-3.3%; -7.0% to +0.5%) | ×0.9708 (-2.9%; -6.9% to +1.2%) | ×0.9958 (-5.9% to +5.4%) | yes |
+| the KAI scheduler | machines (fewer) | ×1.0861 (+8.6%; +4.5% to +12.9%) | ×1.1445 (+14.4%; +8.9% to +20.3%) | ×0.9490 (-10.9% to +1.1%) | yes |
+| the KAI scheduler | energy (less) | ×1.0584 (+5.8%; +3.1% to +8.7%) | ×1.0955 (+9.5%; +6.0% to +13.2%) | ×0.9661 (-7.4% to +0.8%) | yes |
+| Koordinator | speed (the 95th percentile response, lower) | ×1.0746 (+7.5%; +5.1% to +9.9%) | ×0.9437 (-5.6%; -8.1% to -3.1%) | ×1.1388 (+10.0% to +17.9%) | no |
+| Koordinator | machines (fewer) | ×1.0055 (+0.6%; -0.1% to +1.2%) | ×1.2062 (+20.6%; +13.5% to +28.2%) | ×0.8336 (-21.6% to -11.4%) | no |
+| Koordinator | energy (less) | ×1.0046 (+0.5%; +0.1% to +0.9%) | ×1.1344 (+13.4%; +8.9% to +18.2%) | ×0.8856 (-15.0% to -7.7%) | no |
+| the scheduler's bin-packing profile | speed (the 95th percentile response, lower) | ×1.0108 (+1.1%; -2.5% to +4.8%) | ×0.9482 (-5.2%; -8.3% to -1.9%) | ×1.0660 (+1.5% to +12.0%) | no |
+| the scheduler's bin-packing profile | machines (fewer) | ×1.1523 (+15.2%; +8.1% to +22.9%) | ×1.1631 (+16.3%; +8.6% to +24.6%) | ×0.9908 (-9.8% to +8.8%) | yes |
+| the scheduler's bin-packing profile | energy (less) | ×1.1004 (+10.0%; +5.5% to +14.8%) | ×1.1072 (+10.7%; +5.9% to +15.8%) | ×0.9939 (-6.6% to +5.7%) | yes |
+| Crane | speed (the 95th percentile response, lower) | ×1.0105 (+1.0%; -0.5% to +2.6%) | ×1.0354 (+3.5%; +1.6% to +5.5%) | ×0.9759 (-4.8% to -0.01%) | no |
+| Crane | machines (fewer) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0000 (+0.00%; -0.00% to +0.00%) | ×1.0000 (+0.00% to +0.00%) | yes |
+| Crane | energy (less) | ×0.9963 (-0.4%; -0.6% to -0.1%) | ×0.9984 (-0.2%; -0.3% to -0.01%) | ×0.9979 (-0.5% to +0.1%) | yes |
+| KubeRay | speed (the 95th percentile response, lower) | ×0.9754 (-2.5%; -6.3% to +1.6%) | ×0.9500 (-5.0%; -7.1% to -2.8%) | ×1.0268 (-2.0% to +7.6%) | yes |
+| KubeRay | machines (fewer) | ×1.0134 (+1.3%; +0.4% to +2.3%) | ×1.2021 (+20.2%; +11.5% to +29.6%) | ×0.8430 (-21.9% to -9.0%) | no |
+| KubeRay | energy (less) | ×1.0085 (+0.9%; +0.2% to +1.5%) | ×1.1306 (+13.1%; +7.7% to +18.7%) | ×0.8921 (-15.1% to -6.3%) | no |
+| Karmada | speed (the 95th percentile response, lower) | ×0.9125 (-8.8%; -13.6% to -3.7%) | ×0.9309 (-6.9%; -9.8% to -3.9%) | ×0.9802 (-7.9% to +4.4%) | yes |
+| Karmada | machines (fewer) | ×1.1118 (+11.2%; +4.5% to +18.3%) | ×1.1304 (+13.0%; +5.7% to +20.9%) | ×0.9836 (-10.3% to +7.8%) | yes |
+| Karmada | energy (less) | ×1.0743 (+7.4%; +2.9% to +12.2%) | ×1.0893 (+8.9%; +4.0% to +14.1%) | ×0.9862 (-7.5% to +5.1%) | yes |
+
+17 of 24 governor-gauge pairs agree within the noise. Where they do not, the orchestrator under Omni-Compass changed its factor, and a product built from the organism-alone factor would misstate the stacked result there by the TOP ÷ BARE shown; the composition in section 3 uses the TOP factors (Omni-Compass on top of what is actually there), which is the stacked measurement for that pair of layers.
+
+## 5. Beside the total, never inside it
+
+- The organisms, our own models (class S, `results/realms_v5/REALMS_V5.md`, commit 9819a903cba3): the spine (267 muscles) under its own load: fewer misses, misses -0.145 pp (-0.176 to -0.115), work +0.00%, power given +0.011%. A model's energy is not a meter's; these rows are shown, not composed.
+- The organisms, our own models (class S, `results/realms_v5/REALMS_V5.md`, commit 9819a903cba3): the whole tower (1107 muscles) under its own load: fewer misses, misses -0.051 pp (-0.062 to -0.040), work +0.00%, power given +0.000%. A model's energy is not a meter's; these rows are shown, not composed.
+- The organisms with the real cluster inside (omni-v3, `results/live/V3_SIX_KUBE.md`), tower at 10 copies, 5 paired repetitions: the 95th percentile ×1.7118 (+71.2%; +8.2% to +170.9%); an older engine's result, the road to this one, never composed with the rows above.
+- The organisms with the real cluster inside (omni-v3, `results/live/V3_SIX_KUBE.md`), tower at 100 copies, 5 paired repetitions: the 95th percentile ×1.4077 (+40.8%; -25.7% to +166.8%); an older engine's result, the road to this one, never composed with the rows above.
+- The organisms with the real cluster inside (omni-v3, `results/live/V3_SIX_KUBE.md`), stack at 10 copies, 5 paired repetitions: the 95th percentile ×1.0124 (+1.2%; -41.1% to +74.0%); an older engine's result, the road to this one, never composed with the rows above.
+- The organisms with the real cluster inside (omni-v3, `results/live/V3_SIX_KUBE.md`), stack at 100 copies, 5 paired repetitions: the 95th percentile ×1.1893 (+18.9%; +3.8% to +36.2%); an older engine's result, the road to this one, never composed with the rows above.
+
+## 6. What is missing, and what replaces what
+
+- **The machine** (the kernel, bare metal, Kepler and the machine's own meter; register row 79): not yet run. It enters as exactly 1.
+- **The card on the engine that stands**: the omni-v12 run on Lambda (`gpu-omni-v12`, one exact commit) replaces the 2 October row.
+- **The cloud at the tune-down**: the omni-v12 Azure sets (A, B and C of the steady set, the two bursts and the real day) give the bill its three-run reading; Google and Amazon follow on the same harness.
+- **Every cluster and service table on omni-v12**: the campaign (`scripts/reruns.txt`) reruns every benchmark; each row above is replaced by its omni-v12 table as it lands, and this page is rebuilt (`python3 tools/whole_system.py`).
+- **The stacked run**: Omni-Compass at every layer at once against native at every layer, the one measurement that makes the total class L and P instead of a composition. Its place is written here before its result exists.
+
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

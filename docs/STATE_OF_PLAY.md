@@ -209,6 +209,21 @@ faults and a public day of demand, and fewer machines on a queue of jobs; on the
 broker and the do-no-harm reading on three databases. Not yet shown: an energy or cloud-bill saving on real machines (energy on
 kind is a declared model; the Azure tables at the tune-down are being made), and anything on a real card.
 
+## The whole system, every layer composed (20 October)
+
+The founder's question of 20 October: the cloud is the wire between the chip and the software, Omni-Compass sits at both ends
+and at every layer between, what is the total? `results/WHOLE_SYSTEM.md` (built by `tools/whole_system.py`) answers it from the
+tables that stand: each layer's ratio toward its gauge's aim, Rℓ(g) = oℓ/nℓ or nℓ/oℓ, measured with the layer under it as
+native runs it (the card against its own limiter, the cluster against the HPA, the governors against the orchestrator as
+shipped, the cloud against Azure's own autoscaler), composed by the product law R(g) = ∏ℓ Rℓ(g), every run's paired interval
+carried through by the delta method, the three runs pooled by inverse variance, the layers added in the log. Two readings:
+by the index's rule (an EVEN or one-run gauge counts as exactly 1) and with every interval carried. The product's
+assumption, that a layer's factor does not change when the layers around it carry Omni-Compass too, is tested where the
+tables allow (the governors' four ways: Omni-Compass on the organism alone against on top of the orchestrator, in the same
+repetitions). The composition is class S over class P and L tables and across engines, said so on the page; the stacked
+run (Omni-Compass at every layer at once) is the measurement that would replace it, and the page is remade as each layer's
+omni-v12 runs land. The numbers stand on that page, never copied here.
+
 ## Open
 
 1. **Every benchmark on omni-v11**: released A, then B, then C by the conductor from `scripts/reruns.txt` (the steady and

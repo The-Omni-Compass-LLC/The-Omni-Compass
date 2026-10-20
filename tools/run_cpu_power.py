@@ -301,8 +301,9 @@ def calibrate(target_ms=SERVICE_MS, trials=25):
 VERDICT_KW = {}            # the brain's verdict as the engine ships it; the tests shorten its trials here
 
 
-def _worker(req_q, res_q, k, sim_root, service_ms):
+def _worker(req_q, res_q, k, sim_root, service_ms, seed=0):
     plant = SimPlant.__new__(SimPlant) if sim_root else None
+    rng = random.Random(seed)          # the modelled service's own spread, seeded: the same draws in both arms and in every run
     if plant is not None:
         Plant.__init__(plant, sim_root)
     while True:
@@ -316,7 +317,7 @@ def _worker(req_q, res_q, k, sim_root, service_ms):
             except (OSError, ValueError):                              # the modelled file mid-replacement: the last factor stands
                 factor = getattr(plant, "_last_factor", 1.0)
             plant._last_factor = factor
-            time.sleep(service_ms / 1000.0 * factor * random.uniform(0.95, 1.05))
+            time.sleep(service_ms / 1000.0 * factor * rng.uniform(0.95, 1.05))
         else:
             work_unit(k)
         res_q.put((rid, t_issue, time.monotonic()))
@@ -332,7 +333,7 @@ class Service(threading.Thread):
         super().__init__(daemon=True)
         self.steps, self.step_s, self.unit, self.k, self.n_workers = [int(s) for s in steps.split()], step_s, unit_rps, k, workers
         self.last_done_t = None
-        self.rng, self.sim_root, self.service_ms = random.Random(seed), sim_root, service_ms
+        self.rng, self.seed, self.sim_root, self.service_ms = random.Random(seed), seed, sim_root, service_ms
         self.ctx = mp.get_context("fork") if "fork" in mp.get_all_start_methods() else mp.get_context()
         self.req_q, self.res_q = self.ctx.Queue(), self.ctx.Queue()
         self.records, self.lock = [], threading.Lock()
@@ -352,7 +353,8 @@ class Service(threading.Thread):
                 self.records.append((t_issue - self.t0, t_done - t_issue)); self.done += 1; self.last_done_t = t_done
 
     def run(self):
-        procs = [self.ctx.Process(target=_worker, args=(self.req_q, self.res_q, self.k, self.sim_root, self.service_ms), daemon=True) for _ in range(self.n_workers)]
+        procs = [self.ctx.Process(target=_worker, args=(self.req_q, self.res_q, self.k, self.sim_root, self.service_ms, (self.seed or 0) * 7919 + i), daemon=True)
+                 for i in range(self.n_workers)]   # each worker's modelled spread seeded from the arm's seed: no unseeded draw anywhere in the harness
         for p in procs:
             p.start()
         self.t0 = time.monotonic()

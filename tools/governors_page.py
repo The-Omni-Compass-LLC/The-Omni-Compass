@@ -63,7 +63,10 @@ GOVERNORS = [
      "Karmada v1.19.0 on a cluster of its own, two member clusters joined, its placement of the stream as shipped with the "
      "operator's one propagation policy",
      "the batch stream sent to a group of two clusters, four ways (`docs/GROUP_PREREGISTRATION.md`)"),
-    ("ocm", "Open Cluster Management", 96, "multi-cluster management", "its Placement and ManifestWork", "not yet written"),
+    ("ocm", "Open Cluster Management", 96, "multi-cluster management",
+     "OCM's hub (bundle 1.4.0, clusteradm v1.4.0) on a cluster of its own, two member clusters registered and accepted, a "
+     "Placement per job with its default prioritizers and the job as a ManifestWork where it decided",
+     "the batch stream sent to a group of two clusters placed by OCM, four ways (`docs/GROUP_PREREGISTRATION.md`, amendment 1)"),
     ("kubeedge", "KubeEdge", 97, "edge nodes", "its edge sync and offline autonomy", "not yet written"),
     ("nephio", "Nephio", 98, "network-function automation", "its intent-driven deployment and scaling",
      "not yet written (a candidate: its sandbox asks more than a free runner gives)"),
@@ -102,7 +105,7 @@ FOUR_WAYS = (("TOP", "compass", "Omni-Compass on top of it, against it as shippe
              ("BOTH", "compass|nativebare", "Omni-Compass on top of it, against the organism alone"))
 FOUR_SYSTEMS = (("kai", "The KAI scheduler"), ("koordinator", "Koordinator"), ("kueue", "Kueue"), ("volcano", "Volcano"),
                 ("binpack", "The scheduler's bin-packing profile"), ("kuberay", "KubeRay"), ("crane", "Crane"),
-                ("godel", "The Gödel scheduler"), ("karmada", "Karmada"))
+                ("godel", "The Gödel scheduler"), ("karmada", "Karmada"), ("ocm", "Open Cluster Management"))
 
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 

@@ -199,11 +199,12 @@ for d in docs:
         c["args"] = list(c.get("args", [])) + ["--kubelet-insecure-tls"]
         c["image"] = c["image"].replace("k8s.gcr.io/", "registry.k8s.io/")
         spec["nodeSelector"] = {"node-role.kubernetes.io/control-plane": ""}
-        spec["tolerations"] = [{"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"}]
+        spec["tolerations"] = [{"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"},
+                               {"key": "node-role.kubernetes.io/master", "operator": "Exists", "effect": "NoSchedule"}]   # 1.24 carries both taints
 print(yaml.safe_dump_all(docs, sort_keys=False))
 EOF
 kubectl apply -f "$OUT_DIR/metrics-server-rig.yaml"
-pin='{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]}}}}'
+pin='{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"},{"key":"node-role.kubernetes.io/master","operator":"Exists","effect":"NoSchedule"}]}}}}'
 kubectl -n kube-system patch deployment coredns -p "$pin"
 kubectl -n kube-system rollout status deployment/metrics-server --timeout=300s
 kubectl -n kube-system rollout status deployment/coredns --timeout=300s
@@ -395,8 +396,8 @@ elif [ -n "$CRANE" ]; then   # Crane and its Prometheus (scripts/kind_addons_cra
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","crane-system") | not)] | length')
 else   # with a queueing system, its own namespace too (scripts/kind_batch_queue.sh checks its pods are on the control plane)
 qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system; [ "$BATCH_QUEUE" = kuberay ] && qns=kuberay-system; [ "$BATCH_QUEUE" = godel ] && qns=godel-system
-[ "$BATCH_QUEUE" = group ] && qns="${GROUP_AGENT_NS:-}"   # a group member: the orchestrator's agent, where it runs one here
-foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or (. == $q)) | not)] | length')
+[ "$BATCH_QUEUE" = group ] && qns="${GROUP_AGENT_NS:-}"   # a group member: the orchestrator's agents, where it runs them here (OCM's klusterlet: several namespaces, space-separated)
+foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '($q | split(" ")) as $qs | [.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or IN($qs[])) | not)] | length')
 fi
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }
 if [ -z "$NATIVE" ]; then
