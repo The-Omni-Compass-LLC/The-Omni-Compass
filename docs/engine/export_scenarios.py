@@ -314,11 +314,13 @@ def even_reason(abc):
     return {"kind": "changes", "bound": max(abs(ch) for ch, _, _ in runs), "pct": pct}
 
 
-def receipt(name):
-    """Every judged row of results/live/<name>.md as written: its table's heading, the gauge, runs A, B and C, the reading."""
+def receipt(name, path=None):
+    """Every judged row of results/live/<name>.md as written (or of the table at path, written by the same tool): its table's
+    heading, the gauge, runs A, B and C, the reading."""
     import re
     rows, hdr, sect, title, tuning = [], None, "", "", False
-    for ln in (ROOT / "results" / "live" / f"{name}.md").read_text(encoding="utf-8").splitlines():
+    src = Path(path) if path else ROOT / "results" / "live" / f"{name}.md"
+    for ln in src.read_text(encoding="utf-8").splitlines():
         if ln.startswith("# ") and not title:
             title = ln[2:].split(": the A/B/C")[0].strip()
         if ln.startswith("#"):
@@ -342,13 +344,13 @@ def receipt(name):
     count = {}
     for r in rows:
         count[r["w"]] = count.get(r["w"], 0) + 1
-    title = table_title(name)
+    title = table_title(name) if not path else title
     even = [{"s": r["s"], "g": r["g"], "abc": r["abc"], **even_reason(r["abc"])} for r in rows if r["w"] == "EVEN"]
     # the rows a table shows and does not judge (its preregistration's own rule), kept so their sizes are seen: a resource a
     # table only shows, CPU used beside a response time, is the price of the work
     shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **({"tuning": True} if r["w"] == "tuning" else {})}
              for r in rows if r["w"] in ("shown", "tuning")]
-    return {"file": f"results/live/{name}.md", "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown", "tuning")],
+    return {"file": f"results/live/{name}.md" if not path else None, "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown", "tuning")],
             "count": count, "even": even, "shown": shown}
 
 
@@ -371,10 +373,21 @@ def causes(r):
         if row["w"] != "LOSS":
             continue
         base = re.split(r"[,(]", row["g"])[0].strip()
-        for f, h, t in docs:
-            if base.lower() in h.lower() and any(tok in t for tok in tokens):
-                out.append({"gauge": base, "file": str(f.relative_to(ROOT)), "title": h})
-                break
+        hit = next(({"gauge": base, "file": str(f.relative_to(ROOT)), "title": h} for f, h, t in docs
+                    if base.lower() in h.lower() and any(tok in t for tok in tokens)), None)
+        if hit is None:
+            # else a section of a page that names this table's own file and the gauge's own word, as the preregistration's
+            # amendment does for the batch rig: its heading is the cause's title
+            key = base.split()[-1].lower(); stem = Path(r["file"]).stem
+            for f, h, t in docs:
+                for sec in re.split(r"\n(?=## )", t):
+                    if f"{stem}.md" in sec and key in sec.lower():
+                        hit = {"gauge": base, "file": str(f.relative_to(ROOT)), "title": sec.splitlines()[0].lstrip("# ").strip()}
+                        break
+                if hit:
+                    break
+        if hit:
+            out.append(hit)
     return out
 
 

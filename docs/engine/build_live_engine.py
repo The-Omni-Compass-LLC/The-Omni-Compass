@@ -696,6 +696,47 @@ def orchestra() -> dict | None:
             "bodies": {k: len(v) for k, v in (run.get("bodies") or {}).items()}, "loads": loads}
 
 
+def four_ways_from_runs(GP, system: str, started: dict) -> dict:
+    """{way: receipt} for one system's four ways read at the build from its three runs' own scored files on the branch raw
+    (each run's live-reps/LIVE_REPS.json and its arms' preflight.txt, byte for byte) by the repository's own three-run tool
+    (tools/confirm_abc.py --pair), for the ways whose table the repository has not written yet; each run's repetitions as its
+    own file counts them. Empty where a run's files are not on the branch raw."""
+    import export_runs as XR
+    import export_scenarios as XS
+    if sorted(started) != ["A", "B", "C"]:
+        return {}
+    ref, pre = XR.raw_ref()
+    out = {}
+    with tempfile.TemporaryDirectory() as td:
+        t, dirs, reps = Path(td), [], {}
+        for L in "ABC":
+            rid = str(started[L]); base = f"{pre}run-{rid}"
+            names = [x for x in git("ls-tree", "-r", "--name-only", ref, base).splitlines() if x.endswith(("live-reps/LIVE_REPS.json", "/preflight.txt"))]
+            if not any(x.endswith("LIVE_REPS.json") for x in names):
+                return {}
+            for x in names:
+                p = t / x[len(pre):]; p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(subprocess.run(["git", "-C", str(ROOT), "show", f"{ref}:{x}"], capture_output=True).stdout)
+            lr = json.loads((t / f"run-{rid}" / "live-reps" / "LIVE_REPS.json").read_text(encoding="utf-8").replace("NaN", "null"))
+            reps[L] = len(next(iter((lr.get("repetitions") or {}).values()), []) or [])
+            dirs.append(str(t / f"run-{rid}"))
+        # the tool's engine line asks GitHub for each run's commit; the rows do not depend on it, so it is not asked here
+        nogh = t / "nogh"; nogh.mkdir(); (nogh / "gh").write_text("#!/bin/sh\nexit 1\n"); (nogh / "gh").chmod(0o755)
+        env = dict(os.environ, PATH=f"{nogh}:{os.environ.get('PATH', '')}")
+        for tag, arms, label in GP.FOUR_WAYS:
+            if (ROOT / "results" / "live" / f"V12_{system.upper()}_4W_{tag}.md").exists():
+                continue
+            md = t / f"{tag}.md"
+            subprocess.run([sys.executable, str(ROOT / "tools" / "confirm_abc.py"), f"{system}, {label}", *dirs, "--pair", arms, "--out", str(md)],
+                           capture_output=True, text=True, cwd=ROOT, env=env, timeout=600)
+            if md.exists():
+                rc = XS.receipt(md.stem, md)
+                out[tag] = {"file": None, "count": rc["count"], "rows": [{"g": x["g"], "abc": x["abc"], "w": x["w"]} for x in rc["rows"]],
+                            "read": "at the build, from runs A, B and C's own scored files on the branch raw, by tools/confirm_abc.py --pair; the repository's own table is not yet written",
+                            "reps": reps}
+    return out
+
+
 def four_ways(GP, slug: str) -> list:
     """The governor's four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6; tools/governors_page.py FOUR_WAYS): for each of
     its systems, the A, B and C started (results/live/governors_runs.json, <system>4) and each comparison's three-run table
@@ -707,10 +748,10 @@ def four_ways(GP, slug: str) -> list:
     for system, name in getattr(GP, "FOUR_SYSTEMS", ()):
         if system not in keys:
             continue
-        ways = []
+        ways, read = [], four_ways_from_runs(GP, system, started.get(f"{system}4") or {})
         for tag, arms, label in GP.FOUR_WAYS:
             stem = f"V12_{system.upper()}_4W_{tag}"
-            t = None
+            t = read.get(tag)
             if (ROOT / "results" / "live" / f"{stem}.md").exists():
                 rc = XS.receipt(stem)
                 t = {"file": rc["file"], "count": rc["count"], "rows": [{"g": x["g"], "abc": x["abc"], "w": x["w"]} for x in rc["rows"]]}
