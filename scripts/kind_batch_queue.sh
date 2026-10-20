@@ -5,9 +5,10 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 #
-# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 89, 91):
+# The batch queue under a queueing system of its own (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91):
 # Kueue (Kubernetes SIG Scheduling, Apache-2.0), Volcano (the CNCF, Apache-2.0), the KAI scheduler (NVIDIA, Apache-2.0)
-# or Koordinator (the CNCF, Apache-2.0) admits and places a stream of jobs, the same in every arm, installed from its own release on the fresh cluster of each
+# or Koordinator (the CNCF, Apache-2.0) admits and places a stream of jobs, or the Kubernetes scheduler alone places it,
+# as shipped (vanilla) or with the operator's bin-packing profile (binpack), the same in every arm, installed from its own release on the fresh cluster of each
 # arm before the arms are told apart. Native is the queueing system as its project ships it, on Kubernetes alone;
 # Omni-Compass sits on top with its own levers and never writes the queueing system's objects.
 #   PHASE=install  install it from its release (its SHA-256 pinned), every piece of it on the control plane (the measured
@@ -22,7 +23,7 @@
 #                  (batch_queue_end.json)
 set -euo pipefail
 OUT_DIR="${OUT_DIR:?}"
-Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai or koordinator}"
+Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai, koordinator, vanilla or binpack}"
 KUEUE_VERSION="${KUEUE_VERSION:-v0.20.2}"       # released 15 October 2026
 VOLCANO_VERSION="${VOLCANO_VERSION:-v1.16.0}"   # released 14 October 2026
 KAI_VERSION="${KAI_VERSION:-v0.18.6}"           # released 15 October 2026 (its chart, oci://ghcr.io/kai-scheduler/...)
@@ -35,7 +36,8 @@ KOORD_SHA256="${KOORD_SHA256:-766011e7c797a5b2ea0ed2091b31efb4eb16ba14699189db30
 JOBS="${BATCH_JOBS:-24}"; COMPLETIONS="${BATCH_COMPLETIONS:-10}"; PARALLELISM="${BATCH_PARALLELISM:-5}"
 EVERY="${BATCH_EVERY_S:-30}"; MB="${BATCH_MB:-3000}"
 case "$Q" in kueue) NS=kueue-system ;; volcano) NS=volcano-system ;; kai) NS=kai-scheduler ;; koordinator) NS=koordinator-system ;;
-  *) echo "BATCH_QUEUE must be kueue, volcano, kai or koordinator (got $Q)"; exit 1 ;; esac
+  vanilla|binpack) NS=kube-system ;;
+  *) echo "BATCH_QUEUE must be kueue, volcano, kai, koordinator, vanilla or binpack (got $Q)"; exit 1 ;; esac
 # every serving pod of a Helm-installed system on the control plane: a pod a move replaced is given two minutes to finish
 # on its worker; a finished install hook and a node agent of a DaemonSet are not counted, the same in both arms
 off() { kubectl get pods -n "$NS" -o json | jq -r --argjson term "$1" '[.items[]
@@ -121,6 +123,22 @@ install)
     sleep 10
   done
   echo "colocation probe (scheduler, QoS class, batch-cpu asked): $m" >> "$OUT_DIR/koord_placement.txt"
+  elif [ "$Q" = vanilla ]; then
+  # the Kubernetes scheduler as shipped: nothing is installed; the cluster's own default scheduler places the stream
+  url="the cluster's own default scheduler"
+  got=$(kubectl -n kube-system get pod -l component=kube-scheduler -o jsonpath='{.items[0].spec.containers[0].image}')
+  elif [ "$Q" = binpack ]; then
+  # the operator's bin-packing profile: a second scheduler from the cluster's own release (the image the control plane
+  # already runs), its one profile scoring a node higher the fuller it is (deploy/kind/binpack-scheduler.yaml)
+  img=$(kubectl -n kube-system get pod -l component=kube-scheduler -o jsonpath='{.items[0].spec.containers[0].image}')
+  [ -n "$img" ] || { echo "INVALID RUN: the control plane's scheduler image could not be read"; exit 1; }
+  sed "s|KUBE_SCHEDULER_IMAGE|${img}|" deploy/kind/binpack-scheduler.yaml | kubectl apply -f - >/dev/null
+  kubectl -n kube-system rollout status deployment/omni-binpack-scheduler --timeout=300s >/dev/null \
+    || { echo "INVALID RUN: the bin-packing scheduler did not start"; kubectl -n kube-system get pods -l app=omni-binpack-scheduler -o wide; exit 1; }
+  node=$(kubectl -n kube-system get pods -l app=omni-binpack-scheduler -o jsonpath='{.items[0].spec.nodeName}')
+  case "$node" in *control-plane*) ;; *) echo "INVALID RUN: the bin-packing scheduler is not on the control plane ($node)"; exit 1 ;; esac
+  url="deploy/kind/binpack-scheduler.yaml, the image $img"
+  got=$(sha256sum deploy/kind/binpack-scheduler.yaml | cut -d' ' -f1)
   else
   # the project's own release file, fetched whole and checked against its pinned SHA-256; every Deployment and Job of the
   # queueing system is placed on the control plane before the file is applied (Volcano's certificate Job ships with no
@@ -196,6 +214,10 @@ EOF
       [ "$t" = 20 ] && { echo "INVALID RUN: Kueue's queue objects were refused"; exit 1; }; sleep 6
     done
     echo "kueue ${KUEUE_VERSION} (${ver}); ClusterQueue quota cpu ${cpu}, memory ${mem}" > "$OUT_DIR/batch_queue.txt"
+  elif [ "$Q" = vanilla ]; then
+    echo "vanilla: the Kubernetes scheduler as shipped ($got), no queueing system" > "$OUT_DIR/batch_queue.txt"
+  elif [ "$Q" = binpack ]; then
+    echo "binpack: a second scheduler from the cluster's release with the operator's bin-packing profile (MostAllocated)" > "$OUT_DIR/batch_queue.txt"
   elif [ "$Q" = koordinator ]; then
     echo "koordinator ${KOORD_VERSION}; the operator's colocation profile (deploy/kind/koordinator-colocation.yaml), the jobs best effort on batch resources" > "$OUT_DIR/batch_queue.txt"
     kubectl get nodes -o json | jq '[.items[] | {node: .metadata.name, batch_cpu: .status.allocatable["kubernetes.io/batch-cpu"], batch_memory: .status.allocatable["kubernetes.io/batch-memory"]}]' \
@@ -210,7 +232,11 @@ EOF
     done
     echo "volcano ${VOLCANO_VERSION}; the default queue as shipped" > "$OUT_DIR/batch_queue.txt"
   fi
-  echo "release $url sha256 $got (the pinned file)" >> "$OUT_DIR/batch_queue.txt"
+  case "$Q" in
+    vanilla) ;;
+    binpack) echo "the scheduler's manifest: $url; its SHA-256 $got" >> "$OUT_DIR/batch_queue.txt" ;;
+    *) echo "release $url sha256 $got (the pinned file)" >> "$OUT_DIR/batch_queue.txt" ;;
+  esac
   # the stream's image on every worker before the window, as the served image is (deploy/kind/prepull.yaml): a job's wait is
   # the queueing system's and the scheduler's, never a download on the one machine all kind nodes share
   kubectl apply -f - >/dev/null <<'EOF'
@@ -242,6 +268,7 @@ submit)
   [ "$Q" = volcano ] && sched="schedulerName: volcano"
   [ "$Q" = kai ] && { label="kai.scheduler/queue: default-queue"; podlabel="$label"; sched="schedulerName: kai-scheduler"; }
   [ "$Q" = koordinator ] && { label='koordinator.sh/enable-colocation: "true"'; podlabel="$label"; }   # the profile sets the rest
+  [ "$Q" = binpack ] && sched="schedulerName: binpack-scheduler"
   for i in $(seq 1 "$JOBS"); do
     sed -e "s/JOB_NAME/omni-batch-$(printf %03d "$i")/" -e "s/BATCH_COMPLETIONS/${COMPLETIONS}/" -e "s/BATCH_PARALLELISM/${PARALLELISM}/" \
         -e "s/BATCH_MB/${MB}/" -e "s|POD_QUEUE_LABEL|${podlabel:-omni-stream: \"1\"}|" -e "s|QUEUE_LABEL|${label:-omni-stream: \"1\"}|" \
@@ -266,6 +293,8 @@ end)
     kubectl get clusterqueues,localqueues,workloads -A -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
   elif [ "$Q" = kai ]; then
     kubectl get queues.scheduling.run.ai,podgroups.scheduling.run.ai -A -o json > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
+  elif [ "$Q" = vanilla ] || [ "$Q" = binpack ]; then   # where the scheduler put every pod, node by node
+    jq '[.items[] | .spec.nodeName] | group_by(.) | map({node: .[0], pods: length})' "$OUT_DIR/pods.json" > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
   elif [ "$Q" = koordinator ]; then   # every node's batch resources as the window left them, and koordlet's own node metrics
     kubectl get nodes -o json | jq '[.items[] | {node: .metadata.name, batch_cpu: .status.allocatable["kubernetes.io/batch-cpu"], batch_memory: .status.allocatable["kubernetes.io/batch-memory"]}]' \
       > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true

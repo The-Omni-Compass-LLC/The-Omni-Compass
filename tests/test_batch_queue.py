@@ -6,7 +6,8 @@
 """The batch stream under a queueing system (BATCH_QUEUE: Kueue or Volcano; docs/BATCH_QUEUE_PREREGISTRATION.md): every
 job's wait runs from its submission to its first pod running, the same measure whether the queueing system holds the job
 (Kueue) or its pods (Volcano); a job not started or not done by the window's end counts the window's end, never less; and
-the stream's job template renders for every system (Kueue, Volcano, the KAI scheduler, Koordinator)."""
+the stream's job template renders for every system (Kueue, Volcano, the KAI scheduler, Koordinator, and the Kubernetes
+scheduler alone, as shipped and with the operator's bin-packing profile)."""
 import json
 import subprocess
 import sys
@@ -93,6 +94,15 @@ class Template(unittest.TestCase):
             self.assertEqual((j["spec"]["completions"], j["spec"]["parallelism"]), (10, 5))
             self.assertEqual(j["spec"]["template"]["metadata"]["labels"]["app"], "omni-batch-stream")
 
+    def test_the_scheduler_alone(self):
+        v = self.render('omni-stream: "1"', "terminationGracePeriodSeconds: 30")       # as shipped: the default scheduler
+        self.assertNotIn("schedulerName", v["spec"]["template"]["spec"])
+        b = self.render('omni-stream: "1"', "schedulerName: binpack-scheduler")
+        self.assertEqual(b["spec"]["template"]["spec"]["schedulerName"], "binpack-scheduler")
+        text = (ROOT / "scripts" / "kind_batch_queue.sh").read_text()
+        self.assertIn('[ "$Q" = binpack ] && sched="schedulerName: binpack-scheduler"', text)
+        self.assertIn("vanilla|binpack) NS=kube-system", text)
+
     def test_the_script_substitutes_the_pod_label_before_the_job_label(self):
         # QUEUE_LABEL is inside POD_QUEUE_LABEL: substituted the other way round, the pod's line would read POD_<label>
         text = (ROOT / "scripts" / "kind_batch_queue.sh").read_text()
@@ -119,6 +129,26 @@ class KoordinatorFiles(unittest.TestCase):
         self.assertEqual((p["spec"]["qosClass"], p["spec"]["schedulerName"], p["spec"]["priorityClassName"]),
                          ("BE", "koord-scheduler", "koord-batch"))
         self.assertEqual(p["spec"]["selector"]["matchLabels"], {"koordinator.sh/enable-colocation": "true"})
+
+    def test_the_bin_packing_profile(self):
+        docs = list(yaml.safe_load_all((ROOT / "deploy" / "kind" / "binpack-scheduler.yaml").read_text()))
+        kinds = {d["kind"]: d for d in docs}
+        cfg = yaml.safe_load(kinds["ConfigMap"]["data"]["config.yaml"])
+        self.assertEqual((cfg["apiVersion"], cfg["kind"]), ("kubescheduler.config.k8s.io/v1", "KubeSchedulerConfiguration"))
+        self.assertFalse(cfg["leaderElection"]["leaderElect"])                       # one replica
+        (prof,) = cfg["profiles"]
+        self.assertEqual(prof["schedulerName"], "binpack-scheduler")
+        (fit,) = prof["pluginConfig"]                                                  # every other plugin the release's default
+        self.assertEqual(fit["name"], "NodeResourcesFit")
+        self.assertEqual(fit["args"]["scoringStrategy"]["type"], "MostAllocated")
+        self.assertEqual({r["name"]: r["weight"] for r in fit["args"]["scoringStrategy"]["resources"]}, {"cpu": 1, "memory": 1})
+        spec = kinds["Deployment"]["spec"]
+        self.assertEqual(spec["replicas"], 1)
+        pod = spec["template"]["spec"]
+        self.assertEqual(pod["nodeSelector"], {"node-role.kubernetes.io/control-plane": ""})
+        self.assertEqual(pod["containers"][0]["image"], "KUBE_SCHEDULER_IMAGE")      # the control plane's own, read by the script
+        roles = {d["roleRef"]["name"] for d in docs if d["kind"] in ("ClusterRoleBinding", "RoleBinding")}
+        self.assertEqual(roles, {"system:kube-scheduler", "system:volume-scheduler", "extension-apiserver-authentication-reader"})
 
     def test_kai_values_place_every_component_on_the_control_plane(self):
         v = yaml.safe_load((ROOT / "deploy" / "kind" / "kai-values.yaml").read_text())
