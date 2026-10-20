@@ -127,7 +127,8 @@ def ledger() -> dict:
                 break
         if got:
             data = {"read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "source": "GitHub Actions, workflow_dispatch runs of each workflow, newest first", "workflows": got}
+                    "source": "GitHub Actions, workflow_dispatch runs of each workflow, newest first", "workflows": got,
+                    "campaign": campaign_reading(), "grid": grid_reading()}
             # kept for a build without a token; GitHub's own rebuild reads the list fresh every time and commits only the page,
             # so it never rewrites the cache (19 October: the rewritten cache, left uncommitted, stopped the job's push)
             if os.environ.get("GITHUB_ACTIONS") != "true":
@@ -135,7 +136,13 @@ def ledger() -> dict:
     if data is None and LEDGER_CACHE.exists():
         data = json.loads(LEDGER_CACHE.read_text(encoding="utf-8"))
     if data is None:
-        return {"read_at": None, "workflows": {}}
+        return {"read_at": None, "workflows": {}, "campaign": None}
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import dispatch_grid as D
+    if (data.get("campaign") or {}).get("since") != D.RERUN_SINCE:
+        data["campaign"] = None
+    if (data.get("grid") or {}).get("since") != D.SINCE:      # a kept grid reading counts only for its own campaign
+        data["grid"] = None
     import export_runs as XR
     ref, pre = XR.raw_ref()
     raw = set(git("ls-tree", "--name-only", f"{ref}:{pre.rstrip('/')}" if pre else ref).split())
@@ -350,30 +357,179 @@ ORCHESTRATORS = [
     ("CRUISEKUBE", "CruiseKube", "TrueFoundry", "rightsizing: its own recommendations applied in place", ("cruisekube",))]
 
 
-def orchestrators() -> list:
-    """Each governor's place: what it is, and what the repository holds for it now (its register rows, its newest three-run table
-    with every judged row as written, its workflows); empty fields mean the repository holds nothing for it yet."""
-    import export_scenarios as XS
+def _orch_pattern(alias) -> "re.Pattern":
     norm = lambda x: re.sub(r"[-_]+", " ", x.lower())
-    reg = register_places()
-    flows = sorted(p.name for p in (ROOT / ".github" / "workflows").glob("*.yml"))
-    out = []
-    for key, name, owner, role, alias in ORCHESTRATORS:
-        pat = re.compile(r"(?<![a-z0-9])(" + "|".join(re.escape(norm(a)) for a in alias) + r")(?![a-z0-9])")
-        n, stem = XS.newest(f"V7_{key}")
-        table = None
-        if n is not None:
-            rc = XS.receipt(stem)
-            table = {"file": rc["file"], "title": rc["title"], "engine": f"omni-v{n}", "count": rc["count"],
-                     "rows": [{"g": x["g"], "abc": x["abc"], "w": x["w"], "r": x["r"]} for x in rc["rows"]][:60]}
-        out.append({"key": key, "name": name, "owner": owner, "role": role, "table": table,
-                    "register": [{"n": r["n"], "bench": r["bench"], "native": r["native"], "lever": r["lever"], "status": r["status"]}
-                                 for r in reg if pat.search(norm(r["bench"]))][:3],
-                    "workflows": [f for f in flows if pat.search(norm(f[:-4]))]})
+    return re.compile(r"(?<![a-z0-9])(" + "|".join(re.escape(norm(a)) for a in alias) + r")(?![a-z0-9])")
+
+
+def _norm(x: str) -> str:
+    return re.sub(r"[-_]+", " ", x.lower())
+
+
+def orch_campaign() -> dict:
+    """{governor key: [its entries in the campaign of the engine that stands]}: each entry of scripts/reruns.txt whose name or
+    inputs name the governor, with its run letter and its place in its workflow's own line (the conductor reads a run back by
+    its count in its workflow, in release order: scripts/dispatch_grid.py rerun_queue)."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import dispatch_grid as D
+    queue, seen, out = D.rerun_queue(), {}, {}
+    for run, name, wf, kv in queue:
+        pos = seen.get(wf, 0); seen[wf] = pos + 1
+        text = _norm(name + " " + " ".join(f"{k} {v}" for k, v in kv.items()))
+        for key, _n, _o, _r, alias in ORCHESTRATORS:
+            if _orch_pattern(alias).search(text):
+                out.setdefault(key, []).append({"run": run, "name": name, "wf": wf, "pos": pos,
+                                                "inputs": ";".join(f"{k}={v}" for k, v in kv.items())})
     return out
 
 
-def register_places() -> list:
+def campaign_reading() -> dict | None:
+    """The campaign's runs of every workflow a governor's entry stands in, dispatched since the campaign opened
+    (scripts/dispatch_grid.py RERUN_SINCE), oldest first, a cancelled run left out as the conductor leaves it out: the k-th
+    of these is the run of the workflow's k-th entry in the line. Read from GitHub; None where it cannot be read."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import dispatch_grid as D
+    wfs = sorted({c["wf"] for cs in orch_campaign().values() for c in cs})
+    got = {}
+    for wf in wfs:
+        r = subprocess.run(["gh", "api", f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={D.RERUN_SINCE}&per_page=100"],
+                           capture_output=True, text=True, cwd=ROOT)
+        try:
+            rs = json.loads(r.stdout or "").get("workflow_runs")
+        except (json.JSONDecodeError, AttributeError):
+            return None
+        if rs is None:
+            return None
+        got[wf] = [{"id": x["id"], "status": x["status"], "conclusion": x.get("conclusion"), "created": x["created_at"],
+                    "updated": x["updated_at"], "sha": (x.get("head_sha") or "")[:12]}
+                   for x in sorted(rs, key=lambda x: x["created_at"]) if x.get("conclusion") != "cancelled"]
+    return {"since": D.RERUN_SINCE, "read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "workflows": got}
+
+
+def grid_reading() -> dict | None:
+    """The grid of the engine that stands, read the way the conductor reads it (scripts/dispatch_grid.py): every run of
+    six.yml and six-kube.yml since its campaign opened (SINCE), the runs each square has started (coverage: a square of n
+    runs counts the first n of its organism and size) and the ones measured to the end, and the cells too large for a free
+    runner (free_runner_refusals), listed and never rented. Read from GitHub; None where it cannot be read."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import dispatch_grid as D
+    try:
+        runs = D.grid_runs()
+    except Exception:          # GitHub not reachable from this build: the page says the grid's campaign was not read
+        return None
+    # a grid run is one the conductor named (a push's own run of the workflow is skipped and names no square); cancelled
+    # and skipped runs count for nothing, as the conductor counts them
+    runs = [r for r in runs if (D.SIX_NAME.match(r.get("display_title") or "") or D.KUBE_NAME.match(r.get("display_title") or ""))
+            and r.get("conclusion") not in ("cancelled", "skipped")]
+    done = [r for r in runs if r.get("status") == "completed" and r.get("conclusion") == "success"]
+    cov_all, cov_done = D.coverage(runs, {"dispatches": []}, {}), D.coverage(done, {"dispatches": []}, {})
+    name = dict(zip(D.ORGS, D.KUBE))
+    squares = {}
+    for kind, key in (("modelled", "six"), ("kube", "kube")):
+        for size in D.SIZES:
+            for o in (D.ORGS if key == "six" else D.KUBE):
+                org = name[o] if key == "six" else o
+                for n in (1, 10, 100, 1000):
+                    want = range(0, n) if key == "six" else range(1, n + 1)
+                    st = len(cov_all.get((key, size, o), set()) & set(want)); dn = len(cov_done.get((key, size, o), set()) & set(want))
+                    if st:
+                        squares[f"{kind}|{org}|{size}|{n}"] = [st, dn]
+    refused = sorted(f"{'modelled' if g == 'six' else 'kube'}|{name.get(o, o)}|{size}" for g, size, o in D.free_runner_refusals())
+    return {"engine": D.ENGINE, "since": D.SINCE, "read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "runs": {"six": sum(r.get("path", "").endswith("six.yml") for r in runs), "six-kube": sum(r.get("path", "").endswith("six-kube.yml") for r in runs),
+                     "running": sum(r.get("status") != "completed" for r in runs), "done": len(done)},
+            "sizes": list(D.SIZES), "squares": squares, "refused": refused}
+
+
+def _prereg(path: Path) -> dict:
+    """A preregistration as it writes itself: its title, when it was declared, its question, what is measured and its known
+    limits (markdown stripped; each line cut at a sentence end where it runs long)."""
+    t = path.read_text(encoding="utf-8")
+    clean = lambda x: re.sub(r"\s+", " ", re.sub(r"\*\*|`|\[([^\]]*)\]\([^)]*\)", lambda m: m.group(1) or "", x)).strip()
+    def cut(x, n=320):
+        x = clean(x)
+        if len(x) <= n:
+            return x
+        k = x.rfind(". ", 0, n)
+        return x[:k + 1] if k > 80 else x[:n].rsplit(" ", 1)[0] + " …"
+    head = next((ln[2:] for ln in t.splitlines() if ln.startswith("# ")), path.stem)
+    secs = {}
+    for blk in re.split(r"\n## ", t)[1:]:
+        h, _, body = blk.partition("\n")
+        secs[h.strip()] = body
+    def bullets(body, n):
+        out = []
+        for ln in body.splitlines():
+            m = re.match(r"(\s*)- (.*)", ln)
+            if m:
+                out.append([len(m.group(1)), m.group(2)])
+            elif out and ln.strip() and not ln.lstrip().startswith(("|", "#", "<", "---", "*©")):
+                out[-1][1] += " " + ln.strip()
+        if not out:   # a section written as prose: its paragraphs, each cut at a sentence end
+            return [{"d": 0, "t": cut(x, 480)} for x in re.split(r"\n\s*\n", body.strip())
+                    if x.strip() and not x.lstrip().startswith(("|", "#", "<", "---", "*©"))][:3]
+        return [{"d": min(d // 2, 2), "t": cut(x)} for d, x in out][:n]
+    q = next((b for h, b in secs.items() if h.lower().startswith("the question")), "")
+    meas = next((b for h, b in secs.items() if h.lower().startswith(("the workload and the measure", "the measure"))), "")
+    lim = next((b for h, b in secs.items() if h.lower().startswith("known limits")), "")
+    decl = re.search(r"(Declared[^.]*\.)", t)
+    amend = [h for h in secs if h.lower().startswith("amendment")]
+    return {"file": str(path.relative_to(ROOT)), "title": clean(re.sub(r"\s*\(preregistration\)\s*$", "", head)),
+            "declared": cut(decl.group(1), 240) if decl else None, "question": cut(q.strip().split("\n\n")[0], 520) if q.strip() else None,
+            "measure": bullets(meas, 10), "limits": bullets(lim, 6), "amendments": [clean(h) for h in amend][:8]}
+
+
+def orchestrators() -> list:
+    """Each governor's place: what it is, and what the repository holds for it now, read at every build: its register rows
+    (whole), its stage, its preregistration (the question, what is measured, the known limits), the rig and workflow the
+    preregistration names, its entries in the campaign of the engine that stands (scripts/reruns.txt, A, B and C, with their
+    place in their workflow's line), and its newest three-run table with every judged row as written. Empty fields mean the
+    repository holds nothing for it yet; the campaign's runs themselves are read from GitHub into the build (ledger)."""
+    import export_scenarios as XS
+    reg = register_places(limit=False)
+    flows = sorted(p.name for p in (ROOT / ".github" / "workflows").glob("*.yml"))
+    pre = sorted((ROOT / "docs").glob("*_PREREGISTRATION.md"))
+    titles = {q: next((ln for ln in q.read_text(encoding="utf-8").splitlines() if ln.startswith("# ")), "") for q in pre}
+    camp = orch_campaign()
+    tables = {}
+    for f in (ROOT / "results" / "live").glob("V*_*.md"):
+        m = re.fullmatch(r"V(\d+)_(.+)", f.stem)
+        if m:
+            tables.setdefault(m.group(2), []).append(int(m.group(1)))
+    out = []
+    for key, name, owner, role, alias in ORCHESTRATORS:
+        pat = _orch_pattern(alias)
+        rows = [r for r in reg if pat.search(_norm(r["bench"]))][:3]
+        # its newest three-run table: V<n>_<stem>.md whose stem's words hold the governor's key (V12_BATCH_KUEUE.md, V10_CRUISEKUBE.md)
+        kt = key.split("_")
+        cands = [(max(ns), -len(st), st) for st, ns in tables.items() if all(k in st.split("_") for k in kt)]
+        table = None
+        if cands:
+            n, _, st = max(cands)
+            rc = XS.receipt(f"V{n}_{st}")
+            # every row as written: the judged ones that moved, the EVEN ones (no difference beyond the noise) and the rows shown unjudged
+            table = {"file": rc["file"], "title": rc["title"], "engine": f"omni-v{n}", "count": rc["count"],
+                     "rows": ([{"g": x["g"], "abc": x["abc"], "w": x["w"], "r": x["r"]} for x in rc["rows"]]
+                              + [{"g": x["g"], "abc": x["abc"], "w": "EVEN", "r": x.get("kind")} for x in rc["even"]]
+                              + [{"g": x["g"], "abc": x["abc"], "w": "shown", "r": x["r"]} for x in rc["shown"]])[:60]}
+        # the preregistration: the one its register row names, else one whose title names it
+        named = sorted({m for r in rows for m in re.findall(r"docs/[A-Z0-9_]+_PREREGISTRATION\.md", r["status"] + " " + r["bench"] + " " + r["lever"])})
+        pp = [ROOT / x for x in named if (ROOT / x).exists()] or [q for q in pre if pat.search(_norm(titles[q]))]
+        prereg = _prereg(pp[0]) if pp else None
+        text = " ".join(r["status"] for r in rows) + " " + (pp[0].read_text(encoding="utf-8") if pp else "")
+        rig = sorted({x for x in re.findall(r"(?:scripts|deploy/kind)/[\w./-]+\.(?:sh|py|ya?ml)", text) if (ROOT / x).exists()})
+        wfs = sorted({f for f in flows if pat.search(_norm(f[:-4]))} | {x for x in re.findall(r"[\w-]+\.yml", text) if x in flows}
+                     | {c["wf"] for c in camp.get(key, [])})
+        st0 = (rows[0]["status"].lower() if rows else "")
+        stage = ("measured" if table else "built" if st0.startswith("built") else "under" if st0.startswith("under every")
+                 else "candidate" if "candidate" in st0[:40] else "queued" if rows else "none")
+        out.append({"key": key, "name": name, "owner": owner, "role": role, "table": table, "stage": stage,
+                    "register": [{"n": r["n"], "domain": r["domain"], "bench": r["bench"], "native": r["native"], "lever": r["lever"], "status": r["status"]} for r in rows],
+                    "prereg": prereg, "rig": rig, "workflows": wfs, "campaign": camp.get(key, [])})
+    return out
+
+
+def register_places(limit: bool = True) -> list:
     """Every open benchmark still to run, in the register's own order (docs/REGISTER.md, section 4): its domain, the open
     benchmark and its owner, the native it runs on top of, Omni-Compass's lever and its status, each as the register writes it
     (markdown stripped), so the benefit board lays out every place that is supposed to be there before its result exists."""
@@ -390,7 +546,8 @@ def register_places() -> list:
             continue
         c = [clean(x) for x in ln.strip().strip("|").split("|")]
         if len(c) >= 6:
-            out.append({"n": int(c[0]), "domain": c[1], "bench": c[2][:220], "native": c[3][:160], "lever": c[4][:120], "status": c[5][:260]})
+            cut = (lambda x, n: x[:n]) if limit else (lambda x, n: x)
+            out.append({"n": int(c[0]), "domain": c[1], "bench": cut(c[2], 220), "native": cut(c[3], 160), "lever": cut(c[4], 120), "status": cut(c[5], 260)})
     return out
 
 
