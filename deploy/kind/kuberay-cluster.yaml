@@ -1,0 +1,80 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# The Ray cluster of the KubeRay test (scripts/kind_batch_queue.sh, BATCH_QUEUE=kuberay; docs/BATCH_QUEUE_PREREGISTRATION.md,
+# amendment 7): KubeRay's own autoscaling sample at v1.7.1 (ray-operator/config/samples/ray-cluster.autoscaler.yaml), the Ray
+# autoscaler in its sample's settings (upscaling Default, an idle worker given back after 60 s), with the operator's three
+# settings for this rig and nothing else changed:
+#   - the head on the control plane beside the other systems' controllers (it takes no task: num-cpus 0, as in the sample),
+#     so the six measured workers carry only the work;
+#   - each worker pod the processor size of one pod of the Kubernetes stream (deploy/kind/batch-stream-job.yaml: half a
+#     processor asked, one at most; its memory the sample's 1 GiB, which Ray's own processes need) and one Ray processor,
+#     so one task runs on one worker pod as one job's pod runs on Kubernetes;
+#   - the worker group's ceiling sized to the workers (MAX_WORKERS: their allocatable processors over one pod's half, read
+#     live at install), as Kueue's queue is sized to them; the sample's 10 was written for no cluster in particular.
+# The stream's job script reaches the head from a ConfigMap (omni-ray-stream), in place of the sample's two example scripts.
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: omni-ray
+  namespace: default
+spec:
+  rayVersion: "2.52.0"
+  enableInTreeAutoscaling: true
+  autoscalerOptions:
+    upscalingMode: Default
+    idleTimeoutSeconds: 60
+    imagePullPolicy: IfNotPresent
+    securityContext: {}
+    env: []
+    envFrom: []
+    resources:
+      limits: {cpu: "500m", memory: "512Mi"}
+      requests: {cpu: "500m", memory: "512Mi"}
+  headGroupSpec:
+    rayStartParams:
+      num-cpus: "0"
+    template:
+      spec:
+        nodeSelector:
+          node-role.kubernetes.io/control-plane: ""
+        tolerations:
+          - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+        containers:
+          - name: ray-head
+            image: rayproject/ray:2.52.0
+            imagePullPolicy: IfNotPresent
+            ports:
+              - {containerPort: 6379, name: gcs}
+              - {containerPort: 8265, name: dashboard}
+              - {containerPort: 10001, name: client}
+            resources:
+              limits: {cpu: "1", memory: "5Gi"}
+              requests: {cpu: "1", memory: "2Gi"}
+            volumeMounts:
+              - {mountPath: /home/ray/omni, name: omni-ray-stream}
+        volumes:
+          - name: omni-ray-stream
+            configMap: {name: omni-ray-stream, defaultMode: 0755}
+  workerGroupSpecs:
+    - replicas: 0
+      minReplicas: 0
+      maxReplicas: MAX_WORKERS
+      groupName: small-group
+      rayStartParams:
+        num-cpus: "1"
+      template:
+        metadata:
+          labels: {app: omni-ray-stream-worker}
+        spec:
+          containers:
+            - name: ray-worker
+              image: rayproject/ray:2.52.0
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits: {cpu: "1", memory: "1Gi"}
+                requests: {cpu: "500m", memory: "1Gi"}
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

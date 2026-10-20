@@ -2,6 +2,20 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: KubeRay's rig, preregistered (amendment 7), and a trial workflow for every new rig
+
+- **KubeRay on the batch rig** (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 7; register row 92; the founder's list):
+  KubeRay 1.7.1 (its operator's chart pinned by SHA-256, on the control plane) and one Ray cluster (Ray 2.52.0, its image
+  pinned by digest, pulled once by the runner and loaded into every node of each arm's fresh cluster), KubeRay's own
+  autoscaling sample with the operator's three settings (`deploy/kind/kuberay-cluster.yaml`); the stream's same 24 jobs as
+  Ray jobs sent over the cluster's own job API (`deploy/kind/kuberay-job.yaml`, `deploy/kind/kuberay_stream_job.py`); each
+  job's wait, turnaround and end read from its own record (`ray_times.json`, `tools/live_reps.py`), an unfinished job never
+  reading quick. `scripts/kind_batch_queue.sh` and `scripts/kind_bench.sh` take `BATCH_QUEUE=kuberay`;
+  `kind-orchestrators.yml` makes room on the runner's disk for the Ray image (KubeRay only); `tests/test_kuberay_rig.py`.
+- **`kind-trial.yml`**: a new rig tried before its preregistered runs, kind-orchestrators.yml's own job for one repetition
+  or a few, its files archived like every run's (`archive-run.yml`), never counted in any table and never read by the
+  conductor. KubeRay's trial first, then its four ways' A, B and C.
+
 ## 2026-10-20: the scheduler's two three-run tables, the governor's own core, and the four ways
 
 - **`results/live/V12_KOORDINATOR.md`** (Koordinator 1.8.0, colocation as shipped, its repeated runs on the cgroup root its own kind tests use: amendment 4; ten paired repetitions a run, omni-v12, on the rig before amendment 5): GAIN in all three of our runs on the service's response time (mean −36% to −37%, 95th percentile −22% to −25%, 99th percentile −8% to −15%); EVEN on the machines, the machine-hours, the energy, the jobs' wait, turnaround and unfinished jobs, and the failures (none); **no LOSS**. Koordinator gives the batch jobs only what the service leaves unused, so five to eleven of the 24 jobs are still running when the window closes, in both arms alike. Recipe added.

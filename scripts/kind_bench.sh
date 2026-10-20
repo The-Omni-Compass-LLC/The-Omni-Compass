@@ -81,14 +81,15 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # default): every other set, unchanged
 ADDONS="${ADDONS:-}"
 case "$ADDONS" in ""|keda|goldilocks) ;; *) echo "ADDONS must be empty, keda or goldilocks (got $ADDONS)"; exit 1;; esac
-# BATCH_QUEUE=kueue, volcano, kai, koordinator, vanilla or binpack, with WORKLOAD=batch (docs/BATCH_QUEUE_PREREGISTRATION.md;
-# register rows 63, 88, 89, 91): the batch test's work arrives as a stream of jobs and a queueing system of its own admits
-# and places it (vanilla: the Kubernetes scheduler alone; binpack: with the operator's bin-packing profile),
+# BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, vanilla or binpack, with WORKLOAD=batch
+# (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92): the batch test's work arrives as a stream of jobs
+# and a queueing system of its own admits and places it (kuberay: the same work as Ray jobs on one Ray cluster, scaled by
+# the Ray autoscaler; vanilla: the Kubernetes scheduler alone; binpack: with the operator's bin-packing profile),
 # installed from its own release in every arm before the arms are told apart (scripts/kind_batch_queue.sh); Omni-Compass
 # sits on top with its own levers and never writes the queueing system's objects. Empty: the batch test's one Job on
 # Kubernetes alone
 BATCH_QUEUE="${BATCH_QUEUE:-}"
-case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
+case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|kuberay|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, kuberay, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
 [ -z "$BATCH_QUEUE" ] || { [ "${WORKLOAD:-web}" = batch ] && [ -z "$ADDONS" ]; } \
   || { echo "BATCH_QUEUE=$BATCH_QUEUE runs the batch test (WORKLOAD=batch) with no other add-on"; exit 1; }
 CRUISEKUBE="${CRUISEKUBE:-}"
@@ -354,7 +355,7 @@ if [ -n "$KEDA" ]; then   # the add-on's own pods, all on the control plane (scr
 elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's controller; the VPA's recommender is in kube-system (both on the control plane)
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","goldilocks") | not)] | length')
 else   # with a queueing system, its own namespace too (scripts/kind_batch_queue.sh checks its pods are on the control plane)
-qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system
+qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system; [ "$BATCH_QUEUE" = kuberay ] && qns=kuberay-system
 foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or (. == $q)) | not)] | length')
 fi
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }
@@ -446,7 +447,8 @@ if [ "${WORKLOAD:-web}" = batch ] && [ -n "$BATCH_QUEUE" ]; then
   # the batch stream under a queueing system: the load generator stands at zero; the jobs arrive one every BATCH_EVERY_S
   # seconds from the window's opening, the same schedule in every arm (scripts/kind_batch_queue.sh, PHASE=submit)
   kubectl scale deployment/load-generator --replicas=0 >/dev/null 2>&1 || true
-  echo "batch: ${BATCH_JOBS:-24} jobs of ${BATCH_COMPLETIONS:-10} pods, ${BATCH_PARALLELISM:-5} at a time, one every ${BATCH_EVERY_S:-30} s, ${BATCH_MB:-3000} MB hashed each, through $BATCH_QUEUE" | tee -a "$OUT_DIR/preflight.txt"
+  unit=pods; [ "$BATCH_QUEUE" = kuberay ] && unit="Ray tasks"
+  echo "batch: ${BATCH_JOBS:-24} jobs of ${BATCH_COMPLETIONS:-10} $unit, ${BATCH_PARALLELISM:-5} at a time, one every ${BATCH_EVERY_S:-30} s, ${BATCH_MB:-3000} MB hashed each, through $BATCH_QUEUE" | tee -a "$OUT_DIR/preflight.txt"
   OUT_DIR="$OUT_DIR" DURATION="$DURATION" PHASE=submit bash scripts/kind_batch_queue.sh > "$OUT_DIR/batch_submit.out" 2>&1 &
   ( sleep "$DURATION" ) &
   load_pid=$!
