@@ -80,10 +80,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-19 23:56 | big-organism-detached collect | success | [39344570823](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39344570823) |
-| 2026-10-19 23:54 | live-engine | success | [39343278537](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39343278537) |
-| 2026-10-19 23:43 | raw-sweep | success | [39343278468](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39343278468) |
-| 2026-10-19 23:42 | lambda-gpu | cancelled | [39343239141](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39343239141) |
+| 2026-10-20 00:27 | raw-sweep | success | [39347709721](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39347709721) |
+| 2026-10-20 00:27 | live-engine | cancelled | [39347705387](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39347705387) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
