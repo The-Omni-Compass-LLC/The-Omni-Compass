@@ -395,8 +395,8 @@ elif [ -n "$CRANE" ]; then   # Crane and its Prometheus (scripts/kind_addons_cra
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","crane-system") | not)] | length')
 else   # with a queueing system, its own namespace too (scripts/kind_batch_queue.sh checks its pods are on the control plane)
 qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system; [ "$BATCH_QUEUE" = kuberay ] && qns=kuberay-system; [ "$BATCH_QUEUE" = godel ] && qns=godel-system
-[ "$BATCH_QUEUE" = group ] && qns="${GROUP_AGENT_NS:-}"   # a group member: the orchestrator's agent, where it runs one here
-foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or (. == $q)) | not)] | length')
+[ "$BATCH_QUEUE" = group ] && qns="${GROUP_AGENT_NS:-}"   # a group member: the orchestrator's agents, where it runs them here (OCM's klusterlet: several namespaces, space-separated)
+foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '($q | split(" ")) as $qs | [.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or IN($qs[])) | not)] | length')
 fi
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }
 if [ -z "$NATIVE" ]; then

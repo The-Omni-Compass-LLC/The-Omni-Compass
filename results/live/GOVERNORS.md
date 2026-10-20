@@ -21,7 +21,7 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 | Gödel scheduler | unified online and offline scheduling | 93 | built; its runs come in the campaign | not yet run |
 | Armada | multi-cluster batch | 94 | its rig is not yet built | not yet run |
 | Karmada | multi-cluster placement | 95 | built; its runs come in the campaign | not yet run |
-| Open Cluster Management | multi-cluster management | 96 | its rig is not yet built | not yet run |
+| Open Cluster Management | multi-cluster management | 96 | built; its runs come in the campaign | not yet run |
 | KubeEdge | edge nodes | 97 | its rig is not yet built | not yet run |
 | Nephio | network-function automation | 98 | its rig is not yet built | not yet run |
 
@@ -40,6 +40,7 @@ Each system runs four ways in every repetition, each way on a fresh cluster of t
 | Crane | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 | The Gödel scheduler | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 | Karmada | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
+| Open Cluster Management | not yet started | not yet run | not yet run | not yet run | not yet run | not yet run |
 
 ## The orchestra, the eighth organism (modelled, class S)
 
@@ -234,8 +235,8 @@ Every row of the run: [`results/live/V12_KOORDINATOR.md`](V12_KOORDINATOR.md).
 
 ## Open Cluster Management
 
-- **Native**: its Placement and ManifestWork.
-- **Its test on real Kubernetes (class L)**: not yet written; register row 96.
+- **Native**: OCM's hub (bundle 1.4.0, clusteradm v1.4.0) on a cluster of its own, two member clusters registered and accepted, a Placement per job with its default prioritizers and the job as a ManifestWork where it decided.
+- **Its test on real Kubernetes (class L)**: the batch stream sent to a group of two clusters placed by OCM, four ways (`docs/GROUP_PREREGISTRATION.md`, amendment 1); register row 96.
 - **In the catalog (modelled, class S)**: family 39, Cross-Cluster, Multi-Region & Edge (18 muscles, in its realm and the whole tower): `multi_cluster_dispatch`, `workload_migrate_region`, `federation_quota`.
 - **Its muscles as a body in the orchestra (modelled, class S)**: own load: GAIN (more work + fewer misses); the climb: GAIN (more work + fewer misses); work in line: GAIN (more work + fewer misses).
 - **Readings**: none yet; nothing is written here before its three runs are in.
