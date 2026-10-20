@@ -199,11 +199,12 @@ for d in docs:
         c["args"] = list(c.get("args", [])) + ["--kubelet-insecure-tls"]
         c["image"] = c["image"].replace("k8s.gcr.io/", "registry.k8s.io/")
         spec["nodeSelector"] = {"node-role.kubernetes.io/control-plane": ""}
-        spec["tolerations"] = [{"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"}]
+        spec["tolerations"] = [{"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"},
+                               {"key": "node-role.kubernetes.io/master", "operator": "Exists", "effect": "NoSchedule"}]   # 1.24 carries both taints
 print(yaml.safe_dump_all(docs, sort_keys=False))
 EOF
 kubectl apply -f "$OUT_DIR/metrics-server-rig.yaml"
-pin='{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]}}}}'
+pin='{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":""},"tolerations":[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"},{"key":"node-role.kubernetes.io/master","operator":"Exists","effect":"NoSchedule"}]}}}}'
 kubectl -n kube-system patch deployment coredns -p "$pin"
 kubectl -n kube-system rollout status deployment/metrics-server --timeout=300s
 kubectl -n kube-system rollout status deployment/coredns --timeout=300s
