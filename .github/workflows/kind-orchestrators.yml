@@ -14,7 +14,7 @@ run-name: "orchestrators: ${{ inputs.batch_queue }} ${{ inputs.label }}"
 on:
   workflow_dispatch:
     inputs:
-      batch_queue: {description: "The queueing system under the batch stream: kai, koordinator, kueue, volcano, vanilla (the Kubernetes scheduler alone) or binpack (its bin-packing profile)", required: true, default: "kai"}
+      batch_queue: {description: "The queueing system under the batch stream: kai, koordinator, kueue, volcano, kuberay (the same work as Ray jobs), vanilla (the Kubernetes scheduler alone) or binpack (its bin-packing profile)", required: true, default: "kai"}
       duration_s: {description: "Measured seconds per run", default: "1500"}
       arms: {description: "Arms, in rotation order (native, and compass: Omni-Compass on top of native; the four ways add nativebare and compassbare, the organism alone without and with Omni-Compass)", default: "native compass"}
       label: {description: "The run's letter in its three-run set (A, B or C)", default: "A"}
@@ -56,6 +56,12 @@ jobs:
       - name: kind and kubectl again, if the first download was refused
         if: steps.kind.outcome == 'failure'
         run: bash scripts/kind_install.sh v0.31.0 v1.35.0
+      - name: Room on the runner's disk for the Ray image (KubeRay only, the same for every arm of the job)
+        if: inputs.batch_queue == 'kuberay'
+        run: |
+          df -h / | tail -1
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift
+          df -h / | tail -1
       - run: bash scripts/kind_paired.sh
         env:
           REP: ${{ matrix.rep }}
