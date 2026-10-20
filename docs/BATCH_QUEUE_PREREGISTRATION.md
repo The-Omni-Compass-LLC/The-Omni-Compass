@@ -151,6 +151,49 @@ pods need the processor.
 
 Everything else is as written above: the stream, the window, the gauges and how they are read.
 
+## Amendment 3: the Kubernetes scheduler alone, as shipped and with its bin-packing profile (written before its first run, 20 October 2026)
+
+The Kubernetes scheduler (kube-scheduler, `kubernetes/kubernetes`, Kubernetes SIG Scheduling; Apache-2.0; register row 88)
+places every pod of every Kubernetes set in the register; here it places the stream alone, with no queueing system between
+the jobs and the nodes, in two settings, each its own table.
+
+- **Native, as shipped** (`batch_queue=vanilla`): the cluster's own default scheduler, the image the kind node image carries
+  for Kubernetes v1.35.0, its default profile untouched (its NodeResourcesFit scores a node higher the emptier it is, so the
+  stream is spread). Nothing is installed; the jobs name no scheduler. The image is read from the control plane and kept in
+  the run's record.
+- **Native, the operator's bin-packing profile** (`batch_queue=binpack`): a second scheduler from the cluster's own release,
+  as Kubernetes' own pages write one ("Configure Multiple Schedulers", "Resource Bin Packing";
+  `deploy/kind/binpack-scheduler.yaml`): the kube-scheduler image the control plane runs, read from it on each fresh
+  cluster; one profile, `binpack-scheduler`, whose NodeResourcesFit scores a node higher the fuller it is (MostAllocated,
+  processor and memory weighted alike); every other plugin the release's default; one replica, so no leader election; on
+  the control plane. The jobs name it (`schedulerName: binpack-scheduler`); every other pod, the service's included, is
+  placed by the default scheduler as shipped.
+- **Frozen**: the default scheduler is the node image's (kind v0.31.0, Kubernetes v1.35.0, as in every kind set); the
+  bin-packing profile is the manifest above, its SHA-256 kept in each run's record with the image it ran.
+- **Checked before the window**: the bin-packing scheduler stands (its rollout completes within five minutes) and is on the
+  control plane, or the run is invalid, kept in the raw files and not counted.
+- **Recorded at the end**: where the scheduler put every pod, node by node (`batch_queue_end.json`).
+- **What it is not**: a scheduler places; it does not queue. Every job's pods are created as its parallelism allows and
+  wait Pending only for room, so a job's wait here is the scheduler's alone. Each table is native against Omni-Compass on
+  top for its own setting; the tables of different settings and different systems are not a ranking of the systems.
+- **Its runs**: in `kind-orchestrators.yml`, the A, B and C of both settings started together, as the KAI scheduler's.
+
+Everything else is as written above: the stream, the window, the gauges and how they are read.
+
+## Amendment 4: Koordinator's runs repeated on the kubelet's cgroup root its own tests use (written before they were repeated, 20 October 2026)
+
+Koordinator's first three runs (A 39352904186, B 39352911037 and C 39352918048, at commit 99c3002b3) are invalid, kept in the
+raw files and not counted: in every repetition, in both arms, koordlet, Koordinator's node agent, crash-looped on every node,
+its chart's install ran out of its fifteen minutes and no window opened, so nothing was measured. The cause is the cluster,
+not Koordinator's setting: kind starts each node's kubelet with its cgroup root at `/kubelet`, where koordlet does not find the
+pods' cgroups it reads; Koordinator's own tests on kind set the kubelet's cgroup root to `/` (`test/kind-conf.yaml` at v1.8.0).
+
+- Koordinator's runs are repeated on that cluster (`deploy/kind/cluster-koordinator.yaml`: the same control plane and six
+  workers, Koordinator's two patches copied as written), in both arms; every other set keeps kind's default. Each arm's files
+  name the cluster it ran on (`kind_cluster.txt`).
+- When koordlet does not stand, its own log is kept in the run's files (`koordlet.log`).
+- Everything else is as amendment 2 writes it.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
