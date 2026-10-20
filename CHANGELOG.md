@@ -2,6 +2,39 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20: Koordinator's runs repeated on the kubelet's cgroup root its own tests use
+
+- **Koordinator's first A, B and C are invalid**, kept in the raw files and not counted: koordlet crash-looped on every kind
+  node in every repetition, its install ran out of time and no window opened. kind starts the kubelet with its cgroup root at
+  `/kubelet`, where koordlet finds no pod cgroups; Koordinator's own kind tests set it to `/`. Its runs are repeated on that
+  cluster in both arms (`deploy/kind/cluster-koordinator.yaml`, chosen by `scripts/kind_paired.sh` for Koordinator alone; each
+  arm's files name the cluster it ran on), koordlet's own log kept when it does not stand; written first as amendment 4 of
+  `docs/BATCH_QUEUE_PREREGISTRATION.md`; docs/REGISTER.md row 89.
+- **The Kubernetes scheduler's six runs** stand in their own block of `scripts/reruns.txt`, written after they were started
+  so the conductor never starts one of them itself; their ids are on the governors page.
+
+## 2026-10-20: the Kubernetes scheduler alone, as shipped and with its bin-packing profile; every governor's muscles named
+
+- **The Kubernetes scheduler, register row 88** (the founder's "kubernetes schedulers, vanilla"): the row 63 stream placed by
+  the scheduler alone, with no queueing system, in two settings, each its own table: as shipped (`BATCH_QUEUE=vanilla`: the
+  cluster's own default scheduler, nothing installed) and with the operator's bin-packing profile (`BATCH_QUEUE=binpack`: a
+  second scheduler from the cluster's own release, the image the control plane runs, one profile scoring a node higher the
+  fuller it is, one replica on the control plane; `deploy/kind/binpack-scheduler.yaml`); the end record lists where every
+  pod went, node by node. Preregistered as amendment 3 before any run; A, B and C of both settings in
+  `kind-orchestrators.yml`; `tests/test_batch_queue.py`.
+- **The governors page** names, for every governor, the catalog's muscles that stand for its knobs in the modelled organisms
+  (class S, `realms/catalog_v5.csv`: the scheduler's in family 4, on the spine; the queueing systems' in families 1 and 14;
+  the multi-cluster ones in family 39; Nephio's in family 66), and reads the scheduler's two settings from their two tables.
+
+## 2026-10-20: the governors and orchestrators on one page
+
+- **`results/live/GOVERNORS.md`** (`tools/governors_page.py`, the founder's word of 20 October: "I need to see what the
+  results are of those governors"): every governor and orchestrator he named, what it governs, what native is under it,
+  where its test stands, and once its three runs are in, its readings by the one key, every row counted, losses included,
+  each line read only from its own three-run table (`results/live/V12_<NAME>.json`), never a number before. The runs started
+  are listed in `results/live/governors_runs.json`; `verify.py` fails a push where the page is not what the tables and runs
+  give; `tests/test_governors_page.py`.
+
 ## 2026-10-20: Koordinator under the batch stream
 
 - **Koordinator, register row 89** (the founder's "coordinator with a K"): the row 63 rig with a fourth system
