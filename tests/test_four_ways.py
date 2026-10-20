@@ -69,14 +69,21 @@ class FourWays(unittest.TestCase):
 
     def test_the_runner_runs_a_bare_arm_on_the_organism_alone(self):
         text = (ROOT / "scripts" / "kind_paired.sh").read_text()
-        self.assertIn('base="${arm%bare}"; queue="${BATCH_QUEUE:-}"', text)
-        self.assertIn('[ "$base" = "$arm" ] || queue=vanilla', text)
-        self.assertIn('ARM="$base" BATCH_QUEUE="$queue" OUT_DIR="bench-$arm-$REP"', text)
-        r = subprocess.run(["bash", "-c", 'for arm in native nativebare compass compassbare; do base="${arm%bare}"; '
-                            'queue=kai; [ "$base" = "$arm" ] || queue=vanilla; echo "$arm $base $queue"; done'],
-                           capture_output=True, text=True)
-        self.assertEqual(r.stdout.split("\n")[:4], ["native native kai", "nativebare native vanilla",
-                                                    "compass compass kai", "compassbare compass vanilla"])
+        self.assertIn('ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP"', text)
+        start = text.index('  base="${arm%bare}"')
+        split = text[start:text.index("\n", text.index('  if [ "$base" != "$arm" ]', start))]   # the runner's own two lines
+
+        def arms(**env):
+            r = subprocess.run(["bash", "-c", "for arm in native nativebare compass compassbare; do\n" + split
+                                + '\necho "$arm $base ${queue:--} ${addons:--}"; done'],
+                               env={"PATH": "/usr/bin:/bin", **env}, capture_output=True, text=True, check=True)
+            return r.stdout.split("\n")[:4]
+        # the batch rig: the bare arms' stream placed by the default scheduler
+        self.assertEqual(arms(BATCH_QUEUE="kai"), ["native native kai -", "nativebare native vanilla -",
+                                                   "compass compass kai -", "compassbare compass vanilla -"])
+        # the serving rig with an add-on (Crane): the bare arms carry no add-on and start no stream
+        self.assertEqual(arms(ADDONS="crane"), ["native native - crane", "nativebare native - -",
+                                                "compass compass - crane", "compassbare compass - -"])
 
     def test_the_governor_has_its_own_core_on_the_batch_rig(self):
         text = (ROOT / "scripts" / "kind_bench.sh").read_text()

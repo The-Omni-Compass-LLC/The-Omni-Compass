@@ -249,6 +249,78 @@ Each comparison is the first arm against the second, paired within the repetitio
 
 Everything else is as written above: the stream, the window, the gauges and how they are read.
 
+## Amendment 7: KubeRay (written before its first run, 20 October 2026)
+
+The founder's list names KubeRay, the Ray project's operator for Ray clusters on Kubernetes (`ray-project/kuberay`,
+Apache-2.0). The governor it brings is the Ray autoscaler: it adds Ray worker pods while tasks wait for processors and gives
+back a worker left idle for its timeout. Register row 92.
+
+- **Native, as its project ships it**: KubeRay 1.7.1, its operator's chart archive checked against its pinned SHA-256
+  (`fd057c207a6be038f2fe1475abb87f43a8c091b77f1f563b4e8547a2404b5bc8`) and installed on the control plane by the chart's own
+  placement settings (`deploy/kind/kuberay-values.yaml`); one Ray cluster (Ray 2.52.0, its image pinned by its index digest
+  `sha256:5c31da4180403f2d5f4590d05fbd46c1345e91e8d33dd4ff616de2702b611b31`, pulled once by each runner and loaded into every node
+  of each arm's fresh cluster, so no node downloads it inside an arm), from KubeRay's own autoscaling sample at v1.7.1
+  (`ray-cluster.autoscaler.yaml`: the autoscaler in the head, upscaling Default, an idle worker given back after 60 s, the
+  head taking no task) with the operator's three settings and nothing else changed (`deploy/kind/kuberay-cluster.yaml`): the
+  head on the control plane beside the other systems' controllers; each worker pod the processor size of one pod of the
+  Kubernetes stream (half a processor asked, one at most; its memory the sample's 1 GiB, which Ray's own processes need) and
+  one Ray processor, so one task runs on one worker pod as one job's pod runs on Kubernetes; and the worker group's ceiling the
+  workers' allocatable processors over half a processor, read live, as Kueue's queue is sized to the workers (the sample's 10
+  was written for no cluster in particular).
+- **The stream, the same work**: 24 jobs, one every 30 s from the window's opening, each of 10 units, 5 at a time, each unit
+  hashing 3,000 MB: each job a RayJob (`deploy/kind/kuberay-job.yaml`) sent by KubeRay's operator to the one cluster over its
+  own job API (HTTPMode: no submitter pod on the measured workers), its driver on the head (`deploy/kind/kuberay_stream_job.py`),
+  its 10 tasks one Ray processor each on the worker pods the autoscaler adds.
+- **The gauges, read the same way**: a job's wait from its submission (the RayJob's creation) to its first task begun (its own
+  driver's record, the last line of its log), its turnaround to its end as KubeRay recorded it, and a job that has not
+  succeeded by the window's end counted unfinished at the window's end (`tools/live_reps.py`, from `ray_times.json`); every
+  other gauge of the batch rig unchanged.
+- **The four ways**: the organism alone is the same work as Kubernetes Jobs placed by the cluster's own scheduler (amendment
+  6), so "KubeRay as shipped against the organism alone" reads the same work run the Ray way against the Kubernetes way, in
+  the same repetition.
+- **Tried first**: one repetition through `kind-trial.yml`, never counted in any table, to see the rig stand before its A, B
+  and C are started; a trial that shows a fault in the rig is fixed in the rig, the fix written here before the runs.
+- **The runner's disk**: seven copies of the Ray image (about 2.5 GB each, unpacked) do not fit beside the runner's own
+  toolchains, so a KubeRay job removes the toolchains it never uses before its first arm (`kind-orchestrators.yml`), the same
+  for every arm of the job.
+- **What it is not**: a test of Ray's own scheduling against Kubernetes'; Omni-Compass never writes KubeRay's or Ray's
+  objects, never submits or holds a job, and sits on top with its own levers, as everywhere.
+
+## Amendment 8: the Gödel scheduler (written before its first run, 20 October 2026)
+
+The founder's list names the Gödel scheduler (`kubewharf/godel-scheduler`, ByteDance, Apache-2.0), a unified scheduler for
+online and offline work: its dispatcher hands each pod to a scheduler, its scheduler matches pods and nodes with optimistic
+concurrency, and its binder binds them, with units and gangs (PodGroups) as its own scheduling unit. Register row 93.
+
+- **Native, as its project ships it**: Gödel publishes no release and no image, so each runner builds its image once, before
+  the first arm, from its source at the pinned commit `90de2d0dd7e8e4dc99ef36b34b91a30fc171b368` (its main branch on 20
+  October 2026) with the project's own Dockerfile (`docker/godel-local.Dockerfile`), as its setup guide builds it
+  (`scripts/kind_godel_build.sh`); the image is loaded into each arm's control plane and its own manifests are applied from
+  the same source as its guide applies them (kustomize, `manifests/base`: its CRDs, roles, and its scheduler, dispatcher,
+  binder and controller manager, all on the control plane by the manifests' own placement), with nothing changed. The arm
+  checks the source's commit and the image's ID before it loads it.
+- **Kubernetes 1.24 for this system alone**: Gödel supports Kubernetes 1.21.4 to 1.24.6. Its four arms run kind v0.22.0, the
+  last kind whose own node images include 1.24, with its image for 1.24.17
+  (`kindest/node:v1.24.17@sha256:bad10f9b98d54586cba05a7eaa1b61c6b90bfc4ee174fdc43a7b75ca75c95e51`), the last patch release
+  of the 1.24 line (patch releases change no API), kubectl v1.24.17, and metrics-server v0.5.2, the line metrics-server's own
+  compatibility table gives below 1.25 (its manifest's SHA-256 `64bbd06c1b72cb08cffa9ebbe4cb4cfe61607e764a02e2ede573e7673fc0c401`,
+  its image pulled through the old registry's own redirect). Kubernetes 1.24 resizes no pod in place, so Omni-Compass's power
+  cap and processor conveyance do not exist on this cluster and are off in all four arms, as on Crane's 1.25
+  (`docs/CRANE_PREREGISTRATION.md`; `scripts/kind_bench.sh` reads the cluster's API for it); this system's tables are read
+  among its own four arms, never beside the 1.35 systems'.
+- **The stream, the same work**: the same 24 jobs of 10 pods, each pod sent to Gödel by its scheduler's name with the three
+  annotations its own guide puts on every pod it schedules (`godel.bytedance.com/pod-state: pending`,
+  `pod-resource-type: guaranteed`, `pod-launcher: kubelet`); each pod is its own unit, as in Gödel's basic pod scheduling
+  (the stream's jobs need no gang). The organism alone is the same stream placed by the 1.24 cluster's own default scheduler
+  (amendment 6).
+- **The gauges** are the batch rig's, unchanged; where Gödel put every pod and its components' last words are kept in every
+  arm's record (`batch_queue_end.json`, `godel_*.log`).
+- **Its runs**: `kind-godel.yml`, the four arms in every repetition, the governor on its own core (amendment 5); one trial
+  repetition first (label `trial`, never counted), then A, B and C started together.
+- **What it is not**: a test of Gödel's scale (its optimistic concurrency is built for thousands of nodes; here there are six)
+  or of its quotas; Omni-Compass never writes Gödel's objects, never places or binds a pod, and sits on top with its own
+  levers, as everywhere.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

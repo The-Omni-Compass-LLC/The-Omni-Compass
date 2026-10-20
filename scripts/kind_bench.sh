@@ -80,15 +80,16 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # Omni-Compass's moves are its own, on top, the CPU limit left to CruiseKube, which resizes it itself. Empty (the
 # default): every other set, unchanged
 ADDONS="${ADDONS:-}"
-case "$ADDONS" in ""|keda|goldilocks) ;; *) echo "ADDONS must be empty, keda or goldilocks (got $ADDONS)"; exit 1;; esac
-# BATCH_QUEUE=kueue, volcano, kai, koordinator, vanilla or binpack, with WORKLOAD=batch (docs/BATCH_QUEUE_PREREGISTRATION.md;
-# register rows 63, 88, 89, 91): the batch test's work arrives as a stream of jobs and a queueing system of its own admits
-# and places it (vanilla: the Kubernetes scheduler alone; binpack: with the operator's bin-packing profile),
+case "$ADDONS" in ""|keda|goldilocks|crane) ;; *) echo "ADDONS must be empty, keda, goldilocks or crane (got $ADDONS)"; exit 1;; esac
+# BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack, with WORKLOAD=batch
+# (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92, 93): the batch test's work arrives as a stream of jobs
+# and a queueing system of its own admits and places it (kuberay: the same work as Ray jobs on one Ray cluster, scaled by
+# the Ray autoscaler; vanilla: the Kubernetes scheduler alone; binpack: with the operator's bin-packing profile),
 # installed from its own release in every arm before the arms are told apart (scripts/kind_batch_queue.sh); Omni-Compass
 # sits on top with its own levers and never writes the queueing system's objects. Empty: the batch test's one Job on
 # Kubernetes alone
 BATCH_QUEUE="${BATCH_QUEUE:-}"
-case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
+case "$BATCH_QUEUE" in ""|kueue|volcano|kai|koordinator|kuberay|godel|vanilla|binpack) ;; *) echo "BATCH_QUEUE must be empty, kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack (got $BATCH_QUEUE)"; exit 1;; esac
 [ -z "$BATCH_QUEUE" ] || { [ "${WORKLOAD:-web}" = batch ] && [ -z "$ADDONS" ]; } \
   || { echo "BATCH_QUEUE=$BATCH_QUEUE runs the batch test (WORKLOAD=batch) with no other add-on"; exit 1; }
 CRUISEKUBE="${CRUISEKUBE:-}"
@@ -122,6 +123,11 @@ limits_now() {   # the CPU limit the operator's record holds: the pods' own, or 
   fi
 }
 KEDA=""; [ "$ADDONS" = keda ] && KEDA=1
+# ADDONS=crane (register row 90; docs/CRANE_PREREGISTRATION.md): in every arm that carries it, Crane and the Prometheus it
+# reads own the service's autoscaler (scripts/kind_addons_crane.sh): its Effective HPA in auto mode, from which it builds and
+# owns the HPA ehpa-php-apache; Omni-Compass's autoscaler moves reach Crane's EHPA through the plug (scripts/kubectl_crane.py)
+CRANE=""; [ "$ADDONS" = crane ] && CRANE=1
+HPA_NAME=php-apache; [ -z "$CRANE" ] || HPA_NAME=ehpa-php-apache   # the service's HPA, as the arm's autoscaler names it
 if [ -n "$ADDONS" ]; then
   { [ -z "${TWO_APP:-}" ] && [ "$PLATFORM" = kind ] && [ -z "$TUNE" ]; } || { echo "ADDONS=$ADDONS runs on kind, with one app and the operator's own target"; exit 1; }
 fi
@@ -130,7 +136,7 @@ EXPECT_LIMIT=500m   # the operator's CPU limit on php-apache (deploy/kind/demo.y
 # the requests-in-flight metric first, so with the add-on it is found by name, and profile http has none
 EXPECT_TARGET=50; [ -n "$KEDA" ] && [ "${ADDONS_PROFILE:-both}" = http ] && EXPECT_TARGET=""
 hpa_cpu_target() {
-  if [ -n "$KEDA" ]; then
+  if [ -n "$KEDA" ] || [ -n "$CRANE" ]; then   # an add-on's HPA can carry other metrics; the processor's is found by name
     kubectl get hpa "$1" -o json | jq -r '[.spec.metrics[] | select(.type == "Resource" and .resource.name == "cpu") | .resource.target.averageUtilization][0] // empty'
   else
     kubectl get hpa "$1" -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}'
@@ -142,13 +148,25 @@ SITE_LIMIT_W=$(( WORKERS * (IDLE_W + DYN_W) ))
 METRICS_SERVER_VERSION="${METRICS_SERVER_VERSION:-v0.9.0}"
 METRICS_SERVER_SHA256="${METRICS_SERVER_SHA256:-1cec29a5267809306a2c6ec74a3e449abbb705b4a8beed0c8a1963910f72c79b}"
 server_minor=$(kubectl version -o json | jq -r '.serverVersion.minor' | tr -cd '0-9')
-[ "$PLATFORM" = aks ] || { [ -n "$server_minor" ] && [ "$server_minor" -ge 34 ]; } || { echo "metrics-server $METRICS_SERVER_VERSION needs Kubernetes 1.34+ (minor=$server_minor)"; exit 1; }
+# the oldest Kubernetes each metrics-server line supports, from its own compatibility table (the Crane rig runs 1.25 with v0.6.4,
+# Gödel's 1.24 with v0.5.2)
+case "$METRICS_SERVER_VERSION" in v0.5.*) ms_floor=8 ;; v0.6.*) ms_floor=25 ;; v0.7.*) ms_floor=27 ;; v0.8.*) ms_floor=31 ;; *) ms_floor=34 ;; esac
+[ "$PLATFORM" = aks ] || { [ -n "$server_minor" ] && [ "$server_minor" -ge "$ms_floor" ]; } || { echo "metrics-server $METRICS_SERVER_VERSION needs Kubernetes 1.$ms_floor+ (minor=$server_minor)"; exit 1; }
+# the power cap and the processor conveyance resize the serving pods in place (the pods/resize subresource); a cluster that
+# does not serve it (the Crane rig's Kubernetes 1.25, docs/CRANE_PREREGISTRATION.md) has neither lever, so both are off in
+# every arm and the preflight says so
+NO_RESIZE=""
+api_v1=$(kubectl get --raw /api/v1)   # unread, the arm stops here: a lever is never switched off by a failed read
+if [ -n "$CAP_ARGS" ] && ! jq -e '.resources[] | select(.name == "pods/resize")' <<<"$api_v1" >/dev/null; then
+  CAP_ARGS=""; NO_RESIZE=1
+fi
 {
   echo "date_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"; echo "arm=$ARM"; echo "git_commit=$(git rev-parse HEAD 2>/dev/null || echo unknown)"
   echo "docker=$(docker --version 2>/dev/null || echo n/a)"; echo "kind=$(kind version 2>/dev/null || echo n/a)"
   echo "kubectl=$(kubectl version --client=true -o json | jq -r '.clientVersion.gitVersion')"
   kubectl version -o json | jq -r '"server=" + .serverVersion.gitVersion'; echo "python=$(python --version 2>&1)"
   echo "metrics_server=$METRICS_SERVER_VERSION sha256=$METRICS_SERVER_SHA256"; echo "workers=$WORKERS"
+  [ -z "$NO_RESIZE" ] || echo "in_place_resize=not served by this cluster: the power cap and the processor conveyance are off in every arm"
 } | tee "$OUT_DIR/preflight.txt"
 if [ "$PLATFORM" = kind ]; then
 # the pinned manifest, fetched once per machine (both arms of a repetition use the same file) and tried again with a pause
@@ -231,9 +249,10 @@ fi
 # here every node is a container on one runner and the governor's group competes with them as a peer (its niceness ranks
 # it only inside its own group), so its own work and its commands came out of the measured pods' processor time (the
 # scheduler's first runs: the same placement and the same start waits in both arms, each pod's hashing 1.4% longer with
-# Omni-Compass on top)
+# Omni-Compass on top). GOV_CORE=1 gives it its own core on the serving rig too (the governors' serving tests: Crane,
+# docs/CRANE_PREREGISTRATION.md), the same in every arm
 GOV_PIN=""
-if [ -n "$BATCH_QUEUE" ] && [ "$PLATFORM" = kind ] && [ "$(nproc)" -ge 2 ] && command -v taskset >/dev/null 2>&1; then
+if { [ -n "$BATCH_QUEUE" ] || [ "${GOV_CORE:-}" = 1 ]; } && [ "$PLATFORM" = kind ] && [ "$(nproc)" -ge 2 ] && command -v taskset >/dev/null 2>&1; then
   ncpu=$(nproc); gov_cpu=$((ncpu - 1)); cluster_cpus="0-$((ncpu - 2))"; pinned=0
   for node in $(kind get nodes --name "${KIND_CLUSTER:-omni-bench}" 2>/dev/null); do
     docker update --cpuset-cpus "$cluster_cpus" "$node" >/dev/null && pinned=$((pinned + 1))
@@ -248,6 +267,10 @@ if [ -n "$KEDA" ]; then
   # the add-on native, installed the same way in every arm before the arms are told apart
   OUT_DIR="$OUT_DIR" bash scripts/kind_addons.sh
   echo "addons=$ADDONS profile=${ADDONS_PROFILE:-both} (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
+elif [ -n "$CRANE" ]; then
+  # Crane and its Prometheus, installed the same way in every arm that carries them, before the arms are told apart
+  OUT_DIR="$OUT_DIR" HPA_MAX="${HPA_MAX:-10}" bash scripts/kind_addons_crane.sh
+  echo "addons=crane (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
 elif [ "$ADDONS" = goldilocks ]; then
   # Goldilocks and the VPA's recommender installed the same way in every arm; the recommendation is learned and applied
   # once the load runs (below), before the warm-up
@@ -353,8 +376,10 @@ if [ -n "$KEDA" ]; then   # the add-on's own pods, all on the control plane (scr
   foreign=$(kubectl get pods -A -o json | jq --argjson ck "$ck" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","keda") or ($ck and IN("cruisekube-system","cruisekube-metrics"))) | not)] | length')
 elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's controller; the VPA's recommender is in kube-system (both on the control plane)
   foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","goldilocks") | not)] | length')
+elif [ -n "$CRANE" ]; then   # Crane and its Prometheus (scripts/kind_addons_crane.sh checks where they run)
+  foreign=$(kubectl get pods -A -o json | jq '[.items[] | select(.metadata.namespace | IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system","crane-system") | not)] | length')
 else   # with a queueing system, its own namespace too (scripts/kind_batch_queue.sh checks its pods are on the control plane)
-qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system
+qns=""; [ "$BATCH_QUEUE" = kueue ] && qns=kueue-system; [ "$BATCH_QUEUE" = volcano ] && qns=volcano-system; [ "$BATCH_QUEUE" = kai ] && qns=kai-scheduler; [ "$BATCH_QUEUE" = koordinator ] && qns=koordinator-system; [ "$BATCH_QUEUE" = kuberay ] && qns=kuberay-system; [ "$BATCH_QUEUE" = godel ] && qns=godel-system
 foreign=$(kubectl get pods -A -o json | jq --arg q "$qns" '[.items[] | select(.metadata.namespace | (IN("kube-system","local-path-storage","default","omni-compass","gatekeeper-system") or (. == $q)) | not)] | length')
 fi
 [ "$foreign" = "0" ] || { echo "cluster contains non-harness pods"; exit 1; }
@@ -362,11 +387,12 @@ if [ -z "$NATIVE" ]; then
   kubectl apply -f deploy/kind/rbac-omni.yaml
   [ -z "${TWO_APP:-}" ] || kubectl apply -f deploy/kind/rbac-omni-noisy.yaml
   [ -z "$KEDA" ] || kubectl apply -f deploy/kind/rbac-omni-keda.yaml
+  [ -z "$CRANE" ] || kubectl apply -f deploy/kind/rbac-omni-crane.yaml
   SA="system:serviceaccount:omni-compass:omni-compass"
   can() { kubectl auth can-i "$@" --as="$SA"; }
   {
     echo "== can (each muscle's push)"
-    echo "patch hpa/php-apache (hpa): $(can patch hpa/php-apache -n default)"
+    echo "patch hpa/$HPA_NAME (hpa): $(can patch "hpa/$HPA_NAME" -n default)"
     echo "patch nodes (node pool: idle mark): $(can patch nodes)"
     echo "create pods/eviction (node pool: drain): $(can create pods --subresource=eviction -n default)"
     echo "patch pods/resize (power cap, in place): $(can patch pods --subresource=resize -n default)"
@@ -375,6 +401,7 @@ if [ -z "$NATIVE" ]; then
     echo "patch deployment/php-apache (rollout guard, cap record): $(can patch deployment/php-apache -n default)"
     echo "get configmap/omni-security (security afferent): $(can get configmap/omni-security -n default)"
     [ -z "$KEDA" ] || echo "patch scaledobject/php-apache (the add-on's knob: KEDA rebuilds the HPA from it): $(can patch scaledobjects.keda.sh/php-apache -n default)"
+    [ -z "$CRANE" ] || echo "patch ehpa/php-apache (Crane's knob: Crane rebuilds the HPA from it): $(can patch effectivehorizontalpodautoscalers.autoscaling.crane.io/php-apache -n default)"
     echo "== cannot"
     echo "delete nodes: $(can delete nodes)"
     echo "create pods: $(can create pods -n default)"
@@ -389,6 +416,8 @@ if [ -z "$NATIVE" ]; then
     [ -z "$KEDA" ] || echo "delete scaledobject/php-apache: $(can delete scaledobjects.keda.sh/php-apache -n default)"
     [ -z "$KEDA" ] || echo "patch scaledobjects in keda (the add-on's own): $(can patch scaledobjects.keda.sh -n keda)"
     [ -z "$KEDA" ] || echo "patch deployments in keda (the add-on itself): $(can patch deployments -n keda)"
+    [ -z "$CRANE" ] || echo "delete ehpa/php-apache: $(can delete effectivehorizontalpodautoscalers.autoscaling.crane.io/php-apache -n default)"
+    [ -z "$CRANE" ] || echo "patch deployments in crane-system (Crane itself): $(can patch deployments -n crane-system)"
     [ "$ADDONS" != goldilocks ] || echo "patch verticalpodautoscalers (Goldilocks's VPA: its recommendation is the operator's): $(can patch verticalpodautoscalers.autoscaling.k8s.io -n default)"
     [ "$ADDONS" != goldilocks ] || echo "patch deployments in goldilocks (Goldilocks itself): $(can patch deployments -n goldilocks)"
     [ -z "$CRUISEKUBE" ] || echo "patch deployments in cruisekube-system (CruiseKube itself): $(can patch deployments -n cruisekube-system)"
@@ -400,6 +429,9 @@ if [ -z "$NATIVE" ]; then
   if [ -n "$KEDA" ]; then
     # the plug: the same service account underneath; the HPA moves carried to the ScaledObject KEDA builds the HPA from
     export OMNI_KUBECTL="$KUBECTL" KUBECTL="$(pwd)/scripts/kubectl_keda.py" OMNI_PLUG_LOG="$(cd "$OUT_DIR" && pwd)/plug_keda.jsonl"
+  elif [ -n "$CRANE" ]; then
+    # the plug: the same service account underneath; the HPA moves carried to the EHPA Crane builds the HPA from
+    export OMNI_KUBECTL="$KUBECTL" KUBECTL="$(pwd)/scripts/kubectl_crane.py" OMNI_PLUG_LOG="$(cd "$OUT_DIR" && pwd)/plug_crane.jsonl"
   fi
 fi
 kil_pid=""
@@ -446,7 +478,8 @@ if [ "${WORKLOAD:-web}" = batch ] && [ -n "$BATCH_QUEUE" ]; then
   # the batch stream under a queueing system: the load generator stands at zero; the jobs arrive one every BATCH_EVERY_S
   # seconds from the window's opening, the same schedule in every arm (scripts/kind_batch_queue.sh, PHASE=submit)
   kubectl scale deployment/load-generator --replicas=0 >/dev/null 2>&1 || true
-  echo "batch: ${BATCH_JOBS:-24} jobs of ${BATCH_COMPLETIONS:-10} pods, ${BATCH_PARALLELISM:-5} at a time, one every ${BATCH_EVERY_S:-30} s, ${BATCH_MB:-3000} MB hashed each, through $BATCH_QUEUE" | tee -a "$OUT_DIR/preflight.txt"
+  unit=pods; [ "$BATCH_QUEUE" = kuberay ] && unit="Ray tasks"
+  echo "batch: ${BATCH_JOBS:-24} jobs of ${BATCH_COMPLETIONS:-10} $unit, ${BATCH_PARALLELISM:-5} at a time, one every ${BATCH_EVERY_S:-30} s, ${BATCH_MB:-3000} MB hashed each, through $BATCH_QUEUE" | tee -a "$OUT_DIR/preflight.txt"
   OUT_DIR="$OUT_DIR" DURATION="$DURATION" PHASE=submit bash scripts/kind_batch_queue.sh > "$OUT_DIR/batch_submit.out" 2>&1 &
   ( sleep "$DURATION" ) &
   load_pid=$!
@@ -650,12 +683,16 @@ if [ "$LOADGEN" = meter ]; then
   echo "work meter: $(jq -c .total "$OUT_DIR/work_meter.json")" | tee -a "$OUT_DIR/preflight.txt"
 fi
 end_read "$OUT_DIR/nodes_end.txt" get nodes -o wide
-end_read "$OUT_DIR/hpa_end.json" get hpa php-apache -o json
+end_read "$OUT_DIR/hpa_end.json" get hpa "$HPA_NAME" -o json
 if [ -n "$KEDA" ]; then   # the add-on's own record of the window: its ScaledObject and the last words of each part
   end_read "$OUT_DIR/scaledobject_end.json" get scaledobject php-apache -o json
   for d in keda-operator keda-add-ons-http-scaler keda-add-ons-http-interceptor; do
     kubectl -n keda logs deployment/"$d" --tail=300 --request-timeout=20s > "$OUT_DIR/$d.log" 2>&1 || true
   done
+elif [ -n "$CRANE" ]; then   # Crane's own record of the window: its EHPA, its forecast and the last words of craned
+  end_read "$OUT_DIR/ehpa_end.json" get effectivehorizontalpodautoscalers.autoscaling.crane.io php-apache -o json
+  end_read "$OUT_DIR/crane_predictions_end.json" get timeseriespredictions.prediction.crane.io -A -o json
+  kubectl -n crane-system logs deployment/craned --tail=300 --request-timeout=20s > "$OUT_DIR/craned.log" 2>&1 || true
 elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's VPA as the window left it (its recommendation, still in mode Off)
   end_read "$OUT_DIR/vpa_end.json" get vpa goldilocks-php-apache -o json
   kubectl -n goldilocks logs deployment/goldilocks-controller --tail=300 --request-timeout=20s > "$OUT_DIR/goldilocks-controller.log" 2>&1 || true
@@ -675,8 +712,8 @@ if [ "$ARM" = "watch" ]; then
   echo "writes Omni would have made: $logged; writes executed: $executed" | tee "$OUT_DIR/omni_writes.txt"
   stop_governors        # counted first: a stopped governor's hand-back is logged as writes (dry, none executed)
   cpu_limit=$(limits_now)
-  target=$(hpa_cpu_target php-apache)
-  range_now=$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
+  target=$(hpa_cpu_target "$HPA_NAME")
+  range_now=$(kubectl get hpa "$HPA_NAME" -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
   echo "cluster after the run: target $target, range $range_now, CPU limits $cpu_limit, workers $back of $WORKERS" | tee "$OUT_DIR/kill_switch.txt"
   exist=$(kubectl get nodes -l "$WORKER_SEL" --no-headers | wc -l); [ "$PLATFORM" = aks ] || exist="$WORKERS"
@@ -707,26 +744,34 @@ elif [ -z "$NATIVE" ]; then
   cpu_limit=$(limits_now)
   if [ -n "$CAP_ARGS" ]; then echo "pod CPU limits after kill: $cpu_limit" | tee -a "$OUT_DIR/kill_switch.txt"
   elif [ -n "$CRUISEKUBE" ]; then echo "the operator's CPU limit on the Deployment after kill: $cpu_limit (CruiseKube owns the pods' own)" | tee -a "$OUT_DIR/kill_switch.txt"
+  elif [ -n "$NO_RESIZE" ]; then echo "pod CPU limits after kill: $cpu_limit (the cluster serves no in-place resize: no processor conveyed, no power capped)" | tee -a "$OUT_DIR/kill_switch.txt"
   else echo "the operator's CPU limit on the Deployment after kill: $cpu_limit (the governor moved the machines alone: no processor conveyed)" | tee -a "$OUT_DIR/kill_switch.txt"; fi
-  if [ -n "$KEDA" ]; then   # KEDA rebuilds the HPA from its ScaledObject: the operator's settings must show on the HPA
+  if [ -n "$KEDA" ] || [ -n "$CRANE" ]; then   # the add-on rebuilds the HPA from its own object: the operator's settings must show on it
     for i in $(seq 1 15); do
-      [ "$(hpa_cpu_target php-apache)" = "$EXPECT_TARGET" ] && [ "$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')" = "$HPA_RANGE" ] && break
+      [ "$(hpa_cpu_target "$HPA_NAME")" = "$EXPECT_TARGET" ] && [ "$(kubectl get hpa "$HPA_NAME" -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')" = "$HPA_RANGE" ] && break
       sleep 2
     done
   fi
-  restored=$(hpa_cpu_target php-apache)
-  range_now=$(kubectl get hpa php-apache -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
+  restored=$(hpa_cpu_target "$HPA_NAME")
+  range_now=$(kubectl get hpa "$HPA_NAME" -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
   echo "HPA replica range after kill: $range_now" | tee -a "$OUT_DIR/kill_switch.txt"
   test "$range_now" = "$HPA_RANGE"
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
   { echo "restored target: $restored"; echo "workers in service: $back of $WORKERS"; } | tee "$OUT_DIR/kill_switch.txt"
-  leftover=$(kubectl get hpa php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))'; kubectl get deployment php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')
+  leftover=$(kubectl get hpa "$HPA_NAME" -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))'; kubectl get deployment php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')
   if [ -n "$KEDA" ]; then   # the add-on's ScaledObject: the operator's own settings back, and no record left on it either
     leftover="$leftover$(kubectl get scaledobject php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')"
     so_now=$(kubectl get scaledobject php-apache -o json | jq -c '{min: .spec.minReplicaCount, max: .spec.maxReplicaCount, cpu: ([.spec.triggers[] | select(.type == "cpu") | .metadata.value][0] // "")}')
     so_want=$(jq -cn --argjson max "${HPA_MAX:-10}" --arg cpu "$EXPECT_TARGET" '{min: 1, max: $max, cpu: $cpu}')
     echo "add-on's ScaledObject after kill: $so_now (the operator's: $so_want)" | tee -a "$OUT_DIR/kill_switch.txt"
     test "$so_now" = "$so_want"
+  fi
+  if [ -n "$CRANE" ]; then   # Crane's EHPA: the operator's own settings back, and no record left on it either
+    leftover="$leftover$(kubectl get effectivehorizontalpodautoscalers.autoscaling.crane.io php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')"
+    ehpa_now=$(kubectl get effectivehorizontalpodautoscalers.autoscaling.crane.io php-apache -o json | jq -c '{min: .spec.minReplicas, max: .spec.maxReplicas, cpu: ([.spec.metrics[] | select(.type == "Resource" and .resource.name == "cpu") | .resource.target.averageUtilization][0] // "" | tostring)}')
+    ehpa_want=$(jq -cn --argjson max "${HPA_MAX:-10}" --arg cpu "$EXPECT_TARGET" '{min: 1, max: $max, cpu: $cpu}')
+    echo "Crane's EHPA after kill: $ehpa_now (the operator's: $ehpa_want)" | tee -a "$OUT_DIR/kill_switch.txt"
+    test "$ehpa_now" = "$ehpa_want"
   fi
   echo "Omni records left after kill: ${leftover:-none}" | tee -a "$OUT_DIR/kill_switch.txt"
   if [ -n "${TWO_APP:-}" ]; then   # the fairness test: the neighbour's HPA handed back too

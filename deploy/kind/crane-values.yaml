@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Crane's chart values for the kind rig (scripts/kind_addons_crane.sh; docs/CRANE_PREREGISTRATION.md): the chart's own
+# placement settings put craned, its metric adapter and its dashboard on the control plane beside the cluster's other
+# controllers, so the six measured workers carry only the work and Crane's node agent, which runs on every node as shipped.
+# One operator setting more: craned propagates the annotations whose key begins omnicompass.io/ from an EHPA onto the HPA it
+# builds (its own --ehpa-propagation-annotation-prefixes), so a record Omni-Compass keeps on the EHPA reaches the HPA the
+# engine reads (scripts/kubectl_crane.py), as KEDA copies a ScaledObject's annotations; with no such annotation, in every
+# native arm, it changes nothing. Every other value is the chart's as published.
+craned:
+  containerArgs:
+    ehpa-propagation-annotation-prefixes: omnicompass.io/
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+metricAdapter:
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+cranedDashboard:
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+  tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
