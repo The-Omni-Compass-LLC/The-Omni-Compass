@@ -46,7 +46,11 @@ GOVERNORS = [
      "`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 2"),
     ("cruisekube", "CruiseKube", 81, "rightsizing (requests and limits, in place)",
      "CruiseKube applying its own recommendations as shipped", "`docs/CRUISEKUBE_PREREGISTRATION.md`"),
-    ("crane", "Crane", 90, "predictive autoscaling and resource governance", "its Effective HPA in auto mode", "not yet written"),
+    ("crane", "Crane", 90, "predictive autoscaling and resource governance",
+     "Crane 0.11.0 and the Prometheus it reads, as its installation guide installs them, the service's autoscaler handed to its "
+     "Effective HPA in auto mode (its own example for this service), on Kubernetes 1.25.16 (Crane builds its HPA as "
+     "autoscaling/v2beta2, which 1.26 removed)",
+     "the served app under the closed load of the add-on sets, four ways (`docs/CRANE_PREREGISTRATION.md`)"),
     ("kuberay", "KubeRay", 92, "Ray clusters (the Ray autoscaler)",
      "KubeRay 1.7.1 and one Ray cluster (Ray 2.52.0) from KubeRay's own autoscaling sample, the Ray autoscaler as shipped",
      "the batch stream as Ray jobs (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 7)"),
@@ -92,7 +96,7 @@ FOUR_WAYS = (("TOP", "compass", "Omni-Compass on top of it, against it as shippe
              ("VS", "compassbare|native", "Omni-Compass on the organism alone, against it as shipped"),
              ("BOTH", "compass|nativebare", "Omni-Compass on top of it, against the organism alone"))
 FOUR_SYSTEMS = (("kai", "The KAI scheduler"), ("koordinator", "Koordinator"), ("kueue", "Kueue"), ("volcano", "Volcano"),
-                ("binpack", "The scheduler's bin-packing profile"))
+                ("binpack", "The scheduler's bin-packing profile"), ("kuberay", "KubeRay"), ("crane", "Crane"))
 
 WORDS = ("GAIN", "LOSS", "power given", "EVEN", "the runs disagree", "shown, not judged")
 
@@ -207,7 +211,10 @@ def render(runs=None) -> str:
           f"real Kubernetes cluster (kind v0.31.0, Kubernetes v1.35.0) on GitHub's machines, each arm on a fresh cluster, the "
           f"two arms back to back on one runner, ten paired repetitions a run, three runs (A, B and C) for a reading. Native is "
           f"the governor as its project ships it; Omni-Compass sits on top with its own levers (the node pool, the service's "
-          f"autoscaler and processor limit, cruise and idle) and never writes the governor's objects. Cost: $0 (GitHub's free "
+          f"autoscaler and processor limit, cruise and idle) and never writes the governor's objects, but where the governor owns "
+          f"the service's autoscaler (Crane): there its autoscaler moves reach the autoscaler through the governor's own object, "
+          f"by a plug, as on KEDA. Crane alone runs on Kubernetes 1.25.16 (its HPA is an API 1.26 removed), where no pod is "
+          f"resized in place, so no processor limit is moved in any of its arms. Cost: $0 (GitHub's free "
           f"machines). A governor's line reads only from its own three-run table; until then it says where its runs stand.", ""]
     L += ["| Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |", "|---|---|---:|---|---|"]
     for slug, name, row, field, native, test in GOVERNORS:
@@ -233,7 +240,8 @@ def render(runs=None) -> str:
     L += ["## The four ways (the founder's order of 20 October)", "",
           "Each system runs four ways in every repetition, each way on a fresh cluster of the same configuration, back to back "
           "on one runner, the governor on its own core (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendments 5 and 6): the "
-          "organism alone (the stream placed by Kubernetes' own scheduler, no orchestrator installed), the orchestrator as its "
+          "organism alone (the stream placed by Kubernetes' own scheduler, no orchestrator installed; for Crane, the service's HPA "
+          "as Kubernetes ships it, `docs/CRANE_PREREGISTRATION.md`), the orchestrator as its "
           "project ships it, Omni-Compass on top of the organism alone, and Omni-Compass on top of the orchestrator. Each "
           "column is one comparison, the first against the second, paired within the repetition and read by the one key for "
           "the first; each cell reads only from its own three-run table. Omni-Compass never places a pod or admits a job: on "

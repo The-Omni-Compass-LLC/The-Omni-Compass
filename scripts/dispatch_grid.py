@@ -116,7 +116,7 @@ RIG_WORKFLOWS = ("benchmark.yml", "benchmark-reps.yml", "big-organism.yml", "cap
 RERUN_JOBS = 10                    # jobs one rerun is counted as toward the queue's target
 # the workflows whose run records the label it was started with (A, B or C): the conductor passes the rerun's own letter
 # (19 October; before, a run it started read the workflow's default, A, in its own record)
-LABELLED = ("capacity.yml", "kind-orchestrators.yml")
+LABELLED = ("capacity.yml", "kind-crane.yml", "kind-orchestrators.yml")
 RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # The clouds, their sets following one another without a hand on the button. Azure first (the founder's order of 13
 # October): scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
