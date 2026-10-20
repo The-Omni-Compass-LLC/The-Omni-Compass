@@ -30,7 +30,7 @@
 #                  own objects (batch_queue_end.json)
 set -euo pipefail
 OUT_DIR="${OUT_DIR:?}"
-Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack}"
+Q="${BATCH_QUEUE:?set BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, godel, group, vanilla or binpack}"
 KUEUE_VERSION="${KUEUE_VERSION:-v0.20.2}"       # released 15 October 2026
 VOLCANO_VERSION="${VOLCANO_VERSION:-v1.16.0}"   # released 14 October 2026
 KAI_VERSION="${KAI_VERSION:-v0.18.6}"           # released 15 October 2026 (its chart, oci://ghcr.io/kai-scheduler/...)
@@ -51,8 +51,11 @@ KUBERAY_SHA256="${KUBERAY_SHA256:-fd057c207a6be038f2fe1475abb87f43a8c091b77f1f56
 JOBS="${BATCH_JOBS:-24}"; COMPLETIONS="${BATCH_COMPLETIONS:-10}"; PARALLELISM="${BATCH_PARALLELISM:-5}"
 EVERY="${BATCH_EVERY_S:-30}"; MB="${BATCH_MB:-3000}"
 case "$Q" in kueue) NS=kueue-system ;; volcano) NS=volcano-system ;; kai) NS=kai-scheduler ;; koordinator) NS=koordinator-system ;;
-  kuberay) NS=kuberay-system ;; godel) NS=godel-system ;; vanilla|binpack) NS=kube-system ;;
-  *) echo "BATCH_QUEUE must be kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack (got $Q)"; exit 1 ;; esac
+  kuberay) NS=kuberay-system ;; godel) NS=godel-system ;; vanilla|binpack|group) NS=kube-system ;;
+  *) echo "BATCH_QUEUE must be kueue, volcano, kai, koordinator, kuberay, godel, group, vanilla or binpack (got $Q)"; exit 1 ;; esac
+# group: this cluster is one member of a group of clusters (scripts/kind_group.sh, docs/GROUP_PREREGISTRATION.md); the stream is
+# sent to the group, by its orchestrator or, on the group alone, by the harness to each member in turn, never by this script;
+# here it is the member's record of the jobs and pods that ran on it
 # every serving pod of a Helm-installed system on the control plane: a pod a move replaced is given two minutes to finish
 # on its worker; a finished install hook and a node agent of a DaemonSet are not counted, the same in both arms
 off() { kubectl get pods -n "$NS" -o json | jq -r --argjson term "$1" '[.items[]
@@ -205,6 +208,11 @@ print(int(sum(cpu(x["status"]["allocatable"]["cpu"]) for x in json.load(sys.stdi
     || { echo "INVALID RUN: Gödel's components did not all stand"; kubectl get deploy,pods -n "$NS" -o wide; exit 1; }
   placed "$OUT_DIR/godel_placement.txt"
   url="kubewharf/godel-scheduler at $GODEL_COMMIT, built from its own docker/godel-local.Dockerfile"; got="$img"
+  elif [ "$Q" = group ]; then
+  # a member of a group of clusters: nothing is installed here; the group's orchestrator, where there is one, runs on its
+  # own cluster beside the members (scripts/kind_group.sh), and this member's own scheduler places every pod sent to it
+  url="the group's (scripts/kind_group.sh)"
+  got=$(kubectl -n kube-system get pod -l component=kube-scheduler -o jsonpath='{.items[0].spec.containers[0].image}')
   elif [ "$Q" = vanilla ]; then
   # the Kubernetes scheduler as shipped: nothing is installed; the cluster's own default scheduler places the stream
   url="the cluster's own default scheduler"
@@ -296,6 +304,8 @@ EOF
       [ "$t" = 20 ] && { echo "INVALID RUN: Kueue's queue objects were refused"; exit 1; }; sleep 6
     done
     echo "kueue ${KUEUE_VERSION} (${ver}); ClusterQueue quota cpu ${cpu}, memory ${mem}" > "$OUT_DIR/batch_queue.txt"
+  elif [ "$Q" = group ]; then
+    echo "group: a member of a group of clusters ${KIND_CLUSTER:-}; the stream sent by the group, this member's scheduler as shipped ($got)" > "$OUT_DIR/batch_queue.txt"
   elif [ "$Q" = vanilla ]; then
     echo "vanilla: the Kubernetes scheduler as shipped ($got), no queueing system" > "$OUT_DIR/batch_queue.txt"
   elif [ "$Q" = binpack ]; then
@@ -320,7 +330,7 @@ EOF
     echo "volcano ${VOLCANO_VERSION}; the default queue as shipped" > "$OUT_DIR/batch_queue.txt"
   fi
   case "$Q" in
-    vanilla) ;;
+    vanilla|group) ;;
     binpack) echo "the scheduler's manifest: $url; its SHA-256 $got" >> "$OUT_DIR/batch_queue.txt" ;;
     godel) echo "source $url; image $got" >> "$OUT_DIR/batch_queue.txt" ;;
     *) echo "release $url sha256 $got (the pinned file)" >> "$OUT_DIR/batch_queue.txt" ;;
@@ -351,6 +361,7 @@ EOF
   cat "$OUT_DIR/batch_queue.txt"
   ;;
 submit)
+  [ "$Q" = group ] && exit 0   # the group sends the stream (scripts/kind_group.sh)
   START=$(date -u +%s); label=""; podlabel=""; sched=""; podann=""
   if [ "$Q" = kuberay ]; then
     # the same stream as Ray jobs: one RayJob of the same tasks every BATCH_EVERY_S seconds, sent to the one Ray cluster by
@@ -439,7 +450,7 @@ PY
     for d in scheduler dispatcher binder controller-manager; do
       kubectl -n "$NS" logs "deployment/$d" --tail=200 --request-timeout=20s > "$OUT_DIR/godel_$d.log" 2>&1 || true
     done
-  elif [ "$Q" = vanilla ] || [ "$Q" = binpack ]; then   # where the scheduler put every pod, node by node
+  elif [ "$Q" = vanilla ] || [ "$Q" = binpack ] || [ "$Q" = group ]; then   # where the scheduler put every pod, node by node
     jq '[.items[] | .spec.nodeName] | group_by(.) | map({node: .[0], pods: length})' "$OUT_DIR/pods.json" > "$OUT_DIR/batch_queue_end.json" 2>/dev/null || true
   elif [ "$Q" = koordinator ]; then   # every node's batch resources as the window left them, and koordlet's own node metrics
     kubectl get nodes -o json | jq '[.items[] | {node: .metadata.name, batch_cpu: .status.allocatable["kubernetes.io/batch-cpu"], batch_memory: .status.allocatable["kubernetes.io/batch-memory"]}]' \

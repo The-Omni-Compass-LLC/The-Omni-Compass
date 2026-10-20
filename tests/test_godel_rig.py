@@ -71,7 +71,7 @@ class GodelRig(unittest.TestCase):
         self.assertEqual(k["spec"]["template"]["metadata"]["labels"]["kai.scheduler/queue"], "default-queue")
 
     def test_the_bench_takes_godel_its_namespace_and_its_metrics_server(self):
-        self.assertIn("|kuberay|godel|vanilla|binpack)", BENCH)
+        self.assertRegex(BENCH, r'case "\$BATCH_QUEUE" in ""\|[a-z|]*\|godel\|[a-z|]*binpack\)')   # Gödel among the queues
         self.assertIn('[ "$BATCH_QUEUE" = godel ] && qns=godel-system', BENCH)
         self.assertIn("v0.5.*) ms_floor=8 ;;", BENCH)
         self.assertIn("godel) NS=godel-system ;;", QUEUE)
