@@ -83,8 +83,10 @@ def muscles(cluster, stat=None):
 class SharedHostConvey(unittest.TestCase):
     def kind_cluster(self, extra=()):
         nodes = [node("w1"), node("w2"), node("w3")]
+        # coredns with no room of its own (its limit its request; kind's coredns carries no CPU limit at all), so these
+        # cases read the v7 rule; a host where another workload has room is omni-v13's (tests/test_convey_handback.py)
         pods = [pod("web-1", "w1"), pod("web-2", "w2"), pod("web-3", "w3"),
-                pod("dns", "w1", app="coredns", req="300m", ns="kube-system")] + list(extra)
+                pod("dns", "w1", app="coredns", req="300m", limit="300m", ns="kube-system")] + list(extra)
         return Cluster(nodes, pods)
 
     def test_each_node_keeps_its_own_arithmetic_under_the_top(self):
