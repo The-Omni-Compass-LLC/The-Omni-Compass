@@ -41,18 +41,19 @@ for arm in "${order[@]}"; do
   # Ready in time) is cleared and tried again, twice, before the job gives up
   for t in 1 2 3; do
     kind delete cluster --name omni-bench >/dev/null 2>&1 || true
-    kind create cluster --name omni-bench --config "$cluster" --wait 120s && break
+    kind create cluster --name omni-bench --config "$cluster" ${KIND_NODE_IMAGE:+--image "$KIND_NODE_IMAGE"} --wait 120s && break
     [ "$t" = 3 ] && { echo "the kind cluster could not be created (3 tries)"; exit 1; }
     echo "kind cluster not created (try $t): trying again in 30 s"; sleep 30
   done
   echo "######## ARM $arm (repetition $REP)"
-  mkdir -p "bench-$arm-$REP" && echo "$cluster" > "bench-$arm-$REP/kind_cluster.txt"
-  # the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6): an arm named ...bare runs on the organism alone, the
-  # stream placed by the cluster's own default scheduler and no orchestrator installed, native (nativebare) or with
+  mkdir -p "bench-$arm-$REP" && echo "$cluster${KIND_NODE_IMAGE:+ image=$KIND_NODE_IMAGE}" > "bench-$arm-$REP/kind_cluster.txt"
+  # the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6): an arm named ...bare runs on the organism alone, no
+  # orchestrator installed (on the batch rig the stream placed by the cluster's own default scheduler, on the serving rig the
+  # service's HPA as Kubernetes ships it, no add-on: docs/CRANE_PREREGISTRATION.md), native (nativebare) or with
   # Omni-Compass on top (compassbare); the same cluster as the orchestrator's arms, in the same repetition
-  base="${arm%bare}"; queue="${BATCH_QUEUE:-}"
-  [ "$base" = "$arm" ] || queue=vanilla
-  if ! ARM="$base" BATCH_QUEUE="$queue" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
+  base="${arm%bare}"; queue="${BATCH_QUEUE:-}"; addons="${ADDONS:-}"; cruise="${CRUISEKUBE:-}"
+  if [ "$base" != "$arm" ]; then [ -z "$queue" ] || queue=vanilla; addons=""; cruise=""; fi
+  if ! ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
     # a run that fails its own checks is recorded as invalid and left out of the table, never silently counted
     echo "ARM $arm (repetition $REP) FAILED its checks: marked invalid" | tee "bench-$arm-$REP/INVALID"; fail=1
   fi

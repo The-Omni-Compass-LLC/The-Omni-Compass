@@ -58,7 +58,7 @@ class Wiring(unittest.TestCase):
 
     def test_kind_bench_accepts_goldilocks_and_keeps_keda_apart(self):
         s = (ROOT / "scripts/kind_bench.sh").read_text()
-        self.assertIn('case "$ADDONS" in ""|keda|goldilocks)', s)
+        self.assertRegex(s, r'case "\$ADDONS" in ""\|keda\|goldilocks[|)]')   # Goldilocks among the add-ons (Crane after it)
         # every check that belongs to KEDA alone keys on KEDA, never on any add-on
         self.assertNotIn('[ -n "$ADDONS" ] && [ "${ADDONS_PROFILE', s)
         self.assertIn('test "$cpu_limit" = "$EXPECT_LIMIT"', s)

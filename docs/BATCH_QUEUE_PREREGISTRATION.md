@@ -286,6 +286,41 @@ back a worker left idle for its timeout. Register row 92.
 - **What it is not**: a test of Ray's own scheduling against Kubernetes'; Omni-Compass never writes KubeRay's or Ray's
   objects, never submits or holds a job, and sits on top with its own levers, as everywhere.
 
+## Amendment 8: the Gödel scheduler (written before its first run, 20 October 2026)
+
+The founder's list names the Gödel scheduler (`kubewharf/godel-scheduler`, ByteDance, Apache-2.0), a unified scheduler for
+online and offline work: its dispatcher hands each pod to a scheduler, its scheduler matches pods and nodes with optimistic
+concurrency, and its binder binds them, with units and gangs (PodGroups) as its own scheduling unit. Register row 93.
+
+- **Native, as its project ships it**: Gödel publishes no release and no image, so each runner builds its image once, before
+  the first arm, from its source at the pinned commit `90de2d0dd7e8e4dc99ef36b34b91a30fc171b368` (its main branch on 20
+  October 2026) with the project's own Dockerfile (`docker/godel-local.Dockerfile`), as its setup guide builds it
+  (`scripts/kind_godel_build.sh`); the image is loaded into each arm's control plane and its own manifests are applied from
+  the same source as its guide applies them (kustomize, `manifests/base`: its CRDs, roles, and its scheduler, dispatcher,
+  binder and controller manager, all on the control plane by the manifests' own placement), with nothing changed. The arm
+  checks the source's commit and the image's ID before it loads it.
+- **Kubernetes 1.24 for this system alone**: Gödel supports Kubernetes 1.21.4 to 1.24.6. Its four arms run kind v0.22.0, the
+  last kind whose own node images include 1.24, with its image for 1.24.17
+  (`kindest/node:v1.24.17@sha256:bad10f9b98d54586cba05a7eaa1b61c6b90bfc4ee174fdc43a7b75ca75c95e51`), the last patch release
+  of the 1.24 line (patch releases change no API), kubectl v1.24.17, and metrics-server v0.5.2, the line metrics-server's own
+  compatibility table gives below 1.25 (its manifest's SHA-256 `64bbd06c1b72cb08cffa9ebbe4cb4cfe61607e764a02e2ede573e7673fc0c401`,
+  its image pulled through the old registry's own redirect). Kubernetes 1.24 resizes no pod in place, so Omni-Compass's power
+  cap and processor conveyance do not exist on this cluster and are off in all four arms, as on Crane's 1.25
+  (`docs/CRANE_PREREGISTRATION.md`; `scripts/kind_bench.sh` reads the cluster's API for it); this system's tables are read
+  among its own four arms, never beside the 1.35 systems'.
+- **The stream, the same work**: the same 24 jobs of 10 pods, each pod sent to Gödel by its scheduler's name with the three
+  annotations its own guide puts on every pod it schedules (`godel.bytedance.com/pod-state: pending`,
+  `pod-resource-type: guaranteed`, `pod-launcher: kubelet`); each pod is its own unit, as in Gödel's basic pod scheduling
+  (the stream's jobs need no gang). The organism alone is the same stream placed by the 1.24 cluster's own default scheduler
+  (amendment 6).
+- **The gauges** are the batch rig's, unchanged; where Gödel put every pod and its components' last words are kept in every
+  arm's record (`batch_queue_end.json`, `godel_*.log`).
+- **Its runs**: `kind-godel.yml`, the four arms in every repetition, the governor on its own core (amendment 5); one trial
+  repetition first (label `trial`, never counted), then A, B and C started together.
+- **What it is not**: a test of Gödel's scale (its optimistic concurrency is built for thousands of nodes; here there are six)
+  or of its quotas; Omni-Compass never writes Gödel's objects, never places or binds a pod, and sits on top with its own
+  levers, as everywhere.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
