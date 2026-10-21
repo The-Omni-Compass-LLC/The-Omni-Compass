@@ -110,7 +110,7 @@ The engine on main is **omni-v14** (`OMNI_V14.json`, fingerprint `DIGEST14`, 47 
 engine that stands since 21 October by the founder's orders ("knobs on every monitor, to turn off and on ... a muscle"; "tune the
 engine"). It is omni-v13 with three changes in the Kubernetes governor. `--native` leaves any muscle where native runs it, never
 written, and the control panel carries it as one button a muscle. On a shared host beside another workload's room, no limit is raised
-on a reading older than that workload's newest pod: omni-v13 still raised the web's limits once, on the reading that opened the batch
+on the reading that opens that workload's run: omni-v13 still raised the web's limits once, on the reading that opened the batch
 queue, and handed them back 15 s later, the mechanism of the two LOSS rows of the omni-v12 group runs. And the operator's own commands
 run without a shell unless they hold a pipe, a redirect or a variable. GATE14README **omni-v13** ([`docs/OMNI_V13.md`](docs/OMNI_V13.md)),
 the engine that stood from 20 October, was omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig

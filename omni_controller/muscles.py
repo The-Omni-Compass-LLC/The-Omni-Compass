@@ -492,6 +492,7 @@ class Muscles:
         out = {}
         held = set()
         handed = opened = False
+        ahead = None                      # the host with another workload's starting pods added (omni-v14)
         if not hasattr(self, "room_running"):
             self.room_running = {}        # (ns, deployment) -> another workload's pods with room running at the last reading
         for ns, name in targets:
@@ -525,19 +526,32 @@ class Muscles:
             contended = shared and busy is not None and any(not mine(p) and has_room(p) for p in pods)
             give_back = contended and busy >= KIND_SCALE_OUT_BUSY_LIMIT
             cushion = contended and busy >= KIND_SCALE_OUT_BUSY_LIMIT - BAND[0]
-            # omni-v14: the reading is the host's busy share since the previous one. A pod of another workload with room of
-            # its own that is still starting (Pending), or that was not running at the previous reading, ran for none or
-            # only part of it: the reading is older than that workload's newest running pod and does not hold its load, so
-            # nothing is raised on it (lowering and the hand-back are never held); with no reading before this one, no pod
-            # of the workload is known to have run through it. On the toy cluster set from KubeRay's rig
-            # omni-v13 raised the web's limits on the queue's first reading, which spanned the seconds before the batch pods
-            # ran, and handed them back 15 s later (results/toy_gate/V13_VS_V12.md, docs/OMNI_V14.md)
+            # omni-v14: the reading is the host's busy share since the previous one. On the reading that opens another
+            # workload's run (no pod of it with room of its own was running at the previous reading, and now one runs or is
+            # starting), that workload ran for none or only part of the interval: the reading does not hold its load, so
+            # nothing is raised on it (lowering and the hand-back are never held); with no reading before this one, none is
+            # known to have run through it. On the toy cluster set from KubeRay's rig omni-v13 raised the web's limits on the
+            # queue's first reading, which spanned the seconds before the batch pods ran, and handed them back 15 s later
+            # (results/toy_gate/V13_VS_V12.md). Holding every reading after any new pod of a running workload was tried
+            # first and refused by the toy gate: the web's 95th percentile 6.4% higher than omni-v13's (docs/OMNI_V14.md)
             room_now = {(p["metadata"].get("namespace", "default"), p["metadata"]["name"]) for p in pods
                         if not mine(p) and has_room(p) and p["status"].get("phase") == "Running"}
             room_before = self.room_running.get((ns, name))
             self.room_running[(ns, name)] = room_now
-            opening = contended and (any(not mine(p) and has_room(p) and p["status"].get("phase") == "Pending" for p in pods)
-                                     or bool(room_now - (room_before or set())))
+            opening = contended and not room_before and (bool(room_now) or any(
+                not mine(p) and has_room(p) and p["status"].get("phase") == "Pending" for p in pods))
+            # omni-v14: a pod of another workload still starting (Pending on its machine) ran for none of the interval, so
+            # the reading leaves out all it may use; added to the reading by its own claim (its limit, else its request)
+            # over the host's processor, the host it will carry. Within the band's cushion of the top, nothing is raised on
+            # this reading. On the toy set from KubeRay's rig omni-v13 raised the web's limits on the reading a new job's
+            # pods were starting at and handed them back 15 s later (docs/OMNI_V14.md)
+            host_m = max(alloc.values(), default=0.0)
+            starting_m = sum(claim_m(c) for p in pods if not mine(p) and p["status"].get("phase") == "Pending"
+                             for c in p["spec"]["containers"])
+            if contended and starting_m and host_m > 0 and not cushion \
+                    and busy + starting_m / host_m >= KIND_SCALE_OUT_BUSY_LIMIT - BAND[0]:
+                ahead = round(busy + starting_m / host_m, 3)
+                opening = True
             opened = opened or opening
             handed = handed or give_back
             got = []
@@ -550,8 +564,8 @@ class Muscles:
                     if obs.get("security_block", 0.0) > 0.5 and want > cur:
                         got.append(cur); continue  # shield I1: no expansion during a security hold
                     if (busy_hold or cushion or opening) and want > cur:
-                        held.add(node); got.append(cur); continue  # the shared host near its top, unread, or its reading
-                                                                   # older than another workload's newest pod (omni-v14)
+                        held.add(node); got.append(cur); continue  # the shared host near its top, unread, or the reading
+                                                                   # that opens another workload's run (omni-v14)
                     permitted, reservations = budget.limit(ns, p, cur, want)
                     if abs(permitted - cur) < self.a.cap_min_change_m:
                         got.append(cur); continue
@@ -588,7 +602,8 @@ class Muscles:
         if held or handed:
             self.audit({"convey": "handed back" if handed else "held", "machines": sorted(held),
                         "host_busy": None if busy is None else round(busy, 3), "shared_host": shared,
-                        **({"reading_older_than_newest_pod": True} if opened else {})})
+                        **({"reading_opens_another_workload": True} if opened else {}),
+                        **({"host_busy_with_starting_pods": ahead} if ahead is not None else {})})
         return out
 
     def _convey_engaged(self):

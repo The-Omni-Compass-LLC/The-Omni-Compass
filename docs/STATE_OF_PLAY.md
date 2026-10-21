@@ -103,7 +103,7 @@ waits on the family allowance those machines hold.
 **The engine that stands is omni-v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files; `docs/OMNI_V14.md`), on main since
 21 October by the founder's orders: a knob on every monitor for every muscle, and "tune the engine". It is omni-v13 with three
 changes in the Kubernetes governor: `--native` leaves any muscle where native runs it (the control panel's muscle button); on a
-shared host beside another workload's room no limit is raised on a reading older than that workload's newest pod (omni-v13 still
+shared host beside another workload's room no limit is raised on the reading that opens that workload's run (omni-v13 still
 raised the web's limits once on the reading that opened the batch queue, the mechanism of the two LOSS rows the omni-v12 group
 runs read, `docs/GROUP_PREREGISTRATION.md`, amendment 3); and the operator's own commands run without a shell unless they hold a
 pipe, a redirect or a variable. GATE14STATE **omni-v13** (`docs/OMNI_V13.md`), on main from 20 October, was omni-v12 with one fault fixed in the Kubernetes

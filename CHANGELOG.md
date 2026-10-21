@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-## 2026-10-21: omni-v14 lands (a knob for every muscle; a raise only on a reading that holds the other workload; commands without a shell)
+## 2026-10-21: omni-v14 lands (a knob for every muscle; no raise on the reading that opens another workload's run; commands without a shell)
 
 - **omni-v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files; `docs/OMNI_V14.md`), the founder's orders "knobs on every
   monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with three changes in the
@@ -10,17 +10,19 @@
   bytes. (1) `--native MUSCLE[,...]` (or `OMNI_NATIVE`) leaves any of eleven muscles where native runs it, never written, an
   unknown name refused at the start; the control panel carries it as `POST /v1/muscle`, every press audited, passed through
   native like a dial press (`tools/omni_control.py`). (2) On a shared host beside another workload with room of its own, no CPU
-  limit is raised on a reading older than that workload's newest pod (a pod still starting, or not running at the previous
-  reading): omni-v13 still raised the web's limits once, on the reading that opened the batch queue, and handed them back 15 s
+  limit is raised on the reading that opens that workload's run (none of its pods with room running at the previous reading, one
+  running or starting now): omni-v13 still raised the web's limits once, on the reading that opened the batch queue, and handed them back 15 s
   later, the mechanism of the two LOSS rows of the omni-v12 group runs (`docs/GROUP_PREREGISTRATION.md`, amendment 3). Lowering
-  and the hand-back are never held; the audit says `"reading_older_than_newest_pod": true`. (3) The operator's own commands (the
+  and the hand-back are never held; the audit says `"reading_opens_another_workload": true`. A
+  broader rule, no raise on any reading older than the workload's newest pod, was tried first and refused by the toy gate (the
+  web's 95th percentile +6.4% against omni-v13 in the batch toy). (3) The operator's own commands (the
   site power reading, a muscle's read command, a wall meter's) run without a shell unless they hold a pipe, a redirect or a
   variable; the static scan's high findings fall from 3 to 2 (`docs/SECURITY_SCAN.md`). GATE14CHANGELOG Tests:
-  `tests/test_native_muscles.py`, `tests/test_operator_cmd.py`, `tests/test_convey_shared_host.py` (`ReadingOlderThanThePod`);
-  two omni-v13 hand-back tests now say their batch pod ran through the reading. The two changes landed come off the next
+  `tests/test_native_muscles.py`, `tests/test_operator_cmd.py`, `tests/test_convey_shared_host.py` (`ReadingThatOpensAnotherWorkload`);
+  two omni-v13 hand-back tests now say their batch pod ran through the previous reading. The two changes landed come off the next
   version's list (`docs/CHANGE_CONTROL.md`). The toy gate's cluster toy now starts every run with a fresh audit: its first
   run for omni-v14 read a folder an earlier, interrupted gate had left (a container restart), appended to its half-written
-  audits and stopped on the broken line; run again in a fresh folder (`tools/toy_gate.py`). Bookkeeping by `tools/land_engine.py v14`; the three manuals rebuilt; every
+  audits and stopped on the broken line; run again in a fresh folder (`tools/toy_gate.py`). The batch toy listed a batch pod as Running from the moment it was made; it lists it Pending, not ready, until its container runs (3 s, the rig's own pod start), as a cluster does, the same for both engines. Bookkeeping by `tools/land_engine.py v14`; the three manuals rebuilt; every
   benchmark runs again on omni-v14.
 
 - **The raw sweep leaves no cancelled runs either** (`raw-sweep.yml`): its one-at-a-time rule sat on the whole workflow, so

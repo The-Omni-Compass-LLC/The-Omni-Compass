@@ -162,37 +162,41 @@ if __name__ == "__main__":
     unittest.main()
 
 
-class ReadingOlderThanThePod(unittest.TestCase):
-    """omni-v14: on a shared host beside another workload with room of its own, no limit is raised on a reading that began
-    before that workload's newest pod ran (Pending, or not running at the previous reading): the reading does not hold its
-    load. The next reading, which does, may raise; lowering and the hand-back are never held (docs/OMNI_V14.md)."""
+class ReadingThatOpensAnotherWorkload(unittest.TestCase):
+    """omni-v14: on a shared host beside another workload with room of its own, no limit is raised on the reading that opens
+    that workload's run (none of its pods with room was running at the previous reading, and now one runs or is starting):
+    the reading does not hold its load. Once one of its pods has run through a reading, the conveyance decides as omni-v13
+    does, a new pod of the running workload holding nothing; lowering and the hand-back are never held (docs/OMNI_V14.md)."""
 
     def cluster(self, batch):
         nodes = [node("w1"), node("w2"), node("w3")]
         pods = [pod("web-1", "w1"), pod("dns", "w1", app="coredns", req="300m", limit="300m", ns="kube-system")] + batch
         return Cluster(nodes, pods)
 
-    def test_a_new_batch_pod_holds_the_raise_for_one_reading(self):
-        b1 = pod("batch-1", "w2", app="batch", req="500m", limit="1000m")
-        c, stat = self.cluster([b1]), Stat(0.40)
+    def test_the_opening_reading_holds_the_raise_and_the_next_decides(self):
+        c, stat = self.cluster([pod("batch-1", "w2", app="batch", req="500m", limit="1000m")]), Stat(0.40)
         m, events = muscles(c, stat)
-        m.convey()                                     # the first reading with the batch pod running: it is new here
+        self.assertEqual(m.convey(), {})               # the first reading with the workload's pod: its run opens here
         self.assertFalse(any(a[0] == "patch" for a, _ in c.writes))
-        self.assertTrue(any(e.get("reading_older_than_newest_pod") for e in events))
+        self.assertTrue(any(e.get("reading_opens_another_workload") for e in events))
         stat.advance()
-        out = m.convey()                               # the next reading covers the pod's run: the raise goes ahead
-        self.assertEqual(out, {"default/web-1": 3500})
-        c.pods.append(pod("batch-2", "w3", app="batch", req="500m", limit="1000m"))
-        stat.advance()
-        self.assertEqual(m.convey(), {})               # another pod of the workload starts: nothing more is raised on it
+        self.assertEqual(m.convey(), {"default/web-1": 3500})   # the next reading holds the pod's load: omni-v13's raise
 
-    def test_a_pending_pod_of_the_workload_holds_the_raise(self):
+    def test_a_new_pod_of_a_running_workload_holds_nothing(self):
+        c, stat = self.cluster([pod("batch-1", "w2", app="batch", req="500m", limit="1000m")]), Stat(0.40)
+        m, events = muscles(c, stat)
+        m.room_running = {("default", "web"): {("default", "batch-1")}}    # batch-1 ran through the previous reading
+        c.pods.append(pod("batch-2", "w3", app="batch", req="500m", limit="1000m"))
+        self.assertEqual(m.convey(), {"default/web-1": 3500})
+        self.assertFalse(any(e.get("reading_opens_another_workload") for e in events))
+
+    def test_a_starting_pod_opens_the_run_too(self):
         b1 = pod("batch-1", "w2", app="batch", req="500m", limit="1000m", phase="Pending", ready=False)
         c, stat = self.cluster([b1]), Stat(0.40)
         m, events = muscles(c, stat)
         m.room_running = {("default", "web"): set()}   # a reading before this one saw no pod of the workload running
         self.assertEqual(m.convey(), {})
-        self.assertTrue(any(e.get("reading_older_than_newest_pod") for e in events))
+        self.assertTrue(any(e.get("reading_opens_another_workload") for e in events))
 
     def test_lowering_is_never_held(self):
         b1 = pod("batch-1", "w2", app="batch", req="500m", limit="1000m")
@@ -201,7 +205,7 @@ class ReadingOlderThanThePod(unittest.TestCase):
             if p["metadata"]["name"] in ("web-1", "web-2"):
                 p["spec"]["containers"][0]["resources"]["limits"]["cpu"] = "3500m"
         m, events = muscles(c, stat)
-        # w1 carries two serving pods now: (0.95 x 4000 - 300) / 2 = 1750 each, a lowering written on the new pod's reading
+        # w1 carries two serving pods now: (0.95 x 4000 - 300) / 2 = 1750 each, a lowering written on the opening reading
         self.assertEqual(m.convey(), {"default/web-1": 1750, "default/web-2": 1750})
 
     def test_no_other_workload_with_room_keeps_omni_v13s_raise(self):

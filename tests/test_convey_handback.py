@@ -36,7 +36,7 @@ class Handback(unittest.TestCase):
         requested, 1 core limit), so web-2 may have 0.95 x 4000 - 1000 = 2800m, not the 3300m omni-v12 conveyed."""
         c, stat = self.kind([batch("b-1", "w2")]), Stat(0.40)
         m, events = muscles(c, stat)
-        m.room_running = {("default", "web"): {("default", "b-1")}}   # b-1 ran through the reading (omni-v14's rule)
+        m.room_running = {("default", "web"): {("default", "b-1")}}   # b-1 ran through the previous reading (omni-v14's rule)
         self.assertEqual(m.convey(), {"default/web-1": 3500, "default/web-2": 2800, "default/web-3": 3800})
 
     def test_the_top_with_another_workloads_room_hands_every_limit_back(self):
@@ -63,7 +63,7 @@ class Handback(unittest.TestCase):
     def test_under_the_cushion_the_room_is_conveyed_again(self):
         c, stat = self.kind([batch("b-1", "w2")]), Stat(0.65)
         m, events = muscles(c, stat)
-        m.room_running = {("default", "web"): {("default", "b-1")}}   # b-1 ran through the reading (omni-v14's rule)
+        m.room_running = {("default", "web"): {("default", "b-1")}}   # b-1 ran through the previous reading (omni-v14's rule)
         self.assertEqual(m.convey(), {"default/web-1": 3500, "default/web-2": 2800, "default/web-3": 3800})
 
     def test_a_host_with_no_room_but_its_own_keeps_the_v7_rule(self):

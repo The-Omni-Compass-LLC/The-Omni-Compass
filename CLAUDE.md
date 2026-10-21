@@ -49,8 +49,8 @@ the founder overrides one in the conversation.
   orders "knobs on every monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with
   three changes in the Kubernetes governor (`omni_controller/controller.py`, `omni_controller/muscles.py`). `--native MUSCLE[,...]`
   (or `OMNI_NATIVE`, the control panel's muscle button) leaves any muscle where native runs it, never written, an unknown name
-  refused; on a shared host beside another workload's room no limit is raised on a reading older than that workload's newest pod
-  (a pod still starting, or not running at the previous reading), the raise omni-v13 still made on the reading that opened the
+  refused; on a shared host beside another workload's room no limit is raised on the reading that opens that workload's run
+  (none of its pods with room running at the previous reading, one running or starting now), the raise omni-v13 still made on the reading that opened the
   batch queue and handed back 15 s later, and the mechanism of the two LOSS rows of the omni-v12 group runs
   (`docs/GROUP_PREREGISTRATION.md`, amendment 3); and the operator's own commands run without a shell unless they hold a pipe, a
   redirect or a variable (the static scan's high findings 3 to 2). GATE14 Every benchmark runs again on it.

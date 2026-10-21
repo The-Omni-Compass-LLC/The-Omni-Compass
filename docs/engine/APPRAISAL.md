@@ -8,12 +8,12 @@ repository runs it, and does every word on the page say only what the parts do? 
 repository's own code by an independent path and compared, value by value. Run and scored by The Omni-Compass LLC's own
 code. No outside party has reviewed or approved these results.
 
-**Engine.** The engine that stands is **omni-v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files, since 21 October): omni-v13 with a knob that leaves any muscle native, no conveyance raise on a reading older than another workload's newest pod, and the operator's commands run without a shell, none of which the page's ports run.
+**Engine.** The engine that stands is **omni-v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files, since 21 October): omni-v13 with a knob that leaves any muscle native, no conveyance raise on the reading that opens another workload's run, and the operator's commands run without a shell, none of which the page's ports run.
 Since omni-v8 it has changed `tools/run_citylearn.py` (outage buildings' batteries stay native, omni-v8; the wire reads the
 coming hour, omni-v9; the glide that cuts the bill most, omni-v10), the realms harness's t table and the Kubernetes governor (a
 reading with no machine in service is held, never read as an overload, omni-v11; a CPU-limit raise the cluster's admission
 refused is held, not written again at every check, omni-v12; the CPU limits it gave go back to the operator's on a shared host at its
-top beside another workload's room, omni-v13; no raise there on a reading older than that workload's newest pod, a muscle left native on the operator's word, the operator's commands without a shell, omni-v14), and added `omnicompass/student_t.py` (the
+top beside another workload's room, omni-v13; no raise there on the reading that opens that workload's run, a muscle left native on the operator's word, the operator's commands without a shell, omni-v14), and added `omnicompass/student_t.py` (the
 exact Student t); every other engine file is unchanged since omni-v8. Every record on the page was made again on the omni-v9
 tree, whose bytes omni-v14 keeps in every file the page reads but the governor, whose new guards act only on a reading
 with no machine in service, on a raise the cluster refused, on a shared host at its top and on a muscle left native (the page's controller trace has none: recorded again on the

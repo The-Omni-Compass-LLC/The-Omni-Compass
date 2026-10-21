@@ -1,4 +1,4 @@
-# Omni v14: a knob for every muscle, a raise only on a reading that holds the other workload, commands without a shell (the engine that stands since 21 October)
+# Omni v14: a knob for every muscle, no raise on the reading that opens another workload's run, commands without a shell (the engine that stands since 21 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
@@ -18,7 +18,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | # | Change | Where | Why |
 |---|---|---|---|
 | 1 | `--native MUSCLE[,...]` leaves each named muscle where native runs it: never written, the rest running as before; a name that is not a muscle is refused at the start | the governor and its muscles; the control panel's muscle button | the founder's order of 20 October: a knob for every muscle; and his rule that a muscle Omni-Compass would hurt stays native |
-| 2 | On a shared host beside another workload with room of its own, no limit is raised on a reading older than that workload's newest pod: a pod still starting, or not running at the previous reading, ran for none or part of it, so the reading does not hold its load. Lowering and omni-v13's hand-back are never held | the conveyance (`omni_controller/muscles.py`) | omni-v13 still raised the web's limits once, on the reading that opened the batch queue, and handed them back 15 s later; in the toy set from KubeRay's rig the job turnaround read +0.03% against native, a LOSS by the key (`results/toy_gate/V13_VS_V12.md`). The same raise is the mechanism behind the two LOSS rows of the omni-v12 group runs (`docs/GROUP_PREREGISTRATION.md`, amendment 3) |
+| 2 | On a shared host beside another workload with room of its own, no limit is raised on the reading that opens that workload's run: no pod of it with room was running at the previous reading, and now one runs or is starting, so it ran for none or part of the interval and the reading does not hold its load. The next reading decides as omni-v13 does. Lowering and omni-v13's hand-back are never held | the conveyance (`omni_controller/muscles.py`) | omni-v13 still raised the web's limits once, on the reading that opened the batch queue, and handed them back 15 s later; in the toy set from KubeRay's rig the job turnaround read +0.03% against native, a LOSS by the key (`results/toy_gate/V13_VS_V12.md`). The same raise is the mechanism behind the two LOSS rows of the omni-v12 group runs (`docs/GROUP_PREREGISTRATION.md`, amendment 3) |
 | 3 | The operator's own commands (the site power reading, a muscle's read command, a wall meter's `cmd:`) run without a shell unless they hold a pipe, a redirect or a variable | `run_operator_cmd` (`omni_controller/muscles.py`), `tools/wall_meter.py` | the static scan's three high findings (`docs/SECURITY_SCAN.md`); the governor's site power reading no longer reaches a shell at all |
 
 ## 1. The knob
@@ -48,19 +48,26 @@ dial press it passes through native: the governor's own kill file is set, its ex
 and read back), and it starts again with the new list. Nothing is changed under a running governor. The monitor wall
 (`docs/MONITOR_WALL.md`) points every row at these buttons; the wall itself never presses one.
 
-## 3. The conveyance's reading and the other workload's newest pod
+## 3. The conveyance's reading and the other workload's run
 
 The governor reads the host's busy share as the change in the host's processor counters since its previous reading (every
 15 s, on its fast check). A batch pod that started between two readings ran for part of the interval; one still starting
-(Pending) ran for none of it. So on the first reading after a batch's pods start, the busy share is the host before most of their
-load, and on a host whose batch is about to fill it, omni-v13 could read room that was no longer there: it raised the web pods'
-limits on that reading and handed them back on the next, once the busy share showed the host at its top. omni-v14 keeps, for each
-serving deployment, the other workload's pods with room that were running at the previous reading; when a pod with room is still
-starting, or is running now but was not then, nothing is raised on this reading, and the audit says why
-(`"reading_older_than_newest_pod": true` on the `"convey": "held"` record). The next reading, which holds that pod's load, decides
-as omni-v13 does. Nothing is lowered later for it, and nothing about a host with no other workload's room changes. Tests:
-`tests/test_convey_shared_host.py`, `ReadingOlderThanThePod`; omni-v13's hand-back tests carry the one line that says their
-batch pod ran through the reading.
+(Pending) ran for none of it. So on the reading that opens a batch's run, the busy share is the host before most of its load,
+and on a host whose batch is about to fill it, omni-v13 could read room that was no longer there: it raised the web pods' limits
+on that reading and handed them back on the next, once the busy share showed the host at its top. omni-v14 keeps, for each
+serving deployment, the other workloads' pods with room that were running at the previous reading. When none was, and now one
+runs or is starting, nothing is raised on this reading, and the audit says why (`"reading_opens_another_workload": true` on the
+`"convey": "held"` record). The next reading, which holds that workload's load, decides as omni-v13 does. A new pod of a workload
+already running holds nothing, nothing is lowered later for it, and nothing about a host with no other workload's room changes.
+Tests: `tests/test_convey_shared_host.py`, `ReadingThatOpensAnotherWorkload`; omni-v13's hand-back tests carry the one line that
+says their batch pod ran through the previous reading.
+
+A broader rule was written and tried first: no raise on any reading older than that workload's newest running pod, so every
+reading after any new batch pod started. The toy gate refused it: in the batch toy the web's 95th percentile read 6.4% higher
+than omni-v13's, a LOSS, because a stream of jobs starts a pod every few seconds and the web lost the raises it had earned
+between the queue's openings. It is not in omni-v14. The gate also found the toy listing a batch pod as Running from the moment
+it was made; a cluster lists it as Pending until its container runs (the rig's own pod start, about 3 s). The toy now lists it as
+the cluster does, the same for both engines, and both were read on it (section 5).
 
 ## 4. The operator's commands without a shell
 
