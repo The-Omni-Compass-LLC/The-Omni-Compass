@@ -40,7 +40,8 @@ def build_cpp(tmp):
         srcs = [str(p) for p in (src / "src").glob("*.cpp")]
         for tool, name in (("run_fixture.cpp", "oc_run_fixture"), ("run_governor.cpp", "oc_governor"), ("soak.cpp", "oc_soak"),
                            ("smoke.cpp", "oc_smoke"), ("run_shield.cpp", "oc_shield"), ("run_hpa.cpp", "oc_hpa"), ("savings.cpp", "oc_savings"),
-                           ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins")):
+                           ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
+                           ("engine_runs.cpp", "oc_engine_runs")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
 
@@ -93,6 +94,9 @@ def main():
     test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, "throughput"); check("C++ governor vs Python governor (throughput)", True)
     for m_ in ("fleet", "fleet_balanced", "fleet_wear"):
         test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, m_); check(f"C++ governor vs Python governor ({m_})", True)
+    from tools import engine_runs as ER   # the founder's order of 21 October: the Python's runs the input, the C++ harness the mechanism
+    check("the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): every receipt to 1e-9 and the same digest",
+          ER.cpp_check(20 if a.quick else 100, ER.DEFAULT_BASE, b / "oc_engine_runs") == 0)
     from tests import test_cpp_shield_parity
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8 if a.quick else 20); check("C++ shield vs Python shield (enforce and violations)", True)
     from tests import test_cpp_shield_adversarial, test_shield_properties

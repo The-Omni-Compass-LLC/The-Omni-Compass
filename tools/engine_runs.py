@@ -19,6 +19,8 @@ docs/engine/check_live_engine.py) and compares receipt by receipt.
   python3 tools/engine_runs.py --runs 500 --base 20261020           write results/engine_runs/ENGINE_RUNS_500_20261020.json and .md
   python3 tools/engine_runs.py --verify PAGE                        run the page's own loop in node on 20 runs and compare to the Python
   python3 tools/engine_runs.py --verify PAGE --all --runs 500 --base B   the same on every one of the 500
+  python3 tools/engine_runs.py --cpp cpp/build/oc_engine_runs ...    write the record with the same runs through the C++ harness
+  python3 tools/engine_runs.py --verify-cpp cpp/build/oc_engine_runs  the Python's first 20 runs (or --all) through the C++ harness
 
 On GitHub (.github/workflows/engine-runs.yml, the founder's order of 21 October: every set the jump generator runs is linked to
 the live engine) every push that changes the page or this file, and every dispatch, runs another set from a new base, checks the
@@ -91,18 +93,36 @@ class Draw:
         return mu + sigma * math.sqrt(-2.0 * math.log(1.0 - u1)) * math.cos(2.0 * math.pi * u2)
 
 
-def one_run(k: int, base: int) -> dict:
+def draws(k: int, base: int) -> dict:
+    """Every draw run k makes from its own stream, in the one order the page draws them too: the injection the C++ harness reads
+    (cpp/tools/engine_runs.cpp). The senses of each of the 288 decisions; the compass law's tau, starting reading and 80 steps; the
+    give-back trial's cost, allowance, noise, its 30 reference samples and 90 trial samples."""
     seed = jump(base, k)
     d = Draw(seed)
-    g, push, expand, contract = Governor(), 0.0, 0, 0
-    calm = 0.0
+    obs = []
     for _ in range(DECISIONS):
         q = d.choice([0.0, 0.0, None])
         if q is None:
             q = d.uniform(0, 0.6)
-        obs = {"queue_ratio": q, "load_ratio": d.uniform(0.2, 1.4), "power_stress": d.uniform(0, 1.1), "thermal": d.uniform(0, 1.1),
-               "network_stress": d.uniform(0, 0.4), "drift_ratio": d.uniform(0, 0.5), "stale": d.choice([0, 0, 0, 1]),
-               "security_block": d.choice([0, 0, 0, 1]), "slo_clean": d.r() < 0.8}
+        obs.append({"queue_ratio": q, "load_ratio": d.uniform(0.2, 1.4), "power_stress": d.uniform(0, 1.1), "thermal": d.uniform(0, 1.1),
+                    "network_stress": d.uniform(0, 0.4), "drift_ratio": d.uniform(0, 0.5), "stale": d.choice([0, 0, 0, 1]),
+                    "security_block": d.choice([0, 0, 0, 1]), "slo_clean": d.r() < 0.8})
+    tau = d.uniform(1, 8)
+    r0 = d.uniform(0.2, 1.1)
+    inc = [d.gauss(0, 0.06) for _ in range(LAW_STEPS)]
+    cost = d.choice([-0.04, 0, 0.01, 0.02, 0.03, 0.05, 0.08])
+    tol, sig = d.choice([0.005, 0.01, 0.02, 0.03]), d.choice([0.1, 0.25, 0.4])
+    ref = [math.exp(d.gauss(0, sig)) for _ in range(30)]
+    extra = [math.exp(d.gauss(0, sig)) * (1 + cost) for _ in range(90)]
+    return {"k": k, "seed": seed, "obs": obs, "tau": tau, "r0": r0, "inc": inc, "cost": cost, "tol": tol, "sig": sig, "ref": ref, "extra": extra}
+
+
+def run_draws(dr: dict) -> dict:
+    """One run of the engine that stands on its draws: the brain (omnicompass.adapter.Governor) and the nervous system's grants
+    for every decision, the compass law, one give-back trial judged by the verdict."""
+    g, push, expand, contract = Governor(), 0.0, 0, 0
+    calm = 0.0
+    for obs in dr["obs"]:
         dec = g.step(obs, 0)
         a = from_governor(g, obs, dec)
         push += g.last_push
@@ -110,16 +130,13 @@ def one_run(k: int, base: int) -> dict:
             expand += 1 if a["organs"][o]["expand"] else 0
             contract += 1 if a["organs"][o]["contract"] else 0
         calm = a["scalars"]["calm"]
-    tau = d.uniform(1, 8)
-    law, r, fs = CompassLaw(Band(0.2, 1.0), dt=1.0, tau=tau), d.uniform(0.2, 1.1), []
-    for _ in range(LAW_STEPS):
-        r = max(0.0, r + d.gauss(0, 0.06))
+    tau = dr["tau"]
+    law, r, fs = CompassLaw(Band(0.2, 1.0), dt=1.0, tau=tau), dr["r0"], []
+    for inc in dr["inc"]:
+        r = max(0.0, r + inc)
         fs.append(law.force(r))
-    cost = d.choice([-0.04, 0, 0.01, 0.02, 0.03, 0.05, 0.08])
-    tol, sig = d.choice([0.005, 0.01, 0.02, 0.03]), d.choice([0.1, 0.25, 0.4])
-    ref = [math.exp(d.gauss(0, sig)) for _ in range(30)]
-    extra = [math.exp(d.gauss(0, sig)) * (1 + cost) for _ in range(90)]
-    v = Verdict(tolerance=tol, min_samples=30, probe_every=1, max_trial=10 ** 6, judge="interval")
+    ref, extra = dr["ref"], dr["extra"]
+    v = Verdict(tolerance=dr["tol"], min_samples=30, probe_every=1, max_trial=10 ** 6, judge="interval")
     v.tick(True); v.observe(ref); v.tick(True); v.observe(extra[:30])
     used = 30
     while True:
@@ -130,9 +147,69 @@ def one_run(k: int, base: int) -> dict:
             ev = {"verdict": "step refused: the trial ran out of samples"}
             break
         v.observe([extra[used]]); used += 1
-    return {"k": k, "seed": seed, "x": list(g.x.as_tuple()), "push": push, "expand": expand, "contract": contract, "calm": calm,
+    return {"k": dr["k"], "seed": dr["seed"], "x": list(g.x.as_tuple()), "push": push, "expand": expand, "contract": contract, "calm": calm,
             "tau": tau, "meanF": sum(abs(f) for f in fs) / len(fs), "lastF": fs[-1],
             "allowed": 1 if ev["verdict"] == "step allowed" else 0, "used": used}
+
+
+def one_run(k: int, base: int) -> dict:
+    return run_draws(draws(k, base))
+
+
+def injection(sets: list) -> str:
+    """The Python's runs as the C++ harness reads them: every draw at full precision (repr round-trips exactly)."""
+    L = [f"OCRUNS 1 {len(sets)} {DECISIONS} {LAW_STEPS}"]
+    for dr in sets:
+        L.append(f"R {dr['k']} {dr['seed']}")
+        for o in dr["obs"]:
+            L.append("O " + " ".join(repr(float(o[key])) for key in ("queue_ratio", "load_ratio", "power_stress", "thermal", "network_stress",
+                                                                        "drift_ratio", "stale", "security_block")) + (" 1" if o["slo_clean"] else " 0"))
+        L.append("L " + " ".join(repr(float(x)) for x in [dr["tau"], dr["r0"], *dr["inc"]]))
+        L.append("V " + " ".join(repr(float(x)) for x in [dr["cost"], dr["tol"], dr["sig"]]) + f" {len(dr['ref'])} "
+                 + " ".join(repr(float(x)) for x in dr["ref"]) + f" {len(dr['extra'])} " + " ".join(repr(float(x)) for x in dr["extra"]))
+    return "\n".join(L) + "\n"
+
+
+CPP = ROOT / "cpp" / "build" / "oc_engine_runs"
+
+
+def cpp_runs(sets: list, binary: Path = CPP) -> dict:
+    """The C++ harness on the Python's injection: its canonical receipts, its digest, and every receipt at full precision."""
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        inj = injection(sets)
+        (t / "in.txt").write_text(inj, encoding="utf-8")
+        subprocess.run([str(binary), str(t / "in.txt"), str(t / "receipts.txt"), str(t / "full.jsonl")], check=True, capture_output=True, text=True)
+        canon = (t / "receipts.txt").read_text(encoding="utf-8")
+        full = [json.loads(line) for line in (t / "full.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    return {"canon": canon, "digest": hashlib.sha256(canon.encode("utf-8")).hexdigest(), "runs": full,
+            "inputs_digest": hashlib.sha256(inj.encode("utf-8")).hexdigest()}
+
+
+def largest(a: dict, b: dict) -> float:
+    d = 0.0
+    for key in KEYS:
+        va, vb = a[key], b[key]
+        if isinstance(va, list):
+            d = max(d, max(abs(x - y) for x, y in zip(va, vb)))
+        else:
+            d = max(d, abs(float(va) - float(vb)))
+    return d
+
+
+def cpp_check(n: int, base: int, binary: Path = CPP) -> int:
+    """The Python's runs through the C++ harness: every receipt to 1e-9 and the same digest."""
+    if not Path(binary).exists():
+        print(f"the C++ harness is not built: cmake -S cpp -B cpp/build && cmake --build cpp/build ({binary})")
+        return 2
+    sets = [draws(k, base) for k in range(n)]
+    py = [run_draws(dr) for dr in sets]
+    c = cpp_runs(sets, binary)
+    worst = max((largest(a, b) for a, b in zip(py, c["runs"])), default=0.0)
+    same = c["digest"] == digest(py) and len(c["runs"]) == n
+    print(f"the C++ harness on the Python's {n} runs (base {base}): largest difference {worst:.1e}; the digests {'match' if same else 'DIFFER'} "
+          f"(Python {digest(py)[:16]}…, C++ {c['digest'][:16]}…; the injection {c['inputs_digest'][:16]}…)")
+    return 0 if same and worst < 1e-9 else 1
 
 
 KEYS = ("x", "push", "expand", "contract", "calm", "tau", "meanF", "lastF", "allowed", "used")
@@ -237,17 +314,32 @@ def main() -> int:
     ap.add_argument("--base", type=int, default=DEFAULT_BASE, help="the jump generator's base seed")
     ap.add_argument("--verify", default="", help="the live engine page: run its loop in node and compare")
     ap.add_argument("--out", default="", help="where to write (default results/engine_runs/)")
-    ap.add_argument("--all", action="store_true", help="with --verify: every run of the set, not the first 20")
+    ap.add_argument("--all", action="store_true", help="with --verify or --verify-cpp: every run of the set, not the first 20")
+    ap.add_argument("--cpp", default="", help="the C++ harness (cpp/build/oc_engine_runs): run the same set through it and record its digest")
+    ap.add_argument("--verify-cpp", default="", help="the C++ harness: run the Python's runs through it and compare")
     a = ap.parse_args()
     if a.verify:
         return verify(Path(a.verify), a.runs if a.all else min(a.runs, 20), a.base)
-    runs = [one_run(k, a.base) for k in range(a.runs)]
+    if a.verify_cpp:
+        return cpp_check(a.runs if a.all else min(a.runs, 20), a.base, Path(a.verify_cpp))
+    sets = [draws(k, a.base) for k in range(a.runs)]
+    runs = [run_draws(dr) for dr in sets]
     dg = digest(runs)
     eng = engine()
     data = {"tool": "tools/engine_runs.py", "engine": eng, "runs": a.runs, "base": a.base, "jump": "seed_k = base + k·0x9E3779B9 mod 2^32",
             "generator": "mulberry32 (the page's own)", "decisions": DECISIONS, "law_steps": LAW_STEPS, "digest": dg,
             "digest_of": "SHA-256 of every receipt, numbers rounded to six decimals, one line a run (canonical())",
             "written": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "receipts": runs}
+    if a.cpp:   # the same runs through the C++ harness: the Python's draws its input, the C++ twins of the engine the mechanism
+        c = cpp_runs(sets, Path(a.cpp))
+        diffs = [largest(x, y) for x, y in zip(runs, c["runs"])]
+        data["inputs_digest"] = c["inputs_digest"]
+        data["cpp"] = {"tool": "cpp/tools/engine_runs.cpp (oc_engine_runs)", "digest": c["digest"], "same": c["digest"] == dg and len(c["runs"]) == len(runs),
+                       "largest_difference": max(diffs, default=0.0), "agree": sum(1 for x in diffs if x < 1e-9), "diff": [float(f"{x:.1e}") for x in diffs],
+                       "twins": "omnicompass::Governor (sense, assimilate, the brain's RK4) and omnicompass::authority (the nervous system); "
+                                "the compass law and the verdict's interval rule as the page carries them"}
+        if not data["cpp"]["same"]:
+            print(f"the C++ harness DIFFERS from the Python: digest {c['digest'][:16]}… against {dg[:16]}…, largest difference {data['cpp']['largest_difference']:.1e}")
     if os.environ.get("GITHUB_RUN_ID"):   # made on GitHub: the run that made it, so the page links the record to it
         data["github"] = {"run_id": os.environ["GITHUB_RUN_ID"], "workflow": os.environ.get("GITHUB_WORKFLOW", ""),
                           "commit": os.environ.get("GITHUB_SHA", ""), "ref": os.environ.get("GITHUB_REF_NAME", ""),
@@ -260,6 +352,9 @@ def main() -> int:
           f"Engine {eng}. Written {data['written']}. Each run: {DECISIONS} decisions of the brain (RK4), {LAW_STEPS} steps of the compass law, one give-back",
           "trial judged by the verdict; the seed of run k is base + k·0x9E3779B9 mod 2³², the stream mulberry32, the same in the live engine's page.", "",
           f"**Digest {dg}** (SHA-256 of the receipts, six decimals). The page runs the same {a.runs} and shows its own digest beside this one.", "",
+          *([f"**The C++ harness** (`cpp/tools/engine_runs.cpp`, the C++ twins of the engine) on the same draws: digest {data['cpp']['digest']}, "
+             f"{'the same' if data['cpp']['same'] else 'DIFFERENT'}; {data['cpp']['agree']} of {a.runs} runs agree to 1e-9, largest difference "
+             f"{data['cpp']['largest_difference']:.1e}. The draws themselves, the injection: SHA-256 {data['inputs_digest']}.", ""] if "cpp" in data else []),
           f"Trials allowed {allowed} of {a.runs}; the brain's pushes summed over all runs {sum(r['push'] for r in runs):.3f}; grants to expand {sum(r['expand'] for r in runs)}, to contract {sum(r['contract'] for r in runs)}.", "",
           "| run | seed | final state E U I S B C | pushes | expand | contract | calm | τ | mean force | last force | trial | samples |", "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|---:|"]
     for r in runs:
@@ -267,8 +362,9 @@ def main() -> int:
     md += ["", "---", "", f"*{NOTICE}*"]
     out.with_suffix(".md").write_text("\n".join(md) + "\n", encoding="utf-8")
     shown = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
-    print(f"{a.runs} runs written to {shown} (digest {dg[:16]}…, {allowed} trials allowed)")
-    return 0
+    print(f"{a.runs} runs written to {shown} (digest {dg[:16]}…, {allowed} trials allowed)"
+          + (f"; the C++ harness: digest {data['cpp']['digest'][:16]}…, {'the same' if data['cpp']['same'] else 'DIFFERENT'}" if "cpp" in data else ""))
+    return 0 if "cpp" not in data or data["cpp"]["same"] else 1
 
 
 if __name__ == "__main__":

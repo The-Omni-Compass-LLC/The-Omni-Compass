@@ -2,6 +2,32 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21 (morning): the live engine front to back as the founder reads it; every monitor drawn; the Python's runs through the C++
+
+- **The front order** (the founder's order of 21 October): the title page first, then the executive summary and the reading key, then
+  the Engine table of contents (iv), then the monitor wall; the contents carry no bullets and no dotted leaders: part 1 is lettered
+  1a to 1i, one section for each of its panels (1a the control panel and the kill switch, 1b the wall, 1c the monitor list, 1d the
+  status board, 1e the master switch's wiring, 1f the Python's runs, 1g every LOSS row, 1h the golden signals, the event log and the
+  metrics, 1i the pipeline), each with its controls line and summary, every in-page reference moved with it.
+- **The wall read left to right** (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`): monitors numbered 1
+  upward in their order of appearance and laid out left to right, then the next row; the right-to-left mode and its button removed.
+  Two monitors that sit side by side in their section (native beside Omni-Compass) sit side by side on the wall and never split
+  across two rows, and on the page the pairs stay side by side at every width, a phone included, their canvases level.
+- **Every monitor drawn**: the wall redrew a resting monitor through code that refused to draw off screen, so monitors 2 to 7 and 22
+  stayed stale or blank until scrolled to; every monitor is now drawn by its own code as the page opens (about 50 ms for all 58)
+  and in turn while the wall is in view. The proof monitor's runs start on their own; Google's and Amazon's bill monitors show the
+  mechanism every cloud set runs, live on the cloud setting's model (class S, never their bill) until their first set lands; the
+  data pipeline is drawn whole on its own canvas at every width.
+- **The Python's runs through the C++ harness** (`cpp/tools/engine_runs.cpp`, `oc_engine_runs`): the Python writes every draw of every
+  run (the injection); the C++ program reads it, puts the mechanism on through the engine's C++ twins (the governor's sense,
+  assimilation and RK4; the nervous system's grants; the compass law and the verdict's interval rule as the page carries them) and
+  writes every receipt. On GitHub's set of 21 October (base 881947045) all 500 agree to 2.2e-15 and the digests are one
+  (87e77e00bce8e482…). `engine-runs.yml` builds it and records the C++ digest, the run-by-run differences and the digest of the draws
+  in every set; `verify.py` runs it on every push; the proof monitor (1f) reads every run three ways, the Python, the C++ and the
+  page, one digest each.
+- **The Live Engine Manual realigned**: the front order, part 1's sections, the wall's direction, the pairs, the three-way proof and
+  the cloud and pipeline monitors; Appendix A rebuilt from the page's own contents (its numbers had kept an older order).
+
 ## 2026-10-21: the live engine in the founder's order, every monitor numbered and knobbed, the Python's runs in the page, the third manual
 
 - **The live engine's order** (the founder's orders of 20 October): the table of contents first, named "Engine table of contents",

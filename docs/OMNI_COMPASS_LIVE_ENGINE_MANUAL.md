@@ -90,7 +90,7 @@ archived with their SHA-256 lists, the two other manuals and `DISCLOSURES.md`.
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
 (omni-v13, `OMNI_V13.json`). The page names its engine on its own `<html>` element (`data-engine`) and refuses to be built on
 any other; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
-same push. The page's own table of contents (its section ii, "Engine table of contents") is the authority on the order and the
+same push. The page's own table of contents (its section iv, "Engine table of contents") is the authority on the order and the
 numbering of its sections; this manual names every section by its title and its anchor (`#s-health`, `#s-ops`, and so on), which
 do not move when sections are renumbered.
 
@@ -357,15 +357,19 @@ copy.
 
 ### 2.1 The page's own contents
 
-The page opens with its legal notice (i), then its own table of contents (ii, "Engine table
-of contents"), the title page with the build (iii) and the executive summary with the reading key (iv). The body is numbered 1 to 11; the back matter is v (disclosures, governing law and contact) and vi (the closing legal notice). A section's number is
-printed before its title; a lettered section (1a, 4c) is a monitor inside the numbered part that holds it.
+The page opens with its legal notice (i), then the title page with the build (ii) and the executive summary with the
+reading key (iii), and then its own table of contents (iv, "Engine table of contents"): the founder's order of 21 October, the
+title, the summary and the key first and the contents after them. The body is numbered 1 to 11; the back matter is v
+(disclosures, governing law and contact) and vi (the closing legal notice). A section's number is printed before its title; a
+lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
+to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
 
 ### 2.2 The sections, as built on omni-v13
 
 Appendix A lists every section with its anchor and the chapter of this book that
-reads it. In the page's order: 1 the monitor wall (1a the monitor wall and the control panel: the kill switch, every monitor
-numbered, the status board; 1b the pipeline); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
+reads it. In the page's order: 1 the monitor wall and the control panel (1a the control panel and the kill switch, 1b the
+monitor wall, 1c the monitor list, 1d the status board, 1e the master switch's wiring, 1f the Python's runs in the page, 1g
+every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
 measured effect in full (the organisms, every muscle, the register, the grid and every three-run table); 5 the evidence by
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
@@ -376,7 +380,7 @@ self-governed rendering.
 ### 2.3 Anchors
 
 Every section has an anchor that does not move when the page is reordered: `#p-health`, `#s-health`,
-`#s-github`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
+`#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
 `#p-organism`, `#s-engines`, `#s-lab`, `#s-desk`, `#p-brain`, `#s-decision`, `#s-plane`, `#s-brain`, `#s-verdict`, `#s-fail`,
 `#s-math`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
 contents links the same way. When this book names a section it gives its title and its anchor, so the reader finds it on a
@@ -431,23 +435,28 @@ counted in no total.
 ### 4.0 The numbered monitors and the control panel
 
 Every monitor of the page (every chart canvas) carries its number in a badge above it, counted in its order of
-appearance from 1 at the top of the page to the last at the bottom; the page's section 1a shows them all at once on the
-monitor wall, numbered, read right to left and then down as the founder ordered (a button reads them left to right), and a
-click on a tile scrolls to the monitor it copies. Each section names its monitors in the engine table of contents, and each
+appearance from 1 at the top of the page to the last at the bottom; the page's section 1b shows them all at once on the
+monitor wall, numbered, read left to right and then down, as any page is read (the founder's order of 21 October), and a click
+on a tile scrolls to the monitor it copies. Two monitors that sit side by side in their section, native beside Omni-Compass,
+sit side by side on the wall too: a pair never splits across two rows, on the wall or on the page at any width. Each section names its monitors in the engine table of contents, and each
 badge names its section, so a monitor and its section read each other both ways. Under every monitor a strip carries its
-knobs: the kill switch, the console's knobs where the monitor is live, and its own buttons where it replays. The inventory
-under the wall gives each monitor's evidence class, its state (live, replay, record, model or awaiting its run), the
+knobs: the kill switch, the console's knobs where the monitor is live, and its own buttons where it replays. The monitor
+list beside the wall (the page's section 1c, `#s-monlist`) gives every monitor by its number, what it shows, its section, each monitor's evidence class, its state (live, replay, record, model or awaiting its run), the
 open-source exporter and series that would carry it on a running system, and, where it waits, the run that fills it; the
-whole wall is also a Grafana dashboard (`deploy/grafana/omni-compass-wall.json`). The control panel at the head of the
-section holds the kill switch, the button that runs the Python's own seeded runs in the page and proves them by one digest
-(`tools/engine_runs.py`), the three manuals and the wall's dashboard. Appendix L lists every monitor under its number.
+whole wall is also a Grafana dashboard (`deploy/grafana/omni-compass-wall.json`). The control panel (the page's section 1a, `#s-health`)
+holds the kill switch, the button that runs the Python's own seeded runs in the page (they also run on their own as the page
+opens), the three manuals and the wall's dashboard. The proof monitor (the page's section 1f, `#s-proof`) reads every run three ways: the
+Python's set as GitHub ran it (`tools/engine_runs.py`, its run linked), the same draws through the C++ harness on the engine's
+C++ twins (`cpp/tools/engine_runs.cpp`), and this page's own port, one SHA-256 digest each beside the digest of the draws
+themselves; the three must be one. Appendix L lists every monitor under its number.
 
 ### 4.1 What the wall is
 
-The status board (the page's section 1a, `#s-health`) is every live monitor of the page in one view: the same
+The wall (the page's section 1b, `#s-wall`) is every monitor of the page in one view: the same
 canvases the sections draw, copied small four times a second, so nothing is drawn twice from different data. Click a tile and
 the page scrolls to the monitor it copies. The page's own governor (the page's section 11, chapter 25) leaves a monitor resting while it is
-off screen; while the wall is in view the resting monitors are drawn in turn, one a frame, and a tile with the accent border is
+off screen; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to, and while the wall
+is in view the resting monitors are drawn in turn, one a frame, each by its own drawing code; a tile with the accent border is
 a monitor on screen now.
 
 ### 4.2 The order of the board
@@ -490,7 +499,7 @@ records on it are still true for the build they name.
 
 ### 5.1 One switch for the whole organism
 
-The master switch (the page's section 1a, under the wall) is wired at the top of the
+The master switch (the page's section 1e, `#s-master`; its kill switch heads the page's section 1a) is wired at the top of the
 organism: switch, brain, organism, every muscle, as the repository builds it (`omnicompass/master.py`,
 `tools/omni_switch.py`). It holds the brain's outputs. Every governor on the page is registered with it and obeys it at once;
 on a real machine every governor exits at the switch.
@@ -564,7 +573,7 @@ made again by the repository's own code on the engine that stands, checked again
 The page's own file is outside its own push filter, so a rebuild never starts another rebuild; a front-page run that did not
 succeed starts no rebuild (`tests/test_workflow_triggers.py` holds both).
 
-### 7.2 The CI pipeline monitor (the page's section 1b, `#s-github`)
+### 7.2 The CI pipeline monitor (the page's section 1i, `#s-github`)
 
 Every workflow run in progress or queued at the build, as GitHub's
 own list at that moment, and the first of them in each state. The hardware and cloud runs, with their terminal status, are in
@@ -726,7 +735,10 @@ Each provider's four sets (the steady set, the bursts `1 4 1 6 1 9` and
 before a result, or now. Then every cloud run GitHub has started, set by set; the bill on Azure run by run (machine-hours
 billed native · Omni-Compass; the bill; the 95th percentile; the failed requests), each with the engine it ran on; and the
 shipped controller in the cloud setting, live: native's machines against Omni-Compass's on the repository's toy cluster (class
-S), the cloud's own autoscaler running in both arms, its run and speed following the console's clock.
+S), the cloud's own autoscaler running in both arms, its run and speed following the console's clock. Until a provider's
+first set lands, its bill monitor shows the same mechanism live: the machines billed (in service and booting) of native and of
+Omni-Compass on the cloud setting's model, decision by decision, marked class S and never that cloud's bill, which arrives with
+its first set; under it, the provider's newest check in its own words.
 
 ### 10.3 The stopping rule
 
@@ -797,7 +809,9 @@ A real-time operations dashboard over the benchmark runs themselves (class L),
 not a model. Every series streams half minute by half minute out of the raw files GitHub archived, each file's SHA-256 matched
 before a byte is drawn: native (the whole cluster with everything it ships with) against Omni-Compass, the same load, the
 same second. Pick a benchmark, a run (A, B or C) and a repetition at the head of the section; the tiles, the candles, the
-heatmap, the bars and the two tickers all move together with the page's section 5d.
+heatmap, the bars and the two tickers all move together with the page's section 5d. The data pipeline is its own monitor:
+every stage from the GitHub Actions run to the page (the run, the raw files archived, the SHA-256 check, the official scorer,
+the three-run tables, the build, the page) drawn whole, the stage being read lit and the data moving between them.
 
 ### 12.2 The heart
 
@@ -1466,40 +1480,48 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **Ticker.** The governor's decisions (first ticker) and native's own controllers' moves (second ticker), newest first.
 - **Tile.** One small monitor on the wall; click it to go to the monitor it copies.
 - **Verdict.** The paired trial every step past native must pass: kept unless it reads LOSS or exceeds the 2% allowance.
-- **Wall.** The status board: every live monitor in one view, the switch and the engine first.
+- **Wall.** Every monitor of the page in one view (the page's section 1b), numbered 1 upward in its order of appearance and read left to right.
 
 ## Appendix A - The Page, Section by Section
 
 | Page section | Anchor | Title | Chapter of this book |
 |---|---|---|---|
 | i | `#notice` | Legal notice | Notice and Disclaimer |
-| ii | `#contents` | Engine table of contents | 2 |
-| iii | `#title-page` | Title page and build | 1, 27 |
-| iv | `#s-read` | Executive summary and reading key | the key; 3 |
-| 1 | `#p-health` | The monitor wall: system health, now | 4 |
-| 1a | `#s-health` | Status board and the monitor wall; the master switch; alarms; the feed; the event log; the exposition | 4, 5, 6 |
-| 1b | `#s-github` | CI pipeline: GitHub Actions | 7 |
-| 2 | `#s-whole` | The whole organism: the synopsis of everything | 8 |
-| 3 | `#s-fleet` | Measured effect: every domain; the grid; every three-run table; every muscle and the seven organisms; every family | 9 |
-| 4 | `#p-evidence` | Evidence by stack, from the cloud down to the chip | 10 to 15 |
-| 4a | `#s-cloud` | Cloud providers: Azure, Google Cloud, Amazon Web Services | 10 |
-| 4b | `#s-orch` | Orchestrators and governors | 11 |
-| 4c | `#s-ops` | Kubernetes: official run playback | 12 |
-| 4d | `#s-runs` | Kubernetes: per-repetition run telemetry | 13 |
-| 4e | `#s-live` | Kubernetes and cloud: the shipped controller's decision trace | 14 |
-| 4f | `#s-stacks` | Hardware: the GPU card and the CPU host | 15 |
-| 5 | `#p-organism` | The organism, live | 16, 17 |
-| 5a | `#s-engines` | The organism, live: native and Omni-Compass; the body scan; the immune system; the anatomy | 16 |
-| 5b | `#s-lab` | Telemetry analytics and Omni-Compass in its own words | 17 |
-| 6 | `#s-desk` | Control console | 18 |
-| 7 | `#p-brain` | Control architecture: the brain | 19 to 22 |
-| 7a | `#s-decision` | One control cycle, traced | 19 |
-| 7b | `#s-plane` | Phase plane and scoreboard | 20 |
-| 7c | `#s-brain` | The brain's internal state | 21 |
-| 7d | `#s-verdict` | The verdict: change acceptance testing | 22 |
-| 8 | `#s-fail` | Failure modes, controls and residual risk | 23 |
-| 9 | `#s-math` | Component specification and mathematics | 24 |
-| 10 | `#s-self` | Self-governed rendering | 25 |
+| ii | `#title-page` | Title page and build | 1, 27 |
+| iii | `#s-read` | Executive summary and reading key | the key; 3 |
+| iv | `#contents` | Engine table of contents | 2 |
+| 1 | `#p-health` | The monitor wall and the control panel | 4 to 7 |
+| 1a | `#s-health` | The control panel and the kill switch | 4, 5 |
+| 1b | `#s-wall` | The monitor wall, read left to right | 4 |
+| 1c | `#s-monlist` | The monitor list: every monitor by its number | 4 |
+| 1d | `#s-status` | The status board: tiles, alarms and watch items | 4, 6 |
+| 1e | `#s-master` | The master switch's wiring | 5 |
+| 1f | `#s-proof` | The Python's runs, in this page | 4, 31 |
+| 1g | `#s-loss` | Every LOSS row: its cause and its knob | 6, 28 |
+| 1h | `#s-feed` | The golden signals, the event log and the live metrics | 6 |
+| 1i | `#s-github` | CI pipeline: GitHub Actions | 7 |
+| 2 | `#s-board` | The benefit board | 8 |
+| 3 | `#s-whole` | The whole organism, every way it is bought | 9 |
+| 4 | `#s-fleet` | Measured effect in full | 8 |
+| 5 | `#p-evidence` | Evidence by stack, from the cloud down to the chip | 10 to 15 |
+| 5a | `#s-cloud` | Cloud providers: Azure, Google Cloud, Amazon Web Services | 10 |
+| 5b | `#s-orch` | Orchestrators and governors | 11 |
+| 5c | `#s-ops` | Kubernetes: official run playback | 12 |
+| 5d | `#s-runs` | Kubernetes: per-repetition run telemetry | 13 |
+| 5e | `#s-live` | Kubernetes and cloud: the shipped controller's decision trace | 14 |
+| 5f | `#s-stacks` | Hardware: the GPU card and the CPU host | 15 |
+| 6 | `#p-organism` | The organism, live | 16, 17 |
+| 6a | `#s-engines` | The organism, live | 16 |
+| 6b | `#s-lab` | Telemetry analytics: the tensor, the modes, the service level | 17 |
+| 7 | `#s-desk` | Control console | 18 |
+| 8 | `#p-brain` | Control architecture: the brain | 19 to 22 |
+| 8a | `#s-decision` | One control cycle, traced | 19 |
+| 8b | `#s-plane` | Phase plane and scoreboard | 20 |
+| 8c | `#s-brain` | The brain's internal state | 21 |
+| 8d | `#s-verdict` | The verdict: change acceptance testing | 22 |
+| 9 | `#s-fail` | Failure modes, controls and residual risk | 23 |
+| 10 | `#s-math` | Component specification and mathematics | 24 |
+| 11 | `#s-self` | Self-governed rendering | 25 |
 | v | `#s-disclose` | Disclosures, governing law and contact | 29, 30 |
 | vi | `#notice-end` | Closing legal notice | Notice and Disclaimer |
 
@@ -1524,11 +1546,10 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | On-site bare metal / Through the cloud / In the device / As a service | the page's section 3 | which way the stack is bought in the composition | the receipts |
 | Every measured piece / The strict reading | the page's section 3 | which rule the synopsis counts by | the factors |
 | Its one run beside the count / in the count | the page's section 3 | whether a governor that replaces a controller enters the whole | the governor's own table |
-| ALERT / WARN / INFO; All / LOSS / The runs disagree / Live now / Guards and open items / GitHub | the page's sections 1a, 4 | which rows are shown | the rows |
-| Copy the exposition | the page's section 1a | the clipboard | the page |
+| ALERT / WARN / INFO; All / LOSS / The runs disagree / Live now / Guards and open items / GitHub | the page's sections 1d, 1h, 4 | which rows are shown | the rows |
+| Copy the exposition | the page's section 1h | the clipboard | the page |
 | This muscle: Omni-Compass ON / handed back to native; Every muscle back under Omni-Compass | the page's section 8a, on the muscle's card | one muscle of the stress-test model run by native's own controller alone, or in a replay shown by native's own record, while every other muscle stays governed | the body's recorded totals in a replay; the kill switch, which hands every muscle back at once |
-| Read right to left / left to right | the page's section 1a, the monitor wall | the order the numbered monitors are laid out on the wall | the monitors and their numbers |
-| Run the Python's 500 runs here; a new set (base seed, count); print and download the receipts | the page's section 1a, the control panel and the proof monitor | the page's own run of the Python's seeded runs, its digest against the Python's | the Python's record, `results/engine_runs/` |
+| Run the Python's 500 runs here; a new set (base seed, count); print and download the receipts | the page's sections 1a (the control panel) and 1f (the proof monitor) | the page's own run of the Python's seeded runs, its digest against the Python's | the Python's record, `results/engine_runs/` |
 | Speak aloud / Ask Omni-Compass / Stop | the page's section 6b | the viewer's browser voice; a question composed on the viewer's own account | the records |
 
 ## Appendix C - The Gauges on the Wall

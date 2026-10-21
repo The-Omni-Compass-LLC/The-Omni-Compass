@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-21 02:59 UTC on omni-v13 (digest 0088837333c6f0fc) from commit d9cc09ddd745.
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-21 04:58 UTC on omni-v13 (digest 0088837333c6f0fc) from commit f974b1797293.
 
 
 Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
@@ -11,13 +11,13 @@ Each part below is one section of the page, in the page's order and under its nu
 
 **The page, in its own words.**
 
-A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere: Native, the whole system running by itself, and Omni-Compass, the same system with Omni-Compass on top of all of it. It is laid out as a book, read from the top down: the table of contents first, then the front matter (this title page and the reading key), then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v13: omni-v12 with one fault found on its own runs fixed: on a shared host at its top, while another workload there has room of its own, the governor's conveyance hands every processor limit it gave back to the operator's, and it counts every other pod by what it may use (docs/OMNI_V13.md). Before it, omni-v12 fixed two faults found on omni-v11's runs. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
+A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere: Native, the whole system running by itself, and Omni-Compass, the same system with Omni-Compass on top of all of it. It is laid out as a book, read from the top down: this title page first, then the executive summary and the reading key, then the table of contents, then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v13: omni-v12 with one fault found on its own runs fixed: on a shared host at its top, while another workload there has room of its own, the governor's conveyance hands every processor limit it gave back to the operator's, and it counts every other pod by what it may use (docs/OMNI_V13.md). Before it, omni-v12 fixed two faults found on omni-v11's runs. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
 
 DISCLOSURE: REAL RUNS, A REAL ENGINE, NOTHING HARDWIRED. Every real-run figure on this page is played back from the raw files of benchmark runs executed on GitHub's own machines, each file checked against its run's SHA-256 list before a single number is drawn. Every model view runs the engine's own code (the compass law, the brain, the verdict) live in this page, linked through software to the repository's Python and C++ and checked against them on every build. GitHub rebuilds the page from the repository whenever the engine, a model or a result changes, and every three hours: no number on it is typed in by hand, and when the repository changes, the page changes with it.
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-## iv Executive summary and reading key
+## iii Executive summary and reading key
 
 **Controls.** Live: the buttons act on the live engine; every number below is read from the records on this page.
 
@@ -39,11 +39,11 @@ The size is how far the gauge moved from native; the word says whether that move
 
 ## Part 1 of the page: The monitor wall and the control panel
 
-## 1a The monitor wall and the control panel: the kill switch, every monitor, the status board
+## 1a The control panel and the kill switch: one switch for the whole organism, the Python's runs, the three manuals
 
-The first view after the front matter: every monitor of this page at once, numbered, and the control panel that drives them. The kill switch stands at its head; the Python's own runs can be run again here at a button; the status board below says whether Omni-Compass is engaged, which signals are out of tolerance and where, and every LOSS row is raised as an alarm with its source record, its cause and the knob that answers it. No value on the board is typed in: each is computed at runtime from the live engine or from the repository's records embedded at build time.
+The first view after the front matter: the control panel that drives every monitor of this page. The kill switch stands at its head, ON in green while Omni-Compass governs on top of native, red when engaged, and Omni-Compass OFF in white; the Python's own runs can be run again here at a button; the three manuals are a click away. The monitors it drives follow: the wall of every monitor (1b), the numbered list of them (1c), the status board (1d), the master switch's wiring (1e), the Python's runs in this page (1f), every LOSS row (1g), the golden signals (1h) and GitHub's pipeline (1i). No value here is typed in: each is computed at runtime from the live engine or from the repository's records embedded at build time.
 
-**Controls.** Live: the kill switch, the faults and the filters act at once, and every tile is read again four times a second.
+**Controls.** Live: the kill switch acts at once on every governor of this page; the buttons run the Python's runs here and fetch the three manuals.
 
 **The page, in its own words.**
 
@@ -53,39 +53,59 @@ The kill switch. While Omni-Compass governs on top of native the switch reads ON
 
 The three manuals. The Live Engine Manual reads this page top to bottom: how to read, operate, tune and watch it, native beside Omni-Compass, chapter by chapter in the page's own order, and, in its last appendix, the page word for word, every section, every monitor under its number and every knob, written from this page at every build. The Operator's Manual wires and runs Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. Each carries the notice, the LICENSE, the NOTICE and DISCLOSURES.md.
 
-**The monitor wall: every monitor of this page, numbered in its order of appearance, read right to left; click a tile to go to it**
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section 11) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, and a tile with the accent border is a monitor on screen now.
+## 1b The monitor wall: every monitor, numbered 1 upward in its order of appearance, read left to right
 
-**Every monitor: the inventory: what each shows, where its numbers come from, the open-source feed that would carry it live, its knobs, and what is still awaiting its run**
+Every monitor of this page at once, numbered in the order it appears from the top, 1 first, and read left to right, then the next row, as any page is read; the last number is the last monitor on the page. Two monitors that sit side by side in their section, native beside Omni-Compass, stay side by side on the wall. Each tile carries its number and its section; the numbered list beside it (1c) says what each one shows.
 
-Every monitor is one canvas on this page; its number is its order of appearance from the top, and the wall reads them right to left, then the next row. The feeds name the open-source exporters an operator's Prometheus and Grafana already run (node_exporter, kube-state-metrics, the NVIDIA DCGM exporter, Kepler, OpenCost, the governor's own tools/omni_exporter.py); the button in the control panel downloads the whole wall as a Grafana dashboard on those series (deploy/grafana/omni-compass-wall.json, written from docs/engine/monitors.json), beside the governor's own screen (deploy/grafana/omni-compass.json). A monitor the page draws from the repository's tables, or from its own clock, says so: no series carries it.
+**Controls.** Live: click a tile to go to its monitor; every tile is read again four times a second.
+
+**The page, in its own words.**
+
+**The monitor wall: every monitor of this page, numbered 1 upward in its order of appearance, read left to right, then the next row; click a tile to go to it**
+
+The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section 11) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, each through its own drawing code; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to. Two monitors that sit side by side in their section, native beside Omni-Compass, sit side by side on the wall too: a pair never splits across two rows. A tile with the accent border is a monitor on screen now; the list of every monitor by its number follows in section 1c.
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1c The monitor list: every monitor by its number, what it shows, its section and its feed
+
+The list that goes with the wall: every monitor by its number, in the same order, with what it shows, the section it lives in, its evidence class and state, the open-source feed that would carry it live and its knobs. Read the wall, find a number, read its line here.
+
+**Controls.** Recorded data: the list is the page's own registry of its monitors, read when the page opens; click a number to go to its monitor, a section to go to its section.
+
+**The page, in its own words.**
+
+**Every monitor by its number: what it shows, its section, where its numbers come from, the open-source feed that would carry it live, its knobs, and what is still awaiting its run**
+
+Every monitor is one canvas on this page; its number is its order of appearance from the top, and the wall (section 1b) reads them left to right, then the next row. The feeds name the open-source exporters an operator's Prometheus and Grafana already run (node_exporter, kube-state-metrics, the NVIDIA DCGM exporter, Kepler, OpenCost, the governor's own tools/omni_exporter.py); the button in the control panel downloads the whole wall as a Grafana dashboard on those series (deploy/grafana/omni-compass-wall.json, written from docs/engine/monitors.json), beside the governor's own screen (deploy/grafana/omni-compass.json). A monitor the page draws from the repository's tables, or from its own clock, says so: no series carries it.
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1d The status board: the tiles, the alarms and the watch items
+
+Whether Omni-Compass is engaged, which signals are out of tolerance and where, and every LOSS row raised as an alarm with its source record. Each tile and each alarm is computed at runtime from the live engine or from the repository's records.
+
+**Controls.** Live: the filters act at once, and every tile is read again four times a second.
+
+**The page, in its own words.**
+
+**Alarms and watch items, by severity**
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1e The master switch's wiring: the switch above the brain, the brain above the organism, every muscle under it
+
+One switch for the whole organism, drawn as the repository wires it: the master switch holds the brain's outputs; the brain sits above the organism; every muscle hangs under it with native's own controller under every muscle, never switched. Every governor of this page is listed with its state at the switch.
+
+**Controls.** Live: the switch on this monitor is the kill switch of section 1a.
+
+**The page, in its own words.**
 
 **The master switch, wired at the top of the organism: switch, brain, organism, every muscle**
 
 One switch for the whole organism, as the repository builds it (omnicompass/master.py, tools/omni_switch.py). It sits at the top and holds the brain's outputs. With it OFF, nothing the brain computes is pushed or pulled into any muscle, and every muscle runs on native's own controllers, which never stop. On a real machine every governor exits at the switch; on this page the brain keeps reading the native body in shadow, so its monitors keep moving, and nothing it computes leaves it. No monitor is switched off: every Omni-Compass side follows native, drawn in native's colour. Every governor on this page is registered with it and obeys it at once. The live organism hands every setting it held back to native's own controller and reads each one back. Every record's Omni-Compass side, and every playback, trace, table, board and grid, reads native's own. Native's own controllers sit under every muscle and are never switched, so native's side never moves with it. Every section carries the same switch in its controls bar; pressing any one of them throws this one.
-
-**The Python's runs, in this page: the engine's seeded runs recomputed here, and the 500 scenarios replayed**
-
-How the two prove each other. tools/engine_runs.py runs N runs from a base seed: run k's seed is base + k·0x9E3779B9 mod 2³² (the jump generator), its stream mulberry32 (this page's own generator, written in the Python bit for bit), through the engine that stands: 288 decisions of the brain's state equations integrated by the fourth-order Runge–Kutta step, 80 steps of the compass law and one give-back trial judged by the verdict. Each run's receipt is its final state, its pushes and grants, the law's mean and last force and the trial's answer; the digest is the SHA-256 of every receipt at six decimals. This page runs the same N with its own port of the engine (proven equal to the Python and the C++ to 1e-12 on every build by docs/engine/check_live_engine.py) and compares every receipt and the digest. Run the Python again with another base and it writes another set; this page computes the same set from the same base, and the two digests must be one.
-
-**Alarms and watch items, by severity**
-
-**Every LOSS row: its cause and the knob that answers it (Omni-Compass's own rows first, then the orchestrators' own cost)**
-
-**Golden-signal feed, live: the last 240 decisions, native beside Omni-Compass**
-
-One point per decision streamed from the live engine, gapless, each signal on its own axis, with each arm's last, mean and maximum as a time-series dashboard reports them; a kill-switch window is shaded red. Native in amber, Omni-Compass in blue, the same demand on both.
-
-**Engine event log, newest first**
-
-The live engine's own events as it emits them, with the wall-clock time and the decision. They are a threshold breach and its clearing on either arm, every injected fault and its end, the kill switch, the dial, a new day, and the brain's calm crossing the grant threshold. ALERT, WARN and INFO as an operations log grades them.
-
-**OpenMetrics exposition: the live metrics, ready for Prometheus and Grafana**
-
-The live engine's metrics in the OpenMetrics text format, the CNCF exposition format Prometheus scrapes and Grafana charts, refreshed every two seconds. They are engagement, the decision index, breaches, work, band time, actuator moves and reversals per arm, and frame time. Then the verdict's keep ratio at each true cost, the three-run tables' rows by class and reading, and the build's engine, digest and commit.
-
-The board is laid out the way an operations monitor is. The switch and the engine come first. Next come the live organism's signals, native beside Omni-Compass, in the four a service is watched by (site reliability practice: latency, traffic, errors and saturation): here the work waiting, the work done, the decisions past their line and the capacity held. Then every reading of the real and modelled runs that went against native, worst first. Last come GitHub and the age of this page. A tile's word is its reading against native by the key (front matter, iv). A tile with no reading says what it shows.
 
 **Its monitors.**
 
@@ -98,6 +118,20 @@ The switch above the brain: ON, Omni-Compass governs every wired muscle; engaged
 - **Knobs.** Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** The wiring from the top down: the master switch above the brain, the brain above the organism, the organism above every muscle, and native's own controllers under every muscle, never switched. The switch's state is the word on it: ON in green while Omni-Compass governs; engaged, the switch red and OFF in white.
 - **What to do with it.** Press the kill switch only for security: it is instant, every setting goes back to native and is read back. Watch the governors' table beside it: every governor on the page says OFF and what it handed back.
+
+## 1f The Python's runs, in this page: the jump generator's runs recomputed here, the 500 scenarios replayed
+
+The Python's runs, the C++ harness's and this page's, run by run: the jump generator's set GitHub ran in the Python (its run linked), the same draws run through the C++ harness on the engine's C++ twins, and the same set recomputed here by this page's own port of the engine as the page opens; every receipt compared three ways, one SHA-256 digest each, and the digest of the draws themselves; and the Python's 500 scenarios a seed replayed from its own record with every trace hash.
+
+**Controls.** Live: the runs start on their own when the page opens; the buttons run them again, run a new set from any base, print them and save the receipts.
+
+**The page, in its own words.**
+
+**The Python's runs, in this page: the engine's seeded runs recomputed here, and the 500 scenarios replayed**
+
+How the three prove each other. tools/engine_runs.py runs N runs from a base seed: run k's seed is base + k·0x9E3779B9 mod 2³² (the jump generator), its stream mulberry32 (this page's own generator, written in the Python bit for bit), through the engine that stands: 288 decisions of the brain's state equations integrated by the fourth-order Runge–Kutta step, 80 steps of the compass law and one give-back trial judged by the verdict. Each run's receipt is its final state, its pushes and grants, the law's mean and last force and the trial's answer; the digest is the SHA-256 of every receipt at six decimals. The Python writes every draw of every run, the injection, and the C++ harness (cpp/tools/engine_runs.cpp) reads it as its input, puts the mechanism on through the engine's C++ twins and writes every receipt: its digest must be the Python's. This page runs the same N with its own port of the engine (proven equal to the Python and the C++ to 1e-12 on every build by docs/engine/check_live_engine.py) as it opens and compares every receipt and the digest. GitHub does all three on every set it runs (.github/workflows/engine-runs.yml) and on every push (verify.py); run the Python again with another base and it writes another set, and the three digests must be one.
+
+**Its monitors.**
 
 ### Monitor 2: The Python's runs, reproduced here
 
@@ -118,6 +152,42 @@ benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seed
 - **Knobs.** Seed base: which held-out seed base's 500 scenarios are replayed; Arm: which arm stands on the right: Omni-Compass governing, or watching only; Gauge: which gauge of the run is shown; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** The Python's seeded runs beside this page's: one cell a run (green agrees to 1e-9, red differs, blue a new set), the two digests under them; and the Python's 500 scenarios a seed replayed with every trace hash.
 - **What to do with it.** Press the button to run the Python's set here; run a new base to make a new set and run the printed command in the Python to compare digests. Print or download the receipts for the file.
+
+## 1g Every LOSS row: its cause and the knob that answers it
+
+Every LOSS row of every three-run table on this page, Omni-Compass's own first and then the orchestrators' own, each with the cause the repository records and the knob that brings it EVEN or leaves the muscle native. No row is cut and no number is tuned.
+
+**Controls.** Recorded data: every row is read from the three-run tables on this page.
+
+**The page, in its own words.**
+
+**Every LOSS row: its cause and the knob that answers it (Omni-Compass's own rows first, then the orchestrators' own cost)**
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1h The golden signals, the event log and the live metrics
+
+The live organism's four golden signals, native beside Omni-Compass, one point a decision: errors (muscles over the line), throughput (work served), latency and saturation; the engine's own event log, newest first; and the same metrics in the OpenMetrics format Prometheus scrapes and Grafana charts.
+
+**Controls.** Live: one point a decision from the live engine; the event log's filters act at once; the metrics refresh every two seconds.
+
+**The page, in its own words.**
+
+**Golden-signal feed, live: the last 240 decisions, native beside Omni-Compass**
+
+One point per decision streamed from the live engine, gapless, each signal on its own axis, with each arm's last, mean and maximum as a time-series dashboard reports them; a kill-switch window is shaded red. Native in amber, Omni-Compass in blue, the same demand on both.
+
+**Engine event log, newest first**
+
+The live engine's own events as it emits them, with the wall-clock time and the decision. They are a threshold breach and its clearing on either arm, every injected fault and its end, the kill switch, the dial, a new day, and the brain's calm crossing the grant threshold. ALERT, WARN and INFO as an operations log grades them.
+
+**OpenMetrics exposition: the live metrics, ready for Prometheus and Grafana**
+
+The live engine's metrics in the OpenMetrics text format, the CNCF exposition format Prometheus scrapes and Grafana charts, refreshed every two seconds. They are engagement, the decision index, breaches, work, band time, actuator moves and reversals per arm, and frame time. Then the verdict's keep ratio at each true cost, the three-run tables' rows by class and reading, and the build's engine, digest and commit.
+
+The board is laid out the way an operations monitor is. The switch and the engine come first. Next come the live organism's signals, native beside Omni-Compass, in the four a service is watched by (site reliability practice: latency, traffic, errors and saturation): here the work waiting, the work done, the decisions past their line and the capacity held. Then every reading of the real and modelled runs that went against native, worst first. Last come GitHub and the age of this page. A tile's word is its reading against native by the key (front matter, iv). A tile with no reading says what it shows.
+
+**Its monitors.**
 
 ### Monitor 4: Golden signal: errors
 
@@ -159,9 +229,9 @@ Capacity held against capacity used, native beside Omni-Compass.
 - **How to read it.** The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.
 - **What to do with it.** Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises.
 
-## 1b CI pipeline: GitHub Actions runs in progress and queued
+## 1i CI pipeline: GitHub Actions runs in progress and queued
 
-Every GitHub Actions workflow run in progress or queued at build time. The hardware and cloud runs, with their terminal status, are in sections 5a and 5f; every run on the engine that stands that terminated without a measurement is raised on the status board (section 1a).
+Every GitHub Actions workflow run in progress or queued at build time. The hardware and cloud runs, with their terminal status, are in sections 5a and 5f; every run on the engine that stands that terminated without a measurement is raised on the status board (section 1d).
 
 **Controls.** Recorded data: GitHub's runs as read when the page was built.
 
@@ -189,7 +259,7 @@ Every workflow run in progress or queued when the page was built, the Azure set'
 
 ## 2 The benefit board: every domain, native against Omni-Compass
 
-The first thing after the wall: every benchmark's measured effect in one board, native against Omni-Compass on top of native, by domain and by gauge family, and the Omni index that weighs them together. Every bar is its table's own word (GAIN green, EVEN yellow, LOSS red, power given blue) beside its size; every LOSS row stands on it and is answered, with its cause and its knob, on the status board (section 1a). The whole organism composed from these same tables follows in section 3; every table, every muscle and the grid in full in section 4.
+The first thing after the wall: every benchmark's measured effect in one board, native against Omni-Compass on top of native, by domain and by gauge family, and the Omni index that weighs them together. Every bar is its table's own word (GAIN green, EVEN yellow, LOSS red, power given blue) beside its size; every LOSS row stands on it and is answered, with its cause and its knob, on the status board (section 1d). The whole organism composed from these same tables follows in section 3; every table, every muscle and the grid in full in section 4.
 
 **Controls.** Recorded data: every receipt as the repository holds it. The kill switch recolours a recorded result and never rewrites it; console controls never modify it.
 
@@ -371,7 +441,7 @@ Machine-hours billed and the bill at list price, native against Omni-Compass, ev
 
 ### Monitor 16: Google Cloud: the gate and the bill
 
-The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.
+The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill)
 
 - **Evidence and state.** Class L; awaiting its run: the first set starts within the hour after the gate passes: the key stored whole (docs/GOOGLE_SETUP.md, section 4).
 - **Feed.** OpenCost; Google Cloud Billing export; series `node_total_hourly_cost`; on a running system: `sum(node_total_hourly_cost)`.
@@ -381,7 +451,7 @@ The same monitor for Google Cloud: the hourly gate's reading (the key, the login
 
 ### Monitor 17: Amazon: the gate and the bill
 
-The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.
+The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill)
 
 - **Evidence and state.** Class L; awaiting its run: the first set starts within the hour after the gate passes: the account on the Paid plan (docs/AMAZON_SETUP.md, section 1a).
 - **Feed.** OpenCost; AWS Cost and Usage Report; series `node_total_hourly_cost`; on a running system: `sum(node_total_hourly_cost)`.
@@ -485,7 +555,7 @@ From the repetition's own audit.jsonl: the minute and second of the decision, th
 
 **Its monitors.**
 
-### Monitor 22: The official run's pipeline
+### Monitor 22: The data pipeline, live: every stage from the GitHub Actions run to this page
 
 The chosen Kubernetes run played back from its archived files: where every repetition stands.
 
@@ -1194,14 +1264,14 @@ This page's own render loop governed by the compass law: the frame time against 
 
 | No. | Monitor | Section | Class | State |
 |---|---|---|---|---|
-| 1 | The master switch and the kill switch | 1a The monitor wall and the control panel | S (the page's port of the master switch; the real one is omnicompass/master.py) | live |
-| 2 | The Python's runs, reproduced here | 1a The monitor wall and the control panel | S (the engine itself) | live |
-| 3 | The Python's 500 scenarios, replayed | 1a The monitor wall and the control panel | S | replay |
-| 4 | Golden signal: errors | 1a The monitor wall and the control panel | S | live |
-| 5 | Golden signal: throughput | 1a The monitor wall and the control panel | S | live |
-| 6 | Golden signal: latency | 1a The monitor wall and the control panel | S | live |
-| 7 | Golden signal: saturation | 1a The monitor wall and the control panel | S | live |
-| 8 | GitHub Actions: the runs in flight | 1b CI pipeline | L (GitHub's own API, read at the build) | record |
+| 1 | The master switch and the kill switch | 1e The master switch's wiring | S (the page's port of the master switch; the real one is omnicompass/master.py) | live |
+| 2 | The Python's runs, reproduced here | 1f The Python's runs, in this page | S (the engine itself) | live |
+| 3 | The Python's 500 scenarios, replayed | 1f The Python's runs, in this page | S | replay |
+| 4 | Golden signal: errors | 1h The golden signals, the event log and the live metrics | S | live |
+| 5 | Golden signal: throughput | 1h The golden signals, the event log and the live metrics | S | live |
+| 6 | Golden signal: latency | 1h The golden signals, the event log and the live metrics | S | live |
+| 7 | Golden signal: saturation | 1h The golden signals, the event log and the live metrics | S | live |
+| 8 | GitHub Actions: the runs in flight | 1i CI pipeline | L (GitHub's own API, read at the build) | record |
 | 9 | The benefit board | 2 The benefit board | L/S | record |
 | 10 | Where the benefit lives, gauge by gauge | 2 The benefit board | L/S | record |
 | 11 | The whole organism, composed | 3 The whole organism, every way it is bought | S (of P and L) | composed |
@@ -1215,7 +1285,7 @@ This page's own render loop governed by the compass law: the frame time against 
 | 19 | The cloud setting, live: Omni-Compass's machines | 5a Cloud providers | S | live |
 | 20 | The orchestrators' road | 5b Orchestrators and governors | L | record |
 | 21 | An orchestrator, four ways | 5b Orchestrators and governors | L | record |
-| 22 | The official run's pipeline | 5c Kubernetes | L | replay |
+| 22 | The data pipeline, live: every stage from the GitHub Actions run to this page | 5c Kubernetes | L | replay |
 | 23 | The official run's heartbeat | 5c Kubernetes | L | replay |
 | 24 | The official run: response time candles | 5c Kubernetes | L | replay |
 | 25 | The official run: the heat map | 5c Kubernetes | L | replay |
@@ -1257,7 +1327,7 @@ This page's own render loop governed by the compass law: the frame time against 
 
 | Knob | What it does | Where it is |
 |---|---|---|
-| Kill switch | Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white) | the master switch (section 1b) |
+| Kill switch | Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white) | the kill switch (section 1a; its wiring, section 1e) |
 | The dial | the max (every muscle to its own limit) or the tune-down (never more than native) | the console's dial |
 | Demand | ×0.25 to ×2 of the day's own demand, both arms alike | the console's demand slider |
 | Noise | σ of the demand's noise, one draw a muscle a decision, both arms alike | the console's noise slider |
@@ -1281,7 +1351,6 @@ This page's own render loop governed by the compass law: the frame time against 
 | The muscle's own switch | pick one muscle on either ring: its card, and its own switch, which hands that one muscle back to native (Omni-Compass OFF on it) or puts Omni-Compass on it again; the kill switch hands every muscle back at once | the organism's monitors and the muscle's card (section 6a) |
 | Runs | how many of the Python's runs this page computes again | the monitor's own buttons |
 | Print | the receipts of the runs, printable, with the digests and the notice | the monitor's own button |
-| Reading direction | the wall read right to left (as set) or left to right | the wall's own button |
 | Seed base | which held-out seed base's 500 scenarios are replayed | the monitor's own buttons |
 
 ## Every LOSS row, whose it is, its cause and the knob that answers it
