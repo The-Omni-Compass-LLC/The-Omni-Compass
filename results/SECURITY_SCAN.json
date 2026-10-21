@@ -1,17 +1,17 @@
 {
- "lines_scanned": 34657,
+ "lines_scanned": 37048,
  "high": 3,
- "medium": 34,
- "low": 335,
+ "medium": 35,
+ "low": 345,
  "low_by_kind": {
-  "B603 subprocess_without_shell_equals_true": 145,
-  "B404 blacklist": 62,
-  "B607 start_process_with_partial_path": 58,
+  "B603 subprocess_without_shell_equals_true": 150,
+  "B404 blacklist": 65,
+  "B607 start_process_with_partial_path": 59,
   "B101 assert_used": 50,
   "B311 blacklist": 12,
   "B110 try_except_pass": 4,
+  "B606 start_process_with_no_shell": 2,
   "B105 hardcoded_password_string": 2,
-  "B606 start_process_with_no_shell": 1,
   "B107 hardcoded_password_default": 1
  },
  "reviewed": [
@@ -87,7 +87,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    418
+    419
    ],
    "what": "Probable insecure usage of temp file/directory.",
    "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
@@ -102,6 +102,17 @@
    ],
    "what": "Probable insecure usage of temp file/directory.",
    "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
+  },
+  {
+   "test": "B108",
+   "file": "tools/omni_control.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    432
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": "the control panel's default kill file, under /tmp/omni-compass on the operator's own machine, where the panel and the governor it starts run as one user; the operator sets it with --kill-file or OMNI_CONTROL_KILL_FILE, and the governor reads only the file the panel hands it (docs/CONTROL_PLANE.md)"
   },
   {
    "test": "B108",
@@ -157,7 +168,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    382
+    383
    ],
    "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
    "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the GitHub API)"
@@ -223,7 +234,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    534
+    549
    ],
    "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
    "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the YCSB release, checked against its published digest)"
@@ -278,7 +289,7 @@
    "severity": "HIGH",
    "count": 1,
    "lines": [
-    134
+    157
    ],
    "what": "subprocess call with shell=True identified, security issue.",
    "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a muscle's read command in the operator's wiring file; engine file, as above)"
@@ -312,12 +323,12 @@
    "severity": "MEDIUM",
    "count": 6,
    "lines": [
-    750,
-    750,
-    751,
-    752,
-    752,
-    752
+    822,
+    822,
+    823,
+    824,
+    824,
+    824
    ],
    "what": "Use of extra potential SQL attack vector.",
    "why": "not Django: a local function named extra() inside an f-string"
