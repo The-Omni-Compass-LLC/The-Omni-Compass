@@ -72,16 +72,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-20 21:59 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-20 19:24 | [The governors and orchestrators: native under them, Omni-Compass on top](results/live/GOVERNORS.md) |  |
-| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on the organism alone against KubeRay as shipped (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_VS.md) |  |
-| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on top of KubeRay against KubeRay as shipped (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_TOP.md) |  |
-| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: KubeRay as shipped against the organism alone (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_ORCH.md) |  |
-| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on top of KubeRay against the organism alone (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_BOTH.md) |  |
-| 2026-10-20 18:45 | [KubeRay (the Ray autoscaler) under the batch stream, the four ways: Omni-Compass on the organism alone against the organism alone (register row 92): the A/B/C three-run table (Omni v12)](results/live/V12_KUBERAY_4W_BARE.md) |  |
-| 2026-10-20 18:45 | [Karmada on the group of two clusters under the batch stream, the four ways: Omni-Compass on the organism alone against Karmada as shipped (register row 95): the A/B/C three-run table (Omni v12)](results/live/V12_KARMADA_4W_VS.md) |  |
-| 2026-10-20 18:45 | [Karmada on the group of two clusters under the batch stream, the four ways: Omni-Compass on top of Karmada against Karmada as shipped (register row 95): the A/B/C three-run table (Omni v12)](results/live/V12_KARMADA_4W_TOP.md) |  |
-| 2026-10-20 18:45 | [Karmada on the group of two clusters under the batch stream, the four ways: Karmada as shipped against the organism alone (register row 95): the A/B/C three-run table (Omni v12)](results/live/V12_KARMADA_4W_ORCH.md) |  |
+| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 11 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB_SERVICE.md) | Across 4 untouched workloads: 1 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 21 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 0 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [sysbench on MySQL, a database's buffer pool as shipped: the A/B/C three-run table](results/live/V12_SYSBENCH_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 3 power given, 45 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V12_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 48 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V12_SYSBENCH.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 47 EVEN, 1 where the runs disagree. |
+| 2026-10-20 21:59 | [Redis, a cache's memory as shipped (no ceiling): the A/B/C three-run table](results/live/V12_REDIS_SHIPPED.md) | Across 3 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 1 power given, 35 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V12_REDIS_SERVICE.md) | Across 3 untouched workloads: 7 gauge-rows GAIN in all three of our runs, 0 LOSS, 2 power given, 27 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V12_REDIS.md) | Across 3 untouched workloads: 5 gauge-rows GAIN in all three of our runs, 0 LOSS, 2 power given, 29 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V12_PGBENCH.md) | Across 3 workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 36 EVEN, 0 where the runs disagree. |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -89,16 +89,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-20 21:55 | live-engine | success | [39503557251](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39503557251) |
-| 2026-10-20 21:53 | big-organism-detached collect | success | [39503866256](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39503866256) |
-| 2026-10-20 21:47 | six x1 line orgs 5 runs 0+10 | success | [39502811551](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502811551) |
-| 2026-10-20 21:46 | six x1 line orgs 6 runs 0+10 | success | [39502818649](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502818649) |
-| 2026-10-20 21:46 | six x1 line orgs 3 runs 0+10 | success | [39502797078](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502797078) |
-| 2026-10-20 21:46 | six x1 line orgs 7 runs 0+10 | success | [39502826191](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502826191) |
-| 2026-10-20 21:45 | six x1 line orgs 2 runs 0+10 | success | [39502789729](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502789729) |
-| 2026-10-20 21:45 | six x1 line orgs 4 runs 0+10 | success | [39502804182](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502804182) |
-| 2026-10-20 21:45 | six x1 line orgs 1 runs 0+10 | success | [39502782117](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502782117) |
-| 2026-10-20 21:43 | cloud-check amazon | failure | [39502688399](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39502688399) |
+| 2026-10-20 23:54 | six x100 line orgs 2 runs 0+10 | success | [39514426071](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514426071) |
+| 2026-10-20 23:52 | cloud-check amazon | failure | [39517792788](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517792788) |
+| 2026-10-20 23:52 | cloud-check google | failure | [39517785595](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517785595) |
+| 2026-10-20 23:51 | six x100 line orgs 4 runs 0+10 | success | [39514438064](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514438064) |
+| 2026-10-20 23:48 | grid | cancelled | [39517026710](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517026710) |
+| 2026-10-20 23:43 | live-engine | success | [39516212060](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516212060) |
+| 2026-10-20 23:40 | peek | success | [39516530718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516530718) |
+| 2026-10-20 23:38 | six x100 line orgs 7 runs 0+10 | success | [39514454730](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514454730) |
+| 2026-10-20 23:37 | security-scan | failure | [39516212068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516212068) |
+| 2026-10-20 23:18 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 4 | success | [39509009937](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39509009937) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
