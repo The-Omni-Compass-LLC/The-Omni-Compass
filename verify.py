@@ -42,7 +42,7 @@ def build_cpp(tmp):
                            ("smoke.cpp", "oc_smoke"), ("run_shield.cpp", "oc_shield"), ("run_hpa.cpp", "oc_hpa"), ("savings.cpp", "oc_savings"),
                            ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
                            ("run_compass_law.cpp", "oc_compass_law"), ("run_verdict.cpp", "oc_verdict"),
-                           ("run_engine_runs.cpp", "oc_engine_runs")):
+                           ("engine_runs.cpp", "oc_engine_runs")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
 
@@ -95,6 +95,11 @@ def main():
     test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, "throughput"); check("C++ governor vs Python governor (throughput)", True)
     for m_ in ("fleet", "fleet_balanced", "fleet_wear"):
         test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, m_); check(f"C++ governor vs Python governor ({m_})", True)
+    # the founder's order of 21 October: the Python's runs the input, the C++ harness the mechanism, every receipt to the last bit
+    from tests import test_cpp_engine_runs_parity
+    dg_runs = test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50 if a.quick else 500)
+    check(f"the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): "
+          f"every receipt identical to the last bit, one digest {dg_runs[:16]}…", True)
     from tests import test_cpp_shield_parity
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8 if a.quick else 20); check("C++ shield vs Python shield (enforce and violations)", True)
     from tests import test_cpp_shield_adversarial, test_shield_properties
@@ -123,7 +128,7 @@ def main():
     except AssertionError:
         det_law = True
     check("negative control: parity test detects a C++ compass law that takes back while the reading climbs", lmut != lsrc and det_law)
-    from tests import test_cpp_verdict_parity, test_cpp_engine_runs_parity
+    from tests import test_cpp_verdict_parity
     n_ver = test_cpp_verdict_parity.main(str(b / "oc_verdict"), 60 if a.quick else 300)
     check(f"C++ verdict vs Python, every trial, reading and step identical ({n_ver:,} answers)", True)
     # negative control: a C++ verdict that allows a step the interval reads as a LOSS must be caught
@@ -138,8 +143,6 @@ def main():
     except AssertionError:
         det_ver = True
     check("negative control: parity test detects a C++ verdict that allows a step read as a LOSS", vmut != vsrc and det_ver)
-    dg_runs = test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50 if a.quick else 500)
-    check(f"the engine's seeded runs through the C++ vs the Python's (tools/engine_runs.py): every receipt identical, one digest {dg_runs[:16]}…", True)
     from tools import seal
     broken = seal.check()
     check(f"seal: all {len(seal.TWINS)} Python/C++ twins unchanged since proven equal (results/SEAL.json)", not broken, "; ".join(broken))

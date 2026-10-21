@@ -17,8 +17,9 @@ rebuild of the page, on the checkout the page is built from, with the C++ compil
              (cpp/src/compass_law.cpp) and through the Python again; the force, position and velocity compared with the
              run's own, decision by decision
   engine runs the Python's seeded runs (tools/engine_runs.py, the newest record the page shows: 500 runs from the jump
-             generator) run again by the C++ engine (cpp/tools/run_engine_runs.cpp: the governor, the nervous system, the
-             compass law and the verdict, all C++), every receipt compared with the record's and the two SHA-256 digests
+             generator): their draws, the Python's injection, are the input of the C++ harness (cpp/tools/engine_runs.cpp: the
+             governor, the nervous system, the compass law and the verdict, all C++), every receipt compared with the
+             record's and the two SHA-256 digests
   organisms  the seven organisms (the spine, the four realms, the four stacked, the whole tower) at the tune-down, where
              every muscle runs the compass law (realms/compass_arm_v5.py compass_apply_v5 with V5SAVE), on the climb, seed
              3000: every muscle's law fed through the C++ the same way, organism by organism and muscle by muscle
@@ -200,15 +201,18 @@ def twins(b: Path, tmp: Path) -> list:
 def engine_runs(b: Path, er: dict) -> dict:
     """The record's set (the Python's receipts as GitHub or a person wrote them) run again by the C++ engine: its digest beside
     the record's, and each run's largest difference from the record's receipt (0 where every number is the same to the last bit)."""
-    from tools.engine_runs import digest
-    from tests.test_cpp_engine_runs_parity import compare, cpp_runs
+    from tools import engine_runs as ER
+    from tests.test_cpp_engine_runs_parity import compare
+    digest = ER.digest
     py = er.get("receipts") or []
-    cpp, cdg = cpp_runs(b / "oc_engine_runs", len(py), int(er["base"]), py[0]["k"] if py else 0)
-    per = compare(py, cpp)
+    c = ER.cpp_runs([ER.draws(r["k"], int(er["base"])) for r in py], b / "oc_engine_runs")   # the Python's injection in, the C++ out
+    cdg = c["digest"]
+    per = compare(py, c["runs"])
     return {"file": er.get("file"), "base": er["base"], "runs": len(py), "python_digest": er.get("digest"),
             "python_digest_recomputed": digest(py) if py else None, "cpp_digest": cdg, "same_digest": cdg == er.get("digest"),
             "identical_runs": sum(1 for w in per if w == 0.0), "largest_difference": fmt(max(per)) if per else 0.0,
-            "per_run": [fmt(w) for w in per], "github": er.get("github"), "tool": "cpp/tools/run_engine_runs.cpp"}
+            "per_run": [fmt(w) for w in per], "github": er.get("github"), "tool": "cpp/tools/engine_runs.cpp",
+            "inputs_digest": c["inputs_digest"]}
 
 
 def organisms():

@@ -39,7 +39,7 @@ cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build 
 ./cpp/build/oc_smoke
 python tests/test_cpp_compass_law_parity.py cpp/build/oc_compass_law   # the compass law, Python against C++
 python tests/test_cpp_verdict_parity.py cpp/build/oc_verdict            # the verdict, Python against C++
-python tests/test_cpp_engine_runs_parity.py cpp/build/oc_engine_runs 500   # the Python's 500 runs through the C++ engine
+python tests/test_cpp_engine_runs_parity.py cpp/build/oc_engine_runs 500   # the Python's 500 runs through the C++ harness
 python tools/engine_runs.py --runs 500 --base 7 --cpp cpp/build/oc_engine_runs   # a new set, both engines, one record
 ```
 
@@ -63,9 +63,9 @@ Shipped `omnicompass/core.py` is the patent principal form: cubic U(1 − U²), 
 laws, the shield, the pod autoscaler's replica law, the closure, the conveyance law, the nerves, the compass and ledger, the
 GPU governor's rules, the compass law with the two-way plug, and the verdict. Each twin has a parity test that feeds the Python
 and the C++ the same inputs (`verify.py` runs them all; `tools/seal.py` lists them and what still runs in Python only). The
-Python's seeded runs (`tools/engine_runs.py`, 500 from the jump generator) run whole in C++ too (`cpp/tools/run_engine_runs.cpp`:
-the governor, the nerves, the compass law and the verdict, fed the same seeds and draws), every receipt and the SHA-256 digest
-identical to the Python's; the `engine-runs` workflow runs both with every set. The live engine's section 10b feeds the
+Python's seeded runs (`tools/engine_runs.py`, 500 from the jump generator) run whole through the C++ harness too
+(`cpp/tools/engine_runs.cpp`: the Python's draws are its input, and the governor, the nerves, the compass law and the verdict in
+C++ put the mechanism on), every receipt and the SHA-256 digest identical to the Python's; the `engine-runs` workflow runs both with every set. The live engine's section 10b feeds the
 Python's own runs into the C++ at every rebuild (`docs/engine/export_cpp_twins.py`), and its proof monitor sets the C++
 engine's digest beside the Python's and the page's.
 

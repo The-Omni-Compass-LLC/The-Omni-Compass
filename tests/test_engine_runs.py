@@ -36,6 +36,19 @@ class EngineRuns(unittest.TestCase):
         self.assertEqual(len(rec["receipts"]), rec["runs"])
         self.assertEqual(E.digest(rec["receipts"]), rec["digest"])
 
+    def test_the_draws_are_the_runs_input(self):
+        """The injection carries every draw: the Python run on the draws is the run, and the text round-trips every number."""
+        dr = E.draws(3, 20261020)
+        self.assertEqual(E.run_draws(dr), E.one_run(3, 20261020))
+        lines = E.injection([dr]).splitlines()
+        self.assertEqual(lines[0], f"OCRUNS 1 1 {E.DECISIONS} {E.LAW_STEPS}")
+        self.assertEqual(sum(1 for x in lines if x.startswith("O ")), E.DECISIONS)
+        self.assertEqual([float(x) for x in lines[-2].split()[3:]], dr["inc"])
+
+    @unittest.skipUnless((ROOT / "cpp" / "build" / "oc_engine_runs").exists(), "the C++ harness is not built (cmake -S cpp -B cpp/build)")
+    def test_the_cpp_harness_computes_the_same_runs(self):
+        self.assertEqual(E.cpp_check(12, 20261020, ROOT / "cpp" / "build" / "oc_engine_runs"), 0)
+
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_the_page_computes_the_same_runs(self):
         self.assertEqual(E.verify(ROOT / "docs" / "engine" / "OMNI_COMPASS_LIVE_ENGINE.html", 12), 0)

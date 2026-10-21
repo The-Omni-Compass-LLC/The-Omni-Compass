@@ -3560,9 +3560,9 @@ cluster.
 
 
 
-Line coverage of every Python file in the engine that stands (omni-v14), under the whole test suite: the unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 tools/engine_coverage.py --measure` on commit `aebf4fa431e3`; `tools/engine_coverage.py --check`, run by `verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.
+Line coverage of every Python file in the engine that stands (omni-v14), under the whole test suite: the unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 tools/engine_coverage.py --measure` on commit `26a129f707e8`; `tools/engine_coverage.py --check`, run by `verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.
 
-**81% of the engine's 6,547 statements run under the tests** (5,324 run, 1,223 not). Coverage counts lines a test executes, not what it asserts: the properties the tests check are in `tests/test_engine_properties.py`, and the proofs of the core in `docs/ENGINE_PROOFS.md`.
+**82% of the engine's 6,579 statements run under the tests** (5,372 run, 1,207 not). Coverage counts lines a test executes, not what it asserts: the properties the tests check are in `tests/test_engine_properties.py`, and the proofs of the core in `docs/ENGINE_PROOFS.md`.
 
 | Engine file | Statements | Run by the tests | Coverage |
 |---|---:|---:|---:|
@@ -3580,19 +3580,19 @@ Line coverage of every Python file in the engine that stands (omni-v14), under t
 | `omnicompass/master.py` | 77 | 63 | 82% |
 | `realms/harness.py` | 413 | 354 | 86% |
 | `omni_controller/quota.py` | 86 | 75 | 87% |
-| `omni_controller/controller.py` | 850 | 755 | 89% |
-| `omni_controller/capacity.py` | 62 | 56 | 90% |
+| `omni_controller/controller.py` | 870 | 780 | 90% |
 | `omnicompass/compass.py` | 82 | 75 | 91% |
 | `omnicompass/edge.py` | 49 | 45 | 92% |
 | `realms/compass_arm_v5.py` | 838 | 770 | 92% |
 | `omnicompass/conveyance.py` | 52 | 48 | 92% |
 | `omnicompass/muscle_sdk.py` | 215 | 199 | 93% |
-| `omni_controller/muscles.py` | 580 | 538 | 93% |
+| `omni_controller/capacity.py` | 62 | 58 | 94% |
 | `omnicompass/configurations.py` | 31 | 29 | 94% |
 | `omnicompass/disruption_budget.py` | 16 | 15 | 94% |
 | `omnicompass/storage.py` | 32 | 30 | 94% |
 | `omni_controller/gpu_governor.py` | 354 | 332 | 94% |
 | `omnicompass/student_t.py` | 52 | 49 | 94% |
+| `omni_controller/muscles.py` | 592 | 559 | 94% |
 | `omnicompass/compass_law.py` | 95 | 90 | 95% |
 | `realms/compass_arm.py` | 107 | 102 | 95% |
 | `omnicompass/authority_contract.py` | 26 | 25 | 96% |
@@ -5386,7 +5386,7 @@ cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build 
 ./cpp/build/oc_smoke
 python tests/test_cpp_compass_law_parity.py cpp/build/oc_compass_law   # the compass law, Python against C++
 python tests/test_cpp_verdict_parity.py cpp/build/oc_verdict            # the verdict, Python against C++
-python tests/test_cpp_engine_runs_parity.py cpp/build/oc_engine_runs 500   # the Python's 500 runs through the C++ engine
+python tests/test_cpp_engine_runs_parity.py cpp/build/oc_engine_runs 500   # the Python's 500 runs through the C++ harness
 python tools/engine_runs.py --runs 500 --base 7 --cpp cpp/build/oc_engine_runs   # a new set, both engines, one record
 ```
 
@@ -5410,9 +5410,9 @@ Shipped `omnicompass/core.py` is the patent principal form: cubic U(1 − U²), 
 laws, the shield, the pod autoscaler's replica law, the closure, the conveyance law, the nerves, the compass and ledger, the
 GPU governor's rules, the compass law with the two-way plug, and the verdict. Each twin has a parity test that feeds the Python
 and the C++ the same inputs (`verify.py` runs them all; `tools/seal.py` lists them and what still runs in Python only). The
-Python's seeded runs (`tools/engine_runs.py`, 500 from the jump generator) run whole in C++ too (`cpp/tools/run_engine_runs.cpp`:
-the governor, the nerves, the compass law and the verdict, fed the same seeds and draws), every receipt and the SHA-256 digest
-identical to the Python's; the `engine-runs` workflow runs both with every set. The live engine's section 10b feeds the
+Python's seeded runs (`tools/engine_runs.py`, 500 from the jump generator) run whole through the C++ harness too
+(`cpp/tools/engine_runs.cpp`: the Python's draws are its input, and the governor, the nerves, the compass law and the verdict in
+C++ put the mechanism on), every receipt and the SHA-256 digest identical to the Python's; the `engine-runs` workflow runs both with every set. The live engine's section 10b feeds the
 Python's own runs into the C++ at every rebuild (`docs/engine/export_cpp_twins.py`), and its proof monitor sets the C++
 engine's digest beside the Python's and the page's.
 

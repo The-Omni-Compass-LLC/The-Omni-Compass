@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-## 2026-10-21: the Python's 500 runs through the C++ engine, receipt by receipt, on GitHub and on the live engine
+## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 
 - **The verdict in C++** (`cpp/src/verdict.cpp`, `cpp/include/omnicompass/verdict.hpp`, the tool `oc_verdict`): a line-by-line twin of
   `omnicompass/verdict.py` (the median, the log costs' mean and variance, Welch's interval, the trial's phases, both judges, the
@@ -10,23 +10,49 @@
   `tests/test_cpp_verdict_parity.py` runs 300 random verdicts (122,538 answers: trials allowed GAIN and EVEN, refused LOSS and past
   the allowance, abandoned for calm and for work, the median judge) through both: every answer identical. `verify.py` runs it and
   a negative control (a C++ verdict that allows a step read as a LOSS must be caught, and is).
-- **The Python's runs through the C++ engine** (`cpp/tools/run_engine_runs.cpp`, the tool `oc_engine_runs`): the same jump generator
-  (seed_k = base + k·0x9E3779B9 mod 2³²), the same mulberry32 stream and the same draws in the same order as `tools/engine_runs.py`,
-  through the C++ governor (288 decisions of the RK4 state equations), the C++ nervous system (the authority per organ), the C++
-  compass law and the C++ verdict, with its own SHA-256 of the receipts. On base 20261020 and on the record GitHub made (base
-  881947045), every one of the 500 receipts is identical to the Python's to the last bit, and the C++ digest is the record's
-  (`87e77e00bce8e482…`). `tests/test_cpp_engine_runs_parity.py` holds it; `verify.py` runs 500 (50 with `--quick`).
+- **The Python's runs through the C++ harness, to the last bit**: the C++ harness (`cpp/tools/engine_runs.cpp`, `oc_engine_runs`;
+  the Python's draws from the jump generator are its input, `tools/engine_runs.py` injection(); the entry below) now runs on the
+  sealed C++ twins of the compass law and of the verdict and on the C++ governor's own push. With the two fixes below, every one of
+  the 500 receipts of GitHub's set 881947045 and of base 20261020 is the Python's to the last bit (it read 2.2e-15 before), one
+  digest (`87e77e00bce8e482…` for GitHub's set). `tests/test_cpp_engine_runs_parity.py` holds it on every push (`verify.py`: 500, 50
+  with `--quick`). A second C++ driver written the same hour, which drew the seeds itself in C++, agreed bit for bit as well and is
+  removed, so the harness is one program with one input: the Python's own draws.
 - **Two C++ twins brought to the last bit**: the C++ governor now carries the brain's push (`Directive.push`, the Python's
   `last_push`), and the C++ RK4 step adds (h/6)(k₁ + 2k₂ + 2k₃ + k₄) in `omnicompass/core.py`'s own order of operations; the governor's
   parity on 21,600 directives goes from 1e-15 to 0 (identical), and the 500 fixtures still pass.
-- **On GitHub with every set** (`.github/workflows/engine-runs.yml`): the workflow builds the C++ and runs the same set through it
-  (`tools/engine_runs.py --cpp`); the record carries the C++ engine's digest and each run's difference, and the run fails if one
-  receipt differs. A push that changes `cpp/` starts a set too.
-- **On the live engine**: the proof monitor (`#proofPanel`) gains the C++ engine's column and its digest under the grid, and shows
-  the Python's and the C++ engine's receipts before the page runs its own; section 10b gains the table "The Python's runs through
-  the C++ engine, receipt by receipt", computed at every build against the record shown. The seal holds twelve twins (the
-  verdict, and the engine's seeded runs through every twin); Student's t is the one piece of the verdict's family left in Python
-  only, because the verdict reads the fixed 1.96.
+- **On the live engine**: section 10 is now 10a (the component specification and its mathematics) and 10b, the C++ twin (`#s-cpp`):
+  every twin's parity check, the Python's runs through the C++ harness receipt by receipt (500 of 500 identical, the two digests and
+  the GitHub run that made the record), every compass law the page's runs wire, and every muscle of the seven organisms at the
+  tune-down through the C++ law (156,480 readings, all identical). Where a record was made before the harness ran with every set,
+  the proof monitor's C++ lane (section 1f) reads the harness's run of it at the page's build. The seal holds twelve twins (the
+  verdict, and the engine's seeded runs through every twin); Student's t stays in Python only, because the verdict reads the
+  fixed 1.96. The Live Engine Manual gains 24.3 and Appendix A's 10a and 10b.
+
+## 2026-10-21 (morning): the live engine front to back as the founder reads it; every monitor drawn; the Python's runs through the C++
+
+- **The front order** (the founder's order of 21 October): the title page first, then the executive summary and the reading key, then
+  the Engine table of contents (iv), then the monitor wall; the contents carry no bullets and no dotted leaders: part 1 is lettered
+  1a to 1i, one section for each of its panels (1a the control panel and the kill switch, 1b the wall, 1c the monitor list, 1d the
+  status board, 1e the master switch's wiring, 1f the Python's runs, 1g every LOSS row, 1h the golden signals, the event log and the
+  metrics, 1i the pipeline), each with its controls line and summary, every in-page reference moved with it.
+- **The wall read left to right** (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`): monitors numbered 1
+  upward in their order of appearance and laid out left to right, then the next row; the right-to-left mode and its button removed.
+  Two monitors that sit side by side in their section (native beside Omni-Compass) sit side by side on the wall and never split
+  across two rows, and on the page the pairs stay side by side at every width, a phone included, their canvases level.
+- **Every monitor drawn**: the wall redrew a resting monitor through code that refused to draw off screen, so monitors 2 to 7 and 22
+  stayed stale or blank until scrolled to; every monitor is now drawn by its own code as the page opens (about 50 ms for all 58)
+  and in turn while the wall is in view. The proof monitor's runs start on their own; Google's and Amazon's bill monitors show the
+  mechanism every cloud set runs, live on the cloud setting's model (class S, never their bill) until their first set lands; the
+  data pipeline is drawn whole on its own canvas at every width.
+- **The Python's runs through the C++ harness** (`cpp/tools/engine_runs.cpp`, `oc_engine_runs`): the Python writes every draw of every
+  run (the injection); the C++ program reads it, puts the mechanism on through the engine's C++ twins (the governor's sense,
+  assimilation and RK4; the nervous system's grants; the compass law and the verdict's interval rule as the page carries them) and
+  writes every receipt. On GitHub's set of 21 October (base 881947045) all 500 agree to 2.2e-15 and the digests are one
+  (87e77e00bce8e482…). `engine-runs.yml` builds it and records the C++ digest, the run-by-run differences and the digest of the draws
+  in every set; `verify.py` runs it on every push; the proof monitor (1f) reads every run three ways, the Python, the C++ and the
+  page, one digest each.
+- **The Live Engine Manual realigned**: the front order, part 1's sections, the wall's direction, the pairs, the three-way proof and
+  the cloud and pipeline monitors; Appendix A rebuilt from the page's own contents (its numbers had kept an older order).
 
 ## 2026-10-21: the C++ twin of the compass law; the Python's runs fed through the C++ on the live engine; the wall-first page on main
 
@@ -146,30 +172,6 @@
 - **The raw sweep leaves no cancelled runs either** (`raw-sweep.yml`): its one-at-a-time rule sat on the whole workflow, so
   every start after a skipped front page queued and was cancelled (five in a quarter hour); the rule sits on its job now, as
   the conductor's does, and a start whose job is skipped never queues.
-
-## 2026-10-21: every check on GitHub green again; OCM's and Armada's four ways; Gödel's three runs started
-
-- **The security scan passes again** (`security-scan.yml`, runs 22 to 24 red). Two causes, both fixed. The audit of the
-  pinned dependencies found eight published advisories against Pillow 12.3.0 (the image library matplotlib and reportlab
-  bring); `requirements-lock.txt` pins Pillow 13.0.0 with the SHA-256 of each of its 83 files, and `pip-audit` reads no
-  known vulnerability. Pillow 13 needs Python 3.11, so `pyproject.toml` asks for 3.11 or newer (verify runs 3.12); Dependabot's
-  Pillow updates had failed on the same floor. The static scan found one medium finding no review named, the control panel's
-  default kill file under `/tmp/omni-compass` (`tools/omni_control.py`); it is reviewed by name in `tools/security_scan.py`
-  (the operator's own machine, one user, set by `--kill-file` or `OMNI_CONTROL_KILL_FILE`) and the page is current. The bill of
-  materials and the license list carry Pillow 13.0.0 (`tools/sbom.py`).
-- **The conductor no longer leaves cancelled runs behind** (`grid.yml`). Its one-at-a-time rule sat on the whole workflow, so
-  every scheduled start and every verify's start queued behind the five-hour conductor and was cancelled by the next one: four
-  a day, read as failures. A start now opens with a gate that ends green when another conductor ticks or waits; only the
-  successor a conductor starts as it ends (`chained`) waits its turn, and the one-at-a-time rule sits on the ticking job.
-- **Open Cluster Management and Armada, four ways, three runs each, on omni-v12** (`results/live/V12_OCM_4W_*.md`,
-  `V12_ARMADA_4W_*.md`; `docs/GROUP_PREREGISTRATION.md`, amendment 3). Every row is shown. Omni-Compass on top of Armada
-  against Armada as shipped: six GAIN in all three runs (machines in service −40% to −43%, the response time's 95th percentile
-  −44% to −45%) and no LOSS. Two LOSS rows on Omni-Compass's side are reported as they stand: the alert minutes on top of OCM
-  (+5.7% to +45.5%) and the job turnaround on the group alone under Armada (+5.1% to +9.1%), both the shared-host raise
-  omni-v13 fixed; both systems run again on the engine that stands. Armada A carries nine repetitions (a runner lost).
-- **The Gödel scheduler's A, B and C started on omni-v13** (runs 39530159191, 39530162328, 39530165147), once its trial on the
-  rig that tolerates both control-plane taints of Kubernetes 1.24 ran both arms whole (run 39485277362); they count as the
-  campaign's own Gödel entry.
 
 ## 2026-10-21: every check on GitHub green again; OCM's and Armada's four ways; Gödel's three runs started
 

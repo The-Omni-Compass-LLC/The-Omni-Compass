@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-21 02:59 UTC on omni-v13 (digest 0088837333c6f0fc) from commit d9cc09ddd745.
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-21 05:24 UTC on omni-v13 (digest 0088837333c6f0fc) from commit dec89ed76f97.
 
 
 Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
@@ -11,13 +11,13 @@ Each part below is one section of the page, in the page's order and under its nu
 
 **The page, in its own words.**
 
-A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere: Native, the whole system running by itself, and Omni-Compass, the same system with Omni-Compass on top of all of it. It is laid out as a book, read from the top down: the table of contents first, then the front matter (this title page and the reading key), then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v13: omni-v12 with one fault found on its own runs fixed: on a shared host at its top, while another workload there has room of its own, the governor's conveyance hands every processor limit it gave back to the operator's, and it counts every other pod by what it may use (docs/OMNI_V13.md). Before it, omni-v12 fixed two faults found on omni-v11's runs. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
+A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere: Native, the whole system running by itself, and Omni-Compass, the same system with Omni-Compass on top of all of it. It is laid out as a book, read from the top down: this title page first, then the executive summary and the reading key, then the table of contents, then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v13: omni-v12 with one fault found on its own runs fixed: on a shared host at its top, while another workload there has room of its own, the governor's conveyance hands every processor limit it gave back to the operator's, and it counts every other pod by what it may use (docs/OMNI_V13.md). Before it, omni-v12 fixed two faults found on omni-v11's runs. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
 
 DISCLOSURE: REAL RUNS, A REAL ENGINE, NOTHING HARDWIRED. Every real-run figure on this page is played back from the raw files of benchmark runs executed on GitHub's own machines, each file checked against its run's SHA-256 list before a single number is drawn. Every model view runs the engine's own code (the compass law, the brain, the verdict) live in this page, linked through software to the repository's Python and C++ and checked against them on every build. GitHub rebuilds the page from the repository whenever the engine, a model or a result changes, and every three hours: no number on it is typed in by hand, and when the repository changes, the page changes with it.
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-## iv Executive summary and reading key
+## iii Executive summary and reading key
 
 **Controls.** Live: the buttons act on the live engine; every number below is read from the records on this page.
 
@@ -39,11 +39,11 @@ The size is how far the gauge moved from native; the word says whether that move
 
 ## Part 1 of the page: The monitor wall and the control panel
 
-## 1a The monitor wall and the control panel: the kill switch, every monitor, the status board
+## 1a The control panel and the kill switch: one switch for the whole organism, the Python's runs, the three manuals
 
-The first view after the front matter: every monitor of this page at once, numbered, and the control panel that drives them. The kill switch stands at its head; the Python's own runs can be run again here at a button; the status board below says whether Omni-Compass is engaged, which signals are out of tolerance and where, and every LOSS row is raised as an alarm with its source record, its cause and the knob that answers it. No value on the board is typed in: each is computed at runtime from the live engine or from the repository's records embedded at build time.
+The first view after the front matter: the control panel that drives every monitor of this page. The kill switch stands at its head, ON in green while Omni-Compass governs on top of native, red when engaged, and Omni-Compass OFF in white; the Python's own runs can be run again here at a button; the three manuals are a click away. The monitors it drives follow: the wall of every monitor (1b), the numbered list of them (1c), the status board (1d), the master switch's wiring (1e), the Python's runs in this page (1f), every LOSS row (1g), the golden signals (1h) and GitHub's pipeline (1i). No value here is typed in: each is computed at runtime from the live engine or from the repository's records embedded at build time.
 
-**Controls.** Live: the kill switch, the faults and the filters act at once, and every tile is read again four times a second.
+**Controls.** Live: the kill switch acts at once on every governor of this page; the buttons run the Python's runs here and fetch the three manuals.
 
 **The page, in its own words.**
 
@@ -53,39 +53,59 @@ The kill switch. While Omni-Compass governs on top of native the switch reads ON
 
 The three manuals. The Live Engine Manual reads this page top to bottom: how to read, operate, tune and watch it, native beside Omni-Compass, chapter by chapter in the page's own order, and, in its last appendix, the page word for word, every section, every monitor under its number and every knob, written from this page at every build. The Operator's Manual wires and runs Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. Each carries the notice, the LICENSE, the NOTICE and DISCLOSURES.md.
 
-**The monitor wall: every monitor of this page, numbered in its order of appearance, read right to left; click a tile to go to it**
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section 11) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, and a tile with the accent border is a monitor on screen now.
+## 1b The monitor wall: every monitor, numbered 1 upward in its order of appearance, read left to right
 
-**Every monitor: the inventory: what each shows, where its numbers come from, the open-source feed that would carry it live, its knobs, and what is still awaiting its run**
+Every monitor of this page at once, numbered in the order it appears from the top, 1 first, and read left to right, then the next row, as any page is read; the last number is the last monitor on the page. Two monitors that sit side by side in their section, native beside Omni-Compass, stay side by side on the wall. Each tile carries its number and its section; the numbered list beside it (1c) says what each one shows.
 
-Every monitor is one canvas on this page; its number is its order of appearance from the top, and the wall reads them right to left, then the next row. The feeds name the open-source exporters an operator's Prometheus and Grafana already run (node_exporter, kube-state-metrics, the NVIDIA DCGM exporter, Kepler, OpenCost, the governor's own tools/omni_exporter.py); the button in the control panel downloads the whole wall as a Grafana dashboard on those series (deploy/grafana/omni-compass-wall.json, written from docs/engine/monitors.json), beside the governor's own screen (deploy/grafana/omni-compass.json). A monitor the page draws from the repository's tables, or from its own clock, says so: no series carries it.
+**Controls.** Live: click a tile to go to its monitor; every tile is read again four times a second.
+
+**The page, in its own words.**
+
+**The monitor wall: every monitor of this page, numbered 1 upward in its order of appearance, read left to right, then the next row; click a tile to go to it**
+
+The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section 11) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, each through its own drawing code; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to. Two monitors that sit side by side in their section, native beside Omni-Compass, sit side by side on the wall too: a pair never splits across two rows. A tile with the accent border is a monitor on screen now; the list of every monitor by its number follows in section 1c.
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1c The monitor list: every monitor by its number, what it shows, its section and its feed
+
+The list that goes with the wall: every monitor by its number, in the same order, with what it shows, the section it lives in, its evidence class and state, the open-source feed that would carry it live and its knobs. Read the wall, find a number, read its line here.
+
+**Controls.** Recorded data: the list is the page's own registry of its monitors, read when the page opens; click a number to go to its monitor, a section to go to its section.
+
+**The page, in its own words.**
+
+**Every monitor by its number: what it shows, its section, where its numbers come from, the open-source feed that would carry it live, its knobs, and what is still awaiting its run**
+
+Every monitor is one canvas on this page; its number is its order of appearance from the top, and the wall (section 1b) reads them left to right, then the next row. The feeds name the open-source exporters an operator's Prometheus and Grafana already run (node_exporter, kube-state-metrics, the NVIDIA DCGM exporter, Kepler, OpenCost, the governor's own tools/omni_exporter.py); the button in the control panel downloads the whole wall as a Grafana dashboard on those series (deploy/grafana/omni-compass-wall.json, written from docs/engine/monitors.json), beside the governor's own screen (deploy/grafana/omni-compass.json). A monitor the page draws from the repository's tables, or from its own clock, says so: no series carries it.
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1d The status board: the tiles, the alarms and the watch items
+
+Whether Omni-Compass is engaged, which signals are out of tolerance and where, and every LOSS row raised as an alarm with its source record. Each tile and each alarm is computed at runtime from the live engine or from the repository's records.
+
+**Controls.** Live: the filters act at once, and every tile is read again four times a second.
+
+**The page, in its own words.**
+
+**Alarms and watch items, by severity**
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1e The master switch's wiring: the switch above the brain, the brain above the organism, every muscle under it
+
+One switch for the whole organism, drawn as the repository wires it: the master switch holds the brain's outputs; the brain sits above the organism; every muscle hangs under it with native's own controller under every muscle, never switched. Every governor of this page is listed with its state at the switch.
+
+**Controls.** Live: the switch on this monitor is the kill switch of section 1a.
+
+**The page, in its own words.**
 
 **The master switch, wired at the top of the organism: switch, brain, organism, every muscle**
 
 One switch for the whole organism, as the repository builds it (omnicompass/master.py, tools/omni_switch.py). It sits at the top and holds the brain's outputs. With it OFF, nothing the brain computes is pushed or pulled into any muscle, and every muscle runs on native's own controllers, which never stop. On a real machine every governor exits at the switch; on this page the brain keeps reading the native body in shadow, so its monitors keep moving, and nothing it computes leaves it. No monitor is switched off: every Omni-Compass side follows native, drawn in native's colour. Every governor on this page is registered with it and obeys it at once. The live organism hands every setting it held back to native's own controller and reads each one back. Every record's Omni-Compass side, and every playback, trace, table, board and grid, reads native's own. Native's own controllers sit under every muscle and are never switched, so native's side never moves with it. Every section carries the same switch in its controls bar; pressing any one of them throws this one.
-
-**The Python's runs, in this page: the engine's seeded runs recomputed here, and the 500 scenarios replayed**
-
-How the two prove each other. tools/engine_runs.py runs N runs from a base seed: run k's seed is base + k·0x9E3779B9 mod 2³² (the jump generator), its stream mulberry32 (this page's own generator, written in the Python bit for bit), through the engine that stands: 288 decisions of the brain's state equations integrated by the fourth-order Runge–Kutta step, 80 steps of the compass law and one give-back trial judged by the verdict. Each run's receipt is its final state, its pushes and grants, the law's mean and last force and the trial's answer; the digest is the SHA-256 of every receipt at six decimals. This page runs the same N with its own port of the engine (proven equal to the Python and the C++ to 1e-12 on every build by docs/engine/check_live_engine.py) and compares every receipt and the digest. Run the Python again with another base and it writes another set; this page computes the same set from the same base, and the two digests must be one.
-
-**Alarms and watch items, by severity**
-
-**Every LOSS row: its cause and the knob that answers it (Omni-Compass's own rows first, then the orchestrators' own cost)**
-
-**Golden-signal feed, live: the last 240 decisions, native beside Omni-Compass**
-
-One point per decision streamed from the live engine, gapless, each signal on its own axis, with each arm's last, mean and maximum as a time-series dashboard reports them; a kill-switch window is shaded red. Native in amber, Omni-Compass in blue, the same demand on both.
-
-**Engine event log, newest first**
-
-The live engine's own events as it emits them, with the wall-clock time and the decision. They are a threshold breach and its clearing on either arm, every injected fault and its end, the kill switch, the dial, a new day, and the brain's calm crossing the grant threshold. ALERT, WARN and INFO as an operations log grades them.
-
-**OpenMetrics exposition: the live metrics, ready for Prometheus and Grafana**
-
-The live engine's metrics in the OpenMetrics text format, the CNCF exposition format Prometheus scrapes and Grafana charts, refreshed every two seconds. They are engagement, the decision index, breaches, work, band time, actuator moves and reversals per arm, and frame time. Then the verdict's keep ratio at each true cost, the three-run tables' rows by class and reading, and the build's engine, digest and commit.
-
-The board is laid out the way an operations monitor is. The switch and the engine come first. Next come the live organism's signals, native beside Omni-Compass, in the four a service is watched by (site reliability practice: latency, traffic, errors and saturation): here the work waiting, the work done, the decisions past their line and the capacity held. Then every reading of the real and modelled runs that went against native, worst first. Last come GitHub and the age of this page. A tile's word is its reading against native by the key (front matter, iv). A tile with no reading says what it shows.
 
 **Its monitors.**
 
@@ -98,6 +118,20 @@ The switch above the brain: ON, Omni-Compass governs every wired muscle; engaged
 - **Knobs.** Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** The wiring from the top down: the master switch above the brain, the brain above the organism, the organism above every muscle, and native's own controllers under every muscle, never switched. The switch's state is the word on it: ON in green while Omni-Compass governs; engaged, the switch red and OFF in white.
 - **What to do with it.** Press the kill switch only for security: it is instant, every setting goes back to native and is read back. Watch the governors' table beside it: every governor on the page says OFF and what it handed back.
+
+## 1f The Python's runs, in this page: the jump generator's runs recomputed here, the 500 scenarios replayed
+
+The Python's runs, the C++ harness's and this page's, run by run: the jump generator's set GitHub ran in the Python (its run linked), the same draws run through the C++ harness on the engine's C++ twins, and the same set recomputed here by this page's own port of the engine as the page opens; every receipt compared three ways, one SHA-256 digest each, and the digest of the draws themselves; and the Python's 500 scenarios a seed replayed from its own record with every trace hash.
+
+**Controls.** Live: the runs start on their own when the page opens; the buttons run them again, run a new set from any base, print them and save the receipts.
+
+**The page, in its own words.**
+
+**The Python's runs, in this page: the engine's seeded runs recomputed here, and the 500 scenarios replayed**
+
+How the three prove each other. tools/engine_runs.py runs N runs from a base seed: run k's seed is base + k·0x9E3779B9 mod 2³² (the jump generator), its stream mulberry32 (this page's own generator, written in the Python bit for bit), through the engine that stands: 288 decisions of the brain's state equations integrated by the fourth-order Runge–Kutta step, 80 steps of the compass law and one give-back trial judged by the verdict. Each run's receipt is its final state, its pushes and grants, the law's mean and last force and the trial's answer; the digest is the SHA-256 of every receipt at six decimals. The Python writes every draw of every run, the injection, and the C++ harness (cpp/tools/engine_runs.cpp) reads it as its input, puts the mechanism on through the engine's C++ twins and writes every receipt: its digest must be the Python's. This page runs the same N with its own port of the engine (proven equal to the Python and the C++ to 1e-12 on every build by docs/engine/check_live_engine.py) as it opens and compares every receipt and the digest. GitHub does all three on every set it runs (.github/workflows/engine-runs.yml) and on every push (verify.py); run the Python again with another base and it writes another set, and the three digests must be one.
+
+**Its monitors.**
 
 ### Monitor 2: The Python's runs, reproduced here
 
@@ -118,6 +152,42 @@ benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seed
 - **Knobs.** Seed base: which held-out seed base's 500 scenarios are replayed; Arm: which arm stands on the right: Omni-Compass governing, or watching only; Gauge: which gauge of the run is shown; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** The Python's seeded runs beside this page's: one cell a run (green agrees to 1e-9, red differs, blue a new set), the two digests under them; and the Python's 500 scenarios a seed replayed with every trace hash.
 - **What to do with it.** Press the button to run the Python's set here; run a new base to make a new set and run the printed command in the Python to compare digests. Print or download the receipts for the file.
+
+## 1g Every LOSS row: its cause and the knob that answers it
+
+Every LOSS row of every three-run table on this page, Omni-Compass's own first and then the orchestrators' own, each with the cause the repository records and the knob that brings it EVEN or leaves the muscle native. No row is cut and no number is tuned.
+
+**Controls.** Recorded data: every row is read from the three-run tables on this page.
+
+**The page, in its own words.**
+
+**Every LOSS row: its cause and the knob that answers it (Omni-Compass's own rows first, then the orchestrators' own cost)**
+
+**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 1h The golden signals, the event log and the live metrics
+
+The live organism's four golden signals, native beside Omni-Compass, one point a decision: errors (muscles over the line), throughput (work served), latency and saturation; the engine's own event log, newest first; and the same metrics in the OpenMetrics format Prometheus scrapes and Grafana charts.
+
+**Controls.** Live: one point a decision from the live engine; the event log's filters act at once; the metrics refresh every two seconds.
+
+**The page, in its own words.**
+
+**Golden-signal feed, live: the last 240 decisions, native beside Omni-Compass**
+
+One point per decision streamed from the live engine, gapless, each signal on its own axis, with each arm's last, mean and maximum as a time-series dashboard reports them; a kill-switch window is shaded red. Native in amber, Omni-Compass in blue, the same demand on both.
+
+**Engine event log, newest first**
+
+The live engine's own events as it emits them, with the wall-clock time and the decision. They are a threshold breach and its clearing on either arm, every injected fault and its end, the kill switch, the dial, a new day, and the brain's calm crossing the grant threshold. ALERT, WARN and INFO as an operations log grades them.
+
+**OpenMetrics exposition: the live metrics, ready for Prometheus and Grafana**
+
+The live engine's metrics in the OpenMetrics text format, the CNCF exposition format Prometheus scrapes and Grafana charts, refreshed every two seconds. They are engagement, the decision index, breaches, work, band time, actuator moves and reversals per arm, and frame time. Then the verdict's keep ratio at each true cost, the three-run tables' rows by class and reading, and the build's engine, digest and commit.
+
+The board is laid out the way an operations monitor is. The switch and the engine come first. Next come the live organism's signals, native beside Omni-Compass, in the four a service is watched by (site reliability practice: latency, traffic, errors and saturation): here the work waiting, the work done, the decisions past their line and the capacity held. Then every reading of the real and modelled runs that went against native, worst first. Last come GitHub and the age of this page. A tile's word is its reading against native by the key (front matter, iv). A tile with no reading says what it shows.
+
+**Its monitors.**
 
 ### Monitor 4: Golden signal: errors
 
@@ -159,9 +229,9 @@ Capacity held against capacity used, native beside Omni-Compass.
 - **How to read it.** The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.
 - **What to do with it.** Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises.
 
-## 1b CI pipeline: GitHub Actions runs in progress and queued
+## 1i CI pipeline: GitHub Actions runs in progress and queued
 
-Every GitHub Actions workflow run in progress or queued at build time. The hardware and cloud runs, with their terminal status, are in sections 5a and 5f; every run on the engine that stands that terminated without a measurement is raised on the status board (section 1a).
+Every GitHub Actions workflow run in progress or queued at build time. The hardware and cloud runs, with their terminal status, are in sections 5a and 5f; every run on the engine that stands that terminated without a measurement is raised on the status board (section 1d).
 
 **Controls.** Recorded data: GitHub's runs as read when the page was built.
 
@@ -189,7 +259,7 @@ Every workflow run in progress or queued when the page was built, the Azure set'
 
 ## 2 The benefit board: every domain, native against Omni-Compass
 
-The first thing after the wall: every benchmark's measured effect in one board, native against Omni-Compass on top of native, by domain and by gauge family, and the Omni index that weighs them together. Every bar is its table's own word (GAIN green, EVEN yellow, LOSS red, power given blue) beside its size; every LOSS row stands on it and is answered, with its cause and its knob, on the status board (section 1a). The whole organism composed from these same tables follows in section 3; every table, every muscle and the grid in full in section 4.
+The first thing after the wall: every benchmark's measured effect in one board, native against Omni-Compass on top of native, by domain and by gauge family, and the Omni index that weighs them together. Every bar is its table's own word (GAIN green, EVEN yellow, LOSS red, power given blue) beside its size; every LOSS row stands on it and is answered, with its cause and its knob, on the status board (section 1d). The whole organism composed from these same tables follows in section 3; every table, every muscle and the grid in full in section 4.
 
 **Controls.** Recorded data: every receipt as the repository holds it. The kill switch recolours a recorded result and never rewrites it; console controls never modify it.
 
@@ -371,7 +441,7 @@ Machine-hours billed and the bill at list price, native against Omni-Compass, ev
 
 ### Monitor 16: Google Cloud: the gate and the bill
 
-The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.
+The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill)
 
 - **Evidence and state.** Class L; awaiting its run: the first set starts within the hour after the gate passes: the key stored whole (docs/GOOGLE_SETUP.md, section 4).
 - **Feed.** OpenCost; Google Cloud Billing export; series `node_total_hourly_cost`; on a running system: `sum(node_total_hourly_cost)`.
@@ -381,7 +451,7 @@ The same monitor for Google Cloud: the hourly gate's reading (the key, the login
 
 ### Monitor 17: Amazon: the gate and the bill
 
-The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.
+The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill)
 
 - **Evidence and state.** Class L; awaiting its run: the first set starts within the hour after the gate passes: the account on the Paid plan (docs/AMAZON_SETUP.md, section 1a).
 - **Feed.** OpenCost; AWS Cost and Usage Report; series `node_total_hourly_cost`; on a running system: `sum(node_total_hourly_cost)`.
@@ -485,7 +555,7 @@ From the repetition's own audit.jsonl: the minute and second of the decision, th
 
 **Its monitors.**
 
-### Monitor 22: The official run's pipeline
+### Monitor 22: The data pipeline, live: every stage from the GitHub Actions run to this page
 
 The chosen Kubernetes run played back from its archived files: where every repetition stands.
 
@@ -1194,14 +1264,14 @@ This page's own render loop governed by the compass law: the frame time against 
 
 | No. | Monitor | Section | Class | State |
 |---|---|---|---|---|
-| 1 | The master switch and the kill switch | 1a The monitor wall and the control panel | S (the page's port of the master switch; the real one is omnicompass/master.py) | live |
-| 2 | The Python's runs, reproduced here | 1a The monitor wall and the control panel | S (the engine itself) | live |
-| 3 | The Python's 500 scenarios, replayed | 1a The monitor wall and the control panel | S | replay |
-| 4 | Golden signal: errors | 1a The monitor wall and the control panel | S | live |
-| 5 | Golden signal: throughput | 1a The monitor wall and the control panel | S | live |
-| 6 | Golden signal: latency | 1a The monitor wall and the control panel | S | live |
-| 7 | Golden signal: saturation | 1a The monitor wall and the control panel | S | live |
-| 8 | GitHub Actions: the runs in flight | 1b CI pipeline | L (GitHub's own API, read at the build) | record |
+| 1 | The master switch and the kill switch | 1e The master switch's wiring | S (the page's port of the master switch; the real one is omnicompass/master.py) | live |
+| 2 | The Python's runs, reproduced here | 1f The Python's runs, in this page | S (the engine itself) | live |
+| 3 | The Python's 500 scenarios, replayed | 1f The Python's runs, in this page | S | replay |
+| 4 | Golden signal: errors | 1h The golden signals, the event log and the live metrics | S | live |
+| 5 | Golden signal: throughput | 1h The golden signals, the event log and the live metrics | S | live |
+| 6 | Golden signal: latency | 1h The golden signals, the event log and the live metrics | S | live |
+| 7 | Golden signal: saturation | 1h The golden signals, the event log and the live metrics | S | live |
+| 8 | GitHub Actions: the runs in flight | 1i CI pipeline | L (GitHub's own API, read at the build) | record |
 | 9 | The benefit board | 2 The benefit board | L/S | record |
 | 10 | Where the benefit lives, gauge by gauge | 2 The benefit board | L/S | record |
 | 11 | The whole organism, composed | 3 The whole organism, every way it is bought | S (of P and L) | composed |
@@ -1215,7 +1285,7 @@ This page's own render loop governed by the compass law: the frame time against 
 | 19 | The cloud setting, live: Omni-Compass's machines | 5a Cloud providers | S | live |
 | 20 | The orchestrators' road | 5b Orchestrators and governors | L | record |
 | 21 | An orchestrator, four ways | 5b Orchestrators and governors | L | record |
-| 22 | The official run's pipeline | 5c Kubernetes | L | replay |
+| 22 | The data pipeline, live: every stage from the GitHub Actions run to this page | 5c Kubernetes | L | replay |
 | 23 | The official run's heartbeat | 5c Kubernetes | L | replay |
 | 24 | The official run: response time candles | 5c Kubernetes | L | replay |
 | 25 | The official run: the heat map | 5c Kubernetes | L | replay |
@@ -1257,7 +1327,7 @@ This page's own render loop governed by the compass law: the frame time against 
 
 | Knob | What it does | Where it is |
 |---|---|---|
-| Kill switch | Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white) | the master switch (section 1b) |
+| Kill switch | Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white) | the kill switch (section 1a; its wiring, section 1e) |
 | The dial | the max (every muscle to its own limit) or the tune-down (never more than native) | the console's dial |
 | Demand | ×0.25 to ×2 of the day's own demand, both arms alike | the console's demand slider |
 | Noise | σ of the demand's noise, one draw a muscle a decision, both arms alike | the console's noise slider |
@@ -1281,18 +1351,34 @@ This page's own render loop governed by the compass law: the frame time against 
 | The muscle's own switch | pick one muscle on either ring: its card, and its own switch, which hands that one muscle back to native (Omni-Compass OFF on it) or puts Omni-Compass on it again; the kill switch hands every muscle back at once | the organism's monitors and the muscle's card (section 6a) |
 | Runs | how many of the Python's runs this page computes again | the monitor's own buttons |
 | Print | the receipts of the runs, printable, with the digests and the notice | the monitor's own button |
-| Reading direction | the wall read right to left (as set) or left to right | the wall's own button |
 | Seed base | which held-out seed base's 500 scenarios are replayed | the monitor's own buttons |
 
 ## Every LOSS row, whose it is, its cause and the knob that answers it
 
-5 LOSS rows are Omni-Compass against its native; 75 are an orchestrator's own cost against the organism alone, with no Omni-Compass in either arm. Every one is shown as its table writes it.
+7 LOSS rows are Omni-Compass against its native; 103 are an orchestrator's own cost against the organism alone, with no Omni-Compass in either arm. Every one is shown as its table writes it.
 
+- **Omni-Compass against native.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_BARE.md`): queue: job turnaround, submitted to done, mean (s), A B C +5.1% (+1.9 to +8.3) · +8.9% (+4.9 to +12.9) · +9.1% (+0.9 to +17.3). The knob: the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row EVEN in the toy gate, the muscle stays native on this stack.
 - **Omni-Compass against native.** The Kubernetes scheduler with the operator's bin-packing profile under the batch stream (omni-v12, `results/live/V12_BINPACK.md`): queue: job turnaround, submitted to done, mean (s), A B C +1.4% (+0.8 to +1.9) · +1.0% (+0.4 to +1.7) · +1.2% (+0.7 to +1.6). Cause: Amendment 5: the governor's own core (written before any run on it, 20 October 2026) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row EVEN in the toy gate, the muscle stays native on this stack.
 - **Omni-Compass against native.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_TOP.md`): pod start wait, total (s), A B C +80.9% (+37.3 to +124.5) · +104.5% (+46.9 to +162.2) · +54.4% (+20.0 to +88.9). Cause: Amendment 10: what the counted runs of 20 October found (written after those runs, before the Gödel runs start again) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the test machine, not the governor: the image unpacked inside the window on the one runner every kind node shares (`docs/POD_START_WAIT.md`); the rig pre-pulls the image in both arms.
 - **Omni-Compass against native.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BARE.md`): response time (ms), 99th percentile, A B C +9.8% (+1.5 to +18.0) · +4.4% (+0.1 to +8.7) · +13.0% (+4.7 to +21.2). Cause: Amendment 10: what the counted runs of 20 October found (written after those runs, before the Gödel runs start again) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row EVEN in the toy gate, the muscle stays native on this stack.
 - **Omni-Compass against native.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BARE.md`): batch: queue finished (s), A B C +0.8% (+0.1 to +1.5) · +0.7% (+0.2 to +1.2) · +0.6% (+0.2 to +1.1). Cause: Amendment 10: what the counted runs of 20 October found (written after those runs, before the Gödel runs start again) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the muscle's own card (its band, cushions and glide); a setting that reads LOSS in the toy gate is refused and the muscle stays native.
+- **Omni-Compass against native.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_TOP.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +5.7% (+1.4 to +10.0) · +6.1% (+0.8 to +11.4) · +45.5% (+5.7 to +85.2). The knob: the muscle's floor and the trial's tolerance; a muscle that fails a request native served stays native until the gate reads no LOSS.
 - **Omni-Compass against native.** The Kubernetes scheduler as shipped under the batch stream (omni-v12, `results/live/V12_VANILLA.md`): queue: job turnaround, submitted to done, mean (s), A B C +0.9% (+0.2 to +1.7) · +0.9% (+0.1 to +1.6) · +1.2% (+0.6 to +1.8). Cause: Amendment 5: the governor's own core (written before any run on it, 20 October 2026) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row EVEN in the toy gate, the muscle stays native on this stack.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_BOTH.md`): batch: queue finished (s), A B C +72.4% (+61.8 to +82.9) · +68.6% (+58.6 to +78.6) · +86.7% (+75.6 to +97.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1190995.2% (+1185985.7 to +1196004.8) · +1634917.6% (+1630334.8 to +1639500.5) · +1324419.0% (+1319896.0 to +1328942.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +221050.0% (+220287.4 to +221812.6) · +245633.3% (+245069.1 to +246197.6) · +245750.0% (+245056.6 to +246443.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +528.0% (+478.0 to +578.0) · +469.9% (+426.8 to +513.0) · +904.9% (+825.1 to +984.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_BOTH.md`): queue: jobs unfinished at the window's end, A B C +24 (+24 to +24) · +24 (+24 to +24) · +24 (+24 to +24). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_ORCH.md`): batch: queue finished (s), A B C +72.6% (+62.2 to +83.1) · +68.4% (+58.3 to +78.6) · +86.7% (+75.4 to +98.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1193142.9% (+1189052.7 to +1197233.0) · +1632935.3% (+1629797.0 to +1636073.6) · +1323895.2% (+1320577.4 to +1327213.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +221366.7% (+220793.7 to +221939.6) · +245383.3% (+244977.9 to +245788.8) · +245666.7% (+245189.8 to +246143.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +529.1% (+479.5 to +578.7) · +469.3% (+425.4 to +513.1) · +904.5% (+823.7 to +985.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_ORCH.md`): queue: jobs unfinished at the window's end, A B C +24 (+24 to +24) · +24 (+24 to +24) · +24 (+24 to +24). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_VS.md`): response time (ms), mean, A B C +365.9% (+157.4 to +574.3) · +387.2% (+211.6 to +562.8) · +271.6% (+1.7 to +541.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_VS.md`): response time (ms), 95th percentile, A B C +1362.7% (+633.9 to +2091.4) · +1439.3% (+847.3 to +2031.3) · +986.8% (+75.2 to +1898.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_VS.md`): response time (ms), 99th percentile, A B C +1691.7% (+817.5 to +2565.8) · +1837.8% (+1123.2 to +2552.5) · +1233.4% (+145.9 to +2320.8). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_VS.md`): time over the response line (% of samples), A B C +583748.7% (+317248.1 to +850249.4) · +27.76 (+17.87 to +37.65) · +13.96 (+2.291 to +25.63). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Armada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_ARMADA_4W_VS.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +12.33 (+7.036 to +17.63) · +14 (+10.07 to +17.93) · +8.2 (+2.509 to +13.89). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** The Kubernetes scheduler with the operator's bin-packing profile under the batch stream, the four ways (omni-v12, `results/live/V12_BINPACK_4W_VS.md`): time over the response line (% of samples), A B C +21.1% (+5.3 to +36.8) · +37.2% (+12.4 to +61.9) · +29.8% (+1.0 to +58.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_BOTH.md`): pod start wait, total (s), A B C +80.9% (+32.7 to +129.0) · +68.8% (+12.8 to +124.7) · +71.8% (+31.7 to +112.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_ORCH.md`): response time (ms), mean, A B C +2.6% (+0.7 to +4.4) · +3.2% (+0.5 to +5.9) · +2.9% (+0.9 to +5.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
@@ -1358,6 +1444,19 @@ This page's own render loop governed by the compass law: the frame time against 
 - **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): response time (ms), 95th percentile, A B C +12.8% (+0.3 to +25.2) · +10.0% (+1.4 to +18.7) · +10.2% (+2.9 to +17.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +178.6% (+75.7 to +281.5) · +118.2% (+22.2 to +214.1) · +537.5% (+313.8 to +761.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +11.5% (+0.3 to +22.7) · +9.3% (+2.0 to +16.5) · +12.7% (+5.4 to +19.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): response time (ms), mean, A B C +59.9% (+38.6 to +81.3) · +51.7% (+23.3 to +80.0) · +58.7% (+37.1 to +80.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): response time (ms), 95th percentile, A B C +51.5% (+36.6 to +66.4) · +55.2% (+22.4 to +88.0) · +55.0% (+29.0 to +81.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): response time (ms), 99th percentile, A B C +49.4% (+31.0 to +67.8) · +58.4% (+25.9 to +90.9) · +52.9% (+30.2 to +75.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): time over the response line (% of samples), A B C +55.9% (+30.2 to +81.5) · +23.9% (+11.2 to +36.5) · +75.5% (+53.5 to +97.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +24.8% (+18.0 to +31.6) · +26.6% (+20.5 to +32.7) · +74.3% (+40.2 to +108.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): batch: queue finished (s), A B C +21.4% (+16.0 to +26.8) · +19.4% (+11.5 to +27.4) · +19.1% (+13.1 to +25.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +14475.7% (+1985.4 to +26966.0) · +15860.7% (+1447.0 to +30274.5) · +17305.6% (+349.2 to +34262.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +22685.7% (+4894.5 to +40476.9) · +13100.0% (+1240.5 to +24959.5) · +16980.0% (+170.1 to +33789.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +70.9% (+54.6 to +87.2) · +67.7% (+38.0 to +97.5) · +76.8% (+55.5 to +98.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_ORCH.md`): batch: queue finished (s), A B C +15.0% (+9.3 to +20.7) · +15.9% (+9.3 to +22.6) · +16.1% (+4.7 to +27.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +47.9% (+27.4 to +68.3) · +57.0% (+30.7 to +83.2) · +46.0% (+18.7 to +73.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_VS.md`): pod start wait, total (s), A B C +466.7% (+186.8 to +746.5) · +2.4 (+0.9225 to +3.878) · +1.3 (+0.4047 to +2.195). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Open Cluster Management on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_OCM_4W_VS.md`): pod start wait, mean (s), A B C +266.7% (+26.9 to +506.4) · +1.25 (+0.6136 to +1.886) · +0.8 (+0.2615 to +1.338). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): batch: queue finished (s), A B C +1.8% (+0.8 to +2.8) · +1.7% (+0.4 to +2.9) · +1.8% (+0.4 to +3.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1126.7% (+1020.2 to +1233.2) · +1088.9% (+690.1 to +1487.7) · +1416.7% (+986.8 to +1846.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 - **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +333.3% (+174.4 to +492.3) · +450.0% (+38.7 to +861.3) · +550.0% (+436.9 to +663.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.

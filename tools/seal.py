@@ -46,8 +46,8 @@ TWINS = {
     "verdict (the give-back trial, its interval reading and the steps it allows)": {
         "python": ["omnicompass/verdict.py"], "cpp": ["cpp/src/verdict.cpp", "cpp/include/omnicompass/verdict.hpp"],
         "proof": "tests/test_cpp_verdict_parity.py"},
-    "the engine's seeded runs (the Python's 500 from the jump generator, through every twin above)": {
-        "python": ["tools/engine_runs.py"], "cpp": ["cpp/tools/run_engine_runs.cpp"],
+    "the engine's seeded runs (the Python's 500 from the jump generator, its draws the input, every twin above the mechanism)": {
+        "python": ["tools/engine_runs.py"], "cpp": ["cpp/tools/engine_runs.cpp"],
         "proof": "tests/test_cpp_engine_runs_parity.py"},
 }
 PYTHON_ONLY = {

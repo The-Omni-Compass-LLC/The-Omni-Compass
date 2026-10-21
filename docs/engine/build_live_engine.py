@@ -852,7 +852,7 @@ def records(runs: bool) -> dict:
         eruns = json.loads(er_files[-1].read_text(encoding="utf-8")) if er_files else {"missing": "results/engine_runs"}
         if er_files:
             eruns["file"] = str(er_files[-1].relative_to(ROOT))
-        # the same record's set through the C++ engine at this build (cpp/tools/run_engine_runs.cpp), receipt by receipt
+        # the same record's set through the C++ engine at this build (cpp/tools/engine_runs.cpp), receipt by receipt
         XT.main(str(t / "x.json"), live_laws=laws.laws, engine_runs=eruns if er_files else None)
         h, c, s, rr, wh, gpu, cpu, ho, x = (json.loads((t / f).read_text(encoding="utf-8")) for f in
                                            ("h.json", "c.json", "s.json", "r.json", "w.json", "g.json", "cpu.json", "ho.json", "x.json"))

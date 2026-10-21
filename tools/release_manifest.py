@@ -35,7 +35,7 @@ GROUPS = {
                              "cpp/CMakeLists.txt", "tests/test_cpp_compass_law_parity.py", "docs/engine/export_cpp_twins.py",
                              "tools/seal.py", "results/SEAL.json"],
     "cpp_engine_runs": ["cpp/include/omnicompass/verdict.hpp", "cpp/src/verdict.cpp", "cpp/tools/run_verdict.cpp",
-                        "cpp/tools/run_engine_runs.cpp", "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp",
+                        "cpp/tools/engine_runs.cpp", "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp",
                         "tests/test_cpp_verdict_parity.py", "tests/test_cpp_engine_runs_parity.py", "tools/engine_runs.py",
                         ".github/workflows/engine-runs.yml"],
     "engine_v13": ["OMNI_V13.json", "tools/omni_version.py", "docs/OMNI_V13.md", "omni_controller/muscles.py", "tests/test_convey_handback.py",

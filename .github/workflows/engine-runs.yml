@@ -7,9 +7,10 @@ name: engine-runs
 # The founder's order of 21 October: the live engine and the Python run the same runs, and every set the jump generator runs on
 # GitHub is linked to the live engine. A push that changes the live engine's page or the Python's runs, and a dispatch, run
 # another set (500 by default) from a new base seed (this run's own number, unless a dispatch gives one): tools/engine_runs.py
-# writes every receipt and one SHA-256 digest, the C++ engine (cpp/tools/run_engine_runs.cpp, the C++ twins of the engine)
-# runs the same set and must give every receipt and the digest to the last bit; the live engine page's own code (its ported engine and its loop, run in node)
-# computes the same set and must give the same receipts and the same digest on every run; the record is committed to
+# writes every receipt and one SHA-256 digest; the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins) reads the
+# Python's draws as its input, puts the mechanism on and must give the same receipts and the same digest; the live engine page's
+# own code (its ported engine and its loop, run in node) computes the same set and must give the same again; the record, with the
+# digest of the draws, the Python's, the C++'s and their run-by-run differences, is committed to
 # results/engine_runs/ with this run's id, address and commit, and the page shows the newest record with the GitHub run that
 # made it (docs/engine/build_live_engine.py). No two runs share a record (each is named by its base), so none waits on or
 # replaces another. Nothing is billed: GitHub's own machine.
@@ -52,12 +53,9 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
-      - name: The C++ engine built (the twins of the engine, cpp/)
-        run: |
-          set -euo pipefail
-          cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release > /dev/null
-          cmake --build cpp/build -j2 --target oc_engine_runs > /dev/null
-      - name: The Python's runs from the jump generator, and the same set through the C++ engine
+      - name: The C++ harness built (the engine's C++ twins and the runs' driver)
+        run: cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build -j2 --target oc_engine_runs
+      - name: The Python's runs from the jump generator, and the same runs through the C++ harness
         run: |
           set -euo pipefail
           base="${{ github.event.inputs.base }}"; [ -n "$base" ] || base=$(( GITHUB_RUN_ID % 4294967296 ))

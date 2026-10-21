@@ -3,39 +3,23 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The engine's seeded runs through the C++ (cpp/tools/run_engine_runs.cpp) vs the Python's (tools/engine_runs.py): the same
-jump generator and draws, every receipt compared number by number and the two SHA-256 digests compared.
+"""The Python's runs through the C++ harness (cpp/tools/engine_runs.cpp) against the Python's own (tools/engine_runs.py): the
+Python's draws from the jump generator are the input (tools/engine_runs.py injection()), the C++ twins of the engine put the
+mechanism on (the governor's RK4 state equations, the nervous system's authority per organ, the compass law, the verdict), and
+every receipt must equal the Python's to the last bit, with the same SHA-256 digest.
 
-The C++ runs the twins of the engine that stands (the governor's RK4 state equations, the nervous system's authority per
-organ, the compass law, the verdict), fed by the same mulberry32 stream in the same order as the Python and the live engine
-page. compare() is what tools/engine_runs.py --cpp records beside the Python's digest, and what the page's proof monitor
-shows in its C++ column.
+compare() is what the live engine's C++ twin panel (docs/engine/export_cpp_twins.py) shows run by run.
 
 Usage: python tests/test_cpp_engine_runs_parity.py OC_ENGINE_RUNS [runs] [base]"""
-import csv, subprocess, sys, tempfile
+import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools import engine_runs as ER
 
 
-def cpp_runs(exe, n, base, start=0):
-    """The C++'s receipts (as the Python's dicts) and its digest."""
-    with tempfile.TemporaryDirectory() as d:
-        out = Path(d) / "runs.csv"
-        subprocess.run([str(exe), str(n), str(base), str(out), str(start)], check=True, capture_output=True)
-        lines = out.read_text().splitlines()
-    assert lines[-1].startswith("digest,"), lines[-1]
-    runs = []
-    for r in csv.DictReader(lines[:-1]):
-        runs.append({"k": int(r["k"]), "seed": int(r["seed"]), "x": [float(r[c]) for c in ("E", "U", "I_U", "S", "B", "B_dot")],
-                     "push": float(r["push"]), "expand": int(r["expand"]), "contract": int(r["contract"]), "calm": float(r["calm"]),
-                     "tau": float(r["tau"]), "meanF": float(r["meanF"]), "lastF": float(r["lastF"]), "allowed": int(r["allowed"]),
-                     "used": int(r["used"])})
-    return runs, lines[-1].split(",", 1)[1]
-
-
 def compare(py, cpp):
-    """Per run, the largest absolute difference over every number of its receipt (inf where a count or a seed differs)."""
+    """Per run, the largest absolute difference over every number of its receipt (inf where a count, a seed or the number of
+    runs differs)."""
     out = []
     for a, b in zip(py, cpp):
         w = 0.0 if (a["k"], a["seed"]) == (b["k"], b["seed"]) else float("inf")
@@ -48,14 +32,16 @@ def compare(py, cpp):
 
 
 def main(exe, n=50, base=ER.DEFAULT_BASE):
-    py = [ER.one_run(k, base) for k in range(n)]
-    cpp, dg = cpp_runs(exe, n, base)
-    per = compare(py, cpp)
+    sets = [ER.draws(k, base) for k in range(n)]
+    py = [ER.run_draws(dr) for dr in sets]
+    c = ER.cpp_runs(sets, Path(exe))
+    per = compare(py, c["runs"])
     worst, same = max(per), sum(1 for w in per if w == 0.0)
-    assert dg == ER.digest(py), f"digests differ: C++ {dg}, Python {ER.digest(py)}"
+    assert c["digest"] == ER.digest(py), f"digests differ: C++ {c['digest']}, Python {ER.digest(py)}"
     assert worst == 0.0, f"largest difference {worst} ({n - same} of {n} runs differ)"
-    print(f"the engine's runs through the C++ vs the Python: {n} runs from base {base}, every receipt identical, digest {dg[:16]}… the same")
-    return dg
+    print(f"the Python's runs through the C++ harness: {n} runs from base {base}, every receipt identical, digest {c['digest'][:16]}… "
+          f"the same (the injection {c['inputs_digest'][:16]}…)")
+    return c["digest"]
 
 
 if __name__ == "__main__":
