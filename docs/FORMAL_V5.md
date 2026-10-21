@@ -244,7 +244,7 @@ own load, about 1.9 under the climb, 1.7 to 1.8 with work waiting in line):
 | Seeds | Own load: global → cards | The climb: global → cards | Work in line: global → cards | Plants with less work or more misses |
 |---|---|---|---|---:|
 | 7100-7109 (the cards chosen here) | 0.078 → 0.094 points | 0.153 → 0.293 points | 0.088 → 0.161 points | 0 |
-| 7200-7209 (the cards confirmed here) | 0.074 → 0.087 points | 0.145 → 0.282 points | 0.086 → 0.149 points | 0 |
+| 7200-7209 (the cards checked here, on untouched seeds) | 0.074 → 0.087 points | 0.145 → 0.282 points | 0.086 → 0.149 points | 0 |
 
 Work is unchanged within a millionth, and the power given is lower than the global setting's in the organisms where it
 moves at all (Compute under its own load +0.058% → +0.011%). The preregistered result, on seeds the search never read,

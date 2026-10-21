@@ -46,8 +46,8 @@ and the service reading alone +11.9%, GAIN, the same in all three of our runs (`
 read from its own engine's newest three-run table, none pooled across engines). The rows that read LOSS stand in their tables
 with their causes, such as the pod start wait on the kind rig (`docs/POD_START_WAIT.md`). The 1,107 muscles of the catalog are
 modelled (class S) and are never shown as proof of hardware. The engine is written twice, in Python and in C++, and the
-Python's 500 seeded runs through the C++ harness are identical to the last bit, checked on every push
-(`cpp/tools/engine_runs.cpp`). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved
+Python's 500 seeded runs through the C++ harness are identical to the last bit (`cpp/tools/engine_runs.cpp`; GitHub
+reruns the 500 on every change to the harness, the engine's C++ or the page, and every verify reruns 50 of them). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved
 these results.
 
 **What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
@@ -274,7 +274,8 @@ what it tells you.
 ## Introduction: The Problem, the Idea and the Promise
 
 
-**The problem.** Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
+**The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
+Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
 power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
 Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
 follow, and every operator pays them:
@@ -2759,7 +2760,7 @@ own load, about 1.9 under the climb, 1.7 to 1.8 with work waiting in line):
 | Seeds | Own load: global → cards | The climb: global → cards | Work in line: global → cards | Plants with less work or more misses |
 |---|---|---|---|---:|
 | 7100-7109 (the cards chosen here) | 0.078 → 0.094 points | 0.153 → 0.293 points | 0.088 → 0.161 points | 0 |
-| 7200-7209 (the cards confirmed here) | 0.074 → 0.087 points | 0.145 → 0.282 points | 0.086 → 0.149 points | 0 |
+| 7200-7209 (the cards checked here, on untouched seeds) | 0.074 → 0.087 points | 0.145 → 0.282 points | 0.086 → 0.149 points | 0 |
 
 Work is unchanged within a millionth, and the power given is lower than the global setting's in the organisms where it
 moves at all (Compute under its own load +0.058% → +0.011%). The preregistered result, on seeds the search never read,
@@ -6858,7 +6859,7 @@ The price the dry run prints is Lambda's own at that moment; the table is an exa
 may run at the same time (one run of each at once; a second press of the same test waits for the first).
 
 The machine is given back when the run prints its last line, or at the hour budget plus one hour whatever happens, or at the
-end of the workflow if anything before it failed. Each give-back is confirmed with Lambda; if Lambda does not confirm it,
+end of the workflow if anything before it failed. Each give-back is acknowledged by Lambda; if Lambda does not acknowledge it,
 the run turns red and says so. Then, by hand: **cloud.lambda.ai**, **Instances**, tick the machine (its name starts
 `omni-`), **Terminate**.
 
@@ -7633,7 +7634,7 @@ Every benchmark since the engine was frozen runs three separate times, A, B and 
 shows all three beside each gauge, each with its own 95% interval. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
 in all three, every interval clear of zero; a resource spent that rose reads **power given**), **EVEN, no difference beyond the noise** (an interval over zero in at least one
 run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
-confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V10_` or `V11_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
+confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V<n>_` in a table's name (`V10_`, `V11_`, `V12_` and so on) is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
 a table never mixes engines, and a reading is never carried from one engine to another. Every LOSS and every power given is in the table beside
 the GAINs. On the omni-v11 tables there is no LOSS. Power given appears in the grid's dissipated energy in four grids, the tap
 operations in one, PgBouncer's connections, MySQL's pool from its factory size, Redis's memory and CityLearn's distance from net
@@ -13954,7 +13955,7 @@ code. No outside party has reviewed or approved these results.
 - **A margin no gauge judges, and a fault it hid.** In the drone swarm the judged safety gauge is the near miss (two drones
   under half the 0.3 m keep-out, 0.15 m). The closest approach is shown, not judged. With Omni-Compass on top it fell from
   about 0.30 m to as low as 0.156 m (run C, the short cell). There was no near miss and no collision in any counted run, but
-  the margin native keeps was spent to fly faster. On mission draws outside the preregistered seeds it was worse: on the mixed
+  the margin native keeps was spent to fly faster. On mission draws outside the preregistered seeds it read LOSS: on the mixed
   cell with draw 214, the omni-v11 wire let two drones come within 0.083 m, with 5 near-miss ticks and 3 collision ticks, where
   native flew the same draw with none (`results/toy_gate/V12_SWARM_REFLEX.md`). A preregistered set of seeds could not show
   it, and only flying draws the wire was never tuned on did.

@@ -539,7 +539,7 @@ the founder overrides one in the conversation.
 - **Everything on the newest engine** (13 October, night): every benchmark runs again on the engine that stands, and its
   result carries that engine's name. Nothing is shown or compared as "v3" once v5 stands: a v3 table is the road, in
   `docs/history`, never a setting to go back to by name. More versions will follow (perhaps to v10); each one reruns
-  everything. Where a change made a result worse, the fix is made inside the newest engine and rerun.
+  everything. Where a change made a result read LOSS, the fix is made inside the newest engine and rerun.
 - **One cloud first** (13 October, night): Kubernetes on Azure is finished first; Google (GKE), Amazon (EKS) and the GPU
   chips (Lambda) are not run until the founder says the Azure Kubernetes results are where he needs them.
 - **The company's telephone** (13 October, night; wording of 14 October; the landline added 16 October, night): "main
