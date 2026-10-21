@@ -6,11 +6,14 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Builds the printable book, docs/OMNI_COMPASS_MANUAL.pdf, and its one-file text, docs/book/OMNI_COMPASS_BOOK.md.
 
-Two books (the founder's orders of 14 October): the Operator's Manual (the default), how to embed, wire, tune, run and
+Three books (the founder's orders of 14 and 20 October): the Operator's Manual (the default), how to embed, wire, tune, run and
 check Omni-Compass, with the muscle catalog and the license papers and nothing on how the engine is built; and, with
 --owner, the Owner's Manual, the master, docs/OMNI_COMPASS_OWNERS_MANUAL.pdf and docs/book/OMNI_COMPASS_OWNERS_BOOK.md,
 with everything: the theory and the declaration in docs/book/, the full manual, the repository's documents, the muscle
-catalog and the engine's source. Each in the order set in its outline below. US Letter, mirrored margins for binding,
+catalog and the engine's source; and, with --live, the Live Engine Manual (docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf and
+docs/book/OMNI_COMPASS_LIVE_ENGINE_BOOK.md), how to read the live engine page, docs/engine/OMNI_COMPASS_LIVE_ENGINE.html: its
+monitors, gauges and knobs, native beside Omni-Compass, and nothing on how the engine is built or wired. Each in the order set
+in its outline below. US Letter, mirrored margins for binding,
 running heads, roman numerals in the front matter, a contents with page
 numbers and PDF bookmarks, and a List of Figures. The figures (the founder's order of 16 October, night: flow charts and
 illustrations that interpret the language of the mathematics, then fifty more that interpret the code, the wiring and
@@ -24,6 +27,7 @@ height, headings scaled up from it; only the running heads and footers are small
 
     python3 docs/book/build_book.py            # the Operator's Manual
     python3 docs/book/build_book.py --owner    # the Owner's Manual, the master
+    python3 docs/book/build_book.py --live     # the Live Engine Manual: how to read the live engine page
 """
 from __future__ import annotations
 
@@ -61,18 +65,27 @@ BOOK = ROOT / "docs" / "book"
 # philosophy, the mathematics, the mechanism, the engine's source and every result (--owner). Both stay in the repository
 # until the founder takes the Owner's Manual out.
 OWNER = "--owner" in sys.argv
-MANUAL_REL = "docs/OMNI_COMPASS_OWNERS_MANUAL.md" if OWNER else "docs/OMNI_COMPASS_MANUAL.md"
-OUT_PDF = ROOT / "docs" / ("OMNI_COMPASS_OWNERS_MANUAL.pdf" if OWNER else "OMNI_COMPASS_MANUAL.pdf")
-OUT_MD = BOOK / ("OMNI_COMPASS_OWNERS_BOOK.md" if OWNER else "OMNI_COMPASS_BOOK.md")
-EDITION_NAME = "Owner's Manual" if OWNER else "Operator's Manual"
+LIVE = "--live" in sys.argv          # the third book (the founder's order of 20 October): how to read the live engine page
+MANUAL_REL = ("docs/OMNI_COMPASS_OWNERS_MANUAL.md" if OWNER else "docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md" if LIVE
+              else "docs/OMNI_COMPASS_MANUAL.md")
+OUT_PDF = ROOT / "docs" / ("OMNI_COMPASS_OWNERS_MANUAL.pdf" if OWNER else "OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf" if LIVE
+                           else "OMNI_COMPASS_MANUAL.pdf")
+OUT_MD = BOOK / ("OMNI_COMPASS_OWNERS_BOOK.md" if OWNER else "OMNI_COMPASS_LIVE_ENGINE_BOOK.md" if LIVE else "OMNI_COMPASS_BOOK.md")
+EDITION_NAME = "Owner's Manual" if OWNER else "Live Engine Manual" if LIVE else "Operator's Manual"
 SUBTITLE = ("The Master Manual: Its Philosophy, Its Mathematics, Its Mechanism, Its Results, and How to Wire It onto Your Stack"
-            if OWNER else "How to Embed, Wire, Tune and Run Omni-Compass on Your Stack")
+            if OWNER else "How to Read the Live Engine: Its Monitors, Gauges and Knobs, Native beside Omni-Compass" if LIVE
+            else "How to Embed, Wire, Tune and Run Omni-Compass on Your Stack")
 SUBTITLE_HTML = ("The Master Manual:<br/>Its Philosophy, Its Mathematics, Its Mechanism, Its Results,<br/>and How to Wire It "
-                 "onto Your Stack" if OWNER else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
-LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix O"
+                 "onto Your Stack" if OWNER else "How to Read the Live Engine:<br/>Its Monitors, Gauges and Knobs,<br/>Native beside "
+                 "Omni-Compass" if LIVE else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
+LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F" if LIVE else "Appendix O"
 INTRO = ("Introduction: The Problem, the Idea and the Promise" if OWNER else
+         "Introduction: The Page, Its Monitors and What This Manual Covers" if LIVE else
          "Introduction: The Problem, the Idea and What This Manual Covers")
+PRELUDE = "Prelude: A Night at the Wall" if LIVE else "Prelude: A Night on the Cluster"
 RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER else
+                "This book is the reading manual of the live engine page and carries no benchmark results of its own; every "
+                "published result carries its evidence class." if LIVE else
                 "This book is the wiring and operating manual and carries no benchmark results; every published result "
                 "carries its evidence class.")
 EDITION = "October 2026"
@@ -935,7 +948,82 @@ OWNER_OUTLINE = [
     ("Contact", ("X", "contact")),
 ]
 
-OUTLINE = OWNER_OUTLINE if OWNER else OPERATOR_OUTLINE
+LIVE_OUTLINE = [
+    ("PART", "The Page as a Monitor",
+     "What the live engine page is: a monitor of the engine and of the runs GitHub ran, never a drawing; how it is built, its "
+     "table of contents, and its two sides and three words."),
+    ("A Monitor, Not a Drawing", ("M", "A Monitor, Not a Drawing")),
+    ("The Engine Table of Contents and the Numbering", ("M", "The Engine Table of Contents and the Numbering")),
+    ("The Two Sides and the Colours", ("M", "The Two Sides and the Colours")),
+    ("PART", "The Wall and the Switch",
+     "The status board, the master switch and its three states, the alarms, the golden-signal feed, the event log, the metrics "
+     "exposition, and the pipeline that rebuilds the page."),
+    ("The Monitor Wall", ("M", "The Monitor Wall")),
+    ("The Master Switch", ("M", "The Master Switch")),
+    ("The Alarms, the Feed, the Event Log and the Metrics", ("M", "The Alarms, the Feed, the Event Log and the Metrics")),
+    ("The Pipeline That Rebuilds the Page", ("M", "The Pipeline That Rebuilds the Page")),
+    ("PART", "The Measured Effect and the Whole",
+     "In the page's order (the founder's order of 20 October): the benefit board, the grid and the catalog, then the whole "
+     "organism every way it is bought, its bills and receipts."),
+    ("The Benefit Board, the Grid and the Catalog", ("M", "The Benefit Board, the Grid and the Catalog")),
+    ("The Whole Organism, Every Way It Is Bought", ("M", "The Whole Organism, Every Way It Is Bought")),
+    ("PART", "Evidence by Stack",
+     "From the cloud down to the chip: the clouds, the orchestrators, the official Kubernetes runs and their playback, the "
+     "shipped controller's decision trace, the card and the host."),
+    ("The Clouds", ("M", "The Clouds")),
+    ("The Orchestrators and Governors", ("M", "The Orchestrators and Governors")),
+    ("Kubernetes: the Official Run Playback", ("M", "Kubernetes: the Official Run Playback")),
+    ("Kubernetes: Per-Repetition Telemetry", ("M", "Kubernetes: Per-Repetition Telemetry")),
+    ("The Shipped Controller's Decision Trace", ("M", "The Shipped Controller's Decision Trace")),
+    ("The Chip and the Host", ("M", "The Chip and the Host")),
+    ("PART", "The Organism Live and the Console",
+     "The organism rendered live, native beside Omni-Compass, its body scan and immune system; the telemetry analytics; and every "
+     "knob of the console."),
+    ("The Organism, Live", ("M", "The Organism, Live")),
+    ("The Telemetry Analytics and Omni-Compass in Its Own Words", ("M", "The Telemetry Analytics and Omni-Compass in Its Own Words")),
+    ("The Control Console", ("M", "The Control Console")),
+    ("PART", "The Brain",
+     "One control cycle traced, the phase plane and the scoreboard, the brain's state, the verdict, the failure modes, the "
+     "component specification, and the page that governs its own drawing."),
+    ("One Control Cycle, Traced", ("M", "One Control Cycle, Traced")),
+    ("The Phase Plane and the Scoreboard", ("M", "The Phase Plane and the Scoreboard")),
+    ("The Brain's Internal State", ("M", "The Brain's Internal State")),
+    ("The Verdict", ("M", "The Verdict")),
+    ("Failure Modes, Controls and Residual Risk", ("M", "Failure Modes, Controls and Residual Risk")),
+    ("The Component Specification", ("M", "The Component Specification")),
+    ("The Page Governs Its Own Drawing", ("M", "The Page Governs Its Own Drawing")),
+    ("PART", "Reading a Result off the Page",
+     "The mechanism of action side by side, the trace from a tile to its record, what to do when a tile reads LOSS, and what the "
+     "page does not tell you."),
+    ("The Mechanism of Action, Side by Side", ("M", "The Mechanism of Action, Side by Side")),
+    ("From a Tile to Its Record", ("M", "From a Tile to Its Record")),
+    ("When a Tile Reads LOSS", ("M", "When a Tile Reads LOSS")),
+    ("What the Page Does Not Tell You", ("M", "What the Page Does Not Tell You")),
+    ("PART", "License and Your Copy",
+     "The terms the page and this manual are licensed under, and how to verify a copy of the page."),
+    ("License and Commercial Terms", ("M", "License and Commercial Terms")),
+    ("Verifying Your Copy of the Page", ("M", "Verifying Your Copy of the Page")),
+    ("BACK", None),
+    ("Glossary", ("M", "Glossary")),
+    ("Appendix A. The Page, Section by Section", ("M", "Appendix A - The Page, Section by Section")),
+    ("Appendix B. Every Control of the Console", ("M", "Appendix B - Every Control of the Console")),
+    ("Appendix C. The Gauges on the Wall", ("M", "Appendix C - The Gauges on the Wall")),
+    ("Appendix D. The Colours and the Marks", ("M", "Appendix D - The Colours and the Marks")),
+    ("Appendix E. Troubleshooting the Page", ("M", "Appendix E - Troubleshooting the Page")),
+    ("Appendix F. The License", ("X", "license")),
+    ("Appendix G. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
+    ("Appendix H. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
+    ("Appendix I. The Enterprise License: Standard Terms", ("F", "ENTERPRISE_LICENSE.md")),
+    ("Appendix J. Patents and Trademarks", ("FS", ["PATENTS.md", "TRADEMARKS.md"])),
+    ("Appendix K. Security Policy", ("F", "SECURITY.md")),
+    # the page word for word, written from the page at every build (docs/book/build_live_manual.py), so the book and the
+    # page read each other both ways
+    ("Appendix L. The Page Word for Word: Every Section, Monitor and Knob", ("F", "docs/engine/PAGE_WORD_FOR_WORD.md")),
+    ("Index", ("X", "index")),
+    ("Contact", ("X", "contact")),
+]
+
+OUTLINE = OWNER_OUTLINE if OWNER else LIVE_OUTLINE if LIVE else OPERATOR_OUTLINE
 
 # Manual section number -> book chapter number, so that "section 14" in the manual reads "Chapter 44" in the book.
 MAN_NUM = {}
@@ -1009,7 +1097,7 @@ PART_WORDS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "N
 # the manual's own grouping of its chapters into parts (its preface) against the book's parts: the Operator's
 # manual and its book share one grouping; the Owner's manual groups its 18 chapters in seven, the book in eight
 PART_MAP = ({"II": "Two", "III": "Five", "IV": "Five", "V": "Six", "VI": "Seven", "VII": "Eight"} if OWNER
-            else {"I": "One", "II": "Two", "III": "Three", "IV": "Four", "V": "Five", "VI": "Six", "VII": "Seven"})
+            else {"I": "One", "II": "Two", "III": "Three", "IV": "Four", "V": "Five", "VI": "Six", "VII": "Seven", "VIII": "Eight"})
 SEC_REF = re.compile(r"\b([Ss]ections?)\s+(\d+(?:\.\d+)?[a-z]?(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+(?:\.\d+)?[a-z]?)*)(?![\w.]\w)")
 CHAP_REF = re.compile(r"\b([Cc]hapters?)\s+(\d+(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+)*)\b")
 APPX_REF = re.compile(r"\bAppendi(x|ces) ([A-Z])\b")
@@ -1017,9 +1105,10 @@ PART_REF = re.compile(r"\bPart ([IVX]+)\b")
 # a reference that follows another document's name (`DISCLOSURES.md`, section 4; `LICENSE`, section 10; the Operator's
 # Manual, Appendix L; the founder's manuscript) carries that document's numbering and is left as written; the book's own
 # manual, named in full, is not another document
-EXTERNAL = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual)\W*$")
+EXTERNAL = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual|the page['’]s)\W*$")   # the page's section 4c: the live engine's own numbering
 MANUSCRIPT = re.compile(r"[Mm]anuscript")
-OWN_NAME = re.compile(r"Owner's Manual|OWNERS_MANUAL\.md") if OWNER else re.compile(r"Operator's Manual|OMNI_COMPASS_MANUAL\.md")
+OWN_NAME = (re.compile(r"Owner's Manual|OWNERS_MANUAL\.md") if OWNER else re.compile(r"Live Engine Manual|LIVE_ENGINE_MANUAL\.md") if LIVE
+            else re.compile(r"Operator's Manual|OMNI_COMPASS_MANUAL\.md"))
 # the repository's pages ("the manual, section 4.5") cite the Operator's Manual; bound into the Owner's book they are
 # read through this map onto the Owner's own sections that carry the same text (identity in the Operator's book)
 OPERATOR_TO_OWNER = ({"1.5": "1.6", **{f"4.{k}": f"8.{k}" for k in range(1, 8)}, **{f"6.{k}": f"9.{k}" for k in range(1, 5)},
@@ -1581,7 +1670,36 @@ are kept as they were written, because the record of how a result was reached is
 chapters give different figures for the same thing, the later run and the State of Play govern."""
 
 
-PREFACE = OWNER_PREFACE if OWNER else OPERATOR_PREFACE
+LIVE_PREFACE = """This is the Live Engine Manual, the third book: how to read the live engine page, the monitor of the engine and of
+the benchmark runs GitHub ran. It is for the operator at the dashboard: which tile means what, which knob does what, where every
+number comes from, and how the mechanism of action of Omni-Compass against native shows on the monitors. It explains neither how
+the engine is built (the Owner's Manual) nor how it is wired onto a stack (the Operator's Manual).
+
+The book is in eight parts, and it can be read in two ways.
+
+| You are | Read |
+|---|---|
+| The operator on shift, at the wall | the Quick Reference card; Part Two (the wall and the switch); the chapter on a tile that reads LOSS in Part Seven; the troubleshooting appendix |
+| CTO, architect, head of platform | the front matter; Part Three (the whole organism and the benefit board); Part Seven (the mechanism side by side; what the page does not tell you) |
+| CEO, CFO, CIO, board member | the Foreword; the Disclosures; the bills and receipts in Part Three; the clouds in Part Four |
+| Site reliability engineer, on call | the Quick Reference card; Part Two; the official run playback in Part Four (the heart and the two tickers); the gauges appendix |
+| Control or plant engineer | Part Six (one cycle, the phase plane, the brain's state, the verdict, the specification); the console in Part Five |
+| Auditor, diligence team | Part One (a monitor, not a drawing); the trace from a tile to its record and the verification chapter; the page's own appraisal |
+| Procurement and counsel | the Disclosures and the papers bound into the back matter |
+
+**Part One** says what the page is and how it is built. **Part Two** is the wall and the switch. **Part Three** is the whole
+organism and the measured effect. **Part Four** is the evidence stack by stack, from the cloud down to the chip. **Part Five**
+is the organism live and the console. **Part Six** is the brain. **Part Seven** reads a result off the page. **Part Eight** is
+the license and how to verify a copy.
+
+**Conventions.** `Code` is a command, file, anchor or switch exactly as typed. "Native" is the system by itself, amber;
+"Omni-Compass" is Omni-Compass on top of native, blue; there is no third side. "A section" is a numbered part of the page, named
+by its anchor; "a chapter" is a chapter of this book. A knob marked **LIVE** acts on the live engine; one marked **RECORDED**
+chooses a record and modifies nothing. Every number carries its evidence class: P a physical meter, L live software, S our own
+models (modelled); a model is never proof."""
+
+
+PREFACE = OWNER_PREFACE if OWNER else LIVE_PREFACE if LIVE else OPERATOR_PREFACE
 
 
 def preface_lines():
@@ -1617,7 +1735,7 @@ def build():
     # the preface, the prelude and the introduction, then the key, what a hooked-up system looks like and the card
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
     story += front_chapter(doc, "Preface", preface_lines())
-    story += front_chapter(doc, "Prelude: A Night on the Cluster", MAN["Prelude: A Night on the Cluster"])
+    story += front_chapter(doc, PRELUDE, MAN[PRELUDE])
     story += front_chapter(doc, INTRO, MAN[INTRO])
     story += front_chapter(doc, "The key: GAIN, EVEN and LOSS", MAN["The key: GAIN, EVEN and LOSS"])
     story += front_chapter(doc, "What You Are Looking At", MAN["What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report"])
@@ -1627,9 +1745,9 @@ def build():
     story += front_chapter(doc, "Disclosures, Declarations and Disclaimers", doc_body("DISCLOSURES.md")[1], kind="F")
     md_parts = [f"# THE OMNI-COMPASS {EDITION_NAME.upper()}", "", BANNER_MD, "", EDITION, "", FILED, "",
                 "The printable book of this text, with its contents and appendices: "
-                f"`docs/{OUT_PDF.name}`. Built by `docs/book/build_book.py`" + (" --owner" if OWNER else "") + ".", ""]
+                f"`docs/{OUT_PDF.name}`. Built by `docs/book/build_book.py`" + (" --owner" if OWNER else " --live" if LIVE else "") + ".", ""]
     md_parts += ["## Foreword", ""] + front_lines(MAN["Foreword"]) + ["## Preface", ""] + front_lines(preface_lines()) + [""]
-    for sec in ("Prelude: A Night on the Cluster", INTRO,
+    for sec in (PRELUDE, INTRO,
                 "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report",
                 "Quick Reference: The Card for the Glove Box") + (("Executive Summary",) if OWNER else ()):
         md_parts += [f"## {sec}", ""] + front_lines(MAN[sec]) + [""]

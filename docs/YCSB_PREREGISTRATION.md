@@ -341,13 +341,14 @@ and not the rule.
 machine (Linux 6.8; the same 4 cores and 16 GB), MongoDB 8.0 from its publisher's repository for that release, signed by the
 publisher's key. The setup stops the job at once, with the kernel, the server's status and its journal, when the server does not
 answer, and the runner refuses to run a workload on a server whose version it cannot read; every run's files carry the kernel,
-the release and the runner image (`machine.txt`) and the server's journal (`mongod.journal.txt`). Nothing else changes: the
+the release and the runner image (`machine.txt`) and the server's journal (`mongod-journal.log`). Nothing else changes: the
 engine, the rule, the gauges, the workloads, the steps, native's setting.
 
-**The runs.** The preregistered set runs again on this machine as A, B and C (`scripts/reruns.txt`, the block added on 21
-October). The three failed runs stay as they are, listed in their table; omni-v11's table (`results/live/V11_YCSB.md`) stands as
-MongoDB's result, named as omni-v11's, until the three runs on omni-v12 land (`tools/readings.py`, `landed`). The shipped and the
-service sets' omni-v12 tables, whose runs all ran on the earlier image, stand as they are; their next runs run on this machine.
+**The runs.** Every set of this preregistration runs on this machine from this amendment, beginning with the omni-v13 campaign
+(`scripts/reruns.txt`, A, B and C of each). The three failed omni-v12 runs stay as they are, listed in their table; omni-v11's
+table (`results/live/V11_YCSB.md`) stands as MongoDB's result, named as omni-v11's, until three runs on a newer engine land whole
+(`tools/readings.py`, `landed`). The shipped and the service sets' omni-v12 tables, whose runs all ran on the earlier image,
+stand as they are.
 
 ---
 

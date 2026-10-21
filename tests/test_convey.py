@@ -4,7 +4,8 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Energy to where the work is, against the fake kubectl: each machine's idle CPU (inside the living band, less the
-requests of every other pod on it) is conveyed to the serving pods on it as their CPU limit, resized in place with no
+limits of every other pod on it: omni-v13 counts another workload by what it may take, where omni-v12 counted its
+requests) is conveyed to the serving pods on it as their CPU limit, resized in place with no
 restart and never below the operator's limit; requests are untouched; a security hold blocks expansion; a machine
 crowded with other work leaves the operator's limit as it is; the reset returns every pod to the operator's
 limit. A machine closed to new work that still carries work keeps counting in service, and my machine orders are
@@ -57,10 +58,11 @@ def main():
     c = Controller(args(t))
     out = c.m.convey({})
     L = limits(p)
-    # w0: two serving pods share 0.95 x 4000 = 3800m -> 1900m each; w1: (3800 - 1000) / 1 = 2800m;
-    # w2: 3800 - 3700 = 100m < 500m, so the operator's 500m stays
+    # w0: two serving pods share 0.95 x 4000 = 3800m -> 1900m each; w1: (3800 - 2000) / 1 = 1800m (db-0 counted by its
+    # limit of 2 cores, omni-v13; omni-v12 counted its 1000m request and gave 2800m); w2: 3800 - 4000 < 500m, so the
+    # operator's 500m stays
     assert L["web-0"][0] == "1900m" and L["web-1"][0] == "1900m", L
-    assert L["web-2"][0] == "2800m", L
+    assert L["web-2"][0] == "1800m", L
     assert L["web-3"][0] == "500m", L
     assert all(L[n][1] == "200m" for n in ("web-0", "web-1", "web-2", "web-3")), "requests untouched"
     assert L["db-0"] == ("2", "1000m") and L["big-0"] == ("4", "3700m"), "other workloads untouched"
@@ -69,11 +71,11 @@ def main():
     assert S["deployments"][0]["metadata"]["annotations"][CPU_ANN] == "500m"
     writes = [json.loads(l) for l in Path(os.environ["FAKE_KUBE_LOG"]).read_text().splitlines()]
     assert all(w[:2] != ["patch", "pod"] or "--subresource" in w for w in writes), "in place only"
-    # the replica organ reads the gain: mean conveyed limit / operator's limit = (1900 + 1900 + 2800 + 500) / 4 / 500
+    # the replica organ reads the gain: mean conveyed limit / operator's limit = (1900 + 1900 + 1800 + 500) / 4 / 500
     g = c.m.gain[("default", "web")]
-    assert abs(g - 3.55) < 1e-9, g
+    assert abs(g - 3.05) < 1e-9, g
     hpa = {"metadata": {"namespace": "default", "name": "web"}, "spec": {"scaleTargetRef": {"kind": "Deployment", "name": "web"}}}
-    assert abs(c._gain(hpa) - 3.55) < 1e-9 and c._gain({"metadata": {"namespace": "x", "name": "y"}, "spec": {}}) == 1.0
+    assert abs(c._gain(hpa) - 3.05) < 1e-9 and c._gain({"metadata": {"namespace": "x", "name": "y"}, "spec": {}}) == 1.0
     assert c.m.convey({}) == {}, "steady: nothing more to write"
     # the reset returns every serving pod to the operator's limit
     (Path(t) / "kill").touch(); c.restore()
@@ -98,7 +100,7 @@ def main():
     assert s["nodes"] == 2 and s["open"] == 2, s
     # on top, with response time clean: the HPA target keeps the operator's promise in queue terms at the CPU each pod
     # is guaranteed: the autoscaler's largest count (10) over the 3 machines in service is 4 pods a machine, 0.95 x 4000m
-    # / 4 = 950m, g = 1.9 (below the momentary mean 3.55), so 50% -> 95%; while response time is not yet clean (the
+    # / 4 = 950m, g = 1.9 (below the momentary mean 3.05), so 50% -> 95%; while response time is not yet clean (the
     # first decisions), the operator's own 50% stands
     t3 = tempfile.mkdtemp(); p3 = state(t3); S = json.loads(Path(p3).read_text())
     S["hpas"] = [{"metadata": {"name": "web", "namespace": "default"}, "spec": {"minReplicas": 1, "maxReplicas": 10,
@@ -156,16 +158,16 @@ def main():
     probe(100); c4.m.convey({})
     assert web() == ["500m"] * 3 and c4.m.gain[("default", "web")] == 1.0, "calm: the operator's limit, gain 1"
     probe(300); c4.m.convey({})
-    assert web() == ["1900m", "1900m", "2800m"], "p95 over half the SLO: idle CPU conveyed"
+    assert web() == ["1900m", "1900m", "1800m"], "p95 over half the SLO: idle CPU conveyed"
     probe(150); c4.m.convey({})
-    assert web() == ["1900m", "1900m", "2800m"], "inside the band: still conveying"
+    assert web() == ["1900m", "1900m", "1800m"], "inside the band: still conveying"
     probe(100); c4.m.convey({})
     assert web() == ["500m"] * 3, "calm again: back to the operator's limit"
     lf4.unlink(); c4.m.convey({})
-    assert web() == ["1900m", "1900m", "2800m"], "blind: service first, conveyed"
+    assert web() == ["1900m", "1900m", "1800m"], "blind: service first, conveyed"
     ev = [json.loads(l) for l in (Path(t4) / "audit.jsonl").read_text().splitlines() if '"convey"' in l]
     assert [e["convey"] for e in ev if e.get("convey") in ("engaged", "released")] == ["engaged", "released", "engaged"], ev
-    print("convey: w0 1900m x2, w1 2800m, w2 left at 500m (crowded); requests untouched; no rollout; kill restored 500m; "
+    print("convey: w0 1900m x2, w1 1800m (the other pod counted by its limit), w2 left at 500m (crowded); requests untouched; no rollout; kill restored 500m; "
           "only when needed: calm 500m, p95 300 ms conveys, 150 ms holds, 100 ms returns 500m, blind conveys; "
           "hold blocks expansion; HPA target 50 -> 95 once clean and the demand steady for one window (the guaranteed share, same queue promise), then 76 at once (a lower target is never held); closed machine with work: in service 3, open 2")
     print("PASS test_convey")

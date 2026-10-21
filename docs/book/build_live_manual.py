@@ -3,17 +3,19 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The Live Engine Manual, the third book: the live engine read top to bottom, written from the page itself.
+"""The page word for word: the last appendix of the Live Engine Manual, written from the live engine page itself.
 
-The founder's order of 20 October: beside the Operator's Manual and the Owner's Manual, a third book that follows the live
-engine section by section, monitor by monitor and knob by knob, so that whoever runs it can read, operate, tune and watch it as
-the engineer in charge, and so that the book and the page read each other both ways. Nothing in it is typed twice: the
-sections, their numbers, titles, summaries and controls are read from docs/engine/OMNI_COMPASS_LIVE_ENGINE.html, every monitor
-from docs/engine/monitors.json and the page's own order, the key from tools/readings.py, the LOSS rows and their causes from the
-page's embedded records. Rebuild it whenever the page changes:
+The founder's order of 20 October: three manuals in the end, the third reading the live engine top to bottom, so that the book
+and the page read each other both ways. The book is docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md, built with the other two by
+docs/book/build_book.py --live; its last appendix (Appendix L) is this file's output, docs/engine/PAGE_WORD_FOR_WORD.md: every
+section of docs/engine/OMNI_COMPASS_LIVE_ENGINE.html in the page's own order with its number, title, summary and controls line,
+every monitor under its own number with its evidence class, its state, the open-source feed that would carry it and its knobs
+(docs/engine/monitors.json and the page's own order), every knob, and every LOSS row with its cause and the knob that answers
+it, read from the page's embedded records. Nothing in it is typed twice. Rebuild it whenever the page changes, then the book:
 
-  python3 docs/book/build_live_manual.py            docs/LIVE_ENGINE_MANUAL.md and docs/LIVE_ENGINE_MANUAL.pdf
-  python3 docs/book/build_live_manual.py --check    exit 1 if the Markdown differs from what the page gives
+  python3 docs/book/build_live_manual.py            docs/engine/PAGE_WORD_FOR_WORD.md
+  python3 docs/book/build_live_manual.py --check    exit 1 if it differs from what the page gives
+  python3 docs/book/build_book.py --live            the Live Engine Manual, with the appendix bound in
 """
 from __future__ import annotations
 
@@ -31,8 +33,7 @@ from tools import readings as R  # noqa: E402
 
 PAGE = ROOT / "docs" / "engine" / "OMNI_COMPASS_LIVE_ENGINE.html"
 REG = ROOT / "docs" / "engine" / "monitors.json"
-OUT_MD = ROOT / "docs" / "LIVE_ENGINE_MANUAL.md"
-OUT_PDF = ROOT / "docs" / "LIVE_ENGINE_MANUAL.pdf"
+OUT_MD = ROOT / "docs" / "engine" / "PAGE_WORD_FOR_WORD.md"
 BOOK = "The Live Engine Manual"
 
 CONTACT = ("The Omni-Compass LLC, main office infrastructure. Toll-free direct: 1-888-339-9551. System route asset: 1-888-DEX-YLL-1. "
@@ -218,7 +219,7 @@ def md_lines() -> list[str]:
             ""]
     # ---------------------------------------------------------------- Part II
     out += ["## Part II. The live engine, section by section", "",
-            "Each chapter is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.", ""]
+            "Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.", ""]
     for it in M["items"]:
         if it["kind"] == "part":
             out += [f"### Part {it['n']} of the page: {it['title']}", ""]
@@ -451,16 +452,49 @@ def build_pdf(lines: list[str]) -> int:
     return doc.page
 
 
-def main() -> int:
+def appendix_lines() -> list[str]:
+    """The book's last appendix: the page's sections, monitors and knobs word for word (Part II of md_lines) and the tables of
+    every monitor, every knob and every LOSS row (its back matter), one heading level up; the reading guide, the operating
+    notes, the glossary and the contact are the book's own chapters and are not repeated here."""
     lines = md_lines()
-    text_md, _ = normalize_markdown("\n".join(lines))
+    def block(start, stop):
+        i = next(k for k, ln in enumerate(lines) if ln.startswith(start))
+        j = next((k for k, ln in enumerate(lines) if k > i and stop and ln.startswith(stop)), len(lines))
+        return lines[i + 1:j]
+    up = lambda ls: [ln[1:] if ln.startswith("###") else ln for ln in ls]
+    page = PAGE.read_text(encoding="utf-8")
+    build = embedded(page, "build") or {}
+    out = ["# The Live Engine Page, Word for Word", "",
+           "This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of "
+           "this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and "
+           "controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source "
+           "feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause "
+           "and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the "
+           f"page read each other both ways. This edition was written from the page built {build.get('built_at', '')} on "
+           f"{build.get('engine', '')} (digest {build.get('digest', '')[:16]}) from commit {build.get('commit', '')[:12]}.", ""]
+    out += up(block("## Part II.", "## Part III."))
+    tail = block("## Back matter", None)
+    keep, skip = [], False
+    for ln in tail:
+        if ln.startswith("### Appendix D.") or ln.startswith("### Contact"):
+            skip = True
+        elif ln.startswith("### "):
+            skip = False
+        if not skip:
+            keep.append(ln)
+    out += [re.sub(r"^## Appendix [A-C]\. ", "## ", ln) for ln in up(keep)]
+    return out
+
+
+def main() -> int:
+    text_md, _ = normalize_markdown("\n".join(appendix_lines()))
     if "--check" in sys.argv:
         same = OUT_MD.exists() and OUT_MD.read_text(encoding="utf-8") == text_md
-        print("the Live Engine Manual matches the page" if same else "the Live Engine Manual differs from the page: python3 docs/book/build_live_manual.py")
+        print("the page word for word matches the page" if same else "the page word for word differs from the page: python3 docs/book/build_live_manual.py")
         return 0 if same else 1
     OUT_MD.write_text(text_md, encoding="utf-8")
-    pages = build_pdf(lines)
-    print(f"{OUT_MD.relative_to(ROOT)} ({len(text_md.splitlines())} lines) and {OUT_PDF.relative_to(ROOT)} ({pages} pages)")
+    print(f"{OUT_MD.relative_to(ROOT)} ({len(text_md.splitlines())} lines): the Live Engine Manual's Appendix L; "
+          "now python3 docs/book/build_book.py --live")
     return 0
 
 

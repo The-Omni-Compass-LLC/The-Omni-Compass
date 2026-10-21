@@ -16,7 +16,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v12, fingerprint d38b58fbe28939b8 (47 files).
+- **The engine on this checkout:** omni-v13, fingerprint 0088837333c6f0fc (47 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -31,15 +31,15 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v12): 4 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v13): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v12 | +4.3% | GAIN, power given | L |
 | Redis, the cache's memory ceiling | omni-v12 | +0.1% | GAIN, power given | L |
 | PostgreSQL, the pooler's pool size | omni-v12 | +0.0% | EVEN | L |
 | MySQL, the buffer pool's size | omni-v12 | +0.0% | EVEN | L |
 | Kafka, the consumer group's size | omni-v12 | +0.1% | GAIN | L |
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v12 | +4.3% | GAIN, power given | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -98,10 +98,18 @@ with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and wh
 waits on the family allowance those machines hold.
 
 
-## In one paragraph (2026-10-19, the engine that stands is omni-v12)
+## In one paragraph (2026-10-20, the engine that stands is omni-v13)
 
-**The engine that stands is omni-v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`), on main since
-19 October by the founder's order that every fix land as the next version. It is omni-v11 with two faults fixed, both found on the
+**The engine that stands is omni-v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`), on main since
+20 October by the founder's order that every fix land as the next version. It is omni-v12 with one fault fixed in the Kubernetes
+governor's conveyance, found on KubeRay's rig with the organism alone (the queue 0.6% to 0.8% later and the web's 99th
+percentile 4% to 13% higher, LOSS in all three runs): the web pods' CPU limits, raised in the queue's first half minute, stayed
+through the saturated queue, so the batch pods hashed 7.6% slower while the web served no faster; no machine was parked during a
+saturated queue (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11). On a shared host at its top beside another workload's room
+every limit given now goes back to the operator's, and every other pod is counted by its own limit. In the toy gate
+(`results/toy_gate/V13_VS_V12.md`) omni-v13 reads no LOSS against omni-v12 in any toy, identical on the web-only toys, and in a
+batch toy set from the KubeRay runs' own files brings the queue and the job turnaround back to native's. **omni-v12**
+(`docs/OMNI_V12.md`), on main from 19 October, was omni-v11 with two faults fixed, both found on the
 omni-v11 runs: a CPU-limit raise the cluster's admission refuses is held instead of being written again at every fast check (in
 the omni-v11 capacity test the governor asked again about 9 times a minute, 970 to 1,000 refused writes an hour, though nothing
 wrong was ever set), and the swarm's proximity reflex hands back the planner's cruise in the tick it is triggered (the omni-v11
@@ -125,13 +133,13 @@ power outages stays native, because its charge is also the building's reserve. o
 of our runs in the seven 2023 districts, the only districts CityLearn ships with outages; the cause was ours, found on CityLearn
 itself and reproduced to the last digit, and three narrower repairs were refused on the tuning district before this one. Read
 locally before any GitHub run, omni-v8 gives native's numbers on the 2023 districts and omni-v7's on every other district. The
-other 45 engine files were omni-v7's bytes. Every benchmark runs again on omni-v12 (`scripts/reruns.txt`, released a few a tick by
+other 45 engine files were omni-v7's bytes. Every benchmark runs again on omni-v13 (`scripts/reruns.txt`, released a few a tick by
 the grid conductor, A of every benchmark, then B, then C; the grid and every Azure set restarted on it the same day); until a
 benchmark's three runs land, its row names the engine it ran on (`docs/BENEFIT_SHEET.md` and the standing block above). Results
 are never read across engines. The standing block is written from the result files by `tools/summary.py --fix` and checked on
 every push; the prose below says the same in words.
 
-**On omni-v11: twenty-three three-run tables, each benchmark's newest until omni-v12's land** (`results/live/V11_*.md`, 19
+**On omni-v11: twenty-three three-run tables, each benchmark's newest until omni-v13's land** (`results/live/V11_*.md`, 19
 October; 1,039 judged rows, **0 LOSS**), each rebuilt byte for byte from its raw receipts (`tools/reproduce.py`):
 
 - **Real Kubernetes (evidence class L), ten pairs a run.** On top of Goldilocks: response time −47% to −48% mean, −61% to −64%
@@ -222,7 +230,7 @@ assumption, that a layer's factor does not change when the layers around it carr
 tables allow (the governors' four ways: Omni-Compass on the organism alone against on top of the orchestrator, in the same
 repetitions). The composition is class S over class P and L tables and across engines, said so on the page; the stacked
 run (Omni-Compass at every layer at once) is the measurement that would replace it, and the page is remade as each layer's
-omni-v12 runs land. The numbers stand on that page, never copied here.
+omni-v13 runs land. The numbers stand on that page, never copied here.
 
 ## Open
 
@@ -260,6 +268,7 @@ omni-v12 runs land. The numbers stand on that page, never copied here.
 |---|---|
 | `docs/OMNI_COMPASS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_MANUAL.pdf`) | the Operator's Manual: how to embed, wire, tune, run and check Omni-Compass; every muscle's wiring and card (Appendix E) |
 | `docs/OMNI_COMPASS_OWNERS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf`) | the Owner's Manual: the theory, the mechanism, the engine's source, every result, every muscle (Appendix G) |
+| `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` (PDF: `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`) | the Live Engine Manual: how to read the live engine page, its monitors, gauges and knobs, native beside Omni-Compass; what to do when a tile reads LOSS |
 | `docs/BENEFIT_SHEET.md` | one number per benchmark, its word, its engine, every change in words |
 | `docs/LEVELS.md` | every level on one page (muscle, organism, cluster, add-ons, service, plant, cloud, group of clusters), its counts of GAIN, EVEN, power given and LOSS, and any level whose gauges go the other way |
 | `docs/REGISTER.md` | every muscle family wired, every benchmark run, every benchmark still to run |

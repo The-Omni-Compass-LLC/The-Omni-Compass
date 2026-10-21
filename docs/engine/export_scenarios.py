@@ -357,6 +357,10 @@ def receipt(name, path=None):
 
 
 COMMON = {"Kubernetes", "Omni-Compass", "Omni", "The", "With", "Native", "Real", "Linux", "GitHub"}
+# the pages written from every table (the manuals, the state of play, the levels, the power page, the deviations register, the
+# benefit sheet, the wiring verdicts, the dossier, the summaries): each names every table and gauge, and none is a table's cause
+AGGREGATE = __import__("re").compile(r"MANUAL|STATE_OF_PLAY|LEVELS|POWER|DEVIATIONS|BENEFIT_SHEET|WIRING_VERDICTS|DOSSIER|REFEREE_SUMMARY|"
+                                     r"THE_RECEIPTS|ENGINE_COVERAGE|EVIDENCE_LEDGER|REGISTER|CHANGELOG|LIMITATIONS")
 
 
 def causes(r):
@@ -366,6 +370,8 @@ def causes(r):
     import re
     docs = []
     for f in sorted((ROOT / "docs").glob("*.md")):
+        if AGGREGATE.search(f.name):
+            continue                     # a page written from every table names them all and is no table's cause
         t = f.read_text(encoding="utf-8")
         h = next((ln[2:].strip() for ln in t.splitlines() if ln.startswith("# ")), "")
         docs.append((f, h, t))

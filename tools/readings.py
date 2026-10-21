@@ -222,12 +222,13 @@ def classify(reading, aim_=None):
 
 
 def landed(table) -> bool:
-    """Whether a three-run table holds a reading at all: some gauge of a workload other than the tuning one read in all three
-    runs. A table whose runs share no such gauge (each run failed partway, so no workload is in all three) has not taken its
-    benchmark's place: the same benchmark's table on an older engine stands as that engine's result until the newer engine's
-    three runs land (the rule every tool that picks a benchmark's newest table reads: tools/omni_index.py,
-    tools/benefit_sheet.py, tools/levels.py, tools/power.py). A table kept only in Markdown, or one that stores rows rather
-    than workloads, reads as landed when it holds any row."""
+    """Whether a three-run table carries a result (whole): a gauge row, or a workload beside the tuning one (the table writers
+    write a workload only where every run holds it). A table written from runs that failed (its workloads or rows empty: 20
+    October, the omni-v12 MongoDB table) has not taken its benchmark's place: the same benchmark's table on an older engine
+    stands as that engine's result until the newer engine's three runs land. The one rule every tool that picks a benchmark's
+    newest table reads (tools/omni_index.py, tools/benefit_sheet.py, tools/levels.py, tools/power.py, the live engine's
+    docs/engine/export_scenarios.py). A Markdown table is read through its JSON twin; one kept only in Markdown, or whose JSON
+    is another table's shape (neither rows nor workloads), reads as whole."""
     import json
     p = Path(table)
     if p.suffix == ".md":
@@ -238,13 +239,13 @@ def landed(table) -> bool:
         d = json.loads(p.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return False
-    if isinstance(d, dict) and isinstance(d.get("workloads"), dict):
-        return any(isinstance(g, dict) and any(isinstance(x, dict) and len(x.get("runs") or []) == 3 and all(r is not None for r in x["runs"])
-                                               for x in g.values())
-                   for wl, g in d["workloads"].items() if wl != "tuning")
-    if isinstance(d, dict) and "rows" in d:
-        return bool(d["rows"])
-    return True
+    if not isinstance(d, dict):
+        return False
+    if "rows" not in d and "workloads" not in d:
+        return True                      # another table's shape (the organisms, a cloud set's repetitions): its own writer decides
+    if d.get("rows"):
+        return True
+    return any(wl != "tuning" for wl in (d.get("workloads") or {}))
 
 
 def judged(reading: str) -> bool:
@@ -583,7 +584,7 @@ def check_receipts(root: Path = ROOT):
 
 
 KEY_PAGES = ("README.md", "docs/HOW_TO_READ_THE_RESULTS.md", "docs/OMNI_COMPASS_MANUAL.md",
-             "docs/OMNI_COMPASS_OWNERS_MANUAL.md")
+             "docs/OMNI_COMPASS_OWNERS_MANUAL.md", "docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md")
 
 
 def _with_key(text: str) -> str:

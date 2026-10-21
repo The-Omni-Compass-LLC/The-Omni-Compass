@@ -7,7 +7,7 @@
 """Formulas in Unicode, never LaTeX markup (the founder's order of 15 October 2026: "it's got to be Unicode", so a formula
 prints the same on paper, on GitHub, in a terminal and in a code comment, for the engineers who wire and code the engine).
 
-Every page the two manuals print (the Operator's Manual, the Owner's Manual and every document the Owner's book takes in,
+Every page the three manuals print (the Operator's, the Owner's, the Live Engine's and every document the Owner's book takes in,
 listed from docs/book/build_book.py) is read outside its code: a $...$ or $$...$$ formula, and a bare LaTeX subscript or
 superscript (x_{i,k}, e^{-t}), is rewritten in Unicode: Greek letters and operators as their characters (α, Σ, ≤, ∝, √,
 ⌈ ⌉), sub- and superscripts as Unicode sub- and superscript characters where every character has one (xᵢ,ₖ₊₁, e⁻ᵗ) and as
@@ -270,9 +270,10 @@ def remaining(text):
 
 
 def pages():
-    """Every page the two manuals print: the manuals' sources and every document the Owner's book takes in."""
+    """Every page the three manuals print: the manuals' sources and every document the Owner's book takes in."""
     src = (ROOT / "docs" / "book" / "build_book.py").read_text(encoding="utf-8")
-    rels = ["docs/OMNI_COMPASS_MANUAL.md", "docs/OMNI_COMPASS_OWNERS_MANUAL.md", "docs/book/THEORY.md", "docs/book/DECLARATION.md"]
+    rels = ["docs/OMNI_COMPASS_MANUAL.md", "docs/OMNI_COMPASS_OWNERS_MANUAL.md", "docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md",
+            "docs/book/THEORY.md", "docs/book/DECLARATION.md"]
     rels += sorted(set(re.findall(r'\("F", "([^"]+)"\)', src)))
     return [ROOT / r for r in dict.fromkeys(rels) if (ROOT / r).exists()]
 

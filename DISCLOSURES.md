@@ -155,7 +155,7 @@ machines.
 | The license, in plain answers, and third-party components | `LICENSE`, `LICENSING_FAQ.md`, `ENTERPRISE_LICENSE.md`, `NOTICE`, `THIRD_PARTY_NOTICES.md`, `PATENTS.md`, `TRADEMARKS.md`, `SECURITY.md`, `.github/CLA.md` |
 | The muscles, what each is for and how it is wired | `docs/MUSCLE_CATALOG.md` |
 | Proof the code is the code that ran | `python3 verify.py`, `RELEASE_MANIFEST.json`, `results/SEAL.json` |
-| The live engine: every monitor, its feed and its knobs; the third manual, how to read and operate it | `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`, `docs/LIVE_ENGINE_MANUAL.md` and `docs/LIVE_ENGINE_MANUAL.pdf` |
+| The live engine: every monitor, its feed and its knobs; the third manual, how to read and operate it | `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`, `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf` (the Live Engine Manual's Appendix L, the page word for word: `docs/engine/PAGE_WORD_FOR_WORD.md`) |
 | The whole organism, composed every way it is bought | `results/WHOLE_SYSTEM.md`, `tools/whole_system.py`, `docs/engine/export_whole.py`, `docs/WHOLE_SYSTEM_PREREGISTRATION.md` |
 | The Python's runs that the live engine runs again | `tools/engine_runs.py`, `results/engine_runs/`, `results/heldout_seed_*/` |
 

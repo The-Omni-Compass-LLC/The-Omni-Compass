@@ -619,7 +619,7 @@ def main(argv=None):
     L.append("## 6. What is missing, and what replaces what")
     L.append("")
     L.append("- **The machine** (the kernel, bare metal, Kepler and the machine's own meter; register row 79): not yet run. It enters as exactly 1.")
-    L.append("- **The card on the engine that stands**: the omni-v12 run on Lambda (`gpu-omni-v12`, one exact commit) replaces the 2 October row.")
+    L.append("- **The card on the engine that stands**: the omni-v13 run on Lambda (`gpu-omni-v13`, one exact commit) replaces the 2 October row.")
     L.append("- **The cloud at the tune-down**: the omni-v12 Azure sets (A, B and C of the steady set, the two bursts and the real day) give the bill its "
              "three-run reading; Google and Amazon follow on the same harness.")
     L.append("- **Every cluster and service table on omni-v12**: the campaign (`scripts/reruns.txt`) reruns every benchmark; each row above is replaced by "

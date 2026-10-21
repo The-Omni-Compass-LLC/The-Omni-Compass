@@ -74,8 +74,10 @@ class Landed(unittest.TestCase):
             try:
                 self.assertEqual(benefit_sheet.newest_table("V7_DEMO.json"), "V11_DEMO.json")
                 self.assertEqual(omni_index.newest("V7_DEMO.json"), "V11_DEMO.json")
-                (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"tuning": {"g": {"runs": [run, run, run]}}, "f": {"g": {"runs": [run, None, run]}}}}))
-                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V11_DEMO.json")   # the tuning workload and a gap read nothing
+                (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"tuning": {"g": {"runs": [run, run, run]}}}}))
+                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V11_DEMO.json")   # the tuning workload alone reads nothing
+                (live / "V12_ORG.json").write_text(json.dumps({"organisms": {"spine": {}}}))
+                self.assertTrue(R.landed(live / "V12_ORG.json"))                       # another table's shape: its writer decides
                 (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"f": {"g": {"runs": [run, run, run]}}}}))
                 self.assertEqual(benefit_sheet.newest_table("V7_DEMO.json"), "V12_DEMO.json")
                 self.assertEqual(omni_index.newest("V7_DEMO.json"), "V12_DEMO.json")

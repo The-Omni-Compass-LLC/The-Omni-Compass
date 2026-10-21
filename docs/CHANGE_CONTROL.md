@@ -42,9 +42,10 @@ declared engine.
 | omni-v10 | 18 Oct 04:23 | `4bf39b0d707784de` | 47 | CityLearn: the battery glide that cuts the bill most with no LOSS |
 | omni-v11 | 18 Oct 16:03 | `745aa53ec8eeb67b` | 47 | Kubernetes: a reading with no machine in service is held, never read as an overload |
 | omni-v12 | 20 Oct 00:30 | `d38b58fbe28939b8` | 47 | Kubernetes: a raise the cluster's admission refused is held, not written again at every check; the swarm's proximity reflex at once (its wire outside the digest, declared with the version) |
+| omni-v13 | 20 Oct 20:31 | `0088837333c6f0fc` | 47 | Kubernetes: the CPU limits the conveyance gave go back to the operator's on a shared host at its top beside another workload's room; every other pod counted by its own limit |
 
-Each version was a fault found in a real run and fixed: the record is in `docs/OMNI_V6.md` to `docs/OMNI_V12.md`, and each
-toy gate's reading in `results/toy_gate/`. Eight versions in nine days is the cost of fixing every fault the day it is
+Each version was a fault found in a real run and fixed: the record is in `docs/OMNI_V6.md` to `docs/OMNI_V13.md`, and each
+toy gate's reading in `results/toy_gate/`. Nine versions in nine days is the cost of fixing every fault the day it is
 found (the founder's order of 18 October: every fault fixed, none set aside); the rules above are what keep that pace from
 mixing results.
 
@@ -73,8 +74,9 @@ stands is also a version that is re-proved, re-tested and re-built from its rece
 
 Each change below was found in a real run or in our own reading of the code, and each has its evidence written down. Each
 goes through the toy gate against the engine that stands and, when it reads no LOSS there, lands at once as the next version
-with `tools/land_engine.py`; the founder is told what it changed (rule 6). Landed from this list in omni-v12: the refused raise
-held and the swarm's reflex at once (`docs/OMNI_V12.md`). The kind rig's governor role still does not read the namespace's
+with `tools/land_engine.py`; the founder is told what it changed (rule 6). Landed in omni-v13: the conveyance's hand-back on a
+shared host at its top, found on KubeRay's rig (`docs/OMNI_V13.md`); in omni-v12, from this list: the refused raise held and
+the swarm's reflex at once (`docs/OMNI_V12.md`). The kind rig's governor role still does not read the namespace's
 quotas, a grant the Operator's Manual, section 5.5, makes optional, so the omni-v12 capacity runs read the hold in the real
 cluster.
 
@@ -87,6 +89,9 @@ cluster.
 | The power cap the brain asks for passed through a band, so it cannot switch back and forth at one threshold | on the omni-v11 long run the recommended cap moved 41 times in 116 decisions and turned back at 40 of them, between two values, at the gate on the engine's state (`omnicompass/adapter.py`); on Kubernetes the power wire is off and nothing was written, but the card's governor reads the same request | the long run's audit read by `tools/omni_exporter.py` (run 39173420146); to be read on the card's replay in the toy gate before any chip run |
 | The kill test's after-kill reading widened to 300 s | the one tail rise of the omni-v11 kill test came 140 to 190 s after the kill, past the 120 s window declared | `docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v11"; declared before the next version's runs |
 | The Kubernetes governor counting a worker an add-on marks while it serves, and keeping its clock under load | the CruiseKube runs of 18 and 19 October | the recorder's fix of 19 October (`CHANGELOG.md`) |
+| A raise on the reading that opens another workload's run | in `convey_batch` omni-v13 still raises the web's limits once on the queue's first reading, which spans the seconds before the batch pods ran, and hands them back 15 s later: the job turnaround reads +0.03% against native (LOSS by the key, against omni-v12's +10.7%) | `results/toy_gate/V13_VS_V12.md`; the candidate rule to try in the toy gate: no raise beside another workload's room on a reading older than that workload's newest running pod |
+| The governor's other costs on a saturated shared host | one saturated KubeRay repetition with no raise during its queue still read +4.0% on the batch pods' hashing; the decisions every 60 s and their reads run on cores the kind nodes share through the control plane | one repetition is not a reading: the omni-v13 runs of the batch rig read it, pod by pod, before any change |
+| The toy's web model brought to the batch rig's 3-core host from a real run's files | in `convey_batch` both engines read 2% to 3% fewer requests served than native, with no batch at all as well, while KubeRay's real runs read 4% more after the queue | `results/toy_gate/V13_VS_V12.md`; the regime to be set from the KubeRay runs' own after-queue files before the toy is read for that gauge |
 
 ---
 

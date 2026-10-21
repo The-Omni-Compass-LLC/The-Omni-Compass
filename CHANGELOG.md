@@ -32,9 +32,16 @@
   pieces and two), in the device, as a service; the cloud's back end disclosed (`DISCLOSURES.md` section 9): a tenant cannot meter
   the provider's bare metal; the cloud piece is the bill and the machines the provider meters; the bare-metal piece is gauged on
   hardware we meter and carried to the provider's only as a modelled factor.
-- **The third manual** (`docs/LIVE_ENGINE_MANUAL.md` and `.pdf`, `docs/book/build_live_manual.py`): the live engine read top to
-  bottom from the page itself, section by section, monitor by monitor and knob by knob, the page's own words with how to read and
-  operate each monitor; the control panel downloads all three manuals.
+- **One third manual**: main's Live Engine Manual (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, built with the other
+  two by `docs/book/build_book.py --live`) is the third book; this branch's page-generated text became its last appendix,
+  Appendix L, the page word for word (`docs/engine/PAGE_WORD_FOR_WORD.md`, written from the page by
+  `docs/book/build_live_manual.py` at every build): every section, every monitor under its number with its evidence class,
+  state, feed and knobs, every knob and every LOSS row. The book was realigned to the page as it stands: the page's section
+  numbers (the benefit board is section 2, every later section one on), Part III in the page's order (the benefit board, then
+  the whole organism, now every way a stack is bought: on site, through the cloud, in the device, as a service), the numbered
+  wall and its control panel, the 8-card node, the muscle's own switch on the page beside the next version's live switch per
+  muscle on a running engine, and six references to other documents that a blind replacement had turned into the page's.
+  The control panel downloads all three manuals.
 - **Simulation with a capital S** in the one notice (`tools/legal.py`), written on every file but the engine's fingerprinted ones,
   which take it with the next version; the workflows' embedded legal bundles re-written to match.
 - **A newer engine's table stands only once its three runs share a reading** (`tools/readings.py`, `landed`): the three
@@ -47,8 +54,8 @@
   failed job of the three omni-v12 runs (9 of 15) ran on that image and every passing job on the image before it. The workload
   jobs now run on GitHub's ubuntu-22.04 machine (Linux 6.8, the same 4 cores and 16 GB); the setup stops at once with the
   kernel, the server's status and its journal when the server does not answer, and every run's files carry the kernel, the
-  release, the runner image and the server's journal. The set runs again as A, B and C (`scripts/reruns.txt`, the block added
-  on 21 October).
+  release, the runner image and the server's journal; main's rig change of the same night (the server's journal in every
+  run, a second restart before a run stops) is kept beside it. Every set runs on this machine in the omni-v13 campaign.
 - **Main's red checks fixed here**: verify failed on main because `docs/LEVELS.md` and the state of play's standing block
   were not rebuilt after the twelve omni-v12 service tables landed (rebuilt); the security scan failed on Pillow 12.3.0's eight
   published advisories (Pillow 13.0.0 in the lock with every file's SHA-256, the bill of materials rewritten; matplotlib's
@@ -59,6 +66,31 @@
   stored short (595 characters, not the key file); Amazon's on the Free plan (the organization's policy denies every machine
   read). Both say so in their own words on the bill monitors.
 
+## 2026-10-21: the third manual (the Live Engine Manual); the database rigs leave the server's journal in the record
+
+- **The Live Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `docs/book/OMNI_COMPASS_LIVE_ENGINE_BOOK.md`;
+  `python3 docs/book/build_book.py --live`; the founder's order of 20 October, night: "There shall be three in the end"). The
+  third book, for the operator at the dashboard: nothing more than the interpretation of the live engine page
+  (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): how to follow the wall and the master switch (green ON, red the kill switch
+  engaged, white OFF), read every gauge and turn every knob of the console, trace any tile to the record it came from, and see
+  the mechanism of action native beside Omni-Compass as the monitors show it (the two tickers, the phase plane, the brain's
+  state, the verdict); every section of the page in the page's own order, named by title and anchor (its "Engine table of
+  contents"); what to do when a tile reads LOSS; what the page does not tell you. 100 pages, 13 figures from the two kits, one
+  numbering, every cross-reference and every contents row checked on the built PDF (`docs/book/nav_check.py`). It explains
+  neither how the engine is built (the Owner's) nor how it is wired (the Operator's). The Operator's and Owner's Manuals now open
+  with "The Three Manuals"; the README, the state of play and `CLAUDE.md` name all three; `tools/readings.py`,
+  `tools/unicode_math.py` and `tools/land_engine.py` check the third as they check the other two.
+- **The database rigs record why a server did not come back.** The omni-v12 MongoDB runs B and C died at `fresh_server`'s
+  wait ("mongod did not come back after the restart") with an empty `mongod.log` and nothing else recorded, so the cause could
+  not be read. `tools/run_ycsb.py` and `tools/run_sysbench.py` now wait about five minutes, restart the server once more with its
+  `systemctl status` and `journalctl` printed, and stop the run with the journal in the error if it still does not answer;
+  `ycsb.yml` and `sysbench.yml` save the unit's journal into every run's files. The runs B and C of MongoDB on omni-v13 will
+  carry the cause if it happens again.
+- **A three-run table says when a run lacks a workload.** The six table writers (`tools/ycsb_abc.py`, `kafka_abc.py`,
+  `redis_abc.py`, `sysbench_abc.py`, `pgbench_abc.py`, `cpu_power_abc.py`) counted every workload at their foot, those a run
+  never reached included (the omni-v12 MongoDB table read "across 4 untouched workloads" with none judged); now the foot counts
+  only the workloads every run holds, and a warning names each run and what it lacks, with the rule that such a table is not
+  read by the index or the benefit sheet until its runs land.
 
 ## 2026-10-20 (night): the run storm on GitHub stopped
 
@@ -71,6 +103,45 @@
   no rebuild and a skipped run no sweep; and the 21 workflows ignore pushes to main and to the level branches (a dispatch
   needs no push to register a workflow that is on main). `tests/test_workflow_triggers.py` fails a push where a workflow
   would again be started by every push, or the live engine by its own page.
+- **omni-v13 landed on GitHub with two faults fixed on the way.** `tests/test_convey.py` still asserted omni-v12's rule (another
+  pod on the machine counted by its request, web-2 given 2,800m); omni-v13 counts it by its limit, so the test now expects
+  1,800m and a gain of 3.05, the engine unchanged. And the MongoDB benchmark had left the index, the benefit sheet and the
+  standing block (26 rows to 25) because the omni-v12 YCSB table was written from two runs that failed (`mongod did not come
+  back after the restart`; its runs B and C with no workload) and `tools/omni_index.newest` took the newest table whatever it
+  held: it now takes the newest *whole* table (a gauge row, or a workload beside the tuning one), so a table written from
+  failed runs is passed over until its runs land (`tests/test_index_newest.py`); MongoDB reads from its omni-v11 table again
+  and the index headline is +4.3% (omni-v10, omni-v11 and omni-v12 tables). The YCSB rig's restart fault is the next thing fixed.
+- **The cluster recorder takes its first reading before it reads the clock.** `fleet/capture/kube_capture.sh` ended the
+  recording when the deadline had passed before any reading, so a clock tick between its start and its first look left an
+  empty capture (`tests/test_capture_in_service.py` with `DURATION=0`, once in three whole checks on a loaded machine); the
+  deadline now ends a recording only after at least one row.
+
+## 2026-10-20 (evening): Omni v13 stands (no other muscle's room is conveyed)
+
+- **omni-v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`): omni-v12 with one fault fixed in the
+  Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone, whose
+  three-run table read two LOSS rows (the queue finished 0.6% to 0.8% later, the web's 99th percentile 4% to 13% higher). The
+  29 repetitions' own files, read job by job and pod by pod, name the mechanism (`docs/BATCH_QUEUE_PREREGISTRATION.md`,
+  amendment 11, which replaces amendment 10's reading that it was the give-back): in the 16 repetitions whose slower runner
+  saturated the kind cores, the web pods' CPU limits were raised to 3,700m at 33 s, on a busy reading that caught the dip as the
+  stream's first pods started, and kept through the queue (omni-v7's guard holds a new raise at the host's top, never one
+  already given); the batch pods hashed 7.6% slower (63.1 s against 59.2 s) while the web served no faster; no machine was
+  parked during a saturated queue. Now, on a shared host at its top (busy at or over 75%) while another workload there has
+  room of its own (a pod whose limit is above its request), every limit given goes back to the operator's and is conveyed again
+  only under 70%; and every other pod on a machine is counted by its own limit, where omni-v12 counted requests.
+  `tests/test_convey_handback.py`; the shared-host tests' coredns carries no room of its own, as kind's does not.
+- **The toy gate** (`results/toy_gate/V13_VS_V12.md`, seeds 1 to 8): a new toy, `convey_batch`, sets KubeRay's batch muscle
+  beside the serving one on the batch rig's host (the kind nodes on 3 of 4 cores, the governor on the fourth, the stream of
+  24 jobs, the kernel's request-weighted share, the pods' measured start lag, the governor's own windowed reading, and the
+  batch pods' loss of work under a lifted quota taken from the saturated repetitions themselves). Against omni-v12 no reading is a LOSS in any toy: the cluster, verdict and web-only convey toys identical to the last digit;
+  in `convey_batch` the queue 1.48% sooner, the job turnaround 9.59% shorter and the web's 95th percentile 17.4% lower (GAIN).
+  Against native omni-v13 reads the queue identical, and three LOSS rows: the turnaround +0.05% (one raise on the queue's opening
+  reading, handed back 15 s later; on the next version's list) and the requests served and alert minutes, which both engines read
+  the same way with no batch at all on that 3-core host while the real runs read more requests (the toy's web model, on the list).
+- **Recorded with it**: the deviations register (71 amendments), the next version's list (`docs/CHANGE_CONTROL.md`: the toy's
+  web model on the 3-core host, where both engines read fewer requests served than native while the real runs read more after
+  the queue), the mechanism identity and the engine coverage measured again on the omni-v13 tree, the Lambda branch
+  `gpu-omni-v13`. Every benchmark runs again on omni-v13; omni-v12's tables stand as its record.
 
 ## 2026-10-20: the whole system, every layer composed by the product law; Gödel's rig on 1.24; the CPU power harness seeded
 

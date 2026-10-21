@@ -1,151 +1,23 @@
-# The Live Engine Manual
+# The Live Engine Page, Word for Word
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-How to read, operate, tune and watch the Omni-Compass live engine, native beside Omni-Compass, section by section, monitor by monitor and knob by knob
-
-## Front matter
-
-### What this book is
-
-The third of the three manuals of Omni-Compass. The Operator's Manual shows an engineering team how to embed, wire, tune, run and check Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. This book reads the live engine, `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, from its first line to its last, so that an operator can sit at the page with the book open beside it and run it as the engineer in charge: read every gauge, turn every knob, press the switch, watch the organism, and know what every monitor shows, where its numbers come from, how strongly they stand, and what is still waiting for its run.
-
-This edition was written from the page on the engine that stands, omni-v12 (digest d38b58fbe28939b8), as the page was built 2026-10-21 00:50 UTC from commit 319de07abbbe. GitHub rebuilds the page's records every few hours; a page rebuilt since carries newer readings in the same sections and monitors, and the book is rebuilt with every change to the page's structure. The book is written from the page itself (`docs/book/build_live_manual.py`): every section, number, title, summary, control line and paragraph below is the page's own, every monitor is the page's own canvas under its own number, so the two read each other both ways.
-
-### How to use the book with the page
-
-- Open the page in a browser (the repository's copy, or its published copy). It runs entirely in the browser: it reads no live system, sends nothing anywhere, and draws every view from the records embedded in it at build time and from the engine's own mathematics running in it.
-- The page opens with its table of contents, under the one line of the legal notice; then the front matter (the title page and the key to every reading); then eleven sections from the whole organism down to the smallest part; then the back matter. Part II of this book follows the same order and the same numbers.
-- Every monitor (every chart canvas) carries its number in a badge above it, from 1 at the top of the page to 58 at the bottom. The monitor wall in section 1a shows them all at once, numbered, read right to left and then down; this book lists each under its number with what it shows, its evidence, the open-source feed that would carry it on a running system, and its knobs.
-- Every section opens with a summary and a controls line saying whether its views are live (the engine running in the page, moved by the console's knobs) or recorded (a run or a table played back, which no knob can change).
-
-## Part I. Reading the live engine
-
-### 1. The two arms: native, and Omni-Compass on top of native
-
-Every view on the page has two sides and only two. **Native** is the system running by itself under its own controllers: the Kubernetes autoscaler, the card's own driver, the kernel's frequency governor, the cloud's own autoscaler, each muscle's own controller. **Omni-Compass** is the same system with Omni-Compass sitting on top of those native controllers, never in place of them. Native is drawn in amber, Omni-Compass in blue. Where a monitor draws two lanes, native is the left lane and Omni-Compass the right, on one scale, so that a line lying on the other never hides it. A red dashed line is the gauge's own limit (the response line, a temperature line). A red tick is a write the governor made.
-
-Omni-Compass is a supervisory governor: its one goal is to strengthen the organism and keep it healthy, every muscle working as far as its own limit and never past it (do no harm, `DISCLOSURES.md` section 3). The engine that stands keeps the strictest form of that rule: every muscle is judged on itself, never driven below native, nothing traded between muscles; where it cannot bring a knob a GAIN, the knob stays native.
-
-### 2. The key: GAIN, EVEN, LOSS and power given
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-21 01:28 UTC on omni-v13 (digest 0088837333c6f0fc) from commit ada1a0105df8.
 
 
-Every judged reading in Omni-Compass is one of three words: GAIN, EVEN or LOSS. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
+Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
 
-GAIN: G Growth (asset appreciation); A Advantage (risk reduction); I Improvement (margin expansion); N Net-positive (profitable outcome)
-    underwriting: surplus and positive variance
-    in a table: the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut
-EVEN: E Equalized (zero variance); V Verified baseline (expected norm); E Equilibrium (balanced risk); N Neutral (no net change)
-    underwriting: the break-even baseline: equilibrium
-    in a table: native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native
-LOSS: L Leakage (capital drain); O Off-track (adverse selection); S Setback (claim liability); S Subpar (negative variance)
-    underwriting: actuarial deficit and exposure
-    in a table: the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures
-
-How the sign of a number becomes a word:
-
-- Time waited, missed or failed (a response time, time over the line, failed requests): a fall is GAIN, a rise is LOSS.
-- Work done (work inside the line, throughput, a hit rate): a rise is GAIN, a fall is LOSS.
-- A resource spent or held (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a cut, and a cut is GAIN. A rise is power given: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
-- Work bought with each unit of a resource (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
-- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
-- The floor (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads EVEN, under the floor; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
-- The sign beside a word (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN +, LOSS −, EVEN =. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
-
-Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
-
-A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are EVEN, no difference beyond the noise (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), the runs disagree (clear runs pointing different ways: the test is unstable there and is looked into) and shown, not judged (a gauge declared in advance as shown only, such as the knob's own setting).
-
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (DISCLOSURES.md, section 3). So LOSS should never appear: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
-
-Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
-
-The founder's floor of 20 October: a change under 0.5% either way in every run reads EVEN, under the floor. The number beside a word carries the word's sign (GAIN +, LOSS −, EVEN =), never the gauge's raw direction. Colours follow the word everywhere on the page: GAIN green, EVEN yellow, LOSS red, power given blue.
-
-### 3. Evidence classes and the state of a monitor
-
-Every view says its evidence class: **P**, a physical meter (a card's own power meter, a processor's energy counter); **L**, live software (real Kubernetes, real databases, a real cloud, run on GitHub's own machines or in the cloud, played back from their own SHA-256-checked files); **S**, the repository's own models (the engine's harness, the toy cluster, the organisms, the grid), never presented as proof. Every monitor also says its state:
-
-- **live**: the engine's own mathematics running in the page (the brain, the compass law, the verdict), proven equal to the Python and the C++ to 1e-12 on every build; the console's knobs move it.
-- **replay**: a recorded run played back from its own files, second by second or decision by decision; no knob changes it.
-- **record** or **composed**: the repository's tables read at build time, or composed from them by a stated law.
-- **model**: a model of a machine standing in for a run not yet made (the CPU host), marked as such on the monitor itself.
-- **awaiting its run**: built before its run; its native lane shows what exists, its Omni-Compass lane stays empty, and the page names the run that fills it. Nothing on such a monitor is invented.
-
-### 4. The kill switch and the master switch
-
-One switch governs the whole organism, at the top, above the brain (`omnicompass/master.py`, `tools/omni_switch.py`). While Omni-Compass governs, the switch reads **ON** in green. Pressed, the switch turns **red**: at the next decision every governor puts every setting it wrote back, reads each one back and stops; the word **OFF** stands in white, and every Omni-Compass side of every monitor follows native, drawn in native's colour (a lighter tint of amber, dashed, so both lines stay visible). Native's own controllers under every muscle never stop and never see the switch. A recorded result never changes with it: its colour does, never a value, a word or a row.
-
-The same switch stands in the control panel at the head of section 1a, at the head of every section, in every monitor's own knobs and in the console (section 7): one press anywhere is one press everywhere. It is for security, and it is instant. The walk back after a crash is a different mechanism, the lease, which returns every setting to native gradually. The master switch's own panel in section 1a draws the wiring and lists every governor on the page with what it handed back.
-
-### 5. The control panel and the knobs
-
-The control panel at the top of section 1a holds the kill switch, the button that runs the Python's own runs in the page, the three manuals and the wall as a Grafana dashboard. The console (section 7) holds every runtime knob of the live engine; every monitor that is live carries the same knobs in its own strip under its canvas, so the organism can be driven from wherever one is looking. Every knob acts on both arms alike: the difference between the lanes is Omni-Compass's doing alone.
-
-- **Kill switch** (kill): Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); on the master switch (section 1b).
-- **The dial** (dial): the max (every muscle to its own limit) or the tune-down (never more than native); on the console's dial.
-- **Demand** (load): ×0.25 to ×2 of the day's own demand, both arms alike; on the console's demand slider.
-- **Noise** (noise): σ of the demand's noise, one draw a muscle a decision, both arms alike; on the console's noise slider.
-- **Sense delay** (lag): decisions added between what a muscle does and what its controller reads, both arms alike; on the console's delay slider.
-- **Faults** (faults): a surge, half the machines lost, a sense blind, a security hold, on the chosen body part; on the console's fault buttons.
-- **Speed** (speed): 1×, 4×, 16× or 60× of the engine's clock; on the console's time knob.
-- **One decision** (step): step the engine one decision while paused; on the console's time knob.
-- **Pause** (pause): hold the engine's clock; on the console's time knob.
-- **Frame load** (frame): +0, +8 or +16 ms burned inside every frame of this page; on the console's frame-load knob.
-- **Run** (run): A, B or C (or the archived run) the monitor plays; on the monitor's own buttons.
-- **Repetition** (rep): which repetition of the run is replayed; on the monitor's own buttons.
-- **Arm** (arm): which arm stands on the right: Omni-Compass governing, or watching only; on the monitor's own buttons.
-- **Stack** (stack): the GPU card, the Linux host, Kubernetes or the cloud; on the monitor's own buttons.
-- **Governor** (governor): which orchestrator or governor is shown; on the monitor's own table.
-- **Scenario** (scenario): on-site bare metal, through the cloud, in the device, as a service; on the monitor's own buttons.
-- **Reading** (reading): every measured piece carried, or the index's strict rule; on the monitor's own buttons.
-- **The chip's run** (chip): the chip's one run beside the count or in it; on the monitor's own buttons.
-- **Gauge** (gauge): which gauge of the run is shown; on the monitor's own buttons.
-- **Filter** (filter): which rows, words, families or organisms are shown; on the monitor's own buttons.
-- **Body** (body): which body the organism runs: the harness, the organism, every muscle alone; on the organism's own buttons.
-- **The muscle's own switch** (muscle): pick one muscle on either ring: its card, and its own switch, which hands that one muscle back to native (Omni-Compass OFF on it) or puts Omni-Compass on it again; the kill switch hands every muscle back at once; on the organism's monitors and the muscle's card (section 6a).
-- **Runs** (runs): how many of the Python's runs this page computes again; on the monitor's own buttons.
-- **Print** (print): the receipts of the runs, printable, with the digests and the notice; on the monitor's own button.
-- **Reading direction** (direction): the wall read right to left (as set) or left to right; on the wall's own button.
-- **Seed base** (seed): which held-out seed base's 500 scenarios are replayed; on the monitor's own buttons.
-
-### 6. The monitor wall
-
-The wall (section 1a) shows every monitor of the page at once: 58 canvases, each a tile carrying its number and its section. They are numbered in their order of appearance from the top of the page and laid out right to left, then the next row (the founder's order; a button reads them left to right instead). A tile with an accent border is a monitor on screen now. The page's own governor (section 11) rests a monitor while it is off screen; while the wall is in view the resting monitors are drawn in turn, one a frame. A click on a tile goes to the monitor. The inventory under the wall lists every monitor with its feed and its knobs, and names every monitor still awaiting its run.
-
-### 7. The Python's runs, in the page
-
-The proof monitors in section 1a tie the page to the Python. `tools/engine_runs.py` runs N runs from a base seed: run k's seed is base + k·0x9E3779B9 mod 2³², its random stream mulberry32 (the page's own generator, written in the Python bit for bit). Each run steps the engine that stands through 288 decisions of the brain's state equations integrated by the fourth-order Runge–Kutta step, 80 steps of the compass law and one give-back trial judged by the verdict, and its receipt holds the brain's final state, its pushes and grants, the law's mean and last force and the trial's answer. The digest is the SHA-256 of every receipt at six decimals. The record in this build: 500 runs from base 20261020, digest d4f6586bef00cf1d5cda645e106a509f…
-
-Press **Run the Python's 500 runs here** and the page computes the same runs with its own port of the engine, in the browser's idle time, compares every receipt with the Python's and computes its own digest: the two must be one. **A new set** runs any other base in the page and prints the one command that runs the same set in the Python (`python3 tools/engine_runs.py --runs N --base B`), whose digest must equal the page's. **Print the receipts** opens every receipt, the Python's beside the page's, with both digests and the notice, ready for the printer; **Download** saves them as a file.
-
-Beside them the page replays the Python's 500 scenarios a seed of `benchmarks/stack_benchmark.py` (the held-out seeds 346410161, 360555127): each scenario through every arm, native beside the chosen Omni-Compass arm, every scenario's trace hash and the record's own SHA-256. These are replayed from the record, never recomputed in the page; `verify.py` replays them on every push and `verify.py --full-replay` regenerates the whole file byte for byte.
-
-### 8. Grafana, Prometheus and the open-source feeds
-
-Every monitor on the page is the kind of panel an operator already runs in Grafana. The registry `docs/engine/monitors.json` names for each the open-source exporter and the Prometheus series that would carry it on a running system: node_exporter for the machines and the processor (its rapl and cpufreq collectors), kube-state-metrics for the cluster's objects, the NVIDIA DCGM exporter for the card, Kepler for energy by pod, OpenCost for the bill, the service's own request histograms for the golden signals, sloth or pyrra for the service level, and the governor's own exporter (`tools/omni_exporter.py`, read-only, from its audit) for every decision, write, hold and switch state. `docs/engine/export_grafana.py` writes the whole wall as one Grafana dashboard (`deploy/grafana/omni-compass-wall.json`): a panel a monitor, in the page's order and numbering, each on its series, beside the governor's own screen (`deploy/grafana/omni-compass.json`) and its alert rules (`deploy/prometheus/omni-compass-rules.yaml`). A monitor the page draws from the repository's tables or from its own clock becomes a text panel saying so. The control panel downloads the dashboard; the page itself reads no live system.
-
-### 9. The organisms and the whole stack, every way it is bought
-
-The catalog's seven organisms (the spine, 267 muscles, the base every stack runs on; the four realms; the four stacked; the whole tower of 1,107 muscles) each run native and with Omni-Compass on top, under their own load, the climb and work waiting in line. The orchestra stands beside them, every governor's muscles as one body. Section 3 composes the whole stack, the software, the cloud and the hardware, into one body: the founder counts it as the eighth organism running native and the ninth with Omni-Compass on top of every piece. It is composed four ways: on-site bare metal (software × bare metal), through the cloud (cloud × bare metal × software, and the cloud as two pieces), in the device (the bare metal alone) and as a service (the software alone).
-
-Through the cloud, the bare metal at the back end belongs to the provider: no tenant can meter it, so no run reaches it. The cloud piece is measured as what the provider meters and bills (the machines and the bill, native against Omni-Compass on top of the cloud's own autoscaler), which is also the provider's own benefit on its own hardware. The bare-metal piece is gauged on hardware we can meter and carried to the provider's bare metal only as a modelled factor of the same mechanism on the same kind of part, never as a measurement of the provider's machines (`DISCLOSURES.md` section 9). No run has stacked the layers yet: the composition is class S of class P and L measurements until the stacked run, preregistered in `docs/WHOLE_SYSTEM_PREREGISTRATION.md`, replaces it.
-
-## Part II. The live engine, section by section
-
-Each chapter is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
-
-### iii Title page and build
+## iii Title page and build
 
 **The page, in its own words.**
 
-A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere: Native, the whole system running by itself, and Omni-Compass, the same system with Omni-Compass on top of all of it. It is laid out as a book, read from the top down: the table of contents first, then the front matter (this title page and the reading key), then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v12: omni-v11 with two faults found on its own runs fixed. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
+A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere: Native, the whole system running by itself, and Omni-Compass, the same system with Omni-Compass on top of all of it. It is laid out as a book, read from the top down: the table of contents first, then the front matter (this title page and the reading key), then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v13: omni-v12 with one fault found on its own runs fixed: on a shared host at its top, while another workload there has room of its own, the governor's conveyance hands every processor limit it gave back to the operator's, and it counts every other pod by what it may use (docs/OMNI_V13.md). Before it, omni-v12 fixed two faults found on omni-v11's runs. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
 
 DISCLOSURE: REAL RUNS, A REAL ENGINE, NOTHING HARDWIRED. Every real-run figure on this page is played back from the raw files of benchmark runs executed on GitHub's own machines, each file checked against its run's SHA-256 list before a single number is drawn. Every model view runs the engine's own code (the compass law, the brain, the verdict) live in this page, linked through software to the repository's Python and C++ and checked against them on every build. GitHub rebuilds the page from the repository whenever the engine, a model or a result changes, and every three hours: no number on it is typed in by hand, and when the repository changes, the page changes with it.
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-### iv Executive summary and reading key
+## iv Executive summary and reading key
 
 **Controls.** Live: the buttons act on the live engine; every number below is read from the records on this page.
 
@@ -165,9 +37,9 @@ The size is how far the gauge moved from native; the word says whether that move
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-### Part 1 of the page: The monitor wall and the control panel
+## Part 1 of the page: The monitor wall and the control panel
 
-### 1a The monitor wall and the control panel: the kill switch, every monitor, the status board
+## 1a The monitor wall and the control panel: the kill switch, every monitor, the status board
 
 The first view after the front matter: every monitor of this page at once, numbered, and the control panel that drives them. The kill switch stands at its head; the Python's own runs can be run again here at a button; the status board below says whether Omni-Compass is engaged, which signals are out of tolerance and where, and every LOSS row is raised as an alarm with its source record, its cause and the knob that answers it. No value on the board is typed in: each is computed at runtime from the live engine or from the repository's records embedded at build time.
 
@@ -179,7 +51,7 @@ The first view after the front matter: every monitor of this page at once, numbe
 
 The kill switch. While Omni-Compass governs on top of native the switch reads ON in green. Pressed, it turns red: at the next decision every governor puts every setting it wrote back, reads each one back and stops (omnicompass/master.py, tools/omni_switch.py); the word OFF stands white, and every Omni-Compass side of every monitor follows native, drawn in native's colour. Native's own controllers under every muscle never stop and never see the switch. A recorded result never changes with it: its colour does, never a value, a word or a row. The same switch stands at the head of every section and in every monitor's own knobs; one press anywhere is one press everywhere. It is for security and is instant; the walk back after a crash is the lease, separate.
 
-The three manuals. The Live Engine Manual reads this page top to bottom, monitor by monitor and knob by knob: how to read, operate, tune and watch it, native beside Omni-Compass. The Operator's Manual wires and runs Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. Each carries the notice, the LICENSE, the NOTICE and DISCLOSURES.md.
+The three manuals. The Live Engine Manual reads this page top to bottom: how to read, operate, tune and watch it, native beside Omni-Compass, chapter by chapter in the page's own order, and, in its last appendix, the page word for word, every section, every monitor under its number and every knob, written from this page at every build. The Operator's Manual wires and runs Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. Each carries the notice, the LICENSE, the NOTICE and DISCLOSURES.md.
 
 **The monitor wall: every monitor of this page, numbered in its order of appearance, read right to left; click a tile to go to it**
 
@@ -217,7 +89,7 @@ The board is laid out the way an operations monitor is. The switch and the engin
 
 **Its monitors.**
 
-#### Monitor 1: The master switch and the kill switch
+### Monitor 1: The master switch and the kill switch
 
 The switch above the brain: ON, Omni-Compass governs every wired muscle; engaged, every setting is handed back to native's own controller at once and every Omni-Compass side on the page follows native.
 
@@ -227,7 +99,7 @@ The switch above the brain: ON, Omni-Compass governs every wired muscle; engaged
 - **How to read it.** The wiring from the top down: the master switch above the brain, the brain above the organism, the organism above every muscle, and native's own controllers under every muscle, never switched. The switch's state is the word on it: ON in green while Omni-Compass governs; engaged, the switch red and OFF in white.
 - **What to do with it.** Press the kill switch only for security: it is instant, every setting goes back to native and is read back. Watch the governors' table beside it: every governor on the page says OFF and what it handed back.
 
-#### Monitor 2: The Python's runs, reproduced here
+### Monitor 2: The Python's runs, reproduced here
 
 The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.
 
@@ -237,7 +109,7 @@ The engine's seeded runs: the Python's receipts (results/engine_runs) beside the
 - **How to read it.** The Python's seeded runs beside this page's: one cell a run (green agrees to 1e-9, red differs, blue a new set), the two digests under them; and the Python's 500 scenarios a seed replayed with every trace hash.
 - **What to do with it.** Press the button to run the Python's set here; run a new base to make a new set and run the printed command in the Python to compare digests. Print or download the receipts for the file.
 
-#### Monitor 3: The Python's 500 scenarios, replayed
+### Monitor 3: The Python's 500 scenarios, replayed
 
 benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.
 
@@ -247,7 +119,7 @@ benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seed
 - **How to read it.** The Python's seeded runs beside this page's: one cell a run (green agrees to 1e-9, red differs, blue a new set), the two digests under them; and the Python's 500 scenarios a seed replayed with every trace hash.
 - **What to do with it.** Press the button to run the Python's set here; run a new base to make a new set and run the printed command in the Python to compare digests. Print or download the receipts for the file.
 
-#### Monitor 4: Golden signal: errors
+### Monitor 4: Golden signal: errors
 
 Errors a decision on the live organism, native beside Omni-Compass (site reliability's first of four).
 
@@ -257,7 +129,7 @@ Errors a decision on the live organism, native beside Omni-Compass (site reliabi
 - **How to read it.** The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.
 - **What to do with it.** Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises.
 
-#### Monitor 5: Golden signal: throughput
+### Monitor 5: Golden signal: throughput
 
 Work done a decision (traffic), native beside Omni-Compass.
 
@@ -267,7 +139,7 @@ Work done a decision (traffic), native beside Omni-Compass.
 - **How to read it.** The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.
 - **What to do with it.** Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises.
 
-#### Monitor 6: Golden signal: latency
+### Monitor 6: Golden signal: latency
 
 Response time a decision, native beside Omni-Compass.
 
@@ -277,7 +149,7 @@ Response time a decision, native beside Omni-Compass.
 - **How to read it.** The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.
 - **What to do with it.** Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises.
 
-#### Monitor 7: Golden signal: saturation
+### Monitor 7: Golden signal: saturation
 
 Capacity held against capacity used, native beside Omni-Compass.
 
@@ -287,7 +159,7 @@ Capacity held against capacity used, native beside Omni-Compass.
 - **How to read it.** The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.
 - **What to do with it.** Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises.
 
-### 1b CI pipeline: GitHub Actions runs in progress and queued
+## 1b CI pipeline: GitHub Actions runs in progress and queued
 
 Every GitHub Actions workflow run in progress or queued at build time. The hardware and cloud runs, with their terminal status, are in sections 5a and 5f; every run on the engine that stands that terminated without a measurement is raised on the status board (section 1a).
 
@@ -305,7 +177,7 @@ The page is rebuilt by GitHub itself (.github/workflows/live-engine.yml, docs/en
 
 **Its monitors.**
 
-#### Monitor 8: GitHub Actions: the runs in flight
+### Monitor 8: GitHub Actions: the runs in flight
 
 Every workflow run in progress or queued when the page was built, the Azure set's repetitions done of its cap, and the clouds' gates.
 
@@ -315,7 +187,7 @@ Every workflow run in progress or queued when the page was built, the Azure set'
 - **How to read it.** GitHub's runs in flight at the build by workflow, the Azure set's repetitions measured, each cloud's gate with its reason, the chips' runs.
 - **What to do with it.** A gate that holds names its fix in its own words; nothing is billed while it holds.
 
-### 2 The benefit board: every domain, native against Omni-Compass
+## 2 The benefit board: every domain, native against Omni-Compass
 
 The first thing after the wall: every benchmark's measured effect in one board, native against Omni-Compass on top of native, by domain and by gauge family, and the Omni index that weighs them together. Every bar is its table's own word (GAIN green, EVEN yellow, LOSS red, power given blue) beside its size; every LOSS row stands on it and is answered, with its cause and its knob, on the status board (section 1a). The whole organism composed from these same tables follows in section 3; every table, every muscle and the grid in full in section 4.
 
@@ -333,7 +205,7 @@ Every judged row of every newest three-run table (the tables below), sorted into
 
 **Its monitors.**
 
-#### Monitor 9: The benefit board
+### Monitor 9: The benefit board
 
 Every domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, native against Omni-Compass.
 
@@ -343,7 +215,7 @@ Every domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, nat
 - **How to read it.** Bars and tiles in the traffic light of the one key: GAIN green to one side, LOSS red to the other, EVEN yellow on zero, power given blue. A figure is a composition or a table's own word, never a single run's number.
 - **What to do with it.** Read the word before the size, and the interval before the word: an interval across zero is EVEN whatever its centre. A LOSS on the board is answered on the status board, with its cause and its knob.
 
-#### Monitor 10: Where the benefit lives, gauge by gauge
+### Monitor 10: Where the benefit lives, gauge by gauge
 
 The same tables by gauge family: work, speed, misses, resources.
 
@@ -353,9 +225,9 @@ The same tables by gauge family: work, speed, misses, resources.
 - **How to read it.** Bars and tiles in the traffic light of the one key: GAIN green to one side, LOSS red to the other, EVEN yellow on zero, power given blue. A figure is a composition or a table's own word, never a single run's number.
 - **What to do with it.** Read the word before the size, and the interval before the word: an interval across zero is EVEN whatever its centre. A LOSS on the board is answered on the status board, with its cause and its knob.
 
-### 3 The whole organism, every way it is bought: on-site bare metal, through the cloud, in the device, as a service
+## 3 The whole organism, every way it is bought: on-site bare metal, through the cloud, in the device, as a service
 
-Omni-Compass is wired into every piece of a stack through its own two-way plug: the software (the cluster: Kubernetes, its add-ons, its governors and orchestrators; and the services on it: the pools, the consumers, the caches), the bare metal under it (the chip's power limit and clock; the machine's kernel and its own meter) and, where the stack is rented, the cloud that bills the machines. A stack is bought one of two ways: on-site bare metal, the software on the owner's own bare metal (software × bare metal, no cloud); through the cloud, the cloud's build, its bare metal at the back end and the software (cloud × bare metal × software), with the cloud as two pieces beside it (cloud × software, the back-end bare metal left to the provider). Every piece's benefit is added into one collective reading, gauge by gauge (work, the 95th percentile response, machines, energy, the bill), with the receipts under it: what native spent, what Omni-Compass spent, and the benefit, in the units each table measured. The repository composes the layers in one place, tools/whole_system.py, which writes results/WHOLE_SYSTEM.md from the tables that stand: each layer measured against its own native with the layer under it as native runs it; a gauge's ratio oriented so that above 1 is a GAIN at every layer alike; the layers composed by the product law, R(g) = ∏ℓ Rℓ(g), log R = Σℓ log Rℓ (for small benefits the product is their sum), every interval carried (the exact Student t per run; A, B and C pooled by inverse variance; the layers' variances added); two readings of the same numbers (every measured piece: everything measured enters with its interval; the strict reading, the index's rule: only what held the same way in all three of our runs, everything else exactly 1); and the separability assumption tested on the governors' four ways. This section recomputes nothing from the tables: it regroups that file's layers into the two ways (docs/engine/export_whole.py), summing the logarithms of the layers a scenario stacks and adding their variances, as the file's rule composes any set of layers; the one number is the mean of the gauge logarithms, its 95% interval under the file's two bounds. The composition is a model (evidence class S) of class P and class L measurements under the separability assumption, and says so; no run has yet stacked every layer at once, and that stacked run is the measurement that would replace it. The chip's one measured run (2 October, on the card controller since replaced) stands beside the count by default, every row of it shown, as the repository's own headline has it; one click puts it in, until its omni-v12 run on Lambda replaces it. The machine (the kernel, bare metal, Kepler) is not yet run and enters as exactly 1, named. GAIN is green, LOSS red, EVEN yellow, power given blue, on every word, cell and tile.
+Omni-Compass is wired into every piece of a stack through its own two-way plug: the software (the cluster: Kubernetes, its add-ons, its governors and orchestrators; and the services on it: the pools, the consumers, the caches), the bare metal under it (the chip's power limit and clock; the machine's kernel and its own meter) and, where the stack is rented, the cloud that bills the machines. A stack is bought one of two ways: on-site bare metal, the software on the owner's own bare metal (software × bare metal, no cloud); through the cloud, the cloud's build, its bare metal at the back end and the software (cloud × bare metal × software), with the cloud as two pieces beside it (cloud × software, the back-end bare metal left to the provider). Every piece's benefit is added into one collective reading, gauge by gauge (work, the 95th percentile response, machines, energy, the bill), with the receipts under it: what native spent, what Omni-Compass spent, and the benefit, in the units each table measured. The repository composes the layers in one place, tools/whole_system.py, which writes results/WHOLE_SYSTEM.md from the tables that stand: each layer measured against its own native with the layer under it as native runs it; a gauge's ratio oriented so that above 1 is a GAIN at every layer alike; the layers composed by the product law, R(g) = ∏ℓ Rℓ(g), log R = Σℓ log Rℓ (for small benefits the product is their sum), every interval carried (the exact Student t per run; A, B and C pooled by inverse variance; the layers' variances added); two readings of the same numbers (every measured piece: everything measured enters with its interval; the strict reading, the index's rule: only what held the same way in all three of our runs, everything else exactly 1); and the separability assumption tested on the governors' four ways. This section recomputes nothing from the tables: it regroups that file's layers into the two ways (docs/engine/export_whole.py), summing the logarithms of the layers a scenario stacks and adding their variances, as the file's rule composes any set of layers; the one number is the mean of the gauge logarithms, its 95% interval under the file's two bounds. The composition is a model (evidence class S) of class P and class L measurements under the separability assumption, and says so; no run has yet stacked every layer at once, and that stacked run is the measurement that would replace it. The chip's one measured run (2 October, on the card controller since replaced) stands beside the count by default, every row of it shown, as the repository's own headline has it; one click puts it in, until its omni-v13 run on Lambda replaces it. The machine (the kernel, bare metal, Kepler) is not yet run and enters as exactly 1, named. GAIN is green, LOSS red, EVEN yellow, power given blue, on every word, cell and tile.
 
 **The page, in its own words.**
 
@@ -373,7 +245,7 @@ DISCLOSURE: THE CLOUD'S BACK END IS NOT OURS TO METER. Through the cloud, the ba
 
 **Its monitors.**
 
-#### Monitor 11: The whole organism, composed
+### Monitor 11: The whole organism, composed
 
 The pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought.
 
@@ -383,7 +255,7 @@ The pieces of a stack, native beside Omni-Compass, each piece's composed factors
 - **How to read it.** Bars and tiles in the traffic light of the one key: GAIN green to one side, LOSS red to the other, EVEN yellow on zero, power given blue. A figure is a composition or a table's own word, never a single run's number.
 - **What to do with it.** Read the word before the size, and the interval before the word: an interval across zero is EVEN whatever its centre. A LOSS on the board is answered on the status board, with its cause and its knob.
 
-### 4 Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table
+## 4 Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table
 
 Everything the board in section 2 stands on, from the organisms down to the single muscle: the nine organisms under their three loads, all 1,107 muscles of the catalog one cell each, every registered benchmark still to run, the scale-out grid of copies and runs, and every three-run table in the repository with every row as it is written.
 
@@ -425,7 +297,7 @@ From results/realms_v5/REALMS_V5.json, the realms runner at the max, its engine 
 
 **Its monitors.**
 
-#### Monitor 12: The seven organisms, three loads
+### Monitor 12: The seven organisms, three loads
 
 Each organism's misses, work and energy against native under its own load, the climb and the line (the realms table).
 
@@ -435,7 +307,7 @@ Each organism's misses, work and energy against native under its own load, the c
 - **How to read it.** Each organism or grid square read by the one key: green GAIN, yellow EVEN, red LOSS, grey a single run, dashed not yet run.
 - **What to do with it.** A dashed square is pending runner capacity, never rented. A LOSS square names its organism, its size and its runs.
 
-#### Monitor 13: Every muscle of the catalog
+### Monitor 13: Every muscle of the catalog
 
 The 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle.
 
@@ -445,7 +317,7 @@ The 1,107 muscles as one matrix, each cell its word against native, by family an
 - **How to read it.** Every muscle of the catalog one cell, its word against native on its own load: green GAIN, yellow EVEN (pale: at its limit on native), red LOSS.
 - **What to do with it.** Click a cell to read the muscle: its family, realm, template, knob and its word under each load.
 
-#### Monitor 14: The scale-out grid
+### Monitor 14: The scale-out grid
 
 Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside.
 
@@ -455,9 +327,9 @@ Seven organisms × copies × runs: every square's word, modelled and with the re
 - **How to read it.** Each organism or grid square read by the one key: green GAIN, yellow EVEN, red LOSS, grey a single run, dashed not yet run.
 - **What to do with it.** A dashed square is pending runner capacity, never rented. A LOSS square names its organism, its size and its runs.
 
-### Part 5 of the page: Evidence by stack, from the cloud down to the chip
+## Part 5 of the page: Evidence by stack, from the cloud down to the chip
 
-### 5a Cloud providers: Azure, Google Cloud, Amazon Web Services
+## 5a Cloud providers: Azure, Google Cloud, Amazon Web Services
 
 In a cloud the one metric is the bill: whether the same workload costs less with Omni-Compass on top. Each provider's four test sets and their status.
 
@@ -487,7 +359,7 @@ The controller every cloud set runs (omni_controller/controller.py --give-back-o
 
 **Its monitors.**
 
-#### Monitor 15: Azure: the bill, run by run
+### Monitor 15: Azure: the bill, run by run
 
 Machine-hours billed and the bill at list price, native against Omni-Compass, every finished Azure set with its 95% interval, and the running set's repetitions done.
 
@@ -497,7 +369,7 @@ Machine-hours billed and the bill at list price, native against Omni-Compass, ev
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
 
-#### Monitor 16: Google Cloud: the gate and the bill
+### Monitor 16: Google Cloud: the gate and the bill
 
 The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.
 
@@ -507,7 +379,7 @@ The same monitor for Google Cloud: the hourly gate's reading (the key, the login
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
 
-#### Monitor 17: Amazon: the gate and the bill
+### Monitor 17: Amazon: the gate and the bill
 
 The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.
 
@@ -517,7 +389,7 @@ The same monitor for Amazon Web Services: the hourly gate's reading and, once a 
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
 
-#### Monitor 18: The cloud setting, live: native's machines
+### Monitor 18: The cloud setting, live: native's machines
 
 The shipped controller's cloud mode on the toy cluster: the cloud's own autoscaler alone.
 
@@ -527,7 +399,7 @@ The shipped controller's cloud mode on the toy cluster: the cloud's own autoscal
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
 
-#### Monitor 19: The cloud setting, live: Omni-Compass's machines
+### Monitor 19: The cloud setting, live: Omni-Compass's machines
 
 The same autoscaler with Omni-Compass parking a machine only after its trial, waking it on a breach.
 
@@ -537,7 +409,7 @@ The same autoscaler with Omni-Compass parking a machine only after its trial, wa
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
 
-### 5b Orchestrators and governors: every scheduler, queue and multi-cluster governor, native and with Omni-Compass on top
+## 5b Orchestrators and governors: every scheduler, queue and multi-cluster governor, native and with Omni-Compass on top
 
 These are the governors and orchestrators that sit between the work and the cluster: batch schedulers and job queues, multi-cluster governors, the default Kubernetes scheduler, GPU and edge orchestrators, and the rightsizing controllers. Each is benchmarked twice. First it runs native, as its owner ships it. Then it runs with Omni-Compass on top of it, on top of native. Each has three runs, and every row is shown. Every place below is laid out now and fills itself from the repository as each one lands. Until then it says what the repository holds, and nothing more.
 
@@ -559,7 +431,7 @@ Where each governor sits in the stack. Omni-Compass reads and writes on top of i
 
 **Its monitors.**
 
-#### Monitor 20: The orchestrators' road
+### Monitor 20: The orchestrators' road
 
 Every scheduler, queue and multi-cluster governor on its way through trial, A, B and C, on the engine that stands.
 
@@ -569,7 +441,7 @@ Every scheduler, queue and multi-cluster governor on its way through trial, A, B
 - **How to read it.** Each scheduler, queue and multi-cluster governor four ways: the organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator.
 - **What to do with it.** Only two of the four comparisons are Omni-Compass against its native (on top of the orchestrator; on the organism alone); the others are the orchestrator's own cost and are never counted as Omni-Compass's.
 
-#### Monitor 21: An orchestrator, four ways
+### Monitor 21: An orchestrator, four ways
 
 The organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator: the four arms of the chosen governor.
 
@@ -579,7 +451,7 @@ The organism alone, the orchestrator as shipped, Omni-Compass on the organism al
 - **How to read it.** Each scheduler, queue and multi-cluster governor four ways: the organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator.
 - **What to do with it.** Only two of the four comparisons are Omni-Compass against its native (on top of the orchestrator; on the organism alone); the others are the orchestrator's own cost and are never counted as Omni-Compass's.
 
-### 5c Kubernetes: official run playback
+## 5c Kubernetes: official run playback
 
 Playback of the official benchmark runs from their archived raw files: the native cluster and the Omni-Compass cluster under identical load, in 30-second bins, every file verified against its run's SHA-256 manifest.
 
@@ -613,7 +485,7 @@ From the repetition's own audit.jsonl: the minute and second of the decision, th
 
 **Its monitors.**
 
-#### Monitor 22: The official run's pipeline
+### Monitor 22: The official run's pipeline
 
 The chosen Kubernetes run played back from its archived files: where every repetition stands.
 
@@ -623,7 +495,7 @@ The chosen Kubernetes run played back from its archived files: where every repet
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-#### Monitor 23: The official run's heartbeat
+### Monitor 23: The official run's heartbeat
 
 Replicas, machines and the response line decision by decision, native beside Omni-Compass.
 
@@ -633,7 +505,7 @@ Replicas, machines and the response line decision by decision, native beside Omn
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-#### Monitor 24: The official run: response time candles
+### Monitor 24: The official run: response time candles
 
 Each repetition's response time range, native beside Omni-Compass.
 
@@ -643,7 +515,7 @@ Each repetition's response time range, native beside Omni-Compass.
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-#### Monitor 25: The official run: the heat map
+### Monitor 25: The official run: the heat map
 
 The chosen gauge across repetitions and time.
 
@@ -653,7 +525,7 @@ The chosen gauge across repetitions and time.
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-#### Monitor 26: The official run: paired bars
+### Monitor 26: The official run: paired bars
 
 Every repetition's paired difference, native against Omni-Compass.
 
@@ -663,7 +535,7 @@ Every repetition's paired difference, native against Omni-Compass.
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-#### Monitor 27: The official run: the repetitions
+### Monitor 27: The official run: the repetitions
 
 Each repetition's reading in the chosen gauge with its interval.
 
@@ -673,7 +545,7 @@ Each repetition's reading in the chosen gauge with its interval.
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-### 5d Kubernetes: per-repetition run telemetry
+## 5d Kubernetes: per-repetition run telemetry
 
 Per-run telemetry at one-second resolution, with the run's receipt and each repetition's score from the repository's own scorer.
 
@@ -693,7 +565,7 @@ These are the benchmark runs themselves, not a model: each three-run table's run
 
 **Its monitors.**
 
-#### Monitor 28: Per-repetition run telemetry
+### Monitor 28: Per-repetition run telemetry
 
 The archived capture of one repetition second by second: machines ready, CPU used, pods pending, the autoscaler's replicas, native beside Omni-Compass.
 
@@ -703,7 +575,7 @@ The archived capture of one repetition second by second: machines ready, CPU use
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-### 5e Kubernetes and cloud: the shipped controller's decision trace
+## 5e Kubernetes and cloud: the shipped controller's decision trace
 
 The shipped controller's decision trace, replayed from its own audit log one decision at a time: its inputs, its choice and its writes.
 
@@ -729,7 +601,7 @@ The paired change per 15 s tick, averaged over ten-minute blocks, with its 95% i
 
 **Its monitors.**
 
-#### Monitor 29: The shipped controller's trace: native
+### Monitor 29: The shipped controller's trace: native
 
 The controller every Kubernetes and cloud set runs, replayed decision by decision from its own audit: native's cluster.
 
@@ -739,7 +611,7 @@ The controller every Kubernetes and cloud set runs, replayed decision by decisio
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-#### Monitor 30: The shipped controller's trace: Omni-Compass
+### Monitor 30: The shipped controller's trace: Omni-Compass
 
 The same, Omni-Compass's cluster: every write, every trial, every hold.
 
@@ -749,7 +621,7 @@ The same, Omni-Compass's cluster: every write, every trial, every hold.
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-#### Monitor 31: The shipped controller's trace: the strip
+### Monitor 31: The shipped controller's trace: the strip
 
 The compass position, the force and the writes over the run.
 
@@ -759,7 +631,7 @@ The compass position, the force and the writes over the run.
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record.
 
-### 5f Hardware: the GPU card and the CPU host
+## 5f Hardware: the GPU card and the CPU host
 
 The highest-value integration point is the silicon itself, the chip at the far end of every stack: there the max rides each card's own limit, and every watt it takes is power given, shown beside the work it buys. Below: the slots for the metered GPU and CPU runs, every hardware run GitHub has started, then the models of one GPU card and one Linux host, native beside Omni-Compass.
 
@@ -771,11 +643,11 @@ Each stack is run twice on the same load and the same seed: native first, then O
 
 **Hardware runs: the slots for the metered GPU and CPU runs**
 
-The GPU runs on Lambda (class P: the card's own meter) and the CPU on its own machine (class P: the package's own energy counter, tools/run_cpu_power.py) are the most valuable receipts this engine will carry: the same work for less power on the chip itself. Their omni-v12 runs are not hooked up yet: each place is written here as the repository holds it and fills in, played back from its raw files like every Kubernetes run, the moment its three runs land. Until then the views below are the repository's own models of one GPU card and one Linux host (class S), run native and then with Omni-Compass on the same load and seed.
+The GPU runs on Lambda (class P: the card's own meter) and the CPU on its own machine (class P: the package's own energy counter, tools/run_cpu_power.py) are the most valuable receipts this engine will carry: the same work for less power on the chip itself. Their omni-v13 runs are not hooked up yet: each place is written here as the repository holds it and fills in, played back from its raw files like every Kubernetes run, the moment its three runs land. Until then the views below are the repository's own models of one GPU card and one Linux host (class S), run native and then with Omni-Compass on the same load and seed.
 
 **The GPU card, metered: the one real run, replayed second by second (class P, the card's own meter)**
 
-The only run in the repository where a real card's own meter recorded native beside Omni-Compass: an NVIDIA A10 on 2 October, ten paired repetitions of 600 s an arm, native (the card as shipped), Omni-Compass watching only (the switch OFF: it reads and writes nothing) and Omni-Compass governing the power limit, every sample of nvidia-smi (200 ms) and every write of the governor's own audit (results/gpu/run-20261002T082232Z, docs/engine/export_gpu_run.py). It ran the card controller of commit c908054, replaced since: its rows stand as that controller's record, every one shown, until the omni-v12 run on Lambda replaces it (one exact commit, the founder's order). Its own table, re-read by the one key:
+The only run in the repository where a real card's own meter recorded native beside Omni-Compass: an NVIDIA A10 on 2 October, ten paired repetitions of 600 s an arm, native (the card as shipped), Omni-Compass watching only (the switch OFF: it reads and writes nothing) and Omni-Compass governing the power limit, every sample of nvidia-smi (200 ms) and every write of the governor's own audit (results/gpu/run-20261002T082232Z, docs/engine/export_gpu_run.py). It ran the card controller of commit c908054, replaced since: its rows stand as that controller's record, every one shown, until the omni-v13 run on Lambda replaces it (one exact commit, the founder's order). Its own table, re-read by the one key:
 
 **The CPU host: built and waiting for its machine (a model of a machine until then, class S)**
 
@@ -801,7 +673,7 @@ Read from the replayed record itself, second by second, in each of the three run
 
 **Its monitors.**
 
-#### Monitor 32: The GPU card, metered: the one real run
+### Monitor 32: The GPU card, metered: the one real run
 
 The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit, clock and temperature, requests served and the 95th percentile, native beside Omni-Compass governing (or watching only), every write of the governor marked.
 
@@ -811,7 +683,7 @@ The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit,
 - **How to read it.** The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.
 - **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v12 run lands.
 
-#### Monitor 33: The CPU host, metered: awaiting its machine
+### Monitor 33: The CPU host, metered: awaiting its machine
 
 The CPU power harness on the host: the frequency ceiling, the clock run at, the package power and the response line, native beside Omni-Compass; today its own modelled machine (class S), the real run the day a machine with its meter runs it.
 
@@ -821,7 +693,7 @@ The CPU power harness on the host: the frequency ceiling, the clock run at, the 
 - **How to read it.** The processor's frequency ceiling (the knob), the clock the kernel's own governor ran at under it, the package power and the busy share, native beside Omni-Compass.
 - **What to do with it.** Until a machine with its energy counter runs it, the monitor plays the harness's own modelled machine: read the mechanism, never the numbers.
 
-#### Monitor 34: An 8-card node: built and awaiting its run
+### Monitor 34: An 8-card node: built and awaiting its run
 
 Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one-card model (class S), each Omni-Compass lane empty until the 8-card run lands, 24 paired repetitions a test pooled across the cards.
 
@@ -831,7 +703,7 @@ Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one
 - **How to read it.** The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.
 - **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v12 run lands.
 
-#### Monitor 35: The chip and the host, modelled
+### Monitor 35: The chip and the host, modelled
 
 The repository's own models of one GPU card and one Linux host, native beside Omni-Compass, second by second (class S).
 
@@ -841,9 +713,9 @@ The repository's own models of one GPU card and one Linux host, native beside Om
 - **How to read it.** The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.
 - **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v12 run lands.
 
-### Part 6 of the page: The organism, live: native and Omni-Compass
+## Part 6 of the page: The organism, live: native and Omni-Compass
 
-### 6a The organism, live: native and Omni-Compass
+## 6a The organism, live: native and Omni-Compass
 
 The system rendered as an organism: each node is a muscle (one controlled actuator) and each ring its operating range. The left instance runs under its native controllers alone; the right runs the same controllers with Omni-Compass's brain, nerves, heart and immune system supervising them. Evidence class S: our own models, shown beside the real runs and never presented as proof.
 
@@ -869,7 +741,7 @@ The body keeps itself healthy the way a human body does. Every room and every ma
 
 **Its monitors.**
 
-#### Monitor 36: The organism, live: native
+### Monitor 36: The organism, live: native
 
 Sixty muscles of the stress model, each on its own native controller, at their positions in the band.
 
@@ -879,7 +751,7 @@ Sixty muscles of the stress model, each on its own native controller, at their p
 - **How to read it.** The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.
 - **What to do with it.** Turn the console's knobs (demand, noise, sensor delay, faults) and watch both arms take the same input; the difference between the lanes is what Omni-Compass did.
 
-#### Monitor 37: The organism, live: Omni-Compass
+### Monitor 37: The organism, live: Omni-Compass
 
 The same sixty muscles with Omni-Compass on top of their native controllers, the brain's grants and pushes.
 
@@ -889,7 +761,7 @@ The same sixty muscles with Omni-Compass on top of their native controllers, the
 - **How to read it.** The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.
 - **What to do with it.** Turn the console's knobs (demand, noise, sensor delay, faults) and watch both arms take the same input; the difference between the lanes is what Omni-Compass did.
 
-#### Monitor 38: The immune system
+### Monitor 38: The immune system
 
 Where the two sides differ, and the body's heat debt: a room warmer than its native twin, inflamed, given back.
 
@@ -899,7 +771,7 @@ Where the two sides differ, and the body's heat debt: a room warmer than its nat
 - **How to read it.** The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.
 - **What to do with it.** Turn the console's knobs (demand, noise, sensor delay, faults) and watch both arms take the same input; the difference between the lanes is what Omni-Compass did.
 
-#### Monitor 39: The swarm
+### Monitor 39: The swarm
 
 The robot swarm's missions, native beside Omni-Compass with the proximity reflex.
 
@@ -909,7 +781,7 @@ The robot swarm's missions, native beside Omni-Compass with the proximity reflex
 - **How to read it.** The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.
 - **What to do with it.** Turn the console's knobs (demand, noise, sensor delay, faults) and watch both arms take the same input; the difference between the lanes is what Omni-Compass did.
 
-### 6b Telemetry analytics and Omni-Compass in its own words
+## 6b Telemetry analytics and Omni-Compass in its own words
 
 The same telemetry analysed four ways: a three-dimensional tensor view, a difference matrix, a principal-component decomposition and Omni-Compass's own account of its run; the service level and error budget in SRE terms; and Omni-Compass answering the viewer's questions about itself from the page's own records.
 
@@ -943,7 +815,7 @@ Omni-Compass's answers are drawn from this page's records and are not reviewed b
 
 **Its monitors.**
 
-#### Monitor 40: Telemetry tensor: the cube
+### Monitor 40: Telemetry tensor: the cube
 
 The organism's telemetry as a tensor (muscle × gauge × time), native beside Omni-Compass.
 
@@ -953,7 +825,7 @@ The organism's telemetry as a tensor (muscle × gauge × time), native beside Om
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-#### Monitor 41: Telemetry tensor: the difference
+### Monitor 41: Telemetry tensor: the difference
 
 The difference of the two sides' tensors, cell by cell.
 
@@ -963,7 +835,7 @@ The difference of the two sides' tensors, cell by cell.
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-#### Monitor 42: Telemetry tensor: the modes
+### Monitor 42: Telemetry tensor: the modes
 
 The principal modes of the telemetry (its matrix decomposed).
 
@@ -973,7 +845,7 @@ The principal modes of the telemetry (its matrix decomposed).
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-#### Monitor 43: Service level: the objective
+### Monitor 43: Service level: the objective
 
 Time inside the response line against the objective, native beside Omni-Compass.
 
@@ -983,7 +855,7 @@ Time inside the response line against the objective, native beside Omni-Compass.
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-#### Monitor 44: Service level: the error budget burn
+### Monitor 44: Service level: the error budget burn
 
 How fast each side burns its error budget.
 
@@ -993,7 +865,7 @@ How fast each side burns its error budget.
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-#### Monitor 45: Telemetry radar
+### Monitor 45: Telemetry radar
 
 Every gauge family on one radar, native beside Omni-Compass.
 
@@ -1003,7 +875,7 @@ Every gauge family on one radar, native beside Omni-Compass.
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-### 7 Control console: every runtime control of the live engine
+## 7 Control console: every runtime control of the live engine
 
 The engine these knobs turn is the engine's own mathematics running in this page: the brain (omnicompass/core.py, integrated by RK4), the compass law (omnicompass/compass_law.py) and the verdict (omnicompass/verdict.py). docs/engine/check_live_engine.py proves the port equal to the Python and the C++ on every build. It governs the stress-test model's sixty muscles (class S), each on top of its own native controller. Every knob acts on both sides at once, the same demand, the same draw of noise, the same lost pool, so the one difference left between them is Omni-Compass. The knobs move the live engine in sections 6a and 8a to 8c, and the kill switch and the frame load also move this page's own renderer (section 11). A recorded run (the benefit board, the chips' and Kubernetes' replays, the official runs) is a record: no knob rewrites it.
 
@@ -1023,7 +895,7 @@ What these controls do. Runtime parameter control and fault injection on the liv
 
 **Its monitors.**
 
-#### Monitor 46: The console's response
+### Monitor 46: The console's response
 
 The live engine's response to every knob of the console, plotted per decision, native beside Omni-Compass.
 
@@ -1033,7 +905,7 @@ The live engine's response to every knob of the console, plotted per decision, n
 - **How to read it.** The live engine's response to every knob, native beside Omni-Compass, and the page's own frame budget.
 - **What to do with it.** Every knob acts on both arms alike; the difference between them is Omni-Compass's doing alone.
 
-#### Monitor 47: The frame budget
+### Monitor 47: The frame budget
 
 The time between frames of this page against its line under the frame load knob.
 
@@ -1043,9 +915,9 @@ The time between frames of this page against its line under the frame load knob.
 - **How to read it.** The live engine's response to every knob, native beside Omni-Compass, and the page's own frame budget.
 - **What to do with it.** Every knob acts on both arms alike; the difference between them is Omni-Compass's doing alone.
 
-### Part 8 of the page: Control architecture: the brain
+## Part 8 of the page: Control architecture: the brain
 
-### 8a One control cycle, traced step by step
+## 8a One control cycle, traced step by step
 
 One control cycle traced end to end at reduced speed: the sensed inputs, the brain's decision, and the actuator (muscle) it wrote. Evidence class S: our own models, shown beside the real runs and never presented as proof.
 
@@ -1063,7 +935,7 @@ Each stress lasts 40 decisions from the moment you press it. Both arms meet the 
 
 **Its monitors.**
 
-#### Monitor 48: One control cycle, traced
+### Monitor 48: One control cycle, traced
 
 The compass band with its cushions, the two forces and one decision, step by step.
 
@@ -1073,7 +945,7 @@ The compass band with its cushions, the two forces and one decision, step by ste
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### 8b Phase plane and scoreboard
+## 8b Phase plane and scoreboard
 
 The phase-plane state of every muscle (its position and velocity in its band) for both arms at the same instant, with the running scoreboard. Evidence class S: our own models, shown beside the real runs and never presented as proof.
 
@@ -1097,7 +969,7 @@ How each row is read: the paired change, native against Omni-Compass at the same
 
 **Its monitors.**
 
-#### Monitor 49: Phase plane: native
+### Monitor 49: Phase plane: native
 
 Native's muscles in position and velocity.
 
@@ -1107,7 +979,7 @@ Native's muscles in position and velocity.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-#### Monitor 50: Phase plane: Omni-Compass
+### Monitor 50: Phase plane: Omni-Compass
 
 Omni-Compass's muscles in position and velocity, the band's walls drawn.
 
@@ -1117,7 +989,7 @@ Omni-Compass's muscles in position and velocity, the band's walls drawn.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-#### Monitor 51: The scoreboard strip
+### Monitor 51: The scoreboard strip
 
 Breaches, writes, holds and the brain's calm over the day, native beside Omni-Compass.
 
@@ -1127,7 +999,7 @@ Breaches, writes, holds and the brain's calm over the day, native beside Omni-Co
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### 8c The brain's internal state
+## 8c The brain's internal state
 
 The brain's six state variables rendered on their potential-energy landscapes: a state resting at a minimum is stable; a state driven toward a maximum is under load. Evidence class S: our own models, shown beside the real runs and never presented as proof.
 
@@ -1143,11 +1015,11 @@ V(U) = −μ(U²/2 − U⁴/4) + (Ė/E_max)·U. A rising E tilts the well toward
 
 **S in its potential Φ · eqs. (5)–(6)**
 
-Φ(S) = α_s S²/2 + β_s S³/4 − δS. S rolls to S*; the senses pull it back each decision.
+Φ(S) = αₛ S²/2 + βₛ S³/4 − δS. S rolls to S*; the senses pull it back each decision.
 
 **The bath B · eq. (7)**
 
-B̈ = γ_c δ S − (ω_B/Q_B) Ḃ − ω_B² B. The slow tide of physical load.
+B̈ = γ[c] δ S − (ω[B]/Q[B]) Ḃ − ω[B]² B. The slow tide of physical load.
 
 **Native, the same decisions: what its own controllers read and do**
 
@@ -1161,7 +1033,7 @@ calm = κ·h·(1 − (σ − 1)⁺)·(1 − min(ν, 1)). An organ may hand capac
 
 **Its monitors.**
 
-#### Monitor 52: The brain's state: the well
+### Monitor 52: The brain's state: the well
 
 The brain's double-well potential and where its state sits.
 
@@ -1171,7 +1043,7 @@ The brain's double-well potential and where its state sits.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-#### Monitor 53: The brain's state: the six variables
+### Monitor 53: The brain's state: the six variables
 
 E, U, I, S, B and C integrated by RK4 every decision.
 
@@ -1181,7 +1053,7 @@ E, U, I, S, B and C integrated by RK4 every decision.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-#### Monitor 54: The brain's state: the organs
+### Monitor 54: The brain's state: the organs
 
 Each organ's grant to expand or contract, decision by decision.
 
@@ -1191,7 +1063,7 @@ Each organ's grant to expand or contract, decision by decision.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-#### Monitor 55: Native's own controller beside the brain
+### Monitor 55: Native's own controller beside the brain
 
 What native's controller would do at the same decision, beside the brain's grant.
 
@@ -1201,25 +1073,25 @@ What native's controller would do at the same decision, beside the brain's grant
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### 8d The verdict: change acceptance testing
+## 8d The verdict: change acceptance testing
 
 The change-acceptance test. Each step is trialled against native and kept unless the measurement reads LOSS or its estimated cost exceeds the 2% allowance. An EVEN result (no difference resolvable from the noise) is also accepted, so on high-variance workloads a step with a small true cost can pass; the lab below measures that false-acceptance rate.
 
 **The page, in its own words.**
 
-Before a knob moves one step past native, the step runs as a trial: costs at native first, then at the step. omni-v12 reads the change exactly as a report reads a row, on the log of each cost, with its 95% interval. Set what the step truly costs and watch the rule decide. It opens wired as the shipped Kubernetes controller is wired, on the noise the real runs measured.
+Before a knob moves one step past native, the step runs as a trial: costs at native first, then at the step. omni-v13 reads the change exactly as a report reads a row, on the log of each cost, with its 95% interval. Set what the step truly costs and watch the rule decide. It opens wired as the shipped Kubernetes controller is wired, on the noise the real runs measured.
 
 **This trial**
 
 **Over many trials at this cost**
 
-Native: its knob never moves past its own setting, so there is no trial and nothing to judge; every step Omni-Compass takes past native has to pass this test first. The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v12's rule also refuses any step whose interval sits wholly above zero. It measures on while the interval is wider than the allowance, up to three times the pieces measured each side. It keeps a step only if both estimates are inside the allowance. Ported from omnicompass/verdict.py; the costs are modelled (class S).
+Native: its knob never moves past its own setting, so there is no trial and nothing to judge; every step Omni-Compass takes past native has to pass this test first. The medians alone allow a step when the trial's median is within the allowance of the reference's. omni-v13's rule (omni-v12's, unchanged) also refuses any step whose interval sits wholly above zero. It measures on while the interval is wider than the allowance, up to three times the pieces measured each side. It keeps a step only if both estimates are inside the allowance. Ported from omnicompass/verdict.py; the costs are modelled (class S).
 
 How each muscle wires it. The Kubernetes controller measures 200 requests each side against a 2% allowance (omni_controller/controller.py --verdict-samples 200 --allow 0.02), the cost being each request's response time. The noise is measured at every build on each request of the newest tables' own runs. The σ 0.05 and 0.25 this page carried before 19 October did not come from these files and are withdrawn. The GPU card measures 30 requests (gpu_compass.py --verdict-samples 30); in its model the card's own time per request carries no noise. The toy gate measures 60 (tools/toy_gate.py, σ 0.25). What the rule does there is computed live in this page as you read: trials at each cost with this lab's own rule, 200 requests a side to start (the trial side measured on to 600 while its interval is wider than the allowance), a 2% allowance and the measured σ (modelled, class S). With noise this wide, 200 requests a side do not refuse a small LOSS on their own; with no noise any LOSS it can read is refused, even 0.1%. A larger sample would refuse more, and any change to the rule or its sample is the next engine version, landed through the toy gate and told to the founder (his order of 19 October). Above the verdict the max never goes below native at all, so in the default it never runs (section 5e: no trial on top of the HPA).
 
 **Its monitors.**
 
-#### Monitor 56: The verdict: one trial
+### Monitor 56: The verdict: one trial
 
 A give-back trial judged against native: its reference, its step, its interval and the word.
 
@@ -1229,7 +1101,7 @@ A give-back trial judged against native: its reference, its step, its interval a
 - **How to read it.** A give-back trial judged against native: its reference, its step, its interval, the word; then the keep ratio at every true cost.
 - **What to do with it.** A step is kept only when its interval stays inside the allowance; a refused step leaves the muscle where native had it.
 
-#### Monitor 57: The verdict: every true cost
+### Monitor 57: The verdict: every true cost
 
 The keep ratio of the verdict at each true cost, from trials run in this page's idle time.
 
@@ -1239,7 +1111,7 @@ The keep ratio of the verdict at each true cost, from trials run in this page's 
 - **How to read it.** A give-back trial judged against native: its reference, its step, its interval, the word; then the keep ratio at every true cost.
 - **What to do with it.** A step is kept only when its interval stays inside the allowance; a refused step leaves the muscle where native had it.
 
-### 9 Failure modes, controls and residual risk
+## 9 Failure modes, controls and residual risk
 
 The failure-mode register: every known way Omni-Compass can fall short, the control that mitigates it, that control's coverage, and the residual risk where it does not reach. Every failure mode the live engine can be put through has a fault-injection control; trigger it and observe both arms on the console. Below: the resource costs the three-run tables report but do not judge.
 
@@ -1253,7 +1125,7 @@ The failure-mode register: every known way Omni-Compass can fall short, the cont
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-### 10 Component specification and mathematics
+## 10 Component specification and mathematics
 
 The component specification: every part, its equations and the source module that implements it, in Unicode as the repository writes them.
 
@@ -1269,7 +1141,7 @@ Items 1 to 5 and 8 are the engine’s code and run in every view. Items 6 and 7 
 
 **What is the engine's code**
 
-The six-state engine, its constants and RK4 integrator, the assimilation, push and ρ*, the four nerve scalars and the organ thresholds, the compass law and the verdict in words are ported from omnicompass/core.py, adapter.py, nervous_system.py, compass_law.py and verdict.py at commit c8ba7775d. All are inside the omni-v12 fingerprint. omni-v9 added omnicompass/student_t.py, and the page carries its Student t too, computed by bisection on its own distribution and rounded to three decimals as the printed tables are. omni-v10 changed only the CityLearn wire's glide, omni-v11 only the Kubernetes governor's blind-reading guard, and omni-v12 only that governor's hold on a refused raise. Checked against the Python on seeded inputs (docs/engine/check_live_engine.py): 8,000 decisions of the governor (state, push, ρ*, κ, h, σ, ν, calm), 48,000 organ grants, 4,800 compass forces, 300 verdict intervals and 400 full verdict trials. A build passes only when the largest difference is under 10⁻¹², no grant and no verdict differs, and the Student t is equal on all 500 degrees of freedom checked. And against the C++ twin of the core (cpp/src/core.cpp, compiled by the check with docs/engine/cpp_core_probe.cpp): 2,000 seeded states, the derivative and the RK4 step within 10⁻¹² of each other. The check prints its own measured differences in each build's report on GitHub. The page's engine, the Python and the C++ are one engine. The harness views are not ported: they are the harness’s own record, made by its code.
+The six-state engine, its constants and RK4 integrator, the assimilation, push and ρ*, the four nerve scalars and the organ thresholds, the compass law and the verdict in words are ported from omnicompass/core.py, adapter.py, nervous_system.py, compass_law.py and verdict.py at commit c8ba7775d. All are inside the omni-v13 fingerprint, the same bytes as omni-v12's. omni-v9 added omnicompass/student_t.py, and the page carries its Student t too, computed by bisection on its own distribution and rounded to three decimals as the printed tables are. omni-v10 changed only the CityLearn wire's glide, omni-v11 only the Kubernetes governor's blind-reading guard, omni-v12 only that governor's hold on a refused raise, and omni-v13 only the governor's conveyance on a shared host at its top. Checked against the Python on seeded inputs (docs/engine/check_live_engine.py): 8,000 decisions of the governor (state, push, ρ*, κ, h, σ, ν, calm), 48,000 organ grants, 4,800 compass forces, 300 verdict intervals and 400 full verdict trials. A build passes only when the largest difference is under 10⁻¹², no grant and no verdict differs, and the Student t is equal on all 500 degrees of freedom checked. And against the C++ twin of the core (cpp/src/core.cpp, compiled by the check with docs/engine/cpp_core_probe.cpp): 2,000 seeded states, the derivative and the RK4 step within 10⁻¹² of each other. The check prints its own measured differences in each build's report on GitHub. The page's engine, the Python and the C++ are one engine. The harness views are not ported: they are the harness’s own record, made by its code.
 
 **The two bodies**
 
@@ -1277,7 +1149,7 @@ The realms harness (the default). The sixty muscles are one organism of realms/h
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-### 11 Self-governed rendering: Omni-Compass inside this page
+## 11 Self-governed rendering: Omni-Compass inside this page
 
 The page's own render loop is governed by the same compass law, measured on the client device, native beside Omni-Compass.
 
@@ -1295,7 +1167,7 @@ The engine that runs this page has Omni-Compass in it. Native is the browser's o
 
 **Its monitors.**
 
-#### Monitor 58: Self-governed rendering
+### Monitor 58: Self-governed rendering
 
 This page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass.
 
@@ -1305,7 +1177,7 @@ This page's own render loop governed by the compass law: the frame time against 
 - **How to read it.** This page's own render loop governed by the compass law: the time between frames against its line, native (no governor) beside Omni-Compass.
 - **What to do with it.** Load the page with the frame-load knob and watch the governor shed chart frames to keep every frame inside its line.
 
-### v Disclosures, governing law and contact
+## v Disclosures, governing law and contact
 
 **The page, in its own words.**
 
@@ -1317,40 +1189,8 @@ This page's own render loop governed by the compass law: the frame time against 
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
-## Part III. Operating it as the engineer in charge
 
-### Watching: the first minute and the first hour
-
-- **The first minute.** Read the switch (ON green, or engaged red with OFF white). Read the status board's tiles: whether Omni-Compass is engaged, which signals are out of tolerance. Read the alarms, worst first: every LOSS row of every table is raised there with its source record.
-- **The first hour.** Watch the golden signals of the live organism (errors, throughput, latency, saturation), native beside Omni-Compass. Turn the console's knobs one at a time (demand, noise, sensor delay, a fault) and read how both arms take the same input. An alert minute is a whole minute whose 95th percentile, failed requests counted over, was over the line: a minute an on-call page would be open. Omni-Compass aims at none: an alert minute on its arm is found and fixed, never accepted.
-- **No babysitting tax.** Omni-Compass is an autopilot: nobody turns a knob for it and nobody checks its work by hand. Every write is read back, every give-back runs on its own trial, every reason is in its audit; the settings it wrote on its own and its additions made inside the line are shown on every Kubernetes and cloud receipt.
-
-### When a row reads LOSS
-
-A LOSS row is never cut and never tuned away. The rule: first suspect the wiring, the native setup or the scoring; find where the mechanism or its wiring is wrong and correct that, in the toy gate first (`tools/toy_gate.py`), never in a real run; a change that reads no LOSS in the gate lands as the next engine version and every benchmark runs again on it. Where no setting of the muscle's knob brings the row EVEN, the muscle stays native on that stack: if Omni-Compass would hurt something, no mechanism of Omni-Compass is pushed through that muscle. The status board's table of LOSS rows names, for every one, whose row it is (Omni-Compass against its native, or an orchestrator's own cost with no Omni-Compass in either arm), its cause as the repository records it, and the knob that answers it; Appendix C lists them all.
-
-### Tuning and tweaking
-
-- **The dial.** The max, the default brain: every muscle runs at its own limit, never past it and never below native. The tune-down: never more than native; capacity handed back only with the organ's grant and the release gate. In the cloud every set runs at the tune-down on the machines alone, so the bill can only fall or stay.
-- **A muscle's own card.** Every muscle is wired on its own setting (`realms/muscle_cards_v5.csv`, the engine's setting otherwise): its band, cushions and glide. The factory tune is the owner's; a licensee may retune, add on or tune down any muscle, and a changed tune's results are its own (`DISCLOSURES.md` section 3).
-- **The next version.** Any change to a rule, gain, guard, preset or muscle makes the next engine version: built on its own branch, tried in the toy gate against the engine that stands, landed with `tools/land_engine.py` when it reads no LOSS, and every benchmark run again on it.
-
-### What waits, and what fills it
-
-- **The GPU card.** The one metered run is the replaced controller's (2 October); the omni-v12 run on Lambda, from one exact commit given to the founder, replaces it.
-- **The CPU host.** A Linux machine whose processor exposes its energy counter (RAPL) and a writable frequency ceiling (register row 79, `cpu-power.yml`); until then the monitor plays the harness's own modelled machine.
-- **Azure.** The set to the paid cap runs now: 34 of 100 repetitions measured at the build, under the stopping rule (the bill read at 10, 20, 40 and 70 repetitions with 99% intervals); its table is written when the set ends.
-- **Google Cloud.** GCP_CREDENTIALS: it does not start with { (595 characters stored; a whole key is about 2,300 to 2,400 characters, from { to }); it is not the key file. Nothing built, nothing billed. Store the key again, whole: docs/GOOGLE_SETUP.md, section 4 (download the key file and paste all of it).
-- **Amazon Web Services.** pre-flight: the AWS account is on Amazon's Free plan, which denies every machine read; upgrade it to the Paid plan (docs/AMAZON_SETUP.md, section 1a; the credits still pay first). Nothing built, nothing billed. (AWS said:  aws: [ERROR]: An error occurred (UnauthorizedOperation) when calling the DescribeInstanceTypes operation: You are not authorized to perform this operation. User: arn:aws:iam::291796570595:user/omni-compass-github is not authorized to perform: ec2:DescribeInstanceTypes with an explicit deny in a service control policy: arn:aws:organizations::255330795167:policy/o-dhvcfsdewg/service_control_policy/)
-- **The stacked run.** The whole stack in one run, Omni-Compass at every piece at once against native at every piece, preregistered in `docs/WHOLE_SYSTEM_PREREGISTRATION.md`; until it runs, section 3 is a composition.
-
-### Rebuilding the page and the book
-
-The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`, `docs/engine/build_live_engine.py`) whenever the engine, a model or a result changes, and every three hours; `build_live_engine.py --check` rebuilds every record in memory and fails if any differs from the page; `docs/engine/check_live_engine.py` proves the page's engine equal to the Python and the C++; `docs/engine/check_records.py` reproduces every record from the repository's own code; `tools/engine_runs.py --verify` runs the page's own loop of the Python's runs in node and compares the digests. This book is rebuilt from the page with `python3 docs/book/build_live_manual.py`.
-
-## Back matter
-
-### Appendix A. Every monitor
+## Every monitor
 
 | No. | Monitor | Section | Class | State |
 |---|---|---|---|---|
@@ -1413,7 +1253,7 @@ The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`, `docs
 | 57 | The verdict: every true cost | 8d The verdict | S | live |
 | 58 | Self-governed rendering | 11 Self-governed rendering | S | live |
 
-### Appendix B. Every knob
+## Every knob
 
 | Knob | What it does | Where it is |
 |---|---|---|
@@ -1444,7 +1284,7 @@ The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`, `docs
 | Reading direction | the wall read right to left (as set) or left to right | the wall's own button |
 | Seed base | which held-out seed base's 500 scenarios are replayed | the monitor's own buttons |
 
-### Appendix C. Every LOSS row, whose it is, its cause and the knob that answers it
+## Every LOSS row, whose it is, its cause and the knob that answers it
 
 5 LOSS rows are Omni-Compass against its native; 75 are an orchestrator's own cost against the organism alone, with no Omni-Compass in either arm. Every one is shown as its table writes it.
 
@@ -1453,96 +1293,81 @@ The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`, `docs
 - **Omni-Compass against native.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BARE.md`): response time (ms), 99th percentile, A B C +9.8% (+1.5 to +18.0) · +4.4% (+0.1 to +8.7) · +13.0% (+4.7 to +21.2). Cause: Amendment 10: what the counted runs of 20 October found (written after those runs, before the Gödel runs start again) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row EVEN in the toy gate, the muscle stays native on this stack.
 - **Omni-Compass against native.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BARE.md`): batch: queue finished (s), A B C +0.8% (+0.1 to +1.5) · +0.7% (+0.2 to +1.2) · +0.6% (+0.2 to +1.1). Cause: Amendment 10: what the counted runs of 20 October found (written after those runs, before the Gödel runs start again) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the muscle's own card (its band, cushions and glide); a setting that reads LOSS in the toy gate is refused and the muscle stays native.
 - **Omni-Compass against native.** The Kubernetes scheduler as shipped under the batch stream (omni-v12, `results/live/V12_VANILLA.md`): queue: job turnaround, submitted to done, mean (s), A B C +0.9% (+0.2 to +1.7) · +0.9% (+0.1 to +1.6) · +1.2% (+0.6 to +1.8). Cause: Amendment 5: the governor's own core (written before any run on it, 20 October 2026) (`docs/BATCH_QUEUE_PREREGISTRATION.md`). The knob: the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row EVEN in the toy gate, the muscle stays native on this stack.
-- **the orchestrator’s own cost.** The Kubernetes scheduler with the operator's bin-packing profile under the batch stream, the four ways (omni-v12, `results/live/V12_BINPACK_4W_VS.md`): time over the response line (% of samples), A B C +21.1% (+5.3 to +36.8) · +37.2% (+12.4 to +61.9) · +29.8% (+1.0 to +58.6). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_BOTH.md`): pod start wait, total (s), A B C +80.9% (+32.7 to +129.0) · +68.8% (+12.8 to +124.7) · +71.8% (+31.7 to +112.0). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_ORCH.md`): response time (ms), mean, A B C +2.6% (+0.7 to +4.4) · +3.2% (+0.5 to +5.9) · +2.9% (+0.9 to +5.0). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_VS.md`): pod start wait, total (s), A B C +60.3% (+28.4 to +92.2) · +56.1% (+0.6 to +111.6) · +51.9% (+20.4 to +83.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): response time (ms), 95th percentile, A B C +41.9% (+11.7 to +72.1) · +45.9% (+20.6 to +71.1) · +57.5% (+32.2 to +82.7). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): response time (ms), 99th percentile, A B C +45.2% (+12.1 to +78.2) · +48.9% (+22.4 to +75.5) · +62.1% (+33.1 to +91.1). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): batch: queue finished (s), A B C +5.1% (+1.7 to +8.5) · +6.9% (+3.4 to +10.3) · +5.1% (+3.0 to +7.3). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1753.8% (+1040.8 to +2466.9) · +1626.7% (+910.1 to +2343.3) · +915.8% (+807.5 to +1024.0). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +550.0% (+38.6 to +1061.4) · +650.0% (+129.0 to +1171.0) · +128.6% (+70.6 to +186.6). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +48.0% (+17.8 to +78.1) · +51.3% (+28.0 to +74.7) · +52.5% (+31.0 to +73.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): response time (ms), mean, A B C +13.2% (+1.6 to +24.8) · +15.8% (+8.1 to +23.5) · +18.3% (+7.5 to +29.1). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): response time (ms), 95th percentile, A B C +38.1% (+7.2 to +69.0) · +41.1% (+19.5 to +62.6) · +50.8% (+22.6 to +79.0). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): response time (ms), 99th percentile, A B C +39.9% (+7.8 to +72.1) · +44.0% (+23.2 to +64.9) · +61.3% (+30.8 to +91.7). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): batch: queue finished (s), A B C +4.2% (+1.6 to +6.9) · +5.7% (+2.8 to +8.6) · +4.6% (+2.7 to +6.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1461.5% (+1162.4 to +1760.7) · +1613.3% (+1157.7 to +2069.0) · +968.4% (+828.5 to +1108.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +300.0% (+115.3 to +484.7) · +550.0% (+225.7 to +874.3) · +100.0% (+31.0 to +169.0). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +40.1% (+16.1 to +64.0) · +42.1% (+24.1 to +60.0) · +45.2% (+26.8 to +63.6). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): response time (ms), mean, A B C +45.7% (+15.8 to +75.5) · +33.1% (+14.0 to +52.3) · +25.0% (+7.6 to +42.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): response time (ms), 95th percentile, A B C +81.3% (+33.4 to +129.1) · +62.1% (+27.0 to +97.3) · +38.8% (+13.8 to +63.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): response time (ms), 99th percentile, A B C +73.4% (+34.4 to +112.5) · +64.1% (+30.5 to +97.7) · +36.5% (+13.7 to +59.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): time over the response line (% of samples), A B C +17.9% (+8.8 to +27.1) · +12.6% (+0.3 to +25.0) · +22.4% (+7.1 to +37.8). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +45.1% (+21.3 to +68.9) · +34.5% (+21.0 to +48.0) · +30.8% (+18.3 to +43.2). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): batch: queue finished (s), A B C +16.5% (+7.4 to +25.6) · +15.7% (+8.5 to +23.0) · +14.3% (+5.7 to +22.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +180.0% (+82.2 to +277.8) · +183.3% (+52.1 to +314.5) · +24360.0% (+1893.1 to +46826.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +83.0% (+40.0 to +126.1) · +78.2% (+42.6 to +113.8) · +57.9% (+24.1 to +91.8). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): response time (ms), mean, A B C +27.9% (+13.5 to +42.3) · +20.4% (+10.8 to +30.0) · +21.6% (+7.9 to +35.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): response time (ms), 95th percentile, A B C +51.1% (+21.9 to +80.2) · +38.9% (+18.4 to +59.5) · +35.4% (+13.9 to +56.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): response time (ms), 99th percentile, A B C +54.9% (+23.6 to +86.2) · +47.7% (+25.1 to +70.2) · +31.3% (+13.1 to +49.6). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +34.3% (+13.3 to +55.3) · +22.1% (+12.1 to +32.1) · +31.7% (+8.1 to +55.3). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): batch: queue finished (s), A B C +11.7% (+5.1 to +18.3) · +11.2% (+6.1 to +16.2) · +11.0% (+5.0 to +16.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +58.2% (+28.9 to +87.5) · +56.1% (+30.6 to +81.6) · +44.2% (+20.7 to +67.7). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): batch: queue finished (s), A B C +79.6% (+57.4 to +101.8) · +82.5% (+72.2 to +92.7) · +90.2% (+71.9 to +108.5). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +332575.0% (+204178.2 to +460971.8) · +701433.3% (+502619.2 to +900247.5) · +227980.0% (+149811.1 to +306148.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +172733.3% (+104746.8 to +240719.9) · +763800.0% (+530043.0 to +997557.0) · +136780.0% (+86044.3 to +187515.7). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1607.8% (+1081.3 to +2134.4) · +849.4% (+675.6 to +1023.2) · +1322.9% (+1027.8 to +1618.1). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): batch: queue finished (s), A B C +76.5% (+54.1 to +98.9) · +82.5% (+72.8 to +92.1) · +86.9% (+68.4 to +105.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +310637.5% (+166814.0 to +454461.0) · +686083.3% (+439006.5 to +933160.2) · +233933.3% (+162122.7 to +305743.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +171200.0% (+91149.9 to +251250.1) · +797900.0% (+545467.5 to +1050332.5) · +139600.0% (+101748.5 to +177451.5). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1512.7% (+1011.0 to +2014.4) · +831.8% (+691.5 to +972.0) · +1276.6% (+979.1 to +1574.2). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_VS.md`): response time (ms), 95th percentile, A B C +191.2% (+63.6 to +318.8) · +485.5% (+212.9 to +758.0) · +285.6% (+106.4 to +464.8). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_VS.md`): response time (ms), 99th percentile, A B C +181.3% (+56.9 to +305.8) · +481.6% (+212.0 to +751.1) · +285.0% (+116.9 to +453.1). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_VS.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +4.9 (+0.7503 to +9.05) · +8900.0% (+4446.3 to +13353.7) · +9500.0% (+6140.7 to +12859.3). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): response time (ms), mean, A B C +85.7% (+68.2 to +103.3) · +85.1% (+68.5 to +101.7) · +67.0% (+49.1 to +84.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): time over the response line (% of samples), A B C +212.8% (+175.6 to +250.1) · +223.2% (+172.9 to +273.6) · +207.9% (+172.9 to +243.0). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +202.8% (+146.0 to +259.6) · +216.4% (+168.3 to +264.6) · +157.0% (+115.5 to +198.5). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): batch: queue finished (s), A B C +89.3% (+79.7 to +98.9) · +80.1% (+69.7 to +90.5) · +80.8% (+71.6 to +90.1). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1967119.6% (+1111934.3 to +2822304.9) · +1287745.8% (+521467.2 to +2054024.4) · +1250833.4% (+747221.5 to +1754445.3). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +1001696.3% (+623421.0 to +1379971.7) · +230987.0% (+116467.0 to +345506.9) · +285052.5% (+193399.9 to +376705.2). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1067.6% (+891.6 to +1243.7) · +910.0% (+690.2 to +1129.8) · +774.9% (+649.7 to +900.2). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: jobs unfinished at the window's end, A B C +13.44 (+7.163 to +19.73) · +11.3 (+3.858 to +18.74) · +14.5 (+8.326 to +20.67). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): response time (ms), mean, A B C +87.9% (+61.0 to +114.8) · +86.6% (+61.9 to +111.4) · +70.6% (+49.8 to +91.5). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): time over the response line (% of samples), A B C +221.2% (+183.5 to +258.9) · +234.2% (+179.7 to +288.8) · +217.5% (+182.6 to +252.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +204.2% (+145.9 to +262.4) · +219.2% (+169.2 to +269.1) · +159.1% (+116.0 to +202.3). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): batch: queue finished (s), A B C +90.4% (+80.4 to +100.4) · +80.6% (+70.9 to +90.3) · +81.4% (+72.4 to +90.3). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1959438.6% (+1137492.1 to +2781385.0) · +1280430.0% (+511805.8 to +2049054.2) · +1238207.0% (+751232.1 to +1725181.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +1015791.5% (+684899.6 to +1346683.4) · +228574.2% (+114225.9 to +342922.5) · +286211.2% (+190609.6 to +381812.7). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1067.4% (+882.4 to +1252.3) · +927.0% (+727.3 to +1126.7) · +779.3% (+655.6 to +902.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: jobs unfinished at the window's end, A B C +14.33 (+8.22 to +20.45) · +11.1 (+3.755 to +18.44) · +14.6 (+8.613 to +20.59). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_BOTH.md`): response time (ms), 95th percentile, A B C +9.5% (+1.9 to +17.1) · +13.4% (+3.4 to +23.4) · +15.4% (+7.8 to +22.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_BOTH.md`): batch: queue finished (s), A B C +1.0% (+0.3 to +1.7) · +1.6% (+0.8 to +2.5) · +1.9% (+1.1 to +2.8). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +12.5% (+3.2 to +21.8) · +13.8% (+6.4 to +21.3) · +16.6% (+8.6 to +24.5). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): response time (ms), mean, A B C +7.3% (+0.0 to +14.5) · +6.4% (+1.8 to +11.0) · +8.9% (+3.7 to +14.1). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): response time (ms), 95th percentile, A B C +12.8% (+0.3 to +25.2) · +10.0% (+1.4 to +18.7) · +10.2% (+2.9 to +17.5). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +178.6% (+75.7 to +281.5) · +118.2% (+22.2 to +214.1) · +537.5% (+313.8 to +761.2). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +11.5% (+0.3 to +22.7) · +9.3% (+2.0 to +16.5) · +12.7% (+5.4 to +19.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): batch: queue finished (s), A B C +1.8% (+0.8 to +2.8) · +1.7% (+0.4 to +2.9) · +1.8% (+0.4 to +3.2). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1126.7% (+1020.2 to +1233.2) · +1088.9% (+690.1 to +1487.7) · +1416.7% (+986.8 to +1846.5). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +333.3% (+174.4 to +492.3) · +450.0% (+38.7 to +861.3) · +550.0% (+436.9 to +663.1). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +32.1% (+13.4 to +50.8) · +19.7% (+5.5 to +33.9) · +26.0% (+8.1 to +43.9). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): batch: queue finished (s), A B C +1.2% (+0.6 to +1.8) · +1.4% (+0.4 to +2.5) · +1.4% (+0.3 to +2.6). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1053.3% (+883.9 to +1222.8) · +866.7% (+664.7 to +1068.6) · +1491.7% (+1085.0 to +1898.3). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +366.7% (+231.3 to +502.0) · +275.0% (+78.2 to +471.8) · +500.0% (+331.4 to +668.6). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +24.2% (+10.9 to +37.5) · +17.6% (+5.6 to +29.5) · +23.2% (+6.9 to +39.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_VS.md`): response time (ms), 95th percentile, A B C +92.6% (+46.7 to +138.5) · +31.9% (+10.8 to +53.0) · +50.9% (+23.2 to +78.6). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_VS.md`): time over the response line (% of samples), A B C +124.1% (+51.4 to +196.7) · +50.2% (+5.7 to +94.8) · +54.8% (+19.1 to +90.4). Cause: Back matter (`docs/LIVE_ENGINE_MANUAL.md`). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
-
-### Appendix D. Glossary
-
-- **Native**: the system under its own controllers alone. **Omni-Compass** (the omni arm): the same system with Omni-Compass on top of those controllers.
-- **Muscle**: one knob of the system a native controller turns (replicas, machines, a power limit, a frequency ceiling, a cache size). **Organism**: a body of muscles governed as one.
-- **Compass law**: the band with 5% cushions and two antagonist forces, smooth (tanh), that moves a muscle's setting (`omnicompass/compass_law.py`).
-- **Brain**: the engine's six state variables, integrated by the fourth-order Runge–Kutta step every decision (`omnicompass/core.py`). **Verdict**: the give-back trial judged against native (`omnicompass/verdict.py`).
-- **Kill switch**: the master switch's instant hand-back of every setting to native, for security. **Lease**: the gradual walk back to native after a crash.
-- **The max / the tune-down**: the dial's two settings. **Power given**: a resource spent that rose, shown beside what it bought, never a LOSS.
-- **A, B and C**: a benchmark's three runs; a reading counts when it holds the same way in all three.
-- **Evidence classes**: P a physical meter, L live software, S our own models.
-
-### Contact
-
-The Omni-Compass LLC, main office infrastructure. Toll-free direct: 1-888-339-9551. System route asset: 1-888-DEX-YLL-1. Landline, registered in Florida: 321-746-4411. www.omni-compass.com
+- **the orchestrator’s own cost.** The Kubernetes scheduler with the operator's bin-packing profile under the batch stream, the four ways (omni-v12, `results/live/V12_BINPACK_4W_VS.md`): time over the response line (% of samples), A B C +21.1% (+5.3 to +36.8) · +37.2% (+12.4 to +61.9) · +29.8% (+1.0 to +58.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_BOTH.md`): pod start wait, total (s), A B C +80.9% (+32.7 to +129.0) · +68.8% (+12.8 to +124.7) · +71.8% (+31.7 to +112.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_ORCH.md`): response time (ms), mean, A B C +2.6% (+0.7 to +4.4) · +3.2% (+0.5 to +5.9) · +2.9% (+0.9 to +5.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Crane (Effective HPA, on Kubernetes 1.25) under the batch stream, the four ways (omni-v12, `results/live/V12_CRANE_4W_VS.md`): pod start wait, total (s), A B C +60.3% (+28.4 to +92.2) · +56.1% (+0.6 to +111.6) · +51.9% (+20.4 to +83.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): response time (ms), 95th percentile, A B C +41.9% (+11.7 to +72.1) · +45.9% (+20.6 to +71.1) · +57.5% (+32.2 to +82.7). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): response time (ms), 99th percentile, A B C +45.2% (+12.1 to +78.2) · +48.9% (+22.4 to +75.5) · +62.1% (+33.1 to +91.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): batch: queue finished (s), A B C +5.1% (+1.7 to +8.5) · +6.9% (+3.4 to +10.3) · +5.1% (+3.0 to +7.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1753.8% (+1040.8 to +2466.9) · +1626.7% (+910.1 to +2343.3) · +915.8% (+807.5 to +1024.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +550.0% (+38.6 to +1061.4) · +650.0% (+129.0 to +1171.0) · +128.6% (+70.6 to +186.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +48.0% (+17.8 to +78.1) · +51.3% (+28.0 to +74.7) · +52.5% (+31.0 to +73.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): response time (ms), mean, A B C +13.2% (+1.6 to +24.8) · +15.8% (+8.1 to +23.5) · +18.3% (+7.5 to +29.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): response time (ms), 95th percentile, A B C +38.1% (+7.2 to +69.0) · +41.1% (+19.5 to +62.6) · +50.8% (+22.6 to +79.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): response time (ms), 99th percentile, A B C +39.9% (+7.8 to +72.1) · +44.0% (+23.2 to +64.9) · +61.3% (+30.8 to +91.7). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): batch: queue finished (s), A B C +4.2% (+1.6 to +6.9) · +5.7% (+2.8 to +8.6) · +4.6% (+2.7 to +6.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1461.5% (+1162.4 to +1760.7) · +1613.3% (+1157.7 to +2069.0) · +968.4% (+828.5 to +1108.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +300.0% (+115.3 to +484.7) · +550.0% (+225.7 to +874.3) · +100.0% (+31.0 to +169.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** The KAI scheduler under the batch stream, the four ways (omni-v12, `results/live/V12_KAI_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +40.1% (+16.1 to +64.0) · +42.1% (+24.1 to +60.0) · +45.2% (+26.8 to +63.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): response time (ms), mean, A B C +45.7% (+15.8 to +75.5) · +33.1% (+14.0 to +52.3) · +25.0% (+7.6 to +42.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): response time (ms), 95th percentile, A B C +81.3% (+33.4 to +129.1) · +62.1% (+27.0 to +97.3) · +38.8% (+13.8 to +63.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): response time (ms), 99th percentile, A B C +73.4% (+34.4 to +112.5) · +64.1% (+30.5 to +97.7) · +36.5% (+13.7 to +59.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): time over the response line (% of samples), A B C +17.9% (+8.8 to +27.1) · +12.6% (+0.3 to +25.0) · +22.4% (+7.1 to +37.8). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +45.1% (+21.3 to +68.9) · +34.5% (+21.0 to +48.0) · +30.8% (+18.3 to +43.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): batch: queue finished (s), A B C +16.5% (+7.4 to +25.6) · +15.7% (+8.5 to +23.0) · +14.3% (+5.7 to +22.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +180.0% (+82.2 to +277.8) · +183.3% (+52.1 to +314.5) · +24360.0% (+1893.1 to +46826.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +83.0% (+40.0 to +126.1) · +78.2% (+42.6 to +113.8) · +57.9% (+24.1 to +91.8). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): response time (ms), mean, A B C +27.9% (+13.5 to +42.3) · +20.4% (+10.8 to +30.0) · +21.6% (+7.9 to +35.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): response time (ms), 95th percentile, A B C +51.1% (+21.9 to +80.2) · +38.9% (+18.4 to +59.5) · +35.4% (+13.9 to +56.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): response time (ms), 99th percentile, A B C +54.9% (+23.6 to +86.2) · +47.7% (+25.1 to +70.2) · +31.3% (+13.1 to +49.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +34.3% (+13.3 to +55.3) · +22.1% (+12.1 to +32.1) · +31.7% (+8.1 to +55.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): batch: queue finished (s), A B C +11.7% (+5.1 to +18.3) · +11.2% (+6.1 to +16.2) · +11.0% (+5.0 to +16.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Karmada on the group of two clusters under the batch stream, the four ways (omni-v12, `results/live/V12_KARMADA_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +58.2% (+28.9 to +87.5) · +56.1% (+30.6 to +81.6) · +44.2% (+20.7 to +67.7). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): batch: queue finished (s), A B C +79.6% (+57.4 to +101.8) · +82.5% (+72.2 to +92.7) · +90.2% (+71.9 to +108.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +332575.0% (+204178.2 to +460971.8) · +701433.3% (+502619.2 to +900247.5) · +227980.0% (+149811.1 to +306148.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +172733.3% (+104746.8 to +240719.9) · +763800.0% (+530043.0 to +997557.0) · +136780.0% (+86044.3 to +187515.7). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1607.8% (+1081.3 to +2134.4) · +849.4% (+675.6 to +1023.2) · +1322.9% (+1027.8 to +1618.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): batch: queue finished (s), A B C +76.5% (+54.1 to +98.9) · +82.5% (+72.8 to +92.1) · +86.9% (+68.4 to +105.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +310637.5% (+166814.0 to +454461.0) · +686083.3% (+439006.5 to +933160.2) · +233933.3% (+162122.7 to +305743.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +171200.0% (+91149.9 to +251250.1) · +797900.0% (+545467.5 to +1050332.5) · +139600.0% (+101748.5 to +177451.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1512.7% (+1011.0 to +2014.4) · +831.8% (+691.5 to +972.0) · +1276.6% (+979.1 to +1574.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_VS.md`): response time (ms), 95th percentile, A B C +191.2% (+63.6 to +318.8) · +485.5% (+212.9 to +758.0) · +285.6% (+106.4 to +464.8). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_VS.md`): response time (ms), 99th percentile, A B C +181.3% (+56.9 to +305.8) · +481.6% (+212.0 to +751.1) · +285.0% (+116.9 to +453.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Koordinator under the batch stream, the four ways (omni-v12, `results/live/V12_KOORDINATOR_4W_VS.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +4.9 (+0.7503 to +9.05) · +8900.0% (+4446.3 to +13353.7) · +9500.0% (+6140.7 to +12859.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): response time (ms), mean, A B C +85.7% (+68.2 to +103.3) · +85.1% (+68.5 to +101.7) · +67.0% (+49.1 to +84.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): time over the response line (% of samples), A B C +212.8% (+175.6 to +250.1) · +223.2% (+172.9 to +273.6) · +207.9% (+172.9 to +243.0). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +202.8% (+146.0 to +259.6) · +216.4% (+168.3 to +264.6) · +157.0% (+115.5 to +198.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): batch: queue finished (s), A B C +89.3% (+79.7 to +98.9) · +80.1% (+69.7 to +90.5) · +80.8% (+71.6 to +90.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1967119.6% (+1111934.3 to +2822304.9) · +1287745.8% (+521467.2 to +2054024.4) · +1250833.4% (+747221.5 to +1754445.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +1001696.3% (+623421.0 to +1379971.7) · +230987.0% (+116467.0 to +345506.9) · +285052.5% (+193399.9 to +376705.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1067.6% (+891.6 to +1243.7) · +910.0% (+690.2 to +1129.8) · +774.9% (+649.7 to +900.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_BOTH.md`): queue: jobs unfinished at the window's end, A B C +13.44 (+7.163 to +19.73) · +11.3 (+3.858 to +18.74) · +14.5 (+8.326 to +20.67). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): response time (ms), mean, A B C +87.9% (+61.0 to +114.8) · +86.6% (+61.9 to +111.4) · +70.6% (+49.8 to +91.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): time over the response line (% of samples), A B C +221.2% (+183.5 to +258.9) · +234.2% (+179.7 to +288.8) · +217.5% (+182.6 to +252.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line), A B C +204.2% (+145.9 to +262.4) · +219.2% (+169.2 to +269.1) · +159.1% (+116.0 to +202.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): batch: queue finished (s), A B C +90.4% (+80.4 to +100.4) · +80.6% (+70.9 to +90.3) · +81.4% (+72.4 to +90.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1959438.6% (+1137492.1 to +2781385.0) · +1280430.0% (+511805.8 to +2049054.2) · +1238207.0% (+751232.1 to +1725181.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +1015791.5% (+684899.6 to +1346683.4) · +228574.2% (+114225.9 to +342922.5) · +286211.2% (+190609.6 to +381812.7). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +1067.4% (+882.4 to +1252.3) · +927.0% (+727.3 to +1126.7) · +779.3% (+655.6 to +902.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** KubeRay (the Ray autoscaler) under the batch stream, the four ways (omni-v12, `results/live/V12_KUBERAY_4W_ORCH.md`): queue: jobs unfinished at the window's end, A B C +14.33 (+8.22 to +20.45) · +11.1 (+3.755 to +18.44) · +14.6 (+8.613 to +20.59). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_BOTH.md`): response time (ms), 95th percentile, A B C +9.5% (+1.9 to +17.1) · +13.4% (+3.4 to +23.4) · +15.4% (+7.8 to +22.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_BOTH.md`): batch: queue finished (s), A B C +1.0% (+0.3 to +1.7) · +1.6% (+0.8 to +2.5) · +1.9% (+1.1 to +2.8). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +12.5% (+3.2 to +21.8) · +13.8% (+6.4 to +21.3) · +16.6% (+8.6 to +24.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): response time (ms), mean, A B C +7.3% (+0.0 to +14.5) · +6.4% (+1.8 to +11.0) · +8.9% (+3.7 to +14.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): response time (ms), 95th percentile, A B C +12.8% (+0.3 to +25.2) · +10.0% (+1.4 to +18.7) · +10.2% (+2.9 to +17.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +178.6% (+75.7 to +281.5) · +118.2% (+22.2 to +214.1) · +537.5% (+313.8 to +761.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Kueue under the batch stream, the four ways (omni-v12, `results/live/V12_KUEUE_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +11.5% (+0.3 to +22.7) · +9.3% (+2.0 to +16.5) · +12.7% (+5.4 to +19.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): batch: queue finished (s), A B C +1.8% (+0.8 to +2.8) · +1.7% (+0.4 to +2.9) · +1.8% (+0.4 to +3.2). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1126.7% (+1020.2 to +1233.2) · +1088.9% (+690.1 to +1487.7) · +1416.7% (+986.8 to +1846.5). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +333.3% (+174.4 to +492.3) · +450.0% (+38.7 to +861.3) · +550.0% (+436.9 to +663.1). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_BOTH.md`): queue: job turnaround, submitted to done, mean (s), A B C +32.1% (+13.4 to +50.8) · +19.7% (+5.5 to +33.9) · +26.0% (+8.1 to +43.9). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): batch: queue finished (s), A B C +1.2% (+0.6 to +1.8) · +1.4% (+0.4 to +2.5) · +1.4% (+0.3 to +2.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): queue: job wait, submitted to its first pod running, mean (s), A B C +1053.3% (+883.9 to +1222.8) · +866.7% (+664.7 to +1068.6) · +1491.7% (+1085.0 to +1898.3). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): queue: job wait, submitted to its first pod running, 95th percentile (s), A B C +366.7% (+231.3 to +502.0) · +275.0% (+78.2 to +471.8) · +500.0% (+331.4 to +668.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_ORCH.md`): queue: job turnaround, submitted to done, mean (s), A B C +24.2% (+10.9 to +37.5) · +17.6% (+5.6 to +29.5) · +23.2% (+6.9 to +39.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_VS.md`): response time (ms), 95th percentile, A B C +92.6% (+46.7 to +138.5) · +31.9% (+10.8 to +53.0) · +50.9% (+23.2 to +78.6). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
+- **the orchestrator’s own cost.** Volcano under the batch stream, the four ways (omni-v12, `results/live/V12_VOLCANO_4W_VS.md`): time over the response line (% of samples), A B C +124.1% (+51.4 to +196.7) · +50.2% (+5.7 to +94.8) · +54.8% (+19.1 to +90.4). The knob: nothing of Omni-Compass to turn: the orchestrator's own cost.
 
 ---
 

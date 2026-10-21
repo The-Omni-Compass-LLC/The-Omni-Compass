@@ -27,6 +27,8 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v13": ["OMNI_V13.json", "tools/omni_version.py", "docs/OMNI_V13.md", "omni_controller/muscles.py", "tests/test_convey_handback.py",
+                   "results/toy_gate/V13_VS_V12.md", "results/toy_gate/V13_VS_V12.json"],
     "engine_v12_refused_raise": ["OMNI_V12.json", "omni_controller/muscles.py", "tools/omni_version.py", "docs/OMNI_V12.md",
                                  "tools/run_swarm.py", "tests/test_refused_raise.py", "results/toy_gate/V12_VS_V11.md",
                                  "results/toy_gate/V12_SWARM_REFLEX.md", "docs/SWARM_PREREGISTRATION.md", "tools/swarm_abc.py"],

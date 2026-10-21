@@ -1,10 +1,11 @@
-# Omni v12: a refused raise is held, and the swarm's reflex acts at once (the engine that stands since 19 October)
+# Omni v12: a refused raise is held, and the swarm's reflex acts at once (the engine that stood 19 to 20 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v12 has been the engine on main since 19 October. The founder's order behind it, the same night: "Of course I want you to
-land version 12. I want you to keep fixing and building and straightening and enhancing and benchmarking and defensibility, and
-every time you do that ... it becomes a new version." It is omni-v11 (`docs/OMNI_V11.md`) with two faults fixed, both found on
+Omni v12 stood on main from 19 to 20 October; on the evening of 20 October Omni v13 (`docs/OMNI_V13.md`) took its place, which
+is omni-v12 with the conveyance's hand-back. This page stays as omni-v12's record, read beside no other engine's. The founder's
+order behind it, of the night of 19 October: "Of course I want you to land version 12. I want you to keep fixing and building
+and straightening and enhancing and benchmarking and defensibility, and every time you do that ... it becomes a new version." It is omni-v11 (`docs/OMNI_V11.md`) with two faults fixed, both found on
 the omni-v11 runs on 19 October: one in the Kubernetes governor's conveyance, one in the swarm's wire. Every setting, gain,
 preset and muscle is omni-v11's, and so is every rule but these two.
 

@@ -339,23 +339,37 @@ def load_dataset(workload_file, records, log: Path):
         raise RuntimeError(f"YCSB load failed: {txt[-2000:]}")
 
 
+def server_journal(unit):
+    """The server's own journal and status, for the record when a restart does not come back (20 October: the omni-v12
+    MongoDB runs B and C died at this wait with an empty mongod.log and nothing else recorded)."""
+    out = []
+    for cmd in (["sudo", "systemctl", "status", unit, "--no-pager", "-l"], ["sudo", "journalctl", "-u", unit, "--no-pager", "-n", "80"]):
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        out.append(" ".join(cmd) + "\n" + (r.stdout + r.stderr)[-6000:])
+    return "\n".join(out)
+
+
 def fresh_server(cache_mb):
     """The cache emptied and the operator's size restored before an arm, both arms alike: the server restarted at the
-    operator's configured size, the OS page cache dropped."""
-    subprocess.run(["sudo", "systemctl", "restart", "mongod"], check=True)
-    subprocess.run(["sudo", "sh", "-c", "sync; echo 3 > /proc/sys/vm/drop_caches"], check=False)
+    operator's configured size, the OS page cache dropped. A server that has not answered five minutes after its restart is
+    restarted once more, with its journal printed; one that has not answered after that stops the run with the journal in the
+    error, so the cause is in the record (never a bare "did not come back")."""
     import pymongo
-    for _ in range(60):
-        try:
-            c = pymongo.MongoClient(URL, serverSelectionTimeoutMS=2000); st = c.admin.command("serverStatus")
-            got = int(st["wiredTiger"]["cache"]["maximum bytes configured"]) // MB
-            if cache_mb is not None and got != cache_mb:                 # None: MongoDB's own default, as shipped
-                c.admin.command({"setParameter": 1, "wiredTigerEngineRuntimeConfig": f"cache_size={cache_mb}M"})
-            return c
-        except Exception:
-            time.sleep(1)
-    j = subprocess.run(["sudo", "journalctl", "-u", "mongod", "-n", "40", "--no-pager"], capture_output=True, text=True)
-    raise RuntimeError("mongod did not come back after the restart (kernel " + os.uname().release + "); its journal:\n" + (j.stdout or j.stderr)[-4000:])
+    for attempt in (1, 2):
+        subprocess.run(["sudo", "systemctl", "restart", "mongod"], check=True)
+        subprocess.run(["sudo", "sh", "-c", "sync; echo 3 > /proc/sys/vm/drop_caches"], check=False)
+        for _ in range(100):                                           # about five minutes: 2 s to select a server, 1 s between tries
+            try:
+                c = pymongo.MongoClient(URL, serverSelectionTimeoutMS=2000); st = c.admin.command("serverStatus")
+                got = int(st["wiredTiger"]["cache"]["maximum bytes configured"]) // MB
+                if cache_mb is not None and got != cache_mb:                 # None: MongoDB's own default, as shipped
+                    c.admin.command({"setParameter": 1, "wiredTigerEngineRuntimeConfig": f"cache_size={cache_mb}M"})
+                return c
+            except Exception:
+                time.sleep(1)
+        journal = server_journal("mongod")
+        print(f"mongod did not answer five minutes after its restart (attempt {attempt} of 2); its status and journal:\n{journal}", flush=True)
+    raise RuntimeError("mongod did not come back after two restarts; its status and journal are printed above")
 
 
 def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms, seed, objective=DEFAULT_OBJECTIVE):
@@ -549,7 +563,8 @@ def setup():
     print(f"YCSB {YCSB_VERSION} at {YCSB_HOME} (sha256 {got[:16]}...); MongoDB {ver} at native's cache ({NATIVE}: "
           f"{NATIVE_MB if NATIVE_MB is not None else 'the server default'} MB)")
     if ver == "?":                       # the server did not answer after its restart: no workload runs on a server that is not up
-        print(f"mongod did not answer after the restart at native's cache (kernel {os.uname().release})", file=sys.stderr)
+        print(f"mongod did not answer after the restart at native's cache (kernel {os.uname().release}); its status and journal:\n"
+              f"{server_journal('mongod')}", file=sys.stderr)
         return 1
     return 0
 

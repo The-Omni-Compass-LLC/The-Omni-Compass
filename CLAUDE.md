@@ -43,9 +43,21 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v12 stands (v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v13 stands (v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`) stands on main since 19 October, night,
+- **Omni v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`) stands on main since 20 October, evening, the
+  founder's order that every fault found be fixed and every fix land as the next version, told, not asked: omni-v12 with one fault
+  fixed in the Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone (the
+  queue 0.6% to 0.8% later and the web's 99th percentile 4% to 13% higher, LOSS in all three runs). The web pods' limits were raised
+  to 3,700m in the queue's first half minute and kept through the saturated queue (omni-v7's guard holds a new raise at the host's
+  top, never one already given): the batch pods hashed 7.6% slower and the web served no faster while the queue ran; no machine was
+  parked during a saturated queue (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11). Now, on a shared host at its top (busy at or
+  over 75%) beside another workload's room (a pod whose limit is above its request), every limit given goes back to the operator's,
+  conveyed again only under 70%; and every other pod on a machine is counted by its own limit, where omni-v12 counted requests. The
+  toy gate (`results/toy_gate/V13_VS_V12.md`, with a batch toy set from the KubeRay runs' own files): no LOSS against omni-v12 in
+  any toy, the web-only toys identical; in the batch toy the queue and the job turnaround back at native's. Every benchmark runs
+  again on it.
+- **Omni v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`) stood on main 19 to 20 October, landed the night of 19 October,
   the founder's order ("Of course I want you to land version 12 ... every time you do that ... it becomes a new version"):
   omni-v11 with two faults fixed, both found on the omni-v11 runs. A CPU-limit raise the cluster's admission refuses is held
   until the pod's limit changes, the raise shrinks or a wait passes (5 minutes, doubled up to an hour;
@@ -116,7 +128,7 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
@@ -244,7 +256,7 @@ the founder overrides one in the conversation.
   to land a version 12. I want you to keep fixing and building and straightening and enhancing and benchmarking and
   defensibility, and every time you do that to a new version, it becomes a new version ... What you asking me"). A change to
   the engine is built on its own branch, tried in the toy gate against the engine that stands, and, when it reads no LOSS,
-  landed at once with `tools/land_engine.py`: the fingerprint, the words on every page, both manuals, the manifest, the push,
+  landed at once with `tools/land_engine.py`: the fingerprint, the words on every page, all three manuals, the manifest, the push,
   the branches leveled and every benchmark run again on it. The founder is told what changed and what it read, never asked
   whether to land it. A change that reads a LOSS in the gate is fixed in the model first, or kept on its study branch with the
   reason written (`docs/CHANGE_CONTROL.md`).
@@ -291,7 +303,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v12` since 19 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v13` since 20 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -331,7 +343,7 @@ the founder overrides one in the conversation.
   the branch `v8`; every page, manual, table and queue points at it; every benchmark runs again on it. The GPU runs on
   Lambda and the Google and Amazon sets start on his word: the GPU from one exact commit given to him, the two clouds by
   turning their `switch=` line on once their secrets are in the repository.
-- **The page number in both bottom corners, the running head on every page.** Every page of both manuals but the title
+- **The page number in both bottom corners, the running head on every page.** Every page of every manual but the title
   page carries the book's name on the left of the head and the part or chapter it belongs to on the right (openers and
   front matter included), and the page label in the left and the right bottom corner, "so that when somebody can flip
   through it" they know where they are. The notice stays at the foot of every page.
@@ -339,7 +351,7 @@ the founder overrides one in the conversation.
   printed, every List of Figures row against the page of its caption, every index reference against the page it names,
   every figure against the paragraph that names it (under it when it fits, else at the top of the next page, never
   further, never more than two to a page, never in one block), the running head and both corner numbers on every page.
-  "Every time and every fix and change and upgrade" realigns both manuals in the same push.
+  "Every time and every fix and change and upgrade" realigns all three manuals in the same push.
 - **Every figure is read at referee level before it is placed**: what it pictures, where it lives, the mechanism it
   states (the book, the Python, the harness, the organisms), its mathematics, structure, grids, arrows and direction;
   anything under full comprehension is reworked before the push. Nothing may mislead the wiring of Omni-Compass into a
@@ -392,8 +404,8 @@ the founder overrides one in the conversation.
   checks on their own clock; it is used only when a test shows no LOSS. Every Kubernetes and cloud receipt shows it in both arms: the
   alert minutes (judged), the settings commands the governor wrote on its own and its additions made inside the line
   (shown) (`tools/live_reps.py`, `babysitting`); both manuals and the README say so.
-- **Two manuals** (the founder's orders of 14 October, evening and night), both kept in the repository until the founder
-  takes the Owner's Manual out:
+- **Three manuals** (the founder's orders of 14 October, evening and night, and of 20 October, night: "There shall be three in
+  the end"), all kept in the repository until the founder takes the Owner's Manual out:
   - **The Operator's Manual** (`docs/OMNI_COMPASS_MANUAL.md` and `.pdf`): the glove box, not the blueprint. It shows an
     engineering team how to embed, wire, tune, run and check Omni-Compass on a stacked, clustered system, or on any one
     muscle, in all its processes. It does not explain what is inside Omni-Compass or how it is built: no theory, no
@@ -406,7 +418,13 @@ the founder overrides one in the conversation.
   - **The Owner's Manual, the master** (`docs/OMNI_COMPASS_OWNERS_MANUAL.md` and `.pdf`, `build_book.py --owner`):
     everything and all, for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the philosophy and
     theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the
-    engine's source, every result, and the wiring. Every fix realigns both.
+    engine's source, every result, and the wiring. Every fix realigns all three.
+  - **The Live Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `build_book.py --live`): nothing more
+    than the interpretation of the live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) for the operator at the
+    dashboard: how to follow the wall and the switch, read every gauge and knob, trace a tile to its record, and see the
+    mechanism of action native beside Omni-Compass as the monitors show it; no theory, no engine internals beyond what the
+    page itself prints, no wiring. It names the page's sections by title and anchor, in the page's own order (its "Engine
+    table of contents"), and is realigned with the page in the same push that changes it.
 - **The manuals carry drawn figures, no plates and no blank pages** (the founder's orders of 14 October and of 16 October,
   night: "flow charts, illustrations to interpret the language of mathematics, build it in the manuals"; then, the same
   night: fifty more that interpret the code, the wiring and the receipts, "with another tool", so they do not all look the
@@ -534,15 +552,15 @@ the founder overrides one in the conversation.
   real thing" (class L); a meter is class P. The license's own phrase stays as written.
 - The newest result is always at the front; the repository keeps itself current (the archive bot and the front page);
   old material goes to `docs/history`.
-- Both manuals are printed books, front matter, body and back matter (Orders of 14 October: the Operator's Manual for
+- All three manuals are printed books, front matter, body and back matter (Orders of 14 October: the Operator's Manual for
   the people who wire and run it, the Owner's Manual with everything); rebuilt as PDFs whenever they change.
 - The founder hears what a result says before it goes up.
 
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v12` (the engine that stands, 19 October), stay in
-  sync, and `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v12`,
+  One version is always the main one; `main` and the working branch, `v13` (the engine that stands, 20 October), stay in
+  sync, and `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v13`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.
@@ -566,7 +584,8 @@ the founder overrides one in the conversation.
 - The Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`, `python3 docs/book/build_book.py`) is the wiring and operating
   manual, with every muscle's wiring and card (Appendix E); the Owner's Manual (`docs/OMNI_COMPASS_OWNERS_MANUAL.md`,
   `build_book.py --owner`) explains the physics, philosophy, mechanism and wiring, how to read every metric, every result,
-  and holds the muscle catalog, the register and the engine's source.
+  and holds the muscle catalog, the register and the engine's source; the Live Engine Manual
+  (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`, `build_book.py --live`) is how to read the live engine page.
 - Zips on request: split into parts under the upload limit, each part openable on its own, built from a pushed commit.
 - Never put a model identifier in a commit, PR or file.
 

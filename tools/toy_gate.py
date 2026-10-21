@@ -235,6 +235,38 @@ CAL.update(json.loads(os.environ.get("TOY_CAL", "{}")))        # a heavier or li
 CONVEY_GAUGES = {"requests_served": ("higher", False), "start_wait_s": ("lower", False), "start_wait_p95_s": ("lower", False), "p95_ms": ("lower", False),
                  "alert_minutes": ("lower", False), "host_busy": ("lower", True), "limit_given_m": ("lower", True),
                  "pod_seconds": ("lower", True), "writes": ("lower", True)}
+# the batch muscle beside the serving one (omni-v13's gate, 20 October): the stream of KubeRay's rig with the organism
+# alone (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 7): 24 jobs, one every 30 s, each ten pods run five at a time,
+# every pod requesting 500m with a 1-core limit and hashing a fixed amount of work. BATCH_POD_CORE_S is set so the native
+# arm's queue finishes where the saturated runners' did (the 16 KubeRay repetitions whose native queue ran past 760 s:
+# mean 834 s, the host at its top through the stream). BATCH_INTERFERENCE is the batch pods' loss of work per processor
+# second while a serving pod's quota is lifted above its operator's on a host at its top, read from those repetitions'
+# own pods (hashing time 59.2 s native, 63.1 s with the quota lifted: +7.64%, so 1 - 1/1.0764 = 0.071); with the host
+# not at its top the same pods read +0.30%, and the toy takes none
+BATCH = {"jobs": 24, "every_s": 30, "completions": 10, "parallel": 5, "req_m": 500, "lim_m": 1000, "pod_core_s": 8.1,
+         "interference": 0.071, "start_lag_s": 3, "kind_cores": 3.0, "gov_cores": 0.017}
+# the batch rig's host as it ran (amendment 5): the kind nodes on 3 of its 4 cores, the governor alone on the fourth (its
+# own processor 0.017 cores, the table's "Omni's own CPU"); a batch pod running 2.66 s after it was made (the saturated
+# repetitions' mean, rounded up to whole seconds); and the governor's reading as its sampler takes it (capacity.py): the
+# host's busy share over the whole time since its previous reading, none at the first
+BATCH.update(json.loads(os.environ.get("TOY_BATCH", "{}")))
+CONVEY_BATCH_GAUGES = {**CONVEY_GAUGES, "batch_queue_s": ("lower", False), "batch_turnaround_s": ("lower", False),
+                       "batch_work_core_s": ("higher", False)}
+
+
+def water_fill(avail, wants, weights):
+    """The kernel's fair share between cgroups under contention: each gets min(its want, weight x level), the level set
+    so the shares sum to what is available; with room for every want, each gets its want."""
+    if sum(wants) <= avail:
+        return list(wants)
+    lo, hi = 0.0, max((w / max(g, 1e-9) for w, g in zip(wants, weights)), default=0.0)
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if sum(min(w, g * mid) for w, g in zip(wants, weights)) > avail:
+            hi = mid
+        else:
+            lo = mid
+    return [min(w, g * lo) for w, g in zip(wants, weights)]
 
 
 def start_time(busy):
@@ -247,20 +279,26 @@ def start_time(busy):
     return 9.5 + 11.6 * (min(busy, 1.0) - 0.75)
 
 
-def worker_convey(arm, seed, out, quota="none"):
+def worker_convey(arm, seed, out, quota="none", batch=False):
     """A 4-core host carrying three kind nodes (each reports the host's 4 cores as its own); php-apache (200m request,
     500m limit) under an HPA at 50%, minimum 1, maximum 10, five minutes' scale-down window; load generators stepping
     1 2 3 1 2 1 every 150 s, each two closed-loop clients (a client sends its next request when the last one is answered,
     after half a second), 30 ms of CPU a request, so faster answers bring more requests, as on kind, and the HPA sits at
     one to three pods as the v6 KEDA run did (three serving pods at its peak); a starting pod uses 300m and starts at the
     pace the host's busy share allows. Native keeps the operator's limit; the omni arms call the checkout's own
-    Muscles.convey every 15 s, as the governor's fast check does."""
+    Muscles.convey every 15 s, as the governor's fast check does.
+
+    With batch, the batch muscle of KubeRay's rig runs beside it (BATCH above): its pods are placed where the nodes'
+    requests leave room, and the host's processor is shared as the kernel shares it between cgroups, each pod its want
+    up to its own limit, by the weight of its request, when the wants exceed the host (water_fill); a serving pod's
+    limit lifted above its operator's on a host at its top costs the batch pods BATCH_INTERFERENCE of their work."""
     import random
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed * 101 + 3)
     HOST, REQ_M, LIM_M, COST = 4.0, 200, 500, CAL["cost_s"]
     nodes = ["w0", "w1", "w2"]
     pods, ann, nid, busy = [], {}, [0], 0.3
+    bpods, jobs, bid, win = [], [], [0], []                            # the batch muscle and the busy since the last reading (batch only)
     writes = [0]                                                       # every settings command the governor sent, refused ones included
 
     def new_pod():
@@ -286,6 +324,10 @@ def worker_convey(arm, seed, out, quota="none"):
                 items += [{"metadata": {"name": f"sys-{n}", "namespace": "kube-system", "labels": {}},
                            "spec": {"nodeName": n, "containers": [{"name": "s", "resources": {"requests": {"cpu": "100m"}}}]},
                            "status": {"phase": "Running", "conditions": [{"type": "Ready", "status": "True"}]}} for n in nodes]
+                items += [{"metadata": {"name": b["name"], "namespace": "default", "labels": {"app": "omni-batch-stream"}},
+                           "spec": {"nodeName": b["node"], "containers": [{"name": "work", "resources": {
+                               "requests": {"cpu": f"{BATCH['req_m']}m"}, "limits": {"cpu": f"{BATCH['lim_m']}m"}}}]},
+                           "status": {"phase": "Running", "conditions": [{"type": "Ready", "status": "True"}]}} for b in bpods]
                 return {"items": items}
             if args[:2] == ("get", "deployment"):
                 return {"metadata": {"name": "php-apache", "namespace": "default", "annotations": dict(ann)},
@@ -323,7 +365,13 @@ def worker_convey(arm, seed, out, quota="none"):
 
         class Sampler:
             def sample(self):
-                return busy
+                if not batch:
+                    return busy
+                if not hasattr(self, "seen"):           # the governor's sampler: two readings make one share
+                    self.seen = True; win.clear(); return None
+                share = sum(win) / len(win) if win else None
+                win.clear()
+                return share
         m.host_cpu = Sampler()
     t = 0
     new_pod(); pods[0]["ready"] = True; pods[0]["progress"] = 1.0
@@ -337,13 +385,47 @@ def worker_convey(arm, seed, out, quota="none"):
         ready = [p for p in pods if p["ready"]]; boot = [p for p in pods if not p["ready"]]
         other = CAL["other_cores"] + lam * CAL["loadgen_s"]            # control plane, KEDA, system pods, governor; the load generators
         start_use = 0.3 * len(boot)
-        want = [min(p["limit"] / 1000.0, demand / max(1, len(ready))) for p in ready]
-        avail = max(0.05, HOST - other - start_use)
-        scale = min(1.0, avail / sum(want)) if want and sum(want) > 0 else 1.0
-        caps = [min(p["limit"] / 1000.0, avail / max(1, len(ready))) if scale < 1.0 else p["limit"] / 1000.0 for p in ready]
-        used = sum(w * scale for w in want)
-        busy = min(1.0, (other + start_use + used) / HOST)
-        cap_total = max(1e-6, sum(min(c, avail) for c in caps))
+        if batch:
+            # the stream: a job every 30 s; its pods placed on the node whose requests leave the most room, five at a time
+            if t % BATCH["every_s"] == 0 and len(jobs) < BATCH["jobs"]:
+                jobs.append({"arrive": t, "made": 0, "done": 0, "end": None})
+            req_on = {n: 100 + REQ_M * sum(1 for p in pods if p["node"] == n)
+                      + BATCH["req_m"] * sum(1 for b in bpods if b["node"] == n) for n in nodes}
+            for j in jobs:
+                while j["end"] is None and j["made"] < BATCH["completions"] \
+                        and sum(1 for b in bpods if b["job"] is j) < BATCH["parallel"]:
+                    n = min(nodes, key=lambda x: req_on[x])
+                    if 4000 - req_on[n] < BATCH["req_m"]:
+                        break
+                    bid[0] += 1; j["made"] += 1; req_on[n] += BATCH["req_m"]
+                    bpods.append({"name": f"batch-{bid[0]}", "node": n, "left": BATCH["pod_core_s"], "job": j,
+                                  "runs": t + BATCH["start_lag_s"]})
+            run_b = [b for b in bpods if b["runs"] <= t]
+            avail = max(0.05, BATCH["kind_cores"] - other - start_use)
+            weights = [REQ_M / 1000.0] * len(ready) + [BATCH["req_m"] / 1000.0] * len(run_b)
+            blim = [BATCH["lim_m"] / 1000.0] * len(run_b)
+            # what each serving pod could have at this level (its whole limit wanted), and what it takes of its demand
+            caps = water_fill(avail, [p["limit"] / 1000.0 for p in ready] + blim, weights)[:len(ready)]
+            give = water_fill(avail, [min(c, demand / max(1, len(ready))) for c in caps] + blim, weights)
+            used = sum(give[:len(ready)])
+            busy = min(1.0, (other + start_use + used + sum(give[len(ready):]) + (BATCH["gov_cores"] if m else 0.0)) / HOST)
+            win.append(busy)
+            eff = 1.0 - (BATCH["interference"] if busy >= 0.75 and any(p["limit"] > LIM_M for p in ready) else 0.0)
+            for b, g in zip(run_b, give[len(ready):]):
+                b["left"] -= g * eff
+                if b["left"] <= 0:
+                    bpods.remove(b); b["job"]["done"] += 1
+                    if b["job"]["done"] >= BATCH["completions"]:
+                        b["job"]["end"] = t + 1
+            cap_total = max(1e-6, sum(caps))
+        else:
+            want = [min(p["limit"] / 1000.0, demand / max(1, len(ready))) for p in ready]
+            avail = max(0.05, HOST - other - start_use)
+            scale = min(1.0, avail / sum(want)) if want and sum(want) > 0 else 1.0
+            caps = [min(p["limit"] / 1000.0, avail / max(1, len(ready))) if scale < 1.0 else p["limit"] / 1000.0 for p in ready]
+            used = sum(w * scale for w in want)
+            busy = min(1.0, (other + start_use + used) / HOST)
+            cap_total = max(1e-6, sum(min(c, avail) for c in caps))
         rho = demand / cap_total
         backlog = max(0.0, backlog + (demand - cap_total))
         svc = COST / max(1e-6, min(1.0, cap_total / max(1, len(ready))))
@@ -375,6 +457,11 @@ def worker_convey(arm, seed, out, quota="none"):
            "requests_served": served, "starts": len(st), "busy_p95": sorted(busy_hist)[int(0.95 * len(busy_hist))],
            "pods_mean": pod_s / (t + 1), "writes": writes[0],
            "starts_past_75": sum(1 for b in busy_hist if b >= 0.75)}
+    if batch:
+        ends = [j["end"] if j["end"] is not None else t + 1 for j in jobs]
+        res["batch_queue_s"] = float(max(ends)) if ends else 0.0
+        res["batch_turnaround_s"] = sum(e - j["arrive"] for j, e in zip(jobs, ends)) / len(jobs) if jobs else 0.0
+        res["batch_work_core_s"] = BATCH["pod_core_s"] * sum(j["done"] for j in jobs)
     if arm != "native":
         res["engine_tree"] = engine_tree("omni_controller.muscles")
     print(json.dumps(res))
@@ -514,7 +601,7 @@ def main(argv=None):
     ap.add_argument("--cand", help="checkout of the candidate")
     ap.add_argument("--seeds", default="1-8")
     ap.add_argument("--days", type=float, default=1.0)
-    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,convey_refused,verdict")
+    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,convey_refused,convey_batch,verdict")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", default="")
     ap.add_argument("--worker", help=argparse.SUPPRESS)
@@ -523,13 +610,14 @@ def main(argv=None):
     ap.add_argument("--dir", help=argparse.SUPPRESS)
     ap.add_argument("--blink", action="store_true", help=argparse.SUPPRESS)  # the cluster toy with its machines out of service a while
     ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota: none (readable, empty), unreadable, or refused (unreadable, every raise refused)
+    ap.add_argument("--batch", action="store_true", help=argparse.SUPPRESS)  # the convey toy with the batch muscle beside the serving one
     a = ap.parse_args(argv)
     if a.render:
         return render(*a.render)
     if a.worker == "verdict":
         return worker_verdict(a.seed)
     if a.worker in ("convey-native", "convey-omni"):
-        return worker_convey(a.worker.split("-")[1], a.seed, a.dir, a.quota)
+        return worker_convey(a.worker.split("-")[1], a.seed, a.dir, a.quota, a.batch)
     if a.worker:
         return worker(a.worker, a.seed, a.days, a.period, a.dir, a.blink)
     lo_s, _, hi_s = a.seeds.partition("-")
@@ -564,26 +652,29 @@ def main(argv=None):
         report["toys"][toy] = {"period_s": period, "gauges": rows, "counts": extra, "per_seed": res}
     # the convey toy twice: the namespace's quota readable and empty, and unreadable (the governor's role cannot list
     # quotas on every kind test, and on any stack whose role withholds it; the first v7 trial read that as a zero budget)
-    # and a third time with every raise refused by a quota the governor cannot read (the capacity test, v12)
-    for toy, quota in (("convey", "none"), ("convey_unreadable_quota", "unreadable"), ("convey_refused", "refused")):
+    # and a third time with every raise refused by a quota the governor cannot read (the capacity test, v12); and a
+    # fourth with the batch muscle of KubeRay's rig beside the serving one (omni-v13)
+    for toy, quota, bat in (("convey", "none", False), ("convey_unreadable_quota", "unreadable", False),
+                            ("convey_refused", "refused", False), ("convey_batch", "none", True)):
         if toy not in toys:
             continue
+        gauges = CONVEY_BATCH_GAUGES if bat else CONVEY_GAUGES
         jobs = [(arm, tree, s) for s in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]
         with ThreadPoolExecutor(a.jobs) as ex:
             got = list(ex.map(lambda j: run(j[1], ["--worker", "convey-native" if j[0] == "native" else "convey-omni",
-                                                    "--seed", str(j[2]), "--quota", quota,
+                                                    "--seed", str(j[2]), "--quota", quota, *(["--batch"] if bat else []),
                                                     "--dir", str(work / toy / f"{j[0]}-{j[2]}")]), jobs))
         res = {}
         for (arm, _, s), r in zip(jobs, got):
             res.setdefault(arm, {})[s] = r
         rows = {}
-        for g in CONVEY_GAUGES:
+        for g in gauges:
             bv = [res["base"][s][g] for s in seeds]; cv = [res["cand"][s][g] for s in seeds]
             nv = [res["native"][s][g] for s in seeds]
             rows[g] = {"native": sum(nv) / len(nv), "base": sum(bv) / len(bv), "cand": sum(cv) / len(cv),
-                       "cand_vs_base": reading(g, [c - b for c, b in zip(cv, bv)], bv, CONVEY_GAUGES),
-                       "base_vs_native": reading(g, [b - n for b, n in zip(bv, nv)], nv, CONVEY_GAUGES),
-                       "cand_vs_native": reading(g, [c - n for c, n in zip(cv, nv)], nv, CONVEY_GAUGES)}
+                       "cand_vs_base": reading(g, [c - b for c, b in zip(cv, bv)], bv, gauges),
+                       "base_vs_native": reading(g, [b - n for b, n in zip(bv, nv)], nv, gauges),
+                       "cand_vs_native": reading(g, [c - n for c, n in zip(cv, nv)], nv, gauges)}
         report["toys"][toy] = {"gauges": rows, "counts": {k: {arm: sum(res[arm][s][k] for s in seeds) for arm in ("native", "base", "cand")}
                                                           for k in ("starts", "starts_past_75")}, "per_seed": res}
     if "verdict" in toys:
