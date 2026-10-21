@@ -256,7 +256,7 @@ the founder overrides one in the conversation.
   to land a version 12. I want you to keep fixing and building and straightening and enhancing and benchmarking and
   defensibility, and every time you do that to a new version, it becomes a new version ... What you asking me"). A change to
   the engine is built on its own branch, tried in the toy gate against the engine that stands, and, when it reads no LOSS,
-  landed at once with `tools/land_engine.py`: the fingerprint, the words on every page, both manuals, the manifest, the push,
+  landed at once with `tools/land_engine.py`: the fingerprint, the words on every page, all three manuals, the manifest, the push,
   the branches leveled and every benchmark run again on it. The founder is told what changed and what it read, never asked
   whether to land it. A change that reads a LOSS in the gate is fixed in the model first, or kept on its study branch with the
   reason written (`docs/CHANGE_CONTROL.md`).
@@ -343,7 +343,7 @@ the founder overrides one in the conversation.
   the branch `v8`; every page, manual, table and queue points at it; every benchmark runs again on it. The GPU runs on
   Lambda and the Google and Amazon sets start on his word: the GPU from one exact commit given to him, the two clouds by
   turning their `switch=` line on once their secrets are in the repository.
-- **The page number in both bottom corners, the running head on every page.** Every page of both manuals but the title
+- **The page number in both bottom corners, the running head on every page.** Every page of every manual but the title
   page carries the book's name on the left of the head and the part or chapter it belongs to on the right (openers and
   front matter included), and the page label in the left and the right bottom corner, "so that when somebody can flip
   through it" they know where they are. The notice stays at the foot of every page.
@@ -351,7 +351,7 @@ the founder overrides one in the conversation.
   printed, every List of Figures row against the page of its caption, every index reference against the page it names,
   every figure against the paragraph that names it (under it when it fits, else at the top of the next page, never
   further, never more than two to a page, never in one block), the running head and both corner numbers on every page.
-  "Every time and every fix and change and upgrade" realigns both manuals in the same push.
+  "Every time and every fix and change and upgrade" realigns all three manuals in the same push.
 - **Every figure is read at referee level before it is placed**: what it pictures, where it lives, the mechanism it
   states (the book, the Python, the harness, the organisms), its mathematics, structure, grids, arrows and direction;
   anything under full comprehension is reworked before the push. Nothing may mislead the wiring of Omni-Compass into a
@@ -404,8 +404,8 @@ the founder overrides one in the conversation.
   checks on their own clock; it is used only when a test shows no LOSS. Every Kubernetes and cloud receipt shows it in both arms: the
   alert minutes (judged), the settings commands the governor wrote on its own and its additions made inside the line
   (shown) (`tools/live_reps.py`, `babysitting`); both manuals and the README say so.
-- **Two manuals** (the founder's orders of 14 October, evening and night), both kept in the repository until the founder
-  takes the Owner's Manual out:
+- **Three manuals** (the founder's orders of 14 October, evening and night, and of 20 October, night: "There shall be three in
+  the end"), all kept in the repository until the founder takes the Owner's Manual out:
   - **The Operator's Manual** (`docs/OMNI_COMPASS_MANUAL.md` and `.pdf`): the glove box, not the blueprint. It shows an
     engineering team how to embed, wire, tune, run and check Omni-Compass on a stacked, clustered system, or on any one
     muscle, in all its processes. It does not explain what is inside Omni-Compass or how it is built: no theory, no
@@ -418,7 +418,13 @@ the founder overrides one in the conversation.
   - **The Owner's Manual, the master** (`docs/OMNI_COMPASS_OWNERS_MANUAL.md` and `.pdf`, `build_book.py --owner`):
     everything and all, for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the philosophy and
     theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the
-    engine's source, every result, and the wiring. Every fix realigns both.
+    engine's source, every result, and the wiring. Every fix realigns all three.
+  - **The Live Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `build_book.py --live`): nothing more
+    than the interpretation of the live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) for the operator at the
+    dashboard: how to follow the wall and the switch, read every gauge and knob, trace a tile to its record, and see the
+    mechanism of action native beside Omni-Compass as the monitors show it; no theory, no engine internals beyond what the
+    page itself prints, no wiring. It names the page's sections by title and anchor, in the page's own order (its "Engine
+    table of contents"), and is realigned with the page in the same push that changes it.
 - **The manuals carry drawn figures, no plates and no blank pages** (the founder's orders of 14 October and of 16 October,
   night: "flow charts, illustrations to interpret the language of mathematics, build it in the manuals"; then, the same
   night: fifty more that interpret the code, the wiring and the receipts, "with another tool", so they do not all look the
@@ -546,7 +552,7 @@ the founder overrides one in the conversation.
   real thing" (class L); a meter is class P. The license's own phrase stays as written.
 - The newest result is always at the front; the repository keeps itself current (the archive bot and the front page);
   old material goes to `docs/history`.
-- Both manuals are printed books, front matter, body and back matter (Orders of 14 October: the Operator's Manual for
+- All three manuals are printed books, front matter, body and back matter (Orders of 14 October: the Operator's Manual for
   the people who wire and run it, the Owner's Manual with everything); rebuilt as PDFs whenever they change.
 - The founder hears what a result says before it goes up.
 
@@ -578,7 +584,8 @@ the founder overrides one in the conversation.
 - The Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`, `python3 docs/book/build_book.py`) is the wiring and operating
   manual, with every muscle's wiring and card (Appendix E); the Owner's Manual (`docs/OMNI_COMPASS_OWNERS_MANUAL.md`,
   `build_book.py --owner`) explains the physics, philosophy, mechanism and wiring, how to read every metric, every result,
-  and holds the muscle catalog, the register and the engine's source.
+  and holds the muscle catalog, the register and the engine's source; the Live Engine Manual
+  (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`, `build_book.py --live`) is how to read the live engine page.
 - Zips on request: split into parts under the upload limit, each part openable on its own, built from a pushed commit.
 - Never put a model identifier in a commit, PR or file.
 

@@ -409,20 +409,34 @@ def prepare_dataset(log: Path):
         raise RuntimeError(f"sysbench prepare failed: {txt[-2000:]}")
 
 
+def server_journal(unit):
+    """The server's own journal and status, for the record when a restart does not come back."""
+    out = []
+    for cmd in (["sudo", "systemctl", "status", unit, "--no-pager", "-l"], ["sudo", "journalctl", "-u", unit, "--no-pager", "-n", "80"]):
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        out.append(" ".join(cmd) + "\n" + (r.stdout + r.stderr)[-6000:])
+    return "\n".join(out)
+
+
 def fresh_server(pool_mb):
     """The pool emptied and the operator's size restored before an arm, both arms alike: the server restarted at the operator's
-    configured size, the OS page cache dropped."""
-    subprocess.run(["sudo", "systemctl", "restart", "mysql"], check=True)
-    subprocess.run(["sudo", "sh", "-c", "sync; echo 3 > /proc/sys/vm/drop_caches"], check=False)
-    for _ in range(90):
-        try:
-            c = connect(); st = status(c)
-            if st["pool_bytes"] // MB != pool_mb:
-                BufferPool(c).write(pool_mb)
-            return c
-        except Exception:
-            time.sleep(1)
-    raise RuntimeError("mysql did not come back after the restart")
+    configured size, the OS page cache dropped. A server that has not answered after its restart is restarted once more, with
+    its journal printed; one that has not answered after that stops the run with the journal in the error (20 October: the
+    MongoDB rig had died at the same wait with nothing recorded)."""
+    for attempt in (1, 2):
+        subprocess.run(["sudo", "systemctl", "restart", "mysql"], check=True)
+        subprocess.run(["sudo", "sh", "-c", "sync; echo 3 > /proc/sys/vm/drop_caches"], check=False)
+        for _ in range(120):
+            try:
+                c = connect(); st = status(c)
+                if st["pool_bytes"] // MB != pool_mb:
+                    BufferPool(c).write(pool_mb)
+                return c
+            except Exception:
+                time.sleep(1)
+        journal = server_journal("mysql")
+        print(f"mysql did not answer after its restart (attempt {attempt} of 2); its status and journal:\n{journal}", flush=True)
+    raise RuntimeError("mysql did not come back after two restarts; its status and journal are printed above")
 
 
 def run_arm(arm, wl_dir: Path, rep, script, stmts, rate, steps, step_s, line_stmt_ms, objective=DEFAULT_OBJECTIVE):

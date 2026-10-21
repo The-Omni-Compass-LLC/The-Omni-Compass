@@ -2,6 +2,32 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21: the third manual (the Live Engine Manual); the database rigs leave the server's journal in the record
+
+- **The Live Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `docs/book/OMNI_COMPASS_LIVE_ENGINE_BOOK.md`;
+  `python3 docs/book/build_book.py --live`; the founder's order of 20 October, night: "There shall be three in the end"). The
+  third book, for the operator at the dashboard: nothing more than the interpretation of the live engine page
+  (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): how to follow the wall and the master switch (green ON, red the kill switch
+  engaged, white OFF), read every gauge and turn every knob of the console, trace any tile to the record it came from, and see
+  the mechanism of action native beside Omni-Compass as the monitors show it (the two tickers, the phase plane, the brain's
+  state, the verdict); every section of the page in the page's own order, named by title and anchor (its "Engine table of
+  contents"); what to do when a tile reads LOSS; what the page does not tell you. 100 pages, 13 figures from the two kits, one
+  numbering, every cross-reference and every contents row checked on the built PDF (`docs/book/nav_check.py`). It explains
+  neither how the engine is built (the Owner's) nor how it is wired (the Operator's). The Operator's and Owner's Manuals now open
+  with "The Three Manuals"; the README, the state of play and `CLAUDE.md` name all three; `tools/readings.py`,
+  `tools/unicode_math.py` and `tools/land_engine.py` check the third as they check the other two.
+- **The database rigs record why a server did not come back.** The omni-v12 MongoDB runs B and C died at `fresh_server`'s
+  wait ("mongod did not come back after the restart") with an empty `mongod.log` and nothing else recorded, so the cause could
+  not be read. `tools/run_ycsb.py` and `tools/run_sysbench.py` now wait about five minutes, restart the server once more with its
+  `systemctl status` and `journalctl` printed, and stop the run with the journal in the error if it still does not answer;
+  `ycsb.yml` and `sysbench.yml` save the unit's journal into every run's files. The runs B and C of MongoDB on omni-v13 will
+  carry the cause if it happens again.
+- **A three-run table says when a run lacks a workload.** The six table writers (`tools/ycsb_abc.py`, `kafka_abc.py`,
+  `redis_abc.py`, `sysbench_abc.py`, `pgbench_abc.py`, `cpu_power_abc.py`) counted every workload at their foot, those a run
+  never reached included (the omni-v12 MongoDB table read "across 4 untouched workloads" with none judged); now the foot counts
+  only the workloads every run holds, and a warning names each run and what it lacks, with the rule that such a table is not
+  read by the index or the benefit sheet until its runs land.
+
 ## 2026-10-20 (night): the run storm on GitHub stopped
 
 - **Why runs read cancelled.** The live engine committed its rebuilt page to main, and its own push filter matched that page,
