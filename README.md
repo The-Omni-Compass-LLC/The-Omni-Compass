@@ -51,20 +51,20 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v12, fingerprint `d38b58fbe28939b8` (47 files); package 0.12.0.
+- **Engine on main:** omni-v13, fingerprint `0088837333c6f0fc` (47 files); package 0.13.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- 2026-10-19 20:19 UTC: `V11_YCSB_SERVICE` rebuilt from runs 39182911063, 39184161631, 39184179710 (ycsb, the service objective, omni-v11): 4 untouched workloads; 2 GAIN, 0 LOSS, 0 power given, 42 EVEN, 0 disagree
-- 2026-10-19 20:19 UTC: `V11_SYSBENCH_SERVICE` rebuilt from runs 39182906799, 39184157413, 39184175254 (sysbench, the service objective, omni-v11): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
-- 2026-10-19 20:19 UTC: `V11_PGBENCH_SERVICE` rebuilt from runs 39182915425, 39184166001, 39185403353 (pgbench, the service objective, omni-v11): 3 workloads; 2 GAIN, 0 LOSS, 0 power given, 34 EVEN, 0 disagree
-- 2026-10-19 16:28 UTC: `V11_YCSB_SHIPPED` rebuilt from runs 39150495654, 39160201436, 39169863638 (ycsb, the resource objective, native as shipped, omni-v11): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 44 EVEN, 0 disagree
-- 2026-10-19 16:28 UTC: `V11_YCSB` rebuilt from runs 39149263618, 39158992412, 39167564949 (ycsb, the resource objective, omni-v11): 4 untouched workloads; 1 GAIN, 0 LOSS, 0 power given, 43 EVEN, 0 disagree
-- 2026-10-19 16:28 UTC: `V11_SYSBENCH_SHIPPED` rebuilt from runs 39150486066, 39159004803, 39167578494 (sysbench, the resource objective, native as shipped, omni-v11): 4 untouched workloads; 0 GAIN, 0 LOSS, 5 power given, 43 EVEN, 0 disagree
-- 2026-10-19 16:28 UTC: `V11_SYSBENCH` rebuilt from runs 39149259396, 39157795408, 39166382450 (sysbench, the resource objective, omni-v11): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 46 EVEN, 2 disagree
-- 2026-10-19 16:28 UTC: `V11_REDIS_SERVICE` rebuilt from runs 39149267883, 39158996767, 39167569649 (redis, the service objective, omni-v11): 3 untouched workloads; 6 GAIN, 0 LOSS, 2 power given, 28 EVEN, 0 disagree
+- 2026-10-20 21:59 UTC: `V12_YCSB_SERVICE` rebuilt from runs 39470845655, 39475514914, 39477842603 (ycsb, the service objective, omni-v12): 4 untouched workloads; 1 GAIN, 0 LOSS, 0 power given, 21 EVEN, 0 disagree
+- 2026-10-20 21:59 UTC: `V12_YCSB_SHIPPED` rebuilt from runs 39383000915, 39414286889, 39463721089 (ycsb, the resource objective, native as shipped, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 11 EVEN, 0 disagree
+- 2026-10-20 21:59 UTC: `V12_YCSB` rebuilt from runs 39379934444, 39410606870, 39461506751 (ycsb, the resource objective, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 0 EVEN, 0 disagree
+- 2026-10-20 21:59 UTC: `V12_SYSBENCH_SERVICE` rebuilt from runs 39468576581, 39473186537, 39477834359 (sysbench, the service objective, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
+- 2026-10-20 21:59 UTC: `V12_SYSBENCH_SHIPPED` rebuilt from runs 39382990197, 39412436421, 39461531771 (sysbench, the resource objective, native as shipped, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 3 power given, 45 EVEN, 0 disagree
+- 2026-10-20 21:59 UTC: `V12_SYSBENCH` rebuilt from runs 39379929041, 39410600428, 39461498952 (sysbench, the resource objective, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 47 EVEN, 1 disagree
+- 2026-10-20 21:59 UTC: `V12_REDIS_SERVICE` rebuilt from runs 39381449955, 39412421481, 39461515383 (redis, the service objective, omni-v12): 3 untouched workloads; 7 GAIN, 0 LOSS, 2 power given, 27 EVEN, 0 disagree
+- 2026-10-20 21:59 UTC: `V12_REDIS_SHIPPED` rebuilt from runs 39382995467, 39414279979, 39461540163 (redis, the resource objective, native as shipped, omni-v12): 3 untouched workloads; 0 GAIN, 0 LOSS, 1 power given, 35 EVEN, 0 disagree
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -72,13 +72,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-20 05:45 | [The governors and orchestrators: native under them, Omni-Compass on top](results/live/GOVERNORS.md) |  |
-| 2026-10-20 04:12 | [The Kubernetes scheduler as shipped under the batch stream: Omni-Compass on top of the default scheduler alone (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_VANILLA.md) |  |
-| 2026-10-20 04:12 | [Koordinator under the batch stream: Omni-Compass on top of its colocation (register row 89): the A/B/C three-run table (Omni v12)](results/live/V12_KOORDINATOR.md) |  |
-| 2026-10-20 04:12 | [The Kubernetes scheduler with the operator's bin-packing profile under the batch stream: Omni-Compass on top (register row 88): the A/B/C three-run table (Omni v12)](results/live/V12_BINPACK.md) |  |
-| 2026-10-20 03:17 | [The orchestra, the eighth organism: the governors' muscles, native and with Omni-Compass on top (modelled)](results/orchestra/ORCHESTRA.md) |  |
-| 2026-10-20 03:17 | [The KAI scheduler under the batch stream: Omni-Compass on top of KAI's queues (register row 91): the A/B/C three-run table (Omni v12)](results/live/V12_KAI.md) |  |
-| 2026-10-19 23:41 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 11 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB_SERVICE.md) | Across 4 untouched workloads: 1 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 21 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 0 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [sysbench on MySQL, a database's buffer pool as shipped: the A/B/C three-run table](results/live/V12_SYSBENCH_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 3 power given, 45 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V12_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 48 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V12_SYSBENCH.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 47 EVEN, 1 where the runs disagree. |
+| 2026-10-20 21:59 | [Redis, a cache's memory as shipped (no ceiling): the A/B/C three-run table](results/live/V12_REDIS_SHIPPED.md) | Across 3 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 1 power given, 35 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V12_REDIS_SERVICE.md) | Across 3 untouched workloads: 7 gauge-rows GAIN in all three of our runs, 0 LOSS, 2 power given, 27 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V12_REDIS.md) | Across 3 untouched workloads: 5 gauge-rows GAIN in all three of our runs, 0 LOSS, 2 power given, 29 EVEN, 0 where the runs disagree. |
+| 2026-10-20 21:59 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V12_PGBENCH.md) | Across 3 workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 36 EVEN, 0 where the runs disagree. |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -86,25 +89,32 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-20 17:35 | live-engine | success | [39466517370](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466517370) |
-| 2026-10-20 17:35 | raw-sweep | success | [39467387250](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39467387250) |
-| 2026-10-20 17:31 | big-organism-detached collect | success | [39466841010](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466841010) |
-| 2026-10-20 17:28 | benchmark-reps | success | [39452221655](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39452221655) |
-| 2026-10-20 17:27 | cloud-check amazon | failure | [39466145477](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466145477) |
-| 2026-10-20 17:27 | cloud-check google | failure | [39466133594](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39466133594) |
-| 2026-10-20 17:18 | swarm | success | [39463907059](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39463907059) |
-| 2026-10-20 17:11 | mujoco | success | [39463729880](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39463729880) |
-| 2026-10-20 17:10 | grid | cancelled | [39440275095](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39440275095) |
-| 2026-10-20 16:50 | kind-addons | success | [39454568217](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39454568217) |
+| 2026-10-20 23:54 | six x100 line orgs 2 runs 0+10 | success | [39514426071](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514426071) |
+| 2026-10-20 23:52 | cloud-check amazon | failure | [39517792788](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517792788) |
+| 2026-10-20 23:52 | cloud-check google | failure | [39517785595](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517785595) |
+| 2026-10-20 23:51 | six x100 line orgs 4 runs 0+10 | success | [39514438064](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514438064) |
+| 2026-10-20 23:48 | grid | cancelled | [39517026710](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517026710) |
+| 2026-10-20 23:43 | live-engine | success | [39516212060](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516212060) |
+| 2026-10-20 23:40 | peek | success | [39516530718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516530718) |
+| 2026-10-20 23:38 | six x100 line orgs 7 runs 0+10 | success | [39514454730](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514454730) |
+| 2026-10-20 23:37 | security-scan | failure | [39516212068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516212068) |
+| 2026-10-20 23:18 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 4 | success | [39509009937](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39509009937) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v12 (the max on every muscle, every muscle its own card, quota-aware conveyance, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
+## The engine that stands: omni-v13 (the max on every muscle, every muscle its own card, quota-aware conveyance that never takes another muscle's room, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
 
-The engine on main is **omni-v12** (`OMNI_V12.json`, fingerprint `d38b58fbe28939b8`, 47 files; [`docs/OMNI_V12.md`](docs/OMNI_V12.md)), the
-engine that stands since 19 October by the founder's order ("every time you do that ... it becomes a new version"). It is omni-v11 with
+The engine on main is **omni-v13** (`OMNI_V13.json`, fingerprint `0088837333c6f0fc`, 47 files; [`docs/OMNI_V13.md`](docs/OMNI_V13.md)), the
+engine that stands since 20 October. It is omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig
+with the organism alone, where the queue finished 0.6% to 0.8% later and the web's 99th percentile rose 4% to 13% (LOSS in all three
+runs): the web pods' CPU limits, raised in the queue's first half minute, stayed through the saturated queue, the batch pods hashed
+7.6% slower and the web served no faster while the queue ran. On a shared host at its top beside another workload's room, every limit
+given now goes back to the operator's, and every other pod on a machine is counted by its own limit. The toy gate reads no LOSS against
+omni-v12 in any toy, the web-only toys identical, and in a batch toy set from the KubeRay runs' own files the queue and the job
+turnaround back at native's (`results/toy_gate/V13_VS_V12.md`). **omni-v12** ([`docs/OMNI_V12.md`](docs/OMNI_V12.md)), the engine
+that stood from 19 October by the founder's order ("every time you do that ... it becomes a new version"), was omni-v11 with
 two faults fixed, both found on the omni-v11 runs. A CPU-limit raise the cluster's admission refuses is held until the pod or the raise
 changes or a wait passes (5 minutes, doubling to an hour), where omni-v11 wrote it again at every fast check, about 970 to 1,000
 refused writes an hour in the capacity test; and the swarm's proximity reflex hands back the planner's cruise in the tick it is
@@ -123,12 +133,12 @@ the day (on omni-v8 the 2022 robustness district's monthly unevenness rose 0.11%
 simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
 of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
-omni-v11's hold and omni-v12's held refusal: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
+omni-v11's hold, omni-v12's held refusal and omni-v13's hand-back: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v12 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 00:30 UTC on 20 October); until a benchmark's three runs land, its row on
+omni-v13 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 20:31 UTC on 20 October); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
-**On omni-v11, until their omni-v12 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
+**On omni-v11, until their omni-v13 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
 receipts by [`tools/reproduce.py`](tools/reproduce.py)). On real Kubernetes, ten pairs a run: on top of Goldilocks the 95th percentile
 −61% to −64%; on top of KEDA's HTTP add-on −72% to −74%, replicas −11% to −20%, and the pod start wait, omni-v10's one LOSS, EVEN with
 the served image pre-pulled; on top of KEDA on the CPU target and the requests −52% to −53%; fixed capacity EVEN; every one GAIN in all
@@ -139,14 +149,14 @@ found beyond the counted cells**: on a mission draw outside the swarm's preregis
 native did not (its proximity reflex slowed over a second instead of at once); the fix held every drone outside the keep-out on
 every draw tried and is in omni-v12, whose swarm runs judge a collision as a LOSS and fly three mission draws never flown
 ([`results/toy_gate/V12_SWARM_REFLEX.md`](results/toy_gate/V12_SWARM_REFLEX.md), [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md),
-[`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v12 runs land** (`results/live/V10_*.md`): steady work,
+[`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v13 runs land** (`results/live/V10_*.md`): steady work,
 the demand that wanders, all four in one run (work inside the line **+47% to +79%**), faults, a queue of jobs (machines **−6% to −14%**),
 a noisy neighbour, the Google day of 2011, CruiseKube and the two-hour run. The Omni index over the real tests, each test on its newest
 table: **+4.4% GAIN** on the resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 The whole system, every layer composed by the product law from its own table (the card, the cluster with its add-ons and
 governors, the services on it, the cloud's bill), with every interval carried and the product's assumption tested on the
 governors' four ways, is [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md): a modelled composition (class S) of the class P and L
-tables, remade as each layer's omni-v12 runs land.
+tables, remade as each layer's omni-v13 runs land.
 How every one of these was graded, category by category, is in [`docs/REFEREE_GRADES.md`](docs/REFEREE_GRADES.md).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
@@ -333,7 +343,7 @@ the request logs, the Kafka consumer logs) gzipped; read one with `gunzip -c FIL
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **The engine that stands, omni-v12, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V12.md`](docs/OMNI_V12.md), [`docs/OMNI_V11.md`](docs/OMNI_V11.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The engine that stands, omni-v13, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V12.md`](docs/OMNI_V12.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | Every level on one page: the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud, a group of clusters; any level whose gauges go the other way, named | [`docs/LEVELS.md`](docs/LEVELS.md) (`python3 tools/levels.py`) |
