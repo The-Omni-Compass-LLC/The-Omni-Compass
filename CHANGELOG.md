@@ -4,6 +4,13 @@
 
 ## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 
+- **The poster on the live engine's title page** (the founder's order of 21 October): the owner's poster of the Omni-Compass, the
+  stacks and the software it is built to sit on top of by family, now stands at the top of the title page's right column, with the
+  Omni-Compass as its owner pictures it under it (on a phone both sit under the title). Each is captioned an illustration, not a
+  result; the poster's caption says the names and marks on it belong to their owners and claim no endorsement, and that the legal
+  standing is as the notice states. The plate is kept with the others (`docs/book/plates/omni_compass_poster.webp`); the Live
+  Engine Manual's front matter says so. Rendered in headless Chromium at 1,400 and 420 pixels wide before the push: no page error.
+
 - **Alignment sweep, referee level** (the founder's order of 21 October, "fix, fix, align"): the Live Engine Manual named omni-v13
   as the engine the page is built on in four places and listed the page's section 10 without its 10a and 10b (now omni-v14, with
   both); the README gave the Operator's and Owner's books at 496 and 1,249 pages (now 506 and 1,470, as built) and wrote the

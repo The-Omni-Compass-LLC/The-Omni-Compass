@@ -399,9 +399,10 @@ copy.
 
 The page opens with its legal notice (i), then the title page with the build (ii) and the executive summary with the
 reading key (iii), and then its own table of contents (iv, "Engine table of contents"): the founder's order of 21 October, the
-title, the summary and the key first and the contents after them. Beside the title, on a desktop, stands the owner's illustration
-of the Omni-Compass (on a phone it sits under the title); it is an illustration, not a result, and says so under it: every result
-on the page is read from the repository's own records. The body is numbered 1 to 11; the back matter is v
+title, the summary and the key first and the contents after them. Beside the title, on a desktop, stand the owner's two illustrations,
+one above the other: the poster of the Omni-Compass with the stacks and the software it is built to sit on top of, and the
+Omni-Compass as its owner pictures it (on a phone they sit under the title); each is an illustration, not a result, and says so
+under it: every result on the page is read from the repository's own records. The body is numbered 1 to 11; the back matter is v
 (disclosures, governing law and contact) and vi (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
