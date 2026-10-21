@@ -173,7 +173,7 @@ back.
 **What this manual covers.** Every section of the page in the page's own order; every gauge, with its side, its aim and its
 word; every knob of the console, with what it acts on and what it leaves alone; the two tickers that show the mechanism of
 action; the trace from any tile to the record it came from; and what to do when a tile reads LOSS. It covers the page as
-built on omni-v13; a later engine renames itself on the page's title block and this book is realigned in the same push.
+built on omni-v14; a later engine renames itself on the page's title block and this book is realigned in the same push.
 
 **What this manual does not cover.** How the engine is built, its equations beyond the ones the page itself prints, the
 wiring of Omni-Compass onto any stack, and the benchmark results themselves as a body of evidence: those are the Owner's and
@@ -362,7 +362,7 @@ on the page is read from the repository's own records. The body is numbered 1 to
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
 
-### 2.2 The sections, as built on omni-v13
+### 2.2 The sections, as built on omni-v14
 
 Appendix A lists every section with its anchor and the chapter of this book that
 reads it. In the page's order: 1 the monitor wall and the control panel (1a the control panel and the kill switch, 1b the
@@ -372,8 +372,8 @@ measured effect in full (the organisms, every muscle, the register, the grid and
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
 native and Omni-Compass, 6b the telemetry analytics and Omni-Compass in its own words); 7 the console; 8 the brain (8a one
-cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the component specification; 11 the
-self-governed rendering.
+cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the components, their mathematics and their C++ twin (10a the component
+specification and mathematics, 10b the C++ twin, the Python's runs through the C++ engine); 11 the self-governed rendering.
 
 ### 2.3 Anchors
 
@@ -1400,7 +1400,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 27.2 The engine's name
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v13). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v14). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines.
 
 
