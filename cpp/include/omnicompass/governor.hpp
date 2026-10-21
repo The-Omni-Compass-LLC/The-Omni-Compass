@@ -9,12 +9,14 @@ struct AllocationLaw {
   double S_rollback{0.55}; double route_network{0.20}; int down_band{4}, down_dwell{4}, down_after_add{4}; int min_nodes{8}, max_nodes{40};
 };
 struct Directive { int node_delta{}; bool change_permitted{}, rollback_authorized{}, route_shift{};
-                   double power_cap{}, demand{}, command{}; State x{}; };
+                   double power_cap{}, demand{}, command{}, push{}; State x{}; };   // push: the brain's push u/U_AUTHORITY (Python last_push)
 class Governor {
  public:
   explicit Governor(AllocationLaw law = {}, bool evolve = true);
   Directive step(const Observation& obs, double current_cap, int nodes);
   const State& state() const noexcept { return x_; }
+  const Parameters& params() const noexcept { return p_; }
+  const AllocationLaw& law() const noexcept { return L_; }
  private:
   AllocationLaw L_; bool evolve_; State x_; Parameters p_; double t_{0.0}; int surplus_streak_{0}, since_add_{99};
 };

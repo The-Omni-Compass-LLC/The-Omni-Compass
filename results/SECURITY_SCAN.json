@@ -1,11 +1,11 @@
 {
- "lines_scanned": 37048,
- "high": 3,
+ "lines_scanned": 37470,
+ "high": 2,
  "medium": 35,
- "low": 345,
+ "low": 350,
  "low_by_kind": {
-  "B603 subprocess_without_shell_equals_true": 150,
-  "B404 blacklist": 65,
+  "B603 subprocess_without_shell_equals_true": 154,
+  "B404 blacklist": 66,
   "B607 start_process_with_partial_path": 59,
   "B101 assert_used": 50,
   "B311 blacklist": 12,
@@ -43,7 +43,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    1103
+    1137
    ],
    "what": "Probable insecure usage of temp file/directory.",
    "why": "a default file name for the audit log in the working folder, not /tmp; the operator sets --audit"
@@ -109,7 +109,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    432
+    461
    ],
    "what": "Probable insecure usage of temp file/directory.",
    "why": "the control panel's default kill file, under /tmp/omni-compass on the operator's own machine, where the panel and the governor it starts run as one user; the operator sets it with --kill-file or OMNI_CONTROL_KILL_FILE, and the governor reads only the file the panel hands it (docs/CONTROL_PLANE.md)"
@@ -274,25 +274,14 @@
   },
   {
    "test": "B602",
-   "file": "omni_controller/controller.py",
-   "severity": "HIGH",
-   "count": 1,
-   "lines": [
-    810
-   ],
-   "what": "subprocess call with shell=True identified, security issue.",
-   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (the site power reading, --power-cmd; engine file: the next version runs it without a shell when it holds no pipe)"
-  },
-  {
-   "test": "B602",
    "file": "omni_controller/muscles.py",
    "severity": "HIGH",
    "count": 1,
    "lines": [
-    157
+    114
    ],
    "what": "subprocess call with shell=True identified, security issue.",
-   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a muscle's read command in the operator's wiring file; engine file, as above)"
+   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (run_operator_cmd: the site power reading, --power-cmd, and a muscle's read command in the operator's wiring file; from omni-v14 a command with nothing only a shell reads runs without one, so the shell is reached only for a pipe, a redirect or a variable the operator wrote)"
   },
   {
    "test": "B602",
@@ -300,10 +289,10 @@
    "severity": "HIGH",
    "count": 1,
    "lines": [
-    72
+    79
    ],
    "what": "subprocess call with shell=True identified, security issue.",
-   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a wall meter read by a command, `cmd:` in the meter's address)"
+   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a wall meter read by a command, `cmd:` in the meter's address; without a shell unless it holds a pipe, a redirect or a variable, as the governor's commands)"
   },
   {
    "test": "B608",

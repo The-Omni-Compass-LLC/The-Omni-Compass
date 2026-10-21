@@ -1,6 +1,6 @@
 # Observability and control: the gauges, the alerts and the buttons
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Three components, all outside the fingerprinted engine (none moves its digest), all reading or driving the governor only
 through interfaces it already has: its audit file, its own kill file, its start-up arguments and the machine-wide master
@@ -12,7 +12,7 @@ switch. The Operator's Manual, sections 22.2 to 22.5, is the operating reference
 | Grafana screen | `deploy/grafana/omni-compass.json` | 17 panels over the exporter's series; a link to the control console | nothing |
 | Alert rules | `deploy/prometheus/omni-compass-rules.yaml` | 10 Prometheus rules over the exporter's and the panel's series | nothing |
 | Steering report | `tools/steering.py` → `results/STEERING.md` | the same gauges per hour of each omni arm's archived audit, runs A, B and C side by side | a report |
-| Control panel | `tools/omni_control.py` | bearer-token HTTP API (`/v1/status`, `/v1/presses`, `/v1/mode`, `/v1/dial`, `/v1/reset`, `/v1/kill`, `/v1/arm`), OpenAPI 3 at `/v1/openapi.json`, console at `/`, counters at `/metrics`, on 127.0.0.1:9465 | the governor's kill file and arguments; the master switch; its own control log |
+| Control panel | `tools/omni_control.py` | bearer-token HTTP API (`/v1/status`, `/v1/presses`, `/v1/mode`, `/v1/dial`, `/v1/muscle`, `/v1/reset`, `/v1/kill`, `/v1/arm`), OpenAPI 3 at `/v1/openapi.json`, console at `/`, counters at `/metrics`, on 127.0.0.1:9465 | the governor's kill file and arguments; the master switch; its own control log |
 
 ## The series
 
@@ -56,10 +56,14 @@ governor that exits on its own is never restarted by the panel (its lease hands 
 the command line (`tools/omni_switch.py off`). Tests: `tests/test_omni_exporter.py`, `tests/test_omni_control.py`,
 `tests/test_alert_rules.py`, `tests/test_steering.py`.
 
-Not yet built: a per-muscle row of buttons (the engine that stands takes its mode for the whole governor, so per-muscle
-control comes with the next engine version, through the toy gate); OpenTelemetry traces with one span per decision; a Helm
-chart; two governor replicas with leader election.
+The per-muscle row (omni-v14): `POST /v1/muscle {"muscle": NAME, "on": true|false}`, role operator, and a row of On and Native
+buttons on the console, one for each muscle of the governor's own list (`omni_controller/controller.py`, `MUSCLES`: machines,
+replicas, cpu, clock, gpu, rollout, batch, rightsize, coldstart, contain, cooling). A muscle left native is never written; the
+press passes through native like a dial press, and the governor starts again with `--native` naming every muscle left native
+(`docs/OMNI_V14.md`; `tests/test_native_muscles.py`, `tests/test_omni_control.py`).
+
+Not yet built: OpenTelemetry traces with one span per decision; a Helm chart; two governor replicas with leader election.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
