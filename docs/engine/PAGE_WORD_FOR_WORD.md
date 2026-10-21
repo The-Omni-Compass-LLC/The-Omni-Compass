@@ -23,6 +23,8 @@ DISCLOSURE: REAL RUNS, A REAL ENGINE, NOTHING HARDWIRED. Every real-run figure o
 
 **What the whole industry faces**
 
+The stacks Omni-Compass sits on top of, as its owner pictures them: an illustration, not a result. The product names and marks in it belong to their owners and are used only to identify the systems; no partnership, sponsorship or endorsement is stated or implied, and no result on this page concerns a product the repository has not run Omni-Compass on top of (the register, section 4, says which). The repository's legal position is the notice at the top of this page: all patents, copyrights and trademarks filed in the USA.
+
 More demand than capacity. Demand for computing is growing faster than the power, the machines and the budgets built to carry it. The International Energy Agency puts the world's data centres at about 415 TWh of electricity in 2024, around 1.5% of all the electricity the world used, and expects that to more than double, to about 945 TWh, by 2030, with artificial intelligence the largest driver. In the United States, Lawrence Berkeley National Laboratory counts 176 TWh in 2023, 4.4% of the country's electricity, and between 6.7% and 12% by 2028. The usual answer is to build more: more machines, more megawatts, more cooling and a larger bill.
 
 Much of what is built sits idle. Across the Kubernetes clusters Cast AI measured in 2025, the average processor was 8% busy and the average memory 20% used, read before its own automation was switched on. The organizations Flexera surveyed estimate that 29% of what they spend on cloud infrastructure and platforms is wasted.

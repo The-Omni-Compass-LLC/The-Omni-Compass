@@ -402,7 +402,9 @@ Omni-Compass's solution (iii), the executive summary with the reading key (iv), 
 table of contents"): the founder's orders of 21 October, the title, the problem and the solution, the summary and the key first
 and the contents after them. Beside the title, on a desktop, stands the owner's illustration
 of the Omni-Compass (on a phone it sits under the title); it is an illustration, not a result, and says so under it: every result
-on the page is read from the repository's own records. The body is numbered 1 to 11; the back matter is vi
+on the page is read from the repository's own records. A second illustration of his stands in section iii, the stacks Omni-Compass sits
+on top of as he pictures them, with the same words under it: an illustration, not a result; the marks in it belong to their owners;
+no endorsement is stated or implied. The body is numbered 1 to 11; the back matter is vi
 (disclosures, governing law and contact) and vii (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
@@ -2127,6 +2129,8 @@ DISCLOSURE: REAL RUNS, A REAL ENGINE, NOTHING HARDWIRED. Every real-run figure o
 **The page, in its own words.**
 
 **What the whole industry faces**
+
+The stacks Omni-Compass sits on top of, as its owner pictures them: an illustration, not a result. The product names and marks in it belong to their owners and are used only to identify the systems; no partnership, sponsorship or endorsement is stated or implied, and no result on this page concerns a product the repository has not run Omni-Compass on top of (the register, section L.16, says which). The repository's legal position is the notice at the top of this page: all patents, copyrights and trademarks filed in the USA.
 
 More demand than capacity. Demand for computing is growing faster than the power, the machines and the budgets built to carry it. The International Energy Agency puts the world's data centres at about 415 TWh of electricity in 2024, around 1.5% of all the electricity the world used, and expects that to more than double, to about 945 TWh, by 2030, with artificial intelligence the largest driver. In the United States, Lawrence Berkeley National Laboratory counts 176 TWh in 2023, 4.4% of the country's electricity, and between 6.7% and 12% by 2028. The usual answer is to build more: more machines, more megawatts, more cooling and a larger bill.
 

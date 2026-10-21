@@ -32,6 +32,10 @@
   table has three columns, so no word in it is broken across a line.
 - **The wall's tile titles in capital letters** (the founder's order of 21 October, evening); the wall's words and the Live Engine
   Manual (4.1) say so.
+- **The owner's second illustration on the page**, in section iii beside the problem the whole industry faces: the stacks
+  Omni-Compass sits on top of as he pictures them, with the same words under it as the title plate carries: an illustration,
+  not a result; the marks in it belong to their owners; no endorsement is stated or implied; the repository's legal line stays
+  "filed in the USA". The Live Engine Manual (2.1) names it.
 - **Every tile of the monitor wall carries its title** (the founder's order of 21 October: "every monitor in the wall ... its title
   alongside its number in its top"): at the top of each tile its number and its title, what the monitor shows, wrapped to two lines
   on a desktop and four on a phone, never cut short, and under them its section and its state (live, replay, from the records, a

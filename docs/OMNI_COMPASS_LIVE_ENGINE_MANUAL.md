@@ -446,7 +446,9 @@ Omni-Compass's solution (iii), the executive summary with the reading key (iv), 
 table of contents"): the founder's orders of 21 October, the title, the problem and the solution, the summary and the key first
 and the contents after them. Beside the title, on a desktop, stands the owner's illustration
 of the Omni-Compass (on a phone it sits under the title); it is an illustration, not a result, and says so under it: every result
-on the page is read from the repository's own records. The body is numbered 1 to 11; the back matter is vi
+on the page is read from the repository's own records. A second illustration of his stands in section iii, the stacks Omni-Compass sits
+on top of as he pictures them, with the same words under it: an illustration, not a result; the marks in it belong to their owners;
+no endorsement is stated or implied. The body is numbered 1 to 11; the back matter is vi
 (disclosures, governing law and contact) and vii (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
