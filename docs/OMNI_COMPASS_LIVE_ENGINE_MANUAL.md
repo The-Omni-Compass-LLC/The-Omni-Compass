@@ -610,6 +610,19 @@ engineer reads peaks and swings, wear and accuracy, and misses. Each bar counts 
 size beside it is the median of those rows' own sizes; the largest is printed beside the median; power given and LOSS rows are
 counted beside them, and the runs that disagree or differ are listed, not counted.
 
+### 8.2a The trading floor: the market map and the quote board
+
+Every three-run table on the page, read the way a trading floor reads its market (the founder's order of 21 October). The
+market map is a squarified treemap: one tile a table, grouped by stack, its area the number of gauges the table judged and its
+colour its reading: green GAIN, deeper the larger the share of its rows that read GAIN; red wherever any row reads LOSS; yellow
+EVEN; the accent where it gave power; grey with a dashed edge a table of an orchestrator's own cost, with no Omni-Compass in
+either arm. A reading cursor walks the map one table every one and a half seconds and names it under the map. The quote board
+gives every table a quote: its ticker (the table's file) and engine, the gauge that moved most with its mean change across
+the three runs, and that gauge in runs A, B and C as a candle: the vertical bar is the run's 95% interval, the tick its value,
+the line the zero of no change. The strip under each quote counts the table's rows by word, and a tape runs every headline
+across the top. Pointing at a tile or a quote shows its record: the table's title, engine, counts, the headline gauge in each
+run and the file. Every figure is the table's own; nothing is typed in.
+
 ### 8.3 Aggregate: one figure for the whole board
 
 The Omni index (`results/OMNI_INDEX.md`): the geometric mean of the

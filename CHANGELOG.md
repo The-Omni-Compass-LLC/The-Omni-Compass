@@ -2,6 +2,19 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21 (midday): the trading floor; the Grafana wall in the page's order; the owner's illustration
+
+- **The trading floor** on the benefit board (the founder's order of 21 October, after a broker's wall of screens): every three-run
+  table on the page as a market map (a squarified treemap grouped by stack, each tile's area the gauges its table judged and its
+  colour its reading, an orchestrator's own cost grey and dashed) and as a quote board (a quote a table: its ticker and engine, the
+  gauge that moved most, that gauge in runs A, B and C as a candle of its 95% interval and value, its rows counted by word, a tape
+  of every headline), two registered monitors with their record on pointing; a reading cursor walks the map. Every figure is the
+  table's own. The monitors after them are numbered two higher: the numbers stay the order of appearance.
+- **The Grafana wall in the page's order** (`docs/engine/export_grafana.py`): its panels had been numbered in the registry's order
+  (its panel 2 was the page's monitor 4); every panel now carries its monitor's number on the page and the panels run left to right.
+- **The owner's illustration** beside the title on a desktop and under it on a phone (`docs/book/plates/unified_control_authority.webp`,
+  kept with the plates), captioned as an illustration, not a result.
+
 ## 2026-10-21 (morning): the live engine front to back as the founder reads it; every monitor drawn; the Python's runs through the C++
 
 - **The front order** (the founder's order of 21 October): the title page first, then the executive summary and the reading key, then

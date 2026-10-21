@@ -11,6 +11,7 @@ a monitor with a Prometheus expression becomes a panel on that expression (the d
 monitor the page computes from the repository's tables, or from its own clock, becomes a text panel saying so and where the
 number lives. Beside deploy/grafana/omni-compass.json (the governor's own seventeen panels on tools/omni_exporter.py) it is the
 whole wall for an operator's Grafana. The page embeds the same model and offers it for download; the builder writes the file.
+Every panel carries its monitor's number on the page, its order of appearance, and the panels run left to right, then the next row.
 
   python3 docs/engine/export_grafana.py [OUT.json]      (default: deploy/grafana/omni-compass-wall.json)
 """
@@ -23,13 +24,24 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 REG = HERE / "monitors.json"
+PAGE = HERE / "OMNI_COMPASS_LIVE_ENGINE.html"
 OUT = ROOT / "deploy" / "grafana" / "omni-compass-wall.json"
 W, H, COLS = 12, 8, 2
 
 
+def page_order() -> list:
+    """The page's canvases in their order of appearance: the monitors' numbers, as the page itself counts them."""
+    import re
+    if not PAGE.exists():
+        return []
+    body = re.sub(r"<script[^>]*>.*?</script>", "", PAGE.read_text(encoding="utf-8"), flags=re.S)
+    return [m.group(1) for m in re.finditer(r'<canvas\b[^>]*\bid="([^"]+)"', body)]
+
+
 def dashboard(reg: dict) -> dict:
     panels = []
-    for i, m in enumerate(reg["monitors"]):
+    order = {cid: i for i, cid in enumerate(page_order())}   # every panel numbered as the page numbers its monitor, laid out left to right
+    for i, m in enumerate(sorted(reg["monitors"], key=lambda m: order.get(m["id"], len(order)))):
         n = i + 1
         x, y = (i % COLS) * W, (i // COLS) * H
         title = f"{n} · {m['name']}"
