@@ -2,6 +2,42 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21 (afternoon): every monitor moving and wired, its code to its Python to its C++; every dashboard on its section
+
+- **Every monitor moves** (the founder's order of 21 October: "I don't see some grids, charts, diagrams moving with real time"). A
+  photograph of every monitor 2.5 s apart had found 17 that did not change: records with nothing to scan, lines that took one point
+  a decision too small to see. Now a ring opens at the head of every live line as each decision lands, with the line's newest
+  value printed beside it (the scoreboard strip, the console, the controller's strip, the chip and the host, the official run, the
+  clouds' modelled lanes, the brain's wells and its bath, the first mode); every record monitor has a reading cursor that walks it
+  one row a decision and names the row it holds (GitHub's runs, the seven organisms, all 1,107 muscles, the grid, the Azure sets,
+  the orchestrators' road, the whole organism's pieces); every GitHub reading prints its age, counted every second; the modes mark
+  each decision's own motion on every bar; and the proof monitor checks the Python's set again without end, one run about twice a
+  second, the run boxed on all three lanes. The same photograph now finds all 60 moving.
+- **Every monitor's wiring** under it and in the monitor list (`docs/engine/monitors.json`, `wire`): the page's own code, the Python
+  it ports or reads, the C++ twin or why there is none, the checks that hold them equal, each file linked at the build's commit, and
+  how it moves. `tests/test_live_monitors.py` holds every name to the page's script and every file to the repository. The registry's
+  words were read against every canvas and corrected where they named something else (the body parts on the band, the brain's S
+  and B, the pipeline, the heart, the candles, the heat map, the bars, the telemetry strip, the controller's strip, the strip, the
+  console, the organisms); the tensor lab's six monitors and the cloud setting's two now say replay, as they play records.
+- **The motion meter**: the page photographs every monitor in view once a second, as the viewer sees it, and says on its badge and
+  in its row of the list whether it moved; a monitor off screen rests and keeps what it did when last in view. Scrolled once top to
+  bottom: 60 of 60 seen, 60 moving.
+- **The scale-out grid's monitor** drew the newest grid file, omni-v5's, whose squares are all empty; it now draws the engine that
+  stands' own campaign as GitHub runs it (each square's runs started and measured), the road on its button.
+- **Two closing tags**: one too many after the register's panel ended section 4 early and left the scale-out grid and every section
+  from 5 on outside the page's frame (full width on a wide screen, no section of their own for the grid's badge); one missing after
+  the benefit board nested the next three panels inside it. Both repaired; a test now walks every section's tags.
+- **Every dashboard on its section**: the Grafana wall carries a row for each section of the page, its panels under it, numbered as
+  the page numbers its monitors, each describing its wiring. A canvas text that fits is drawn whole, its ellipsis only where it is cut.
+- **The official-run playback, lined up with the Python's scorer** (`docs/engine/export_runs.py`). The page scores every repetition with
+  the repository's own scorer (`tools/live_reps.py`) and checks it against the run's own summary; for the three governors that run a
+  group of two clusters (Armada, Karmada, Open Cluster Management) it disagreed by 51% to 68%: the scorer was handed the repetition's
+  files laid flat, so a member cluster's capture overwrote the group's own and the page counted one cluster's machines, node-hours,
+  energy and writes. Every file now keeps its place in the folder: every run agrees to about 1e-16. And each of a governor's five
+  four-ways tables had replayed the same two arms (the orchestrator as shipped and Omni-Compass on top of it); each now plays its
+  own two arms, named on the lanes, the candles, the heat map and the repetition's table, with Omni-Compass's colour only on an arm
+  that carries it.
+
 ## 2026-10-21 (midday): the trading floor; the Grafana wall in the page's order; the owner's illustration
 
 - **The trading floor** on the benefit board (the founder's order of 21 October, after a broker's wall of screens): every three-run

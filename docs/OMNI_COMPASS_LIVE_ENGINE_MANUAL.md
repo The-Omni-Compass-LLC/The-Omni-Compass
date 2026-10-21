@@ -426,7 +426,11 @@ capacity it holds there is power given, shown beside the work and the speed it b
 A kill-switch window is shaded red across every time axis. A monitor on screen now carries an accent
 border on its tile. A tile with no reading says what it shows (a count, a state, an age) and carries no colour of a word. A
 row shown and not judged (the knob's own setting, the governor's own commands, Omni-Compass's own processor time) is grey and
-counted in no total.
+counted in no total. A ring that opens and fades at the head of a line is the decision that has just landed on it, and the small
+box beside the head prints that line's newest value, as a quote board prints the last price. A box drawn round a row, a cell or a
+bar of a record monitor is its reading cursor: it walks the record one row for each decision of the live engine, and the row it
+holds is named under the monitor; the record itself changes only when GitHub's next run rebuilds the page. An age printed
+beside a reading of GitHub ("read 06:16 UTC, 41 min 07 s ago") counts up every second.
 
 ---
 
@@ -445,12 +449,32 @@ badge names its section, so a monitor and its section read each other both ways.
 knobs: the kill switch, the console's knobs where the monitor is live, and its own buttons where it replays. The monitor
 list beside the wall (the page's section 1c, `#s-monlist`) gives every monitor by its number, what it shows, its section, each monitor's evidence class, its state (live, replay, record, model or awaiting its run), the
 open-source exporter and series that would carry it on a running system, and, where it waits, the run that fills it; the
-whole wall is also a Grafana dashboard (`deploy/grafana/omni-compass-wall.json`). The control panel (the page's section 1a, `#s-health`)
+whole wall is also a Grafana dashboard (`deploy/grafana/omni-compass-wall.json`), its panels numbered as the page numbers its
+monitors and laid out left to right, each under a row for the page's section that holds it, each carrying its wiring. The control panel (the page's section 1a, `#s-health`)
 holds the kill switch, the button that runs the Python's own seeded runs in the page (they also run on their own as the page
 opens), the three manuals and the wall's dashboard. The proof monitor (the page's section 1f, `#s-proof`) reads every run three ways: the
 Python's set as GitHub ran it (`tools/engine_runs.py`, its run linked), the same draws through the C++ harness on the engine's
 C++ twins (`cpp/tools/engine_runs.cpp`), and this page's own port, one SHA-256 digest each beside the digest of the draws
-themselves; the three must be one. Appendix L lists every monitor under its number.
+themselves; the three must be one. Once that first check ends, the page checks the set again without end: one run at a time,
+about twice a second, each run recomputed from its own seed by the page's engine and held against the Python's receipt; the run
+being checked is boxed on all three lanes and its result printed under the digests. Appendix L lists every monitor under its number.
+
+**Every monitor's wiring.** Under every monitor, below its knobs and its feed, one line names its wiring as the repository wires
+it (`docs/engine/monitors.json`): this page's own code (the drawing function), the Python it ports or reads, the C++ twin or why
+there is none, and the checks that hold them equal, each file linked at the commit the page was built from; then how the monitor
+moves. The monitor list carries the same in two columns. Three kinds of chain stand on the page. A live monitor runs the page's
+port of the engine (`omnicompass/adapter.py`, `core.py`, `nervous_system.py`, `compass_law.py`, `verdict.py`), held equal to the
+Python by `docs/engine/check_live_engine.py`, and the Python held equal to its C++ twins (`cpp/src/core.cpp`, `governor.cpp`,
+`nervous_system.cpp`) by the parity tests and by the C++ harness that runs the Python's own draws. A replay plays a record the
+Python wrote (the harness, the shipped controller, the models of the chip and the host), held equal to its source by
+`docs/engine/check_records.py`. A record reads a table of measured runs as it is written: no engine runs in the page for it, so no
+C++ applies, and its line says so.
+
+**The motion meter.** The page watches itself as the viewer sees it. Every monitor in view is photographed small once a second;
+one whose picture changed in the last three seconds reads **● moving** on its badge and in its row of the list, one in view for
+three seconds without a change reads **● still** (and says so when the engine is paused). A monitor off screen rests, as the page's
+own governor rests it (chapter 25), and its row keeps what it did when it was last in view; the note under the list counts the
+monitors seen so far and how many of them moved. Scroll the page once from top to bottom and every row reads what its monitor does.
 
 ### 4.1 What the wall is
 
@@ -646,7 +670,10 @@ Seven organisms × 1, 10, 100 and 1,000 copies × 1, 10, 100 and 1,000 runs: mod
 and with the real cluster inside (the 95th percentile), both values shown in every square. The 1,000 tier runs on GitHub's free
 runners only; paid machines stay at 100. Two buttons choose *the engine that stands: its runs as they land* or *the road: the
 newest grid with its squares landed*. A square not yet landed says so; a square beyond a free runner's memory or time is listed
-as pending runner capacity, never rented.
+as pending runner capacity, never rented. The grid's monitor draws the engine that stands' own campaign as GitHub runs it: each
+square filled by its runs started (pale) and measured (solid), as GitHub was read at the build, with the age of that reading in
+its heading; the reading cursor walks every started square and names it under the grid. Once the grid's receipt is written, each
+square takes its word. The road draws the newest grid with its squares landed, under its own engine's name, never read across.
 
 ### 8.6 Every three-run table
 
@@ -808,7 +835,11 @@ orchestrator (compass), all four in every repetition, each comparison paired wit
 (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6). On the organism alone Omni-Compass sits on top of Kubernetes' own
 scheduler. The monitor shows the four as four columns of one table per governor; the comparisons an operator reads first are
 native against compass (what Omni-Compass adds on top of the orchestrator) and nativebare against compassbare (what it adds
-with no orchestrator at all).
+with no orchestrator at all). In the official-run playback (the page's section 5c) each of a governor's five tables plays its own
+two arms of the run's repetitions, named on the lanes, the candles, the heat map and the repetition's table by the table's own
+words, the left lane its reference and the right lane its candidate; Omni-Compass's colour is drawn only on an arm that carries
+Omni-Compass, so the orchestrator's own cost (the orchestrator as shipped against the organism alone) plays in native's colours on
+both lanes.
 
 ### 11.4 The orchestra
 
@@ -826,7 +857,10 @@ before a byte is drawn: native (the whole cluster with everything it ships with)
 same second. Pick a benchmark, a run (A, B or C) and a repetition at the head of the section; the tiles, the candles, the
 heatmap, the bars and the two tickers all move together with the page's section 5d. The data pipeline is its own monitor:
 every stage from the GitHub Actions run to the page (the run, the raw files archived, the SHA-256 check, the official scorer,
-the three-run tables, the build, the page) drawn whole, the stage being read lit and the data moving between them.
+the three-run tables, the build, the page) drawn whole, the stage being read lit and the data moving between them. Under the
+receipt the page holds its own scoring of every repetition against the run's own scored summary (`LIVE_REPS.json`) and prints
+the largest relative difference: at machine precision (about 1e-16) for every run, the governors that run a group of two
+clusters included, whose every file the scorer reads at its own place in the repetition's folder.
 
 ### 12.2 The heart
 
@@ -1013,21 +1047,24 @@ it reads, where it lives in the code, and its measure on this run.
 
 The engine's own record is a tensor: two sides × every decision × sixty muscles,
 each entry a muscle's compass position (0 calm, 0.5 the center of its band, 1 its line), recorded from `realms/harness.py`
-(class S). It fills in decision by decision as the page's section 6a plays. Read it as a sheet of heat: a column (one decision) that is
+(class S). It fills in decision by decision as the page's section 6a plays: the tensor, the difference matrix and the principal
+motions replay that record on the live engine's clock, and no knob of the console changes them. Read it as a sheet of heat: a column (one decision) that is
 light on the blue side and dark on the amber side is a body Omni-Compass held nearer calm at that moment.
 
 ### 17.2 The difference matrix and the principal motions
 
 The difference between the sides, muscle by decision, with the
 sign of the word; and the body's principal motions, the tensor's eigen-decomposition: the few patterns of movement that
-account for most of the body's motion, each with the share of the variance it carries. A first motion that is the whole body
+account for most of the body's motion, each with the share of the variance it carries. The line across each bar is the
+decision on screen: the share of that decision's own departure from the run's mean that lies in the mode. A first motion that is the whole body
 rising and falling together is a body breathing with its demand; a motion that is one room against the rest is that room's
 inflammation.
 
 ### 17.3 The service level and the error budget
 
 The official runs (class L) read as a site-reliability engineer reads a
-service: the service level this repetition, the error budget burned, and every gauge of this repetition against native.
+service: the service level this repetition, the error budget burned, and every gauge of this repetition against native, each
+replaying the official run chosen in the page's section 5c.
 
 ### 17.4 Omni-Compass in its own words
 
@@ -1452,7 +1489,14 @@ Python and the C++ (`docs/engine/cpp_core_probe.cpp`) and prints the largest dif
 `python3 docs/engine/check_records.py` reproduces every record the page carries by an independent path
 and compares value by value; `docs/engine/APPRAISAL.md` is the standing result.
 
-### 31.4 The whole
+### 31.4 The wiring
+
+`python3 -m unittest tests.test_live_monitors` holds every monitor to its wiring: every page function a monitor names is in the
+page's script; every Python, C++ and check file it names is in the repository; every monitor sits in a numbered section; every
+section of the page closes what it opens; and every panel of the Grafana wall sits under the row of its section, numbered as the
+page numbers it.
+
+### 31.5 The whole
 
 `python3 verify.py` runs every check of the repository, this page's included, and ends
 `VERIFICATION: PASS`; `python3 tools/release_manifest.py` writes `RELEASE_MANIFEST.json` at the commit and must read 0 FAIL.
