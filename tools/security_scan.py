@@ -50,6 +50,10 @@ REVIEWED = {
                                        "only its own registry (docs/THREAT_MODEL.md, T4)",
     ("B108", "scripts/dispatch_grid.py"): CI_TMP,
     ("B108", "tools/gpu_actuator_watchdog.py"): CI_TMP,
+    ("B108", "tools/omni_control.py"): "the control panel's default kill file, under /tmp/omni-compass on the operator's own "
+                                       "machine, where the panel and the governor it starts run as one user; the operator sets "
+                                       "it with --kill-file or OMNI_CONTROL_KILL_FILE, and the governor reads only the file the "
+                                       "panel hands it (docs/CONTROL_PLANE.md)",
     ("B108", "tools/run_kafka.py"): CI_TMP,
     ("B108", "tools/run_redis.py"): CI_TMP,
     ("B310", "omni_controller/controller.py"): FIXED_URL + " (the operator's metrics endpoint)",
