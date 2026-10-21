@@ -120,6 +120,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-21 17:58 | [The engine's runs: 500 runs from the jump generator (base 993613928), one digest](results/engine_runs/ENGINE_RUNS_500_993613928.md) |  |
 | 2026-10-21 06:48 | [The engine's runs: 500 runs from the jump generator (base 902816710), one digest](results/engine_runs/ENGINE_RUNS_500_902816710.md) |  |
 | 2026-10-21 06:28 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-21 05:02 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V14_VS_V13.md) |  |
@@ -130,16 +131,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-21 15:23 | pgbench | success | [39611501101](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39611501101) |
-| 2026-10-21 15:20 | kafka | success | [39609209866](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39609209866) |
-| 2026-10-21 15:19 | kind-cruisekube | success | [39596141149](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39596141149) |
-| 2026-10-21 14:56 | benchmark-reps | success | [39606881656](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39606881656) |
-| 2026-10-21 14:54 | engine-runs | success | [39620723676](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39620723676) |
-| 2026-10-21 14:51 | redis | success | [39606898003](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39606898003) |
-| 2026-10-21 14:46 | live-engine | success | [39615891213](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39615891213) |
-| 2026-10-21 14:44 | swarm | success | [39618544495](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39618544495) |
-| 2026-10-21 14:40 | mujoco | success | [39618516215](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39618516215) |
-| 2026-10-21 14:37 | cloud-check amazon | failure | [39618440105](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39618440105) |
+| 2026-10-21 18:55 | orchestrators: kai C | success | [39647463421](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39647463421) |
+| 2026-10-21 18:55 | big-organism-detached collect | success | [39657026836](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39657026836) |
+| 2026-10-21 18:54 | cloud-check amazon | failure | [39656910750](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39656910750) |
+| 2026-10-21 18:54 | orchestrators: koordinator A | success | [39647472329](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39647472329) |
+| 2026-10-21 18:54 | cloud-check google | failure | [39656897770](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39656897770) |
+| 2026-10-21 18:42 | benchmark-reps | success | [39640329297](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39640329297) |
+| 2026-10-21 18:39 | orchestrators: kai B | success | [39645113782](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39645113782) |
+| 2026-10-21 18:23 | orchestrators: kai A | success | [39642745319](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39642745319) |
+| 2026-10-21 18:17 | live-engine | success | [39648604258](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39648604258) |
+| 2026-10-21 18:02 | engine-runs | success | [39648944815](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39648944815) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
