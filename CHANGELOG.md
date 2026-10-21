@@ -4,6 +4,17 @@
 
 ## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 
+- **The live engine's record check, read on the same commits as the build** (`docs/engine/build_live_engine.py`): the check that
+  every record on the page is the repository's own run printed "differs: runs" on GitHub's builds of 21 October (05:15 and after),
+  and the step went on, because the check's output was piped into the summary without `pipefail`; the workflow's bash with
+  `pipefail` (from the live engine branch) now stops the page there. The cause: the build read each run's serial number (its full
+  commit, where git knows it) before its GitHub ledger fetched the commits the shallow checkout lacked, and the check read it after.
+  The build now reads GitHub first, so the build and its check read the records on the same commits; a check that still finds a
+  difference prints the first field that differs.
+- **The compass law's parity test reaches its "never take back while it climbs" line**: its random laws never drew a negative gain,
+  so that line never decided an answer and a C++ law without it passed unseen (the negative control said so). 101 laws whose damping
+  gain takes either sign, fed climbing readings, now run beside the 300 random ones; the twin stays identical, the mutant is caught.
+
 - **The verdict in C++** (`cpp/src/verdict.cpp`, `cpp/include/omnicompass/verdict.hpp`, the tool `oc_verdict`): a line-by-line twin of
   `omnicompass/verdict.py` (the median, the log costs' mean and variance, Welch's interval, the trial's phases, both judges, the
   stepwise reference), with the Python's own `sum()` (Neumaier's compensated sum, as CPython 3.12 adds floats) and its `round()`.
