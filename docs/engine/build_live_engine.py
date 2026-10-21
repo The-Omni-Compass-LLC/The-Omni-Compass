@@ -838,6 +838,14 @@ def records(runs: bool) -> dict:
     import export_grafana as XGF
     import export_heldout as XHO
     import export_cpp_twins as XT
+    now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # GitHub is read first: the ledger fetches the commit of every run it lists that the checkout lacks, and the runs' serial
+    # numbers below (export_runs.py serial: the full commit, where git knows it) must be read on the commits the build leaves
+    # behind, the same ones its --check reads them on; read after them, the check found commits the build had not
+    gh = github_runs() if runs else None
+    runs_read_at = now() if gh is not None else None
+    camp = campaign_reading() if gh is not None else None      # the campaign's runs, read with the run list
+    led = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
         import export_runs as XR
@@ -860,17 +868,14 @@ def records(runs: bool) -> dict:
         reg = json.loads((HERE / "monitors.json").read_text(encoding="utf-8"))
         reg["grafana"] = XGF.main(str(t / "wall.json")) if CHECKING else XGF.main()
     name, digest = engine()
-    now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    gh = github_runs() if runs else None
-    camp = campaign_reading() if gh is not None else None      # the campaign's runs, read with the run list
     from tools.readings import SIZE_FLOOR
     build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"), "floor": SIZE_FLOOR,
              "built_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
              # GitHub's running and queued runs, with the moment they were read; None where this build did not read them (no token)
-             "runs": gh or [], "runs_read_at": now() if gh is not None else None}
+             "runs": gh or [], "runs_read_at": runs_read_at}
     build["board"] = board(build["runs"], camp)
-    build["ledger"] = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
+    build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x}
 
@@ -881,6 +886,27 @@ def embedded(page: str, key: str):
         return None
     a = page.index(tag) + len(tag)
     return json.loads(page[a:page.index("</script>", a)])
+
+
+def first_difference(a, b, path="$"):
+    """The first place two records differ, as (path, a's value, b's value) cut short, or None where they are equal."""
+    if a == b:
+        return None
+    if isinstance(a, dict) and isinstance(b, dict):
+        for k in sorted(set(a) | set(b), key=str):
+            if k not in a or k not in b:
+                return f"{path}.{k}", repr(a.get(k, "<absent>"))[:120], repr(b.get(k, "<absent>"))[:120]
+            d = first_difference(a[k], b[k], f"{path}.{k}")
+            if d:
+                return d
+    elif isinstance(a, list) and isinstance(b, list):
+        for i, (x, y) in enumerate(zip(a, b)):
+            d = first_difference(x, y, f"{path}[{i}]")
+            if d:
+                return d
+        if len(a) != len(b):
+            return f"{path} (length)", str(len(a)), str(len(b))
+    return path, repr(a)[:120], repr(b)[:120]
 
 
 def inject(page: str, key: str, value) -> str:
@@ -933,6 +959,10 @@ def main() -> int:
         if any(pb.get(k) != rec["build"][k] for k in keep) or strip(pb.get("board")) != strip(rec["build"]["board"]):
             bad.append("build")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
+        for k in bad:
+            where = first_difference(embedded(page, k), rec[k])
+            if where:
+                print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin"):
         page = inject(page, k, rec[k])
