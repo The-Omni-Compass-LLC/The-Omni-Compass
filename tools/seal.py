@@ -43,6 +43,12 @@ TWINS = {
     "compass law and the two-way plug (every muscle's law, the tune-down and every live controller)": {
         "python": ["omnicompass/compass_law.py"], "cpp": ["cpp/src/compass_law.cpp", "cpp/include/omnicompass/compass_law.hpp"],
         "proof": "tests/test_cpp_compass_law_parity.py"},
+    "verdict (the give-back trial, its interval reading and the steps it allows)": {
+        "python": ["omnicompass/verdict.py"], "cpp": ["cpp/src/verdict.cpp", "cpp/include/omnicompass/verdict.hpp"],
+        "proof": "tests/test_cpp_verdict_parity.py"},
+    "the engine's seeded runs (the Python's 500 from the jump generator, through every twin above)": {
+        "python": ["tools/engine_runs.py"], "cpp": ["cpp/tools/run_engine_runs.cpp"],
+        "proof": "tests/test_cpp_engine_runs_parity.py"},
 }
 PYTHON_ONLY = {
     "omni_controller/gpu_governor.py (device I/O)": "reading nvidia-smi and writing power limits; its decision rules are twinned above",
@@ -53,8 +59,8 @@ PYTHON_ONLY = {
                                 "heat debt); its tune-down runs the compass law, twinned above",
     "realms/harness.py, realms/plants.py": "the organisms' body and its plants (the modelled muscles the harness drives)",
     "omnicompass/edge.py": "the edge every muscle's balance point and wall move by (realms/compass_arm_v5.py Edge)",
-    "omnicompass/verdict.py, omnicompass/student_t.py": "the verdict on a trial and its exact 95% point (checked against the live "
-                                                        "engine page's own port, docs/engine/check_live_engine.py)",
+    "omnicompass/student_t.py": "the exact 95% point of Student's t the reports read (the verdict itself is twinned above and "
+                                "reads the fixed 1.96)",
 }
 
 
@@ -82,6 +88,9 @@ def prove():
     test_cpp_twins_parity.main(str(b / "oc_twins"), 2000)
     from tests import test_cpp_compass_law_parity
     test_cpp_compass_law_parity.main(str(b / "oc_compass_law"), 300)
+    from tests import test_cpp_verdict_parity, test_cpp_engine_runs_parity
+    test_cpp_verdict_parity.main(str(b / "oc_verdict"), 300)
+    test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 100)
 
 
 def check():

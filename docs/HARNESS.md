@@ -10,7 +10,7 @@ This tree is the GitHub-ready kit: frozen engine + C++ twin + two plants + live 
 
 ```bash
 pip install -r requirements.txt
-python verify.py --quick          # engine, C++, soak, parity
+python verify.py --quick          # engine, C++ twins and their parity, soak
 python k8s_controlplane/test_controlplane.py
 python -m k8s_controlplane.suite  # elastic / always_on / idle_power
 python tests/test_hpa_three_way.py
@@ -37,6 +37,10 @@ C++:
 ```bash
 cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build -j2
 ./cpp/build/oc_smoke
+python tests/test_cpp_compass_law_parity.py cpp/build/oc_compass_law   # the compass law, Python against C++
+python tests/test_cpp_verdict_parity.py cpp/build/oc_verdict            # the verdict, Python against C++
+python tests/test_cpp_engine_runs_parity.py cpp/build/oc_engine_runs 500   # the Python's 500 runs through the C++ engine
+python tools/engine_runs.py --runs 500 --base 7 --cpp cpp/build/oc_engine_runs   # a new set, both engines, one record
 ```
 
 ## Two plants (do not mix the tables)
@@ -50,12 +54,24 @@ Observe must match the native arm on that plant. If it does not, the run is inva
 
 ## Engine species
 
-Shipped `omnicompass/core.py` is the patent principal form: cubic \(U(1-U^2)\), FIG. 4 command, RK4 with held \(u\).
+Shipped `omnicompass/core.py` is the patent principal form: cubic U(1 − U²), FIG. 4 command, RK4 with held u.
 `omnicompass/pools.py` is actuation only (off / hold / park). It does not change the field.
+
+## The C++ twin
+
+`cpp/` is the engine written a second time, line for line where a twin exists: the six-state core, the governor's allocation
+laws, the shield, the pod autoscaler's replica law, the closure, the conveyance law, the nerves, the compass and ledger, the
+GPU governor's rules, the compass law with the two-way plug, and the verdict. Each twin has a parity test that feeds the Python
+and the C++ the same inputs (`verify.py` runs them all; `tools/seal.py` lists them and what still runs in Python only). The
+Python's seeded runs (`tools/engine_runs.py`, 500 from the jump generator) run whole in C++ too (`cpp/tools/run_engine_runs.cpp`:
+the governor, the nerves, the compass law and the verdict, fed the same seeds and draws), every receipt and the SHA-256 digest
+identical to the Python's; the `engine-runs` workflow runs both with every set. The live engine's section 10b feeds the
+Python's own runs into the C++ at every rebuild (`docs/engine/export_cpp_twins.py`), and its proof monitor sets the C++
+engine's digest beside the Python's and the page's.
 
 ## Not in this harness
 
-Live kube-controller-manager, kind CI, GPU MIG scheduler, facility cooling plant.
+Live kube-controller-manager, GPU MIG scheduler, facility cooling plant (kind runs on GitHub: `docs/K8S_COMPASS_PREREGISTRATION.md`).
 `omni_controller/` is observe-first against kubectl; tests use `tests/fake_cluster/kubectl`.
 
 See `LIMITS.md`.

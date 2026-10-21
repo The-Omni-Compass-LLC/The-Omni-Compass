@@ -16,6 +16,9 @@ rebuild of the page, on the checkout the page is built from, with the C++ compil
              with the band's center, cushion and push as they stood at each reading, fed through the C++ law
              (cpp/src/compass_law.cpp) and through the Python again; the force, position and velocity compared with the
              run's own, decision by decision
+  engine runs the Python's seeded runs (tools/engine_runs.py, the newest record the page shows: 500 runs from the jump
+             generator) run again by the C++ engine (cpp/tools/run_engine_runs.cpp: the governor, the nervous system, the
+             compass law and the verdict, all C++), every receipt compared with the record's and the two SHA-256 digests
   organisms  the seven organisms (the spine, the four realms, the four stacked, the whole tower) at the tune-down, where
              every muscle runs the compass law (realms/compass_arm_v5.py compass_apply_v5 with V5SAVE), on the climb, seed
              3000: every muscle's law fed through the C++ the same way, organism by organism and muscle by muscle
@@ -186,7 +189,26 @@ def twins(b: Path, tmp: Path) -> list:
         run(name, lambda: test_cpp_twins_parity.main(str(b / "oc_twins"), 500) and None, "500 seeded cases")
     law = [k for k in seal.TWINS if k.startswith("compass law")][0]
     run(law, lambda: LP.main(str(b / "oc_compass_law"), 300) and 0.0, "300 random laws and plugs")   # it asserts every answer identical
+    from tests import test_cpp_verdict_parity, test_cpp_engine_runs_parity
+    run([k for k in seal.TWINS if k.startswith("verdict")][0], lambda: test_cpp_verdict_parity.main(str(b / "oc_verdict"), 300) and 0.0,
+        "300 random verdicts, both judges")
+    run([k for k in seal.TWINS if k.startswith("the engine's seeded runs")][0],
+        lambda: test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50) and 0.0, "50 runs from the jump generator")
     return rows
+
+
+def engine_runs(b: Path, er: dict) -> dict:
+    """The record's set (the Python's receipts as GitHub or a person wrote them) run again by the C++ engine: its digest beside
+    the record's, and each run's largest difference from the record's receipt (0 where every number is the same to the last bit)."""
+    from tools.engine_runs import digest
+    from tests.test_cpp_engine_runs_parity import compare, cpp_runs
+    py = er.get("receipts") or []
+    cpp, cdg = cpp_runs(b / "oc_engine_runs", len(py), int(er["base"]), py[0]["k"] if py else 0)
+    per = compare(py, cpp)
+    return {"file": er.get("file"), "base": er["base"], "runs": len(py), "python_digest": er.get("digest"),
+            "python_digest_recomputed": digest(py) if py else None, "cpp_digest": cdg, "same_digest": cdg == er.get("digest"),
+            "identical_runs": sum(1 for w in per if w == 0.0), "largest_difference": fmt(max(per)) if per else 0.0,
+            "per_run": [fmt(w) for w in per], "github": er.get("github"), "tool": "cpp/tools/run_engine_runs.cpp"}
 
 
 def organisms():
@@ -215,7 +237,7 @@ def organisms():
     return out
 
 
-def main(out_path, live_laws=()):
+def main(out_path, live_laws=(), engine_runs=None):
     from tools import seal
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
@@ -224,6 +246,7 @@ def main(out_path, live_laws=()):
         rec = {"compiler": None if b is None else (shutil.which("g++") or shutil.which("clang++")).rsplit("/", 1)[-1],
                "github": GITHUB, "seed": SEED, "python_only": seal.PYTHON_ONLY}
         rec["twins"] = twins(b, tmp) if b is not None else []
+        rec["engine_runs"] = globals()["engine_runs"](b, engine_runs) if b is not None and engine_runs else None
         live = list(live_laws)
         by = defaultdict(lambda: {"laws": 0, "readings": 0, "cpp": 0.0, "own": 0.0})
         for t, n, wc, wo in replay(exe, live, tmp):
@@ -246,8 +269,12 @@ def main(out_path, live_laws=()):
     Path(out_path).write_text(json.dumps(rec, separators=(",", ":")), encoding="utf-8")
     n_live = sum(x["readings"] for x in rec["live"]); n_org = sum(x["readings"] for x in rec["organisms"])
     same = all(t["same"] for t in rec["twins"]) and all(x["cpp"] in (0.0, None) and x["own"] == 0.0 for x in rec["live"] + rec["organisms"])
+    er = rec["engine_runs"]
+    if er:
+        same = same and er["same_digest"] and er["identical_runs"] == er["runs"]
     print(f"C++ twins: {len(rec['twins'])} parity checks, {n_live:,} live readings and {n_org:,} organism readings through the "
-          f"C++ compass law; " + ("every number identical" if same else "A DIFFERENCE (see the record)"))
+          f"C++ compass law" + (f", the Python's {er['runs']} runs (base {er['base']}) through the C++ engine" if er else "") + "; "
+          + ("every number identical" if same else "A DIFFERENCE (see the record)"))
     return rec
 
 

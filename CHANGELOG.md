@@ -2,6 +2,54 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21: the Python's 500 runs through the C++ engine, receipt by receipt, on GitHub and on the live engine
+
+- **The verdict in C++** (`cpp/src/verdict.cpp`, `cpp/include/omnicompass/verdict.hpp`, the tool `oc_verdict`): a line-by-line twin of
+  `omnicompass/verdict.py` (the median, the log costs' mean and variance, Welch's interval, the trial's phases, both judges, the
+  stepwise reference), with the Python's own `sum()` (Neumaier's compensated sum, as CPython 3.12 adds floats) and its `round()`.
+  `tests/test_cpp_verdict_parity.py` runs 300 random verdicts (122,538 answers: trials allowed GAIN and EVEN, refused LOSS and past
+  the allowance, abandoned for calm and for work, the median judge) through both: every answer identical. `verify.py` runs it and
+  a negative control (a C++ verdict that allows a step read as a LOSS must be caught, and is).
+- **The Python's runs through the C++ engine** (`cpp/tools/run_engine_runs.cpp`, the tool `oc_engine_runs`): the same jump generator
+  (seed_k = base + k·0x9E3779B9 mod 2³²), the same mulberry32 stream and the same draws in the same order as `tools/engine_runs.py`,
+  through the C++ governor (288 decisions of the RK4 state equations), the C++ nervous system (the authority per organ), the C++
+  compass law and the C++ verdict, with its own SHA-256 of the receipts. On base 20261020 and on the record GitHub made (base
+  881947045), every one of the 500 receipts is identical to the Python's to the last bit, and the C++ digest is the record's
+  (`87e77e00bce8e482…`). `tests/test_cpp_engine_runs_parity.py` holds it; `verify.py` runs 500 (50 with `--quick`).
+- **Two C++ twins brought to the last bit**: the C++ governor now carries the brain's push (`Directive.push`, the Python's
+  `last_push`), and the C++ RK4 step adds (h/6)(k₁ + 2k₂ + 2k₃ + k₄) in `omnicompass/core.py`'s own order of operations; the governor's
+  parity on 21,600 directives goes from 1e-15 to 0 (identical), and the 500 fixtures still pass.
+- **On GitHub with every set** (`.github/workflows/engine-runs.yml`): the workflow builds the C++ and runs the same set through it
+  (`tools/engine_runs.py --cpp`); the record carries the C++ engine's digest and each run's difference, and the run fails if one
+  receipt differs. A push that changes `cpp/` starts a set too.
+- **On the live engine**: the proof monitor (`#proofPanel`) gains the C++ engine's column and its digest under the grid, and shows
+  the Python's and the C++ engine's receipts before the page runs its own; section 10b gains the table "The Python's runs through
+  the C++ engine, receipt by receipt", computed at every build against the record shown. The seal holds twelve twins (the
+  verdict, and the engine's seeded runs through every twin); Student's t is the one piece of the verdict's family left in Python
+  only, because the verdict reads the fixed 1.96.
+
+## 2026-10-21: the C++ twin of the compass law; the Python's runs fed through the C++ on the live engine; the wall-first page on main
+
+- **The compass law and the two-way plug in C++** (`cpp/src/compass_law.cpp`, `cpp/include/omnicompass/compass_law.hpp`, the tool
+  `oc_compass_law`): a line-by-line twin of `omnicompass/compass_law.py` (Band, CompassLaw, Plug), the one law every muscle runs at
+  the tune-down and every live controller runs on its service. `tests/test_cpp_compass_law_parity.py` runs 300 random laws and
+  plugs through both (readings past the wall and below calm, the band moved between readings, writes in and out of the cover,
+  another writer moving the lever, restores): every one of 29,876 answers identical to the last bit. `verify.py` builds it, runs
+  it, and runs a negative control (a C++ law that takes back while the reading climbs must be caught, and is). The seal holds
+  ten Python/C++ twins (`results/SEAL.json`, `tools/seal.py`), and its list of what runs in Python only now names the max of
+  every organism (`realms/compass_arm_v5.py`), the organisms' body and plants, the edge, and the verdict with its Student t.
+- **The live engine's section 10b, the C++ twin** (`#s-cpp`, `docs/engine/export_cpp_twins.py`, the record `cpptwin`): on every
+  rebuild the C++ is compiled where the page is built; every twin's parity check runs; every compass law the page's own runs
+  wire is recorded as it runs (the file that wired it, each reading with the band and push as they stood) and fed through the
+  C++ law and the Python again; and the seven organisms run at the tune-down on the climb, every muscle's law fed through the
+  C++ the same way. On the first build every number is identical: ten parity checks, and 156,480 readings of the seven
+  organisms' muscles (the tower's 239 muscles with a lever at the tune-down among them). A box finds any muscle by its id. At
+  the max the edge and the bone decide each muscle, with no C++ twin yet; the section says so and lists them.
+- **The wall-first live page is on main**: the branch that built it (the monitor wall and control panel first, the benefit board,
+  the whole organism every way it is bought, the evidence from the cloud down to the chip, the Python's 500 runs from the jump
+  generator replayed in the page) is merged into the omni-v14 landing, with the notice as the LICENSE writes it ("Evaluation and
+  Simulation use only") on every file. The Live Engine Manual's Appendix A, its anchors and its chapter 24 follow the page.
+
 ## 2026-10-21: the live engine in the founder's order, every monitor numbered and knobbed, the Python's runs in the page, the third manual
 
 - **The live engine's order** (the founder's orders of 20 October): the table of contents first, named "Engine table of contents",

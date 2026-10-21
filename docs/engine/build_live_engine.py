@@ -846,18 +846,19 @@ def records(runs: bool) -> dict:
             XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json"))
         XR.main(str(t / "r.json")); XW.main(str(t / "w.json"))
         XG.main(str(t / "g.json")); XCPU.main(str(t / "cpu.json")); XHO.main(str(t / "ho.json"))
-        XT.main(str(t / "x.json"), live_laws=laws.laws)
-        h, c, s, rr, wh, gpu, cpu, ho, x = (json.loads((t / f).read_text(encoding="utf-8")) for f in
-                                           ("h.json", "c.json", "s.json", "r.json", "w.json", "g.json", "cpu.json", "ho.json", "x.json"))
-        # the monitor registry with the wall's Grafana dashboard (written to deploy/grafana/omni-compass-wall.json by the build, read back by a check)
-        reg = json.loads((HERE / "monitors.json").read_text(encoding="utf-8"))
-        reg["grafana"] = XGF.main(str(t / "wall.json")) if CHECKING else XGF.main()
         # the Python's runs (tools/engine_runs.py): the newest record, for the page to run the same runs and compare
         er_files = sorted((ROOT / "results" / "engine_runs").glob("ENGINE_RUNS_*.json"),     # the newest written last, whatever its base
                           key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("written", ""), f.name))
         eruns = json.loads(er_files[-1].read_text(encoding="utf-8")) if er_files else {"missing": "results/engine_runs"}
         if er_files:
             eruns["file"] = str(er_files[-1].relative_to(ROOT))
+        # the same record's set through the C++ engine at this build (cpp/tools/run_engine_runs.cpp), receipt by receipt
+        XT.main(str(t / "x.json"), live_laws=laws.laws, engine_runs=eruns if er_files else None)
+        h, c, s, rr, wh, gpu, cpu, ho, x = (json.loads((t / f).read_text(encoding="utf-8")) for f in
+                                           ("h.json", "c.json", "s.json", "r.json", "w.json", "g.json", "cpu.json", "ho.json", "x.json"))
+        # the monitor registry with the wall's Grafana dashboard (written to deploy/grafana/omni-compass-wall.json by the build, read back by a check)
+        reg = json.loads((HERE / "monitors.json").read_text(encoding="utf-8"))
+        reg["grafana"] = XGF.main(str(t / "wall.json")) if CHECKING else XGF.main()
     name, digest = engine()
     now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     gh = github_runs() if runs else None

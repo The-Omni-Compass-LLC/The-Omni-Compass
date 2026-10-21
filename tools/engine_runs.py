@@ -19,6 +19,13 @@ docs/engine/check_live_engine.py) and compares receipt by receipt.
   python3 tools/engine_runs.py --runs 500 --base 20261020           write results/engine_runs/ENGINE_RUNS_500_20261020.json and .md
   python3 tools/engine_runs.py --verify PAGE                        run the page's own loop in node on 20 runs and compare to the Python
   python3 tools/engine_runs.py --verify PAGE --all --runs 500 --base B   the same on every one of the 500
+  python3 tools/engine_runs.py --runs 500 --base B --cpp cpp/build/oc_engine_runs   the same set through the C++ engine too
+                                                                    (cpp/tools/run_engine_runs.cpp), its digest in the record
+
+The C++ runs the same set from the same jump generator through the C++ twins of the engine (the governor's RK4 state
+equations, the nervous system, the compass law, the verdict: tools/seal.py) and must give every receipt and the digest to the
+last bit (tests/test_cpp_engine_runs_parity.py); the record carries its digest and each run's largest difference, and the
+live engine page's proof monitor shows the C++ beside the Python and the page.
 
 On GitHub (.github/workflows/engine-runs.yml, the founder's order of 21 October: every set the jump generator runs is linked to
 the live engine) every push that changes the page or this file, and every dispatch, runs another set from a new base, checks the
@@ -231,6 +238,17 @@ def verify(page: Path, n: int = 20, base: int = DEFAULT_BASE) -> int:
     return 0 if gen_ok and worst < 1e-9 and same_digest else 1
 
 
+def cpp_check(exe: Path, runs: list, base: int, dg: str) -> dict:
+    """The same set through the C++ engine: its digest, and each run's largest difference from the Python's receipt."""
+    from tests.test_cpp_engine_runs_parity import compare, cpp_runs
+    cpp, cdg = cpp_runs(exe, len(runs), base, runs[0]["k"] if runs else 0)
+    per = compare(runs, cpp)                 # inf where a count, a seed or the number of runs differs: written as null
+    js = [w if math.isfinite(w) else None for w in per]
+    return {"tool": "cpp/tools/run_engine_runs.cpp", "twins": "cpp/src/governor.cpp, nervous_system.cpp, compass_law.cpp, verdict.cpp",
+            "digest": cdg, "same_digest": cdg == dg, "identical_runs": sum(1 for w in per if w == 0.0),
+            "largest_difference": (max(per) if all(w is not None for w in js) else None) if per else 0.0, "per_run": js}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--runs", type=int, default=DEFAULT_RUNS)
@@ -238,6 +256,7 @@ def main() -> int:
     ap.add_argument("--verify", default="", help="the live engine page: run its loop in node and compare")
     ap.add_argument("--out", default="", help="where to write (default results/engine_runs/)")
     ap.add_argument("--all", action="store_true", help="with --verify: every run of the set, not the first 20")
+    ap.add_argument("--cpp", default="", help="oc_engine_runs (cpp/tools/run_engine_runs.cpp): run the same set through the C++ engine")
     a = ap.parse_args()
     if a.verify:
         return verify(Path(a.verify), a.runs if a.all else min(a.runs, 20), a.base)
@@ -248,6 +267,8 @@ def main() -> int:
             "generator": "mulberry32 (the page's own)", "decisions": DECISIONS, "law_steps": LAW_STEPS, "digest": dg,
             "digest_of": "SHA-256 of every receipt, numbers rounded to six decimals, one line a run (canonical())",
             "written": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "receipts": runs}
+    if a.cpp:                             # the same set through the C++ engine, receipt by receipt
+        data["cpp"] = cpp_check(Path(a.cpp), runs, a.base, dg)
     if os.environ.get("GITHUB_RUN_ID"):   # made on GitHub: the run that made it, so the page links the record to it
         data["github"] = {"run_id": os.environ["GITHUB_RUN_ID"], "workflow": os.environ.get("GITHUB_WORKFLOW", ""),
                           "commit": os.environ.get("GITHUB_SHA", ""), "ref": os.environ.get("GITHUB_REF_NAME", ""),
@@ -260,6 +281,9 @@ def main() -> int:
           f"Engine {eng}. Written {data['written']}. Each run: {DECISIONS} decisions of the brain (RK4), {LAW_STEPS} steps of the compass law, one give-back",
           "trial judged by the verdict; the seed of run k is base + k·0x9E3779B9 mod 2³², the stream mulberry32, the same in the live engine's page.", "",
           f"**Digest {dg}** (SHA-256 of the receipts, six decimals). The page runs the same {a.runs} and shows its own digest beside this one.", "",
+          *([f"**The C++ engine** (`cpp/tools/run_engine_runs.cpp`, the C++ twins of the engine): digest {data['cpp']['digest']}, "
+             f"{'the same' if data['cpp']['same_digest'] else 'DIFFERENT'}; {data['cpp']['identical_runs']} of {a.runs} receipts identical to the last bit.", ""]
+            if "cpp" in data else []),
           f"Trials allowed {allowed} of {a.runs}; the brain's pushes summed over all runs {sum(r['push'] for r in runs):.3f}; grants to expand {sum(r['expand'] for r in runs)}, to contract {sum(r['contract'] for r in runs)}.", "",
           "| run | seed | final state E U I S B C | pushes | expand | contract | calm | τ | mean force | last force | trial | samples |", "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|---:|"]
     for r in runs:
@@ -268,6 +292,11 @@ def main() -> int:
     out.with_suffix(".md").write_text("\n".join(md) + "\n", encoding="utf-8")
     shown = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
     print(f"{a.runs} runs written to {shown} (digest {dg[:16]}…, {allowed} trials allowed)")
+    if "cpp" in data:
+        c = data["cpp"]
+        print(f"the C++ engine on the same set: digest {c['digest'][:16]}… {'the same' if c['same_digest'] else 'DIFFERENT'}, "
+              f"{c['identical_runs']} of {a.runs} receipts identical")
+        return 0 if c["same_digest"] and c["identical_runs"] == a.runs else 1
     return 0
 
 
