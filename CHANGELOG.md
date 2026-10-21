@@ -43,10 +43,11 @@
   muscle on a running engine, and six references to other documents that a blind replacement had turned into the page's.
   The control panel downloads all three manuals.
 - **The Python's runs linked to GitHub** (the founder's order of 21 October): `.github/workflows/engine-runs.yml` runs another set
-  from the jump generator (500 by default, a new base each dispatch), runs the live engine's own code on every run of it in node
+  from the jump generator (500 by default, a new base each time) on every push that changes the live engine's page or the Python's
+  runs, on a working branch as on main, and on every dispatch; runs the live engine's own code on every run of it in node
   (`tools/engine_runs.py --verify --all`), and commits the record with the GitHub run that made it (its id, address and commit);
-  the page reads the newest record by its time and names that run beside the digest, and a committed set starts the page's
-  rebuild on main. Dispatchable once the workflow is on main (GitHub starts a dispatch only from the default branch's list).
+  the page reads the newest record by its time and names that run beside the digest, and on main the job starts the page's
+  rebuild itself (a commit made with GitHub's own token starts no workflow; a dispatch does). Dispatchable once the workflow is on main (GitHub starts a dispatch only from the default branch's list).
 - **Simulation with a capital S** in the one notice (`tools/legal.py`), written on every file but the engine's fingerprinted ones,
   which take it with the next version; the workflows' embedded legal bundles re-written to match.
 - **A newer engine's table stands only once its three runs share a reading** (`tools/readings.py`, `landed`): the three

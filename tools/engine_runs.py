@@ -21,8 +21,9 @@ docs/engine/check_live_engine.py) and compares receipt by receipt.
   python3 tools/engine_runs.py --verify PAGE --all --runs 500 --base B   the same on every one of the 500
 
 On GitHub (.github/workflows/engine-runs.yml, the founder's order of 21 October: every set the jump generator runs is linked to
-the live engine) a dispatch runs another set from a new base, checks the page's own code on every run of it, and commits the
-record with the run that made it (its id, address and commit); the page shows the newest record and the GitHub run beside it.
+the live engine) every push that changes the page or this file, and every dispatch, runs another set from a new base, checks the
+page's own code on every run of it, and commits the record with the run that made it (its id, address and commit); the page
+shows the newest record and the GitHub run beside it.
 """
 from __future__ import annotations
 
