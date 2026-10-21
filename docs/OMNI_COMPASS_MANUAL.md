@@ -3442,6 +3442,7 @@ python3 tools/omni_control.py serve --tokens /etc/omni/tokens.json --audit /var/
 | Watch | `POST /v1/mode {"mode": "watch"}` | operator | the governor runs, decides and audits every decision, and writes nothing (its `--dry-run`) |
 | Off | `POST /v1/mode {"mode": "off"}` | operator | every setting handed back; the governor stops |
 | Max, tune-down | `POST /v1/dial {"dial": "max" or "save"}` | operator | the governor handed back and started again on the new dial |
+| One muscle on, or left native | `POST /v1/muscle {"muscle": NAME, "on": true or false}` | operator | the governor handed back and started again with `--native` naming every muscle left native; a muscle left native is never written (omni-v14; the names are `machines`, `replicas`, `cpu`, `clock`, `gpu`, `rollout`, `batch`, `rightsize`, `coldstart`, `contain`, `cooling`) |
 | Reset | `POST /v1/reset {"reason": ...}` | operator | every setting handed back to native; mode off until the next press |
 | Kill switch | `POST /v1/kill {"reason": ...}` | security | the master switch OFF for every Omni-Compass governor on the machine; each restores and exits; none starts while it is OFF |
 | Arm | `POST /v1/arm {"reason": ...}` | security | the master switch ON again once two different holders of the security role press it within ten minutes |

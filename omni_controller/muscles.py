@@ -107,6 +107,10 @@ class Muscles:
         self.gpu_min_w = 0.0     # the card's own minimum power limit, read live (0 until the card reports it)
         self.gpu_heat_c = 0.0    # one degree under the card's own slowdown temperature, read live (0: not reported)
 
+    def native(self, muscle):
+        """omni-v14: a muscle the operator left native (--native) is never written; every other runs as before."""
+        return muscle in getattr(self.a, "native_muscles", ())
+
     def at_max(self):
         """The max (the default dial): no level is ever set under what native runs."""
         return getattr(self.a, "dial", "max") == "max"
@@ -173,14 +177,18 @@ class Muscles:
         if killed:
             return
         cap = 1.0 if self.at_max() else float(d["power_cap"])     # the max: never under native
-        self._power_cap(cap, obs)
+        if not self.native("cpu"):
+            self._power_cap(cap, obs)
         self._hardware(cap, obs)
-        self._rollout(bool(d["change_permitted"]), bool(d["rollback_authorized"]))
-        self._batch(bool(d["change_permitted"]), obs)
-        for name, fn in (("rightsize", lambda: self._rightsize(obs)), ("coldstart", self._coldstart),
-                         ("batch_pace", lambda: self._batch_pace(obs)), ("contain", lambda: self._contain(obs)),
-                         ("cooling", lambda: self._cooling(obs))):
-            self._guard(name, fn)
+        if not self.native("rollout"):
+            self._rollout(bool(d["change_permitted"]), bool(d["rollback_authorized"]))
+        if not self.native("batch"):
+            self._batch(bool(d["change_permitted"]), obs)
+        for name, muscle, fn in (("rightsize", "rightsize", lambda: self._rightsize(obs)), ("coldstart", "coldstart", self._coldstart),
+                                 ("batch_pace", "batch", lambda: self._batch_pace(obs)), ("contain", "contain", lambda: self._contain(obs)),
+                                 ("cooling", "cooling", lambda: self._cooling(obs))):
+            if not self.native(muscle):
+                self._guard(name, fn)
 
     def _may(self, organ, what):
         """Nervous-system authority for an organ ("expand", "contract", "admit", "pause"); without it, everything allowed."""
@@ -448,7 +456,7 @@ class Muscles:
         from omnicompass.nervous_system import BAND
         obs = obs or {}
         targets = [ref(t) for t in filter(None, getattr(self.a, "cap_deployments", "").split(","))]
-        if not targets:
+        if not targets or self.native("cpu"):
             return None
         engaged = self._convey_engaged()
         from omni_controller.capacity import HostCpuSampler, KIND_SCALE_OUT_BUSY_LIMIT, one_host
@@ -569,12 +577,12 @@ class Muscles:
             cap = min(cap, getattr(self, "_last_cap", 1.0))  # shield I1: no expansion during a security hold
         if abs(cap - getattr(self, "_last_cap", 1.0)) < 0.02:
             return
-        if getattr(self.a, "cpufreq_policy_root", ""):
+        if getattr(self.a, "cpufreq_policy_root", "") and not self.native("clock"):
             self._cpufreq_sysfs(cap, obs)
-        if getattr(self.a, "cpufreq_cmd", "") and self.a.cpu_max_khz:
+        if getattr(self.a, "cpufreq_cmd", "") and self.a.cpu_max_khz and not self.native("clock"):
             lo, hi = self._envelope("cpufreq", [0.0, 1.0]); cap = min(max(cap, lo), hi)
             self._hw(self.a.cpufreq_cmd, self.a.cpu_max_khz * cap, f"cpu_pstate: frequency ceiling {int(self.a.cpu_max_khz * cap)} kHz (cap {cap:.3f})")
-        if getattr(self.a, "gpu_power_cmd", "") and self.a.gpu_max_w:
+        if getattr(self.a, "gpu_power_cmd", "") and self.a.gpu_max_w and not self.native("gpu"):
             w = max(self.gpu_min_w, self.a.gpu_max_w * cap)               # never under the card's own minimum
             self._hw(self.a.gpu_power_cmd, w, f"gpu: power limit {int(w)} W (cap {cap:.3f})")
         self._last_cap = cap

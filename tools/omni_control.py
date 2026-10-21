@@ -28,6 +28,10 @@ The buttons (each a POST carrying a bearer token; JSON body):
   POST /v1/arm    {"reason": ...}                                       role security
         the master switch ON again, only when two different holders of the security role press it within ten minutes
         (the two-person rule); the first press is recorded and answered 202
+  POST /v1/muscle {"muscle": NAME, "on": true|false, "reason": ...}     role operator
+        one muscle on (Omni-Compass drives it) or left native (never written), omni-v14's --native; the muscles are the
+        governor's own list (omni_controller/controller.py, MUSCLES). Like a dial press, it passes through native: the
+        governor hands every setting back and starts again with the new list
 The reads (role viewer): GET /v1/status (the switch, the desired and the actual state, the governor's process, the
 registry and its leases, the age of the last decision), GET /v1/presses (the last presses), GET /metrics. The console
 (GET /) and the OpenAPI document (GET /v1/openapi.json) carry no data and need no token; every call the console makes
@@ -58,8 +62,9 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omnicompass import master                    # noqa: E402
 from tools import omni_switch                     # noqa: E402
 from tools.legal import PLAIN                     # noqa: E402
+from omni_controller.controller import MUSCLES    # noqa: E402
 
-BUTTONS = {"mode": "operator", "dial": "operator", "reset": "operator", "kill": "security", "arm": "security"}
+BUTTONS = {"mode": "operator", "dial": "operator", "reset": "operator", "kill": "security", "arm": "security", "muscle": "operator"}
 MODES, DIALS = ("autopilot", "watch", "off"), ("max", "save")
 ARM_WINDOW_S = 600.0              # the two-person rule: two different holders of the security role within ten minutes
 MAX_BODY = 4096
@@ -104,23 +109,25 @@ class Panel:
         self.cmd = list(governor)
         self.kill_file = Path(kill_file)
         self.state_path, self.log_path, self.audit = state, log, audit
-        self.flags = {"kill": "--kill-file", "dial": "--dial", "watch": "--dry-run", **(flags or {})}
+        self.flags = {"kill": "--kill-file", "dial": "--dial", "watch": "--dry-run", "native": "--native", **(flags or {})}
         self.handback_s = handback_s
         self.lock = threading.Lock()
         self.proc = None
         self.arms = {}                                    # security holder -> time of their arm press
         self.counts = {}                                  # (button, outcome) -> presses
-        self.desired = {"mode": "off", "dial": "max"}
+        self.desired = {"mode": "off", "dial": "max", "native": []}
         if state and Path(state).exists():
             try:
                 d = json.loads(Path(state).read_text(encoding="utf-8"))
                 self.desired.update({k: d[k] for k in ("dial",) if d.get(k) in DIALS})
+                self.desired["native"] = sorted(m for m in (d.get("native") or []) if m in MUSCLES)
             except (OSError, ValueError):
                 pass                                      # a panel never starts a governor by itself: mode starts off
 
     # the governor's process
     def args(self):
         a = self.cmd + [self.flags["kill"], str(self.kill_file), self.flags["dial"], self.desired["dial"]]
+        a += [self.flags["native"], ",".join(self.desired["native"])] if self.desired["native"] else []
         return a + ([self.flags["watch"]] if self.desired["mode"] == "watch" else [])
 
     def running(self):
@@ -209,6 +216,23 @@ class Panel:
         out = {"hand_back": self._hand_back()}
         out.update(self._start())
         return {"dial": d, **out}
+
+    def _muscle(self, who, body):
+        m, on = body.get("muscle"), body.get("on")
+        if m not in MUSCLES:
+            raise Refused(400, f"muscle must be one of {', '.join(MUSCLES)}")
+        if not isinstance(on, bool):
+            raise Refused(400, "on must be true (Omni-Compass drives it) or false (left native)")
+        native = set(self.desired["native"])
+        if (m not in native) == on:
+            return {"muscle": m, "on": on, "unchanged": True}
+        (native.discard if on else native.add)(m)
+        self.desired["native"] = sorted(native)
+        if not self.running():
+            return {"muscle": m, "on": on, "native": self.desired["native"], "applies": "at the next start"}
+        out = {"hand_back": self._hand_back()}
+        out.update(self._start())
+        return {"muscle": m, "on": on, "native": self.desired["native"], **out}
 
     def _reset(self, who, body):
         out = self._hand_back()
@@ -329,9 +353,13 @@ def openapi():
                       "/v1/dial": post("the max or the tune-down", "operator", {"dial": {"type": "string", "enum": list(DIALS)}}),
                       "/v1/reset": post("every setting handed back to native; the governor stops", "operator"),
                       "/v1/kill": post("the master switch OFF for every governor on the machine (security)", "security"),
-                      "/v1/arm": post("the master switch ON again: two holders of the security role within ten minutes", "security")}}
+                      "/v1/arm": post("the master switch ON again: two holders of the security role within ten minutes", "security"),
+                      "/v1/muscle": post("one muscle on (Omni-Compass drives it) or left native (never written); passes through native",
+                                         "operator", {"muscle": {"type": "string", "enum": list(MUSCLES)}, "on": {"type": "boolean"}})}}
 
 
+MUSCLE_ROWS = "".join(f'<div><small>{m}: {d}</small><br><button onclick="go(\'muscle\',{{muscle:\'{m}\',on:true}})">On</button>'
+                      f'<button onclick="go(\'muscle\',{{muscle:\'{m}\',on:false}})">Native</button></div>' for m, d in MUSCLES.items())
 CONSOLE = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Omni-Compass control</title><style>
 :root{--bg:#fff;--fg:#111;--muted:#555;--line:#ccc;--kill:#b00020}
@@ -345,6 +373,7 @@ pre{white-space:pre-wrap;border:1px solid var(--line);padding:8px;overflow-x:aut
 <fieldset><legend>Mode</legend><button onclick="go('mode',{mode:'autopilot'})">Autopilot</button><button onclick="go('mode',{mode:'watch'})">Watch (writes nothing)</button><button onclick="go('mode',{mode:'off'})">Off (hand back)</button></fieldset>
 <fieldset><legend>Dial</legend><button onclick="go('dial',{dial:'max'})">Max</button><button onclick="go('dial',{dial:'save'})">Tune-down</button></fieldset>
 <fieldset><legend>Native</legend><button onclick="go('reset',{})">Reset: every setting back to native</button></fieldset>
+<fieldset><legend>Muscles: on, or left native</legend>MUSCLE_ROWS</fieldset>
 <fieldset><legend>Security</legend><button class="kill" onclick="if(confirm('Master switch OFF for every governor on this machine?'))go('kill',{})">Kill switch</button><button onclick="go('arm',{})">Arm (two holders)</button></fieldset>
 <button onclick="look()">Refresh status</button><pre id="o"></pre><p><small>NOTICE_TEXT</small></p>
 <script>
@@ -377,7 +406,7 @@ def server(panel: Panel, tokens_path: Path, bind: str, port: int, cert=None, key
         def do_GET(self):
             path = self.path.split("?", 1)[0]
             if path == "/":
-                return self._send(200, CONSOLE.replace("NOTICE_TEXT", PLAIN), "text/html")
+                return self._send(200, CONSOLE.replace("NOTICE_TEXT", PLAIN).replace("MUSCLE_ROWS", MUSCLE_ROWS), "text/html")
             if path == "/v1/openapi.json":
                 return self._send(200, openapi())
             if path not in ("/v1/status", "/v1/presses", "/metrics"):
