@@ -21,7 +21,8 @@ class EngineRuns(unittest.TestCase):
         self.assertEqual([round(g(), 12) for _ in range(3)], [round(x, 12) for x in (0.9797282677609473, 0.3067522644996643, 0.484205421525985)])
 
     def test_the_record_reproduces(self):
-        recs = sorted((ROOT / "results" / "engine_runs").glob("ENGINE_RUNS_*.json"))
+        recs = sorted((ROOT / "results" / "engine_runs").glob("ENGINE_RUNS_*.json"),
+                      key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("written", ""), f.name))   # the newest written, as the page reads it
         self.assertTrue(recs, "no record of the engine's runs")
         rec = json.loads(recs[-1].read_text(encoding="utf-8"))
         runs = [E.one_run(k, rec["base"]) for k in range(25)]

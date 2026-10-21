@@ -18,6 +18,11 @@ docs/engine/check_live_engine.py) and compares receipt by receipt.
 
   python3 tools/engine_runs.py --runs 500 --base 20261020           write results/engine_runs/ENGINE_RUNS_500_20261020.json and .md
   python3 tools/engine_runs.py --verify PAGE                        run the page's own loop in node on 20 runs and compare to the Python
+  python3 tools/engine_runs.py --verify PAGE --all --runs 500 --base B   the same on every one of the 500
+
+On GitHub (.github/workflows/engine-runs.yml, the founder's order of 21 October: every set the jump generator runs is linked to
+the live engine) a dispatch runs another set from a new base, checks the page's own code on every run of it, and commits the
+record with the run that made it (its id, address and commit); the page shows the newest record and the GitHub run beside it.
 """
 from __future__ import annotations
 
@@ -26,6 +31,7 @@ import datetime
 import hashlib
 import json
 import math
+import os
 import shutil
 import subprocess
 import sys
@@ -230,9 +236,10 @@ def main() -> int:
     ap.add_argument("--base", type=int, default=DEFAULT_BASE, help="the jump generator's base seed")
     ap.add_argument("--verify", default="", help="the live engine page: run its loop in node and compare")
     ap.add_argument("--out", default="", help="where to write (default results/engine_runs/)")
+    ap.add_argument("--all", action="store_true", help="with --verify: every run of the set, not the first 20")
     a = ap.parse_args()
     if a.verify:
-        return verify(Path(a.verify), min(a.runs, 20), a.base)
+        return verify(Path(a.verify), a.runs if a.all else min(a.runs, 20), a.base)
     runs = [one_run(k, a.base) for k in range(a.runs)]
     dg = digest(runs)
     eng = engine()
@@ -240,6 +247,10 @@ def main() -> int:
             "generator": "mulberry32 (the page's own)", "decisions": DECISIONS, "law_steps": LAW_STEPS, "digest": dg,
             "digest_of": "SHA-256 of every receipt, numbers rounded to six decimals, one line a run (canonical())",
             "written": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "receipts": runs}
+    if os.environ.get("GITHUB_RUN_ID"):   # made on GitHub: the run that made it, so the page links the record to it
+        data["github"] = {"run_id": os.environ["GITHUB_RUN_ID"], "workflow": os.environ.get("GITHUB_WORKFLOW", ""),
+                          "commit": os.environ.get("GITHUB_SHA", ""), "ref": os.environ.get("GITHUB_REF_NAME", ""),
+                          "url": f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{os.environ.get('GITHUB_REPOSITORY', '')}/actions/runs/{os.environ['GITHUB_RUN_ID']}"}
     out = Path(a.out) if a.out else OUT_DIR / f"ENGINE_RUNS_{a.runs}_{a.base}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")

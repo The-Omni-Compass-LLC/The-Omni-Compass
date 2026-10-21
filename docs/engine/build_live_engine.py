@@ -844,7 +844,8 @@ def records(runs: bool) -> dict:
         reg = json.loads((HERE / "monitors.json").read_text(encoding="utf-8"))
         reg["grafana"] = XGF.main(str(t / "wall.json")) if CHECKING else XGF.main()
         # the Python's runs (tools/engine_runs.py): the newest record, for the page to run the same runs and compare
-        er_files = sorted((ROOT / "results" / "engine_runs").glob("ENGINE_RUNS_*.json"))
+        er_files = sorted((ROOT / "results" / "engine_runs").glob("ENGINE_RUNS_*.json"),     # the newest written last, whatever its base
+                          key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("written", ""), f.name))
         eruns = json.loads(er_files[-1].read_text(encoding="utf-8")) if er_files else {"missing": "results/engine_runs"}
         if er_files:
             eruns["file"] = str(er_files[-1].relative_to(ROOT))
