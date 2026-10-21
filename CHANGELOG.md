@@ -21,6 +21,10 @@
   held: it now takes the newest *whole* table (a gauge row, or a workload beside the tuning one), so a table written from
   failed runs is passed over until its runs land (`tests/test_index_newest.py`); MongoDB reads from its omni-v11 table again
   and the index headline is +4.3% (omni-v10, omni-v11 and omni-v12 tables). The YCSB rig's restart fault is the next thing fixed.
+- **The cluster recorder takes its first reading before it reads the clock.** `fleet/capture/kube_capture.sh` ended the
+  recording when the deadline had passed before any reading, so a clock tick between its start and its first look left an
+  empty capture (`tests/test_capture_in_service.py` with `DURATION=0`, once in three whole checks on a loaded machine); the
+  deadline now ends a recording only after at least one row.
 
 ## 2026-10-20 (evening): Omni v13 stands (no other muscle's room is conveyed)
 

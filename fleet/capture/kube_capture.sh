@@ -12,9 +12,11 @@ set -euo pipefail
 OUT="${OUT:-capture.csv}"; INTERVAL="${INTERVAL:-15}"; DURATION="${DURATION:-21600}"
 to_m() { awk '{v=$1; if (v ~ /m$/) {sub(/m$/,"",v); print v+0} else if (v ~ /n$/) {sub(/n$/,"",v); print v/1000000} else print v*1000}'; }
 echo "timestamp,elapsed_seconds,nodes_ready,nodes_total,alloc_cpu_m,req_cpu_m,used_cpu_m,pods_pending,hpa_count,hpa_current_replicas,hpa_desired_replicas,power_w" > "$OUT"
-start=$(date +%s)
+start=$(date +%s); n=0
 while :; do
-  now=$(date +%s); el=$((now - start)); [ "$el" -gt "$DURATION" ] && break
+  # the deadline ends the recording only after at least one reading: a recording with no row is never right (the
+  # first reading used to be skipped when the clock ticked between the start and the first look, 21 October)
+  now=$(date +%s); el=$((now - start)); [ "$el" -gt "$DURATION" ] && [ "$n" -gt 0 ] && break
   # a reading the API server does not answer (a swamped cluster, a managed control plane under load) is logged and
   # skipped; the recording goes on, so the moments a cluster struggles are kept, never the end of the run
   if ! nodes=$(kubectl get nodes -o json --request-timeout=20s 2>>"$OUT.errors") || \
@@ -58,5 +60,6 @@ while :; do
   hc=$(echo "$hpa" | jq '.items | length'); hcur=$(echo "$hpa" | jq '[.items[].status.currentReplicas // 0] | add // 0'); hdes=$(echo "$hpa" | jq '[.items[].status.desiredReplicas // 0] | add // 0')
   pw=""; if [ -n "${POWER_CMD:-}" ]; then pw=$(eval "$POWER_CMD" 2>/dev/null || echo ""); fi
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ),$el,$ready,$total,$alloc,$req,$used,$pending,$hc,$hcur,$hdes,$pw" >> "$OUT"
+  n=$((n + 1))
   sleep "$INTERVAL"
 done
