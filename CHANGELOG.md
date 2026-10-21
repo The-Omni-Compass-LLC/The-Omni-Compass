@@ -32,10 +32,15 @@
   table has three columns, so no word in it is broken across a line.
 - **The wall's tile titles in capital letters** (the founder's order of 21 October, evening); the wall's words and the Live Engine
   Manual (4.1) say so.
-- **The owner's second illustration on the page**, in section iii beside the problem the whole industry faces: the stacks
-  Omni-Compass sits on top of as he pictures them, with the same words under it as the title plate carries: an illustration,
-  not a result; the marks in it belong to their owners; no endorsement is stated or implied; the repository's legal line stays
-  "filed in the USA". The Live Engine Manual (2.1) names it.
+- **The owner's two illustrations beside the title, both live** (the founder's order of 21 October, evening): the stacks
+  Omni-Compass sits on top of as he pictures them on top, the unified control authority under it, in one stack in the title page's
+  right column (under the title on a phone). Over each the engine draws its own marks and nothing of the picture's own: a ring at
+  every decision of the live engine; on the rose two hands, native's (amber, the longer) and Omni-Compass's (blue), each at the
+  mean place of that side's muscles in their bands, calm at north, the line at south; on the control core a glow that grows with
+  the settings Omni-Compass wrote in that decision; under each, that decision's counts; OFF at the master switch, Omni-Compass's
+  marks take native's colour. Each caption says it is an illustration, not a result, that the marks in it belong to their owners
+  with no endorsement stated or implied, and the repository's legal line stays "filed in the USA". The Live Engine Manual (2.1)
+  says so; the overlays carry no id, so the monitors keep their numbers.
 - **Every tile of the monitor wall carries its title** (the founder's order of 21 October: "every monitor in the wall ... its title
   alongside its number in its top"): at the top of each tile its number and its title, what the monitor shows, wrapped to two lines
   on a desktop and four on a phone, never cut short, and under them its section and its state (live, replay, from the records, a

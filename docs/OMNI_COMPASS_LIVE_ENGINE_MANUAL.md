@@ -444,11 +444,14 @@ copy.
 The page opens with its legal notice (i), then the title page with the build (ii), the problem the whole industry faces and
 Omni-Compass's solution (iii), the executive summary with the reading key (iv), and then its own table of contents (v, "Engine
 table of contents"): the founder's orders of 21 October, the title, the problem and the solution, the summary and the key first
-and the contents after them. Beside the title, on a desktop, stands the owner's illustration
-of the Omni-Compass (on a phone it sits under the title); it is an illustration, not a result, and says so under it: every result
-on the page is read from the repository's own records. A second illustration of his stands in section iii, the stacks Omni-Compass sits
-on top of as he pictures them, with the same words under it: an illustration, not a result; the marks in it belong to their owners;
-no endorsement is stated or implied. The body is numbered 1 to 11; the back matter is vi
+and the contents after them. Beside the title, on a desktop, stand the owner's two
+illustrations, one above the other (on a phone they sit under the title): the stacks Omni-Compass sits on top of as he pictures
+them, and under it the Omni-Compass as the unified control authority. Each says under it that it is an illustration, not a result,
+that the product marks in it belong to their owners with no endorsement stated or implied, and what the engine draws over it: a
+ring at every decision of the live engine; on the rose two hands, native's (amber, the longer) and Omni-Compass's (blue), each at
+the mean place of that side's muscles in their bands, calm at north and the line at south; on the control core a glow that grows
+with the settings Omni-Compass wrote in that decision; and under each, that decision's counts. The marks are the engine's state
+(the page's section 6a), never a number of the picture's own. The body is numbered 1 to 11; the back matter is vi
 (disclosures, governing law and contact) and vii (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
