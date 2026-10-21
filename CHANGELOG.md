@@ -30,6 +30,8 @@
   was started lower on the same page under its header again; the book builder now splits the tall row inside it when a
   row's end would leave more than four lines of the page empty (`BookTable`, `docs/book/build_book.py`). The new section's
   table has three columns, so no word in it is broken across a line.
+- **The wall's tile titles in capital letters** (the founder's order of 21 October, evening); the wall's words and the Live Engine
+  Manual (4.1) say so.
 - **Every tile of the monitor wall carries its title** (the founder's order of 21 October: "every monitor in the wall ... its title
   alongside its number in its top"): at the top of each tile its number and its title, what the monitor shows, wrapped to two lines
   on a desktop and four on a phone, never cut short, and under them its section and its state (live, replay, from the records, a

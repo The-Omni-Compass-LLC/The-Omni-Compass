@@ -560,7 +560,7 @@ monitors seen so far and how many of them moved. Scroll the page once from top t
 
 The wall (the page's section 1b, `#s-wall`) is every monitor of the page in one view: the same
 canvases the sections draw, copied small four times a second, so nothing is drawn twice from different data. Every tile
-carries at its top its number and its title, what the monitor shows, and under them its section and its state (live, replay,
+carries at its top its number and its title in capital letters, what the monitor shows, and under them its section and its state (live, replay,
 from the records, a model, or awaiting its run), so a tile says where its monitor is and what it represents before it is
 opened. Click a tile and the page scrolls to the monitor it copies. The page's own governor (the page's section 11, chapter 25) leaves a monitor resting while it is
 off screen; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to, and while the wall

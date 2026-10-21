@@ -523,7 +523,7 @@ monitors seen so far and how many of them moved. Scroll the page once from top t
 
 The wall (the page's section 1b, `#s-wall`) is every monitor of the page in one view: the same
 canvases the sections draw, copied small four times a second, so nothing is drawn twice from different data. Every tile
-carries at its top its number and its title, what the monitor shows, and under them its section and its state (live, replay,
+carries at its top its number and its title in capital letters, what the monitor shows, and under them its section and its state (live, replay,
 from the records, a model, or awaiting its run), so a tile says where its monitor is and what it represents before it is
 opened. Click a tile and the page scrolls to the monitor it copies. The page's own governor (the page's section 11, chapter 25) leaves a monitor resting while it is
 off screen; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to, and while the wall
@@ -2213,7 +2213,7 @@ Every monitor of this page at once, numbered in the order it appears from the to
 
 **The monitor wall: every monitor of this page, numbered 1 upward in its order of appearance, read left to right, then the next row; click a tile to go to it**
 
-The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section L.35) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, each through its own drawing code; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to. Two monitors that sit side by side in their section, native beside Omni-Compass, sit side by side on the wall too: a pair never splits across two rows. Each tile's head is its number and its title, then its section and its state (live, replay, from the records, a model, or awaiting its run). A tile with the accent border is a monitor on screen now; the list of every monitor by its number follows in section L.7.
+The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section L.35) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, each through its own drawing code; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to. Two monitors that sit side by side in their section, native beside Omni-Compass, sit side by side on the wall too: a pair never splits across two rows. Each tile's head is its number and its title in capital letters, then its section and its state (live, replay, from the records, a model, or awaiting its run). A tile with the accent border is a monitor on screen now; the list of every monitor by its number follows in section L.7.
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
