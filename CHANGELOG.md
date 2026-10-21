@@ -13,6 +13,14 @@
   no rebuild and a skipped run no sweep; and the 21 workflows ignore pushes to main and to the level branches (a dispatch
   needs no push to register a workflow that is on main). `tests/test_workflow_triggers.py` fails a push where a workflow
   would again be started by every push, or the live engine by its own page.
+- **omni-v13 landed on GitHub with two faults fixed on the way.** `tests/test_convey.py` still asserted omni-v12's rule (another
+  pod on the machine counted by its request, web-2 given 2,800m); omni-v13 counts it by its limit, so the test now expects
+  1,800m and a gain of 3.05, the engine unchanged. And the MongoDB benchmark had left the index, the benefit sheet and the
+  standing block (26 rows to 25) because the omni-v12 YCSB table was written from two runs that failed (`mongod did not come
+  back after the restart`; its runs B and C with no workload) and `tools/omni_index.newest` took the newest table whatever it
+  held: it now takes the newest *whole* table (a gauge row, or a workload beside the tuning one), so a table written from
+  failed runs is passed over until its runs land (`tests/test_index_newest.py`); MongoDB reads from its omni-v11 table again
+  and the index headline is +4.3% (omni-v10, omni-v11 and omni-v12 tables). The YCSB rig's restart fault is the next thing fixed.
 
 ## 2026-10-20 (evening): Omni v13 stands (no other muscle's room is conveyed)
 

@@ -120,11 +120,28 @@ def measure(row, m):
     return {"native": row["runs"][0]["native"], "omni": row["runs"][0]["omni"], "ratio": g, "reading": reading}
 
 
+def whole(path):
+    """A table that carries a result: a gauge row, or a workload beside the tuning one. A table written from runs that
+    failed (its workloads or rows empty) is not whole, and the test is read from the newest whole table until its runs land."""
+    try:
+        d = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return False
+    if d.get("rows"):
+        return True
+    return any(wl != "tuning" for wl in (d.get("workloads") or {}))
+
+
 def newest(fname):
-    """The same test's table on the newest engine that has one (V<n>_<TEST>.json with the highest n); tables of two engines
-    are never pooled, and a later engine's three runs take the test's place the moment their table lands."""
+    """The same test's table on the newest engine that has a whole one (V<n>_<TEST>.json with the highest n whose table
+    carries a result); tables of two engines are never pooled, and a later engine's three runs take the test's place the
+    moment their table lands whole. A newer table written from failed runs (20 October: the omni-v12 MongoDB table, its B and
+    C with no workload) is passed over, so no test leaves the index or the benefit sheet for a run that failed."""
     base = re.sub(r"^V\d+_", "", fname)
     found = sorted((int(m.group(1)), x.name) for x in LIVE.glob("V*_" + base) if (m := re.fullmatch(r"V(\d+)_" + re.escape(base), x.name)))
+    for _, name in reversed(found):
+        if whole(LIVE / name):
+            return name
     return found[-1][1] if found else fname
 
 

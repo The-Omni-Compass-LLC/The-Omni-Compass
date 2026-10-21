@@ -10,7 +10,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Omni-Compass is wired **out of** every muscle: it reads every reading. It is wired **into** a knob only where the paired measurement shows no gauge of the muscle read **LOSS** against native. Where the measurement shows nothing (**EVEN**), or shows a LOSS, the muscle stays native and Omni only watches it: one wire out, no wire in. This is not a new rule. It is what the engine does on the muscle itself before it moves anything (`omnicompass/verdict.py`: the paired trial, and the verdict **left native** where no step is allowed), and it is the watch arm of every realms run (`docs/REALMS_PREREGISTRATION.md`: the governor reads every period and writes nothing). This page applies the same principle to every published result, one verdict per knob, so that an operator can see which knobs earn a wire in and which stay native. The founder's order of 9 October 2026: where Omni cannot beat native, the muscle lives by itself; we only wire out of it.
 
-Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1209 rows, the 1,107 modelled muscles included one by one, and the seven organisms under three loads).
+Every verdict here is computed by `tools/wiring_verdicts.py` from the test's own result file; nothing is typed in, and `verify.py` fails if this page differs from what the tables give. One row per knob and case: `results/WIRING_VERDICTS.csv` (1214 rows, the 1,107 modelled muscles included one by one, and the seven organisms under three loads).
 
 ## The rule
 
@@ -26,12 +26,12 @@ A modelled muscle (the 1,107 on their plants under its own load and work waiting
 
 | Where | Knobs or cases | Write | Operator's choice | Watch |
 |---|---:|---:|---:|---:|
-| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 22 | 8 | 5 | 9 |
+| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 26 | 9 | 5 | 12 |
 | Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | 38 | 20 | 15 | 3 |
 | The 1,107 modelled muscles, alone on their plants under two loads (evidence class S) | 1107 | 527 | 0 | 580 |
 | The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | 14 | 12 | 1 | 1 |
 
-In words: on the real stacks Omni earns its wire in on 8 of 22 knob-cases, trades on 5 and watches on 9. Of the 1,107 modelled muscles, 527 earn a wire in and 580 stay native: 421 of the 580 are at their limit on native (the knob already at the top of its range: nothing to push, read and left native) and 159 read the same as native (nothing moved beyond the noise). A knob left native costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
+In words: on the real stacks Omni earns its wire in on 9 of 26 knob-cases, trades on 5 and watches on 12. Of the 1,107 modelled muscles, 527 earn a wire in and 580 stay native: 421 of the 580 are at their limit on native (the knob already at the top of its range: nothing to push, read and left native) and 159 read the same as native (nothing moved beyond the noise). A knob left native costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
 
 ## The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)
 
@@ -84,6 +84,18 @@ The knob: the cache's memory ceiling.
 | burst | memory ceiling held cut 2.2% to 2.3%, memory used cut 0.8% to 0.9% | none | **write** | +0.6% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V12_REDIS.md` |
 | large | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 2 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V12_REDIS.md` |
 | small | work inside the line up 1.2% to 1.4%, hit rate up 1.2% to 1.4%, mean cut 1.7% to 2.3% | power given: memory ceiling held up 2.2% to 2.4%, memory used up 1.7% to 2.0% | **operator's choice** | -0.2% | +0.7% | Why: memory ceiling held up 2.2% to 2.4% (power given), because the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges); memory used up 1.7% to 2.0% (power given), because the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held. The trade pays under the service reading (+0.7%) and not under the resource reading (-0.2%, the preregistered headline): the operator who runs Redis for its speed and has the memory wires in; the operator who counts the memory as the cost watches. | `results/live/V12_REDIS.md` |
+
+### Real database cache (MongoDB under YCSB, GitHub)
+
+The knob: the storage engine's cache size.
+
+| Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
+|---|---|---|---|---:|---:|---|---|
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
+| b | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
+| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
+| c | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
+| f | cache size held cut 0.9% to 1.0% | none | **write** | +0.2% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V11_YCSB.md` |
 
 ### Real database buffer pool (MySQL under sysbench, GitHub)
 
