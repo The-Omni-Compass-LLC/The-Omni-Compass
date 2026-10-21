@@ -196,7 +196,7 @@ models) and its state: live (the engine's port, proven equal to the Python and t
 built and awaiting its run. A monitor awaiting its run carries no invented number: its native lane shows what exists, its
 Omni-Compass lane stays empty, and the page names the run that fills it. The CPU host monitor plays the harness on its own
 modelled machine until a machine with its energy counter runs it; the GPU card monitor replays the one metered run of 2
-October, made by a card controller replaced since, until its omni-v12 run lands. The kill switch on the page acts on what
+October, made by a card controller replaced since, until its omni-v14 run on Lambda lands. The kill switch on the page acts on what
 runs in the page: every Omni-Compass side follows native at once, and a recorded result changes its colour, never a value, a
 word or a row. The page's own seeded runs reproduce the Python's (`tools/engine_runs.py`) receipt by receipt, with one
 SHA-256 digest on each side; the 500 scenarios of `benchmarks/stack_benchmark.py` are replayed from their record with every

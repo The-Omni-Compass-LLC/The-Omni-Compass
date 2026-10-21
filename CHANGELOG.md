@@ -4,6 +4,23 @@
 
 ## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 
+- **The poster on the live engine's title page** (the founder's order of 21 October): the owner's poster of the Omni-Compass, the
+  stacks and the software it is built to sit on top of by family, now stands at the top of the title page's right column, with the
+  Omni-Compass as its owner pictures it under it (on a phone both sit under the title). Each is captioned an illustration, not a
+  result; the poster's caption says the names and marks on it belong to their owners and claim no endorsement, and that the legal
+  standing is as the notice states. The plate is kept with the others (`docs/book/plates/omni_compass_poster.webp`); the Live
+  Engine Manual's front matter says so. Rendered in headless Chromium at 1,400 and 420 pixels wide before the push: no page error.
+
+- **Alignment sweep, referee level** (the founder's order of 21 October, "fix, fix, align"): the Live Engine Manual named omni-v13
+  as the engine the page is built on in four places and listed the page's section 10 without its 10a and 10b (now omni-v14, with
+  both); the README gave the Operator's and Owner's books at 496 and 1,249 pages (now 506 and 1,470, as built) and wrote the
+  license phrase in mixed case (now as the notice writes it); the reading page named only `V10_` and `V11_` tables; a retired
+  word stood in `docs/LIMITATIONS.md` (a swarm draw "worse": it read LOSS), a "confirmed" in `docs/FORMAL_V5.md` (cards checked on
+  untouched seeds) and in `docs/LAMBDA_SETUP.md` (a give-back acknowledged by Lambda), a "worse" in `CLAUDE.md`, and
+  `DISCLOSURES.md` naming omni-v12 for the card's rerun on Lambda (omni-v14). Every count
+  on the front pages read against its source: 1,107 muscles in 70 families, 12 Python/C++ twins, 50 and 77 figures, the
+  index's +4.3% and +11.9%, the engine omni-v14 (digest `7afba44615fcff8f`, 47 files); all agree.
+
 - **The Problem and the Answer, first** (the founder's order of 21 October): the README and all three manuals now open their
   front matter with what every stack faces (capacity held idle, late reaction, loops at cross purposes, demand outrunning the
   power and hardware that can be built) and what Omni-Compass does about it (a supervisory governor on top of the native
