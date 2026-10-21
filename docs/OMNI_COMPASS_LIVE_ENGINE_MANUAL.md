@@ -13,6 +13,89 @@ All patents, copyrights and trademarks covering the Omni-Compass engine, its mat
 
 # FRONT MATTER
 
+## The Problem and Omni-Compass's Solution
+
+**What the whole industry faces.** Demand for computing is growing faster than the power, the machines and the budgets
+built to carry it. The International Energy Agency puts the world's data centres at about 415 TWh of electricity in 2024,
+around 1.5% of all the electricity the world used, and expects that to more than double, to about 945 TWh, by 2030, with
+artificial intelligence the largest driver. In the United States, Lawrence Berkeley National Laboratory counts 176 TWh in
+2023, 4.4% of the country's electricity, and between 6.7% and 12% by 2028. The usual answer is to build more: more
+machines, more megawatts, more cooling and a larger bill.
+
+**Much of what is built sits idle.** Across the Kubernetes clusters Cast AI measured in 2025, the average processor was 8%
+busy and the average memory 20% used, read before its own automation was switched on. The organizations Flexera surveyed
+estimate that 29% of what they spend on cloud infrastructure and platforms is wasted.
+
+**Not short of control, short of coordination.** In every realm (compute, AI and the cloud; physics, robotics and
+autonomy; energy, facilities and industry; distribution and specialized systems) each machine already runs under local
+feedback loops: horizontal autoscalers, firmware power and clock governors, building-management loops,
+battery-management systems, connection pools, servo controllers. Each loop is tuned on its own, against its own setpoint,
+with margins sized for a worst case. Four costs follow, and every operator pays them:
+
+- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
+  recomputes its replicas every 15 seconds by default and damps its scale-downs over a 5-minute stabilization window; new
+  pods then need time to schedule and start. Queues form before capacity arrives.
+- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
+  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
+  rarely used.
+- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
+  is another loop's disturbance: more web replicas saturate the database's connections; more cooling pushes a power feed
+  toward its limit.
+- **The gaps closed by hand.** Operators close them with fixed settings, runbooks, alerts and on-call rotations, and the
+  settings go stale as the load moves. That is safe, and it leaves the region between the operating point and the safe
+  boundary unused nearly all of the time.
+
+**Omni-Compass's solution: govern what is built before building more.** Omni-Compass is a supervisory governor. It
+sits on top of every native controller and never in place of one; native keeps running underneath, always. It treats each
+setting a native controller already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool
+size) as a muscle, and the whole stack as one body, the organism. Through a two-way plug, one wire in (the readings native
+already reports) and one wire out (the settings native already exposes), it reads every muscle, places each reading in the
+muscle's own band, from calm to its line (the limit it must not cross: a response time, a temperature, a feed's rating),
+and moves each setting one bounded, smooth step at a time. By default every muscle is driven up to its own limit, never
+past it and never below native; every write is read back; every step is tried in its own paired trial (the muscle with
+and without it, under the same load) and undone if the muscle loses by it; and wherever no gain can be brought, the muscle
+stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
+inside its own cushion. The aim, in one line: more work, faster, on fewer machines, with less energy. Where Omni-Compass takes more energy to buy more work or speed, that energy is shown beside
+what it bought, as power given, and never called a loss.
+
+**How it addresses each cost.**
+
+| What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
+|---|---|---|
+| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its fast checks run every 5 seconds, beside the autoscaler's own 15-second check) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
+| **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
+| **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion | every muscle judged on itself, and the organism judged whole |
+| **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
+
+**Where the page shows each answer.** Reaction latency: the organism live, every muscle's place in its band and the
+decisions past the line, native beside Omni-Compass (6a, `#s-engines`), and the shipped controller's decision trace (5e,
+`#s-live`). Static over-provisioning: the benefit board (2, `#s-board`) and the clouds' bills (5a, `#s-cloud`).
+Uncoordinated coupling: the whole organism (3, `#s-whole`) and the organism's immune system (6a, `#s-engines`). The gaps
+closed by hand: the status board's alarms (1d, `#s-status`) and the golden signals, the event log and the live metrics
+(1h, `#s-feed`).
+
+**What it does not do.** It replaces no controller, and it creates no capacity a machine does not have: it uses the
+capacity already there, each muscle to its own limit. It promises no number on a system it has not run on: the only number
+that applies to a system is the one that system's own paired runs produce. The outside figures above are their authors'
+own, quoted for scale; none was measured, checked or endorsed by The Omni-Compass LLC, and none is a result of
+Omni-Compass.
+
+**How it is held to account.** Every benchmark has two arms, native and Omni-Compass on top of native, on the same
+machines with the same work, run three separate times. Every reading is one word, GAIN, EVEN or LOSS, decided by what the
+gauge is for (the key, in this front matter); every result carries its evidence class (**P** a physical meter, **L** live
+software, **S** our own models, never shown as proof of hardware); and every row is shown, LOSS included. The governing
+rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the organism is never left turning out less than
+native, nor less healthy. On the page this is section iii (`#s-problem`), the first after the title page; the executive summary under it
+reads where the record stands from the records on the page, and this book carries no benchmark results of its own.
+
+**The outside sources.** International Energy Agency, *Energy and AI* (April 2025), its executive summary. Lawrence
+Berkeley National Laboratory, *2024 United States Data Center Energy Usage Report* (December 2024), prepared for the U.S.
+Department of Energy. Cast AI, *2026 State of Kubernetes Optimization Report*: a seller of Kubernetes optimization,
+reporting its own customers' clusters as they ran before its automation. Flexera, *2026 State of the Cloud Report* (March
+2026): a survey of 753 cloud decision-makers and users, the figure their own estimate. The Kubernetes documentation,
+*Horizontal Pod Autoscaling*: the controller's defaults.
+
+
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
 
@@ -90,7 +173,7 @@ archived with their SHA-256 lists, the two other manuals and `DISCLOSURES.md`.
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
 (omni-v13, `OMNI_V13.json`). The page names its engine on its own `<html>` element (`data-engine`) and refuses to be built on
 any other; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
-same push. The page's own table of contents (its section iv, "Engine table of contents") is the authority on the order and the
+same push. The page's own table of contents (its section v, "Engine table of contents") is the authority on the order and the
 numbering of its sections; this manual names every section by its title and its anchor (`#s-health`, `#s-ops`, and so on), which
 do not move when sections are renumbered.
 
@@ -223,8 +306,9 @@ three of them are read together. The page's own age, in the last tile, reads twe
 
 ## Introduction: The Page, Its Monitors and What This Manual Covers
 
-**The problem the page answers.** A supervisory governor sits on top of controllers that each have their own dashboard, and
-the owner of the stack has to answer one question about it every day: is it doing what the receipts say, right now, on this
+**The problem the page answers.** Omni-Compass's answer to the problem the whole industry faces (the first section of this
+front matter) is a supervisory governor on top of controllers that each have their own dashboard, and the owner of the
+stack has to answer one question about it every day: is it doing what the receipts say, right now, on this
 body, and would I see it if it were not? The receipts are tables; a table is read after the fact. The page is the same
 record played back in motion, native beside Omni-Compass, with the governor's own decisions and the native controllers' own
 moves on two tickers side by side, so the mechanism is seen, not inferred.
@@ -357,12 +441,13 @@ copy.
 
 ### 2.1 The page's own contents
 
-The page opens with its legal notice (i), then the title page with the build (ii) and the executive summary with the
-reading key (iii), and then its own table of contents (iv, "Engine table of contents"): the founder's order of 21 October, the
-title, the summary and the key first and the contents after them. Beside the title, on a desktop, stands the owner's illustration
+The page opens with its legal notice (i), then the title page with the build (ii), the problem the whole industry faces and
+Omni-Compass's solution (iii), the executive summary with the reading key (iv), and then its own table of contents (v, "Engine
+table of contents"): the founder's orders of 21 October, the title, the problem and the solution, the summary and the key first
+and the contents after them. Beside the title, on a desktop, stands the owner's illustration
 of the Omni-Compass (on a phone it sits under the title); it is an illustration, not a result, and says so under it: every result
-on the page is read from the repository's own records. The body is numbered 1 to 11; the back matter is v
-(disclosures, governing law and contact) and vi (the closing legal notice). A section's number is printed before its title; a
+on the page is read from the repository's own records. The body is numbered 1 to 11; the back matter is vi
+(disclosures, governing law and contact) and vii (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
 
@@ -381,7 +466,7 @@ self-governed rendering.
 
 ### 2.3 Anchors
 
-Every section has an anchor that does not move when the page is reordered: `#p-health`, `#s-health`,
+Every section has an anchor that does not move when the page is reordered: `#s-problem`, `#s-read`, `#p-health`, `#s-health`,
 `#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
 `#p-organism`, `#s-engines`, `#s-lab`, `#s-desk`, `#p-brain`, `#s-decision`, `#s-plane`, `#s-brain`, `#s-verdict`, `#s-fail`,
 `#s-math`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
@@ -459,16 +544,11 @@ themselves; the three must be one. Once that first check ends, the page checks t
 about twice a second, each run recomputed from its own seed by the page's engine and held against the Python's receipt; the run
 being checked is boxed on all three lanes and its result printed under the digests. Appendix L lists every monitor under its number.
 
-**Every monitor's wiring.** Under every monitor, below its knobs and its feed, one line names its wiring as the repository wires
-it (`docs/engine/monitors.json`): this page's own code (the drawing function), the Python it ports or reads, the C++ twin or why
-there is none, and the checks that hold them equal, each file linked at the commit the page was built from; then how the monitor
-moves. The monitor list carries the same in two columns. Three kinds of chain stand on the page. A live monitor runs the page's
-port of the engine (`omnicompass/adapter.py`, `core.py`, `nervous_system.py`, `compass_law.py`, `verdict.py`), held equal to the
-Python by `docs/engine/check_live_engine.py`, and the Python held equal to its C++ twins (`cpp/src/core.cpp`, `governor.cpp`,
-`nervous_system.cpp`) by the parity tests and by the C++ harness that runs the Python's own draws. A replay plays a record the
-Python wrote (the harness, the shipped controller, the models of the chip and the host), held equal to its source by
-`docs/engine/check_records.py`. A record reads a table of measured runs as it is written: no engine runs in the page for it, so no
-C++ applies, and its line says so.
+**Every monitor's wiring.** Under every monitor one line names its wiring (`docs/engine/monitors.json`): the page's own code, the
+Python it ports or reads, the C++ twin or why there is none, the checks that hold them equal, each file linked at the build's
+commit, and how it moves; the monitor list carries the same. A live monitor runs the page's port of the engine, held equal to the
+Python by `docs/engine/check_live_engine.py` and the Python to its C++ twins by the parity tests; a replay plays a record the Python
+wrote, held equal to its source by `docs/engine/check_records.py`; a record reads a measured table as written, so no C++ applies.
 
 **The motion meter.** The page watches itself as the viewer sees it. Every monitor in view is photographed small once a second;
 one whose picture changed in the last three seconds reads **● moving** on its badge and in its row of the list, one in view for
@@ -479,8 +559,10 @@ monitors seen so far and how many of them moved. Scroll the page once from top t
 ### 4.1 What the wall is
 
 The wall (the page's section 1b, `#s-wall`) is every monitor of the page in one view: the same
-canvases the sections draw, copied small four times a second, so nothing is drawn twice from different data. Click a tile and
-the page scrolls to the monitor it copies. The page's own governor (the page's section 11, chapter 25) leaves a monitor resting while it is
+canvases the sections draw, copied small four times a second, so nothing is drawn twice from different data. Every tile
+carries at its top its number and its title, what the monitor shows, and under them its section and its state (live, replay,
+from the records, a model, or awaiting its run), so a tile says where its monitor is and what it represents before it is
+opened. Click a tile and the page scrolls to the monitor it copies. The page's own governor (the page's section 11, chapter 25) leaves a monitor resting while it is
 off screen; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to, and while the wall
 is in view the resting monitors are drawn in turn, one a frame, each by its own drawing code; a tile with the accent border is
 a monitor on screen now.
@@ -1547,8 +1629,9 @@ A copy whose page, engine or records differ from what these print is not a copy 
 |---|---|---|---|
 | i | `#notice` | Legal notice | Notice and Disclaimer |
 | ii | `#title-page` | Title page and build | 1, 27 |
-| iii | `#s-read` | Executive summary and reading key | the key; 3 |
-| iv | `#contents` | Engine table of contents | 2 |
+| iii | `#s-problem` | The problem and Omni-Compass's solution | The Problem and Omni-Compass's Solution |
+| iv | `#s-read` | Executive summary and reading key | the key; 3 |
+| v | `#contents` | Engine table of contents | 2 |
 | 1 | `#p-health` | The monitor wall and the control panel | 4 to 7 |
 | 1a | `#s-health` | The control panel and the kill switch | 4, 5 |
 | 1b | `#s-wall` | The monitor wall, read left to right | 4 |
@@ -1581,8 +1664,8 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 9 | `#s-fail` | Failure modes, controls and residual risk | 23 |
 | 10 | `#s-math` | Component specification and mathematics | 24 |
 | 11 | `#s-self` | Self-governed rendering | 25 |
-| v | `#s-disclose` | Disclosures, governing law and contact | 29, 30 |
-| vi | `#notice-end` | Closing legal notice | Notice and Disclaimer |
+| vi | `#s-disclose` | Disclosures, governing law and contact | 29, 30 |
+| vii | `#notice-end` | Closing legal notice | Notice and Disclaimer |
 
 ## Appendix B - Every Control of the Console
 

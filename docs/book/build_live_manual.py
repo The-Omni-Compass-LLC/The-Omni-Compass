@@ -63,7 +63,7 @@ def model(page: str) -> dict:
     tp = re.search(r'<header class="head" id="title-page">(.*?)</header>', body, re.S)
     if tp:
         words = [("p", text(x)) for x in re.findall(r'<p class="lede"[^>]*>(.*?)</p>|<div class="realDisclose"[^>]*>(.*?)</div>', tp.group(1), re.S) for x in x if x]
-        items.append({"kind": "section", "id": "title-page", "n": "iii", "title": "Title page and build", "summary": "", "controls": "", "words": [w for w in words if w[1]], "panels": [], "monitors": []})
+        items.append({"kind": "section", "id": "title-page", "n": "ii", "title": "Title page and build", "summary": "", "controls": "", "words": [w for w in words if w[1]], "panels": [], "monitors": []})
     for m in re.finditer(r'<div class="partHead" id="([^"]+)"><span class="pn">([^<]*)</span><span class="pt">([^<]*)</span></div>|<section class="[^"]*" id="([^"]+)"', body):
         if m.group(1):
             items.append({"kind": "part", "id": m.group(1), "n": m.group(2), "title": html.unescape(m.group(3))})
@@ -80,7 +80,11 @@ def model(page: str) -> dict:
         summ = re.search(r'<p class="plain"><b>Summary\.</b>(.*?)</p>', sec, re.S)
         ctl = re.search(r'<div class="secknobs"[^>]*><b>Controls\.</b>(.*?)</div>', sec, re.S)
         words = []
-        for w in re.finditer(r'<h3[^>]*>(.*?)</h3>|<p class="(?:lede|note|plain)[^"]*"[^>]*>(.*?)</p>|<div class="realDisclose"[^>]*>(.*?)</div>|<summary>(.*?)</summary>', sec, re.S):
+        for w in re.finditer(r'<h3[^>]*>(.*?)</h3>|<p class="(?:lede|note|plain|prose)[^"]*"[^>]*>(.*?)</p>|<div class="realDisclose"[^>]*>(.*?)</div>|<summary>(.*?)</summary>|<table class="[^"]*\bptab\b[^"]*">(.*?)</table>', sec, re.S):
+            if w.group(5) is not None:              # a table of words the page writes itself, row by row
+                words.append(("t", [[text(c) for c in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", tr, re.S)]
+                                    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", w.group(5), re.S)]))
+                continue
             if w.group(1) is not None:
                 tx = text(w.group(1)); kind = "h"
             elif w.group(4) is not None:
@@ -94,6 +98,7 @@ def model(page: str) -> dict:
             lede = re.search(r'<p class="lede"[^>]*>(.*?)</p>', sec, re.S)
             summ_t = text(lede.group(1)) if lede else ""
         items.append({"kind": "section", "id": sid, "n": (h2.group(1) or "") if h2 else "", "title": text(h2.group(2)) if h2 else sid,
+                      "fixed": not re.search(r'\sid="', sec[sec.index(">") + 1:]),     # nothing in it is filled from a record
                       "summary": summ_t, "controls": text(ctl.group(1)) if ctl else "", "words": words,
                       "panels": [text(x) for x in re.findall(r"<h3[^>]*>(.*?)</h3>", sec, re.S)],
                       "monitors": [c for c in re.findall(r'<canvas id="([A-Za-z0-9_-]+)"', sec) if c != "wallCv"]})
@@ -166,10 +171,16 @@ def md_lines() -> list[str]:
         if it.get("words"):
             out += ["**The page, in its own words.**", ""]
             for kind, tx in it["words"]:
+                if kind == "t":
+                    out += ["| " + " | ".join(tx[0]) + " |", "|" + "---|" * len(tx[0])]
+                    out += ["| " + " | ".join(c.replace("|", "/") for c in row) + " |" for row in tx[1:]] + [""]
+                    continue
                 if tx == it["summary"]:
                     continue
                 out += [f"**{tx}**" if kind == "h" else tx, ""]
-        out += ["**Its monitors.**" if it["monitors"] else "**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.", ""]
+        out += ["**Its monitors.**" if it["monitors"] else
+                "**Its monitors.** This section draws no canvas: it is words and their sources, written in the page itself." if it.get("fixed") else
+                "**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.", ""]
         for cid in it["monitors"]:
             m = by.get(cid, {"name": cid, "what": "", "cls": "", "status": "", "feed": {"exporter": "", "metrics": [], "promql": []}, "knobs": [], "layer": "page"})
             n = M["number"].get(cid, "?")

@@ -13,6 +13,83 @@ All patents, copyrights and trademarks covering the Omni-Compass engine, its mat
 
 # FRONT MATTER
 
+## The Problem and Omni-Compass's Solution
+
+**What the whole industry faces.** Demand for computing is growing faster than the power, the machines and the budgets
+built to carry it. The International Energy Agency puts the world's data centres at about 415 TWh of electricity in 2024,
+around 1.5% of all the electricity the world used, and expects that to more than double, to about 945 TWh, by 2030, with
+artificial intelligence the largest driver. In the United States, Lawrence Berkeley National Laboratory counts 176 TWh in
+2023, 4.4% of the country's electricity, and between 6.7% and 12% by 2028. The usual answer is to build more: more
+machines, more megawatts, more cooling and a larger bill.
+
+**Much of what is built sits idle.** Across the Kubernetes clusters Cast AI measured in 2025, the average processor was 8%
+busy and the average memory 20% used, read before its own automation was switched on. The organizations Flexera surveyed
+estimate that 29% of what they spend on cloud infrastructure and platforms is wasted.
+
+**Not short of control, short of coordination.** In every realm (compute, AI and the cloud; physics, robotics and
+autonomy; energy, facilities and industry; distribution and specialized systems) each machine already runs under local
+feedback loops: horizontal autoscalers, firmware power and clock governors, building-management loops,
+battery-management systems, connection pools, servo controllers. Each loop is tuned on its own, against its own setpoint,
+with margins sized for a worst case. Four costs follow, and every operator pays them:
+
+- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
+  recomputes its replicas every 15 seconds by default and damps its scale-downs over a 5-minute stabilization window; new
+  pods then need time to schedule and start. Queues form before capacity arrives.
+- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
+  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
+  rarely used.
+- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
+  is another loop's disturbance: more web replicas saturate the database's connections; more cooling pushes a power feed
+  toward its limit.
+- **The gaps closed by hand.** Operators close them with fixed settings, runbooks, alerts and on-call rotations, and the
+  settings go stale as the load moves. That is safe, and it leaves the region between the operating point and the safe
+  boundary unused nearly all of the time.
+
+**Omni-Compass's solution: govern what is built before building more.** Omni-Compass is a supervisory governor. It
+sits on top of every native controller and never in place of one; native keeps running underneath, always. It treats each
+setting a native controller already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool
+size) as a muscle, and the whole stack as one body, the organism. Through a two-way plug, one wire in (the readings native
+already reports) and one wire out (the settings native already exposes), it reads every muscle, places each reading in the
+muscle's own band, from calm to its line (the limit it must not cross: a response time, a temperature, a feed's rating),
+and moves each setting one bounded, smooth step at a time. By default every muscle is driven up to its own limit, never
+past it and never below native; every write is read back; every step is tried in its own paired trial (the muscle with
+and without it, under the same load) and undone if the muscle loses by it; and wherever no gain can be brought, the muscle
+stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
+inside its own cushion. The aim, in one line: more work, faster, on fewer machines, with less energy. Where Omni-Compass takes more energy to buy more work or speed, that energy is shown beside
+what it bought, as power given, and never called a loss.
+
+**How it addresses each cost.**
+
+| What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
+|---|---|---|
+| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its fast checks run every 5 seconds, beside the autoscaler's own 15-second check) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
+| **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
+| **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion | every muscle judged on itself, and the organism judged whole |
+| **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
+
+**What it does not do.** It replaces no controller, and it creates no capacity a machine does not have: it uses the
+capacity already there, each muscle to its own limit. It promises no number on a system it has not run on: the only number
+that applies to a system is the one that system's own paired runs produce. The outside figures above are their authors'
+own, quoted for scale; none was measured, checked or endorsed by The Omni-Compass LLC, and none is a result of
+Omni-Compass.
+
+**How it is held to account.** Every benchmark has two arms, native and Omni-Compass on top of native, on the same
+machines with the same work, run three separate times. Every reading is one word, GAIN, EVEN or LOSS, decided by what the
+gauge is for (the key, in this front matter); every result carries its evidence class (**P** a physical meter, **L** live
+software, **S** our own models, never shown as proof of hardware); and every row is shown, LOSS included. The governing
+rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the organism is never left turning out less than
+native, nor less healthy. This manual carries no results: they are kept with the code, each in its own table with its evidence class,
+and the Owner's Manual carries them all. The Introduction shows the solution as an installation meets it, step
+by step.
+
+**The outside sources.** International Energy Agency, *Energy and AI* (April 2025), its executive summary. Lawrence
+Berkeley National Laboratory, *2024 United States Data Center Energy Usage Report* (December 2024), prepared for the U.S.
+Department of Energy. Cast AI, *2026 State of Kubernetes Optimization Report*: a seller of Kubernetes optimization,
+reporting its own customers' clusters as they ran before its automation. Flexera, *2026 State of the Cloud Report* (March
+2026): a survey of 753 cloud decision-makers and users, the figure their own estimate. The Kubernetes documentation,
+*Horizontal Pod Autoscaling*: the controller's defaults.
+
+
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
 
@@ -406,26 +483,11 @@ loss.
 Read the rest of the front matter before you touch a wire. It tells you what you are looking at and how to read
 what it tells you.
 
-## Introduction: The Problem, the Idea and What This Manual Covers
+## Introduction: The Idea and What This Manual Covers
 
-**The problem.** Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
-power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
-Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
-follow, and every operator pays them:
-
-- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
-  recomputes its desired replicas from averaged utilization on a sync period (15 seconds by default) and damps its
-  decisions with stabilization windows; new pods then need time to schedule and start. Queues form before capacity
-  arrives.
-- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
-  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
-  rarely used.
-- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
-  is another loop's disturbance. More web replicas saturate the database's connections; more cooling pushes a power feed
-  toward its limit.
-
-Operators close these gaps by hand, with fixed settings and runbooks. That is safe, and it leaves the region between the
-nominal operating point and the safe boundary unused nearly all of the time.
+The problem the whole industry faces, and Omni-Compass's solution in brief, stand at the head of this front matter. This
+introduction shows the solution as an installation meets it: the idea in its five steps, what Omni-Compass is not, the
+promise, what it governs, what you need before you wire it, and what this manual covers.
 
 **The idea.** Close one supervisory loop around the native loops. Omni-Compass treats each setting a native controller
 already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool size) as an actuator and
@@ -569,8 +631,8 @@ Read as one sentence: Omni-Compass takes the system in through a Data Exchange (
 
 ## Table of Contents
 
-**Front Matter** - The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
-Prelude: A Night on the Cluster; Introduction: The Problem, the Idea and What This Manual Covers; Quick Reference: The
+**Front Matter** - The Problem and Omni-Compass's Solution; The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
+Prelude: A Night on the Cluster; Introduction: The Idea and What This Manual Covers; Quick Reference: The
 Card for the Glove Box
 
 **Part I - The Governor, from the Outside**

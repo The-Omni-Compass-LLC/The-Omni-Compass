@@ -16,6 +16,23 @@ of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NO
 
 **The whole summary, straight after a pull:** `python3 tools/summary.py` (plain text) or `python3 tools/summary.py --markdown`. It prints what Omni-Compass is, the key below, and every headline result with its word and its evidence class, read from the result files in this repository.
 
+## The problem and Omni-Compass's solution
+
+**The problem the whole industry faces.** Demand for computing is outgrowing the power, the machines and the budgets built
+for it: the International Energy Agency expects the world's data centres to use about 945 TWh of electricity by 2030, more
+than double the 415 TWh of 2024. Yet much of what is built sits idle: across the Kubernetes clusters Cast AI measured in
+2025 the average processor was 8% busy, and the organizations Flexera surveyed in 2026 estimate 29% of their cloud
+infrastructure and platform spend wasted. Every machine already runs under local loops, each tuned alone with worst-case
+margins: they react late, hold headroom that is rarely used, disturb one another, and leave the gaps to people.
+
+**Omni-Compass's solution.** Govern what is built before building more: one supervisory governor on top of every native
+controller, never in place of one. It reads every muscle through a two-way plug, drives each up to its own limit and never
+past it or below native, reads every write back, tries every step in its own paired trial and undoes it if the muscle loses
+by it, leaves a muscle native wherever no gain can be brought, and hands every setting back to native when it stops. Every
+result is native against Omni-Compass on top of native, in three runs, read GAIN, EVEN or LOSS, every row shown. The full
+statement, with its sources and how each cost is addressed: the first section of the front matter of all three manuals,
+and section iii of the live engine page. The outside figures are their authors' own, none a result of Omni-Compass.
+
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
 

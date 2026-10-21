@@ -2,6 +2,42 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21 (late afternoon): the problem and Omni-Compass's solution at the head of the front matter; every tile of the wall titled
+
+- **The problem and Omni-Compass's solution** (the founder's order of 21 October: "in the beginning we have to state in front
+  matter the problem and omnicompasses solution, what the whole tech world is facing, and how omnicompass addresses it"). A new
+  first section of the front matter in the live engine page (section iii, `#s-problem`, after the title page; the executive
+  summary and key become iv, the contents v, the back matter vi and vii) and in all three manuals (the first chapter after the
+  contents), and in short in the README: what the whole industry faces (the International Energy Agency's 415 TWh for the
+  world's data centres in 2024 and about 945 TWh by 2030; Lawrence Berkeley National Laboratory's 4.4% of US electricity in 2023
+  and 6.7% to 12% by 2028; Cast AI's 8% processor and 20% memory use across the Kubernetes clusters it measured in 2025;
+  Flexera's 29% of cloud infrastructure and platform spend wasted, its respondents' own estimate; the Kubernetes autoscaler's
+  15-second sync and 5-minute scale-down window), the four costs of loops tuned alone (reaction latency, static
+  over-provisioning, uncoordinated coupling, the gaps closed by hand), Omni-Compass's solution, a table of how it addresses each
+  cost and how each is judged, what it does not do and how it is held to account. The outside figures are quoted for scale,
+  each source named: their authors' own, none measured or checked by us, none a result of Omni-Compass. The Owner's and the
+  Operator's Introductions no longer repeat the problem and open on the idea (The Idea and the Promise; The Idea and What This
+  Manual Covers). The Live Engine Manual's chapter 2 and Appendix A carry the page's new numbering; Appendix L names the title
+  page ii (it had printed iii, the executive summary's number) and reads the section's prose.
+- **The printed books' section numbers.** All three PDFs printed every section of every chapter under a number shifted from
+  the book's own: the Operator's Manual's 1.1 (Always on top of a native controller) was printed 1.6, and in the Live Engine
+  Manual all 176 numbered headings were off, while every reference in the text kept the right number, so "section 4.1" led
+  to no heading of that number. The book builder numbers every heading once to learn the labels and again to print them, and
+  the second pass counted on from the first; it now starts each chapter again from its first section
+  (`docs/book/build_book.py`). `docs/book/nav_check.py` now reads every numbered heading of the PDF against the number the
+  book's one-file text gives it and fails a book where one differs. The three manuals rebuilt.
+- **A table with tall rows no longer prints its header twice on one page.** Split at a row's end, the rest of such a table
+  was started lower on the same page under its header again; the book builder now splits the tall row inside it when a
+  row's end would leave more than four lines of the page empty (`BookTable`, `docs/book/build_book.py`). The new section's
+  table has three columns, so no word in it is broken across a line.
+- **Every tile of the monitor wall carries its title** (the founder's order of 21 October: "every monitor in the wall ... its title
+  alongside its number in its top"): at the top of each tile its number and its title, what the monitor shows, wrapped to two lines
+  on a desktop and four on a phone, never cut short, and under them its section and its state (live, replay, from the records, a
+  model, or awaiting its run); the monitor's picture under its head. The wall's own words and the Live Engine Manual (4.1) say so.
+- **The notice at the foot of every page of the three manuals** printed the word simulation with a small s, against the founder's
+  wording of 20 October (Simulation, as the LICENSE writes it): the book builder had split the line in two pieces, so the
+  notice check never read it whole. One piece now, a capital S, and the Operator's, the Owner's and the Live Engine Manual rebuilt.
+
 ## 2026-10-21 (afternoon): every monitor moving and wired, its code to its Python to its C++; every dashboard on its section
 
 - **Every monitor moves** (the founder's order of 21 October: "I don't see some grids, charts, diagrams moving with real time"). A
