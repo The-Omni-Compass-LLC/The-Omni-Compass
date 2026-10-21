@@ -189,7 +189,7 @@ def twins(b: Path, tmp: Path) -> list:
                  "GPU governor rules (shield limit, busy gate, speed lock, window, baseline)"):
         run(name, lambda: test_cpp_twins_parity.main(str(b / "oc_twins"), 500) and None, "500 seeded cases")
     law = [k for k in seal.TWINS if k.startswith("compass law")][0]
-    run(law, lambda: LP.main(str(b / "oc_compass_law"), 300) and 0.0, "300 random laws and plugs")   # it asserts every answer identical
+    run(law, lambda: LP.main(str(b / "oc_compass_law"), 300) and 0.0, "300 random laws and plugs, 101 climbing")   # it asserts every answer identical
     from tests import test_cpp_verdict_parity, test_cpp_engine_runs_parity
     run([k for k in seal.TWINS if k.startswith("verdict")][0], lambda: test_cpp_verdict_parity.main(str(b / "oc_verdict"), 300) and 0.0,
         "300 random verdicts, both judges")

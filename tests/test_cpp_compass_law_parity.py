@@ -146,15 +146,31 @@ def script(rng):
     return lines
 
 
+def climb(rng):
+    """A law whose damping gain takes either sign (the Python answers for any real gain, so the twin must too) fed readings
+    that climb above the center: with a negative kd the pull goes negative while the reading climbs, and the law's "never
+    take back while it climbs above the center" line decides the answer. script() never reaches that line (its gains are
+    never negative), so without these laws a C++ law missing it would pass."""
+    lo = rng.uniform(-5, 5); hi = lo + rng.uniform(0.01, 50)
+    band = Band(lo, hi, center=rng.uniform(0.1, 0.9), cushion=rng.uniform(0.005, 0.2))
+    lines = [law_line(band, rng.uniform(0.1, 2), rng.uniform(0.1, 300), rng.uniform(0.1, 1), rng.uniform(-5, 1),
+                      rng.uniform(0.1, 2), rng.uniform(0, 0.95))]
+    x = rng.uniform(lo, lo + band.center * (hi - lo))
+    for _ in range(rng.randint(10, 60)):
+        x += abs(rng.gauss(0, (hi - lo) * 0.05)) if rng.random() < 0.85 else -abs(rng.gauss(0, (hi - lo) * 0.05))
+        lines.append(f"F,{g(x)},nan,nan,{g(rng.uniform(-5, 4)) if rng.random() < 0.05 else 'nan'}")
+    return lines
+
+
 def main(exe, laws=300):
-    rng = random.Random(20261021)
+    rng, rng_climb = random.Random(20261021), random.Random(20261022)
     worst, n = 0.0, 0
     with tempfile.TemporaryDirectory() as d:
-        lines = [l for _ in range(laws) for l in script(rng)]
+        lines = [l for _ in range(laws) for l in script(rng)] + [l for _ in range(laws // 3 + 1) for l in climb(rng_climb)]
         n, worst, bad = differences(py_answers(lines), cpp_answers(exe, lines, d))
     assert bad is None, bad
     assert worst == 0.0, f"largest difference {worst}"
-    print(f"C++ compass law and plug vs Python: {laws} laws and plugs, {n} answers, every one identical")
+    print(f"C++ compass law and plug vs Python: {laws} laws and plugs and {laws // 3 + 1} climbing laws, {n} answers, every one identical")
     return n
 
 

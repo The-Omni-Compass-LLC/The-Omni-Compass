@@ -3332,8 +3332,8 @@ governor runs exactly as omni-v13 does.
 The control panel (`tools/omni_control.py`) carries it as one more button, `POST /v1/muscle {"muscle": NAME, "on": true|false}`,
 role operator, every press audited with its holder and reason, and as a row of On and Native buttons on the console. Like a
 dial press it passes through native: the governor's own kill file is set, its exit awaited (every setting it wrote restored
-and read back), and it starts again with the new list. Nothing is changed under a running governor. The monitor wall
-(`docs/MONITOR_WALL.md`) points every row at these buttons; the wall itself never presses one. Tests:
+and read back), and it starts again with the new list. Nothing is changed under a running governor. The monitor wall on the live
+engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `#s-wall`) points every row at these buttons; the wall itself never presses one. Tests:
 `tests/test_native_muscles.py`.
 
 ### 26.2 The operator's commands without a shell
