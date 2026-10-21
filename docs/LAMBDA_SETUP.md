@@ -77,7 +77,7 @@ The price the dry run prints is Lambda's own at that moment; the table is an exa
 may run at the same time (one run of each at once; a second press of the same test waits for the first).
 
 The machine is given back when the run prints its last line, or at the hour budget plus one hour whatever happens, or at the
-end of the workflow if anything before it failed. Each give-back is confirmed with Lambda; if Lambda does not confirm it,
+end of the workflow if anything before it failed. Each give-back is acknowledged by Lambda; if Lambda does not acknowledge it,
 the run turns red and says so. Then, by hand: **cloud.lambda.ai**, **Instances**, tick the machine (its name starts
 `omni-`), **Terminate**.
 

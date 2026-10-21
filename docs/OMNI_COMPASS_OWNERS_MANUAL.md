@@ -58,8 +58,8 @@ and the service reading alone +11.9%, GAIN, the same in all three of our runs (`
 read from its own engine's newest three-run table, none pooled across engines). The rows that read LOSS stand in their tables
 with their causes, such as the pod start wait on the kind rig (`docs/POD_START_WAIT.md`). The 1,107 muscles of the catalog are
 modelled (class S) and are never shown as proof of hardware. The engine is written twice, in Python and in C++, and the
-Python's 500 seeded runs through the C++ harness are identical to the last bit, checked on every push
-(`cpp/tools/engine_runs.cpp`). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved
+Python's 500 seeded runs through the C++ harness are identical to the last bit (`cpp/tools/engine_runs.cpp`; GitHub
+reruns the 500 on every change to the harness, the engine's C++ or the page, and every verify reruns 50 of them). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved
 these results.
 
 **What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
@@ -502,7 +502,8 @@ what it tells you.
 
 ## Introduction: The Problem, the Idea and the Promise
 
-**The problem.** Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
+**The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
+Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
 power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
 Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
 follow, and every operator pays them:
