@@ -133,7 +133,12 @@ def main(argv=None):
             L += ["", "The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: " + ", ".join(objs) + "): "
                   + "; ".join(f"run {t}: {summarize(vs)}" for t, vs in vr.items() if vs) + "."]
             out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "spend_allowed_steps", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
-    n_wl = sum(1 for w in wls if not any((r.get(w) or {}).get("tuning") for _, r in runs))
+    missing = {t: [w for w in wls if w not in r] for t, (_, r) in zip("ABC", runs)}
+    if any(missing.values()):                           # 21 October: a table written from runs that failed said nothing at its foot
+        L += ["", "> **Warning:** a run lacks a workload: " + "; ".join(f"run {t} lacks {', '.join(ws)}" for t, ws in missing.items() if ws)
+              + ". A workload is read only where every run holds it; a table whose runs hold none carries no result and is not read by "
+              "the index or the benefit sheet until its runs land (`tools/omni_index.newest`)."]
+    n_wl = sum(1 for w in wls if all(w in r for _, r in runs) and not any((r.get(w) or {}).get("tuning") for _, r in runs))
     L += ["", tally.sentence(n_wl, "untouched workloads")]
     Path(a.out).write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")
     Path(a.out).with_suffix(".json").write_text(json.dumps(out, indent=1))
