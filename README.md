@@ -1,6 +1,6 @@
 # Omni-Compass
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
@@ -34,6 +34,8 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -72,16 +74,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 11 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB_SERVICE.md) | Across 4 untouched workloads: 1 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 21 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V12_YCSB.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 0 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [sysbench on MySQL, a database's buffer pool as shipped: the A/B/C three-run table](results/live/V12_SYSBENCH_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 3 power given, 45 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V12_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 48 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V12_SYSBENCH.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 47 EVEN, 1 where the runs disagree. |
-| 2026-10-20 21:59 | [Redis, a cache's memory as shipped (no ceiling): the A/B/C three-run table](results/live/V12_REDIS_SHIPPED.md) | Across 3 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 1 power given, 35 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V12_REDIS_SERVICE.md) | Across 3 untouched workloads: 7 gauge-rows GAIN in all three of our runs, 0 LOSS, 2 power given, 27 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V12_REDIS.md) | Across 3 untouched workloads: 5 gauge-rows GAIN in all three of our runs, 0 LOSS, 2 power given, 29 EVEN, 0 where the runs disagree. |
-| 2026-10-20 21:59 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V12_PGBENCH.md) | Across 3 workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 36 EVEN, 0 where the runs disagree. |
+| 2026-10-21 00:03 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-20 20:55 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V13_VS_V12.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -89,16 +83,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-20 23:54 | six x100 line orgs 2 runs 0+10 | success | [39514426071](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514426071) |
-| 2026-10-20 23:52 | cloud-check amazon | failure | [39517792788](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517792788) |
-| 2026-10-20 23:52 | cloud-check google | failure | [39517785595](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517785595) |
-| 2026-10-20 23:51 | six x100 line orgs 4 runs 0+10 | success | [39514438064](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514438064) |
-| 2026-10-20 23:48 | grid | cancelled | [39517026710](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517026710) |
-| 2026-10-20 23:43 | live-engine | success | [39516212060](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516212060) |
-| 2026-10-20 23:40 | peek | success | [39516530718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516530718) |
-| 2026-10-20 23:38 | six x100 line orgs 7 runs 0+10 | success | [39514454730](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39514454730) |
-| 2026-10-20 23:37 | security-scan | failure | [39516212068](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39516212068) |
-| 2026-10-20 23:18 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 4 | success | [39509009937](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39509009937) |
+| 2026-10-21 01:02 | live-kind | success | [39522724506](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39522724506) |
+| 2026-10-21 00:59 | live-kind-levers | success | [39524294470](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524294470) |
+| 2026-10-21 00:57 | big-organism-detached collect | success | [39524414202](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524414202) |
+| 2026-10-21 00:57 | raw-sweep | success | [39524403355](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524403355) |
+| 2026-10-21 00:55 | cloud-check amazon | failure | [39524249374](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524249374) |
+| 2026-10-21 00:55 | cloud-check google | failure | [39524243196](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524243196) |
+| 2026-10-21 00:53 | security-scan | failure | [39524001703](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524001703) |
+| 2026-10-21 00:47 | grid | cancelled | [39517374939](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517374939) |
+| 2026-10-21 00:46 | kind-cruisekube | success | [39500612894](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39500612894) |
+| 2026-10-21 00:40 | live-engine | success | [39522065173](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39522065173) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
@@ -158,7 +152,8 @@ every draw tried and is in omni-v12, whose swarm runs judge a collision as a LOS
 [`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v14 runs land** (`results/live/V10_*.md`): steady work,
 the demand that wanders, all four in one run (work inside the line **+47% to +79%**), faults, a queue of jobs (machines **−6% to −14%**),
 a noisy neighbour, the Google day of 2011, CruiseKube and the two-hour run. The Omni index over the real tests, each test on its newest
-table: **+4.4% GAIN** on the resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+table with a reading (MongoDB's on omni-v11 until its omni-v12 runs land): **+4.3% GAIN** on the resource reading and **+11.9% GAIN** on
+the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 The whole system, every layer composed by the product law from its own table (the card, the cluster with its add-ons and
 governors, the services on it, the cloud's bill), with every interval carried and the product's assumption tested on the
 governors' four ways, is [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md): a modelled composition (class S) of the class P and L
@@ -291,7 +286,10 @@ follow the wall and the switch, read every gauge and turn every knob, trace any 
 mechanism of action of Omni-Compass against native as the monitors show it (the two tickers, the phase plane, the brain's
 state, the verdict), section by section in the page's own order, with what to do when a tile reads LOSS and what the page
 does not tell you. It explains neither how the engine is built nor how it is wired; it is built by `docs/book/build_book.py
---live`, and its text is [`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md).
+--live`, and its text is [`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md). Its last appendix
+is the page word for word, written from the page itself at every build (`docs/book/build_live_manual.py`): every section, every
+monitor with its number, evidence class, feed and knobs, and every control, so the book and the page read each other both
+ways; the control panel at the top of the live engine downloads all three books.
 
 ## What is real and what is a model
 
@@ -413,14 +411,14 @@ Read as one sentence: Omni-Compass takes the system in through a Data Exchange (
 
 ## License
 
-**Proprietary. Evaluation and simulation use only.** You may download, run and modify the software only to evaluate
+**Proprietary. Evaluation and Simulation use only.** You may download, run and modify the software only to evaluate
 it and to reproduce the published results, including in shadow or test mode on systems you own or control. Everything
 else requires a written **Omni-Compass Enterprise License** signed by The Omni-Compass LLC and paid for. No patent or
 trademark license is granted for any other use.
 
 | File | What it says |
 |---|---|
-| [`LICENSE`](LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
+| [`LICENSE`](LICENSE) | evaluation and Simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
 | [`NOTICE`](NOTICE) | copyright, the US filings notice, third-party notices |
 | [`PATENTS.md`](PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
 | [`TRADEMARKS.md`](TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |
@@ -431,4 +429,4 @@ trademark license is granted for any other use.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

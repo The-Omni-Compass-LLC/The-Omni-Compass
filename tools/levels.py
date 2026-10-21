@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Every level on one page: Omni-Compass on top of the muscle, the organism, the cluster, the cluster with its add-ons, the
@@ -30,7 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import receipt_key, with_own_runs              # noqa: E402
+from tools.readings import receipt_key, with_own_runs, landed      # noqa: E402
 
 OUT = ROOT / "docs" / "LEVELS.md"
 LIVE = ROOT / "results" / "live"
@@ -72,9 +72,11 @@ def kind_of(reading: str) -> str | None:
 
 
 def newest_table(stem: str) -> Path | None:
-    """The table of this benchmark on the newest engine that has one (V8_ before V7_ ...)."""
-    found = sorted(LIVE.glob(f"V[0-9]*_{stem}.md"), key=lambda p: int(re.match(r"V(\d+)_", p.name).group(1)), reverse=True)
-    return next((p for p in found if re.fullmatch(rf"V\d+_{re.escape(stem)}\.md", p.name)), None)
+    """The table of this benchmark on the newest engine that has one with a reading (V8_ before V7_ ...; tools/readings.py,
+    landed: a table whose runs share no workload leaves the older engine's table standing)."""
+    found = [p for p in sorted(LIVE.glob(f"V[0-9]*_{stem}.md"), key=lambda p: int(re.match(r"V(\d+)_", p.name).group(1)), reverse=True)
+             if re.fullmatch(rf"V\d+_{re.escape(stem)}\.md", p.name)]
+    return next((p for p in found if landed(p)), found[0] if found else None)
 
 
 def engine_of(text: str, name: str) -> str:

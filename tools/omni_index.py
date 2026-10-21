@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The Omni index: one number for more for the same, or the same for less (docs/K8S_COMPASS_PREREGISTRATION.md).
@@ -36,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-from tools.readings import judged, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
+from tools.readings import judged, landed, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "results" / "live"
@@ -122,14 +122,9 @@ def measure(row, m):
 
 def whole(path):
     """A table that carries a result: a gauge row, or a workload beside the tuning one. A table written from runs that
-    failed (its workloads or rows empty) is not whole, and the test is read from the newest whole table until its runs land."""
-    try:
-        d = json.loads(path.read_text())
-    except (OSError, ValueError):
-        return False
-    if d.get("rows"):
-        return True
-    return any(wl != "tuning" for wl in (d.get("workloads") or {}))
+    failed (its workloads or rows empty) is not whole, and the test is read from the newest whole table until its runs land.
+    The rule is written once, in tools/readings.py (landed), and read by every tool that picks a benchmark's newest table."""
+    return landed(path)
 
 
 def newest(fname):

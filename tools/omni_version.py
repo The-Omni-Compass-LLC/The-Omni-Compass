@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The engines, fingerprinted file by file: Omni v14, the engine that stands (OMNI_V14.json, docs/OMNI_V14.md), Omni v13 (OMNI_V13.json), Omni v12 (OMNI_V12.json), Omni v11 (OMNI_V11.json), Omni v10 (OMNI_V10.json), Omni v9

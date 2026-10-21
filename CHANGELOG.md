@@ -1,6 +1,76 @@
 # Changelog
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+## 2026-10-21: the live engine in the founder's order, every monitor numbered and knobbed, the Python's runs in the page, the third manual
+
+- **The live engine's order** (the founder's orders of 20 October): the table of contents first, named "Engine table of contents",
+  under the one line of the notice; the front matter (the title page, the reading key); then 1 the monitor wall and the control
+  panel, 2 the benefit board, 3 the whole organism, then the whole down to the smallest part (4 the measured effect in full, 5 the
+  evidence by stack from the cloud down to the chip, 6 the organism, 7 the console, 8 the brain, 9 the failure modes, 10 the
+  components, 11 the page's rendering); every badge, part head and in-page reference renumbered; the contents name every
+  section's monitors.
+- **Every monitor numbered, on the wall, with its own knobs and its feed** (`docs/engine/monitors.json`): 58 monitors, numbered in
+  their order on the page, the wall reading them right to left and down; every monitor carries the kill switch, the console's
+  knobs where it is live and its own buttons where it replays; the inventory names each one's evidence class, state, the
+  open-source exporter and Prometheus series that would carry it on a running system, and what is still awaiting its run; the
+  whole wall as a Grafana dashboard (`docs/engine/export_grafana.py`, `deploy/grafana/omni-compass-wall.json`). New monitors: the
+  GPU card's one metered run replayed second by second (class P, the replaced controller's record), the CPU host on the harness's
+  own modelled machine until its machine (class S), an 8-card node awaiting `scripts/gpu_8card.sh`, the bill on Azure, Google
+  Cloud and Amazon with each gate's own reason, GitHub's pipeline, the nine organisms, every muscle of the catalog, the grid, the
+  Python's runs reproduced in the page and the Python's 500 scenarios a seed replayed with every trace hash. The tensor and
+  service-level monitors are on the wall.
+- **The kill switch's words** (the founder's order): ON green while Omni-Compass governs; engaged, the switch red and OFF white;
+  it stands in the control panel, in the contents, at every section's head and in every monitor's knobs, one press everywhere.
+  Each muscle of the organism carries its own switch: one muscle handed back to native, the rest under Omni-Compass.
+- **The Python's runs in the page** (`tools/engine_runs.py`): N runs from a base seed (seed_k = base + k·0x9E3779B9 mod 2³²,
+  mulberry32, the page's own generator in the Python bit for bit), each through 288 decisions of the brain (RK4), 80 steps of the
+  compass law and one give-back trial; one SHA-256 digest of the receipts. The page runs the Python's 500 again at a button and
+  matches every receipt and the digest (`d4f6586b…`); a new base runs in the page with the one Python command that runs the
+  same set; the receipts print and download. `tests/test_engine_runs.py`, `tests/test_live_monitors.py`.
+- **The whole organism every way it is bought** (`docs/engine/export_whole.py`): on-site bare metal, through the cloud (three
+  pieces and two), in the device, as a service; the cloud's back end disclosed (`DISCLOSURES.md` section 9): a tenant cannot meter
+  the provider's bare metal; the cloud piece is the bill and the machines the provider meters; the bare-metal piece is gauged on
+  hardware we meter and carried to the provider's only as a modelled factor.
+- **One third manual**: main's Live Engine Manual (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, built with the other
+  two by `docs/book/build_book.py --live`) is the third book; this branch's page-generated text became its last appendix,
+  Appendix L, the page word for word (`docs/engine/PAGE_WORD_FOR_WORD.md`, written from the page by
+  `docs/book/build_live_manual.py` at every build): every section, every monitor under its number with its evidence class,
+  state, feed and knobs, every knob and every LOSS row. The book was realigned to the page as it stands: the page's section
+  numbers (the benefit board is section 2, every later section one on), Part III in the page's order (the benefit board, then
+  the whole organism, now every way a stack is bought: on site, through the cloud, in the device, as a service), the numbered
+  wall and its control panel, the 8-card node, the muscle's own switch on the page beside the next version's live switch per
+  muscle on a running engine, and six references to other documents that a blind replacement had turned into the page's.
+  The control panel downloads all three manuals.
+- **The Python's runs linked to GitHub** (the founder's order of 21 October): `.github/workflows/engine-runs.yml` runs another set
+  from the jump generator (500 by default, a new base each time) on every push that changes the live engine's page or the Python's
+  runs, on a working branch as on main, and on every dispatch; runs the live engine's own code on every run of it in node
+  (`tools/engine_runs.py --verify --all`), and commits the record with the GitHub run that made it (its id, address and commit);
+  the page reads the newest record by its time and names that run beside the digest, and on main the job starts the page's
+  rebuild itself (a commit made with GitHub's own token starts no workflow; a dispatch does). Dispatchable once the workflow is on main (GitHub starts a dispatch only from the default branch's list).
+- **Simulation with a capital S** in the one notice (`tools/legal.py`), written on every file but the engine's fingerprinted ones,
+  which take it with the next version; the workflows' embedded legal bundles re-written to match.
+- **A newer engine's table stands only once its three runs share a reading** (`tools/readings.py`, `landed`): the three
+  omni-v12 YCSB runs on MongoDB each failed partway, so their table holds no workload in all three; the benefit sheet, the Omni
+  index, the levels page, the power page and the live engine took it as MongoDB's result and the benchmark fell off all of
+  them. Each now reads the one rule: omni-v11's table stands, named as omni-v11's (+0.1% GAIN), until omni-v12's three runs
+  land. `tests/test_readings.py`.
+- **MongoDB's runs on GitHub's new machine** (`docs/YCSB_PREREGISTRATION.md`, amendment 5): GitHub's ubuntu-24.04 image of 18
+  October runs Linux 7.0.0, and MongoDB 8.0 refuses or fails to start on Linux 6.19 to 7.0.13 (MongoDB's SERVER-121912); every
+  failed job of the three omni-v12 runs (9 of 15) ran on that image and every passing job on the image before it. The workload
+  jobs now run on GitHub's ubuntu-22.04 machine (Linux 6.8, the same 4 cores and 16 GB); the setup stops at once with the
+  kernel, the server's status and its journal when the server does not answer, and every run's files carry the kernel, the
+  release, the runner image and the server's journal; main's rig change of the same night (the server's journal in every
+  run, a second restart before a run stops) is kept beside it. Every set runs on this machine in the omni-v13 campaign.
+- **Main's red checks fixed here**: verify failed on main because `docs/LEVELS.md` and the state of play's standing block
+  were not rebuilt after the twelve omni-v12 service tables landed (rebuilt); the security scan failed on Pillow 12.3.0's eight
+  published advisories (Pillow 13.0.0 in the lock with every file's SHA-256, the bill of materials rewritten; matplotlib's
+  charts and reportlab's PDFs checked on it). The notice check now refuses the lower-case wording, so a table a bot writes
+  with the older notice fails until `tools/legal.py --fix` rewrites it.
+- **GitHub**: the branch's verify failed only on the release manifest (hashed pages changed); the manifest and the receipt are
+  regenerated with this change. Azure's set to the paid cap runs (repetition 31 of 100 at 20:13 UTC); Google's gate holds on a key
+  stored short (595 characters, not the key file); Amazon's on the Free plan (the organization's policy denies every machine
+  read). Both say so in their own words on the bill monitors.
 
 ## 2026-10-21: omni-v14 lands (a knob for every muscle; the operator's commands without a shell)
 
@@ -3203,7 +3273,7 @@
   (`tools/run_scale.py`, workflow `six`).
 - Robot-joint simulation compiled (identical results, about 30 times faster).
 - Real Kubernetes set 24 reproduces set 23.
-- License: evaluation and simulation use only; Omni-Compass Enterprise License for everything else; US filings notice.
+- License: evaluation and Simulation use only; Omni-Compass Enterprise License for everything else; US filings notice.
 - The Omni-Compass Manual, edition 1.0.
 
 ## Earlier
@@ -3211,4 +3281,4 @@ See `docs/HISTORY.md` and `docs/STATE_OF_PLAY.md`.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
