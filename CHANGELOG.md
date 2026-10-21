@@ -2,6 +2,57 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-20 (night): the run storm on GitHub stopped
+
+- **Why runs read cancelled.** The live engine committed its rebuilt page to main, and its own push filter matched that page,
+  so it rebuilt itself every seven minutes (ten bot commits between 19:43 and 20:52 UTC). Each of those commits also started
+  21 workflows that run only when started by hand (they register on a push and skip it), each skipped run started the front
+  page, and each front page started the live engine and the raw sweep, which then cancelled one another in their queues: in
+  the hour and a half read, 320 cancelled runs and about 300 skipped ones, no benchmark among them, and every bot commit ran
+  the whole verify. Now the live engine's own page is outside its push filter; a front-page run that did not succeed starts
+  no rebuild and a skipped run no sweep; and the 21 workflows ignore pushes to main and to the level branches (a dispatch
+  needs no push to register a workflow that is on main). `tests/test_workflow_triggers.py` fails a push where a workflow
+  would again be started by every push, or the live engine by its own page.
+- **omni-v13 landed on GitHub with two faults fixed on the way.** `tests/test_convey.py` still asserted omni-v12's rule (another
+  pod on the machine counted by its request, web-2 given 2,800m); omni-v13 counts it by its limit, so the test now expects
+  1,800m and a gain of 3.05, the engine unchanged. And the MongoDB benchmark had left the index, the benefit sheet and the
+  standing block (26 rows to 25) because the omni-v12 YCSB table was written from two runs that failed (`mongod did not come
+  back after the restart`; its runs B and C with no workload) and `tools/omni_index.newest` took the newest table whatever it
+  held: it now takes the newest *whole* table (a gauge row, or a workload beside the tuning one), so a table written from
+  failed runs is passed over until its runs land (`tests/test_index_newest.py`); MongoDB reads from its omni-v11 table again
+  and the index headline is +4.3% (omni-v10, omni-v11 and omni-v12 tables). The YCSB rig's restart fault is the next thing fixed.
+- **The cluster recorder takes its first reading before it reads the clock.** `fleet/capture/kube_capture.sh` ended the
+  recording when the deadline had passed before any reading, so a clock tick between its start and its first look left an
+  empty capture (`tests/test_capture_in_service.py` with `DURATION=0`, once in three whole checks on a loaded machine); the
+  deadline now ends a recording only after at least one row.
+
+## 2026-10-20 (evening): Omni v13 stands (no other muscle's room is conveyed)
+
+- **omni-v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`): omni-v12 with one fault fixed in the
+  Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone, whose
+  three-run table read two LOSS rows (the queue finished 0.6% to 0.8% later, the web's 99th percentile 4% to 13% higher). The
+  29 repetitions' own files, read job by job and pod by pod, name the mechanism (`docs/BATCH_QUEUE_PREREGISTRATION.md`,
+  amendment 11, which replaces amendment 10's reading that it was the give-back): in the 16 repetitions whose slower runner
+  saturated the kind cores, the web pods' CPU limits were raised to 3,700m at 33 s, on a busy reading that caught the dip as the
+  stream's first pods started, and kept through the queue (omni-v7's guard holds a new raise at the host's top, never one
+  already given); the batch pods hashed 7.6% slower (63.1 s against 59.2 s) while the web served no faster; no machine was
+  parked during a saturated queue. Now, on a shared host at its top (busy at or over 75%) while another workload there has
+  room of its own (a pod whose limit is above its request), every limit given goes back to the operator's and is conveyed again
+  only under 70%; and every other pod on a machine is counted by its own limit, where omni-v12 counted requests.
+  `tests/test_convey_handback.py`; the shared-host tests' coredns carries no room of its own, as kind's does not.
+- **The toy gate** (`results/toy_gate/V13_VS_V12.md`, seeds 1 to 8): a new toy, `convey_batch`, sets KubeRay's batch muscle
+  beside the serving one on the batch rig's host (the kind nodes on 3 of 4 cores, the governor on the fourth, the stream of
+  24 jobs, the kernel's request-weighted share, the pods' measured start lag, the governor's own windowed reading, and the
+  batch pods' loss of work under a lifted quota taken from the saturated repetitions themselves). Against omni-v12 no reading is a LOSS in any toy: the cluster, verdict and web-only convey toys identical to the last digit;
+  in `convey_batch` the queue 1.48% sooner, the job turnaround 9.59% shorter and the web's 95th percentile 17.4% lower (GAIN).
+  Against native omni-v13 reads the queue identical, and three LOSS rows: the turnaround +0.05% (one raise on the queue's opening
+  reading, handed back 15 s later; on the next version's list) and the requests served and alert minutes, which both engines read
+  the same way with no batch at all on that 3-core host while the real runs read more requests (the toy's web model, on the list).
+- **Recorded with it**: the deviations register (71 amendments), the next version's list (`docs/CHANGE_CONTROL.md`: the toy's
+  web model on the 3-core host, where both engines read fewer requests served than native while the real runs read more after
+  the queue), the mechanism identity and the engine coverage measured again on the omni-v13 tree, the Lambda branch
+  `gpu-omni-v13`. Every benchmark runs again on omni-v13; omni-v12's tables stand as its record.
+
 ## 2026-10-20: the whole system, every layer composed by the product law; Gödel's rig on 1.24; the CPU power harness seeded
 
 - **The whole system** (`results/WHOLE_SYSTEM.md`, `tools/whole_system.py`; the founder's question of 20 October: the cloud is
