@@ -8,6 +8,49 @@ All patents, copyrights and trademarks covering the Omni-Compass engine, its mat
 
 The printable book of this text, with its contents and appendices: `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`. Built by `docs/book/build_book.py` --live.
 
+## The Problem and the Answer
+
+
+**What the whole industry faces.** Every computing system in service, from one server to a cloud region, from a GPU to a
+building's chillers, a grid feeder or a robot cell, is run by a stack of native controllers: the Kubernetes autoscalers and
+scheduler, the cloud's node pools, the GPU's power and clock firmware, the database's cache and connection pools, the
+building's cooling loops, the battery's management system, the servo's loop. Each was designed and tuned alone, against its own
+setpoint, with margins sized for the worst case it might meet. Three costs follow, on every stack:
+
+1. **Capacity held idle.** Worst-case margins stay in place through the common case. Machines, power caps, caches and cooling
+   run far inside their limits, and the room between the operating point and the limit is paid for and seldom used.
+2. **Late reaction.** Reactive loops act on averaged, lagging signals and wait out deliberate cooldowns, so queues and
+   response-time tails form before capacity arrives.
+3. **Loops at cross purposes.** The loops share power, cooling, connections and memory. One loop's correction is another
+   loop's disturbance, and no loop sees the whole.
+
+Demand for computing, above all for AI and the cloud, is growing faster than the power, cooling and hardware that can be built
+for it. The usual answer is to add: more machines, more power, more people watching thresholds. Replacing the native
+controllers is not an answer most operators will take: they are proven, often certified, and the people on call know them.
+
+**What Omni-Compass does about it.** Omni-Compass is a supervisory governor. It sits on top of those native controllers and
+never replaces them. It plugs into each setting a native controller already exposes, through a two-way plug (one wire in, the
+reading; one wire out, the setting), takes a snapshot of every setting before its first write, and governs the whole stack as
+one body, the organism: every muscle driven as far as its own limit and never past it, and, on the engine that stands, never
+below native; where it cannot bring a muscle a GAIN, that muscle stays native. It acts before a line is crossed instead of
+after, reads back every write, puts every give-back to its own trial, records every decision with its reason, walks every
+setting home if it stops (the lease) and stops at once on the kill switch. Its first rule is do no harm, judged at the
+organism: never less work or health than native (`DISCLOSURES.md`, section 3). The aim is the one headline: more work,
+faster, on fewer machines, with less energy, from the hardware and the controllers already in place; in a cloud, the same
+work for a smaller bill.
+
+**Where the page shows it.** The live engine page plays every benchmark back from its own SHA-256-checked files, native
+beside Omni-Compass on top of native, lane by lane, and runs the engine's own runs in the page: the Python's seeded runs, and
+the same runs through the engine's C++ twin, side by side (the page's section 10b). This book reads that page; the mechanism and every
+result are in the Owner's Manual.
+
+**What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
+run on. It does not make a system immune to failure, delay or drift: it keeps each muscle inside its own limits and shows, row
+by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
+differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
+
+<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
+
 ## Foreword
 
 
@@ -39,7 +82,7 @@ The book is in eight parts, and it can be read in two ways.
 |---|---|
 | The operator on shift, at the wall | the Quick Reference card; Part Two (the wall and the switch); the chapter on a tile that reads LOSS in Part Seven; the troubleshooting appendix |
 | CTO, architect, head of platform | the front matter; Part Three (the whole organism and the benefit board); Part Seven (the mechanism side by side; what the page does not tell you) |
-| CEO, CFO, CIO, board member | the Foreword; the Disclosures; the bills and receipts in Part Three; the clouds in Part Four |
+| CEO, CFO, CIO, board member | the Problem and the Answer; the Foreword; the Disclosures; the bills and receipts in Part Three; the clouds in Part Four |
 | Site reliability engineer, on call | the Quick Reference card; Part Two; the official run playback in Part Four (the heart and the two tickers); the gauges appendix |
 | Control or plant engineer | Part Six (one cycle, the phase plane, the brain's state, the verdict, the specification); the console in Part Five |
 | Auditor, diligence team | Part One (a monitor, not a drawing); the trace from a tile to its record and the verification chapter; the page's own appraisal |
