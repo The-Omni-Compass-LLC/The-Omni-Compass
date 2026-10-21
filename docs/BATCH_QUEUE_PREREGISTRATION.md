@@ -385,6 +385,30 @@ machine. Each is fixed where it was found, the same in every arm, before the cou
   queue's finish and the tail among the gauges it judges before a machine is parked, in the next version, through the toy gate
   first (`docs/CHANGE_CONTROL.md`). The rows stand until that version's three runs replace them.
 
+## Amendment 11: KubeRay's two LOSS rows root-caused (written from the runs' own files, 20 October 2026, before any run on the engine that fixes them)
+
+Amendment 10 put KubeRay's two LOSS rows (the organism alone: the queue 0.6% to 0.8% later, the 99th percentile 4% to 13%
+higher) down to the give-back. The 29 paired repetitions' own files, read job by job and pod by pod, say otherwise. The
+mechanism is named here as they show it (`docs/OMNI_V13.md`, section 1):
+
+- The cost sits in the 16 repetitions whose native queue ran past 760 s, where a slower runner's kind cores were saturated
+  through the queue (the host's busy share 0.78, 95% of readings at or over 0.75). There each batch pod hashed its work 7.6%
+  slower with Omni-Compass on top (63.1 s against 59.2 s), and the queue finished 1.1% later. In the other 13 the same pods
+  read +0.3%.
+- No machine was parked during a saturated queue: six workers were in service through it in both arms. The machines given
+  back were given back after the queue, so the give-back is not the mechanism.
+- In 15 of those 16 the conveyance raised the web pods' limits to 3,700m at 33 s (one at 65 s) and kept them for 92% to 96% of
+  the queue. The raise came on the governor's reading of the host's busy share over the 15 s since its previous reading, which
+  caught the dip as the stream's first pods started. omni-v7's guard holds a new raise at the host's top, never one already
+  given.
+- The web gained nothing while the queue ran: its median was 266 ms against 253 ms natively, its 99th percentile 3,429 ms
+  against 3,226 ms, and it served the same requests. After the queue, with the host free, its median fell from 114 ms to 69 ms.
+
+The fault is the engine's: on a host with no idle processor a limit above the operator's conveys nothing and costs the muscle
+beside it. omni-v13 hands such limits back while another workload on the shared host has room of its own, and counts every
+other pod by its limit (`docs/OMNI_V13.md`). The rows of amendment 10 stand as omni-v12's record. The four ways run again on
+omni-v13, A, B and C, and its tables replace none of omni-v12's.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

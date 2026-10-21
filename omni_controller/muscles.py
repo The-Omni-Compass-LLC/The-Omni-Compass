@@ -73,6 +73,25 @@ def milli(v):
     return float(v[:-1]) if v.endswith("m") else float(v) * 1000.0
 
 
+def claim_m(container):
+    """The CPU (milli) a container may use: its own limit where it has one, else its request (omni-v13). A limit is the
+    container's own room up to which the kernel lets it burst; that room is its muscle's, never idle for another."""
+    res = container.get("resources", {}) or {}
+    req = milli((res.get("requests", {}) or {}).get("cpu", "0") or "0")
+    lim = (res.get("limits", {}) or {}).get("cpu")
+    return max(req, milli(lim)) if lim else req
+
+
+def has_room(pod):
+    """A pod with room of its own: a container whose limit is above its request, the CPU between them the pod's to burst
+    into (omni-v13). Conveyed to another muscle on a host with no idle CPU, that room is a trade the engine never makes."""
+    for c in pod["spec"]["containers"]:
+        res = c.get("resources", {}) or {}
+        if claim_m(c) > milli((res.get("requests", {}) or {}).get("cpu", "0") or "0"):
+            return True
+    return False
+
+
 def ref(s):
     ns, name = s.split("/", 1)
     return ns, name
@@ -392,8 +411,9 @@ class Muscles:
 
             c_i = min( max(L_i, (0.95 A_j - Q_j) / |P_j|), 0.95 A_j )
 
-        A_j the machine's allocatable CPU, Q_j the requests of every other pod on it, P_j the serving pods on it, L_i the
-        operator's own limit. The machine's last five percent is never handed out (the living band), a pod never gets
+        A_j the machine's allocatable CPU, Q_j what every other pod on it may use (its own limit, or its request where it
+        has no limit: omni-v13; the requests alone before), P_j the serving pods on it, L_i the operator's own limit. The
+        machine's last five percent is never handed out (the living band), a pod never gets
         less than its operator gave it, and the requests (what the scheduler and the autoscaler read) are untouched.
         Resized in place through pods/resize: no pod restarts. No expansion during a security hold. The reset
         returns every pod to L_i.
@@ -403,7 +423,15 @@ class Muscles:
         when the serving pods ask for more than the machine, as it does for native's pods. v7 adds one guard, the same
         as the replica room's (capacity.py): on such a shared host no limit is raised while the machine's measured busy
         share is at or over 75% or cannot be read; limits already given stay, and lowering is never held back. Each hold
-        is written to the audit ("convey": "held"). Two other designs were tried in the toy gate (tools/toy_gate.py,
+        is written to the audit ("convey": "held"). omni-v13 adds the hand-back: while another workload on the shared
+        host has room of its own (a pod, not one of the serving pods, whose limit is above its request) and the host is
+        at its top (busy at or over 75%), there is no idle CPU to convey, so every limit given goes back to the
+        operator's; it is conveyed again only once the host's busy share is under 70% (the band's 5% cushion below the
+        top), so the hand-back and the raise never chase each other. On KubeRay's rig the limits given in the queue's
+        first half minute stayed through the saturated queue: the batch pods hashed 7.6% slower, the queue finished
+        0.7% later and the web served no faster (20 October, docs/OMNI_V13.md). A host with no such workload keeps the
+        v7 rule: what the serving pods use there at the top is the host's own idle, and no other muscle's room.
+        Two other designs were tried in the toy gate (tools/toy_gate.py,
         docs/OMNI_V7.md) and refused by it: the host's CPU counted once and shared by every serving pod (at the v6 KEDA
         runs' nine replicas, 3,500m / 9 is under the operator's 500m, so nothing is ever conveyed and the +64% work and
         -53% response time of conveyance are lost whole), and a hold while a pod starts on the host (a start wait 1%
@@ -438,6 +466,7 @@ class Muscles:
         budget = CpuLimitBudget(self.k, self.audit)
         out = {}
         held = set()
+        handed = False
         for ns, name in targets:
             self.gain[(ns, name)] = 1.0
             dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
@@ -456,20 +485,30 @@ class Muscles:
                 if mine(p) and p["status"].get("phase") == "Running":
                     serving.setdefault(node, []).append(p)
                 elif not mine(p):
-                    other[node] = other.get(node, 0.0) + sum(
-                        milli(c.get("resources", {}).get("requests", {}).get("cpu", "0") or "0") for c in p["spec"]["containers"])
+                    # every other pod by what it may use: its own limit where it has one, its request where it has none
+                    # (omni-v13). Counted by requests (omni-v12 and before), a batch pod's room between its request and
+                    # its limit read as idle and was conveyed to the serving pod: the queue finished later and its tail
+                    # rose on KubeRay's rig (20 October, docs/OMNI_V13.md), a trade between muscles the engine never makes
+                    other[node] = other.get(node, 0.0) + sum(claim_m(c) for c in p["spec"]["containers"])
             if CPU_ANN not in ann and serving:
                 self.k.write(["annotate", "deployment", name, "-n", ns, f"{CPU_ANN}={int(base)}m"], "convey: record original CPU limit")
+            # omni-v13: on a shared host, another workload with room of its own (a limit above its request) and the host
+            # at its top: there is no idle CPU, every limit given goes back to the operator's; under the top but within
+            # the band's cushion of it, nothing is raised again, so the hand-back and the raise never chase each other
+            contended = shared and busy is not None and any(not mine(p) and has_room(p) for p in pods)
+            give_back = contended and busy >= KIND_SCALE_OUT_BUSY_LIMIT
+            cushion = contended and busy >= KIND_SCALE_OUT_BUSY_LIMIT - BAND[0]
+            handed = handed or give_back
             got = []
             for node, ps in serving.items():
                 a_j = alloc.get(node, 0.0)
                 share = (BAND[1] * a_j - other.get(node, 0.0)) / len(ps)
-                want = int(min(max(base, math.floor(share / 10.0) * 10), BAND[1] * a_j)) if engaged else int(base)
+                want = int(min(max(base, math.floor(share / 10.0) * 10), BAND[1] * a_j)) if engaged and not give_back else int(base)
                 for p in ps:
                     cur = milli(p["spec"]["containers"][0].get("resources", {}).get("limits", {}).get("cpu", tmpl))
                     if obs.get("security_block", 0.0) > 0.5 and want > cur:
                         got.append(cur); continue  # shield I1: no expansion during a security hold
-                    if busy_hold and want > cur:
+                    if (busy_hold or cushion) and want > cur:
                         held.add(node); got.append(cur); continue  # the shared host near its top, or unread
                     permitted, reservations = budget.limit(ns, p, cur, want)
                     if abs(permitted - cur) < self.a.cap_min_change_m:
@@ -481,8 +520,10 @@ class Muscles:
                     if r is not None and permitted > cur and time.time() < r[2]:
                         got.append(cur); continue                   # held: admission refused this raise and nothing changed
                     try:
-                        self._resize(p, ns, f"{permitted}m", f"convey: {node} idle CPU to its {len(ps)} serving pod(s), limit {permitted}m in place"
-                                     if engaged else f"convey: response time calm, operator's limit {permitted}m in place")
+                        self._resize(p, ns, f"{permitted}m", (
+                            f"convey: the shared host at its top (busy {busy:.2f}) beside another workload's room, operator's limit {permitted}m in place"
+                            if give_back else f"convey: {node} idle CPU to its {len(ps)} serving pod(s), limit {permitted}m in place"
+                            if engaged else f"convey: response time calm, operator's limit {permitted}m in place"))
                     except Exception as error:
                         # Admission can race another writer. Never advertise a rejected increase to the HPA.
                         wait = REFUSED_WAIT_S[0] if r is None else min(REFUSED_WAIT_S[1], 2.0 * r[3])
@@ -502,9 +543,9 @@ class Muscles:
             # promise in queue terms (target x request / limit) while the limit is larger
             self.gain[(ns, name)] = (sum(got) / len(got) / base) if got and base > 0 else 1.0
             self.base[(ns, name)] = base
-        if held:
-            self.audit({"convey": "held", "machines": sorted(held), "host_busy": None if busy is None else round(busy, 3),
-                        "shared_host": shared})
+        if held or handed:
+            self.audit({"convey": "handed back" if handed else "held", "machines": sorted(held),
+                        "host_busy": None if busy is None else round(busy, 3), "shared_host": shared})
         return out
 
     def _convey_engaged(self):
