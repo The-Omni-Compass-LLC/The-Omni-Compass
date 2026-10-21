@@ -2,6 +2,56 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21: the third manual (the Live Engine Manual); the database rigs leave the server's journal in the record
+
+- **The Live Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `docs/book/OMNI_COMPASS_LIVE_ENGINE_BOOK.md`;
+  `python3 docs/book/build_book.py --live`; the founder's order of 20 October, night: "There shall be three in the end"). The
+  third book, for the operator at the dashboard: nothing more than the interpretation of the live engine page
+  (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): how to follow the wall and the master switch (green ON, red the kill switch
+  engaged, white OFF), read every gauge and turn every knob of the console, trace any tile to the record it came from, and see
+  the mechanism of action native beside Omni-Compass as the monitors show it (the two tickers, the phase plane, the brain's
+  state, the verdict); every section of the page in the page's own order, named by title and anchor (its "Engine table of
+  contents"); what to do when a tile reads LOSS; what the page does not tell you. 100 pages, 13 figures from the two kits, one
+  numbering, every cross-reference and every contents row checked on the built PDF (`docs/book/nav_check.py`). It explains
+  neither how the engine is built (the Owner's) nor how it is wired (the Operator's). The Operator's and Owner's Manuals now open
+  with "The Three Manuals"; the README, the state of play and `CLAUDE.md` name all three; `tools/readings.py`,
+  `tools/unicode_math.py` and `tools/land_engine.py` check the third as they check the other two.
+- **The database rigs record why a server did not come back.** The omni-v12 MongoDB runs B and C died at `fresh_server`'s
+  wait ("mongod did not come back after the restart") with an empty `mongod.log` and nothing else recorded, so the cause could
+  not be read. `tools/run_ycsb.py` and `tools/run_sysbench.py` now wait about five minutes, restart the server once more with its
+  `systemctl status` and `journalctl` printed, and stop the run with the journal in the error if it still does not answer;
+  `ycsb.yml` and `sysbench.yml` save the unit's journal into every run's files. The runs B and C of MongoDB on omni-v13 will
+  carry the cause if it happens again.
+- **A three-run table says when a run lacks a workload.** The six table writers (`tools/ycsb_abc.py`, `kafka_abc.py`,
+  `redis_abc.py`, `sysbench_abc.py`, `pgbench_abc.py`, `cpu_power_abc.py`) counted every workload at their foot, those a run
+  never reached included (the omni-v12 MongoDB table read "across 4 untouched workloads" with none judged); now the foot counts
+  only the workloads every run holds, and a warning names each run and what it lacks, with the rule that such a table is not
+  read by the index or the benefit sheet until its runs land.
+
+## 2026-10-20 (night): the run storm on GitHub stopped
+
+- **Why runs read cancelled.** The live engine committed its rebuilt page to main, and its own push filter matched that page,
+  so it rebuilt itself every seven minutes (ten bot commits between 19:43 and 20:52 UTC). Each of those commits also started
+  21 workflows that run only when started by hand (they register on a push and skip it), each skipped run started the front
+  page, and each front page started the live engine and the raw sweep, which then cancelled one another in their queues: in
+  the hour and a half read, 320 cancelled runs and about 300 skipped ones, no benchmark among them, and every bot commit ran
+  the whole verify. Now the live engine's own page is outside its push filter; a front-page run that did not succeed starts
+  no rebuild and a skipped run no sweep; and the 21 workflows ignore pushes to main and to the level branches (a dispatch
+  needs no push to register a workflow that is on main). `tests/test_workflow_triggers.py` fails a push where a workflow
+  would again be started by every push, or the live engine by its own page.
+- **omni-v13 landed on GitHub with two faults fixed on the way.** `tests/test_convey.py` still asserted omni-v12's rule (another
+  pod on the machine counted by its request, web-2 given 2,800m); omni-v13 counts it by its limit, so the test now expects
+  1,800m and a gain of 3.05, the engine unchanged. And the MongoDB benchmark had left the index, the benefit sheet and the
+  standing block (26 rows to 25) because the omni-v12 YCSB table was written from two runs that failed (`mongod did not come
+  back after the restart`; its runs B and C with no workload) and `tools/omni_index.newest` took the newest table whatever it
+  held: it now takes the newest *whole* table (a gauge row, or a workload beside the tuning one), so a table written from
+  failed runs is passed over until its runs land (`tests/test_index_newest.py`); MongoDB reads from its omni-v11 table again
+  and the index headline is +4.3% (omni-v10, omni-v11 and omni-v12 tables). The YCSB rig's restart fault is the next thing fixed.
+- **The cluster recorder takes its first reading before it reads the clock.** `fleet/capture/kube_capture.sh` ended the
+  recording when the deadline had passed before any reading, so a clock tick between its start and its first look left an
+  empty capture (`tests/test_capture_in_service.py` with `DURATION=0`, once in three whole checks on a loaded machine); the
+  deadline now ends a recording only after at least one row.
+
 ## 2026-10-20 (evening): Omni v13 stands (no other muscle's room is conveyed)
 
 - **omni-v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`): omni-v12 with one fault fixed in the

@@ -23,9 +23,9 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
   - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11, each named in its table): +4.4% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v12, each named in its table): +4.3% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
-  - Real cache (Redis, GitHub): +0.3% GAIN
+  - Real cache (Redis, GitHub): +0.1% GAIN
   - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
   - Real database cache (MongoDB under YCSB, GitHub): +0.1% GAIN
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
@@ -35,19 +35,19 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 | +4.4% | GAIN, power given | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v12 | +4.3% | GAIN, power given | L |
+| Redis, the cache's memory ceiling | omni-v12 | +0.1% | GAIN, power given | L |
+| PostgreSQL, the pooler's pool size | omni-v12 | +0.0% | EVEN | L |
+| MySQL, the buffer pool's size | omni-v12 | +0.0% | EVEN | L |
+| Kafka, the consumer group's size | omni-v12 | +0.1% | GAIN | L |
 | Robustness: the two-hour run | omni-v11 | +3.8% | GAIN, power given | L |
 | Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
 | Robot arms (MuJoCo), the three untouched robots | omni-v11 | +3.8% | GAIN | S |
-| Redis, the cache's memory ceiling | omni-v11 | +0.3% | GAIN | L |
 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | +72.9% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +59.7% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +41.0% | GAIN, power given | L |
 | Power grids (SimBench), both load models | omni-v11 | +5.8% | GAIN, power given | S |
-| PostgreSQL, the pooler's pool size | omni-v11 | +0.0% | power given | L |
-| MySQL, the buffer pool's size | omni-v11 | +0.0% | EVEN | L |
 | MongoDB, the storage engine's cache size | omni-v11 | +0.1% | GAIN | L |
-| Kafka, the consumer group's size | omni-v11 | +0.1% | GAIN | L |
 | Drone swarms, the three untouched cells | omni-v11 | +5.9% | GAIN | S |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN, power given | S |
 | Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
@@ -268,6 +268,7 @@ omni-v13 runs land. The numbers stand on that page, never copied here.
 |---|---|
 | `docs/OMNI_COMPASS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_MANUAL.pdf`) | the Operator's Manual: how to embed, wire, tune, run and check Omni-Compass; every muscle's wiring and card (Appendix E) |
 | `docs/OMNI_COMPASS_OWNERS_MANUAL.md` (PDF: `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf`) | the Owner's Manual: the theory, the mechanism, the engine's source, every result, every muscle (Appendix G) |
+| `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` (PDF: `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`) | the Live Engine Manual: how to read the live engine page, its monitors, gauges and knobs, native beside Omni-Compass; what to do when a tile reads LOSS |
 | `docs/BENEFIT_SHEET.md` | one number per benchmark, its word, its engine, every change in words |
 | `docs/LEVELS.md` | every level on one page (muscle, organism, cluster, add-ons, service, plant, cloud, group of clusters), its counts of GAIN, EVEN, power given and LOSS, and any level whose gauges go the other way |
 | `docs/REGISTER.md` | every muscle family wired, every benchmark run, every benchmark still to run |
