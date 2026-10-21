@@ -40,7 +40,8 @@ def build_cpp(tmp):
         srcs = [str(p) for p in (src / "src").glob("*.cpp")]
         for tool, name in (("run_fixture.cpp", "oc_run_fixture"), ("run_governor.cpp", "oc_governor"), ("soak.cpp", "oc_soak"),
                            ("smoke.cpp", "oc_smoke"), ("run_shield.cpp", "oc_shield"), ("run_hpa.cpp", "oc_hpa"), ("savings.cpp", "oc_savings"),
-                           ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins")):
+                           ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
+                           ("run_compass_law.cpp", "oc_compass_law")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
 
@@ -106,6 +107,21 @@ def main():
     from tests import test_cpp_twins_parity
     test_cpp_twins_parity.main(str(b / "oc_twins"), 500 if a.quick else 2000)
     check("C++ nervous system, compass and ledger, GPU rules vs Python, value for value", True)
+    from tests import test_cpp_compass_law_parity
+    n_law = test_cpp_compass_law_parity.main(str(b / "oc_compass_law"), 60 if a.quick else 300)
+    check(f"C++ compass law and two-way plug vs Python, every force and every write identical ({n_law:,} answers)", True)
+    # negative control: a C++ law that takes back while the reading climbs above the center must be caught
+    lsrc = (ROOT / "cpp" / "src" / "compass_law.cpp").read_text()
+    lmut = lsrc.replace("if (f < 0.0 && v > 0.0 && pos > band.center) f = 0.0;", "")
+    (tmp / "compass_law_mut.cpp").write_text(lmut)
+    lothers = [str(p) for p in (ROOT / "cpp" / "src").glob("*.cpp") if p.name != "compass_law.cpp"]
+    subprocess.run([shutil.which("g++") or shutil.which("clang++"), "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"), *lothers,
+                    str(tmp / "compass_law_mut.cpp"), str(ROOT / "cpp" / "tools" / "run_compass_law.cpp"), "-o", str(tmp / "oc_compass_law_mut")], check=True)
+    try:
+        test_cpp_compass_law_parity.main(str(tmp / "oc_compass_law_mut"), 60); det_law = False
+    except AssertionError:
+        det_law = True
+    check("negative control: parity test detects a C++ compass law that takes back while the reading climbs", lmut != lsrc and det_law)
     from tools import seal
     broken = seal.check()
     check(f"seal: all {len(seal.TWINS)} Python/C++ twins unchanged since proven equal (results/SEAL.json)", not broken, "; ".join(broken))

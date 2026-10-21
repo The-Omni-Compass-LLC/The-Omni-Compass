@@ -1293,7 +1293,7 @@ quantile (omni-v9, `docs/OMNI_V9.md`), the wire's glide at the speed that cuts t
 `docs/OMNI_V10.md`), the Kubernetes governor holding on a reading with no machine in service (omni-v11, `docs/OMNI_V11.md`), and a raise the cluster's
 admission refused held until something changes, with the swarm's reflex acting at once (omni-v12, `docs/OMNI_V12.md`), and the
 CPU limits the conveyance gave handed back on a shared host at its top beside another workload's room, every other pod counted by
-its own limit (omni-v13, `docs/OMNI_V13.md`), and no limit raised on a reading older than that workload's newest pod, the
+its own limit (omni-v13, `docs/OMNI_V13.md`), and the
 operator's own commands run without a shell unless they hold one's syntax, and a knob that leaves any muscle native (omni-v14,
 `docs/OMNI_V14.md`). No table has yet landed on omni-v14; every benchmark runs again on it from SINCE14 on 21 October.
 The governors' first tables, on omni-v12, read two LOSS rows: KubeRay's queue and tail with the organism alone, root-caused to the

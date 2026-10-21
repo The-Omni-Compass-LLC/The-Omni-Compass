@@ -491,9 +491,7 @@ class Muscles:
         budget = CpuLimitBudget(self.k, self.audit)
         out = {}
         held = set()
-        handed = opened = False
-        if not hasattr(self, "room_running"):
-            self.room_running = {}        # (ns, deployment) -> another workload's pods with room running at the last reading
+        handed = False
         for ns, name in targets:
             self.gain[(ns, name)] = 1.0
             dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
@@ -525,20 +523,6 @@ class Muscles:
             contended = shared and busy is not None and any(not mine(p) and has_room(p) for p in pods)
             give_back = contended and busy >= KIND_SCALE_OUT_BUSY_LIMIT
             cushion = contended and busy >= KIND_SCALE_OUT_BUSY_LIMIT - BAND[0]
-            # omni-v14: the reading is the host's busy share since the previous one. A pod of another workload with room of
-            # its own that is still starting (Pending), or that was not running at the previous reading, ran for none or
-            # only part of it: the reading is older than that workload's newest running pod and does not hold its load, so
-            # nothing is raised on it (lowering and the hand-back are never held); with no reading before this one, no pod
-            # of the workload is known to have run through it. On the toy cluster set from KubeRay's rig
-            # omni-v13 raised the web's limits on the queue's first reading, which spanned the seconds before the batch pods
-            # ran, and handed them back 15 s later (results/toy_gate/V13_VS_V12.md, docs/OMNI_V14.md)
-            room_now = {(p["metadata"].get("namespace", "default"), p["metadata"]["name"]) for p in pods
-                        if not mine(p) and has_room(p) and p["status"].get("phase") == "Running"}
-            room_before = self.room_running.get((ns, name))
-            self.room_running[(ns, name)] = room_now
-            opening = contended and (any(not mine(p) and has_room(p) and p["status"].get("phase") == "Pending" for p in pods)
-                                     or bool(room_now - (room_before or set())))
-            opened = opened or opening
             handed = handed or give_back
             got = []
             for node, ps in serving.items():
@@ -549,9 +533,8 @@ class Muscles:
                     cur = milli(p["spec"]["containers"][0].get("resources", {}).get("limits", {}).get("cpu", tmpl))
                     if obs.get("security_block", 0.0) > 0.5 and want > cur:
                         got.append(cur); continue  # shield I1: no expansion during a security hold
-                    if (busy_hold or cushion or opening) and want > cur:
-                        held.add(node); got.append(cur); continue  # the shared host near its top, unread, or its reading
-                                                                   # older than another workload's newest pod (omni-v14)
+                    if (busy_hold or cushion) and want > cur:
+                        held.add(node); got.append(cur); continue  # the shared host near its top, or unread
                     permitted, reservations = budget.limit(ns, p, cur, want)
                     if abs(permitted - cur) < self.a.cap_min_change_m:
                         got.append(cur); continue
@@ -587,8 +570,7 @@ class Muscles:
             self.base[(ns, name)] = base
         if held or handed:
             self.audit({"convey": "handed back" if handed else "held", "machines": sorted(held),
-                        "host_busy": None if busy is None else round(busy, 3), "shared_host": shared,
-                        **({"reading_older_than_newest_pod": True} if opened else {})})
+                        "host_busy": None if busy is None else round(busy, 3), "shared_host": shared})
         return out
 
     def _convey_engaged(self):

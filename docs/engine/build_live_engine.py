@@ -18,6 +18,9 @@ Every record the page replays is made again here by the repository's own code on
   scen       docs/engine/export_scenarios.py: the GPU card (realms/gpu_card.py), the Linux host (tools/toy_gate.py's
              conveyance), every muscle and organism of the realms table (results/realms_v5) and every judged row of the
              newest engine's receipts (results/live/V<n>_*.md)
+  cpptwin    docs/engine/export_cpp_twins.py: the Python's own runs fed through the C++ engine (cpp/): every Python/C++
+             twin's parity check, every compass law the runs above wired (recorded as they ran), and the seven organisms
+             at the tune-down, every muscle's law, reading by reading through the C++ compass law
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
@@ -362,11 +365,16 @@ def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
     import export_scenarios as XS
+    import export_cpp_twins as XT
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
         import export_runs as XR
-        XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json")); XR.main(str(t / "r.json"))
-        h, c, s, rr = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json"))
+        # every compass law these runs wire is recorded as it runs, then fed through the C++ twin (export_cpp_twins.py)
+        with XT.LawRecorder() as laws:
+            XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json"))
+        XR.main(str(t / "r.json"))
+        XT.main(str(t / "x.json"), live_laws=laws.laws)
+        h, c, s, rr, x = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json", "x.json"))
     name, digest = engine()
     build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"),
              "built_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
@@ -374,7 +382,7 @@ def records(runs: bool) -> dict:
              "runs": github_runs() if runs else []}
     build["board"] = board(build["runs"])
     build["ledger"] = ledger()
-    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build}
+    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "cpptwin": x, "build": build}
 
 
 def embedded(page: str, key: str):
@@ -419,10 +427,10 @@ def main() -> int:
         print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet") if embedded(page, k) != rec[k]]
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "cpptwin") if embedded(page, k) != rec[k]]
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build"):
+    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "cpptwin", "build"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     b = rec["build"]

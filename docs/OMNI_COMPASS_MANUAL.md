@@ -1291,11 +1291,9 @@ quoted here ran on omni-v7, whose rules omni-v14 carries (omni-v8, omni-v9 and o
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
 the operator's on a shared host at its top while another workload there has room of its own, and counts every other pod by its
-own limit; omni-v14 raises no limit on a reading older than that workload's newest pod, runs the operator's own commands
+own limit; omni-v14 runs the operator's own commands
 without a shell unless they hold a pipe, a redirect or a variable, and takes `--native` to leave any muscle where native runs
-it). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write; a raise withheld
-because the reading began before the other workload's newest pod ran shows as `"convey": "held"` with
-`"reading_older_than_newest_pod": true`; a muscle left native shows as `"native_muscles"` at the start and `"held"` on each write
+it). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write; a muscle left native shows as `"native_muscles"` at the start and `"held"` on each write
 it withholds. The guard shows in the audit: when the cluster's
 reading shows no machine in service (every worker cordoned, tainted NoSchedule or unreachable at once), the decision is recorded
 as `held: the cluster's reading shows no machine in service; nothing decided, nothing written`, and the governor takes up again

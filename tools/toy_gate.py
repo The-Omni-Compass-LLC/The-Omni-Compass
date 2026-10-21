@@ -328,10 +328,13 @@ def worker_convey(arm, seed, out, quota="none", batch=False):
                 items += [{"metadata": {"name": f"sys-{n}", "namespace": "kube-system", "labels": {}},
                            "spec": {"nodeName": n, "containers": [{"name": "s", "resources": {"requests": {"cpu": "100m"}}}]},
                            "status": {"phase": "Running", "conditions": [{"type": "Ready", "status": "True"}]}} for n in nodes]
+                # a batch pod is Pending, not ready, until its container runs (start_lag_s, the rig's own pod start), as the
+                # cluster lists it; the toy listed it Running from its creation until 21 October
                 items += [{"metadata": {"name": b["name"], "namespace": "default", "labels": {"app": "omni-batch-stream"}},
                            "spec": {"nodeName": b["node"], "containers": [{"name": "work", "resources": {
                                "requests": {"cpu": f"{BATCH['req_m']}m"}, "limits": {"cpu": f"{BATCH['lim_m']}m"}}}]},
-                           "status": {"phase": "Running", "conditions": [{"type": "Ready", "status": "True"}]}} for b in bpods]
+                           "status": {"phase": "Running" if b["runs"] <= t else "Pending", "conditions": [
+                               {"type": "Ready", "status": "True" if b["runs"] <= t else "False"}]}} for b in bpods]
                 return {"items": items}
             if args[:2] == ("get", "deployment"):
                 return {"metadata": {"name": "php-apache", "namespace": "default", "annotations": dict(ann)},

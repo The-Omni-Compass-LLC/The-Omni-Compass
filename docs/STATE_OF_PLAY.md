@@ -101,12 +101,11 @@ waits on the family allowance those machines hold.
 ## In one paragraph (2026-10-21, the engine that stands is omni-v14)
 
 **The engine that stands is omni-v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files; `docs/OMNI_V14.md`), on main since
-21 October by the founder's orders: a knob on every monitor for every muscle, and "tune the engine". It is omni-v13 with three
-changes in the Kubernetes governor: `--native` leaves any muscle where native runs it (the control panel's muscle button); on a
-shared host beside another workload's room no limit is raised on a reading older than that workload's newest pod (omni-v13 still
-raised the web's limits once on the reading that opened the batch queue, the mechanism of the two LOSS rows the omni-v12 group
-runs read, `docs/GROUP_PREREGISTRATION.md`, amendment 3); and the operator's own commands run without a shell unless they hold a
-pipe, a redirect or a variable. GATE14STATE **omni-v13** (`docs/OMNI_V13.md`), on main from 20 October, was omni-v12 with one fault fixed in the Kubernetes
+21 October by the founder's orders: a knob on every monitor for every muscle, and "tune the engine". It is omni-v13 with two
+changes in the Kubernetes governor: `--native` leaves any muscle where native runs it (the control panel's muscle button); and the
+operator's own commands run without a shell unless they hold a pipe, a redirect or a variable. A third, no conveyance raise on a
+reading that leaves out another workload's starting pods, was refused by the toy gate (the web's 95th percentile 6.4% higher than
+omni-v13's) and is kept on a study branch (`docs/OMNI_V14.md`, section 3). GATE14STATE **omni-v13** (`docs/OMNI_V13.md`), on main from 20 October, was omni-v12 with one fault fixed in the Kubernetes
 governor's conveyance, found on KubeRay's rig with the organism alone (the queue 0.6% to 0.8% later and the web's 99th
 percentile 4% to 13% higher, LOSS in all three runs): the web pods' CPU limits, raised in the queue's first half minute, stayed
 through the saturated queue, so the batch pods hashed 7.6% slower while the web served no faster; no machine was parked during a

@@ -108,11 +108,11 @@ replaces native; every comparison is native against omni.
 
 The engine on main is **omni-v14** (`OMNI_V14.json`, fingerprint `DIGEST14`, 47 files; [`docs/OMNI_V14.md`](docs/OMNI_V14.md)), the
 engine that stands since 21 October by the founder's orders ("knobs on every monitor, to turn off and on ... a muscle"; "tune the
-engine"). It is omni-v13 with three changes in the Kubernetes governor. `--native` leaves any muscle where native runs it, never
-written, and the control panel carries it as one button a muscle. On a shared host beside another workload's room, no limit is raised
-on a reading older than that workload's newest pod: omni-v13 still raised the web's limits once, on the reading that opened the batch
-queue, and handed them back 15 s later, the mechanism of the two LOSS rows of the omni-v12 group runs. And the operator's own commands
-run without a shell unless they hold a pipe, a redirect or a variable. GATE14README **omni-v13** ([`docs/OMNI_V13.md`](docs/OMNI_V13.md)),
+engine"). It is omni-v13 with two changes in the Kubernetes governor. `--native` leaves any muscle where native runs it, never
+written, and the control panel carries it as one button a muscle. And the operator's own commands run without a shell unless they
+hold a pipe, a redirect or a variable. A third change, no conveyance raise on a reading that leaves out another workload's starting
+pods, was refused by the toy gate (the web's 95th percentile 6.4% higher than omni-v13's) and is kept on a study branch.
+GATE14README **omni-v13** ([`docs/OMNI_V13.md`](docs/OMNI_V13.md)),
 the engine that stood from 20 October, was omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig
 with the organism alone, where the queue finished 0.6% to 0.8% later and the web's 99th percentile rose 4% to 13% (LOSS in all three
 runs): the web pods' CPU limits, raised in the queue's first half minute, stayed through the saturated queue, the batch pods hashed
@@ -139,7 +139,7 @@ the day (on omni-v8 the 2022 robustness district's monthly unevenness rose 0.11%
 simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
 of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
-omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back and omni-v14's three changes: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
+omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back and omni-v14's two changes: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
 omni-v14 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from SINCE14 on 21 October); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.

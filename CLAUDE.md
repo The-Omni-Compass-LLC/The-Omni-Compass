@@ -47,13 +47,13 @@ the founder overrides one in the conversation.
 
 - **Omni v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files; `docs/OMNI_V14.md`) stands on main since 21 October, the founder's
   orders "knobs on every monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with
-  three changes in the Kubernetes governor (`omni_controller/controller.py`, `omni_controller/muscles.py`). `--native MUSCLE[,...]`
+  two changes in the Kubernetes governor (`omni_controller/controller.py`, `omni_controller/muscles.py`). `--native MUSCLE[,...]`
   (or `OMNI_NATIVE`, the control panel's muscle button) leaves any muscle where native runs it, never written, an unknown name
-  refused; on a shared host beside another workload's room no limit is raised on a reading older than that workload's newest pod
-  (a pod still starting, or not running at the previous reading), the raise omni-v13 still made on the reading that opened the
-  batch queue and handed back 15 s later, and the mechanism of the two LOSS rows of the omni-v12 group runs
-  (`docs/GROUP_PREREGISTRATION.md`, amendment 3); and the operator's own commands run without a shell unless they hold a pipe, a
-  redirect or a variable (the static scan's high findings 3 to 2). GATE14 Every benchmark runs again on it.
+  refused; and the operator's own commands run without a shell unless they hold a pipe, a redirect or a variable (the static
+  scan's high findings 3 to 2). A third, no conveyance raise on a reading that leaves out another workload's starting pods (the
+  raise omni-v13 makes once early in the batch toy's queue), was refused by the toy gate: the batch back at native's, but the
+  web's 95th percentile 6.4% higher than omni-v13's; it is kept on the branch `v14-convey-study` until the toy's web model is set
+  from a real run's files. GATE14 Every benchmark runs again on it.
 - **Omni v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`) stood on main 20 to 21 October, landed 20 October, evening, the
   founder's order that every fault found be fixed and every fix land as the next version, told, not asked: omni-v12 with one fault
   fixed in the Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone (the

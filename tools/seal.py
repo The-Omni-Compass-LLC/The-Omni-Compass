@@ -40,12 +40,21 @@ TWINS = {
         "cpp": ["cpp/src/compass.cpp", "cpp/include/omnicompass/compass.hpp"], "proof": "tests/test_cpp_twins_parity.py"},
     "GPU governor rules (shield limit, busy gate, speed lock, window, baseline)": {"python": ["omni_controller/gpu_governor.py"],
         "cpp": ["cpp/src/gpu_rules.cpp", "cpp/include/omnicompass/gpu_rules.hpp"], "proof": "tests/test_cpp_twins_parity.py"},
+    "compass law and the two-way plug (every muscle's law, the tune-down and every live controller)": {
+        "python": ["omnicompass/compass_law.py"], "cpp": ["cpp/src/compass_law.cpp", "cpp/include/omnicompass/compass_law.hpp"],
+        "proof": "tests/test_cpp_compass_law_parity.py"},
 }
 PYTHON_ONLY = {
     "omni_controller/gpu_governor.py (device I/O)": "reading nvidia-smi and writing power limits; its decision rules are twinned above",
     "omni_controller/muscles.py": "Kubernetes and hardware muscles (convey, rightsize, coldstart, batch, contain, cooling, CPU/GPU connectors)",
     "omni_controller/controller.py": "Kubernetes controller (HPA target, pod reflex, machines, strict replicas)",
     "hardware/node_exchange.py": "CPU + GPU on one power budget (simulation harness; the law itself is twinned above)",
+    "realms/compass_arm_v5.py": "the max, the default brain of every organism (max_apply, max_body_step, the Bone, the twins, the "
+                                "heat debt); its tune-down runs the compass law, twinned above",
+    "realms/harness.py, realms/plants.py": "the organisms' body and its plants (the modelled muscles the harness drives)",
+    "omnicompass/edge.py": "the edge every muscle's balance point and wall move by (realms/compass_arm_v5.py Edge)",
+    "omnicompass/verdict.py, omnicompass/student_t.py": "the verdict on a trial and its exact 95% point (checked against the live "
+                                                        "engine page's own port, docs/engine/check_live_engine.py)",
 }
 
 
@@ -71,6 +80,8 @@ def prove():
     assert test_cpp_conveyance_parity.main(str(b / "oc_conveyance"), 200) < 1e-9
     from tests import test_cpp_twins_parity
     test_cpp_twins_parity.main(str(b / "oc_twins"), 2000)
+    from tests import test_cpp_compass_law_parity
+    test_cpp_compass_law_parity.main(str(b / "oc_compass_law"), 300)
 
 
 def check():

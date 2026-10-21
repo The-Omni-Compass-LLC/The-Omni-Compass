@@ -74,9 +74,10 @@ stands is also a version that is re-proved, re-tested and re-built from its rece
 
 Each change below was found in a real run or in our own reading of the code, and each has its evidence written down. Each
 goes through the toy gate against the engine that stands and, when it reads no LOSS there, lands at once as the next version
-with `tools/land_engine.py`; the founder is told what it changed (rule 6). Landed in omni-v14, from this list: no raise on a
-reading older than another workload's newest pod, and the operator's commands without a shell, beside the founder's knob for
-every muscle (`docs/OMNI_V14.md`); in omni-v13: the conveyance's hand-back on a shared host at its top, found on KubeRay's rig
+with `tools/land_engine.py`; the founder is told what it changed (rule 6). Landed in omni-v14, from this list: the operator's commands
+without a shell, beside the founder's knob for every muscle; refused there by the gate and kept on the branch
+`v14-convey-study`: no conveyance raise on a reading that leaves out another workload's starting pods (`docs/OMNI_V14.md`,
+section 3); in omni-v13: the conveyance's hand-back on a shared host at its top, found on KubeRay's rig
 (`docs/OMNI_V13.md`); in omni-v12, from this list: the refused raise held and the swarm's reflex at once (`docs/OMNI_V12.md`). The kind rig's governor role still does not read the namespace's
 quotas, a grant the Operator's Manual, section 5.5, makes optional, so the omni-v12 capacity runs read the hold in the real
 cluster.
