@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Builds the printable book, docs/OMNI_COMPASS_MANUAL.pdf, and its one-file text, docs/book/OMNI_COMPASS_BOOK.md.
@@ -200,7 +200,7 @@ CODE_WIDTH = 70                     # characters of 11 pt mono that fit the fram
 
 # ---------------------------------------------------------------- text cleaning
 AI_WORDS = re.compile(r"\b(grok|chatgpt|claude|gemini|anthropic|openai|xai|copilot|same assistant|other AI builds?)\b", re.I)
-BANNER = re.compile(r"^>\s*(\*\*PROPRIETARY|©\s*2026 The Omni-Compass LLC|\*\*Evaluation and simulation use only)")
+BANNER = re.compile(r"^>\s*(\*\*PROPRIETARY|©\s*2026 The Omni-Compass LLC|\*\*Evaluation and Simulation use only)")
 
 
 def clean_lines(text: str) -> list[str]:
@@ -962,10 +962,11 @@ LIVE_OUTLINE = [
     ("The Master Switch", ("M", "The Master Switch")),
     ("The Alarms, the Feed, the Event Log and the Metrics", ("M", "The Alarms, the Feed, the Event Log and the Metrics")),
     ("The Pipeline That Rebuilds the Page", ("M", "The Pipeline That Rebuilds the Page")),
-    ("PART", "The Whole and the Measured Effect",
-     "The whole organism two ways, its bills and receipts, the benefit board, the grid and the catalog."),
-    ("The Whole Organism, Two Ways", ("M", "The Whole Organism, Two Ways")),
+    ("PART", "The Measured Effect and the Whole",
+     "In the page's order (the founder's order of 20 October): the benefit board, the grid and the catalog, then the whole "
+     "organism every way it is bought, its bills and receipts."),
     ("The Benefit Board, the Grid and the Catalog", ("M", "The Benefit Board, the Grid and the Catalog")),
+    ("The Whole Organism, Every Way It Is Bought", ("M", "The Whole Organism, Every Way It Is Bought")),
     ("PART", "Evidence by Stack",
      "From the cloud down to the chip: the clouds, the orchestrators, the official Kubernetes runs and their playback, the "
      "shipped controller's decision trace, the card and the host."),
@@ -1015,6 +1016,9 @@ LIVE_OUTLINE = [
     ("Appendix I. The Enterprise License: Standard Terms", ("F", "ENTERPRISE_LICENSE.md")),
     ("Appendix J. Patents and Trademarks", ("FS", ["PATENTS.md", "TRADEMARKS.md"])),
     ("Appendix K. Security Policy", ("F", "SECURITY.md")),
+    # the page word for word, written from the page at every build (docs/book/build_live_manual.py), so the book and the
+    # page read each other both ways
+    ("Appendix L. The Page Word for Word: Every Section, Monitor and Knob", ("F", "docs/engine/PAGE_WORD_FOR_WORD.md")),
     ("Index", ("X", "index")),
     ("Contact", ("X", "contact")),
 ]

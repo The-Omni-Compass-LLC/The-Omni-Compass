@@ -1,6 +1,6 @@
 # YCSB on MongoDB: Omni-Compass on top of a database's operator-set cache size, preregistered
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Written 2026-10-08, before any counted run. The rules below are set on the tuning workload (run on one machine, never counted)
 and are then applied unchanged to the untouched workloads; every row is reported, losses included; the readings are the three-run
@@ -311,7 +311,7 @@ The first counted set on the brain's verdict (runs 38013343689, 38013348512, 380
 
 ---
 
-© 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
+© 2026 The Omni-Compass LLC. Evaluation and Simulation use only; any other use requires a signed, paid Omni-Compass
 Enterprise License. All rights reserved. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 ## Amendment 4 (2026-10-17, declared before any run on it): native as shipped, beside the operator's cache
@@ -325,6 +325,31 @@ omni reads the server, writes nothing and says so in its audit, and every row re
 run. The record carries native's size as the server reported it. The preregistered set keeps its name; the shipped set's tables
 are named for it (`…_YCSB_SHIPPED.md`).
 
+## Amendment 5 (2026-10-21, declared before any run on it): the machine's operating system, Linux 6.8
+
+**What happened.** All three omni-v12 runs of the preregistered set (39379934444, 39410606870, 39461506751, 20 October) failed
+partway, so their table (`results/live/V12_YCSB.md`) holds no workload in all three runs and judges nothing. Every failed job
+(9 of 15) ran on GitHub's ubuntu-24.04 image of 18 October (20261018.339.1), whose kernel is Linux 7.0.0-1017-azure; every job
+that passed, in these runs and in the omni-v11 runs before them, ran on the image of 12 October (20261012.334.1, Linux 6.17).
+MongoDB 8.0 (8.0.34, the series this preregistration names) refuses or fails to start on Linux 6.19 to 7.0.13 (MongoDB's own
+issue SERVER-121912: the TCMalloc bundled with the server and the kernel's restartable sequences); on the new image the server
+died before its first log line (`mongod.log` empty in all nine), the setup's wait ended without saying so, and the workload
+stopped at its first restart ("mongod did not come back after the restart"). The cause is the test machine, not the engine
+and not the rule.
+
+**From this amendment** (`.github/workflows/ycsb.yml`, `tools/run_ycsb.py`): the workload jobs run on GitHub's ubuntu-22.04
+machine (Linux 6.8; the same 4 cores and 16 GB), MongoDB 8.0 from its publisher's repository for that release, signed by the
+publisher's key. The setup stops the job at once, with the kernel, the server's status and its journal, when the server does not
+answer, and the runner refuses to run a workload on a server whose version it cannot read; every run's files carry the kernel,
+the release and the runner image (`machine.txt`) and the server's journal (`mongod-journal.log`). Nothing else changes: the
+engine, the rule, the gauges, the workloads, the steps, native's setting.
+
+**The runs.** Every set of this preregistration runs on this machine from this amendment, beginning with the omni-v13 campaign
+(`scripts/reruns.txt`, A, B and C of each). The three failed omni-v12 runs stay as they are, listed in their table; omni-v11's
+table (`results/live/V11_YCSB.md`) stands as MongoDB's result, named as omni-v11's, until three runs on a newer engine land whole
+(`tools/readings.py`, `landed`). The shipped and the service sets' omni-v12 tables, whose runs all ran on the earlier image,
+stand as they are.
+
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

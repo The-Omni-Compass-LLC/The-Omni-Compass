@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # Omni-Compass on a real Kubernetes control plane at scale: a kind cluster whose worker nodes are KWOK nodes (the
@@ -15,7 +15,7 @@
 # CPU) and checks that its counts are right and its commands land; then the master switch turns the whole harness off,
 # and every HPA target and every node must be back as the operator had them. Writes $OUT/KWOK.json.
 set -euo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
 NODES="${NODES:-50}"; ITER="${ITER:-12}"; INTERVAL="${INTERVAL:-10}"; OUT="${OUT:-kwok-$NODES}"
 KWOK_VERSION="${KWOK_VERSION:-v0.6.1}"

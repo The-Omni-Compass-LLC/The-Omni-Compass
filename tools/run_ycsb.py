@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Omni-Compass on top of a database's operator-set cache size: YCSB on MongoDB (docs/YCSB_PREREGISTRATION.md).
@@ -559,8 +559,13 @@ def setup():
             txt = txt.replace("storage:\n", f"storage:\n  wiredTiger:\n    engineConfig:\n      cacheSizeGB: {NATIVE_MB / 1024:.3f}\n", 1)
             subprocess.run(["sudo", "tee", str(conf)], input=txt, text=True, check=True, capture_output=True)
         subprocess.run(["sudo", "systemctl", "restart", "mongod"], check=True)
-    print(f"YCSB {YCSB_VERSION} at {YCSB_HOME} (sha256 {got[:16]}...); MongoDB {server_version()} at native's cache ({NATIVE}: "
+    ver = server_version()
+    print(f"YCSB {YCSB_VERSION} at {YCSB_HOME} (sha256 {got[:16]}...); MongoDB {ver} at native's cache ({NATIVE}: "
           f"{NATIVE_MB if NATIVE_MB is not None else 'the server default'} MB)")
+    if ver == "?":                       # the server did not answer after its restart: no workload runs on a server that is not up
+        print(f"mongod did not answer after the restart at native's cache (kernel {os.uname().release}); its status and journal:\n"
+              f"{server_journal('mongod')}", file=sys.stderr)
+        return 1
     return 0
 
 
