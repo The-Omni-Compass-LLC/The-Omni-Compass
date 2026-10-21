@@ -120,6 +120,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-21 17:58 | [The engine's runs: 500 runs from the jump generator (base 993613928), one digest](results/engine_runs/ENGINE_RUNS_500_993613928.md) |  |
 | 2026-10-21 06:48 | [The engine's runs: 500 runs from the jump generator (base 902816710), one digest](results/engine_runs/ENGINE_RUNS_500_902816710.md) |  |
 | 2026-10-21 06:28 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-21 05:02 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V14_VS_V13.md) |  |
@@ -130,16 +131,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-21 15:23 | pgbench | success | [39611501101](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39611501101) |
-| 2026-10-21 15:20 | kafka | success | [39609209866](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39609209866) |
-| 2026-10-21 15:19 | kind-cruisekube | success | [39596141149](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39596141149) |
-| 2026-10-21 14:56 | benchmark-reps | success | [39606881656](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39606881656) |
-| 2026-10-21 14:54 | engine-runs | success | [39620723676](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39620723676) |
-| 2026-10-21 14:51 | redis | success | [39606898003](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39606898003) |
-| 2026-10-21 14:46 | live-engine | success | [39615891213](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39615891213) |
-| 2026-10-21 14:44 | swarm | success | [39618544495](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39618544495) |
-| 2026-10-21 14:40 | mujoco | success | [39618516215](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39618516215) |
-| 2026-10-21 14:37 | cloud-check amazon | failure | [39618440105](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39618440105) |
+| 2026-10-21 20:14 | orchestrators: koordinator A | success | [39659387986](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39659387986) |
+| 2026-10-21 20:12 | orchestrators: binpack C | success | [39659378785](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39659378785) |
+| 2026-10-21 19:59 | orchestrators: vanilla C | failure | [39657032525](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39657032525) |
+| 2026-10-21 19:58 | cloud-check amazon | failure | [39666238193](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39666238193) |
+| 2026-10-21 19:58 | cloud-check google | failure | [39666226235](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39666226235) |
+| 2026-10-21 19:56 | orchestrators: binpack B | success | [39657023398](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39657023398) |
+| 2026-10-21 19:56 | orchestrators: vanilla B | success | [39657014417](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39657014417) |
+| 2026-10-21 19:40 | orchestrators: binpack A | success | [39654638025](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39654638025) |
+| 2026-10-21 19:40 | orchestrators: vanilla A | success | [39654629313](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39654629313) |
+| 2026-10-21 19:34 | live-engine | success | [39659307458](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39659307458) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
