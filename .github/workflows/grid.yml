@@ -12,8 +12,11 @@ name: grid
 # (other workflows still get a runner within minutes). Every square runs on GitHub's own machines; nothing is rented. It
 # never starts a run twice and never starts a run on another engine; when every square is started it starts nothing. One job ticks every 15 minutes for five hours, then starts the next job (GitHub's own
 # schedule here is delayed by hours under load; the schedule below only restarts the chain if it ever breaks, and two
-# conductors never run at once). To stop the grid: Actions -> grid -> "..." -> Disable workflow (and cancel the six and
-# six-kube runs in flight). Started by hand it ticks at once; dry_run says what it would start, once.
+# conductors never run at once). A start that finds another conductor ticking or waiting (the schedule's, a verify's, a hand
+# start) stands aside and ends green at once; only the successor a conductor starts as it ends (chained) waits its turn,
+# so no conductor is ever left queued to be cancelled (21 October: four cancelled starts a day had read as failures). To stop
+# the grid: Actions -> grid -> "..." -> Disable workflow (and cancel the six and six-kube runs in flight). Started by hand
+# it ticks at once when no conductor runs; dry_run says what it would start, once.
 on:
   workflow_run:
     workflows: [verify]
@@ -25,15 +28,64 @@ on:
     inputs:
       grid: {description: "all, six (modelled) or six-kube (the real cluster inside)", default: "all"}
       dry_run: {description: "yes: say once what would start, start nothing", default: "no"}
+      chained: {description: "yes: the successor a conductor starts as it ends (waits its turn); otherwise a start stands aside while another conductor runs", default: "no"}
 permissions:
   actions: write
   contents: read
-concurrency: {group: grid-conductor-v6, cancel-in-progress: false}
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
-  tick:
+  gate:
+    # whether this start ticks: never while another conductor ticks or waits, unless it is the successor that conductor
+    # started (chained) or a dry run; a start that stands aside ends green, with the conductor it found named
     if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message, '[all-nongpu]'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      go: ${{ steps.gate.outputs.go }}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - name: Another conductor ticking or waiting?
+        id: gate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CHAINED: ${{ github.event.inputs.chained || 'no' }}
+          DRY: ${{ github.event.inputs.dry_run || 'no' }}
+        shell: python
+        run: |
+          import json, os, urllib.request
+          def get(path):
+              req = urllib.request.Request(f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/{path}",
+                                           headers={"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                                                    "Accept": "application/vnd.github+json"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.load(r)
+          me, live = int(os.environ["GITHUB_RUN_ID"]), []
+          if os.environ["CHAINED"] != "yes" and os.environ["DRY"] != "yes":
+              for st in ("in_progress", "queued", "waiting", "pending", "requested"):
+                  for r in get(f"actions/workflows/grid.yml/runs?status={st}&per_page=20").get("workflow_runs", []):
+                      if r["id"] == me or r["id"] in live:
+                          continue
+                      jobs = get(f"actions/runs/{r['id']}/jobs?per_page=10").get("jobs", [])
+                      if any(j["name"] == "tick" and j["status"] != "completed" for j in jobs):
+                          live.append(r["id"])
+          go = "false" if live else "true"
+          why = (f"another conductor is ticking or waiting (run {', '.join(map(str, live))}): this start stands aside"
+                 if live else "no other conductor ticks or waits: this start ticks")
+          print(why)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"go={go}\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+              f.write(why + "\n\n")
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  tick:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    # one conductor at a time: the chained successor waits here for the one that started it to end
+    concurrency: {group: grid-conductor-v6, cancel-in-progress: false}
     runs-on: ubuntu-24.04
     timeout-minutes: 340
     env:
@@ -65,22 +117,39 @@ jobs:
       - name: The next conductor (one at a time; it waits for this one to end)
         if: ${{ !cancelled() && env.DRY != 'yes' }}
         run: |
-          # another conductor already waiting (the schedule's, or a hand start) carries on instead; a cancelled conductor
-          # starts none (to stop the grid, disable this workflow). Only a dispatched or scheduled run counts as waiting: a
-          # run a verify started (workflow_run) ticks only when its commit says [all-nongpu] and is otherwise skipped, so
-          # counting it left the grid idle from 15:33 to the next schedule on 16 October
-          waiting=0
-          for st in queued pending waiting requested; do
-            n=$(curl -fsS -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/grid.yml/runs?status=$st&per_page=10" \
-              | python3 -c "import sys, json; print(sum(1 for r in json.load(sys.stdin).get('workflow_runs', []) if r.get('event') in ('workflow_dispatch', 'schedule')))" || echo 0)
-            waiting=$((waiting + n))
-          done
+          # another conductor already waiting its turn (its tick job not yet run, whatever started it) carries on instead; a
+          # cancelled conductor starts none (to stop the grid, disable this workflow). Only a run whose tick job is waiting
+          # counts: a start that stood aside, or a verify's run that is skipped without [all-nongpu], has no tick to wait,
+          # so counting it left the grid idle from 15:33 to the next schedule on 16 October
+          waiting=$(python3 - <<'EOF'
+          import json, os, urllib.request
+          def get(path):
+              req = urllib.request.Request(f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/{path}",
+                                           headers={"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                                                    "Accept": "application/vnd.github+json"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.load(r)
+          me, n = int(os.environ["GITHUB_RUN_ID"]), 0
+          try:
+              seen = set()
+              for st in ("in_progress", "queued", "waiting", "pending", "requested"):
+                  for r in get(f"actions/workflows/grid.yml/runs?status={st}&per_page=20").get("workflow_runs", []):
+                      if r["id"] == me or r["id"] in seen:
+                          continue
+                      seen.add(r["id"])
+                      jobs = get(f"actions/runs/{r['id']}/jobs?per_page=10").get("jobs", [])
+                      n += any(j["name"] == "tick" and j["status"] != "completed" for j in jobs)
+          except Exception as e:                      # unread: start the successor; two never tick at once (concurrency)
+              print(f"::warning::the waiting conductors were not read ({e})", flush=True)
+          print(n)
+          EOF
+          )
+          waiting=$(echo "$waiting" | tail -1)
           if [ "$waiting" = 0 ]; then
             curl -fsS -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/grid.yml/dispatches" \
-              -d "{\"ref\": \"${{ github.ref_name }}\", \"inputs\": {\"grid\": \"$GRID\"}}" \
-              && echo "the next conductor is started"
+              -d "{\"ref\": \"${{ github.ref_name }}\", \"inputs\": {\"grid\": \"$GRID\", \"chained\": \"yes\"}}" \
+              && echo "the next conductor is started (chained: it waits for this one to end)"
           else
             echo "a conductor is already waiting: it carries on"
           fi
