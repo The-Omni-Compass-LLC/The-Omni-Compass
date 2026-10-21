@@ -248,6 +248,16 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 21 October
+
+- **The problem and the answer, first** (the founder's words: "in the beginning we have to state in front matter the problem
+  and omnicompasses solution, what the whole tech world is facing, and how omnicompass addresses it"). The README and all three
+  manuals open their front matter with "The Problem and the Answer" (the book builder prints it first): what every stack faces
+  (capacity held idle, late reaction, loops at cross purposes, demand outrunning power and hardware), what Omni-Compass does
+  about it (on top of native, never replacing it), where the proof is (the Owner's carries the record; the Operator's points
+  to it), what is not claimed, and what is protected. It is held to the honesty rules like every page: no claim beyond the
+  record, no outside review implied, no equation that is not the engine's.
+
 ## Orders of 20 October
 
 - **The governors four ways** (the founder's words: "We can show what they do natively on top of the system organism. And

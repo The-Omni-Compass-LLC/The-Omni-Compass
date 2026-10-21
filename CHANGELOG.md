@@ -4,6 +4,12 @@
 
 ## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 
+- **The Problem and the Answer, first** (the founder's order of 21 October): the README and all three manuals now open their
+  front matter with what every stack faces (capacity held idle, late reaction, loops at cross purposes, demand outrunning the
+  power and hardware that can be built) and what Omni-Compass does about it (a supervisory governor on top of the native
+  controllers, never replacing them), where the proof is, what is not claimed and what is protected. The book builder prints it
+  first, before the Foreword; the three PDFs are rebuilt.
+
 - **The live engine's record check, read on the same commits as the build** (`docs/engine/build_live_engine.py`): the check that
   every record on the page is the repository's own run printed "differs: runs" on GitHub's builds of 21 October (05:15 and after),
   and the step went on, because the check's output was piped into the summary without `pipefail`; the workflow's bash with
