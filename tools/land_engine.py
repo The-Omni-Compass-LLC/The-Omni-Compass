@@ -145,7 +145,7 @@ def land(n: int, since: str, root: Path = ROOT, fingerprint: bool = True) -> Non
         subprocess.run([sys.executable, str(ver), "--write", f"v{n}"], cwd=root, check=True)
     print(f"omni-v{n} landed in the bookkeeping; the campaign starts at {since}. The words a person writes next:")
     for w in [f"docs/OMNI_V{n}.md (new)", "README.md", "docs/STATE_OF_PLAY.md", "CLAUDE.md", "CHANGELOG.md",
-              "docs/OMNI_COMPASS_MANUAL.md and docs/OMNI_COMPASS_OWNERS_MANUAL.md (then docs/book/build_book.py, both)",
+              "docs/OMNI_COMPASS_MANUAL.md, docs/OMNI_COMPASS_OWNERS_MANUAL.md and docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md (then docs/book/build_book.py, all three)",
               "docs/THE_RECEIPTS.md", "docs/engine/OMNI_COMPASS_LIVE_ENGINE.html and docs/engine/APPRAISAL.md",
               f"docs/OMNI_V{old}.md (it stood until today)", f"results/toy_gate/V{n}_VS_V{old}.md (tools/toy_gate.py)"]:
         print("  " + w)

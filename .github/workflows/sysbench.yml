@@ -84,6 +84,7 @@ jobs:
           tail -40 run.log
           grep "^==\|^   " run.log | tee -a "$GITHUB_STEP_SUMMARY"
           sudo cat /var/log/mysql/error.log > out/mysql-error.log 2>/dev/null || true
+          sudo journalctl -u mysql --no-pager > out/mysql-journal.log 2>/dev/null || true   # the server's own record, in every run
           exit $code
       - run: cd out && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
       - name: Attach README, licenses and disclosures to this artifact
