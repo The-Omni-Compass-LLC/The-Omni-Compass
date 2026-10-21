@@ -1,0 +1,1413 @@
+{
+ "uid": "omni-compass-wall",
+ "title": "Omni-Compass: the monitor wall",
+ "tags": [
+  "omni-compass",
+  "wall"
+ ],
+ "timezone": "utc",
+ "schemaVersion": 39,
+ "version": 1,
+ "editable": true,
+ "graphTooltip": 1,
+ "time": {
+  "from": "now-6h",
+  "to": "now"
+ },
+ "refresh": "30s",
+ "templating": {
+  "list": [
+   {
+    "name": "DS_PROMETHEUS",
+    "label": "Prometheus",
+    "type": "datasource",
+    "query": "prometheus",
+    "current": {},
+    "hide": 0
+   }
+  ]
+ },
+ "links": [
+  {
+   "title": "The governor's own screen",
+   "type": "dashboards",
+   "tags": [
+    "omni-compass"
+   ],
+   "asDropdown": false
+  },
+  {
+   "title": "The live engine",
+   "type": "link",
+   "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"
+  }
+ ],
+ "panels": [
+  {
+   "id": 1,
+   "title": "1 · The master switch and the kill switch",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The switch above the brain: ON, Omni-Compass governs every wired muscle; engaged, every setting is handed back to native's own controller at once and every Omni-Compass side on the page follows native. Evidence class S (the page's port of the master switch; the real one is omnicompass/master.py); on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "omni_master_switch",
+     "legendFormat": "omni_master_switch"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "title": "2 · Golden signal: errors",
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Errors a decision on the live organism, native beside Omni-Compass (site reliability's first of four). Evidence class S; on the live engine: live. Feed: the service's own request counter (Prometheus client), kube-state-metrics for pod restarts.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ops"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(rate(http_requests_total{code=~\"5..\"}[5m]))",
+     "legendFormat": "http_requests_total{code=~\"5..\"}"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "title": "3 · Golden signal: throughput",
+   "gridPos": {
+    "x": 0,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Work done a decision (traffic), native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: the service's own request counter (Prometheus client).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqps"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(rate(http_requests_total[5m]))",
+     "legendFormat": "http_requests_total"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "title": "4 · Golden signal: latency",
+   "gridPos": {
+    "x": 12,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Response time a decision, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: the service's own duration histogram.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))",
+     "legendFormat": "http_request_duration_seconds_bucket"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "title": "5 · Golden signal: saturation",
+   "gridPos": {
+    "x": 0,
+    "y": 16,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Capacity held against capacity used, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: node_exporter.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
+     "legendFormat": "node_cpu_seconds_total"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "title": "6 · GitHub Actions: the runs in flight",
+   "gridPos": {
+    "x": 12,
+    "y": 16,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Every workflow run in progress or queued when the page was built, the Azure set's repetitions done of its cap, and the clouds' gates. Evidence class L (GitHub's own API, read at the build); on the live engine: record. Feed: GitHub Actions API (read at the build); live: github-actions-exporter.",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (workflow) (github_workflow_run_status == 1)",
+     "legendFormat": "github_workflow_run_status"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "title": "7 · The benefit board",
+   "gridPos": {
+    "x": 0,
+    "y": 24,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Every domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, native against Omni-Compass. Evidence class L/S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The benefit board** (the whole organism).\n\nEvery domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, native against Omni-Compass.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 7)."
+   }
+  },
+  {
+   "id": 8,
+   "title": "8 · Where the benefit lives, gauge by gauge",
+   "gridPos": {
+    "x": 12,
+    "y": 24,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The same tables by gauge family: work, speed, misses, resources. Evidence class L/S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Where the benefit lives, gauge by gauge** (the whole organism).\n\nThe same tables by gauge family: work, speed, misses, resources.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 8)."
+   }
+  },
+  {
+   "id": 9,
+   "title": "9 · The scale-out grid",
+   "gridPos": {
+    "x": 0,
+    "y": 32,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside. Evidence class S/L; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The scale-out grid** (the organisms and the catalog).\n\nSeven organisms × copies × runs: every square's word, modelled and with the real cluster inside.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 9)."
+   }
+  },
+  {
+   "id": 10,
+   "title": "10 · The seven organisms, three loads",
+   "gridPos": {
+    "x": 12,
+    "y": 32,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Each organism's misses, work and energy against native under its own load, the climb and the line (the realms table). Evidence class S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The seven organisms, three loads** (the organisms and the catalog).\n\nEach organism's misses, work and energy against native under its own load, the climb and the line (the realms table).\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 10)."
+   }
+  },
+  {
+   "id": 11,
+   "title": "11 · Every muscle of the catalog",
+   "gridPos": {
+    "x": 0,
+    "y": 40,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle. Evidence class S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Every muscle of the catalog** (every muscle).\n\nThe 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 11)."
+   }
+  },
+  {
+   "id": 12,
+   "title": "12 · The whole organism, composed",
+   "gridPos": {
+    "x": 12,
+    "y": 40,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought. Evidence class S (of P and L); on the live engine: composed. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The whole organism, composed** (the whole organism).\n\nThe pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 12)."
+   }
+  },
+  {
+   "id": 13,
+   "title": "13 · Azure: the bill, run by run",
+   "gridPos": {
+    "x": 0,
+    "y": 48,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Machine-hours billed and the bill at list price, native against Omni-Compass, every finished Azure set with its 95% interval, and the running set's repetitions done. Evidence class L (metered by Azure); on the live engine: record. Feed: OpenCost; Azure's own billing export.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(node_total_hourly_cost)",
+     "legendFormat": "node_total_hourly_cost"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "title": "14 · Google Cloud: the gate and the bill",
+   "gridPos": {
+    "x": 12,
+    "y": 48,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; Google Cloud Billing export. Awaiting: the first set starts within the hour after the gate passes: the key stored whole (docs/GOOGLE_SETUP.md, section 4).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(node_total_hourly_cost)",
+     "legendFormat": "node_total_hourly_cost"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "title": "15 · Amazon: the gate and the bill",
+   "gridPos": {
+    "x": 0,
+    "y": 56,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; AWS Cost and Usage Report. Awaiting: the first set starts within the hour after the gate passes: the account on the Paid plan (docs/AMAZON_SETUP.md, section 1a).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(node_total_hourly_cost)",
+     "legendFormat": "node_total_hourly_cost"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "title": "16 · The cloud setting, live: native's machines",
+   "gridPos": {
+    "x": 12,
+    "y": 56,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The shipped controller's cloud mode on the toy cluster: the cloud's own autoscaler alone. Evidence class S; on the live engine: live. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "count(kube_node_info)",
+     "legendFormat": "kube_node_info"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "title": "17 · The cloud setting, live: Omni-Compass's machines",
+   "gridPos": {
+    "x": 0,
+    "y": 64,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The same autoscaler with Omni-Compass parking a machine only after its trial, waking it on a breach. Evidence class S; on the live engine: live. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "count(kube_node_info)",
+     "legendFormat": "kube_node_info"
+    },
+    {
+     "refId": "B",
+     "expr": "omni_nodes_observed",
+     "legendFormat": "omni_nodes_observed"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "title": "18 · The orchestrators' road",
+   "gridPos": {
+    "x": 12,
+    "y": 64,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Every scheduler, queue and multi-cluster governor on its way through trial, A, B and C, on the engine that stands. Evidence class L; on the live engine: record. Feed: GitHub Actions API (read at the build); live: github-actions-exporter.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The orchestrators' road** (the orchestrators and governors).\n\nEvery scheduler, queue and multi-cluster governor on its way through trial, A, B and C, on the engine that stands.\n\nSource: GitHub Actions API (read at the build); live: github-actions-exporter. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 18)."
+   }
+  },
+  {
+   "id": 19,
+   "title": "19 · An orchestrator, four ways",
+   "gridPos": {
+    "x": 0,
+    "y": 72,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator: the four arms of the chosen governor. Evidence class L; on the live engine: record. Feed: kube-state-metrics; each orchestrator's own metrics endpoint (Kueue, Volcano, KAI, Koordinator, Crane, KubeRay).",
+   "type": "bargauge",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(kube_pod_status_phase{phase=\"Pending\"})",
+     "legendFormat": "kube_pod_status_phase{phase=\"Pending\"}"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "title": "20 · The data pipeline, live: every stage from the GitHub Actions run to this page",
+   "gridPos": {
+    "x": 12,
+    "y": 72,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The chosen Kubernetes run played back from its archived files: where every repetition stands. Evidence class L; on the live engine: replay. Feed: GitHub Actions API (read at the build); live: github-actions-exporter.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The data pipeline, live: every stage from the GitHub Actions run to this page** (the cluster (Kubernetes)).\n\nThe chosen Kubernetes run played back from its archived files: where every repetition stands.\n\nSource: GitHub Actions API (read at the build); live: github-actions-exporter. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 20)."
+   }
+  },
+  {
+   "id": 21,
+   "title": "21 · The official run's heartbeat",
+   "gridPos": {
+    "x": 0,
+    "y": 80,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Replicas, machines and the response line decision by decision, native beside Omni-Compass. Evidence class L; on the live engine: replay. Feed: kube-state-metrics; the load generator's own histogram (the rig's loadgen).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(kube_horizontalpodautoscaler_status_current_replicas)",
+     "legendFormat": "kube_horizontalpodautoscaler_status_current_replicas"
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "title": "22 · The official run: response time candles",
+   "gridPos": {
+    "x": 12,
+    "y": 80,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Each repetition's response time range, native beside Omni-Compass. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[1m])))",
+     "legendFormat": "http_request_duration_seconds_bucket"
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "title": "23 · The official run: the heat map",
+   "gridPos": {
+    "x": 0,
+    "y": 88,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The chosen gauge across repetitions and time. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The official run: the heat map** (the cluster (Kubernetes)).\n\nThe chosen gauge across repetitions and time.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 23)."
+   }
+  },
+  {
+   "id": 24,
+   "title": "24 · The official run: paired bars",
+   "gridPos": {
+    "x": 12,
+    "y": 88,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Every repetition's paired difference, native against Omni-Compass. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The official run: paired bars** (the cluster (Kubernetes)).\n\nEvery repetition's paired difference, native against Omni-Compass.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 24)."
+   }
+  },
+  {
+   "id": 25,
+   "title": "25 · The official run: the repetitions",
+   "gridPos": {
+    "x": 0,
+    "y": 96,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Each repetition's reading in the chosen gauge with its interval. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The official run: the repetitions** (the cluster (Kubernetes)).\n\nEach repetition's reading in the chosen gauge with its interval.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 25)."
+   }
+  },
+  {
+   "id": 26,
+   "title": "26 · Per-repetition run telemetry",
+   "gridPos": {
+    "x": 12,
+    "y": 96,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The archived capture of one repetition second by second: machines ready, CPU used, pods pending, the autoscaler's replicas, native beside Omni-Compass. Evidence class L; on the live engine: replay. Feed: kube-state-metrics; metrics-server; Kepler.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(kube_pod_status_phase{phase=\"Pending\"})",
+     "legendFormat": "kube_node_status_condition"
+    },
+    {
+     "refId": "B",
+     "expr": "rate(kepler_node_package_joules_total[1m])",
+     "legendFormat": "kube_pod_status_phase"
+    }
+   ]
+  },
+  {
+   "id": 27,
+   "title": "27 · The shipped controller's trace: native",
+   "gridPos": {
+    "x": 0,
+    "y": 104,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The controller every Kubernetes and cloud set runs, replayed decision by decision from its own audit: native's cluster. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "omni_nodes_observed",
+     "legendFormat": "omni_nodes_observed"
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "title": "28 · The shipped controller's trace: Omni-Compass",
+   "gridPos": {
+    "x": 12,
+    "y": 104,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The same, Omni-Compass's cluster: every write, every trial, every hold. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "omni_recommended",
+     "legendFormat": "omni_recommended"
+    },
+    {
+     "refId": "B",
+     "expr": "increase(omni_writes_total[1h])",
+     "legendFormat": "omni_writes_total"
+    }
+   ]
+  },
+  {
+   "id": 29,
+   "title": "29 · The shipped controller's trace: the strip",
+   "gridPos": {
+    "x": 0,
+    "y": 112,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The compass position, the force and the writes over the run. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "omni_compass_position",
+     "legendFormat": "omni_compass_position"
+    },
+    {
+     "refId": "B",
+     "expr": "omni_compass_force",
+     "legendFormat": "omni_compass_force"
+    }
+   ]
+  },
+  {
+   "id": 30,
+   "title": "30 · The chip and the host, modelled",
+   "gridPos": {
+    "x": 12,
+    "y": 112,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The repository's own models of one GPU card and one Linux host, native beside Omni-Compass, second by second (class S). Evidence class S; on the live engine: model. Feed: NVIDIA DCGM exporter; node_exporter.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "watt"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "DCGM_FI_DEV_POWER_USAGE",
+     "legendFormat": "DCGM_FI_DEV_POWER_USAGE"
+    },
+    {
+     "refId": "B",
+     "expr": "DCGM_FI_DEV_SM_CLOCK",
+     "legendFormat": "DCGM_FI_DEV_SM_CLOCK"
+    }
+   ]
+  },
+  {
+   "id": 31,
+   "title": "31 · The GPU card, metered: the one real run",
+   "gridPos": {
+    "x": 0,
+    "y": 120,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit, clock and temperature, requests served and the 95th percentile, native beside Omni-Compass governing (or watching only), every write of the governor marked. Evidence class P; on the live engine: replay. Feed: NVIDIA DCGM exporter. Awaiting: its omni-v12 run on Lambda (lambda-gpu.yml, one exact commit): the replaced controller's run stands until then, shown as such.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "watt"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "DCGM_FI_DEV_POWER_USAGE",
+     "legendFormat": "DCGM_FI_DEV_POWER_USAGE"
+    },
+    {
+     "refId": "B",
+     "expr": "DCGM_FI_DEV_POWER_MGMT_LIMIT",
+     "legendFormat": "DCGM_FI_DEV_POWER_MGMT_LIMIT"
+    },
+    {
+     "refId": "C",
+     "expr": "DCGM_FI_DEV_SM_CLOCK",
+     "legendFormat": "DCGM_FI_DEV_SM_CLOCK"
+    }
+   ]
+  },
+  {
+   "id": 32,
+   "title": "32 · The CPU host, metered: awaiting its machine",
+   "gridPos": {
+    "x": 12,
+    "y": 120,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The CPU power harness on the host: the frequency ceiling, the clock run at, the package power and the response line, native beside Omni-Compass; today its own modelled machine (class S), the real run the day a machine with its meter runs it. Evidence class S (model) until the run; on the live engine: awaiting. Feed: node_exporter (rapl, cpufreq collectors); Kepler. Awaiting: a Linux machine whose processor exposes its energy counter (RAPL) and a writable frequency ceiling (register row 79, cpu-power.yml).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "watt"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "rate(node_rapl_package_joules_total[1m])",
+     "legendFormat": "node_rapl_package_joules_total"
+    },
+    {
+     "refId": "B",
+     "expr": "avg(node_cpu_scaling_frequency_hertz)",
+     "legendFormat": "node_cpu_scaling_frequency_hertz"
+    }
+   ]
+  },
+  {
+   "id": 33,
+   "title": "33 · An 8-card node: built and awaiting its run",
+   "gridPos": {
+    "x": 0,
+    "y": 128,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one-card model (class S), each Omni-Compass lane empty until the 8-card run lands, 24 paired repetitions a test pooled across the cards. Evidence class S (native model) until the run; on the live engine: awaiting. Feed: NVIDIA DCGM exporter, card by card. Awaiting: scripts/gpu_8card.sh on a rented machine with eight NVIDIA cards (docs/GPU_RUN_GUIDE.md, section D).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "watt"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum by (gpu) (DCGM_FI_DEV_POWER_USAGE)",
+     "legendFormat": "DCGM_FI_DEV_POWER_USAGE"
+    }
+   ]
+  },
+  {
+   "id": 34,
+   "title": "34 · The organism, live: native",
+   "gridPos": {
+    "x": 12,
+    "y": 128,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Sixty muscles of the stress model, each on its own native controller, at their positions in the band. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format); kube-state-metrics.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The organism, live: native** (the organism and its muscles).\n\nSixty muscles of the stress model, each on its own native controller, at their positions in the band.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format); kube-state-metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 34)."
+   }
+  },
+  {
+   "id": 35,
+   "title": "35 · The organism, live: Omni-Compass",
+   "gridPos": {
+    "x": 0,
+    "y": 136,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The same sixty muscles with Omni-Compass on top of their native controllers, the brain's grants and pushes. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "omni_recommended",
+     "legendFormat": "omni_recommended"
+    },
+    {
+     "refId": "B",
+     "expr": "increase(omni_writes_total[1h])",
+     "legendFormat": "omni_recommended_moves_total"
+    }
+   ]
+  },
+  {
+   "id": 36,
+   "title": "36 · The immune system",
+   "gridPos": {
+    "x": 12,
+    "y": 136,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Where the two sides differ, and the body's heat debt: a room warmer than its native twin, inflamed, given back. Evidence class S; on the live engine: live. Feed: Prometheus Alertmanager; tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(ALERTS{alertstate=\"firing\"})",
+     "legendFormat": "ALERTS"
+    },
+    {
+     "refId": "B",
+     "expr": "increase(omni_compass_decisions_total{zone=\"wall\"}[1h])",
+     "legendFormat": "omni_compass_decisions_total{zone=\"wall\"}"
+    }
+   ]
+  },
+  {
+   "id": 37,
+   "title": "37 · The swarm",
+   "gridPos": {
+    "x": 0,
+    "y": 144,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The robot swarm's missions, native beside Omni-Compass with the proximity reflex. Evidence class S; on the live engine: live. Feed: the swarm runner's own log (tools/run_swarm.py); no Prometheus feed.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The swarm** (the organism and its muscles).\n\nThe robot swarm's missions, native beside Omni-Compass with the proximity reflex.\n\nSource: the swarm runner's own log (tools/run_swarm.py); no Prometheus feed. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 37)."
+   }
+  },
+  {
+   "id": 38,
+   "title": "38 · Telemetry tensor: the cube",
+   "gridPos": {
+    "x": 12,
+    "y": 144,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The organism's telemetry as a tensor (muscle × gauge × time), native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: kube-state-metrics; the service's own metrics.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Telemetry tensor: the cube** (telemetry analytics).\n\nThe organism's telemetry as a tensor (muscle × gauge × time), native beside Omni-Compass.\n\nSource: kube-state-metrics; the service's own metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 38)."
+   }
+  },
+  {
+   "id": 39,
+   "title": "39 · Telemetry tensor: the difference",
+   "gridPos": {
+    "x": 0,
+    "y": 152,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The difference of the two sides' tensors, cell by cell. Evidence class S; on the live engine: live. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Telemetry tensor: the difference** (telemetry analytics).\n\nThe difference of the two sides' tensors, cell by cell.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 39)."
+   }
+  },
+  {
+   "id": 40,
+   "title": "40 · Telemetry tensor: the modes",
+   "gridPos": {
+    "x": 12,
+    "y": 152,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The principal modes of the telemetry (its matrix decomposed). Evidence class S; on the live engine: live. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Telemetry tensor: the modes** (telemetry analytics).\n\nThe principal modes of the telemetry (its matrix decomposed).\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 40)."
+   }
+  },
+  {
+   "id": 41,
+   "title": "41 · Service level: the objective",
+   "gridPos": {
+    "x": 0,
+    "y": 160,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Time inside the response line against the objective, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: SLO recording rules (sloth, pyrra) over the service's histogram.",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "1 - slo:sli_error:ratio_rate5m",
+     "legendFormat": "slo:sli_error:ratio_rate5m"
+    }
+   ]
+  },
+  {
+   "id": 42,
+   "title": "42 · Service level: the error budget burn",
+   "gridPos": {
+    "x": 12,
+    "y": 160,
+    "w": 12,
+    "h": 8
+   },
+   "description": "How fast each side burns its error budget. Evidence class S; on the live engine: live. Feed: SLO recording rules (sloth, pyrra).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "slo:error_budget:remaining",
+     "legendFormat": "slo:error_budget:remaining"
+    }
+   ]
+  },
+  {
+   "id": 43,
+   "title": "43 · Telemetry radar",
+   "gridPos": {
+    "x": 0,
+    "y": 168,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Every gauge family on one radar, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Telemetry radar** (telemetry analytics).\n\nEvery gauge family on one radar, native beside Omni-Compass.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 43)."
+   }
+  },
+  {
+   "id": 44,
+   "title": "44 · The console's response",
+   "gridPos": {
+    "x": 12,
+    "y": 168,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The live engine's response to every knob of the console, plotted per decision, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The console's response** (the console).\n\nThe live engine's response to every knob of the console, plotted per decision, native beside Omni-Compass.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 44)."
+   }
+  },
+  {
+   "id": 45,
+   "title": "45 · The frame budget",
+   "gridPos": {
+    "x": 0,
+    "y": 176,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The time between frames of this page against its line under the frame load knob. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The frame budget** (the console).\n\nThe time between frames of this page against its line under the frame load knob.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 45)."
+   }
+  },
+  {
+   "id": 46,
+   "title": "46 · One control cycle, traced",
+   "gridPos": {
+    "x": 12,
+    "y": 176,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The compass band with its cushions, the two forces and one decision, step by step. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "omni_compass_position",
+     "legendFormat": "omni_compass_position"
+    },
+    {
+     "refId": "B",
+     "expr": "omni_compass_force",
+     "legendFormat": "omni_compass_force"
+    }
+   ]
+  },
+  {
+   "id": 47,
+   "title": "47 · Phase plane: native",
+   "gridPos": {
+    "x": 0,
+    "y": 184,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Native's muscles in position and velocity. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Phase plane: native** (the brain).\n\nNative's muscles in position and velocity.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 47)."
+   }
+  },
+  {
+   "id": 48,
+   "title": "48 · Phase plane: Omni-Compass",
+   "gridPos": {
+    "x": 12,
+    "y": 184,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Omni-Compass's muscles in position and velocity, the band's walls drawn. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Phase plane: Omni-Compass** (the brain).\n\nOmni-Compass's muscles in position and velocity, the band's walls drawn.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 48)."
+   }
+  },
+  {
+   "id": 49,
+   "title": "49 · The scoreboard strip",
+   "gridPos": {
+    "x": 0,
+    "y": 192,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Breaches, writes, holds and the brain's calm over the day, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "increase(omni_compass_decisions_total{zone=\"wall\"}[1h])",
+     "legendFormat": "omni_compass_decisions_total"
+    },
+    {
+     "refId": "B",
+     "expr": "increase(omni_writes_total[1h])",
+     "legendFormat": "omni_writes_total"
+    }
+   ]
+  },
+  {
+   "id": 50,
+   "title": "50 · The brain's state: the well",
+   "gridPos": {
+    "x": 12,
+    "y": 192,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The brain's double-well potential and where its state sits. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The brain's state: the well** (the brain).\n\nThe brain's double-well potential and where its state sits.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 50)."
+   }
+  },
+  {
+   "id": 51,
+   "title": "51 · The brain's state: the six variables",
+   "gridPos": {
+    "x": 0,
+    "y": 200,
+    "w": 12,
+    "h": 8
+   },
+   "description": "E, U, I, S, B and C integrated by RK4 every decision. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The brain's state: the six variables** (the brain).\n\nE, U, I, S, B and C integrated by RK4 every decision.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 51)."
+   }
+  },
+  {
+   "id": 52,
+   "title": "52 · The brain's state: the organs",
+   "gridPos": {
+    "x": 12,
+    "y": 200,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Each organ's grant to expand or contract, decision by decision. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The brain's state: the organs** (the brain).\n\nEach organ's grant to expand or contract, decision by decision.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 52)."
+   }
+  },
+  {
+   "id": 53,
+   "title": "53 · Native's own controller beside the brain",
+   "gridPos": {
+    "x": 0,
+    "y": 208,
+    "w": 12,
+    "h": 8
+   },
+   "description": "What native's controller would do at the same decision, beside the brain's grant. Evidence class S; on the live engine: live. Feed: kube-state-metrics.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Native's own controller beside the brain** (the brain).\n\nWhat native's controller would do at the same decision, beside the brain's grant.\n\nSource: kube-state-metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 53)."
+   }
+  },
+  {
+   "id": 54,
+   "title": "54 · The verdict: one trial",
+   "gridPos": {
+    "x": 12,
+    "y": 208,
+    "w": 12,
+    "h": 8
+   },
+   "description": "A give-back trial judged against native: its reference, its step, its interval and the word. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "omni_verdict_state",
+     "legendFormat": "omni_verdict_state"
+    }
+   ]
+  },
+  {
+   "id": 55,
+   "title": "55 · The verdict: every true cost",
+   "gridPos": {
+    "x": 0,
+    "y": 216,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The keep ratio of the verdict at each true cost, from trials run in this page's idle time. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The verdict: every true cost** (the verdict).\n\nThe keep ratio of the verdict at each true cost, from trials run in this page's idle time.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 55)."
+   }
+  },
+  {
+   "id": 56,
+   "title": "56 · The Python's runs, reproduced here",
+   "gridPos": {
+    "x": 12,
+    "y": 216,
+    "w": 12,
+    "h": 8
+   },
+   "description": "The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each. Evidence class S (the engine itself); on the live engine: live. Feed: tools/engine_runs.py (the Python) and this page.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The Python's runs, reproduced here** (the proof against the Python).\n\nThe engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.\n\nSource: tools/engine_runs.py (the Python) and this page. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 56)."
+   }
+  },
+  {
+   "id": 57,
+   "title": "57 · The Python's 500 scenarios, replayed",
+   "gridPos": {
+    "x": 0,
+    "y": 224,
+    "w": 12,
+    "h": 8
+   },
+   "description": "benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push. Evidence class S; on the live engine: replay. Feed: benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The Python's 500 scenarios, replayed** (the proof against the Python).\n\nbenchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.\n\nSource: benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 57)."
+   }
+  },
+  {
+   "id": 58,
+   "title": "58 · Self-governed rendering",
+   "gridPos": {
+    "x": 12,
+    "y": 224,
+    "w": 12,
+    "h": 8
+   },
+   "description": "This page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself).",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Self-governed rendering** (this page).\n\nThis page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 58)."
+   }
+  }
+ ],
+ "__notice": "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com"
+}

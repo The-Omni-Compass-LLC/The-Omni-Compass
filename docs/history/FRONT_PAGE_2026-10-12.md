@@ -1,6 +1,6 @@
 # Omni-Compass
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
@@ -202,14 +202,14 @@ organisms, Omni index. The repository's GitHub topics (set by its owner from the
 
 ## License
 
-**Proprietary. Evaluation and simulation use only.** You may download, run and modify the software only to evaluate
+**Proprietary. Evaluation and Simulation use only.** You may download, run and modify the software only to evaluate
 it and to reproduce the published results, including in shadow or test mode on systems you own or control. Everything
 else requires a written **Omni-Compass Enterprise License** signed by The Omni-Compass LLC and paid for. No patent or
 trademark license is granted for any other use.
 
 | File | What it says |
 |---|---|
-| [`LICENSE`](../../LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
+| [`LICENSE`](../../LICENSE) | evaluation and Simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
 | [`NOTICE`](../../NOTICE) | copyright, the US filings notice, third-party notices |
 | [`PATENTS.md`](../../PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
 | [`TRADEMARKS.md`](../../TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |
@@ -220,4 +220,4 @@ trademark license is granted for any other use.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

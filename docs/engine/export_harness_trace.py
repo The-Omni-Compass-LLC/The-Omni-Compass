@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Records the realms harness, decision by decision, as an organism and muscle by muscle alone, for the live engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html).
@@ -16,7 +16,8 @@ their power) under the climb, on seeds 3000, 3001 and 3002 (runs A, B and C). Tw
 
 Every decision it records, for each plant: the service position the law reads (v5_position: 1 or more is past the
 line), whether the decision was over the line, whether Omni-Compass held a setting away from native and whether it
-wrote one; for the body: its electrical power and the harness's aggregate observation (what a governor would read).
+wrote one, and whether the plant's own native controller changed what it commands (own_cmd: in both arms, so native's
+side has its own moves to show beside Omni-Compass's writes); for the body: its electrical power and the harness's aggregate observation (what a governor would read).
 The work each plant did is recorded per decision so the page can show work against native's. Omni-Compass's organism
 also records its immune system, read as max_body_step reads it, never stepping it again (realms/compass_arm_v5.py, V6
 to V13): every room against its twin (the same room under its operator's settings and native's heat), the rooms that
@@ -66,6 +67,30 @@ def t95(df):
     return _t95(df)
 
 
+def own_cmd(p, st):
+    """What a plant's own native controller commands now, read the same way in both arms (st: the plant's own memory): a
+    pool's machines in service and starting (its autoscaler), a room's cooling units staged (its staging), a battery's
+    dispatch, charging, holding or discharging (read from its charge's change over the decision), an axis's move under
+    way (its next task dispatched), a loop's actuator, counted each time it has moved 2% of its range since the last count
+    (its PI controller). A change from the previous decision is one move of the native controller."""
+    t = p.template
+    if t == "compute_pool":
+        return machines(p)
+    if t == "thermal_zone":
+        return p.units_on
+    if t == "energy_storage":
+        d = p.soc - st.get("soc", p.soc); st["soc"] = p.soc
+        return 1 if d > 1e-9 else -1 if d < -1e-9 else 0
+    if t == "motion_axis":
+        return None if p.move is None else (round(p.move["start"], 6), p.move["sgn"])
+    if t == "process_loop":
+        ref = st.setdefault("u", p.u_avg)
+        if abs(p.u_avg - ref) >= 0.02 * p.P["u_max"]:
+            st["u"] = ref = p.u_avg
+        return round(ref, 9)
+    return None
+
+
 def rows():
     by = {r["muscle"]: r for r in catalog(ROOT / "realms" / "catalog_v5.csv")}
     out = []
@@ -81,7 +106,13 @@ def run(rs, seed, arm):
     n, kill_at = len(b.plants), int(KILL_AT * ORGANISM_STEPS)
     bone = Bone(b, V5CFG) if arm == "omni" else None
     last = [None] * n
-    rec = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power_kw": [], "obs": [], "imm": []}
+    rec = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power_kw": [], "obs": [], "imm": [], "mach": [], "troom": [], "own": []}
+    own_st = [{} for _ in b.plants]
+    own_last = [own_cmd(p, s0) for p, s0 in zip(b.plants, own_st)]
+    # each side's own pools and rooms, read the way the bone reads them: the machines in service and starting over every compute
+    # pool, and the warmest room; native's are its own controllers', Omni-Compass's carry what it added and gave back
+    pools = [i for i, (p, r) in enumerate(zip(b.plants, b.rows)) if p.template == "compute_pool" and r["knob"] not in ("power", "admission")]
+    rooms = [i for i, p in enumerate(b.plants) if p.template == "thermal_zone"]
     if bone is not None:                     # the bone's own reading of its lines, kept as max_body_step reads it (no extra call)
         seen = {}
         cls_room = bone.room
@@ -123,7 +154,13 @@ def run(rs, seed, arm):
         o = aggregate([b])
         rec["p"].append(ps); rec["over"].append(ov); rec["wrote"].append(wrote)
         rec["held"].append([1 if p.override else 0 for p in b.plants]); rec["work"].append(wk)
+        own = []
+        for i, p in enumerate(b.plants):
+            c = own_cmd(p, own_st[i]); own.append(int(c != own_last[i])); own_last[i] = c
+        rec["own"].append(own)
         rec["power_kw"].append(round(b.all_w / 1000.0, 3))
+        rec["mach"].append(sum(machines(b.plants[i]) for i in pools))
+        rec["troom"].append(round(max((b.plants[i].T for i in rooms), default=0.0), 3))
         rec["obs"].append({k2: round(o[k2], 4) for k2 in ("queue_ratio", "load_ratio", "power_stress", "thermal",
                                                          "network_stress", "drift_ratio")})
     return rec
@@ -144,7 +181,9 @@ def run_alone(row, seed, arm, load="line"):
     if arm == "omni":
         twin = make_plant(row, seed)
         scale_load_plant(twin, load)
-    last, rec, pv, pw = None, {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": [], "obs": []}, 0, 0.0
+    last, rec, pv, pw = None, {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": [], "obs": [], "own": []}, 0, 0.0
+    own_st = {}
+    own_last = own_cmd(plant, own_st)
     for k in range(steps):
         wrote = 0
         if arm == "omni":
@@ -159,6 +198,7 @@ def run_alone(row, seed, arm, load="line"):
         rec["p"].append(min(2.0, max(-0.5, v5_position(plant)))); rec["over"].append(plant.m["viol"] - pv); pv = plant.m["viol"]
         rec["held"].append(1 if plant.override else 0); rec["wrote"].append(wrote)
         rec["work"].append(plant.m["work"] - pw); pw = plant.m["work"]; rec["power"].append(plant.power_w)
+        c = own_cmd(plant, own_st); rec["own"].append(int(c != own_last)); own_last = c
         rec["obs"].append(plant.observe())
     line_k = getattr(plant, "line_k", None)
     return rec, steps, (line_k if line_k is not None else steps) if getattr(plant, "line_n", 0) or getattr(plant, "line_e", 0.0) or getattr(plant, "line0", 0.0) else None
@@ -166,12 +206,12 @@ def run_alone(row, seed, arm, load="line"):
 
 def frames(rec, steps):
     """A muscle's own decisions onto the 240 frames."""
-    out = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": [], "obs": []}
+    out = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": [], "obs": [], "own": []}
     for f in range(FRAMES):
         a, b = f * steps // FRAMES, max(f * steps // FRAMES + 1, (f + 1) * steps // FRAMES)
         out["p"].append(rec["p"][b - 1]); out["over"].append(int(any(rec["over"][a:b]))); out["held"].append(rec["held"][b - 1])
         out["wrote"].append(int(any(rec["wrote"][a:b]))); out["work"].append(sum(rec["work"][a:b])); out["power"].append(sum(rec["power"][a:b]) / (b - a))
-        out["obs"].append(rec["obs"][b - 1])
+        out["obs"].append(rec["obs"][b - 1]); out["own"].append(int(any(rec["own"][a:b])))
     return out
 
 
@@ -182,7 +222,7 @@ def alone_body(rs, seed, arm):
         rec, steps, lk = run_alone(r, seed, arm)
         per.append(frames(rec, steps)); lines.append(None if lk is None else lk / steps)
     T = lambda key: [[per[i][key][f] for i in range(len(rs))] for f in range(FRAMES)]
-    out = {"p": T("p"), "over": T("over"), "held": T("held"), "wrote": T("wrote"), "work": T("work"),
+    out = {"p": T("p"), "over": T("over"), "held": T("held"), "wrote": T("wrote"), "work": T("work"), "own": T("own"),
            "power_kw": [round(sum(per[i]["power"][f] for i in range(len(rs))) / 1000.0, 4) for f in range(FRAMES)],
            # what a governor would read of the sixty muscles: the mean of their own observations (realms/harness.py
            # aggregate), each muscle's power stress against its own budget
@@ -236,15 +276,18 @@ def reading(per_run, aim):
 
 
 def pack(rec, n):
-    """The page's compact form: positions as int16 thousandths and three flags a byte (1 over the line, 2 a setting held
-    away from native, 4 a write), each base64; the body's power, the aggregate observation, and the work index."""
+    """The page's compact form: positions as int16 thousandths and four flags a byte (1 over the line, 2 a setting held
+    away from native, 4 a write, 8 the plant's own native controller moved), each base64; the body's power, the aggregate
+    observation, and the work index."""
     import base64, array
     pos = array.array("h", [int(round(max(-0.5, min(2.0, x)) * 1000)) for row in rec["p"] for x in row])
-    fl = bytes((1 if o else 0) | (2 if h else 0) | (4 if w else 0)
-               for ro, rh, rw in zip(rec["over"], rec["held"], rec["wrote"]) for o, h, w in zip(ro, rh, rw))
+    own = rec.get("own") or [[0] * len(r) for r in rec["over"]]
+    fl = bytes((1 if o else 0) | (2 if h else 0) | (4 if w else 0) | (8 if m else 0)
+               for ro, rh, rw, rm in zip(rec["over"], rec["held"], rec["wrote"], own) for o, h, w, m in zip(ro, rh, rw, rm))
     return {"p": base64.b64encode(pos.tobytes()).decode(), "f": base64.b64encode(fl).decode(), "kw": rec["power_kw"],
             "obs": [[o["queue_ratio"], o["load_ratio"], o["power_stress"], o["thermal"], o["network_stress"], o["drift_ratio"]]
-                    for o in rec["obs"]], **({"imm": rec["imm"]} if rec.get("imm") else {})}
+                    for o in rec["obs"]], **({"imm": rec["imm"]} if rec.get("imm") else {}),
+            **({"mach": rec["mach"], "troom": rec["troom"]} if rec.get("mach") else {})}
 
 
 def section(rs, runner, steps, kill_at):

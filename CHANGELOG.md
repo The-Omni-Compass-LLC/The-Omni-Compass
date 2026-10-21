@@ -1,6 +1,177 @@
 # Changelog
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
+## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
+
+- **The verdict in C++** (`cpp/src/verdict.cpp`, `cpp/include/omnicompass/verdict.hpp`, the tool `oc_verdict`): a line-by-line twin of
+  `omnicompass/verdict.py` (the median, the log costs' mean and variance, Welch's interval, the trial's phases, both judges, the
+  stepwise reference), with the Python's own `sum()` (Neumaier's compensated sum, as CPython 3.12 adds floats) and its `round()`.
+  `tests/test_cpp_verdict_parity.py` runs 300 random verdicts (122,538 answers: trials allowed GAIN and EVEN, refused LOSS and past
+  the allowance, abandoned for calm and for work, the median judge) through both: every answer identical. `verify.py` runs it and
+  a negative control (a C++ verdict that allows a step read as a LOSS must be caught, and is).
+- **The Python's runs through the C++ harness, to the last bit**: the C++ harness (`cpp/tools/engine_runs.cpp`, `oc_engine_runs`;
+  the Python's draws from the jump generator are its input, `tools/engine_runs.py` injection(); the entry below) now runs on the
+  sealed C++ twins of the compass law and of the verdict and on the C++ governor's own push. With the two fixes below, every one of
+  the 500 receipts of GitHub's set 881947045 and of base 20261020 is the Python's to the last bit (it read 2.2e-15 before), one
+  digest (`87e77e00bce8e482…` for GitHub's set). `tests/test_cpp_engine_runs_parity.py` holds it on every push (`verify.py`: 500, 50
+  with `--quick`). A second C++ driver written the same hour, which drew the seeds itself in C++, agreed bit for bit as well and is
+  removed, so the harness is one program with one input: the Python's own draws.
+- **Two C++ twins brought to the last bit**: the C++ governor now carries the brain's push (`Directive.push`, the Python's
+  `last_push`), and the C++ RK4 step adds (h/6)(k₁ + 2k₂ + 2k₃ + k₄) in `omnicompass/core.py`'s own order of operations; the governor's
+  parity on 21,600 directives goes from 1e-15 to 0 (identical), and the 500 fixtures still pass.
+- **On the live engine**: section 10 is now 10a (the component specification and its mathematics) and 10b, the C++ twin (`#s-cpp`):
+  every twin's parity check, the Python's runs through the C++ harness receipt by receipt (500 of 500 identical, the two digests and
+  the GitHub run that made the record), every compass law the page's runs wire, and every muscle of the seven organisms at the
+  tune-down through the C++ law (156,480 readings, all identical). Where a record was made before the harness ran with every set,
+  the proof monitor's C++ lane (section 1f) reads the harness's run of it at the page's build. The seal holds twelve twins (the
+  verdict, and the engine's seeded runs through every twin); Student's t stays in Python only, because the verdict reads the
+  fixed 1.96. The Live Engine Manual gains 24.3 and Appendix A's 10a and 10b.
+
+## 2026-10-21 (morning): the live engine front to back as the founder reads it; every monitor drawn; the Python's runs through the C++
+
+- **The front order** (the founder's order of 21 October): the title page first, then the executive summary and the reading key, then
+  the Engine table of contents (iv), then the monitor wall; the contents carry no bullets and no dotted leaders: part 1 is lettered
+  1a to 1i, one section for each of its panels (1a the control panel and the kill switch, 1b the wall, 1c the monitor list, 1d the
+  status board, 1e the master switch's wiring, 1f the Python's runs, 1g every LOSS row, 1h the golden signals, the event log and the
+  metrics, 1i the pipeline), each with its controls line and summary, every in-page reference moved with it.
+- **The wall read left to right** (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`): monitors numbered 1
+  upward in their order of appearance and laid out left to right, then the next row; the right-to-left mode and its button removed.
+  Two monitors that sit side by side in their section (native beside Omni-Compass) sit side by side on the wall and never split
+  across two rows, and on the page the pairs stay side by side at every width, a phone included, their canvases level.
+- **Every monitor drawn**: the wall redrew a resting monitor through code that refused to draw off screen, so monitors 2 to 7 and 22
+  stayed stale or blank until scrolled to; every monitor is now drawn by its own code as the page opens (about 50 ms for all 58)
+  and in turn while the wall is in view. The proof monitor's runs start on their own; Google's and Amazon's bill monitors show the
+  mechanism every cloud set runs, live on the cloud setting's model (class S, never their bill) until their first set lands; the
+  data pipeline is drawn whole on its own canvas at every width.
+- **The Python's runs through the C++ harness** (`cpp/tools/engine_runs.cpp`, `oc_engine_runs`): the Python writes every draw of every
+  run (the injection); the C++ program reads it, puts the mechanism on through the engine's C++ twins (the governor's sense,
+  assimilation and RK4; the nervous system's grants; the compass law and the verdict's interval rule as the page carries them) and
+  writes every receipt. On GitHub's set of 21 October (base 881947045) all 500 agree to 2.2e-15 and the digests are one
+  (87e77e00bce8e482…). `engine-runs.yml` builds it and records the C++ digest, the run-by-run differences and the digest of the draws
+  in every set; `verify.py` runs it on every push; the proof monitor (1f) reads every run three ways, the Python, the C++ and the
+  page, one digest each.
+- **The Live Engine Manual realigned**: the front order, part 1's sections, the wall's direction, the pairs, the three-way proof and
+  the cloud and pipeline monitors; Appendix A rebuilt from the page's own contents (its numbers had kept an older order).
+
+## 2026-10-21: the C++ twin of the compass law; the Python's runs fed through the C++ on the live engine; the wall-first page on main
+
+- **The compass law and the two-way plug in C++** (`cpp/src/compass_law.cpp`, `cpp/include/omnicompass/compass_law.hpp`, the tool
+  `oc_compass_law`): a line-by-line twin of `omnicompass/compass_law.py` (Band, CompassLaw, Plug), the one law every muscle runs at
+  the tune-down and every live controller runs on its service. `tests/test_cpp_compass_law_parity.py` runs 300 random laws and
+  plugs through both (readings past the wall and below calm, the band moved between readings, writes in and out of the cover,
+  another writer moving the lever, restores): every one of 29,876 answers identical to the last bit. `verify.py` builds it, runs
+  it, and runs a negative control (a C++ law that takes back while the reading climbs must be caught, and is). The seal holds
+  ten Python/C++ twins (`results/SEAL.json`, `tools/seal.py`), and its list of what runs in Python only now names the max of
+  every organism (`realms/compass_arm_v5.py`), the organisms' body and plants, the edge, and the verdict with its Student t.
+- **The live engine's section 10b, the C++ twin** (`#s-cpp`, `docs/engine/export_cpp_twins.py`, the record `cpptwin`): on every
+  rebuild the C++ is compiled where the page is built; every twin's parity check runs; every compass law the page's own runs
+  wire is recorded as it runs (the file that wired it, each reading with the band and push as they stood) and fed through the
+  C++ law and the Python again; and the seven organisms run at the tune-down on the climb, every muscle's law fed through the
+  C++ the same way. On the first build every number is identical: ten parity checks, and 156,480 readings of the seven
+  organisms' muscles (the tower's 239 muscles with a lever at the tune-down among them). A box finds any muscle by its id. At
+  the max the edge and the bone decide each muscle, with no C++ twin yet; the section says so and lists them.
+- **The wall-first live page is on main**: the branch that built it (the monitor wall and control panel first, the benefit board,
+  the whole organism every way it is bought, the evidence from the cloud down to the chip, the Python's 500 runs from the jump
+  generator replayed in the page) is merged into the omni-v14 landing, with the notice as the LICENSE writes it ("Evaluation and
+  Simulation use only") on every file. The Live Engine Manual's Appendix A, its anchors and its chapter 24 follow the page.
+
+## 2026-10-21: the live engine in the founder's order, every monitor numbered and knobbed, the Python's runs in the page, the third manual
+
+- **The live engine's order** (the founder's orders of 20 October): the table of contents first, named "Engine table of contents",
+  under the one line of the notice; the front matter (the title page, the reading key); then 1 the monitor wall and the control
+  panel, 2 the benefit board, 3 the whole organism, then the whole down to the smallest part (4 the measured effect in full, 5 the
+  evidence by stack from the cloud down to the chip, 6 the organism, 7 the console, 8 the brain, 9 the failure modes, 10 the
+  components, 11 the page's rendering); every badge, part head and in-page reference renumbered; the contents name every
+  section's monitors.
+- **Every monitor numbered, on the wall, with its own knobs and its feed** (`docs/engine/monitors.json`): 58 monitors, numbered in
+  their order on the page, the wall reading them right to left and down; every monitor carries the kill switch, the console's
+  knobs where it is live and its own buttons where it replays; the inventory names each one's evidence class, state, the
+  open-source exporter and Prometheus series that would carry it on a running system, and what is still awaiting its run; the
+  whole wall as a Grafana dashboard (`docs/engine/export_grafana.py`, `deploy/grafana/omni-compass-wall.json`). New monitors: the
+  GPU card's one metered run replayed second by second (class P, the replaced controller's record), the CPU host on the harness's
+  own modelled machine until its machine (class S), an 8-card node awaiting `scripts/gpu_8card.sh`, the bill on Azure, Google
+  Cloud and Amazon with each gate's own reason, GitHub's pipeline, the nine organisms, every muscle of the catalog, the grid, the
+  Python's runs reproduced in the page and the Python's 500 scenarios a seed replayed with every trace hash. The tensor and
+  service-level monitors are on the wall.
+- **The kill switch's words** (the founder's order): ON green while Omni-Compass governs; engaged, the switch red and OFF white;
+  it stands in the control panel, in the contents, at every section's head and in every monitor's knobs, one press everywhere.
+  Each muscle of the organism carries its own switch: one muscle handed back to native, the rest under Omni-Compass.
+- **The Python's runs in the page** (`tools/engine_runs.py`): N runs from a base seed (seed_k = base + k·0x9E3779B9 mod 2³²,
+  mulberry32, the page's own generator in the Python bit for bit), each through 288 decisions of the brain (RK4), 80 steps of the
+  compass law and one give-back trial; one SHA-256 digest of the receipts. The page runs the Python's 500 again at a button and
+  matches every receipt and the digest (`d4f6586b…`); a new base runs in the page with the one Python command that runs the
+  same set; the receipts print and download. `tests/test_engine_runs.py`, `tests/test_live_monitors.py`.
+- **The whole organism every way it is bought** (`docs/engine/export_whole.py`): on-site bare metal, through the cloud (three
+  pieces and two), in the device, as a service; the cloud's back end disclosed (`DISCLOSURES.md` section 9): a tenant cannot meter
+  the provider's bare metal; the cloud piece is the bill and the machines the provider meters; the bare-metal piece is gauged on
+  hardware we meter and carried to the provider's only as a modelled factor.
+- **One third manual**: main's Live Engine Manual (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, built with the other
+  two by `docs/book/build_book.py --live`) is the third book; this branch's page-generated text became its last appendix,
+  Appendix L, the page word for word (`docs/engine/PAGE_WORD_FOR_WORD.md`, written from the page by
+  `docs/book/build_live_manual.py` at every build): every section, every monitor under its number with its evidence class,
+  state, feed and knobs, every knob and every LOSS row. The book was realigned to the page as it stands: the page's section
+  numbers (the benefit board is section 2, every later section one on), Part III in the page's order (the benefit board, then
+  the whole organism, now every way a stack is bought: on site, through the cloud, in the device, as a service), the numbered
+  wall and its control panel, the 8-card node, the muscle's own switch on the page beside the next version's live switch per
+  muscle on a running engine, and six references to other documents that a blind replacement had turned into the page's.
+  The control panel downloads all three manuals.
+- **The Python's runs linked to GitHub** (the founder's order of 21 October): `.github/workflows/engine-runs.yml` runs another set
+  from the jump generator (500 by default, a new base each time) on every push that changes the live engine's page or the Python's
+  runs, on a working branch as on main, and on every dispatch; runs the live engine's own code on every run of it in node
+  (`tools/engine_runs.py --verify --all`), and commits the record with the GitHub run that made it (its id, address and commit);
+  the page reads the newest record by its time and names that run beside the digest, and on main the job starts the page's
+  rebuild itself (a commit made with GitHub's own token starts no workflow; a dispatch does). Dispatchable once the workflow is on main (GitHub starts a dispatch only from the default branch's list).
+- **Simulation with a capital S** in the one notice (`tools/legal.py`), written on every file but the engine's fingerprinted ones,
+  which take it with the next version; the workflows' embedded legal bundles re-written to match.
+- **A newer engine's table stands only once its three runs share a reading** (`tools/readings.py`, `landed`): the three
+  omni-v12 YCSB runs on MongoDB each failed partway, so their table holds no workload in all three; the benefit sheet, the Omni
+  index, the levels page, the power page and the live engine took it as MongoDB's result and the benchmark fell off all of
+  them. Each now reads the one rule: omni-v11's table stands, named as omni-v11's (+0.1% GAIN), until omni-v12's three runs
+  land. `tests/test_readings.py`.
+- **MongoDB's runs on GitHub's new machine** (`docs/YCSB_PREREGISTRATION.md`, amendment 5): GitHub's ubuntu-24.04 image of 18
+  October runs Linux 7.0.0, and MongoDB 8.0 refuses or fails to start on Linux 6.19 to 7.0.13 (MongoDB's SERVER-121912); every
+  failed job of the three omni-v12 runs (9 of 15) ran on that image and every passing job on the image before it. The workload
+  jobs now run on GitHub's ubuntu-22.04 machine (Linux 6.8, the same 4 cores and 16 GB); the setup stops at once with the
+  kernel, the server's status and its journal when the server does not answer, and every run's files carry the kernel, the
+  release, the runner image and the server's journal; main's rig change of the same night (the server's journal in every
+  run, a second restart before a run stops) is kept beside it. Every set runs on this machine in the omni-v13 campaign.
+- **Main's red checks fixed here**: verify failed on main because `docs/LEVELS.md` and the state of play's standing block
+  were not rebuilt after the twelve omni-v12 service tables landed (rebuilt); the security scan failed on Pillow 12.3.0's eight
+  published advisories (Pillow 13.0.0 in the lock with every file's SHA-256, the bill of materials rewritten; matplotlib's
+  charts and reportlab's PDFs checked on it). The notice check now refuses the lower-case wording, so a table a bot writes
+  with the older notice fails until `tools/legal.py --fix` rewrites it.
+- **GitHub**: the branch's verify failed only on the release manifest (hashed pages changed); the manifest and the receipt are
+  regenerated with this change. Azure's set to the paid cap runs (repetition 31 of 100 at 20:13 UTC); Google's gate holds on a key
+  stored short (595 characters, not the key file); Amazon's on the Free plan (the organization's policy denies every machine
+  read). Both say so in their own words on the bill monitors.
+
+## 2026-10-21: omni-v14 lands (a knob for every muscle; the operator's commands without a shell)
+
+- **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`), the founder's orders "knobs on every
+  monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with two changes in the
+  Kubernetes governor (`omni_controller/controller.py`, `omni_controller/muscles.py`); the other 45 engine files are omni-v13's
+  bytes. (1) `--native MUSCLE[,...]` (or `OMNI_NATIVE`) leaves any of eleven muscles where native runs it, never written, an
+  unknown name refused at the start; the control panel carries it as `POST /v1/muscle`, every press audited, passed through
+  native like a dial press (`tools/omni_control.py`). (2) The operator's own commands (the
+  site power reading, a muscle's read command, a wall meter's) run without a shell unless they hold a pipe, a redirect or a
+  variable; the static scan's high findings fall from 3 to 2 (`docs/SECURITY_SCAN.md`). The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. Tests:
+  `tests/test_native_muscles.py`, `tests/test_operator_cmd.py`. The commands without a shell come off the next version's list
+  (`docs/CHANGE_CONTROL.md`). **Refused by the gate, not in omni-v14:** a change to the conveyance's reading on a shared host,
+  meant to stop the one raise omni-v13 makes early in the batch toy's queue (the batch's turnaround +0.05% against native). Three
+  rules were tried against omni-v13 on the same eight seeds: no raise on any reading older than another workload's newest pod
+  (the web's 95th percentile +6.4%, LOSS); no raise on the reading that opens another workload's run (never fires in the toy,
+  identical); and that rule with another workload's starting pods added to the reading (the batch back at native's exactly, the
+  web's queue native's second by second, but its 95th percentile +6.4% against omni-v13, LOSS: omni-v13's one raise moves when
+  every later batch pod finishes, and with it the seconds the web runs on its last pod). All three are kept on the branch
+  `v14-convey-study` with their tests; the toy's web model is set from a real run's files first (`docs/OMNI_V14.md`, section 3). The toy gate's cluster toy now starts every run with a fresh audit: its first
+  run for omni-v14 read a folder an earlier, interrupted gate had left (a container restart), appended to its half-written
+  audits and stopped on the broken line; run again in a fresh folder (`tools/toy_gate.py`). The batch toy listed a batch pod as Running from the moment it was made; it lists it Pending, not ready, until its container runs (3 s, the rig's own pod start), as a cluster does, the same for both engines. Bookkeeping by `tools/land_engine.py v14`; the three manuals rebuilt; every
+  benchmark runs again on omni-v14.
+
+- **The raw sweep leaves no cancelled runs either** (`raw-sweep.yml`): its one-at-a-time rule sat on the whole workflow, so
+  every start after a skipped front page queued and was cancelled (five in a quarter hour); the rule sits on its job now, as
+  the conductor's does, and a start whose job is skipped never queues.
 
 ## 2026-10-21: every check on GitHub green again; OCM's and Armada's four ways; Gödel's three runs started
 
@@ -3176,7 +3347,7 @@
   (`tools/run_scale.py`, workflow `six`).
 - Robot-joint simulation compiled (identical results, about 30 times faster).
 - Real Kubernetes set 24 reproduces set 23.
-- License: evaluation and simulation use only; Omni-Compass Enterprise License for everything else; US filings notice.
+- License: evaluation and Simulation use only; Omni-Compass Enterprise License for everything else; US filings notice.
 - The Omni-Compass Manual, edition 1.0.
 
 ## Earlier
@@ -3184,4 +3355,4 @@ See `docs/HISTORY.md` and `docs/STATE_OF_PLAY.md`.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
