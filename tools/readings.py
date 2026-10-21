@@ -538,7 +538,7 @@ def check_receipts(root: Path = ROOT):
 
 
 KEY_PAGES = ("README.md", "docs/HOW_TO_READ_THE_RESULTS.md", "docs/OMNI_COMPASS_MANUAL.md",
-             "docs/OMNI_COMPASS_OWNERS_MANUAL.md")
+             "docs/OMNI_COMPASS_OWNERS_MANUAL.md", "docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md")
 
 
 def _with_key(text: str) -> str:
