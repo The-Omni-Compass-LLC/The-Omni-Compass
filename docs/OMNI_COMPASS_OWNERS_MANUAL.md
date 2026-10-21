@@ -255,9 +255,9 @@ anything. Then wire it one level at a time, watch it before you let it write, an
 **AJ Dubra**
 Founder, The Omni-Compass LLC
 
-## The Two Manuals: the Owner's and the Operator's
+## The Three Manuals: the Owner's, the Operator's and the Live Engine's
 
-Omni-Compass is documented in two books written to one plan, in the same words, with the same structure, and read as one
+Omni-Compass is documented in three books written to one plan, in the same words, with the same structure, and read as one
 work; each stands on its own for its own reader.
 
 **The Owner's Manual** is for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the one who puts
@@ -272,7 +272,14 @@ what it may never do, how it is switched off, what its audit says and how its re
 the engine is built; where its reader needs what is inside, the text says so and names the place in the Owner's Manual where
 it lives, and never repeats it.
 
-The two books share their front matter (the key, the notice, the foreword, the prefaces, the quick reference), their
+**The Live Engine Manual** is the third book (the founder's order of 20 October: "There shall be three in the end"), for the
+operator at the dashboard: nothing more than the interpretation of the live engine page, `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`,
+the monitor of the engine and of the runs GitHub ran. It says how to follow the wall and the switch, how to read every gauge and
+turn every knob, where every number comes from, and how the mechanism of action of Omni-Compass against native shows on the
+monitors, section by section in the page's own order. It explains neither how the engine is built nor how it is wired; for the
+first it names the Owner's Manual, for the second this one.
+
+The three books share their front matter (the key, the notice, the foreword, the prefaces, the quick reference), their
 vocabulary (one glossary), their structure (parts, chapters, numbered sections, appendices, a table of contents rebuilt
 from the book itself at every edition, a list of figures, each figure drawn from the code it pictures, and an index of every term,
 muscle family, file and setting with its pages) and their reading
