@@ -27,6 +27,12 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v15": ["OMNI_V15.json", "tools/omni_version.py", "docs/OMNI_V15.md", "omnicompass/adapter.py",
+                   "omni_controller/gpu_governor.py", "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp",
+                   "cpp/tools/run_governor.cpp", "cpp/tools/engine_runs.cpp", "tests/test_cap_band.py",
+                   "tests/fixtures/robust_long_39173420146_decisions.json", "tests/test_cpp_governor_parity.py", "tools/toy_gate.py",
+                   "results/toy_gate/V15_VS_V14.md", "results/toy_gate/V15_VS_V14.json", "tools/live_reps.py", "tests/test_robust.py",
+                   "docs/ROBUSTNESS_PREREGISTRATION.md", "docs/CHANGE_CONTROL.md", "docs/MECHANISM_OF_ACTION.md", "results/SEAL.json"],
     "engine_v14": ["OMNI_V14.json", "tools/omni_version.py", "docs/OMNI_V14.md", "omni_controller/controller.py",
                    "omni_controller/muscles.py", "tools/wall_meter.py", "tools/omni_control.py", "tests/test_native_muscles.py",
                    "tests/test_operator_cmd.py", "results/toy_gate/V14_VS_V13.md", "results/toy_gate/V14_VS_V13.json",

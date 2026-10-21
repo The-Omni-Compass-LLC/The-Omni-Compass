@@ -2,6 +2,46 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21 (evening): omni-v15, the power cap's request through the line's own clear time; every wire in the fingerprint
+
+- **omni-v15 lands** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), under the founder's standing order that
+  every fault found is fixed and lands as the next version, told, not asked, and his word of 21 October ("push, push, push on GitHub,
+  update, enhanced engine"). The fault, from the next version's list (`docs/CHANGE_CONTROL.md`): on the omni-v11 long run the brain's
+  request for the power cap switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them, at
+  the one threshold on the queue and the state. The fix: the brain (`omnicompass/adapter.py`) trims to demand only while the response
+  line has been clean for the governor's own clear time, the flag the Kubernetes governor already declared for its muscles
+  (`--slo-clear-s`, 180 s) and the card governor applied outside the brain (3 decisions; it now hands the brain the flag). A breach, or
+  a line not yet clean, releases the request in the same decision; no constant is added to the law. On the run's own decisions, kept
+  as a fixture with the audits' SHA-256 (`tests/fixtures/robust_long_39173420146_decisions.json`), the recorded request is omni-v14's
+  rule decision for decision and the gate leaves 35 moves, 32 reversals and 28% of the travel (`tests/test_cap_band.py`). The C++ twin
+  (`cpp/src/governor.cpp`, `Observation.slo_clean`) carries the same rule, proven equal on an observation stream that now carries the
+  flag (`tests/test_cpp_governor_parity.py`; `cpp/tools/run_governor.cpp` reads the column when present; `cpp/tools/engine_runs.cpp`
+  passes the injection's flag to the brain); the seal is rewritten. A dwell with a glide (three calm decisions, then 0.05 a decision)
+  was built first and refused by the toy gate: seven small moves for one on the toy cluster (149 against 38 in a day on one seed), 25
+  limit writes for 16 on the toy card at the same travel and 0.17% more energy; it is not in omni-v15.
+
+- **Every wire in the fingerprint** (`tools/omni_version.py`): the data stores' runners (`tools/run_redis.py`, `run_kafka.py`,
+  `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`), `run_swarm.py`, `run_mujoco.py` and `run_cpu_power.py` are inside the scope,
+  their bytes as they stood, so no rule can change without the version changing (the gap `docs/CHANGE_CONTROL.md` named since
+  omni-v12). A version declared before is read on its own files, and the tool prints a version's own digest and file count.
+
+- **The toy gate reads the request's wear and the card** (`tools/toy_gate.py`): the cluster toys now read the brain's request for
+  the power cap over the day (its moves, reversals and travel; wear, a resource held: a fall is a cut, a rise power given), and two
+  card toys run each checkout's GPU governor on the modelled card of `tools/gpu_physics_sim.py`, written into the gate so both
+  engines meet one model (the card whose voltage falls with its clock, and the card near its voltage floor): requests served and not
+  served, the 95th and 99th percentiles, energy, peak temperature, and the limit's writes, moves, reversals and travel.
+  `results/toy_gate/V15_VS_V14.md` is omni-v15's reading against omni-v14 on eight seeds.
+
+- **The kill test reads the 300 s after the kill** (`tools/live_reps.py`, `ROBUST_AFTER_KILL_S`; `tests/test_robust.py`), declared
+  before omni-v15's runs in `docs/ROBUSTNESS_PREREGISTRATION.md` ("On omni-v15"): the one tail rise of the omni-v11 kill test came 140
+  to 190 s after the kill, past the 120 s window. The omni-v11 kill table stands as read.
+
+- **Every page on omni-v15**: the README, the state of play, `CLAUDE.md`, the three manuals and their PDFs, the live engine page
+  (`data-engine`, its words; its records rebuilt by its workflow), the appraisal, the receipts, the limitations, the Lambda and
+  whole-system pages, the change-control record and the mechanism-of-action page (the cap rule); `docs/OMNI_V14.md` says when it
+  stood. Every benchmark runs again on omni-v15 (`scripts/reruns.txt`, the grid and the cloud sets restarted); the GPU's run on
+  Lambda starts from `gpu-omni-v15`, one exact commit.
+
 ## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 
 - **The poster on the live engine's title page** (the founder's order of 21 October): the owner's poster of the Omni-Compass, the

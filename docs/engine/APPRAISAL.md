@@ -8,19 +8,19 @@ repository runs it, and does every word on the page say only what the parts do? 
 repository's own code by an independent path and compared, value by value. Run and scored by The Omni-Compass LLC's own
 code. No outside party has reviewed or approved these results.
 
-**Engine.** The engine that stands is **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files, since 21 October): omni-v13 with a knob that leaves any muscle native and the operator's commands run without a shell, neither of which the page's ports run.
+**Engine.** The engine that stands is **omni-v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files, since 21 October, evening): omni-v14 with the brain's power-cap request trimming only while the response line has been clean for the governor's own clear time, and every wire that holds a governor's rules inside the fingerprint; the page's port of the brain computes its states, push and headroom, not the power-cap request, so the port is unchanged by it. omni-v14 was omni-v13 with a knob that leaves any muscle native and the operator's commands run without a shell, neither of which the page's ports run.
 Since omni-v8 it has changed `tools/run_citylearn.py` (outage buildings' batteries stay native, omni-v8; the wire reads the
 coming hour, omni-v9; the glide that cuts the bill most, omni-v10), the realms harness's t table and the Kubernetes governor (a
 reading with no machine in service is held, never read as an overload, omni-v11; a CPU-limit raise the cluster's admission
 refused is held, not written again at every check, omni-v12; the CPU limits it gave go back to the operator's on a shared host at its
-top beside another workload's room, omni-v13; a muscle left native on the operator's word, the operator's commands without a shell, omni-v14), and added `omnicompass/student_t.py` (the
+top beside another workload's room, omni-v13; a muscle left native on the operator's word, the operator's commands without a shell, omni-v14; the brain's power-cap request through the line's own clear time, omni-v15), and added `omnicompass/student_t.py` (the
 exact Student t); every other engine file is unchanged since omni-v8. Every record on the page was made again on the omni-v9
-tree, whose bytes omni-v14 keeps in every file the page reads but the governor, whose new guards act only on a reading
-with no machine in service, on a raise the cluster refused, on a shared host at its top and on a muscle left native (the page's controller trace has none: recorded again on the
-omni-v12 tree on 19 October, it is identical to the record on the page), and its workflow rebuilds them on omni-v14: every run, tick and
+tree, whose bytes omni-v15 keeps in every file the page reads but the governor and the brain, whose new guards act only on a reading
+with no machine in service, on a raise the cluster refused, on a shared host at its top, on a muscle left native and on a response line not yet clean (the page's controller trace has none: recorded again on the
+omni-v12 tree on 19 October, it is identical to the record on the page), and its workflow rebuilds them on omni-v15: every run, tick and
 decision is identical to the one it replaced, and the intervals are drawn with the exact t (the waiting line's interval widens
 in its fourth digit; every word stays). The receipts of the real runs are each benchmark's newest engine's table, today
-omni-v11's for seventeen benchmarks and omni-v10's for six, replaced as omni-v14's three runs land.
+omni-v11's for seventeen benchmarks and omni-v10's for six, replaced as omni-v15's three runs land.
 
 **Wired to the engine.** The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`,
 `docs/engine/build_live_engine.py`) on every change to the engine, a model, a harness or a result on main, after every
@@ -33,7 +33,7 @@ that names another engine than `tools/omni_version.py` reads.
 
 | Part of the page | What it claims to be | Reproduced against | Result | Rerun with |
 |---|---|---|---|---|
-| The brain, nerves, compass law and verdict (JavaScript in the page) | a port of `omnicompass/core.py`, `adapter.py`, `nervous_system.py`, `compass_law.py`, `verdict.py`, `student_t.py` (omni-v14 fingerprint) | the Python itself, on seeded inputs: 8,000 governor decisions, 48,000 organ grants, 4,800 compass forces, 300 verdict intervals, 400 whole verdict trials, 500 degrees of freedom of the exact t | largest difference 2 × 10⁻¹⁵; 0 grants, 0 verdicts, 0 t values differ | `docs/engine/check_live_engine.py` |
+| The brain, nerves, compass law and verdict (JavaScript in the page) | a port of `omnicompass/core.py`, `adapter.py`, `nervous_system.py`, `compass_law.py`, `verdict.py`, `student_t.py` (omni-v15 fingerprint) | the Python itself, on seeded inputs: 8,000 governor decisions, 48,000 organ grants, 4,800 compass forces, 300 verdict intervals, 400 whole verdict trials, 500 degrees of freedom of the exact t | largest difference 2 × 10⁻¹⁵; 0 grants, 0 verdicts, 0 t values differ | `docs/engine/check_live_engine.py` |
 | The core in C++ | the page's six-state derivative and RK4 step against the repository's C++ twin (`cpp/src/core.cpp`, compiled by the check with `docs/engine/cpp_core_probe.cpp`) | 2,000 seeded states and parameters | largest relative difference 4.4 × 10⁻¹⁶ (derivative), 2.2 × 10⁻¹⁶ (RK4 step) | `docs/engine/check_live_engine.py` |
 | Section 1, one organism | the realms harness's own organism run, native and the max, under the climb | `realms/harness.py run_organism_arm`, seeds 3000 and 3001 | decisions over the line and every plant's work identical (seed 3000: 900 native, 849 the max, both paths) | `docs/engine/check_records.py` |
 | Section 1, each muscle alone | the harness's own single-muscle runs, native and the max with its twin, under the line | `realms/harness.py run_muscle_arm`, 60 muscles × 2 arms, seeds 3000 and 3001 | 120 of 120 runs identical per seed | `docs/engine/check_records.py` |
@@ -41,7 +41,7 @@ that names another engine than `tools/omni_version.py` reads.
 | Section 2, on top of the HPA | the shipped controller as `pilot/selfpilot.py run_day` wires it | `pilot/selfpilot.py run_day`, seeds 3000 and 3001 | machines and pods waiting identical on every one of 1,440 ticks; writes identical (25) | `docs/engine/check_records.py` |
 | Section 1, the immune system | Omni-Compass's organism reading its own immune system: every room against its twin, the heat debt, the body giving back | the same run of `realms/harness.py`'s organism with the readings taken as `max_body_step` reads them (read only: the organism's record is identical with and without them) | run A: 7 decisions with an inflamed room (`pump_speed`), heat debt 1,109 W fading to 21 W, the pools' 26 extra machines handed back; runs B and C: none | `docs/engine/export_harness_trace.py` |
 | Section 4, the official runs | each three-run table's runs A, B and C played back from their raw files (`docs/engine/export_runs.py`) | every file's SHA-256 against the run's own `SHA256SUMS_ALL.txt`; every Kubernetes repetition scored by `tools/live_reps.py arm_gauges` on its own files, the mean over repetitions against the run's own `LIVE_REPS.json` | 18 benchmarks, 54 runs: 20,231 of 20,231 files match; the scorer's means equal each run's result to 3.1 × 10⁻¹⁶ | `docs/engine/build_live_engine.py --check` |
-| Section 3, a GPU card | `realms/gpu_card.py` (inside the omni-v14 fingerprint, unchanged since omni-v8), native and Omni-Compass on top, the card as shipped and under an operator's cap, AI and compute-bound work | `realms/gpu_card.run` untouched, every arm, seeds 5100, 5101 and 5102 | the run's own result identical; every second's energy and requests add up to it | `docs/engine/check_records.py` |
+| Section 3, a GPU card | `realms/gpu_card.py` (inside the omni-v15 fingerprint, unchanged since omni-v8), native and Omni-Compass on top, the card as shipped and under an operator's cap, AI and compute-bound work | `realms/gpu_card.run` untouched, every arm, seeds 5100, 5101 and 5102 | the run's own result identical; every second's energy and requests add up to it | `docs/engine/check_records.py` |
 | Section 3, Linux, one host | `tools/toy_gate.py`'s conveyance model, the shipped `Muscles.convey` and `quota.py` on the CFS quota | `tools/toy_gate.py worker_convey` untouched, seeds 3000, 3001 and 3002 | its own result line identical; requests and the host's busy share add up to it | `docs/engine/check_records.py` |
 | Section 3, every muscle on omni-v8 | the realms runner's own table of 1,107 muscles and seven organisms, native and the max | `results/realms_v5/REALMS_V5.json` (omni-v8, commit 9819a903c, seeds 3000 to 3009), read by `docs/engine/export_scenarios.py` | 527 GAIN, 159 the same as native, 421 at their limit on native, 0 LOSS; all seven organisms GAIN under all three loads | `docs/engine/export_scenarios.py` |
 | Section 3, the receipts | every judged row of the 22 receipts of each benchmark's newest table (`results/live/V10_*.md`) | the receipts themselves, read row by row by `docs/engine/export_scenarios.py` | 176 GAIN, 30 power given, 584 EVEN, 1 LOSS, 14 the runs disagree (201 rows shown, not judged) | `docs/engine/export_scenarios.py` |
@@ -86,14 +86,14 @@ that names another engine than `tools/omni_version.py` reads.
 2. **The harness's native is estimated, not measured** (`realms/presets.py`: "round engineering figures"). The native
    register (`docs/engine/NATIVE_REGISTER.md`) finds the max's "native at its limit" rule right on real defaults for power
    limits, CPU clocks and admission gates, and one setting off: the HPA target, 70% in the harness against 50% in the
-   repository's real runs. Correcting it is a change inside the omni-v14 fingerprint, the next engine version.
+   repository's real runs. Correcting it is a change inside the omni-v15 fingerprint, the next engine version.
 3. **No cut in the cloud bill is shown yet.** The real Azure bill (`results/live/AKS_BILL.md`, an earlier engine, four
    repetitions) reads machines billed −0.6%, EVEN; Azure's own autoscaler ran that light load on fewer than two workers.
    The one gauge clear of the noise there was fewer replicas (−3.7%, GAIN).
 4. **`pilot/selfpilot.py` no longer runs its omni day on a machine without `kubectl`**: the controller now starts a
    `kubectl proxy` when it builds its reader. The check stubs that one call; the simulated cluster answers every read.
    A one-line repair (`--no-api-proxy` in its arguments) is the owner's to make.
-5. **The verdict's rule depends on the noise more than on the cost.** omni-v14 (its verdict omni-v11's, byte for byte) refuses any step whose interval of cost
+5. **The verdict's rule depends on the noise more than on the cost.** omni-v15 (its verdict omni-v11's, byte for byte) refuses any step whose interval of cost
    lies wholly above zero. Where the cost carries no noise (the GPU card's model) it refuses a step costing +0.14% a
    request, well inside the 2% allowance, so the card never leaves native at the tune-down and the recorded +3.4%
    requests per kJ (`results/sim/gpu_two_wire`, written under omni-v6's medians) does not stand on any engine since. Where the
