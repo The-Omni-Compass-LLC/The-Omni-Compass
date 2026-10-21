@@ -98,6 +98,30 @@
   stored short (595 characters, not the key file); Amazon's on the Free plan (the organization's policy denies every machine
   read). Both say so in their own words on the bill monitors.
 
+## 2026-10-21: every check on GitHub green again; OCM's and Armada's four ways; Gödel's three runs started
+
+- **The security scan passes again** (`security-scan.yml`, runs 22 to 24 red). Two causes, both fixed. The audit of the
+  pinned dependencies found eight published advisories against Pillow 12.3.0 (the image library matplotlib and reportlab
+  bring); `requirements-lock.txt` pins Pillow 13.0.0 with the SHA-256 of each of its 83 files, and `pip-audit` reads no
+  known vulnerability. Pillow 13 needs Python 3.11, so `pyproject.toml` asks for 3.11 or newer (verify runs 3.12); Dependabot's
+  Pillow updates had failed on the same floor. The static scan found one medium finding no review named, the control panel's
+  default kill file under `/tmp/omni-compass` (`tools/omni_control.py`); it is reviewed by name in `tools/security_scan.py`
+  (the operator's own machine, one user, set by `--kill-file` or `OMNI_CONTROL_KILL_FILE`) and the page is current. The bill of
+  materials and the license list carry Pillow 13.0.0 (`tools/sbom.py`).
+- **The conductor no longer leaves cancelled runs behind** (`grid.yml`). Its one-at-a-time rule sat on the whole workflow, so
+  every scheduled start and every verify's start queued behind the five-hour conductor and was cancelled by the next one: four
+  a day, read as failures. A start now opens with a gate that ends green when another conductor ticks or waits; only the
+  successor a conductor starts as it ends (`chained`) waits its turn, and the one-at-a-time rule sits on the ticking job.
+- **Open Cluster Management and Armada, four ways, three runs each, on omni-v12** (`results/live/V12_OCM_4W_*.md`,
+  `V12_ARMADA_4W_*.md`; `docs/GROUP_PREREGISTRATION.md`, amendment 3). Every row is shown. Omni-Compass on top of Armada
+  against Armada as shipped: six GAIN in all three runs (machines in service −40% to −43%, the response time's 95th percentile
+  −44% to −45%) and no LOSS. Two LOSS rows on Omni-Compass's side are reported as they stand: the alert minutes on top of OCM
+  (+5.7% to +45.5%) and the job turnaround on the group alone under Armada (+5.1% to +9.1%), both the shared-host raise
+  omni-v13 fixed; both systems run again on the engine that stands. Armada A carries nine repetitions (a runner lost).
+- **The Gödel scheduler's A, B and C started on omni-v13** (runs 39530159191, 39530162328, 39530165147), once its trial on the
+  rig that tolerates both control-plane taints of Kubernetes 1.24 ran both arms whole (run 39485277362); they count as the
+  campaign's own Gödel entry.
+
 ## 2026-10-21: the third manual (the Live Engine Manual); the database rigs leave the server's journal in the record
 
 - **The Live Engine Manual** (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`, `docs/book/OMNI_COMPASS_LIVE_ENGINE_BOOK.md`;

@@ -170,6 +170,24 @@ above, with the same stream, members, measure and tables.
 - **Tried first**: one repetition (`kind-group.yml`, `orch=armada`, label `trial`), never counted; a fault in the rig is fixed
   in the rig and written here before the counted runs.
 
+## Amendment 3: what the counted runs of OCM and Armada found (written after those runs, 21 October 2026)
+
+- **Their tables, on omni-v12**: OCM's A, B and C (runs 39479807336, 39479824367, 39479840381) and Armada's (39482335827,
+  39482351075, 39482365814) ran on omni-v12, the engine that stood when they started, ten repetitions each, every arm on the
+  pre-pulled rig with the governor on its own core; their five tables each are `results/live/V12_OCM_4W_*.md` and
+  `V12_ARMADA_4W_*.md`, every row shown. They stand as omni-v12's record; both systems run again on the engine that stands
+  (`scripts/reruns.txt`) and their tables on it replace these on the page when they land.
+- **The test machine, once more**: Armada A's repetition 3 lost its runner 81 minutes in, no log kept; the other nine landed
+  whole and are read, and the table says A carries nine. No rig changed for it.
+- **Two LOSS rows on Omni-Compass's side, reported as they stand**: on top of OCM against OCM as shipped, the alert minutes
+  rose in all three runs (+5.7%, +6.1%, +45.5%); on the group alone, Omni-Compass against the group alone, the job turnaround
+  rose in all three (+5.1%, +8.9%, +9.1%). Both runs put three kind clusters on one runner, a shared host at its top while
+  the batch queue runs, and both show the mechanism omni-v13 fixed on KubeRay's rig the same day (`docs/OMNI_V13.md`): the
+  serving pods' limits raised beside the batch pods' room and kept through a saturated queue, so the batch pods ran slower
+  and the host's processor, busier by 4% to 16% in the omni arms, slowed the service it was meant to help. The cause is in
+  the engine, not in the rig; the fix is omni-v13's hand-back, and the raise on the reading that opens the queue is the next
+  version's (`docs/CHANGE_CONTROL.md`). Neither row is cut; each is read again on the engine that stands.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
