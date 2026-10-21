@@ -448,7 +448,7 @@ engine's (`cpp/tools/run_engine_runs.cpp`, the same seeds and draws through the 
 the compass law and the verdict), run on GitHub with the record and again at every build of the page. Its table shows the
 first twelve runs, the Python's final state and trial beside the page's, the page's largest difference, and the C++ engine's
 difference from the Python ("identical" where every number of the receipt is the same to the last bit); under its grid it
-prints the three digests, which must be one string. Section 10b (chapter 24.3) carries the C++ engine's row for the whole set.
+prints the three digests, which must be one string; the page's section 10b carries the C++ engine's row for the whole set, read as 24.3 below says.
 
 ### 4.1 What the wall is
 

@@ -130,7 +130,7 @@ back.
 **What this manual covers.** Every section of the page in the page's own order; every gauge, with its side, its aim and its
 word; every knob of the console, with what it acts on and what it leaves alone; the two tickers that show the mechanism of
 action; the trace from any tile to the record it came from; and what to do when a tile reads LOSS. It covers the page as
-built on omni-v13; a later engine renames itself on the page's title block and this book is realigned in the same push.
+built on omni-v14; a later engine renames itself on the page's title block and this book is realigned in the same push.
 
 **What this manual does not cover.** How the engine is built, its equations beyond the ones the page itself prints, the
 wiring of Omni-Compass onto any stack, and the benchmark results themselves as a body of evidence: those are the Owner's and
@@ -314,7 +314,7 @@ The page opens with its legal notice (i), then its own table of contents (ii, "E
 of contents"), the title page with the build (iii) and the executive summary with the reading key (iv). The body is numbered 1 to 11; the back matter is v (disclosures, governing law and contact) and vi (the closing legal notice). A section's number is
 printed before its title; a lettered section (1a, 4c) is a monitor inside the numbered part that holds it.
 
-### 2.2 The sections, as built on omni-v13
+### 2.2 The sections, as built on omni-v14
 
 Appendix A lists every section with its anchor and the chapter of this book that
 reads it. In the page's order: 1 the monitor wall (1a the monitor wall and the control panel: the kill switch, every monitor
@@ -323,7 +323,7 @@ measured effect in full (the organisms, every muscle, the register, the grid and
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
 native and Omni-Compass, 6b the telemetry analytics and Omni-Compass in its own words); 7 the console; 8 the brain (8a one
-cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the component specification; 11 the
+cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the component specification (10a) and the C++ twin (10b); 11 the
 self-governed rendering.
 
 ### 2.3 Anchors
@@ -331,7 +331,7 @@ self-governed rendering.
 Every section has an anchor that does not move when the page is reordered: `#p-health`, `#s-health`,
 `#s-github`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
 `#p-organism`, `#s-engines`, `#s-lab`, `#s-desk`, `#p-brain`, `#s-decision`, `#s-plane`, `#s-brain`, `#s-verdict`, `#s-fail`,
-`#s-math`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
+`#s-math`, `#s-cpp`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
 contents links the same way. When this book names a section it gives its title and its anchor, so the reader finds it on a
 page whose numbering has moved.
 
@@ -401,6 +401,14 @@ open-source exporter and series that would carry it on a running system, and, wh
 whole wall is also a Grafana dashboard (`deploy/grafana/omni-compass-wall.json`). The control panel at the head of the
 section holds the kill switch, the button that runs the Python's own seeded runs in the page and proves them by one digest
 (`tools/engine_runs.py`), the three manuals and the wall's dashboard. Appendix L lists every monitor under its number.
+
+The proof monitor ("The Python's runs, in this page", `#proofPanel`) sets three runs of the same set side by side: the
+Python's record (written on GitHub by the `engine-runs` workflow, its run linked), the page's own run of it, and the C++
+engine's (`cpp/tools/run_engine_runs.cpp`, the same seeds and draws through the C++ twins of the brain, the nervous system,
+the compass law and the verdict), run on GitHub with the record and again at every build of the page. Its table shows the
+first twelve runs, the Python's final state and trial beside the page's, the page's largest difference, and the C++ engine's
+difference from the Python ("identical" where every number of the receipt is the same to the last bit); under its grid it
+prints the three digests, which must be one string; the page's section 10b carries the C++ engine's row for the whole set, read as 24.3 below says.
 
 ### 4.2 What the wall is
 
@@ -1236,6 +1244,24 @@ code says: the six spokes at the center of the cycle (E, U, I[U], S, B, Ḃ) are
 is item 1's senses, the force field of the phase plane is item 6's law. The Owner's Manual carries the derivations; this page
 carries the statements.
 
+### 24.3 The C++ twin (the page's section 10b, `#s-cpp`)
+
+The engine is written twice, in Python and in C++, line for line where a twin exists. Every time the page is built, the
+Python's own runs are fed into the C++ as its input and the C++ answer is set beside the Python's, number by number. Where
+they are the same to the last digit, the two are one engine. The section holds five tables.
+
+| Table | What it shows | How to read it |
+|---|---|---|
+| Every twin, on its own parity check | each Python file and its C++ twin, the inputs the check fed both, the largest difference, and the reading | "the same" on every row is a whole engine in two languages; "DIFFERS" names the row to look at |
+| The Python's runs through the C++ engine, receipt by receipt | the record of the Python's seeded runs the page shows (the jump generator's 500), run again by the C++ engine at the page's build: the record, its runs and base seed, the Python's digest, the C++ engine's digest, how many receipts are identical to the last bit, the largest difference, the reading, and the GitHub run that made the record | the Python's runs are the input and the C++ engine's receipts the output; the two digests one string and every receipt identical is the same engine run twice, in two languages |
+| The compass law of every run on this page | every compass law the page's own runs wired while the page was built, grouped by the file that wired it, each law's readings in the order they came, through the C++ law and through the Python again | the C++ against the Python, and the Python again against the run's own forces: 0 (identical) on both is the run's law reproduced exactly |
+| The seven organisms at the tune-down | each organism, its muscles, the muscles that run the compass law at the tune-down, the readings fed through the C++, and any muscle that differs | at the max, the default brain, the edge and the bone decide each muscle, and they have no C++ twin yet; the tune-down is where every muscle's law is the compass law, so that is where it is fed through |
+| What runs in Python only, for now | every part of the engine with no C++ twin yet, by file | the list is the work still to twin; nothing on it is hidden from the other tables |
+
+A box under the organisms' table finds any muscle by its catalog id: it names each organism the muscle's law ran in, its
+readings, and whether the C++ and the Python gave the same answer. A muscle with no lever at the tune-down stays native
+there, and the box says so.
+
 
 ## 25. The Page Governs Its Own Drawing
 
@@ -1323,7 +1349,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 27.2 The engine's name
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v13). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v14). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines.
 
 
@@ -1361,7 +1387,7 @@ window and why. Three outcomes follow, and only these:
 | What the audit shows | What it means | What is done |
 |---|---|---|
 | a knob moved and the gauge went against its aim while the muscle stayed inside its limit | the wire or the rule is wrong for this muscle | the mechanism is corrected in the toy gate first, lands as the next engine version with no LOSS, and the benchmark runs again |
-| a knob moved and the muscle went past its own limit, or another muscle's room was taken | a guard did not hold | the guard is corrected (as omni-v13 did for the conveyance on a shared host) and lands the same way |
+| a knob moved and the muscle went past its own limit, or another muscle's room was taken | a guard did not hold | the guard is corrected (as omni-v13 and omni-v14 did for the conveyance on a shared host) and lands the same way |
 | no knob moved, and the gauge still differs | the test machine, native's setup or the scoring | the rig or the scorer is fixed; a test machine's limit is never reported as Omni-Compass's result |
 
 Nothing is ever tuned to make a row read well; no row is steered. What is held to the letter is the mechanism: the code does
@@ -1402,7 +1428,7 @@ reading of the record. Nothing is drawn in its place.
 A page is true for the build it names. The last tile of the wall is its age; the title block is its
 commit. A reading landed after the build is on the next page.
 
-### 29.5 The page's Chapter 10 is measured on your machine
+### 29.5 The page's Chapter 11 is measured on your machine
 
 The self-governed rendering is class L on the viewer's own device; its
 numbers are the viewer's browser's and prove nothing about any server.
@@ -1511,30 +1537,32 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | ii | `#contents` | Engine table of contents | 2 |
 | iii | `#title-page` | Title page and build | 1, 27 |
 | iv | `#s-read` | Executive summary and reading key | the key; 3 |
-| 1 | `#p-health` | The monitor wall: system health, now | 4 |
-| 1a | `#s-health` | Status board and the monitor wall; the master switch; alarms; the feed; the event log; the exposition | 4, 5, 6 |
+| 1 | `#p-health` | The monitor wall and the control panel | 4 |
+| 1a | `#s-health` | The monitor wall and the control panel: the master switch, the Python's runs, alarms, the feed, the event log, the exposition | 4, 5, 6 |
 | 1b | `#s-github` | CI pipeline: GitHub Actions | 7 |
-| 2 | `#s-whole` | The whole organism: the synopsis of everything | 8 |
-| 3 | `#s-fleet` | Measured effect: every domain; the grid; every three-run table; every muscle and the seven organisms; every family | 9 |
-| 4 | `#p-evidence` | Evidence by stack, from the cloud down to the chip | 10 to 15 |
-| 4a | `#s-cloud` | Cloud providers: Azure, Google Cloud, Amazon Web Services | 10 |
-| 4b | `#s-orch` | Orchestrators and governors | 11 |
-| 4c | `#s-ops` | Kubernetes: official run playback | 12 |
-| 4d | `#s-runs` | Kubernetes: per-repetition run telemetry | 13 |
-| 4e | `#s-live` | Kubernetes and cloud: the shipped controller's decision trace | 14 |
-| 4f | `#s-stacks` | Hardware: the GPU card and the CPU host | 15 |
-| 5 | `#p-organism` | The organism, live | 16, 17 |
-| 5a | `#s-engines` | The organism, live: native and Omni-Compass; the body scan; the immune system; the anatomy | 16 |
-| 5b | `#s-lab` | Telemetry analytics and Omni-Compass in its own words | 17 |
-| 6 | `#s-desk` | Control console | 18 |
-| 7 | `#p-brain` | Control architecture: the brain | 19 to 22 |
-| 7a | `#s-decision` | One control cycle, traced | 19 |
-| 7b | `#s-plane` | Phase plane and scoreboard | 20 |
-| 7c | `#s-brain` | The brain's internal state | 21 |
-| 7d | `#s-verdict` | The verdict: change acceptance testing | 22 |
-| 8 | `#s-fail` | Failure modes, controls and residual risk | 23 |
-| 9 | `#s-math` | Component specification and mathematics | 24 |
-| 10 | `#s-self` | Self-governed rendering | 25 |
+| 2 | `#s-board` | The benefit board | 9 |
+| 3 | `#s-whole` | The whole organism, every way it is bought | 8 |
+| 4 | `#s-fleet` | Measured effect in full: every domain; the grid; every three-run table; every muscle and the seven organisms; every family | 9 |
+| 5 | `#p-evidence` | Evidence by stack, from the cloud down to the chip | 10 to 15 |
+| 5a | `#s-cloud` | Cloud providers: Azure, Google Cloud, Amazon Web Services | 10 |
+| 5b | `#s-orch` | Orchestrators and governors | 11 |
+| 5c | `#s-ops` | Kubernetes: official run playback | 12 |
+| 5d | `#s-runs` | Kubernetes: per-repetition run telemetry | 13 |
+| 5e | `#s-live` | Kubernetes and cloud: the shipped controller's decision trace | 14 |
+| 5f | `#s-stacks` | Hardware: the GPU card and the CPU host | 15 |
+| 6 | `#p-organism` | The organism, live | 16, 17 |
+| 6a | `#s-engines` | The organism, live: native and Omni-Compass; the body scan; the immune system; the anatomy | 16 |
+| 6b | `#s-lab` | Telemetry analytics: the tensor, the modes, the service level | 17 |
+| 7 | `#s-desk` | Control console | 18 |
+| 8 | `#p-brain` | Control architecture: the brain | 19 to 22 |
+| 8a | `#s-decision` | One control cycle, traced | 19 |
+| 8b | `#s-plane` | Phase plane and scoreboard | 20 |
+| 8c | `#s-brain` | The brain's internal state | 21 |
+| 8d | `#s-verdict` | The verdict: change acceptance testing | 22 |
+| 9 | `#s-fail` | Failure modes, controls and residual risk | 23 |
+| 10a | `#s-math` | Component specification and mathematics | 24 |
+| 10b | `#s-cpp` | The C++ twin: the Python's runs through the C++ engine | 24 |
+| 11 | `#s-self` | Self-governed rendering | 25 |
 | v | `#s-disclose` | Disclosures, governing law and contact | 29, 30 |
 | vi | `#notice-end` | Closing legal notice | Notice and Disclaimer |
 
