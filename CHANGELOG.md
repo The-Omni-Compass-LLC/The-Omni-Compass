@@ -23,6 +23,10 @@
   audits and stopped on the broken line; run again in a fresh folder (`tools/toy_gate.py`). Bookkeeping by `tools/land_engine.py v14`; the three manuals rebuilt; every
   benchmark runs again on omni-v14.
 
+- **The raw sweep leaves no cancelled runs either** (`raw-sweep.yml`): its one-at-a-time rule sat on the whole workflow, so
+  every start after a skipped front page queued and was cancelled (five in a quarter hour); the rule sits on its job now, as
+  the conductor's does, and a start whose job is skipped never queues.
+
 ## 2026-10-21: every check on GitHub green again; OCM's and Armada's four ways; Gödel's three runs started
 
 - **The security scan passes again** (`security-scan.yml`, runs 22 to 24 red). Two causes, both fixed. The audit of the
