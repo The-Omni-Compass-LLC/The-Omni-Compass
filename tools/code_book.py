@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The source code of Omni-Compass as printed pages, for a copyright registration.
@@ -62,7 +62,7 @@ def header(c, version, page, total):
     c.setFont("Helvetica", 7)
     c.drawString(M, H - M + 8, f"{TITLE}. Version {version}. Copyright (c) 2026 {OWNER}. All rights reserved.")
     c.drawRightString(W - M, H - M + 8, f"page {page} of {total}")
-    c.drawString(M, M - 18, "Confidential. Evaluation and simulation use only; any other use requires a signed, paid "
+    c.drawString(M, M - 18, "Confidential. Evaluation and Simulation use only; any other use requires a signed, paid "
                  "Omni-Compass Enterprise License.")
 
 

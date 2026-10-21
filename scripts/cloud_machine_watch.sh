@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # Watch one rented Google Cloud or Amazon machine running the detached big-organism test (.github/workflows/
@@ -13,7 +13,7 @@
 # never leaves this job. Writes the state (done, deadline, gone or watching) to OUT/state.
 # Usage: bash scripts/cloud_machine_watch.sh ID DEADLINE_EPOCH MINUTES OUT
 set -uo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 ID="$1"; DEADLINE="$2"; MINUTES="$3"; OUT="$4"
 EVERY="${EVERY:-600}"
 CM=(python3 scripts/cloud_machine.py)

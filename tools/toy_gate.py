@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The toy gate: every change to the engine or a live controller runs here first, in our own models (evidence class S),
@@ -74,6 +74,10 @@ def worker(arm, seed, days, period, out, blink=False):
     from pilot.score import blocks, load
     from fleet.sim import ALLOC
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
+    # a fresh audit every run: the governor appends to its audit, so a folder left by an earlier, interrupted gate would
+    # carry that run's records into this one's counts (21 October: a container restart left half-written audits, and the
+    # next gate appended to them)
+    (out / "audit.jsonl").unlink(missing_ok=True)
     rng = np.random.default_rng(seed + 7)
     IDLE = "omnicompass.io/idle"
 
@@ -324,10 +328,13 @@ def worker_convey(arm, seed, out, quota="none", batch=False):
                 items += [{"metadata": {"name": f"sys-{n}", "namespace": "kube-system", "labels": {}},
                            "spec": {"nodeName": n, "containers": [{"name": "s", "resources": {"requests": {"cpu": "100m"}}}]},
                            "status": {"phase": "Running", "conditions": [{"type": "Ready", "status": "True"}]}} for n in nodes]
+                # a batch pod is Pending, not ready, until its container runs (start_lag_s, the rig's own pod start), as the
+                # cluster lists it; the toy listed it Running from its creation until 21 October
                 items += [{"metadata": {"name": b["name"], "namespace": "default", "labels": {"app": "omni-batch-stream"}},
                            "spec": {"nodeName": b["node"], "containers": [{"name": "work", "resources": {
                                "requests": {"cpu": f"{BATCH['req_m']}m"}, "limits": {"cpu": f"{BATCH['lim_m']}m"}}}]},
-                           "status": {"phase": "Running", "conditions": [{"type": "Ready", "status": "True"}]}} for b in bpods]
+                           "status": {"phase": "Running" if b["runs"] <= t else "Pending", "conditions": [
+                               {"type": "Ready", "status": "True" if b["runs"] <= t else "False"}]}} for b in bpods]
                 return {"items": items}
             if args[:2] == ("get", "deployment"):
                 return {"metadata": {"name": "php-apache", "namespace": "default", "annotations": dict(ann)},

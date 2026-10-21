@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The control panel (tools/omni_control.py): every button behind a token and a role, every press logged, every change
@@ -105,6 +105,28 @@ class Panel(unittest.TestCase):
         self.assertEqual(save[save.index("--dial") + 1], "save"); self.assertIn("--dry-run", save)
         self.assertEqual(json.loads((self.d / "state.json").read_text())["dial"], "save")
 
+    def test_a_muscle_is_switched_through_native_and_carried_into_the_governors_arguments(self):
+        """omni-v14: POST /v1/muscle leaves one muscle native (never written) or turns it on again, through native."""
+        self.assertEqual(self.call("/v1/muscle", "vera", {"muscle": "cpu", "on": False})[0], 403)
+        self.assertEqual(self.call("/v1/muscle", "otto", {"muscle": "cpus", "on": False})[0], 400)
+        self.assertEqual(self.call("/v1/muscle", "otto", {"muscle": "cpu", "on": "no"})[0], 400)
+        code, out = self.call("/v1/muscle", "otto", {"muscle": "cpu", "on": False})
+        self.assertEqual((code, out["native"], out["applies"]), (200, ["cpu"], "at the next start"))
+        self.assertEqual(self.call("/v1/mode", "otto", {"mode": "autopilot"})[0], 200)
+        self.assertEqual(self.call("/v1/muscle", "otto", {"muscle": "machines", "on": False})[0], 200)
+        t0 = time.time()
+        while len(self.starts()) < 3 and time.time() - t0 < 10:
+            time.sleep(0.05)
+        ev = self.starts()
+        self.assertEqual([("start" if "start" in e else "back") for e in ev], ["start", "back", "start"])
+        first, second = ev[0]["start"], ev[2]["start"]
+        self.assertEqual(first[first.index("--native") + 1], "cpu")
+        self.assertEqual(second[second.index("--native") + 1], "cpu,machines")
+        self.assertEqual(json.loads((self.d / "state.json").read_text())["native"], ["cpu", "machines"])
+        self.assertTrue(self.call("/v1/muscle", "otto", {"muscle": "cpu", "on": False})[1]["unchanged"])
+        code, page = self.call("/")
+        self.assertIn("muscle:'cooling',on:false", page)
+
     def test_reset_needs_a_reason_then_hands_back_and_stops(self):
         self.call("/v1/mode", "otto", {"mode": "autopilot"})
         self.assertEqual(self.call("/v1/reset", "otto", {})[0], 400)
@@ -151,5 +173,5 @@ class Panel(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
 # monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

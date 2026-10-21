@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The whole system: Omni-Compass at every layer, the layers composed by the product law, every number with its interval.
@@ -619,7 +619,7 @@ def main(argv=None):
     L.append("## 6. What is missing, and what replaces what")
     L.append("")
     L.append("- **The machine** (the kernel, bare metal, Kepler and the machine's own meter; register row 79): not yet run. It enters as exactly 1.")
-    L.append("- **The card on the engine that stands**: the omni-v13 run on Lambda (`gpu-omni-v13`, one exact commit) replaces the 2 October row.")
+    L.append("- **The card on the engine that stands**: the omni-v14 run on Lambda (`gpu-omni-v14`, one exact commit) replaces the 2 October row.")
     L.append("- **The cloud at the tune-down**: the omni-v12 Azure sets (A, B and C of the steady set, the two bursts and the real day) give the bill its "
              "three-run reading; Google and Amazon follow on the same harness.")
     L.append("- **Every cluster and service table on omni-v12**: the campaign (`scripts/reruns.txt`) reruns every benchmark; each row above is replaced by "

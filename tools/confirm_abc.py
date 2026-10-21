@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C three-run table (docs/OMNI_V1.md): one v1 benchmark run three times as separate GitHub runs on the same
@@ -163,7 +163,8 @@ def verdict(k, rs):
     if not all(clear):
         n = sum(1 for c in clear if not c)
         return even_noise("all three runs") if n == len(rs) else even_noise(f"{n} of {len(rs)} runs")
-    return in_all_three(signs[0] == -1, aim_of_row(k))
+    sizes = [abs(r["diff"]) / abs(r["native"]) for r in rs if r["native"]]
+    return in_all_three(signs[0] == -1, aim_of_row(k), max(sizes) if len(sizes) == len(rs) else None)
 
 
 def rig(d):

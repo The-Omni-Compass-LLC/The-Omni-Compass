@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The words every table uses: GAIN, EVEN and LOSS (the founder's order of 13 October 2026, night).
@@ -105,8 +105,21 @@ def word(fell: bool, aim_: str) -> str:
     return GAIN if fell else LOSS                     # lower, never more
 
 
-def in_all_three(fell: bool, aim_: str) -> str:
-    """The three-run reading of a number that went the same way in all three runs, every interval clear of zero."""
+SIZE_FLOOR = 0.005           # the founder's floor of 20 October 2026: a change under half of one percent either way, in every run, reads EVEN
+EVEN_FLOOR = f"{EVEN}, under the floor"              # held the same way in all three runs, every run's change under SIZE_FLOOR
+SIGN_OF = {GAIN: "+", LOSS: "−", EVEN: "="}          # the number beside a word carries the word's sign, never the gauge's raw direction (20 October)
+
+
+def even_floor(size: float) -> str:
+    """The reading of a change that held the same way in all three runs but under the floor in every one of them."""
+    return f"{EVEN_FLOOR} (every run under {100 * SIZE_FLOOR:g}%; the largest {100 * size:.2f}%)"
+
+
+def in_all_three(fell: bool, aim_: str, size: float | None = None) -> str:
+    """The three-run reading of a number that went the same way in all three runs, every interval clear of zero. size, where the
+    caller has it, is the largest run's relative change: under the founder's floor in every run the reading is EVEN, under the floor."""
+    if size is not None and size < SIZE_FLOOR:
+        return even_floor(size)
     return f"**{word(fell, aim_)} {IN_ALL_THREE}**"
 
 
@@ -206,6 +219,33 @@ def classify(reading, aim_=None):
     # a receipt of its own kind (the robustness test's "the same in all three of our runs" for a hand-back held, "handed back
     # within the allowance ..."): a fact about the governor, not a gauge against native; the caller decides what it is
     raise ValueError(f"unknown reading: {reading!r}")
+
+
+def landed(table) -> bool:
+    """Whether a three-run table carries a result (whole): a gauge row, or a workload beside the tuning one (the table writers
+    write a workload only where every run holds it). A table written from runs that failed (its workloads or rows empty: 20
+    October, the omni-v12 MongoDB table) has not taken its benchmark's place: the same benchmark's table on an older engine
+    stands as that engine's result until the newer engine's three runs land. The one rule every tool that picks a benchmark's
+    newest table reads (tools/omni_index.py, tools/benefit_sheet.py, tools/levels.py, tools/power.py, the live engine's
+    docs/engine/export_scenarios.py). A Markdown table is read through its JSON twin; one kept only in Markdown, or whose JSON
+    is another table's shape (neither rows nor workloads), reads as whole."""
+    import json
+    p = Path(table)
+    if p.suffix == ".md":
+        if not p.with_suffix(".json").exists():
+            return True
+        p = p.with_suffix(".json")
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if not isinstance(d, dict):
+        return False
+    if "rows" not in d and "workloads" not in d:
+        return True                      # another table's shape (the organisms, a cloud set's repetitions): its own writer decides
+    if d.get("rows"):
+        return True
+    return any(wl != "tuning" for wl in (d.get("workloads") or {}))
 
 
 def judged(reading: str) -> bool:
@@ -413,7 +453,13 @@ def key_lines():
           "that rose is power given, in a data centre and in a building alike (17 October).",
           "- **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; "
           "a fall is power given, because it falls when more power is given for the same work.",
-          "- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).", "",
+          "- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).",
+          "- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every "
+          "run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in "
+          "all three runs reads GAIN or LOSS by the gauge's aim.",
+          "- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw "
+          "direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads "
+          "GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.", "",
           "Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN "
           "GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: "
           + "; ".join(f"{k} reads {v}" for k, v in LABEL_SHOWN.items() if k not in ("WORSE", "MIXED", "AWAY FROM ITS AIM", "INVALID"))
