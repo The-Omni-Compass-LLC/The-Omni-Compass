@@ -74,6 +74,10 @@ def worker(arm, seed, days, period, out, blink=False):
     from pilot.score import blocks, load
     from fleet.sim import ALLOC
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
+    # a fresh audit every run: the governor appends to its audit, so a folder left by an earlier, interrupted gate would
+    # carry that run's records into this one's counts (21 October: a container restart left half-written audits, and the
+    # next gate appended to them)
+    (out / "audit.jsonl").unlink(missing_ok=True)
     rng = np.random.default_rng(seed + 7)
     IDLE = "omnicompass.io/idle"
 

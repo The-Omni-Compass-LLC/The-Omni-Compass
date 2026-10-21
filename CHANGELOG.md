@@ -18,7 +18,9 @@
   variable; the static scan's high findings fall from 3 to 2 (`docs/SECURITY_SCAN.md`). GATE14CHANGELOG Tests:
   `tests/test_native_muscles.py`, `tests/test_operator_cmd.py`, `tests/test_convey_shared_host.py` (`ReadingOlderThanThePod`);
   two omni-v13 hand-back tests now say their batch pod ran through the reading. The two changes landed come off the next
-  version's list (`docs/CHANGE_CONTROL.md`). Bookkeeping by `tools/land_engine.py v14`; the three manuals rebuilt; every
+  version's list (`docs/CHANGE_CONTROL.md`). The toy gate's cluster toy now starts every run with a fresh audit: its first
+  run for omni-v14 read a folder an earlier, interrupted gate had left (a container restart), appended to its half-written
+  audits and stopped on the broken line; run again in a fresh folder (`tools/toy_gate.py`). Bookkeeping by `tools/land_engine.py v14`; the three manuals rebuilt; every
   benchmark runs again on omni-v14.
 
 ## 2026-10-21: every check on GitHub green again; OCM's and Armada's four ways; Gödel's three runs started
