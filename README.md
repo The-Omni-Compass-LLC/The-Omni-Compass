@@ -241,7 +241,7 @@ in both arms, four cap levels): EVEN, no difference beyond the noise at any cap,
 Omni-Compass has there, more copies of the service ([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-## The manuals: the Operator's Manual and the Owner's Manual
+## The manuals: the Operator's Manual, the Owner's Manual and the Live Engine Manual
 
 [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), the Operator's Manual, is the manual for the glove box, built from the
 repository whenever it changes (`docs/book/build_book.py`): how to embed, wire, tune, run and check Omni-Compass on a
@@ -266,7 +266,7 @@ controller, the muscle and the meters); the flowcharts of the wire check, the pa
 the three stops and the reading rule; the timing diagrams; and the state machines of the modes, the card governor and the life
 of a muscle; and an index. The Owner's, which prints the engine's whole source and adds the engine's six states and its two
 landscapes, the control-loop block diagrams, the modelled traces and every receipt of the engine that stands charted from its
-own table (77 figures), is 1,249 pages. Both books carry one numbering (chapter.section), and every cross-reference in
+own table (77 figures), is 1,249 pages. All three books carry one numbering (chapter.section), and every cross-reference in
 them is rewritten to it when the book is built and checked against the headings on the built PDF. Its text is
 [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
 (`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the
@@ -277,6 +277,15 @@ in one book, for whoever owns or licenses Omni-Compass and so must know the whol
 mathematics, the mechanism, the engine that stands and the road to it, every Python file of the engine's source printed in
 full, every result, the wiring, and every legal paper bound in). Its text is
 [`docs/OMNI_COMPASS_OWNERS_MANUAL.md`](docs/OMNI_COMPASS_OWNERS_MANUAL.md).
+
+[`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf), the Live Engine Manual, is the third book (the
+founder's order of 20 October: three in the end): nothing more than the interpretation of the live engine page,
+[`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html), for the operator at the dashboard: how to
+follow the wall and the switch, read every gauge and turn every knob, trace any tile to the record it came from, and see the
+mechanism of action of Omni-Compass against native as the monitors show it (the two tickers, the phase plane, the brain's
+state, the verdict), section by section in the page's own order, with what to do when a tile reads LOSS and what the page
+does not tell you. It explains neither how the engine is built nor how it is wired; it is built by `docs/book/build_book.py
+--live`, and its text is [`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md).
 
 ## What is real and what is a model
 
