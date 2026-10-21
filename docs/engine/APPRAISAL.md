@@ -8,7 +8,7 @@ repository runs it, and does every word on the page say only what the parts do? 
 repository's own code by an independent path and compared, value by value. Run and scored by The Omni-Compass LLC's own
 code. No outside party has reviewed or approved these results.
 
-**Engine.** The engine that stands is **omni-v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files, since 21 October): omni-v13 with a knob that leaves any muscle native and the operator's commands run without a shell, neither of which the page's ports run.
+**Engine.** The engine that stands is **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files, since 21 October): omni-v13 with a knob that leaves any muscle native and the operator's commands run without a shell, neither of which the page's ports run.
 Since omni-v8 it has changed `tools/run_citylearn.py` (outage buildings' batteries stay native, omni-v8; the wire reads the
 coming hour, omni-v9; the glide that cuts the bill most, omni-v10), the realms harness's t table and the Kubernetes governor (a
 reading with no machine in service is held, never read as an overload, omni-v11; a CPU-limit raise the cluster's admission

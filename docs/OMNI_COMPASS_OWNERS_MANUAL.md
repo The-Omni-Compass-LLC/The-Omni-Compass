@@ -625,7 +625,7 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v14, fingerprint DIGEST14 (47 files).
+- **The engine on this checkout:** omni-v14, fingerprint 7afba44615fcff8f (47 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -1287,7 +1287,7 @@ and the other as power given in all three of our runs, because that is what happ
 
 Every number below is from a three-run table, each row naming the engine it ran on, with its evidence class and the
 question a referee is entitled to ask about it. The engine that stands is **omni-v14** (`OMNI_V14.json`, digest
-`DIGEST14`, on main since 21 October by the founder's order): omni-v8 (a battery whose building simulates power outages
+`7afba44615fcff8f`, on main since 21 October by the founder's order): omni-v8 (a battery whose building simulates power outages
 stays native, section 3.6) with the CityLearn battery wire reading the coming hour and every interval on the exact Student t
 quantile (omni-v9, `docs/OMNI_V9.md`), the wire's glide at the speed that cuts the bill most with no LOSS (omni-v10,
 `docs/OMNI_V10.md`), the Kubernetes governor holding on a reading with no machine in service (omni-v11, `docs/OMNI_V11.md`), and a raise the cluster's
@@ -1295,7 +1295,7 @@ admission refused held until something changes, with the swarm's reflex acting a
 CPU limits the conveyance gave handed back on a shared host at its top beside another workload's room, every other pod counted by
 its own limit (omni-v13, `docs/OMNI_V13.md`), and the
 operator's own commands run without a shell unless they hold one's syntax, and a knob that leaves any muscle native (omni-v14,
-`docs/OMNI_V14.md`). No table has yet landed on omni-v14; every benchmark runs again on it from SINCE14 on 21 October.
+`docs/OMNI_V14.md`). No table has yet landed on omni-v14; every benchmark runs again on it from 04:47 UTC on 21 October.
 The governors' first tables, on omni-v12, read two LOSS rows: KubeRay's queue and tail with the organism alone, root-caused to the
 conveyance and fixed in omni-v13 (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11), and Crane's total pod start wait, a sum of
 pods started and the wait per pod, which the metric-aims audit rules on in writing before any table is read by it.

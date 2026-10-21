@@ -4,14 +4,14 @@
 
 ## 2026-10-21: omni-v14 lands (a knob for every muscle; the operator's commands without a shell)
 
-- **omni-v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files; `docs/OMNI_V14.md`), the founder's orders "knobs on every
+- **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`), the founder's orders "knobs on every
   monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with two changes in the
   Kubernetes governor (`omni_controller/controller.py`, `omni_controller/muscles.py`); the other 45 engine files are omni-v13's
   bytes. (1) `--native MUSCLE[,...]` (or `OMNI_NATIVE`) leaves any of eleven muscles where native runs it, never written, an
   unknown name refused at the start; the control panel carries it as `POST /v1/muscle`, every press audited, passed through
   native like a dial press (`tools/omni_control.py`). (2) The operator's own commands (the
   site power reading, a muscle's read command, a wall meter's) run without a shell unless they hold a pipe, a redirect or a
-  variable; the static scan's high findings fall from 3 to 2 (`docs/SECURITY_SCAN.md`). GATE14CHANGELOG Tests:
+  variable; the static scan's high findings fall from 3 to 2 (`docs/SECURITY_SCAN.md`). The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. Tests:
   `tests/test_native_muscles.py`, `tests/test_operator_cmd.py`. The commands without a shell come off the next version's list
   (`docs/CHANGE_CONTROL.md`). **Refused by the gate, not in omni-v14:** a change to the conveyance's reading on a shared host,
   meant to stop the one raise omni-v13 makes early in the batch toy's queue (the batch's turnaround +0.05% against native). Three

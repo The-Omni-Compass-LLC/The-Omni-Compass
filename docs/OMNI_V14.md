@@ -9,7 +9,7 @@ same seeds before it landed: a knob that leaves any one muscle native, and the o
 setting, gain, preset and muscle is omni-v13's, and so is every other rule. A third change, to the conveyance's reading on a
 shared host, was built, tried in the gate and refused there; it is not in omni-v14 (section 3).
 
-Its fingerprint is `OMNI_V14.json` (digest DIGEST, 47 files). Forty-five files are omni-v13's bytes; two differ, the Kubernetes
+Its fingerprint is `OMNI_V14.json` (digest `7afba44615fcff8f`, 47 files). Forty-five files are omni-v13's bytes; two differ, the Kubernetes
 governor (`omni_controller/controller.py`) and its muscles (`omni_controller/muscles.py`). Every benchmark runs again on
 omni-v14, A, B and C. Every earlier table stands as its own engine's result until its three runs on v14 land, and results from
 two versions are never pooled. The readings from the toy gate are our own models (evidence class S), never a benchmark result.
@@ -88,7 +88,13 @@ engines: a batch pod was listed as Running from the moment it was made; a cluste
 
 ## 4. The toy gate against omni-v13
 
-GATE
+`results/toy_gate/V14_VS_V13.md`: the shipped controller on the toy cluster in the cloud setting at 60 and 15 s and with every
+worker out of service for two minutes, the conveyance on one kind host (readable quota, unreadable quota, a quota that refuses
+every raise, and the batch muscle of KubeRay's rig beside the serving one), and the verdict on noisy work, eight seeds each, the
+same seeds for both engines. Every one of the 57 gauges reads identical between omni-v14 and omni-v13, and the verdict allows the
+same share of give-back steps at every cost: no LOSS. That is what both changes should read there: with no muscle named, the
+knob leaves nothing native, and no toy calls an operator's command. The knob's own behaviour is proven in its tests (a muscle
+named is never written, an unknown name is refused, every other muscle runs as before), and the commands' in theirs.
 
 ## 5. What stays omni-v13's
 

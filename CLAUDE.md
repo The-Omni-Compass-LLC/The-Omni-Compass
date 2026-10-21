@@ -45,7 +45,7 @@ the founder overrides one in the conversation.
 
 ## The engine: Omni v14 stands (v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v14** (`OMNI_V14.json`, digest `DIGEST14`, 47 files; `docs/OMNI_V14.md`) stands on main since 21 October, the founder's
+- **Omni v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`) stands on main since 21 October, the founder's
   orders "knobs on every monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with
   two changes in the Kubernetes governor (`omni_controller/controller.py`, `omni_controller/muscles.py`). `--native MUSCLE[,...]`
   (or `OMNI_NATIVE`, the control panel's muscle button) leaves any muscle where native runs it, never written, an unknown name
@@ -53,7 +53,7 @@ the founder overrides one in the conversation.
   scan's high findings 3 to 2). A third, no conveyance raise on a reading that leaves out another workload's starting pods (the
   raise omni-v13 makes once early in the batch toy's queue), was refused by the toy gate: the batch back at native's, but the
   web's 95th percentile 6.4% higher than omni-v13's; it is kept on the branch `v14-convey-study` until the toy's web model is set
-  from a real run's files. GATE14 Every benchmark runs again on it.
+  from a real run's files. The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. Every benchmark runs again on it.
 - **Omni v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`) stood on main 20 to 21 October, landed 20 October, evening, the
   founder's order that every fault found be fixed and every fix land as the next version, told, not asked: omni-v12 with one fault
   fixed in the Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone (the

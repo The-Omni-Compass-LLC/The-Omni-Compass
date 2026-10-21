@@ -27,6 +27,13 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v14": ["OMNI_V14.json", "tools/omni_version.py", "docs/OMNI_V14.md", "omni_controller/controller.py",
+                   "omni_controller/muscles.py", "tools/wall_meter.py", "tools/omni_control.py", "tests/test_native_muscles.py",
+                   "tests/test_operator_cmd.py", "results/toy_gate/V14_VS_V13.md", "results/toy_gate/V14_VS_V13.json",
+                   "tools/toy_gate.py"],
+    "cpp_twin_compass_law": ["cpp/include/omnicompass/compass_law.hpp", "cpp/src/compass_law.cpp", "cpp/tools/run_compass_law.cpp",
+                             "cpp/CMakeLists.txt", "tests/test_cpp_compass_law_parity.py", "docs/engine/export_cpp_twins.py",
+                             "tools/seal.py", "results/SEAL.json"],
     "engine_v13": ["OMNI_V13.json", "tools/omni_version.py", "docs/OMNI_V13.md", "omni_controller/muscles.py", "tests/test_convey_handback.py",
                    "results/toy_gate/V13_VS_V12.md", "results/toy_gate/V13_VS_V12.json"],
     "engine_v12_refused_raise": ["OMNI_V12.json", "omni_controller/muscles.py", "tools/omni_version.py", "docs/OMNI_V12.md",

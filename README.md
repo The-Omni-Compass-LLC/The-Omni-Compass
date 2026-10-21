@@ -51,7 +51,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v14, fingerprint `DIGEST14` (47 files); package 0.14.0.
+- **Engine on main:** omni-v14, fingerprint `7afba44615fcff8f` (47 files); package 0.14.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -106,13 +106,13 @@ replaces native; every comparison is native against omni.
 
 ## The engine that stands: omni-v14 (the max on every muscle, a knob that leaves any muscle native, every muscle its own card, quota-aware conveyance that never takes another muscle's room nor raises on a reading that cannot see it, the operator's commands without a shell, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
 
-The engine on main is **omni-v14** (`OMNI_V14.json`, fingerprint `DIGEST14`, 47 files; [`docs/OMNI_V14.md`](docs/OMNI_V14.md)), the
+The engine on main is **omni-v14** (`OMNI_V14.json`, fingerprint `7afba44615fcff8f`, 47 files; [`docs/OMNI_V14.md`](docs/OMNI_V14.md)), the
 engine that stands since 21 October by the founder's orders ("knobs on every monitor, to turn off and on ... a muscle"; "tune the
 engine"). It is omni-v13 with two changes in the Kubernetes governor. `--native` leaves any muscle where native runs it, never
 written, and the control panel carries it as one button a muscle. And the operator's own commands run without a shell unless they
 hold a pipe, a redirect or a variable. A third change, no conveyance raise on a reading that leaves out another workload's starting
 pods, was refused by the toy gate (the web's 95th percentile 6.4% higher than omni-v13's) and is kept on a study branch.
-GATE14README **omni-v13** ([`docs/OMNI_V13.md`](docs/OMNI_V13.md)),
+The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. **omni-v13** ([`docs/OMNI_V13.md`](docs/OMNI_V13.md)),
 the engine that stood from 20 October, was omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig
 with the organism alone, where the queue finished 0.6% to 0.8% later and the web's 99th percentile rose 4% to 13% (LOSS in all three
 runs): the web pods' CPU limits, raised in the queue's first half minute, stayed through the saturated queue, the batch pods hashed
@@ -141,7 +141,7 @@ of our runs in the seven 2023 districts, the only districts with outages; the ca
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
 omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back and omni-v14's two changes: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v14 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from SINCE14 on 21 October); until a benchmark's three runs land, its row on
+omni-v14 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 04:47 UTC on 21 October); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
 **On omni-v11, until their omni-v14 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
