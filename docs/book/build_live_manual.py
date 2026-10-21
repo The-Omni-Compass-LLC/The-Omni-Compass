@@ -109,13 +109,13 @@ READ = {   # how to read a monitor of each layer, and what the engineer in charg
     "service": ("The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.",
                 "Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises."),
     "cluster": ("A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.",
-                "Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v12; an older engine's run is its own record."),
+                "Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries {engine}; an older engine's run is its own record."),
     "cloud": ("The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.",
               "The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands."),
     "orchestrators": ("Each scheduler, queue and multi-cluster governor four ways: the organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator.",
                       "Only two of the four comparisons are Omni-Compass against its native (on top of the orchestrator; on the organism alone); the others are the orchestrator's own cost and are never counted as Omni-Compass's."),
     "chip": ("The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.",
-             "Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v12 run lands."),
+             "Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its {engine} run lands."),
     "host": ("The processor's frequency ceiling (the knob), the clock the kernel's own governor ran at under it, the package power and the busy share, native beside Omni-Compass.",
              "Until a machine with its energy counter runs it, the monitor plays the harness's own modelled machine: read the mechanism, never the numbers."),
     "organism": ("The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.",
@@ -254,7 +254,7 @@ def md_lines() -> list[str]:
             out += [f"- **Feed.** {feed}."]
             if m.get("knobs"):
                 out += ["- **Knobs.** " + "; ".join(f"{K[k]['label']}: {K[k]['what']}" if k in K else k for k in m["knobs"]) + "."]
-            rd, act = READ.get(m.get("layer", ""), ("", ""))
+            rd, act = (x.replace("{engine}", eng) for x in READ.get(m.get("layer", ""), ("", "")))
             if rd:
                 out += [f"- **How to read it.** {rd}", f"- **What to do with it.** {act}"]
             out += [""]
@@ -277,7 +277,7 @@ def md_lines() -> list[str]:
             "- **The next version.** Any change to a rule, gain, guard, preset or muscle makes the next engine version: built on its own branch, tried in the toy gate against the engine that stands, landed with `tools/land_engine.py` when it reads no LOSS, and every benchmark run again on it.",
             "",
             "### What waits, and what fills it", "",
-            f"- **The GPU card.** The one metered run is the replaced controller's (2 October); the omni-v12 run on Lambda, from one exact commit given to the founder, replaces it.",
+            f"- **The GPU card.** The one metered run is the replaced controller's (2 October); the {eng} run on Lambda, from one exact commit given to the founder, replaces it.",
             f"- **The CPU host.** A Linux machine whose processor exposes its energy counter (RAPL) and a writable frequency ceiling (register row 79, `cpu-power.yml`); until then the monitor plays the harness's own modelled machine.",
             f"- **Azure.** " + (f"The set to the paid cap runs now: {aks['progress']['done']} of {aks['progress']['total']} repetitions measured at the build, under the stopping rule (the bill read at 10, 20, 40 and 70 repetitions with 99% intervals); its table is written when the set ends." if aks else "Its sets run from the queue, A, then B, then C."),
             f"- **Google Cloud.** " + ((gates['cloud-check google'].get('reason') or "the hourly gate holds") if gates.get("cloud-check google") else "its hourly gate decides when its first set starts."),
@@ -340,118 +340,6 @@ def md_lines() -> list[str]:
 
 
 # ---------------------------------------------------------------- the PDF
-def build_pdf(lines: list[str]) -> int:
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.lib.units import inch
-    from reportlab.lib import colors
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.platypus import (BaseDocTemplate, Frame, PageTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle,
-                                    KeepTogether, Flowable)
-    from reportlab.platypus.tableofcontents import TableOfContents
-    LIB, DJV = "/usr/share/fonts/truetype/liberation/", "/usr/share/fonts/truetype/dejavu/"
-    for n, f in (("Serif", "LiberationSerif-Regular.ttf"), ("Serif-Bold", "LiberationSerif-Bold.ttf"), ("Serif-Italic", "LiberationSerif-Italic.ttf"),
-                 ("Serif-BoldItalic", "LiberationSerif-BoldItalic.ttf"), ("Sans", "LiberationSans-Regular.ttf"), ("Sans-Bold", "LiberationSans-Bold.ttf")):
-        pdfmetrics.registerFont(TTFont(n, LIB + f))
-    pdfmetrics.registerFont(TTFont("Mono", DJV + "DejaVuSansMono.ttf"))
-    pdfmetrics.registerFont(TTFont("Sym", DJV + "DejaVuSans.ttf"))
-    pdfmetrics.registerFontFamily("Serif", normal="Serif", bold="Serif-Bold", italic="Serif-Italic", boldItalic="Serif-BoldItalic")
-    body = ParagraphStyle("body", fontName="Serif", fontSize=11, leading=17, spaceAfter=6)
-    bullet = ParagraphStyle("bullet", parent=body, leftIndent=16, bulletIndent=4, spaceAfter=3)
-    h1 = ParagraphStyle("h1", fontName="Sans-Bold", fontSize=24, leading=30, spaceBefore=0, spaceAfter=14)
-    h2 = ParagraphStyle("h2", fontName="Sans-Bold", fontSize=18, leading=24, spaceBefore=12, spaceAfter=10)
-    h3 = ParagraphStyle("h3", fontName="Sans-Bold", fontSize=14, leading=20, spaceBefore=10, spaceAfter=6)
-    h4 = ParagraphStyle("h4", fontName="Sans-Bold", fontSize=12, leading=18, spaceBefore=8, spaceAfter=4)
-    cell = ParagraphStyle("cell", fontName="Serif", fontSize=11, leading=16)
-    notice = ParagraphStyle("notice", fontName="Serif-Italic", fontSize=11, leading=17, textColor=colors.HexColor("#333333"))
-    state = {"chapter": "Front matter"}
-
-    class Mark(Flowable):
-        def __init__(self, name): super().__init__(); self.name = name; self.width = self.height = 0
-        def draw(self): state["chapter"] = self.name
-
-    def inline(s: str) -> str:
-        s = html.escape(s, quote=False)
-        s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
-        s = re.sub(r"`([^`]+)`", r'<font name="Mono" size="10.5">\1</font>', s)
-        s = re.sub(r"([∏Σ≤≥⌈⌉ℓ·³²¹⁰]+)", r'<font name="Sym">\1</font>', s)
-        return s
-
-    def foot(canv, doc):
-        canv.saveState()
-        w, h = letter
-        canv.setFont("Sans", 8); canv.setFillColor(colors.HexColor("#444444"))
-        if doc.page > 1:
-            canv.drawString(0.75 * inch, h - 0.5 * inch, BOOK)
-            canv.drawRightString(w - 0.75 * inch, h - 0.5 * inch, state["chapter"].split(":")[0][:80])
-        lab = f"Page {doc.page}"
-        canv.drawString(0.75 * inch, 0.45 * inch, lab); canv.drawRightString(w - 0.75 * inch, 0.45 * inch, lab)
-        canv.setFont("Serif-Italic", 7.5)
-        txt = PLAIN
-        from reportlab.lib.utils import simpleSplit
-        parts = simpleSplit(txt, "Serif-Italic", 7.5, w - 2.4 * inch)
-        y = 0.45 * inch + 9 * (len(parts) - 1) + 12
-        for p in parts[:4]:
-            canv.drawCentredString(w / 2, y, p); y -= 9
-        canv.restoreState()
-
-    class Doc(BaseDocTemplate):
-        def afterFlowable(self, f):
-            if isinstance(f, Paragraph) and f.style.name in ("h2", "h3"):
-                self.notify("TOCEntry", (0 if f.style.name == "h2" else 1, f.getPlainText(), self.page))
-
-    doc = Doc(str(OUT_PDF), pagesize=letter, leftMargin=0.9 * inch, rightMargin=0.9 * inch, topMargin=0.85 * inch, bottomMargin=1.35 * inch,
-              title=BOOK, author="The Omni-Compass LLC", subject="How to read, operate, tune and watch the live engine")
-    frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="f")
-    doc.addPageTemplates([PageTemplate(id="p", frames=[frame], onPageEnd=foot)])
-    toc = TableOfContents()
-    toc.levelStyles = [ParagraphStyle("t1", fontName="Sans-Bold", fontSize=11, leading=17, leftIndent=0),
-                       ParagraphStyle("t2", fontName="Serif", fontSize=11, leading=16, leftIndent=18)]
-    ttl = ParagraphStyle("title", parent=h1, fontSize=30, leading=38); sup = ParagraphStyle("super", parent=h2)
-    story = [Spacer(1, 1.6 * inch), Paragraph("Omni-Compass", sup), Paragraph(BOOK, ttl),
-             Paragraph(inline(lines[2]), body), Spacer(1, 0.4 * inch), Paragraph(inline(TOP.replace("**", "")), notice), PageBreak(),
-             Mark("Table of contents"), Paragraph("Table of contents", h2), toc, PageBreak()]
-    i, tbl = 3, []
-
-    def flush_table():
-        if not tbl:
-            return
-        data = [[Paragraph(inline(c.strip()), cell) for c in r.strip().strip("|").split("|")] for r in tbl if not re.match(r"^\|[-|\s]+\|$", r.strip())]
-        ncol = max(len(r) for r in data)
-        data = [r + [Paragraph("", cell)] * (ncol - len(r)) for r in data]
-        widths = {5: [0.5, 2.6, 1.7, 0.8, 1.1], 3: [1.4, 3.6, 1.7]}.get(ncol)
-        t = Table(data, repeatRows=1, colWidths=[x * inch for x in widths] if widths else None)
-        t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#999999")), ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                               ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee"))]))
-        story.append(t); story.append(Spacer(1, 8)); tbl.clear()
-
-    while i < len(lines):
-        ln = lines[i]
-        if ln.startswith("|"):
-            tbl.append(ln); i += 1; continue
-        flush_table()
-        if ln.startswith("## "):
-            name = ln[3:]
-            story += [PageBreak(), Mark(name), Paragraph(inline(name), h2)]
-        elif ln.startswith("### "):
-            name = ln[4:]
-            story += [Mark(name), Paragraph(inline(name), h3)]
-        elif ln.startswith("#### "):
-            story.append(Paragraph(inline(ln[5:]), h4))
-        elif ln.startswith("- "):
-            story.append(Paragraph(inline(ln[2:]), bullet, bulletText="•"))
-        elif ln.startswith("    "):
-            story.append(Paragraph(inline(ln.strip()), bullet, bulletText="–"))
-        elif ln.strip() and not ln.startswith(">") and not ln.startswith("# "):
-            story.append(Paragraph(inline(ln), body))
-        i += 1
-    flush_table()
-    story += [Spacer(1, 18), Paragraph(inline(NOTICE.replace("**", "")), notice)]
-    doc.multiBuild(story)
-    return doc.page
-
-
 def appendix_lines() -> list[str]:
     """The book's last appendix: the page's sections, monitors and knobs word for word (Part II of md_lines) and the tables of
     every monitor, every knob and every LOSS row (its back matter), one heading level up; the reading guide, the operating
