@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The detached big-organism test on a rented machine (any cloud): every repetition of every organism in turn, native
@@ -13,7 +13,7 @@
 #   ORGS=tower,stack SCALE=1000 REPS=3 DUR=10800 TEST=organism bash scripts/organism_detached.sh
 set -u
 cd "$(dirname "$0")/.."
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 ORGS="${ORGS:-stack}"; SCALE="${SCALE:-1000}"; REPS="${REPS:-3}"; DUR="${DUR:-10800}"; TEST="${TEST:-organism}"
 export PATH="$PWD/.v/bin:$PATH" ARMS="${ARMS:-native compass}" DURATION="$DUR" ORGANISM_SCALE="$SCALE" LOAD_MAX="${LOAD_MAX:-6}" LOADGEN=open
 export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json

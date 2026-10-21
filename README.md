@@ -1,6 +1,6 @@
 # Omni-Compass
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
@@ -34,6 +34,8 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -51,7 +53,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v13, fingerprint `0088837333c6f0fc` (47 files); package 0.13.0.
+- **Engine on main:** omni-v14, fingerprint `7afba44615fcff8f` (47 files); package 0.14.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -81,29 +83,35 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-21 01:02 | live-kind | success | [39522724506](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39522724506) |
-| 2026-10-21 00:59 | live-kind-levers | success | [39524294470](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524294470) |
-| 2026-10-21 00:57 | big-organism-detached collect | success | [39524414202](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524414202) |
-| 2026-10-21 00:57 | raw-sweep | success | [39524403355](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524403355) |
-| 2026-10-21 00:55 | cloud-check amazon | failure | [39524249374](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524249374) |
-| 2026-10-21 00:55 | cloud-check google | failure | [39524243196](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524243196) |
-| 2026-10-21 00:53 | security-scan | failure | [39524001703](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39524001703) |
-| 2026-10-21 00:47 | grid | cancelled | [39517374939](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39517374939) |
-| 2026-10-21 00:46 | kind-cruisekube | success | [39500612894](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39500612894) |
-| 2026-10-21 00:40 | live-engine | success | [39522065173](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39522065173) |
+| 2026-10-21 05:01 | realms-v5 | success | [39546396237](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39546396237) |
+| 2026-10-21 04:59 | live-kind-full | success | [39544954971](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39544954971) |
+| 2026-10-21 04:57 | ycsb | failure | [39540626608](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39540626608) |
+| 2026-10-21 04:55 | kwok-scale | success | [39546386051](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39546386051) |
+| 2026-10-21 04:53 | kafka | success | [39537766295](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39537766295) |
+| 2026-10-21 04:51 | pgbench | success | [39537751149](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39537751149) |
+| 2026-10-21 04:49 | redis | success | [39537761211](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39537761211) |
+| 2026-10-21 04:49 | live-shadow | success | [39544965098](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39544965098) |
+| 2026-10-21 04:46 | benchmark | success | [39543507041](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39543507041) |
+| 2026-10-21 04:46 | robustness | success | [39542051810](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39542051810) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v13 (the max on every muscle, every muscle its own card, quota-aware conveyance that never takes another muscle's room, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
+## The engine that stands: omni-v14 (the max on every muscle, a knob that leaves any muscle native, every muscle its own card, quota-aware conveyance that never takes another muscle's room nor raises on a reading that cannot see it, the operator's commands without a shell, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
 
-The engine on main is **omni-v13** (`OMNI_V13.json`, fingerprint `0088837333c6f0fc`, 47 files; [`docs/OMNI_V13.md`](docs/OMNI_V13.md)), the
-engine that stands since 20 October. It is omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig
+The engine on main is **omni-v14** (`OMNI_V14.json`, fingerprint `7afba44615fcff8f`, 47 files; [`docs/OMNI_V14.md`](docs/OMNI_V14.md)), the
+engine that stands since 21 October by the founder's orders ("knobs on every monitor, to turn off and on ... a muscle"; "tune the
+engine"). It is omni-v13 with two changes in the Kubernetes governor. `--native` leaves any muscle where native runs it, never
+written, and the control panel carries it as one button a muscle. And the operator's own commands run without a shell unless they
+hold a pipe, a redirect or a variable. A third change, no conveyance raise on a reading that leaves out another workload's starting
+pods, was refused by the toy gate (the web's 95th percentile 6.4% higher than omni-v13's) and is kept on a study branch.
+The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. **omni-v13** ([`docs/OMNI_V13.md`](docs/OMNI_V13.md)),
+the engine that stood from 20 October, was omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig
 with the organism alone, where the queue finished 0.6% to 0.8% later and the web's 99th percentile rose 4% to 13% (LOSS in all three
 runs): the web pods' CPU limits, raised in the queue's first half minute, stayed through the saturated queue, the batch pods hashed
 7.6% slower and the web served no faster while the queue ran. On a shared host at its top beside another workload's room, every limit
-given now goes back to the operator's, and every other pod on a machine is counted by its own limit. The toy gate reads no LOSS against
+given now goes back to the operator's, and every other pod on a machine is counted by its own limit. Its toy gate read no LOSS against
 omni-v12 in any toy, the web-only toys identical, and in a batch toy set from the KubeRay runs' own files the queue and the job
 turnaround back at native's (`results/toy_gate/V13_VS_V12.md`). **omni-v12** ([`docs/OMNI_V12.md`](docs/OMNI_V12.md)), the engine
 that stood from 19 October by the founder's order ("every time you do that ... it becomes a new version"), was omni-v11 with
@@ -125,12 +133,12 @@ the day (on omni-v8 the 2022 robustness district's monthly unevenness rose 0.11%
 simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
 of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
-omni-v11's hold, omni-v12's held refusal and omni-v13's hand-back: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
+omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back and omni-v14's two changes: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v13 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 20:31 UTC on 20 October); until a benchmark's three runs land, its row on
+omni-v14 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 04:47 UTC on 21 October); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
-**On omni-v11, until their omni-v13 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
+**On omni-v11, until their omni-v14 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
 receipts by [`tools/reproduce.py`](tools/reproduce.py)). On real Kubernetes, ten pairs a run: on top of Goldilocks the 95th percentile
 −61% to −64%; on top of KEDA's HTTP add-on −72% to −74%, replicas −11% to −20%, and the pod start wait, omni-v10's one LOSS, EVEN with
 the served image pre-pulled; on top of KEDA on the CPU target and the requests −52% to −53%; fixed capacity EVEN; every one GAIN in all
@@ -141,14 +149,15 @@ found beyond the counted cells**: on a mission draw outside the swarm's preregis
 native did not (its proximity reflex slowed over a second instead of at once); the fix held every drone outside the keep-out on
 every draw tried and is in omni-v12, whose swarm runs judge a collision as a LOSS and fly three mission draws never flown
 ([`results/toy_gate/V12_SWARM_REFLEX.md`](results/toy_gate/V12_SWARM_REFLEX.md), [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md),
-[`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v13 runs land** (`results/live/V10_*.md`): steady work,
+[`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v14 runs land** (`results/live/V10_*.md`): steady work,
 the demand that wanders, all four in one run (work inside the line **+47% to +79%**), faults, a queue of jobs (machines **−6% to −14%**),
 a noisy neighbour, the Google day of 2011, CruiseKube and the two-hour run. The Omni index over the real tests, each test on its newest
-table: **+4.4% GAIN** on the resource reading and **+11.9% GAIN** on the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+table with a reading (MongoDB's on omni-v11 until its omni-v12 runs land): **+4.3% GAIN** on the resource reading and **+11.9% GAIN** on
+the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 The whole system, every layer composed by the product law from its own table (the card, the cluster with its add-ons and
 governors, the services on it, the cloud's bill), with every interval carried and the product's assumption tested on the
 governors' four ways, is [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md): a modelled composition (class S) of the class P and L
-tables, remade as each layer's omni-v13 runs land.
+tables, remade as each layer's omni-v14 runs land.
 How every one of these was graded, category by category, is in [`docs/REFEREE_GRADES.md`](docs/REFEREE_GRADES.md).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
@@ -277,7 +286,12 @@ follow the wall and the switch, read every gauge and turn every knob, trace any 
 mechanism of action of Omni-Compass against native as the monitors show it (the two tickers, the phase plane, the brain's
 state, the verdict), section by section in the page's own order, with what to do when a tile reads LOSS and what the page
 does not tell you. It explains neither how the engine is built nor how it is wired; it is built by `docs/book/build_book.py
---live`, and its text is [`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md).
+--live`, and its text is [`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md). Its last appendix
+is the page word for word, written from the page itself at every build (`docs/book/build_live_manual.py`): every section, every
+monitor with its number, evidence class, feed and knobs, and every control, so the book and the page read each other both
+ways; the control panel at the top of the live engine downloads all three books.
+
+The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for line where a twin exists. The live engine's section 10b ([`#s-cpp`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#s-cpp)) feeds the Python's own runs into the C++ at every rebuild and sets the two side by side, number by number: every twin's parity check, every compass law the page's runs wire, and every muscle of the seven organisms at the tune-down. The Python's 500 seeded runs (`tools/engine_runs.py`, the jump generator) run whole through the C++ harness too ([`cpp/tools/engine_runs.cpp`](cpp/tools/engine_runs.cpp): the Python's draws are the input, the governor, the nerves, the compass law and the verdict in C++ put the mechanism on): every receipt and the SHA-256 digest identical to the Python's, on GitHub with every set (`engine-runs`) and on the page's proof monitor ([`#proofPanel`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#proofPanel)) beside the page's own run. What still runs in Python only is listed there by file (`tools/seal.py`).
 
 ## What is real and what is a model
 
@@ -344,7 +358,7 @@ the request logs, the Kafka consumer logs) gzipped; read one with `gunzip -c FIL
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **The engine that stands, omni-v13, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V12.md`](docs/OMNI_V12.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The engine that stands, omni-v14, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V14.md`](docs/OMNI_V14.md), [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | Every level on one page: the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud, a group of clusters; any level whose gauges go the other way, named | [`docs/LEVELS.md`](docs/LEVELS.md) (`python3 tools/levels.py`) |
@@ -399,14 +413,14 @@ Read as one sentence: Omni-Compass takes the system in through a Data Exchange (
 
 ## License
 
-**Proprietary. Evaluation and simulation use only.** You may download, run and modify the software only to evaluate
+**Proprietary. Evaluation and Simulation use only.** You may download, run and modify the software only to evaluate
 it and to reproduce the published results, including in shadow or test mode on systems you own or control. Everything
 else requires a written **Omni-Compass Enterprise License** signed by The Omni-Compass LLC and paid for. No patent or
 trademark license is granted for any other use.
 
 | File | What it says |
 |---|---|
-| [`LICENSE`](LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
+| [`LICENSE`](LICENSE) | evaluation and Simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
 | [`NOTICE`](NOTICE) | copyright, the US filings notice, third-party notices |
 | [`PATENTS.md`](PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
 | [`TRADEMARKS.md`](TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |
@@ -417,4 +431,4 @@ trademark license is granted for any other use.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

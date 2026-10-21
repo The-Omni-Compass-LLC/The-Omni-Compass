@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: live-engine
@@ -35,6 +35,7 @@ on:
       - "results/BENEFIT_SHEET.json"
       - "results/OMNI_INDEX.md"
       - "results/grid_v*/**"
+      - "results/engine_runs/**"   # a set of the Python's runs pushed by hand (engine-runs.yml starts this build itself once its set is committed)
       - "scripts/reruns.txt"
       - "scripts/*_queue.txt"
       - "scripts/gpu_campaign_profiles.json"
@@ -51,7 +52,7 @@ permissions:
   contents: write
   actions: read
 env:
-  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
   build:
     # a front-page run that skipped or failed has nothing new for the page
@@ -59,6 +60,11 @@ jobs:
     concurrency: {group: live-engine, cancel-in-progress: false}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    defaults:
+      run:
+        # bash with -e and -o pipefail: a check whose output is piped into tee still fails its step, and a failed check stops
+        # the page from being committed (the default shell without "shell: bash" drops a failure in front of a pipe)
+        shell: bash
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -86,7 +92,7 @@ jobs:
       - name: The page's engine against the Python and the C++; every record against the repository's own runs
         run: |
           python docs/engine/check_live_engine.py | tee -a "$GITHUB_STEP_SUMMARY"
-          python docs/engine/check_records.py --seed 3000 | tee -a "$GITHUB_STEP_SUMMARY"
+          python docs/engine/check_records.py --seed 3000 3001 3002 | tee -a "$GITHUB_STEP_SUMMARY"
           python docs/engine/build_live_engine.py --check | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Legal notice checked, the page committed
         run: |

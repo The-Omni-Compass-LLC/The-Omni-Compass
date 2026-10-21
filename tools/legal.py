@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The legal notice, written once, and the check that it stands everywhere.
@@ -38,7 +38,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-BODY = ("© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial "
+BODY = ("© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial "
         "use, commercialization, monetization, production use, redistribution or hosted service of any part of "
         "Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, "
         "report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`.")
@@ -52,12 +52,12 @@ TOP = f"{BODY} `{SPDX}` {CLOSE}"          # a page's opening notice carries the 
 MARK = "© 2026 The Omni-Compass LLC"      # a page carrying this carries the notice in this wording or an earlier one
 PLAIN = re.sub(r"[*`]", "", NOTICE)       # the same words without Markdown, for plain text, PDFs and chat answers
 FILED = "All patents, copyrights and trademarks filed in the USA."
-SHORT = ("© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only. All patents, copyrights "
+SHORT = ("© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only. All patents, copyrights "
          "and trademarks filed in the USA. www.omni-compass.com")
 HEADER = (
     "SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0",
     "Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.",
-    "Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid",
+    "Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid",
     "Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.",
     "All patents, copyrights and trademarks filed in the USA. www.omni-compass.com",
 )
@@ -68,6 +68,9 @@ REQUIRED = ("omni-compass llc", "all rights reserved", "all patents, copyrights 
 # the two sentences the founder retired from the notice on the evening of 10 October; no page, header, report or program
 # may carry them. Spelled word by word so that this file, which looks for them, carries neither
 RETIRED = (" ".join(("subject", "to", "change")), " ".join(("authority", "of", "record")))
+# the notice's word written in lower case: the founder's order of 20 October writes Simulation with a capital S, as the
+# LICENSE does. Spelled in two pieces so that this file, which looks for it, does not carry it
+LOWER_S = "Evaluation and " + "simulation use only"
 
 HASH, SLASH = "#", "//"
 BY_SUFFIX = {".py": HASH, ".sh": HASH, ".bash": HASH, ".yml": HASH, ".yaml": HASH, ".toml": HASH, ".cff": HASH, ".cfg": HASH,
@@ -155,7 +158,7 @@ def _legal_paragraph(par: list[str]) -> bool:
     t = _flat(" ".join(par))
     if "omni-compass llc" not in t and "spdx-license-identifier" not in t:
         return False
-    return any(h in t for h in ("evaluation and simulation use only", "enterprise license", "all rights reserved",
+    return any(h in t for h in ("evaluation and Simulation use only", "enterprise license", "all rights reserved",
                                 "spdx-license-identifier", "proprietary") + RETIRED)
 
 
@@ -436,6 +439,8 @@ def problems(path: str, text: str, k) -> list[str]:
     gone = [r for r in RETIRED if r in flat_all]
     if gone:
         bad.append("wording retired from the notice on 10 October still stands here (" + "; ".join(gone) + ")")
+    if LOWER_S in text:
+        bad.append("the notice reads 'simulation' in lower case (the founder's order of 20 October: Simulation, as the LICENSE writes it)")
     if k == "md":
         lines = text.rstrip("\n").split("\n")
         top, end = _flat("\n".join(lines[:30])), _flat("\n".join(lines[-6:]))

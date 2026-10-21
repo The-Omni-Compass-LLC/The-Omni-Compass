@@ -37,7 +37,8 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
   long delta = std::max<long>(-L_.down_max, std::min<long>(L_.up_max, n_req - n));
   const double drift_U = derivatives(x_, p_, t_, 0.0).U;
   const double u_push = std::max(-U_AUTHORITY, std::min(U_AUTHORITY, -drift_U + KP * (1.0 - x_.U)));
-  const bool converged = u_push / U_AUTHORITY <= L_.push_release;
+  d.push = u_push / U_AUTHORITY;
+  const bool converged = d.push <= L_.push_release;
   if (delta < 0 && !converged) delta = 0;
   if (delta > 0 && q < L_.guard_queue && u_push / U_AUTHORITY < L_.push_add) delta = 0;
   if (delta < 0 && (q >= L_.guard_queue || n_req > n - L_.down_band)) delta = 0;
