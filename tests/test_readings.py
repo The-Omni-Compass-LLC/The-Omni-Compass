@@ -52,5 +52,36 @@ class Words(unittest.TestCase):
         self.assertEqual(R.check_pages(), [], "a page lacks the key word for word: python3 tools/readings.py --fix")
 
 
+class Landed(unittest.TestCase):
+    """A newer engine's table takes its benchmark's place only once its three runs share a reading (20 October: the three
+    omni-v12 YCSB runs each failed partway, their table held no workload in all three, and the benchmark fell off the
+    benefit sheet and the Omni index instead of omni-v11's table standing)."""
+
+    def test_a_table_whose_runs_share_no_workload_has_not_landed(self):
+        import json, tempfile
+        from tools import benefit_sheet, omni_index
+        run = {"native": 1.0, "omni": 0.9, "diff": -0.1, "ci95": [-0.2, -0.05]}
+        with tempfile.TemporaryDirectory() as td:
+            live = Path(td)
+            (live / "V11_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"f": {"g": {"reading": "x", "runs": [run, run, run]}}}}))
+            (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {}}))
+            (live / "V12_DEMO.md").write_text("# demo\n")
+            self.assertTrue(R.landed(live / "V11_DEMO.json"))
+            self.assertFalse(R.landed(live / "V12_DEMO.json"))
+            self.assertFalse(R.landed(live / "V12_DEMO.md"))          # read through its JSON twin
+            keep = (benefit_sheet.LIVE, omni_index.LIVE)
+            benefit_sheet.LIVE = omni_index.LIVE = live
+            try:
+                self.assertEqual(benefit_sheet.newest_table("V7_DEMO.json"), "V11_DEMO.json")
+                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V11_DEMO.json")
+                (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"tuning": {"g": {"runs": [run, run, run]}}, "f": {"g": {"runs": [run, None, run]}}}}))
+                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V11_DEMO.json")   # the tuning workload and a gap read nothing
+                (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"f": {"g": {"runs": [run, run, run]}}}}))
+                self.assertEqual(benefit_sheet.newest_table("V7_DEMO.json"), "V12_DEMO.json")
+                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V12_DEMO.json")
+            finally:
+                benefit_sheet.LIVE, omni_index.LIVE = keep
+
+
 if __name__ == "__main__":
     unittest.main()

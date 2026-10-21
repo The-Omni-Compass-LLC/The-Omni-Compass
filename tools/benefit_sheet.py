@@ -43,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, receipt_key, row_gain, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN  # noqa: E402
+from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools import wiring_verdicts as wv                            # noqa: E402
 
@@ -428,10 +428,11 @@ def from_realms():
 
 def newest_table(fname):
     """The same benchmark's table on the newest engine that has one (V<n>_<BENCHMARK>.json with the highest n), so a later
-    engine's three runs take the row the moment their table lands; tables of two engines are never pooled."""
+    engine's three runs take the row the moment their table lands with a reading (tools/readings.py, landed); tables of two
+    engines are never pooled."""
     base = re.sub(r"^V\d+_", "", fname)
     found = sorted((int(m.group(1)), f.name) for f in LIVE.glob("V*_" + base) if (m := re.fullmatch(r"V(\d+)_" + re.escape(base), f.name)))
-    return found[-1][1] if found else fname
+    return next((n for _, n in reversed(found) if landed(LIVE / n)), found[-1][1]) if found else fname
 
 
 def main(check=False):

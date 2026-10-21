@@ -29,7 +29,7 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 186)        # 62 entries, A, B and C (the steady and wandering tests back since omni-v8;
+        self.assertEqual(len(queue), 189)        # 63 entries, A, B and C (the steady and wandering tests back since omni-v8;
                                                  # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October;
                                                  # every data store at the max beside the tune-down, 18 October;
                                                  # the extended fault test, 18 October; CruiseKube on the recorder that
@@ -41,7 +41,9 @@ class ReleaseCampaign(unittest.TestCase):
                                                  # its bin-packing profile, 20 October; Koordinator again, on the
                                                  # kubelet's cgroup root its own tests use, 20 October; the governors
                                                  # four ways, 20 October; KubeRay, Crane, Gödel, Karmada and OCM four
-                                                 # ways, each in its own rig, 20 October)
+                                                 # ways, each in its own rig, 20 October; MongoDB's preregistered set
+                                                 # again on Linux 6.8, its omni-v12 runs having failed on Linux 7.0,
+                                                 # 21 October)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
         for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
             self.assertEqual({row[3].get('objective') for row in queue if row[2] == wf and row[3].get('native') != 'shipped'},

@@ -30,7 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import receipt_key, with_own_runs              # noqa: E402
+from tools.readings import receipt_key, with_own_runs, landed      # noqa: E402
 
 OUT = ROOT / "docs" / "LEVELS.md"
 LIVE = ROOT / "results" / "live"
@@ -72,9 +72,11 @@ def kind_of(reading: str) -> str | None:
 
 
 def newest_table(stem: str) -> Path | None:
-    """The table of this benchmark on the newest engine that has one (V8_ before V7_ ...)."""
-    found = sorted(LIVE.glob(f"V[0-9]*_{stem}.md"), key=lambda p: int(re.match(r"V(\d+)_", p.name).group(1)), reverse=True)
-    return next((p for p in found if re.fullmatch(rf"V\d+_{re.escape(stem)}\.md", p.name)), None)
+    """The table of this benchmark on the newest engine that has one with a reading (V8_ before V7_ ...; tools/readings.py,
+    landed: a table whose runs share no workload leaves the older engine's table standing)."""
+    found = [p for p in sorted(LIVE.glob(f"V[0-9]*_{stem}.md"), key=lambda p: int(re.match(r"V(\d+)_", p.name).group(1)), reverse=True)
+             if re.fullmatch(rf"V\d+_{re.escape(stem)}\.md", p.name)]
+    return next((p for p in found if landed(p)), found[0] if found else None)
 
 
 def engine_of(text: str, name: str) -> str:

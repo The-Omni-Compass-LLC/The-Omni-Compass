@@ -354,7 +354,8 @@ def fresh_server(cache_mb):
             return c
         except Exception:
             time.sleep(1)
-    raise RuntimeError("mongod did not come back after the restart")
+    j = subprocess.run(["sudo", "journalctl", "-u", "mongod", "-n", "40", "--no-pager"], capture_output=True, text=True)
+    raise RuntimeError("mongod did not come back after the restart (kernel " + os.uname().release + "); its journal:\n" + (j.stdout or j.stderr)[-4000:])
 
 
 def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms, seed, objective=DEFAULT_OBJECTIVE):
@@ -544,8 +545,12 @@ def setup():
             txt = txt.replace("storage:\n", f"storage:\n  wiredTiger:\n    engineConfig:\n      cacheSizeGB: {NATIVE_MB / 1024:.3f}\n", 1)
             subprocess.run(["sudo", "tee", str(conf)], input=txt, text=True, check=True, capture_output=True)
         subprocess.run(["sudo", "systemctl", "restart", "mongod"], check=True)
-    print(f"YCSB {YCSB_VERSION} at {YCSB_HOME} (sha256 {got[:16]}...); MongoDB {server_version()} at native's cache ({NATIVE}: "
+    ver = server_version()
+    print(f"YCSB {YCSB_VERSION} at {YCSB_HOME} (sha256 {got[:16]}...); MongoDB {ver} at native's cache ({NATIVE}: "
           f"{NATIVE_MB if NATIVE_MB is not None else 'the server default'} MB)")
+    if ver == "?":                       # the server did not answer after its restart: no workload runs on a server that is not up
+        print(f"mongod did not answer after the restart at native's cache (kernel {os.uname().release})", file=sys.stderr)
+        return 1
     return 0
 
 

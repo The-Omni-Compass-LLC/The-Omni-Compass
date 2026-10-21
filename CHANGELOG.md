@@ -37,6 +37,23 @@
   operate each monitor; the control panel downloads all three manuals.
 - **Simulation with a capital S** in the one notice (`tools/legal.py`), written on every file but the engine's fingerprinted ones,
   which take it with the next version; the workflows' embedded legal bundles re-written to match.
+- **A newer engine's table stands only once its three runs share a reading** (`tools/readings.py`, `landed`): the three
+  omni-v12 YCSB runs on MongoDB each failed partway, so their table holds no workload in all three; the benefit sheet, the Omni
+  index, the levels page, the power page and the live engine took it as MongoDB's result and the benchmark fell off all of
+  them. Each now reads the one rule: omni-v11's table stands, named as omni-v11's (+0.1% GAIN), until omni-v12's three runs
+  land. `tests/test_readings.py`.
+- **MongoDB's runs on GitHub's new machine** (`docs/YCSB_PREREGISTRATION.md`, amendment 5): GitHub's ubuntu-24.04 image of 18
+  October runs Linux 7.0.0, and MongoDB 8.0 refuses or fails to start on Linux 6.19 to 7.0.13 (MongoDB's SERVER-121912); every
+  failed job of the three omni-v12 runs (9 of 15) ran on that image and every passing job on the image before it. The workload
+  jobs now run on GitHub's ubuntu-22.04 machine (Linux 6.8, the same 4 cores and 16 GB); the setup stops at once with the
+  kernel, the server's status and its journal when the server does not answer, and every run's files carry the kernel, the
+  release, the runner image and the server's journal. The set runs again as A, B and C (`scripts/reruns.txt`, the block added
+  on 21 October).
+- **Main's red checks fixed here**: verify failed on main because `docs/LEVELS.md` and the state of play's standing block
+  were not rebuilt after the twelve omni-v12 service tables landed (rebuilt); the security scan failed on Pillow 12.3.0's eight
+  published advisories (Pillow 13.0.0 in the lock with every file's SHA-256, the bill of materials rewritten; matplotlib's
+  charts and reportlab's PDFs checked on it). The notice check now refuses the lower-case wording, so a table a bot writes
+  with the older notice fails until `tools/legal.py --fix` rewrites it.
 - **GitHub**: the branch's verify failed only on the release manifest (hashed pages changed); the manifest and the receipt are
   regenerated with this change. Azure's set to the paid cap runs (repetition 31 of 100 at 20:13 UTC); Google's gate holds on a key
   stored short (595 characters, not the key file); Amazon's on the Free plan (the organization's policy denies every machine

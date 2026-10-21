@@ -68,6 +68,9 @@ REQUIRED = ("omni-compass llc", "all rights reserved", "all patents, copyrights 
 # the two sentences the founder retired from the notice on the evening of 10 October; no page, header, report or program
 # may carry them. Spelled word by word so that this file, which looks for them, carries neither
 RETIRED = (" ".join(("subject", "to", "change")), " ".join(("authority", "of", "record")))
+# the notice's word written in lower case: the founder's order of 20 October writes Simulation with a capital S, as the
+# LICENSE does. Spelled in two pieces so that this file, which looks for it, does not carry it
+LOWER_S = "Evaluation and " + "simulation use only"
 
 HASH, SLASH = "#", "//"
 BY_SUFFIX = {".py": HASH, ".sh": HASH, ".bash": HASH, ".yml": HASH, ".yaml": HASH, ".toml": HASH, ".cff": HASH, ".cfg": HASH,
@@ -436,6 +439,8 @@ def problems(path: str, text: str, k) -> list[str]:
     gone = [r for r in RETIRED if r in flat_all]
     if gone:
         bad.append("wording retired from the notice on 10 October still stands here (" + "; ".join(gone) + ")")
+    if LOWER_S in text:
+        bad.append("the notice reads 'simulation' in lower case (the founder's order of 20 October: Simulation, as the LICENSE writes it)")
     if k == "md":
         lines = text.rstrip("\n").split("\n")
         top, end = _flat("\n".join(lines[:30])), _flat("\n".join(lines[-6:]))

@@ -221,6 +221,32 @@ def classify(reading, aim_=None):
     raise ValueError(f"unknown reading: {reading!r}")
 
 
+def landed(table) -> bool:
+    """Whether a three-run table holds a reading at all: some gauge of a workload other than the tuning one read in all three
+    runs. A table whose runs share no such gauge (each run failed partway, so no workload is in all three) has not taken its
+    benchmark's place: the same benchmark's table on an older engine stands as that engine's result until the newer engine's
+    three runs land (the rule every tool that picks a benchmark's newest table reads: tools/omni_index.py,
+    tools/benefit_sheet.py, tools/levels.py, tools/power.py). A table kept only in Markdown, or one that stores rows rather
+    than workloads, reads as landed when it holds any row."""
+    import json
+    p = Path(table)
+    if p.suffix == ".md":
+        if not p.with_suffix(".json").exists():
+            return True
+        p = p.with_suffix(".json")
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if isinstance(d, dict) and isinstance(d.get("workloads"), dict):
+        return any(isinstance(g, dict) and any(isinstance(x, dict) and len(x.get("runs") or []) == 3 and all(r is not None for r in x["runs"])
+                                               for x in g.values())
+                   for wl, g in d["workloads"].items() if wl != "tuning")
+    if isinstance(d, dict) and "rows" in d:
+        return bool(d["rows"])
+    return True
+
+
 def judged(reading: str) -> bool:
     """A reading that holds the same way in all three runs, every interval clear of zero (GAIN, LOSS or power given, or an
     older table's words for the same), or a count that must never rise and rose in a run."""

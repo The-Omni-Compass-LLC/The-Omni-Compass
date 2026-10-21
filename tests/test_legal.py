@@ -95,6 +95,14 @@ class TestMarkdown(unittest.TestCase):
         self.assertTrue(any("older filing" in p for p in legal.problems("x.md", page, "md")))
         self.assertTrue(legal.problems("y.md", "# T\n\nno notice\n", "md"))
 
+    def test_simulation_in_lower_case_is_a_problem(self):
+        # the founder's order of 20 October: Simulation with a capital S, as the LICENSE writes it; a table a bot wrote with the
+        # older notice fails the check until --fix rewrites it
+        good = f"# T\n\n> {legal.TOP}\n\n---\n\n*" + legal.NOTICE + "*\n"
+        self.assertEqual(legal.problems("x.md", good, "md"), [])
+        low = good.replace("Evaluation and Simulation", "Evaluation and " + "simulation")
+        self.assertTrue(any("lower case" in p for p in legal.problems("x.md", low, "md")))
+
     def test_the_notice_closes_with_the_website_and_the_struck_wording_is_a_problem(self):
         # the founder's order of 10 October (night): the filing sentence, then the website, nothing after it; the two struck
         # sentences stand nowhere (spelled word by word here too, so this file carries neither)

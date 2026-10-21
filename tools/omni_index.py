@@ -36,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-from tools.readings import judged, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
+from tools.readings import judged, landed, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "results" / "live"
@@ -122,10 +122,11 @@ def measure(row, m):
 
 def newest(fname):
     """The same test's table on the newest engine that has one (V<n>_<TEST>.json with the highest n); tables of two engines
-    are never pooled, and a later engine's three runs take the test's place the moment their table lands."""
+    are never pooled, and a later engine's three runs take the test's place the moment their table lands with a reading
+    (tools/readings.py, landed: a table whose runs share no workload leaves the older engine's table standing)."""
     base = re.sub(r"^V\d+_", "", fname)
     found = sorted((int(m.group(1)), x.name) for x in LIVE.glob("V*_" + base) if (m := re.fullmatch(r"V(\d+)_" + re.escape(base), x.name)))
-    return found[-1][1] if found else fname
+    return next((n for _, n in reversed(found) if landed(LIVE / n)), found[-1][1]) if found else fname
 
 
 def tests():

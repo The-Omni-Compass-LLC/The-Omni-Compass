@@ -232,18 +232,20 @@ def tables():
     its stack and evidence class read from its own files: a table whose JSON holds its workloads is a Linux service and one
     whose JSON holds its rows is Kubernetes (both real software, class L); a table with no JSON beside it is an outside
     simulator driven by our own runner (class S). Nothing is listed by hand: a table that lands is on the page at the next
-    build, and a later engine's table replaces an earlier one's the moment it lands (two engines are never pooled)."""
+    build, and a later engine's table replaces an earlier one's the moment it lands with a reading (tools/readings.py, landed:
+    a table whose three runs share no workload leaves the older engine's table standing; two engines are never pooled)."""
     import re
+    from tools.readings import landed
     best = {}
     for f in (ROOT / "results" / "live").glob("V*_*.md"):
         m = re.fullmatch(r"V(\d+)_([A-Z0-9_]+)", f.stem)
         if not m or int(m.group(1)) < FIRST_ENGINE or "three-run table" not in f.read_text(encoding="utf-8").split("\n", 1)[0]:
             continue
-        n, base = int(m.group(1)), m.group(2)
-        if base not in best or n > best[base][0]:
-            best[base] = (n, f.stem)
+        n, base, ok = int(m.group(1)), m.group(2), landed(f)
+        if base not in best or (ok, n) > (best[base][2], best[base][0]):
+            best[base] = (n, f.stem, ok)
     out = []
-    for base, (n, stem) in best.items():
+    for base, (n, stem, _) in best.items():
         j = ROOT / "results" / "live" / f"{stem}.json"
         meta = json.loads(j.read_text(encoding="utf-8")) if j.exists() else None
         if isinstance(meta, dict) and "workloads" in meta:

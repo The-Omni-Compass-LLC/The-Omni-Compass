@@ -49,7 +49,11 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix: {workload: "${{ fromJSON(needs.plan.outputs.workloads) }}"}
-    runs-on: ubuntu-24.04
+    # GitHub's ubuntu-22.04 machine (Linux 6.8, 4 cores, 16 GB), not ubuntu-24.04: from the image of 18 October (20261018.339.1)
+    # ubuntu-24.04 runs Linux 7.0.0, and MongoDB 8.0 refuses or fails to start on Linux 6.19 to 7.0.13 (MongoDB's SERVER-121912,
+    # its bundled TCMalloc's use of restartable sequences): all three omni-v12 runs failed there (docs/YCSB_PREREGISTRATION.md,
+    # amendment 5). Every workload of A, B and C runs on this one machine.
+    runs-on: ubuntu-22.04
     timeout-minutes: 180
     steps:
       - name: Legal notice at the top of this job's report
@@ -78,8 +82,16 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y -q mongodb-org
           sudo systemctl enable --now mongod
-          for i in $(seq 1 30); do mongod --version >/dev/null 2>&1 && python -c "import pymongo; pymongo.MongoClient('mongodb://127.0.0.1:27017', serverSelectionTimeoutMS=2000).server_info()" 2>/dev/null && break; sleep 2; done
+          up=0
+          for i in $(seq 1 30); do mongod --version >/dev/null 2>&1 && python -c "import pymongo; pymongo.MongoClient('mongodb://127.0.0.1:27017', serverSelectionTimeoutMS=2000).server_info()" 2>/dev/null && { up=1; break; }; sleep 2; done
+          echo "kernel $(uname -r); $(lsb_release -ds)" | tee -a "$GITHUB_STEP_SUMMARY"
           mongod --version | head -1
+          if [ "$up" != 1 ]; then
+            # the server never answered: stop here with its own words, never run a workload on a server that is not up
+            sudo systemctl status mongod --no-pager || true
+            sudo journalctl -u mongod -n 100 --no-pager || true
+            echo "::error::mongod did not answer after it was started on kernel $(uname -r)"; exit 1
+          fi
           python tools/run_ycsb.py --setup --native "${{ github.event.inputs.native || 'operator' }}"
       - name: Run the workload, native and omni
         run: |
@@ -88,7 +100,10 @@ jobs:
           code=$?
           tail -40 run.log
           grep "^==\|^   " run.log | tee -a "$GITHUB_STEP_SUMMARY"
+          mkdir -p out
           sudo cat /var/log/mongodb/mongod.log > out/mongod.log 2>/dev/null || true
+          sudo journalctl -u mongod --no-pager > out/mongod.journal.txt 2>/dev/null || true
+          { echo "kernel $(uname -r)"; lsb_release -ds; echo "runner image ${ImageOS:-?} ${ImageVersion:-?}"; } > out/machine.txt
           exit $code
       - run: cd out && find . -type f -name '*.raw' -size +20M -delete; find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
       - name: Attach README, licenses and disclosures to this artifact

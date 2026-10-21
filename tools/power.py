@@ -32,6 +32,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.student_t import coverage, t95  # noqa: E402
 from tools.legal import stamp  # noqa: E402
+from tools.readings import landed  # noqa: E402
 
 LIVE = ROOT / "results" / "live"
 PAGE = ROOT / "docs" / "POWER.md"
@@ -59,7 +60,7 @@ def newest_tables(live: Path = LIVE):
             d = json.loads(p.read_text())
         except ValueError:
             continue
-        if not isinstance(d.get("rows"), dict) or not isinstance(d.get("runs"), list) or len(d["runs"]) != 3:
+        if not isinstance(d.get("rows"), dict) or not isinstance(d.get("runs"), list) or len(d["runs"]) != 3 or not landed(p):
             continue
         v, name = int(m.group(1)), m.group(2)
         if name not in best or v > best[name][0]:
