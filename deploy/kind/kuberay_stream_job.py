@@ -41,5 +41,5 @@ while sent < a.tasks or pending:
 print("OMNI_TIMES " + json.dumps({"first": min(t[0] for t in times), "last": max(t[1] for t in times), "tasks": len(times)}),
       flush=True)
 
-# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
 # monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

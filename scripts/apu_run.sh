@@ -17,7 +17,7 @@
 # power its owner pays for). The adapter has not yet run on an AMD chip: the wire check in step 1 counts nothing unless
 # both wires follow, read back and go home, so a wrong reading stops the run there and is never a result.
 set -uo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
 command -v "${AMD_SMI:-amd-smi}" >/dev/null 2>&1 || { echo "amd-smi not found: this machine has no ROCm driver (install ROCm 6.x)"; exit 1; }
 "${AMD_SMI:-amd-smi}" version >/dev/null 2>&1 || { echo "amd-smi does not answer: check the ROCm driver"; exit 1; }

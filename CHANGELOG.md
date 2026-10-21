@@ -2,6 +2,46 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21: the live engine in the founder's order, every monitor numbered and knobbed, the Python's runs in the page, the third manual
+
+- **The live engine's order** (the founder's orders of 20 October): the table of contents first, named "Engine table of contents",
+  under the one line of the notice; the front matter (the title page, the reading key); then 1 the monitor wall and the control
+  panel, 2 the benefit board, 3 the whole organism, then the whole down to the smallest part (4 the measured effect in full, 5 the
+  evidence by stack from the cloud down to the chip, 6 the organism, 7 the console, 8 the brain, 9 the failure modes, 10 the
+  components, 11 the page's rendering); every badge, part head and in-page reference renumbered; the contents name every
+  section's monitors.
+- **Every monitor numbered, on the wall, with its own knobs and its feed** (`docs/engine/monitors.json`): 58 monitors, numbered in
+  their order on the page, the wall reading them right to left and down; every monitor carries the kill switch, the console's
+  knobs where it is live and its own buttons where it replays; the inventory names each one's evidence class, state, the
+  open-source exporter and Prometheus series that would carry it on a running system, and what is still awaiting its run; the
+  whole wall as a Grafana dashboard (`docs/engine/export_grafana.py`, `deploy/grafana/omni-compass-wall.json`). New monitors: the
+  GPU card's one metered run replayed second by second (class P, the replaced controller's record), the CPU host on the harness's
+  own modelled machine until its machine (class S), an 8-card node awaiting `scripts/gpu_8card.sh`, the bill on Azure, Google
+  Cloud and Amazon with each gate's own reason, GitHub's pipeline, the nine organisms, every muscle of the catalog, the grid, the
+  Python's runs reproduced in the page and the Python's 500 scenarios a seed replayed with every trace hash. The tensor and
+  service-level monitors are on the wall.
+- **The kill switch's words** (the founder's order): ON green while Omni-Compass governs; engaged, the switch red and OFF white;
+  it stands in the control panel, in the contents, at every section's head and in every monitor's knobs, one press everywhere.
+  Each muscle of the organism carries its own switch: one muscle handed back to native, the rest under Omni-Compass.
+- **The Python's runs in the page** (`tools/engine_runs.py`): N runs from a base seed (seed_k = base + k·0x9E3779B9 mod 2³²,
+  mulberry32, the page's own generator in the Python bit for bit), each through 288 decisions of the brain (RK4), 80 steps of the
+  compass law and one give-back trial; one SHA-256 digest of the receipts. The page runs the Python's 500 again at a button and
+  matches every receipt and the digest (`d4f6586b…`); a new base runs in the page with the one Python command that runs the
+  same set; the receipts print and download. `tests/test_engine_runs.py`, `tests/test_live_monitors.py`.
+- **The whole organism every way it is bought** (`docs/engine/export_whole.py`): on-site bare metal, through the cloud (three
+  pieces and two), in the device, as a service; the cloud's back end disclosed (`DISCLOSURES.md` section 9): a tenant cannot meter
+  the provider's bare metal; the cloud piece is the bill and the machines the provider meters; the bare-metal piece is gauged on
+  hardware we meter and carried to the provider's only as a modelled factor.
+- **The third manual** (`docs/LIVE_ENGINE_MANUAL.md` and `.pdf`, `docs/book/build_live_manual.py`): the live engine read top to
+  bottom from the page itself, section by section, monitor by monitor and knob by knob, the page's own words with how to read and
+  operate each monitor; the control panel downloads all three manuals.
+- **Simulation with a capital S** in the one notice (`tools/legal.py`), written on every file but the engine's fingerprinted ones,
+  which take it with the next version; the workflows' embedded legal bundles re-written to match.
+- **GitHub**: the branch's verify failed only on the release manifest (hashed pages changed); the manifest and the receipt are
+  regenerated with this change. Azure's set to the paid cap runs (repetition 31 of 100 at 20:13 UTC); Google's gate holds on a key
+  stored short (595 characters, not the key file); Amazon's on the Free plan (the organization's policy denies every machine
+  read). Both say so in their own words on the bill monitors.
+
 ## 2026-10-20: the whole system, every layer composed by the product law; Gödel's rig on 1.24; the CPU power harness seeded
 
 - **The whole system** (`results/WHOLE_SYSTEM.md`, `tools/whole_system.py`; the founder's question of 20 October: the cloud is
@@ -3075,7 +3115,7 @@
   (`tools/run_scale.py`, workflow `six`).
 - Robot-joint simulation compiled (identical results, about 30 times faster).
 - Real Kubernetes set 24 reproduces set 23.
-- License: evaluation and simulation use only; Omni-Compass Enterprise License for everything else; US filings notice.
+- License: evaluation and Simulation use only; Omni-Compass Enterprise License for everything else; US filings notice.
 - The Omni-Compass Manual, edition 1.0.
 
 ## Earlier

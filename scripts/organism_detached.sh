@@ -13,7 +13,7 @@
 #   ORGS=tower,stack SCALE=1000 REPS=3 DUR=10800 TEST=organism bash scripts/organism_detached.sh
 set -u
 cd "$(dirname "$0")/.."
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 ORGS="${ORGS:-stack}"; SCALE="${SCALE:-1000}"; REPS="${REPS:-3}"; DUR="${DUR:-10800}"; TEST="${TEST:-organism}"
 export PATH="$PWD/.v/bin:$PATH" ARMS="${ARMS:-native compass}" DURATION="$DUR" ORGANISM_SCALE="$SCALE" LOAD_MAX="${LOAD_MAX:-6}" LOADGEN=open
 export CLOSURE=tuning/GLOBAL_LEAGUE_PREREGISTRATION.json

@@ -470,7 +470,7 @@ def drawing(key: str, width: float = W) -> Drawing:
 FAMILIES = {"Sans": "'Liberation Sans', Arial, Helvetica, sans-serif", "Sans-Bold": "'Liberation Sans', Arial, Helvetica, sans-serif",
             "Serif": "'Liberation Serif', 'Times New Roman', serif", "Sym": "'DejaVu Sans', Verdana, sans-serif",
             "Mono": "'DejaVu Sans Mono', Menlo, monospace"}
-NOTICE = ("© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only. Any commercial use, "
+NOTICE = ("© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only. Any commercial use, "
           "commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass "
           "requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and "
           "printout carries this notice with LICENSE, NOTICE and DISCLOSURES.md. All patents, copyrights and trademarks filed "

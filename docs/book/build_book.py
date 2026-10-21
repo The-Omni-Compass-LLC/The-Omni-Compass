@@ -187,7 +187,7 @@ CODE_WIDTH = 70                     # characters of 11 pt mono that fit the fram
 
 # ---------------------------------------------------------------- text cleaning
 AI_WORDS = re.compile(r"\b(grok|chatgpt|claude|gemini|anthropic|openai|xai|copilot|same assistant|other AI builds?)\b", re.I)
-BANNER = re.compile(r"^>\s*(\*\*PROPRIETARY|©\s*2026 The Omni-Compass LLC|\*\*Evaluation and simulation use only)")
+BANNER = re.compile(r"^>\s*(\*\*PROPRIETARY|©\s*2026 The Omni-Compass LLC|\*\*Evaluation and Simulation use only)")
 
 
 def clean_lines(text: str) -> list[str]:

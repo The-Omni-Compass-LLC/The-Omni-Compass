@@ -233,7 +233,19 @@ in both arms, four cap levels): EVEN, no difference beyond the noise at any cap,
 Omni-Compass has there, more copies of the service ([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-## The manuals: the Operator's Manual and the Owner's Manual
+## The manuals: the Operator's Manual, the Owner's Manual and the Live Engine Manual
+
+**Three books** (the founder's order of 20 October). The two below, and the third:
+[`docs/LIVE_ENGINE_MANUAL.pdf`](docs/LIVE_ENGINE_MANUAL.pdf), the **Live Engine Manual**, written from the live engine itself
+(`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`; `python3 docs/book/build_live_manual.py`): the page read
+top to bottom, section by section, monitor by monitor and knob by knob, so an operator can sit at the live engine with the
+book open beside it and read, operate, tune and watch it as the engineer in charge: what every gauge is, native beside
+Omni-Compass; what the kill switch does (ON in green; engaged in red, Omni-Compass OFF in white, every setting handed back to
+native at once); how the page runs the Python's own seeded runs again at a button and proves them by one digest; which
+open-source exporter and series would carry each monitor on a running system (the wall as a Grafana dashboard,
+`deploy/grafana/omni-compass-wall.json`); and what every monitor still awaiting its run waits for. The control panel at the top
+of the live engine downloads all three books.
+
 
 [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), the Operator's Manual, is the manual for the glove box, built from the
 repository whenever it changes (`docs/book/build_book.py`): how to embed, wire, tune, run and check Omni-Compass on a
@@ -390,14 +402,14 @@ Read as one sentence: Omni-Compass takes the system in through a Data Exchange (
 
 ## License
 
-**Proprietary. Evaluation and simulation use only.** You may download, run and modify the software only to evaluate
+**Proprietary. Evaluation and Simulation use only.** You may download, run and modify the software only to evaluate
 it and to reproduce the published results, including in shadow or test mode on systems you own or control. Everything
 else requires a written **Omni-Compass Enterprise License** signed by The Omni-Compass LLC and paid for. No patent or
 trademark license is granted for any other use.
 
 | File | What it says |
 |---|---|
-| [`LICENSE`](LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
+| [`LICENSE`](LICENSE) | evaluation and Simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
 | [`NOTICE`](NOTICE) | copyright, the US filings notice, third-party notices |
 | [`PATENTS.md`](PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
 | [`TRADEMARKS.md`](TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |

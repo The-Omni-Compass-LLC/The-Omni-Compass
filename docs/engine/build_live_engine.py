@@ -184,6 +184,26 @@ def ledger(camp: dict | None = None) -> dict:
                 if reps:
                     r["progress"] = {"total": len(reps), "done": sum(j["status"] == "completed" and j["conclusion"] == "success" for j in reps),
                                      "running": sum(j["status"] == "in_progress" for j in reps)}
+            if wf == "cloud-check.yml" and r["conclusion"] == "failure" and not r.get("reason") and shutil.which("gh") and not CHECKING \
+                    and r is next((x for x in rs if x["title"] == r["title"] and x["status"] == "completed"), None):
+                # the newest finished check of each cloud: the reason its failed job wrote (its own error annotations), so the page can say why the gate holds
+                got = subprocess.run(["gh", "api", f"repos/{REPO}/actions/runs/{r['id']}/jobs"], capture_output=True, text=True, cwd=ROOT)
+                try:
+                    jobs = json.loads(got.stdout or "{}").get("jobs") or []
+                except json.JSONDecodeError:
+                    jobs = []
+                msgs = []
+                for j in jobs:
+                    if j.get("conclusion") != "failure":
+                        continue
+                    an = subprocess.run(["gh", "api", f"repos/{REPO}/check-runs/{j['id']}/annotations"], capture_output=True, text=True, cwd=ROOT)
+                    try:
+                        msgs += [a["message"] for a in json.loads(an.stdout or "[]") if a.get("annotation_level") == "failure" and not str(a.get("message", "")).startswith("Process completed")]
+                    except (json.JSONDecodeError, TypeError, KeyError):
+                        pass
+                if msgs:
+                    r["reason"] = " ".join(dict.fromkeys(msgs))
+                    r["reason_read"] = f"the job's error annotations, read {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}"
             if wf == "aks-metered.yml" and r["raw"] and r["conclusion"] == "success":   # the bill as the run's own LIVE_REPS.json reads it
                 src = f"{ref}:{pre}run-{r['id']}/live-reps-aks/LIVE_REPS.json"
                 try:
@@ -194,6 +214,26 @@ def ledger(camp: dict | None = None) -> dict:
                 if arm:
                     r["result"] = {"reps": len((lr.get("repetitions") or {}).get("native") or []),
                                    "gauges": {g: {k: arm[g].get(k) for k in ("native", "omni", "ci95", "significant")} for g in LEDGER_GAUGES if g in arm}}
+                    # the machines Azure billed every 15 s in each arm of each repetition (billed_nodes.csv), for the bill monitor's replay
+                    billed = []
+                    for i in range(1, 101):
+                        arms = {}
+                        for arm_key, names in (("native", ("native",)), ("omni", ("compass", "omni"))):
+                            for nm in names:
+                                txt = git("show", f"{ref}:{pre}run-{r['id']}/aks-{i}/bench-{nm}-{i}/billed_nodes.csv")
+                                if txt:
+                                    pts = [ln.split(",") for ln in txt.splitlines()[1:] if "," in ln]
+                                    try:
+                                        t0 = int(pts[0][0])
+                                        arms[arm_key] = [[int(a) - t0, int(b)] for a, b in pts]
+                                    except (ValueError, IndexError):
+                                        pass
+                                    break
+                        if not arms:
+                            break
+                        billed.append({"rep": i, **arms})
+                    if billed:
+                        r["result"]["billed"] = billed
     # the page shows the runs on omni-v8 and newer, each with its engine; the earlier engines' runs stay in GitHub's own list
     # and in docs/history (the founder's order of 19 October: no version 7 on the page)
     def recent(r):
@@ -790,11 +830,24 @@ def records(runs: bool) -> dict:
     import export_harness_trace as XH
     import export_scenarios as XS
     import export_whole as XW
+    import export_gpu_run as XG
+    import export_cpu_model as XCPU
+    import export_grafana as XGF
+    import export_heldout as XHO
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
         import export_runs as XR
         XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json")); XR.main(str(t / "r.json")); XW.main(str(t / "w.json"))
-        h, c, s, rr, wh = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json", "w.json"))
+        XG.main(str(t / "g.json")); XCPU.main(str(t / "cpu.json")); XHO.main(str(t / "ho.json"))
+        h, c, s, rr, wh, gpu, cpu, ho = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json", "w.json", "g.json", "cpu.json", "ho.json"))
+        # the monitor registry with the wall's Grafana dashboard (written to deploy/grafana/omni-compass-wall.json by the build, read back by a check)
+        reg = json.loads((HERE / "monitors.json").read_text(encoding="utf-8"))
+        reg["grafana"] = XGF.main(str(t / "wall.json")) if CHECKING else XGF.main()
+        # the Python's runs (tools/engine_runs.py): the newest record, for the page to run the same runs and compare
+        er_files = sorted((ROOT / "results" / "engine_runs").glob("ENGINE_RUNS_*.json"))
+        eruns = json.loads(er_files[-1].read_text(encoding="utf-8")) if er_files else {"missing": "results/engine_runs"}
+        if er_files:
+            eruns["file"] = str(er_files[-1].relative_to(ROOT))
     name, digest = engine()
     now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     gh = github_runs() if runs else None
@@ -807,7 +860,8 @@ def records(runs: bool) -> dict:
              "runs": gh or [], "runs_read_at": now() if gh is not None else None}
     build["board"] = board(build["runs"], camp)
     build["ledger"] = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
-    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh}
+    return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
+            "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho}
 
 
 def embedded(page: str, key: str):
@@ -858,7 +912,7 @@ def main() -> int:
         print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole") if embedded(page, k) != rec[k]]
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout") if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
         # the ledger, the commit and the time) is a reading with its own read time, not rebuilt by a check
@@ -868,7 +922,7 @@ def main() -> int:
             bad.append("build")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole"):
+    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     b = rec["build"]

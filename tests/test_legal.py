@@ -20,11 +20,11 @@ OLD_TOP = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c
            "open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use requires a "
            "signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent " + "applications, copyright "
            "registrations and trademark applications covering the Omni-Compass engine have been filed in the United States.")
-OLD_END = ("*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use requires a signed, paid\n"
+OLD_END = ("*Evaluation and Simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use requires a signed, paid\n"
            "Omni-Compass Enterprise License from The Omni-Compass LLC. All rights reserved.*")
 
 WORKFLOW = """# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 name: demo
 on:
@@ -114,7 +114,7 @@ class TestMarkdown(unittest.TestCase):
 
 class TestHeaders(unittest.TestCase):
     def test_header_rewritten_after_the_shebang_and_idempotent(self):
-        src = "#!/usr/bin/env python3\n# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0\n# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid\n# Omni-Compass Enterprise License. See LICENSE.\n# What this script does.\nprint(1)\n"
+        src = "#!/usr/bin/env python3\n# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0\n# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only; any other use requires a signed, paid\n# Omni-Compass Enterprise License. See LICENSE.\n# What this script does.\nprint(1)\n"
         out = legal.normalize_header(src, "#")
         lines = out.split("\n")
         self.assertEqual(lines[0], "#!/usr/bin/env python3")

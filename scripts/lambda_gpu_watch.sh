@@ -12,7 +12,7 @@
 # Writes the state (done, deadline, gone or watching) to OUT/state. The key never leaves the environment.
 # Usage: bash scripts/lambda_gpu_watch.sh ID IP DEADLINE_EPOCH MINUTES OUT     (SSH_KEY: the private key file)
 set -uo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 ID="$1"; IP="$2"; DEADLINE="$3"; MINUTES="$4"; OUT="$5"
 EVERY="${EVERY:-600}"
 mkdir -p "$OUT"

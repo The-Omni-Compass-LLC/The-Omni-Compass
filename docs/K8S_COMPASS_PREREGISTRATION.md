@@ -1014,7 +1014,7 @@ modelled grid (`six`) is run again on the new engine too (its numbers are expect
 unchanged but for comments, headers and one label's name), because no result is read across engine versions.
 
 ---
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+*Evaluation and Simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
 All rights reserved. See `LICENSE` and `NOTICE` at the root of this repository. All patents, copyrights and trademarks
 filed in the USA. www.omni-compass.com*

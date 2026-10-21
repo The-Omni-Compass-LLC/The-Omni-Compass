@@ -195,14 +195,14 @@ organisms, Omni index. GitHub topics for this repository are set from the reposi
 
 ## License
 
-**Proprietary. Evaluation and simulation use only.** You may download, run and modify the software only to evaluate
+**Proprietary. Evaluation and Simulation use only.** You may download, run and modify the software only to evaluate
 it and to reproduce the published results, including in shadow or test mode on systems you own or control. Everything
 else requires a written **Omni-Compass Enterprise License** signed by The Omni-Compass LLC and paid for. No patent or
 trademark license is granted for any other use.
 
 | File | What it says |
 |---|---|
-| [`LICENSE`](../../LICENSE) | evaluation and simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
+| [`LICENSE`](../../LICENSE) | evaluation and Simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
 | [`NOTICE`](../../NOTICE) | copyright, the US filings notice, third-party notices |
 | [`PATENTS.md`](../../PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
 | [`TRADEMARKS.md`](../../TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |

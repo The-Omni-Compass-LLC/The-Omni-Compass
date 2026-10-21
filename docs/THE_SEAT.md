@@ -96,7 +96,7 @@ placement, the learned GPU power cap and NVIDIA's platform power budget. A model
 
 - **The copyright in Omni-Compass belongs to The Omni-Compass LLC.** Contributions are accepted only on the terms of
   `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
-- **The source is visible under the Omni-Compass Evaluation License (`LICENSE`): evaluation and simulation use only.**
+- **The source is visible under the Omni-Compass Evaluation License (`LICENSE`): evaluation and Simulation use only.**
   It is not an open-source license. Any commercial use, commercialization, monetization, production use,
   redistribution or hosted service requires a signed, paid Omni-Compass Enterprise License. Seeing the source grants
   no right beyond the Evaluation License.

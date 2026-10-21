@@ -62,7 +62,7 @@ def header(c, version, page, total):
     c.setFont("Helvetica", 7)
     c.drawString(M, H - M + 8, f"{TITLE}. Version {version}. Copyright (c) 2026 {OWNER}. All rights reserved.")
     c.drawRightString(W - M, H - M + 8, f"page {page} of {total}")
-    c.drawString(M, M - 18, "Confidential. Evaluation and simulation use only; any other use requires a signed, paid "
+    c.drawString(M, M - 18, "Confidential. Evaluation and Simulation use only; any other use requires a signed, paid "
                  "Omni-Compass Enterprise License.")
 
 

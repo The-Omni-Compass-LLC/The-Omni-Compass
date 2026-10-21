@@ -22,7 +22,7 @@
 # Usage: REP=n ARMS="native compass" GCP_PROJECT=... [GCP_ZONE=us-central1-a GKE_MACHINE=e2-standard-2
 #        GKE_MAX_NODES=4 RUN_ID=...] bash scripts/gke_paired.sh
 set -euo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native compass}"
 PROJECT="${GCP_PROJECT:?set GCP_PROJECT}"; ZONE="${GCP_ZONE:-us-central1-a}"; MACHINE="${GKE_MACHINE:-e2-standard-2}"
 MAX="${GKE_MAX_NODES:-4}"; RUNID="${RUN_ID:-local}"

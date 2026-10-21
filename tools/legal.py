@@ -155,7 +155,7 @@ def _legal_paragraph(par: list[str]) -> bool:
     t = _flat(" ".join(par))
     if "omni-compass llc" not in t and "spdx-license-identifier" not in t:
         return False
-    return any(h in t for h in ("evaluation and simulation use only", "enterprise license", "all rights reserved",
+    return any(h in t for h in ("evaluation and Simulation use only", "enterprise license", "all rights reserved",
                                 "spdx-license-identifier", "proprietary") + RETIRED)
 
 

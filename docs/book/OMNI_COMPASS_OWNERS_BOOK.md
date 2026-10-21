@@ -323,6 +323,8 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -1194,7 +1196,7 @@ placement, the learned GPU power cap and NVIDIA's platform power budget. A model
 
 - **The copyright in Omni-Compass belongs to The Omni-Compass LLC.** Contributions are accepted only on the terms of
   `.github/CONTRIBUTING.md`, which assign their rights to The Omni-Compass LLC.
-- **The source is visible under the Omni-Compass Evaluation License (`LICENSE`): evaluation and simulation use only.**
+- **The source is visible under the Omni-Compass Evaluation License (`LICENSE`): evaluation and Simulation use only.**
   It is not an open-source license. Any commercial use, commercialization, monetization, production use,
   redistribution or hosted service requires a signed, paid Omni-Compass Enterprise License. Seeing the source grants
   no right beyond the Evaluation License.
@@ -7412,6 +7414,8 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -7657,37 +7661,39 @@ Every row names the engine its table ran on (read from the table). Results are n
 
 | Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |
 |---|---|---|---|---:|---|---|
-| 2026-10-19 | Every real test together: the Omni index | omni-v10 and omni-v11 | **GAIN, power given** | **+4.4% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
-| 2026-10-19 | Robustness: the two-hour run | omni-v11 | **GAIN, power given** | **+3.8% GAIN** | mean response cut 34% to 36% (GAIN); time over the line cut 32% to 35% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 14% to 19% (GAIN); replicas up 49% to 52% (power given) | `results/live/V11_ROBUST_LONG.md` |
-| 2026-10-19 | Robustness: the governor killed outright mid-run | omni-v11 | **GAIN, power given** | **+11% GAIN** | mean response cut 29% to 44% (GAIN); p95 cut 39% to 58% (GAIN); time over the line cut 30% to 31% (GAIN); failed requests cut 7% to 12% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 16% to 23% (GAIN); replicas up 3.4% to 6.4% (power given) | `results/live/V11_ROBUST_KILL.md` |
-| 2026-10-19 | Robot arms (MuJoCo), the three untouched robots | omni-v11 | **GAIN** | **+3.8% GAIN** | energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN) | `results/live/V11_MUJOCO.md` |
-| 2026-10-19 | Redis, the cache's memory ceiling | omni-v11 | **GAIN** | **+0.3% GAIN** | memory ceiling held cut 2.3% to 2.6% (GAIN); memory used cut 0.9% to 1.3% (GAIN); work inside the line up 1.4% to 1.6% (GAIN); hit rate up 1.4% to 1.6% (GAIN) | `results/live/V11_REDIS.md` |
-| 2026-10-19 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | **GAIN, power given** | **+73% GAIN** | parked-worker energy up 1.7% to 2.3% (power given); standby-model energy up 1.7% to 2.3% (power given); mean response cut 47% to 48% (GAIN); p95 cut 61% to 64% (GAIN); p99 cut 68% to 70% (GAIN); time over the line cut 98% to 100% (GAIN); pods started cut 53% to 61% (GAIN); pod start wait, total (s) cut 48% to 63% (GAIN) | `results/live/V11_GOLDILOCKS.md` |
-| 2026-10-19 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | **GAIN, power given** | **+60% GAIN** | parked-worker energy up 1.6% to 2.2% (power given); standby-model energy up 1.6% to 2.2% (power given); mean response cut 57% (GAIN); p95 cut 72% to 74% (GAIN); p99 cut 57% to 62% (GAIN); time over the line cut 98% to 99% (GAIN); replicas cut 11% to 20% (GAIN) | `results/live/V11_KEDA_REQUESTS.md` |
-| 2026-10-19 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | **GAIN, power given** | **+41% GAIN** | parked-worker energy up 1.1% to 1.8% (power given); standby-model energy up 1.1% to 1.8% (power given); mean response cut 36% to 37% (GAIN); p95 cut 52% to 53% (GAIN); p99 cut 57% to 61% (GAIN); time over the line cut 97% to 100% (GAIN); replicas up 1.8% to 3.1% (power given) | `results/live/V11_KEDA_CPU_REQUESTS.md` |
-| 2026-10-19 | Power grids (SimBench), both load models | omni-v11 | **GAIN, power given** | **+5.8% GAIN** | energy the loads drew cut 1.3% to 1.5% (GAIN); energy dissipated in lines and transformers cut 0.0% to 2.4% (GAIN); net import from the upstream grid cut 0% to 15% (GAIN); tap operations cut 16% to 38% (GAIN); energy dissipated in lines and transformers up 0.6% to 1.5% (power given); tap operations up 100% (power given); net import from the upstream grid up 0.0% (power given) | `results/live/V11_PANDAPOWER.md` |
-| 2026-10-19 | PostgreSQL, the pooler's pool size | omni-v11 | **power given** | **0%: EVEN** | connections most at once up 8% to 10% (power given) | `results/live/V11_PGBENCH.md` |
-| 2026-10-19 | MySQL, the buffer pool's size | omni-v11 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V11_SYSBENCH.md` |
-| 2026-10-19 | MongoDB, the storage engine's cache size | omni-v11 | **GAIN** | **+0.1% GAIN** | cache size held cut 0.9% to 1.0% (GAIN) | `results/live/V11_YCSB.md` |
-| 2026-10-19 | Kafka, the consumer group's size | omni-v11 | **GAIN** | **+0.1% GAIN** | consumers running cut 0.8% (GAIN) | `results/live/V11_KAFKA.md` |
-| 2026-10-19 | Drone swarms, the three untouched cells | omni-v11 | **GAIN** | **+5.9% GAIN** | energy per mission cut 7% to 20% (GAIN); fleet energy over the window cut 7% to 20% (GAIN); missions per charge at the autopilot's reserve up 8% to 25% (GAIN) | `results/live/V11_SWARM.md` |
-| 2026-10-19 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | **GAIN, power given** | **+1.5% GAIN** | electricity bought cut 3% to 14% (GAIN); daily peak draw cut 3% to 17% (GAIN); highest peak cut 2.7% to 4.4% (GAIN); ramping cut 3% to 10% (GAIN); daily load unevenness cut 0.9% to 6.0% (GAIN); monthly load unevenness cut 0.8% to 2.3% (GAIN); distance from zero net energy up 0.0% (power given); electricity bill cut 16% (GAIN); carbon cut 12% (GAIN); distance from zero net energy cut 0.1% to 1.0% (GAIN) | `results/live/V11_CITYLEARN.md` |
-| 2026-10-18 | Real Kubernetes, steady work | omni-v10 | **GAIN** | **+30% GAIN** | mean response cut 48% to 49% (GAIN); p95 cut 64% to 65% (GAIN); p99 cut 69% to 73% (GAIN); time over the line cut 98% to 100% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 100% (GAIN) | `results/live/V10_STEADY.md` |
-| 2026-10-18 | Real Kubernetes, faults | omni-v10 | **GAIN, power given** | **+34% GAIN** | mean response cut 33% to 40% (GAIN); p95 cut 54% to 63% (GAIN); p99 cut 43% to 51% (GAIN); time over the line cut 26% to 31% (GAIN); replicas up 14% to 20% (power given) | `results/live/V10_FAULTS.md` |
-| 2026-10-18 | Real Kubernetes, demand that wanders | omni-v10 | **GAIN** | **+37% GAIN** | parked-worker energy cut 0.3% to 0.4% (GAIN); standby-model energy cut 0.3% to 0.4% (GAIN); mean response cut 45% to 50% (GAIN); p95 cut 57% to 65% (GAIN); p99 cut 34% to 46% (GAIN); time over the line cut 38% to 45% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 21% to 32% (GAIN) | `results/live/V10_WANDERING.md` |
-| 2026-10-18 | Real Kubernetes, all four at once | omni-v10 | **GAIN** | **+40% GAIN** | work inside the line up 47% to 79% (GAIN); mean response cut 38% to 46% (GAIN); p95 cut 56% to 61% (GAIN); time over the line cut 35% to 46% (GAIN); failed requests cut 9% to 14% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 16% to 34% (GAIN) | `results/live/V10_ALL_FOUR.md` |
-| 2026-10-18 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V10_CRUISEKUBE.md` |
-| 2026-10-18 | Real Kubernetes, a queue of jobs | omni-v10 | **GAIN** | **+10% GAIN** | machines cut 6% to 14% (GAIN); machine-hours cut 6% to 14% (GAIN); standby-model energy cut 4.3% to 9.5% (GAIN); mean response cut 10% to 12% (GAIN); machines after the queue cut 10% to 22% (GAIN) | `results/live/V10_BATCH.md` |
-| 2026-10-18 | Real Kubernetes, a public day of demand (Google 2011) | omni-v10 | **GAIN, power given** | **+35% GAIN** | parked-worker energy cut 0.3% to 0.4% (GAIN); standby-model energy cut 0.3% to 0.4% (GAIN); mean response cut 48% to 50% (GAIN); p95 cut 56% to 62% (GAIN); p99 cut 38% to 51% (GAIN); time over the line cut 74% to 77% (GAIN); failed requests cut 15% to 18% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 61% to 66% (GAIN); pods started up 120% to 193% (power given) | `results/live/V10_TRACE_GOOGLE2011.md` |
-| 2026-10-18 | Real Kubernetes, a noisy neighbour | omni-v10 | **GAIN** | **0%: EVEN** | time over the line cut 11% (GAIN) | `results/live/V10_FAIRNESS.md` |
-| 2026-10-13 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | **GAIN, power given** | **+5.3% GAIN** | p95 cut 32% to 52% (GAIN); time over the line cut 8% to 36% (GAIN); replicas up 0.6% (power given); failed requests cut 8.4% to 8.5% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN) | `results/live/V3_SIX_KUBE.md` |
-| 2026-10-13 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | **GAIN** | **+155% GAIN** | p95 cut 95% to 98% (GAIN); p99 cut 97% to 98% (GAIN) | `results/live/V3_BIG_ORGANISM.md` |
-| 2026-10-13 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | **GAIN** | **+0.3% GAIN** | work per energy up 0.3% (GAIN) | `results/realms/REALMS.md` |
+| 2026-10-20 | Every real test together: the Omni index | omni-v10 and omni-v11 | **GAIN, power given** | **+4.4% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| 2026-10-20 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | **GAIN, power given** | **+5.3% GAIN** | p95 cut 32% to 52% (GAIN); time over the line cut 8% to 36% (GAIN); replicas up 0.6% (power given); failed requests cut 8.4% to 8.5% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN) | `results/live/V3_SIX_KUBE.md` |
+| 2026-10-20 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | **GAIN** | **+155% GAIN** | p95 cut 95% to 98% (GAIN); p99 cut 97% to 98% (GAIN) | `results/live/V3_BIG_ORGANISM.md` |
+| 2026-10-20 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | **GAIN** | **+0.3% GAIN** | work per energy up 0.3% (GAIN) | `results/realms/REALMS.md` |
+| 2026-10-20 | Robustness: the two-hour run | omni-v11 | **GAIN, power given** | **+3.8% GAIN** | mean response cut 34% to 36% (GAIN); time over the line cut 32% to 35% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 14% to 19% (GAIN); replicas up 49% to 52% (power given) | `results/live/V11_ROBUST_LONG.md` |
+| 2026-10-20 | Robustness: the governor killed outright mid-run | omni-v11 | **GAIN, power given** | **+11% GAIN** | mean response cut 29% to 44% (GAIN); p95 cut 39% to 58% (GAIN); time over the line cut 30% to 31% (GAIN); failed requests cut 7% to 12% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 16% to 23% (GAIN); replicas up 3.4% to 6.4% (power given) | `results/live/V11_ROBUST_KILL.md` |
+| 2026-10-20 | Robot arms (MuJoCo), the three untouched robots | omni-v11 | **GAIN** | **+3.8% GAIN** | energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN) | `results/live/V11_MUJOCO.md` |
+| 2026-10-20 | Redis, the cache's memory ceiling | omni-v11 | **GAIN** | **+0.3% GAIN** | memory ceiling held cut 2.3% to 2.6% (GAIN); memory used cut 0.9% to 1.3% (GAIN); work inside the line up 1.4% to 1.6% (GAIN); hit rate up 1.4% to 1.6% (GAIN) | `results/live/V11_REDIS.md` |
+| 2026-10-20 | Real Kubernetes, steady work | omni-v10 | **GAIN** | **+30% GAIN** | mean response cut 48% to 49% (GAIN); p95 cut 64% to 65% (GAIN); p99 cut 69% to 73% (GAIN); time over the line cut 98% to 100% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 100% (GAIN) | `results/live/V10_STEADY.md` |
+| 2026-10-20 | Real Kubernetes, faults | omni-v10 | **GAIN, power given** | **+34% GAIN** | mean response cut 33% to 40% (GAIN); p95 cut 54% to 63% (GAIN); p99 cut 43% to 51% (GAIN); time over the line cut 26% to 31% (GAIN); replicas up 14% to 20% (power given) | `results/live/V10_FAULTS.md` |
+| 2026-10-20 | Real Kubernetes, demand that wanders | omni-v10 | **GAIN** | **+37% GAIN** | parked-worker energy cut 0.3% to 0.4% (GAIN); standby-model energy cut 0.3% to 0.4% (GAIN); mean response cut 45% to 50% (GAIN); p95 cut 57% to 65% (GAIN); p99 cut 34% to 46% (GAIN); time over the line cut 38% to 45% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 21% to 32% (GAIN) | `results/live/V10_WANDERING.md` |
+| 2026-10-20 | Real Kubernetes, all four at once | omni-v10 | **GAIN** | **+40% GAIN** | work inside the line up 47% to 79% (GAIN); mean response cut 38% to 46% (GAIN); p95 cut 56% to 61% (GAIN); time over the line cut 35% to 46% (GAIN); failed requests cut 9% to 14% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 16% to 34% (GAIN) | `results/live/V10_ALL_FOUR.md` |
+| 2026-10-20 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | **GAIN, power given** | **+73% GAIN** | parked-worker energy up 1.7% to 2.3% (power given); standby-model energy up 1.7% to 2.3% (power given); mean response cut 47% to 48% (GAIN); p95 cut 61% to 64% (GAIN); p99 cut 68% to 70% (GAIN); time over the line cut 98% to 100% (GAIN); pods started cut 53% to 61% (GAIN); pod start wait, total (s) cut 48% to 63% (GAIN) | `results/live/V11_GOLDILOCKS.md` |
+| 2026-10-20 | Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V10_CRUISEKUBE.md` |
+| 2026-10-20 | Real Kubernetes, a queue of jobs | omni-v10 | **GAIN** | **+10% GAIN** | machines cut 6% to 14% (GAIN); machine-hours cut 6% to 14% (GAIN); standby-model energy cut 4.3% to 9.5% (GAIN); mean response cut 10% to 12% (GAIN); machines after the queue cut 10% to 22% (GAIN) | `results/live/V10_BATCH.md` |
+| 2026-10-20 | Real Kubernetes, a public day of demand (Google 2011) | omni-v10 | **GAIN, power given** | **+35% GAIN** | parked-worker energy cut 0.3% to 0.4% (GAIN); standby-model energy cut 0.3% to 0.4% (GAIN); mean response cut 48% to 50% (GAIN); p95 cut 56% to 62% (GAIN); p99 cut 38% to 51% (GAIN); time over the line cut 74% to 77% (GAIN); failed requests cut 15% to 18% (GAIN); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) cut 61% to 66% (GAIN); pods started up 120% to 193% (power given) | `results/live/V10_TRACE_GOOGLE2011.md` |
+| 2026-10-20 | Real Kubernetes, a noisy neighbour | omni-v10 | **GAIN** | **0%: EVEN** | time over the line cut 11% (GAIN) | `results/live/V10_FAIRNESS.md` |
+| 2026-10-20 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | **GAIN, power given** | **+60% GAIN** | parked-worker energy up 1.6% to 2.2% (power given); standby-model energy up 1.6% to 2.2% (power given); mean response cut 57% (GAIN); p95 cut 72% to 74% (GAIN); p99 cut 57% to 62% (GAIN); time over the line cut 98% to 99% (GAIN); replicas cut 11% to 20% (GAIN) | `results/live/V11_KEDA_REQUESTS.md` |
+| 2026-10-20 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | **GAIN, power given** | **+41% GAIN** | parked-worker energy up 1.1% to 1.8% (power given); standby-model energy up 1.1% to 1.8% (power given); mean response cut 36% to 37% (GAIN); p95 cut 52% to 53% (GAIN); p99 cut 57% to 61% (GAIN); time over the line cut 97% to 100% (GAIN); replicas up 1.8% to 3.1% (power given) | `results/live/V11_KEDA_CPU_REQUESTS.md` |
+| 2026-10-20 | Power grids (SimBench), both load models | omni-v11 | **GAIN, power given** | **+5.8% GAIN** | energy the loads drew cut 1.3% to 1.5% (GAIN); energy dissipated in lines and transformers cut 0.0% to 2.4% (GAIN); net import from the upstream grid cut 0% to 15% (GAIN); tap operations cut 16% to 38% (GAIN); energy dissipated in lines and transformers up 0.6% to 1.5% (power given); tap operations up 100% (power given); net import from the upstream grid up 0.0% (power given) | `results/live/V11_PANDAPOWER.md` |
+| 2026-10-20 | PostgreSQL, the pooler's pool size | omni-v11 | **power given** | **0%: EVEN** | connections most at once up 8% to 10% (power given) | `results/live/V11_PGBENCH.md` |
+| 2026-10-20 | MySQL, the buffer pool's size | omni-v11 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V11_SYSBENCH.md` |
+| 2026-10-20 | MongoDB, the storage engine's cache size | omni-v11 | **GAIN** | **+0.1% GAIN** | cache size held cut 0.9% to 1.0% (GAIN) | `results/live/V11_YCSB.md` |
+| 2026-10-20 | Kafka, the consumer group's size | omni-v11 | **GAIN** | **+0.1% GAIN** | consumers running cut 0.8% (GAIN) | `results/live/V11_KAFKA.md` |
+| 2026-10-20 | Drone swarms, the three untouched cells | omni-v11 | **GAIN** | **+5.9% GAIN** | energy per mission cut 7% to 20% (GAIN); fleet energy over the window cut 7% to 20% (GAIN); missions per charge at the autopilot's reserve up 8% to 25% (GAIN) | `results/live/V11_SWARM.md` |
+| 2026-10-20 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | **GAIN, power given** | **+1.5% GAIN** | electricity bought cut 3% to 14% (GAIN); daily peak draw cut 3% to 17% (GAIN); highest peak cut 2.7% to 4.4% (GAIN); ramping cut 3% to 10% (GAIN); daily load unevenness cut 0.9% to 6.0% (GAIN); monthly load unevenness cut 0.8% to 2.3% (GAIN); distance from zero net energy up 0.0% (power given); electricity bill cut 16% (GAIN); carbon cut 12% (GAIN); distance from zero net energy cut 0.1% to 1.0% (GAIN) | `results/live/V11_CITYLEARN.md` |
 
 ### 54.1 The parts behind a row
 
 Where a row sums several workloads, grids, districts, cells or robots, each part with its own number, the same way round:
 
+- **The six organisms with the real cluster inside, 10 and 100 copies**: compute_ai_cloud at 10 copies +14% GAIN (GAIN: p95 cut 50% (GAIN); time over the line cut 32% (GAIN)); physics_robotics_autonomous at 10 copies 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); energy_facility_industrial at 10 copies +5.0% GAIN (GAIN, power given: time over the line cut 33% (GAIN); replicas up 0.6% (power given)); distribution_specialized at 10 copies +16% GAIN (GAIN: p95 cut 52% (GAIN); time over the line cut 36% (GAIN)); tower at 10 copies +11% GAIN (GAIN: p95 cut 42% (GAIN); time over the line cut 20% (GAIN); failed requests cut 8.4% (GAIN)); stack at 10 copies +2.8% GAIN (GAIN: time over the line cut 12% (GAIN); failed requests cut 8.5% (GAIN)); compute_ai_cloud at 100 copies +1.3% GAIN (GAIN: time over the line cut 9.8% (GAIN)); physics_robotics_autonomous at 100 copies +1.1% GAIN (GAIN: time over the line cut 8.4% (GAIN)); energy_facility_industrial at 100 copies +2.1% GAIN (GAIN: time over the line cut 15% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN)); distribution_specialized at 100 copies +8.2% GAIN (GAIN: p95 cut 32% (GAIN); time over the line cut 22% (GAIN)); tower at 100 copies +1.3% GAIN (GAIN: time over the line cut 8.7% (GAIN)); stack at 100 copies +2.3% GAIN (GAIN: time over the line cut 15% (GAIN)).
+- **The big organisms with the real cluster inside, 1,000 copies on Azure**: tower at 1000 copies +159% GAIN (GAIN: p95 cut 98% (GAIN); p99 cut 98% (GAIN)); stack at 1000 copies +151% GAIN (GAIN: p95 cut 95% (GAIN); p99 cut 97% (GAIN)).
 - **Robot arms (MuJoCo), the three untouched robots**: kinova_gen3 +12% GAIN (GAIN: energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN)); kuka_iiwa_14 (left native by the engine's own trial) 0%: EVEN (EVEN: EVEN: nothing moved); universal_robots_ur5e (left native by the engine's own trial) 0%: EVEN (EVEN: EVEN: nothing moved).
 - **Redis, the cache's memory ceiling**: burst +0.6% GAIN (GAIN: memory ceiling held cut 2.3% to 2.6% (GAIN); memory used cut 0.9% to 1.3% (GAIN)); large +0.4% GAIN (GAIN: work inside the line up 1.4% to 1.6% (GAIN); hit rate up 1.4% to 1.6% (GAIN)); small 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs).
 - **Power grids (SimBench), both load models**: 1-MV-comm--0-sw (ZIP loads) +9.7% GAIN (GAIN: energy the loads drew cut 1.5% (GAIN); energy dissipated in lines and transformers cut 1.0% (GAIN); net import from the upstream grid cut 2.9% (GAIN); tap operations cut 34% (GAIN)); 1-MV-comm--1-sw (ZIP loads) +13% GAIN (GAIN: energy the loads drew cut 1.4% (GAIN); energy dissipated in lines and transformers cut 0.8% (GAIN); net import from the upstream grid cut 15% (GAIN); tap operations cut 36% (GAIN)); 1-MV-comm--2-sw (ZIP loads) +11% GAIN (GAIN: energy the loads drew cut 1.4% (GAIN); energy dissipated in lines and transformers cut 0.3% (GAIN); net import from the upstream grid cut 6.4% (GAIN); tap operations cut 36% (GAIN)); 1-MV-rural--1-sw (ZIP loads) -13% power given (GAIN, power given: energy the loads drew cut 1.4% (GAIN); net import from the upstream grid cut 1.4% (GAIN); energy dissipated in lines and transformers up 0.8% (power given); tap operations up 100% (power given)); 1-MV-rural--2-sw (ZIP loads) +6.8% GAIN (GAIN, power given: energy the loads drew cut 1.3% (GAIN); net import from the upstream grid cut 1.1% (GAIN); tap operations cut 27% (GAIN); energy dissipated in lines and transformers up 1.5% (power given)); 1-MV-semiurb--0-sw (ZIP loads) +12% GAIN (GAIN: energy the loads drew cut 1.4% (GAIN); energy dissipated in lines and transformers cut 1.0% (GAIN); net import from the upstream grid cut 7.0% (GAIN); tap operations cut 38% (GAIN)); 1-MV-semiurb--1-sw (ZIP loads) +9.0% GAIN (GAIN, power given: energy the loads drew cut 1.4% (GAIN); net import from the upstream grid cut 1.1% (GAIN); tap operations cut 34% (GAIN); energy dissipated in lines and transformers up 0.7% (power given)); 1-MV-semiurb--2-sw (ZIP loads) +5.8% GAIN (GAIN, power given: energy the loads drew cut 1.4% (GAIN); net import from the upstream grid cut 0.9% (GAIN); tap operations cut 24% (GAIN); energy dissipated in lines and transformers up 1.1% (power given)); 1-MV-urban--0-sw (ZIP loads) +8.9% GAIN (GAIN: energy the loads drew cut 1.5% (GAIN); energy dissipated in lines and transformers cut 2.4% (GAIN); net import from the upstream grid cut 2.0% (GAIN); tap operations cut 31% (GAIN)); 1-MV-urban--1-sw (ZIP loads) +8.6% GAIN (GAIN: energy the loads drew cut 1.5% (GAIN); energy dissipated in lines and transformers cut 2.4% (GAIN); net import from the upstream grid cut 2.2% (GAIN); tap operations cut 30% (GAIN)); 1-MV-urban--2-sw (ZIP loads) +6.8% GAIN (GAIN: energy the loads drew cut 1.5% (GAIN); energy dissipated in lines and transformers cut 2.2% (GAIN); net import from the upstream grid cut 3.1% (GAIN); tap operations cut 23% (GAIN)); 1-MV-comm--0-sw (constant-power loads) +7.8% GAIN (GAIN: energy dissipated in lines and transformers cut 0.5% (GAIN); net import from the upstream grid cut 0.0% (GAIN); tap operations cut 31% (GAIN)); 1-MV-comm--1-sw (constant-power loads) +7.7% GAIN (GAIN: energy dissipated in lines and transformers cut 0.4% (GAIN); net import from the upstream grid cut 0.0% (GAIN); tap operations cut 31% (GAIN)); 1-MV-comm--2-sw (constant-power loads) +7.8% GAIN (GAIN: energy dissipated in lines and transformers cut 0.0% (GAIN); net import from the upstream grid cut 0.0% (GAIN); tap operations cut 31% (GAIN)); 1-MV-rural--1-sw (constant-power loads) -13% power given (power given: energy dissipated in lines and transformers up 0.6% (power given); net import from the upstream grid up 0.0% (power given); tap operations up 100% (power given)); 1-MV-rural--2-sw (constant-power loads) +3.3% GAIN (GAIN, power given: tap operations cut 16% (GAIN); energy dissipated in lines and transformers up 1.2% (power given); net import from the upstream grid up 0.0% (power given)); 1-MV-semiurb--0-sw (constant-power loads) +7.4% GAIN (GAIN: energy dissipated in lines and transformers cut 0.9% (GAIN); net import from the upstream grid cut 0.1% (GAIN); tap operations cut 29% (GAIN)); 1-MV-semiurb--1-sw (constant-power loads) +7.6% GAIN (GAIN, power given: tap operations cut 31% (GAIN); energy dissipated in lines and transformers up 0.6% (power given); net import from the upstream grid up 0.0% (power given)); 1-MV-semiurb--2-sw (constant-power loads) +4.7% GAIN (GAIN, power given: tap operations cut 21% (GAIN); energy dissipated in lines and transformers up 0.9% (power given); net import from the upstream grid up 0.0% (power given)); 1-MV-urban--0-sw (constant-power loads) +7.7% GAIN (GAIN: energy dissipated in lines and transformers cut 1.9% (GAIN); net import from the upstream grid cut 0.0% (GAIN); tap operations cut 30% (GAIN)); 1-MV-urban--1-sw (constant-power loads) +6.8% GAIN (GAIN: energy dissipated in lines and transformers cut 1.9% (GAIN); net import from the upstream grid cut 0.0% (GAIN); tap operations cut 27% (GAIN)); 1-MV-urban--2-sw (constant-power loads) +5.4% GAIN (GAIN: energy dissipated in lines and transformers cut 1.8% (GAIN); net import from the upstream grid cut 0.0% (GAIN); tap operations cut 22% (GAIN)).
@@ -7697,8 +7703,6 @@ Where a row sums several workloads, grids, districts, cells or robots, each part
 - **Kafka, the consumer group's size**: burst +0.2% GAIN (GAIN: consumers running cut 0.8% (GAIN)); heavy 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); light 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs).
 - **Drone swarms, the three untouched cells**: tuning +5.9% GAIN (GAIN: energy per mission cut 16% (GAIN); fleet energy over the window cut 16% (GAIN); missions per charge at the autopilot's reserve up 19% (GAIN)); long +7.6% GAIN (GAIN: energy per mission cut 20% (GAIN); fleet energy over the window cut 20% (GAIN); missions per charge at the autopilot's reserve up 25% (GAIN)); mixed +6.8% GAIN (GAIN: energy per mission cut 18% (GAIN); fleet energy over the window cut 18% (GAIN); missions per charge at the autopilot's reserve up 22% (GAIN)); short +3.4% GAIN (GAIN: energy per mission cut 7.4% (GAIN); fleet energy over the window cut 7.4% (GAIN); missions per charge at the autopilot's reserve up 8.0% (GAIN)).
 - **Buildings and batteries (CityLearn), the districts with batteries**: ca_alameda_county_neighborhood +3.0% GAIN (GAIN, power given: electricity bought cut 7.1% (GAIN); daily peak draw cut 6.6% (GAIN); highest peak cut 4.4% (GAIN); ramping cut 10% (GAIN); daily load unevenness cut 2.1% (GAIN); monthly load unevenness cut 1.3% (GAIN); distance from zero net energy up 0.0% (power given)); citylearn_challenge_2022_phase_all_robustness +9.9% GAIN (GAIN: electricity bill cut 16% (GAIN); electricity bought cut 14% (GAIN); carbon cut 12% (GAIN); daily peak draw cut 17% (GAIN); highest peak cut 2.7% (GAIN); ramping cut 9.4% (GAIN); daily load unevenness cut 6.0% (GAIN); monthly load unevenness cut 1.6% (GAIN); distance from zero net energy cut 1.0% (GAIN)); citylearn_challenge_2023_phase_2_local_evaluation 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); citylearn_challenge_2023_phase_2_online_evaluation_1 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); citylearn_challenge_2023_phase_2_online_evaluation_2 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); citylearn_challenge_2023_phase_2_online_evaluation_3 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); citylearn_challenge_2023_phase_3_1 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); citylearn_challenge_2023_phase_3_2 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); citylearn_challenge_2023_phase_3_3 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); tx_travis_county_neighborhood +2.4% GAIN (GAIN: electricity bought cut 4.0% (GAIN); daily peak draw cut 7.1% (GAIN); ramping cut 8.7% (GAIN); daily load unevenness cut 3.3% (GAIN); monthly load unevenness cut 2.3% (GAIN); distance from zero net energy cut 0.1% (GAIN)); vt_chittenden_county_neighborhood +1.1% GAIN (GAIN: electricity bought cut 3.0% (GAIN); daily peak draw cut 3.2% (GAIN); ramping cut 3.4% (GAIN); daily load unevenness cut 0.9% (GAIN); monthly load unevenness cut 0.8% (GAIN); distance from zero net energy cut 0.4% (GAIN)).
-- **The six organisms with the real cluster inside, 10 and 100 copies**: compute_ai_cloud at 10 copies +14% GAIN (GAIN: p95 cut 50% (GAIN); time over the line cut 32% (GAIN)); physics_robotics_autonomous at 10 copies 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); energy_facility_industrial at 10 copies +5.0% GAIN (GAIN, power given: time over the line cut 33% (GAIN); replicas up 0.6% (power given)); distribution_specialized at 10 copies +16% GAIN (GAIN: p95 cut 52% (GAIN); time over the line cut 36% (GAIN)); tower at 10 copies +11% GAIN (GAIN: p95 cut 42% (GAIN); time over the line cut 20% (GAIN); failed requests cut 8.4% (GAIN)); stack at 10 copies +2.8% GAIN (GAIN: time over the line cut 12% (GAIN); failed requests cut 8.5% (GAIN)); compute_ai_cloud at 100 copies +1.3% GAIN (GAIN: time over the line cut 9.8% (GAIN)); physics_robotics_autonomous at 100 copies +1.1% GAIN (GAIN: time over the line cut 8.4% (GAIN)); energy_facility_industrial at 100 copies +2.1% GAIN (GAIN: time over the line cut 15% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN)); distribution_specialized at 100 copies +8.2% GAIN (GAIN: p95 cut 32% (GAIN); time over the line cut 22% (GAIN)); tower at 100 copies +1.3% GAIN (GAIN: time over the line cut 8.7% (GAIN)); stack at 100 copies +2.3% GAIN (GAIN: time over the line cut 15% (GAIN)).
-- **The big organisms with the real cluster inside, 1,000 copies on Azure**: tower at 1000 copies +159% GAIN (GAIN: p95 cut 98% (GAIN); p99 cut 98% (GAIN)); stack at 1000 copies +151% GAIN (GAIN: p95 cut 95% (GAIN); p99 cut 97% (GAIN)).
 
 ### 54.2 Not on the sheet, and why
 
@@ -10122,7 +10126,7 @@ script is removed, and the cells already run at 1,000 copies stand as they were 
 
 ---
 
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+*Evaluation and Simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
 All rights reserved. See `LICENSE` and `NOTICE` at the root of this repository. All patents, copyrights and trademarks
 filed in the USA. www.omni-compass.com*
@@ -11289,7 +11293,7 @@ modelled grid (`six`) is run again on the new engine too (its numbers are expect
 unchanged but for comments, headers and one label's name), because no result is read across engine versions.
 
 ---
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+*Evaluation and Simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
 All rights reserved. See `LICENSE` and `NOTICE` at the root of this repository. All patents, copyrights and trademarks
 filed in the USA. www.omni-compass.com*
@@ -11926,7 +11930,291 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 1.0% | 1.2% | 1 |
 | batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 15.4% | 18.9% | 144 |
 
-### 69.3 Cruisekube (omni-v10, `V10_CRUISEKUBE.md`, 10 paired repetitions a run)
+### 69.3 Binpack (omni-v12, `V12_BINPACK.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 17.1% | 21.0% | 177 |
+| node-hours | GAIN in all three of our runs | 17.0% | 20.9% | 176 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.7% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 12.0% | 14.8% | 88 |
+| response time (ms), mean | GAIN in all three of our runs | 10.2% | 12.6% | 64 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 14.5% | 17.9% | 128 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 8.1% | 10.0% | 40 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 126.0% | 154.8% | 9588 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 234.2% | 287.7% | 33117 |
+| pending pods, pod-minutes | shown, not judged | 50.6% | 62.2% | 1550 |
+| utilisation (used / allocatable) | shown, not judged | 23.2% | 28.6% | 327 |
+| CPU used (cores), mean | shown, not judged | 5.9% | 7.2% | 21 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 5.9% | 7.2% | 22 |
+| energy per core-hour (Wh) | shown, not judged | 12.8% | 15.7% | 99 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 13.7% | 16.9% | 115 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 818.9% | 1006.3% | 405024 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 1074.4% | 1320.2% | 697173 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 960.9% | 1180.8% | 557738 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 0.8% | 1.1% | 1 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.2% | 0.3% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 28.0% | 34.4% | 475 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 197.8% | 243.1% | 23638 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 0.9% | 1.1% | 1 |
+
+### 69.4 Binpack 4W Bare (omni-v12, `V12_BINPACK_4W_BARE.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 17.7% | 21.7% | 189 |
+| node-hours | GAIN in all three of our runs | 17.8% | 21.9% | 193 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 12.4% | 15.2% | 93 |
+| response time (ms), mean | GAIN in all three of our runs | 8.2% | 10.1% | 41 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 11.6% | 14.3% | 82 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 16.1% | 19.8% | 158 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 14.7% | 18.0% | 131 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 19.0% | 23.3% | 218 |
+| pending pods, pod-minutes | shown, not judged | 27.6% | 33.9% | 459 |
+| utilisation (used / allocatable) | shown, not judged | 23.5% | 28.9% | 335 |
+| CPU used (cores), mean | shown, not judged | 2.6% | 3.2% | 5 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.7% | 3.3% | 5 |
+| energy per core-hour (Wh) | shown, not judged | 18.6% | 22.9% | 210 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 12.5% | 15.4% | 95 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.6% | 2.0% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 1.0% | 1.3% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 28.7% | 35.2% | 497 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 165.4% | 203.3% | 16533 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 367.0% | 450.9% | 81337 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 9.4% | 11.6% | 54 |
+
+### 69.5 Binpack 4W Both (omni-v12, `V12_BINPACK_4W_BOTH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 18.8% | 23.1% | 215 |
+| node-hours | GAIN in all three of our runs | 18.9% | 23.2% | 216 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 13.0% | 15.9% | 102 |
+| response time (ms), mean | GAIN in all three of our runs | 11.6% | 14.3% | 82 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 15.7% | 19.3% | 149 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 23.6% | 29.0% | 337 |
+| time over the response line (% of samples) | GAIN in all three of our runs | 37.5% | 46.1% | 852 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 23.0% | 28.3% | 320 |
+| pending pods, pod-minutes | shown, not judged | 35.2% | 43.2% | 748 |
+| utilisation (used / allocatable) | shown, not judged | 28.3% | 34.8% | 485 |
+| CPU used (cores), mean | shown, not judged | 5.0% | 6.1% | 15 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 4.9% | 6.0% | 15 |
+| energy per core-hour (Wh) | shown, not judged | 20.6% | 25.2% | 256 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 15.3% | 18.8% | 142 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.6% | 2.0% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 1.0% | 1.2% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 28.9% | 35.5% | 503 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 142.2% | 174.8% | 12218 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 314.5% | 386.5% | 59758 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 8.4% | 10.3% | 43 |
+
+### 69.6 Binpack 4W Orch (omni-v12, `V12_BINPACK_4W_ORCH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.3% | 0.4% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.7% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.7% | 1 |
+| response time (ms), mean | EVEN, no difference beyond the noise (1 of 3 runs) | 9.7% | 11.9% | 57 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 18.4% | 22.6% | 206 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 25.0% | 30.7% | 378 |
+| time over the response line (% of samples) | GAIN in all three of our runs | 31.7% | 39.0% | 609 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 22.0% | 27.0% | 292 |
+| pending pods, pod-minutes | shown, not judged | 27.6% | 33.9% | 461 |
+| utilisation (used / allocatable) | shown, not judged | 5.5% | 6.7% | 19 |
+| CPU used (cores), mean | shown, not judged | 5.5% | 6.7% | 19 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 5.5% | 6.7% | 19 |
+| energy per core-hour (Wh) | shown, not judged | 9.9% | 12.1% | 59 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 9.4% | 11.6% | 54 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.1% | 1.3% | 1 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 1.2% | 1.5% | 1 |
+| batch: worker machines in service after the queue finished, mean | EVEN, the same | 0.0% | 0.0% | 10 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 136.3% | 167.5% | 11222 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 256.8% | 315.6% | 39839 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 9.3% | 11.4% | 53 |
+
+### 69.7 Binpack 4W Top (omni-v12, `V12_BINPACK_4W_TOP.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 18.8% | 23.1% | 215 |
+| node-hours | GAIN in all three of our runs | 18.9% | 23.2% | 216 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.7% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 13.2% | 16.2% | 105 |
+| response time (ms), mean | GAIN in all three of our runs | 6.8% | 8.4% | 28 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 13.6% | 16.7% | 112 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 11.9% | 14.6% | 86 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 16.2% | 19.9% | 159 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 7.2% | 8.8% | 31 |
+| pending pods, pod-minutes | shown, not judged | 27.1% | 33.3% | 444 |
+| utilisation (used / allocatable) | shown, not judged | 27.3% | 33.6% | 451 |
+| CPU used (cores), mean | shown, not judged | 2.3% | 2.8% | 4 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.3% | 2.9% | 4 |
+| energy per core-hour (Wh) | shown, not judged | 14.4% | 17.7% | 126 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 14.1% | 17.3% | 120 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.0% | 1.3% | 1 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 0.9% | 1.1% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 28.9% | 35.5% | 503 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 103.3% | 126.9% | 6444 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 221.0% | 271.6% | 29510 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 6.3% | 7.7% | 24 |
+
+### 69.8 Binpack 4W Vs (omni-v12, `V12_BINPACK_4W_VS.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 17.7% | 21.7% | 189 |
+| node-hours | GAIN in all three of our runs | 17.7% | 21.8% | 190 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 12.5% | 15.4% | 95 |
+| response time (ms), mean | EVEN, no difference beyond the noise (1 of 3 runs) | 13.7% | 16.9% | 114 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 18.5% | 22.7% | 207 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 22.6% | 27.8% | 310 |
+| time over the response line (% of samples) | LOSS in all three of our runs | 40.1% | 49.3% | 971 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 43.5% | 53.5% | 1146 |
+| pending pods, pod-minutes | shown, not judged | 31.9% | 39.2% | 616 |
+| utilisation (used / allocatable) | shown, not judged | 21.9% | 26.9% | 289 |
+| CPU used (cores), mean | shown, not judged | 3.7% | 4.5% | 9 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.8% | 4.6% | 9 |
+| energy per core-hour (Wh) | shown, not judged | 13.5% | 16.6% | 110 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 11.6% | 14.2% | 81 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.6% | 1.9% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 1.4% | 1.8% | 2 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 28.7% | 35.2% | 497 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 247.4% | 304.0% | 36971 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 244.6% | 300.6% | 36150 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 13.9% | 17.1% | 117 |
+
+### 69.9 Crane 4W Bare (omni-v12, `V12_CRANE_4W_BARE.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (2 of 3 runs) | 0.8% | 0.9% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.8% | 0.9% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.8% | 0.9% | 1 |
+| response time (ms), mean | EVEN, no difference beyond the noise (2 of 3 runs) | 3.9% | 4.8% | 10 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 6.9% | 8.5% | 29 |
+| response time (ms), 99th percentile | the runs disagree | 7.7% | 9.4% | 36 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 65.4% | 80.4% | 2585 |
+| pending pods, pod-minutes | shown, not judged | 209.2% | 257.1% | 26435 |
+| utilisation (used / allocatable) | shown, not judged | 2.5% | 3.0% | 4 |
+| CPU used (cores), mean | shown, not judged | 2.5% | 3.0% | 4 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.5% | 3.1% | 4 |
+| energy per core-hour (Wh) | shown, not judged | 2.6% | 3.2% | 5 |
+| HPA replicas, mean | power given in all three of our runs | 10.9% | 13.4% | 72 |
+| pods started | EVEN, no difference beyond the noise (1 of 3 runs) | 62.8% | 77.2% | 2382 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 71.3% | 87.6% | 3072 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 34.9% | 42.9% | 737 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.8% | 3.4% | 5 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+
+### 69.10 Crane 4W Both (omni-v12, `V12_CRANE_4W_BOTH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.7% | 0.8% | 1 |
+| energy, parked workers still on at idle power (Wh) | power given in all three of our runs | 0.7% | 0.9% | 1 |
+| energy (Wh) | power given in all three of our runs | 0.7% | 0.9% | 1 |
+| response time (ms), mean | EVEN, no difference beyond the noise (all three runs) | 3.8% | 4.6% | 9 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 6.0% | 7.4% | 22 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 9.1% | 11.2% | 51 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 51.6% | 63.4% | 1609 |
+| pending pods, pod-minutes | shown, not judged | 364.6% | 448.0% | 80289 |
+| utilisation (used / allocatable) | shown, not judged | 4.0% | 4.9% | 10 |
+| CPU used (cores), mean | shown, not judged | 4.0% | 4.9% | 10 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 4.2% | 5.1% | 11 |
+| energy per core-hour (Wh) | shown, not judged | 2.5% | 3.1% | 4 |
+| HPA replicas, mean | power given in all three of our runs | 14.2% | 17.4% | 122 |
+| pods started | power given in all three of our runs | 59.8% | 73.5% | 2160 |
+| pod start wait, total (s) | LOSS in all three of our runs | 77.8% | 95.6% | 3658 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 31.3% | 38.4% | 591 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 5.2% | 6.4% | 17 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+
+### 69.11 Crane 4W Orch (omni-v12, `V12_CRANE_4W_ORCH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (2 of 3 runs) | 0.8% | 1.0% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.8% | 1.0% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.8% | 1.0% | 1 |
+| response time (ms), mean | LOSS in all three of our runs | 3.7% | 4.6% | 9 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 4.6% | 5.7% | 13 |
+| response time (ms), 99th percentile | the runs disagree | 8.9% | 11.0% | 49 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 56.1% | 69.0% | 1903 |
+| pending pods, pod-minutes | shown, not judged | 176.3% | 216.6% | 18770 |
+| utilisation (used / allocatable) | shown, not judged | 2.8% | 3.5% | 5 |
+| CPU used (cores), mean | shown, not judged | 2.8% | 3.5% | 5 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.8% | 3.5% | 5 |
+| energy per core-hour (Wh) | shown, not judged | 1.8% | 2.3% | 3 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 2.0% | 2.4% | 3 |
+| pods started | EVEN, no difference beyond the noise (2 of 3 runs) | 28.6% | 35.1% | 494 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 46.2% | 56.8% | 1291 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 39.5% | 48.5% | 942 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.7% | 3.4% | 5 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+
+### 69.12 Crane 4W Top (omni-v12, `V12_CRANE_4W_TOP.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (2 of 3 runs) | 1.0% | 1.2% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.9% | 1.2% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.9% | 1.2% | 1 |
+| response time (ms), mean | EVEN, no difference beyond the noise (all three runs) | 2.5% | 3.1% | 4 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 5.2% | 6.4% | 17 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 6.3% | 7.8% | 24 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 64.2% | 78.9% | 2489 |
+| pending pods, pod-minutes | shown, not judged | 575.3% | 706.9% | 199906 |
+| utilisation (used / allocatable) | shown, not judged | 2.6% | 3.2% | 5 |
+| CPU used (cores), mean | shown, not judged | 2.6% | 3.2% | 5 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.8% | 3.4% | 5 |
+| energy per core-hour (Wh) | shown, not judged | 2.3% | 2.8% | 4 |
+| HPA replicas, mean | power given in all three of our runs | 14.4% | 17.7% | 126 |
+| pods started | power given in all three of our runs | 54.2% | 66.6% | 1773 |
+| pod start wait, total (s) | LOSS in all three of our runs | 80.2% | 98.6% | 3886 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 27.7% | 34.0% | 463 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.7% | 3.3% | 5 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+
+### 69.13 Crane 4W Vs (omni-v12, `V12_CRANE_4W_VS.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.9% | 1.1% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.9% | 1.1% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.9% | 1.1% | 1 |
+| response time (ms), mean | GAIN in all three of our runs | 3.6% | 4.4% | 8 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 4.9% | 6.1% | 15 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 8.8% | 10.8% | 48 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 65.9% | 81.0% | 2622 |
+| pending pods, pod-minutes | shown, not judged | 281.3% | 345.7% | 47807 |
+| utilisation (used / allocatable) | shown, not judged | 2.7% | 3.3% | 5 |
+| CPU used (cores), mean | shown, not judged | 2.7% | 3.3% | 5 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.7% | 3.3% | 5 |
+| energy per core-hour (Wh) | shown, not judged | 2.9% | 3.5% | 6 |
+| HPA replicas, mean | power given in all three of our runs | 11.3% | 13.8% | 77 |
+| pods started | EVEN, no difference beyond the noise (1 of 3 runs) | 55.0% | 67.6% | 1828 |
+| pod start wait, total (s) | LOSS in all three of our runs | 77.2% | 94.8% | 3599 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 38.9% | 47.8% | 915 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.2% | 2.6% | 3 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+
+### 69.14 Cruisekube (omni-v10, `V10_CRUISEKUBE.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -11949,7 +12237,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 1.7% | 2.1% | 2 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.4 Fairness (omni-v10, `V10_FAIRNESS.md`, 10 paired repetitions a run)
+### 69.15 Fairness (omni-v10, `V10_FAIRNESS.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -11979,7 +12267,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | second app: time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 3.9% | 4.7% | 9 |
 | second app: failed requests (%) | EVEN, no difference beyond the noise (all three runs) | 4.9% | 6.1% | 15 |
 
-### 69.5 Faults (omni-v10, `V10_FAULTS.md`, 10 paired repetitions a run)
+### 69.16 Faults (omni-v10, `V10_FAULTS.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12005,7 +12293,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 3.6% | 4.4% | 8 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.6 Goldilocks (omni-v11, `V11_GOLDILOCKS.md`, 10 paired repetitions a run)
+### 69.17 Goldilocks (omni-v11, `V11_GOLDILOCKS.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12030,7 +12318,318 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 14.7% | 18.1% | 131 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.7 Keda Cpu Requests (omni-v11, `V11_KEDA_CPU_REQUESTS.md`, 10 paired repetitions a run)
+### 69.18 Kai (omni-v12, `V12_KAI.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 13.4% | 16.5% | 109 |
+| node-hours | GAIN in all three of our runs | 13.7% | 16.8% | 113 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 9.3% | 11.5% | 53 |
+| response time (ms), mean | GAIN in all three of our runs | 8.9% | 10.9% | 48 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 23.4% | 28.8% | 331 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 24.4% | 30.0% | 360 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 74.5% | 91.6% | 3357 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 142.9% | 175.6% | 12331 |
+| pending pods, pod-minutes | shown, not judged | 26.7% | 32.8% | 431 |
+| utilisation (used / allocatable) | shown, not judged | 20.9% | 25.7% | 265 |
+| CPU used (cores), mean | shown, not judged | 5.8% | 7.1% | 21 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 5.4% | 6.6% | 18 |
+| energy per core-hour (Wh) | shown, not judged | 13.6% | 16.7% | 112 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 16.2% | 19.9% | 159 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.4% | 2.9% | 4 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 0.5% | 0.6% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 24.9% | 30.6% | 374 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 12.2% | 15.1% | 91 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 41.9% | 51.5% | 1063 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 10.8% | 13.2% | 70 |
+
+### 69.19 Kai 4W Bare (omni-v12, `V12_KAI_4W_BARE.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 16.4% | 20.1% | 162 |
+| node-hours | GAIN in all three of our runs | 16.2% | 19.9% | 159 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.4% | 0.5% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 11.4% | 14.0% | 79 |
+| response time (ms), mean | GAIN in all three of our runs | 10.2% | 12.6% | 64 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 14.4% | 17.6% | 125 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 21.7% | 26.6% | 284 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 9.4% | 11.6% | 54 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 7.3% | 9.0% | 33 |
+| pending pods, pod-minutes | shown, not judged | 28.0% | 34.4% | 475 |
+| utilisation (used / allocatable) | shown, not judged | 17.2% | 21.2% | 180 |
+| CPU used (cores), mean | shown, not judged | 4.4% | 5.4% | 12 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 4.4% | 5.4% | 12 |
+| energy per core-hour (Wh) | shown, not judged | 10.0% | 12.3% | 61 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 19.0% | 23.3% | 218 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.6% | 2.0% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 1.3% | 1.6% | 2 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 26.8% | 32.9% | 433 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 129.1% | 158.6% | 10063 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 165.8% | 203.7% | 16600 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 15.5% | 19.1% | 146 |
+
+### 69.20 Kai 4W Both (omni-v12, `V12_KAI_4W_BOTH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 13.8% | 16.9% | 115 |
+| node-hours | EVEN, no difference beyond the noise (1 of 3 runs) | 13.5% | 16.6% | 111 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (1 of 3 runs) | 9.5% | 11.7% | 55 |
+| response time (ms), mean | EVEN, no difference beyond the noise (all three runs) | 14.0% | 17.2% | 118 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 42.0% | 51.6% | 1066 |
+| response time (ms), 99th percentile | LOSS in all three of our runs | 46.0% | 56.5% | 1278 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 27.2% | 33.4% | 448 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (2 of 3 runs) | 22.4% | 27.5% | 302 |
+| pending pods, pod-minutes | shown, not judged | 122.9% | 151.0% | 9118 |
+| utilisation (used / allocatable) | shown, not judged | 13.4% | 16.5% | 109 |
+| CPU used (cores), mean | shown, not judged | 5.2% | 6.4% | 17 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 5.3% | 6.5% | 17 |
+| energy per core-hour (Wh) | shown, not judged | 8.6% | 10.6% | 45 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 20.4% | 25.1% | 253 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.8% | 3.5% | 5 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | LOSS in all three of our runs | 4.8% | 5.8% | 14 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 23.5% | 28.9% | 335 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 996.5% | 1224.5% | 599760 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 724.5% | 890.3% | 317048 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 42.0% | 51.5% | 1063 |
+
+### 69.21 Kai 4W Orch (omni-v12, `V12_KAI_4W_ORCH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.7% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| response time (ms), mean | LOSS in all three of our runs | 16.1% | 19.8% | 157 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 43.0% | 52.9% | 1118 |
+| response time (ms), 99th percentile | LOSS in all three of our runs | 44.7% | 54.9% | 1206 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (1 of 3 runs) | 22.6% | 27.8% | 308 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (1 of 3 runs) | 17.6% | 21.7% | 188 |
+| pending pods, pod-minutes | shown, not judged | 72.4% | 89.0% | 3166 |
+| utilisation (used / allocatable) | shown, not judged | 2.8% | 3.5% | 5 |
+| CPU used (cores), mean | shown, not judged | 2.8% | 3.5% | 5 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.8% | 3.5% | 5 |
+| energy per core-hour (Wh) | shown, not judged | 3.1% | 3.8% | 6 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 16.3% | 20.0% | 161 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.2% | 2.8% | 4 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | LOSS in all three of our runs | 4.0% | 4.9% | 10 |
+| batch: worker machines in service after the queue finished, mean | EVEN, the same | 0.0% | 0.0% | 10 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 633.6% | 778.5% | 242454 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 451.0% | 554.2% | 122836 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 33.3% | 40.9% | 671 |
+
+### 69.22 Kai 4W Top (omni-v12, `V12_KAI_4W_TOP.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 13.8% | 16.9% | 115 |
+| node-hours | EVEN, no difference beyond the noise (1 of 3 runs) | 13.7% | 16.9% | 114 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.7% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (1 of 3 runs) | 9.6% | 11.8% | 56 |
+| response time (ms), mean | GAIN in all three of our runs | 12.5% | 15.4% | 96 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 16.1% | 19.7% | 156 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 13.5% | 16.6% | 110 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 17.6% | 21.6% | 188 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 7.6% | 9.3% | 35 |
+| pending pods, pod-minutes | shown, not judged | 29.8% | 36.6% | 538 |
+| utilisation (used / allocatable) | shown, not judged | 15.3% | 18.8% | 142 |
+| CPU used (cores), mean | shown, not judged | 3.6% | 4.5% | 8 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.6% | 4.4% | 8 |
+| energy per core-hour (Wh) | shown, not judged | 10.6% | 13.0% | 68 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 14.8% | 18.2% | 133 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 471.8% | 579.8% | 134455 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 500.4% | 614.9% | 151239 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 766.5% | 941.9% | 354857 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.5% | 1.9% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 1.1% | 1.4% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 23.5% | 28.9% | 335 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 45.3% | 55.7% | 1241 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 117.2% | 144.1% | 8300 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 8.4% | 10.3% | 43 |
+
+### 69.23 Kai 4W Vs (omni-v12, `V12_KAI_4W_VS.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 16.4% | 20.1% | 162 |
+| node-hours | GAIN in all three of our runs | 16.4% | 20.1% | 163 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 11.4% | 14.1% | 79 |
+| response time (ms), mean | GAIN in all three of our runs | 19.2% | 23.6% | 222 |
+| response time (ms), 95th percentile | GAIN in all three of our runs | 31.4% | 38.5% | 595 |
+| response time (ms), 99th percentile | GAIN in all three of our runs | 32.2% | 39.6% | 627 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 24.0% | 29.4% | 347 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (1 of 3 runs) | 10.8% | 13.3% | 72 |
+| pending pods, pod-minutes | shown, not judged | 39.8% | 48.9% | 956 |
+| utilisation (used / allocatable) | shown, not judged | 19.5% | 24.0% | 231 |
+| CPU used (cores), mean | shown, not judged | 3.2% | 3.9% | 7 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.1% | 3.9% | 6 |
+| energy per core-hour (Wh) | shown, not judged | 12.8% | 15.7% | 99 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 11.1% | 13.7% | 75 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 406.1% | 499.0% | 99597 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 364.9% | 448.4% | 80415 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 454.3% | 558.3% | 124680 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.1% | 2.6% | 3 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | GAIN in all three of our runs | 3.1% | 3.9% | 6 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 26.8% | 32.9% | 433 |
+| queue: job wait, submitted to its first pod running, mean (s) | GAIN in all three of our runs | 39.7% | 48.8% | 952 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | GAIN in all three of our runs | 80.2% | 98.6% | 3890 |
+| queue: job turnaround, submitted to done, mean (s) | GAIN in all three of our runs | 21.8% | 26.8% | 289 |
+
+### 69.24 Karmada 4W Bare (omni-v12, `V12_KARMADA_4W_BARE.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 21.1% | 25.9% | 243 |
+| node-hours | EVEN, no difference beyond the noise (1 of 3 runs) | 21.3% | 26.2% | 247 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.4% | 0.5% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (1 of 3 runs) | 15.3% | 18.8% | 127 |
+| response time (ms), mean | EVEN, no difference beyond the noise (2 of 3 runs) | 5.8% | 7.1% | 19 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 11.4% | 14.0% | 71 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 15.9% | 19.6% | 138 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 12.0% | 14.8% | 79 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (2 of 3 runs) | 24.0% | 29.5% | 313 |
+| pending pods, pod-minutes | shown, not judged | 99.6% | 122.5% | 5402 |
+| utilisation (used / allocatable) | shown, not judged | 26.1% | 32.1% | 372 |
+| CPU used (cores), mean | shown, not judged | 7.3% | 9.0% | 29 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 7.3% | 9.0% | 30 |
+| energy per core-hour (Wh) | shown, not judged | 17.9% | 22.1% | 176 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 8.7% | 10.7% | 42 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.0% | 2.5% | 3 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 2.4% | 3.0% | 4 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 32.8% | 40.3% | 585 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 94.7% | 116.5% | 4884 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 115.2% | 141.6% | 7223 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 9.2% | 11.3% | 47 |
+
+### 69.25 Karmada 4W Both (omni-v12, `V12_KARMADA_4W_BOTH.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 19.7% | 24.2% | 211 |
+| node-hours | EVEN, no difference beyond the noise (2 of 3 runs) | 19.8% | 24.4% | 215 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.7% | 0.9% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 14.2% | 17.4% | 109 |
+| response time (ms), mean | LOSS in all three of our runs | 41.4% | 50.9% | 931 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 66.3% | 81.5% | 2392 |
+| response time (ms), 99th percentile | LOSS in all three of our runs | 54.1% | 66.6% | 1596 |
+| time over the response line (% of samples) | LOSS in all three of our runs | 21.3% | 26.1% | 247 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | LOSS in all three of our runs | 33.0% | 40.6% | 595 |
+| pending pods, pod-minutes | shown, not judged | 325.8% | 400.5% | 57756 |
+| utilisation (used / allocatable) | shown, not judged | 25.9% | 31.8% | 365 |
+| CPU used (cores), mean | shown, not judged | 10.9% | 13.4% | 65 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 10.9% | 13.4% | 65 |
+| energy per core-hour (Wh) | shown, not judged | 18.8% | 23.1% | 193 |
+| HPA replicas, mean | power given in all three of our runs | 13.3% | 16.4% | 97 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 7.7% | 9.5% | 33 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | LOSS in all three of our runs | 12.6% | 15.5% | 87 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 32.4% | 39.8% | 572 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 20939.2% | 25746.9% | 238644457 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 31127.1% | 38274.0% | 527363696 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 59.7% | 73.4% | 1940 |
+
+### 69.26 Karmada 4W Orch (omni-v12, `V12_KARMADA_4W_ORCH.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.7% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| response time (ms), mean | LOSS in all three of our runs | 20.0% | 24.5% | 217 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 40.4% | 49.6% | 887 |
+| response time (ms), 99th percentile | LOSS in all three of our runs | 43.3% | 53.2% | 1021 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (1 of 3 runs) | 18.1% | 22.2% | 178 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | LOSS in all three of our runs | 32.7% | 40.2% | 583 |
+| pending pods, pod-minutes | shown, not judged | 246.3% | 302.9% | 33032 |
+| utilisation (used / allocatable) | shown, not judged | 10.7% | 13.2% | 63 |
+| CPU used (cores), mean | shown, not judged | 10.7% | 13.2% | 63 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 10.7% | 13.2% | 63 |
+| energy per core-hour (Wh) | shown, not judged | 8.3% | 10.2% | 38 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 9.8% | 12.0% | 53 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 5.5% | 6.7% | 17 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | LOSS in all three of our runs | 9.1% | 11.2% | 46 |
+| batch: worker machines in service after the queue finished, mean | EVEN, the same | 0.0% | 0.0% | 9 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 15916.3% | 19570.7% | 137884244 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 26101.8% | 32094.8% | 370828125 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 40.6% | 49.9% | 897 |
+
+### 69.27 Karmada 4W Top (omni-v12, `V12_KARMADA_4W_TOP.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 19.7% | 24.2% | 211 |
+| node-hours | EVEN, no difference beyond the noise (2 of 3 runs) | 20.0% | 24.6% | 219 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.7% | 0.8% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 14.5% | 17.8% | 115 |
+| response time (ms), mean | EVEN, no difference beyond the noise (all three runs) | 19.8% | 24.4% | 214 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 22.0% | 27.0% | 263 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 14.0% | 17.2% | 108 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 22.1% | 27.2% | 267 |
+| failed requests (%) | EVEN, no difference beyond the noise (all three runs) | 356.8% | 438.7% | 69281 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (1 of 3 runs) | 36.5% | 44.9% | 725 |
+| pending pods, pod-minutes | shown, not judged | 99.0% | 121.7% | 5334 |
+| utilisation (used / allocatable) | shown, not judged | 23.4% | 28.7% | 297 |
+| CPU used (cores), mean | shown, not judged | 9.1% | 11.2% | 46 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 9.2% | 11.3% | 46 |
+| energy per core-hour (Wh) | shown, not judged | 16.7% | 20.6% | 153 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 16.5% | 20.2% | 148 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 634.0% | 779.5% | 218759 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 640.8% | 787.9% | 223481 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 249.3% | 306.5% | 33823 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 6.3% | 7.7% | 22 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 4.6% | 5.7% | 12 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 32.4% | 39.8% | 572 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 230.4% | 283.3% | 28900 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 309.3% | 380.3% | 52060 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 15.7% | 19.2% | 134 |
+
+### 69.28 Karmada 4W Vs (omni-v12, `V12_KARMADA_4W_VS.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 21.1% | 25.9% | 243 |
+| node-hours | EVEN, no difference beyond the noise (2 of 3 runs) | 21.5% | 26.4% | 252 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.8% | 0.9% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 15.6% | 19.2% | 133 |
+| response time (ms), mean | GAIN in all three of our runs | 17.9% | 22.0% | 175 |
+| response time (ms), 95th percentile | GAIN in all three of our runs | 24.6% | 30.2% | 329 |
+| response time (ms), 99th percentile | GAIN in all three of our runs | 21.5% | 26.4% | 252 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (1 of 3 runs) | 12.3% | 15.1% | 83 |
+| failed requests (%) | EVEN, no difference beyond the noise (all three runs) | 232.5% | 285.9% | 29425 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | GAIN in all three of our runs | 25.0% | 30.8% | 341 |
+| pending pods, pod-minutes | shown, not judged | 101.9% | 125.3% | 5651 |
+| utilisation (used / allocatable) | shown, not judged | 25.1% | 30.9% | 343 |
+| CPU used (cores), mean | shown, not judged | 11.7% | 14.4% | 75 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 11.7% | 14.4% | 75 |
+| energy per core-hour (Wh) | shown, not judged | 16.5% | 20.3% | 149 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 12.4% | 15.2% | 84 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 281.1% | 345.6% | 43004 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 246.9% | 303.6% | 33185 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 236.2% | 290.4% | 30367 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 3.8% | 4.6% | 8 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | GAIN in all three of our runs | 6.2% | 7.7% | 22 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 32.8% | 40.3% | 585 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 282.4% | 347.2% | 43409 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 310.5% | 381.8% | 52466 |
+| queue: job turnaround, submitted to done, mean (s) | GAIN in all three of our runs | 21.7% | 26.7% | 257 |
+
+### 69.29 Keda Cpu Requests (omni-v11, `V11_KEDA_CPU_REQUESTS.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12054,7 +12653,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 12.4% | 15.2% | 93 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.8 Keda Requests (omni-v11, `V11_KEDA_REQUESTS.md`, 10 paired repetitions a run)
+### 69.30 Keda Requests (omni-v11, `V11_KEDA_REQUESTS.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12079,7 +12678,453 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 14.1% | 17.4% | 121 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.9 Robust Kill (omni-v11, `V11_ROBUST_KILL.md`, 10 paired repetitions a run)
+### 69.31 Koordinator (omni-v12, `V12_KOORDINATOR.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (all three runs) | 2.0% | 2.4% | 3 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 2.2% | 2.7% | 3 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.8% | 1.0% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 1.6% | 1.9% | 2 |
+| response time (ms), mean | GAIN in all three of our runs | 12.1% | 14.9% | 89 |
+| response time (ms), 95th percentile | GAIN in all three of our runs | 7.7% | 9.4% | 36 |
+| response time (ms), 99th percentile | GAIN in all three of our runs | 11.3% | 13.9% | 78 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 277.2% | 340.6% | 46417 |
+| pending pods, pod-minutes | shown, not judged | 14.5% | 17.8% | 127 |
+| utilisation (used / allocatable) | shown, not judged | 4.2% | 5.2% | 11 |
+| CPU used (cores), mean | shown, not judged | 3.6% | 4.4% | 8 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.5% | 4.3% | 8 |
+| energy per core-hour (Wh) | shown, not judged | 3.9% | 4.8% | 10 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 15.9% | 19.6% | 154 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 838.8% | 1030.7% | 424944 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 909.5% | 1117.6% | 499641 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 625.2% | 768.3% | 236126 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 3.0% | 3.6% | 6 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 6.1% | 7.5% | 23 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (all three runs) | 73.2% | 90.0% | 3240 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 39.7% | 48.8% | 953 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 42.0% | 51.6% | 1068 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 11.7% | 14.4% | 83 |
+| queue: jobs unfinished at the window's end | EVEN, no difference beyond the noise (all three runs) | 59.2% | 72.7% | 2115 |
+
+### 69.32 Koordinator 4W Bare (omni-v12, `V12_KOORDINATOR_4W_BARE.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 19.3% | 23.7% | 226 |
+| node-hours | GAIN in all three of our runs | 19.4% | 23.8% | 227 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 13.5% | 16.6% | 111 |
+| response time (ms), mean | GAIN in all three of our runs | 8.9% | 11.0% | 49 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 11.4% | 14.0% | 79 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 15.7% | 19.3% | 149 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 11.6% | 14.2% | 82 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 15.4% | 18.9% | 143 |
+| pending pods, pod-minutes | shown, not judged | 40.5% | 49.8% | 994 |
+| utilisation (used / allocatable) | shown, not judged | 24.0% | 29.5% | 348 |
+| CPU used (cores), mean | shown, not judged | 4.3% | 5.3% | 12 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 4.3% | 5.2% | 11 |
+| energy per core-hour (Wh) | shown, not judged | 16.9% | 20.8% | 173 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 13.3% | 16.4% | 108 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.7% | 2.1% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 0.8% | 0.9% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 30.3% | 37.2% | 554 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 264.4% | 324.9% | 42237 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 480.5% | 590.4% | 139435 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 13.9% | 17.1% | 117 |
+
+### 69.33 Koordinator 4W Both (omni-v12, `V12_KOORDINATOR_4W_BOTH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (all three runs) | 5.1% | 6.3% | 16 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 5.3% | 6.5% | 17 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 1.1% | 1.3% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 3.5% | 4.4% | 8 |
+| response time (ms), mean | GAIN in all three of our runs | 55.0% | 67.6% | 1827 |
+| response time (ms), 95th percentile | GAIN in all three of our runs | 70.9% | 87.1% | 3035 |
+| response time (ms), 99th percentile | GAIN in all three of our runs | 68.3% | 83.9% | 2819 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (1 of 3 runs) | 139.5% | 171.4% | 11755 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | GAIN in all three of our runs | 114.3% | 140.4% | 7886 |
+| pending pods, pod-minutes | shown, not judged | 5480.4% | 6734.4% | 18140835 |
+| utilisation (used / allocatable) | shown, not judged | 15.8% | 19.4% | 151 |
+| CPU used (cores), mean | shown, not judged | 14.7% | 18.1% | 131 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 14.6% | 17.9% | 129 |
+| energy per core-hour (Wh) | shown, not judged | 16.7% | 20.5% | 168 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 14.3% | 17.5% | 123 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 11.2% | 13.8% | 77 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | LOSS in all three of our runs | 30.9% | 38.0% | 577 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (all three runs) | 65.7% | 80.7% | 2604 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 276459.2% | 339720.2% | 46163914789 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 325048.7% | 399428.1% | 63817130129 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 732.2% | 899.8% | 323831 |
+
+### 69.34 Koordinator 4W Orch (omni-v12, `V12_KOORDINATOR_4W_ORCH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (2 of 3 runs) | 0.6% | 0.8% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 1.0% | 1.2% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 1.0% | 1.2% | 1 |
+| response time (ms), mean | GAIN in all three of our runs | 52.8% | 64.8% | 1682 |
+| response time (ms), 95th percentile | GAIN in all three of our runs | 70.9% | 87.2% | 3040 |
+| response time (ms), 99th percentile | GAIN in all three of our runs | 68.8% | 84.5% | 2856 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (1 of 3 runs) | 138.9% | 170.6% | 11646 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | GAIN in all three of our runs | 114.3% | 140.4% | 7886 |
+| pending pods, pod-minutes | shown, not judged | 4845.4% | 5954.2% | 14181041 |
+| utilisation (used / allocatable) | shown, not judged | 15.1% | 18.5% | 137 |
+| CPU used (cores), mean | shown, not judged | 15.1% | 18.5% | 137 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 15.1% | 18.5% | 137 |
+| energy per core-hour (Wh) | shown, not judged | 14.8% | 18.2% | 133 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 8.9% | 11.0% | 49 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 11.6% | 14.2% | 81 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | LOSS in all three of our runs | 31.1% | 38.3% | 587 |
+| batch: worker machines in service after the queue finished, mean | EVEN, the same | 0.0% | 0.0% | 10 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 343570.5% | 422188.2% | 71297159356 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 351017.8% | 431339.6% | 74421538495 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 697.6% | 857.3% | 293968 |
+
+### 69.35 Koordinator 4W Top (omni-v12, `V12_KOORDINATOR_4W_TOP.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (all three runs) | 5.1% | 6.3% | 16 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 5.4% | 6.6% | 18 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 3.9% | 4.7% | 9 |
+| response time (ms), mean | GAIN in all three of our runs | 10.2% | 12.6% | 64 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 10.3% | 12.6% | 64 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 11.5% | 14.2% | 81 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 97.0% | 119.2% | 5681 |
+| pending pods, pod-minutes | shown, not judged | 14.2% | 17.4% | 122 |
+| utilisation (used / allocatable) | shown, not judged | 5.7% | 7.0% | 20 |
+| CPU used (cores), mean | shown, not judged | 3.8% | 4.7% | 9 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.7% | 4.6% | 9 |
+| energy per core-hour (Wh) | shown, not judged | 4.8% | 5.9% | 14 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 11.7% | 14.4% | 84 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 3.2% | 4.0% | 7 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 7.6% | 9.4% | 36 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (all three runs) | 65.7% | 80.7% | 2604 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 48.9% | 60.1% | 1446 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 45.6% | 56.0% | 1257 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 11.3% | 13.9% | 78 |
+| queue: jobs unfinished at the window's end | EVEN, no difference beyond the noise (2 of 3 runs) | 49.9% | 61.3% | 1505 |
+
+### 69.36 Koordinator 4W Vs (omni-v12, `V12_KOORDINATOR_4W_VS.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 19.3% | 23.7% | 226 |
+| node-hours | GAIN in all three of our runs | 19.1% | 23.5% | 222 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 1.1% | 1.4% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 14.3% | 17.6% | 125 |
+| response time (ms), mean | EVEN, no difference beyond the noise (1 of 3 runs) | 128.8% | 158.3% | 10021 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 379.0% | 465.7% | 86753 |
+| response time (ms), 99th percentile | LOSS in all three of our runs | 374.8% | 460.6% | 84858 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (1 of 3 runs) | 6359.1% | 7814.2% | 24424617 |
+| pending pods, pod-minutes | shown, not judged | 50.1% | 61.6% | 1518 |
+| utilisation (used / allocatable) | shown, not judged | 15.6% | 19.1% | 147 |
+| CPU used (cores), mean | shown, not judged | 17.4% | 21.4% | 183 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 17.5% | 21.5% | 185 |
+| energy per core-hour (Wh) | shown, not judged | 7.8% | 9.6% | 37 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 11.1% | 13.6% | 74 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 10.9% | 13.4% | 72 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | GAIN in all three of our runs | 17.6% | 21.6% | 187 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 22.4% | 27.6% | 304 |
+| queue: job wait, submitted to its first pod running, mean (s) | GAIN in all three of our runs | 64.4% | 79.1% | 2502 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | GAIN in all three of our runs | 65.0% | 79.9% | 2555 |
+| queue: job turnaround, submitted to done, mean (s) | GAIN in all three of our runs | 42.9% | 52.7% | 1110 |
+| queue: jobs unfinished at the window's end | EVEN, no difference beyond the noise (1 of 3 runs) | 161.7% | 198.7% | 15788 |
+
+### 69.37 Kuberay 4W Bare (omni-v12, `V12_KUBERAY_4W_BARE.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 18.7% | 23.0% | 191 |
+| node-hours | GAIN in all three of our runs | 18.6% | 22.9% | 189 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.7% | 0.9% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 13.0% | 15.9% | 92 |
+| response time (ms), mean | GAIN in all three of our runs | 7.0% | 8.7% | 28 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 9.8% | 12.1% | 53 |
+| response time (ms), 99th percentile | LOSS in all three of our runs | 11.4% | 14.0% | 72 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 7.8% | 9.6% | 34 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 13.3% | 16.4% | 97 |
+| pending pods, pod-minutes | shown, not judged | 31.7% | 39.0% | 547 |
+| utilisation (used / allocatable) | shown, not judged | 26.4% | 32.4% | 379 |
+| CPU used (cores), mean | shown, not judged | 5.6% | 6.9% | 18 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 5.6% | 6.9% | 18 |
+| energy per core-hour (Wh) | shown, not judged | 21.6% | 26.5% | 254 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 14.3% | 17.6% | 113 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.9% | 2.4% | 3 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | LOSS in all three of our runs | 0.9% | 1.2% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 30.0% | 36.9% | 492 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 250.7% | 308.3% | 34213 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 422.6% | 519.7% | 97227 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 10.2% | 12.6% | 57 |
+
+### 69.38 Kuberay 4W Both (omni-v12, `V12_KUBERAY_4W_BOTH.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 2.8% | 3.4% | 5 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 2.7% | 3.4% | 5 |
+| energy, parked workers still on at idle power (Wh) | power given in all three of our runs | 2.1% | 2.5% | 3 |
+| energy (Wh) | power given in all three of our runs | 2.9% | 3.6% | 5 |
+| response time (ms), mean | LOSS in all three of our runs | 24.8% | 30.5% | 336 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 57.6% | 70.8% | 1806 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 63.9% | 78.6% | 2222 |
+| time over the response line (% of samples) | LOSS in all three of our runs | 69.8% | 85.8% | 2649 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | LOSS in all three of our runs | 78.7% | 96.8% | 3371 |
+| pending pods, pod-minutes | shown, not judged | 46.1% | 56.7% | 1158 |
+| utilisation (used / allocatable) | shown, not judged | 25.3% | 31.1% | 348 |
+| CPU used (cores), mean | shown, not judged | 25.2% | 31.0% | 347 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 25.2% | 31.0% | 346 |
+| energy per core-hour (Wh) | shown, not judged | 25.1% | 30.9% | 343 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 10.7% | 13.2% | 63 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 15.8% | 19.4% | 136 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | LOSS in all three of our runs | 14.4% | 17.7% | 113 |
+| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 321.3% | 395.1% | 56203 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 1184832.0% | 1456873.6% | 764093080716 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 524088.4% | 644421.0% | 149500222022 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 304.5% | 374.4% | 50477 |
+
+### 69.39 Kuberay 4W Orch (omni-v12, `V12_KUBERAY_4W_ORCH.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.4% | 0.5% | 1 |
+| energy, parked workers still on at idle power (Wh) | power given in all three of our runs | 2.0% | 2.4% | 3 |
+| energy (Wh) | power given in all three of our runs | 2.0% | 2.4% | 3 |
+| response time (ms), mean | LOSS in all three of our runs | 37.2% | 45.8% | 755 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 64.7% | 79.5% | 2278 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 63.6% | 78.2% | 2201 |
+| time over the response line (% of samples) | LOSS in all three of our runs | 75.6% | 93.0% | 3111 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | LOSS in all three of our runs | 80.7% | 99.2% | 3545 |
+| pending pods, pod-minutes | shown, not judged | 47.7% | 58.7% | 1241 |
+| utilisation (used / allocatable) | shown, not judged | 25.3% | 31.1% | 348 |
+| CPU used (cores), mean | shown, not judged | 25.3% | 31.1% | 348 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 25.3% | 31.1% | 348 |
+| energy per core-hour (Wh) | shown, not judged | 25.0% | 30.7% | 340 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 14.1% | 17.3% | 108 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 17.5% | 21.5% | 167 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | LOSS in all three of our runs | 13.9% | 17.1% | 105 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 1138780.6% | 1400248.6% | 705850630730 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 458440.2% | 563699.7% | 114392632456 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 276.6% | 340.2% | 41655 |
+
+### 69.40 Kuberay 4W Top (omni-v12, `V12_KUBERAY_4W_TOP.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (2 of 3 runs) | 2.8% | 3.4% | 5 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 2.6% | 3.2% | 4 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.7% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 1.8% | 2.1% | 2 |
+| response time (ms), mean | EVEN, no difference beyond the noise (all three runs) | 12.5% | 15.4% | 86 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 15.0% | 18.4% | 122 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 16.4% | 20.2% | 147 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 9.5% | 11.7% | 50 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 2.7% | 3.3% | 4 |
+| pending pods, pod-minutes | shown, not judged | 30.1% | 37.0% | 494 |
+| utilisation (used / allocatable) | shown, not judged | 2.5% | 3.1% | 4 |
+| CPU used (cores), mean | shown, not judged | 1.3% | 1.6% | 1 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 1.3% | 1.6% | 1 |
+| energy per core-hour (Wh) | shown, not judged | 1.9% | 2.4% | 3 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 15.6% | 19.2% | 133 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 1083.4% | 1332.2% | 638914 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 1000.8% | 1230.6% | 545161 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 705.9% | 868.0% | 271230 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.4% | 1.7% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 1.7% | 2.0% | 2 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 12.2% | 15.1% | 82 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 10.1% | 12.4% | 56 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 5.2% | 6.4% | 15 |
+| queue: jobs unfinished at the window's end | EVEN, no difference beyond the noise (all three runs) | 15.5% | 19.1% | 132 |
+
+### 69.41 Kuberay 4W Vs (omni-v12, `V12_KUBERAY_4W_VS.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 18.7% | 23.0% | 191 |
+| node-hours | GAIN in all three of our runs | 18.6% | 22.9% | 189 |
+| energy, parked workers still on at idle power (Wh) | GAIN in all three of our runs | 1.5% | 1.9% | 2 |
+| energy (Wh) | GAIN in all three of our runs | 13.5% | 16.6% | 99 |
+| response time (ms), mean | GAIN in all three of our runs | 18.3% | 22.5% | 183 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 60.4% | 74.2% | 1983 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 69.6% | 85.5% | 2635 |
+| time over the response line (% of samples) | GAIN in all three of our runs | 23.7% | 29.1% | 306 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | GAIN in all three of our runs | 24.9% | 30.6% | 337 |
+| pending pods, pod-minutes | shown, not judged | 247.2% | 303.9% | 33253 |
+| utilisation (used / allocatable) | shown, not judged | 14.6% | 17.9% | 116 |
+| CPU used (cores), mean | shown, not judged | 13.6% | 16.8% | 101 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 13.7% | 16.8% | 102 |
+| energy per core-hour (Wh) | shown, not judged | 13.4% | 16.4% | 98 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 13.6% | 16.7% | 101 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 576.0% | 708.2% | 180563 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 677.7% | 833.4% | 250010 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 677.7% | 833.4% | 250010 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 8.6% | 10.5% | 40 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | GAIN in all three of our runs | 7.3% | 9.0% | 30 |
+| queue: job wait, submitted to its first pod running, mean (s) | GAIN in all three of our runs | 83.2% | 102.2% | 3764 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | GAIN in all three of our runs | 69.3% | 85.2% | 2613 |
+| queue: job turnaround, submitted to done, mean (s) | GAIN in all three of our runs | 26.5% | 32.6% | 384 |
+| queue: jobs unfinished at the window's end | GAIN in all three of our runs | 91.7% | 112.7% | 4575 |
+
+### 69.42 Kueue 4W Bare (omni-v12, `V12_KUEUE_4W_BARE.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 14.8% | 18.2% | 119 |
+| node-hours | GAIN in all three of our runs | 14.6% | 17.9% | 116 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.4% | 0.5% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 10.2% | 12.5% | 57 |
+| response time (ms), mean | GAIN in all three of our runs | 8.1% | 10.0% | 36 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 13.1% | 16.1% | 94 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 16.4% | 20.2% | 147 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 9.3% | 11.5% | 48 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 7.2% | 8.9% | 29 |
+| pending pods, pod-minutes | shown, not judged | 32.5% | 40.0% | 577 |
+| utilisation (used / allocatable) | shown, not judged | 16.4% | 20.1% | 147 |
+| CPU used (cores), mean | shown, not judged | 4.2% | 5.2% | 10 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 4.3% | 5.2% | 10 |
+| energy per core-hour (Wh) | shown, not judged | 9.8% | 12.0% | 52 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 11.5% | 14.1% | 72 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 3.0% | 3.7% | 5 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 1.4% | 1.7% | 2 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 26.5% | 32.6% | 383 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 101.2% | 124.5% | 5577 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 319.5% | 392.8% | 55558 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 11.0% | 13.6% | 67 |
+
+### 69.43 Kueue 4W Both (omni-v12, `V12_KUEUE_4W_BOTH.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 14.3% | 17.6% | 112 |
+| node-hours | GAIN in all three of our runs | 14.2% | 17.5% | 111 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.4% | 0.5% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 9.9% | 12.2% | 54 |
+| response time (ms), mean | EVEN, no difference beyond the noise (1 of 3 runs) | 5.9% | 7.3% | 20 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 13.9% | 17.1% | 105 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 15.7% | 19.3% | 135 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 5.7% | 7.0% | 18 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 11.7% | 14.4% | 75 |
+| pending pods, pod-minutes | shown, not judged | 33.9% | 41.7% | 627 |
+| utilisation (used / allocatable) | shown, not judged | 15.7% | 19.3% | 135 |
+| CPU used (cores), mean | shown, not judged | 2.8% | 3.4% | 5 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.8% | 3.4% | 5 |
+| energy per core-hour (Wh) | shown, not judged | 11.0% | 13.5% | 66 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 14.6% | 17.9% | 116 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.4% | 3.0% | 4 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | LOSS in all three of our runs | 1.2% | 1.4% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 25.8% | 31.8% | 364 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 323.9% | 398.2% | 57095 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 319.5% | 392.8% | 55558 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 12.9% | 15.8% | 91 |
+
+### 69.44 Kueue 4W Orch (omni-v12, `V12_KUEUE_4W_ORCH.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.7% | 0.8% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.7% | 0.8% | 1 |
+| response time (ms), mean | LOSS in all three of our runs | 10.0% | 12.3% | 55 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 17.2% | 21.2% | 162 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 20.1% | 24.7% | 220 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (2 of 3 runs) | 7.4% | 9.1% | 31 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 9.7% | 11.9% | 51 |
+| pending pods, pod-minutes | shown, not judged | 26.1% | 32.1% | 371 |
+| utilisation (used / allocatable) | shown, not judged | 2.8% | 3.4% | 5 |
+| CPU used (cores), mean | shown, not judged | 2.8% | 3.4% | 5 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.8% | 3.4% | 5 |
+| energy per core-hour (Wh) | shown, not judged | 3.3% | 4.1% | 6 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 9.0% | 11.1% | 44 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 3.1% | 3.8% | 6 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 1.4% | 1.7% | 2 |
+| batch: worker machines in service after the queue finished, mean | EVEN, the same | 0.0% | 0.0% | 9 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 310.0% | 381.2% | 52303 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 422.6% | 519.7% | 97227 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 15.6% | 19.1% | 132 |
+
+### 69.45 Kueue 4W Top (omni-v12, `V12_KUEUE_4W_TOP.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 14.3% | 17.6% | 112 |
+| node-hours | GAIN in all three of our runs | 14.4% | 17.7% | 114 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.6% | 0.8% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 10.0% | 12.3% | 55 |
+| response time (ms), mean | GAIN in all three of our runs | 7.8% | 9.6% | 34 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 14.7% | 18.1% | 119 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 13.0% | 16.0% | 93 |
+| time over the response line (% of samples) | GAIN in all three of our runs | 8.6% | 10.5% | 41 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 15.6% | 19.2% | 133 |
+| pending pods, pod-minutes | shown, not judged | 25.0% | 30.8% | 341 |
+| utilisation (used / allocatable) | shown, not judged | 17.8% | 21.9% | 173 |
+| CPU used (cores), mean | shown, not judged | 3.8% | 4.7% | 8 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.9% | 4.8% | 9 |
+| energy per core-hour (Wh) | shown, not judged | 13.2% | 16.2% | 95 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 17.0% | 20.9% | 157 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 971.7% | 1194.8% | 513909 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 805.8% | 990.8% | 353409 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 540.4% | 664.5% | 158957 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 2.3% | 2.8% | 3 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) | 0.9% | 1.1% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 25.8% | 31.8% | 364 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 107.4% | 132.1% | 6284 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 69.3% | 85.2% | 2614 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) | 8.9% | 10.9% | 43 |
+
+### 69.46 Kueue 4W Vs (omni-v12, `V12_KUEUE_4W_VS.md`, 9 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 14.8% | 18.2% | 119 |
+| node-hours | GAIN in all three of our runs | 15.0% | 18.5% | 124 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.5% | 0.7% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 10.6% | 13.0% | 61 |
+| response time (ms), mean | GAIN in all three of our runs | 12.1% | 14.9% | 80 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 17.1% | 21.0% | 160 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 13.9% | 17.2% | 106 |
+| time over the response line (% of samples) | GAIN in all three of our runs | 12.8% | 15.8% | 90 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 7.9% | 9.7% | 34 |
+| pending pods, pod-minutes | shown, not judged | 26.6% | 32.7% | 386 |
+| utilisation (used / allocatable) | shown, not judged | 17.0% | 20.9% | 158 |
+| CPU used (cores), mean | shown, not judged | 3.2% | 3.9% | 6 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.1% | 3.9% | 6 |
+| energy per core-hour (Wh) | shown, not judged | 10.8% | 13.3% | 64 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 11.1% | 13.7% | 68 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 467.2% | 574.4% | 118796 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 412.1% | 506.7% | 92438 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 412.1% | 506.7% | 92438 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.4% | 1.7% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 9 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 1.2% | 1.5% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 26.5% | 32.6% | 383 |
+| queue: job wait, submitted to its first pod running, mean (s) | GAIN in all three of our runs | 66.9% | 82.3% | 2437 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | GAIN in all three of our runs | 47.9% | 58.9% | 1248 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 12.3% | 15.1% | 83 |
+
+### 69.47 Robust Kill (omni-v11, `V11_ROBUST_KILL.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12107,7 +13152,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | robust: failed requests in the 120 s after the kill (%) | EVEN, no difference beyond the noise (all three runs) | 32.0% | 39.3% | 618 |
 | robust: time over the line in the 120 s after the kill (% of samples) | EVEN, no difference beyond the noise (all three runs) | 7.5% | 9.3% | 35 |
 
-### 69.10 Robust Long (omni-v11, `V11_ROBUST_LONG.md`, 3 paired repetitions a run)
+### 69.48 Robust Long (omni-v11, `V11_ROBUST_LONG.md`, 3 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12133,7 +13178,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 2.8% | 3.5% | 2 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 3 |
 
-### 69.11 Steady (omni-v10, `V10_STEADY.md`, 10 paired repetitions a run)
+### 69.49 Steady (omni-v10, `V10_STEADY.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12158,7 +13203,7 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 2.9% | 3.6% | 6 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.12 Trace Google2011 (omni-v10, `V10_TRACE_GOOGLE2011.md`, 10 paired repetitions a run)
+### 69.50 Trace Google2011 (omni-v10, `V10_TRACE_GOOGLE2011.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12184,7 +13229,180 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 1.4% | 1.8% | 2 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.13 Wandering (omni-v10, `V10_WANDERING.md`, 10 paired repetitions a run)
+### 69.51 Vanilla (omni-v12, `V12_VANILLA.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 17.7% | 21.7% | 189 |
+| node-hours | GAIN in all three of our runs | 17.8% | 21.9% | 192 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.8% | 1.0% | 1 |
+| energy (Wh) | GAIN in all three of our runs | 12.6% | 15.5% | 97 |
+| response time (ms), mean | GAIN in all three of our runs | 6.0% | 7.4% | 22 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 9.1% | 11.2% | 51 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 6.5% | 8.0% | 26 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 33.6% | 41.2% | 681 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 45.5% | 55.9% | 1250 |
+| pending pods, pod-minutes | shown, not judged | 56.7% | 69.7% | 1942 |
+| utilisation (used / allocatable) | shown, not judged | 22.0% | 27.1% | 293 |
+| CPU used (cores), mean | shown, not judged | 9.8% | 12.1% | 59 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 9.9% | 12.1% | 59 |
+| energy per core-hour (Wh) | shown, not judged | 13.0% | 16.0% | 103 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 14.6% | 18.0% | 130 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 409.4% | 503.1% | 101256 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 378.0% | 464.5% | 86317 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 303.1% | 372.5% | 55509 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 0.8% | 0.9% | 1 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.3% | 0.4% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 28.3% | 34.8% | 485 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 188.2% | 231.3% | 21395 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 1.1% | 1.3% | 1 |
+
+### 69.52 Volcano 4W Bare (omni-v12, `V12_VOLCANO_4W_BARE.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 16.6% | 20.4% | 167 |
+| node-hours | EVEN, no difference beyond the noise (1 of 3 runs) | 16.6% | 20.4% | 167 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (1 of 3 runs) | 11.7% | 14.4% | 83 |
+| response time (ms), mean | GAIN in all three of our runs | 7.8% | 9.6% | 37 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 10.5% | 12.9% | 68 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 15.7% | 19.3% | 149 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 12.6% | 15.4% | 96 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 20.7% | 25.5% | 260 |
+| pending pods, pod-minutes | shown, not judged | 30.6% | 37.6% | 567 |
+| utilisation (used / allocatable) | shown, not judged | 21.3% | 26.2% | 275 |
+| CPU used (cores), mean | shown, not judged | 3.9% | 4.8% | 10 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.9% | 4.8% | 10 |
+| energy per core-hour (Wh) | shown, not judged | 11.9% | 14.6% | 86 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 16.8% | 20.6% | 170 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 468.9% | 576.2% | 132795 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 468.9% | 576.2% | 132795 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 468.9% | 576.2% | 132795 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.8% | 2.2% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.8% | 1.0% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 27.3% | 33.6% | 452 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 150.3% | 184.7% | 13649 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 335.7% | 412.5% | 68058 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (1 of 3 runs) | 10.4% | 12.8% | 66 |
+
+### 69.53 Volcano 4W Both (omni-v12, `V12_VOLCANO_4W_BOTH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 18.8% | 23.1% | 214 |
+| node-hours | GAIN in all three of our runs | 18.9% | 23.2% | 216 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.7% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (1 of 3 runs) | 13.3% | 16.4% | 108 |
+| response time (ms), mean | GAIN in all three of our runs | 20.3% | 24.9% | 249 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 30.2% | 37.1% | 550 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 31.3% | 38.5% | 594 |
+| time over the response line (% of samples) | GAIN in all three of our runs | 50.9% | 62.6% | 1567 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (1 of 3 runs) | 26.5% | 32.6% | 425 |
+| pending pods, pod-minutes | shown, not judged | 52.2% | 64.2% | 1649 |
+| utilisation (used / allocatable) | shown, not judged | 22.1% | 27.2% | 296 |
+| CPU used (cores), mean | shown, not judged | 3.6% | 4.5% | 9 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.7% | 4.5% | 9 |
+| energy per core-hour (Wh) | shown, not judged | 12.4% | 15.3% | 94 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 15.8% | 19.4% | 152 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 629.1% | 773.0% | 239031 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 1174.3% | 1443.0% | 832918 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 1174.3% | 1443.0% | 832918 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.7% | 2.0% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | LOSS in all three of our runs | 1.9% | 2.4% | 3 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 30.8% | 37.8% | 572 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 597.7% | 734.5% | 215792 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 571.9% | 702.7% | 197533 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 26.0% | 32.0% | 409 |
+
+### 69.54 Volcano 4W Orch (omni-v12, `V12_VOLCANO_4W_ORCH.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, the same | 0.0% | 0.0% | 1 |
+| node-hours | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.6% | 1 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.7% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.7% | 1 |
+| response time (ms), mean | GAIN in all three of our runs | 23.4% | 28.8% | 331 |
+| response time (ms), 95th percentile | GAIN in all three of our runs | 33.0% | 40.6% | 659 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (2 of 3 runs) | 30.4% | 37.4% | 559 |
+| time over the response line (% of samples) | GAIN in all three of our runs | 47.6% | 58.5% | 1369 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (2 of 3 runs) | 33.6% | 41.2% | 681 |
+| pending pods, pod-minutes | shown, not judged | 45.8% | 56.3% | 1267 |
+| utilisation (used / allocatable) | shown, not judged | 2.2% | 2.8% | 4 |
+| CPU used (cores), mean | shown, not judged | 2.2% | 2.8% | 4 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 2.2% | 2.8% | 4 |
+| energy per core-hour (Wh) | shown, not judged | 2.5% | 3.1% | 4 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 12.2% | 14.9% | 90 |
+| pods started | EVEN, no difference beyond the noise (all three runs) | 367.0% | 450.9% | 81337 |
+| pod start wait, total (s) | EVEN, no difference beyond the noise (all three runs) | 367.0% | 450.9% | 81337 |
+| pod start wait, mean (s) | EVEN, no difference beyond the noise (all three runs) | 468.9% | 576.2% | 132795 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.1% | 1.3% | 1 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | LOSS in all three of our runs | 1.6% | 1.9% | 2 |
+| batch: worker machines in service after the queue finished, mean | EVEN, the same | 0.0% | 0.0% | 10 |
+| queue: job wait, submitted to its first pod running, mean (s) | LOSS in all three of our runs | 565.5% | 694.9% | 193152 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS in all three of our runs | 273.7% | 336.3% | 45234 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs | 22.6% | 27.8% | 310 |
+
+### 69.55 Volcano 4W Top (omni-v12, `V12_VOLCANO_4W_TOP.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | GAIN in all three of our runs | 18.8% | 23.1% | 214 |
+| node-hours | GAIN in all three of our runs | 18.6% | 22.9% | 210 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) | 0.5% | 0.7% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (1 of 3 runs) | 13.0% | 16.0% | 103 |
+| response time (ms), mean | GAIN in all three of our runs | 14.1% | 17.3% | 120 |
+| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) | 30.6% | 37.6% | 567 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (all three runs) | 38.0% | 46.7% | 874 |
+| time over the response line (% of samples) | EVEN, no difference beyond the noise (all three runs) | 56.5% | 69.4% | 1927 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (all three runs) | 21.6% | 26.5% | 282 |
+| pending pods, pod-minutes | shown, not judged | 26.5% | 32.5% | 423 |
+| utilisation (used / allocatable) | shown, not judged | 22.0% | 27.1% | 293 |
+| CPU used (cores), mean | shown, not judged | 3.2% | 3.9% | 7 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.2% | 4.0% | 7 |
+| energy per core-hour (Wh) | shown, not judged | 12.5% | 15.4% | 95 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 14.5% | 17.8% | 127 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.4% | 1.7% | 2 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.9% | 1.1% | 1 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 30.8% | 37.8% | 572 |
+| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) | 43.0% | 52.9% | 1119 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) | 103.9% | 127.7% | 6522 |
+| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) | 8.8% | 10.8% | 47 |
+
+### 69.56 Volcano 4W Vs (omni-v12, `V12_VOLCANO_4W_VS.md`, 10 paired repetitions a run)
+
+| Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
+|---|---|---:|---:|---:|
+| worker nodes in service, mean | EVEN, no difference beyond the noise (1 of 3 runs) | 16.6% | 20.4% | 167 |
+| node-hours | EVEN, no difference beyond the noise (1 of 3 runs) | 16.4% | 20.1% | 163 |
+| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (2 of 3 runs) | 0.5% | 0.6% | 1 |
+| energy (Wh) | EVEN, no difference beyond the noise (1 of 3 runs) | 11.4% | 14.1% | 80 |
+| response time (ms), mean | EVEN, no difference beyond the noise (2 of 3 runs) | 26.9% | 33.0% | 436 |
+| response time (ms), 95th percentile | LOSS in all three of our runs | 63.9% | 78.5% | 2464 |
+| response time (ms), 99th percentile | EVEN, no difference beyond the noise (1 of 3 runs) | 58.1% | 71.4% | 2039 |
+| time over the response line (% of samples) | LOSS in all three of our runs | 101.0% | 124.1% | 6165 |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | EVEN, no difference beyond the noise (2 of 3 runs) | 34.8% | 42.7% | 731 |
+| pending pods, pod-minutes | shown, not judged | 25.4% | 31.2% | 390 |
+| utilisation (used / allocatable) | shown, not judged | 22.0% | 27.0% | 292 |
+| CPU used (cores), mean | shown, not judged | 3.2% | 4.0% | 7 |
+| CPU used with Omni's own (cores), mean | shown, not judged | 3.3% | 4.1% | 7 |
+| energy per core-hour (Wh) | shown, not judged | 12.8% | 15.8% | 100 |
+| HPA replicas, mean | EVEN, no difference beyond the noise (all three runs) | 16.3% | 20.0% | 160 |
+| host CPU busy, the real machine under kind (%) | shown, not judged | 1.2% | 1.5% | 1 |
+| host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
+| batch: queue finished (s) | GAIN in all three of our runs | 1.4% | 1.8% | 2 |
+| batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs | 27.3% | 33.6% | 452 |
+| queue: job wait, submitted to its first pod running, mean (s) | GAIN in all three of our runs | 29.1% | 35.7% | 510 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | GAIN in all three of our runs | 76.6% | 94.1% | 3542 |
+| queue: job turnaround, submitted to done, mean (s) | GAIN in all three of our runs | 13.9% | 17.1% | 117 |
+
+### 69.57 Wandering (omni-v10, `V10_WANDERING.md`, 10 paired repetitions a run)
 
 | Measure | Reading | MDE, one run | MDE, all three runs | Repetitions for 5% |
 |---|---|---:|---:|---:|
@@ -12210,9 +13428,9 @@ Each figure is in percent of native's mean in the least favourable of the three 
 | host CPU busy, the real machine under kind (%) | shown, not judged | 2.3% | 2.8% | 4 |
 | host cores (the real machine under kind) | shown, not judged | 0.0% | 0.0% | 10 |
 
-### 69.14 What the EVEN rows mean
+### 69.58 What the EVEN rows mean
 
-107 rows read EVEN. In 55 of them the test could not resolve a change under 10% of native in all three runs, so EVEN there means "no change larger than the MDE shown", and nothing finer is claimed.
+555 rows read EVEN. In 362 of them the test could not resolve a change under 10% of native in all three runs, so EVEN there means "no change larger than the MDE shown", and nothing finer is claimed.
 
 ## 70. Every Change to Every Preregistration
 
@@ -12220,10 +13438,23 @@ Each figure is in percent of native's mean in the least favourable of the three 
 
 Generated by `python3 tools/deviations.py` from the preregistrations in `docs/`; `tools/deviations.py --check`, run by `verify.py`, fails a push where this register is not what they give. Each amendment's reason, and what it changed, is written in the preregistration it amends; this register is the index to all of them, newest first. The timing is the amendment's own statement in its heading. Earlier windows, runs and tables keep the rule they ran under, and a three-run table never pools runs from either side of an amendment that changes what it reads.
 
-57 amendments in 12 preregistrations: 41 before the runs it governs; 10 not stated in its heading; 6 after runs began.
+70 amendments in 15 preregistrations: 54 before the runs it governs; 10 not stated in its heading; 6 after runs began.
 
 | Date | Preregistration | Amendment | Timing |
 |---|---|---|---|
+| 2026-10-20 | `docs/GROUP_PREREGISTRATION.md` | Amendment 2: Armada, frozen (written before its first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/GROUP_PREREGISTRATION.md` | Amendment 1: Open Cluster Management, frozen (written before its first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/CRANE_PREREGISTRATION.md` | Amendment 1: what the trial found in the rig (written after the trial of 20 October 2026, before the counted runs) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 9: what the trials of 20 October found in the rigs (written after the trials, before the counted runs) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 8: the Gödel scheduler (written before its first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 7: KubeRay (written before its first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 6: the four ways (written before their first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 5: the governor's own core (written before any run on it, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 4: Koordinator's runs repeated on the kubelet's cgroup root its own tests use (written before they were repeated, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 3: the Kubernetes scheduler alone, as shipped and with its bin-packing profile (written before its first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 2: Koordinator (written before its first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 1: the KAI scheduler (written before its first run, 20 October 2026) | before the runs it governs |
+| 2026-10-20 | `docs/BATCH_QUEUE_PREREGISTRATION.md` | Amendment 10: what the counted runs of 20 October found (written after those runs, before the Gödel runs start again) | before the runs it governs |
 | 2026-10-19 | `docs/SWARM_PREREGISTRATION.md` | Amendment 2 (2026-10-19, before omni-v12's runs; written after the omni-v11 runs and the reflex study were seen, and said so) | after runs began |
 | 2026-10-19 | `docs/K8S_COMPASS_PREREGISTRATION.md` | Amendment (2026-10-19): a worker held by an add-on's own mark while it serves is in service | not stated in its heading |
 | 2026-10-19 | `docs/K8S_COMPASS_PREREGISTRATION.md` | Amendment (2026-10-19): a paid cloud set runs to its cap and stops when its bill is read (written before any run of it) | before the runs it governs |
@@ -12823,7 +14054,22 @@ faults and a public day of demand, and fewer machines on a queue of jobs; on the
 broker and the do-no-harm reading on three databases. Not yet shown: an energy or cloud-bill saving on real machines (energy on
 kind is a declared model; the Azure tables at the tune-down are being made), and anything on a real card.
 
-### 75.2 Open
+### 75.2 The whole system, every layer composed (20 October)
+
+The founder's question of 20 October: the cloud is the wire between the chip and the software, Omni-Compass sits at both ends
+and at every layer between, what is the total? `results/WHOLE_SYSTEM.md` (built by `tools/whole_system.py`) answers it from the
+tables that stand: each layer's ratio toward its gauge's aim, Rℓ(g) = oℓ/nℓ or nℓ/oℓ, measured with the layer under it as
+native runs it (the card against its own limiter, the cluster against the HPA, the governors against the orchestrator as
+shipped, the cloud against Azure's own autoscaler), composed by the product law R(g) = ∏ℓ Rℓ(g), every run's paired interval
+carried through by the delta method, the three runs pooled by inverse variance, the layers added in the log. Two readings:
+by the index's rule (an EVEN or one-run gauge counts as exactly 1) and with every interval carried. The product's
+assumption, that a layer's factor does not change when the layers around it carry Omni-Compass too, is tested where the
+tables allow (the governors' four ways: Omni-Compass on the organism alone against on top of the orchestrator, in the same
+repetitions). The composition is class S over class P and L tables and across engines, said so on the page; the stacked
+run (Omni-Compass at every layer at once) is the measurement that would replace it, and the page is remade as each layer's
+omni-v12 runs land. The numbers stand on that page, never copied here.
+
+### 75.3 Open
 
 1. **Every benchmark on omni-v11**: released A, then B, then C by the conductor from `scripts/reruns.txt` (the steady and
    wandering Kubernetes tests among them, MySQL, Redis and MongoDB with native as shipped beside the operator's setting,
@@ -12853,7 +14099,7 @@ kind is a declared model; the Azure tables at the tune-down are being made), and
 10. **Omni-Compass 1.0**: when the founder declares the engine final, the engine that stands then is published as 1.0 and
    the older fingerprints go to `docs/history` as the road to it.
 
-### 75.3 Where things are
+### 75.4 Where things are
 
 | Path | What it is |
 |---|---|
@@ -14028,7 +15274,7 @@ Their workflows, cloud-organism, gpu-bench and lambda-gpu are excluded from this
 The profiles are operational through the existing `HIL_SCALES` and `HIL_REPS_BY_SCALE` environment variables. Existing
 wall-clock budgets still apply: a stage that cannot finish within its budget must be reported incomplete.
 
-© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 ### 88.3 Omni v7: tighter convergence on top of v6 (the engine of 16 to 17 October)
 
 
@@ -14162,7 +15408,7 @@ The organisms the candidate is run on are the seven of 16 October (the spine, th
 
 Reference: Kubernetes [Resource Quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/) and [in-place container resource resizing](https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/). The CPU budget helper is included in both the engine and actuator fingerprints. README.md, LICENSE, NOTICE, DISCLOSURES.md, PATENTS.md and TRADEMARKS.md accompany the trial artifact.
 
-© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 ### 88.4 Omni v8: the battery that carries its building through an outage stays native (the engine of 17 October)
 
 
@@ -14257,7 +15503,7 @@ benchmark, then B, then C); the grid on its own manifest (`results/grid_v8/`); e
 record. Google Cloud and Amazon carry the same sets behind their switches, off until the founder turns them on; the GPU runs on
 Lambda wait for his word and one exact commit. The organisms are the seven of 16 October, the spine first (`docs/THE_SPINE.md`).
 
-© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 ### 88.5 Omni v9: the battery wire reads the coming hour (the engine that stood on 17 and 18 October)
 
 

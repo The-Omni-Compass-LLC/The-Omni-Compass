@@ -21,7 +21,7 @@
 # Usage: REP=n ARMS="native compass" [AWS_REGION=us-east-1 EKS_INSTANCE=m5.large EKS_MAX_NODES=4 RUN_ID=...]
 #        bash scripts/eks_paired.sh            (credentials from the environment: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 set -euo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native compass}"
 REGION="${AWS_REGION:-us-east-1}"; TYPE="${EKS_INSTANCE:-m5.large}"; MAX="${EKS_MAX_NODES:-4}"; RUNID="${RUN_ID:-local}"
 K8S="${EKS_VERSION:-}"; MS_VERSION="${METRICS_SERVER_EKS:-v0.7.2}"   # EKS_VERSION empty: eksctl's default, a supported version
