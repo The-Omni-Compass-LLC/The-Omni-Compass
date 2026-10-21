@@ -42,6 +42,19 @@
   stored short (595 characters, not the key file); Amazon's on the Free plan (the organization's policy denies every machine
   read). Both say so in their own words on the bill monitors.
 
+
+## 2026-10-20 (night): the run storm on GitHub stopped
+
+- **Why runs read cancelled.** The live engine committed its rebuilt page to main, and its own push filter matched that page,
+  so it rebuilt itself every seven minutes (ten bot commits between 19:43 and 20:52 UTC). Each of those commits also started
+  21 workflows that run only when started by hand (they register on a push and skip it), each skipped run started the front
+  page, and each front page started the live engine and the raw sweep, which then cancelled one another in their queues: in
+  the hour and a half read, 320 cancelled runs and about 300 skipped ones, no benchmark among them, and every bot commit ran
+  the whole verify. Now the live engine's own page is outside its push filter; a front-page run that did not succeed starts
+  no rebuild and a skipped run no sweep; and the 21 workflows ignore pushes to main and to the level branches (a dispatch
+  needs no push to register a workflow that is on main). `tests/test_workflow_triggers.py` fails a push where a workflow
+  would again be started by every push, or the live engine by its own page.
+
 ## 2026-10-20: the whole system, every layer composed by the product law; Gödel's rig on 1.24; the CPU power harness seeded
 
 - **The whole system** (`results/WHOLE_SYSTEM.md`, `tools/whole_system.py`; the founder's question of 20 October: the cloud is

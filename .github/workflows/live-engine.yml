@@ -39,6 +39,7 @@ on:
       - "scripts/*_queue.txt"
       - "scripts/gpu_campaign_profiles.json"
       - "docs/engine/**"
+      - "!docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"   # its own commit never starts it again (20 October: it had rebuilt itself every 7 minutes)
       - ".github/workflows/live-engine.yml"
   workflow_run:
     workflows: [front-page]
@@ -53,6 +54,8 @@ env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
   build:
+    # a front-page run that skipped or failed has nothing new for the page
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     concurrency: {group: live-engine, cancel-in-progress: false}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
