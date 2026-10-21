@@ -69,7 +69,14 @@ def read(spec, timeout=3.0):
     if kind == "redfish":
         return redfish(where, timeout)
     if kind == "cmd":
-        out = subprocess.run(where, shell=True, capture_output=True, text=True, timeout=timeout + 5).stdout
+        # the meter's own command, the operator's: run without a shell when it holds nothing only a shell reads (a pipe, a
+        # redirect, a variable), as the governor runs its read commands from omni-v14 (omni_controller/muscles.py,
+        # run_operator_cmd); with one, through the shell as before
+        words = shlex.split(where) if not (set(where) & set("|&;<>()$`*?[]{}~#\n")) else None
+        if words and "=" not in words[0]:
+            out = subprocess.run(words, capture_output=True, text=True, timeout=timeout + 5).stdout
+        else:
+            out = subprocess.run(where, shell=True, capture_output=True, text=True, timeout=timeout + 5).stdout
         return float(out.split()[0])
     url = {"shelly1": f"http://{where}/meter/0", "shelly2": f"http://{where}/rpc/Switch.GetStatus?id=0",
            "tasmota": f"http://{where}/cm?cmnd=Status%208"}[kind]

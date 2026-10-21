@@ -33,11 +33,12 @@ OPERATOR = ("the command is the operator's own configuration, run with the gover
 FIXED_URL = "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data"
 CI_TMP = "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
 REVIEWED = {
-    ("B602", "omni_controller/controller.py"): OPERATOR + " (the site power reading, --power-cmd; engine file: the next "
-                                               "version runs it without a shell when it holds no pipe)",
-    ("B602", "omni_controller/muscles.py"): OPERATOR + " (a muscle's read command in the operator's wiring file; engine file, "
-                                            "as above)",
-    ("B602", "tools/wall_meter.py"): OPERATOR + " (a wall meter read by a command, `cmd:` in the meter's address)",
+    ("B602", "omni_controller/muscles.py"): OPERATOR + " (run_operator_cmd: the site power reading, --power-cmd, and a "
+                                            "muscle's read command in the operator's wiring file; from omni-v14 a command "
+                                            "with nothing only a shell reads runs without one, so the shell is reached only "
+                                            "for a pipe, a redirect or a variable the operator wrote)",
+    ("B602", "tools/wall_meter.py"): OPERATOR + " (a wall meter read by a command, `cmd:` in the meter's address; without a "
+                                     "shell unless it holds a pipe, a redirect or a variable, as the governor's commands)",
     ("B103", "tools/run_pgbench.py"): "PgBouncer's folder on the benchmark machine is owned by postgres and set 0o755: others "
                                       "may read and enter it, never write it",
     ("B108", "k8s_controlplane/mechanism_harness.py"): CI_TMP,
@@ -108,7 +109,9 @@ def page(j: dict) -> str:
          f"**{j['high']} findings of high severity and {j['medium']} of medium severity, every one reviewed below; "
          f"{j['low']} of low severity, counted by kind.** Fixed on 19 October: a world-writable PgBouncer folder (now owned "
          "by postgres, 0o755) and the MD5 that PostgreSQL's own password method defines, now marked as not used for "
-         "security.", "",
+         "security. Fixed in omni-v14 (21 October): the operator's own commands (the site power reading, a muscle's read "
+         "command, a wall meter's) run without a shell unless they hold a pipe, a redirect or a variable, so the governor's "
+         "site power reading no longer reaches a shell at all and one high finding is gone.", "",
          "## Every finding of high or medium severity, and why it stands", "",
          "| Check | File | Severity | Findings (lines) | Why it stands |", "|---|---|---|---|---|"]
     for r in j["reviewed"]:

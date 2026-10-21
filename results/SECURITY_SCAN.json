@@ -1,17 +1,17 @@
 {
- "lines_scanned": 34657,
- "high": 3,
- "medium": 34,
- "low": 335,
+ "lines_scanned": 37136,
+ "high": 2,
+ "medium": 35,
+ "low": 347,
  "low_by_kind": {
-  "B603 subprocess_without_shell_equals_true": 145,
-  "B404 blacklist": 62,
-  "B607 start_process_with_partial_path": 58,
+  "B603 subprocess_without_shell_equals_true": 152,
+  "B404 blacklist": 65,
+  "B607 start_process_with_partial_path": 59,
   "B101 assert_used": 50,
   "B311 blacklist": 12,
   "B110 try_except_pass": 4,
+  "B606 start_process_with_no_shell": 2,
   "B105 hardcoded_password_string": 2,
-  "B606 start_process_with_no_shell": 1,
   "B107 hardcoded_password_default": 1
  },
  "reviewed": [
@@ -43,7 +43,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    1103
+    1137
    ],
    "what": "Probable insecure usage of temp file/directory.",
    "why": "a default file name for the audit log in the working folder, not /tmp; the operator sets --audit"
@@ -87,7 +87,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    418
+    419
    ],
    "what": "Probable insecure usage of temp file/directory.",
    "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
@@ -102,6 +102,17 @@
    ],
    "what": "Probable insecure usage of temp file/directory.",
    "why": "a path on the benchmark's own throwaway machine (a GitHub runner), never on a machine Omni-Compass governs"
+  },
+  {
+   "test": "B108",
+   "file": "tools/omni_control.py",
+   "severity": "MEDIUM",
+   "count": 1,
+   "lines": [
+    461
+   ],
+   "what": "Probable insecure usage of temp file/directory.",
+   "why": ""
   },
   {
    "test": "B108",
@@ -157,7 +168,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    382
+    383
    ],
    "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
    "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the GitHub API)"
@@ -223,7 +234,7 @@
    "severity": "MEDIUM",
    "count": 1,
    "lines": [
-    534
+    549
    ],
    "what": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
    "why": "every URL it opens is an https address written in the code or the operator's own endpoint, never one read from data (the YCSB release, checked against its published digest)"
@@ -263,25 +274,14 @@
   },
   {
    "test": "B602",
-   "file": "omni_controller/controller.py",
-   "severity": "HIGH",
-   "count": 1,
-   "lines": [
-    810
-   ],
-   "what": "subprocess call with shell=True identified, security issue.",
-   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (the site power reading, --power-cmd; engine file: the next version runs it without a shell when it holds no pipe)"
-  },
-  {
-   "test": "B602",
    "file": "omni_controller/muscles.py",
    "severity": "HIGH",
    "count": 1,
    "lines": [
-    134
+    114
    ],
    "what": "subprocess call with shell=True identified, security issue.",
-   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a muscle's read command in the operator's wiring file; engine file, as above)"
+   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (run_operator_cmd: the site power reading, --power-cmd, and a muscle's read command in the operator's wiring file; from omni-v14 a command with nothing only a shell reads runs without one, so the shell is reached only for a pipe, a redirect or a variable the operator wrote)"
   },
   {
    "test": "B602",
@@ -289,10 +289,10 @@
    "severity": "HIGH",
    "count": 1,
    "lines": [
-    72
+    79
    ],
    "what": "subprocess call with shell=True identified, security issue.",
-   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a wall meter read by a command, `cmd:` in the meter's address)"
+   "why": "the command is the operator's own configuration, run with the governor's own rights; it never holds text read from the cluster or the network, and an operator may use a pipe in it (a wall meter read by a command, `cmd:` in the meter's address; without a shell unless it holds a pipe, a redirect or a variable, as the governor's commands)"
   },
   {
    "test": "B608",
@@ -312,17 +312,22 @@
    "severity": "MEDIUM",
    "count": 6,
    "lines": [
-    750,
-    750,
-    751,
-    752,
-    752,
-    752
+    822,
+    822,
+    823,
+    824,
+    824,
+    824
    ],
    "what": "Use of extra potential SQL attack vector.",
    "why": "not Django: a local function named extra() inside an f-string"
   }
  ],
- "unreviewed": [],
+ "unreviewed": [
+  [
+   "B108",
+   "tools/omni_control.py"
+  ]
+ ],
  "stale": []
 }

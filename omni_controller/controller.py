@@ -52,7 +52,7 @@ sys.path.insert(0, str(ROOT))
 from omnicompass import master
 from omnicompass.adapter import Governor, mode_law, OBSERVE
 from omnicompass.shield import enforce, ShieldLimits
-from omni_controller.muscles import Muscles, add_args as add_muscle_args
+from omni_controller.muscles import Muscles, add_args as add_muscle_args, run_operator_cmd
 from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling, one_host
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
@@ -839,7 +839,7 @@ class Controller:
         power_stress = 0.0; blind = {}
         if self.a.power_cmd and self.a.site_limit_w:
             try:
-                power_stress = float(subprocess.run(self.a.power_cmd, shell=True, capture_output=True, text=True).stdout.strip()) / self.a.site_limit_w
+                power_stress = float(run_operator_cmd(self.a.power_cmd).stdout.strip()) / self.a.site_limit_w
                 blind["power"] = False
             except ValueError:
                 power_stress = 0.0; blind["power"] = True
