@@ -255,8 +255,9 @@ def main():
     except AssertionError:
         detected3 = True
     check("negative control: parity test detects a C++ governor with a wrong equation (2) add gate", detected3)
-    gsrc = (ROOT / "cpp" / "src" / "governor.cpp").read_text(); assert "std::nearbyint(c / r)" in gsrc
-    (tmp / "mut_src").mkdir(); (tmp / "mut_src" / "governor.cpp").write_text(gsrc.replace("std::nearbyint(c / r)", "std::nearbyint(c * 1.0)"))
+    gsrc = (ROOT / "cpp" / "src" / "governor.cpp").read_text()
+    gblend = "const double a = r == 1.0 ? 0.339 : 1.0 - std::pow(1.0 - 0.339, r);"; assert gblend in gsrc
+    (tmp / "mut_src").mkdir(); (tmp / "mut_src" / "governor.cpp").write_text(gsrc.replace(gblend, "const double a = 0.339;"))
     subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"),
                     *[str(p) for p in (ROOT / "cpp" / "src").glob("*.cpp") if p.name != "governor.cpp"], str(tmp / "mut_src" / "governor.cpp"),
                     str(ROOT / "cpp" / "tools" / "run_governor.cpp"), "-o", str(tmp / "oc_mut4")], check=True)
@@ -265,7 +266,7 @@ def main():
         detected_p = False
     except AssertionError:
         detected_p = True
-    check("negative control: parity test at 15 s detects a C++ governor counting its dwell in steps, not seconds", detected_p)
+    check("negative control: parity test at 15 s detects a C++ governor that blends a minute's share of each observation every 15 s", detected_p)
     from benchmarks.stack_benchmark import simulate, ARMS
     from omnicompass import stack_sim as S
     from omnicompass.adapter import AllocationLaw

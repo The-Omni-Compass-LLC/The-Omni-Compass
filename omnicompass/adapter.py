@@ -145,10 +145,10 @@ class Governor:
     last_push: float = 0.0
     log: deque = field(default_factory=lambda: deque(maxlen=4096))
     evolve: bool = True
-    # omni-v16: the seconds between two steps. The engine was built at a step every FLEET_DECISION_SECONDS (60), and every
-    # constant of its law is stated there; at any other period each one keeps its time: the engine's own clock advances
-    # MACRO_DT x period / 60 a step, the observation is taken in at the share that blends the same amount a minute, and
-    # the law's dwell counts are converted to steps of this period. At 60 s every value is the one v13 used
+    # omni-v16: the seconds between two steps. The engine was built at a step every FLEET_DECISION_SECONDS (60), and its
+    # clocks are stated there; at any other period each keeps its time: the engine's own clock advances MACRO_DT x period
+    # / 60 a step and the observation is taken in at the share that blends the same amount a minute. The law's dwell is a
+    # count of readings that agree and stays one (docs/OMNI_V16.md, fault 9). At 60 s every value is the one omni-v15 used
     period_s: float = float(FLEET_DECISION_SECONDS)
 
     def kill(self) -> None:
@@ -177,8 +177,6 @@ class Governor:
         self.x = xn
         self.t += MACRO_DT * r
         L = self.law
-        # a count of the law's 60 s steps, in steps of this period (none stays none; at 60 s the count itself)
-        steps = lambda n: int(n) if n <= 0 or r == 1.0 else max(1, int(round(n / r)))
         n = int(self.nodes)
         u_push, _ = control_command(xn, self.p, self.t, +1)
         push = u_push / U_AUTHORITY
@@ -195,7 +193,10 @@ class Governor:
         if delta < 0 and (o["q"] >= L.guard_queue or n_req > n - L.down_band):
             delta = 0
         self.surplus_streak = self.surplus_streak + 1 if delta < 0 else 0
-        if delta < 0 and (self.surplus_streak < steps(L.down_dwell) or self.since_add < steps(L.down_after_add)):
+        # the dwell is a count of readings that agree, never a clock (omni-v16, docs/OMNI_V16.md fault 9): counted in seconds,
+        # its hold after an add grew to five minutes at a reading every 15 s, while an add still comes at the first reading
+        # that calls for it, and the pool kept machines the load no longer needed with no fewer pods waiting
+        if delta < 0 and (self.surplus_streak < L.down_dwell or self.since_add < L.down_after_add):
             delta = 0
         ceiling = L.power_ceiling_backlog if o["q"] >= L.guard_queue else L.power_ceiling
         if delta > 0 and (o["power"] >= ceiling or n >= L.max_nodes):

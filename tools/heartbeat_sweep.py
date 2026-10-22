@@ -19,7 +19,9 @@ the checkout under test. The governor's own cost is the process's CPU time less 
   python3 tools/heartbeat_sweep.py --cand CAND --base BASE --out OUT [--seeds 1-8] [--periods 5,10,15,20,30,60] [--jobs 4]
   python3 tools/heartbeat_sweep.py --one SETTING ARM SEED PERIOD DIR CAND   (one run, inside the checkout under test)
 
-The record of 22 October is results/toy_gate/HEARTBEAT_SWEEP.md (its table, written from OUT/results.jsonl).
+  python3 tools/heartbeat_sweep.py --table OUT/results.jsonl results/toy_gate/HEARTBEAT_SWEEP.md   (the record)
+
+The record of 22 October is results/toy_gate/HEARTBEAT_SWEEP.md and its .json, written from OUT/results.jsonl.
 """
 import argparse, importlib.util, json, os, subprocess, sys, time
 from pathlib import Path
@@ -229,7 +231,84 @@ def run_one(tree, cand, setting, arm, seed, period, d):
     return json.loads(p.stdout.strip().splitlines()[-1])
 
 
+GAUGES = {"machine_hours": ("lower", True), "kwh_per_core_hour": ("lower", True), "pending_pod_minutes_per_hour": ("lower", False),
+          "p95_ms": ("lower", False), "p99_ms": ("lower", False), "alert_minutes": ("lower", False)}
+NAMES = {"machine_hours": "Machine-hours", "kwh_per_core_hour": "Energy per used core-hour", "pending_pod_minutes_per_hour":
+         "Pods waiting for a place", "p95_ms": "95th percentile response", "p99_ms": "99th percentile response",
+         "alert_minutes": "Minutes over the line"}
+ENGINE = {"cand": "omni-v16", "base": "omni-v15"}
+SETTING = {"onsite": "On-site: native is the pod autoscaler with the cluster autoscaler; with Omni-Compass the governor sizes "
+                     "the pool on top of the pod autoscaler (the max)",
+           "cloud": "In the cloud: the cloud's own autoscaler makes and deletes machines in every arm; the governor on the "
+                    "machines alone (--give-back-only)"}
+
+
+def table(results, out_md):
+    """The record: every beat of each engine against native and against the same engine at 60 s, paired by seed, read by the
+    gate's own rule (tools/toy_gate.py reading: the mean change, its 95% interval over the seeds, the word by the gauge's aim);
+    with the engine's own cost a day."""
+    import collections
+    sys.path.insert(0, str(HERE.parents[1]))
+    from tools.toy_gate import reading
+    rows = [json.loads(l) for l in open(results)]
+    by = collections.defaultdict(dict)
+    for r in rows:
+        by[(r["setting"], r["arm"], r["period"])][r["seed"]] = r
+    pct = lambda x: "identical" if x["word"].startswith("EVEN (identical)") else f"{100 * x['relative']:+.1f}% {x['word']}"
+    rec, L = {}, ["# The heartbeat sweep: a decision every 5, 10, 15, 20, 30 and 60 seconds", "",
+                  "Our own model (evidence class S): what each beat of the governor does against native, in the cloud and on-site, "
+                  "and what it costs the engine; never a benchmark result. The founder's questions of 22 October: does a decision "
+                  "every 10 or 5 seconds do better than 15, is 20 different, and what does a faster beat cost. Run by "
+                  "`tools/heartbeat_sweep.py` (the shipped controller of each checkout on one 5-second plant, eight seeds of a day "
+                  "each, paired by seed; omni-v16 is this checkout's engine, omni-v15 main's as it stood on 22 October). Each "
+                  "reading is the gate's rule (`tools/toy_gate.py`): the mean change over the seeds with its 95% interval, the word "
+                  "by the gauge's aim (`tools/readings.py`). Run and scored by The Omni-Compass LLC's own code. No outside party has "
+                  "reviewed or approved these results.", ""]
+    for setting in ("onsite", "cloud"):
+        nat = by.get((setting, "native", 15.0), {})
+        if not nat:
+            continue
+        L += [f"## {SETTING[setting]}", ""]
+        for arm in ("cand", "base"):
+            periods = sorted(p for (st, a, p) in by if st == setting and a == arm)
+            if not periods:
+                continue
+            L += [f"### {ENGINE[arm]} against native", "",
+                  "| Beat | " + " | ".join(NAMES[g] for g in GAUGES) + " | Decisions a day | Governor CPU a day | Cluster reads a day | Writes a day |",
+                  "|---|" + "---|" * (len(GAUGES) + 4)]
+            for p in periods:
+                cur = by[(setting, arm, p)]
+                seeds = sorted(set(cur) & set(nat))
+                if len(seeds) < 3:
+                    continue
+                words = {g: reading(g, [cur[s][g] - nat[s][g] for s in seeds], [nat[s][g] for s in seeds], GAUGES) for g in GAUGES}
+                cost = {c: sum(cur[s][c] for s in seeds) / len(seeds) for c in ("decisions", "governor_cpu_s", "cluster_reads", "writes")}
+                r60 = by.get((setting, arm, 60.0), {})
+                s60 = sorted(set(cur) & set(r60))
+                vs60 = ({g: reading(g, [cur[s][g] - r60[s][g] for s in s60], [r60[s][g] for s in s60], GAUGES) for g in GAUGES}
+                        if p != 60.0 and len(s60) >= 3 else {})
+                rec[f"{setting}|{ENGINE[arm]}|{p:g}"] = {"seeds": seeds, "vs_native": words, "vs_60": vs60, "cost": cost,
+                                                        "mean": {g: sum(cur[s][g] for s in seeds) / len(seeds) for g in GAUGES}}
+                L.append(f"| {p:g} s | " + " | ".join(pct(words[g]) for g in GAUGES) +
+                         f" | {cost['decisions']:,.0f} | {cost['governor_cpu_s']:.1f} s | {cost['cluster_reads']:,.0f} | {cost['writes']:,.0f} |")
+            L.append("")
+            L += [f"#### {ENGINE[arm]} at each beat against itself at 60 s", "",
+                  "| Beat | " + " | ".join(NAMES[g] for g in GAUGES) + " |", "|---|" + "---|" * len(GAUGES)]
+            for p in periods:
+                v = rec.get(f"{setting}|{ENGINE[arm]}|{p:g}", {}).get("vs_60")
+                if v:
+                    L.append(f"| {p:g} s | " + " | ".join(pct(v[g]) for g in GAUGES) + " |")
+            L.append("")
+        rec[f"{setting}|native"] = {g: sum(r[g] for r in nat.values()) / len(nat) for g in GAUGES}
+        L += [f"Native's means over the seeds: " + "; ".join(f"{NAMES[g].lower()} {rec[f'{setting}|native'][g]:.3f}" for g in GAUGES) + ".", ""]
+    Path(out_md).write_text("\n".join(L) + "\n", encoding="utf-8")
+    Path(out_md).with_suffix(".json").write_text(json.dumps(rec, indent=1) + "\n", encoding="utf-8")
+    print(f"{out_md}: {len(rec)} rows")
+
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "--table":
+        return table(sys.argv[2], sys.argv[3])
     if len(sys.argv) > 1 and sys.argv[1] == "--one":
         setting, arm, seed, period, d, cand = sys.argv[2:8]
         return one(setting, arm, int(seed), float(period), d, cand)
@@ -237,14 +316,18 @@ def main():
     ap.add_argument("--cand"); ap.add_argument("--base"); ap.add_argument("--out")
     ap.add_argument("--seeds", default="1-8"); ap.add_argument("--periods", default="5,10,15,20,30,60")
     ap.add_argument("--settings", default="cloud,onsite"); ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--arms", default="native,cand,base", help="which arms to run: native, cand (the candidate), base")
     a = ap.parse_args()
     lo, _, hi = a.seeds.partition("-"); seeds = list(range(int(lo), int(hi or lo) + 1))
     periods = [float(x) for x in a.periods.split(",")]
     cand, base, out = Path(a.cand).resolve(), Path(a.base).resolve(), Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     sts = a.settings.split(",")
-    jobs = [(cand, st, "native", s, 15.0) for st in sts for s in seeds]
+    arms = a.arms.split(",")
+    jobs = [(cand, st, "native", s, 15.0) for st in sts for s in seeds] if "native" in arms else []
     for tree_name, tree in (("cand", cand), ("base", base)):          # the candidate first: it is the answer
+        if tree_name not in arms:
+            continue
         for st in sts:
             for p in sorted(periods):
                 jobs += [(tree, st, tree_name, s, p) for s in seeds]

@@ -45,9 +45,8 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
   if (delta > 0 && q < L_.guard_queue && u_push / U_AUTHORITY < L_.push_add) delta = 0;
   if (delta < 0 && (q >= L_.guard_queue || n_req > n - L_.down_band)) delta = 0;
   surplus_streak_ = delta < 0 ? surplus_streak_ + 1 : 0;
-  // a count of the law's 60 s steps in steps of this period (none stays none; at 60 s the count itself; ties to even, as Python's round)
-  auto steps = [r](int c) { return (c <= 0 || r == 1.0) ? c : std::max(1, static_cast<int>(std::nearbyint(c / r))); };
-  if (delta < 0 && (surplus_streak_ < steps(L_.down_dwell) || since_add_ < steps(L_.down_after_add))) delta = 0;
+  // the dwell is a count of readings that agree, never a clock (omni-v16, docs/OMNI_V16.md fault 9), as the Python
+  if (delta < 0 && (surplus_streak_ < L_.down_dwell || since_add_ < L_.down_after_add)) delta = 0;
   const double ceiling = q >= L_.guard_queue ? L_.power_ceiling_backlog : L_.power_ceiling;
   if (delta > 0 && (pw >= ceiling || n >= L_.max_nodes)) delta = 0;
   if (sec > 0.5) delta = std::min<long>(delta, 0);
