@@ -86,7 +86,7 @@ def cap_wear(caps):
 
 # the cluster toys: (the standing engine's decision period, the candidate's, the 5-second plant, the blink). The first three
 # run both engines at one period; the x60 toys run the candidate at its own default against the standing engine at its own
-# (omni-v14: 15 s against 60 s, and 10 s against 60 s on the 5-second plant, where a decision every 10 s falls on a step)
+# (omni-v16: 15 s against 60 s, and 10 s against 60 s on the 5-second plant, where a decision every 10 s falls on a step)
 CLUSTER_TOYS = {"cluster": (60.0, 60.0, False, False), "cluster15": (15.0, 15.0, False, False),
                 "cluster_blink": (60.0, 60.0, False, True), "cluster15x60": (60.0, 15.0, False, False),
                 "cluster_blink15x60": (60.0, 15.0, False, True), "fine60": (60.0, 60.0, True, False),
@@ -110,10 +110,10 @@ def cloud_toy(seed, days, fine=False, blink=False):
     class CloudSim(SimCluster):
         """The cloud as the governor meets it (scripts/kind_bench.sh, the cloud setting): the cloud's own autoscaler
         makes machines and deletes an unneeded one, in every arm; the governor only marks a machine that exists idle
-        and wakes it, and never adds one. An idle machine is the shipped actuator's (scripts/kind_nodepool.sh, omni-v14's
+        and wakes it, and never adds one. An idle machine is the shipped actuator's (scripts/kind_nodepool.sh, omni-v16's
         gate): marked PreferNoSchedule, Ready, powered and billed; no pod is moved off it; a pod that finds the open
         machines full lands on it at once; once it carries no work it stands empty for the cloud's scale-down time and
-        is deleted. (Until omni-v14 the toy took an idle machine's room away at once, as if drained, which the actuator
+        is deleted. (Until omni-v16 the toy took an idle machine's room away at once, as if drained, which the actuator
         never does: pods waited there that wait nowhere on a real cluster.)"""
         PARK_TICKS = 40 * SUB                                  # ten minutes: the autoscaler's scale-down-unneeded time
 
