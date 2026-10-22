@@ -29,7 +29,7 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 186)        # 62 entries, A, B and C (the steady and wandering tests back since omni-v8;
+        self.assertEqual(len(queue), 189)        # 63 entries, A, B and C (the steady and wandering tests back since omni-v8;
                                                  # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October;
                                                  # every data store at the max beside the tune-down, 18 October;
                                                  # the extended fault test, 18 October; CruiseKube on the recorder that
@@ -41,7 +41,8 @@ class ReleaseCampaign(unittest.TestCase):
                                                  # its bin-packing profile, 20 October; Koordinator again, on the
                                                  # kubelet's cgroup root its own tests use, 20 October; the governors
                                                  # four ways, 20 October; KubeRay, Crane, Gödel, Karmada and OCM four
-                                                 # ways, each in its own rig, 20 October)
+                                                 # ways, each in its own rig, 20 October; the decision pace, five arms,
+                                                 # docs/PACE_PREREGISTRATION.md, 22 October)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
         for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
             self.assertEqual({row[3].get('objective') for row in queue if row[2] == wf and row[3].get('native') != 'shipped'},
@@ -72,12 +73,14 @@ class ReleaseCampaign(unittest.TestCase):
              'Kubernetes observe-only check', 'Kubernetes CruiseKube', 'Kubernetes Goldilocks', 'Kubernetes fixed capacity',
              'Kubernetes scale control plane', 'every catalog muscle', '1107 muscles and seven organisms',
              'Linux CPU governor and meter capability', 'Azure full-control six-stage burst', 'large organisms on Azure',
-             'kubernetes steady', 'kubernetes wandering', 'kubernetes all four', 'kubernetes fairness', 'kubernetes faults',
+             'kubernetes steady', 'kubernetes decision pace', 'kubernetes wandering', 'kubernetes all four', 'kubernetes fairness', 'kubernetes faults',
              'kubernetes batch', 'kubernetes google 2011 trace', 'kubernetes keda add-ons', 'redis resource', 'kafka resource',
              'postgresql resource', 'mysql resource', 'mongodb resource', 'redis service', 'kafka service',
              'mysql resource, native as shipped', 'redis resource, native as shipped', 'mongodb resource, native as shipped',
              'robot arms', 'power grids', 'buildings and batteries', 'drone swarms', 'robustness kill', 'robustness long',
-             'kubernetes batch through kueue', 'kubernetes batch through volcano'],   # written before the omni-v12 campaign opened
+             'kubernetes batch through kueue', 'kubernetes batch through volcano'],   # written before the omni-v12 campaign opened;
+                                                                                      # the decision pace before the omni-v16 campaign
+                                                                                      # opened (22 October), when no run of it had started
             ['mysql service', 'mongodb service', 'postgresql service', 'kubernetes faults extended'],   # added 18 October, night
             ['Kubernetes CruiseKube, recorder in service'],                                               # added 19 October
             ['kubernetes cost to match'],                                                                 # added 19 October, evening

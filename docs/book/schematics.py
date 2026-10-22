@@ -390,7 +390,7 @@ CAPTION_NOTES = {
                      "(--strict-replicas): the replica decision itself. The HPA keeps its own 15-second check underneath. Nothing is ever "
                      "deleted or evicted; a parked machine is emptied by the autoscaler's own scale-down.",
     "s_cloud_machines": "A machine is parked only after its own trial (the response time holds within 2%) and woken on a breach: at the next "
-                        "decision (60 s) for a response time over the line, at the next fast check (5 s) for a waiting pod. No cloud credential: "
+                        "decision (15 s) for a response time over the line, at the next fast check (5 s) for a waiting pod. No cloud credential: "
                         "the governor holds a Kubernetes service account that can read, taint and annotate, nothing more.",
     "s_pgbouncer": "Up: a server for every percent of clients waiting; down: one idle server, only while clients waited under 1%; at 95% of "
                    "the line the pool goes back to the pooler's own setting at once. One writer; the restore read back at the end.",
@@ -439,12 +439,12 @@ def s_cloud_machines():
         motors=["park: taint PreferNoSchedule", "wake: remove the taint", "pod-deletion-cost"],
         adapter_lines=["--mode nodepool --law compass --dial save --sensed none/none (no HPA moved) --give-back-only",
                        "--node-scale-cmd \"bash /app/scripts/kind_nodepool.sh {n}\"",
-                       "--min-nodes 2 --max-node-step 1 --interval 60 --floor-interval 5"],
+                       "--min-nodes 2 --max-node-step 1 --interval 15 --floor-interval 5"],
         native="the cloud's cluster autoscaler and every HPA, untouched",
         muscle="the work pool's machines (omni-role=work)", cover="cover: [2, the pools' autoscaler maxima]; one machine a decision; never asks the cloud for one",
         meters=["the probe: real requests every 5 s → latency.csv", "the API: pods pending (every 5 s)", "the bill: every machine that exists, every 15 s"],
         notes_text=["A machine is parked only after its own trial (the response time holds within 2%) and woken on a breach:",
-                    "at the next decision (60 s) for a response time over the line, at the next fast check (5 s) for a waiting pod.",
+                    "at the next decision (15 s) for a response time over the line, at the next fast check (5 s) for a waiting pod.",
                     "No cloud credential: the governor holds a Kubernetes service account that can read, taint and annotate, nothing more."],
         title="THE GOVERNOR, cloud mode", inside="the compass law · the verdict · the release gate · one decision a period")
 
@@ -739,7 +739,7 @@ def c_verdict():
     """The verdict as the engine that stands reads it (omnicompass/verdict.py, judge="interval"): the trial step's cost
     against the reference's as a 95% interval on the logarithm of each piece of work's cost, read GAIN, EVEN or LOSS
     exactly as a report reads a row; the medians kept as the second guard. Every number is the controllers' own
-    (omni_controller/controller.py: n = 200, a = 0.02, R = 120 decisions of 60 s; omni_controller/gpu_compass.py:
+    (omni_controller/controller.py: n = 200, a = 0.02, R = 7,200 s, 480 decisions at 15 s; omni_controller/gpu_compass.py:
     n = 30, a = 0.02, R = 900 decisions of 2 s)."""
     d = new_drawing()
     y1, h = 0.0, 2.6
@@ -761,7 +761,7 @@ def c_verdict():
                                              "trial no sooner than P decisions after this one began (Kubernetes 10 = 600 s; a card 8)", fill="#e4efe4", color=GREEN)
     more = box(d, 4.8, y3 - h3 / 2, 4.0, h3, "MEASURE ON: the knob stays at the trial step one more decision, up to 3n requests", fill=PALE, color=GOLD)
     no = box(d, 9.2, y3 - h3 / 2, 3.8, h3, "REFUSED: the muscle is slower there. The knob goes back; the step is not tried again for R decisions "
-                                            "(Kubernetes 120 = 7,200 s; a card 900 = 30 min)", fill=ROSE, color=RED)
+                                            "(Kubernetes 7,200 s; a card 900 decisions = 30 min)", fill=ROSE, color=RED)
     for b, col in ((yes, GREEN), (more, GOLD), (no, RED)):
         arrow(d, (b.N.x, rule.S.y), b.N, color=col)
     yb, yt = y3 - h3 / 2 - 0.3, y1 + h / 2 + 0.4                   # the measure-on return, round the outside, into the trial
@@ -771,7 +771,7 @@ def c_verdict():
     text_at(d, trial.N.x + 0.15, yt + 0.05, "the trial continues", GOLD, valign="bottom")
     notes(d, 0.4, y3 - h3 / 2 - 0.65, "The verdict stands over every slow knob (the machines, the clock ceiling, a cache's notch). A trial begins only while "
                                      "the service is calm and nothing waits; a phase that sees the service leave calm, or that takes longer than its "
-                                     "limit (Kubernetes 20 decisions = 1,200 s; a card 30 decisions), is abandoned and the knob goes back, the step neither "
+                                     "limit (Kubernetes 1,200 s; a card 30 decisions), is abandoned and the knob goes back, the step neither "
                                      "allowed nor refused. The knob never passes the deepest allowed step, so steps cannot add up past the allowance. "
                                      "On the max, the Kubernetes machine count never gives back a machine the cluster had on its own.")
     return sd_svg(d)
@@ -804,7 +804,7 @@ def c_authority():
     # omnicompass/nervous_system.py authority(): contract = calm ≥ θ (pods 0.5, machines 0.7) and slo_clean and seeing;
     # calm = κ·h·(1 − clamp(σ − 1))·(1 − clamp(ν)); the controller adds its own gate (node_release_gate) and the verdict
     cond = ["the engine settled: calm = κ·h·(1 − excess stress)·(1 − unmet need) at or over the organ's threshold θ (pods 0.5; machines 0.7)",
-            "the line clean: no breach now, and for the pods none in the last 3 decisions (180 s)",
+            "the line clean: no breach now, and for the pods none in the last 180 s (the clear time)",
             "every sense live (none blind or stale): a blind sense never gives capacity back",
             "and, for the machines, the release gate: more than one machine; no pod waiting; pods not scaling up; the remaining machines at or under ρ",
             "the last command landed (proprioception: no new order to a muscle still carrying out the previous one)",
@@ -1013,7 +1013,7 @@ def f_reading():
 
 
 def f_park():
-    return chart([("start", "a full decision in the cloud mode (every 60 s)"),
+    return chart([("start", "a full decision in the cloud mode (every 15 s)"),
                   ("decision", "the 95th percentile over the line, or the feed blind?"),
                   ("decision", "a pod waiting for a place (checked every 5 s)?"),
                   ("decision", "the release gate open and the trial allowing one more machine parked?"),
@@ -1039,7 +1039,7 @@ TRIAL = ([("start", "a slow knob; the service calm and nothing waiting; P decisi
           ("box", "reference: the knob at the deepest step already allowed (a card: at native); the cost of n requests measured fresh "
                   "(Kubernetes n = 200 response times; a card n = 30 of its own service time, the queue's wait left out)"),
           ("box", "the trial step: one step deeper, under the same traffic; the cost of n more requests"),
-          ("decision", "the service calm throughout, and each phase within its limit (Kubernetes 20 decisions = 1,200 s; a card 30)?"),
+          ("decision", "the service calm throughout, and each phase within its limit (Kubernetes 1,200 s; a card 30 decisions)?"),
           ("box", "the reading: d = mean ln c[trial] − mean ln c[ref] with its 95% interval (Welch); stepwise, a second interval against the "
                   "costs first measured at native"),
           ("decision", "an interval wholly above zero (a LOSS)?"),
@@ -1047,7 +1047,7 @@ TRIAL = ([("start", "a slow knob; the service calm and nothing waiting; P decisi
           ("decision", "median t ≤ min(r, c[native]) · (1 + a) and d ≤ τ, with a = 0.02?"),
           ("end", "step allowed: the deepest allowed step is now the trial step")],
          {3: ("no", "trial abandoned: the knob goes back to the deepest allowed step; the step neither allowed nor refused"),
-          5: ("yes", "step refused: the muscle is slower there; the knob goes back; not tried again for R decisions (Kubernetes 120 = 7,200 s; a card 900)"),
+          5: ("yes", "step refused: the muscle is slower there; the knob goes back; not tried again for R (Kubernetes 7,200 s; a card 900 decisions)"),
           6: ("yes", "measure on: the knob stays at the trial step one more decision"),
           7: ("no", "step refused, past the allowance; the knob goes back; not tried again for R decisions")})
 
@@ -1089,16 +1089,16 @@ def t_clocks():
         ax.vlines(t, 0, 0.35, color=GOLD, lw=0.8)
     for t in range(0, T + 1, 15):
         ax.vlines(t, 1.0, 1.35, color=GREY, lw=1.0)
-    for t in range(0, T + 1, 60):
+    for t in range(0, T + 1, 15):
         ax.vlines(t, 2.0, 2.6, color=NAVY, lw=2.0)
     for t in range(0, T + 1, 2):
         ax.vlines(t, 3.0, 3.25, color=GREEN, lw=0.5)
     ax.text(T + 6, 0.15, "the governor's fast checks, every 5 s\n(a waiting pod wakes a machine; the floor)", va="center", color=GOLD)
     ax.text(T + 6, 1.15, "the HPA's own check, every 15 s\n(native, untouched)", va="center", color=GREY)
-    ax.text(T + 6, 2.3, "the full decision, every 60 s: the state,\nthe law, the gate, the verdict, one write,\none audit line", va="center", color=NAVY)
+    ax.text(T + 6, 2.3, "the full decision, every 15 s: the state,\nthe law, the gate, the verdict, one write,\none audit line", va="center", color=NAVY)
     ax.text(T + 6, 3.1, "the card governor, every 2 s", va="center", color=GREEN)
     ax.annotate("", xy=(180, -0.55), xytext=(0, -0.55), arrowprops=dict(arrowstyle="<->", color=INK))
-    ax.text(90, -1.0, "a clean line for 3 decisions (180 s) before the pods,\nthe clock or the power give back (a machine: no breach now)",
+    ax.text(90, -1.0, "a clean line for 180 s (12 decisions) before the pods,\nthe clock or the power give back (a machine: no breach now)",
             ha="center", va="top", color=INK)
     ax.set_xlim(0, T * 2.35); ax.set_ylim(-1.9, 3.6)
     ax.set_xticks(range(0, T + 1, 60)); ax.set_xlabel("seconds")
@@ -1235,22 +1235,22 @@ def t_trial():
     fig = mpl_fig(4.2)
     ax = fig.add_subplot(111)
     # the phases in decisions, as the controllers set them: a phase ends when its n requests are in (Kubernetes n = 200;
-    # a card n = 30) and is abandoned past its limit (Kubernetes 20 decisions; a card 30); a refusal rests R decisions
-    # (Kubernetes 120 = 7,200 s; a card 900 = 30 min); the next trial no sooner than P after the last began (10; 8)
+    # a card n = 30) and is abandoned past its limit (Kubernetes 1,200 s; a card 30 decisions); a refusal rests R
+    # (Kubernetes 7,200 s; a card 900 decisions = 30 min); the next trial no sooner than P after the last began (600 s; 8)
     spans = [(0, 8, "reference: n requests at the deepest allowed step (a card: at native)", MIST, 15),
              (8, 16, "trial: n more one step deeper, the same traffic; up to 3n", PALE, 15),
-             (16, 17, "", BLUE, 1), (17, 36, "refused: not tried again for R decisions (Kubernetes 120 = 7,200 s; a card 900 = 30 min)", ROSE, 36)]
+             (16, 17, "", BLUE, 1), (17, 36, "refused: not tried again for R (Kubernetes 7,200 s; a card 900 decisions = 30 min)", ROSE, 36)]
     for a, b, lab, col, n in spans:
         ax.add_patch(patches.Rectangle((a, 0.7), b - a, 1.3, color=col, ec=GREY))
         if lab:
             ax.text((a + b) / 2, 1.35, wrap(lab, n), ha="center", va="center", fontsize=PT)
     ax.annotate("the verdict (one decision): the 95% interval of the change in log cost,\nGAIN, EVEN or LOSS; allowed, the deepest step moves one deeper; the\n"
-                "next trial no sooner than P decisions after this one began (10; a card 8)", xy=(16.5, 2.0), xytext=(0.5, 2.55),
+                "next trial no sooner than P after this one began (Kubernetes 600 s; a card 8 decisions)", xy=(16.5, 2.0), xytext=(0.5, 2.55),
                 arrowprops=dict(arrowstyle="->", color=GREEN), color=GREEN, ha="left")
-    ax.text(18, 0.3, wrap("a phase past its limit (Kubernetes 20 decisions = 1,200 s; a card 30), or out of calm, is abandoned: the knob goes back, "
+    ax.text(18, 0.3, wrap("a phase past its limit (Kubernetes 1,200 s; a card 30 decisions), or out of calm, is abandoned: the knob goes back, "
                           "the step neither allowed nor refused", 100), ha="center", va="center", color=GREY, fontsize=PT)
     ax.set_xlim(0, 36); ax.set_ylim(0, 3.7); ax.set_yticks([]); ax.spines["left"].set_visible(False)
-    ax.set_xlabel("decisions (one every 60 s on Kubernetes; every 2 s on a card)")
+    ax.set_xlabel("decisions (one every 15 s on Kubernetes, its rules counted in seconds; one every 2 s on a card)")
     return fig_svg(fig)
 
 
