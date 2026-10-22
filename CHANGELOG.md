@@ -53,7 +53,10 @@
   records the host's free memory every 5 s, and the runner's own agent is kept out of the kernel's memory killer's reach (a
   repetition had lost its runner 64 minutes in). Two tests written for one decision a minute (`tests/test_convey.py`,
   `tests/test_muscles_levers.py`) now name the 60 s and 15 s they were written at.
-- Every benchmark runs again on omni-v16 from 07:00 UTC on 22 October; omni-v15's runs started from 02:30 UTC run to their end as
+- **Azure held**: the Azure queue's switch is off (`scripts/azure_queue.txt`) until the founder confirms that the account the
+  Azure login bills agreed to it (he said the login in use may be another person's account; a key bills only its own account).
+  Google and Amazon stay behind their own $0 checks, as before.
+- Every benchmark runs again on omni-v16 from 07:30 UTC on 22 October; omni-v15's runs started from 02:30 UTC run to their end as
   its record.
 
 ## 2026-10-22 (night): Azure behind its own $0 check; every Azure login reads the key's shape first

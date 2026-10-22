@@ -70,7 +70,7 @@ the founder overrides one in the conversation.
   percentile (+0.36% to +0.47%) and the alert minutes (+2.31%), which read EVEN at 60 s only by the seeds' spread: the engine's, on
   the next version's list. The real runs (`docs/PACE_PREREGISTRATION.md`, amendment 2: native, Omni-Compass at 15 s, and at 60, 10
   and 5 s, three runs) read the heartbeat for real. The seal is written under Python 3.12 (its compensated `sum` is what the C++
-  engine-runs twin follows; 3.11's differs by one rounding step). Every benchmark runs again on it from 07:00 UTC on 22 October.
+  engine-runs twin follows; 3.11's differs by one rounding step). Every benchmark runs again on it from 07:30 UTC on 22 October.
 - **Omni v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`) stood on main 21 to 22 October, landed 21 October, evening, under the
   founder's standing order that every fault found is fixed and lands as the next version, told, not asked, and his word of 21 October
   ("push, push, push on GitHub, update, enhanced engine"): omni-v14 with two changes. The brain's request for the power cap
@@ -302,7 +302,8 @@ the founder overrides one in the conversation.
   is root-caused and fixed in the next version.
 - **Another person's cloud account** (the founder's words: he logged into another person's Azure account to use their free credit
   for his benchmark). A key bills only the account it belongs to; nothing merges. Using it is his and that person's matter: only
-  with that person's agreement. Asked whether they agreed; nothing on Azure is touched until he answers.
+  with that person's agreement. Asked whether they agreed; nothing on Azure is touched until he answers: the Azure queue's switch is off
+  (`scripts/azure_queue.txt`), and goes back on at his word.
 
 ## Orders of 21 October
 
