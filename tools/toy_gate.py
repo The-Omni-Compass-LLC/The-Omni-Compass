@@ -27,9 +27,16 @@ its own code, so the two never share a module.
   verdict   the do-no-harm trigger (omnicompass/verdict.py) on noisy work: how often a give-back step that truly costs
              0 to 5% more is allowed against a 2% allowance, the candidate's verdict against the standing one, at 20 and at
              200 pieces of work a decision (slow work, and work fast enough to read a 2% step in a trial's time).
+  card, card_floor  the checkout's own GPU governor (omni_controller/gpu_governor.py, cap mode, its defaults) on the
+             modelled card of tools/gpu_physics_sim.py, written into this file so both engines meet one model: the card
+             whose voltage falls with its clock (gamma 3) and the card near its voltage floor (gamma 1.5), under Poisson
+             work at 30 to 80% of capacity for 600 s; native is the card's own firmware at its start limit (omni-v15).
 
 Gauges per seed (a day each): machine-hours, energy per used core-hour, pending-pod minutes an hour, HPA shortfall
-minutes an hour, the 95th-percentile response time, and alert minutes (minutes whose 95th percentile is over the line).
+minutes an hour, the 95th-percentile response time, alert minutes (minutes whose 95th percentile is over the line), and
+the brain's request for the power cap: its moves, its reversals and its travel over the day (omni-v15; never written in
+the cloud setting). The card toys read the requests served and not served, the 95th and 99th percentiles, the card's
+energy and peak temperature, and the power limit's writes, moves, reversals and travel in watts.
 The candidate is read against the standing engine paired by seed: the mean change, its 95% interval over the seeds
 (Student's t), and the word by the gauge's aim (tools/readings.py): a fall in time waited, missed or over the line is a
 GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; an interval across zero is EVEN.
@@ -62,7 +69,19 @@ except ImportError:   # a worker on a checkout from before omni-v9 has none, and
 # gauge -> (aim, a resource spent?)
 GAUGES = {"machine_hours": ("lower", True), "kwh_per_core_hour": ("lower", True),
           "pending_pod_minutes_per_hour": ("lower", False), "hpa_shortfall_minutes_per_hour": ("lower", False),
-          "p95_ms": ("lower", False), "alert_minutes": ("lower", False)}
+          "p95_ms": ("lower", False), "alert_minutes": ("lower", False),
+          # the brain's request for the power cap over the day (omni-v15): how often it moved, how often it turned back the
+          # other way, and how far it travelled in all; wear on the part that would obey it, a resource held (a fall is a
+          # cut, a rise is power given). In the cloud setting the request is never written; native asks for none
+          "power_cap_moves": ("lower", True), "power_cap_reversals": ("lower", True), "power_cap_travel": ("lower", True)}
+
+
+def cap_wear(caps):
+    """A request's wear over a run: moves (a change from one decision to the next), reversals (a move the other way from
+    the move before it) and travel (the sizes of the moves, summed)."""
+    moves = [b - a for a, b in zip(caps, caps[1:]) if b != a]
+    return {"power_cap_moves": float(len(moves)), "power_cap_travel": float(sum(abs(m) for m in moves)),
+            "power_cap_reversals": float(sum(1 for a, b in zip(moves, moves[1:]) if (a > 0) != (b > 0)))}
 
 
 # ---- the worker: one arm, one seed, run inside one checkout --------------------------------------------------------
@@ -217,9 +236,12 @@ def worker(arm, seed, days, period, out, blink=False):
     res = {"machine_hours": hours, "kwh_per_core_hour": day["kwh_per_core_hour"],
            "pending_pod_minutes_per_hour": day["pending_pod_minutes_per_hour"],
            "hpa_shortfall_minutes_per_hour": day["hpa_shortfall_minutes_per_hour"],
-           "p95_ms": allm[int(0.95 * len(allm))], "alert_minutes": alert}
+           "p95_ms": allm[int(0.95 * len(allm))], "alert_minutes": alert,
+           "power_cap_moves": 0.0, "power_cap_reversals": 0.0, "power_cap_travel": 0.0}
     if arm != "native":
         recs = [json.loads(l) for l in open(out / "audit.jsonl")]
+        res.update(cap_wear([float(r["decision"]["power_cap"]) for r in recs
+                             if isinstance(r.get("decision"), dict) and "power_cap" in r["decision"]]))
         ev = [r["verdict"].get("verdict", "") for r in recs if isinstance(r.get("verdict"), dict)]
         res["steps_allowed"] = sum(1 for v in ev if v == "step allowed")
         res["steps_refused"] = sum(1 for v in ev if v.startswith("step refused"))
@@ -475,6 +497,104 @@ def worker_convey(arm, seed, out, quota="none", batch=False):
 
 
 # ---- the verdict toy: the trigger alone on noisy work, in one checkout ---------------------------------------------
+# ---- the card toy: the checkout's own GPU governor on a modelled card -----------------------------------------------
+# the card of tools/gpu_physics_sim.py, written here so both engines meet one model: idle draw 40 W; busy draw
+# 80 + 220 s^gamma W at speed s (1 = full clock, 300 W, the start limit); a power limit under 300 W slows the card to the
+# speed whose draw is the limit, as real cards do by lowering their clocks; heat first order toward 30 C + 0.12 C/W x draw
+# with a 20 s time constant. gamma 3: voltage falls with the clock (capping cheap in speed); gamma 1.5: the card near its
+# voltage floor (capping dear). The work: Poisson arrivals at 30, 60, 80, 30, 60, 30% of full-speed capacity, 100 s each,
+# one server first come first served, 50 ms a request at full speed, 600 s and a 30 s drain, the response line ten service
+# times (500 ms). The governor is omni_controller/gpu_governor.py at its command-line defaults (cap mode, a decision every
+# 2 s), reading the modelled card as it reads nvidia-smi and the response-time file as on hardware; native is the card's own
+# firmware at the start limit. A reading here is a model's (class S): the hardware answer is scripts/gpu_paired.sh
+CARD = {"start_w": 300.0, "min_w": 100.0, "idle_w": 40.0, "static_w": 80.0, "demand_w": 300.0, "service_ms": 50.0, "slo_ms": 500.0,
+        "phases": (0.3, 0.6, 0.8, 0.3, 0.6, 0.3), "duration_s": 600, "drain_s": 30}
+CARD_GAUGES = {"requests_served": ("higher", False), "requests_not_served": ("lower", False), "p95_ms": ("lower", False),
+               "p99_ms": ("lower", False), "gpu_energy_j": ("lower", True), "peak_temp_c": ("lower", True),
+               "limit_writes": ("lower", True), "limit_moves": ("lower", True), "limit_reversals": ("lower", True),
+               "limit_travel_w": ("lower", True)}
+CARD_SMI = '''#!/usr/bin/env python3
+import json, os, sys
+p = os.environ["PHYS_STATE"]; st = json.load(open(p)); a = sys.argv[1:]
+if "-pl" in a:
+    st["limit"] = float(a[a.index("-pl") + 1]); json.dump(st, open(p, "w")); print("ok"); sys.exit(0)
+f = [x for x in a if x.startswith("--query-gpu=")][0].split("=", 1)[1].split(",")
+if any("reasons" in x for x in f): sys.exit(2)
+v = {"index": 0, "power.draw": st["draw"], "temperature.gpu": st["temp"], "utilization.gpu": round(100 * st["util"]),
+     "power.limit": st["limit"], "power.min_limit": %s, "clocks.sm": round(1800 * st["speed"]),
+     "enforced.power.limit": st["limit"], "power.management": "Enabled", "persistence_mode": "Enabled",
+     "power.default_limit": 300, "power.max_limit": 300}
+print(", ".join(str(v[x]) for x in f))
+''' % CARD["min_w"]
+
+
+def worker_card(arm, seed, gamma, out):
+    """One arm of the card toy on one seed: native (the start limit throughout) or the checkout's governor in cap mode."""
+    import random
+    import statistics
+    out = Path(out); out.mkdir(parents=True, exist_ok=True)
+    (out / "audit.jsonl").unlink(missing_ok=True)
+    C = CARD
+    speed_at = lambda limit: 1.0 if limit >= C["demand_w"] else max(0.05, (limit - C["static_w"]) / (C["demand_w"] - C["static_w"])) ** (1.0 / gamma)
+    busy_power = lambda s: C["static_w"] + (C["demand_w"] - C["static_w"]) * s ** gamma
+    rng = random.Random(seed); arr = []; per = C["duration_s"] / len(C["phases"])
+    for i, share in enumerate(C["phases"]):
+        rate = share / (C["service_ms"] / 1000.0); t = i * per
+        while True:
+            t += rng.expovariate(rate)
+            if t >= (i + 1) * per:
+                break
+            arr.append(t)
+    smi, state, lat = out / "smi.py", out / "state.json", out / "latency.csv"
+    smi.write_text(CARD_SMI); smi.chmod(0o755)
+    state.write_text(json.dumps({"limit": C["start_w"], "draw": C["idle_w"], "temp": 35.0, "util": 0.0, "speed": 1.0}))
+    lat.write_text("elapsed_seconds,latency_ms,ok\n")
+    os.environ["PHYS_STATE"] = str(state)
+    gov = None
+    if arm != "native":
+        from omni_controller.gpu_governor import GpuGovernor, parser as gov_parser
+        a = gov_parser().parse_args(["--mode", "cap", "--smi", str(smi), "--audit", str(out / "audit.jsonl"), "--kill-file", str(out / "no-kill"),
+                                     "--latency-file", str(lat), "--slo-ms", str(C["slo_ms"])])
+        gov = GpuGovernor(a); every = max(1, int(round(a.interval)))
+    ai = 0; queue = []; energy = 0.0; temp = 35.0; lats = []; limits = []; peak = 0.0
+    for sec in range(C["duration_s"] + C["drain_s"]):
+        st = json.loads(state.read_text()); limit = st["limit"]; limits.append(limit)
+        s = speed_at(limit); pb = busy_power(s)
+        t, end, busy, rows = float(sec), sec + 1.0, 0.0, []
+        while t < end:
+            while ai < len(arr) and arr[ai] <= t:
+                queue.append([arr[ai], C["service_ms"] / 1000.0]); ai += 1
+            nxt = arr[ai] if ai < len(arr) else math.inf
+            if not queue:
+                t = min(end, nxt); continue
+            job = queue[0]
+            step = min(job[1] / s, end - t, nxt - t)
+            job[1] -= step * s; busy += step; t += step
+            if job[1] <= 1e-12:
+                queue.pop(0); ms = (t - job[0]) * 1000.0; lats.append(ms); rows.append(f"{t:.3f},{ms:.2f},1\n")
+        draw = busy * pb + (1 - busy) * C["idle_w"]
+        energy += draw; temp += (30 + 0.12 * draw - temp) / 20.0; peak = max(peak, temp)
+        with open(lat, "a") as f:
+            f.writelines(rows)
+        st.update(draw=round(draw, 2), temp=round(temp, 1), util=busy, speed=s); state.write_text(json.dumps(st))
+        if gov and sec < C["duration_s"] and sec % every == every - 1:
+            gov.step()
+    if gov:
+        gov.restore()
+    lats.sort()
+    held = limits[:C["duration_s"]]
+    wear = cap_wear(held)
+    res = {"requests_served": float(len(lats)), "requests_not_served": float(len(arr) - len(lats)),
+           "p95_ms": lats[int(0.95 * len(lats))], "p99_ms": lats[int(0.99 * len(lats))], "gpu_energy_j": energy, "peak_temp_c": peak,
+           "limit_writes": float(gov.writes if gov else 0), "limit_moves": wear["power_cap_moves"],
+           "limit_reversals": wear["power_cap_reversals"], "limit_travel_w": wear["power_cap_travel"]}
+    if gov:
+        res["engine_tree"] = engine_tree("omni_controller.gpu_governor")
+        if engine_tree("omnicompass.adapter") != res["engine_tree"]:
+            raise RuntimeError("the card governor and the brain were imported from two trees")
+    print(json.dumps(res))
+
+
 VERDICT_RATES = (20, 200)
 
 
@@ -608,7 +728,7 @@ def main(argv=None):
     ap.add_argument("--cand", help="checkout of the candidate")
     ap.add_argument("--seeds", default="1-8")
     ap.add_argument("--days", type=float, default=1.0)
-    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,convey_refused,convey_batch,verdict")
+    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,convey_refused,convey_batch,card,card_floor,verdict")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", default="")
     ap.add_argument("--worker", help=argparse.SUPPRESS)
@@ -618,6 +738,7 @@ def main(argv=None):
     ap.add_argument("--blink", action="store_true", help=argparse.SUPPRESS)  # the cluster toy with its machines out of service a while
     ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota: none (readable, empty), unreadable, or refused (unreadable, every raise refused)
     ap.add_argument("--batch", action="store_true", help=argparse.SUPPRESS)  # the convey toy with the batch muscle beside the serving one
+    ap.add_argument("--gamma", type=float, default=3.0, help=argparse.SUPPRESS)  # the card toy's clock-cost exponent
     a = ap.parse_args(argv)
     if a.render:
         return render(*a.render)
@@ -625,6 +746,8 @@ def main(argv=None):
         return worker_verdict(a.seed)
     if a.worker in ("convey-native", "convey-omni"):
         return worker_convey(a.worker.split("-")[1], a.seed, a.dir, a.quota, a.batch)
+    if a.worker in ("card-native", "card-omni"):
+        return worker_card(a.worker.split("-")[1], a.seed, a.gamma, a.dir)
     if a.worker:
         return worker(a.worker, a.seed, a.days, a.period, a.dir, a.blink)
     lo_s, _, hi_s = a.seeds.partition("-")
@@ -684,6 +807,29 @@ def main(argv=None):
                        "cand_vs_native": reading(g, [c - n for c, n in zip(cv, nv)], nv, gauges)}
         report["toys"][toy] = {"gauges": rows, "counts": {k: {arm: sum(res[arm][s][k] for s in seeds) for arm in ("native", "base", "cand")}
                                                           for k in ("starts", "starts_past_75")}, "per_seed": res}
+    # the card toys (omni-v15): the GPU governor of each checkout on the modelled card, native the card's own firmware at its
+    # start limit; the card whose voltage falls with its clock (gamma 3) and the card near its voltage floor (gamma 1.5)
+    for toy, gamma in (("card", 3.0), ("card_floor", 1.5)):
+        if toy not in toys:
+            continue
+        jobs = [(arm, tree, s) for s in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]
+        with ThreadPoolExecutor(a.jobs) as ex:
+            got = list(ex.map(lambda j: run(j[1], ["--worker", "card-native" if j[0] == "native" else "card-omni",
+                                                    "--seed", str(j[2]), "--gamma", str(gamma),
+                                                    "--dir", str(work / toy / f"{j[0]}-{j[2]}")]), jobs))
+        res = {}
+        for (arm, _, s), r in zip(jobs, got):
+            res.setdefault(arm, {})[s] = r
+        rows = {}
+        for g in CARD_GAUGES:
+            bv = [res["base"][s][g] for s in seeds]; cv = [res["cand"][s][g] for s in seeds]
+            nv = [res["native"][s][g] for s in seeds]
+            rows[g] = {"native": sum(nv) / len(nv), "base": sum(bv) / len(bv), "cand": sum(cv) / len(cv),
+                       "cand_vs_base": reading(g, [c - b for c, b in zip(cv, bv)], bv, CARD_GAUGES),
+                       "base_vs_native": reading(g, [b - n for b, n in zip(bv, nv)], nv, CARD_GAUGES),
+                       "cand_vs_native": reading(g, [c - n for c, n in zip(cv, nv)], nv, CARD_GAUGES)}
+        report["toys"][toy] = {"gauges": rows, "counts": {k: {arm: sum(res[arm][s][k] for s in seeds) for arm in ("native", "base", "cand")}
+                                                          for k in ("limit_writes", "limit_moves", "limit_reversals")}, "per_seed": res}
     if "verdict" in toys:
         report["toys"]["verdict"] = {"base": run(base, ["--worker", "verdict", "--seed", "300"]),
                                      "cand": run(cand, ["--worker", "verdict", "--seed", "300"])}

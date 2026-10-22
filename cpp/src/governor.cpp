@@ -51,7 +51,9 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
   if (delta < 0) surplus_streak_ = 0;
   const bool at_envelope = pw >= ceiling;
   double cap;
-  if (q < L_.guard_queue && x_.U >= L_.U_gate) cap = cl(current_cap * load * (1.0 + L_.margin), L_.cap_min, 1.0);
+  // the trim to demand only while the response line has been clean for the caller's own clear time (omni-v15, as
+  // omnicompass/adapter.py): the request cannot switch back and forth at the one threshold; a release is never delayed
+  if (q < L_.guard_queue && x_.U >= L_.U_gate && ob.slo_clean) cap = cl(current_cap * load * (1.0 + L_.margin), L_.cap_min, 1.0);
   else if (q >= L_.guard_queue && L_.spread_step > 0.0)
     cap = at_envelope ? cl(current_cap - L_.spread_step, L_.cap_min, 1.0) : (L_.backlog_release ? 1.0 : (n < L_.max_nodes ? current_cap : 1.0));
   else cap = 1.0;

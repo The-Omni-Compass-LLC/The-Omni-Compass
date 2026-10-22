@@ -180,7 +180,7 @@ size. The robustness tables (`results/live/V11_ROBUST_KILL.md` and `V11_ROBUST_L
 arm alone, since native has no governor to kill: the seconds from the kill until every setting was back at the operator's
 (the allowance is 60 s, declared before the run), whether a second governor started and governed to the end, and the
 governor's memory in the last ten minutes over the first ten (a quarter's growth is a leak, declared before the run); the
-120 s after the kill are compared between the arms like any paired gauge.
+300 s after the kill (120 s on the tables up to omni-v14's) are compared between the arms like any paired gauge.
 
 ## The organisms with a real cluster inside (`SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V3_BIG_ORGANISM.md`)
 
