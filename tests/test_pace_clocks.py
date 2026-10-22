@@ -51,6 +51,22 @@ class Brain(unittest.TestCase):
             self.assertEqual(a.step(dict(OBS), 0), b.step(dict(OBS), 0))
         self.assertIsNone(b.recent)
 
+    def test_contraction_waits_for_the_brains_own_minute(self):
+        """The pods' contraction authority (calm >= 0.5, omnicompass/nervous_system.py) comes after the brain's first minute
+        on an idle reading, whatever the period: the first decision at 60 s, the fourth at 15 s, and not within three
+        decisions of 5 s (the levers rig's old phases, which failed rightsize and coldstart on omni-v16, 22 October)."""
+        from omnicompass.nervous_system import from_governor
+        idle = dict(OBS, queue_ratio=0.0, load_ratio=0.2, power_stress=0.0, thermal=0.0, network_stress=0.0)
+        first = {}
+        for period, n in ((60.0, 3), (15.0, 12), (5.0, 3)):
+            g = Governor(law=mode_law("fleet"), period_s=period)
+            for i in range(n):
+                d = g.step(dict(idle), 0)
+                if from_governor(g, idle, d)["organs"]["pods"]["contract"]:
+                    first[period] = (i + 1) * period
+                    break
+        self.assertEqual(first, {60.0: 60.0, 15.0: 60.0})
+
     def test_additions_stay_within_the_minute(self):
         """A need far above the machines asks for up_max a step at 60 s; at 15, 10 or 5 s the same law adds no more than
         up_max over any minute's steps, and as much as at 60 s over whole minutes."""
@@ -94,6 +110,18 @@ class ControllerClocks(unittest.TestCase):
         self.assertIn('OMNI_INTERVAL="${OMNI_INTERVAL:-15}"', (ROOT / "scripts" / "kind_bench.sh").read_text())
         for f in ("deploy/install/omni-compass.yaml", "deploy/install/omni-compass-cloud.yaml", "deploy/controller.yaml"):
             self.assertIn('"--interval", "15"', (ROOT / f).read_text(), f)
+
+    def test_the_levers_rig_runs_the_brains_minutes(self):
+        """The levers rig runs at the default heartbeat and gives each phase the 3, 2 and 3 minutes its checks were written
+        for (three, two and three decisions of a brain minute before omni-v16), the idle time before cold start in seconds."""
+        text = (ROOT / "scripts" / "kind_levers.sh").read_text()
+        self.assertIn('IV="${OMNI_INTERVAL:-15}"', text)
+        self.assertIn('--interval "$IV" --iterations "$n"', text)
+        self.assertIn("--coldstart-idle-s 120", text)
+        self.assertNotIn("--interval 5 ", text)
+        for phase in ("run 180 --pace-high 0 --contain-cpu-m 200", "run 120 --pace-high 5 --pace-low 5 --contain-cpu-m 100000",
+                      'touch "$OUT_DIR/kill"; run 0 --contain-cpu-m 200'):
+            self.assertIn(phase, text)
 
     def test_at_60_s_every_value_is_omni_v15s(self):
         c = controller("--interval", "60", "--law", "compass", "--floor-interval", "5")
