@@ -359,8 +359,12 @@ spec:
       containers:
         - {name: done, image: "registry.k8s.io/pause:3.10", resources: {requests: {cpu: 1m, memory: 4Mi}}}
 EOF
+  # (the image is already on every node when the runner's copy was loaded into the cluster, scripts/kind_bench.sh; a pull
+  # that still never finishes leaves what each puller pod says in the arm's own files)
   kubectl -n kube-system rollout status daemonset/rig-prepull-batch --timeout=300s >/dev/null \
-    || { echo "INVALID RUN: the stream's image was not pulled onto every worker"; exit 1; }
+    || { { kubectl -n kube-system get pods -l app=rig-prepull-batch -o wide; kubectl -n kube-system describe pods -l app=rig-prepull-batch; } \
+           > "$OUT_DIR/prepull_batch_failed.txt" 2>&1 || true
+         echo "INVALID RUN: the stream's image was not pulled onto every worker (prepull_batch_failed.txt)"; exit 1; }
   kubectl -n kube-system delete daemonset rig-prepull-batch --wait=true --timeout=120s >/dev/null
   kubectl -n kube-system wait --for=delete pod -l app=rig-prepull-batch --timeout=120s >/dev/null 2>&1 || true
   echo "busybox:1.36 pre-pulled on every worker" >> "$OUT_DIR/batch_queue.txt"

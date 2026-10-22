@@ -62,6 +62,12 @@ jobs:
           df -h / | tail -1
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift
           df -h / | tail -1
+      - name: The runner's own agent kept out of the kernel's choice when memory runs short
+        # 21 October (run 39657032525, repetition 9): a runner went silent 64 minutes in, "The hosted runner lost communication
+        # with the server", and left no file. A machine short of memory kills a process; when the process is the runner's own
+        # agent, the repetition's files go with it. With the agent protected the kernel takes a measured process instead, whose
+        # arm fails its own checks and is recorded; host_cpu.csv carries the memory left every 5 s (scripts/kind_bench.sh)
+        run: for p in $(pgrep -f 'Runner\.(Listener|Worker)'); do echo -1000 | sudo tee "/proc/$p/oom_score_adj" >/dev/null || true; done
       - run: bash scripts/kind_paired.sh
         env:
           REP: ${{ matrix.rep }}

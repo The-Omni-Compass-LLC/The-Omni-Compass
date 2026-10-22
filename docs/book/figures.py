@@ -218,7 +218,7 @@ def fig_loop():
     def down(y_from, y_to):
         arrow(d, [(cx, y_from), (cx, y_to)])
 
-    step(454, 30, ["Wake on the period: a full decision every 60 s,", "the fast checks every 5 s"], fill=BLUE)
+    step(454, 30, ["Wake on the period: a full decision every 15 s,", "the fast checks every 5 s"], fill=BLUE)
     down(454, 444)
     step(414, 30, ["Read every sense: the service gauge, the resource,", "and the knob read back from the device"])
     down(414, 404)

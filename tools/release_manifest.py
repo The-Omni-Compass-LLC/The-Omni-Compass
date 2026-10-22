@@ -27,6 +27,14 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v16": ["OMNI_V16.json", "tools/omni_version.py", "docs/OMNI_V16.md", "omnicompass/adapter.py", "omnicompass/edge.py",
+                   "omni_controller/controller.py", "omni_controller/muscles.py", "omni_controller/capacity.py",
+                   "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp", "cpp/tools/run_governor.cpp",
+                   "tests/test_cpp_governor_parity.py", "tests/test_pace_clocks.py", "tests/test_loop_schedule.py", "tools/toy_gate.py",
+                   "results/toy_gate/V16_VS_V15.md", "results/toy_gate/V16_VS_V15.json", "results/toy_gate/V16_PACE.md",
+                   "results/toy_gate/V16_PACE.json", "docs/PACE_PREREGISTRATION.md", "scripts/kind_paired.sh", "scripts/kind_bench.sh",
+                   "tools/live_reps.py", "tools/confirm_abc.py", "docs/CHANGE_CONTROL.md", "results/SEAL.json",
+                   "results/LOCK_AMENDMENTS.json"],
     "engine_v15": ["OMNI_V15.json", "tools/omni_version.py", "docs/OMNI_V15.md", "omnicompass/adapter.py",
                    "omni_controller/gpu_governor.py", "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp",
                    "cpp/tools/run_governor.cpp", "cpp/tools/engine_runs.cpp", "tests/test_cap_band.py",
