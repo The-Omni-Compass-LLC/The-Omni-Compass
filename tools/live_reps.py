@@ -372,10 +372,19 @@ def robust_marks(d):
     return out
 
 
-ROBUST_INTERVAL_S = 60.0       # the governor's configured decision interval in the robustness runs (scripts/kind_bench.sh, --interval 60)
+ROBUST_INTERVAL_S = 60.0       # the governor's decision interval in the runs before omni-v14, whose files record none (--interval 60)
 ROBUST_DECISION_SHARE = 0.95   # fewer decisions than this share of the count the interval predicts reads INVALID (docs/ROBUSTNESS_PREREGISTRATION.md)
 ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again is marked
 ROBUST_LONG_MIN_S = 6840.0     # the decision-time ratio needs a span of at least 95% of the 7,200 s window, so the first and last hours do not overlap
+
+
+def run_interval(d):
+    """The governor's decision period in a run: recorded beside its files from omni-v14 on (scripts/kind_bench.sh,
+    governor_interval_s.txt, 15 s by default); 60 s in every run before it."""
+    try:
+        return float((Path(d) / "governor_interval_s.txt").read_text().split()[0])
+    except (OSError, ValueError, IndexError):
+        return ROBUST_INTERVAL_S
 
 
 def robust_decisions(d, window_s):
@@ -408,15 +417,16 @@ def robust_decisions(d, window_s):
                 r = l.split("):", 1)[-1].strip() if "):" in l else l.strip()
                 r = re.sub(r"CalledProcessError\(\d+, \[.*?\]\)\s*", "", r)[:160]
                 reasons.append(r)
-    expected = window_s / ROBUST_INTERVAL_S
-    out = {"decisions": len(times), "expected": expected, "share": (len(times) / expected if expected else None), "failed": failed,
+    iv = run_interval(d)
+    expected = window_s / iv
+    out = {"decisions": len(times), "expected": expected, "interval_s": iv, "share": (len(times) / expected if expected else None), "failed": failed,
            "failed_reasons": sorted(set(reasons)), "decision_time_ratio": None}
     if len(times) >= 4 and times[-1] - times[0] >= ROBUST_LONG_MIN_S:
         gaps = [(b - a, a) for a, b in zip(times, times[1:])]
         t0, t1 = times[0], times[-1]
         first = [g for g, t in gaps if t <= t0 + 3600]; last = [g for g, t in gaps if t >= t1 - 3600]
         if first and last:
-            a = max(sum(first) / len(first) - ROBUST_INTERVAL_S, 0.0); b = max(sum(last) / len(last) - ROBUST_INTERVAL_S, 0.0)
+            a = max(sum(first) / len(first) - iv, 0.0); b = max(sum(last) / len(last) - iv, 0.0)
             out["decision_time_first_s"], out["decision_time_last_s"] = a, b
             out["decision_time_ratio"] = (b / a) if a >= 0.1 else None    # under a tenth of a second there is nothing to compare
     ks = d / "kill_switch.txt"
@@ -488,7 +498,8 @@ def robust_table(root, cols):
          f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
          f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The 120 s after the kill mark are compared between the arms "
          "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`). In the long run the governor's own audit gives its decisions against "
-         f"the count its {ROBUST_INTERVAL_S:.0f} s interval predicts for the window (under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
+         f"the count its configured interval predicts for the window (60 s before omni-v14, 15 s from it, read from the run's own files; "
+         f"under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
          f"and its decision time (the gap between decisions less the interval it sleeps), mean of the last hour over the first (over {ROBUST_CYCLE_GROWTH} "
          "is marked); the reset check at the end says whether every setting was handed back.", "",
          "| Arm | Repetition | Mode | Seconds from the kill to every setting back | Within the allowance | Second governor | Watchdog hand-backs | Governor memory, last ten minutes / first ten | Decisions | Decisions of expected | Failed decisions | Decision time, last hour / first hour | Handed back at the end |",

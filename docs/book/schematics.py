@@ -1089,16 +1089,16 @@ def t_clocks():
         ax.vlines(t, 0, 0.35, color=GOLD, lw=0.8)
     for t in range(0, T + 1, 15):
         ax.vlines(t, 1.0, 1.35, color=GREY, lw=1.0)
-    for t in range(0, T + 1, 60):
+    for t in range(0, T + 1, 15):
         ax.vlines(t, 2.0, 2.6, color=NAVY, lw=2.0)
     for t in range(0, T + 1, 2):
         ax.vlines(t, 3.0, 3.25, color=GREEN, lw=0.5)
     ax.text(T + 6, 0.15, "the governor's fast checks, every 5 s\n(a waiting pod wakes a machine; the floor)", va="center", color=GOLD)
     ax.text(T + 6, 1.15, "the HPA's own check, every 15 s\n(native, untouched)", va="center", color=GREY)
-    ax.text(T + 6, 2.3, "the full decision, every 60 s: the state,\nthe law, the gate, the verdict, one write,\none audit line", va="center", color=NAVY)
+    ax.text(T + 6, 2.3, "the full decision, every 15 s (omni-v14):\nthe state, the law, the gate, the verdict,\none write, one audit line", va="center", color=NAVY)
     ax.text(T + 6, 3.1, "the card governor, every 2 s", va="center", color=GREEN)
     ax.annotate("", xy=(180, -0.55), xytext=(0, -0.55), arrowprops=dict(arrowstyle="<->", color=INK))
-    ax.text(90, -1.0, "a clean line for 3 decisions (180 s) before the pods,\nthe clock or the power give back (a machine: no breach now)",
+    ax.text(90, -1.0, "a clean line for 180 s (12 decisions) before the pods,\nthe clock or the power give back (a machine: no breach now)",
             ha="center", va="top", color=INK)
     ax.set_xlim(0, T * 2.35); ax.set_ylim(-1.9, 3.6)
     ax.set_xticks(range(0, T + 1, 60)); ax.set_xlabel("seconds")
@@ -1109,19 +1109,20 @@ def t_clocks():
 def t_band_step():
     """The law's own code answering a load step: CompassLaw on a first-order muscle (class S)."""
     from omnicompass.compass_law import Band, CompassLaw
-    dt, tau = 60.0, 120.0
-    law = CompassLaw(band=Band(lo=50.0, hi=500.0, center=0.4), dt=dt, tau=tau, kp=1.0)
+    # a decision every 15 s (omni-v14), the knob moving at a rate a minute and the law's damping stated at the minute
+    dt, tau = 15.0, 120.0
+    law = CompassLaw(band=Band(lo=50.0, hi=500.0, center=0.4), dt=dt, tau=tau, kp=1.0, ref_dt=60.0)
     g_up, g_down, cover = 0.10, 0.02, (2.0, 12.0)
     x, demand, reading = 2.0, 1.0, 100.0
-    T = 40
+    T = 160
     ts, ps, Fs, xs, rs, ds = [], [], [], [], [], []
     for k in range(T):
         t = k * dt
-        demand = 1.0 if k < 6 else (2.6 if k < 22 else 1.2)
+        demand = 1.0 if t < 360 else (2.6 if t < 1320 else 1.2)
         target = 100.0 * (demand / x) ** 2 * 2.0 if x > 0 else 500.0
         reading += (target - reading) * (1 - math.exp(-dt / tau))
         F = law.force(reading)
-        step = (g_up if F > 0 else g_down) * F * (cover[1] - cover[0])
+        step = (g_up if F > 0 else g_down) * F * (cover[1] - cover[0]) * dt / 60.0
         x = min(cover[1], max(cover[0], x + step))
         ts.append(t / 60); ps.append(law.p); Fs.append(F); xs.append(x); rs.append(reading); ds.append(demand)
     fig = mpl_fig(5.6)
@@ -1137,7 +1138,7 @@ def t_band_step():
     axs[1].set_ylim(-1.05, 1.05); axs[1].legend(loc="lower right"); axs[1].set_ylabel("p, F")
     axs[2].step(ts, xs, where="post", color=NAVY, label="the knob (machines)")
     axs[2].axhline(2, color=GREY, ls=":", lw=1); axs[2].text(0.3, 2.3, "the floor, 2", color=GREY)
-    axs[2].set_ylabel("knob"); axs[2].set_xlabel("decisions (minutes, one decision every 60 s)"); axs[2].legend(loc="upper right")
+    axs[2].set_ylabel("knob"); axs[2].set_xlabel("minutes (a decision every 15 s)"); axs[2].legend(loc="upper right")
     return fig_svg(fig)
 
 

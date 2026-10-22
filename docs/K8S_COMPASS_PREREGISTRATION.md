@@ -1153,6 +1153,19 @@ version, with every rule above counted in seconds and the fast checks on their o
 shows it reads no LOSS on any gauge anywhere; until then the order holds as the founder put it: native's speed at least, faster only where it hurts nothing. The cloud's arms are native and Omni-Compass on top, nothing else (`ARMS`
 defaults to `native compass` in the workflow and in every cloud script); the steady run of the max had run those two.
 
+### Amendment (2026-10-22, omni-v14, written before any run on it): the full decision every 15 seconds, every clock in seconds
+
+The founder's order of 22 October: the full
+decision every 15 seconds, the pace of the HPA's own check, with every clock counted in seconds, 10 seconds tested and never
+above 60. Omni v14 states every rule of the table above in seconds, and every other clock the governor kept in decisions
+(the engine core, the cushion, the compass's damping, the closure law's step, the conveyance, the host reading;
+`docs/OMNI_V14.md`), so at any period the trial's phase is 1,200 s, the cool-down 180 s, cruise 120 s, the spacing 600 s and
+the recheck 7,200 s, as at 60 s. From omni-v14 every set runs the full decision every 15 seconds and the fast checks every
+5 seconds (`OMNI_INTERVAL=15`, the rig's default); each run records its period beside its files
+(`governor_interval_s.txt`) and the scorer reads it there; the rig refuses a period above 60 seconds or under the fast
+checks' own. The window's rule is unchanged: a window counts only with at least one decision a minute. Runs on the engines
+before omni-v14 ran at 60 seconds and stay their own engine's record; no reading is pooled across the two.
+
 ## In the cloud, the machines alone: a bill that can only fall or stay (the founder's order, 2026-10-14, night, before any run at the tune-down)
 
 The founder's order of 14 October: in the cloud Omni-Compass must never make the bill bigger. Read against the governor,

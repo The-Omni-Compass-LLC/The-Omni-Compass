@@ -4,7 +4,7 @@
 namespace omnicompass {
 static double cl(double v, double lo, double hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
-Governor::Governor(AllocationLaw law, bool evolve) : L_(law), evolve_(evolve) {
+Governor::Governor(AllocationLaw law, bool evolve, double period_s) : L_(law), evolve_(evolve), period_s_(period_s) {
   x_ = {0.12, 0.82, 0.0, 0.0, 0.0, 0.0};
   p_ = {4.2, 0.0, 0.0, 1.7, 0.38, 0.705, 1.35, 1.0, -0.40, 1.55, 1.15, 1.0, 2.0, 1.0, 2.5, 0.12, 0.10, 3.782, 3.487, 4.2, 0.719, 0.0};
 }
@@ -18,7 +18,8 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
   const double s_obs = cl(0.36*th + 0.28*pw + 0.18*nw + 0.10*sec + 0.08*st - 0.20*q, -1, 1);
   const double b_obs = cl(0.52*pw + 0.26*th + 0.22*dr, -1, 1.5);
   const double i_obs = cl(q + dr + cf, 0, 2);
-  const double a = 0.339;
+  const double r = period_s_ / 60.0;                    // this period in the law's 60 s steps (1 at 60 s)
+  const double a = r == 1.0 ? 0.339 : 1.0 - std::pow(1.0 - 0.339, r);   // the blend that takes in the same a minute
   p_.beta_int = cl(0.58*q + 0.42*std::max(0.0, load-0.75), 0, 1);
   p_.beta_ext = cl(0.33*pw + 0.27*th + 0.20*nw + 0.12*st + 0.08*sec, 0, 1);
   const double U_before = x_.U;
@@ -26,9 +27,10 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
            (1-a)*x_.S + a*s_obs, (1-a)*x_.B + a*b_obs, (1-a)*x_.B_dot + a*(b_obs - x_.B)};
   if (evolve_) {
     double t = t_;
-    for (int i = 0; i < MICRO_STEPS; ++i) { xa = rk4_step(xa, p_, t, MICRO_DT, 0.0); t += MICRO_DT; }
+    const double h = r == 1.0 ? MICRO_DT : (MACRO_DT * r) / MICRO_STEPS;
+    for (int i = 0; i < MICRO_STEPS; ++i) { xa = rk4_step(xa, p_, t, h, 0.0); t += h; }
   }
-  x_ = xa; t_ += MACRO_DT;
+  x_ = xa; t_ += MACRO_DT * r;
   Directive d{}; d.x = x_;
   const int n = nodes;
   const double rho = cl(L_.rho0 - L_.kI*x_.I_U - L_.kE*x_.E, L_.rho_min, L_.rho0);
@@ -42,7 +44,9 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
   if (delta > 0 && q < L_.guard_queue && u_push / U_AUTHORITY < L_.push_add) delta = 0;
   if (delta < 0 && (q >= L_.guard_queue || n_req > n - L_.down_band)) delta = 0;
   surplus_streak_ = delta < 0 ? surplus_streak_ + 1 : 0;
-  if (delta < 0 && (surplus_streak_ < L_.down_dwell || since_add_ < L_.down_after_add)) delta = 0;
+  // a count of the law's 60 s steps in steps of this period (none stays none; at 60 s the count itself; ties to even, as Python's round)
+  auto steps = [r](int c) { return (c <= 0 || r == 1.0) ? c : std::max(1, static_cast<int>(std::nearbyint(c / r))); };
+  if (delta < 0 && (surplus_streak_ < steps(L_.down_dwell) || since_add_ < steps(L_.down_after_add))) delta = 0;
   const double ceiling = q >= L_.guard_queue ? L_.power_ceiling_backlog : L_.power_ceiling;
   if (delta > 0 && (pw >= ceiling || n >= L_.max_nodes)) delta = 0;
   if (sec > 0.5) delta = std::min<long>(delta, 0);

@@ -18,7 +18,8 @@ the muscle back, and tags every write with its muscle name in the audit log.
   security    pull: ConfigMap key "hold" == "true" means a security hold; the shield then blocks every expansion
   rollout     push: pause a deployment's rollout while the governor does not permit change; resume it when it does;
               undo a rollout that has exceeded its progress deadline when the governor authorises rollback
-  batch       push: admit (unsuspend) held batch Jobs, one per decision, only when change is permitted and load and power
+  batch       push: admit (unsuspend) held batch Jobs, one a minute (omni-v14; one a decision before, at a decision a
+              minute), only when change is permitted and load and power
               stress are under the compass's wall less one cushion (0.95 - 0.05: one click under, the nervous system's
               own admit gate); running Jobs are never suspended
   latency     pull: 95th-percentile response time over the last --latency-window-s from --latency-file (CSV written by
@@ -36,10 +37,11 @@ the muscle back, and tags every write with its muscle name in the audit log.
               pods/resize subresource (no restart); never above the limit, never below --rightsize-min-m; no decrease while
               the SLO is breached, no increase during a security hold; kill restores every original request
   coldstart   push: a deployment with no work waiting (ConfigMap key "queue" == 0, the queue a KEDA scaler would read) for
-              --coldstart-idle decisions is scaled to zero; it is scaled back to its recorded replica count the moment
+              --coldstart-idle-s (180 s; or --coldstart-idle decisions) is scaled to zero; it is scaled back to its recorded replica count the moment
               work is waiting; kill restores the recorded count
   batch_pace  push: while power stress or heat is high, one running Job labelled omnicompass.io/pausable=true is suspended
-              per decision (checkpointed training pauses instead of the site going over its limit); it is resumed when
+              per decision, at once (checkpointed training pauses instead of the site going over its limit); one is
+              resumed a minute (omni-v14) when
               stress and heat are back down; kill resumes every Job Omni paused
   contain     push: an agent namespace whose measured CPU use exceeds --contain-cpu-m, or any namespace during a security
               hold, gets a ResourceQuota (limits.cpu = budget) and its running pods' CPU limits are scaled in place so the
@@ -107,6 +109,22 @@ class Muscles:
         self.gpu_min_w = 0.0     # the card's own minimum power limit, read live (0 until the card reports it)
         self.gpu_heat_c = 0.0    # one degree under the card's own slowdown temperature, read live (0: not reported)
 
+    def _per(self):
+        """This decision period over the minute the muscles' rules were stated at (omni-v14): 1 at a decision a minute."""
+        iv = float(getattr(self.a, "interval", 60.0) or 0.0)
+        return (iv if iv > 0 else 60.0) / 60.0
+
+    def _spaced(self, key, seconds=60.0):
+        """A move away from native (admit held work, resume a paused job) at most once every `seconds` of the governor's
+        own schedule, at any decision period (omni-v14): a faster reading never moves things away from native faster.
+        True and recorded when the move may go now."""
+        now = float(getattr(self, "clock_s", 0.0))
+        last = getattr(self, "_moved_at", {}).get(key)
+        if last is not None and now - last < seconds - 1e-6:
+            return False
+        self._moved_at = {**getattr(self, "_moved_at", {}), key: now}
+        return True
+
     def at_max(self):
         """The max (the default dial): no level is ever set under what native runs."""
         return getattr(self.a, "dial", "max") == "max"
@@ -115,7 +133,10 @@ class Muscles:
     def sense(self, power_stress):
         o = {}
         if getattr(self.a, "thermal_model", False):
-            self.thermal = min(1.35, max(0.0, 0.86 * self.thermal + 0.14 * (0.34 + 0.62 * min(1.35, power_stress))))
+            # the heat law's memory per minute, at any period (omni-v14): 0.86 of the heat stays a minute
+            r = self._per()
+            k, j = (0.86, 0.14) if r == 1.0 else (0.86 ** r, 1.0 - 0.86 ** r)
+            self.thermal = min(1.35, max(0.0, k * self.thermal + j * (0.34 + 0.62 * min(1.35, power_stress))))
             o["thermal"] = self.thermal
         if getattr(self.a, "rapl_cmd", ""):
             o["cpu_watts"] = self._read(self.a.rapl_cmd)
@@ -258,9 +279,17 @@ class Muscles:
             rep = int(dep["spec"].get("replicas", 1))
             if q > 0 and rep == 0 and REPL_ANN in ann:
                 self.k.write(["scale", "deployment", name, "-n", ns, f"--replicas={ann[REPL_ANN]}"], f"coldstart: wake to {ann[REPL_ANN]} (queue {q:g})")
-            elif self._idle >= self.a.coldstart_idle and rep > 0 and self._may("pods", "contract"):
+            elif self._idle >= self._coldstart_n() and rep > 0 and self._may("pods", "contract"):
                 self.k.write(["annotate", "deployment", name, "-n", ns, "--overwrite", f"{REPL_ANN}={rep}"], "coldstart: record replicas")
                 self.k.write(["scale", "deployment", name, "-n", ns, "--replicas=0"], f"coldstart: scale to zero (idle {self._idle} decisions)")
+
+    def _coldstart_n(self):
+        """Idle decisions before a deployment is scaled to zero: --coldstart-idle where given, else --coldstart-idle-s in
+        decisions of this period (omni-v14: 180 s, three decisions at a minute, twelve at 15 s)."""
+        n = getattr(self.a, "coldstart_idle", None)
+        if n is not None:
+            return int(n)
+        return max(1, int(round(float(getattr(self.a, "coldstart_idle_s", 180.0)) / (60.0 * self._per()))))
 
     def _batch_pace(self, obs):
         if not getattr(self.a, "batch_pace", False):
@@ -278,7 +307,7 @@ class Muscles:
                              f"batch_pace: pause job (power stress {obs.get('power_stress', 0.0):.2f}, heat {obs.get('thermal', 0.0):.2f})")
         elif calm:
             paced = [j for j in jobs if j["spec"].get("suspend") and (j["metadata"].get("annotations") or {}).get(PACE_ANN) == "true"]
-            if paced:
+            if paced and self._spaced("resume"):        # one a minute at any period; a pause stays at once
                 self._resume_job(paced[0], "batch_pace: resume job (stress and heat back down)")
 
     def _resume_job(self, j, why):
@@ -628,7 +657,7 @@ class Muscles:
             return
         jobs = self.k.get("get", "jobs", "-A", "-l", BATCH_LABEL, "-o", "json")["items"]
         held = sorted((j for j in jobs if j["spec"].get("suspend")), key=lambda j: j["metadata"].get("creationTimestamp", ""))
-        if held:
+        if held and self._spaced("admit"):              # one held job a minute at any period (omni-v14)
             j = held[0]; ns, name = j["metadata"]["namespace"], j["metadata"]["name"]
             self.k.write(["patch", "job", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"suspend": False}})],
                          "batch: admit held job (headroom)")
@@ -799,7 +828,9 @@ def add_args(ap):
     ap.add_argument("--rightsize-min-m", type=int, default=50)
     ap.add_argument("--coldstart-deployments", default="", help="ns/name[,ns/name]: scaled to zero when idle, woken on work")
     ap.add_argument("--coldstart-signal", default="", help="ns/name of a ConfigMap whose key 'queue' is the waiting work")
-    ap.add_argument("--coldstart-idle", type=int, default=3, help="idle decisions before scaling to zero")
+    ap.add_argument("--coldstart-idle", type=int, default=None, help="idle decisions before scaling to zero (unset: --coldstart-idle-s)")
+    ap.add_argument("--coldstart-idle-s", type=float, default=180.0,
+                    help="idle seconds before scaling to zero (omni-v14: the rule in seconds, three decisions at a minute)")
     ap.add_argument("--batch-pace", action="store_true", help="batch_pace muscle: pause Jobs labelled " + PAUSABLE_LABEL + " under stress")
     ap.add_argument("--pace-high", type=float, default=0.95, help="power stress that pauses a job")
     ap.add_argument("--pace-low", type=float, default=0.8, help="power stress under which a paused job resumes")

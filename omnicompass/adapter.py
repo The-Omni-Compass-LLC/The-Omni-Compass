@@ -13,7 +13,7 @@ from collections import deque
 from dataclasses import dataclass, asdict, field
 from typing import Any, Dict, List, Optional
 
-from .core import State, Params, macro_step, v_eff, control_command, U_AUTHORITY
+from .core import State, Params, macro_step, v_eff, control_command, U_AUTHORITY, MACRO_DT
 
 OBSERVE = "observe"
 AUTOPILOT = "autopilot"
@@ -25,6 +25,7 @@ STACK_PARAMS = Params(alpha=4.2, beta_int=0.0, beta_ext=0.0, k=1.7, sigma_1=0.38
                       lambda_I=0.719, lambda_U=0.0)
 INITIAL_STATE = State(E=0.12, U=0.82, I_U=0.0, S=0.0, B=0.0, B_dot=0.0)
 ASSIMILATION = 0.339
+FLEET_DECISION_SECONDS = 60          # the period every constant of the law was stated at (one engine step a minute)
 
 
 def clamp(v: float, lo: float, hi: float) -> float:
@@ -46,8 +47,9 @@ def observe_vector(obs: Dict[str, float], conflicts: int) -> Dict[str, float]:
     }
 
 
-def assimilate(x: State, o: Dict[str, float], p: Params) -> State:
-    """Blend the observation into the engine state and set the forcing terms."""
+def assimilate(x: State, o: Dict[str, float], p: Params, a: float = ASSIMILATION) -> State:
+    """Blend the observation into the engine state and set the forcing terms. a: the share of the observation taken in
+    (ASSIMILATION at a decision every FLEET_DECISION_SECONDS; Governor.step passes the share for its own period)."""
     q, load, pw, th, nw, dr, st, sec, cf = (o[k] for k in
         ("q", "load", "power", "thermal", "network", "drift", "stale", "security", "conflict"))
     e_obs = clamp(0.25 * q + 0.18 * max(0.0, load - 0.85) + 0.16 * pw + 0.13 * th + 0.10 * nw + 0.08 * dr
@@ -56,7 +58,6 @@ def assimilate(x: State, o: Dict[str, float], p: Params) -> State:
     s_obs = clamp(0.36 * th + 0.28 * pw + 0.18 * nw + 0.10 * sec + 0.08 * st - 0.20 * q, -1.0, 1.0)
     b_obs = clamp(0.52 * pw + 0.26 * th + 0.22 * dr, -1.0, 1.5)
     i_obs = clamp(q + dr + cf, 0.0, 2.0)
-    a = ASSIMILATION
     p.beta_int = clamp(0.58 * q + 0.42 * max(0.0, load - 0.75), 0.0, 1.0)
     p.beta_ext = clamp(0.33 * pw + 0.27 * th + 0.20 * nw + 0.12 * st + 0.08 * sec, 0.0, 1.0)
     return State(E=(1 - a) * x.E + a * e_obs, U=(1 - a) * x.U + a * u_obs, I_U=(1 - a) * x.I_U + a * i_obs,
@@ -137,6 +138,11 @@ class Governor:
     last_push: float = 0.0
     log: deque = field(default_factory=lambda: deque(maxlen=4096))
     evolve: bool = True
+    # omni-v14: the seconds between two steps. The engine was built at a step every FLEET_DECISION_SECONDS (60), and every
+    # constant of its law is stated there; at any other period each one keeps its time: the engine's own clock advances
+    # MACRO_DT x period / 60 a step, the observation is taken in at the share that blends the same amount a minute, and
+    # the law's dwell counts are converted to steps of this period. At 60 s every value is the one v13 used
+    period_s: float = float(FLEET_DECISION_SECONDS)
 
     def kill(self) -> None:
         """Revoke authority; the engine continues to compute and log directives."""
@@ -155,14 +161,17 @@ class Governor:
         """Sense, assimilate, evolve, allocate."""
         o = observe_vector(obs, conflicts)
         U_before = self.x.U
-        xa = assimilate(self.x, o, self.p)
+        r = float(self.period_s) / FLEET_DECISION_SECONDS        # this period in the engine's own steps (1 at 60 s)
+        xa = assimilate(self.x, o, self.p, a=ASSIMILATION if r == 1.0 else 1.0 - (1.0 - ASSIMILATION) ** r)
         if self.evolve:
-            xn, _ = macro_step(xa, self.p, self.t, target=None)
+            xn, _ = macro_step(xa, self.p, self.t, target=None, macro_dt=MACRO_DT * r)
         else:
             xn = xa
         self.x = xn
-        self.t += 0.1
+        self.t += MACRO_DT * r
         L = self.law
+        # a count of the law's 60 s steps, in steps of this period (none stays none; at 60 s the count itself)
+        steps = lambda n: int(n) if n <= 0 or r == 1.0 else max(1, int(round(n / r)))
         n = int(self.nodes)
         u_push, _ = control_command(xn, self.p, self.t, +1)
         push = u_push / U_AUTHORITY
@@ -179,7 +188,7 @@ class Governor:
         if delta < 0 and (o["q"] >= L.guard_queue or n_req > n - L.down_band):
             delta = 0
         self.surplus_streak = self.surplus_streak + 1 if delta < 0 else 0
-        if delta < 0 and (self.surplus_streak < L.down_dwell or self.since_add < L.down_after_add):
+        if delta < 0 and (self.surplus_streak < steps(L.down_dwell) or self.since_add < steps(L.down_after_add)):
             delta = 0
         ceiling = L.power_ceiling_backlog if o["q"] >= L.guard_queue else L.power_ceiling
         if delta > 0 and (o["power"] >= ceiling or n >= L.max_nodes):
@@ -277,7 +286,6 @@ THROUGHPUT_MODE = dict(backlog_release=True, power_ceiling=9.0, power_ceiling_ba
 FLEET_MODE = dict(THROUGHPUT_MODE, rho0=0.829, rho_min=0.769, kI=0.072, kE=0.487, kq=0.635, down_band=3, down_dwell=1, down_after_add=5, push_release=0.053, cap_min=0.695, margin=0.131, U_gate=0.85, up_max=8)
 FLEET_BALANCED_MODE = dict(FLEET_MODE, push_release=0.0098, push_add=0.0098)
 FLEET_WEAR_MODE = dict(FLEET_MODE, push_release=0.0035, push_add=0.0035)
-FLEET_DECISION_SECONDS = 60
 
 
 def mode_law(mode: str, base: "AllocationLaw" = None) -> "AllocationLaw":

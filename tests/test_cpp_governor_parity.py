@@ -11,10 +11,11 @@ import benchmarks.stack_benchmark as B
 from omnicompass import stack_sim as S
 from omnicompass.adapter import Governor, AllocationLaw
 
-def main(exe, n=60, mode="power_protect"):
+def main(exe, n=60, mode="power_protect", period=60.0):
     rows, exp = [], []
     class Rec(Governor):
         def step(self, obs, conflicts):
+            self.period_s = period            # omni-v14: the seconds between two steps, the same in both twins
             o = {"q": obs.get("queue_ratio", 0.0), "load": obs.get("load_ratio", 0.0), "power": obs.get("power_stress", 0.0),
                  "thermal": obs.get("thermal", 0.0), "network": obs.get("network_stress", 0.0), "drift": obs.get("drift_ratio", 0.0),
                  "stale": obs.get("stale", 0.0), "security": obs.get("security_block", 0.0)}
@@ -37,7 +38,7 @@ def main(exe, n=60, mode="power_protect"):
     with open(tmp / "obs.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader()
         for r in rows: w.writerow({k: repr(v) if isinstance(v, float) else v for k, v in r.items()})
-    subprocess.run([exe, str(tmp / "obs.csv"), str(tmp / "out.csv"), mode], check=True)
+    subprocess.run([exe, str(tmp / "obs.csv"), str(tmp / "out.csv"), mode, repr(float(period))], check=True)
     got = list(csv.DictReader(open(tmp / "out.csv")))
     assert len(got) == len(exp)
     mx = 0.0; bad = 0
@@ -47,7 +48,7 @@ def main(exe, n=60, mode="power_protect"):
         for k, v in (("power_cap", e["power_cap"]), ("demand", e["demand"]), ("command", e["command"]),
                      *((k, e["state"][k]) for k in ("E", "U", "I_U", "S", "B"))):
             mx = max(mx, abs(float(g[k]) - v))
-    print(f"C++ vs Python governor ({mode}): {len(exp)} directives, discrete mismatches = {bad}, max |diff| = {mx:.3e}")
+    print(f"C++ vs Python governor ({mode}, a step every {period:g} s): {len(exp)} directives, discrete mismatches = {bad}, max |diff| = {mx:.3e}")
     assert bad == 0 and mx < 1e-12
     print("PASS test_cpp_governor_parity")
 
@@ -55,3 +56,5 @@ if __name__ == "__main__":
     exe = sys.argv[1] if len(sys.argv) > 1 else str(ROOT / "cpp" / "build" / "oc_governor")
     for m_ in ("power_protect", "throughput", "fleet", "fleet_balanced", "fleet_wear"):
         main(exe, mode=m_)
+    for p_ in (15.0, 10.0):                   # omni-v14: the live governor's periods
+        main(exe, mode="fleet", period=p_)

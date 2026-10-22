@@ -16,17 +16,18 @@ using namespace omnicompass;
 static std::vector<std::string> split(const std::string& s) { std::vector<std::string> v; std::stringstream ss(s); std::string x;
   while (std::getline(ss, x, ',')) { if (!x.empty() && x.back() == '\r') x.pop_back(); v.push_back(x); } return v; }
 int main(int argc, char** argv) {
-  if (argc != 3 && argc != 4) { std::cerr << "usage: oc_governor OBS.csv OUT.csv [power_protect|throughput]\n"; return 2; }
+  if (argc < 3 || argc > 5) { std::cerr << "usage: oc_governor OBS.csv OUT.csv [power_protect|throughput|fleet...] [period_s]\n"; return 2; }
+  const double period_s = argc == 5 ? std::stod(argv[4]) : 60.0;   // omni-v14: the seconds between two steps
   AllocationLaw law{};
-  if (argc == 4 && (std::string(argv[3]) == "throughput" || std::string(argv[3]).rfind("fleet", 0) == 0)) {
+  if (argc >= 4 && (std::string(argv[3]) == "throughput" || std::string(argv[3]).rfind("fleet", 0) == 0)) {
     law.backlog_release = true; law.power_ceiling = 9.0; law.power_ceiling_backlog = 9.0; law.spread_step = 0.0; law.B_cap = 9.0; law.size_at_full_cap = true;
     law.kI = 0.05; law.kE = 0.40; law.cap_min = 0.65; law.down_band = 1; law.down_dwell = 10; law.down_after_add = 3;
     law.kq = 0.30; law.U_gate = 0.45; law.push_release = 0.01;
   }
-  if (argc == 4 && std::string(argv[3]).rfind("fleet", 0) == 0) {
+  if (argc >= 4 && std::string(argv[3]).rfind("fleet", 0) == 0) {
     law.rho0 = 0.829; law.rho_min = 0.769; law.kI = 0.072; law.kE = 0.487; law.kq = 0.635; law.down_band = 3; law.down_dwell = 1; law.down_after_add = 5; law.push_release = 0.053; law.cap_min = 0.695; law.margin = 0.131; law.U_gate = 0.85; law.up_max = 8;
-  }  if (argc == 4 && std::string(argv[3]) == "fleet_balanced") { law.push_release = 0.0098; law.push_add = 0.0098; }
-  if (argc == 4 && std::string(argv[3]) == "fleet_wear") { law.push_release = 0.0035; law.push_add = 0.0035; }
+  }  if (argc >= 4 && std::string(argv[3]) == "fleet_balanced") { law.push_release = 0.0098; law.push_add = 0.0098; }
+  if (argc >= 4 && std::string(argv[3]) == "fleet_wear") { law.push_release = 0.0035; law.push_add = 0.0035; }
 
 
 
@@ -42,7 +43,7 @@ int main(int argc, char** argv) {
     int sid = static_cast<int>(d("scenario_id"));
     Observation ob{d("q"), d("load"), d("power"), d("thermal"), d("network"), d("drift"), d("stale"), d("security"),
                    static_cast<int>(d("conflicts"))};
-    auto it = govs.find(sid); if (it == govs.end()) it = govs.emplace(sid, Governor{law}).first;
+    auto it = govs.find(sid); if (it == govs.end()) it = govs.emplace(sid, Governor{law, true, period_s}).first;
     Directive dv = it->second.step(ob, d("current_cap"), static_cast<int>(d("nodes")));
     o << sid << ',' << r.at(ix.at("step")) << ',' << dv.node_delta << ',' << dv.change_permitted << ',' << dv.power_cap << ','
       << dv.rollback_authorized << ',' << dv.route_shift << ',' << dv.demand << ',' << dv.command << ','

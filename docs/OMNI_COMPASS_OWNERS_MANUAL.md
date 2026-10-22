@@ -71,7 +71,7 @@ what it bought, as power given, and never called a loss.
 
 | What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
 |---|---|---|
-| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its fast checks run every 5 seconds, beside the autoscaler's own 15-second check) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
+| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its full read of the state every 15 seconds, the autoscaler's own pace, and its fast checks every 5 seconds) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
 | **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
 | **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion, one trial at a time inside a body | every muscle judged on itself, and the organism judged whole |
 | **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
@@ -1796,7 +1796,7 @@ Both are written out in the Kubernetes preregistration (`docs/K8S_COMPASS_PREREG
 9), both ran in the batch test, and the result (section 16) is machines 19% to 23% fewer over the whole window and 29% to
 35% fewer after the queue finished, with the queue itself finishing no later beyond the noise.
 
-![Modelled trace: the compass law answering a load step on one muscle (class S: the law's own code, omnicompass/compass_law.py, on a first-order muscle with τ = 120 s and a decision every 60 s). Demand rises 2.6-fold at minute 6 and falls at minute 22; the reading climbs toward the line, the position p leaves the centre c = 0.4 (the tune-down), the force F rises and the knob adds machines at once; as the reading settles the force crosses zero and the knob is given back one step at a time toward the floor of 2.](book/figures/t_band_step.svg)
+![Modelled trace: the compass law answering a load step on one muscle (class S: the law's own code, omnicompass/compass_law.py, on a first-order muscle with τ = 120 s and a decision every 15 s, the knob moving at a rate a minute). Demand rises 2.6-fold at minute 6 and falls at minute 22; the reading climbs toward the line, the position p leaves the centre c = 0.4 (the tune-down), the force F rises and the knob adds machines at once; as the reading settles the force crosses zero and the knob is given back one step at a time toward the floor of 2.](book/figures/t_band_step.svg)
 
 ### 6.5 The reflex rule: one body, one brain
 
@@ -2489,8 +2489,9 @@ bursts and in a day's trough. The
 max (`dial max`) belongs where the machines are already paid for (your own racks, a chip whose heat line is its limit),
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
-In the cloud, as everywhere, the governor's fast checks (the scheduling floor, the pod reflex, conveyance on every third)
-run every 5 seconds, three times as fast as the HPA's own 15-second check, and its full decision every 60 seconds. Through
+In the cloud, as everywhere, the governor's fast checks (the scheduling floor, the pod reflex, the conveyance's 15-second
+slot) run every 5 seconds, three times as fast as the HPA's own 15-second check, and on omni-v14 its full decision every 15
+seconds, the HPA's own pace (every 60 seconds on the engines before it). Through
 v6 a shorter decision period was not a free setting: the give-back trial's phase (`max_trial`, 20 decisions), the breach
 cool-down (`--slo-clear`), cruise (`--cruise-after`) and the trial spacing counted in decisions, so at 5 seconds a trial
 would have lasted 100 seconds, too short for the 200 response times it measures, and no machine would ever have been
@@ -2499,9 +2500,18 @@ seconds (`--slo-clear-s 180`, `--cruise-after-s 120`, `--strict-window-s 300`, `
 `--verdict-recheck-s 7200`, `--verdict-trial-s 1200`) and converts each to decisions at the running period,
 n = max(1, round(seconds / period)), so at 60 seconds every count is v6's; the compass's step on the HPA target and its
 coasting are scaled by period / 60, so the target moves the same amount a minute, and a pool gives back at most one
-machine a minute at any period (`docs/OMNI_V7.md`, section 4). The default period stays 60 seconds, because the governor
-core still advances its own state one fixed step per decision; a shorter default waits for that clock in seconds and a
-test that shows no LOSS. In the cloud v7 also makes the whole rule one flag, `--give-back-only`, enforced in the governor
+machine a minute at any period (`docs/OMNI_V7.md`, section 4). The default period stayed 60 seconds through omni-v13,
+because the governor core still advanced its own state one fixed step per decision. Omni v14 (the founder's order of 22
+October) states every remaining clock in seconds: the core's step and its blend of each observation, the fleet law's
+dwell counts, the edge's window, narrowing, memory, wobble and lesson, the compass's damping and velocity smoothing, the
+closure law's step (once a minute), the conveyance (every 15 seconds of the governor's schedule), the shared host's busy
+reading, the modelled heat, the cold start and the batch's pace; a move away from native goes at most once a minute, a move
+toward native or safety at the first reading that calls for it. At 60 seconds every clock's value is omni-v13's; the
+default is 15 seconds (`docs/OMNI_V14.md`). In the cloud, where a machine given back is the cloud's to delete and the
+governor never adds one, omni-v14 also holds the closure law's warm reserve: no machine the largest requests of the last
+four hours need, at the governor's own headroom, is given back, nothing is given back before those four hours are read, and
+no give-back trial starts inside the reserve. Its toy gate traced the fault it fixes: a machine given back in a midday dip,
+deleted ten minutes later, and pods waiting 90 seconds for a new one when the requests came back. In the cloud v7 also makes the whole rule one flag, `--give-back-only`, enforced in the governor
 itself: every actuator but the node pool off, the replica ceiling 0, the dial at the tune-down (`docs/OMNI_V7.md`,
 section 5).
 
@@ -2904,7 +2914,7 @@ paired receipts, this section is a wiring instruction, not a claim of savings.
 8. One writer: if anyone else changes a knob, Omni-Compass stops writing it and leaves it alone.
 9. Everything is logged: every read, decision, write and reason goes to the audit log.
 
-![Timing diagram: the governor's clocks against the native controllers' own, over five minutes. The card governor decides every 2 s; the Kubernetes governor's fast checks run every 5 s (a waiting pod wakes a machine; the floor); native's own autoscaler keeps its 15-second check underneath, untouched; the full decision (the state, the law, the gate, the verdict, one write, one audit line) runs every 60 s, and nothing is given back until the line has been clean for three decisions, 180 s.](book/figures/t_clocks.svg)
+![Timing diagram: the governor's clocks against the native controllers' own, over five minutes. The card governor decides every 2 s; the Kubernetes governor's fast checks run every 5 s (a waiting pod wakes a machine; the floor); native's own autoscaler keeps its 15-second check underneath, untouched; the full decision (the state, the law, the gate, the verdict, one write, one audit line) runs every 15 s, the autoscaler's own pace, and nothing is given back until the line has been clean for 180 s.](book/figures/t_clocks.svg)
 
 **On autopilot: why nobody babysits it.** Omni-Compass is an autopilot: a closed-loop supervisory controller that runs,
 steers and corrects itself inside the system it governs, as a self-driving car's controller does inside the car. Once

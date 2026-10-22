@@ -62,7 +62,7 @@ what it bought, as power given, and never called a loss.
 
 | What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
 |---|---|---|
-| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its fast checks run every 5 seconds, beside the autoscaler's own 15-second check) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
+| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its full read of the state every 15 seconds, the autoscaler's own pace, and its fast checks every 5 seconds) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
 | **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
 | **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion | every muscle judged on itself, and the organism judged whole |
 | **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
@@ -993,12 +993,14 @@ written down before the first counted run:
 
 ![The compass band and the smoothing of the force. (a) The service reading placed in its band as a position p from 0, calm, to 1, the operator's line; the walls at 0.05 and 0.95 leave a cushion of 5% at each edge, and the centre c is where the needle comes to rest (0.5 by default; on a service 0.3 at the max and 0.4 at the tune-down). (b) The force F = A·tanh(r/A) against the raw force r = K[P]·(p − c) + K[D]·v, the pull toward the centre plus the push against the reading's motion: near the centre a spring, far out a curve that flattens into the authority A and never passes it. Past the upper wall the up side goes to A at once, and the down side may not act until the reading is back inside the band.](book/figures/band.svg)
 
-Three settings are deliberately not on that list. The governor's decision period, its damping and how fast each muscle
-answers are the muscle's own declaration, read from the catalog or measured from the system at the start; an
-installation does not tune them (on a Kubernetes cluster the declared decision period is 60 seconds and the fast checks
-run every 5 seconds, three times as fast as the autoscaler's own 15-second check; a shorter decision period changes rules
-the governor counts in decisions, so it is not an installation setting), and a receipt that needed them changed is a receipt to read as wiring first (section
-4.5).
+Two settings are deliberately not on that list. The governor's damping and how fast each muscle answers are the
+muscle's own declaration, read from the catalog or measured from the system at the start; an installation does not tune
+them, and a receipt that needed them changed is a receipt to read as wiring first (section 4.5). The decision period is
+the factory's: on a Kubernetes cluster the full read of the state every 15 seconds, the autoscaler's own pace, and the
+fast checks every 5 seconds between (`--interval 15 --floor-interval 5`). Every clock of the governor counts seconds, so a
+period from the fast checks' own up to 60 seconds changes how often the state is read and nothing any rule means; the rig
+refuses a period above 60 seconds. An installation that writes another period writes it down as a changed tune (section
+3.6), and its receipts are its own.
 
 ### 3.5 Profiles: service and batch
 
@@ -1364,7 +1366,7 @@ at the cluster's nodes, not at Omni-Compass. Its
 mechanism is the Owner's Manual's; five of its rules show in the wiring, the settings and the audit, and are stated here so
 that a line in the audit is read for what it is.
 
-![Timing diagram: the governor's clocks against the native controllers' own, over five minutes. The card governor decides every 2 s; the Kubernetes governor's fast checks run every 5 s (a waiting pod wakes a machine; the floor); native's own autoscaler keeps its 15-second check underneath, untouched; the full decision (the state, the law, the gate, the verdict, one write, one audit line) runs every 60 s, and nothing is given back until the line has been clean for three decisions, 180 s.](book/figures/t_clocks.svg)
+![Timing diagram: the governor's clocks against the native controllers' own, over five minutes. The card governor decides every 2 s; the Kubernetes governor's fast checks run every 5 s (a waiting pod wakes a machine; the floor); native's own autoscaler keeps its 15-second check underneath, untouched; the full decision (the state, the law, the gate, the verdict, one write, one audit line) runs every 15 s, the autoscaler's own pace, and nothing is given back until the line has been clean for 180 s.](book/figures/t_clocks.svg)
 
 **Conveyance obeys the namespace's own quota.** Where the governor conveys a machine's idle processor to the serving pods on
 it (`--cap-deployments`, level 3), every raise of a pod's CPU limit is bounded by the namespace's ResourceQuota as Kubernetes
@@ -1388,8 +1390,10 @@ clear time after a breach (`--slo-clear-s`, 180 s), the cruise wait (`--cruise-a
 7,200 s, `--verdict-trial-s` 1,200 s) and the reflex window (`--reflex-window-s`, 30 s). Each is converted to a count of
 decisions at the running period, n = max(1, round(seconds / period)), so a governor deciding every 15 s waits the same
 minutes as one deciding every 60 s. The compass moves an autoscaler's target by the same amount a minute at any period, and
-the node pool gives back at most one machine a minute. The decision period itself stays 60 s (section 3.4); the fast
-checks run every 5 s underneath it, and native's own autoscaler keeps its own 15-second check untouched.
+the node pool gives back at most one machine a minute. Every other clock of the governor keeps its time too, so the period
+sets only how often the state is read (the Owner's Manual holds the mechanism). The decision period is 15 s, the
+autoscaler's own pace (section 3.4); the fast checks run every 5 s underneath it, and native's own autoscaler keeps its own
+15-second check untouched.
 
 **The verdict reads a trial in the words of a receipt.** Before a knob moves one step further from native, the step runs as
 a trial and its cost per piece of work is compared with the cost at the reference, on the logarithm of each piece's cost,
@@ -1515,7 +1519,7 @@ kubectl -n omni-compass logs deploy/omni-compass -f
 The install file grants a read-only identity; `scripts/pilot_shadow.sh` records `kubectl auth can-i` receipts that
 show it cannot write. Every decision it would take is logged with its reason.
 Pass: zero writes, and readings your operators agree with.
-What you should see: an audit with a `decision` record every 60 s and no `write` record at all (`jq -c 'select(.write)' audit.jsonl` prints nothing); `authority.senses.blind` false for every sense once the feed is wired; `nodes_recommended` at or below `nodes_observed` while the service is calm and above it when it is not. A `write` here is a wiring fault (the identity can write: chapter 9); a sense that stays blind is a feed fault (section 5.3).
+What you should see: an audit with a `decision` record every 15 s and no `write` record at all (`jq -c 'select(.write)' audit.jsonl` prints nothing); `authority.senses.blind` false for every sense once the feed is wired; `nodes_recommended` at or below `nodes_observed` while the service is calm and above it when it is not. A `write` here is a wiring fault (the identity can write: chapter 9); a sense that stays blind is a feed fault (section 5.3).
 
 **Level 2 - The pods, on top of your autoscalers. WRITES.**
 1. Grant `patch horizontalpodautoscalers` and `patch pods/resize` (`deploy/rbac-target.yaml`).
@@ -1713,9 +1717,9 @@ max (`dial max`) belongs where the machines are already paid for (your own racks
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
 In the cloud, as everywhere, the governor's fast check (a parked machine woken for pods that wait) runs every 5 seconds,
-three times as fast as the autoscaler's own 15-second check, and its full decision every 60 seconds; a pod's start and a
-new machine's join are not shortened by deciding faster, so the governor acts on the reading while it climbs, before the
-line. On machines already paid for, the fast checks also give the running pods the processor their machine already has,
+three times as fast as the autoscaler's own 15-second check, and its full decision every 15 seconds, the autoscaler's own
+pace; a pod's start and a new machine's join are not shortened by deciding faster, so the governor acts on the reading while
+it climbs, before the line. On machines already paid for, the fast checks also give the running pods the processor their machine already has,
 which takes seconds and needs no new pod; in the cloud mode that lever is off, because a pod given more processor reads
 busier to its autoscaler, which then asks for more pods and, through them, more machines.
 
@@ -3013,11 +3017,16 @@ pods; and a power cap saves nothing a cloud bills. So in a cloud the governor mo
 - **No processor is conveyed and no power is capped.**
 - **The machines.** The governor parks a machine the cloud's autoscaler already made, only after its own trial shows the
   service's response time holds without it (within 2% of the response time with it, through the release gate, one
-  machine at a time), and wakes it on a breach: at the next full decision (within 60 seconds) for a response time over
+  machine at a time), and wakes it on a breach: at the next full decision (within 15 seconds) for a response time over
   the line, and at the next fast check (within 5 seconds) for a pod that cannot be placed. A pod never waits for either:
   a parked machine's taint is `PreferNoSchedule`, so a pod that finds the open machines full lands on a parked one at
   once. A parked machine whose pods have gone is deleted by the cloud's
   own autoscaler, on the cloud's own schedule.
+- **The warm reserve.** Because the cloud deletes a parked machine and the governor never adds one, a machine given back
+  cannot be taken back by the governor. So in the cloud mode it never parks below what the largest requests of the last
+  four hours need at its own headroom, and it parks nothing in its first four hours, while it has not yet watched that
+  horizon. Expect no parked machine in the first four hours after the governor starts or restarts: that is the design,
+  not a fault. The audit's decision record carries the reserve (`warm_reserve`, machines) at every decision.
 
 The governor never asks the cloud for a machine (its machine lever cannot ask for more machines than the cluster has),
 and it can hold no more pods than native's autoscaler gives it. **The bill can only fall or stay.** It falls where native
@@ -3047,7 +3056,7 @@ machines is the gain; it is never used in a cloud, and a run of the max in a clo
 | `--min-nodes` and `MIN_NODES` | 2, or the operator's floor | never fewer machines in service |
 | `--max-node-step` | 1 | one machine a decision |
 | `--max-nodes` | the work pools' top (the sum of their autoscaler maxima) | the most machines the lever counts on; it never asks for more than exist |
-| `--interval`, `--floor-interval` | 60 and 5 | the full decision every minute, the fast checks every 5 seconds |
+| `--interval`, `--floor-interval` | 15 and 5 | the full decision every 15 seconds, the autoscaler's own pace (5 to 60 allowed, never above), the fast checks every 5 seconds |
 | `--closure` | `/app/law/closure.json` | shipped in the image |
 | `--audit`, `--kill-file` | `/var/log/omni/audit.jsonl`, `/tmp/omni.kill` | the record and the switch |
 | `WORKER_SEL` (environment) | `omni-role=work` | which machines may be parked |
@@ -3099,8 +3108,9 @@ evidence that the service holds without the machine. That evidence is the paired
 | Hour of a typical day | Native | With Omni-Compass on top, machines alone |
 |---|---|---|
 | The peak | every machine the pods need | the same machines; nothing parked while the line is at risk |
-| The descent after a peak | machines held until the autoscaler's own scale-down finds them unneeded | machines parked one at a time as each trial passes; their pods leave first on the autoscaler's next scale-down |
-| The trough (night, weekend) | the pool held at what the pods' requests need | parked down to the floor where the trial allows; each empty parked machine deleted by the cloud |
+| The first four hours after the governor starts | as on any day | nothing parked: the warm reserve has not yet watched its horizon |
+| The descent after a peak | machines held until the autoscaler's own scale-down finds them unneeded | machines above the warm reserve (what the largest requests of the last four hours need) parked one at a time as each trial passes; their pods leave first on the autoscaler's next scale-down |
+| The trough (night, weekend) | the pool held at what the pods' requests need | parked down to the warm reserve and the floor where the trial allows; each empty parked machine deleted by the cloud |
 | A new burst | the autoscaler adds machines when pods cannot be placed | pods that find the open machines full land on a parked machine at once (its taint only prefers against it); the governor wakes it within 5 seconds if pods wait, or at the next decision on a breach; the cloud adds machines past those, as for native |
 
 ![Modelled trace: one pedal over a burst, machines against demand (class S: the rules of the pedal drawn over the burst 1 4 1 6 1 9, five decisions a step). Native's autoscaler adds a machine when pods cannot be placed and removes one after its own delay; with Omni-Compass on top the push adds capacity at once at the wall and the lift off gives it back one machine at a time through the gate and the trial, never below the floor of 2.](book/figures/t_pedal.svg)
@@ -3108,7 +3118,10 @@ evidence that the service holds without the machine. That evidence is the paired
 The savings come from two places: the machines the governor parks before native's autoscaler would find them unneeded,
 and the empty machines the cloud deletes sooner because their pods were marked first to go. Neither changes how many pods
 run, and neither delays a pod: a parked machine carries a `PreferNoSchedule` taint, so a pod that finds the open machines
-full lands on a parked one at once.
+full lands on a parked one at once. Neither takes a machine the last four hours' largest requests needed: once the cloud
+has deleted a parked machine only the cloud's autoscaler brings one back, after pods wait for it, so the warm reserve
+gives back only what the recent peak did not use. Where a workload never leaves that margin, nothing is parked and the
+bill reads EVEN: the same machines as native, by design.
 
 ### 19.6 Reading the bill and the alarm minutes
 
@@ -3183,7 +3196,7 @@ In a cluster the OFF switch has three forms, and the person who holds it (sectio
 | Form | Command | What happens | How long it holds |
 |---|---|---|---|
 | Scale to zero (the OFF switch of record) | `kubectl -n omni-compass scale deployment/omni-compass --replicas=0` | the pod receives `SIGTERM`; the governor hands every setting back at once (every parked machine woken, its marks on pods removed), reads each back, writes its last audit line and exits | until the holder scales it back to 1 |
-| The kill file | `kubectl -n omni-compass exec deploy/omni-compass -c controller -- touch /tmp/omni.kill` | at its next full decision (within 60 seconds) the governor hands every setting back, then writes nothing; each decision's audit reads `killed` | until the file is removed; the file lives in the pod's own `/tmp`, so a replaced pod starts ON |
+| The kill file | `kubectl -n omni-compass exec deploy/omni-compass -c controller -- touch /tmp/omni.kill` | at its next full decision (within 15 seconds) the governor hands every setting back, then writes nothing; each decision's audit reads `killed` | until the file is removed; the file lives in the pod's own `/tmp`, so a replaced pod starts ON |
 | Revoke the grant | `kubectl delete clusterrolebinding omni-compass-machines` | every write the governor attempts is refused by the API server and recorded | until the binding is applied again |
 
 Revoke the grant only after one of the first two forms has handed everything back: a governor without its grant cannot
@@ -3254,7 +3267,7 @@ company's configuration repository and deploy them like any other workload, and 
 ### 20.8 Runbooks
 
 **A breach while machines are parked.** Expected and handled: a breach wakes a parked machine at the next full decision
-(within 60 seconds), and a pod that cannot be placed wakes one at the next fast check (within 5 seconds). If alert minutes persist with machines parked, turn the governor OFF (section 20.3), which wakes every
+(within 15 seconds), and a pod that cannot be placed wakes one at the next fast check (within 5 seconds). If alert minutes persist with machines parked, turn the governor OFF (section 20.3), which wakes every
 machine, and read the audit for the decision that parked the last one: its trial, its readings and the feed's age.
 
 **The governor parks nothing for days.** In the cloud mode at a steady peak that is the right answer: there is nothing to
@@ -3486,8 +3499,8 @@ with its severity, its meaning and the action to take: the governor stale (no de
 governing; critical), a governor orphaned (died or hung without handing back; critical), writes hammering (more than 300
 settings commands an hour), write errors, a recommendation oscillating (more than 20 reversals an hour), a sense blind for
 five minutes, the service at its line in more than 10% of decisions, the master switch off (information), the audit
-unreadable, and the governor's own processor above half a core. The thresholds assume a decision every 60 s; scale the
-windows with `--interval`. The alert that matters most is not the governor's: it is the service's own line.
+unreadable, and the governor's own processor above half a core. The thresholds assume a decision every 15 s (the staleness
+alert fires after four decisions missed, 60 s); scale the windows with `--interval`. The alert that matters most is not the governor's: it is the service's own line.
 An installation in the cloud mode is judged first by whether that alert fires more often with the governor than without
 it, and the paired receipt's alert-minutes row (section 19.6) is the same measure taken under control.
 
@@ -3505,7 +3518,7 @@ python3 tools/omni_control.py token --name alice --roles operator --tokens /etc/
 python3 tools/omni_control.py token --name sam --roles security --tokens /etc/omni/tokens.json
 python3 tools/omni_control.py serve --tokens /etc/omni/tokens.json --audit /var/log/omni/audit.jsonl \
     --log /var/log/omni/control.jsonl --state /var/lib/omni/control.json \
-    --governor "python3 -m omni_controller.controller --mode nodepool --audit /var/log/omni/audit.jsonl --interval 60"
+    --governor "python3 -m omni_controller.controller --mode nodepool --audit /var/log/omni/audit.jsonl --interval 15"
 ```
 
 | Button | Request | Role | What happens |
@@ -4380,7 +4393,7 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/args
         value: ["--mode", "nodepool", "--law", "compass", "--dial", "save", "--sensed", "none/none",
-                "--active-nodes-only", "--interval", "60", "--floor-interval", "5",
+                "--active-nodes-only", "--interval", "15", "--floor-interval", "5",
                 "--min-nodes", "3", "--max-nodes", "24", "--max-node-step", "1",
                 "--node-scale-cmd", "bash /app/scripts/kind_nodepool.sh {n}",
                 "--node-restore-cmd", "bash /app/scripts/kind_nodepool.sh 100000",
@@ -4763,8 +4776,9 @@ alert minutes in both arms (section 19.6), and the aim in a cloud is none on the
 fault to find, never a cost to accept.
 
 **How fast does it act?** Its fast checks run every 5 seconds (a machine for pods that wait, a parked machine woken), three
-times as fast as the HPA's own 15-second check; its full decision runs every 60 seconds, the period it was built and
-tested at (section 3.4). Native's own checks run underneath, untouched, whatever the governor's period.
+times as fast as the HPA's own 15-second check; its full decision runs every 15 seconds, the HPA's own pace, with every
+clock counted in seconds (section 3.4); engines before omni-v14 decided every 60 seconds. Native's own checks run
+underneath, untouched, whatever the governor's period.
 
 **What happens if the governor crashes?** Nothing harmful. The watchdog puts every setting back from the records on the
 objects themselves (section 20.2); a parked machine never blocks a pod even before that, because its taint is
@@ -5187,8 +5201,8 @@ changes one runs a changed tune, whose receipts are its own (section 3.6).
 |---|---|---|---|
 | `--mode` | `observe` | `nodepool` | `observe` writes nothing; `target` moves autoscaler targets; `nodepool` also moves machines |
 | `--law` | `governor` | `compass` | the law the governor holds the service with |
-| `--interval` | 60 s | 60 s | the full decision period (section 3.4) |
-| `--floor-interval` | 15 s | 5 s | the fast checks' period, between decisions, in `nodepool` mode |
+| `--interval` | 15 s | 15 s | the full decision period (section 3.4): 5 to 60 s, never above |
+| `--floor-interval` | 5 s | 5 s | the fast checks' period, between decisions, in `nodepool` mode |
 | `--max-node-step` | 2 | 1 | the most machines one decision moves |
 | `--active-nodes-only` | off | on | count only machines in service |
 | `--closure` | none | `/app/law/closure.json` | the shipped setting file the image carries |

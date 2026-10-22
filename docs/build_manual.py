@@ -611,7 +611,7 @@ T([["Profile", "Vessel", "Saved MWh / yr (mid)", "Saved USD / yr (low to high)",
   [1.4 * inch, 1.2 * inch, 1.3 * inch, 1.8 * inch, 1.2 * inch])
 
 P("8.12 Live controller", H2)
-P("omni_controller/controller.py runs the fleet-mode governor against a real cluster through kubectl, every 60 s by default, in "
+P("omni_controller/controller.py runs the fleet-mode governor against a real cluster through kubectl, every 15 s by default (omni-v14), in "
   "three modes: observe (decisions logged, no writes; the default), target (each HPA's CPU averageUtilization set to rho*, bounded "
   "to 50-95% and changed only by at least 3 points, original recorded in an annotation; node management unchanged) and nodepool "
   "(one node pool sized to the governor's recommendation through a configured command, never below what running pod requests or "

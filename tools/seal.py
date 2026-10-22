@@ -65,6 +65,8 @@ def prove():
                        test_cpp_conveyance_parity)
     for m in ("power_protect", "throughput", "fleet", "fleet_balanced", "fleet_wear"):
         test_cpp_governor_parity.main(str(b / "oc_governor"), 20, m)
+    for p in (15.0, 10.0):   # omni-v14: the live governor's periods
+        test_cpp_governor_parity.main(str(b / "oc_governor"), 20, "fleet", p)
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8)
     test_cpp_hpa_parity.main(str(b / "oc_hpa"), (901,))
     test_cpp_closure_parity.main(str(b / "oc_closure"), 1)

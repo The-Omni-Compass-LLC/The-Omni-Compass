@@ -598,13 +598,16 @@ fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
-# the governor's full decision every OMNI_INTERVAL seconds and its fast checks (the scheduling floor, the pod reflex,
-# conveyance on every third) every OMNI_FLOOR_INTERVAL seconds: 60 and 5, the periods the engine was built and tested at.
-# Four of the governor's rules count in decisions (a give-back trial's 20-decision phase, the breach cool-down, cruise,
-# the trial spacing), so a shorter decision period changes them; it belongs to the next engine version, with those rules
-# in seconds (docs/K8S_COMPASS_PREREGISTRATION.md, "The decision period in the cloud"). The fast checks run only between
-# decisions, so their period must stay under the decision's
-export OMNI_INTERVAL="${OMNI_INTERVAL:-60}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
+# the governor's full decision every OMNI_INTERVAL seconds and its fast checks (the scheduling floor, the pod reflex, the
+# conveyance's 15-second slot) every OMNI_FLOOR_INTERVAL seconds: 15 and 5 on omni-v14 (the founder's order of 22 October:
+# the full read of the state at the pod autoscaler's own 15-second pace, every clock counted in seconds, 10 s tested, never
+# above 60; docs/OMNI_V14.md). Every rule keeps its time at any period, so OMNI_INTERVAL is a setting of the run, recorded
+# beside its files (governor_interval_s.txt) and read by the scorer; engines before omni-v14 ran at 60
+export OMNI_INTERVAL="${OMNI_INTERVAL:-15}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
+if (( OMNI_INTERVAL > 60 || OMNI_INTERVAL < OMNI_FLOOR_INTERVAL )); then
+  echo "OMNI_INTERVAL=$OMNI_INTERVAL: the decision period runs from the fast checks' own ($OMNI_FLOOR_INTERVAL s) to 60 s, never above" >&2; exit 2
+fi
+echo "$OMNI_INTERVAL" > "$OUT_DIR/governor_interval_s.txt"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file
   $GOV_PIN nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval "$OMNI_FLOOR_INTERVAL" --reflex-window-s 15 \

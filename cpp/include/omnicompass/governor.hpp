@@ -12,10 +12,12 @@ struct Directive { int node_delta{}; bool change_permitted{}, rollback_authorize
                    double power_cap{}, demand{}, command{}; State x{}; };
 class Governor {
  public:
-  explicit Governor(AllocationLaw law = {}, bool evolve = true);
+  // period_s: the seconds between two steps (omni-v14; the law's constants are stated at a step a minute, and every one
+  // keeps its time at another period, exactly as omnicompass/adapter.py's Governor.period_s)
+  explicit Governor(AllocationLaw law = {}, bool evolve = true, double period_s = 60.0);
   Directive step(const Observation& obs, double current_cap, int nodes);
   const State& state() const noexcept { return x_; }
  private:
-  AllocationLaw L_; bool evolve_; State x_; Parameters p_; double t_{0.0}; int surplus_streak_{0}, since_add_{99};
+  AllocationLaw L_; bool evolve_; double period_s_{60.0}; State x_; Parameters p_; double t_{0.0}; int surplus_streak_{0}, since_add_{99};
 };
 }

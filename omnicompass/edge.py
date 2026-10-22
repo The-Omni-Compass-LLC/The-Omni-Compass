@@ -33,11 +33,19 @@ import math
 
 class Edge:
     def __init__(self, react: float, z: float = 3.09, window: int = 20, narrow: float = 0.05, start: float = 0.5,
-                 memory: float = 0.0, fall_decay: float = 0.9995, est: int = 2):
+                 memory: float = 0.0, fall_decay: float = 0.9995, est: int = 2, per: float = 1.0, lag: int = 1):
+        # omni-v14: per is the reading period over the period the window, the narrowing, the memory and the fall's decay
+        # are stated at (the live governor: its decision period over 60 s), so each keeps its time at any period: the
+        # window covers the same seconds, the cushion narrows and forgets as much a minute. lag: the readings between two
+        # whose difference measures the wobble, so the two never share samples (one reading's own window); at per 1 and
+        # lag 1 every value is the one v13 used
         self.react = max(1.0, float(react))
-        self.z, self.window, self.narrow, self.est = z, int(window), narrow, est
-        self.mem = memory
-        self.fall_decay = fall_decay
+        self.z, self.est = z, est
+        self.window = int(window) if per == 1.0 else max(3, int(round(window / per)))
+        self.narrow = narrow if per == 1.0 else 1.0 - (1.0 - narrow) ** per
+        self.mem = memory if (per == 1.0 or memory <= 0.0) else memory ** per
+        self.fall_decay = fall_decay if per == 1.0 else fall_decay ** per
+        self.lag = max(1, int(lag))
         self.hist = []
         self.cushion = 1.0 - start
         self.react_part = 0.05
@@ -58,8 +66,12 @@ class Edge:
         if len(h) >= 3 and self.est == 2:
             r = max(1, int(round(self.react)))
             d = [b - a for a, b in zip(h, h[1:])]
-            md = sum(d) / len(d)
-            wob = math.sqrt(sum((x - md) ** 2 for x in d) / max(1, len(d) - 1)) / math.sqrt(2.0)
+            # the wobble from readings one reading's own window apart (lag), so a reading that shares samples with the next
+            # never makes the service look steadier than it is; with too few readings yet, the nearest that two allow
+            g = min(self.lag, max(1, len(h) - 2))
+            dw = d if g == 1 else [h[i + g] - h[i] for i in range(len(h) - g)]
+            md = sum(dw) / len(dw)
+            wob = math.sqrt(sum((x - md) ** 2 for x in dw) / max(1, len(dw) - 1)) / math.sqrt(2.0)
             if r < len(h):
                 rise = max(h[i + r] - h[i] for i in range(len(h) - r))
             else:

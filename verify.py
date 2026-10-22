@@ -94,6 +94,9 @@ def main():
     test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, "throughput"); check("C++ governor vs Python governor (throughput)", True)
     for m_ in ("fleet", "fleet_balanced", "fleet_wear"):
         test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, m_); check(f"C++ governor vs Python governor ({m_})", True)
+    for p_ in (15.0, 10.0):   # omni-v14: the live governor's periods; both twins keep every clock in seconds
+        test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, "fleet", p_)
+        check(f"C++ governor vs Python governor (fleet, a step every {p_:g} s)", True)
     from tools import engine_runs as ER   # the founder's order of 21 October: the Python's runs the input, the C++ harness the mechanism
     check("the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): every receipt to 1e-9 and the same digest",
           ER.cpp_check(20 if a.quick else 100, ER.DEFAULT_BASE, b / "oc_engine_runs") == 0)
@@ -208,6 +211,17 @@ def main():
     except AssertionError:
         detected3 = True
     check("negative control: parity test detects a C++ governor with a wrong equation (2) add gate", detected3)
+    gsrc = (ROOT / "cpp" / "src" / "governor.cpp").read_text(); assert "std::nearbyint(c / r)" in gsrc
+    (tmp / "mut_src").mkdir(); (tmp / "mut_src" / "governor.cpp").write_text(gsrc.replace("std::nearbyint(c / r)", "std::nearbyint(c * 1.0)"))
+    subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"),
+                    *[str(p) for p in (ROOT / "cpp" / "src").glob("*.cpp") if p.name != "governor.cpp"], str(tmp / "mut_src" / "governor.cpp"),
+                    str(ROOT / "cpp" / "tools" / "run_governor.cpp"), "-o", str(tmp / "oc_mut4")], check=True)
+    try:
+        test_cpp_governor_parity.main(str(tmp / "oc_mut4"), 20, "fleet", 15.0)
+        detected_p = False
+    except AssertionError:
+        detected_p = True
+    check("negative control: parity test at 15 s detects a C++ governor counting its dwell in steps, not seconds", detected_p)
     from benchmarks.stack_benchmark import simulate, ARMS
     from omnicompass import stack_sim as S
     from omnicompass.adapter import AllocationLaw

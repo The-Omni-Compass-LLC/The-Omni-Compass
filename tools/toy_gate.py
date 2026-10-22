@@ -65,33 +65,89 @@ GAUGES = {"machine_hours": ("lower", True), "kwh_per_core_hour": ("lower", True)
           "p95_ms": ("lower", False), "alert_minutes": ("lower", False)}
 
 
+# the cluster toys: (the standing engine's decision period, the candidate's, the 5-second plant, the blink). The first three
+# run both engines at one period; the x60 toys run the candidate at its own default against the standing engine at its own
+# (omni-v14: 15 s against 60 s, and 10 s against 60 s on the 5-second plant, where a decision every 10 s falls on a step)
+CLUSTER_TOYS = {"cluster": (60.0, 60.0, False, False), "cluster15": (15.0, 15.0, False, False),
+                "cluster_blink": (60.0, 60.0, False, True), "cluster15x60": (60.0, 15.0, False, False),
+                "cluster_blink15x60": (60.0, 15.0, False, True), "fine60": (60.0, 60.0, True, False),
+                "fine15x60": (60.0, 15.0, True, False), "fine10x60": (60.0, 10.0, True, False),
+                "fine15": (15.0, 15.0, True, False), "fine10": (10.0, 10.0, True, False)}
+
+
 # ---- the worker: one arm, one seed, run inside one checkout --------------------------------------------------------
-def worker(arm, seed, days, period, out, blink=False):
-    import csv
-    from unittest import mock
-    import numpy as np
+def cloud_toy(seed, days, fine=False, blink=False):
+    """The cloud toy's plant and the cluster as its API shows it, for the worker and for the live engine's controller trace
+    (docs/engine/export_controller_trace.py): (sim, kube, STEP_S). The actuator is the shipped one (CloudSim below)."""
     from pilot.selfpilot import SimCluster, SimKube
-    from pilot.score import blocks, load
-    from fleet.sim import ALLOC
-    out = Path(out); out.mkdir(parents=True, exist_ok=True)
-    rng = np.random.default_rng(seed + 7)
+    from fleet.harness import hpa_step
+    from fleet.sim import ALLOC, _cluster_autoscaler
     IDLE = "omnicompass.io/idle"
+    # the plant's step: the harness's 15 s, or 5 s in the fine plant (omni-v14's gate: a decision every 10 s, and every
+    # period that divides the minute, falls on a step; the autoscaler and the cloud's autoscaler still sync every 15 s)
+    SUB = 3 if fine else 1
+    STEP_S = 15.0 / SUB
 
     class CloudSim(SimCluster):
         """The cloud as the governor meets it (scripts/kind_bench.sh, the cloud setting): the cloud's own autoscaler
-        makes machines and deletes an unneeded one, in every arm; the governor only parks a machine that exists (marked
-        idle and drained), which the cloud deletes once it has stood empty for its scale-down time, and wakes a parked
-        machine at once while it still exists. It never adds one."""
-        PARK_TICKS = 40                                        # ten minutes: the autoscaler's scale-down-unneeded time
+        makes machines and deletes an unneeded one, in every arm; the governor only marks a machine that exists idle
+        and wakes it, and never adds one. An idle machine is the shipped actuator's (scripts/kind_nodepool.sh, omni-v14's
+        gate): marked PreferNoSchedule, Ready, powered and billed; no pod is moved off it; a pod that finds the open
+        machines full lands on it at once; once it carries no work it stands empty for the cloud's scale-down time and
+        is deleted. (Until omni-v14 the toy took an idle machine's room away at once, as if drained, which the actuator
+        never does: pods waited there that wait nowhere on a real cluster.)"""
+        PARK_TICKS = 40 * SUB                                  # ten minutes: the autoscaler's scale-down-unneeded time
 
         def __init__(self, *a, **k):
             super().__init__(*a, **k)
             self.c.pool.power_off = True                       # a machine the cloud scales down is deleted, not kept
-            self.parked = []
+            self.parked = []                                   # idle machines, carrying ones first: steps left once empty
+            self.u = 0                                         # plant steps taken
+            self.steps = self.steps * SUB
+            self.acc = {}                                      # each workload's busy share over the autoscaler's 15 s
 
         def tick(self):
-            self.parked = [x - 1 for x in self.parked if x > 1]
-            super().tick()
+            c, p = self.c, self.c.pool
+            t = self.u // SUB                                  # the harness's 15 s demand sample
+            sync = (self.u + 1) % SUB == 0                     # this step closes a 15 s window: the autoscalers' sync
+            if self.u % SUB == 0:                              # boots count in the harness's 15 s steps (BOOT_TICKS)
+                p.booting = [b - 1 for b in p.booting]; p.nodes += sum(1 for b in p.booting if b <= 0)
+                p.booting = [b for b in p.booting if b > 0]
+            cap = p.cores * ALLOC
+            alloc = (p.nodes + len(self.parked)) * cap         # every Ready machine: the idle ones take pods once the open are full
+            reqs = sum(w.replicas * w.request for w in c.workloads)
+            frac = min(1.0, alloc / reqs) if reqs > 0 else 1.0
+            used = 0.0
+            for w in c.workloads:
+                capw = w.replicas * w.request * frac
+                srv = min(w.demand[t] / SUB + w.backlog, capw / SUB)   # a step carries 1/SUB of the 15 s work
+                w.backlog = w.demand[t] / SUB + w.backlog - srv; used += srv * SUB
+                self.acc.setdefault(w.name, []).append(min(1.0, srv * SUB / max(w.replicas * w.request, 1e-9)))
+            c.pending, c.reqs, c.alloc, c.used = max(0.0, reqs - alloc), reqs, alloc, used
+            # the idle machines carrying pods (the requests past the open machines' room) stay in service, their clock
+            # reset; the empty ones count down to the cloud's own scale-down
+            carrying = min(len(self.parked), int(math.ceil(max(0.0, reqs - p.nodes * cap) / cap - 1e-9)))
+            self.parked = [self.PARK_TICKS] * carrying + [x - 1 for x in self.parked[carrying:] if x > 1]
+            util = min(1.0, used / max(alloc, 1e-9))
+            kw = ((p.nodes + len(self.parked)) * (p.idle_kw + p.dyn_kw * util) + len(p.booting) * p.idle_kw) * self.scn.pue
+            pending_pods = int(sum(max(0, w.replicas - int(w.replicas * frac)) for w in c.workloads))
+            cur = sum(w.replicas for w in c.workloads)
+            if sync:
+                for w in c.workloads:
+                    got = self.acc.pop(w.name, None) or [w.metric]
+                    w.metric = sum(got) / len(got)             # the window the autoscaler reads
+                    before = w.replicas; hpa_step(w, w.target); w.desired = w.replicas; w.current = before
+                if self.autoscaler == "ca":
+                    # the cloud's autoscaler: a pod that finds no room even on the idle machines starts one; an unneeded
+                    # open machine leaves after its ten minutes (an idle one leaves by its own clock above)
+                    c.alloc = p.nodes * cap
+                    _cluster_autoscaler(c)
+                    c.alloc = alloc
+            self.rows.append(["", self.u * STEP_S, p.nodes + len(self.parked), p.nodes + len(self.parked) + len(p.booting),
+                              int(alloc / ALLOC * 1000), int(reqs * 1000), int(used * 1000), pending_pods, len(c.workloads),
+                              cur, sum(w.desired for w in c.workloads), kw * 1000])
+            self.u += 1
+            self.t = self.u // SUB
 
         def billed(self):
             p = self.c.pool
@@ -102,35 +158,33 @@ def worker(arm, seed, days, period, out, blink=False):
             if n < p.nodes:
                 k = p.nodes - n; p.nodes -= k; self.parked += [self.PARK_TICKS] * k
             elif n > p.nodes:
+                # those still carrying work first: they are warm (scripts/kind_nodepool.sh)
                 k = min(n - p.nodes, len(self.parked)); p.nodes += k; self.parked = self.parked[k:]
 
     sim = CloudSim(seed, days, autoscaler="ca")
-    billed = []
-    lat_path = out / "latency.csv"
-    lat_rows, minute_ms, p95s = [], {}, []
 
-    def time_requests():
-        """The requests of this 15 s, timed on the pods running now (the same queue in every arm)."""
-        c = sim.c
+    def placed():
+        """Every running pod on its machine, as the API shows it: the open machines filled first, then the idle ones (a
+        pod lands on an idle machine only when the open ones are full); the rest wait, with no machine."""
+        c, p = sim.c, sim.c.pool
         frac = min(1.0, c.alloc / c.reqs) if c.reqs > 0 else 1.0
-        cap = sum(w.replicas * w.request * frac for w in c.workloads)
-        dem = sum(w.demand[min(sim.t, len(w.demand) - 1)] for w in c.workloads)
-        backlog = sum(w.backlog for w in c.workloads)
-        rho = min(0.98, dem / cap) if cap > 0 else 0.98
-        mean = SERVICE_MS / (1.0 - rho) + (1000.0 * backlog / cap if cap > 0 else 1e4)
-        t0 = sim.t * 15.0
-        for i in range(SAMPLES_PER_TICK):
-            ms = float(mean * rng.lognormal(0.0, 0.25))
-            lat_rows.append((t0 + i * 15.0 / SAMPLES_PER_TICK, ms))
-            minute_ms.setdefault(int(t0 // 60), []).append(ms)
-        del lat_rows[:-60 * SAMPLES_PER_TICK]                  # the probe file keeps the last 15 minutes
-        with open(lat_path, "w") as f:
-            f.write("elapsed_seconds,latency_ms,ok\n")
-            f.writelines(f"{t:.2f},{ms:.3f},1\n" for t, ms in lat_rows)
+        cap = p.cores * ALLOC
+        names = [f"n{i}" for i in range(p.nodes)] + [f"n{p.nodes + j}" for j in range(len(sim.parked))]
+        room = [cap] * len(names); out_ = []; i = 0
+        for w in c.workloads:
+            run = int(w.replicas * frac)
+            for _ in range(run):
+                while i < len(names) - 1 and room[i] < w.request - 1e-9:
+                    i += 1
+                if names:
+                    room[i] -= w.request
+                out_.append((w, names[i] if names else None))
+            out_ += [(w, None)] * (w.replicas - run)
+        return out_, names, room
 
     class Kube(SimKube):
         def get(self, *args):
-            if args[:2] == ("get", "nodes"):                    # in service, then parked (marked idle) until deleted
+            if args[:2] == ("get", "nodes"):                    # in service, then idle-marked until the cloud deletes them
                 p = self.sim.c.pool
                 node = lambda i, taints: {"metadata": {"name": f"n{i}", "labels": {}},
                                           "spec": {"taints": taints}, "status": {"allocatable": {"cpu": str(p.cores)},
@@ -147,6 +201,19 @@ def worker(arm, seed, days, period, out, blink=False):
                 frac = min(1.0, c.alloc / c.reqs) if c.reqs > 0 else 1.0
                 pend = sum(w.replicas - int(w.replicas * frac) for w in c.workloads)
                 return "\n".join(f"pod/p{i}" for i in range(pend))
+            if args[:2] == ("get", "pods"):                     # every pod with its machine, as the API shows it
+                cpu = lambda w: f"{int(w.request * 1000)}m"
+                return {"items": [{"metadata": {"name": f"p{k}", "namespace": "default", "ownerReferences": [{"kind": "ReplicaSet"}]},
+                                   "spec": {"nodeName": nm, "containers": [{"resources": {"requests": {"cpu": cpu(w)}}}]} if nm else
+                                           {"containers": [{"resources": {"requests": {"cpu": cpu(w)}}}]},
+                                   "status": {"phase": "Running" if nm else "Pending"}} for k, (w, nm) in enumerate(placed()[0])]}
+            if args[:2] == ("top", "nodes"):                    # each machine's use, by the requests placed on it
+                c, p = self.sim.c, self.sim.c.pool
+                pods, names, room = placed()
+                cap = p.cores * ALLOC
+                load_ = {nm: cap - r for nm, r in zip(names, room)}
+                tot = sum(load_.values()) or 1.0
+                return "\n".join(f"{nm} {int(c.used * load_[nm] / tot * 1000)}m 1% 1Gi 1%" for nm in names if load_[nm] > 1e-9)
             if args[:2] == ("get", "hpa"):                      # the HPA as Kubernetes shows it: its range and target
                 hp = super().get(*args)
                 for h, w in zip(hp["items"], self.sim.c.workloads):
@@ -166,18 +233,56 @@ def worker(arm, seed, days, period, out, blink=False):
             except ValueError:
                 raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy cluster")
 
+    return sim, Kube(sim, None), STEP_S
+
+
+def worker(arm, seed, days, period, out, blink=False, fine=False):
+    import csv
+    from unittest import mock
+    import numpy as np
+    from pilot.score import blocks, load
+    from fleet.sim import ALLOC
+    out = Path(out); out.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(seed + 7)
+    sim, k, STEP_S = cloud_toy(seed, days, fine, blink)
+    SUB = int(round(15.0 / STEP_S))
+    billed = []
+    lat_path = out / "latency.csv"
+    lat_rows, minute_ms, p95s = [], {}, []
+
+    def time_requests():
+        """The requests of this step, timed on the pods running now (the same queue in every arm): SAMPLES_PER_TICK
+        every 15 s, spread over the step's own seconds."""
+        c = sim.c
+        frac = min(1.0, c.alloc / c.reqs) if c.reqs > 0 else 1.0
+        cap = sum(w.replicas * w.request * frac for w in c.workloads)
+        dem = sum(w.demand[min(sim.t, len(w.demand) - 1)] for w in c.workloads)
+        backlog = sum(w.backlog for w in c.workloads)
+        rho = min(0.98, dem / cap) if cap > 0 else 0.98
+        mean = SERVICE_MS / (1.0 - rho) + (1000.0 * backlog / cap if cap > 0 else 1e4)
+        t0 = sim.u * STEP_S
+        k = sim.u % SUB
+        n = int(round((k + 1) * SAMPLES_PER_TICK / SUB)) - int(round(k * SAMPLES_PER_TICK / SUB))
+        for i in range(n):
+            ms = float(mean * rng.lognormal(0.0, 0.25))
+            lat_rows.append((t0 + i * STEP_S / n, ms))
+            minute_ms.setdefault(int(t0 // 60), []).append(ms)
+        del lat_rows[:-60 * SAMPLES_PER_TICK]                  # the probe file keeps the last 15 minutes
+        with open(lat_path, "w") as f:
+            f.write("elapsed_seconds,latency_ms,ok\n")
+            f.writelines(f"{t:.2f},{ms:.3f},1\n" for t, ms in lat_rows)
+
     if arm != "native":
         from omni_controller.controller import Controller, parser
         argv = ["--mode", "nodepool", "--law", "compass", "--dial", "save", "--sensed", "none/none",
                 "--interval", str(period), "--latency-file", str(lat_path), "--slo-ms", str(SLO_MS),
                 "--audit", str(out / "audit.jsonl"), "--kill-file", str(out / "kill"), "--node-scale-cmd", "SIMSCALE {n}",
                 "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.max_nodes), "--headroom", "0.5",
-                "--active-nodes-only", "--max-node-step", "1"]
+                "--active-nodes-only", "--max-node-step", "1", "--floor-interval", str(STEP_S)]
         p = parser()
         if any("--give-back-only" in getattr(x, "option_strings", []) for x in p._actions):
             argv.append("--give-back-only")
         a = p.parse_args(argv)
-        k = Kube(sim, None)
         ctl = Controller(a, kube=k)
         real_run = subprocess.run
 
@@ -185,16 +290,16 @@ def worker(arm, seed, days, period, out, blink=False):
             if isinstance(cmd, list) and cmd and cmd[0] == "SIMSCALE":
                 sim.resize(int(cmd[1])); return subprocess.CompletedProcess(cmd, 0)
             return real_run(cmd, *kw_a, **kw)
-        every = max(1, int(round(period / 15.0)))
+        every = max(1, int(round(period / STEP_S)))
         from omni_controller import controller as shipped
         fails = 0
         with mock.patch("omni_controller.controller.subprocess.run", side_effect=fake_run):
-            while sim.t < sim.steps:
-                sim.tick(); sim.c.alloc = sim.c.pool.nodes * sim.c.pool.cores * ALLOC
+            while sim.u < sim.steps:
+                sim.tick(); sim.c.alloc = (sim.c.pool.nodes + len(sim.parked)) * sim.c.pool.cores * ALLOC
                 time_requests(); billed.append(sim.billed())
                 # the shipped loop's own handling (omni_controller.controller.main): a failed decision is recorded and
                 # skipped, a failed floor check recorded, and the next one comes on time
-                if sim.t % every == 0:
+                if sim.u % every == 0:
                     fails = shipped.safe_step(ctl, fails)
                 else:
                     try:
@@ -202,12 +307,12 @@ def worker(arm, seed, days, period, out, blink=False):
                     except Exception as e:
                         ctl.audit({"error": "floor check: " + repr(e)[:500], "stderr": ""})
     else:
-        while sim.t < sim.steps:
+        while sim.u < sim.steps:
             sim.tick(); time_requests(); billed.append(sim.billed())
     cap = out / "capture.csv"; sim.write_capture(cap)
     rows = load(str(cap))
     day = blocks(rows, 86400 * days + 60, None, None)[0]                # one block: the whole run
-    hours = sum(billed) * 15.0 / 3600.0                                 # the bill: every machine that exists
+    hours = sum(billed) * STEP_S / 3600.0                               # the bill: every machine that exists
     allm = sorted(ms for v in minute_ms.values() for ms in v)
     alert = sum(1 for v in minute_ms.values() if sorted(v)[int(0.95 * len(v))] > SLO_MS)
     res = {"machine_hours": hours, "kwh_per_core_hour": day["kwh_per_core_hour"],
@@ -538,6 +643,17 @@ def reading(gauge, diffs, base_vals, gauges=None):
     return {"mean_change": m, "ci95": [lo, hi], "relative": m / b if b else float("nan"), "word": word}
 
 
+def toy_period(t):
+    """A cluster toy's heading: the decision periods of the two engines, and the plant's step where it is not 15 s."""
+    if "period_s" not in t:
+        return ""
+    bp, cp = t.get("base_period_s", t["period_s"]), t.get("cand_period_s", t["period_s"])
+    plant = f"; the plant in {t['plant_s']:.0f}-second steps" if t.get("plant_s", 15.0) != 15.0 else ""
+    if bp == cp:
+        return f" (a decision every {cp:g} s{plant})"
+    return f" (the standing engine every {bp:g} s, the candidate every {cp:g} s{plant})"
+
+
 def render(report_path, out_md):
     """TOY_GATE.json -> a page with the notice: the toys, their gauges, the readings, the counts (class S, never a benchmark)."""
     from tools.legal import stamp
@@ -565,8 +681,7 @@ def render(report_path, out_md):
     if r.get("note"):
         lines += [r["note"], ""]
     for toy, t in r["toys"].items():
-        period = f" (a decision every {t['period_s']:.0f} s)" if "period_s" in t else ""
-        lines += [f"## {toy}{period}", ""]
+        lines += [f"## {toy}{toy_period(t)}", ""]
         if toy == "verdict":
             for rate, b in verdict_rates(t["base"]).items():
                 c = verdict_rates(t["cand"]).get(rate, {})
@@ -601,7 +716,8 @@ def main(argv=None):
     ap.add_argument("--cand", help="checkout of the candidate")
     ap.add_argument("--seeds", default="1-8")
     ap.add_argument("--days", type=float, default=1.0)
-    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,convey_refused,convey_batch,verdict")
+    ap.add_argument("--toys", default=",".join(list(CLUSTER_TOYS) + ["convey", "convey_unreadable_quota", "convey_refused",
+                                                                   "convey_batch", "verdict"]))
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", default="")
     ap.add_argument("--worker", help=argparse.SUPPRESS)
@@ -609,6 +725,7 @@ def main(argv=None):
     ap.add_argument("--period", type=float, default=60.0, help=argparse.SUPPRESS)
     ap.add_argument("--dir", help=argparse.SUPPRESS)
     ap.add_argument("--blink", action="store_true", help=argparse.SUPPRESS)  # the cluster toy with its machines out of service a while
+    ap.add_argument("--fine", action="store_true", help=argparse.SUPPRESS)   # the cluster toy on the 5-second plant
     ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota: none (readable, empty), unreadable, or refused (unreadable, every raise refused)
     ap.add_argument("--batch", action="store_true", help=argparse.SUPPRESS)  # the convey toy with the batch muscle beside the serving one
     a = ap.parse_args(argv)
@@ -619,7 +736,7 @@ def main(argv=None):
     if a.worker in ("convey-native", "convey-omni"):
         return worker_convey(a.worker.split("-")[1], a.seed, a.dir, a.quota, a.batch)
     if a.worker:
-        return worker(a.worker, a.seed, a.days, a.period, a.dir, a.blink)
+        return worker(a.worker, a.seed, a.days, a.period, a.dir, a.blink, a.fine)
     lo_s, _, hi_s = a.seeds.partition("-")
     seeds = list(range(int(lo_s), int(hi_s or lo_s) + 1))
     base, cand = Path(a.base).resolve(), Path(a.cand).resolve()
@@ -627,17 +744,25 @@ def main(argv=None):
     from concurrent.futures import ThreadPoolExecutor
     report = {"seeds": seeds, "days": a.days, "base": str(base), "cand": str(cand), "toys": {}}
     toys = a.toys.split(",")
-    for toy, period in (("cluster", 60.0), ("cluster15", 15.0), ("cluster_blink", 60.0)):
+    memo = {}                                       # a run's reading by what decides it: the same run is never run twice
+
+    def cluster_run(j):
+        arm, tree, sd, period, blink, fine, d = j
+        key = ("native", sd, fine) if arm == "native" else (str(tree), sd, period, blink, fine)
+        if key not in memo:
+            memo[key] = run(tree, ["--worker", "native" if arm == "native" else "omni", "--seed", str(sd), "--days", str(a.days),
+                                   "--period", str(period), *(["--blink"] if blink else []), *(["--fine"] if fine else []),
+                                   "--dir", str(d)])
+        return memo[key]
+    for toy, (bp, cp, fine, blink) in CLUSTER_TOYS.items():
         if toy not in toys:
             continue
-        jobs = [(arm, tree, s) for s in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]
-        blink = ["--blink"] if toy == "cluster_blink" else []
+        jobs = [(arm, tree, sd, cp if arm == "cand" else bp, blink, fine, work / toy / f"{arm}-{sd}")
+                for sd in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]
         with ThreadPoolExecutor(a.jobs) as ex:
-            got = list(ex.map(lambda j: run(j[1], ["--worker", "native" if j[0] == "native" else "omni", "--seed", str(j[2]),
-                                                    "--days", str(a.days), "--period", str(period), *blink,
-                                                    "--dir", str(work / toy / f"{j[0]}-{j[2]}")]), jobs))
+            got = list(ex.map(cluster_run, jobs))
         res = {}
-        for (arm, _, s), r in zip(jobs, got):
+        for (arm, _, s, *_), r in zip(jobs, got):
             res.setdefault(arm, {})[s] = r
         rows = {}
         for g in GAUGES:
@@ -649,7 +774,8 @@ def main(argv=None):
                        "cand_vs_native": reading(g, [c - n for c, n in zip(cv, nv)], nv)}
         extra = {k: {arm: sum(res[arm][s].get(k, 0) for s in seeds) for arm in ("base", "cand")}
                  for k in ("steps_allowed", "steps_refused", "trials_abandoned", "machines_parked", "errors", "readings_held")}
-        report["toys"][toy] = {"period_s": period, "gauges": rows, "counts": extra, "per_seed": res}
+        report["toys"][toy] = {"period_s": cp, "base_period_s": bp, "cand_period_s": cp, "plant_s": 5.0 if fine else 15.0,
+                               "gauges": rows, "counts": extra, "per_seed": res}
     # the convey toy twice: the namespace's quota readable and empty, and unreadable (the governor's role cannot list
     # quotas on every kind test, and on any stack whose role withholds it; the first v7 trial read that as a zero budget)
     # and a third time with every raise refused by a quota the governor cannot read (the capacity test, v12); and a
@@ -682,7 +808,7 @@ def main(argv=None):
                                      "cand": run(cand, ["--worker", "verdict", "--seed", "300"])}
     (work / "TOY_GATE.json").write_text(json.dumps(report, indent=1))
     for toy, r in report["toys"].items():
-        print(f"\n== {toy}" + (f" (a decision every {r['period_s']:.0f} s)" if "period_s" in r else ""))
+        print(f"\n== {toy}{toy_period(r)}")
         if toy == "verdict":
             print("share of give-back steps allowed, by the step's true extra cost (2% allowance, noisy work):")
             for rate, b in verdict_rates(r["base"]).items():

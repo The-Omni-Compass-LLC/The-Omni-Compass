@@ -60,7 +60,7 @@ def pack_controller(data: dict) -> dict:
         val = {**d, "kappa": sc.get("kappa"), "h": sc.get("h"), "sigma": sc.get("sigma"), "nu": sc.get("nu"),
                "gate_ok": int(bool(d.get("gate_ok"))), "nodes_ok": int(bool(ct.get("nodes"))), "verdict": d.get("verdict", "")}
         return [val.get(k) for k in CDEC]
-    out = {"slo": data["slo_ms"], "seeds": data["seeds"], "settings": {}}
+    out = {"slo": data["slo_ms"], "seeds": data["seeds"], "interval_s": data.get("interval_s", 60.0), "settings": {}}
     for name, sec in data["settings"].items():
         runs = {sd: {arm: {k: [t[k] for t in r[arm]] for k in TICK} for arm in ("native", "omni")} for sd, r in sec["runs"].items()}
         for sd, r in sec["runs"].items():

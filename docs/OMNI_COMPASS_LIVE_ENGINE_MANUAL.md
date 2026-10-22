@@ -62,7 +62,7 @@ what it bought, as power given, and never called a loss.
 
 | What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
 |---|---|---|
-| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its fast checks run every 5 seconds, beside the autoscaler's own 15-second check) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
+| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its full read of the state every 15 seconds, the autoscaler's own pace, and its fast checks every 5 seconds) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
 | **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
 | **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion | every muscle judged on itself, and the organism judged whole |
 | **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
@@ -1039,7 +1039,7 @@ The shipped controller,
 runs the chain left to right: the senses, the six-state brain, the nerves and the machine organ's grant, the compass law on
 the service (the cloud setting), the verdict's trial, the release gate, the plug. Every value below the chain is the
 controller's own audit record of that decision, recorded by `docs/engine/export_controller_trace.py` on runs A, B and C (six
-hours each, a decision every 60 s, class S). Three buttons choose the setting: *on top of the HPA, the max*; *the cloud: the
+hours each, a decision every 15 s, the controller's own default on omni-v14; class S). Three buttons choose the setting: *on top of the HPA, the max*; *the cloud: the
 tune-down, machines only*; and the Linux host and the card (the page's section 5f).
 
 ![One decision of the governor. Read the body (the senses), place every reading in its band, let the brain's state evolve, grant or refuse through the nerves, apply the compass law to each muscle (push or lift), run the verdict's trial on a step past native, pass the release gate, write through the plug and read it back, renew the lease. On the decision-trace monitor each box is one column of the audit, and *open the same controller, decision by decision* steps through them.](book/figures/loop.svg)
