@@ -280,7 +280,9 @@ omni-v16 runs land. The numbers stand on that page, never copied here.
    it started nothing: it fingerprinted the fetched commit with its own copy of the version tool's scope, which predated
    omni-v15's eight wires, so no commit matched (fixed: it runs that commit's own version tool, `CHANGELOG.md`, 22 October,
    afternoon). omni-v15's campaign started no run; the last runs started, omni-v14's at 00:31 UTC, stand as its record. Nothing
-   cancelled.
+   cancelled. The first omni-v16 starts came at 13:50 UTC; of them the levers check (A) failed three of its 19 checks on a rig
+   omni-v16 had left at decisions of 5 s, too short for the brain's own minute (rightsize and coldstart wait for its calm); the
+   rig now runs the minutes its checks were written for, and the levers check runs again, A, B and C (`docs/OMNI_V16.md`).
 5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the toy read no LOSS at 15 s against 60 s
    (`results/toy_gate/V16_PACE.md`, `results/toy_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a
    place (both settings) and, in the cloud's setting, on the 95th percentile and the alert minutes, rows the engine carries at
