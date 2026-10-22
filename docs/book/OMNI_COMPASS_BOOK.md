@@ -239,7 +239,7 @@ Read the rest of the front matter before you touch a wire. It tells you what you
 what it tells you.
 
 
-## Introduction: The Problem, the Idea and What This Manual Covers
+## Introduction: The Idea and What This Manual Covers
 
 
 **The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.

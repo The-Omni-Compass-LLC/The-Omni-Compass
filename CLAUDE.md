@@ -302,6 +302,42 @@ the founder overrides one in the conversation.
   every 5 s. A longer period is not a bigger cushion: it is a longer blind spot (his question of the same night, answered so). The
   pace runs (`docs/PACE_PREREGISTRATION.md`) read 15 s for real, against native and against 60, 10 and 5 s; a LOSS at 15 s there
   is root-caused and fixed in the next version.
+- **The heartbeat as a knob on the wall** (the founder's words, the same day: "5, 15, 30, 60 ... Then give me 75 90 And after 90,
+  I want 120 ... Heartbeat sweeps. With buttons in my monitor canvas dashboard of that wired mechanism of the heartbeat ... Maybe
+  somebody wants to pick a different one ... somebody might want to tune it to be something different"). The heartbeat sweep
+  (`tools/heartbeat_sweep.py`, our own model, class S; the record `results/toy_gate/HEARTBEAT_SWEEP.md`, written again from its
+  runs by `tests/test_heartbeat_sweep.py`) reads the engine that stands and the one before it at every beat from 5 to 120 s,
+  on-site and in the cloud. Each beat is read against native and against the same engine at 15 s and 60 s, with the engine's own
+  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 5c,
+  after the heart) has a button for each beat, setting, engine, zero line and gauge. The factory's beat stays 15 s; another beat
+  is a changed tune, its receipts its own. On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in
+  pods waiting (−83.5% at 5 to 15 s, −72.9% at 60 s, −57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power
+  given); a beat slower than 60 s waits more than the factory's 15 s (+86% to +160%, LOSS at 90 s) for at most 0.4 points fewer
+  machines than 60 s, and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines alone, 5
+  to 15 s cut the machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next version's
+  list, as omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%.
+- **The word never carries a sign** (the founder's words, 22 October, night: "If it's a gain, it should be a plus 73
+  with the word gain. When you put a minus, it confuses me ... that word gain can never have a minus beside the word
+  gain"). Every judged change is said as down or up by its size, then its word ("down 73.0%, GAIN"; "up 2.9%, power
+  given"), never as a signed number beside the word; an interval is said the same way ("down 47.3% to 127.5%"). The
+  heartbeat monitor and the sweep's record print it so; every other table, page and manual follows in the pass after it.
+- **A live tuning engine beside one tuned engine** (the founder's words, the same night: "the live engine ... is a live
+  tuning engine that can be tuned in real time to show mechanism of action ... what they're seeing is one tuned engine
+  ... If you turn and tweak any piece of an engine ... can change the mechanism of action's output"). The live engine's
+  title page, the Live Engine Manual's front matter and the two other manuals' factory-tune notice say so in the same
+  words: the knobs show variations of the mechanism (class S); the benchmarks prove the factory tune only, the tune
+  found and confirmed as the best state for the organism in our own models before any real run; a changed tune's results
+  are its own. Finding and confirming that tune, gauge by gauge, is the standing work of the sweeps (the heartbeat sweep
+  first).
+- **The beat, read right** (the same night: "73% gain means you're gaining more pods waiting ... Answer the question").
+  No: down 73% at 60 s means 73% fewer pods waiting than native, down 87% at 15 s means 87% fewer; both GAIN, 15 s the
+  larger. Native keeps its own 15 s autoscaler in both arms, so the benefit is not the beat: it is the governor sizing
+  the pool ahead of the load, where native's autoscaler adds a machine after pods wait; the beat sets only how often the
+  governor looks. The factory's beat stays 15 s (the order above). A beat shown to make the engine do too much work for
+  nothing (120 s) is kept on the monitor only to show why nobody would tune there; no run is spent proving it further.
+- **The page's order** (the same night: "my TOC is in order of comprehension ... there's too much shit before people see
+  some metrics ... the real monitor wall ... got to hit them right away"): open order; the founder goes through the
+  contents next.
 - **Another person's cloud account** (the founder's words: he logged into another person's Azure account to use their free credit
   for his benchmark). A key bills only the account it belongs to; nothing merges. Using it is his and that person's matter: only
   with that person's agreement. Asked whether they agreed, he answered "Yes yes yes" the same day: the Azure queue's switch, off while the

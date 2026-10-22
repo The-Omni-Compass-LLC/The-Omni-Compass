@@ -396,6 +396,43 @@ def _clean(v):
     return v
 
 
+def beat_sweep() -> dict:
+    """The heartbeat sweep's record (tools/heartbeat_sweep.py --table, results/toy_gate/HEARTBEAT_SWEEP.json) as the page's
+    heartbeat monitor reads it: every beat of each engine in each setting, each gauge's change in percent against native and
+    against the same engine at 15 s and at 60 s, with its 95% interval and its word, and the engine's own cost a day."""
+    f = ROOT / "results" / "toy_gate" / "HEARTBEAT_SWEEP.json"
+    if not f.exists():
+        return {"missing": str(f.relative_to(ROOT)), "periods": [], "rows": {}}
+    rec = json.loads(f.read_text(encoding="utf-8"))
+    fin = lambda v: v if isinstance(v, (int, float)) and math.isfinite(v) else None
+
+    def pct(x, base):
+        # the gate's reading (tools/toy_gate.py reading) in percent of the zero line's mean over the same seeds: the change is
+        # mean_change/relative's base; where the change is nought, the zero line's mean as recorded
+        m, (lo, hi), rel = x["mean_change"], x["ci95"], x["relative"]
+        b = m / rel if fin(rel) and rel and m else base
+        out = {"word": x["word"], "pct": fin(100 * rel) if fin(rel) is not None else None,
+               "lo": fin(100 * lo / b) if b else None, "hi": fin(100 * hi / b) if b else None}
+        return {k: (round(v, 3) if isinstance(v, float) else v) for k, v in out.items()}
+    rows, periods, seeds = {}, set(), 0
+    for key, v in rec.items():
+        parts = key.split("|")
+        if len(parts) != 3:
+            continue
+        setting, eng, p = parts
+        nat = rec.get(f"{setting}|native", {})
+        mean_at = lambda q: (rec.get(f"{setting}|{eng}|{q}") or {}).get("mean", {})
+        rows.setdefault(setting, {}).setdefault(eng, {})[p] = {
+            "vs": {g: pct(x, nat.get(g)) for g, x in v["vs_native"].items()},
+            "vs15": {g: pct(x, mean_at(15).get(g)) for g, x in (v.get("vs_15") or {}).items()} or None,
+            "vs60": {g: pct(x, mean_at(60).get(g)) for g, x in (v.get("vs_60") or {}).items()} or None,
+            "cost": {c: round(x, 3) for c, x in v["cost"].items()}}
+        periods.add(float(p))
+        seeds = max(seeds, len(v["seeds"]))
+    return {"file": str(f.relative_to(ROOT)), "seeds": seeds, "rows": rows,
+            "periods": [int(p) if p == int(p) else p for p in sorted(periods)]}
+
+
 def fleet() -> dict:
     """The benefit sheet (results/BENEFIT_SHEET.json, every benchmark's benefit in one row), the Omni index's headline
     (results/OMNI_INDEX.md) and the grid (results/grid_v5/GRID.json, the newest grid with squares; the dispatches of the
@@ -878,7 +915,8 @@ def records(runs: bool) -> dict:
     build["board"] = board(build["runs"], camp)
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
-            "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x}
+            "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
+            "beatsweep": beat_sweep()}
 
 
 def embedded(page: str, key: str):
@@ -1032,7 +1070,8 @@ def main() -> int:
         print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin")
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
+                          "beatsweep")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1049,7 +1088,8 @@ def main() -> int:
             if where:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin"):
+    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
+              "beatsweep"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

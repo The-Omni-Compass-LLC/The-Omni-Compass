@@ -85,6 +85,14 @@ Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are
 
 ## What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report
 
+**A live tuning engine beside one tuned engine.** The page is two things, and every tile says which it is. Its knobs
+turn the engine in real time, so the mechanism of action can be watched under other settings: native alone, Omni-Compass
+on top, or both side by side, a knob up or down, a muscle on or off; what a knob shows is that configuration's own
+reading, our own model (class S), never a benchmark result. The benchmarks on the page prove one engine, the factory
+tune (`DISCLOSURES.md`, section 3), the same in every run, found and confirmed as the best state for the organism in our
+own models before any real run. Like any engine, turn one part and the output moves: a changed tune's results are its
+own, and the page names the tune of everything it shows.
+
 **What the live engine is.** The live engine is one web page, `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, built by the
 repository's own code (`docs/engine/build_live_engine.py`) from the engine that stands and from the repository's own
 results. It is a monitor of the engine and of the benchmark runs GitHub ran: every number on it is read from a record the
@@ -932,21 +940,56 @@ one sync every 15 s, and nothing proves any of them is still there.
 
 ### 12.3 A healthy heart, never pushed
 
-The beat runs at a fixed, calm rate (one decision a minute in these runs, the fast
-checks every 5 s between beats) and is never driven faster by the load it governs. What it costs is counted inside the body's
+The beat runs at a fixed, calm rate (on omni-v16 one decision every 15 s, the fast checks every 5 s between beats; the
+runs replayed on the page ran before omni-v16, one decision a minute) and is never driven faster by the load it governs.
+Every clock of the engine counts seconds, so the beat's pace sets how often the body is read, never what a rule means: a
+give-back still waits its trial's minutes, the cushion still keeps its twenty minutes of memory, and a machine still goes
+back at most one a minute. What it costs is counted inside the body's
 own load (the row *Omni's own CPU*), so the organism never pays for its brain without knowing it. A decision that fails is
 recorded and skipped: it writes nothing, the body keeps the last settings that landed, and the next beat comes at its normal
 time. Two gauges read its health: the share of each beat spent deciding, and how close the lease came to its limit. The page
 calls a heart under strain when a decision takes more than half its beat, or a gap between beats runs past half the lease.
 
-### 12.4 The three charts
+### 12.4 The heartbeat sweep: the beat as a knob
+
+Under the heart stands the heartbeat sweep (the panel `#beatPanel`, monitor *The heartbeat sweep: every beat the governor can
+run at*). The beat is a setting of the run, not a constant: the factory sets 15 s, and an operator may choose another for a
+system's own reasons (a slower beat reads the cluster less often; a faster one answers sooner). The monitor shows what each
+choice does. Its five rows of buttons pick the record to read:
+
+- **Beat:** 5, 10, 15, 20, 30, 60, 75, 90 or 120 s.
+- **Setting:** on-site, where the governor sizes the pool on top of the pod autoscaler, or in the cloud, the machines alone.
+- **Engine:** omni-v16, every clock in seconds, or omni-v15, its rules counted in beats.
+- **Against:** what each reading is set against: native, the same engine at 15 s (the factory's beat), or the same engine at
+  60 s.
+- **Gauge:** pods waiting for a place, machine-hours, energy per used core-hour, the 95th and 99th percentile response, the
+  minutes over the line, and the engine's own cost: its processor time, its reads of the cluster and its writes a day, and
+  the fast check's rescues, the machines its 5-second check added only after a pod already waited.
+
+The tiles give the chosen beat whole. They show what it is read against and every gauge's mean change with its 95% interval
+and its word (GAIN, EVEN, LOSS or power given, by the one key). The last tiles give the engine's own cost a day; native,
+which runs no governor, costs nothing there. The rescues tile says why a slow beat waits more: the full decision sizes the
+pool ahead of the load, and read less often, the load outruns it between decisions, so the 5-second check adds the machine
+only once a pod already waits.
+
+The chart gives the chosen gauge at every beat. Each bar is the mean change over the seeds, coloured by its word, with its
+whisker the 95% interval. A fall cannot pass −100%, so an interval reaching past it is cut there and marked ▼; the tiles
+print it whole. The beat chosen is framed, and a cursor reads the beats in turn and names the row it holds.
+
+Every number is our own model (evidence class S), never a benchmark result. The shipped controller of each engine runs on the
+toy cluster's 5-second plant, eight seeds of a day each, paired by seed and read by the toy gate's own rule
+(`tools/heartbeat_sweep.py`; the record, `results/toy_gate/HEARTBEAT_SWEEP.md`). Every beat on this monitor is read in
+the model only: a real run reads the one beat it was started with, the governor's `--interval`, and the gauges
+`omni_decisions_total` and `omni_own_cpu_cores` of `tools/omni_exporter.py` show the beat it runs at and what it costs.
+
+### 12.5 The three charts
 
 Response time, one candlestick per 30-second bin (open, high, low, close of the responses in the
 bin), native beside Omni-Compass; the latency heatmap, every response binned by time and by duration, the darker the fuller;
 throughput, requests served per 30-second bin. Read the three together: a GAIN in the 99th percentile shows as the candles'
 upper wicks shortening on the blue side while the heatmap's upper band thins and the throughput bars stand level or higher.
 
-### 12.5 The governor's ticker
+### 12.6 The governor's ticker
 
 From the repetition's own `audit.jsonl`: the minute and second of the decision, the compass
 position (0 calm, 1 at the line), and the force on the pedal (push: toward more; lift: handing the setting back toward
@@ -954,7 +997,7 @@ native). Then the machines it recommends, and the give-back verdict's state: *le
 native's; *acting* means a trial on its own measurement. Every line of the ticker is a line of the governor's audit, and the
 audit is the record of authority for what it did.
 
-### 12.6 Native's own controllers' ticker
+### 12.7 Native's own controllers' ticker
 
 Native has no governor; its own controllers' moves are the second ticker, read
 from the native arm's `capture.csv`: the replicas its pod autoscaler holds, the pods waiting for a place and the machines
@@ -963,7 +1006,7 @@ decides on top of native. The two tickers side by side are the mechanism of acti
 
 ![One pedal, no brake. Pushing the pedal adds capacity at once; lifting it eases capacity back toward native a step at a time, never below idle, the floor of two machines. Cruise holds every machine in service while a known queue waits. Watching reads and writes nothing. On the governor's ticker, push and lift are the force column, and the machines recommended are what the pedal bought or handed back.](book/figures/pedal.svg)
 
-### 12.7 Every repetition side by side, and the run's receipt
+### 12.8 Every repetition side by side, and the run's receipt
 
 Each repetition of the run as one small pair of lines; the
 receipt of this run as the repository wrote it; and this repetition scored by the repository's own scorer, which must equal

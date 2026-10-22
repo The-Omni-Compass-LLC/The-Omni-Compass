@@ -112,6 +112,21 @@
    "what": "the chip's one run beside the count or in it",
    "where": "the monitor's own buttons"
   },
+  "beat": {
+   "label": "Beat",
+   "what": "the governor's full read of the state and its decision: every 5, 10, 15, 20, 30, 60, 75, 90 or 120 s in the heartbeat sweep's record; on a real governor its --interval (15 s at the factory)",
+   "where": "the monitor's own buttons"
+  },
+  "engine": {
+   "label": "Engine",
+   "what": "which engine's record the monitor reads: the engine that stands or the one before it",
+   "where": "the monitor's own buttons"
+  },
+  "against": {
+   "label": "Against",
+   "what": "what each reading is set against: native, or the same engine at another setting",
+   "where": "the monitor's own buttons"
+  },
   "gauge": {
    "label": "Gauge",
    "what": "which gauge of the run is shown",
@@ -1149,6 +1164,56 @@
      "docs/engine/build_live_engine.py"
     ],
     "moves": "the chosen repetition replayed decision by decision; native's own 15 s clock beats above"
+   }
+  },
+  {
+   "id": "beatCv",
+   "name": "The heartbeat sweep: every beat the governor can run at",
+   "layer": "cluster",
+   "what": "The governor's beat as a knob: what a decision every 5 to 120 s does against native, or against the same engine at 15 s or 60 s, on-site and in the cloud, gauge by gauge with its 95% interval, and what each beat costs the engine; our own model.",
+   "cls": "S",
+   "status": "model",
+   "awaiting": null,
+   "feed": {
+    "exporter": "tools/omni_exporter.py (the governor's own audit, Prometheus text format)",
+    "metrics": [
+     "omni_decisions_total",
+     "omni_decision_seconds",
+     "omni_last_decision_timestamp_seconds",
+     "omni_own_cpu_cores"
+    ],
+    "promql": [
+     "60 * rate(omni_decisions_total[5m])",
+     "omni_own_cpu_cores",
+     "time() - omni_last_decision_timestamp_seconds"
+    ]
+   },
+   "knobs": [
+    "beat",
+    "scenario",
+    "engine",
+    "against",
+    "gauge",
+    "kill"
+   ],
+   "grafana": {
+    "type": "timeseries",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawBeat, beatSetup",
+    "python": [
+     "tools/heartbeat_sweep.py",
+     "tools/toy_gate.py",
+     "omni_controller/controller.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none here: the sweep runs the shipped Python controller on the toy cluster; the C++ governor twin is held to the Python's at 60 s and at 15, 10 and 5 s (tests/test_cpp_governor_parity.py)",
+    "proof": [
+     "results/toy_gate/HEARTBEAT_SWEEP.md",
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "a cursor reads the beats in turn and names the row it holds; every button redraws the chart from the record"
    }
   },
   {

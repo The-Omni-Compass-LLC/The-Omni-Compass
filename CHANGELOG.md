@@ -2,6 +2,46 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-22 (evening, the live engine): the heartbeat sweep on the wall, every beat from 5 to 120 s; main's omni-v16 merged
+
+- **The founder's order** ("5, 15, 30, 60 ... Then give me 75 90 And after 90, I want 120 ... Heartbeat sweeps. With buttons in
+  my monitor canvas dashboard of that wired mechanism of the heartbeat ... somebody might want to tune it to be something
+  different"). The live engine's new monitor, *The heartbeat sweep: every beat the governor can run at* (`beatCv`, section 5c,
+  after the heart), has a button for:
+  - each beat (5, 10, 15, 20, 30, 60, 75, 90 and 120 s);
+  - each setting (on-site, the governor sizing the pool; in the cloud, the machines alone);
+  - each engine (omni-v16, the engine that stands; omni-v15, the one before it);
+  - each zero line (native, or the same engine at 15 s or at 60 s);
+  - each gauge.
+
+  Its tiles give the chosen beat whole. Each gauge's change shows with its 95% interval and its word, together with the engine's
+  own processor time, cluster reads and writes a day, and the fast check's rescues (the machines added only after a pod already
+  waited). The chart gives the chosen gauge at every beat, and a cursor reads the beats in turn. The registry, the Grafana wall
+  (61 panels), the builder's record (`beatsweep`) and the Live Engine Manual (section 12.4) carry it.
+- **The record** (`results/toy_gate/HEARTBEAT_SWEEP.md` and `.json`, our own model, class S). It is written by
+  `tools/heartbeat_sweep.py --table` from its runs (`results/toy_gate/HEARTBEAT_SWEEP_RUNS.jsonl`), and
+  `tests/test_heartbeat_sweep.py` writes it again from them byte for byte. Its design:
+  - Eight seeds of a day at each beat, paired with native and read by the toy gate's rule.
+  - The sweep carries its own cloud plant, so every engine runs on the same one.
+  - A run counts the fast check's rescues from its own audit.
+
+  **What it reads.** On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in pods waiting (−83.5%
+  at 5 to 15 s, −72.9% at 60 s, −57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power given); a beat slower
+  than 60 s waits more than the factory's 15 s (+86% to +160%, LOSS at 90 s) for at most 0.4 points fewer machines than 60 s,
+  and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines alone, 5 to 15 s cut the
+  machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next version's list, as
+  omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%. omni-v15, its rules
+  counted in beats, reads the same at 60 s and slower, and in the cloud at 5 to 15 s waits more (+20.5% to +22.2%, LOSS).
+- **Main's omni-v16 merged** (digest `5c5502f12b1c0ce4`, landed on main by another session on the founder's words). This branch
+  had built the same order in parallel without seeing it. Main's engine is taken whole, and the parallel build's own files are
+  reset to main's or removed. Its findings were handed to the work on the next version, through its toy gate:
+  - the fleet law's dwell restated in seconds;
+  - the cloud's order for machines already deleted;
+  - the closure law's warm reserve.
+
+  The live page, its builder, its registry and the Live Engine Manual keep this branch's work, with main's version words carried
+  in.
+
 ## 2026-10-22 (afternoon): the Azure sets back on; the conductor starts runs again; the levers rig at the brain's minutes
 
 - **The founder's answer.** Asked whether the person whose Azure account the login bills agreed to its use, he answered "Yes yes

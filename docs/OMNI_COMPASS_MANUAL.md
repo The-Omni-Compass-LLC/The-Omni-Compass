@@ -198,6 +198,15 @@ then add on, retune, upgrade or tune down any muscle or any combination of muscl
 service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
 published ones.
 
+**The live engine's knobs.** The live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`; its own book, the Live
+Engine Manual) is a live tuning engine beside this one tuned engine: its knobs (the dial, the demand, the noise, the
+sense delay, the faults, the speed, the master switch, each muscle's own switch, the heartbeat, every monitor's own
+buttons) turn the engine in real time, so the mechanism of action can be watched under other settings, native alone,
+Omni-Compass on top, or both side by side. What a knob shows is that configuration's own reading, our own model (class
+S), never a benchmark result; the benchmarks prove the factory tune only, the tune found and confirmed as the best state
+for the organism in our own models before any real run. Like any engine, turn one part and the output moves: a changed
+tune's results are its own.
+
 **The wiring declaration.** Omni-Compass acts only through the wires it is given. A wrong reading, a wrong or shared
 lever, a wrong range, or a service line set for another workload makes it do exactly what its law says with the wrong
 information. It cannot be slapped on. If your paired receipts differ from the published benchmarks in direction, the
@@ -452,7 +461,7 @@ loss.
 Read the rest of the front matter before you touch a wire. It tells you what you are looking at and how to read
 what it tells you.
 
-## Introduction: The Problem, the Idea and What This Manual Covers
+## Introduction: The Idea and What This Manual Covers
 
 **The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
 Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
@@ -616,8 +625,8 @@ Read as one sentence: Omni-Compass takes the system in through a Data Exchange (
 
 ## Table of Contents
 
-**Front Matter** - The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
-Prelude: A Night on the Cluster; Introduction: The Problem, the Idea and What This Manual Covers; Quick Reference: The
+**Front Matter** - The Problem and the Answer; The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
+Prelude: A Night on the Cluster; Introduction: The Idea and What This Manual Covers; Quick Reference: The
 Card for the Glove Box
 
 **Part I - The Governor, from the Outside**
