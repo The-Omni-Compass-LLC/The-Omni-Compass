@@ -399,7 +399,7 @@ class GpuGovernor:
                 e = self.eng[g]; e.current_cap = min(1.0, r["enforced"] / self.start[g])
                 obs = {"queue_ratio": min(2.0, lp), "load_ratio": r["util"], "power_stress": r["draw"] / self.start[g],
                        "thermal": r["temp"] / a.temp_limit, "network_stress": 0.0, "drift_ratio": 0.0,
-                       "stale": 0.0, "security_block": 0.0}
+                       "stale": 0.0, "security_block": 0.0, "slo_clean": slo_clean}   # the brain sees the line's clear time too (omni-v15)
                 # the chain, recorded whole: what the device said, the state it puts the engine in, what I had projected
                 # for this moment, the projection for the next, what the engine asked for, what the shield allowed
                 seen = assimilate(e.x, observe_vector(obs, 0), copy.deepcopy(e.p))

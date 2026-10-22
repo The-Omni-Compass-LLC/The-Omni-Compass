@@ -47,12 +47,29 @@ class Fingerprints(unittest.TestCase):
         self.assertIsNone(ov.version_of(files))
         self.assertEqual(ov.version_before(files), (None, []))
 
+    def test_the_late_wires_count_only_for_the_versions_that_list_them(self):
+        """omni-v15 took eight wires into the fingerprint. A tree with omni-v14's 47 files byte for byte reads omni-v14
+        whatever those eight hold (its fingerprint never covered them); any other file omni-v14 does not list still makes
+        it no version; and on omni-v15, which lists them, one changed byte in a late wire is no version."""
+        v14 = json.loads(ov.VERSIONS["v14"].read_text())["files"]
+        self.assertFalse(set(v14) & set(ov.LATE_WIRES), "omni-v14 was declared before the late wires")
+        files = dict(v14); files.update({n: "2" * 64 for n in ov.LATE_WIRES})
+        self.assertEqual(ov.version_of(files), "omni-v14")
+        files["omni_controller/new_rule.py"] = "3" * 64
+        self.assertIsNone(ov.version_of(files))
+        self.assertEqual(ov.version_before(files), (None, []))
+        v15 = json.loads(ov.VERSIONS["v15"].read_text())["files"]
+        self.assertTrue(set(ov.LATE_WIRES) <= set(v15), "omni-v15 lists every late wire")
+        files = dict(v15); files["tools/run_redis.py"] = "4" * 64
+        self.assertIsNone(ov.version_of(files))
+        self.assertEqual(ov.version_before(files), (None, []))
+
 
 def main():
     r = unittest.TextTestRunner(verbosity=0, stream=open("/dev/null", "w")).run(unittest.defaultTestLoader.loadTestsFromTestCase(Fingerprints))
     assert r.wasSuccessful(), f"{len(r.failures)} failures, {len(r.errors)} errors in tests/test_omni_version.py"
     print("PASS  engine fingerprints: this checkout is one declared version; a commit before a runner was written reads as that version "
-          "minus the runner; a changed byte or an extra engine file is no version")
+          "minus the runner; a changed byte or an extra engine file is no version; the late wires count only for the versions that list them")
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-What the newest three-run tables (omni-v11's; omni-v14, the engine that stands since 21 October, runs every benchmark again)
+What the newest three-run tables (omni-v11's; omni-v15, the engine that stands since 21 October, evening, runs every benchmark again)
 can and cannot support, written the way a referee reads a
 study: who ran it, what could bias a comparison, what a gauge really measures, how often the reading rule could be fooled,
 and how far a result travels. Each limitation names what would remove it. Run and scored by The Omni-Compass LLC's own
@@ -91,7 +91,7 @@ code. No outside party has reviewed or approved these results.
 
 ## 6. The engine changed often
 
-Ten versions in ten days (omni-v5 to omni-v14, `docs/CHANGE_CONTROL.md`), each a fault found in a real run and fixed.
+Eleven versions in eleven days (omni-v5 to omni-v15, `docs/CHANGE_CONTROL.md`), each a fault found in a real run and fixed.
 No table mixes engines, and each benchmark runs again on every version; the cost is that each version's three-run tables
 take a day or more to land, so the newest tables of some benchmarks are an older engine's until they do.
 
