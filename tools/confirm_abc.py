@@ -33,7 +33,9 @@ ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-
 # tools/live_reps.py keys it, each cell the first against the second; unset, the Omni arm against native
 PAIR = None
 PAIR_WORDS = {"nativebare": "the organism alone", "compassbare": "Omni-Compass on the organism alone",
-              "native": "the orchestrator as shipped", "compass": "Omni-Compass on top of the orchestrator"}
+              "native": "the orchestrator as shipped", "compass": "Omni-Compass on top of the orchestrator",
+              # the decision pace (omni-v16, docs/PACE_PREREGISTRATION.md): compass15|compass, compass15 (against native)
+              **{f"compass{p}": f"Omni-Compass deciding every {p} s" for p in (15, 10, 5)}}
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge)"
 from tools.omni_index import CAPACITY as CAPACITY_RECORDED  # noqa: E402  (the same row's name in the tables written before 13 October)
 AIM_HIGHER = {CAPACITY, CAPACITY_RECORDED}
@@ -217,10 +219,11 @@ def main(argv=None):
          "the test itself is unstable there. Every row is shown, LOSS included.", "", OWN_RUNS, ""]
     if PAIR and "|" in PAIR:                               # one comparison of the four ways: the cells name its two arms
         first, second = PAIR.split("|")
+        src = ("the decision pace, `docs/PACE_PREREGISTRATION.md`" if first.startswith("compass") and first[7:].isdigit()
+               else "the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6")
         L += [f"**The comparison.** In this table \"omni\" stands for {PAIR_WORDS.get(first, first)} and \"native\" for "
               f"{PAIR_WORDS.get(second, second)}: each cell is the first against the second, paired within one repetition "
-              "(the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6), and each word is read by the gauge's aim "
-              "for the first.", ""]
+              f"({src}), and each word is read by the gauge's aim for the first.", ""]
     L += ["| Run | GitHub run | Commit | Engine | Paired repetitions |", "|---|---|---|---|---:|"]
     off, meta = [], []
     for tag, (run, _, n, _) in zip("ABC", runs):

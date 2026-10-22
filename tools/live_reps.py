@@ -733,11 +733,14 @@ def main(root):
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
+    # the decision pace (omni-v16): compass15, compass10, compass5 are the compass arm deciding every 15, 10 or 5 s
+    paces = sorted((a for a in runs if re.fullmatch(r"compass\d+", a)), key=lambda a: -int(a[7:]))
     cols = ([a for a in ("nativebare", "native") if a in runs] + tuned
-            + [a for a in ("watch", "omni", "compassbare", "compass", "strict") if a in runs])
+            + [a for a in ("watch", "omni", "compassbare", "compass") if a in runs] + paces + [a for a in ("strict",) if a in runs])
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",
              "nativebare": "the organism alone (no orchestrator)", "compassbare": "omni on the organism alone",
-             **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned}}
+             **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned},
+             **{a: f"omni, a decision every {a[7:]} s" for a in paces}}
     L += ["## All columns, mean over repetitions", "", "| Gauge | " + " | ".join(names[a] for a in cols) + " |",
           "|---|" + "---:|" * len(cols)]
     L += [f"| {LABEL.get(k, k)} | " + " | ".join(f"{out['means'][a][k]:.4g}" for a in cols) + " |" for k in keys]
@@ -757,6 +760,9 @@ def main(root):
     # every comparison: the arm, the arm it is read against, its key in the paired table, and its title; the four ways
     # (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6) add the organism alone, without and with Omni-Compass on top
     pairs = [(a, "native", a, None) for a in ("watch", "omni", "compass", "strict")] + [(a, b, f"{a}|{b}", t) for a, b, t in FOUR_WAYS]
+    # each pace against native, and against the compass arm at the default decision (60 s), paired in the repetition
+    pairs += [(a, "native", a, f"omni deciding every {a[7:]} s vs native") for a in paces]
+    pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni deciding every 60 s") for a in paces]
     for a, base, key, four in pairs:
         if a not in runs or base not in runs:
             continue
