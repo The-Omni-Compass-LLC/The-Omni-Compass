@@ -65,7 +65,7 @@ Receipt run(const Run& r) {                     // tools/engine_runs.py run_draw
   const double s_eq = stress_equilibrium(g.params().delta, g.params().alpha_s, g.params().beta_s);
   static const char* ORGANS[] = {"pods", "nodes", "cpufreq", "gpu", "power", "routing"};
   for (const Obs& o : r.obs) {
-    const Observation ob{o.q, o.load, o.power, o.thermal, o.network, o.drift, o.stale, o.security, 0};
+    const Observation ob{o.q, o.load, o.power, o.thermal, o.network, o.drift, o.stale, o.security, 0, o.slo};   // the line's clear flag reaches the brain (omni-v15)
     const Directive d = g.step(ob, 1.0, 20);   // the Python's governor holds its cap at 1.0 and its 20 machines through these runs
     const State& x = g.state();
     NervousInputs ni;                           // omnicompass/nervous_system.from_governor

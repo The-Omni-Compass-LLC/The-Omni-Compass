@@ -154,6 +154,8 @@ def md_lines() -> list[str]:
     held = embedded(page, "heldout") or {}
     ledger = build.get("ledger") or {}
     eng, dig, commit, built = build.get("engine", ""), build.get("digest", ""), build.get("commit", "")[:12], build.get("built_at", "")
+    from tools.omni_version import VERSIONS
+    standing = f"omni-{next(iter(VERSIONS))}"    # the engine that stands: the version list's newest
     nmon = len(M["canvases"])
     out = [f"# {BOOK}", "", "How to read, operate, tune and watch the Omni-Compass live engine, native beside Omni-Compass, section by section, monitor by monitor and knob by knob", ""]
     out += ["## Front matter", "", "### What this book is", "",
@@ -254,7 +256,10 @@ def md_lines() -> list[str]:
             out += [f"- **Feed.** {feed}."]
             if m.get("knobs"):
                 out += ["- **Knobs.** " + "; ".join(f"{K[k]['label']}: {K[k]['what']}" if k in K else k for k in m["knobs"]) + "."]
-            rd, act = (x.replace("{engine}", eng) for x in READ.get(m.get("layer", ""), ("", "")))
+            # "the engine that stands" is the version list's newest (tools/omni_version.py, the one list the books read the
+            # engine from); the page's own build record says which engine its records were built on, and lags a landing until
+            # the page is rebuilt (21 October: omni-v15 landed while the page's records were still omni-v14's)
+            rd, act = (x.replace("{engine}", standing) for x in READ.get(m.get("layer", ""), ("", "")))
             if rd:
                 out += [f"- **How to read it.** {rd}", f"- **What to do with it.** {act}"]
             out += [""]

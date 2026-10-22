@@ -4,7 +4,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The engines, fingerprinted file by file: Omni v14, the engine that stands (OMNI_V14.json, docs/OMNI_V14.md), Omni v13 (OMNI_V13.json), Omni v12 (OMNI_V12.json), Omni v11 (OMNI_V11.json), Omni v10 (OMNI_V10.json), Omni v9
+"""The engines, fingerprinted file by file: Omni v15, the engine that stands (OMNI_V15.json, docs/OMNI_V15.md), Omni v14 (OMNI_V14.json), Omni v13 (OMNI_V13.json), Omni v12 (OMNI_V12.json), Omni v11 (OMNI_V11.json), Omni v10 (OMNI_V10.json), Omni v9
 (OMNI_V9.json), Omni v8 (OMNI_V8.json),
 Omni v7 (OMNI_V7.json),
 Omni v6 (OMNI_V6.json), Omni v5 (OMNI_V5.json,
@@ -13,7 +13,7 @@ docs/OMNI_V5.md), then the frozen v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V
 v5 is in active development its fingerprint is re-declared on each engine change, and no v5 result is published until the
 v5 freeze. No result is ever read across versions.
 
-  python3 tools/omni_version.py                 check this checkout: prints "omni-v14", "omni-v13", "omni-v12", "omni-v11", "omni-v10", "omni-v9", "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
+  python3 tools/omni_version.py                 check this checkout: prints "omni-v15", "omni-v14", "omni-v13", "omni-v12", "omni-v11", "omni-v10", "omni-v9", "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
   python3 tools/omni_version.py --commit <sha>  the same, for the engine as it stood at a git commit (any result's run)
   python3 tools/omni_version.py --write v5      write OMNI_V5.json from this checkout (only when a new version is declared or re-declared in development)
 
@@ -30,9 +30,14 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"v14": ROOT / "OMNI_V14.json", "v13": ROOT / "OMNI_V13.json", "v12": ROOT / "OMNI_V12.json", "v11": ROOT / "OMNI_V11.json", "v10": ROOT / "OMNI_V10.json", "v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
+VERSIONS = {"v15": ROOT / "OMNI_V15.json", "v14": ROOT / "OMNI_V14.json", "v13": ROOT / "OMNI_V13.json", "v12": ROOT / "OMNI_V12.json", "v11": ROOT / "OMNI_V11.json", "v10": ROOT / "OMNI_V10.json", "v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
             "v1": ROOT / "OMNI_V1.json"}     # newest first
-SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py")
+# omni-v15 (21 October): every wire that holds a governor's rules is in the fingerprint, so no rule can change without the
+# version changing (docs/CHANGE_CONTROL.md, "Gaps this page names"). A version declared before them never covered them
+LATE_WIRES = ("tools/run_redis.py", "tools/run_kafka.py", "tools/run_pgbench.py", "tools/run_sysbench.py", "tools/run_ycsb.py",
+              "tools/run_swarm.py", "tools/run_mujoco.py", "tools/run_cpu_power.py")
+SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py",
+         *LATE_WIRES)
 
 
 def engine_files(commit: str | None = None) -> dict[str, str]:
@@ -55,13 +60,32 @@ def digest(files: dict[str, str]) -> str:
     return hashlib.sha256("".join(f"{h}  {n}\n" for n, h in sorted(files.items())).encode()).hexdigest()
 
 
+def own_files(files: dict[str, str], want: dict[str, str]) -> dict[str, str]:
+    """A tree's engine files as a version's fingerprint covers them. A version declared before omni-v15 took the late wires
+    into the scope (its list names none of them) is read without those eight files and only those: a tree carrying
+    omni-v14's 47 files byte for byte is omni-v14 whatever the late wires hold, because its fingerprint never covered them,
+    while any other file it does not list (a new rule, a new module) still makes it a different engine."""
+    if any(n in want for n in LATE_WIRES):
+        return dict(files)
+    return {n: h for n, h in files.items() if n not in LATE_WIRES}
+
+
+def version_match(files: dict[str, str]) -> tuple[str, dict] | None:
+    """('omni-vN', the version's record) for a set of engine files that carries a version's own files byte for byte, else None."""
+    for v, path in VERSIONS.items():
+        if not path.exists():
+            continue
+        rec = json.loads(path.read_text())
+        own = own_files(files, rec["files"])
+        if set(own) == set(rec["files"]) and digest(own) == rec["digest"]:
+            return f"omni-{v}", rec
+    return None
+
+
 def version_of(files: dict[str, str]) -> str | None:
     """'omni-v2', 'omni-v1' or None, for a set of engine files."""
-    d = digest(files)
-    for v, path in VERSIONS.items():
-        if path.exists() and json.loads(path.read_text())["digest"] == d:
-            return f"omni-{v}"
-    return None
+    m = version_match(files)
+    return m[0] if m else None
 
 
 def version_before(files: dict[str, str]) -> tuple[str | None, list[str]]:
@@ -71,8 +95,9 @@ def version_before(files: dict[str, str]) -> tuple[str | None, list[str]]:
         if not path.exists():
             continue
         want = json.loads(path.read_text())["files"]
-        missing = sorted(set(want) - set(files))
-        if missing and set(files) <= set(want) and all(want[n] == h for n, h in files.items()):
+        own = own_files(files, want)
+        missing = sorted(set(want) - set(own))
+        if missing and set(own) <= set(want) and all(want[n] == h for n, h in own.items()):
             return f"omni-{v}", missing
     return None, []
 
@@ -90,9 +115,9 @@ def main() -> int:
         VERSIONS[v].write_text(json.dumps({"version": f"omni-{v}", "digest": digest(files), "files": files}, indent=1) + "\n")
         print(f"{VERSIONS[v].name} written: {len(files)} files, digest {digest(files)[:16]}")
         return 0
-    v = version_of(files)
-    if v:
-        print(f"{v} (digest {digest(files)[:16]}, {len(files)} files)")
+    m = version_match(files)
+    if m:                                             # the version's own digest and file count, as its fingerprint records them
+        print(f"{m[0]} (digest {m[1]['digest'][:16]}, {len(m[1]['files'])} files)")
         return 0
     v, missing = version_before(files)
     if v:

@@ -48,8 +48,12 @@ QUEUE = {"queue: job wait, submitted to its first pod running, mean (s)",
 KEYS[KEYS.index("batch: worker machines in service after the queue finished, mean") + 1:KEYS.index("batch: worker machines in service after the queue finished, mean") + 1] = [
     "queue: job wait, submitted to its first pod running, mean (s)", "queue: job wait, submitted to its first pod running, 95th percentile (s)",
     "queue: job turnaround, submitted to done, mean (s)", "queue: jobs unfinished at the window's end"]
-# the robustness test only (ROBUST=kill, scripts/kind_robust.sh): the same 120 s after the kill mark in both arms
-ROBUST = {"robust: time over the line in the 120 s after the kill (% of samples)", "robust: failed requests in the 120 s after the kill (%)"}
+# the robustness test only (ROBUST=kill, scripts/kind_robust.sh): the same 300 s after the kill mark in both arms (120 s up to
+# omni-v14; omni-v15 reads 300 s, declared in docs/ROBUSTNESS_PREREGISTRATION.md before its runs: the one tail rise of the
+# omni-v11 kill test came 140 to 190 s after the kill, past the 120 s window)
+ROBUST_AFTER_KILL_S = 300
+ROBUST = {f"robust: time over the line in the {ROBUST_AFTER_KILL_S} s after the kill (% of samples)",
+          f"robust: failed requests in the {ROBUST_AFTER_KILL_S} s after the kill (%)"}
 KEYS += sorted(ROBUST)
 # the machine's own meter (METER=rapl, scripts/kind_bench.sh; a machine with the processor's RAPL counters only) beside
 # the declared model; and Kepler's readings of the same counters (KEPLER=1), shown beside it and never judged
@@ -430,7 +434,7 @@ def robust_decisions(d, window_s):
 
 
 def robust_window(d, slo):
-    """Both arms: in the 120 s after the kill mark, the share of response samples over the line or failed, and the share failed."""
+    """Both arms: in the ROBUST_AFTER_KILL_S after the kill mark, the share of response samples over the line or failed, and the share failed."""
     m = robust_marks(d)
     if "kill_epoch" not in m:
         return {}
@@ -439,12 +443,13 @@ def robust_window(d, slo):
     except (OSError, ValueError, IndexError):
         return {}
     k = m["kill_epoch"]
-    win = [r for r in rows if k <= t0 + float(r["elapsed_seconds"]) <= k + 120]
+    win = [r for r in rows if k <= t0 + float(r["elapsed_seconds"]) <= k + ROBUST_AFTER_KILL_S]
     if not win:
         return {}
     over = 100.0 * sum(1 for r in win if not (r.get("ok") == "1" and float(r["latency_ms"]) <= slo)) / len(win)
     failed = 100.0 * sum(1 for r in win if r.get("ok") != "1") / len(win)
-    return {"robust: time over the line in the 120 s after the kill (% of samples)": over, "robust: failed requests in the 120 s after the kill (%)": failed}
+    return {f"robust: time over the line in the {ROBUST_AFTER_KILL_S} s after the kill (% of samples)": over,
+            f"robust: failed requests in the {ROBUST_AFTER_KILL_S} s after the kill (%)": failed}
 
 
 def robust_memory(d):
@@ -486,7 +491,7 @@ def robust_table(root, cols):
          f"from the lease it left; the harness asks the cluster every 2 s until the HPA target, the replica range, every CPU limit, every worker "
          f"and the records are at the operator's. Preregistered: within {ROBUST_HANDBACK_S:.0f} s, or the repetition is marked. A second governor "
          f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
-         f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The 120 s after the kill mark are compared between the arms "
+         f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The {ROBUST_AFTER_KILL_S} s after the kill mark are compared between the arms "
          "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`). In the long run the governor's own audit gives its decisions against "
          f"the count its {ROBUST_INTERVAL_S:.0f} s interval predicts for the window (under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
          f"and its decision time (the gap between decisions less the interval it sleeps), mean of the last hour over the first (over {ROBUST_CYCLE_GROWTH} "
@@ -721,7 +726,7 @@ def main(root):
     two = any(not math.isnan(m.get("second app: failed requests (%)", float("nan"))) for m in out["means"].values())
     host = any(not math.isnan(m.get("host cores (the real machine under kind)", float("nan"))) for m in out["means"].values())
     bat = any(not math.isnan(m.get("batch: queue finished (s)", float("nan"))) for m in out["means"].values())
-    rob = any(not math.isnan(m.get("robust: failed requests in the 120 s after the kill (%)", float("nan"))) for m in out["means"].values())
+    rob = any(not math.isnan(m.get(f"robust: failed requests in the {ROBUST_AFTER_KILL_S} s after the kill (%)", float("nan"))) for m in out["means"].values())
     que = any(not math.isnan(m.get("queue: jobs unfinished at the window's end", float("nan"))) for m in out["means"].values())
     keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat) and (k not in ROBUST or rob)
             and (k not in QUEUE or que)]
