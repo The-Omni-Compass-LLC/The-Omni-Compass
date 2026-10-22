@@ -4,7 +4,6 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The approved campaign's dispatch boundaries and the v6 capacity regressions."""
-import hashlib
 import inspect
 import json
 import os
@@ -162,14 +161,19 @@ class ReleaseCampaign(unittest.TestCase):
         def fetched(d):                    # FETCH_HEAD as a fetch writes it (git 2.55 refuses update-ref on a pseudoref)
             sha = subprocess.run(['git', '-C', d, 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip()
             (Path(d) / '.git' / 'FETCH_HEAD').write_text(f"{sha}\t\tbranch 'main' of origin\n")
-        # on GitHub each tick fetches the branch's newest commit; its engine, by that commit's own fingerprints, decides
-        src = ROOT / 'omnicompass' / 'compass_law.py'
-        files = {'omnicompass/compass_law.py': hashlib.sha256(src.read_bytes()).hexdigest()}
-        digest = hashlib.sha256(''.join(f'{h}  {n}\n' for n, h in sorted(files.items())).encode()).hexdigest()
+        # on GitHub each tick fetches the branch's newest commit; its engine, read by that commit's own version tool over the
+        # tool's whole scope, decides. A tree with this checkout's engine (the late wires of omni-v15 among its files) reads
+        # as the version tool reads it: the conductor's old copy of the scope left them out, read omni-v15 and omni-v16 as
+        # unknown and started nothing (22 October)
+        from tools import omni_version as V
+        files = V.engine_files()
+        want = V.version_of(files) or 'unknown'
+        self.assertTrue(set(V.LATE_WIRES) <= set(files))
+        prints = [p.name for p in V.VERSIONS.values() if p.exists()]
         with tempfile.TemporaryDirectory() as d:
-            (Path(d) / 'omnicompass').mkdir()
-            (Path(d) / 'omnicompass' / 'compass_law.py').write_bytes(src.read_bytes())
-            (Path(d) / 'OMNI_V99.json').write_text(json.dumps({'version': 'omni-v99', 'digest': digest, 'files': files}))
+            for n in [*files, 'tools/omni_version.py', *prints]:
+                (Path(d) / n).parent.mkdir(parents=True, exist_ok=True)
+                (Path(d) / n).write_bytes((ROOT / n).read_bytes())
             git = ['git', '-C', d, '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false']
             subprocess.run(['git', 'init', '-q', d], check=True)
             subprocess.run(git + ['add', '-A'], check=True)
@@ -179,11 +183,17 @@ class ReleaseCampaign(unittest.TestCase):
             try:
                 grid.ROOT = Path(d)
                 with unittest.mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}):
-                    self.assertEqual(grid.engine(), 'omni-v99')
-                (Path(d) / 'omnicompass' / 'compass_law.py').write_text('changed\n')
-                subprocess.run(git + ['commit', '-q', '-am', 'y'], check=True)
-                fetched(d)
-                with unittest.mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}):
+                    self.assertEqual(grid.engine(), want)
+                    if want != 'unknown':
+                        # a tick that began before the engine landed: its own files hold an older version tool and no
+                        # fingerprint of the newest engine, and the fetched commit is still read by its own
+                        (Path(d) / 'tools' / 'omni_version.py').write_text('raise SystemExit(3)\n')
+                        (Path(d) / f'OMNI_V{want[6:]}.json').unlink()
+                        self.assertEqual(grid.engine(), want)
+                        subprocess.run(git + ['checkout', '-q', '--', '.'], check=True)
+                    (Path(d) / V.LATE_WIRES[0]).write_text('changed\n')
+                    subprocess.run(git + ['commit', '-q', '-am', 'y'], check=True)
+                    fetched(d)
                     self.assertEqual(grid.engine(), 'unknown')          # a commit no fingerprint matches starts nothing
             finally:
                 grid.ROOT = old
