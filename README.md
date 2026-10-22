@@ -120,14 +120,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-21 23:45 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V14_YCSB_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 44 EVEN, 0 where the runs disagree. |
-| 2026-10-21 23:45 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V14_YCSB_SERVICE.md) | Across 4 untouched workloads: 1 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 43 EVEN, 0 where the runs disagree. |
-| 2026-10-21 23:45 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V14_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 48 EVEN, 0 where the runs disagree. |
-| 2026-10-21 23:45 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V14_PGBENCH_SERVICE.md) | Across 3 workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 35 EVEN, 1 where the runs disagree. |
-| 2026-10-21 17:58 | [The engine's runs: 500 runs from the jump generator (base 993613928), one digest](results/engine_runs/ENGINE_RUNS_500_993613928.md) |  |
-| 2026-10-21 06:48 | [The engine's runs: 500 runs from the jump generator (base 902816710), one digest](results/engine_runs/ENGINE_RUNS_500_902816710.md) |  |
-| 2026-10-21 06:28 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-21 05:02 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V14_VS_V13.md) |  |
+| 2026-10-22 00:34 | [The engine's runs: 500 runs from the jump generator (base 1045605085), one digest](results/engine_runs/ENGINE_RUNS_500_1045605085.md) |  |
+| 2026-10-22 00:14 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-21 22:58 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V15_VS_V14.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -135,16 +130,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-22 00:05 | engine-runs | success | [39697166403](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39697166403) |
-| 2026-10-22 00:01 | group: ocm A (nativebare native compassbare compass) | success | [39680080910](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39680080910) |
-| 2026-10-22 00:00 | group: karmada A (nativebare native compassbare compass) | success | [39680072074](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39680072074) |
-| 2026-10-21 23:51 | godel: A (nativebare native compassbare compass) | success | [39677901734](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39677901734) |
-| 2026-10-21 23:51 | raw-sweep | success | [39695531368](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39695531368) |
-| 2026-10-21 23:45 | six x1 line orgs 6 runs 0+10 | success | [39695202278](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39695202278) |
-| 2026-10-21 23:44 | six x1 line orgs 7 runs 0+10 | success | [39695208573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39695208573) |
-| 2026-10-21 23:37 | big-organism-detached collect | failure | [39694622506](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39694622506) |
-| 2026-10-21 23:29 | six x1 line orgs 5 runs 0+10 | success | [39693510698](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39693510698) |
-| 2026-10-21 23:28 | six x1 line orgs 1 runs 0+10 | success | [39693483929](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39693483929) |
+| 2026-10-22 04:21 | grid | success | [39721861570](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39721861570) |
+| 2026-10-22 03:04 | six x100 line orgs 5 runs 0+10 | success | [39700177767](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700177767) |
+| 2026-10-22 02:31 | six x100 line orgs 6 runs 0+10 | success | [39700183533](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700183533) |
+| 2026-10-22 01:55 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 1+10 arms native compass split no window 1440 protocol 4 | failure | [39700194974](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700194974) |
+| 2026-10-22 01:23 | six x100 line orgs 3 runs 0+10 | success | [39700166030](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700166030) |
+| 2026-10-22 01:20 | six x100 line orgs 2 runs 0+10 | success | [39700160352](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700160352) |
+| 2026-10-22 01:18 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 4 | success | [39698560945](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39698560945) |
+| 2026-10-22 01:16 | six x100 line orgs 1 runs 0+10 | success | [39700154529](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700154529) |
+| 2026-10-22 01:10 | six x100 line orgs 4 runs 0+10 | success | [39700171834](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700171834) |
+| 2026-10-22 01:04 | live-engine | success | [39700537673](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700537673) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
