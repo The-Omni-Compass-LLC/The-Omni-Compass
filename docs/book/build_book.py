@@ -82,7 +82,7 @@ LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F" if LIVE else "Appendi
 INTRO = ("Introduction: The Idea and the Promise" if OWNER else
          "Introduction: The Page, Its Monitors and What This Manual Covers" if LIVE else
          "Introduction: The Idea and What This Manual Covers")
-PROBLEM = "The Problem and Omni-Compass's Solution"   # the front matter opens with it (the founder's order of 21 October)
+PROBLEM = "The Problem and the Answer"   # the front matter opens with it (the founder's order of 21 October)
 PRELUDE = "Prelude: A Night at the Wall" if LIVE else "Prelude: A Night on the Cluster"
 RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER else
                 "This book is the reading manual of the live engine page and carries no benchmark results of its own; every "
@@ -1657,7 +1657,7 @@ The book is in eight parts, and it can be read in two ways.
 
 | You are | Read |
 |---|---|
-| CEO, board member, investor | the Foreword, the Prelude, the Introduction, the Executive Summary, Part One, the Results to Date, and Part Eight |
+| CEO, board member, investor | the Problem and the Answer, the Foreword, the Prelude, the Introduction, the Executive Summary, Part One, the Results to Date, and Part Eight |
 | CTO, architect, head of platform | Parts One to Four, then the eight wiring levels in Part Five, then Part Seven |
 | The engineer wiring it | everything, in order. Do not skip the wire check or the watch level |
 | Data-center, facility or energy operator | the Quick Reference card, Part One's chapter on the reflex, Part Five (levels five to seven, the processor and the data center under the servers), Part Six |
@@ -1697,7 +1697,7 @@ The book is in eight parts, and it can be read in two ways.
 |---|---|
 | The operator on shift, at the wall | the Quick Reference card; Part Two (the wall and the switch); the chapter on a tile that reads LOSS in Part Seven; the troubleshooting appendix |
 | CTO, architect, head of platform | the front matter; Part Three (the whole organism and the benefit board); Part Seven (the mechanism side by side; what the page does not tell you) |
-| CEO, CFO, CIO, board member | the Foreword; the Disclosures; the bills and receipts in Part Three; the clouds in Part Four |
+| CEO, CFO, CIO, board member | the Problem and the Answer; the Foreword; the Disclosures; the bills and receipts in Part Three; the clouds in Part Four |
 | Site reliability engineer, on call | the Quick Reference card; Part Two; the official run playback in Part Four (the heart and the two tickers); the gauges appendix |
 | Control or plant engineer | Part Six (one cycle, the phase plane, the brain's state, the verdict, the specification); the console in Part Five |
 | Auditor, diligence team | Part One (a monitor, not a drawing); the trace from a tile to its record and the verification chapter; the page's own appraisal |

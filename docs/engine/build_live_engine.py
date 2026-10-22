@@ -18,6 +18,9 @@ Every record the page replays is made again here by the repository's own code on
   scen       docs/engine/export_scenarios.py: the GPU card (realms/gpu_card.py), the Linux host (tools/toy_gate.py's
              conveyance), every muscle and organism of the realms table (results/realms_v5) and every judged row of the
              newest engine's receipts (results/live/V<n>_*.md)
+  cpptwin    docs/engine/export_cpp_twins.py: the Python's own runs fed through the C++ engine (cpp/): every Python/C++
+             twin's parity check, every compass law the runs above wired (recorded as they ran), and the seven organisms
+             at the tune-down, every muscle's law, reading by reading through the C++ compass law
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
@@ -835,35 +838,47 @@ def records(runs: bool) -> dict:
     import export_cpu_model as XCPU
     import export_grafana as XGF
     import export_heldout as XHO
+    import export_cpp_twins as XT
+    now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # GitHub is read first: the ledger fetches the commit of every run it lists that the checkout lacks, and the runs' serial
+    # numbers below (export_runs.py serial: the full commit, where git knows it) must be read on the commits the build leaves
+    # behind, the same ones its --check reads them on; read after them, the check found commits the build had not
+    gh = github_runs() if runs else None
+    runs_read_at = now() if gh is not None else None
+    camp = campaign_reading() if gh is not None else None      # the campaign's runs, read with the run list
+    led = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
         import export_runs as XR
-        XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json")); XR.main(str(t / "r.json")); XW.main(str(t / "w.json"))
+        # every compass law the runs below wire is recorded as it runs, then fed through the C++ twin (export_cpp_twins.py)
+        with XT.LawRecorder() as laws:
+            XH.main(str(t / "h.json")); XC.main(str(t / "c.json")); XS.main(str(t / "s.json"))
+        XR.main(str(t / "r.json")); XW.main(str(t / "w.json"))
         XG.main(str(t / "g.json")); XCPU.main(str(t / "cpu.json")); XHO.main(str(t / "ho.json"))
-        h, c, s, rr, wh, gpu, cpu, ho = (json.loads((t / f).read_text(encoding="utf-8")) for f in ("h.json", "c.json", "s.json", "r.json", "w.json", "g.json", "cpu.json", "ho.json"))
-        # the monitor registry with the wall's Grafana dashboard (written to deploy/grafana/omni-compass-wall.json by the build, read back by a check)
-        reg = json.loads((HERE / "monitors.json").read_text(encoding="utf-8"))
-        reg["grafana"] = XGF.main(str(t / "wall.json")) if CHECKING else XGF.main()
         # the Python's runs (tools/engine_runs.py): the newest record, for the page to run the same runs and compare
         er_files = sorted((ROOT / "results" / "engine_runs").glob("ENGINE_RUNS_*.json"),     # the newest written last, whatever its base
                           key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("written", ""), f.name))
         eruns = json.loads(er_files[-1].read_text(encoding="utf-8")) if er_files else {"missing": "results/engine_runs"}
         if er_files:
             eruns["file"] = str(er_files[-1].relative_to(ROOT))
+        # the same record's set through the C++ engine at this build (cpp/tools/engine_runs.cpp), receipt by receipt
+        XT.main(str(t / "x.json"), live_laws=laws.laws, engine_runs=eruns if er_files else None)
+        h, c, s, rr, wh, gpu, cpu, ho, x = (json.loads((t / f).read_text(encoding="utf-8")) for f in
+                                           ("h.json", "c.json", "s.json", "r.json", "w.json", "g.json", "cpu.json", "ho.json", "x.json"))
+        # the monitor registry with the wall's Grafana dashboard (written to deploy/grafana/omni-compass-wall.json by the build, read back by a check)
+        reg = json.loads((HERE / "monitors.json").read_text(encoding="utf-8"))
+        reg["grafana"] = XGF.main(str(t / "wall.json")) if CHECKING else XGF.main()
     name, digest = engine()
-    now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    gh = github_runs() if runs else None
-    camp = campaign_reading() if gh is not None else None      # the campaign's runs, read with the run list
     from tools.readings import SIZE_FLOOR
     build = {"engine": name, "digest": digest, "commit": git("rev-parse", "HEAD"), "floor": SIZE_FLOOR,
              "built_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
              "realms_engine": s["realms"]["run"]["engine"], "receipts_engines": sorted({r["engine"] for r in s["receipts"]}),
              # GitHub's running and queued runs, with the moment they were read; None where this build did not read them (no token)
-             "runs": gh or [], "runs_read_at": now() if gh is not None else None}
+             "runs": gh or [], "runs_read_at": runs_read_at}
     build["board"] = board(build["runs"], camp)
-    build["ledger"] = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
+    build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
-            "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho}
+            "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x}
 
 
 def embedded(page: str, key: str):
@@ -872,6 +887,27 @@ def embedded(page: str, key: str):
         return None
     a = page.index(tag) + len(tag)
     return json.loads(page[a:page.index("</script>", a)])
+
+
+def first_difference(a, b, path="$"):
+    """The first place two records differ, as (path, a's value, b's value) cut short, or None where they are equal."""
+    if a == b:
+        return None
+    if isinstance(a, dict) and isinstance(b, dict):
+        for k in sorted(set(a) | set(b), key=str):
+            if k not in a or k not in b:
+                return f"{path}.{k}", repr(a.get(k, "<absent>"))[:120], repr(b.get(k, "<absent>"))[:120]
+            d = first_difference(a[k], b[k], f"{path}.{k}")
+            if d:
+                return d
+    elif isinstance(a, list) and isinstance(b, list):
+        for i, (x, y) in enumerate(zip(a, b)):
+            d = first_difference(x, y, f"{path}[{i}]")
+            if d:
+                return d
+        if len(a) != len(b):
+            return f"{path} (length)", str(len(a)), str(len(b))
+    return path, repr(a)[:120], repr(b)[:120]
 
 
 def inject(page: str, key: str, value) -> str:
@@ -996,7 +1032,8 @@ def main() -> int:
         print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout") if embedded(page, k) != rec[k]]
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin")
+               if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
         # the ledger, the commit and the time) is a reading with its own read time, not rebuilt by a check
@@ -1007,8 +1044,12 @@ def main() -> int:
         if not write_appraisal(rec, check=True):
             bad.append("the appraisal's counts (docs/engine/APPRAISAL.md)")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
+        for k in bad:
+            where = first_difference(embedded(page, k), rec[k])
+            if where:
+                print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout"):
+    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

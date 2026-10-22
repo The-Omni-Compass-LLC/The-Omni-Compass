@@ -337,7 +337,7 @@ def main() -> int:
         data["cpp"] = {"tool": "cpp/tools/engine_runs.cpp (oc_engine_runs)", "digest": c["digest"], "same": c["digest"] == dg and len(c["runs"]) == len(runs),
                        "largest_difference": max(diffs, default=0.0), "agree": sum(1 for x in diffs if x < 1e-9), "diff": [float(f"{x:.1e}") for x in diffs],
                        "twins": "omnicompass::Governor (sense, assimilate, the brain's RK4) and omnicompass::authority (the nervous system); "
-                                "the compass law and the verdict's interval rule as the page carries them"}
+                                "omnicompass::CompassLaw and omnicompass::Verdict (cpp/src/compass_law.cpp, cpp/src/verdict.cpp), sealed twins of their Python"}
         if not data["cpp"]["same"]:
             print(f"the C++ harness DIFFERS from the Python: digest {c['digest'][:16]}… against {dg[:16]}…, largest difference {data['cpp']['largest_difference']:.1e}")
     if os.environ.get("GITHUB_RUN_ID"):   # made on GitHub: the run that made it, so the page links the record to it

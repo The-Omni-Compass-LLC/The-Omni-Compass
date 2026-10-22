@@ -21,83 +21,57 @@ All patents, copyrights and trademarks covering the Omni-Compass engine, its mat
 
 # FRONT MATTER
 
-## The Problem and Omni-Compass's Solution
+## The Problem and the Answer
 
-**What the whole industry faces.** Demand for computing is growing faster than the power, the machines and the budgets
-built to carry it. The International Energy Agency puts the world's data centres at about 415 TWh of electricity in 2024,
-around 1.5% of all the electricity the world used, and expects that to more than double, to about 945 TWh, by 2030, with
-artificial intelligence the largest driver. In the United States, Lawrence Berkeley National Laboratory counts 176 TWh in
-2023, 4.4% of the country's electricity, and between 6.7% and 12% by 2028. The usual answer is to build more: more
-machines, more megawatts, more cooling and a larger bill.
+**What the whole industry faces.** Every computing system in service, from one server to a cloud region, from a GPU to a
+building's chillers, a grid feeder or a robot cell, is run by a stack of native controllers: the Kubernetes autoscalers and
+scheduler, the cloud's node pools, the GPU's power and clock firmware, the database's cache and connection pools, the
+building's cooling loops, the battery's management system, the servo's loop. Each was designed and tuned alone, against its own
+setpoint, with margins sized for the worst case it might meet. Three costs follow, on every stack:
 
-**Much of what is built sits idle.** Across the Kubernetes clusters Cast AI measured in 2025, the average processor was 8%
-busy and the average memory 20% used, read before its own automation was switched on. The organizations Flexera surveyed
-estimate that 29% of what they spend on cloud infrastructure and platforms is wasted.
+1. **Capacity held idle.** Worst-case margins stay in place through the common case. Machines, power caps, caches and cooling
+   run far inside their limits, and the room between the operating point and the limit is paid for and seldom used.
+2. **Late reaction.** Reactive loops act on averaged, lagging signals and wait out deliberate cooldowns, so queues and
+   response-time tails form before capacity arrives.
+3. **Loops at cross purposes.** The loops share power, cooling, connections and memory. One loop's correction is another
+   loop's disturbance, and no loop sees the whole.
 
-**Not short of control, short of coordination.** In every realm (compute, AI and the cloud; physics, robotics and
-autonomy; energy, facilities and industry; distribution and specialized systems) each machine already runs under local
-feedback loops: horizontal autoscalers, firmware power and clock governors, building-management loops,
-battery-management systems, connection pools, servo controllers. Each loop is tuned on its own, against its own setpoint,
-with margins sized for a worst case. Four costs follow, and every operator pays them:
+Demand for computing, above all for AI and the cloud, is growing faster than the power, cooling and hardware that can be built
+for it. The usual answer is to add: more machines, more power, more people watching thresholds. Replacing the native
+controllers is not an answer most operators will take: they are proven, often certified, and the people on call know them.
 
-- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
-  recomputes its replicas every 15 seconds by default and damps its scale-downs over a 5-minute stabilization window; new
-  pods then need time to schedule and start. Queues form before capacity arrives.
-- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
-  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
-  rarely used.
-- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
-  is another loop's disturbance: more web replicas saturate the database's connections; more cooling pushes a power feed
-  toward its limit.
-- **The gaps closed by hand.** Operators close them with fixed settings, runbooks, alerts and on-call rotations, and the
-  settings go stale as the load moves. That is safe, and it leaves the region between the operating point and the safe
-  boundary unused nearly all of the time.
+**What Omni-Compass does about it.** Omni-Compass is a supervisory governor. It sits on top of those native controllers and
+never replaces them. It plugs into each setting a native controller already exposes, through a two-way plug (one wire in, the
+reading; one wire out, the setting), takes a snapshot of every setting before its first write, and governs the whole stack as
+one body, the organism: every muscle driven as far as its own limit and never past it, and, on the engine that stands, never
+below native; where it cannot bring a muscle a GAIN, that muscle stays native. It acts before a line is crossed instead of
+after, reads back every write, puts every give-back to its own trial, records every decision with its reason, walks every
+setting home if it stops (the lease) and stops at once on the kill switch. Its first rule is do no harm, judged at the
+organism: never less work or health than native (`DISCLOSURES.md`, section 3). The aim is the one headline: more work,
+faster, on fewer machines, with less energy, from the hardware and the controllers already in place; in a cloud, the same
+work for a smaller bill.
 
-**Omni-Compass's solution: govern what is built before building more.** Omni-Compass is a supervisory governor. It
-sits on top of every native controller and never in place of one; native keeps running underneath, always. It treats each
-setting a native controller already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool
-size) as a muscle, and the whole stack as one body, the organism. Through a two-way plug, one wire in (the readings native
-already reports) and one wire out (the settings native already exposes), it reads every muscle, places each reading in the
-muscle's own band, from calm to its line (the limit it must not cross: a response time, a temperature, a feed's rating),
-and moves each setting one bounded, smooth step at a time. By default every muscle is driven up to its own limit, never
-past it and never below native; every write is read back; every give-back is tried in its own paired trial (the muscle with and without it, under the same load) and undone if the
-muscle loses by it; a raise is held inside the muscle's own bounds and judged afterwards by the three-run tables; and
-wherever no gain can be brought, the muscle stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
-inside its own cushion. The aim is the headline the record is read against: more work, faster, on fewer machines, with less energy,
-combined into one number, the Omni index. Where Omni-Compass takes more energy to buy more work or speed, that energy is shown beside
-what it bought, as power given, and never called a loss.
+**What the record shows so far.** Every claim is a paired comparison of two arms, native and Omni-Compass on top of native,
+on the same machines with the same work, run three separate times (A, B and C) and read GAIN, EVEN or LOSS by what each gauge
+is for; every row is kept, LOSS included. On real machines (class L, live software), the combined Omni index read +4.3%, GAIN,
+and the service reading alone +11.9%, GAIN, the same in all three of our runs (`results/OMNI_INDEX.md`, 21 October; each test
+read from its own engine's newest three-run table, none pooled across engines). The rows that read LOSS stand in their tables
+with their causes, such as the pod start wait on the kind rig (`docs/POD_START_WAIT.md`). The 1,107 muscles of the catalog are
+modelled (class S) and are never shown as proof of hardware. The engine is written twice, in Python and in C++, and the
+Python's 500 seeded runs through the C++ harness are identical to the last bit (`cpp/tools/engine_runs.cpp`; GitHub
+reruns the 500 on every change to the harness, the engine's C++ or the page, and every verify reruns 50 of them). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved
+these results.
 
-**How it addresses each cost.**
+**What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
+run on. It does not make a system immune to failure, delay or drift: it keeps each muscle inside its own limits and shows, row
+by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
+differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
 
-| What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
-|---|---|---|
-| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its full read of the state every 15 seconds, the autoscaler's own pace, and its fast checks every 5 seconds) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
-| **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
-| **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion, one trial at a time inside a body | every muscle judged on itself, and the organism judged whole |
-| **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
-
-**What it does not do.** It replaces no controller, and it creates no capacity a machine does not have: it uses the
-capacity already there, each muscle to its own limit. It promises no number on a system it has not run on: the only number
-that applies to a system is the one that system's own paired runs produce. The outside figures above are their authors'
-own, quoted for scale; none was measured, checked or endorsed by The Omni-Compass LLC, and none is a result of
-Omni-Compass.
-
-**How it is held to account.** Every benchmark has two arms, native and Omni-Compass on top of native, on the same
-machines with the same work, run three separate times. Every reading is one word, GAIN, EVEN or LOSS, decided by what the
-gauge is for (the key, in this front matter); every result carries its evidence class (**P** a physical meter, **L** live
-software, **S** our own models, never shown as proof of hardware); and every row is shown, LOSS included. The governing
-rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the aim is an organism never left turning out less
-than native, nor less healthy; where a row reads LOSS against native, the row stays, its cause is found and fixed, and the
-test runs again. Where the record stands on the engine that stands is the Executive Summary, later in this front matter; the
-live engine page plays the same record back in motion; the Introduction takes the solution apart, step by step.
-
-**The outside sources.** International Energy Agency, *Energy and AI* (April 2025), its executive summary. Lawrence
-Berkeley National Laboratory, *2024 United States Data Center Energy Usage Report* (December 2024), prepared for the U.S.
-Department of Energy. Cast AI, *2026 State of Kubernetes Optimization Report*: a seller of Kubernetes optimization,
-reporting its own customers' clusters as they ran before its automation. Flexera, *2026 State of the Cloud Report* (March
-2026): a survey of 753 cloud decision-makers and users, the figure their own estimate. The Kubernetes documentation,
-*Horizontal Pod Autoscaling*: the controller's defaults.
-
+**What is protected, and how.** Omni-Compass belongs to The Omni-Compass LLC. Its source, manuals and records are its
+copyrighted work; all patents, copyrights and trademarks filed in the USA. The repository is licensed for Evaluation and
+Simulation use only (`LICENSE`); any commercial use, monetization or production use requires a signed, paid Omni-Compass
+Enterprise License (`ENTERPRISE_LICENSE.md`). What a licensee acquires is the working whole: the engine, the wiring and the
+factory card of every muscle, the harness that measures it against native, and the receipts.
 
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
@@ -377,7 +351,7 @@ This is the Owner's Manual, the master: the engine's book, and the vessel's with
 
 | You are | Read |
 |---|---|
-| CEO, board member, investor | Foreword; Part I (sections 1-3); section 14 (evidence); section 15 (the frozen engines and the three-run rule); section 17 (license); the Executive Summary below |
+| CEO, board member, investor | The Problem and the Answer; Foreword; Part I (sections 1-3); section 14 (evidence); section 15 (the frozen engines and the three-run rule); section 17 (license); the Executive Summary below |
 | CFO, CIO | section 3 (where the value comes from; 3.4 the arithmetic of the benefit; 3.5 where the evidence stands, read honestly); section 16.3 (the bill on a real cloud); section 14 (what a receipt proves and what it does not); "The Economics of a Receipt" and "Due Diligence"; section 17 and the chapters bound after it (the Enterprise License's standard terms, the patents and trademarks, the security policy) |
 | CTO, architect, head of platform | Parts I-III; section 9 (wiring levels) to plan the rollout; Part VI |
 | The engineer wiring it | Everything, in order. Do not skip the wire check (section 8) or the watch level (section 9, level 1) |
@@ -528,9 +502,25 @@ what it tells you.
 
 ## Introduction: The Idea and the Promise
 
-The problem the whole industry faces, and Omni-Compass's solution in brief, stand at the head of this front matter. This
-introduction takes the solution apart: the idea in its five steps, what Omni-Compass is not, the promise, what it
-governs and what you need before you wire it.
+**The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
+Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
+power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
+Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
+follow, and every operator pays them:
+
+- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
+  recomputes its desired replicas from averaged utilization on a sync period (15 seconds by default) and damps its
+  decisions with stabilization windows; new pods then need time to schedule and start. Queues form before capacity
+  arrives.
+- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
+  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
+  rarely used.
+- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
+  is another loop's disturbance. More web replicas saturate the database's connections; more cooling pushes a power feed
+  toward its limit.
+
+Operators close these gaps by hand, with fixed settings and runbooks. That is safe, and it leaves the region between the
+nominal operating point and the safe boundary unused nearly all of the time.
 
 **The idea.** Close one supervisory loop around the native loops. Omni-Compass treats each setting a native controller
 already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool size) as an actuator, each
@@ -690,7 +680,7 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v13, fingerprint 0088837333c6f0fc (47 files).
+- **The engine on this checkout:** omni-v15, fingerprint 0a53cdd7a558f803 (55 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -705,7 +695,7 @@ installed is a quarter off the bill.
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v13): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v15): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
@@ -760,7 +750,7 @@ written before the run, counted only when all three of our runs agree, and repor
 
 ## Table of Contents
 
-**Front Matter** - The Problem and Omni-Compass's Solution; The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
+**Front Matter** - The Problem and the Answer; The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
 Prelude: A Night on the Cluster; Introduction: The Idea and the Promise; Quick Reference: The Card for the
 Glove Box; Executive Summary
 
@@ -1351,14 +1341,18 @@ and the other as power given in all three of our runs, because that is what happ
 ### 3.5 Where the evidence stands today, read honestly
 
 Every number below is from a three-run table, each row naming the engine it ran on, with its evidence class and the
-question a referee is entitled to ask about it. The engine that stands is **omni-v13** (`OMNI_V13.json`, digest
-`0088837333c6f0fc`, on main since 20 October by the founder's order): omni-v8 (a battery whose building simulates power outages
+question a referee is entitled to ask about it. The engine that stands is **omni-v15** (`OMNI_V15.json`, digest
+`0a53cdd7a558f803`, on main since 21 October, evening, by the founder's standing order): omni-v8 (a battery whose building simulates power outages
 stays native, section 3.6) with the CityLearn battery wire reading the coming hour and every interval on the exact Student t
 quantile (omni-v9, `docs/OMNI_V9.md`), the wire's glide at the speed that cuts the bill most with no LOSS (omni-v10,
 `docs/OMNI_V10.md`), the Kubernetes governor holding on a reading with no machine in service (omni-v11, `docs/OMNI_V11.md`), and a raise the cluster's
 admission refused held until something changes, with the swarm's reflex acting at once (omni-v12, `docs/OMNI_V12.md`), and the
 CPU limits the conveyance gave handed back on a shared host at its top beside another workload's room, every other pod counted by
-its own limit (omni-v13, `docs/OMNI_V13.md`). No table has yet landed on omni-v13; every benchmark runs again on it from 20:31 UTC on 20 October.
+its own limit (omni-v13, `docs/OMNI_V13.md`), and the
+operator's own commands run without a shell unless they hold one's syntax, and a knob that leaves any muscle native (omni-v14,
+`docs/OMNI_V14.md`), and the brain's request for the power cap trimming only while the response line has been clean for the
+governor's own clear time, with every wire that holds a governor's rules inside the fingerprint (omni-v15, `docs/OMNI_V15.md`).
+No table has yet landed on omni-v15; every benchmark runs again on it from 02:30 UTC on 22 October.
 The governors' first tables, on omni-v12, read two LOSS rows: KubeRay's queue and tail with the organism alone, root-caused to the
 conveyance and fixed in omni-v13 (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11), and Crane's total pod start wait, a sum of
 pods started and the wait per pod, which the metric-aims audit rules on in writing before any table is read by it.
@@ -3648,7 +3642,7 @@ or approved these results.
   the discomfort are native's to the last digit. Two rows read "the runs differ" on the time uncomfortable, though the paired
   change is exactly zero in every run: CityLearn's own value moved by at most 3.6 × 10⁻⁵ between runs, in both arms alike.
   In all, 27 score-rows GAIN, 1 power given and no LOSS. The wire's road since then: omni-v9 reads the coming hour, and omni-v10
-  glides at 0.0875 an hour (`docs/OMNI_V8.md` to `docs/OMNI_V10.md`); omni-v11, omni-v12 and omni-v13, the engine that stands, carry it unchanged.
+  glides at 0.0875 an hour (`docs/OMNI_V8.md` to `docs/OMNI_V10.md`); omni-v11 to omni-v15, the engine that stands, carry it unchanged.
 
 ### 16.6 The one number, and the table
 
@@ -3686,7 +3680,7 @@ happened to work. The numbers of earlier engines are the road, in `docs/history`
 | Drone swarms (omni-v11) | S | energy a mission −7% to −20%, missions a charge +8% to +25%, GAIN; the closest approach spent to about 0.16 m (shown); collisions on a mission draw outside the counted cells, a fault in the wire fixed in omni-v12, its runs under way (section 16.5) | `results/live/V11_SWARM.md` |
 | Buildings with batteries (omni-v11) | S | 27 score-rows GAIN, 1 power given, no LOSS; the batteries of the outage districts native | `results/live/V11_CITYLEARN.md` |
 
-**Running now and next.** Every benchmark runs again on omni-v13, the engine that stands, released by the conductor
+**Running now and next.** Every benchmark runs again on omni-v15, the engine that stands, released by the conductor
 (`scripts/dispatch_grid.py`, `scripts/reruns.txt`: A of every benchmark, then B, then C), the steady and wandering Kubernetes
 tests among them; Azure one run at a time in its region (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day;
 A, B and C); the grid with the real cluster inside on GitHub's free runners. The runs of earlier engines already started
@@ -3707,7 +3701,7 @@ GAIN and LOSS (or power given) both hold in all three of our runs, a trade shown
 its realms label (`results/realms_v5`): a GAIN on work, speed or misses is write, the energy the max took for it power given and
 never a trade; SAME AS NATIVE and AT ITS LIMIT ON NATIVE are watch.
 
-What the page says (written 16 October from the tables then standing; each row names its engine). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the seven organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v13); it changes what an operator connects.
+What the page says (written 16 October from the tables then standing; each row names its engine). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the seven organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v15); it changes what an operator connects.
 
 **The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
 brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 9.4;

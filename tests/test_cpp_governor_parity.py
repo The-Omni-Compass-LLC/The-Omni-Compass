@@ -15,12 +15,16 @@ def main(exe, n=60, mode="power_protect", period=60.0):
     rows, exp = [], []
     class Rec(Governor):
         def step(self, obs, conflicts):
-            self.period_s = period            # omni-v14: the seconds between two steps, the same in both twins
+            self.period_s = period            # omni-v16: the seconds between two steps, the same in both twins
+            k = len([r for r in rows if r["scenario_id"] == self._sid])
+            # the line clean for the caller's clear time (omni-v15): the stack simulation senses none, so the stream carries a
+            # fixed pattern of breaches (three decisions in every seven), the same for the Python and the C++
+            obs = {**obs, "slo_clean": k % 7 not in (3, 4, 5)}
             o = {"q": obs.get("queue_ratio", 0.0), "load": obs.get("load_ratio", 0.0), "power": obs.get("power_stress", 0.0),
                  "thermal": obs.get("thermal", 0.0), "network": obs.get("network_stress", 0.0), "drift": obs.get("drift_ratio", 0.0),
                  "stale": obs.get("stale", 0.0), "security": obs.get("security_block", 0.0)}
-            rows.append({"scenario_id": self._sid, "step": len([r for r in rows if r["scenario_id"] == self._sid]),
-                         **o, "conflicts": conflicts, "current_cap": self.current_cap, "nodes": self.nodes})
+            rows.append({"scenario_id": self._sid, "step": k, **o, "conflicts": conflicts, "current_cap": self.current_cap, "nodes": self.nodes,
+                         "slo_clean": 1 if obs["slo_clean"] else 0})
             d = super().step(obs, conflicts)
             exp.append(d); return d
     cfg = S.ManagerBenchmarkConfig(profile="full", scenarios=n, steps=72)

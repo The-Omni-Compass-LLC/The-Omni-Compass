@@ -41,6 +41,7 @@ def build_cpp(tmp):
         for tool, name in (("run_fixture.cpp", "oc_run_fixture"), ("run_governor.cpp", "oc_governor"), ("soak.cpp", "oc_soak"),
                            ("smoke.cpp", "oc_smoke"), ("run_shield.cpp", "oc_shield"), ("run_hpa.cpp", "oc_hpa"), ("savings.cpp", "oc_savings"),
                            ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
+                           ("run_compass_law.cpp", "oc_compass_law"), ("run_verdict.cpp", "oc_verdict"),
                            ("engine_runs.cpp", "oc_engine_runs")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
@@ -94,12 +95,14 @@ def main():
     test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, "throughput"); check("C++ governor vs Python governor (throughput)", True)
     for m_ in ("fleet", "fleet_balanced", "fleet_wear"):
         test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, m_); check(f"C++ governor vs Python governor ({m_})", True)
-    for p_ in (15.0, 10.0):   # omni-v14: the live governor's periods; both twins keep every clock in seconds
+    for p_ in (15.0, 10.0):   # omni-v16: the live governor's periods; both twins keep every clock in seconds
         test_cpp_governor_parity.main(str(b / "oc_governor"), 20 if a.quick else 60, "fleet", p_)
         check(f"C++ governor vs Python governor (fleet, a step every {p_:g} s)", True)
-    from tools import engine_runs as ER   # the founder's order of 21 October: the Python's runs the input, the C++ harness the mechanism
-    check("the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): every receipt to 1e-9 and the same digest",
-          ER.cpp_check(20 if a.quick else 100, ER.DEFAULT_BASE, b / "oc_engine_runs") == 0)
+    # the founder's order of 21 October: the Python's runs the input, the C++ harness the mechanism, every receipt to the last bit
+    from tests import test_cpp_engine_runs_parity
+    dg_runs = test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50 if a.quick else 500)
+    check(f"the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): "
+          f"every receipt identical to the last bit, one digest {dg_runs[:16]}…", True)
     from tests import test_cpp_shield_parity
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8 if a.quick else 20); check("C++ shield vs Python shield (enforce and violations)", True)
     from tests import test_cpp_shield_adversarial, test_shield_properties
@@ -113,6 +116,36 @@ def main():
     from tests import test_cpp_twins_parity
     test_cpp_twins_parity.main(str(b / "oc_twins"), 500 if a.quick else 2000)
     check("C++ nervous system, compass and ledger, GPU rules vs Python, value for value", True)
+    from tests import test_cpp_compass_law_parity
+    n_law = test_cpp_compass_law_parity.main(str(b / "oc_compass_law"), 60 if a.quick else 300)
+    check(f"C++ compass law and two-way plug vs Python, every force and every write identical ({n_law:,} answers)", True)
+    # negative control: a C++ law that takes back while the reading climbs above the center must be caught
+    lsrc = (ROOT / "cpp" / "src" / "compass_law.cpp").read_text()
+    lmut = lsrc.replace("if (f < 0.0 && v > 0.0 && pos > band.center) f = 0.0;", "")
+    (tmp / "compass_law_mut.cpp").write_text(lmut)
+    lothers = [str(p) for p in (ROOT / "cpp" / "src").glob("*.cpp") if p.name != "compass_law.cpp"]
+    subprocess.run([shutil.which("g++") or shutil.which("clang++"), "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"), *lothers,
+                    str(tmp / "compass_law_mut.cpp"), str(ROOT / "cpp" / "tools" / "run_compass_law.cpp"), "-o", str(tmp / "oc_compass_law_mut")], check=True)
+    try:
+        test_cpp_compass_law_parity.main(str(tmp / "oc_compass_law_mut"), 60); det_law = False
+    except AssertionError:
+        det_law = True
+    check("negative control: parity test detects a C++ compass law that takes back while the reading climbs", lmut != lsrc and det_law)
+    from tests import test_cpp_verdict_parity
+    n_ver = test_cpp_verdict_parity.main(str(b / "oc_verdict"), 60 if a.quick else 300)
+    check(f"C++ verdict vs Python, every trial, reading and step identical ({n_ver:,} answers)", True)
+    # negative control: a C++ verdict that allows a step the interval reads as a LOSS must be caught
+    vsrc = (ROOT / "cpp" / "src" / "verdict.cpp").read_text()
+    vmut = vsrc.replace('if (r.reading != "LOSS" && within && r.d_max <= std::log(1.0 + tol)) {', "if (within && r.d_max <= std::log(1.0 + tol)) {")
+    (tmp / "verdict_mut.cpp").write_text(vmut)
+    vothers = [str(p) for p in (ROOT / "cpp" / "src").glob("*.cpp") if p.name != "verdict.cpp"]
+    subprocess.run([shutil.which("g++") or shutil.which("clang++"), "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"), *vothers,
+                    str(tmp / "verdict_mut.cpp"), str(ROOT / "cpp" / "tools" / "run_verdict.cpp"), "-o", str(tmp / "oc_verdict_mut")], check=True)
+    try:
+        test_cpp_verdict_parity.main(str(tmp / "oc_verdict_mut"), 300); det_ver = False
+    except AssertionError:
+        det_ver = True
+    check("negative control: parity test detects a C++ verdict that allows a step read as a LOSS", vmut != vsrc and det_ver)
     from tools import seal
     broken = seal.check()
     check(f"seal: all {len(seal.TWINS)} Python/C++ twins unchanged since proven equal (results/SEAL.json)", not broken, "; ".join(broken))

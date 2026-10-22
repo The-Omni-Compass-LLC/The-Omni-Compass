@@ -8,84 +8,52 @@ All patents, copyrights and trademarks covering the Omni-Compass engine, its mat
 
 The printable book of this text, with its contents and appendices: `docs/OMNI_COMPASS_MANUAL.pdf`. Built by `docs/book/build_book.py`.
 
-## The Problem and Omni-Compass's Solution
+## The Problem and the Answer
 
 
-**What the whole industry faces.** Demand for computing is growing faster than the power, the machines and the budgets
-built to carry it. The International Energy Agency puts the world's data centres at about 415 TWh of electricity in 2024,
-around 1.5% of all the electricity the world used, and expects that to more than double, to about 945 TWh, by 2030, with
-artificial intelligence the largest driver. In the United States, Lawrence Berkeley National Laboratory counts 176 TWh in
-2023, 4.4% of the country's electricity, and between 6.7% and 12% by 2028. The usual answer is to build more: more
-machines, more megawatts, more cooling and a larger bill.
+**What the whole industry faces.** Every computing system in service, from one server to a cloud region, from a GPU to a
+building's chillers, a grid feeder or a robot cell, is run by a stack of native controllers: the Kubernetes autoscalers and
+scheduler, the cloud's node pools, the GPU's power and clock firmware, the database's cache and connection pools, the
+building's cooling loops, the battery's management system, the servo's loop. Each was designed and tuned alone, against its own
+setpoint, with margins sized for the worst case it might meet. Three costs follow, on every stack:
 
-**Much of what is built sits idle.** Across the Kubernetes clusters Cast AI measured in 2025, the average processor was 8%
-busy and the average memory 20% used, read before its own automation was switched on. The organizations Flexera surveyed
-estimate that 29% of what they spend on cloud infrastructure and platforms is wasted.
+1. **Capacity held idle.** Worst-case margins stay in place through the common case. Machines, power caps, caches and cooling
+   run far inside their limits, and the room between the operating point and the limit is paid for and seldom used.
+2. **Late reaction.** Reactive loops act on averaged, lagging signals and wait out deliberate cooldowns, so queues and
+   response-time tails form before capacity arrives.
+3. **Loops at cross purposes.** The loops share power, cooling, connections and memory. One loop's correction is another
+   loop's disturbance, and no loop sees the whole.
 
-**Not short of control, short of coordination.** In every realm (compute, AI and the cloud; physics, robotics and
-autonomy; energy, facilities and industry; distribution and specialized systems) each machine already runs under local
-feedback loops: horizontal autoscalers, firmware power and clock governors, building-management loops,
-battery-management systems, connection pools, servo controllers. Each loop is tuned on its own, against its own setpoint,
-with margins sized for a worst case. Four costs follow, and every operator pays them:
+Demand for computing, above all for AI and the cloud, is growing faster than the power, cooling and hardware that can be built
+for it. The usual answer is to add: more machines, more power, more people watching thresholds. Replacing the native
+controllers is not an answer most operators will take: they are proven, often certified, and the people on call know them.
 
-- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
-  recomputes its replicas every 15 seconds by default and damps its scale-downs over a 5-minute stabilization window; new
-  pods then need time to schedule and start. Queues form before capacity arrives.
-- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
-  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
-  rarely used.
-- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
-  is another loop's disturbance: more web replicas saturate the database's connections; more cooling pushes a power feed
-  toward its limit.
-- **The gaps closed by hand.** Operators close them with fixed settings, runbooks, alerts and on-call rotations, and the
-  settings go stale as the load moves. That is safe, and it leaves the region between the operating point and the safe
-  boundary unused nearly all of the time.
+**What Omni-Compass does about it.** Omni-Compass is a supervisory governor. It sits on top of those native controllers and
+never replaces them. It plugs into each setting a native controller already exposes, through a two-way plug (one wire in, the
+reading; one wire out, the setting), takes a snapshot of every setting before its first write, and governs the whole stack as
+one body, the organism: every muscle driven as far as its own limit and never past it, and, on the engine that stands, never
+below native; where it cannot bring a muscle a GAIN, that muscle stays native. It acts before a line is crossed instead of
+after, reads back every write, puts every give-back to its own trial, records every decision with its reason, walks every
+setting home if it stops (the lease) and stops at once on the kill switch. Its first rule is do no harm, judged at the
+organism: never less work or health than native (`DISCLOSURES.md`, section 3). The aim is the one headline: more work,
+faster, on fewer machines, with less energy, from the hardware and the controllers already in place; in a cloud, the same
+work for a smaller bill.
 
-**Omni-Compass's solution: govern what is built before building more.** Omni-Compass is a supervisory governor. It
-sits on top of every native controller and never in place of one; native keeps running underneath, always. It treats each
-setting a native controller already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool
-size) as a muscle, and the whole stack as one body, the organism. Through a two-way plug, one wire in (the readings native
-already reports) and one wire out (the settings native already exposes), it reads every muscle, places each reading in the
-muscle's own band, from calm to its line (the limit it must not cross: a response time, a temperature, a feed's rating),
-and moves each setting one bounded, smooth step at a time. By default every muscle is driven up to its own limit, never
-past it and never below native; every write is read back; every give-back is tried in its own paired trial (the muscle with and without it, under the same load) and undone if the
-muscle loses by it; a raise is held inside the muscle's own bounds and judged afterwards by the three-run tables; and
-wherever no gain can be brought, the muscle stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
-inside its own cushion. The aim, in one line: more work, faster, on fewer machines, with less energy. Where Omni-Compass takes more energy to buy more work or speed, that energy is shown beside
-what it bought, as power given, and never called a loss.
+**Where the proof is.** This book shows how to wire, tune, run and check Omni-Compass. The mechanism, the mathematics and
+every result, each a paired comparison of native and Omni-Compass on top of native run three times, every row kept, LOSS
+included, are in the Owner's Manual and in `results/`. The only number that applies to your system is the one your own paired
+runs produce.
 
-**How it addresses each cost.**
+**What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
+run on. It does not make a system immune to failure, delay or drift: it keeps each muscle inside its own limits and shows, row
+by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
+differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
 
-| What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
-|---|---|---|
-| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its fast checks run every 5 seconds, beside the autoscaler's own 15-second check) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
-| **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
-| **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion | every muscle judged on itself, and the organism judged whole |
-| **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
-
-**What it does not do.** It replaces no controller, and it creates no capacity a machine does not have: it uses the
-capacity already there, each muscle to its own limit. It promises no number on a system it has not run on: the only number
-that applies to a system is the one that system's own paired runs produce. The outside figures above are their authors'
-own, quoted for scale; none was measured, checked or endorsed by The Omni-Compass LLC, and none is a result of
-Omni-Compass.
-
-**How it is held to account.** Every benchmark has two arms, native and Omni-Compass on top of native, on the same
-machines with the same work, run three separate times. Every reading is one word, GAIN, EVEN or LOSS, decided by what the
-gauge is for (the key, in this front matter); every result carries its evidence class (**P** a physical meter, **L** live
-software, **S** our own models, never shown as proof of hardware); and every row is shown, LOSS included. The governing
-rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the aim is an organism never left turning out less
-than native, nor less healthy; where a row reads LOSS against native, the row stays, its cause is found and fixed, and the
-test runs again. This manual carries no results: they are kept with the code, each in its own table with its evidence class,
-and the Owner's Manual carries them all. The Introduction shows the solution as an installation meets it, step
-by step.
-
-**The outside sources.** International Energy Agency, *Energy and AI* (April 2025), its executive summary. Lawrence
-Berkeley National Laboratory, *2024 United States Data Center Energy Usage Report* (December 2024), prepared for the U.S.
-Department of Energy. Cast AI, *2026 State of Kubernetes Optimization Report*: a seller of Kubernetes optimization,
-reporting its own customers' clusters as they ran before its automation. Flexera, *2026 State of the Cloud Report* (March
-2026): a survey of 753 cloud decision-makers and users, the figure their own estimate. The Kubernetes documentation,
-*Horizontal Pod Autoscaling*: the controller's defaults.
-
+**What is protected, and how.** Omni-Compass belongs to The Omni-Compass LLC. Its source, manuals and records are its
+copyrighted work; all patents, copyrights and trademarks filed in the USA. The repository is licensed for Evaluation and
+Simulation use only (`LICENSE`); any commercial use, monetization or production use requires a signed, paid Omni-Compass
+Enterprise License (`ENTERPRISE_LICENSE.md`). What a licensee acquires is the working whole: the engine, the wiring and the
+factory card of every muscle, the harness that measures it against native, and the receipts.
 
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 
@@ -271,12 +239,28 @@ Read the rest of the front matter before you touch a wire. It tells you what you
 what it tells you.
 
 
-## Introduction: The Idea and What This Manual Covers
+## Introduction: The Problem, the Idea and What This Manual Covers
 
 
-The problem the whole industry faces, and Omni-Compass's solution in brief, stand at the head of this front matter. This
-introduction shows the solution as an installation meets it: the idea in its five steps, what Omni-Compass is not, the
-promise, what it governs, what you need before you wire it, and what this manual covers.
+**The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
+Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
+power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
+Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
+follow, and every operator pays them:
+
+- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
+  recomputes its desired replicas from averaged utilization on a sync period (15 seconds by default) and damps its
+  decisions with stabilization windows; new pods then need time to schedule and start. Queues form before capacity
+  arrives.
+- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
+  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
+  rarely used.
+- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
+  is another loop's disturbance. More web replicas saturate the database's connections; more cooling pushes a power feed
+  toward its limit.
+
+Operators close these gaps by hand, with fixed settings and runbooks. That is safe, and it leaves the region between the
+nominal operating point and the safe boundary unused nearly all of the time.
 
 **The idea.** Close one supervisory loop around the native loops. Omni-Compass treats each setting a native controller
 already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool size) as an actuator and
@@ -1302,12 +1286,16 @@ respect a limit the wires do not carry.
 
 ### 6.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v13** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
-quoted here ran on omni-v7, whose rules omni-v13 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
+The engine that stands in this edition is **omni-v15** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
+quoted here ran on omni-v7, whose rules omni-v15 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
 the operator's on a shared host at its top while another workload there has room of its own, and counts every other pod by its
-own limit). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write. The guard shows in the audit: when the cluster's
+own limit; omni-v14 runs the operator's own commands
+without a shell unless they hold a pipe, a redirect or a variable, and takes `--native` to leave any muscle where native runs
+it; omni-v15 asks for the power cap's trim only while the response line has been clean for the governor's own clear time, its
+`--slo-clear-s`, so the request cannot switch back and forth at one threshold, and holds every wire in its fingerprint). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write; a muscle left native shows as `"native_muscles"` at the start and `"held"` on each write
+it withholds. The guard shows in the audit: when the cluster's
 reading shows no machine in service (every worker cordoned, tainted NoSchedule or unreachable at once), the decision is recorded
 as `held: the cluster's reading shows no machine in service; nothing decided, nothing written`, and the governor takes up again
 at the first reading with machines. A held decision is never an error and needs no action from anyone; several in a row point
@@ -1459,7 +1447,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v13 (digest 0088837333c6f0fc, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v15 (digest 0a53cdd7a558f803, 55 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
 
 **Level 1 - Watch (read-only).**
 
@@ -3511,6 +3499,7 @@ python3 tools/omni_control.py serve --tokens /etc/omni/tokens.json --audit /var/
 | Watch | `POST /v1/mode {"mode": "watch"}` | operator | the governor runs, decides and audits every decision, and writes nothing (its `--dry-run`) |
 | Off | `POST /v1/mode {"mode": "off"}` | operator | every setting handed back; the governor stops |
 | Max, tune-down | `POST /v1/dial {"dial": "max" or "save"}` | operator | the governor handed back and started again on the new dial |
+| One muscle on, or left native | `POST /v1/muscle {"muscle": NAME, "on": true or false}` | operator | the governor handed back and started again with `--native` naming every muscle left native; a muscle left native is never written (omni-v14; the names are `machines`, `replicas`, `cpu`, `clock`, `gpu`, `rollout`, `batch`, `rightsize`, `coldstart`, `contain`, `cooling`) |
 | Reset | `POST /v1/reset {"reason": ...}` | operator | every setting handed back to native; mode off until the next press |
 | Kill switch | `POST /v1/kill {"reason": ...}` | security | the master switch OFF for every Omni-Compass governor on the machine; each restores and exits; none starts while it is OFF |
 | Arm | `POST /v1/arm {"reason": ...}` | security | the master switch ON again once two different holders of the security role press it within ten minutes |
@@ -7438,6 +7427,25 @@ with Omni-Compass on top, beside response time, failures and CPU, each with its 
 access when you are done: in the Azure portal search **App registrations**, open **omni-compass-github**, **Delete**;
 and delete the `AZURE_CREDENTIALS` secret in GitHub.
 
+### F.7 When Azure's check says the key is not whole
+
+Every Azure set, and the conductor's own check at no cost (the run **cloud-check azure** on the **Actions** tab), reads the
+shape of `AZURE_CREDENTIALS` before Azure's login and says what is wrong without printing a character of it: that it does not
+start with `{`, that it holds a client secret's value alone, that it was cut short, or which field is missing. Store it again,
+whole:
+
+1. In the Azure portal, click **>_** (Cloud Shell) and choose **Bash**, as in section F.2.
+2. Paste the one line of section F.3 again and press **Enter**. It prints a new block that starts with `{` and ends with `}`.
+3. Select all of it, from `{` to `}`, and copy it.
+4. On GitHub, open the repository, then **Settings**, then **Secrets and variables**, then **Actions**.
+5. Beside `AZURE_CREDENTIALS`, click the pencil (**Update**).
+6. Paste the whole block as the new value and click **Update secret**.
+7. To retire every older password of the same login: in the Azure portal search **App registrations**, open
+   **omni-compass-github**, then **Certificates & secrets**, and delete every client secret but the newest.
+
+The conductor runs Azure's check again within the hour, and the sets start on their own once it passes. Nothing is built and
+nothing is billed while it fails.
+
 ## Appendix G. The Google Cloud Account, Click by Click
 
 
@@ -7754,8 +7762,9 @@ changes one runs a changed tune, whose receipts are its own (section 4.6).
 | `--audit` | `omni_audit.jsonl` | `/var/log/omni/audit.jsonl` | the audit file (section 21.4) |
 | `--kill-file` | `/tmp/omni.kill` | `/tmp/omni.kill` | the file whose presence turns the governor OFF (section 21.3) |
 | `--dry-run` | off | on for the first day, then removed | decide and record every command, write none |
+| `--native` (and `OMNI_NATIVE`) | none | none, or the muscles the site keeps on its own controller | the muscles left where native runs them, never written: `machines`, `replicas`, `cpu`, `clock`, `gpu`, `rollout`, `batch`, `rightsize`, `coldstart`, `contain`, `cooling`; a name that is not one of them stops the start (omni-v14; the control panel's muscle button sets it) |
 | `--kubectl` | `kubectl` | `kubectl` | the client the governor reads and writes through |
-| `--site-limit-w`, `--power-cmd` | none | absent | a site's power limit and the command that prints its watts (level 7; never in a cloud) |
+| `--site-limit-w`, `--power-cmd` | none | absent | a site's power limit and the command that prints its watts (level 7; never in a cloud); the command runs without a shell unless it holds a pipe, a redirect or a variable |
 | `--cooling-cmd`, `--cooling-min-c`, `--cooling-max-c`, `--cooling-restore-c` | none; 18, 27, 22 °C | absent | the facility's cooling setpoint command and band (section 8.10) |
 
 ### K.2 The settings the cloud mode fixes

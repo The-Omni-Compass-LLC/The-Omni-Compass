@@ -57,7 +57,7 @@ what is tested.
 | seconds from the kill to every setting back at the operator's (omni only) | **the aim is lower; shown with its interval**; an arm not handed back within 60 s reads **LOSS**, and an arm never handed back is INVALID and a LOSS |
 | settings after the hand-back equal the operator's; no record left (omni only) | **any failure is marked** |
 | the second governor's snapshot equals the operator's settings (omni only) | **any difference is marked** |
-| time over the response line and failed requests in the 120 s after the kill, native against omni | the aim is lower (the paired reading, as the fault test reads its windows) |
+| time over the response line and failed requests in the 300 s after the kill (120 s up to omni-v14; "On omni-v15" below), native against omni | the aim is lower (the paired reading, as the fault test reads its windows) |
 | the whole window's gauges, as in every Kubernetes test: work inside the line, p95, p99, time over the line, failed requests, machines, standby-model energy | by the usual directions: a governor killed and restarted mid-run must not leave omni behind native over the window |
 | the watchdog's own record: which governor, hung or dead, which commands, each exit code | shown |
 
@@ -230,6 +230,17 @@ setting handed back at the end and read back at the operator's, no record left, 
 response, time over the line and alert minutes GAIN in all three of our runs; HPA replicas +49% to +52%, power given; machines,
 node-hours and energy EVEN; the 95th and 99th percentiles and failed requests EVEN (three pairs give wide intervals). The
 governor's own CPU 0.0104 to 0.0108 of a core.
+
+## On omni-v15 (21 October): the after-kill reading is 300 s, declared before its runs
+
+As proposed above from the omni-v11 kill test (its one tail rise came 140 to 190 s after the kill, past the 120 s window), the
+kill scenario's two paired gauges, the time over the response line and the failed requests after the kill, are read over the
+**300 s** after the kill mark from omni-v15's first kill run on (`tools/live_reps.py`, `ROBUST_AFTER_KILL_S`; `tests/test_robust.py`
+holds the value). Nothing else in the scenario changes: the kill at 40% of the 900 s window, the second governor at 50%, the
+hand-back allowance of 60 s, the probe through the whole window. The omni-v11 kill table (`results/live/V11_ROBUST_KILL.md`)
+stands as it was read, over 120 s; a table on omni-v15 names its window in its row. The long run's request for the power cap,
+whose switching this scenario's audits showed (126 of 350 decisions), is the fault omni-v15 fixes in the brain
+(`docs/OMNI_V15.md`, section 1); omni-v15's long runs read it again in `results/STEERING.md`'s rows.
 
 ## What is declared before the first run
 

@@ -13,89 +13,45 @@ All patents, copyrights and trademarks covering the Omni-Compass engine, its mat
 
 # FRONT MATTER
 
-## The Problem and Omni-Compass's Solution
+## The Problem and the Answer
 
-**What the whole industry faces.** Demand for computing is growing faster than the power, the machines and the budgets
-built to carry it. The International Energy Agency puts the world's data centres at about 415 TWh of electricity in 2024,
-around 1.5% of all the electricity the world used, and expects that to more than double, to about 945 TWh, by 2030, with
-artificial intelligence the largest driver. In the United States, Lawrence Berkeley National Laboratory counts 176 TWh in
-2023, 4.4% of the country's electricity, and between 6.7% and 12% by 2028. The usual answer is to build more: more
-machines, more megawatts, more cooling and a larger bill.
+**What the whole industry faces.** Every computing system in service, from one server to a cloud region, from a GPU to a
+building's chillers, a grid feeder or a robot cell, is run by a stack of native controllers: the Kubernetes autoscalers and
+scheduler, the cloud's node pools, the GPU's power and clock firmware, the database's cache and connection pools, the
+building's cooling loops, the battery's management system, the servo's loop. Each was designed and tuned alone, against its own
+setpoint, with margins sized for the worst case it might meet. Three costs follow, on every stack:
 
-**Much of what is built sits idle.** Across the Kubernetes clusters Cast AI measured in 2025, the average processor was 8%
-busy and the average memory 20% used, read before its own automation was switched on. The organizations Flexera surveyed
-estimate that 29% of what they spend on cloud infrastructure and platforms is wasted.
+1. **Capacity held idle.** Worst-case margins stay in place through the common case. Machines, power caps, caches and cooling
+   run far inside their limits, and the room between the operating point and the limit is paid for and seldom used.
+2. **Late reaction.** Reactive loops act on averaged, lagging signals and wait out deliberate cooldowns, so queues and
+   response-time tails form before capacity arrives.
+3. **Loops at cross purposes.** The loops share power, cooling, connections and memory. One loop's correction is another
+   loop's disturbance, and no loop sees the whole.
 
-**Not short of control, short of coordination.** In every realm (compute, AI and the cloud; physics, robotics and
-autonomy; energy, facilities and industry; distribution and specialized systems) each machine already runs under local
-feedback loops: horizontal autoscalers, firmware power and clock governors, building-management loops,
-battery-management systems, connection pools, servo controllers. Each loop is tuned on its own, against its own setpoint,
-with margins sized for a worst case. Four costs follow, and every operator pays them:
+Demand for computing, above all for AI and the cloud, is growing faster than the power, cooling and hardware that can be built
+for it. The usual answer is to add: more machines, more power, more people watching thresholds. Replacing the native
+controllers is not an answer most operators will take: they are proven, often certified, and the people on call know them.
 
-- **Reaction latency.** Reactive loops act on lagging, averaged signals. A Kubernetes Horizontal Pod Autoscaler
-  recomputes its replicas every 15 seconds by default and damps its scale-downs over a 5-minute stabilization window; new
-  pods then need time to schedule and start. Queues form before capacity arrives.
-- **Static over-provisioning.** Worst-case margins persist through the far more common nominal regime. The operating
-  point sits well inside the safe region, and the headroom between it and the constraint boundary is paid for and
-  rarely used.
-- **Uncoordinated coupling.** Loops share resources: power, cooling, connections, memory, network. One loop's correction
-  is another loop's disturbance: more web replicas saturate the database's connections; more cooling pushes a power feed
-  toward its limit.
-- **The gaps closed by hand.** Operators close them with fixed settings, runbooks, alerts and on-call rotations, and the
-  settings go stale as the load moves. That is safe, and it leaves the region between the operating point and the safe
-  boundary unused nearly all of the time.
+**What Omni-Compass does about it.** Omni-Compass is a supervisory governor. It sits on top of those native controllers and
+never replaces them. It plugs into each setting a native controller already exposes, through a two-way plug (one wire in, the
+reading; one wire out, the setting), takes a snapshot of every setting before its first write, and governs the whole stack as
+one body, the organism: every muscle driven as far as its own limit and never past it, and, on the engine that stands, never
+below native; where it cannot bring a muscle a GAIN, that muscle stays native. It acts before a line is crossed instead of
+after, reads back every write, puts every give-back to its own trial, records every decision with its reason, walks every
+setting home if it stops (the lease) and stops at once on the kill switch. Its first rule is do no harm, judged at the
+organism: never less work or health than native (`DISCLOSURES.md`, section 3). The aim is the one headline: more work,
+faster, on fewer machines, with less energy, from the hardware and the controllers already in place; in a cloud, the same
+work for a smaller bill.
 
-**Omni-Compass's solution: govern what is built before building more.** Omni-Compass is a supervisory governor. It
-sits on top of every native controller and never in place of one; native keeps running underneath, always. It treats each
-setting a native controller already exposes (a replica floor, a power cap, a clock ceiling, a temperature setpoint, a pool
-size) as a muscle, and the whole stack as one body, the organism. Through a two-way plug, one wire in (the readings native
-already reports) and one wire out (the settings native already exposes), it reads every muscle, places each reading in the
-muscle's own band, from calm to its line (the limit it must not cross: a response time, a temperature, a feed's rating),
-and moves each setting one bounded, smooth step at a time. By default every muscle is driven up to its own limit, never
-past it and never below native; every write is read back; every give-back is tried in its own paired trial (the muscle with and without it, under the same load) and undone if the
-muscle loses by it; a raise is held inside the muscle's own bounds and judged afterwards by the three-run tables; and
-wherever no gain can be brought, the muscle stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
-inside its own cushion. The aim, in one line: more work, faster, on fewer machines, with less energy. Where Omni-Compass takes more energy to buy more work or speed, that energy is shown beside
-what it bought, as power given, and never called a loss.
+**Where the page shows it.** The live engine page plays every benchmark back from its own SHA-256-checked files, native
+beside Omni-Compass on top of native, lane by lane, and runs the engine's own runs in the page: the Python's seeded runs, and
+the same runs through the engine's C++ twin, side by side (the page's section 10b). This book reads that page; the mechanism and every
+result are in the Owner's Manual.
 
-**How it addresses each cost.**
-
-| What the industry faces, and what it costs | How Omni-Compass addresses it | How it is judged |
-|---|---|---|
-| **Reaction latency**: waiting, queues and time over the line before capacity arrives | it reads every muscle on its own clock (on Kubernetes its full read of the state every 15 seconds, the autoscaler's own pace, and its fast checks every 5 seconds) and moves as a reading nears its line, not after the line is crossed: proactive as well as reactive, like an immune system | time waited, missed or failed: a fall is GAIN, a rise is LOSS |
-| **Static over-provisioning**: machines, energy and a bill paid for headroom rarely used | every muscle driven up to its own limit and never past it, so the machines already paid for carry more work; in a public cloud it parks only a machine the cloud already made, after its own trial, and wakes it on a breach, so the bill can only fall or stay | work done: a rise is GAIN; machines, energy and the bill: a fall is a cut, a GAIN, and a rise is power given |
-| **Uncoordinated coupling**: one loop's correction is another loop's disturbance | one brain for one body: a step on one muscle stands only while every muscle it couples to stays inside its own cushion | every muscle judged on itself, and the organism judged whole |
-| **The gaps closed by hand**: settings retuned by hand, alert minutes, on-call | an autopilot: every write read back, every give-back on its own trial, every reason written to its audit; an alert minute on Omni-Compass's side is found and fixed, never accepted | the alert minutes, judged; the settings commands it wrote on its own, shown |
-
-**Where the page shows each answer.** Reaction latency: the organism live, every muscle's place in its band and the
-decisions past the line, native beside Omni-Compass (6a, `#s-engines`), and the shipped controller's decision trace (5e,
-`#s-live`). Static over-provisioning: the benefit board (2, `#s-board`) and the clouds' bills (5a, `#s-cloud`).
-Uncoordinated coupling: the whole organism (3, `#s-whole`) and the organism's immune system (6a, `#s-engines`). The gaps
-closed by hand: the status board's alarms (1d, `#s-status`) and the golden signals, the event log and the live metrics
-(1h, `#s-feed`).
-
-**What it does not do.** It replaces no controller, and it creates no capacity a machine does not have: it uses the
-capacity already there, each muscle to its own limit. It promises no number on a system it has not run on: the only number
-that applies to a system is the one that system's own paired runs produce. The outside figures above are their authors'
-own, quoted for scale; none was measured, checked or endorsed by The Omni-Compass LLC, and none is a result of
-Omni-Compass.
-
-**How it is held to account.** Every benchmark has two arms, native and Omni-Compass on top of native, on the same
-machines with the same work, run three separate times. Every reading is one word, GAIN, EVEN or LOSS, decided by what the
-gauge is for (the key, in this front matter); every result carries its evidence class (**P** a physical meter, **L** live
-software, **S** our own models, never shown as proof of hardware); and every row is shown, LOSS included. The governing
-rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the aim is an organism never left turning out less
-than native, nor less healthy; where a row reads LOSS against native, the row stays, its cause is found and fixed, and the
-test runs again. On the page this is section iii (`#s-problem`), the first after the title page; the executive summary under it
-reads where the record stands from the records on the page, and this book carries no benchmark results of its own.
-
-**The outside sources.** International Energy Agency, *Energy and AI* (April 2025), its executive summary. Lawrence
-Berkeley National Laboratory, *2024 United States Data Center Energy Usage Report* (December 2024), prepared for the U.S.
-Department of Energy. Cast AI, *2026 State of Kubernetes Optimization Report*: a seller of Kubernetes optimization,
-reporting its own customers' clusters as they ran before its automation. Flexera, *2026 State of the Cloud Report* (March
-2026): a survey of 753 cloud decision-makers and users, the figure their own estimate. The Kubernetes documentation,
-*Horizontal Pod Autoscaling*: the controller's defaults.
-
+**What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
+run on. It does not make a system immune to failure, delay or drift: it keeps each muscle inside its own limits and shows, row
+by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
+differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
 
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
@@ -172,7 +128,7 @@ archived with their SHA-256 lists, the two other manuals and `DISCLOSURES.md`.
 ## Notice and Disclaimer
 
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
-(omni-v13, `OMNI_V13.json`). The page names its engine on its own `<html>` element (`data-engine`); the build stamps the engine that stands
+(omni-v15, `OMNI_V15.json`). The page names its engine on its own `<html>` element (`data-engine`); the build stamps the engine that stands
 on it and rebuilds every record, and `--check` fails a page whose engine differs; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
 same push. The page's own table of contents (its section v, "Engine table of contents") is the authority on the order and the
 numbering of its sections; this manual names every section by its title and its anchor (`#s-health`, `#s-ops`, and so on), which
@@ -218,7 +174,7 @@ receipt seem to differ, the receipt governs, and the page is rebuilt.
 |---|---|
 | The operator on shift, at the wall | the Quick Reference card; chapters 4 to 7 (the wall, the switch, the alarms and the feed); chapter 28 (when a tile reads LOSS); Appendix E |
 | CTO, architect, head of platform | the front matter; chapters 8 and 9 (the benefit board and the whole organism); chapter 26 (the mechanism of action, side by side); chapter 29 (what the page does not tell you) |
-| CEO, CFO, CIO, board member | the Foreword; the front matter's "Disclosures, Declarations and Disclaimers"; chapter 9 (the bills and receipts, every way a stack is bought); section 8.3 (one figure for the whole board); chapter 10 (the bill in a cloud) |
+| CEO, CFO, CIO, board member | the front matter's "The Problem and the Answer"; the Foreword; the front matter's "Disclosures, Declarations and Disclaimers"; chapter 9 (the bills and receipts, every way a stack is bought); section 8.3 (one figure for the whole board); chapter 10 (the bill in a cloud) |
 | Site reliability engineer, on call | the Quick Reference card; chapters 4 to 6 (the golden signals, the alarms, the event log, the OpenMetrics exposition); chapter 12 (the heart and the two tickers); Appendix C |
 | Control or plant engineer | chapters 19 to 22 (one control cycle, the phase plane, the brain's state, the verdict); chapter 24 (the component specification); chapter 18 (the console's knobs) |
 | Auditor, diligence team | chapter 1 (a monitor, not a drawing); chapter 27 (from a tile to its record); chapter 31 (verifying the page); the page's own appraisal, `docs/engine/APPRAISAL.md` |
@@ -331,7 +287,7 @@ back.
 **What this manual covers.** Every section of the page in the page's own order; every gauge, with its side, its aim and its
 word; every knob of the console, with what it acts on and what it leaves alone; the two tickers that show the mechanism of
 action; the trace from any tile to the record it came from; and what to do when a tile reads LOSS. It covers the page as
-built on omni-v13; a later engine renames itself on the page's title block and this book is realigned in the same push.
+built on omni-v15; a later engine renames itself on the page's title block and this book is realigned in the same push.
 
 **What this manual does not cover.** How the engine is built, its equations beyond the ones the page itself prints, the
 wiring of Omni-Compass onto any stack, and the benchmark results themselves as a body of evidence: those are the Owner's and
@@ -443,8 +399,8 @@ copy.
 
 ### 2.1 The page's own contents
 
-The page opens with its legal notice (i), then the title page with the build (ii), the problem the whole industry faces and
-Omni-Compass's solution (iii), the executive summary with the reading key (iv), and then its own table of contents (v, "Engine
+The page opens with its legal notice (i), then the title page with the build (ii), the problem and the answer: what the whole industry faces and how
+Omni-Compass addresses it (iii), the executive summary with the reading key (iv), and then its own table of contents (v, "Engine
 table of contents"): the founder's orders of 21 October, the title, the problem and the solution, the summary and the key first
 and the contents after them. Beside the title, on a desktop, stand the owner's two
 illustrations, one above the other (on a phone they sit under the title): the stacks Omni-Compass sits on top of as he pictures
@@ -458,7 +414,7 @@ with the settings Omni-Compass wrote in that decision; and under each, that deci
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
 
-### 2.2 The sections, as built on omni-v13
+### 2.2 The sections, as built on omni-v15
 
 Appendix A lists every section with its anchor and the chapter of this book that
 reads it. In the page's order: 1 the monitor wall and the control panel (1a the control panel and the kill switch, 1b the
@@ -468,15 +424,15 @@ measured effect in full (the organisms, every muscle, the register, the grid and
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
 native and Omni-Compass, 6b the telemetry analytics and Omni-Compass in its own words); 7 the console; 8 the brain (8a one
-cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the component specification; 11 the
-self-governed rendering.
+cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the components, their mathematics and their C++ twin (10a the component
+specification and mathematics, 10b the C++ twin, the Python's runs through the C++ engine); 11 the self-governed rendering.
 
 ### 2.3 Anchors
 
 Every section has an anchor that does not move when the page is reordered: `#s-problem`, `#s-read`, `#p-health`, `#s-health`,
 `#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
 `#p-organism`, `#s-engines`, `#s-lab`, `#s-desk`, `#p-brain`, `#s-decision`, `#s-plane`, `#s-brain`, `#s-verdict`, `#s-fail`,
-`#s-math`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
+`#s-math`, `#s-cpp`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
 contents links the same way. When this book names a section it gives its title and its anchor, so the reader finds it on a
 page whose numbering has moved.
 
@@ -904,7 +860,9 @@ The conductor starts a cloud's set only after that cloud's newest check passed
 every quota), at no cost. The monitor shows a failed check as the cloud's status, in the check's own words: a Google key stored
 cut short (the stored secret shorter than a whole key file) is stored again whole (`docs/GOOGLE_SETUP.md`, section 4); an Amazon
 account on the Free plan, whose organization policy denies every machine read, is moved to the Paid plan
-(`docs/AMAZON_SETUP.md`, section 1a). Nothing is built and nothing is billed until the check passes.
+(`docs/AMAZON_SETUP.md`, section 1a); an Azure key stored in another form than the whole block from `{` to `}` (a client
+secret's value alone, for one) is stored again whole (`docs/AZURE_SETUP.md`, sections 3 and 4; Azure joined the check on
+22 October). Nothing is built and nothing is billed until the check passes.
 
 ## 11. The Orchestrators and Governors
 
@@ -1364,7 +1322,7 @@ the cost of the governor is never hidden; they carry no word because their prere
 
 ## 24. The Component Specification
 
-### 24.1 Every part and its equation (the page's section 10, `#s-math`)
+### 24.1 Every part and its equation (the page's section 10a, `#s-math`)
 
 The component specification: every part of the engine, its
 equation in Unicode as the repository writes it, and the source module that implements it. Items 1 to 5 and 8 are the engine's
@@ -1381,7 +1339,7 @@ on the service, as the page's section 5e shows.
 | 5 | Nerves | κ, h, σ, ν into calm; calm against each organ's θ grants contraction (the spine to nodes, θ 0.7; compute to pods, 0.5; physics to the processor's clock, 0.3; energy to power, 0.3; distribution to routing, 0.5) | `nervous_system` |
 | 6 | Compass | p = (r − lo)/(hi − lo); F = A·tanh((kₚ(p − ½) + k[d]·v)/A); fails up past 0.95; never hands back while climbing above the center; k[d] at three times critical damping from the muscle's own τ, the push | `compass_law.CompassLaw` |
 | 7 | Plug | one wire in, one wire out: each write clipped to the cover; the snapshot taken once at the start is what reset restores; each write read back; the kill switch hands every lever to native at once | `compass_law.Plug`, `master.py` |
-| 8 | Verdict | the paired trial of chapter 22 | `verdict.py` |
+| 8 | Verdict | the paired trial of chapter 22 | `verdict.py` (its C++ twin `cpp/src/verdict.cpp`, 24.3) |
 
 ### 24.2 What the specification is for
 
@@ -1389,6 +1347,24 @@ It lets the reader of the page check that what moves on the monitors is what the
 code says: the six spokes at the center of the cycle (E, U, I[U], S, B, Ḃ) are item 3's state, the inner arc of nine segments
 is item 1's senses, the force field of the phase plane is item 6's law. The Owner's Manual carries the derivations; this page
 carries the statements.
+
+### 24.3 The C++ twin (the page's section 10b, `#s-cpp`)
+
+The engine is written twice, in Python and in C++, line for line where a twin exists. Every time the page is built, the
+Python's own runs are fed into the C++ as its input and the C++ answer is set beside the Python's, number by number. Where
+they are the same to the last digit, the two are one engine. The section holds five tables.
+
+| Table | What it shows | How to read it |
+|---|---|---|
+| Every twin, on its own parity check | each Python file and its C++ twin, the inputs the check fed both, the largest difference, and the reading | "the same" on every row is a whole engine in two languages; "DIFFERS" names the row to look at |
+| The Python's runs through the C++ harness, receipt by receipt | the record of the Python's seeded runs the page shows (the jump generator's 500), its draws (the Python's injection) fed to the C++ harness at the page's build (`cpp/tools/engine_runs.cpp`): the record, its runs and base seed, the Python's digest, the C++ engine's digest, how many receipts are identical to the last bit, the largest difference, the reading, and the GitHub run that made the record | the Python's runs are the input and the C++ engine's receipts the output; the two digests one string and every receipt identical is the same engine run twice, in two languages |
+| The compass law of every run on this page | every compass law the page's own runs wired while the page was built, grouped by the file that wired it, each law's readings in the order they came, through the C++ law and through the Python again | the C++ against the Python, and the Python again against the run's own forces: 0 (identical) on both is the run's law reproduced exactly |
+| The seven organisms at the tune-down | each organism, its muscles, the muscles that run the compass law at the tune-down, the readings fed through the C++, and any muscle that differs | at the max, the default brain, the edge and the bone decide each muscle, and they have no C++ twin yet; the tune-down is where every muscle's law is the compass law, so that is where it is fed through |
+| What runs in Python only, for now | every part of the engine with no C++ twin yet, by file | the list is the work still to twin; nothing on it is hidden from the other tables |
+
+A box under the organisms' table finds any muscle by its catalog id: it names each organism the muscle's law ran in, its
+readings, and whether the C++ and the Python gave the same answer. A muscle with no lever at the tune-down stays native
+there, and the box says so.
 
 ## 25. The Page Governs Its Own Drawing
 
@@ -1468,7 +1444,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 27.2 The engine's name
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v13). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v15). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines.
 
 ## 28. When a Tile Reads LOSS
@@ -1645,7 +1621,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 |---|---|---|---|
 | i | `#notice` | Legal notice | Notice and Disclaimer |
 | ii | `#title-page` | Title page and build | 1, 27 |
-| iii | `#s-problem` | The problem and Omni-Compass's solution | The Problem and Omni-Compass's Solution |
+| iii | `#s-problem` | The problem and the answer | The Problem and the Answer |
 | iv | `#s-read` | Executive summary and reading key | the key; 3 |
 | v | `#contents` | Engine table of contents | 2 |
 | 1 | `#p-health` | The monitor wall and the control panel | 4 to 7 |
@@ -1678,7 +1654,9 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 8c | `#s-brain` | The brain's internal state | 21 |
 | 8d | `#s-verdict` | The verdict: change acceptance testing | 22 |
 | 9 | `#s-fail` | Failure modes, controls and residual risk | 23 |
-| 10 | `#s-math` | Component specification and mathematics | 24 |
+| 10 | `#s-math` | The components: their mathematics and their C++ twin | 24 |
+| 10a | `#s-math` | Component specification and mathematics | 24.1, 24.2 |
+| 10b | `#s-cpp` | The C++ twin: the Python's runs through the C++ engine | 24.3 |
 | 11 | `#s-self` | Self-governed rendering | 25 |
 | vi | `#s-disclose` | Disclosures, governing law and contact | 29, 30 |
 | vii | `#notice-end` | Closing legal notice | Notice and Disclaimer |

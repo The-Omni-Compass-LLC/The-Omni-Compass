@@ -43,9 +43,35 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v13 stands (v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v15 stands (v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`) stands on main since 20 October, evening, the
+- **Omni v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`) stands on main since 21 October, evening, under the
+  founder's standing order that every fault found is fixed and lands as the next version, told, not asked, and his word of 21 October
+  ("push, push, push on GitHub, update, enhanced engine"): omni-v14 with two changes. The brain's request for the power cap
+  (`omnicompass/adapter.py`, its C++ twin `cpp/src/governor.cpp`) trims to demand only while the response line has been clean for
+  the governor's own clear time (the Kubernetes governor's `--slo-clear-s`, 180 s; the card governor's 3 decisions, which it now
+  hands the brain): on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and
+  turned back at 123 of them, at the one threshold on the queue and the state; on the same decisions, read from the governor's own
+  audit, the gate leaves 35 moves and 32 reversals (`tests/test_cap_band.py`, the fixture
+  `tests/fixtures/robust_long_39173420146_decisions.json`). On Kubernetes the cap wire is off, so no table moves for it; the card
+  governor had applied the same gate outside the brain. A dwell with a glide was built first and refused by the gate (seven small
+  moves for one on the toy cluster, 25 limit writes for 16 on the toy card). And every wire that holds a governor's rules is in the
+  fingerprint (`tools/omni_version.py`: the data stores' five runners, the swarm, MuJoCo and the CPU power runner, their bytes as
+  they stood; a version declared before them is read without those eight and only those). Declared with it, not an engine change: the kill test reads the
+  300 s after the kill (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v15"). The toy gate against omni-v14
+  (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Every benchmark runs
+  again on it from 02:30 UTC on 22 October, a little after the push, so no run started by omni-v14's conductor is counted in it.
+
+- **Omni v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`) stood on main on 21 October, from 04:47 UTC to the evening, the founder's
+  orders "knobs on every monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with
+  two changes in the Kubernetes governor (`omni_controller/controller.py`, `omni_controller/muscles.py`). `--native MUSCLE[,...]`
+  (or `OMNI_NATIVE`, the control panel's muscle button) leaves any muscle where native runs it, never written, an unknown name
+  refused; and the operator's own commands run without a shell unless they hold a pipe, a redirect or a variable (the static
+  scan's high findings 3 to 2). A third, no conveyance raise on a reading that leaves out another workload's starting pods (the
+  raise omni-v13 makes once early in the batch toy's queue), was refused by the toy gate: the batch back at native's, but the
+  web's 95th percentile 6.4% higher than omni-v13's; it is kept on the branch `v14-convey-study` until the toy's web model is set
+  from a real run's files. The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. Every benchmark runs again on it.
+- **Omni v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`) stood on main 20 to 21 October, landed 20 October, evening, the
   founder's order that every fault found be fixed and every fix land as the next version, told, not asked: omni-v12 with one fault
   fixed in the Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone (the
   queue 0.6% to 0.8% later and the web's 99th percentile 4% to 13% higher, LOSS in all three runs). The web pods' limits were raised
@@ -128,7 +154,7 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v15, omni-v14, omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
@@ -239,6 +265,30 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 21 October
+
+- **Push, push, push; the enhanced engine** (the founder's words: "Back to work push push push on GitHub update enhanced engine"):
+  omni-v15 landed the same evening by the standing rules (the fault from the next version's list, the toy gate against omni-v14
+  first, no LOSS, told, not asked): the brain's power-cap request through the line's own clear time and every wire in the
+  fingerprint (`docs/OMNI_V15.md`). What the gate refused (a dwell with a glide) is written on the same page and is not in it.
+
+- **Azure behind its own $0 check** (22 October, under the order of 18 October that no set's A, B or C is spent on a login):
+  for a while on the night of 21 October the stored `AZURE_CREDENTIALS` held a text Azure's login refuses (not the JSON block of
+  `docs/AZURE_SETUP.md`, section 3): the collect of 23:37 UTC failed at the login, and by 00:00 UTC the block was whole again
+  (the steady set's next repetition logged in). A failed Azure set counts as started, and Azure had no check before it. The
+  conductor now starts an Azure set only after `cloud-check azure` passed (the key's shape, the login, the subscription, the
+  machine and its allowance; nothing built), as Google's and Amazon's; every Azure login reads the key's shape first
+  (`tools/cloud_key_check.py azure`), because Azure's own login step quoted the stored text's first characters on a public run
+  page while refusing it. Section 7 of `docs/AZURE_SETUP.md` is the founder's steps if the key is ever stored wrong again.
+
+- **The problem and the answer, first** (the founder's words: "in the beginning we have to state in front matter the problem
+  and omnicompasses solution, what the whole tech world is facing, and how omnicompass addresses it"). The README and all three
+  manuals open their front matter with "The Problem and the Answer" (the book builder prints it first): what every stack faces
+  (capacity held idle, late reaction, loops at cross purposes, demand outrunning power and hardware), what Omni-Compass does
+  about it (on top of native, never replacing it), where the proof is (the Owner's carries the record; the Operator's points
+  to it), what is not claimed, and what is protected. It is held to the honesty rules like every page: no claim beyond the
+  record, no outside review implied, no equation that is not the engine's.
+
 ## Orders of 20 October
 
 - **The governors four ways** (the founder's words: "We can show what they do natively on top of the system organism. And
@@ -303,7 +353,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v13` since 20 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v15` since 21 October, evening), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -520,7 +570,7 @@ the founder overrides one in the conversation.
 - **Everything on the newest engine** (13 October, night): every benchmark runs again on the engine that stands, and its
   result carries that engine's name. Nothing is shown or compared as "v3" once v5 stands: a v3 table is the road, in
   `docs/history`, never a setting to go back to by name. More versions will follow (perhaps to v10); each one reruns
-  everything. Where a change made a result worse, the fix is made inside the newest engine and rerun.
+  everything. Where a change made a result read LOSS, the fix is made inside the newest engine and rerun.
 - **One cloud first** (13 October, night): Kubernetes on Azure is finished first; Google (GKE), Amazon (EKS) and the GPU
   chips (Lambda) are not run until the founder says the Azure Kubernetes results are where he needs them.
 - **The company's telephone** (13 October, night; wording of 14 October; the landline added 16 October, night): "main
@@ -559,8 +609,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v13` (the engine that stands, 20 October), stay in
-  sync, and `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v13`,
+  One version is always the main one; `main` and the working branch, `v15` (the engine that stands, 21 October, evening), stay in
+  sync, and `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v15`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

@@ -16,23 +16,51 @@ of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NO
 
 **The whole summary, straight after a pull:** `python3 tools/summary.py` (plain text) or `python3 tools/summary.py --markdown`. It prints what Omni-Compass is, the key below, and every headline result with its word and its evidence class, read from the result files in this repository.
 
-## The problem and Omni-Compass's solution
+## The Problem and the Answer
 
-**The problem the whole industry faces.** Demand for computing is outgrowing the power, the machines and the budgets built
-for it: the International Energy Agency expects the world's data centres to use about 945 TWh of electricity by 2030, more
-than double the 415 TWh of 2024. Yet much of what is built sits idle: across the Kubernetes clusters Cast AI measured in
-2025 the average processor was 8% busy, and the organizations Flexera surveyed in 2026 estimate 29% of their cloud
-infrastructure and platform spend wasted. Every machine already runs under local loops, each tuned alone with worst-case
-margins: they react late, hold headroom that is rarely used, disturb one another, and leave the gaps to people.
+**What the whole industry faces.** Every computing system in service, from one server to a cloud region, from a GPU to a
+building's chillers, a grid feeder or a robot cell, is run by a stack of native controllers: the Kubernetes autoscalers and
+scheduler, the cloud's node pools, the GPU's power and clock firmware, the database's cache and connection pools, the
+building's cooling loops, the battery's management system, the servo's loop. Each was designed and tuned alone, against its own
+setpoint, with margins sized for the worst case it might meet. Three costs follow, on every stack:
 
-**Omni-Compass's solution.** Govern what is built before building more: one supervisory governor on top of every native
-controller, never in place of one. It reads every muscle through a two-way plug, drives each up to its own limit and never
-past it or below native, reads every write back, tries every give-back in its own paired trial and undoes it if the muscle loses
-by it (a raise is held inside the muscle's bounds and judged afterwards by the three-run tables), leaves a muscle native wherever
-no gain can be brought, and hands every setting back to native when it stops. Every
-result is native against Omni-Compass on top of native, in three runs, read GAIN, EVEN or LOSS, every row shown. The full
-statement, with its sources and how each cost is addressed: the first section of the front matter of all three manuals,
-and section iii of the live engine page. The outside figures are their authors' own, none a result of Omni-Compass.
+1. **Capacity held idle.** Worst-case margins stay in place through the common case. Machines, power caps, caches and cooling
+   run far inside their limits, and the room between the operating point and the limit is paid for and seldom used.
+2. **Late reaction.** Reactive loops act on averaged, lagging signals and wait out deliberate cooldowns, so queues and
+   response-time tails form before capacity arrives.
+3. **Loops at cross purposes.** The loops share power, cooling, connections and memory. One loop's correction is another
+   loop's disturbance, and no loop sees the whole.
+
+Demand for computing, above all for AI and the cloud, is growing faster than the power, cooling and hardware that can be built
+for it. The usual answer is to add: more machines, more power, more people watching thresholds. Replacing the native
+controllers is not an answer most operators will take: they are proven, often certified, and the people on call know them.
+
+**What Omni-Compass does about it.** Omni-Compass is a supervisory governor. It sits on top of those native controllers and
+never replaces them. It plugs into each setting a native controller already exposes, through a two-way plug (one wire in, the
+reading; one wire out, the setting), takes a snapshot of every setting before its first write, and governs the whole stack as
+one body, the organism: every muscle driven as far as its own limit and never past it, and, on the engine that stands, never
+below native; where it cannot bring a muscle a GAIN, that muscle stays native. It acts before a line is crossed instead of
+after, reads back every write, puts every give-back to its own trial, records every decision with its reason, walks every
+setting home if it stops (the lease) and stops at once on the kill switch. Its first rule is do no harm, judged at the
+organism: never less work or health than native (`DISCLOSURES.md`, section 3). The aim is the one headline: more work,
+faster, on fewer machines, with less energy, from the hardware and the controllers already in place; in a cloud, the same
+work for a smaller bill.
+
+**What the record shows.** Every claim is a paired comparison of native and Omni-Compass on top of native, run three
+times (A, B and C) and read by the key below; every row is kept, LOSS included. The newest combined reading is at the top of
+[`results/OMNI_INDEX.md`](results/OMNI_INDEX.md); every result is in [`results/`](results/) and in the Owner's Manual. Run and
+scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
+**What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
+run on. It does not make a system immune to failure, delay or drift: it keeps each muscle inside its own limits and shows, row
+by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
+differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
+
+**What is protected, and how.** Omni-Compass belongs to The Omni-Compass LLC. Its source, manuals and records are its
+copyrighted work; all patents, copyrights and trademarks filed in the USA. The repository is licensed for Evaluation and
+Simulation use only (`LICENSE`); any commercial use, monetization or production use requires a signed, paid Omni-Compass
+Enterprise License (`ENTERPRISE_LICENSE.md`). What a licensee acquires is the working whole: the engine, the wiring and the
+factory card of every muscle, the harness that measures it against native, and the receipts.
 
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
@@ -71,20 +99,20 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v13, fingerprint `0088837333c6f0fc` (47 files); package 0.13.0.
+- **Engine on main:** omni-v15, fingerprint `0a53cdd7a558f803` (55 files); package 0.15.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
+- 2026-10-21 23:45 UTC: `V14_YCSB_SERVICE` rebuilt from runs 39623244880, 39628035584, 39630660108 (ycsb, the service objective, omni-v14): 4 untouched workloads; 1 GAIN, 0 LOSS, 0 power given, 43 EVEN, 0 disagree
+- 2026-10-21 23:45 UTC: `V14_YCSB_SHIPPED` rebuilt from runs 39562510452, 39590117126, 39616239634 (ycsb, the resource objective, native as shipped, omni-v14): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 44 EVEN, 0 disagree
+- 2026-10-21 23:45 UTC: `V14_SYSBENCH_SERVICE` rebuilt from runs 39623235693, 39625624640, 39630651710 (sysbench, the service objective, omni-v14): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
+- 2026-10-21 23:45 UTC: `V14_PGBENCH_SERVICE` rebuilt from runs 39625603596, 39628245625, 39630669154 (pgbench, the service objective, omni-v14): 3 workloads; 0 GAIN, 0 LOSS, 0 power given, 35 EVEN, 1 disagree
 - 2026-10-20 21:59 UTC: `V12_YCSB_SERVICE` rebuilt from runs 39470845655, 39475514914, 39477842603 (ycsb, the service objective, omni-v12): 4 untouched workloads; 1 GAIN, 0 LOSS, 0 power given, 21 EVEN, 0 disagree
 - 2026-10-20 21:59 UTC: `V12_YCSB_SHIPPED` rebuilt from runs 39383000915, 39414286889, 39463721089 (ycsb, the resource objective, native as shipped, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 11 EVEN, 0 disagree
 - 2026-10-20 21:59 UTC: `V12_YCSB` rebuilt from runs 39379934444, 39410606870, 39461506751 (ycsb, the resource objective, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 0 EVEN, 0 disagree
 - 2026-10-20 21:59 UTC: `V12_SYSBENCH_SERVICE` rebuilt from runs 39468576581, 39473186537, 39477834359 (sysbench, the service objective, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
-- 2026-10-20 21:59 UTC: `V12_SYSBENCH_SHIPPED` rebuilt from runs 39382990197, 39412436421, 39461531771 (sysbench, the resource objective, native as shipped, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 3 power given, 45 EVEN, 0 disagree
-- 2026-10-20 21:59 UTC: `V12_SYSBENCH` rebuilt from runs 39379929041, 39410600428, 39461498952 (sysbench, the resource objective, omni-v12): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 47 EVEN, 1 disagree
-- 2026-10-20 21:59 UTC: `V12_REDIS_SERVICE` rebuilt from runs 39381449955, 39412421481, 39461515383 (redis, the service objective, omni-v12): 3 untouched workloads; 7 GAIN, 0 LOSS, 2 power given, 27 EVEN, 0 disagree
-- 2026-10-20 21:59 UTC: `V12_REDIS_SHIPPED` rebuilt from runs 39382995467, 39414279979, 39461540163 (redis, the resource objective, native as shipped, omni-v12): 3 untouched workloads; 0 GAIN, 0 LOSS, 1 power given, 35 EVEN, 0 disagree
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -92,8 +120,14 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-21 00:03 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-20 20:55 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V13_VS_V12.md) |  |
+| 2026-10-21 23:45 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V14_YCSB_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 44 EVEN, 0 where the runs disagree. |
+| 2026-10-21 23:45 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V14_YCSB_SERVICE.md) | Across 4 untouched workloads: 1 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 43 EVEN, 0 where the runs disagree. |
+| 2026-10-21 23:45 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V14_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 48 EVEN, 0 where the runs disagree. |
+| 2026-10-21 23:45 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V14_PGBENCH_SERVICE.md) | Across 3 workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 35 EVEN, 1 where the runs disagree. |
+| 2026-10-21 17:58 | [The engine's runs: 500 runs from the jump generator (base 993613928), one digest](results/engine_runs/ENGINE_RUNS_500_993613928.md) |  |
+| 2026-10-21 06:48 | [The engine's runs: 500 runs from the jump generator (base 902816710), one digest](results/engine_runs/ENGINE_RUNS_500_902816710.md) |  |
+| 2026-10-21 06:28 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-21 05:02 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V14_VS_V13.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -101,29 +135,38 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-21 05:01 | realms-v5 | success | [39546396237](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39546396237) |
-| 2026-10-21 04:59 | live-kind-full | success | [39544954971](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39544954971) |
-| 2026-10-21 04:57 | ycsb | failure | [39540626608](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39540626608) |
-| 2026-10-21 04:55 | kwok-scale | success | [39546386051](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39546386051) |
-| 2026-10-21 04:53 | kafka | success | [39537766295](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39537766295) |
-| 2026-10-21 04:51 | pgbench | success | [39537751149](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39537751149) |
-| 2026-10-21 04:49 | redis | success | [39537761211](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39537761211) |
-| 2026-10-21 04:49 | live-shadow | success | [39544965098](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39544965098) |
-| 2026-10-21 04:46 | benchmark | success | [39543507041](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39543507041) |
-| 2026-10-21 04:46 | robustness | success | [39542051810](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39542051810) |
+| 2026-10-22 00:05 | engine-runs | success | [39697166403](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39697166403) |
+| 2026-10-22 00:01 | group: ocm A (nativebare native compassbare compass) | success | [39680080910](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39680080910) |
+| 2026-10-22 00:00 | group: karmada A (nativebare native compassbare compass) | success | [39680072074](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39680072074) |
+| 2026-10-21 23:51 | godel: A (nativebare native compassbare compass) | success | [39677901734](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39677901734) |
+| 2026-10-21 23:51 | raw-sweep | success | [39695531368](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39695531368) |
+| 2026-10-21 23:45 | six x1 line orgs 6 runs 0+10 | success | [39695202278](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39695202278) |
+| 2026-10-21 23:44 | six x1 line orgs 7 runs 0+10 | success | [39695208573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39695208573) |
+| 2026-10-21 23:37 | big-organism-detached collect | failure | [39694622506](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39694622506) |
+| 2026-10-21 23:29 | six x1 line orgs 5 runs 0+10 | success | [39693510698](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39693510698) |
+| 2026-10-21 23:28 | six x1 line orgs 1 runs 0+10 | success | [39693483929](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39693483929) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
 replaces native; every comparison is native against omni.
 
-## The engine that stands: omni-v13 (the max on every muscle, every muscle its own card, quota-aware conveyance that never takes another muscle's room, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
+## The engine that stands: omni-v15 (the max on every muscle, the power cap's request through the line's own clear time, every wire in the fingerprint, a knob that leaves any muscle native, every muscle its own card, quota-aware conveyance that never takes another muscle's room nor raises on a reading that cannot see it, the operator's commands without a shell, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
 
-The engine on main is **omni-v13** (`OMNI_V13.json`, fingerprint `0088837333c6f0fc`, 47 files; [`docs/OMNI_V13.md`](docs/OMNI_V13.md)), the
-engine that stands since 20 October. It is omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig
+The engine on main is **omni-v15** (`OMNI_V15.json`, fingerprint `0a53cdd7a558f803`, 55 files; [`docs/OMNI_V15.md`](docs/OMNI_V15.md)), the
+engine that stands since 21 October, evening, under the founder's standing order that every fault found is fixed and lands as the
+next version, told, not asked. It is omni-v14 with two changes: the brain's request for the power cap trims only while the response line has been clean for the governor's own clear time (on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them; on the same decisions the gate leaves 35 moves and 32 reversals), and every wire that holds a governor's rules is inside the fingerprint (eight taken in, their bytes as they stood); a dwell with a glide was built, read in the gate and refused. The toy gate against omni-v14 ([`results/toy_gate/V15_VS_V14.md`](results/toy_gate/V15_VS_V14.md),
+eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. **omni-v14** ([`docs/OMNI_V14.md`](docs/OMNI_V14.md)), on main
+from 04:47 UTC on 21 October by the founder's orders ("knobs on every monitor, to turn off and on ... a muscle"; "tune the
+engine"), was omni-v13 with two changes in the Kubernetes governor. `--native` leaves any muscle where native runs it, never
+written, and the control panel carries it as one button a muscle. And the operator's own commands run without a shell unless they
+hold a pipe, a redirect or a variable. A third change, no conveyance raise on a reading that leaves out another workload's starting
+pods, was refused by the toy gate (the web's 95th percentile 6.4% higher than omni-v13's) and is kept on a study branch.
+The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. **omni-v13** ([`docs/OMNI_V13.md`](docs/OMNI_V13.md)),
+the engine that stood from 20 October, was omni-v12 with one fault fixed in the Kubernetes governor's conveyance, found on KubeRay's rig
 with the organism alone, where the queue finished 0.6% to 0.8% later and the web's 99th percentile rose 4% to 13% (LOSS in all three
 runs): the web pods' CPU limits, raised in the queue's first half minute, stayed through the saturated queue, the batch pods hashed
 7.6% slower and the web served no faster while the queue ran. On a shared host at its top beside another workload's room, every limit
-given now goes back to the operator's, and every other pod on a machine is counted by its own limit. The toy gate reads no LOSS against
+given now goes back to the operator's, and every other pod on a machine is counted by its own limit. Its toy gate read no LOSS against
 omni-v12 in any toy, the web-only toys identical, and in a batch toy set from the KubeRay runs' own files the queue and the job
 turnaround back at native's (`results/toy_gate/V13_VS_V12.md`). **omni-v12** ([`docs/OMNI_V12.md`](docs/OMNI_V12.md)), the engine
 that stood from 19 October by the founder's order ("every time you do that ... it becomes a new version"), was omni-v11 with
@@ -145,12 +188,12 @@ the day (on omni-v8 the 2022 robustness district's monthly unevenness rose 0.11%
 simulates power outages stays native, because its charge is also the building's reserve (omni-v7's CityLearn table read LOSS in all three
 of our runs in the seven 2023 districts, the only districts with outages; the cause was ours, and on those districts omni-v8 now reads
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
-omni-v11's hold, omni-v12's held refusal and omni-v13's hand-back: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
+omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back, omni-v14's two changes and omni-v15's clear-time gate on the brain's power-cap request: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v13 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 20:31 UTC on 20 October); until a benchmark's three runs land, its row on
+omni-v15 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 02:30 UTC on 22 October); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
-**On omni-v11, until their omni-v13 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
+**On omni-v11, until their omni-v15 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
 receipts by [`tools/reproduce.py`](tools/reproduce.py)). On real Kubernetes, ten pairs a run: on top of Goldilocks the 95th percentile
 −61% to −64%; on top of KEDA's HTTP add-on −72% to −74%, replicas −11% to −20%, and the pod start wait, omni-v10's one LOSS, EVEN with
 the served image pre-pulled; on top of KEDA on the CPU target and the requests −52% to −53%; fixed capacity EVEN; every one GAIN in all
@@ -161,7 +204,7 @@ found beyond the counted cells**: on a mission draw outside the swarm's preregis
 native did not (its proximity reflex slowed over a second instead of at once); the fix held every drone outside the keep-out on
 every draw tried and is in omni-v12, whose swarm runs judge a collision as a LOSS and fly three mission draws never flown
 ([`results/toy_gate/V12_SWARM_REFLEX.md`](results/toy_gate/V12_SWARM_REFLEX.md), [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md),
-[`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v13 runs land** (`results/live/V10_*.md`): steady work,
+[`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v15 runs land** (`results/live/V10_*.md`): steady work,
 the demand that wanders, all four in one run (work inside the line **+47% to +79%**), faults, a queue of jobs (machines **−6% to −14%**),
 a noisy neighbour, the Google day of 2011, CruiseKube and the two-hour run. The Omni index over the real tests, each test on its newest
 table with a reading (MongoDB's on omni-v11 until its omni-v12 runs land): **+4.3% GAIN** on the resource reading and **+11.9% GAIN** on
@@ -169,7 +212,7 @@ the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 The whole system, every layer composed by the product law from its own table (the card, the cluster with its add-ons and
 governors, the services on it, the cloud's bill), with every interval carried and the product's assumption tested on the
 governors' four ways, is [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md): a modelled composition (class S) of the class P and L
-tables, remade as each layer's omni-v13 runs land.
+tables, remade as each layer's omni-v15 runs land.
 How every one of these was graded, category by category, is in [`docs/REFEREE_GRADES.md`](docs/REFEREE_GRADES.md).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
@@ -271,7 +314,7 @@ record by record (every record of the governor, of the other muscles and of the 
 side, every input of the paired run from GitHub, and the papers counsel asks for (the license, the licensing answers, the
 third-party notices, the Enterprise License's standard terms, the patents and trademarks, the security policy). Since 16
 October it also states the rules of the engine that stands as an operator meets them (section 6.5) and how a new muscle is
-coded on the muscle SDK (section 5.7). It is 496 pages, with 50 figures drawn from the code by two kits (`docs/book/figures.py`,
+coded on the muscle SDK (section 5.7). It is 507 pages, with 50 figures drawn from the code by two kits (`docs/book/figures.py`,
 `docs/book/schematics.py`; the drawings in `docs/book/figures/`): the plug, the band and the two forces, one decision of the
 governor, the eight levels, the one pedal, the seven organisms and the three-run rule; a wiring schematic for every stack in
 the grammar of an electrical drawing (the governor's sense and motor terminals, the kill switch, the plug, the native
@@ -279,7 +322,7 @@ controller, the muscle and the meters); the flowcharts of the wire check, the pa
 the three stops and the reading rule; the timing diagrams; and the state machines of the modes, the card governor and the life
 of a muscle; and an index. The Owner's, which prints the engine's whole source and adds the engine's six states and its two
 landscapes, the control-loop block diagrams, the modelled traces and every receipt of the engine that stands charted from its
-own table (77 figures), is 1,249 pages. All three books carry one numbering (chapter.section), and every cross-reference in
+own table (77 figures), is 1,657 pages (the engine's source appendix now carries the eight wires omni-v15 took into the fingerprint). All three books carry one numbering (chapter.section), and every cross-reference in
 them is rewritten to it when the book is built and checked against the headings on the built PDF. Its text is
 [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
 (`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the
@@ -302,6 +345,8 @@ does not tell you. It explains neither how the engine is built nor how it is wir
 is the page word for word, written from the page itself at every build (`docs/book/build_live_manual.py`): every section, every
 monitor with its number, evidence class, feed and knobs, and every control, so the book and the page read each other both
 ways; the control panel at the top of the live engine downloads all three books.
+
+The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for line where a twin exists. The live engine's section 10b ([`#s-cpp`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#s-cpp)) feeds the Python's own runs into the C++ at every rebuild and sets the two side by side, number by number: every twin's parity check, every compass law the page's runs wire, and every muscle of the seven organisms at the tune-down. The Python's 500 seeded runs (`tools/engine_runs.py`, the jump generator) run whole through the C++ harness too ([`cpp/tools/engine_runs.cpp`](cpp/tools/engine_runs.cpp): the Python's draws are the input, the governor, the nerves, the compass law and the verdict in C++ put the mechanism on): every receipt and the SHA-256 digest identical to the Python's, on GitHub with every set (`engine-runs`) and on the page's proof monitor ([`#proofPanel`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#proofPanel)) beside the page's own run. What still runs in Python only is listed there by file (`tools/seal.py`).
 
 ## What is real and what is a model
 
@@ -368,7 +413,7 @@ the request logs, the Kafka consumer logs) gzipped; read one with `gunzip -c FIL
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **The engine that stands, omni-v13, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V12.md`](docs/OMNI_V12.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The engine that stands, omni-v15, fingerprinted; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V15.md`](docs/OMNI_V15.md), [`docs/OMNI_V14.md`](docs/OMNI_V14.md), [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | Every level on one page: the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud, a group of clusters; any level whose gauges go the other way, named | [`docs/LEVELS.md`](docs/LEVELS.md) (`python3 tools/levels.py`) |
@@ -430,7 +475,7 @@ trademark license is granted for any other use.
 
 | File | What it says |
 |---|---|
-| [`LICENSE`](LICENSE) | evaluation and Simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
+| [`LICENSE`](LICENSE) | Evaluation and Simulation use only; everything else needs a signed, paid Omni-Compass Enterprise License |
 | [`NOTICE`](NOTICE) | copyright, the US filings notice, third-party notices |
 | [`PATENTS.md`](PATENTS.md) | the nonprovisional utility patent application "The Omni-Compass" filed in the United States (title, inventor, date; the number is withheld on purpose); no patent license is granted |
 | [`TRADEMARKS.md`](TRADEMARKS.md) | the Omni-Compass marks; trademark applications filed in the United States |

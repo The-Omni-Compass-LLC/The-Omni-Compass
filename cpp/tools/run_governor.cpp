@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     auto d = [&](const char* k) { return std::stod(r.at(ix.at(k))); };
     int sid = static_cast<int>(d("scenario_id"));
     Observation ob{d("q"), d("load"), d("power"), d("thermal"), d("network"), d("drift"), d("stale"), d("security"),
-                   static_cast<int>(d("conflicts"))};
+                   static_cast<int>(d("conflicts")), ix.count("slo_clean") ? d("slo_clean") != 0.0 : true};   // the line clean (omni-v15); a stream without the column is clean
     auto it = govs.find(sid); if (it == govs.end()) it = govs.emplace(sid, Governor{law, true, period_s}).first;
     Directive dv = it->second.step(ob, d("current_cap"), static_cast<int>(d("nodes")));
     o << sid << ',' << r.at(ix.at("step")) << ',' << dv.node_delta << ',' << dv.change_permitted << ',' << dv.power_cap << ','

@@ -52,7 +52,7 @@ sys.path.insert(0, str(ROOT))
 from omnicompass import master
 from omnicompass.adapter import Governor, mode_law, OBSERVE
 from omnicompass.shield import enforce, ShieldLimits
-from omni_controller.muscles import Muscles, add_args as add_muscle_args
+from omni_controller.muscles import Muscles, add_args as add_muscle_args, run_operator_cmd
 from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling, one_host
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
@@ -250,6 +250,28 @@ def apply_give_back_only(a):
         a.mode = "nodepool"
 
 
+# the muscles the operator can leave native, one by one (omni-v14; the founder's order of 20 October: "knobs on every monitor
+# to turn off and on such a mechanism, a muscle"). A muscle named here is never written by the governor: it stays where native
+# runs it, and every other muscle runs as before. The engine decides with the whole body in view either way.
+MUSCLES = {"machines": "the node pool's size (the operator's node-scale command)",
+           "replicas": "the pod autoscaler's target, the pod reflex's replica floor and the replica cap",
+           "cpu": "the serving pods' CPU limits (the conveyance and the pod power cap)",
+           "clock": "the processors' frequency ceiling", "gpu": "the GPU's power limit",
+           "rollout": "the rollout guard (pause and undo)", "batch": "the batch admission and pacing",
+           "rightsize": "the pods' rightsizing", "coldstart": "the cold-start reserve", "contain": "the namespaces' containment",
+           "cooling": "the cooling setpoint"}
+
+
+def native_muscles(text) -> frozenset:
+    """The muscles left native, from --native (or OMNI_NATIVE): a comma list of MUSCLES' names; an unknown name is refused,
+    never ignored, so a muscle the operator meant to leave native is never driven by a misspelling."""
+    names = frozenset(x.strip() for x in str(text or "").split(",") if x.strip())
+    bad = sorted(names - set(MUSCLES))
+    if bad:
+        raise SystemExit(f"--native: unknown muscle {', '.join(bad)} (the muscles: {', '.join(MUSCLES)})")
+    return names
+
+
 def autoscaler_room(k):
     """The machines the cluster's own autoscaler may still add, read live from its status (kube-system/
     cluster-autoscaler-status: per node group, its maxSize less the machines registered); None where no autoscaler reports
@@ -315,6 +337,11 @@ class Controller:
     def __init__(self, a, kube: Kube | None = None):
         self.a = a
         apply_give_back_only(a)
+        a.native_muscles = native_muscles(getattr(a, "native", ""))        # omni-v14: the muscles left native
+        if a.native_muscles:
+            a.pod_reflex_writes = False if "replicas" in a.native_muscles else getattr(a, "pod_reflex_writes", False)
+            a.strict_replicas = False if "replicas" in a.native_muscles else getattr(a, "strict_replicas", False)
+            a.replica_ceiling = 0 if "replicas" in a.native_muscles else getattr(a, "replica_ceiling", -1)
         # v7: every rule of the governor counts in seconds; its count of decisions follows from the decision period, so
         # the period can change without changing any rule's time (at --interval 60 every count is the one v6 used)
         # --interval 0 is a model's or a test's loop that does not sleep: each call is one decision of the shipped minute
@@ -356,6 +383,8 @@ class Controller:
         self.target_at = {}            # (ns, hpa) -> when I last set its target
         self.nodes_restored = False
         self.m = Muscles(self.k, a, self.audit)
+        if a.native_muscles:
+            self.audit({"native_muscles": sorted(a.native_muscles), "why": "left native by the operator (--native): never written"})
         self.cl = None
         if getattr(a, "closure", ""):
             from omnicompass.closure import ClosureLaw, ClosureNodes
@@ -496,6 +525,9 @@ class Controller:
     def _pool_command(self, n, n_now, why, **extra):
         """One node-pool command (the operator's own, --node-scale-cmd). A count the pool refuses is its top, read live:
         the lever stays one under it from then on, and the decision goes on (nothing else is held back by it)."""
+        if "machines" in getattr(self.a, "native_muscles", ()):
+            self.audit({"held": "machines", "why": f"{why}: the machines are left native (--native); {n} not written"})
+            return False
         cmd = self.a.node_scale_cmd.format(n=n)
         self.audit({"write": shlex.split(cmd), "why": why, "dry_run": self.a.dry_run, **extra})
         if self.a.dry_run:
@@ -714,7 +746,7 @@ class Controller:
         floor to what that rule needs now and hands it back the moment the queue no longer needs it: no padding, no new
         target, the operator's own promise met sooner. Zero cluster reads while the queue is calm."""
         lf = getattr(self.a, "latency_file", "")
-        if not lf or self.killed() or self.a.mode not in ("target", "nodepool"):
+        if not lf or self.killed() or self.a.mode not in ("target", "nodepool") or "replicas" in getattr(self.a, "native_muscles", ()):
             return None
         from omni_controller.muscles import latency_window
         w = latency_window(lf, getattr(self.a, "reflex_window_s", 30.0))
@@ -863,7 +895,7 @@ class Controller:
         power_stress = 0.0; blind = {}
         if self.a.power_cmd and self.a.site_limit_w:
             try:
-                power_stress = float(subprocess.run(self.a.power_cmd, shell=True, capture_output=True, text=True).stdout.strip()) / self.a.site_limit_w
+                power_stress = float(run_operator_cmd(self.a.power_cmd).stdout.strip()) / self.a.site_limit_w
                 blind["power"] = False
             except ValueError:
                 power_stress = 0.0; blind["power"] = True
@@ -1144,6 +1176,8 @@ class Controller:
                 # handing the operator's own target back is never held: it is where native stands
                 if obs["slo_clean"] and last is not None and time.time() - last < win and not back and want_h > cur:
                     continue
+                if "replicas" in self.a.native_muscles:
+                    continue     # omni-v14: the replicas are left native; the decision is audited, nothing written
                 self.target_at[(ns, name)] = time.time()
                 self.changed.setdefault((ns, name), int(h["metadata"].get("annotations", {}).get(ANNOTATION, cur)))
                 self.k.write(["annotate", "hpa", name, "-n", ns, "--overwrite", f"{ANNOTATION}={self.changed[(ns, name)]}"], "record original target")
@@ -1252,6 +1286,8 @@ def parser():
     add_muscle_args(ap)
     ap.add_argument("--power-cmd", default="")
     ap.add_argument("--site-limit-w", type=float, default=0.0)
+    ap.add_argument("--native", default=os.environ.get("OMNI_NATIVE", ""),
+                    help="muscles left native, never written (omni-v14): a comma list of " + ", ".join(MUSCLES))
     return ap
 
 

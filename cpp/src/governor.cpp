@@ -39,7 +39,8 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
   long delta = std::max<long>(-L_.down_max, std::min<long>(L_.up_max, n_req - n));
   const double drift_U = derivatives(x_, p_, t_, 0.0).U;
   const double u_push = std::max(-U_AUTHORITY, std::min(U_AUTHORITY, -drift_U + KP * (1.0 - x_.U)));
-  const bool converged = u_push / U_AUTHORITY <= L_.push_release;
+  d.push = u_push / U_AUTHORITY;
+  const bool converged = d.push <= L_.push_release;
   if (delta < 0 && !converged) delta = 0;
   if (delta > 0 && q < L_.guard_queue && u_push / U_AUTHORITY < L_.push_add) delta = 0;
   if (delta < 0 && (q >= L_.guard_queue || n_req > n - L_.down_band)) delta = 0;
@@ -54,7 +55,9 @@ Directive Governor::step(const Observation& ob, double current_cap, int nodes) {
   if (delta < 0) surplus_streak_ = 0;
   const bool at_envelope = pw >= ceiling;
   double cap;
-  if (q < L_.guard_queue && x_.U >= L_.U_gate) cap = cl(current_cap * load * (1.0 + L_.margin), L_.cap_min, 1.0);
+  // the trim to demand only while the response line has been clean for the caller's own clear time (omni-v15, as
+  // omnicompass/adapter.py): the request cannot switch back and forth at the one threshold; a release is never delayed
+  if (q < L_.guard_queue && x_.U >= L_.U_gate && ob.slo_clean) cap = cl(current_cap * load * (1.0 + L_.margin), L_.cap_min, 1.0);
   else if (q >= L_.guard_queue && L_.spread_step > 0.0)
     cap = at_envelope ? cl(current_cap - L_.spread_step, L_.cap_min, 1.0) : (L_.backlog_release ? 1.0 : (n < L_.max_nodes ? current_cap : 1.0));
   else cap = 1.0;
