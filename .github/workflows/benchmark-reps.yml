@@ -33,7 +33,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[reps]')
     strategy:
       fail-fast: false
-      max-parallel: 16   # 20 runners on this plan: 4 stay free for Azure and the big organisms (one job each)
+      max-parallel: 4   # 20 runners on this plan: 4 stay free for Azure and the big organisms (one job each)
       matrix: {rep: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
     runs-on: ubuntu-24.04
     timeout-minutes: 150
@@ -69,17 +69,70 @@ jobs:
         run: for p in $(pgrep -f 'Runner\.(Listener|Worker)'); do echo -1000 | sudo tee "/proc/$p/oom_score_adj" >/dev/null || true; done
       - run: bash scripts/kind_paired.sh
         env:
+          OMNI_NATIVE: replicas
           REP: ${{ matrix.rep }}
-          ARMS: ${{ github.event.inputs.arms || 'native omni' }}
-          DURATION: ${{ github.event.inputs.duration_s || '900' }}
+          ARMS: ${{ github.event.inputs.arms || 'native compass' }}
+          DURATION: ${{ github.event.inputs.duration_s || '2592' }}
           CLOSURE: tuning/GLOBAL_LEAGUE_PREREGISTRATION.json
           FAULTS: ${{ github.event.inputs.faults || '' }}
-          LOAD_STEPS_IN: ${{ github.event.inputs.load_steps || '' }}
+          LOAD_STEPS_IN: ${{ github.event.inputs.load_steps || '2 3 3 3 3 4 4 3 2 2 2 2 2 3 2 3 4 4 3 4 5 6 5 4' }}
           TWO_APP: ${{ github.event.inputs.two_app || '' }}
           REPLICA_CEILING: ${{ github.event.inputs.replica_ceiling || '' }}
           WORKLOAD: ${{ github.event.inputs.workload || 'web' }}
           BATCH_QUEUE: ${{ github.event.inputs.batch_queue || '' }}
-          LOADGEN: ${{ github.event.inputs.loadgen || (contains(github.event.head_commit.message, '[open-load]') && 'open' || 'closed') }}
+          LOADGEN: ${{ github.event.inputs.loadgen || 'open' }}
+      - name: Verify native replica control and actual startup timestamps
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import datetime, json, os
+          from pathlib import Path
+          def ts(value):
+              try: return float(str(value).strip())
+              except ValueError: return datetime.datetime.fromisoformat(value.strip().replace("Z", "+00:00")).timestamp()
+          failures = []
+          for directory in sorted(Path(".").glob("bench-*-*")):
+              watch = directory / "pod_watch.json"
+              if not watch.exists():
+                  failures.append(str(directory) + ": missing pod watch")
+                  continue
+              begin = ts((directory / "window_start.txt").read_text())
+              end = ts((directory / "window_end.txt").read_text())
+              raw = watch.read_text(); decoder = json.JSONDecoder(); offset = 0; pods = {}
+              while offset < len(raw):
+                  while offset < len(raw) and raw[offset].isspace(): offset += 1
+                  if offset == len(raw): break
+                  event, offset = decoder.raw_decode(raw, offset)
+                  obj = event.get("object", event); meta = obj.get("metadata", {})
+                  if not meta.get("uid") or not meta.get("creationTimestamp"): continue
+                  pod = pods.setdefault(meta["uid"], {"name": meta.get("name"), "created": ts(meta["creationTimestamp"]), "ready": None})
+                  for condition in obj.get("status", {}).get("conditions", []) or []:
+                      if condition.get("type") == "Ready" and condition.get("status") == "True" and condition.get("lastTransitionTime") and pod["ready"] is None:
+                          pod["ready"] = ts(condition["lastTransitionTime"])
+              selected = [p for p in pods.values() if begin <= p["created"] <= end]
+              for pod in selected:
+                  pod["ready_within_window"] = pod["ready"] is not None and pod["ready"] <= end
+                  pod["wait_s"] = max(0.0, min(end, pod["ready"] if pod["ready"] is not None else end) - pod["created"])
+              waits = [p["wait_s"] for p in selected]
+              hpa_writes = []
+              audit = directory / "audit.jsonl"
+              if audit.exists():
+                  for line in audit.read_text().splitlines():
+                      if not line.strip(): continue
+                      row = json.loads(line); cmd = row.get("write", [])
+                      if isinstance(cmd, list) and "patch" in cmd and "hpa" in cmd and not row.get("dry_run", False):
+                          hpa_writes.append(row)
+              if hpa_writes: failures.append(str(directory) + ": replica-native trial wrote an HPA")
+              receipt = {"source_commit": os.environ["GITHUB_SHA"], "run_id": os.environ["GITHUB_RUN_ID"],
+                         "configuration": "OMNI_NATIVE=replicas; heartbeat unchanged at 15 seconds",
+                         "timestamp_resolution_s": 1, "pods_started": len(selected),
+                         "startup_wait_total_s": sum(waits), "startup_wait_mean_s": sum(waits)/len(waits) if waits else None,
+                         "censored_at_window_end": sum(not p["ready_within_window"] for p in selected),
+                         "hpa_writes": hpa_writes, "pods": selected}
+              (directory / "STARTUP_VALIDATION.json").write_text(json.dumps(receipt, indent=2))
+              print(directory, json.dumps({k:v for k,v in receipt.items() if k not in ("pods", "hpa_writes")}))
+          if failures: raise SystemExit("; ".join(failures))
+          PY
       - name: Attach README, licenses and disclosures to this artifact
         id: omni_legal_export_1
         if: "always()"
