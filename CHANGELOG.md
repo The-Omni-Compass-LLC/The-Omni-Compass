@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-## 2026-10-22 (afternoon): the Azure sets back on; the conductor starts runs again
+## 2026-10-22 (afternoon): the Azure sets back on; the conductor starts runs again; the levers rig at the brain's minutes
 
 - **The founder's answer.** Asked whether the person whose Azure account the login bills agreed to its use, he answered "Yes yes
   yes". The Azure queue's switch, off while the question stood, is on again (`scripts/azure_queue.txt`): the four sets (the
@@ -17,7 +17,22 @@
   old copy read unknown, and a tick that began before an engine landed still reads the fetched commit. The test
   (`tests/test_release_campaign.py`) builds a commit from this checkout's engine, late wires and all, and fails the old code.
   The running conductor fetches its newest code at every tick, so the grid, the reruns and the clouds start within 15 minutes of
-  the push.
+  the push. It did: at 13:50 UTC it started the first six reruns (A of the core benchmark, the Kubernetes baseline, full
+  controls, levers, observe-only check and CruiseKube), the first grid runs and both cloud checks.
+- **The levers check, on the rig omni-v16 left behind.** Its first omni-v16 run (Kubernetes levers A) failed three of its 19
+  checks: rightsize never changed the CPU request, and coldstart never parked the idle worker in either idle phase; batch pace,
+  containment, cooling and every hand-back passed. The rig ran three, two and three decisions of 5 s per phase. Under omni-v14 each decision was a
+  minute of the brain's whatever the period; under omni-v16 every clock counts seconds, so the phases gave the brain 15, 10 and
+  15 s, and the two levers that give back wait for the brain's calm, its authority to contract (calm at least 0.5), which comes
+  about a minute after it starts on an idle reading. The engine's own brain read on that reading: calm 0.59, 0.82, 0.89 after
+  decisions of 60 s (the passing omni-v14 run's cooling setpoints say the same, 23.3, 25.4, 26.0 °C), 0.00, 0.00, 0.08 after
+  three of 5 s (the failed run's), 0.59 at the fourth decision of 15 s. A rig fault, not the engine's: in a deployment the
+  authority comes after the same minute it took at omni-v15's 60 s. The rig now runs at the default 15 s for the 3, 2 and 3
+  minutes its checks were written for, the idle time before cold start in seconds (`scripts/kind_levers.sh`,
+  `--coldstart-idle-s 120`); `tests/test_pace_clocks.py` holds both the rig's phases and the minute the authority waits for. The
+  failed A stands as the old rig's record; the first block's B and C run on the corrected rig, and a new block runs the levers
+  check again, A, B and C (`scripts/reruns.txt`, added 14:30 UTC). Every other rig that runs the governor counts its phases in
+  seconds at 15 s, or reads no lever's authority within a few decisions (the scale test records its decisions and hand-back).
 
 ## 2026-10-22: omni-v16, the heartbeat at 15 s; every clock of the Kubernetes governor in seconds
 
