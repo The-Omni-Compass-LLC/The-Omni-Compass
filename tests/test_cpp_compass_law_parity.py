@@ -53,7 +53,8 @@ def py_answers(lines):
         if c == "L":
             kd = num(f[8])
             law = CompassLaw(Band(float(f[1]), float(f[2]), center=float(f[3]), cushion=float(f[4])), dt=float(f[5]),
-                             tau=float(f[6]), kp=float(f[7]), kd=kd, authority=float(f[9]), smooth=float(f[10]))
+                             tau=float(f[6]), kp=float(f[7]), kd=kd, authority=float(f[9]), smooth=float(f[10]),
+                             ref_dt=num(f[11]) if len(f) > 11 else None)
             out.append(["L", law.kd])
         elif c == "F":
             center, cushion, kd = num(f[2]), num(f[3]), num(f[4])
@@ -113,8 +114,9 @@ def differences(py, cpp):
     return len(py), worst, None
 
 
-def law_line(band, dt, tau, kp=1.0, kd=None, authority=1.0, smooth=0.5):
-    return f"L,{g(band.lo)},{g(band.hi)},{g(band.center)},{g(band.cushion)},{g(dt)},{g(tau)},{g(kp)},{g(kd)},{g(authority)},{g(smooth)}"
+def law_line(band, dt, tau, kp=1.0, kd=None, authority=1.0, smooth=0.5, ref_dt=None):
+    line = f"L,{g(band.lo)},{g(band.hi)},{g(band.center)},{g(band.cushion)},{g(dt)},{g(tau)},{g(kp)},{g(kd)},{g(authority)},{g(smooth)}"
+    return line if ref_dt is None else f"{line},{g(ref_dt)}"   # the period the lever's rate is stated at (omni-v16)
 
 
 def script(rng):
@@ -162,15 +164,31 @@ def climb(rng):
     return lines
 
 
+def governor(rng):
+    """The live governor's own law at every decision period it may run (omni-v16: 5 to 60 s): its lever's rate and its
+    smoothing stated at the minute (ref_dt 60), the damping computed from it, readings that climb, fall and swing."""
+    lo = rng.uniform(0, 100); hi = lo + rng.uniform(1, 400)
+    band = Band(lo, hi, center=rng.uniform(0.3, 0.7), cushion=0.05)
+    lines = [law_line(band, rng.choice((5.0, 10.0, 15.0, 20.0, 30.0, 60.0)), rng.uniform(10, 300), 1.0, None, 1.0,
+                      rng.choice((0.3, 0.5, rng.uniform(0, 0.95))), rng.choice((60.0, 0.0, rng.uniform(1, 120))))]
+    x = rng.uniform(lo, hi)
+    for _ in range(rng.randint(20, 80)):
+        x += rng.gauss(0, (hi - lo) * 0.1)
+        lines.append(f"F,{g(x)},nan,nan,nan")
+    return lines
+
+
 def main(exe, laws=300):
-    rng, rng_climb = random.Random(20261021), random.Random(20261022)
+    rng, rng_climb, rng_gov = random.Random(20261021), random.Random(20261022), random.Random(20261023)
     worst, n = 0.0, 0
     with tempfile.TemporaryDirectory() as d:
         lines = [l for _ in range(laws) for l in script(rng)] + [l for _ in range(laws // 3 + 1) for l in climb(rng_climb)]
+        lines += [l for _ in range(laws // 3 + 1) for l in governor(rng_gov)]
         n, worst, bad = differences(py_answers(lines), cpp_answers(exe, lines, d))
     assert bad is None, bad
     assert worst == 0.0, f"largest difference {worst}"
-    print(f"C++ compass law and plug vs Python: {laws} laws and plugs and {laws // 3 + 1} climbing laws, {n} answers, every one identical")
+    print(f"C++ compass law and plug vs Python: {laws} laws and plugs, {laws // 3 + 1} climbing laws and {laws // 3 + 1} laws of the "
+          f"live governor at 5 to 60 s, {n} answers, every one identical")
     return n
 
 

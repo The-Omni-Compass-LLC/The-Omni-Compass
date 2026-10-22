@@ -57,7 +57,7 @@ from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_r
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
 RELEASE_PERIOD_S = 60.0   # the pool gives back at most one machine a minute (v7: a rate in time, not in decisions)
-# omni-v14: the clocks that keep their time at any decision period (docs/OMNI_V14.md)
+# omni-v16: the clocks that keep their time at any decision period (docs/OMNI_V16.md)
 CLOSURE_PERIOD_S = 60.0   # the closure law steps once a minute, as it ran on every live result; between its steps an add
                           # it made is held and nothing is given back on its behalf
 CONVEY_PERIOD_S = 15.0    # energy to where the work is: the conveyance runs every 15 s of the governor's own schedule
@@ -357,8 +357,8 @@ class Controller:
         self.n_verdict_trial = per(getattr(a, "verdict_trial_s", 1200.0))
         self.step_scale = period / 60.0                # the compass's gains are per minute: a decision moves its share of one
         self.n_release = per(RELEASE_PERIOD_S)         # decisions between two machines given back (at most one a minute)
-        # omni-v14: every clock of the governor counts seconds, so the decision period sets only how often the state is
-        # read (docs/OMNI_V14.md). The period, its share of the minute every law was stated at, and the law's own steps
+        # omni-v16: every clock of the governor counts seconds, so the decision period sets only how often the state is
+        # read (docs/OMNI_V16.md). The period, its share of the minute every law was stated at, and the law's own steps
         self.period = period
         self.n_closure = per(CLOSURE_PERIOD_S)         # decisions between two steps of the closure law (its own clock)
         self.cl_held = None                            # the closure law's last add, held between its steps
@@ -371,7 +371,7 @@ class Controller:
         self.log = open(a.audit, "a") if a.audit else None
         self.k = kube or Kube(a.kubectl, a.dry_run, self.audit, proxy=not getattr(a, "no_api_proxy", False))
         self.k.audit = self.audit
-        # shared-host signal for kind; None means no scale-out proof. Read over the last minute at any period (omni-v14):
+        # shared-host signal for kind; None means no scale-out proof. Read over the last minute at any period (omni-v16):
         # a raise of the replica cap waits on the host's minute, as it did at a decision a minute
         self.host_cpu = HostCpuSampler(span=per(HOST_READ_S))
         self.g = Governor(law=mode_law("fleet"), period_s=period); self.g.set_mode(OBSERVE)
@@ -420,7 +420,7 @@ class Controller:
                 center = 0.3 if self.dial == "max" else 0.4
             # one decision every --interval s; the service follows a target in about one HPA sync plus a pod start (tau)
             # the target moves at a rate in time (step_scale), so the damping and the smoothing are stated at the minute
-            # (omni-v14: at 15 s the damping is a minute's, never the 15-second decision's)
+            # (omni-v16: at 15 s the damping is a minute's, never the 15-second decision's)
             self.compass_law = CompassLaw(Band(0.0, 1.0, center=center), dt=period,
                              tau=getattr(a, "compass_tau", 60.0), kp=1.0, smooth=0.3, ref_dt=60.0)
             self.compass_law.kd *= 3.0                    # the same push as on every realm muscle (realms/compass_arm.py)
@@ -428,7 +428,7 @@ class Controller:
             # sync and a pod start, --compass-tau), in decisions
             from omnicompass.edge import Edge
             # its window, narrowing and memory keep their minutes; its wobble compares readings one response-time window
-            # apart, so two readings that share requests never make the service look steadier than it is (omni-v14)
+            # apart, so two readings that share requests never make the service look steadier than it is (omni-v16)
             self.edge = Edge(react=getattr(a, "compass_tau", 60.0) / period, per=period / 60.0,
                              lag=per(float(getattr(a, "latency_window_s", 60.0) or 60.0))) if self.dial == "save" else None
             self.edge_base = center
@@ -807,7 +807,7 @@ class Controller:
         return out
 
     def _clock_s(self):
-        """The governor's own schedule in seconds since its first decision (omni-v14): decision k opens at (k - 1) x the
+        """The governor's own schedule in seconds since its first decision (omni-v16): decision k opens at (k - 1) x the
         period and its fast checks follow every --floor-interval, as the shipped loop (main) keeps them."""
         return max(0, self.decisions - 1) * self.period + self.fast_k * float(getattr(self.a, "floor_interval", 5.0) or 5.0)
 
@@ -829,7 +829,7 @@ class Controller:
             self.audit({"error": f"convey: {e}"})
 
     def _warm_reserve(self, n, req_m, per_node):
-        """The machines never given back in the cloud (omni-v14): what the largest requests of the last RESERVE_S need at the
+        """The machines never given back in the cloud (omni-v16): what the largest requests of the last RESERVE_S need at the
         governor's own headroom, read at this decision. Until the requests have been read for the whole horizon the
         reserve is unread, and an unread reading is never room: every machine in service is kept."""
         now = self._clock_s()
@@ -863,7 +863,7 @@ class Controller:
         floor = max(int(math.ceil(s["req_m"] * (1.0 + self.a.headroom) / per_node)) if s["req_m"] > 0 else self.a.min_nodes, int(math.ceil(s["used_m"] / per_node)))
         floor = min(self._max_nodes(s), floor)
         if getattr(self.a, "give_back_only", False):
-            floor = min(floor, int(s.get("pool", n)))   # the cloud adds machines, never the governor: wake only what exists (omni-v14)
+            floor = min(floor, int(s.get("pool", n)))   # the cloud adds machines, never the governor: wake only what exists (omni-v16)
         if s["pending"] > 0 and floor > n and floor > (self.rec_n or 0):
             if self._pool_command(floor, n, "scheduling floor (pending pods)"):
                 self.rec_n = floor
@@ -933,7 +933,7 @@ class Controller:
         self.g.nodes = self.rec_n; self.g.current_cap = 1.0
         d = self.g.step(obs, 0)
         floor = max(int(math.ceil(s["req_m"] * (1.0 + self.a.headroom) / per_node)) if s["req_m"] > 0 else self.a.min_nodes, int(math.ceil(s["used_m"] / per_node)))
-        # the warm reserve in the cloud (omni-v14), read once a decision: no machine at or under it is given back, and no
+        # the warm reserve in the cloud (omni-v16), read once a decision: no machine at or under it is given back, and no
         # give-back trial starts while every machine in service is inside it (a trial must be able to take its step)
         reserve = self._warm_reserve(n, s["req_m"], per_node) if getattr(self.a, "give_back_only", False) else 0
         rec_n = max(self.a.min_nodes, min(self._max_nodes(s), max(self.rec_n + int(d["node_delta"]), floor)))
@@ -953,7 +953,7 @@ class Controller:
         if self.cl is not None:
             # the benchmarked law drives the machines: the closure law on requested cores (omnicompass/closure.py), the
             # scheduling floor stays underneath it. The law counts its own steps (its tracker, its horizons, its reserve),
-            # one a minute, as it ran on every live result (omni-v14): at a shorter period it steps on the decisions that
+            # one a minute, as it ran on every live result (omni-v16): at a shorter period it steps on the decisions that
             # open each minute, and between them an add it made is held (the safe side, at once) while nothing is given
             # back on its behalf (a release waits for its own next step)
             if (self.decisions - 1) % self.n_closure == 0:
@@ -1019,11 +1019,11 @@ class Controller:
                          for h in s["hpas"])
         gate = node_release_gate(n, per_node, s["used_m"], s["pending"], scaling_up, breach_now, rho, auth_n,
                                  senses_live=not any(blind.values()), last_command_landed=nodes_landed)
-        # the warm reserve (omni-v14): in the cloud the governor never adds a machine, and one it gives back is the cloud's to
+        # the warm reserve (omni-v16): in the cloud the governor never adds a machine, and one it gives back is the cloud's to
         # delete once it has stood empty for its scale-down time, so a give-back is undone only by a pod that waits for a
         # new machine. The machines the largest requests of the reserve horizon need, at the governor's own headroom, are
         # never given back there: the closure law's warm reserve (omnicompass/closure.py, its tone), which the live governor
-        # had never wired (found in omni-v14's toy gate: a machine given back in a midday dip, deleted, and the requests
+        # had never wired (found in omni-v16's toy gate: a machine given back in a midday dip, deleted, and the requests
         # back above it an hour later; pods waited 90 s for a new one where native's autoscaler had kept it)
         if rec_n < n and rec_n < reserve:
             rec_n = min(n, reserve)
@@ -1190,7 +1190,7 @@ class Controller:
             self.pod_reflex()
         if getattr(self.a, "give_back_only", False) and rec_n > n:
             # the cloud's rule (v7): the governor only wakes a machine it idled and never adds one, so it never orders more
-            # machines than exist, open or idle (omni-v14). An order past them was carried out by nobody (the actuator
+            # machines than exist, open or idle (omni-v16). An order past them was carried out by nobody (the actuator
             # clamps it to the machines there are), and the next decision read it as a command that did not land, which
             # held every give-back until the cloud made a machine again
             rec_n = max(n, min(rec_n, int(s.get("pool", n))))
@@ -1203,7 +1203,7 @@ class Controller:
                 if self._pool_command(int(act["target"]), n, "node pool size", shield_interventions=hits) and not self.a.dry_run:
                     self.cmd_nodes = int(act["target"])
         self.rec_n = rec_n
-        self._convey_due()                  # the conveyance's 15-second slot, if this decision opens it (omni-v14)
+        self._convey_due()                  # the conveyance's 15-second slot, if this decision opens it (omni-v16)
         return out
 
 
@@ -1211,7 +1211,7 @@ def parser():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--mode", choices=["observe", "target", "nodepool"], default="observe")
     ap.add_argument("--interval", type=float, default=15.0,
-                    help="seconds between governor decisions: every full read of the state (omni-v14: 15, the pace of the "
+                    help="seconds between governor decisions: every full read of the state (omni-v16: 15, the pace of the "
                          "pod autoscaler's own sync; every rule keeps its time in seconds at any period from 5 to 60)")
     ap.add_argument("--floor-interval", type=float, default=5.0,
                     help="seconds between the fast checks between decisions (nodepool mode): a pod waiting for a place, "

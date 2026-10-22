@@ -34,7 +34,7 @@ import math
 class Edge:
     def __init__(self, react: float, z: float = 3.09, window: int = 20, narrow: float = 0.05, start: float = 0.5,
                  memory: float = 0.0, fall_decay: float = 0.9995, est: int = 2, per: float = 1.0, lag: int = 1):
-        # omni-v14: per is the reading period over the period the window, the narrowing, the memory and the fall's decay
+        # omni-v16: per is the reading period over the period the window, the narrowing, the memory and the fall's decay
         # are stated at (the live governor: its decision period over 60 s), so each keeps its time at any period: the
         # window covers the same seconds, the cushion narrows and forgets as much a minute. lag: the readings between two
         # whose difference measures the wobble, so the two never share samples (one reading's own window); at per 1 and

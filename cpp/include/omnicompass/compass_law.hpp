@@ -24,15 +24,17 @@ struct Band {
 };
 
 // The brain's law for one muscle. dt: seconds between decisions; tau: the muscle's response time in seconds; kd defaults
-// to critical damping for that response.
+// to critical damping for that response. ref_dt (omni-v16): the period the lever's rate and the smoothing are stated at,
+// where the caller moves its lever at a rate in time (the live governor: 60 s); none, or 0, is dt itself.
 class CompassLaw {
  public:
   CompassLaw(Band band, double dt, double tau, double kp = 1.0, std::optional<double> kd = std::nullopt,
-             double authority = 1.0, double smooth = 0.5);
+             double authority = 1.0, double smooth = 0.5, std::optional<double> ref_dt = std::nullopt);
   double sense(double reading);
   double force(double reading);   // positive: the up side (add capacity); negative: the down side; bounded by authority
   Band band;
   double dt, tau, kp, kd, authority, smooth;
+  std::optional<double> ref_dt;
   std::optional<double> p;
   double v = 0.0;
 };

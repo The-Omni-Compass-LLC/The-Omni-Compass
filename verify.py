@@ -131,6 +131,17 @@ def main():
     except AssertionError:
         det_law = True
     check("negative control: parity test detects a C++ compass law that takes back while the reading climbs", lmut != lsrc and det_law)
+    # negative control (omni-v16): a C++ law that smooths a decision at a time where the live governor states its smoothing
+    # at the minute must be caught by the live governor's own laws at 5 to 60 s
+    lmut2 = lsrc.replace("const double s = (ref_dt && *ref_dt != 0.0) ? std::pow(smooth, dt / *ref_dt) : smooth;", "const double s = smooth;")
+    (tmp / "compass_law_mut2.cpp").write_text(lmut2)
+    subprocess.run([shutil.which("g++") or shutil.which("clang++"), "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"), *lothers,
+                    str(tmp / "compass_law_mut2.cpp"), str(ROOT / "cpp" / "tools" / "run_compass_law.cpp"), "-o", str(tmp / "oc_compass_law_mut2")], check=True)
+    try:
+        test_cpp_compass_law_parity.main(str(tmp / "oc_compass_law_mut2"), 60); det_law2 = False
+    except AssertionError:
+        det_law2 = True
+    check("negative control: parity test detects a C++ compass law that ignores the minute its smoothing is stated at", lmut2 != lsrc and det_law2)
     from tests import test_cpp_verdict_parity
     n_ver = test_cpp_verdict_parity.main(str(b / "oc_verdict"), 60 if a.quick else 300)
     check(f"C++ verdict vs Python, every trial, reading and step identical ({n_ver:,} answers)", True)

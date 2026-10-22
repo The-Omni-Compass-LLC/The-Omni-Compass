@@ -145,7 +145,7 @@ class Governor:
     last_push: float = 0.0
     log: deque = field(default_factory=lambda: deque(maxlen=4096))
     evolve: bool = True
-    # omni-v14: the seconds between two steps. The engine was built at a step every FLEET_DECISION_SECONDS (60), and every
+    # omni-v16: the seconds between two steps. The engine was built at a step every FLEET_DECISION_SECONDS (60), and every
     # constant of its law is stated there; at any other period each one keeps its time: the engine's own clock advances
     # MACRO_DT x period / 60 a step, the observation is taken in at the share that blends the same amount a minute, and
     # the law's dwell counts are converted to steps of this period. At 60 s every value is the one v13 used

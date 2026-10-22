@@ -1,12 +1,15 @@
-# Omni v14: every clock in seconds, the full decision every 15 seconds
+# Omni v16: every clock in seconds, the full decision every 15 seconds
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 The founder's order of 22 October 2026: the governor's full read of the state and its decision every 15 seconds, the pace of
 the pod autoscaler it sits on, "with the clocks counted in seconds. Test 10S and never above 60", native or better, never
-worse, and anything found worse fixed. Omni v14 is omni-v13 (`docs/OMNI_V13.md`) with every clock of the governor stated in
-seconds, so that its decision period sets only how often it reads the state and never what a rule means, the default period
-15 seconds, and the faults found on the way fixed. Its fingerprint is `OMNI_V14.json`. Every benchmark runs again on it, A, B
+worse, and anything found worse fixed; then, the toy sim asked for 5, 10, 15 and 20 seconds, "Put back the 15 ... In the
+heartbeat and everywhere else ... in the monitor, wire, coding". Omni v16 is omni-v15 (`docs/OMNI_V15.md`) with every clock
+of the governor stated in seconds, so that its decision period sets only how often it reads the state and never what a rule
+means, the default period 15 seconds, and the faults found on the way fixed. It was built as omni-v14 on a working branch
+while main landed omni-v14 (a knob that leaves any muscle native) and omni-v15 (the power cap's request through the line's
+own clear time), and was renumbered and rebased onto omni-v15 before its gate. Its fingerprint is `OMNI_V16.json`. Every benchmark runs again on it, A, B
 and C; every earlier table stands as its own engine's result, and results from two versions are never pooled. The readings
 of the toy gate below are our own models (evidence class S), never a benchmark result. Run and scored by The Omni-Compass LLC's
 own code. No outside party has reviewed or approved these results.
@@ -23,7 +26,7 @@ own code. No outside party has reviewed or approved these results.
   (`FLEET_DECISION_SECONDS = 60`, `omnicompass/adapter.py`), and the rules were written in decisions. On 14 October the founder
   asked for 15, 10 and 5 s. Omni v7 (16 October) restated six rules in seconds (`docs/OMNI_V7.md`, section 4) and kept 60 s
   as the default, because the engine core still advanced one fixed step a decision and the toy at 15 s read LOSS rows.
-- **What still counted decisions on omni-v13**, each found in the code and fixed here: the engine core's step and its blend
+- **What still counted decisions on omni-v15**, each found in the code and fixed here: the engine core's step and its blend
   of each observation; the fleet law's dwell counts; the edge's window, narrowing, memory, wobble and lesson; the compass law's
   damping and velocity smoothing; the closure law's step; the conveyance's cadence; the shared host's busy reading; the
   modelled heat; the cold start's wait; the batch admission's and resumption's pace. At 15 s each ran four times as fast.
@@ -50,8 +53,8 @@ the governor is defined in seconds; Δ sets only how often the state is read. Ea
    service look steadier than it is; the compass's damping is the critical damping of the rate its lever moves at (the target
    moves period / 60 of a step each decision, a rate a minute), so it is stated at Δ₀.
 
-**The identity.** At Δ = Δ₀ every clock's value is omni-v13's: r = 1 leaves every factor, share, step, count and lag as it was
-(`tests/test_clocks_in_seconds.py`), so wherever the cloud's rule (`--give-back-only`) is off, omni-v14 at 60 s is omni-v13 at
+**The identity.** At Δ = Δ₀ every clock's value is omni-v15's: r = 1 leaves every factor, share, step, count and lag as it was
+(`tests/test_clocks_in_seconds.py`), so wherever the cloud's rule (`--give-back-only`) is off, omni-v16 at 60 s is omni-v15 at
 60 s, read for read and write for write. The three cloud fixes of section 4 (5, 6 and 7) act at every period, 60 s included.
 
 **Convergence.** The engine core blends an observation in and then advances its equations, so the two are applied in turn
@@ -60,7 +63,7 @@ read at 60, 15 and 1 s leaves the engine nearer the 1 s path at 15 s than at 60 
 
 ## 3. Every clock, mapped
 
-| Clock | Where | omni-v13 (a reading) | omni-v14 (in seconds) | at 60 s | at 15 s | at 10 s |
+| Clock | Where | omni-v15 (a reading) | omni-v16 (in seconds) | at 60 s | at 15 s | at 10 s |
 |---|---|---|---|---|---|---|
 | The engine core's step | `omnicompass/adapter.py` | 0.1 a decision | 0.1·r (the engine's own time, 0.1 a minute) | 0.1 | 0.025 | 0.0167 |
 | Its blend of each observation | the same | 0.339 a decision | 1 − 0.661ʳ (time constant 145 s) | 0.339 | 0.0983 | 0.0667 |
@@ -70,10 +73,10 @@ read at 60, 15 and 1 s leaves the engine nearer the 1 s path at 15 s than at 60 
 | The edge's memory of a fall | the same | 0.9995 a decision | 0.9995ʳ (half-life 23 h) | 0.9995 | 0.999875 | 0.999917 |
 | The edge's wobble | the same | readings a decision apart | readings 60 s apart | lag 1 | lag 4 | lag 6 |
 | The edge's lesson from a fall | `omni_controller/controller.py` | 0.1 a decision | 0.1 a minute of fall | 0.1 | 0.025 | 0.0167 |
-| The compass's damping k_d | `omnicompass/compass_law.py` | (2√(k_p τ/Δ) − 1)·Δ ×3 | stated at Δ₀: 180 s | 180 | 180 (v13: 135) | 180 (v13: 117) |
+| The compass's damping k_d | `omnicompass/compass_law.py` | (2√(k_p τ/Δ) − 1)·Δ ×3 | stated at Δ₀: 180 s | 180 | 180 (v15: 135) | 180 (v15: 117) |
 | Its velocity smoothing | the same | 0.3 a decision | 0.3ʳ (time constant 50 s) | 0.3 | 0.740 | 0.818 |
 | The closure law's step | `omni_controller/controller.py` | every decision | once a minute; an add held between, nothing given back | every decision | every 4th | every 6th |
-| The conveyance | the same | every third fast check | every 15 s of the governor's schedule | 15 s | 15 s (v13: 22.5 s) | 15 s (v13: 30 s) |
+| The conveyance | the same | every third fast check | every 15 s of the governor's schedule | 15 s | 15 s (v15: 22.5 s) | 15 s (v15: 30 s) |
 | The shared host's busy share (replica raise) | `omni_controller/capacity.py` | since the last decision | over the last minute | 1 interval | 4 intervals | 6 intervals |
 | The modelled heat | `omni_controller/muscles.py` | 0.86 a decision | 0.86ʳ (time constant 398 s) | 0.86 | 0.963 | 0.975 |
 | The cold start's wait | the same | 3 decisions | 180 s | 3 | 12 | 18 |
@@ -86,7 +89,7 @@ of the autoscaler's target and coasting, a rate a minute; the pod reflex's windo
 
 ## 4. The faults fixed with it
 
-| # | Fault on omni-v13 | Fix in omni-v14 | Found |
+| # | Fault on omni-v15 | Fix in omni-v16 | Found |
 |---|---|---|---|
 | 1 | At a period under 60 s the cushion in front of the line narrowed: its window covered fewer minutes, it narrowed and forgot faster, and readings that share requests made the service look up to twice as steady | the edge in seconds (section 3) | reading the code for the founder's question |
 | 2 | The engine core's clock and its blend ran four times as fast at 15 s | the core in seconds | the same |
@@ -97,8 +100,9 @@ of the autoscaler's target and coasting, a rate a minute; the pod reflex's windo
 | 7 | In the cloud the fast check between decisions ordered machines for pods that wait, though only the cloud adds a machine there: an order past the machines that exist changed nothing (a waiting pod already lands on an idle one) | the fast check's order held to the machines that exist, as the decision's (5) | the same per-seed audits |
 | 8 | The toy gate's cloud took an idle machine's room away at once, as if drained, and gave its pods no machine, so the governor in the model never counted an idle machine still carrying work and missed the running pods' requests; pods waited in the model where they wait nowhere on a real cluster (the shipped actuator, `scripts/kind_nodepool.sh`: PreferNoSchedule, no pod moved, a pod that finds the open machines full lands on an idle one at once; the Azure receipts read pods waiting EVEN in all four sets) | the toy's cloud corrected to the actuator as shipped (`tools/toy_gate.py`) | the toy gate's per-seed readings |
 
-The eighth is a fault of our model, not of the engine: the LOSS rows the model printed for pods waiting at 15 s on omni-v13
-(+112%) were its own. It is corrected for both engines alike, and every reading in section 6 is on the corrected model.
+The eighth is a fault of our model, not of the engine: the LOSS rows the model printed for pods waiting at 15 s (+112% on
+omni-v13's engine) were its own. It is corrected for both engines alike, and every reading in sections 6 and 7 is on the
+corrected model.
 
 ## 5. What the period costs and gains
 
@@ -116,14 +120,18 @@ The eighth is a fault of our model, not of the engine: the LOSS rows the model p
   that reads states the last move has not reached yet. Every move away from native is paced in seconds (section 2) and the
   release gate holds a machine while its last command has not landed, so a faster reading cannot stack moves.
 
-## 6. The toy gate against omni-v13
+## 6. The toy gate against omni-v15
 
-To be filled from `results/toy_gate/V14_VS_V13.md`.
+To be filled from `results/toy_gate/V16_VS_V15.md`.
 
-## 7. What stays omni-v13's
+## 7. The heartbeat sweep: 5, 10, 15, 20, 30 and 60 seconds
+
+To be filled from `results/toy_gate/HEARTBEAT_SWEEP.md`.
+
+## 8. What stays omni-v15's
 
 Every gain, guard, preset, muscle, band and threshold; the verdict and its interval; the closure law's setting; the GPU
-governors (their own 2 s loop); the realms' arms (their own ticks); the fleet harness's arms. Engines before omni-v14 ran at a
+governors (their own 2 s loop); the realms' arms (their own ticks); the fleet harness's arms. Engines before omni-v16 ran at a
 decision a minute, and their tables stand as their own.
 
 ---

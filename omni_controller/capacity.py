@@ -27,7 +27,7 @@ def one_host(nodes) -> bool:
 class HostCpuSampler:
     """Measure aggregate host CPU busy share from Linux /proc/stat.
 
-    span: the sample intervals the share is read over (omni-v14). The governor samples once a decision; at 1 the share
+    span: the sample intervals the share is read over (omni-v16). The governor samples once a decision; at 1 the share
     is the one since the previous decision (v13 at a decision a minute), and at a shorter period it passes the intervals
     that make the same minute (4 at 15 s), so a guard that read the host's minute still reads its minute."""
 

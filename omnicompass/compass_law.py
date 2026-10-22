@@ -83,7 +83,7 @@ class CompassLaw:
     kd: Optional[float] = None
     authority: float = 1.0
     smooth: float = 0.5          # the velocity estimate's smoothing (0: raw difference, near 1: heavily smoothed)
-    # omni-v14: the period the lever's rate and the smoothing are stated at, where the caller moves its lever at a rate in
+    # omni-v16: the period the lever's rate and the smoothing are stated at, where the caller moves its lever at a rate in
     # time rather than a step a decision (the live governor: its compass moves the target by period / 60 of a step each
     # decision). The damping is then the critical damping of that rate, and the smoothing keeps its time constant, at any
     # decision period. None: dt itself, every value as before
