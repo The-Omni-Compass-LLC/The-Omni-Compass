@@ -952,7 +952,8 @@ choice does. Its five rows of buttons pick the record to read:
   the fast check's rescues, the machines its 5-second check added only after a pod already waited.
 
 The tiles give the chosen beat whole. They show what it is read against and every gauge's mean change with its 95% interval
-and its word (GAIN, EVEN, LOSS or power given, by the one key). The last tiles give the engine's own cost a day; native,
+and its word (GAIN, EVEN, LOSS or power given, by the one key); the number carries the word's sign (GAIN +, LOSS −, EVEN =),
+never the gauge's raw direction. The last tiles give the engine's own cost a day; native,
 which runs no governor, costs nothing there. The rescues tile says why a slow beat waits more: the full decision sizes the
 pool ahead of the load, and read less often, the load outruns it between decisions, so the 5-second check adds the machine
 only once a pod already waits.
