@@ -186,7 +186,7 @@ of our runs in the seven 2023 districts, the only districts with outages; the ca
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
 omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back, omni-v14's two changes and omni-v15's clear-time gate on the brain's power-cap request: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v15 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 23:30 UTC on 21 October); until a benchmark's three runs land, its row on
+omni-v15 (`scripts/reruns.txt`, the grid and the Azure sets restarted on it from 02:30 UTC on 22 October); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
 **On omni-v11, until their omni-v15 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
@@ -310,7 +310,7 @@ record by record (every record of the governor, of the other muscles and of the 
 side, every input of the paired run from GitHub, and the papers counsel asks for (the license, the licensing answers, the
 third-party notices, the Enterprise License's standard terms, the patents and trademarks, the security policy). Since 16
 October it also states the rules of the engine that stands as an operator meets them (section 6.5) and how a new muscle is
-coded on the muscle SDK (section 5.7). It is 506 pages, with 50 figures drawn from the code by two kits (`docs/book/figures.py`,
+coded on the muscle SDK (section 5.7). It is 507 pages, with 50 figures drawn from the code by two kits (`docs/book/figures.py`,
 `docs/book/schematics.py`; the drawings in `docs/book/figures/`): the plug, the band and the two forces, one decision of the
 governor, the eight levels, the one pedal, the seven organisms and the three-run rule; a wiring schematic for every stack in
 the grammar of an electrical drawing (the governor's sense and motor terminals, the kill switch, the plug, the native
@@ -318,7 +318,7 @@ controller, the muscle and the meters); the flowcharts of the wire check, the pa
 the three stops and the reading rule; the timing diagrams; and the state machines of the modes, the card governor and the life
 of a muscle; and an index. The Owner's, which prints the engine's whole source and adds the engine's six states and its two
 landscapes, the control-loop block diagrams, the modelled traces and every receipt of the engine that stands charted from its
-own table (77 figures), is 1,655 pages (the engine's source appendix now carries the eight wires omni-v15 took into the fingerprint). All three books carry one numbering (chapter.section), and every cross-reference in
+own table (77 figures), is 1,657 pages (the engine's source appendix now carries the eight wires omni-v15 took into the fingerprint). All three books carry one numbering (chapter.section), and every cross-reference in
 them is rewritten to it when the book is built and checked against the headings on the built PDF. Its text is
 [`docs/OMNI_COMPASS_MANUAL.md`](docs/OMNI_COMPASS_MANUAL.md); the cloud install files are `deploy/install/`
 (`omni-compass.yaml`, `rbac-machines.yaml`, `omni-compass-cloud.yaml`) and `deploy/Dockerfile.cloud`. It is written for the CTO who decides, the

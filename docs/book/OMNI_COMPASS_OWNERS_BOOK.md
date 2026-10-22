@@ -910,7 +910,7 @@ hands every setting back to native's value when it stops, dies or is switched of
 
 ### 2.3 Real Kubernetes, each gain beside its cost (L, three runs of ten pairs, kind on one GitHub runner)
 
-The rows marked omni-v11 are the newest tables; the others are omni-v10's. omni-v14, the engine that stands since 21 October, runs every test again, and each test's three runs on it replace its row as they land (the conductor is running them).
+The rows marked omni-v11 are the newest tables; the others are omni-v10's. omni-v15, the engine that stands since 21 October, evening, runs every test again, and each test's three runs on it replace its row as they land (the conductor is running them).
 
 | Test | Gain, the same in all three of our runs | What it cost |
 |---|---|---|
@@ -988,7 +988,7 @@ measurement exists.
 
 1. **Concept.** Where the idea comes from and what it adds, against supervisory control, reference governors, the
    Simplex fallback and online experiments (`docs/RELATED_WORK.md`).
-2. **Engine code.** 82% of the engine's 6,531 statements run under the tests (`docs/ENGINE_COVERAGE.md`, measured again on the omni-v12 tree); every proved
+2. **Engine code.** 71% of the engine's 9,685 statements run under the tests (`docs/ENGINE_COVERAGE.md`, measured again on the omni-v15 tree): 82% of the 6,579 in the files that stood before omni-v15, 49% of the 3,106 in the eight runners it took into the fingerprint, which their own benchmarks run whole on GitHub; every proved
    property checked on thousands of generated cases (`tests/test_engine_properties.py`); every static-scan finding fixed or
    reviewed (`docs/SECURITY_SCAN.md`). Held at B by a fault found in the swarm's wire, whose code did not do what its own
    comment says (`docs/LIMITATIONS.md`, section 3), and by the wires outside the fingerprint (`docs/CHANGE_CONTROL.md`).
@@ -3236,8 +3236,8 @@ analysis: **no outside security review or penetration test has been made**, and 
 | T6 | Someone feeds the governor false readings (a lying metric, a stalled probe) | A reading with no machine in service holds the decision and writes nothing (omni-v11); a stale reading makes a muscle BLIND (`omnicompass/muscle_sdk.py`); every step is a paired trial on the system itself, refused if its cost rises more than 2% (`tools/knob_verdict.py`, `omnicompass/verdict.py`); every write stays inside the capability and safety contracts | `tests/test_blind_reading.py`, `tests/test_muscle_sdk.py`, `tests/test_knob_verdict.py`; the fault test's blind probe; the extended fault test's frozen API server and missing metrics server (queued) | A false reading that stays consistent and inside the bounds can steer the governor within the room the operator granted |
 | T7 | The engine's code is changed | The engine is fingerprinted: `OMNI_V11.json` names the digest of its 47 files, and `python3 tools/omni_version.py` names the engine a checkout carries, or what differs from every fingerprint. `python3 verify.py` holds every place that names the engine to the engine that stands (`tools/land_engine.py --check`) | `tests/` (the release manifest and the version tool); every run's receipt names the engine its commit carries | Releases are not signed artefacts, the repository's bots commit unsigned, and nothing checks the fingerprint when a governor starts |
 | T8 | A dependency is replaced (a Python package, a GitHub action) | Every package pip installs is pinned to an exact version with the SHA-256 of every file PyPI publishes for it (`requirements-lock.txt`, hash-checking mode), with a software bill of materials (`sbom/omni-compass.cdx.json`, `sbom/omni-compass.spdx.json`, written by `tools/sbom.py`); every action a workflow uses is named by its commit, its tag beside it (407 uses, 19 October); `security-scan.yml` audits every pin against the public vulnerability databases each week; Dependabot watches both the packages and the actions (`.github/dependabot.yml`) | `tests/test_supply_chain.py` fails a push with an action named by tag or a package without hashes; `tools/sbom.py --check` in `verify.py` | Closed for what Omni-Compass installs; the tools a benchmark machine installs from its own package manager (kind, kubectl, the databases) are pinned by version, not by hash |
-| T9 | A secret leaks from a workflow | Secrets reach only workflows started on this repository (a push or a dispatch); no workflow runs on `pull_request_target`, so no fork's code ever runs with them. Secrets are kept in GitHub's store only, and GitHub masks them in every log | Every workflow names its token's rights; the 28 that only build, run and upload get `contents: read` and nothing else (18 October). `tests/test_workflow_permissions.py` fails a push that leaves any workflow on the repository's default, or gives a read-only token to a workflow that pushes, starts a run or reads another run's files | — |
-| T10 | A run spends money it should not | In a cloud, the governor works on the machines alone: it parks a machine the cloud already made and wakes it on a breach, and moves no pod, conveys no processor and caps no power (`OMNI_MACHINES_ONLY=1`). A cloud's set starts only after that cloud's $0 check passes (the key, the login, the plan, the machine type, every quota; `tools/cloud_key_check.py`). Nothing is rented for the grid | `results/live/AKS_BILL.md`; `tests/test_cloud_check.py` | The credentials in the secrets can create clusters; their scope is set in each cloud's console |
+| T9 | A secret leaks from a workflow | Secrets reach only workflows started on this repository (a push or a dispatch); no workflow runs on `pull_request_target`, so no fork's code ever runs with them. Secrets are kept in GitHub's store only, and GitHub masks them in every log. A key stored in another form is named by its shape before any cloud's login step reads it, never a character of it printed (`tools/cloud_key_check.py`), because a login step's own refusal can quote the first characters of what it was given, and a piece of a secret is not masked (21 October: Azure's did, on a public run page) | Every workflow names its token's rights; `tests/test_cloud_check.py` fails a push that leaves any Azure login without the shape check before it; the 28 that only build, run and upload get `contents: read` and nothing else (18 October). `tests/test_workflow_permissions.py` fails a push that leaves any workflow on the repository's default, or gives a read-only token to a workflow that pushes, starts a run or reads another run's files | — |
+| T10 | A run spends money it should not | In a cloud, the governor works on the machines alone: it parks a machine the cloud already made and wakes it on a breach, and moves no pod, conveys no processor and caps no power (`OMNI_MACHINES_ONLY=1`). A cloud's set starts only after that cloud's $0 check passes (Google, Amazon and, since 22 October, Azure: the key, the login, the plan, the machine type, every quota; `tools/cloud_key_check.py`). Nothing is rented for the grid | `results/live/AKS_BILL.md`; `tests/test_cloud_check.py` | The credentials in the secrets can create clusters; their scope is set in each cloud's console |
 | T11 | The evidence is changed after the run | Every archived run is kept byte for byte on the branch `raw` with its SHA-256 sums (`scripts/raw_archive.sh`); every table names its runs and is rebuilt by its own tool from them | `tests/test_raw_archive.py` | Audit lines are not signed when written; the sums protect them from the moment they are archived |
 | T12 | The system's control plane is taken away (the API server frozen, the metrics server gone) | The governor holds on a reading it cannot make; a failed decision writes nothing; its lease runs 300 s at a 60-second decision, so a short outage does not hand back what is working | The extended fault test (queued, A, B and C: `docs/K8S_COMPASS_PREREGISTRATION.md`) | Whatever the runs read is reported |
 
@@ -3308,7 +3308,7 @@ The low-severity kinds are the patterns of a harness that drives other programs:
 
 
 
-Generated by `python3 tools/sbom.py` from `requirements-lock.txt` (Omni-Compass 0.14.0); `tools/sbom.py --check`, run by `verify.py`, fails a push where this page or the bill of materials (`sbom/omni-compass.cdx.json`, CycloneDX 1.5; `sbom/omni-compass.spdx.json`, SPDX 2.3) is not what the lock gives, where a pinned package has no license read, or where a license is strong copyleft. Every package is pinned with the SHA-256 of every file PyPI publishes for its version, and `security-scan.yml` audits every pin against the public vulnerability databases each week.
+Generated by `python3 tools/sbom.py` from `requirements-lock.txt` (Omni-Compass 0.15.0); `tools/sbom.py --check`, run by `verify.py`, fails a push where this page or the bill of materials (`sbom/omni-compass.cdx.json`, CycloneDX 1.5; `sbom/omni-compass.spdx.json`, SPDX 2.3) is not what the lock gives, where a pinned package has no license read, or where a license is strong copyleft. Every package is pinned with the SHA-256 of every file PyPI publishes for its version, and `security-scan.yml` audits every pin against the public vulnerability databases each week.
 
 **29 packages; every license permissive except one weak, file-level copyleft (MPL-2.0, Hypothesis, used by the tests alone and never shipped with the engine); no GPL, LGPL or AGPL.** Each package keeps its own license; nothing in the Omni-Compass Evaluation License changes those terms (`THIRD_PARTY_NOTICES.md`).
 
@@ -3371,7 +3371,7 @@ and scored by The Omni-Compass LLC's own code. No outside party has reviewed or 
 | # | Change | Where | Why |
 |---|---|---|---|
 | 1 | The brain trims the power cap to demand only while the response line has been clean for the governor's own clear time; a breach, or a line not yet clean, releases the request to the start limit in the same decision | `omnicompass/adapter.py` (the `power` rule, `observe_vector`'s `clean`), its C++ twin `cpp/src/governor.cpp`; the card governor hands the brain its clear flag (`omni_controller/gpu_governor.py`) | on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them, at the one threshold on the queue and the state (`docs/CHANGE_CONTROL.md`, "the next version's list") |
-| 2 | Every wire that holds a governor's rules is in the fingerprint | `tools/omni_version.py` (`SCOPE`; a version declared before is read on its own files) | a rule in a wire outside the fingerprint could change without the version changing (the swarm's reflex did, in omni-v12) |
+| 2 | Every wire that holds a governor's rules is in the fingerprint | `tools/omni_version.py` (`SCOPE`; a version declared before them is read without those eight wires and only those) | a rule in a wire outside the fingerprint could change without the version changing (the swarm's reflex did, in omni-v12) |
 | 3 | Declared, not an engine change: the kill test reads the 300 s after the kill, where it read 120 s | `tools/live_reps.py`, `docs/ROBUSTNESS_PREREGISTRATION.md` ("On omni-v15"), `tests/test_robust.py` | the one tail rise of the omni-v11 kill test came 140 to 190 s after the kill, past the window declared |
 
 ### 26.1 The request through the clear time
@@ -3420,9 +3420,11 @@ the live governors, the realms and three outside-simulator wires (`tools/run_kil
 the data stores' wires (`run_redis.py`, `run_kafka.py`, `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`) and `run_swarm.py`,
 `run_mujoco.py` and `run_cpu_power.py` were versioned by git and tested but did not move the digest, and one of them carried a
 fault fixed in omni-v12 without the digest moving (`docs/CHANGE_CONTROL.md`, "Gaps this page names"). From omni-v15 every one
-of them is in the scope: a change to any rule changes the version. A version declared before is read on its own files: a
-commit carrying omni-v14's 47 files byte for byte reads omni-v14 whatever those eight wires hold, because its fingerprint never
-covered them, and the tool prints a version's own digest and file count as its fingerprint records them.
+of them is in the scope: a change to any rule changes the version. A version declared before them is read without those eight
+wires and only those: a commit carrying omni-v14's 47 files byte for byte reads omni-v14 whatever those eight wires hold,
+because its fingerprint never covered them, while any other file omni-v14's list does not name (a new rule, a new module)
+still makes the tree a different engine (`tests/test_omni_version.py`); and the tool prints a version's own digest and file
+count as its fingerprint records them.
 
 ### 26.3 The kill test's reading: 300 s after the kill
 
@@ -3580,7 +3582,7 @@ declared engine.
 | omni-v12 | 20 Oct 00:30 | `d38b58fbe28939b8` | 47 | Kubernetes: a raise the cluster's admission refused is held, not written again at every check; the swarm's proximity reflex at once (its wire outside the digest, declared with the version) |
 | omni-v13 | 20 Oct 20:31 | `0088837333c6f0fc` | 47 | Kubernetes: the CPU limits the conveyance gave go back to the operator's on a shared host at its top beside another workload's room; every other pod counted by its own limit |
 | omni-v14 | 21 Oct 04:47 | `7afba44615fcff8f` | 47 | Kubernetes: a knob that leaves any one muscle native; the operator's own commands run without a shell |
-| omni-v15 | 21 Oct (evening) | `0a53cdd7a558f803` | 55 | the brain: the power cap's request trims only while the response line has been clean for the governor's own clear time (the omni-v11 long run's 126 switches in 350 decisions); every wire that holds a governor's rules in the fingerprint (eight taken in, their bytes as they stood) |
+| omni-v15 | 22 Oct 02:30 | `0a53cdd7a558f803` | 55 | the brain: the power cap's request trims only while the response line has been clean for the governor's own clear time (the omni-v11 long run's 126 switches in 350 decisions); every wire that holds a governor's rules in the fingerprint (eight taken in, their bytes as they stood) |
 
 Each version was a fault found in a real run and fixed: the record is in `docs/OMNI_V6.md` to `docs/OMNI_V15.md`, and each
 toy gate's reading in `results/toy_gate/`. Eleven versions in eleven days is the cost of fixing every fault the day it is
@@ -3601,8 +3603,8 @@ stands is also a version that is re-proved, re-tested and re-built from its rece
   `tools/run_kil.py`); the other wires that hold a governor's rules (the data stores' `tools/run_redis.py`,
   `run_kafka.py`, `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`, and `tools/run_swarm.py`, `run_mujoco.py`,
   `run_cpu_power.py`) were versioned by git and tested, but a change to them did not move the digest. Closed in omni-v15
-  (21 October): every one of them is in the scope (`tools/omni_version.py`, 55 files), and a version declared before is
-  read on its own files.
+  (21 October): every one of them is in the scope (`tools/omni_version.py`, 55 files), and a version declared before them is
+  read without those eight wires and only those: any other file its list does not name still makes the tree a different engine.
 - A wire outside the fingerprint carried a fault: the swarm's proximity reflex (`tools/run_swarm.py`) slowed a drone over a
   second where its own comment says at once, and on a mission draw outside the preregistered seeds it let drones collide
   (`results/toy_gate/V12_SWARM_REFLEX.md`). Its fix is a change to a guard, so by rule 1 it was a version, not a patch: it
@@ -3635,33 +3637,43 @@ cluster.
 
 
 
-Line coverage of every Python file in the engine that stands (omni-v14), under the whole test suite: the unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 tools/engine_coverage.py --measure` on commit `26a129f707e8`; `tools/engine_coverage.py --check`, run by `verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.
+Line coverage of every Python file in the engine that stands (omni-v15), under the whole test suite: the unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 tools/engine_coverage.py --measure` on commit `a2906c98e34e`; `tools/engine_coverage.py --check`, run by `verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.
 
-**82% of the engine's 6,579 statements run under the tests** (5,372 run, 1,207 not). Coverage counts lines a test executes, not what it asserts: the properties the tests check are in `tests/test_engine_properties.py`, and the proofs of the core in `docs/ENGINE_PROOFS.md`.
+**71% of the engine's 9,685 statements run under the tests** (6,887 run, 2,798 not). Coverage counts lines a test executes, not what it asserts: the properties the tests check are in `tests/test_engine_properties.py`, and the proofs of the core in `docs/ENGINE_PROOFS.md`.
+
+The 8 runners omni-v15 took into the fingerprint (the data stores', the swarm's, MuJoCo's and the CPU power runner, `tools/run_*.py`) hold 3,106 of these statements, 49% of them run under the tests: each is run whole by its own benchmark on GitHub, A, B and C, rather than by a unit test. The other 38 Python files, the engine as it stood before them, hold 6,579, 82% run. The whole figure fell when those runners came in; no test was lost.
 
 | Engine file | Statements | Run by the tests | Coverage |
 |---|---:|---:|---:|
+| `tools/run_pgbench.py` | 581 | 96 | 17% |
 | `tools/run_citylearn.py` | 166 | 41 | 25% |
 | `omnicompass/stack_sim.py` | 210 | 55 | 26% |
+| `tools/run_kafka.py` | 373 | 122 | 33% |
 | `omnicompass/closure.py` | 151 | 61 | 40% |
 | `omnicompass/speed.py` | 60 | 25 | 42% |
+| `tools/run_ycsb.py` | 394 | 173 | 44% |
 | `omnicompass/mathdrive.py` | 50 | 22 | 44% |
+| `tools/run_redis.py` | 356 | 165 | 46% |
+| `tools/run_sysbench.py` | 386 | 187 | 48% |
 | `omnicompass/shield.py` | 79 | 41 | 52% |
+| `tools/run_swarm.py` | 257 | 134 | 52% |
 | `tools/run_kil.py` | 132 | 94 | 71% |
 | `realms/plants.py` | 642 | 458 | 71% |
-| `omnicompass/adapter.py` | 192 | 141 | 73% |
+| `omnicompass/adapter.py` | 192 | 142 | 74% |
 | `omnicompass/core.py` | 159 | 121 | 76% |
 | `omni_controller/gpu_compass.py` | 295 | 227 | 77% |
+| `tools/run_mujoco.py` | 205 | 165 | 80% |
 | `omnicompass/master.py` | 77 | 63 | 82% |
+| `tools/run_cpu_power.py` | 554 | 474 | 86% |
 | `realms/harness.py` | 413 | 354 | 86% |
 | `omni_controller/quota.py` | 86 | 75 | 87% |
 | `omni_controller/controller.py` | 870 | 780 | 90% |
+| `omni_controller/capacity.py` | 62 | 56 | 90% |
 | `omnicompass/compass.py` | 82 | 75 | 91% |
 | `omnicompass/edge.py` | 49 | 45 | 92% |
 | `realms/compass_arm_v5.py` | 838 | 770 | 92% |
 | `omnicompass/conveyance.py` | 52 | 48 | 92% |
 | `omnicompass/muscle_sdk.py` | 215 | 199 | 93% |
-| `omni_controller/capacity.py` | 62 | 58 | 94% |
 | `omnicompass/configurations.py` | 31 | 29 | 94% |
 | `omnicompass/disruption_budget.py` | 16 | 15 | 94% |
 | `omnicompass/storage.py` | 32 | 30 | 94% |
@@ -3679,7 +3691,7 @@ Line coverage of every Python file in the engine that stands (omni-v14), under t
 
 ### 29.1 Where the tests reach least
 
-Files under 60%: `tools/run_citylearn.py`, `omnicompass/stack_sim.py`, `omnicompass/closure.py`, `omnicompass/speed.py`, `omnicompass/mathdrive.py`, `omnicompass/shield.py`. The CityLearn runner is exercised by its own benchmark on GitHub (`citylearn.yml`, three runs on every engine) rather than by a unit test; the stack simulator, the shield and the speed and mathdrive modules hold paths the live governors do not call. Raising each to the level of the rest is the next tests' work: no engine file changes for a test.
+Files under 60%: `tools/run_pgbench.py`, `tools/run_citylearn.py`, `omnicompass/stack_sim.py`, `tools/run_kafka.py`, `omnicompass/closure.py`, `omnicompass/speed.py`, `tools/run_ycsb.py`, `omnicompass/mathdrive.py`, `tools/run_redis.py`, `tools/run_sysbench.py`, `omnicompass/shield.py`, `tools/run_swarm.py`. The CityLearn runner and the runners of the data stores and the swarm are exercised by their own benchmarks on GitHub (`citylearn.yml`, `redis.yml` and the rest, three runs on every engine) rather than by a unit test; the stack simulator, the shield and the speed and mathdrive modules hold paths the live governors do not call. Raising each to the level of the rest is the next tests' work: no engine file changes for a test.
 
 # Part Three. The Physics: the Compass and the Nervous System
 
@@ -5487,7 +5499,7 @@ GPU governor's rules, the compass law with the two-way plug, and the verdict. Ea
 and the C++ the same inputs (`verify.py` runs them all; `tools/seal.py` lists them and what still runs in Python only). The
 Python's seeded runs (`tools/engine_runs.py`, 500 from the jump generator) run whole through the C++ harness too
 (`cpp/tools/engine_runs.cpp`: the Python's draws are its input, and the governor, the nerves, the compass law and the verdict in
-C++ put the mechanism on), every receipt and the SHA-256 digest identical to the Python's; the `engine-runs` workflow runs both with every set. The live engine's section 10b feeds the
+C++ put the mechanism on), every receipt and the SHA-256 digest identical to the Python's; the `engine-runs` workflow runs both with every set. The live engine's page, in the page's section 10b, feeds the
 Python's own runs into the C++ at every rebuild (`docs/engine/export_cpp_twins.py`), and its proof monitor sets the C++
 engine's digest beside the Python's and the page's.
 
@@ -8735,7 +8747,7 @@ GAIN and LOSS (or power given) both hold in all three of our runs, a trade shown
 its realms label (`results/realms_v5`): a GAIN on work, speed or misses is write, the energy the max took for it power given and
 never a trade; SAME AS NATIVE and AT ITS LIMIT ON NATIVE are watch.
 
-What the page says (written 16 October from the tables then standing; each row names its engine). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the seven organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v14); it changes what an operator connects.
+What the page says (written 16 October from the tables then standing; each row names its engine). On the real stacks, 10 of 26 knob-cases write, 2 are the operator's choice and 14 watch (the sets of 10 October on omni-v3 and the four v6 tables; each row names its engine and the v3 rows run again on v6). Of the independent simulators' 39 cases, 21 write, 15 are trades (the four SimBench grids that export, where the lower voltage costs line losses; the seven 2023 CityLearn districts, where the bill read power given) and 3 watch (two robots the engine itself left native, one grid where nothing was bought). Of the 1,107 modelled muscles on the v5 realms result, 527 write and 580 watch: 421 of the 580 are at their limit on native (every admission knob, 96 power knobs and 50 capacity and setpoint knobs that native already runs at the top of their range: nothing to push, read and left native) and 159 read the same as native (40 wrote and nothing moved beyond the noise, 119 wrote nothing). Every one of the seven organisms writes under every load, the power given shown beside its gain. Of the 14 organism cells with the real cluster inside, 12 write on the cluster's gauges, one is the operator's choice and one watches. Nothing on the page changes the engine, which stays the engine that stands (omni-v15); it changes what an operator connects.
 
 **The same verdict, live (built 9 October, running since 10 October).** The page judges after the fact; the founder's order is that the
 brain judge in real time, on the knob, before it writes. On the five live stacks that is now in the harnesses (section 45.4;
@@ -14456,7 +14468,10 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 **The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one thing,
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
-on omni-v11; the sets of earlier engines already started run to their end as their own record. The only Azure tables up so far are v1's
+on omni-v15 from 02:30 UTC on 22 October, each only after Azure's own $0 check passed (since 22 October, as Google's and
+Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
+the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
+to their end as their own record (the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
 **Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
 `scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
@@ -14467,7 +14482,7 @@ Amazon's account is on its Free plan, whose policy denies every machine read. Bo
 the machine type and every quota; a short Amazon quota is asked of Amazon by the check itself), so nothing more is spent on a
 login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, its step 4);
 Amazon waits for its account on the Paid plan (appendix H, its step 1a). Then the sets start on their own, A, B and C on
-omni-v11, one at a time in each machine-family queue.
+omni-v15, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -14509,12 +14524,12 @@ omni-v15 runs land. The numbers stand on that page, never copied here.
    back at the operator's 8 to 11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one; over
    two hours no leak, no failed decision, no slowing, everything handed back; no LOSS in either. Closed; the extended faults'
    table lands when its runs do.
-4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): the fix makes the next engine version,
-   with every wire that holds a governor's rules taken into the fingerprint, on the founder's word
-   (`docs/CHANGE_CONTROL.md`).
-5. **The grid and Azure on omni-v11**: restarted on 18 October; nothing cancelled.
-6. **Google and Amazon**: on behind their $0 check; they start on their own once Google's key is stored whole and Amazon's
-   account is on its Paid plan, the four sets A, B and C on omni-v11.
+4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): fixed in omni-v12, and every wire that
+   holds a governor's rules taken into the fingerprint in omni-v15 (`docs/OMNI_V15.md`, section 2). Closed.
+5. **The grid, the reruns and Azure on omni-v15**: restarted from 02:30 UTC on 22 October; nothing cancelled.
+6. **Google, Amazon and Azure**: each behind its own $0 check; Google starts once its key is stored whole, Amazon once its
+   account is on its Paid plan, Azure as soon as its check passes (its key whole again since 00:00 UTC on 22 October); the four
+   sets A, B and C on omni-v15.
 7. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 8. **Linux**: a machine on the metal for `cpu-power`.
 9. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
@@ -14665,7 +14680,7 @@ its own limit (omni-v13, `docs/OMNI_V13.md`), and the
 operator's own commands run without a shell unless they hold one's syntax, and a knob that leaves any muscle native (omni-v14,
 `docs/OMNI_V14.md`), and the brain's request for the power cap trimming only while the response line has been clean for the
 governor's own clear time, with every wire that holds a governor's rules inside the fingerprint (omni-v15, `docs/OMNI_V15.md`).
-No table has yet landed on omni-v15; every benchmark runs again on it from 19:30 UTC on 21 October.
+No table has yet landed on omni-v15; every benchmark runs again on it from 02:30 UTC on 22 October.
 The governors' first tables, on omni-v12, read two LOSS rows: KubeRay's queue and tail with the organism alone, root-caused to the
 conveyance and fixed in omni-v13 (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11), and Crane's total pod start wait, a sum of
 pods started and the wait per pod, which the metric-aims audit rules on in writing before any table is read by it.

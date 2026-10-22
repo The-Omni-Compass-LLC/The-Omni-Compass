@@ -54,7 +54,8 @@ def has_capacity(required, usage):
     return ready
 
 
-def wait_capacity(location, system_size, pools, timeout=1800, interval=20):
+def machine_specs(location, system_size, pools):
+    """{size: (family, vCPUs)} for every machine the fleet asks for; a size not offered to this subscription fails closed."""
     sizes = {system_size, *(p.rsplit(':', 1)[0] for p in filter(None, pools.split(',')))}
     specs = {}
     for size in sorted(sizes):
@@ -65,7 +66,22 @@ def wait_capacity(location, system_size, pools, timeout=1800, interval=20):
         row = rows[0]
         cpus = next((int(c['value']) for c in row['capabilities'] if c['name'] == 'vCPUs'), 0)
         specs[size] = row['family'], cpus
-    required = demand(system_size, pools, specs)
+    return specs
+
+
+def preflight(location, system_size, pools):
+    """The $0 check's pre-flight (.github/workflows/cloud-check.yml, 22 October): the machine is offered to this
+    subscription and every CPU allowance can hold the complete fleet. Capacity another run holds now is no refusal (each
+    set waits for it itself), so nothing waits here and nothing is created."""
+    required = demand(system_size, pools, machine_specs(location, system_size, pools))
+    free_now = has_capacity(required, az('vm', 'list-usage', '-l', location))
+    print('pre-flight: the machine is offered and every Azure CPU allowance holds the complete fleet'
+          + ('' if free_now else ' (another run holds part of it now; a set waits its turn)')
+          + '. pre-flight only: nothing built, nothing billed.', flush=True)
+
+
+def wait_capacity(location, system_size, pools, timeout=1800, interval=20):
+    required = demand(system_size, pools, machine_specs(location, system_size, pools))
     deadline = time.monotonic() + timeout
     while True:
         if has_capacity(required, az('vm', 'list-usage', '-l', location)):
@@ -113,8 +129,18 @@ def main():
     cluster = sub.add_parser('cleanup-cluster')
     cluster.add_argument('--group', required=True)
     cluster.add_argument('--name', required=True)
+    pre = sub.add_parser('preflight')
+    pre.add_argument('--location', required=True)
+    pre.add_argument('--system-size', required=True)
+    pre.add_argument('--pools', required=True)
     a = ap.parse_args()
-    if a.action == 'wait':
+    if a.action == 'preflight':
+        try:
+            preflight(a.location, a.system_size, a.pools)
+        except (RuntimeError, ValueError, KeyError) as e:
+            print(f'pre-flight: {e}', flush=True)
+            raise SystemExit(2)
+    elif a.action == 'wait':
         wait_capacity(a.location, a.system_size, a.pools, a.timeout)
     elif a.action == 'cleanup':
         cleanup(a.group, a.timeout)

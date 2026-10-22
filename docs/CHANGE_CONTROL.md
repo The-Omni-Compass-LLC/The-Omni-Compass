@@ -44,7 +44,7 @@ declared engine.
 | omni-v12 | 20 Oct 00:30 | `d38b58fbe28939b8` | 47 | Kubernetes: a raise the cluster's admission refused is held, not written again at every check; the swarm's proximity reflex at once (its wire outside the digest, declared with the version) |
 | omni-v13 | 20 Oct 20:31 | `0088837333c6f0fc` | 47 | Kubernetes: the CPU limits the conveyance gave go back to the operator's on a shared host at its top beside another workload's room; every other pod counted by its own limit |
 | omni-v14 | 21 Oct 04:47 | `7afba44615fcff8f` | 47 | Kubernetes: a knob that leaves any one muscle native; the operator's own commands run without a shell |
-| omni-v15 | 21 Oct (evening) | `0a53cdd7a558f803` | 55 | the brain: the power cap's request trims only while the response line has been clean for the governor's own clear time (the omni-v11 long run's 126 switches in 350 decisions); every wire that holds a governor's rules in the fingerprint (eight taken in, their bytes as they stood) |
+| omni-v15 | 22 Oct 02:30 | `0a53cdd7a558f803` | 55 | the brain: the power cap's request trims only while the response line has been clean for the governor's own clear time (the omni-v11 long run's 126 switches in 350 decisions); every wire that holds a governor's rules in the fingerprint (eight taken in, their bytes as they stood) |
 
 Each version was a fault found in a real run and fixed: the record is in `docs/OMNI_V6.md` to `docs/OMNI_V15.md`, and each
 toy gate's reading in `results/toy_gate/`. Eleven versions in eleven days is the cost of fixing every fault the day it is
@@ -65,8 +65,8 @@ stands is also a version that is re-proved, re-tested and re-built from its rece
   `tools/run_kil.py`); the other wires that hold a governor's rules (the data stores' `tools/run_redis.py`,
   `run_kafka.py`, `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`, and `tools/run_swarm.py`, `run_mujoco.py`,
   `run_cpu_power.py`) were versioned by git and tested, but a change to them did not move the digest. Closed in omni-v15
-  (21 October): every one of them is in the scope (`tools/omni_version.py`, 55 files), and a version declared before is
-  read on its own files.
+  (21 October): every one of them is in the scope (`tools/omni_version.py`, 55 files), and a version declared before them is
+  read without those eight wires and only those: any other file its list does not name still makes the tree a different engine.
 - A wire outside the fingerprint carried a fault: the swarm's proximity reflex (`tools/run_swarm.py`) slowed a drone over a
   second where its own comment says at once, and on a mission draw outside the preregistered seeds it let drones collide
   (`results/toy_gate/V12_SWARM_REFLEX.md`). Its fix is a change to a guard, so by rule 1 it was a version, not a patch: it

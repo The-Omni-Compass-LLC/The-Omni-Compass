@@ -32,11 +32,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 VERSIONS = {"v15": ROOT / "OMNI_V15.json", "v14": ROOT / "OMNI_V14.json", "v13": ROOT / "OMNI_V13.json", "v12": ROOT / "OMNI_V12.json", "v11": ROOT / "OMNI_V11.json", "v10": ROOT / "OMNI_V10.json", "v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
             "v1": ROOT / "OMNI_V1.json"}     # newest first
+# omni-v15 (21 October): every wire that holds a governor's rules is in the fingerprint, so no rule can change without the
+# version changing (docs/CHANGE_CONTROL.md, "Gaps this page names"). A version declared before them never covered them
+LATE_WIRES = ("tools/run_redis.py", "tools/run_kafka.py", "tools/run_pgbench.py", "tools/run_sysbench.py", "tools/run_ycsb.py",
+              "tools/run_swarm.py", "tools/run_mujoco.py", "tools/run_cpu_power.py")
 SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py",
-         # omni-v15 (21 October): every wire that holds a governor's rules is in the fingerprint, so no rule can change without
-         # the version changing (docs/CHANGE_CONTROL.md, "Gaps this page names"); a version declared before is read on its own files
-         "tools/run_redis.py", "tools/run_kafka.py", "tools/run_pgbench.py", "tools/run_sysbench.py", "tools/run_ycsb.py",
-         "tools/run_swarm.py", "tools/run_mujoco.py", "tools/run_cpu_power.py")
+         *LATE_WIRES)
 
 
 def engine_files(commit: str | None = None) -> dict[str, str]:
@@ -60,10 +61,13 @@ def digest(files: dict[str, str]) -> str:
 
 
 def own_files(files: dict[str, str], want: dict[str, str]) -> dict[str, str]:
-    """The engine files a version's own list names, out of a tree's. A version declared before a wire was taken into the
-    scope (omni-v15 took every wire in) is read on its own files: a tree carrying omni-v14's 47 files byte for byte is
-    omni-v14 whatever the wires outside its list hold, because its fingerprint never covered them."""
-    return {n: h for n, h in files.items() if n in want}
+    """A tree's engine files as a version's fingerprint covers them. A version declared before omni-v15 took the late wires
+    into the scope (its list names none of them) is read without those eight files and only those: a tree carrying
+    omni-v14's 47 files byte for byte is omni-v14 whatever the late wires hold, because its fingerprint never covered them,
+    while any other file it does not list (a new rule, a new module) still makes it a different engine."""
+    if any(n in want for n in LATE_WIRES):
+        return dict(files)
+    return {n: h for n, h in files.items() if n not in LATE_WIRES}
 
 
 def version_match(files: dict[str, str]) -> tuple[str, dict] | None:
@@ -93,7 +97,7 @@ def version_before(files: dict[str, str]) -> tuple[str | None, list[str]]:
         want = json.loads(path.read_text())["files"]
         own = own_files(files, want)
         missing = sorted(set(want) - set(own))
-        if missing and all(want[n] == h for n, h in own.items()):
+        if missing and set(own) <= set(want) and all(want[n] == h for n, h in own.items()):
             return f"omni-{v}", missing
     return None, []
 

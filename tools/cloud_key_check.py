@@ -4,13 +4,19 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The Google key's shape, read before Google's login, so a key cut short when it was copied is named at no cost.
+"""A cloud key's shape, read before the cloud's login, so a key cut short or stored in the wrong form is named at no cost.
+
+  python3 tools/cloud_key_check.py           Google: GCP_CREDENTIALS (and GCP_PROJECT to compare)
+  python3 tools/cloud_key_check.py azure     Azure: AZURE_CREDENTIALS
 
 On 18 October the stored GCP_CREDENTIALS ended part of the way through (it had been selected from Cloud Shell's screen),
-and every Google set failed at the login with Google's "unexpected end of JSON input". This reads the key from the
-environment (GCP_CREDENTIALS, and GCP_PROJECT to compare) and prints only what is wrong with its shape: how many characters
-were stored, which fields are missing, where the JSON stops. It never prints a character of the key.
-Exit 0: a whole service-account key. Exit 2: what is wrong, and what to store again (docs/GOOGLE_SETUP.md)."""
+and every Google set failed at the login with Google's "unexpected end of JSON input". For a while on the night of
+21 October AZURE_CREDENTIALS held a text that is not the JSON block Azure's login takes (a collect failed at 23:37 UTC; the
+block was whole again by 00:00), and Azure's own login step quoted its first characters on the run's page while refusing it. This reads the key from the environment and prints
+only what is wrong with its shape: how many characters were stored, which fields are missing, where the JSON stops, what
+the stored text looks like. It never prints a character of the key, and it runs before the cloud's own login step, so a
+key in the wrong form never reaches a step that would quote it.
+Exit 0: a whole key. Exit 2: what is wrong, and what to store again (docs/GOOGLE_SETUP.md, docs/AZURE_SETUP.md)."""
 from __future__ import annotations
 
 import json
@@ -74,7 +80,72 @@ def problems(raw: str | None, project: str = "") -> list[str]:
     return out
 
 
-def main() -> int:
+# Azure: the block `az ad sp create-for-rbac ... --sdk-auth` prints (docs/AZURE_SETUP.md, section 3), the form azure/login's
+# creds input takes; its four fields that login reads
+AZURE_FIELDS = ("clientId", "clientSecret", "subscriptionId", "tenantId")
+AZURE_WHOLE = "the whole block is about 400 to 700 characters on about ten lines, from { to }"
+
+
+def _guid(s: str) -> bool:
+    parts = s.split("-")
+    return [len(x) for x in parts] == [8, 4, 4, 4, 12] and all(all(c in "0123456789abcdefABCDEF" for c in x) for x in parts)
+
+
+def azure_what_it_holds(raw: str) -> str:
+    """What a stored text that is not the JSON block looks like, from its shape alone (never a character of it)."""
+    if any(f'"{f}"' in raw for f in AZURE_FIELDS):
+        return "it holds a piece from inside the block (its first line, the {, is missing): the copy started part of the way in"
+    one = raw.strip()
+    if _guid(one):
+        return ("it holds one identifier alone (an application, tenant or subscription ID, a 36-character GUID), not the "
+                "whole block")
+    if "\n" not in one and " " not in one and 30 <= len(one) <= 48:
+        return ("it looks like a client secret's value alone (one line, no { or }): Azure's login needs the whole block that "
+                "the line in section 3 prints, the secret one of its fields")
+    if "=" in one and ";" in one:
+        return "it looks like a connection string, not the block"
+    return "it is not the block"
+
+
+def azure_problems(raw: str | None) -> list[str]:
+    """What is wrong with a stored AZURE_CREDENTIALS, in words that carry none of its characters (empty: whole)."""
+    raw = (raw or "").strip()
+    if not raw:
+        return ["the secret is empty"]
+    n = len(raw)
+    if not raw.startswith("{"):
+        return [f"it does not start with {{ ({n} characters stored; {AZURE_WHOLE}); {azure_what_it_holds(raw)}"]
+    if not raw.endswith("}"):
+        return [f"it does not end with }}: it was cut short when it was copied ({n} characters stored; {AZURE_WHOLE})"]
+    try:
+        block = json.loads(raw)
+    except ValueError as e:
+        where = getattr(e, "pos", None)
+        return [f"it is not whole JSON (it breaks at character {where} of {n}): it was cut or changed when it was copied"]
+    if not isinstance(block, dict):
+        return ["it is not the block (not one JSON object)"]
+    out = []
+    missing = [f for f in AZURE_FIELDS if not str(block.get(f) or "").strip()]
+    if missing:
+        out.append("fields missing: " + ", ".join(missing))
+    bad_ids = [f for f in ("clientId", "subscriptionId", "tenantId") if f not in missing and not _guid(str(block[f]).strip())]
+    if bad_ids:
+        out.append("not a 36-character GUID: " + ", ".join(bad_ids))
+    return out
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = sys.argv[1:] if argv is None else argv
+    if args[:1] == ["azure"]:
+        bad = azure_problems(os.environ.get("AZURE_CREDENTIALS"))
+        if not bad:
+            print("AZURE_CREDENTIALS: the whole block, its four fields present")
+            return 0
+        for b in bad:
+            print(f"::error::AZURE_CREDENTIALS: {b}. Nothing built, nothing billed. Store it again, whole: docs/AZURE_SETUP.md, "
+                  "sections 3 and 4 (run the one line again in Azure's own terminal, copy everything from { to }, and paste "
+                  "it as the secret's new value).")
+        return 2
     bad = problems(os.environ.get("GCP_CREDENTIALS"), os.environ.get("GCP_PROJECT", ""))
     if not bad:
         print("GCP_CREDENTIALS: a whole service-account key")

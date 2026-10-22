@@ -807,7 +807,9 @@ The conductor starts a cloud's set only after that cloud's newest check passed
 every quota), at no cost. The monitor shows a failed check as the cloud's status, in the check's own words: a Google key stored
 cut short (the stored secret shorter than a whole key file) is stored again whole (`docs/GOOGLE_SETUP.md`, section 4); an Amazon
 account on the Free plan, whose organization policy denies every machine read, is moved to the Paid plan
-(`docs/AMAZON_SETUP.md`, section 1a). Nothing is built and nothing is billed until the check passes.
+(`docs/AMAZON_SETUP.md`, section 1a); an Azure key stored in another form than the whole block from `{` to `}` (a client
+secret's value alone, for one) is stored again whole (`docs/AZURE_SETUP.md`, sections 3 and 4; Azure joined the check on
+22 October). Nothing is built and nothing is billed until the check passes.
 
 ## 11. The Orchestrators and Governors
 

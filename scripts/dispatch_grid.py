@@ -45,7 +45,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "results" / "grid_v15" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-21T23:30:00Z"  # only this campaign, omni-v15 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
+SINCE = "2026-10-22T02:30:00Z"  # only this campaign, omni-v15 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
 ENGINE = "omni-v15"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
 RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
@@ -105,7 +105,7 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "2026-10-21T23:30:00Z"   # omni-v15: every benchmark runs again from the moment the engine landed on main (19 October)
+RERUN_SINCE = "2026-10-22T02:30:00Z"   # omni-v15: every benchmark runs again from a little after the moment the engine landed on main (22 October)
 # the kind rig as amended on 18 October (scripts/kind_bench.sh pulls the served image onto every worker before each arm,
 # docs/POD_START_WAIT.md): a run of a workflow that builds a kind cluster counts only when its own commit carries the
 # pre-puller (RIG_FILE, read from GitHub at the run's head commit), so no table mixes the two rigs and no run is counted on
@@ -128,19 +128,20 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
 # (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-21T23:30:00Z"   # omni-v15: every Azure set runs again on the engine that stands; the sets of earlier engines already
+AZURE_SINCE = "2026-10-22T02:30:00Z"   # omni-v15: every Azure set runs again on the engine that stands; the sets of earlier engines already
                                        # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v15 table
 AZURE_WF = "aks-metered.yml"
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
           ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
           ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"))
-# Google Cloud and Amazon start a set only after their $0 check passed (.github/workflows/cloud-check.yml: the login, the
-# key's shape, the machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's
-# Free plan failed every set started there at the login, each using up its A or B). The conductor starts a check itself when the
-# cloud has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder
-# stores is so taken up within the hour, and a cloud that cannot rent never uses up a set. Azure's sets carry their own.
+# A cloud starts a set only after its $0 check passed (.github/workflows/cloud-check.yml: the login, the key's shape, the
+# machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's Free plan failed
+# every set started there at the login, each using up its A or B; Azure since 22 October, after its stored key held, for a
+# while on 21 October, a text Azure's login refuses, and a failed set counts as started). The conductor starts a check itself when the cloud
+# has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder stores is
+# so taken up within the hour, and a cloud that cannot rent never uses up a set.
 CHECK_WF = "cloud-check.yml"
-CHECKS = {"Google Cloud": "google", "Amazon": "amazon"}
+CHECKS = {"Google Cloud": "google", "Amazon": "amazon", "Azure": "azure"}
 CHECK_FRESH_H = 24
 CHECK_RETRY_MIN = 60
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
@@ -944,7 +945,7 @@ def main(argv=None):
             left = reruns_to_start(family_reruns, rerun_counts or {}) if family_reruns else []
             nxt = cloud_next(queue, azure_runs(wf)[0], left)
             if nxt and cloud in CHECKS:
-                # Google and Amazon: a set starts only once the cloud's $0 check passed (CHECK_WF)
+                # every cloud: a set starts only once the cloud's $0 check passed (CHECK_WF)
                 checks = api(f"repos/{REPO}/actions/workflows/{CHECK_WF}/runs?event=workflow_dispatch&per_page=30")
                 state, why = check_state(checks.get("workflow_runs", []), cloud)
                 if state == "check" and not a.dry:

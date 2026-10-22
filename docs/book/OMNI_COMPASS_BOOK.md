@@ -7427,6 +7427,25 @@ with Omni-Compass on top, beside response time, failures and CPU, each with its 
 access when you are done: in the Azure portal search **App registrations**, open **omni-compass-github**, **Delete**;
 and delete the `AZURE_CREDENTIALS` secret in GitHub.
 
+### F.7 When Azure's check says the key is not whole
+
+Every Azure set, and the conductor's own check at no cost (the run **cloud-check azure** on the **Actions** tab), reads the
+shape of `AZURE_CREDENTIALS` before Azure's login and says what is wrong without printing a character of it: that it does not
+start with `{`, that it holds a client secret's value alone, that it was cut short, or which field is missing. Store it again,
+whole:
+
+1. In the Azure portal, click **>_** (Cloud Shell) and choose **Bash**, as in section F.2.
+2. Paste the one line of section F.3 again and press **Enter**. It prints a new block that starts with `{` and ends with `}`.
+3. Select all of it, from `{` to `}`, and copy it.
+4. On GitHub, open the repository, then **Settings**, then **Secrets and variables**, then **Actions**.
+5. Beside `AZURE_CREDENTIALS`, click the pencil (**Update**).
+6. Paste the whole block as the new value and click **Update secret**.
+7. To retire every older password of the same login: in the Azure portal search **App registrations**, open
+   **omni-compass-github**, then **Certificates & secrets**, and delete every client secret but the newest.
+
+The conductor runs Azure's check again within the hour, and the sets start on their own once it passes. Nothing is built and
+nothing is billed while it fails.
+
 ## Appendix G. The Google Cloud Account, Click by Click
 
 

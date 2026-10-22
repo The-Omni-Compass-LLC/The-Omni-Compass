@@ -57,10 +57,10 @@ the founder overrides one in the conversation.
   governor had applied the same gate outside the brain. A dwell with a glide was built first and refused by the gate (seven small
   moves for one on the toy cluster, 25 limit writes for 16 on the toy card). And every wire that holds a governor's rules is in the
   fingerprint (`tools/omni_version.py`: the data stores' five runners, the swarm, MuJoCo and the CPU power runner, their bytes as
-  they stood; a version declared before is read on its own files). Declared with it, not an engine change: the kill test reads the
+  they stood; a version declared before them is read without those eight and only those). Declared with it, not an engine change: the kill test reads the
   300 s after the kill (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v15"). The toy gate against omni-v14
   (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Every benchmark runs
-  again on it from 23:30 UTC.
+  again on it from 02:30 UTC on 22 October, a little after the push, so no run started by omni-v14's conductor is counted in it.
 
 - **Omni v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`) stood on main on 21 October, from 04:47 UTC to the evening, the founder's
   orders "knobs on every monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with
@@ -271,6 +271,15 @@ the founder overrides one in the conversation.
   omni-v15 landed the same evening by the standing rules (the fault from the next version's list, the toy gate against omni-v14
   first, no LOSS, told, not asked): the brain's power-cap request through the line's own clear time and every wire in the
   fingerprint (`docs/OMNI_V15.md`). What the gate refused (a dwell with a glide) is written on the same page and is not in it.
+
+- **Azure behind its own $0 check** (22 October, under the order of 18 October that no set's A, B or C is spent on a login):
+  for a while on the night of 21 October the stored `AZURE_CREDENTIALS` held a text Azure's login refuses (not the JSON block of
+  `docs/AZURE_SETUP.md`, section 3): the collect of 23:37 UTC failed at the login, and by 00:00 UTC the block was whole again
+  (the steady set's next repetition logged in). A failed Azure set counts as started, and Azure had no check before it. The
+  conductor now starts an Azure set only after `cloud-check azure` passed (the key's shape, the login, the subscription, the
+  machine and its allowance; nothing built), as Google's and Amazon's; every Azure login reads the key's shape first
+  (`tools/cloud_key_check.py azure`), because Azure's own login step quoted the stored text's first characters on a public run
+  page while refusing it. Section 7 of `docs/AZURE_SETUP.md` is the founder's steps if the key is ever stored wrong again.
 
 - **The problem and the answer, first** (the founder's words: "in the beginning we have to state in front matter the problem
   and omnicompasses solution, what the whole tech world is facing, and how omnicompass addresses it"). The README and all three

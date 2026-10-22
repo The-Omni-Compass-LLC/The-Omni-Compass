@@ -25,7 +25,7 @@ and scored by The Omni-Compass LLC's own code. No outside party has reviewed or 
 | # | Change | Where | Why |
 |---|---|---|---|
 | 1 | The brain trims the power cap to demand only while the response line has been clean for the governor's own clear time; a breach, or a line not yet clean, releases the request to the start limit in the same decision | `omnicompass/adapter.py` (the `power` rule, `observe_vector`'s `clean`), its C++ twin `cpp/src/governor.cpp`; the card governor hands the brain its clear flag (`omni_controller/gpu_governor.py`) | on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them, at the one threshold on the queue and the state (`docs/CHANGE_CONTROL.md`, "the next version's list") |
-| 2 | Every wire that holds a governor's rules is in the fingerprint | `tools/omni_version.py` (`SCOPE`; a version declared before is read on its own files) | a rule in a wire outside the fingerprint could change without the version changing (the swarm's reflex did, in omni-v12) |
+| 2 | Every wire that holds a governor's rules is in the fingerprint | `tools/omni_version.py` (`SCOPE`; a version declared before them is read without those eight wires and only those) | a rule in a wire outside the fingerprint could change without the version changing (the swarm's reflex did, in omni-v12) |
 | 3 | Declared, not an engine change: the kill test reads the 300 s after the kill, where it read 120 s | `tools/live_reps.py`, `docs/ROBUSTNESS_PREREGISTRATION.md` ("On omni-v15"), `tests/test_robust.py` | the one tail rise of the omni-v11 kill test came 140 to 190 s after the kill, past the window declared |
 
 ## 1. The request through the clear time
@@ -74,9 +74,11 @@ the live governors, the realms and three outside-simulator wires (`tools/run_kil
 the data stores' wires (`run_redis.py`, `run_kafka.py`, `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`) and `run_swarm.py`,
 `run_mujoco.py` and `run_cpu_power.py` were versioned by git and tested but did not move the digest, and one of them carried a
 fault fixed in omni-v12 without the digest moving (`docs/CHANGE_CONTROL.md`, "Gaps this page names"). From omni-v15 every one
-of them is in the scope: a change to any rule changes the version. A version declared before is read on its own files: a
-commit carrying omni-v14's 47 files byte for byte reads omni-v14 whatever those eight wires hold, because its fingerprint never
-covered them, and the tool prints a version's own digest and file count as its fingerprint records them.
+of them is in the scope: a change to any rule changes the version. A version declared before them is read without those eight
+wires and only those: a commit carrying omni-v14's 47 files byte for byte reads omni-v14 whatever those eight wires hold,
+because its fingerprint never covered them, while any other file omni-v14's list does not name (a new rule, a new module)
+still makes the tree a different engine (`tests/test_omni_version.py`); and the tool prints a version's own digest and file
+count as its fingerprint records them.
 
 ## 3. The kill test's reading: 300 s after the kill
 

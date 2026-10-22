@@ -201,7 +201,10 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 **The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one thing,
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
-on omni-v11; the sets of earlier engines already started run to their end as their own record. The only Azure tables up so far are v1's
+on omni-v15 from 02:30 UTC on 22 October, each only after Azure's own $0 check passed (since 22 October, as Google's and
+Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
+the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
+to their end as their own record (the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
 **Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
 `scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
@@ -212,7 +215,7 @@ Amazon's account is on its Free plan, whose policy denies every machine read. Bo
 the machine type and every quota; a short Amazon quota is asked of Amazon by the check itself), so nothing more is spent on a
 login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, its step 4);
 Amazon waits for its account on the Paid plan (appendix H, its step 1a). Then the sets start on their own, A, B and C on
-omni-v11, one at a time in each machine-family queue.
+omni-v15, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -254,12 +257,12 @@ omni-v15 runs land. The numbers stand on that page, never copied here.
    back at the operator's 8 to 11 s after the kill in 30 of 30 repetitions, a second governor to the end in every one; over
    two hours no leak, no failed decision, no slowing, everything handed back; no LOSS in either. Closed; the extended faults'
    table lands when its runs do.
-4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): the fix makes the next engine version,
-   with every wire that holds a governor's rules taken into the fingerprint, on the founder's word
-   (`docs/CHANGE_CONTROL.md`).
-5. **The grid and Azure on omni-v11**: restarted on 18 October; nothing cancelled.
-6. **Google and Amazon**: on behind their $0 check; they start on their own once Google's key is stored whole and Amazon's
-   account is on its Paid plan, the four sets A, B and C on omni-v11.
+4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): fixed in omni-v12, and every wire that
+   holds a governor's rules taken into the fingerprint in omni-v15 (`docs/OMNI_V15.md`, section 2). Closed.
+5. **The grid, the reruns and Azure on omni-v15**: restarted from 02:30 UTC on 22 October; nothing cancelled.
+6. **Google, Amazon and Azure**: each behind its own $0 check; Google starts once its key is stored whole, Amazon once its
+   account is on its Paid plan, Azure as soon as its check passes (its key whole again since 00:00 UTC on 22 October); the four
+   sets A, B and C on omni-v15.
 7. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 8. **Linux**: a machine on the metal for `cpu-power`.
 9. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
