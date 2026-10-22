@@ -53,6 +53,8 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from tools.readings import by_word  # noqa: E402  (a number beside a word carries the word's sign)
 
 ROOT = Path(__file__).resolve().parents[1]
 SLO_MS = 200.0                       # the toy service's line
@@ -779,7 +781,7 @@ def render(report_path, out_md):
         if toy.startswith("pace_"):
             # the pace study (omni-v16): the candidate alone at each decision period on the 5 s plant, each pace against the
             # candidate at the reference period and against native, paired by seed
-            cellp = lambda d: "" if d is None else (f"{100 * d['relative']:+.2f}% {d['word']}" if d["relative"] == d["relative"]
+            cellp = lambda d: "" if d is None else (f"{by_word(100 * d['relative'], d['word'], digits=2)} {d['word']}" if d["relative"] == d["relative"]
                                                      else d["word"])
             lines += [f"The {t['setting']} setting on the plant that moves every 5 s; the candidate decides every "
                       f"{', '.join(f'{p:g}' for p in t['periods'])} s, each faster pace read against a decision every "
@@ -810,7 +812,7 @@ def render(report_path, out_md):
             continue
         lines += ["| Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |",
                   "|---|---:|---:|---:|---|---|---|"]
-        cell = lambda d: f"{100 * d['relative']:+.2f}% {d['word']}" if d["relative"] == d["relative"] else d["word"]
+        cell = lambda d: f"{by_word(100 * d['relative'], d['word'], digits=2)} {d['word']}" if d["relative"] == d["relative"] else d["word"]
         for g, x in t["gauges"].items():
             lines.append(f"| {g} | {x['native']:.3f} | {x['base']:.3f} | {x['cand']:.3f} | {cell(x['cand_vs_base'])} | "
                          f"{cell(x['base_vs_native'])} | {cell(x['cand_vs_native'])} |")
@@ -987,8 +989,8 @@ def main(argv=None):
                 print(f" a decision every {per} s:")
                 for g, x in rows.items():
                     d = x["pace_vs_ref"]; n = x["pace_vs_native"]
-                    print(f"  {g:32s} {x['ref']:10.3f} -> {x['pace']:10.3f}  {100 * d['relative']:+7.2f}% {d['word']:12s}"
-                          + (f"  against native {100 * n['relative']:+7.2f}% {n['word']}" if n else ""))
+                    print(f"  {g:32s} {x['ref']:10.3f} -> {x['pace']:10.3f}  {by_word(100 * d['relative'], d['word'], digits=2):>9s} {d['word']:12s}"
+                          + (f"  against native {by_word(100 * n['relative'], n['word'], digits=2):>9s} {n['word']}" if n else ""))
             print("counts over all seeds:", json.dumps(r["counts"]))
             continue
         print(f"\n== {toy}" + (f" (a decision every {r['period_s']:.0f} s)" if "period_s" in r else ""))
@@ -1004,8 +1006,8 @@ def main(argv=None):
         print(f"{'gauge':32s} {'native':>10s} {'standing':>10s} {'candidate':>10s}  candidate vs standing         standing vs native   candidate vs native")
         for g, x in r["gauges"].items():
             cb, bn, cn = x["cand_vs_base"], x["base_vs_native"], x["cand_vs_native"]
-            print(f"{g:32s} {x['native']:10.3f} {x['base']:10.3f} {x['cand']:10.3f}  {100 * cb['relative']:+7.2f}% {cb['word']:18s}"
-                  f"  {100 * bn['relative']:+7.2f}% {bn['word']:10s}  {100 * cn['relative']:+7.2f}% {cn['word']}")
+            print(f"{g:32s} {x['native']:10.3f} {x['base']:10.3f} {x['cand']:10.3f}  {by_word(100 * cb['relative'], cb['word'], digits=2):>9s} {cb['word']:18s}"
+                  f"  {by_word(100 * bn['relative'], bn['word'], digits=2):>9s} {bn['word']:10s}  {by_word(100 * cn['relative'], cn['word'], digits=2):>9s} {cn['word']}")
         print("counts over all seeds:", json.dumps(r["counts"]))
     print(f"\n(our own models, evidence class S; {work / 'TOY_GATE.json'})")
     return report

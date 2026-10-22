@@ -435,11 +435,11 @@ def table(results, out_md):
         eng = "native" if r["arm"] == "native" else r["engine"]
         by[(r["setting"], eng, r["period"])][r["seed"]] = r
     engines = sorted({e for (_, e, _) in by if e != "native"}, key=lambda e: [int(x) if x.isdigit() else x for x in e.replace("-", ".").split(".")], reverse=True)
-    def pct(x):            # the word never carries a sign (the founder's order of 22 October): down or up by its size, then the word
+    from tools.readings import by_word
+    def pct(x):            # the number carries the word's sign, never the gauge's raw direction (the key, tools/readings.py)
         if x["word"].startswith("EVEN (identical)"):
             return "identical"
-        r = round(100 * x["relative"], 1)
-        return f"{'down' if r < 0 else 'up' if r > 0 else 'no change'}{'' if r == 0 else f' {abs(r):.1f}%'}, {x['word']}"
+        return f"{by_word(100 * x['relative'], x['word'])} {x['word']}"
     beats = sorted({p for (_, e, p) in by if e != "native"})
     say = lambda ps: ", ".join(f"{p:g}" for p in ps[:-1]) + f" and {ps[-1]:g}" if len(ps) > 1 else f"{ps[0]:g}"
     rec, L = {}, [f"# The heartbeat sweep: a decision every {say(beats)} seconds", "",

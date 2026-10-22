@@ -27,6 +27,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.readings import OWN_RUNS, receipt_key, in_all_three, word, aim, EVEN_SAME, even_noise, SHOWN, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
 from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
+from tools.readings import by_word, interval_by_word
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
 # --pair: one comparison of the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6), "first|second" as
@@ -130,12 +131,13 @@ def load(d):
     return run, paired, n, j.get("robust")
 
 
-def cell(r):
-    """One run's change, in percent of native where native is not zero, with its 95% interval."""
+def cell(r, word=None):
+    """One run's change, in percent of native where native is not zero, with its 95% interval; the number carries the row's
+    word's sign (tools/readings.py by_word: GAIN +, LOSS −, EVEN =), never the gauge's raw direction."""
     nat, diff, lo, hi = r["native"], r["diff"], r["ci95"][0], r["ci95"][1]
     if nat:
-        return f"{100 * diff / abs(nat):+.1f}% ({100 * lo / abs(nat):+.1f} to {100 * hi / abs(nat):+.1f})"
-    return f"{diff:+.4g} ({lo:+.4g} to {hi:+.4g})"
+        return f"{by_word(100 * diff / abs(nat), word)} ({interval_by_word(100 * lo / abs(nat), 100 * hi / abs(nat), word)})"
+    return f"{by_word(diff, word, unit='', digits=4)} ({interval_by_word(lo, hi, word, unit='', digits=4)})"
 
 
 def aim_of_row(k):
@@ -259,7 +261,7 @@ def main(argv=None):
         tally[v] = tally.get(v, 0) + 1
         rows[k] = {"reading": v.strip("*"), "aim": aim_of_row(k) if k not in NEUTRAL else None,
                    "runs": [{"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": list(r["ci95"])} for r in rs]}
-        L.append(f"| {LABEL.get(k, k)} | {cell(rs[0])} | {cell(rs[1])} | {cell(rs[2])} | {v} |")
+        L.append(f"| {LABEL.get(k, k)} | {cell(rs[0], v)} | {cell(rs[1], v)} | {cell(rs[2], v)} | {v} |")
     rob_l, rob_rows = robust_rows(runs)           # the robustness test's own rows (omni only, by rule, not paired)
     for line in rob_l:
         v = line.rsplit("|", 2)[-2].strip(); tally[v] = tally.get(v, 0) + 1

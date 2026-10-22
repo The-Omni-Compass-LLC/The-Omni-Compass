@@ -311,16 +311,18 @@ the founder overrides one in the conversation.
   cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 5c,
   after the heart) has a button for each beat, setting, engine, zero line and gauge. The factory's beat stays 15 s; another beat
   is a changed tune, its receipts its own. On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in
-  pods waiting (−83.5% at 5 to 15 s, −72.9% at 60 s, −57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power
-  given); a beat slower than 60 s waits more than the factory's 15 s (+86% to +160%, LOSS at 90 s) for at most 0.4 points fewer
-  machines than 60 s, and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines alone, 5
-  to 15 s cut the machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next version's
-  list, as omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%.
-- **The word never carries a sign** (the founder's words, 22 October, night: "If it's a gain, it should be a plus 73
-  with the word gain. When you put a minus, it confuses me ... that word gain can never have a minus beside the word
-  gain"). Every judged change is said as down or up by its size, then its word ("down 73.0%, GAIN"; "up 2.9%, power
-  given"), never as a signed number beside the word; an interval is said the same way ("down 47.3% to 127.5%"). The
-  heartbeat monitor and the sweep's record print it so; every other table, page and manual follows in the pass after it.
+  pods waiting (GAIN +83.5% at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power
+  given +2.9%); a beat slower than 60 s waits more than the factory's 15 s (86% to 160% more, LOSS at 90 s) for at most 0.4 points
+  fewer machines than 60 s, and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines
+  alone, 5 to 15 s cut the machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next
+  version's list, as omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%.
+- **The number beside a word carries the word's sign** (the founder's words, 22 October, night: "If it's a gain, it should be a
+  plus 73 with the word gain. When you put a minus, it confuses me ... that word gain can never have a minus beside the word
+  gain"; the key's own rule of 20 October, said again). GAIN +, LOSS −, EVEN =, power given +: "+73.0% GAIN", "−16.8% LOSS",
+  "=0.9% EVEN"; an interval beside GAIN or LOSS is its two sizes with the word's sign ("+47.3% to +127.5%"), beside EVEN as it
+  lies. The heartbeat monitor had printed the gauge's raw direction ("−73% GAIN"); the key's formatter (`tools/readings.py`
+  `by_word`, `interval_by_word`) now prints every number beside a word in the three-run tables, the receipts, the toy gate, the
+  heartbeat sweep and the live engine's trading floor, index, verdict and heartbeat monitor.
 - **A live tuning engine beside one tuned engine** (the founder's words, the same night: "the live engine ... is a live
   tuning engine that can be tuned in real time to show mechanism of action ... what they're seeing is one tuned engine
   ... If you turn and tweak any piece of an engine ... can change the mechanism of action's output"). The live engine's

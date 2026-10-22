@@ -18,6 +18,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from pilot.bench_report import gauges, latency, pod_starts
 from tools.readings import word as gel_word, aim as gel_aim, receipt_key  # noqa: E402  (the words every table uses)
+from tools.readings import by_word, interval_by_word  # noqa: E402  (a number beside a word carries the word's sign)
 
 SAME_REL = 1e-6   # a change under one part in a million of the value reads "same" (amendment 11)
 from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
@@ -721,7 +722,7 @@ def capacity_table(root, cols):
             L.append(f"| native | {mn:.1f} |  |  | {len(reps)} |"); out[a] = {"capacity_rps": mn}; continue
         dd = v - n0; half = T95.get(len(dd) - 1, 1.96) * (dd.std(ddof=1) / math.sqrt(len(dd))) if len(dd) > 1 else float("nan")
         ch = (m - mn) / mn * 100 if mn > 0 else float("nan")
-        L.append(f"| {a} | {m:.1f} | {ch:+.1f}% | {dd.mean() - half:+.1f} to {dd.mean() + half:+.1f} | {len(reps)} |")
+        L.append(f"| {a} | {m:.1f} | {by_word(ch, None)} | {interval_by_word(dd.mean() - half, dd.mean() + half, None, unit='')} | {len(reps)} |")
         out[a] = {"capacity_rps": m, "change_pct": ch, "ci95": [float(dd.mean() - half), float(dd.mean() + half)]}
     return L + [""], out
 
@@ -812,9 +813,10 @@ def main(root):
             sig = sig and not same
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
             out["paired"][key][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
-            ch_s = f"{ch:+.1f}%" if ch is not None else f"{ob - nb:+.3g} (native is 0)"
-            L.append(f"| {LABEL.get(k, k)} | {nb:.4g} | {ob:.4g} | {ch_s} | {d.mean() - half:+.4g} to {d.mean() + half:+.4g} | "
-                     f"{'EVEN, the same (under one part in a million)' if same and d.mean() != 0 else sig_word(k, d.mean()) if sig else 'no'} |")
+            wd = 'EVEN, the same (under one part in a million)' if same and d.mean() != 0 else sig_word(k, d.mean()) if sig else 'no'
+            ch_s = by_word(ch, wd) if ch is not None else f"{by_word(ob - nb, wd, unit='', digits=3)} (native is 0)"
+            L.append(f"| {LABEL.get(k, k)} | {nb:.4g} | {ob:.4g} | {ch_s} | {interval_by_word(d.mean() - half, d.mean() + half, wd, unit='', digits=4)} | "
+                     f"{wd} |")
         L.append("")
     if tuned and "native" in runs and any(a in runs for a in ("omni", "compass")):
         # the cost to match: native tuned harder by its operator (a lower HPA target, more pods) against native with
@@ -847,7 +849,7 @@ def main(root):
             best = min(match, key=lambda a: m[a][CPU])
             extra = lambda k: (m[best][k] - m[o][k]) / m[o][k] * 100 if m[o][k] else float("nan")
             L.append(f"- To match {names[o]} (p95 {m[o][P95]:.4g} ms), the cheapest native setting is {names[best]} "
-                     f"(p95 {m[best][P95]:.4g} ms): {extra(REP):+.1f}% HPA replicas, {extra(CPU):+.1f}% CPU including "
+                     f"(p95 {m[best][P95]:.4g} ms): {by_word(extra(REP), None)} HPA replicas, {by_word(extra(CPU), None)} CPU including "
                      f"Omni-Compass's own, {extra(NODES):+.1f}% machines in service, against native with Omni-Compass on top.")
             out["cost_to_match"][o] = {"native_setting": best, "replicas_pct": extra(REP), "cpu_pct": extra(CPU), "machines_pct": extra(NODES)}
         L.append("")

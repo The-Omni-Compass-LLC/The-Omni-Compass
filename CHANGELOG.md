@@ -4,6 +4,12 @@
 
 ## 2026-10-22 (evening, the live engine): the heartbeat sweep on the wall, every beat from 5 to 120 s; main's omni-v16 merged
 
+- **The number beside a word carries the word's sign** (the founder's words of the same night: "If it's a gain, it should be a plus 73
+  with the word gain ... that word gain can never have a minus beside the word gain"; the key's rule of 20 October). The heartbeat
+  monitor had printed the gauge's raw direction ("−73% GAIN"). The key's formatter (`tools/readings.py` `by_word`, `interval_by_word`)
+  now prints every number beside a word with the word's sign (GAIN +, LOSS −, EVEN =, power given +) in the three-run tables,
+  the receipts, the toy gate, the heartbeat sweep and the live engine's trading floor, index, verdict and heartbeat monitor;
+  tables already written stand as the record of their day.
 - **The founder's order** ("5, 15, 30, 60 ... Then give me 75 90 And after 90, I want 120 ... Heartbeat sweeps. With buttons in
   my monitor canvas dashboard of that wired mechanism of the heartbeat ... somebody might want to tune it to be something
   different"). The live engine's new monitor, *The heartbeat sweep: every beat the governor can run at* (`beatCv`, section 5c,
@@ -25,9 +31,9 @@
   - The sweep carries its own cloud plant, so every engine runs on the same one.
   - A run counts the fast check's rescues from its own audit.
 
-  **What it reads.** On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in pods waiting (−83.5%
-  at 5 to 15 s, −72.9% at 60 s, −57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power given); a beat slower
-  than 60 s waits more than the factory's 15 s (+86% to +160%, LOSS at 90 s) for at most 0.4 points fewer machines than 60 s,
+  **What it reads.** On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in pods waiting (GAIN +83.5%
+  at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power given +2.9%); a beat slower
+  than 60 s waits more than the factory's 15 s (86% to 160% more, LOSS at 90 s) for at most 0.4 points fewer machines than 60 s,
   and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines alone, 5 to 15 s cut the
   machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next version's list, as
   omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%. omni-v15, its rules

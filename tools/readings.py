@@ -415,6 +415,43 @@ def with_own_runs(lines):
 
 
 # ------------------------------------------------------------------------------------------------------------- the key
+def word_sign(word):
+    """The sign a number carries beside its word (the founder's order of 20 October, said again on 22 October: the word GAIN can
+    never have a minus beside it): GAIN '+', LOSS '−', EVEN '=', power given '+' (what Omni put in); a reading with no word of
+    its own (shown, tuning, the runs disagree) keeps the number's own direction."""
+    w = str(word or "")
+    if w.startswith("GAIN") or w.startswith("power given"):
+        return "+"
+    if w.startswith("LOSS"):
+        return "−"
+    if w.startswith("EVEN"):
+        return "="
+    return None
+
+
+def by_word(x, word, unit="%", digits=1):
+    """A change beside its word, carrying the word's sign: 'GAIN +73.0%' is printed as '+73.0% GAIN' by the caller; here the
+    number alone: '+73.0%', '−16.8%', '=0.9%'; with no word of its own, the number's own sign."""
+    if x is None or x != x:
+        return "—"
+    sg = word_sign(word)
+    size = f"{abs(x):.{digits}f}{unit}"
+    return f"{sg}{size}" if sg else f"{'+' if x > 0 else '−' if x < 0 else '±'}{size}"
+
+
+def interval_by_word(lo, hi, word, unit="%", digits=1):
+    """A 95% interval beside its word: with GAIN or LOSS the two sizes from the smaller to the larger, each with the word's
+    sign ('+47.3% to +127.5%'); with EVEN, or with no word of its own, the interval as it lies, crossing zero ('−1.9% to
+    +3.7%')."""
+    sg = word_sign(word)
+    f = lambda v: f"{abs(v):.{digits}f}{unit}"
+    if sg in ("+", "−"):
+        a, b = sorted((abs(lo), abs(hi)))
+        return f"{sg}{f(a)} to {sg}{f(b)}"
+    raw = lambda v: f"{'+' if v > 0 else '−' if v < 0 else '±'}{f(v)}"
+    return f"{raw(lo)} to {raw(hi)}"
+
+
 KEY_TITLE = "The key: GAIN, EVEN and LOSS"
 KEY_BEGIN = "<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->"
 KEY_END = "<!-- end of the key -->"
