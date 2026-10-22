@@ -1330,6 +1330,19 @@ read as before.
 - **Run again.** The CruiseKube test runs again, A, B and C, on the corrected recorder (`scripts/reruns.txt`, block of
   19 October). The three-run table pools only runs of one recorder.
 
+## Amendment (2026-10-22, omni-v16, written before any run of it): the full decision every 15 s
+
+"The decision period in the cloud" above held every run at 60 s because four rules counted decisions. omni-v16 counts every
+clock of the governor in seconds (`docs/OMNI_V16.md`: the give-back trial, the cool-down, cruise and the trial spacing
+already counted seconds since omni-v7; now the brain's own minute, the compass's damping and smoothing, the edge's window and
+rates, the additions past the floor, a command's minute to land and the rest do too), so a period changes only how often the
+governor looks: at 15 s a give-back trial still lasts its 20 minutes, the wait after a breach its 3 minutes, and one machine is
+still given back at most once a minute. On the founder's word of 22 October ("15 sec all over heart beat"), the default
+decision period is 15 s, native's own pod autoscaler's pace, in every run from omni-v16's first on: the kind tests and the
+cloud sets alike (`scripts/kind_bench.sh`, `OMNI_INTERVAL`), the fast checks every 5 s as before. A window in which the
+governor made no write still needs its decisions to count, now one every 15 s. Runs before omni-v16 stand at the 60 s they
+ran at; nothing is read across engines.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

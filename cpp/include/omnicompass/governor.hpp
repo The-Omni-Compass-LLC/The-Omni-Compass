@@ -1,6 +1,8 @@
 #pragma once
 // Omni-Compass stack governor: sense -> assimilate -> evolve (u = 0) -> allocate.
 #include "omnicompass/core.hpp"
+#include <deque>
+#include <utility>
 namespace omnicompass {
 struct Observation { double q{}, load{}, power{}, thermal{}, network{}, drift{}, stale{}, security{}; int conflicts{};
                      bool slo_clean{true}; };   // the response line clean for the caller's own clear time (Python obs slo_clean; omni-v15)
@@ -13,12 +15,15 @@ struct Directive { int node_delta{}; bool change_permitted{}, rollback_authorize
                    double power_cap{}, demand{}, command{}, push{}; State x{}; };   // push: the brain's push u/U_AUTHORITY (Python last_push)
 class Governor {
  public:
-  explicit Governor(AllocationLaw law = {}, bool evolve = true);
+  // period_s (omni-v16): the caller's seconds between steps; the brain keeps its own minute (omnicompass/adapter.py)
+  explicit Governor(AllocationLaw law = {}, bool evolve = true, double period_s = 60.0);
   Directive step(const Observation& obs, double current_cap, int nodes);
   const State& state() const noexcept { return x_; }
   const Parameters& params() const noexcept { return p_; }
   const AllocationLaw& law() const noexcept { return L_; }
  private:
   AllocationLaw L_; bool evolve_; State x_; Parameters p_; double t_{0.0}; int surplus_streak_{0}, since_add_{99};
+  double period_s_{60.0};                          // omni-v16: the caller's seconds between steps
+  std::deque<std::pair<long, long>> recent_;       // omni-v16: (added, removed) at each of the other steps of the last minute
 };
 }

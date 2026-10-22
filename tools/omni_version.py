@@ -4,7 +4,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The engines, fingerprinted file by file: Omni v15, the engine that stands (OMNI_V15.json, docs/OMNI_V15.md), Omni v14 (OMNI_V14.json), Omni v13 (OMNI_V13.json), Omni v12 (OMNI_V12.json), Omni v11 (OMNI_V11.json), Omni v10 (OMNI_V10.json), Omni v9
+"""The engines, fingerprinted file by file: Omni v16, the engine that stands (OMNI_V16.json, docs/OMNI_V16.md), Omni v15 (OMNI_V15.json), Omni v14 (OMNI_V14.json), Omni v13 (OMNI_V13.json), Omni v12 (OMNI_V12.json), Omni v11 (OMNI_V11.json), Omni v10 (OMNI_V10.json), Omni v9
 (OMNI_V9.json), Omni v8 (OMNI_V8.json),
 Omni v7 (OMNI_V7.json),
 Omni v6 (OMNI_V6.json), Omni v5 (OMNI_V5.json,
@@ -13,7 +13,7 @@ docs/OMNI_V5.md), then the frozen v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V
 v5 is in active development its fingerprint is re-declared on each engine change, and no v5 result is published until the
 v5 freeze. No result is ever read across versions.
 
-  python3 tools/omni_version.py                 check this checkout: prints "omni-v15", "omni-v14", "omni-v13", "omni-v12", "omni-v11", "omni-v10", "omni-v9", "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
+  python3 tools/omni_version.py                 check this checkout: prints "omni-v16", "omni-v15", "omni-v14", "omni-v13", "omni-v12", "omni-v11", "omni-v10", "omni-v9", "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
   python3 tools/omni_version.py --commit <sha>  the same, for the engine as it stood at a git commit (any result's run)
   python3 tools/omni_version.py --write v5      write OMNI_V5.json from this checkout (only when a new version is declared or re-declared in development)
 
@@ -30,7 +30,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"v15": ROOT / "OMNI_V15.json", "v14": ROOT / "OMNI_V14.json", "v13": ROOT / "OMNI_V13.json", "v12": ROOT / "OMNI_V12.json", "v11": ROOT / "OMNI_V11.json", "v10": ROOT / "OMNI_V10.json", "v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
+VERSIONS = {"v16": ROOT / "OMNI_V16.json", "v15": ROOT / "OMNI_V15.json", "v14": ROOT / "OMNI_V14.json", "v13": ROOT / "OMNI_V13.json", "v12": ROOT / "OMNI_V12.json", "v11": ROOT / "OMNI_V11.json", "v10": ROOT / "OMNI_V10.json", "v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
             "v1": ROOT / "OMNI_V1.json"}     # newest first
 # omni-v15 (21 October): every wire that holds a governor's rules is in the fingerprint, so no rule can change without the
 # version changing (docs/CHANGE_CONTROL.md, "Gaps this page names"). A version declared before them never covered them

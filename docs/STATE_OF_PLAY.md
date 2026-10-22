@@ -16,7 +16,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v15, fingerprint 0a53cdd7a558f803 (55 files).
+- **The engine on this checkout:** omni-v16, fingerprint 5c5502f12b1c0ce4 (55 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
@@ -31,7 +31,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
 
-**On the engine that stands (omni-v15): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v16): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
@@ -98,10 +98,25 @@ with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and wh
 waits on the family allowance those machines hold.
 
 
-## In one paragraph (2026-10-21, the engine that stands is omni-v15)
+## In one paragraph (2026-10-22, the engine that stands is omni-v16)
 
-**The engine that stands is omni-v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), on main since
-21 October, evening, under the founder's standing order that every fault found is fixed and lands as the next version. It is
+**The engine that stands is omni-v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`), on main since
+22 October on two words of the founder's: "Go" on the pace plan, and, once the models had read, "15 sec all over heart beat fix
+update code". Every clock of the Kubernetes governor counts seconds, so the period of its full decision changes only how often it
+looks, and that heartbeat now comes every 15 s, native's own pod autoscaler's pace (every engine before it: 60 s); the fast checks
+stay every 5 s. It is omni-v15 with the clocks changed and the heartbeat set, and nothing else (50 of its 55 files are omni-v15's
+bytes): the brain's minute (in the Python and its sealed C++ twin), the compass's damping and smoothing, the edge's window and
+rates, the additions past the scheduling floor, a command's minute to land, the host's busy share over a minute, the heat law's
+minute, one batch job a minute, the conveyance every 15 s whichever check falls due, and a loop that keeps its schedule. At 60 s it
+makes exactly omni-v15's decisions in the toy gate (4,578 audit records, none different; `results/toy_gate/V16_VS_V15.md`);
+as shipped, omni-v16 at its 15 s against omni-v15 at its 60 s reads every gauge EVEN, no LOSS. Against native, at 15 s two rows read
+LOSS in the cloud's setting, the pods waiting for a place (+122%, about twice native's) and the 95th percentile (+0.36%), which
+omni-v15 at 60 s reads EVEN only by the seeds' spread (+210%, +0.63%). In the pace study (`results/toy_gate/V16_PACE.md`), 15 s
+against 60 s: 14.7% fewer minutes over the line in the kind setting, 2.6% less energy per core in the cloud's (GAIN), every other
+reading EVEN; against native the pods waiting read LOSS at every pace, and in the cloud's setting at 15 s the 95th percentile
+(+0.47%) and the alert minutes (+2.31%). Those rows are the engine's, at every pace, and the next version's work. The real runs read 15 s against native
+and against 60, 10 and 5 s (`docs/PACE_PREREGISTRATION.md`, amendment 2). **omni-v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), on main from
+21 October, evening, under the founder's standing order that every fault found is fixed and lands as the next version, was
 omni-v14 with two changes: the brain's request for the power cap trims only while the response line has been clean for the governor's own clear time (on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them; on the same decisions the gate leaves 35 moves and 32 reversals), and every wire that holds a governor's rules is inside the fingerprint (eight taken in, their bytes as they stood); a dwell with a glide was built, read in the gate and refused (`docs/OMNI_V15.md`). The toy gate against omni-v14 (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two
 card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`), on main
 from 04:47 UTC on 21 October by the founder's orders: a knob on every monitor for every muscle, and "tune the engine". It was omni-v13 with two
@@ -140,13 +155,13 @@ power outages stays native, because its charge is also the building's reserve. o
 of our runs in the seven 2023 districts, the only districts CityLearn ships with outages; the cause was ours, found on CityLearn
 itself and reproduced to the last digit, and three narrower repairs were refused on the tuning district before this one. Read
 locally before any GitHub run, omni-v8 gives native's numbers on the 2023 districts and omni-v7's on every other district. The
-other 45 engine files were omni-v7's bytes. Every benchmark runs again on omni-v15 (`scripts/reruns.txt`, released a few a tick by
+other 45 engine files were omni-v7's bytes. Every benchmark runs again on omni-v16 (`scripts/reruns.txt`, released a few a tick by
 the grid conductor, A of every benchmark, then B, then C; the grid and every Azure set restarted on it the same day); until a
 benchmark's three runs land, its row names the engine it ran on (`docs/BENEFIT_SHEET.md` and the standing block above). Results
 are never read across engines. The standing block is written from the result files by `tools/summary.py --fix` and checked on
 every push; the prose below says the same in words.
 
-**On omni-v11: twenty-three three-run tables, each benchmark's newest until omni-v15's land** (`results/live/V11_*.md`, 19
+**On omni-v11: twenty-three three-run tables, each benchmark's newest until omni-v16's land** (`results/live/V11_*.md`, 19
 October; 1,039 judged rows, **0 LOSS**), each rebuilt byte for byte from its raw receipts (`tools/reproduce.py`):
 
 - **Real Kubernetes (evidence class L), ten pairs a run.** On top of Goldilocks: response time −47% to −48% mean, −61% to −64%
@@ -201,10 +216,12 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 **The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one thing,
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
-on omni-v15 from 02:30 UTC on 22 October, each only after Azure's own $0 check passed (since 22 October, as Google's and
+on omni-v16, each only after Azure's own $0 check passed, once the founder confirms whose account the Azure login bills (the
+queue's switch is off since 22 October: he said the login in use may be another person's account, and a key bills only its
+own account) (since 22 October, as Google's and
 Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
 the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
-to their end as their own record (the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
+to their end as their own record (omni-v15's started from 02:30 UTC; the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
 **Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
 `scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
@@ -215,7 +232,7 @@ Amazon's account is on its Free plan, whose policy denies every machine read. Bo
 the machine type and every quota; a short Amazon quota is asked of Amazon by the check itself), so nothing more is spent on a
 login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, its step 4);
 Amazon waits for its account on the Paid plan (appendix H, its step 1a). Then the sets start on their own, A, B and C on
-omni-v15, one at a time in each machine-family queue.
+omni-v16, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -240,7 +257,7 @@ assumption, that a layer's factor does not change when the layers around it carr
 tables allow (the governors' four ways: Omni-Compass on the organism alone against on top of the orchestrator, in the same
 repetitions). The composition is class S over class P and L tables and across engines, said so on the page; the stacked
 run (Omni-Compass at every layer at once) is the measurement that would replace it, and the page is remade as each layer's
-omni-v15 runs land. The numbers stand on that page, never copied here.
+omni-v16 runs land. The numbers stand on that page, never copied here.
 
 ## Open
 
@@ -259,10 +276,17 @@ omni-v15 runs land. The numbers stand on that page, never copied here.
    table lands when its runs do.
 4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): fixed in omni-v12, and every wire that
    holds a governor's rules taken into the fingerprint in omni-v15 (`docs/OMNI_V15.md`, section 2). Closed.
-5. **The grid, the reruns and Azure on omni-v15**: restarted from 02:30 UTC on 22 October; nothing cancelled.
+5. **The grid, the reruns and Azure on omni-v16**: restarted from 07:30 UTC on 22 October (Azure held, item 6); nothing cancelled (omni-v15's,
+   started from 02:30 UTC, run to their end as its record).
+5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the toy read no LOSS at 15 s against 60 s
+   (`results/toy_gate/V16_PACE.md`, `results/toy_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a
+   place (both settings) and, in the cloud's setting, on the 95th percentile and the alert minutes, rows the engine carries at
+   every pace (at 60 s they read EVEN only by the seeds' spread); they are on the next version's list. Three runs of five arms
+   (native, Omni-Compass at 15 s, and at 60, 10 and 5 s) on GitHub's own machines read it for real. A LOSS at 15 s there is
+   root-caused and fixed in the next version.
 6. **Google, Amazon and Azure**: each behind its own $0 check; Google starts once its key is stored whole, Amazon once its
-   account is on its Paid plan, Azure as soon as its check passes (its key whole again since 00:00 UTC on 22 October); the four
-   sets A, B and C on omni-v15.
+   account is on its Paid plan, Azure once the founder confirms that the account its login bills agreed to it (its switch off
+   since 22 October; then as soon as its check passes); the four sets A, B and C on omni-v16.
 7. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 8. **Linux**: a machine on the metal for `cpu-power`.
 9. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
