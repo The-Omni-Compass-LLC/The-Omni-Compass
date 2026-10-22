@@ -120,9 +120,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-22 00:34 | [The engine's runs: 500 runs from the jump generator (base 1045605085), one digest](results/engine_runs/ENGINE_RUNS_500_1045605085.md) |  |
-| 2026-10-22 00:14 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-21 22:58 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V15_VS_V14.md) |  |
+| 2026-10-22 06:47 | [The engine's runs: 500 runs from the jump generator (base 1081281782), one digest](results/engine_runs/ENGINE_RUNS_500_1081281782.md) |  |
+| 2026-10-22 05:28 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V16_VS_V15.md) |  |
+| 2026-10-22 05:28 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V16_PACE.md) |  |
+| 2026-10-22 05:28 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -130,16 +131,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-22 05:31 | live-engine | success | [39726165987](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39726165987) |
-| 2026-10-22 05:21 | big-organism-detached collect | failure | [39727581654](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39727581654) |
-| 2026-10-22 05:20 | raw-sweep | success | [39727423531](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39727423531) |
-| 2026-10-22 04:21 | grid | success | [39721861570](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39721861570) |
+| 2026-10-22 12:25 | big-organism-detached collect | failure | [39778251992](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39778251992) |
+| 2026-10-22 11:35 | grid | success | [39771689454](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39771689454) |
+| 2026-10-22 10:58 | live-engine | success | [39763422874](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39763422874) |
+| 2026-10-22 10:37 | raw-sweep | success | [39764454671](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39764454671) |
+| 2026-10-22 06:47 | engine-runs | success | [39735987446](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39735987446) |
+| 2026-10-22 06:46 | security-scan | success | [39735989212](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39735989212) |
 | 2026-10-22 03:04 | six x100 line orgs 5 runs 0+10 | success | [39700177767](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700177767) |
 | 2026-10-22 02:31 | six x100 line orgs 6 runs 0+10 | success | [39700183533](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700183533) |
 | 2026-10-22 01:55 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 1+10 arms native compass split no window 1440 protocol 4 | failure | [39700194974](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700194974) |
 | 2026-10-22 01:23 | six x100 line orgs 3 runs 0+10 | success | [39700166030](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700166030) |
-| 2026-10-22 01:20 | six x100 line orgs 2 runs 0+10 | success | [39700160352](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700160352) |
-| 2026-10-22 01:18 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 4 | success | [39698560945](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39698560945) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
@@ -206,8 +207,8 @@ of our runs in the seven 2023 districts, the only districts with outages; the ca
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
 omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back, omni-v14's two changes, omni-v15's clear-time gate on the brain's power-cap request and omni-v16's clocks in seconds and 15 s heartbeat: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v16 (`scripts/reruns.txt` and the grid restarted on it from 07:30 UTC on 22 October; the Azure sets held until the founder
-confirms whose account the Azure login bills, `scripts/azure_queue.txt`); until a benchmark's three runs land, its row on
+omni-v16 (`scripts/reruns.txt` and the grid on it from 07:30 UTC on 22 October, started from that afternoon's fix of the conductor's engine check; the Azure sets from the founder's word of the
+same afternoon that the account the Azure login bills agreed, each after Azure's own $0 check, `scripts/azure_queue.txt`); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
 **On omni-v11, until their omni-v16 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw

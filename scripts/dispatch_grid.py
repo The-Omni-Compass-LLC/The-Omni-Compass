@@ -37,6 +37,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -343,29 +344,31 @@ def campaign_open(now=None):
 
 def engine():
     """The engine the runs started now will carry. On GitHub that is the newest commit of the branch they start on, which
-    every tick fetches (FETCH_HEAD), read by that commit's own fingerprints: a tick that began before a new engine landed
-    starts the new engine's runs at its next round, not after its five hours (17 October: omni-v8 landed during a tick).
+    every tick fetches (FETCH_HEAD), read by that commit's own version tool and fingerprints: a tick that began before a new
+    engine landed starts the new engine's runs at its next round, not after its five hours (17 October: omni-v8 landed during
+    a tick). The conductor keeps no copy of the tool's scope or rule: its copy went stale once (omni-v15 took eight wires into
+    the fingerprint, the copy read every commit after it as unknown, and nothing started; 22 October).
     Elsewhere, this checkout's HEAD, by its version tool; a partial checkout without the engine's files reads it from git."""
-    def git(*a):
-        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True, timeout=120)
+    def git(*a, text=True, check=False):
+        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=text, check=check, timeout=120)
     try:
         if os.environ.get("GITHUB_ACTIONS") == "true" and git("rev-parse", "-q", "--verify", "FETCH_HEAD").returncode == 0:
-            scope = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py",
-                     "tools/run_pandapower.py")              # tools/omni_version.py's SCOPE
-            files = {}
-            for n in sorted(git("ls-tree", "-r", "--name-only", "FETCH_HEAD", "--", *scope).stdout.split()):
-                if n.endswith((".py", ".csv")) and "__pycache__" not in n:
-                    data = subprocess.run(["git", "show", f"FETCH_HEAD:{n}"], cwd=ROOT, capture_output=True, check=True,
-                                          timeout=120).stdout
-                    files[n] = hashlib.sha256(data).hexdigest()
-            d = hashlib.sha256("".join(f"{h}  {n}\n" for n, h in sorted(files.items())).encode()).hexdigest()
-            for f in git("ls-tree", "--name-only", "FETCH_HEAD").stdout.split():
-                if re.fullmatch(r"OMNI_V\d+\.json", f) and json.loads(git("show", f"FETCH_HEAD:{f}").stdout).get("digest") == d:
-                    return f"omni-v{f[6:-5]}"
-            return "unknown"
-        r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", "HEAD"], cwd=ROOT,
-                           capture_output=True, text=True, timeout=120)
-        return r.stdout.split()[0] if r.stdout.strip() else "unknown"
+            with tempfile.TemporaryDirectory() as tmp:
+                # the fetched commit's version tool and fingerprints, run on that commit's tree in this repository: with
+                # GIT_DIR naming the repository, git takes the folder it runs in as the top of the tree
+                (Path(tmp) / "tools").mkdir()
+                prints = [f for f in git("ls-tree", "--name-only", "FETCH_HEAD").stdout.split() if re.fullmatch(r"OMNI_V\d+\.json", f)]
+                for f in ("tools/omni_version.py", *prints):
+                    (Path(tmp) / f).write_bytes(git("show", f"FETCH_HEAD:{f}", text=False, check=True).stdout)
+                env = {k: v for k, v in os.environ.items() if k != "GIT_WORK_TREE"}
+                env["GIT_DIR"] = git("rev-parse", "--absolute-git-dir", check=True).stdout.strip()
+                r = subprocess.run([sys.executable, str(Path(tmp) / "tools" / "omni_version.py"), "--commit", "FETCH_HEAD"],
+                                   cwd=tmp, env=env, capture_output=True, text=True, timeout=600)
+        else:
+            r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", "HEAD"], cwd=ROOT,
+                               capture_output=True, text=True, timeout=120)
+        out = r.stdout.split()
+        return out[0] if r.returncode == 0 and out and re.fullmatch(r"omni-v\d+", out[0]) else "unknown"
     except (OSError, subprocess.SubprocessError, ValueError):
         return "unknown"
 
