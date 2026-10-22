@@ -3415,7 +3415,13 @@ and install file setting the fast checks to 5 s). Every place that starts the go
 through `kind_bench.sh`), the alert rules' staleness bound (`deploy/prometheus/omni-compass-rules.yaml`: three intervals, 45 s)
 and the manuals. Each run writes its period beside its files (`omni_interval.txt`), and the receipts read each run at its own
 (`tools/live_reps.py`; the robustness runs before it at 60 s). The page's controller trace and the modelled traces in the
-manuals keep the 60 s step they were drawn at, and say so.
+manuals keep the 60 s step they were drawn at, and say so. The levers rig (`scripts/kind_levers.sh`) was left at three, two
+and three decisions of 5 s when omni-v16 landed: under omni-v14 each of them was a minute of the brain's, under omni-v16 they
+are 15 s, and the two levers that give back (rightsize, coldstart), which wait for the brain's calm (its contraction authority,
+about a minute after it starts on an idle reading, `tests/test_pace_clocks.py`), failed three of the rig's 19 checks in the
+first omni-v16 run (22 October, 13:50 UTC). The rig now runs at the default 15 s for the 3, 2 and 3 minutes its checks were
+written for, with the idle time before cold start in seconds (120 s), and the levers check runs again, A, B and C
+(`scripts/reruns.txt`).
 
 ### 26.4 At 60 s it is omni-v15
 
@@ -14587,7 +14593,9 @@ omni-v16 runs land. The numbers stand on that page, never copied here.
    it started nothing: it fingerprinted the fetched commit with its own copy of the version tool's scope, which predated
    omni-v15's eight wires, so no commit matched (fixed: it runs that commit's own version tool, `CHANGELOG.md`, 22 October,
    afternoon). omni-v15's campaign started no run; the last runs started, omni-v14's at 00:31 UTC, stand as its record. Nothing
-   cancelled.
+   cancelled. The first omni-v16 starts came at 13:50 UTC; of them the levers check (A) failed three of its 19 checks on a rig
+   omni-v16 had left at decisions of 5 s, too short for the brain's own minute (rightsize and coldstart wait for its calm); the
+   rig now runs the minutes its checks were written for, and the levers check runs again, A, B and C (`docs/OMNI_V16.md`).
 5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the toy read no LOSS at 15 s against 60 s
    (`results/toy_gate/V16_PACE.md`, `results/toy_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a
    place (both settings) and, in the cloud's setting, on the 95th percentile and the alert minutes, rows the engine carries at
