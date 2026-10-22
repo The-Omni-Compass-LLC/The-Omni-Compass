@@ -14523,12 +14523,11 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 **The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one thing,
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
-on omni-v16, each only after Azure's own $0 check passed, once the founder confirms whose account the Azure login bills (the
-queue's switch is off since 22 October: he said the login in use may be another person's account, and a key bills only its
-own account) (since 22 October, as Google's and
+on omni-v16, each only after Azure's own $0 check passed (the queue's switch was off for part of 22 October, until the founder
+confirmed that the person whose account the Azure login bills agreed to its use; a key bills only its own account) (since 22 October, as Google's and
 Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
 the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
-to their end as their own record (omni-v15's started from 02:30 UTC; the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
+to their end as their own record (omni-v15's campaign started none; the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
 **Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
 `scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
@@ -14583,8 +14582,12 @@ omni-v16 runs land. The numbers stand on that page, never copied here.
    table lands when its runs do.
 4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): fixed in omni-v12, and every wire that
    holds a governor's rules taken into the fingerprint in omni-v15 (`docs/OMNI_V15.md`, section 2). Closed.
-5. **The grid, the reruns and Azure on omni-v16**: restarted from 07:30 UTC on 22 October (Azure held, item 6); nothing cancelled (omni-v15's,
-   started from 02:30 UTC, run to their end as its record).
+5. **The grid, the reruns and Azure on omni-v16**: the campaign opened at 07:30 UTC on 22 October; the conductor starts its runs
+   from the afternoon's push (Azure from the founder's word that afternoon, item 6). From omni-v15's push (00:45 UTC) until then
+   it started nothing: it fingerprinted the fetched commit with its own copy of the version tool's scope, which predated
+   omni-v15's eight wires, so no commit matched (fixed: it runs that commit's own version tool, `CHANGELOG.md`, 22 October,
+   afternoon). omni-v15's campaign started no run; the last runs started, omni-v14's at 00:31 UTC, stand as its record. Nothing
+   cancelled.
 5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the toy read no LOSS at 15 s against 60 s
    (`results/toy_gate/V16_PACE.md`, `results/toy_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a
    place (both settings) and, in the cloud's setting, on the 95th percentile and the alert minutes, rows the engine carries at
@@ -14592,8 +14595,8 @@ omni-v16 runs land. The numbers stand on that page, never copied here.
    (native, Omni-Compass at 15 s, and at 60, 10 and 5 s) on GitHub's own machines read it for real. A LOSS at 15 s there is
    root-caused and fixed in the next version.
 6. **Google, Amazon and Azure**: each behind its own $0 check; Google starts once its key is stored whole, Amazon once its
-   account is on its Paid plan, Azure once the founder confirms that the account its login bills agreed to it (its switch off
-   since 22 October; then as soon as its check passes); the four sets A, B and C on omni-v16.
+   account is on its Paid plan, Azure as soon as its check passes (its switch on again from the founder's word of 22 October
+   that the account its login bills agreed to it); the four sets A, B and C on omni-v16.
 7. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 8. **Linux**: a machine on the metal for `cpu-power`.
 9. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
@@ -16816,8 +16819,9 @@ differ, the brain (`omnicompass/adapter.py`) and the card governor (`omni_contro
 taken into the fingerprint with this version, their bytes as they stood (`tools/run_redis.py`, `run_kafka.py`,
 `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`, `run_swarm.py`, `run_mujoco.py`, `run_cpu_power.py`). The C++ twin of the
 brain (`cpp/src/governor.cpp`) carries the same change and is proven equal to the Python again (`tests/test_cpp_governor_parity.py`,
-on an observation stream that now carries the line's clear flag; `results/SEAL.json`). Every benchmark runs again on omni-v15,
-A, B and C. Every earlier table stands as its own engine's result until its three runs on v15 land, and results from two
+on an observation stream that now carries the line's clear flag; `results/SEAL.json`). Every benchmark was to run again on omni-v15,
+A, B and C; none started before omni-v16 replaced it, because the grid's conductor read omni-v15's commits as no engine (its own
+copy of the version tool's scope predated the eight wires; fixed on 22 October, `CHANGELOG.md`). Every earlier table stands as its own engine's result until its three runs on v15 land, and results from two
 versions are never pooled. The readings from the toy gate are our own models (evidence class S), never a benchmark result. Run
 and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
