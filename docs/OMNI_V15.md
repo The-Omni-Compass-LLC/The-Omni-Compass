@@ -1,8 +1,8 @@
-# Omni v15: the power cap's request through the line's own clear time, every wire in the fingerprint (the engine that stands since 21 October)
+# Omni v15: the power cap's request through the line's own clear time, every wire in the fingerprint (the engine that stood 21 to 22 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v15 has been the engine on main since 21 October, evening, under the founder's standing order that every fault found is
+Omni v15 was the engine on main from 21 October, evening, until omni-v16 (`docs/OMNI_V16.md`) landed on 22 October, under the founder's standing order that every fault found is
 fixed and every fix lands as the next version, told, not asked (19 October), and his word of 21 October ("push, push, push on
 GitHub, update, enhanced engine"). It is omni-v14 (`docs/OMNI_V14.md`) with one change to the brain and one to the fingerprint,
 each written before it was built and read in the toy gate against omni-v14 on the same seeds before it landed: the brain's

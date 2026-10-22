@@ -7,13 +7,14 @@
 # The governor's alert rules for Prometheus: load with `rule_files:` (or wrap the `groups:` list in a PrometheusRule for the
 # Prometheus Operator). Every expression reads only gauges that tools/omni_exporter.py (job omni-exporter) or the control
 # panel, tools/omni_control.py (job omni-control), serve; tests/test_alert_rules.py checks that. The thresholds assume the
-# governor's full decision every 60 s (--interval 60); scale the "for" windows and the staleness bound with the interval.
+# governor's full decision every 15 s (--interval 15, the default since omni-v16); scale the "for" windows and the staleness
+# bound with the interval (three intervals and a minute: 45 s and 1m at 15 s; 180 s and 2m at 60 s).
 groups:
   - name: omni-compass-governor
     rules:
       - alert: OmniGovernorStale
-        expr: time() - omni_last_decision_timestamp_seconds > 180 and omni_master_switch == 1
-        for: 2m
+        expr: time() - omni_last_decision_timestamp_seconds > 45 and omni_master_switch == 1
+        for: 1m
         labels: {severity: critical}
         annotations:
           summary: "No governor decision for more than three intervals while it is meant to be governing."
