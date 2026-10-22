@@ -2,6 +2,36 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-21 (night): the consensus audit's nineteen majors closed
+
+The five referees' consensus audit (`docs/engine/CONSENSUS_AUDIT_2026-10-21.md`, consensus A−, no blocker) named nineteen majors,
+every one a sentence, a count or a drawing. Each is closed here, in the page, its exporter, its builder and the three manuals:
+
+- **The counts.** The executive summary counts the tables of Omni-Compass against its native (55) apart from the orchestrators' own
+  cost (30 four-ways tables in which Omni-Compass is in neither arm or on the other side), and says which engines the tables stand
+  on. The 0.5% floor of 20 October reads every judged word (GAIN, LOSS and power given), in the tables, the models' live judges, the
+  cloud's tally and the exporter (`docs/engine/export_scenarios.py`, from `tools/readings.py SIZE_FLOOR`). A model gauge with one
+  value a run has no interval: the Linux host's pod start wait and 95th percentile are shown, not judged. The appraisal's counts
+  (`docs/engine/APPRAISAL.md`) are written by the build from the records at every run (`write_appraisal`), and `--check` fails a
+  stale one; its stale sentences now point at them.
+- **The mechanism's words.** Section 10 names both laws: the engine's default allocation law, which the page's brain runs, and the
+  fleet law the shipped controller runs (its trace in 5e shows ρ* between 0.79 and 0.83). Section iii and the three manuals say what
+  the mechanism does: every give-back is tried in its own paired trial; a raise is held inside the muscle's bounds and judged by the
+  three-run tables; and do no harm is the aim, with every LOSS row kept, its cause found and the test run again. The builder, its
+  workflow, the appraisal and the manual say what the build does with a new engine (it stamps it and rebuilds every record; `--check`
+  fails a page whose engine differs), where they had said it "refuses".
+- **The LOSS rows' causes.** The two LOSS rows of Omni-Compass against its native that had no cause page (job turnaround under
+  Armada on the organism alone; alert minutes under Open Cluster Management) have one: `docs/LOSS_ROWS_UNDER_INVESTIGATION.md`, each
+  row's reading, what is known, what is suspected and not yet shown, and what decides it.
+- **The words.** The back matter is vi (it read iv); power given is blue everywhere, written once in the key; the organisms are the
+  seven and the orchestra the eighth, the whole stack a composition with two arms; the governors run four ways in every repetition;
+  LOSS rows are raised in 1d and answered in 1g; our own model is a model, never a simulator; the factory tune is `DISCLOSURES.md`
+  section 3; the awaited GPU run is omni-v13's; the benefit board takes omni-v5 and later (three omni-v3 rows go to the road); the
+  poster's caption says the ® and "registered 2026" are the artwork's words and the company's statement of record is "filed".
+- **The drawing.** The wall keeps every monitor's own shape (letterboxed, never stretched) and draws any monitor not yet drawn
+  before it copies it; no canvas type under 11 px; the red of LOSS is legible as text (AA); on a phone a native/Omni-Compass pair
+  stacks, native above, at full width; the nested three-run tables stay inside their cell; captions and badges at the page's floor.
+
 ## 2026-10-21 (late afternoon): the problem and Omni-Compass's solution at the head of the front matter; every tile of the wall titled
 
 - **The problem and Omni-Compass's solution** (the founder's order of 21 October: "in the beginning we have to state in front

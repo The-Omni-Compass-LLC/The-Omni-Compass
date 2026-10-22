@@ -22,8 +22,9 @@ Every record the page replays is made again here by the repository's own code on
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
 
-The page names the engine it stands on (data-engine on its <html>); the build refuses to write a page whose engine is not
-the one tools/omni_version.py reads, so a new engine version is always written into the page's words by a person first.
+The page names the engine it stands on (data-engine on its <html>); the build stamps the engine tools/omni_version.py reads on
+the page and rebuilds every record on it, and when that engine is newer than the one the page's prose was written for, the page
+says so in a banner until the prose is realigned; --check fails a page whose engine differs from the one that stands.
 Usage: python3 docs/engine/build_live_engine.py [--check] [--no-runs]. --check rebuilds in memory and exits 1 if any record
 differs from the page (nothing written). Evidence class S for the models; the receipts keep their own classes.
 """
@@ -885,6 +886,88 @@ def inject(page: str, key: str, value) -> str:
     return page.replace(anchor, f"{tag}{text}</script>\n{anchor}", 1)
 
 
+APPRAISAL = ROOT / "docs" / "engine" / "APPRAISAL.md"
+COUNTS_BEGIN = "<!-- counts: written by docs/engine/build_live_engine.py at every build; never edited by hand -->"
+COUNTS_END = "<!-- end counts -->"
+WORDS = ("GAIN", "power given", "EVEN", "LOSS", "the runs disagree", "the runs differ", "shown", "tuning")
+
+
+def table_way(file: str):
+    """As the page reads it (tableWay): a four-ways table's tag, and whether Omni-Compass is read against its own native in it."""
+    m = re.search(r"_4W_(TOP|ORCH|BARE|VS|BOTH)\.md$", file or "")
+    return (m.group(1) if m else None), (not m or m.group(1) in ("TOP", "BARE"))
+
+
+def _size(abc):
+    """The largest size among a row's three runs, in percent, or None where a run is not a percentage."""
+    out = []
+    for c in abc or []:
+        m = re.search(r"[-+\u2212]?\d[\d,]*(?:\.\d+)?", str(c or ""))
+        if not m or "%" not in str(c):
+            return None
+        out.append(abs(float(m.group(0).replace(",", "").replace("\u2212", "-"))))
+    return max(out) if out else None
+
+
+def appraisal_counts(rec) -> str:
+    """The appraisal's counts, from the records this build made: the runs and their files, the receipts by engine and by word
+    (Omni-Compass against its native apart from the orchestrators' own cost, before and after the page's floor), and every LOSS
+    row of Omni-Compass against its native. Written between COUNTS_BEGIN and COUNTS_END in docs/engine/APPRAISAL.md."""
+    from collections import Counter
+    b, R, S = rec["build"], rec["runs"], rec["scen"]
+    runs = [r for bm in R["benchmarks"] for r in bm["runs"]]
+    files, ok, unmatched = sum(r["checked"] for r in runs), sum(r["ok"] for r in runs), sum(len(r.get("unmatched") or []) for r in runs)
+    recs = S["receipts"]; floor = rec["build"].get("floor")
+    by_eng = Counter(r["engine"] for r in recs)
+
+    def tally(rs, floored):
+        c = Counter()
+        for r in rs:
+            cnt = dict(r.get("count") or {})
+            if floored and floor is not None:
+                for x in r["rows"]:
+                    sz = _size(x.get("abc"))
+                    if x["w"] in ("GAIN", "LOSS", "power given") and sz is not None and sz < 100 * floor:
+                        cnt[x["w"]] = cnt.get(x["w"], 0) - 1; cnt["EVEN"] = cnt.get("EVEN", 0) + 1
+            c.update({w: cnt.get(w, 0) for w in WORDS})
+        return c
+
+    def words(c):
+        return ", ".join(f"{c[w]} {w}" for w in WORDS if c[w])
+    omni = [r for r in recs if table_way(r["file"])[1]]; orch = [r for r in recs if not table_way(r["file"])[1]]
+    losses = [f"{x['g']} under `{Path(r['file']).name}` ({r['engine']}: {', '.join(str(a) for a in (x.get('abc') or []))})"
+              for r in omni for x in r["rows"] if x["w"] == "LOSS"]
+    fl = f" (the page applies the floor of {100 * floor:g}% at load; after it: " if floor is not None else ""
+    lines = [COUNTS_BEGIN,
+             f"**The counts of the records on the page** ({b['engine']}, digest `{b['digest']}`), written by the build from the records it made, so a check rebuilds them exactly:",
+             "", "| What | Count |", "|---|---|",
+             f"| Three-run tables played back from their raw files (sections 5c and 5d) | {len(R['benchmarks'])}, with {len(runs)} runs |",
+             f"| Raw files checked against their run's own `SHA256SUMS_ALL.txt` | {ok:,} of {files:,} matched; {unmatched} unmatched |",
+             f"| Receipts (every judged row of each benchmark's newest table) | {len(recs)}: " + ", ".join(f"{e} {n}" for e, n in sorted(by_eng.items(), key=lambda kv: -int(re.sub(r'\D', '', kv[0]) or 0))) + " |",
+             f"| Omni-Compass against its native ({len(omni)} tables), as the tables wrote them | {words(tally(omni, False))}{fl}{words(tally(omni, True)) + ')' if floor is not None else ''} |",
+             f"| The orchestrators' own cost ({len(orch)} four-ways tables: the orchestrator as shipped against the organism alone, and the comparisons where Omni-Compass is on the other side), never a reading of Omni-Compass | {words(tally(orch, False))}{fl}{words(tally(orch, True)) + ')' if floor is not None else ''} |",
+             f"| LOSS rows of Omni-Compass against its native | {len(losses)}: " + ("; ".join(losses) if losses else "none") + " |",
+             "", COUNTS_END]
+    return "\n".join(lines)
+
+
+def write_appraisal(rec, check: bool = False) -> bool:
+    """Rewrites the counts block of the appraisal (or, under --check, says whether it is current). True when current or written."""
+    if not APPRAISAL.exists():
+        return True
+    t = APPRAISAL.read_text(encoding="utf-8")
+    a, z = t.find(COUNTS_BEGIN), t.find(COUNTS_END)
+    if a < 0 or z < 0:
+        return True
+    new = t[:a] + appraisal_counts(rec) + t[z + len(COUNTS_END):]
+    if new == t:
+        return True
+    if check:
+        return False
+    APPRAISAL.write_text(new, encoding="utf-8")
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true", help="rebuild in memory; exit 1 if any record differs from the page")
@@ -921,11 +1004,14 @@ def main() -> int:
         strip = lambda bd: [{k: v for k, v in x.items() if k not in ("now", "abc")} for x in (bd or [])]
         if any(pb.get(k) != rec["build"][k] for k in keep) or strip(pb.get("board")) != strip(rec["build"]["board"]):
             bad.append("build")
+        if not write_appraisal(rec, check=True):
+            bad.append("the appraisal's counts (docs/engine/APPRAISAL.md)")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
+    write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand
     b = rec["build"]
     print(f"live engine rebuilt on {b['engine']} ({b['digest']}) at {b['commit'][:12]}, {b['built_at']}; "
           f"{len(b['runs'])} GitHub runs running or queued")

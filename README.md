@@ -27,8 +27,9 @@ margins: they react late, hold headroom that is rarely used, disturb one another
 
 **Omni-Compass's solution.** Govern what is built before building more: one supervisory governor on top of every native
 controller, never in place of one. It reads every muscle through a two-way plug, drives each up to its own limit and never
-past it or below native, reads every write back, tries every step in its own paired trial and undoes it if the muscle loses
-by it, leaves a muscle native wherever no gain can be brought, and hands every setting back to native when it stops. Every
+past it or below native, reads every write back, tries every give-back in its own paired trial and undoes it if the muscle loses
+by it (a raise is held inside the muscle's bounds and judged afterwards by the three-run tables), leaves a muscle native wherever
+no gain can be brought, and hands every setting back to native when it stops. Every
 result is native against Omni-Compass on top of native, in three runs, read GAIN, EVEN or LOSS, every row shown. The full
 statement, with its sources and how each cost is addressed: the first section of the front matter of all three manuals,
 and section iii of the live engine page. The outside figures are their authors' own, none a result of Omni-Compass.

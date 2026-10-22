@@ -48,9 +48,9 @@ size) as a muscle, and the whole stack as one body, the organism. Through a two-
 already reports) and one wire out (the settings native already exposes), it reads every muscle, places each reading in the
 muscle's own band, from calm to its line (the limit it must not cross: a response time, a temperature, a feed's rating),
 and moves each setting one bounded, smooth step at a time. By default every muscle is driven up to its own limit, never
-past it and never below native; every write is read back; every step is tried in its own paired trial (the muscle with
-and without it, under the same load) and undone if the muscle loses by it; and wherever no gain can be brought, the muscle
-stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
+past it and never below native; every write is read back; every give-back is tried in its own paired trial (the muscle with and without it, under the same load) and undone if the
+muscle loses by it; a raise is held inside the muscle's own bounds and judged afterwards by the three-run tables; and
+wherever no gain can be brought, the muscle stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
 inside its own cushion. The aim is the headline the record is read against: more work, faster, on fewer machines, with less energy,
 combined into one number, the Omni index. Where Omni-Compass takes more energy to buy more work or speed, that energy is shown beside
 what it bought, as power given, and never called a loss.
@@ -74,8 +74,9 @@ Omni-Compass.
 machines with the same work, run three separate times. Every reading is one word, GAIN, EVEN or LOSS, decided by what the
 gauge is for (the key, in this front matter); every result carries its evidence class (**P** a physical meter, **L** live
 software, **S** our own models, never shown as proof of hardware); and every row is shown, LOSS included. The governing
-rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the organism is never left turning out less than
-native, nor less healthy. Where the record stands on the engine that stands is the Executive Summary, later in this front matter; the
+rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the aim is an organism never left turning out less
+than native, nor less healthy; where a row reads LOSS against native, the row stays, its cause is found and fixed, and the
+test runs again. Where the record stands on the engine that stands is the Executive Summary, later in this front matter; the
 live engine page plays the same record back in motion; the Introduction takes the solution apart, step by step.
 
 **The outside sources.** International Energy Agency, *Energy and AI* (April 2025), its executive summary. Lawrence

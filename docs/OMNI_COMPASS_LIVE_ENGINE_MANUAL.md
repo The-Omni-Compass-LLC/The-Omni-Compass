@@ -52,9 +52,9 @@ size) as a muscle, and the whole stack as one body, the organism. Through a two-
 already reports) and one wire out (the settings native already exposes), it reads every muscle, places each reading in the
 muscle's own band, from calm to its line (the limit it must not cross: a response time, a temperature, a feed's rating),
 and moves each setting one bounded, smooth step at a time. By default every muscle is driven up to its own limit, never
-past it and never below native; every write is read back; every step is tried in its own paired trial (the muscle with
-and without it, under the same load) and undone if the muscle loses by it; and wherever no gain can be brought, the muscle
-stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
+past it and never below native; every write is read back; every give-back is tried in its own paired trial (the muscle with and without it, under the same load) and undone if the
+muscle loses by it; a raise is held inside the muscle's own bounds and judged afterwards by the three-run tables; and
+wherever no gain can be brought, the muscle stays native. One brain governs the whole body, so a step on one muscle stands only while every muscle it couples to stays
 inside its own cushion. The aim, in one line: more work, faster, on fewer machines, with less energy. Where Omni-Compass takes more energy to buy more work or speed, that energy is shown beside
 what it bought, as power given, and never called a loss.
 
@@ -84,8 +84,9 @@ Omni-Compass.
 machines with the same work, run three separate times. Every reading is one word, GAIN, EVEN or LOSS, decided by what the
 gauge is for (the key, in this front matter); every result carries its evidence class (**P** a physical meter, **L** live
 software, **S** our own models, never shown as proof of hardware); and every row is shown, LOSS included. The governing
-rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the organism is never left turning out less than
-native, nor less healthy. On the page this is section iii (`#s-problem`), the first after the title page; the executive summary under it
+rule is do no harm, in its one meaning (`DISCLOSURES.md`, section 3): the aim is an organism never left turning out less
+than native, nor less healthy; where a row reads LOSS against native, the row stays, its cause is found and fixed, and the
+test runs again. On the page this is section iii (`#s-problem`), the first after the title page; the executive summary under it
 reads where the record stands from the records on the page, and this book carries no benchmark results of its own.
 
 **The outside sources.** International Energy Agency, *Energy and AI* (April 2025), its executive summary. Lawrence
@@ -151,7 +152,7 @@ beside Omni-Compass on the same demand, the same seconds, so the one difference 
 **What a gauge is.** A gauge is one measured quantity of the system (the work waiting, the work done, a response time, the
 machines in service, the energy drawn, a bill). On the page each gauge is drawn for both sides with its paired reading: the
 change from native, its 95% interval, and its word. The word is decided by what the gauge is for (the key, above), never by
-the sign of its number. A rise in a resource reads *power given*, in green, never a loss.
+the sign of its number. A rise in a resource reads *power given*, in blue, Omni-Compass's own colour, never a loss.
 
 **How to read the page, in order.** First the switch and the engine (the master switch at the top of the wall, and the
 engine's name, digest and commit in the title block). Then the four signals a service is watched by: the work waiting, the
@@ -171,8 +172,8 @@ archived with their SHA-256 lists, the two other manuals and `DISCLOSURES.md`.
 ## Notice and Disclaimer
 
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
-(omni-v13, `OMNI_V13.json`). The page names its engine on its own `<html>` element (`data-engine`) and refuses to be built on
-any other; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
+(omni-v13, `OMNI_V13.json`). The page names its engine on its own `<html>` element (`data-engine`); the build stamps the engine that stands
+on it and rebuilds every record, and `--check` fails a page whose engine differs; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
 same push. The page's own table of contents (its section v, "Engine table of contents") is the authority on the order and the
 numbering of its sections; this manual names every section by its title and its anchor (`#s-health`, `#s-ops`, and so on), which
 do not move when sections are renumbered.
@@ -246,7 +247,7 @@ chooses a record is marked **RECORDED**. Every number carries its evidence class
    draws a word from the stream it plays, and never prints "up", "down", "better" or "worse".
 4. **Every row, LOSS included.** A reading that went against native is raised first, as an alarm, with its source record and
    the repository's root-cause document where one exists. Nothing is cut from the page because it went against Omni-Compass.
-5. **Nothing read across engine versions.** The page names the engine it stands on and refuses to be built on another; each
+5. **Nothing read across engine versions.** The page names the engine it stands on, every record is rebuilt on the engine that stands, and `--check` fails a page whose engine differs; each
    three-run table on it names its own engine, and a table stands on an older engine only until its runs on the engine that
    stands land.
 6. **Models are not proof.** Every view says its evidence class. The official Kubernetes and database runs are class L, played
@@ -343,7 +344,7 @@ Keep this card beside the screen that shows the wall. Every line is explained in
 **The two sides** (chapter 3). Amber is native, the system by itself. Blue is Omni-Compass on top of native. Nothing else is
 drawn.
 
-**The three words** (the key). Green GAIN, yellow EVEN, red LOSS. A resource that rose is *power given*, green. White with a
+**The three words** (the key). Green GAIN, yellow EVEN, red LOSS. A resource that rose is *power given*, blue. White with a
 dashed edge is *the runs disagree* or *the runs differ*; grey is *shown, not judged*; neither is a reading.
 
 **The switch** (chapter 5). At the top of the wall. Green ON: the governor's outputs reach the muscles. Red: the kill switch
@@ -398,9 +399,10 @@ Copy of the Page. Back matter: Glossary; Appendices A to K; Index; Contact.
 
 The live engine is a monitor of the Omni-Compass engine and of the benchmark runs GitHub ran. A
 monitor shows what its instrument reads; a drawing shows what its author believes. The page is the former by construction:
-every record it replays is made again by the repository's own code on the checkout it is built from, and the build refuses to
-write a page whose engine is not the one `python3 tools/omni_version.py` reads. So the page can never run ahead of the
-repository, and a new engine version is written into the page's words by a person before the page can be rebuilt on it.
+every record it replays is made again by the repository's own code on the checkout it is built from, and `--check` fails a
+page whose engine is not the one `python3 tools/omni_version.py` reads. So the page never runs ahead of the repository: when
+a new engine stands, the build stamps it on the page and rebuilds every record on it, and the page says in a banner that its
+prose was written for the older engine until a person realigns the words.
 
 ### 1.2 The five records
 
@@ -497,10 +499,19 @@ lane or the upper row; where it draws them as two instances (the organism, the p
 ### 3.2 The words
 
 GAIN is green, EVEN is yellow, LOSS is red. Every reading, in every table, chart, bar and tile, wears one
-of those three colours and no other. Power given wears GAIN's green. *The runs disagree* and *the runs differ* are white with
+of those three colours, or blue for power given, and no other. Power given wears blue, Omni-Compass's own colour, because it is
+what Omni-Compass put in. *The runs disagree* and *the runs differ* are white with
 a dashed edge, and *shown, not judged* is grey, because none of them is a reading. The size printed beside a word is how far
 the gauge moved from native and carries the word's own sign (GAIN +, LOSS −, EVEN =), never the gauge's raw direction. A
 change under half of one percent either way reads EVEN, under the floor.
+
+**How the executive summary counts** (the consensus audit of 21 October, `docs/engine/CONSENSUS_AUDIT_2026-10-21.md`). Its first
+line counts the three-run tables of Omni-Compass against its native apart from the orchestrators' own cost: the four-ways tables in
+which Omni-Compass is in neither arm, or on the other side of the comparison, are counted in a sentence of their own and never in
+Omni-Compass's words. The floor reads every judged word, GAIN, LOSS and power given alike, in the tables, in the models' live
+judges and in the cloud's tally. A model's gauge that has one value a run (the Linux host's pod start wait and its 95th percentile)
+has no interval, so it is shown, not judged, with the way it moved and its size. And the line says which engines the tables stand
+on, so a reader never takes a table of an older engine for the engine that stands.
 
 ### 3.3 The sides are never a reading
 
@@ -1723,8 +1734,8 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | Mark | Meaning |
 |---|---|
 | Amber | native |
-| Blue | Omni-Compass |
-| Green | GAIN, and power given |
+| Blue | Omni-Compass; on a reading, power given |
+| Green | GAIN |
 | Yellow | EVEN |
 | Red | LOSS; the kill switch and its window; the master switch engaged |
 | White, dashed edge | the runs disagree; the runs differ; not a reading |

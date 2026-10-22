@@ -7,6 +7,40 @@
 
 **The scale** (referee and underwriter): A+++ nothing to fix, an underwriter signs; A++ one or two nits; A+ a few minors, no major; A one major or several minors; A− more than one major; B a blocker (something wrong or misleading a referee would reject) or many majors; C several blockers; F unsound. A finding is a blocker, a major, a minor or a nit.
 
+## 0. Where the findings stand (21 October, night)
+
+**All 19 majors are closed** in the page, its exporter, its builder, the registry and the three manuals (CHANGELOG, "the consensus
+audit's nineteen majors closed"). The grade below is the referees' grade of the page they read; it stands until the next audit
+reads the page again, and the page is not re-graded by the hand that fixed it.
+
+| Major | Closed by |
+|---|---|
+| S1 headline pooled | the summary counts Omni-Compass against its native (51 class-L tables: 142 GAIN, 23 power given, 7 LOSS after the floor) apart from the orchestrators' own cost (30 tables: 103 LOSS), and names the tables' engines |
+| S2 single values judged | a model gauge with one value a run is shown, not judged (exporter and page) |
+| S3 the floor | every judged word takes the 0.5% floor: tables, live judges, cloud tally, exporter |
+| S4 stale appraisal | the appraisal's counts are written by the build from the records at every run; `--check` fails a stale one |
+| M1 one law named | section 10 names the default law and the fleet law, with both constant sets |
+| U1 "refuses" | the builder, workflow, appraisal and manual say what the build does with a new engine |
+| U2 causes missing | `docs/LOSS_ROWS_UNDER_INVESTIGATION.md`: both rows, what is known, suspected and decisive; all 7 LOSS rows now name a cause page |
+| U5 absolute sentence | section iii states do no harm as the aim, with the LOSS process |
+| L4 trial overstated | section iii, the three manuals and the README: every give-back is trialled; a raise is held by its bounds |
+| L1 numeral | the back matter is vi |
+| L2 power given colours | blue everywhere, written once in the key and the manual's colour table |
+| L3 eighth organism | the seven, the orchestra the eighth, the whole stack a composition with two arms |
+| L5 omni-v3 rows | the board takes omni-v5 and later |
+| U6 poster's ® | the caption says the ® and "registered 2026" are the artwork's words; the statement of record is "filed" |
+| Y1 stretched thumbnails | the wall letterboxes every monitor in its own shape |
+| Y2 type under 11 px | no canvas text under 11 px, whatever a drawing asks |
+| Y3 LOSS red contrast | the red of LOSS at 5.4:1 on the panels; LOSS chips take dark type |
+| Y4 phone pairs | a native/Omni-Compass pair stacks on a phone, native above, full width |
+| Y5 nested tables | the nested three-run tables scroll inside their cell |
+| Y6 empty tile | the wall draws any monitor not yet drawn before it copies it |
+
+**Minors closed in the same push:** U7 (the factory tune is section 3), L6 (the awaited GPU run is omni-v13's), L7 (the governors
+run four ways), L8 (LOSS rows raised in 1d, answered in 1g), L9 (our model is a model), L11 (the body parts' feed), Y10 (captions
+and badges at the page's floor), Y14 (a pair's badges keep their names on a phone). **Open:** S5 to S9, M2 to M7, L10, L12 to L17,
+U8 to U13, Y7 to Y9, Y11 to Y13, Y15, Y16, and the nits; each with its fix in section 3.
+
 ## 1. The grade
 
 | Dimension | Referee's grade | Blockers | Majors | Minors | Nits |
