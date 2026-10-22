@@ -207,8 +207,8 @@ of our runs in the seven 2023 districts, the only districts with outages; the ca
 native's numbers to the last digit). The other 44 engine files are omni-v7's bytes, and the Kubernetes governor is omni-v7's but for
 omni-v11's hold, omni-v12's held refusal, omni-v13's hand-back, omni-v14's two changes, omni-v15's clear-time gate on the brain's power-cap request and omni-v16's clocks in seconds and 15 s heartbeat: the max on every muscle of the 1,107-muscle catalog, every muscle its own card, the Kubernetes controller's shared-host capacity repair, conveyance bounded by each namespace's CPU quota, every
 rule counted in seconds, the verdict reading a trial in the reports' words, the cloud's rule as one flag. Every benchmark runs again on
-omni-v16 (`scripts/reruns.txt` and the grid restarted on it from 07:30 UTC on 22 October; the Azure sets held until the founder
-confirms whose account the Azure login bills, `scripts/azure_queue.txt`); until a benchmark's three runs land, its row on
+omni-v16 (`scripts/reruns.txt` and the grid on it from 07:30 UTC on 22 October, started from that afternoon's fix of the conductor's engine check; the Azure sets from the founder's word of the
+same afternoon that the account the Azure login bills agreed, each after Azure's own $0 check, `scripts/azure_queue.txt`); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
 **On omni-v11, until their omni-v16 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw

@@ -70,7 +70,8 @@ the founder overrides one in the conversation.
   percentile (+0.36% to +0.47%) and the alert minutes (+2.31%), which read EVEN at 60 s only by the seeds' spread: the engine's, on
   the next version's list. The real runs (`docs/PACE_PREREGISTRATION.md`, amendment 2: native, Omni-Compass at 15 s, and at 60, 10
   and 5 s, three runs) read the heartbeat for real. The seal is written under Python 3.12 (its compensated `sum` is what the C++
-  engine-runs twin follows; 3.11's differs by one rounding step). Every benchmark runs again on it from 07:30 UTC on 22 October.
+  engine-runs twin follows; 3.11's differs by one rounding step). Every benchmark runs again on it: its campaign opened at 07:30 UTC
+  on 22 October, and the conductor starts its runs from the afternoon's push that fixed its engine check (Orders of 22 October).
 - **Omni v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`) stood on main 21 to 22 October, landed 21 October, evening, under the
   founder's standing order that every fault found is fixed and lands as the next version, told, not asked, and his word of 21 October
   ("push, push, push on GitHub, update, enhanced engine"): omni-v14 with two changes. The brain's request for the power cap
@@ -85,8 +86,9 @@ the founder overrides one in the conversation.
   fingerprint (`tools/omni_version.py`: the data stores' five runners, the swarm, MuJoCo and the CPU power runner, their bytes as
   they stood; a version declared before them is read without those eight and only those). Declared with it, not an engine change: the kill test reads the
   300 s after the kill (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v15"). The toy gate against omni-v14
-  (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Its campaign started at
-  02:30 UTC on 22 October; the runs started before omni-v16's push stand as its record.
+  (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Its campaign opened at
+  02:30 UTC on 22 October and started no run: the conductor read every commit from omni-v15's push on as no engine (Orders of 22
+  October); the last runs it started, at 00:31 UTC, were omni-v14's.
 
 - **Omni v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`) stood on main on 21 October, from 04:47 UTC to the evening, the founder's
   orders "knobs on every monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with
@@ -302,8 +304,13 @@ the founder overrides one in the conversation.
   is root-caused and fixed in the next version.
 - **Another person's cloud account** (the founder's words: he logged into another person's Azure account to use their free credit
   for his benchmark). A key bills only the account it belongs to; nothing merges. Using it is his and that person's matter: only
-  with that person's agreement. Asked whether they agreed; nothing on Azure is touched until he answers: the Azure queue's switch is off
-  (`scripts/azure_queue.txt`), and goes back on at his word.
+  with that person's agreement. Asked whether they agreed, he answered "Yes yes yes" the same day: the Azure queue's switch, off while the
+  question stood, is on again (`scripts/azure_queue.txt`), and each set starts after Azure's own $0 check passes.
+- **The conductor's engine check** (under the order of 18 October that every fault is fixed): from omni-v15's push (00:45 UTC on 22
+  October) to the afternoon the conductor started nothing. On GitHub it fingerprinted the fetched commit with its own copy of the
+  version tool's scope, which predated the eight wires omni-v15 took in, so omni-v15's and omni-v16's commits matched no version.
+  It now runs the fetched commit's own version tool on that commit (`scripts/dispatch_grid.py`, `engine`), and
+  `tests/test_release_campaign.py` fails the old code. No copy of a rule kept in two places.
 
 ## Orders of 21 October
 
