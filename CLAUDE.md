@@ -43,9 +43,35 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v15 stands (v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v16 stands (v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`) stands on main since 21 October, evening, under the
+- **Omni v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`) stands on main since 22 October, on two
+  words of the founder's: "Go opus" on the plan put to him that night (every clock of the Kubernetes governor in seconds, the pace
+  read at 60, 15, 10 and 5 s in our models, three runs at each pace on GitHub's own machines), and, once the models had read,
+  "15 sec all over heart beat fix update code". **The heartbeat is 15 s**: the governor's full decision comes every 15 s by default
+  (`--interval 15`, `--floor-interval 5`; `omni_controller/controller.py`), native's own pod autoscaler's pace, in every rig,
+  install file and cloud run (`scripts/kind_bench.sh` `OMNI_INTERVAL`, `kind_paired.sh`, `kind_robust.sh`, `kind_full.sh`,
+  `kind_pilot.sh`, `deploy/install/*.yaml`, `deploy/controller.yaml`, the alert rules' 45 s staleness bound); each run writes its
+  period beside its files (`omni_interval.txt`) and the receipts read each run at its own (`tools/live_reps.py`). omni-v15 with the
+  clocks changed and the heartbeat set, and nothing else (every gain, guard, preset and muscle is omni-v15's; 50 of its 55 files
+  are omni-v15's bytes): the brain's own minute (`omnicompass/adapter.py` `period_s`, and its C++ twin `cpp/src/governor.cpp`,
+  sealed: the reading's weight 1 − (1 − 0.339)^k a step with k = period / 60 s, the inner time, the dwell and waits, the machines
+  added or removed over the last minute's steps), the compass's damping and smoothing, the edge's window and rates
+  (`omnicompass/edge.py` `pace`), the additions past the scheduling floor (a step a minute), a command's minute to land, the host's
+  busy share over a minute (`omni_controller/capacity.py`), the heat law's minute and one batch job a minute
+  (`omni_controller/muscles.py`), the coast per raise, the conveyance every 15 s whichever check falls due, and a loop that keeps
+  its own schedule (`tests/test_pace_clocks.py`, `tests/test_loop_schedule.py`). The cushion each muscle keeps is the same at any
+  pace; the pace sets only how soon trouble is seen, and a longer one would only blind the governor longer (the founder's question
+  of 22 October, answered so). At 60 s it makes exactly omni-v15's decisions (the toy gate, `results/toy_gate/V16_VS_V15.md`: 4,578
+  audit records, none different). The pace study (`results/toy_gate/V16_PACE.md`, a plant that moves every 5 s): 15 s against 60 s,
+  alert minutes −14.7% in the kind setting and energy per core −2.6% in the cloud's (GAIN), every other reading EVEN, no LOSS at
+  any pace; as shipped (the gate's `cluster_shipped`, omni-v16 at 15 s against omni-v15 at 60 s) every gauge EVEN. Against native
+  the pods waiting for a place read LOSS at every pace, the old 60 s default included, and in the cloud's setting at 15 s the 95th
+  percentile (+0.36% to +0.47%) and the alert minutes (+2.31%), which read EVEN at 60 s only by the seeds' spread: the engine's, on
+  the next version's list. The real runs (`docs/PACE_PREREGISTRATION.md`, amendment 2: native, Omni-Compass at 15 s, and at 60, 10
+  and 5 s, three runs) read the heartbeat for real. The seal is written under Python 3.12 (its compensated `sum` is what the C++
+  engine-runs twin follows; 3.11's differs by one rounding step). Every benchmark runs again on it from 04:30 UTC on 22 October.
+- **Omni v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`) stood on main 21 to 22 October, landed 21 October, evening, under the
   founder's standing order that every fault found is fixed and lands as the next version, told, not asked, and his word of 21 October
   ("push, push, push on GitHub, update, enhanced engine"): omni-v14 with two changes. The brain's request for the power cap
   (`omnicompass/adapter.py`, its C++ twin `cpp/src/governor.cpp`) trims to demand only while the response line has been clean for
@@ -59,8 +85,8 @@ the founder overrides one in the conversation.
   fingerprint (`tools/omni_version.py`: the data stores' five runners, the swarm, MuJoCo and the CPU power runner, their bytes as
   they stood; a version declared before them is read without those eight and only those). Declared with it, not an engine change: the kill test reads the
   300 s after the kill (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v15"). The toy gate against omni-v14
-  (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Every benchmark runs
-  again on it from 02:30 UTC on 22 October, a little after the push, so no run started by omni-v14's conductor is counted in it.
+  (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Its campaign started at
+  02:30 UTC on 22 October; the runs started before omni-v16's push stand as its record.
 
 - **Omni v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`) stood on main on 21 October, from 04:47 UTC to the evening, the founder's
   orders "knobs on every monitor, to turn off and on ... a muscle" (20 October) and "tune the engine" (21 October): omni-v13 with
@@ -154,7 +180,7 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v15, omni-v14, omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v16, omni-v15, omni-v14, omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
@@ -265,6 +291,19 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 22 October
+
+- **The heartbeat at 15 s, "all over"** (the founder's words, once the pace models had read: "15 seconds back to, instead of 60
+  seconds in the clock, the heartbeat"; "15 sec all over heart beat fix update code"). Who set 60 s: we did, on 26 September, with
+  no reason recorded; native's pod autoscaler checks every 15 s by the Kubernetes project's default. omni-v16 puts every clock in
+  seconds, so the pace changes only how often the governor looks, and sets the full decision every 15 s everywhere, the fast checks
+  every 5 s. A longer period is not a bigger cushion: it is a longer blind spot (his question of the same night, answered so). The
+  pace runs (`docs/PACE_PREREGISTRATION.md`) read 15 s for real, against native and against 60, 10 and 5 s; a LOSS at 15 s there
+  is root-caused and fixed in the next version.
+- **Another person's cloud account** (the founder's words: he logged into another person's Azure account to use their free credit
+  for his benchmark). A key bills only the account it belongs to; nothing merges. Using it is his and that person's matter: only
+  with that person's agreement. Asked whether they agreed; nothing on Azure is touched until he answers.
+
 ## Orders of 21 October
 
 - **Push, push, push; the enhanced engine** (the founder's words: "Back to work push push push on GitHub update enhanced engine"):
@@ -353,7 +392,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v15` since 21 October, evening), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v16` since 22 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -609,8 +648,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v15` (the engine that stands, 21 October, evening), stay in
-  sync, and `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v15`,
+  One version is always the main one; `main` and the working branch, `v16` (the engine that stands, 22 October), stay in
+  sync, and `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v16`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

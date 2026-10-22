@@ -57,7 +57,7 @@ for arm in "${order[@]}"; do
   # arm deciding every 15, 10 or 5 s, its fast checks every 5 s as always; compass alone decides at the default
   pace=""
   if [[ "$base" =~ ^compass([0-9]+)$ ]]; then pace="${BASH_REMATCH[1]}"; base=compass; fi
-  if ! OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-60}}" ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
+  if ! OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-15}}" ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
     # a run that fails its own checks is recorded as invalid and left out of the table, never silently counted
     echo "ARM $arm (repetition $REP) FAILED its checks: marked invalid" | tee "bench-$arm-$REP/INVALID"; fail=1
   fi

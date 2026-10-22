@@ -620,11 +620,13 @@ kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json >
 watch_pid=$!
 omni_pid=""
 # the governor's full decision every OMNI_INTERVAL seconds and its fast checks (the scheduling floor, the pod reflex, and
-# the conveyance every 15 s) every OMNI_FLOOR_INTERVAL seconds: 60 and 5 by default. Since omni-v16 every clock of the
-# governor counts seconds, so the decision period changes only how often it looks (docs/PACE_PREREGISTRATION.md; the
-# pace arms compass15, compass10 and compass5 of scripts/kind_paired.sh set it); the fast checks' period stays under
-# the decision's
-export OMNI_INTERVAL="${OMNI_INTERVAL:-60}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
+# the conveyance every 15 s) every OMNI_FLOOR_INTERVAL seconds: 15 and 5 by default (omni-v16, the founder's word of 22
+# October: the heartbeat at native's own 15 s). Every clock of the governor counts seconds, so the decision period changes
+# only how often it looks (docs/PACE_PREREGISTRATION.md; the pace arms compass60, compass10 and compass5 of
+# scripts/kind_paired.sh set it); the fast checks' period stays under the decision's. The period is written beside the
+# run's files, so a receipt reads each run at its own (tools/live_reps.py)
+export OMNI_INTERVAL="${OMNI_INTERVAL:-15}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
+mkdir -p "$OUT_DIR" && printf '%s\n' "$OMNI_INTERVAL" > "$OUT_DIR/omni_interval.txt"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file
   $GOV_PIN nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval "$OMNI_FLOOR_INTERVAL" --reflex-window-s 15 \

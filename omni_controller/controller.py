@@ -1173,8 +1173,10 @@ class Controller:
 def parser():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--mode", choices=["observe", "target", "nodepool"], default="observe")
-    ap.add_argument("--interval", type=float, default=60.0, help="seconds between governor decisions")
-    ap.add_argument("--floor-interval", type=float, default=15.0, help="seconds between scheduling-floor checks (nodepool mode)")
+    # the heartbeat (omni-v16, the founder's word of 22 October: "15 sec all over"): a full decision every 15 s, native's own
+    # pod autoscaler's pace, and the fast checks every 5 s between; every rule counts seconds, so either can be turned alone
+    ap.add_argument("--interval", type=float, default=15.0, help="seconds between governor decisions (the heartbeat)")
+    ap.add_argument("--floor-interval", type=float, default=5.0, help="seconds between the fast checks: the scheduling floor, the pod reflex, the conveyance's clock (nodepool mode)")
     ap.add_argument("--convey-every-s", type=float, default=15.0,
                     help="seconds between conveyance passes, counted on the checks (a fast check or a decision; omni-v16)")
     ap.add_argument("--iterations", type=int, default=0, help="0 = run until stopped")

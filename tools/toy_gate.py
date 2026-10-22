@@ -21,6 +21,8 @@ its own code, so the two never share a module.
              (an M/M/1 delay on each pod's share, log-normal spread, the backlog's wait added). Native is the HPA with
              the Cluster Autoscaler on the same demand.
   cluster15  the same with a decision every 15 s: each rule's time at a shorter period.
+  cluster_shipped  the same with each checkout at its own default decision period, as an install file that sets none
+             runs it (omni-v16: 15 s, the founder's word of 22 October; every engine before it: 60 s).
   cluster_blink  the cluster toy with every machine out of service in the governor's reading for two minutes every six
              hours while the cluster serves on (the kind cluster of the CruiseKube test, 18 October): a decision or a
              check that fails is recorded and skipped, as the shipped loop does.
@@ -250,15 +252,18 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
         # toys: the compass law at the max, every HPA sensed, as ARM=compass runs it in benchmark-reps.yml)
         law = ["--law", "compass", "--dial", "save", "--sensed", "none/none"] if setting == "cloud" else \
             ["--law", "compass", "--dial", "max"]
-        argv = ["--mode", "nodepool", *law,
-                "--interval", str(period), "--latency-file", str(lat_path), "--slo-ms", str(SLO_MS),
+        # a period of 0 is the checkout's own default (the shipped toy); the fast checks come once a plant step, as
+        # every toy has run them (15 s on the cluster's plant, 5 s on the fine one)
+        argv = ["--mode", "nodepool", *law, *(["--interval", str(period)] if period > 0 else []),
+                "--floor-interval", str(tick_s), "--latency-file", str(lat_path), "--slo-ms", str(SLO_MS),
                 "--audit", str(out / "audit.jsonl"), "--kill-file", str(out / "kill"), "--node-scale-cmd", "SIMSCALE {n}",
                 "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.max_nodes), "--headroom", "0.5",
-                "--active-nodes-only", "--max-node-step", "1"] + (["--floor-interval", str(FINE_S)] if fine else [])
+                "--active-nodes-only", "--max-node-step", "1"]
         p = parser()
         if setting == "cloud" and any("--give-back-only" in getattr(x, "option_strings", []) for x in p._actions):
             argv.append("--give-back-only")
         a = p.parse_args(argv)
+        period = period if period > 0 else float(a.interval)
         k = Kube(sim, None)
         ctl = Controller(a, kube=k)
         real_run = subprocess.run
@@ -700,6 +705,14 @@ def engine_tree(module):
 
 
 def run(tree, args):
+    # a worker's reading is kept in its own folder, so a study stopped part way (22 October: the machine restarted an hour into
+    # the pace study) starts again from the jobs it has not finished; a kept reading is reused only for the same checkout and
+    # the same arguments
+    keep = Path(args[args.index("--dir") + 1]) / "reading.json" if "--dir" in args else None
+    if keep is not None and keep.exists():
+        k = json.loads(keep.read_text())
+        if k.get("tree") == str(Path(tree).resolve()) and k.get("args") == list(args):
+            return k["reading"]
     env = {**os.environ, "PYTHONPATH": str(tree)}
     p = subprocess.run([sys.executable, str(Path(__file__).resolve()), *args], cwd=tree, env=env, capture_output=True,
                        text=True, timeout=7200)
@@ -709,6 +722,8 @@ def run(tree, args):
     got = r.pop("engine_tree", None) if isinstance(r, dict) else None
     if got is not None and Path(got).resolve() != Path(tree).resolve():
         raise RuntimeError(f"{args[:2]}: the engine was imported from {got}, not from the checkout under test {tree}")
+    if keep is not None and keep.parent.is_dir():
+        keep.write_text(json.dumps({"tree": str(Path(tree).resolve()), "args": list(args), "reading": r}))
     return r
 
 
@@ -758,7 +773,8 @@ def render(report_path, out_md):
     if r.get("note"):
         lines += [r["note"], ""]
     for toy, t in r["toys"].items():
-        period = f" (a decision every {t['period_s']:.0f} s)" if "period_s" in t else ""
+        period = (f" (a decision every {t['period_s']:.0f} s)" if t["period_s"] else " (each checkout at its own default decision period)") \
+            if "period_s" in t else ""
         lines += [f"## {toy}{period}", ""]
         if toy.startswith("pace_"):
             # the pace study (omni-v16): the candidate alone at each decision period on the 5 s plant, each pace against the
@@ -817,7 +833,7 @@ def main(argv=None):
     ap.add_argument("--cand", help="checkout of the candidate")
     ap.add_argument("--seeds", default="1-8")
     ap.add_argument("--days", type=float, default=1.0)
-    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,convey,convey_unreadable_quota,convey_refused,convey_batch,card,card_floor,verdict")
+    ap.add_argument("--toys", default="cluster,cluster15,cluster_blink,cluster_shipped,convey,convey_unreadable_quota,convey_refused,convey_batch,card,card_floor,verdict")
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--out", default="")
     ap.add_argument("--worker", help=argparse.SUPPRESS)
@@ -849,7 +865,7 @@ def main(argv=None):
     from concurrent.futures import ThreadPoolExecutor
     report = {"seeds": seeds, "days": a.days, "base": str(base), "cand": str(cand), "toys": {}}
     toys = a.toys.split(",")
-    for toy, period in (("cluster", 60.0), ("cluster15", 15.0), ("cluster_blink", 60.0)):
+    for toy, period in (("cluster", 60.0), ("cluster15", 15.0), ("cluster_blink", 60.0), ("cluster_shipped", 0.0)):
         if toy not in toys:
             continue
         jobs = [(arm, tree, s) for s in seeds for arm, tree in (("native", cand), ("base", base), ("cand", cand))]

@@ -47,7 +47,9 @@ def limits(p):
 
 
 def args(tmp):
-    a = parser().parse_args(["--kubectl", FAKE, "--audit", str(Path(tmp) / "audit.jsonl"), "--kill-file", str(Path(tmp) / "kill"),
+    # a decision a minute and a check every 15 s, the defaults this test was written against before omni-v16 set 15 s and 5 s
+    a = parser().parse_args(["--interval", "60", "--floor-interval", "15",
+                             "--kubectl", FAKE, "--audit", str(Path(tmp) / "audit.jsonl"), "--kill-file", str(Path(tmp) / "kill"),
                              "--cap-deployments", "default/web", "--security-configmap", "default/omni-security",
                              "--latency-file", str(Path(tmp) / "latency.csv"), "--mode", "target"])
     return a

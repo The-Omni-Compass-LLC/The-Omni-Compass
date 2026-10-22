@@ -376,7 +376,9 @@ def robust_marks(d):
     return out
 
 
-ROBUST_INTERVAL_S = 60.0       # the governor's configured decision interval in the robustness runs (scripts/kind_bench.sh, --interval 60)
+ROBUST_INTERVAL_S = 60.0       # the decision interval of the robustness runs that predate omni_interval.txt (scripts/kind_bench.sh, --interval 60); a run that
+                               # carries the file (omni-v16 on) is read at its own, and its decision time from the governor's own decision_ms records,
+                               # because its loop keeps its schedule and the gap between decisions no longer holds the step's time
 ROBUST_DECISION_SHARE = 0.95   # fewer decisions than this share of the count the interval predicts reads INVALID (docs/ROBUSTNESS_PREREGISTRATION.md)
 ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again is marked
 ROBUST_LONG_MIN_S = 6840.0     # the decision-time ratio needs a span of at least 95% of the 7,200 s window, so the first and last hours do not overlap
@@ -390,8 +392,17 @@ def robust_decisions(d, window_s):
     f = d / "audit.jsonl"
     if not f.exists() or not window_s:
         return None
-    times, failed, reasons = [], 0, []
+    try:
+        interval = float((d / "omni_interval.txt").read_text().split()[0]); own = True
+    except (OSError, ValueError, IndexError):
+        interval, own = ROBUST_INTERVAL_S, False
+    times, failed, reasons, step_ms = [], 0, [], []
     for line in open(f):
+        if own and '"decision_ms"' in line:
+            try:
+                step_ms.append((len(times), float(json.loads(line)["decision_ms"])))
+            except (ValueError, KeyError, TypeError):
+                pass
         if '"decision"' in line:
             try:
                 times.append(float(json.loads(line)["time"]))
@@ -412,15 +423,20 @@ def robust_decisions(d, window_s):
                 r = l.split("):", 1)[-1].strip() if "):" in l else l.strip()
                 r = re.sub(r"CalledProcessError\(\d+, \[.*?\]\)\s*", "", r)[:160]
                 reasons.append(r)
-    expected = window_s / ROBUST_INTERVAL_S
-    out = {"decisions": len(times), "expected": expected, "share": (len(times) / expected if expected else None), "failed": failed,
+    expected = window_s / interval
+    out = {"decisions": len(times), "expected": expected, "interval_s": interval, "share": (len(times) / expected if expected else None), "failed": failed,
            "failed_reasons": sorted(set(reasons)), "decision_time_ratio": None}
     if len(times) >= 4 and times[-1] - times[0] >= ROBUST_LONG_MIN_S:
         gaps = [(b - a, a) for a, b in zip(times, times[1:])]
         t0, t1 = times[0], times[-1]
         first = [g for g, t in gaps if t <= t0 + 3600]; last = [g for g, t in gaps if t >= t1 - 3600]
+        if own:
+            # the step's own time, as the governor timed it: decisions whose time falls in the first and the last hour
+            first = [ms / 1000.0 for i, ms in step_ms if i and times[i - 1] <= t0 + 3600]
+            last = [ms / 1000.0 for i, ms in step_ms if i and times[i - 1] >= t1 - 3600]
         if first and last:
-            a = max(sum(first) / len(first) - ROBUST_INTERVAL_S, 0.0); b = max(sum(last) / len(last) - ROBUST_INTERVAL_S, 0.0)
+            a = max(sum(first) / len(first) - (0.0 if own else ROBUST_INTERVAL_S), 0.0)
+            b = max(sum(last) / len(last) - (0.0 if own else ROBUST_INTERVAL_S), 0.0)
             out["decision_time_first_s"], out["decision_time_last_s"] = a, b
             out["decision_time_ratio"] = (b / a) if a >= 0.1 else None    # under a tenth of a second there is nothing to compare
     ks = d / "kill_switch.txt"
@@ -733,7 +749,8 @@ def main(root):
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
-    # the decision pace (omni-v16): compass15, compass10, compass5 are the compass arm deciding every 15, 10 or 5 s
+    # the decision pace (omni-v16): compass60, compass10, compass5 (any compassN) are the compass arm deciding every N s;
+    # the compass arm itself decides at the default, every 15 s (OMNI_INTERVAL in scripts/kind_bench.sh)
     paces = sorted((a for a in runs if re.fullmatch(r"compass\d+", a)), key=lambda a: -int(a[7:]))
     cols = ([a for a in ("nativebare", "native") if a in runs] + tuned
             + [a for a in ("watch", "omni", "compassbare", "compass") if a in runs] + paces + [a for a in ("strict",) if a in runs])
@@ -760,9 +777,9 @@ def main(root):
     # every comparison: the arm, the arm it is read against, its key in the paired table, and its title; the four ways
     # (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6) add the organism alone, without and with Omni-Compass on top
     pairs = [(a, "native", a, None) for a in ("watch", "omni", "compass", "strict")] + [(a, b, f"{a}|{b}", t) for a, b, t in FOUR_WAYS]
-    # each pace against native, and against the compass arm at the default decision (60 s), paired in the repetition
+    # each pace against native, and against the compass arm at the default decision (15 s), paired in the repetition
     pairs += [(a, "native", a, f"omni deciding every {a[7:]} s vs native") for a in paces]
-    pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni deciding every 60 s") for a in paces]
+    pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni at its default, every 15 s") for a in paces]
     for a, base, key, four in pairs:
         if a not in runs or base not in runs:
             continue

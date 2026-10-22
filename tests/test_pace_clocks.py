@@ -86,6 +86,15 @@ class EdgePace(unittest.TestCase):
 
 
 class ControllerClocks(unittest.TestCase):
+    def test_the_heartbeat_is_15_s(self):
+        """The founder's word of 22 October ("15 sec all over"): a full decision every 15 s by default, the fast checks
+        every 5 s, in the governor and in every place that starts it (the rigs and the install files)."""
+        a = parser().parse_args(["--audit", ""])
+        self.assertEqual((a.interval, a.floor_interval), (15.0, 5.0))
+        self.assertIn('OMNI_INTERVAL="${OMNI_INTERVAL:-15}"', (ROOT / "scripts" / "kind_bench.sh").read_text())
+        for f in ("deploy/install/omni-compass.yaml", "deploy/install/omni-compass-cloud.yaml", "deploy/controller.yaml"):
+            self.assertIn('"--interval", "15"', (ROOT / f).read_text(), f)
+
     def test_at_60_s_every_value_is_omni_v15s(self):
         c = controller("--interval", "60", "--law", "compass", "--floor-interval", "5")
         self.assertEqual((c.pace, c.n_add, c.n_land, c.n_convey, c.host_cpu.span), (1.0, 1, 1, 3, 1))
@@ -152,13 +161,13 @@ class PaceArms(unittest.TestCase):
     def test_the_runner_sets_the_pace_from_the_arm(self):
         text = (ROOT / "scripts" / "kind_paired.sh").read_text()
         self.assertIn('if [[ "$base" =~ ^compass([0-9]+)$ ]]; then pace="${BASH_REMATCH[1]}"; base=compass; fi', text)
-        self.assertIn('OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-60}}" ARM="$base"', text)
+        self.assertIn('OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-15}}" ARM="$base"', text)
 
     def test_the_receipt_pairs_each_pace(self):
         import json
         import tools.live_reps as LR
         p95 = "response time (ms), 95th percentile"
-        level = {"native": 300.0, "compass": 200.0, "compass15": 190.0, "compass10": 185.0, "compass5": 188.0}
+        level = {"native": 300.0, "compass": 200.0, "compass60": 190.0, "compass10": 185.0, "compass5": 188.0}
 
         def fake(d):
             arm, rep = d.name.split("-")[1], int(d.name.split("-")[2])
@@ -176,11 +185,11 @@ class PaceArms(unittest.TestCase):
         finally:
             LR.arm_gauges = old
         out = json.loads((t / "LIVE_REPS.json").read_text())
-        for pace in (15, 10, 5):
+        for pace in (60, 10, 5):
             self.assertAlmostEqual(out["paired"][f"compass{pace}"][p95]["diff"], level[f"compass{pace}"] - 300.0, places=6)
             self.assertAlmostEqual(out["paired"][f"compass{pace}|compass"][p95]["diff"], level[f"compass{pace}"] - 200.0, places=6)
         md = (t / "LIVE_REPS.md").read_text()
-        self.assertIn("omni deciding every 15 s vs omni deciding every 60 s", md)
+        self.assertIn("omni deciding every 60 s vs omni at its default, every 15 s", md)
         self.assertIn("omni, a decision every 5 s", md)
 
 
