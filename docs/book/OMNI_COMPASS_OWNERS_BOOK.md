@@ -3582,7 +3582,7 @@ declared engine.
 | omni-v13 | 20 Oct 20:31 | `0088837333c6f0fc` | 47 | Kubernetes: the CPU limits the conveyance gave go back to the operator's on a shared host at its top beside another workload's room; every other pod counted by its own limit |
 | omni-v14 | 21 Oct 04:47 | `7afba44615fcff8f` | 47 | Kubernetes: a knob that leaves any one muscle native; the operator's own commands run without a shell |
 | omni-v15 | 22 Oct 02:30 | `0a53cdd7a558f803` | 55 | the brain: the power cap's request trims only while the response line has been clean for the governor's own clear time (the omni-v11 long run's 126 switches in 350 decisions); every wire that holds a governor's rules in the fingerprint (eight taken in, their bytes as they stood) |
-| omni-v16 | 22 Oct 06:45 | `5c5502f12b1c0ce4` | 55 | the Kubernetes governor: every clock in seconds (the brain's minute and its C++ twin, the compass's damping and smoothing, the edge, the additions past the floor, a command's minute to land, the host's busy share, the heat law, one batch job a minute, the conveyance every 15 s, the loop's own schedule), so the decision period is a clean setting; the heartbeat, the full decision, every 15 s by default (the founder's word, "15 sec all over"), the fast checks every 5 s; at 60 s exactly omni-v15's decisions; the pace read by its own runs (`docs/PACE_PREREGISTRATION.md`) |
+| omni-v16 | 22 Oct 07:00 | `5c5502f12b1c0ce4` | 55 | the Kubernetes governor: every clock in seconds (the brain's minute and its C++ twin, the compass's damping and smoothing, the edge, the additions past the floor, a command's minute to land, the host's busy share, the heat law, one batch job a minute, the conveyance every 15 s, the loop's own schedule), so the decision period is a clean setting; the heartbeat, the full decision, every 15 s by default (the founder's word, "15 sec all over"), the fast checks every 5 s; at 60 s exactly omni-v15's decisions; the pace read by its own runs (`docs/PACE_PREREGISTRATION.md`) |
 
 Each version through omni-v15 was a fault found in a real run and fixed, and omni-v16 made the decision pace a clean setting
 and set the heartbeat at 15 s on the founder's word: the record is in `docs/OMNI_V6.md` to `docs/OMNI_V16.md`, and each toy gate's reading in
@@ -14523,7 +14523,7 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 **The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one thing,
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
-on omni-v16 from 06:45 UTC on 22 October, each only after Azure's own $0 check passed (since 22 October, as Google's and
+on omni-v16 from 07:00 UTC on 22 October, each only after Azure's own $0 check passed (since 22 October, as Google's and
 Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
 the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
 to their end as their own record (omni-v15's started from 02:30 UTC; the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
@@ -14581,7 +14581,7 @@ omni-v16 runs land. The numbers stand on that page, never copied here.
    table lands when its runs do.
 4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): fixed in omni-v12, and every wire that
    holds a governor's rules taken into the fingerprint in omni-v15 (`docs/OMNI_V15.md`, section 2). Closed.
-5. **The grid, the reruns and Azure on omni-v16**: restarted from 06:45 UTC on 22 October; nothing cancelled (omni-v15's,
+5. **The grid, the reruns and Azure on omni-v16**: restarted from 07:00 UTC on 22 October; nothing cancelled (omni-v15's,
    started from 02:30 UTC, run to their end as its record).
 5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the toy read no LOSS at 15 s against 60 s
    (`results/toy_gate/V16_PACE.md`, `results/toy_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a
@@ -14743,7 +14743,7 @@ operator's own commands run without a shell unless they hold one's syntax, and a
 `docs/OMNI_V14.md`), and the brain's request for the power cap trimming only while the response line has been clean for the
 governor's own clear time, with every wire that holds a governor's rules inside the fingerprint (omni-v15, `docs/OMNI_V15.md`),
 and every clock of the Kubernetes governor in seconds, so its decision period is a clean setting, identical to omni-v15 at
-its 60 s, with the full decision every 15 s by default, the founder's heartbeat (omni-v16, `docs/OMNI_V16.md`). No table has yet landed on omni-v16; every benchmark runs again on it from 06:45 UTC
+its 60 s, with the full decision every 15 s by default, the founder's heartbeat (omni-v16, `docs/OMNI_V16.md`). No table has yet landed on omni-v16; every benchmark runs again on it from 07:00 UTC
 on 22 October.
 The governors' first tables, on omni-v12, read two LOSS rows: KubeRay's queue and tail with the organism alone, root-caused to the
 conveyance and fixed in omni-v13 (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11), and Crane's total pod start wait, a sum of
