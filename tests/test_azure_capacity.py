@@ -45,6 +45,26 @@ class AzureCapacity(unittest.TestCase):
             self.assertEqual([c.args[:2] for c in az.call_args_list],
                              [('vm', 'list-skus'), ('vm', 'list-usage'), ('vm', 'list-usage')])
 
+    def test_preflight_waits_for_nothing_and_fails_only_on_a_refusal(self):
+        """The $0 check's pre-flight (cloud-check.yml): capacity another run holds now passes (a set waits its turn itself);
+        an allowance that can never hold the fleet, or a machine not offered, fails closed; it prints no counter."""
+        import contextlib
+        import io
+        sku = [{'name': 'worker', 'family': 'f', 'capabilities': [{'name': 'vCPUs', 'value': '2'}]}]
+        for rows, note in ((usage(f=(0, 10), cores=(0, 200)), ''), (usage(f=(8, 10), cores=(8, 200)), 'another run holds')):
+            out = io.StringIO()
+            with self.subTest(note=note), patch.object(cap, 'az', side_effect=[sku, rows]), \
+                    patch.object(cap.time, 'sleep') as sleep, contextlib.redirect_stdout(out):
+                cap.preflight('eastus', 'worker', 'worker:4')
+                sleep.assert_not_called()
+            self.assertIn('nothing built, nothing billed', out.getvalue())
+            self.assertIn(note, out.getvalue())
+            self.assertFalse(any(ch.isdigit() for ch in out.getvalue()), out.getvalue())
+        with patch.object(cap, 'az', side_effect=[sku, usage(f=(0, 8), cores=(0, 200))]), self.assertRaises(RuntimeError):
+            cap.preflight('eastus', 'worker', 'worker:4')
+        with patch.object(cap, 'az', side_effect=[[{**sku[0], 'restrictions': [{'type': 'Location'}]}]]), self.assertRaises(RuntimeError):
+            cap.preflight('eastus', 'worker', 'worker:4')
+
     def test_cleanup_timeout_is_reported_as_a_failure(self):
         with patch.object(cap, 'az', side_effect=[True, None, True]), patch.object(cap.time, 'monotonic', side_effect=[0, 2]):
             with self.assertRaises(RuntimeError):
