@@ -131,12 +131,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-22 10:25 | raw-sweep | success | [39762927935](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39762927935) |
-| 2026-10-22 09:18 | grid | success | [39725736488](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39725736488) |
-| 2026-10-22 07:43 | live-engine | success | [39736186450](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39736186450) |
+| 2026-10-22 12:25 | big-organism-detached collect | failure | [39778251992](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39778251992) |
+| 2026-10-22 11:35 | grid | success | [39771689454](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39771689454) |
+| 2026-10-22 10:58 | live-engine | success | [39763422874](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39763422874) |
+| 2026-10-22 10:37 | raw-sweep | success | [39764454671](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39764454671) |
 | 2026-10-22 06:47 | engine-runs | success | [39735987446](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39735987446) |
 | 2026-10-22 06:46 | security-scan | success | [39735989212](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39735989212) |
-| 2026-10-22 05:21 | big-organism-detached collect | failure | [39727581654](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39727581654) |
 | 2026-10-22 03:04 | six x100 line orgs 5 runs 0+10 | success | [39700177767](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700177767) |
 | 2026-10-22 02:31 | six x100 line orgs 6 runs 0+10 | success | [39700183533](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700183533) |
 | 2026-10-22 01:55 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 1+10 arms native compass split no window 1440 protocol 4 | failure | [39700194974](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39700194974) |
