@@ -243,7 +243,7 @@ Your HPAs keep scaling. My pod reflex raises floors ahead of the CPU averages.
 - g is the CPU each pod is guaranteed (section II.5), divided by your limit; the target that keeps each pod exactly as busy is g times yours.
 - The pod answers faster, because it has g times the CPU, at the same busy share.
 - Apart from that, I only tighten, never loosen.
-- While response time is over your target, and for three decisions after, your own target stands.
+- While response time is over your target, and for 180 s after (the clear time), your own target stands.
 
 **Pass condition.** p95, p99 and failed requests never behind native.
 

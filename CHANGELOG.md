@@ -2,6 +2,63 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-22: omni-v16, the heartbeat at 15 s; every clock of the Kubernetes governor in seconds
+
+- **omni-v16 lands** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`) on two words of the founder's of 22
+  October: "Go", on the plan put to him that night (every clock of the governor in seconds, the decision pace read at 60, 15, 10 and
+  5 s in our own models, three runs at each pace on GitHub's own machines), and, once the models had read, "15 sec all over heart beat
+  fix update code". Who set the 60 s: the first harness, on 26 September, with no reason recorded; native's pod autoscaler checks
+  every 15 s. Through omni-v15 several rules still counted decisions, so a shorter period also changed what they meant.
+- **The heartbeat is 15 s**: the governor's full decision comes every 15 s by default and its fast checks every 5 s (`--interval 15`,
+  `--floor-interval 5`, `omni_controller/controller.py`), in every rig (`scripts/kind_bench.sh`'s `OMNI_INTERVAL`, `kind_paired.sh`,
+  `kind_robust.sh`, `kind_full.sh`, `kind_pilot.sh`), every install file (`deploy/install/omni-compass.yaml`,
+  `omni-compass-cloud.yaml`, `deploy/controller.yaml`), every cloud set (started through `kind_bench.sh`) and the alert rules'
+  staleness bound (three intervals, 45 s). Each run writes its period beside its files (`omni_interval.txt`); the robustness receipts
+  read each run at its own and its decision time from the audit's own `decision_ms` (`tools/live_reps.py`); the tables of the runs
+  before it are read as they were. A longer period is not a larger cushion: each muscle's cushion is set in seconds by its own
+  climb, wobble and reaction time, and a longer period only leaves the governor blind longer (the founder's question of the same
+  night, answered in `docs/OMNI_V16.md`).
+- **What moved, and nothing else** (every gain, guard, preset and muscle is omni-v15's; 50 of the 55 files are omni-v15's bytes): the
+  brain's own minute (`omnicompass/adapter.py` `period_s`: the reading's weight 1 − (1 − 0.339)^k a step with k = period / 60 s, its
+  inner time, its dwell and waits, and the machines it adds or removes over the last minute's steps; its C++ twin
+  `cpp/src/governor.cpp` identically, equal to the Python at 60, 15, 10 and 5 s and sealed again); the compass's damping, critical
+  at the minute, and its smoothing; the edge's window, narrowing, forgetting and wobble per minute (`omnicompass/edge.py` `pace`);
+  the additions past the scheduling floor, one step a minute; a command's minute to land; the host's busy share over a minute
+  (`omni_controller/capacity.py`); the heat law's minute, one batch job a minute and a quiet deployment's 180 idle seconds
+  (`omni_controller/muscles.py`, `--coldstart-idle-s`); the coast per raise; the conveyance every 15 s whichever check falls due
+  (`--convey-every-s`; omni-v15 never conveyed at a decision every 5 s); and a loop that keeps its own schedule, a missed slot
+  skipped and written in the audit (`behind_s`), never run in a burst (`omni_controller/controller.py`; `tests/test_pace_clocks.py`,
+  `tests/test_loop_schedule.py`).
+- **Read before it was pushed** (the toy gate, class S, `results/toy_gate/V16_VS_V15.md`, eight seeds, every toy): at 60 s it makes
+  exactly omni-v15's decisions (4,578 audit records, none different; every gauge of every toy identical); at 15 s every gauge reads
+  EVEN against omni-v15 at 15 s and the machines parked fall from 4,212 to 1,782; as shipped (toy `cluster_shipped`, omni-v16 at
+  its 15 s default against omni-v15 at its 60 s) every gauge reads EVEN: no LOSS. Against native, omni-v16 at 15 s reads two LOSS
+  rows in the cloud's setting, the pods waiting for a place (+121.6%) and the 95th percentile (+0.36%), which omni-v15 at 60 s reads
+  EVEN only by the seeds' spread (+209.8%, +0.63%).
+- **The pace** (`results/toy_gate/V16_PACE.md`, omni-v16 alone, a plant that moves every 5 s): against 60 s, no LOSS at any pace in
+  either setting; at 15 s the alert minutes fall 14.7% in the kind benchmark's setting (18.4% at 10 and 5 s) and energy per core-hour
+  2.6% in the cloud's (GAIN), every other reading EVEN; Omni's own processor 2.7 s an hour at 15 s (1.6 to 1.7 at 60 s, 5.5 at 5 s).
+  Against native the pods waiting for a place read LOSS at every pace, the old 60 s default included (in the kind setting about four
+  times native's; in the cloud's about twice), and in the cloud's setting at 15 s the 95th percentile (+0.47%) and the alert minutes
+  (+2.31%), which read EVEN at 60 s only by the seeds' spread (+0.49%, +1.85%): the engine's, on the next version's list
+  (`docs/CHANGE_CONTROL.md`).
+- **The real runs** (`docs/PACE_PREREGISTRATION.md`, amendment 2, on main): workflow `benchmark-reps`, five arms in every repetition
+  (native; Omni-Compass on top at its heartbeat of 15 s; the same deciding every 60, 10 and 5 s), the reruns' steady scenario, three
+  runs of 10 repetitions on GitHub's own machines at no cost. They read the heartbeat the founder set; a LOSS at 15 s there is
+  root-caused and fixed in the next version.
+- **Found on the way and fixed**: the seal's engine-runs twin differs from the Python by one rounding step (3.3 × 10⁻¹⁶ in 65 of 100
+  runs) under Python 3.11 and matches it to the bit under 3.12, whose compensated `sum` the C++ follows: the seal is written under
+  3.12, as GitHub runs it (the base commit reads the same, so it was never this version's). The kind rig loads busybox from the
+  runner's own copy (a repetition's arms had failed Docker Hub's pull after 300 s), keeps the pre-pull's evidence when it fails,
+  records the host's free memory every 5 s, and the runner's own agent is kept out of the kernel's memory killer's reach (a
+  repetition had lost its runner 64 minutes in). Two tests written for one decision a minute (`tests/test_convey.py`,
+  `tests/test_muscles_levers.py`) now name the 60 s and 15 s they were written at.
+- **Azure held**: the Azure queue's switch is off (`scripts/azure_queue.txt`) until the founder confirms that the account the
+  Azure login bills agreed to it (he said the login in use may be another person's account; a key bills only its own account).
+  Google and Amazon stay behind their own $0 checks, as before.
+- Every benchmark runs again on omni-v16 from 07:30 UTC on 22 October; omni-v15's runs started from 02:30 UTC run to their end as
+  its record.
+
 ## 2026-10-22 (night): Azure behind its own $0 check; every Azure login reads the key's shape first
 
 - **The fault.** For a while on the night of 21 October the stored `AZURE_CREDENTIALS` held a text that is not the JSON block
