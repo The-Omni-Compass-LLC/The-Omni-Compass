@@ -2,6 +2,23 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-22 (afternoon): the Azure sets back on; the conductor starts runs again
+
+- **The founder's answer.** Asked whether the person whose Azure account the login bills agreed to its use, he answered "Yes yes
+  yes". The Azure queue's switch, off while the question stood, is on again (`scripts/azure_queue.txt`): the four sets (the
+  steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, then B, then C) on omni-v16, at the tune-down
+  with native's cap, each only after Azure's own $0 check passes. The engine, the harness and every other queue are unchanged.
+- **The conductor had started nothing since omni-v15's push** (00:45 UTC on 22 October; the last runs it started, at 00:31 UTC,
+  were omni-v14's grid). On GitHub it fingerprinted the fetched commit with its own copy of the version tool's scope, written
+  before omni-v15 took eight wires (the data stores' five runners, the swarm, MuJoCo, the CPU power runner) into the fingerprint, so
+  every commit of omni-v15 and omni-v16 matched no version and each tick said "this checkout runs unknown ... nothing started".
+  omni-v15's campaign started no run, and omni-v16's none until this push. The conductor now runs the fetched commit's own
+  version tool with that commit's own fingerprints (`scripts/dispatch_grid.py`, `engine`): it reads omni-v16 on main, where its
+  old copy read unknown, and a tick that began before an engine landed still reads the fetched commit. The test
+  (`tests/test_release_campaign.py`) builds a commit from this checkout's engine, late wires and all, and fails the old code.
+  The running conductor fetches its newest code at every tick, so the grid, the reruns and the clouds start within 15 minutes of
+  the push.
+
 ## 2026-10-22: omni-v16, the heartbeat at 15 s; every clock of the Kubernetes governor in seconds
 
 - **omni-v16 lands** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`) on two words of the founder's of 22
@@ -56,8 +73,8 @@
 - **Azure held**: the Azure queue's switch is off (`scripts/azure_queue.txt`) until the founder confirms that the account the
   Azure login bills agreed to it (he said the login in use may be another person's account; a key bills only its own account).
   Google and Amazon stay behind their own $0 checks, as before.
-- Every benchmark runs again on omni-v16 from 07:30 UTC on 22 October; omni-v15's runs started from 02:30 UTC run to their end as
-  its record.
+- Every benchmark runs again on omni-v16 from 07:30 UTC on 22 October (the conductor started none of its runs, and none of omni-v15's,
+  until its engine check was fixed that afternoon: the entry above).
 
 ## 2026-10-22 (night): Azure behind its own $0 check; every Azure login reads the key's shape first
 
@@ -118,8 +135,9 @@
   (`data-engine`, its words; its records rebuilt by its workflow), the appraisal, the receipts, the limitations, the Lambda and
   whole-system pages, the change-control record and the mechanism-of-action page (the cap rule); `docs/OMNI_V14.md` says when it
   stood. Every benchmark runs again on omni-v15 (`scripts/reruns.txt`, the grid and the cloud sets restarted from 02:30 UTC on
-  22 October, a little after the push, so no run started by omni-v14's conductor is counted in its campaign); the GPU's run on
-  Lambda starts from `gpu-omni-v15`, one exact commit.
+  22 October, a little after the push, so no run started by omni-v14's conductor is counted in its campaign; none started: the
+  conductor read omni-v15's commits as no engine until 22 October, afternoon); the GPU's run on Lambda starts from
+  `gpu-omni-v15`, one exact commit.
 
 - **The preregistration's lock on the brain, amended on record** (`results/LOCK_AMENDMENTS.json`): `omnicompass/adapter.py` is one
   of the files the first preregistration locks by SHA-256. Its omni-v15 change is recorded with the exact old and new hashes and the
