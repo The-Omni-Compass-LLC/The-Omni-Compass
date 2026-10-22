@@ -216,7 +216,7 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 **The cloud (Azure), the bill at native's work.** The founder's order of 14 October: in a cloud Omni-Compass shows one thing,
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
-on omni-v16 from 04:30 UTC on 22 October, each only after Azure's own $0 check passed (since 22 October, as Google's and
+on omni-v16 from 06:45 UTC on 22 October, each only after Azure's own $0 check passed (since 22 October, as Google's and
 Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
 the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
 to their end as their own record (omni-v15's started from 02:30 UTC; the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
@@ -274,7 +274,7 @@ omni-v16 runs land. The numbers stand on that page, never copied here.
    table lands when its runs do.
 4. **The swarm's proximity reflex** (a fault found 19 October beyond the counted cells): fixed in omni-v12, and every wire that
    holds a governor's rules taken into the fingerprint in omni-v15 (`docs/OMNI_V15.md`, section 2). Closed.
-5. **The grid, the reruns and Azure on omni-v16**: restarted from 04:30 UTC on 22 October; nothing cancelled (omni-v15's,
+5. **The grid, the reruns and Azure on omni-v16**: restarted from 06:45 UTC on 22 October; nothing cancelled (omni-v15's,
    started from 02:30 UTC, run to their end as its record).
 5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the toy read no LOSS at 15 s against 60 s
    (`results/toy_gate/V16_PACE.md`, `results/toy_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a

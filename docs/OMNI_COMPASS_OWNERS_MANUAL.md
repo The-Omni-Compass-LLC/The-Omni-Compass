@@ -1353,7 +1353,7 @@ operator's own commands run without a shell unless they hold one's syntax, and a
 `docs/OMNI_V14.md`), and the brain's request for the power cap trimming only while the response line has been clean for the
 governor's own clear time, with every wire that holds a governor's rules inside the fingerprint (omni-v15, `docs/OMNI_V15.md`),
 and every clock of the Kubernetes governor in seconds, so its decision period is a clean setting, identical to omni-v15 at
-its 60 s, with the full decision every 15 s by default, the founder's heartbeat (omni-v16, `docs/OMNI_V16.md`). No table has yet landed on omni-v16; every benchmark runs again on it from 04:30 UTC
+its 60 s, with the full decision every 15 s by default, the founder's heartbeat (omni-v16, `docs/OMNI_V16.md`). No table has yet landed on omni-v16; every benchmark runs again on it from 06:45 UTC
 on 22 October.
 The governors' first tables, on omni-v12, read two LOSS rows: KubeRay's queue and tail with the organism alone, root-caused to the
 conveyance and fixed in omni-v13 (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11), and Crane's total pod start wait, a sum of
