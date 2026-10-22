@@ -69,7 +69,13 @@ and install file setting the fast checks to 5 s). Every place that starts the go
 through `kind_bench.sh`), the alert rules' staleness bound (`deploy/prometheus/omni-compass-rules.yaml`: three intervals, 45 s)
 and the manuals. Each run writes its period beside its files (`omni_interval.txt`), and the receipts read each run at its own
 (`tools/live_reps.py`; the robustness runs before it at 60 s). The page's controller trace and the modelled traces in the
-manuals keep the 60 s step they were drawn at, and say so.
+manuals keep the 60 s step they were drawn at, and say so. The levers rig (`scripts/kind_levers.sh`) was left at three, two
+and three decisions of 5 s when omni-v16 landed: under omni-v14 each of them was a minute of the brain's, under omni-v16 they
+are 15 s, and the two levers that give back (rightsize, coldstart), which wait for the brain's calm (its contraction authority,
+about a minute after it starts on an idle reading, `tests/test_pace_clocks.py`), failed three of the rig's 19 checks in the
+first omni-v16 run (22 October, 13:50 UTC). The rig now runs at the default 15 s for the 3, 2 and 3 minutes its checks were
+written for, with the idle time before cold start in seconds (120 s), and the levers check runs again, A, B and C
+(`scripts/reruns.txt`).
 
 ## At 60 s it is omni-v15
 
