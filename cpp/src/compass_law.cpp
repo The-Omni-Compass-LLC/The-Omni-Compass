@@ -12,22 +12,16 @@
 namespace omnicompass {
 
 CompassLaw::CompassLaw(Band band_, double dt_, double tau_, double kp_, std::optional<double> kd_, double authority_,
-                       double smooth_, std::optional<double> ref_dt_)
-    : band(band_), dt(dt_), tau(tau_), kp(kp_), kd(0.0), authority(authority_), smooth(smooth_), ref_dt(ref_dt_) {
+                       double smooth_)
+    : band(band_), dt(dt_), tau(tau_), kp(kp_), kd(0.0), authority(authority_), smooth(smooth_) {
   // __post_init__: a first-order muscle with response tau under a P-D pull: critical damping when
-  // kd = 2 sqrt(kp tau) - 1 scaled to the period the lever's rate is stated at (the decision period, unless ref_dt; ref =
-  // self.ref_dt or self.dt, so a ref_dt of 0 is dt); never negative
-  const double ref = (ref_dt && *ref_dt != 0.0) ? *ref_dt : dt;
-  kd = kd_ ? *kd_ : std::max(0.0, 2.0 * std::sqrt(kp * tau / ref) - 1.0) * ref;
+  // kd = 2 sqrt(kp tau) - 1 scaled to the decision period; never negative
+  kd = kd_ ? *kd_ : std::max(0.0, 2.0 * std::sqrt(kp * tau / dt) - 1.0) * dt;
 }
 
 double CompassLaw::sense(double reading) {
   const double pos = band.position(reading);
-  if (p) {
-    // the smoothing keeps its time constant where ref_dt is set (omni-v16): smooth ** (dt / ref_dt), as the Python
-    const double s = (ref_dt && *ref_dt != 0.0) ? std::pow(smooth, dt / *ref_dt) : smooth;
-    v = s * v + (1.0 - s) * (pos - *p) / dt;
-  }
+  if (p) v = smooth * v + (1.0 - smooth) * (pos - *p) / dt;
   p = pos;
   return pos;
 }

@@ -1,138 +1,130 @@
-# Omni v16: every clock in seconds, the full decision every 15 seconds
+# Omni v16: every clock of the governor in seconds; the heartbeat at 15 s
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-The founder's order of 22 October 2026: the governor's full read of the state and its decision every 15 seconds, the pace of
-the pod autoscaler it sits on, "with the clocks counted in seconds. Test 10S and never above 60", native or better, never
-worse, and anything found worse fixed; then, the toy sim asked for 5, 10, 15 and 20 seconds, "Put back the 15 ... In the
-heartbeat and everywhere else ... in the monitor, wire, coding". Omni v16 is omni-v15 (`docs/OMNI_V15.md`) with every clock
-of the governor stated in seconds, so that its decision period sets only how often it reads the state and never what a rule
-means, the default period 15 seconds, and the faults found on the way fixed. It was built as omni-v14 on a working branch
-while main landed omni-v14 (a knob that leaves any muscle native) and omni-v15 (the power cap's request through the line's
-own clear time), and was renumbered and rebased onto omni-v15 before its gate. Its fingerprint is `OMNI_V16.json`. Every benchmark runs again on it, A, B
-and C; every earlier table stands as its own engine's result, and results from two versions are never pooled. The readings
-of the toy gate below are our own models (evidence class S), never a benchmark result. Run and scored by The Omni-Compass LLC's
-own code. No outside party has reviewed or approved these results.
+Omni v16 (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files) stands on main since 22 October. Two words of the founder's
+made it. That night ("Go"), on the plan put to him: put every clock of the Kubernetes governor in seconds, read the decision
+pace at 60, 15, 10 and 5 s in our own models, and run each pace three times on GitHub's own machines
+(`docs/PACE_PREREGISTRATION.md`). Then, once the models had read: "15 sec all over heart beat fix update code". So the
+governor's heartbeat, its full decision, comes every 15 s by default, native's own pod autoscaler's pace, where every engine
+before it decided every 60 s; the fast checks stay every 5 s. It is omni-v15 (`docs/OMNI_V15.md`) with the clocks changed and
+the heartbeat set, and nothing else: every gain, guard, preset and muscle is omni-v15's, and 50 of its 55 files are
+omni-v15's bytes (the five changed: `omnicompass/adapter.py`, `omnicompass/edge.py`, `omni_controller/controller.py`,
+`omni_controller/muscles.py`, `omni_controller/capacity.py`; the brain's C++ twin `cpp/src/governor.cpp` with it, sealed).
+Read in the toy gate against omni-v15 on the same seeds before it was pushed (`results/toy_gate/V16_VS_V15.md`), and the
+pace read alone on a plant that moves every 5 s (`results/toy_gate/V16_PACE.md`). The readings from the toy gate are our own
+models (evidence class S), never a benchmark result. Run and scored by The Omni-Compass LLC's own code. No outside party has
+reviewed or approved these results.
 
-## 1. Why the governor decided once a minute
+## Why
 
-- **Native's clocks are its projects' own defaults.** The Kubernetes pod autoscaler recomputes every 15 s (the controller
-  manager's `--horizontal-pod-autoscaler-sync-period`, default 15 s, kept by the managed clouds); the processor readings it
-  uses are refreshed every 15 s (metrics-server's resolution); it waits 5 minutes before it removes pods (its downscale
-  stabilization); the cluster autoscaler scans every 10 s and removes an unneeded machine after 10 minutes (2 in our Azure and
-  Amazon scripts); KEDA polls every 30 s. No setup of ours changes the pod autoscaler's 15 s.
-- **Ours was written in, never measured.** The first harness, of 26 September (commit `3b86a5163a`), has the governor
-  "compute every minute"; the fleet law's constants were selected on the 15-second fleet harness with a decision every 60 s
-  (`FLEET_DECISION_SECONDS = 60`, `omnicompass/adapter.py`), and the rules were written in decisions. On 14 October the founder
-  asked for 15, 10 and 5 s. Omni v7 (16 October) restated six rules in seconds (`docs/OMNI_V7.md`, section 4) and kept 60 s
-  as the default, because the engine core still advanced one fixed step a decision and the toy at 15 s read LOSS rows.
-- **What still counted decisions on omni-v15**, each found in the code and fixed here: the engine core's step and its blend
-  of each observation; the fleet law's dwell counts; the edge's window, narrowing, memory, wobble and lesson; the compass law's
-  damping and velocity smoothing; the closure law's step; the conveyance's cadence; the shared host's busy reading; the
-  modelled heat; the cold start's wait; the batch admission's and resumption's pace. At 15 s each ran four times as fast.
+Every engine through omni-v15 took its full decision every 60 s. The number was written into the first harness on 26
+September, with no reason recorded, and never measured against another; the engine was then tuned at 60 s and several of
+its rules were written in decisions, which locked 60 s in. Native's pod autoscaler checks every 15 s, the metrics it reads
+refresh every 15 s, the Cluster Autoscaler scans every 10 s, KEDA every 30 s. The founder asked for 15, 10 and 5 s on 14
+October; six rules moved to seconds on 16 October (omni-v7) and the rest did not, so turning the period also changed what
+the remaining rules meant. omni-v16 finishes the job: turning the period changes only how often the governor looks. The
+cushion each muscle keeps is set by its own climb, wobble and reaction time in seconds, and is the same at any pace; the pace
+sets only how soon trouble is seen (within 15 s at 15 s, within a minute at 60 s), and so the default moves to native's 15 s.
 
-## 2. The rule
+The founder asked, before the default was set, whether a longer period would make a larger cushion and a stronger engine.
+It would not: a longer period leaves the governor blind for longer between looks (up to two minutes at 120 s, while native
+checks every 15 s), and to stay as safe while blind longer it would have to hold more back, which is less work done. The
+cushion has its own setting (each muscle's z of 3.09, 99.9% of steps inside it, and the dial's tune-down), and the period is
+not it.
 
-Let Δ be the decision period in seconds, Δ₀ = 60 s the period every constant was stated at, and r = Δ / Δ₀. Every quantity of
-the governor is defined in seconds; Δ sets only how often the state is read. Each clock is one of four kinds.
+## What counted in decisions, and what it counts now
 
-1. **A condition held for T seconds** is held for n(T) = max(1, round(T / Δ)) readings (omni-v7). The readings span between
-   (n − 1)·Δ and n·Δ of the condition, so the rule's time is met to within one period, nearer the faster it reads.
-2. **A move away from native** (a machine given back, a held job admitted, a paused job resumed) goes at most once every
-   T_move seconds, whatever Δ: one a minute. **A move toward native or toward safety** (fail up past the wall, a machine woken
-   on a breach, the operator's target handed back, a job paused on heat, a trial abandoned) goes at the first reading that calls
-   for it. A faster reading therefore reacts sooner and never takes anything away faster. **A move away from native that
-   cannot be undone** is held to the longest horizon its own law states: in the cloud a machine given back is the cloud's to
-   delete once it has stood empty for its scale-down time, and the governor never adds one, so it never gives back the
-   machines the largest requests of the last R seconds need at its own headroom (the closure law's warm reserve, R = 960
-   steps of the 15-second harness, 4 hours), and gives back nothing before it has read those R seconds.
-3. **A filter or a memory** keeps its time constant: a factor λ₀ a reading at Δ₀ becomes λ(Δ) = λ₀ʳ; a blend that takes in the
-   share a₀ of an observation becomes a(Δ) = 1 − (1 − a₀)ʳ; an integration step h₀ becomes h₀·r.
-4. **An estimator that depends on the spacing of its samples** is stated in time: the wobble of the service is read from
-   readings one response-time window apart (lag L = round(W / Δ), W = 60 s), so two readings that share requests never make the
-   service look steadier than it is; the compass's damping is the critical damping of the rate its lever moves at (the target
-   moves period / 60 of a step each decision, a rate a minute), so it is stated at Δ₀.
+Every value below is the one omni-v15 used when a decision comes every 60 s (the reference step; `REF_PERIOD_S`).
 
-**The identity.** At Δ = Δ₀ every clock's value is omni-v15's: r = 1 leaves every factor, share, step, count and lag as it was
-(`tests/test_clocks_in_seconds.py`), so wherever the cloud's rule (`--give-back-only`) is off, omni-v16 at 60 s is omni-v15 at
-60 s, read for read and write for write. The three cloud fixes of section 4 (5, 6 and 7) act at every period, 60 s included.
-
-**Convergence.** The engine core blends an observation in and then advances its equations, so the two are applied in turn
-within a step. At a finer step the governor comes nearer the one path of the continuous engine: the same minute of telemetry
-read at 60, 15 and 1 s leaves the engine nearer the 1 s path at 15 s than at 60 s (`tests/test_clocks_in_seconds.py`).
-
-## 3. Every clock, mapped
-
-| Clock | Where | omni-v15 (a reading) | omni-v16 (in seconds) | at 60 s | at 15 s | at 10 s |
-|---|---|---|---|---|---|---|
-| The engine core's step | `omnicompass/adapter.py` | 0.1 a decision | 0.1·r (the engine's own time, 0.1 a minute) | 0.1 | 0.025 | 0.0167 |
-| Its blend of each observation | the same | 0.339 a decision | 1 − 0.661ʳ (time constant 145 s) | 0.339 | 0.0983 | 0.0667 |
-| The fleet law's dwell counts | the same | 1 and 5 decisions | 60 s and 300 s | 1 and 5 | 4 and 20 | 6 and 30 |
-| The edge's window | `omnicompass/edge.py` | 20 decisions | 1,200 s | 20 | 80 | 120 |
-| The edge's narrowing | the same | 0.05 a decision | 1 − 0.95ʳ (5% a minute) | 0.05 | 0.0127 | 0.0085 |
-| The edge's memory of a fall | the same | 0.9995 a decision | 0.9995ʳ (half-life 23 h) | 0.9995 | 0.999875 | 0.999917 |
-| The edge's wobble | the same | readings a decision apart | readings 60 s apart | lag 1 | lag 4 | lag 6 |
-| The edge's lesson from a fall | `omni_controller/controller.py` | 0.1 a decision | 0.1 a minute of fall | 0.1 | 0.025 | 0.0167 |
-| The compass's damping k_d | `omnicompass/compass_law.py` | (2√(k_p τ/Δ) − 1)·Δ ×3 | stated at Δ₀: 180 s | 180 | 180 (v15: 135) | 180 (v15: 117) |
-| Its velocity smoothing | the same | 0.3 a decision | 0.3ʳ (time constant 50 s) | 0.3 | 0.740 | 0.818 |
-| The closure law's step | `omni_controller/controller.py` | every decision | once a minute; an add held between, nothing given back | every decision | every 4th | every 6th |
-| The conveyance | the same | every third fast check | every 15 s of the governor's schedule | 15 s | 15 s (v15: 22.5 s) | 15 s (v15: 30 s) |
-| The shared host's busy share (replica raise) | `omni_controller/capacity.py` | since the last decision | over the last minute | 1 interval | 4 intervals | 6 intervals |
-| The modelled heat | `omni_controller/muscles.py` | 0.86 a decision | 0.86ʳ (time constant 398 s) | 0.86 | 0.963 | 0.975 |
-| The cold start's wait | the same | 3 decisions | 180 s | 3 | 12 | 18 |
-| A held job admitted, a paused job resumed | the same | one a decision | one a minute | 1 a minute | 1 a minute | 1 a minute |
-| The warm reserve in the cloud (machines never given back) | `omni_controller/controller.py` | none | the largest requests of the last 14,400 s at the governor's headroom; nothing given back before 14,400 s are read | 240 readings | 960 readings | 1,440 readings |
-
-Already in seconds since omni-v7 and unchanged: the breach's clear time 180 s, cruise 120 s, the strict window 300 s, the
-give-back trial's spacing 600 s, its recheck 7,200 s and its phase 1,200 s; one machine given back a minute; the compass's move
-of the autoscaler's target and coasting, a rate a minute; the pod reflex's window 30 s and the response-time window 60 s.
-
-## 4. The faults fixed with it
-
-| # | Fault on omni-v15 | Fix in omni-v16 | Found |
+| Clock | omni-v15 (per decision) | omni-v16 (per second) | Where |
 |---|---|---|---|
-| 1 | At a period under 60 s the cushion in front of the line narrowed: its window covered fewer minutes, it narrowed and forgot faster, and readings that share requests made the service look up to twice as steady | the edge in seconds (section 3) | reading the code for the founder's question |
-| 2 | The engine core's clock and its blend ran four times as fast at 15 s | the core in seconds | the same |
-| 3 | The compass's damping was computed for the decision period while its lever moved at a rate a minute (omni-v7's step scale): at 15 s it was a quarter weaker | the damping at the lever's own rate | the same |
-| 4 | The conveyance ran at every third fast check, so it slowed at shorter periods (22.5 s at 15 s, 30 s at 10 s) and never ran where the period was under the fast checks' own | every 15 s of the governor's schedule, at a decision or a fast check | the same |
-| 5 | In the cloud the governor ordered machines that no longer existed (the cloud had deleted them); the order changed nothing, and the next decision read it as a command that did not land, which held every give-back until the cloud made a machine again | the order held to the machines that exist, open or idle | the toy gate's audits (382 such holds in one modelled day) |
-| 6 | In the cloud a give-back was judged on the load of the moment only, while the cloud deletes a machine given back once it has stood empty for 10 minutes and the governor never adds one: a machine given back in a dip was gone when the requests came back, and pods waited for a new one (in the toy gate at 15 s and 10 s, pods waiting for a place +16% to +21% against native, LOSS; at 60 s the same rise, EVEN only by its spread) | the closure law's warm reserve, which the live governor had never wired: the machines the largest requests of the last 4 hours need, at the governor's own headroom, are never given back in the cloud, and nothing is given back before those 4 hours are read (an unread reading is never room); and no give-back trial starts while every machine in service is inside the reserve, so the verdict never counts a step it could not take | the toy gate's per-seed readings, traced minute by minute (seed 2: a machine given back at 12.8 h, deleted at 13.0 h, the requests above the four machines left from 13.5 h, 19 pods waiting 90 s at 14.45 h where native's autoscaler had kept five) |
-| 7 | In the cloud the fast check between decisions ordered machines for pods that wait, though only the cloud adds a machine there: an order past the machines that exist changed nothing (a waiting pod already lands on an idle one) | the fast check's order held to the machines that exist, as the decision's (5) | the same per-seed audits |
-| 8 | The toy gate's cloud took an idle machine's room away at once, as if drained, and gave its pods no machine, so the governor in the model never counted an idle machine still carrying work and missed the running pods' requests; pods waited in the model where they wait nowhere on a real cluster (the shipped actuator, `scripts/kind_nodepool.sh`: PreferNoSchedule, no pod moved, a pod that finds the open machines full lands on an idle one at once; the Azure receipts read pods waiting EVEN in all four sets) | the toy's cloud corrected to the actuator as shipped (`tools/toy_gate.py`) | the toy gate's per-seed readings |
+| the brain's blending of each reading | 0.339 of the state a decision | 1 − (1 − 0.339)^k a decision, k = period / 60 s: 0.339 a minute | `omnicompass/adapter.py` (`Governor.step`, `period_s`) |
+| the brain's inner time | 0.1 of its macro interval a decision | 0.1 k a decision | the same |
+| the brain's dwell and wait before giving a machine back | 1 and 5 decisions (the fleet law) | the same seconds: 60 and 300 s | the same |
+| the brain's machines added or removed | up to 8 and 1 a decision | up to 8 and 1 over the last minute's decisions | the same; the C++ twin `cpp/src/governor.cpp` identically |
+| the compass's damping (kd) | critical damping for the decision period | critical damping at the minute, so the law's push and pull per second are the same at any period | `omni_controller/controller.py` |
+| the compass's velocity smoothing | 0.3 a decision | 0.3 a minute | the same |
+| the edge's window, narrowing, the floor's forgetting, memory, wobble step | 20 decisions; 0.05, 0.9995 a decision; one decision's change | 20 minutes; 0.05, 0.9995 a minute; a minute's change | `omnicompass/edge.py` (`pace`) |
+| what a breach teaches the edge | 0.1 a decision of breach | 0.1 a minute of breach | `omni_controller/controller.py` |
+| machines added past the scheduling floor | one step a decision | one step a minute (the release has been one a minute since v7); the floor's machines at once | the same (`ADD_PERIOD_S`) |
+| a command's time to land (proprioception) | the next decision | a minute, every decision reading it until it lands | the same (`LAND_S`) |
+| the host's busy share (kind's shared runner) | since the last decision | over the last minute | `omni_controller/capacity.py` (`span`) |
+| the heat law | 0.86 of the heat kept a decision | 0.86 a minute | `omni_controller/muscles.py` |
+| held batch jobs admitted; jobs paused or resumed | one a decision | one a minute | the same |
+| a quiet deployment scaled to zero | 3 idle decisions | 180 idle seconds (`--coldstart-idle-s`) | the same |
+| the coast toward fewer pods | coast step × period / 60 a raise | the coast step a raise (a raise comes at most once a window) | `omni_controller/controller.py` |
+| the conveyance | every third fast check, never at a decision (so never at a decision every 5 s) | every 15 s, whichever check falls due (`--convey-every-s`) | the same |
+| the loop | each wait began when the step ended (a 60 s decision came every 62 to 67 s on kind) | keeps its own schedule; a missed slot is skipped, never run in a burst | the same (`main`) |
 
-The eighth is a fault of our model, not of the engine: the LOSS rows the model printed for pods waiting at 15 s (+112% on
-omni-v13's engine) were its own. It is corrected for both engines alike, and every reading in sections 6 and 7 is on the
-corrected model.
+Six rules already counted seconds since omni-v7 and stay as they were: the line's clear time, cruise, the strict window,
+the trial spacing, the wait after a refusal, and a trial's length; so does the release of one machine a minute.
 
-## 5. What the period costs and gains
+## The heartbeat: a full decision every 15 s
 
-- **Noticing.** An event is read at worst one period after it happens and on average half a period: 60 s and 30 s at a
-  decision a minute; 15 s and 7.5 s at 15 s; 10 s and 5 s at 10 s. The fast checks (every 5 s) are unchanged.
-- **Reading.** Full reads of the state an hour: 3,600 / Δ, so 60, 240 and 360; each lists every machine, pod and autoscaler.
-  The governor's own processor is measured in every run (Omni's own CPU, cores; 0.008 to 0.019 cores in the omni-v12 tables at
-  a decision a minute with fast checks every 5 s).
-- **Freshness.** The processor readings refresh every 15 s, so at 15 s every full read is new and at 10 s two in three; the
-  response times and the pods waiting refresh with every request and event.
-- **Never above 60 s.** Above a minute a reading covers only part of the time since the last (the response-time window is
-  60 s), so the cushion's statistics would never see some of the requests; the rig refuses a period over 60 s or under the
-  fast checks' own (`scripts/kind_bench.sh`).
-- **No faster than the muscles answer.** A pod starts in 8 to 12 s on kind and the autoscaler syncs every 15 s; a period under
-  that reads states the last move has not reached yet. Every move away from native is paced in seconds (section 2) and the
-  release gate holds a machine while its last command has not landed, so a faster reading cannot stack moves.
+The default `--interval` is 15 s and `--floor-interval` 5 s (`omni_controller/controller.py`; before, 60 s and 15 s, every rig
+and install file setting the fast checks to 5 s). Every place that starts the governor carries it: the rigs
+(`scripts/kind_bench.sh`, `kind_paired.sh`, `kind_robust.sh`, `kind_full.sh`, `kind_pilot.sh`), the install files
+(`deploy/install/omni-compass.yaml`, `omni-compass-cloud.yaml`, `deploy/controller.yaml`), the cloud runs (which start it
+through `kind_bench.sh`), the alert rules' staleness bound (`deploy/prometheus/omni-compass-rules.yaml`: three intervals, 45 s)
+and the manuals. Each run writes its period beside its files (`omni_interval.txt`), and the receipts read each run at its own
+(`tools/live_reps.py`; the robustness runs before it at 60 s). The page's controller trace and the modelled traces in the
+manuals keep the 60 s step they were drawn at, and say so. The levers rig (`scripts/kind_levers.sh`) was left at three, two
+and three decisions of 5 s when omni-v16 landed: under omni-v14 each of them was a minute of the brain's, under omni-v16 they
+are 15 s, and the two levers that give back (rightsize, coldstart), which wait for the brain's calm (its contraction authority,
+about a minute after it starts on an idle reading, `tests/test_pace_clocks.py`), failed three of the rig's 19 checks in the
+first omni-v16 run (22 October, 13:50 UTC). The rig now runs at the default 15 s for the 3, 2 and 3 minutes its checks were
+written for, with the idle time before cold start in seconds (120 s), and the levers check runs again, A, B and C
+(`scripts/reruns.txt`).
 
-## 6. The toy gate against omni-v15
+## At 60 s it is omni-v15
 
-To be filled from `results/toy_gate/V16_VS_V15.md`.
+On the toy cluster at a decision every 60 s, omni-v16 makes exactly omni-v15's decisions: 4,578 audit records, none
+different (seed 1; the gate's eight seeds read every gauge identical, on every toy). The brain's C++ twin equals the Python
+at 60, 15, 10 and 5 s (`tests/test_cpp_governor_parity.py`, 4,320 directives each, no difference), and every twin was
+sealed again after its parity test passed (`results/SEAL.json`). Two changes can be seen at 60 s on a real cluster and
+nowhere else: the conveyance comes every 15 s exactly (omni-v15: about 3.7 passes a minute), and the loop keeps its
+schedule (omni-v15's decisions drifted by the steps' own time). The toy gate's other columns, each engine against native,
+read as they read for omni-v15 (the same rows, the same numbers at 60 s), because nothing but the clocks moved.
 
-## 7. The heartbeat sweep: 5, 10, 15, 20, 30 and 60 seconds
+At 15 s, where omni-v15's rules counted in decisions ran four times as fast, every gauge reads EVEN against omni-v15, and the
+machines parked over the eight days fall from 4,212 to 1,782 (omni-v15 at 60 s: 1,464): the pace no longer changes what a
+rule means. As shipped (the toy `cluster_shipped`: omni-v16 at its default of 15 s against omni-v15 at its 60 s, each started
+without a period, as an install file starts it), every gauge reads EVEN: machine hours +2.4%, energy per core-hour −0.5%, the
+pods waiting for a place −28.5%, the 95th percentile −0.3%, the alert minutes −0.9%. No LOSS against the engine it replaces.
 
-To be filled from `results/toy_gate/HEARTBEAT_SWEEP.md`.
+The brain's lock (`results/LOCK_AMENDMENTS.json`) takes an amendment for `omnicompass/adapter.py`: the stack simulator steps
+at 60 s, so the held-out seeds replay unchanged (`verify.py`).
 
-## 8. What stays omni-v15's
+## The pace in our models (`results/toy_gate/V16_PACE.md`)
 
-Every gain, guard, preset, muscle, band and threshold; the verdict and its interval; the closure law's setting; the GPU
-governors (their own 2 s loop); the realms' arms (their own ticks); the fleet harness's arms. Engines before omni-v16 ran at a
-decision a minute, and their tables stand as their own.
+omni-v16 alone, eight seeds of a day each on a plant that moves every 5 s, at 60, 15, 10 and 5 s, each faster pace paired by
+seed against 60 s and against native. In the cloud's setting (the tune-down, machines alone), against 60 s, every service
+reading is EVEN at every pace (at 15 s: pending pod minutes −12.1%, the 95th percentile −0.0%, alert minutes +0.5%, machine
+hours −0.4%) and energy per core-hour falls 2.6% at 15 s (GAIN); the power cap's request moves more (power given). In the
+kind benchmark's setting (the compass law at the max, every autoscaler sensed), against 60 s, the alert minutes fall 14.7% at
+15 s and 18.4% at 10 and 5 s (GAIN), the autoscaler's shortfall 6% at 10 and 5 s (GAIN), and every other reading is EVEN.
+Omni's own processor: 1.6 to 1.7 s an hour at 60 s, 2.7 at 15 s, 3.4 at 10 s, 5.5 at 5 s (under a thousandth of one core
+at 5 s); its reads: 1,650 an hour at 60 s, 2,190 at 15 s, 3,600 at 5 s. No LOSS against 60 s at any pace.
+
+Against native, the rows read as the engine reads them at every pace, the old 60 s default included, and some read LOSS.
+The pods waiting for a place: in the kind setting about four times native's at every pace (pending pod minutes an hour:
+native 8.2; 32.0 at 60 s, 33.5 at 15 s, 28.8 and 28.6 at 10 and 5 s), LOSS at every pace; in the cloud's setting about twice
+(20.9 at 60 s, 18.4 at 15 s), LOSS at 15 and 5 s and EVEN at 60 and 10 s only by the seeds' spread; on the toy gate's 15 s
+plant, +121.6% at 15 s (LOSS) and +209.8% at 60 s (EVEN by the spread). In the cloud's setting at 15 s two small rows read LOSS
+as well: the 95th percentile, +0.47% on the 5 s plant and +0.36% on the gate's (at 60 s +0.49% and +0.63%, EVEN by the
+spread), and the alert minutes, +2.31% on the 5 s plant (at 60 s +1.85%, EVEN). Against 60 s every one of them reads EVEN,
+the 15 s point estimates the smaller, so they are the engine's and not the pace's: the faster pace narrows the seeds' spread
+until the rows clear zero. They are on the next version's list to be root-caused (`docs/CHANGE_CONTROL.md`), beside the
+blink toy's alert minutes (+2.35% against native at 60 s, LOSS, the same in every gate since omni-v13).
+
+## The real runs
+
+`docs/PACE_PREREGISTRATION.md`: workflow `benchmark-reps`, five arms in every repetition (native; Omni-Compass on top at its
+default heartbeat of 15 s; the same deciding every 60, 10 and 5 s), the reruns' steady scenario, three runs of 10
+repetitions on GitHub's own machines at no cost, released by the conductor as the campaign's entry `kubernetes decision
+pace`. They are the real-run reading of the heartbeat the founder set: a LOSS at 15 s there is root-caused and fixed in the
+next version, as any other.
 
 ---
 

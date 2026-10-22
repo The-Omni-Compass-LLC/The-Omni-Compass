@@ -42,7 +42,8 @@ def load(p): return json.loads(Path(p).read_text())
 def main():
     t = tempfile.mkdtemp(); p = setup(t)
     cool = Path(t) / "bms.log"
-    a = parser().parse_args(["--kubectl", FAKE, "--audit", str(Path(t) / "audit.jsonl"),
+    # a decision a minute, the default this test was written against before omni-v16 set 15 s (one batch step a minute)
+    a = parser().parse_args(["--interval", "60", "--floor-interval", "15", "--kubectl", FAKE, "--audit", str(Path(t) / "audit.jsonl"),
                              "--rightsize-deployments", "default/web", "--coldstart-deployments", "default/svc",
                              "--coldstart-signal", "default/work", "--coldstart-idle", "2", "--batch-pace",
                              "--contain-namespaces", "agents", "--contain-cpu-m", "1000",

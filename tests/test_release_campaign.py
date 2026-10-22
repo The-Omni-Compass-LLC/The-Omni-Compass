@@ -4,7 +4,6 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The approved campaign's dispatch boundaries and the v6 capacity regressions."""
-import hashlib
 import inspect
 import json
 import os
@@ -29,7 +28,7 @@ class ReleaseCampaign(unittest.TestCase):
 
     def test_queue_is_complete_and_excluded_providers_cannot_dispatch(self):
         queue = grid.rerun_queue()
-        self.assertEqual(len(queue), 186)        # 62 entries, A, B and C (the steady and wandering tests back since omni-v8;
+        self.assertEqual(len(queue), 192)        # 64 entries, A, B and C (the steady and wandering tests back since omni-v8;
                                                  # MySQL, Redis and MongoDB with native as shipped beside the operator's, 17 October;
                                                  # every data store at the max beside the tune-down, 18 October;
                                                  # the extended fault test, 18 October; CruiseKube on the recorder that
@@ -41,7 +40,9 @@ class ReleaseCampaign(unittest.TestCase):
                                                  # its bin-packing profile, 20 October; Koordinator again, on the
                                                  # kubelet's cgroup root its own tests use, 20 October; the governors
                                                  # four ways, 20 October; KubeRay, Crane, Gödel, Karmada and OCM four
-                                                 # ways, each in its own rig, 20 October)
+                                                 # ways, each in its own rig, 20 October; the decision pace, five arms,
+                                                 # docs/PACE_PREREGISTRATION.md, 22 October; the levers check again on
+                                                 # its rig as corrected on 22 October, afternoon)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
         for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
             self.assertEqual({row[3].get('objective') for row in queue if row[2] == wf and row[3].get('native') != 'shipped'},
@@ -72,12 +73,14 @@ class ReleaseCampaign(unittest.TestCase):
              'Kubernetes observe-only check', 'Kubernetes CruiseKube', 'Kubernetes Goldilocks', 'Kubernetes fixed capacity',
              'Kubernetes scale control plane', 'every catalog muscle', '1107 muscles and seven organisms',
              'Linux CPU governor and meter capability', 'Azure full-control six-stage burst', 'large organisms on Azure',
-             'kubernetes steady', 'kubernetes wandering', 'kubernetes all four', 'kubernetes fairness', 'kubernetes faults',
+             'kubernetes steady', 'kubernetes decision pace', 'kubernetes wandering', 'kubernetes all four', 'kubernetes fairness', 'kubernetes faults',
              'kubernetes batch', 'kubernetes google 2011 trace', 'kubernetes keda add-ons', 'redis resource', 'kafka resource',
              'postgresql resource', 'mysql resource', 'mongodb resource', 'redis service', 'kafka service',
              'mysql resource, native as shipped', 'redis resource, native as shipped', 'mongodb resource, native as shipped',
              'robot arms', 'power grids', 'buildings and batteries', 'drone swarms', 'robustness kill', 'robustness long',
-             'kubernetes batch through kueue', 'kubernetes batch through volcano'],   # written before the omni-v12 campaign opened
+             'kubernetes batch through kueue', 'kubernetes batch through volcano'],   # written before the omni-v12 campaign opened;
+                                                                                      # the decision pace before the omni-v16 campaign
+                                                                                      # opened (22 October), when no run of it had started
             ['mysql service', 'mongodb service', 'postgresql service', 'kubernetes faults extended'],   # added 18 October, night
             ['Kubernetes CruiseKube, recorder in service'],                                               # added 19 October
             ['kubernetes cost to match'],                                                                 # added 19 October, evening
@@ -159,14 +162,19 @@ class ReleaseCampaign(unittest.TestCase):
         def fetched(d):                    # FETCH_HEAD as a fetch writes it (git 2.55 refuses update-ref on a pseudoref)
             sha = subprocess.run(['git', '-C', d, 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip()
             (Path(d) / '.git' / 'FETCH_HEAD').write_text(f"{sha}\t\tbranch 'main' of origin\n")
-        # on GitHub each tick fetches the branch's newest commit; its engine, by that commit's own fingerprints, decides
-        src = ROOT / 'omnicompass' / 'compass_law.py'
-        files = {'omnicompass/compass_law.py': hashlib.sha256(src.read_bytes()).hexdigest()}
-        digest = hashlib.sha256(''.join(f'{h}  {n}\n' for n, h in sorted(files.items())).encode()).hexdigest()
+        # on GitHub each tick fetches the branch's newest commit; its engine, read by that commit's own version tool over the
+        # tool's whole scope, decides. A tree with this checkout's engine (the late wires of omni-v15 among its files) reads
+        # as the version tool reads it: the conductor's old copy of the scope left them out, read omni-v15 and omni-v16 as
+        # unknown and started nothing (22 October)
+        from tools import omni_version as V
+        files = V.engine_files()
+        want = V.version_of(files) or 'unknown'
+        self.assertTrue(set(V.LATE_WIRES) <= set(files))
+        prints = [p.name for p in V.VERSIONS.values() if p.exists()]
         with tempfile.TemporaryDirectory() as d:
-            (Path(d) / 'omnicompass').mkdir()
-            (Path(d) / 'omnicompass' / 'compass_law.py').write_bytes(src.read_bytes())
-            (Path(d) / 'OMNI_V99.json').write_text(json.dumps({'version': 'omni-v99', 'digest': digest, 'files': files}))
+            for n in [*files, 'tools/omni_version.py', *prints]:
+                (Path(d) / n).parent.mkdir(parents=True, exist_ok=True)
+                (Path(d) / n).write_bytes((ROOT / n).read_bytes())
             git = ['git', '-C', d, '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false']
             subprocess.run(['git', 'init', '-q', d], check=True)
             subprocess.run(git + ['add', '-A'], check=True)
@@ -176,11 +184,17 @@ class ReleaseCampaign(unittest.TestCase):
             try:
                 grid.ROOT = Path(d)
                 with unittest.mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}):
-                    self.assertEqual(grid.engine(), 'omni-v99')
-                (Path(d) / 'omnicompass' / 'compass_law.py').write_text('changed\n')
-                subprocess.run(git + ['commit', '-q', '-am', 'y'], check=True)
-                fetched(d)
-                with unittest.mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}):
+                    self.assertEqual(grid.engine(), want)
+                    if want != 'unknown':
+                        # a tick that began before the engine landed: its own files hold an older version tool and no
+                        # fingerprint of the newest engine, and the fetched commit is still read by its own
+                        (Path(d) / 'tools' / 'omni_version.py').write_text('raise SystemExit(3)\n')
+                        (Path(d) / f'OMNI_V{want[6:]}.json').unlink()
+                        self.assertEqual(grid.engine(), want)
+                        subprocess.run(git + ['checkout', '-q', '--', '.'], check=True)
+                    (Path(d) / V.LATE_WIRES[0]).write_text('changed\n')
+                    subprocess.run(git + ['commit', '-q', '-am', 'y'], check=True)
+                    fetched(d)
                     self.assertEqual(grid.engine(), 'unknown')          # a commit no fingerprint matches starts nothing
             finally:
                 grid.ROOT = old

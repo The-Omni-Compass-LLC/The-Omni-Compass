@@ -3,8 +3,8 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-# The omni-v15 campaign (the founder's order of 17 October: a new version means everything runs again on it): A of every
-# entry, then B, then C; released by the grid conductor from the moment omni-v15 landed on main. MySQL, Redis and MongoDB
+# The omni-v16 campaign (the founder's order of 17 October: a new version means everything runs again on it): A of every
+# entry, then B, then C; released by the grid conductor from the moment omni-v16 landed on main. MySQL, Redis and MongoDB
 # run twice: native as the operator sets it (the preregistered setting) and native exactly as the vendor ships it.
 # Every data store runs at the tune-down (objective=resource) and at the max (objective=service, the default brain, 12
 # October): MySQL, MongoDB and PostgreSQL had run at the tune-down alone until 18 October (their runs at the max stand in
@@ -30,6 +30,10 @@ Linux CPU governor and meter capability|cpu-power.yml|
 Azure full-control six-stage burst|aks-metered-full.yml|reps=3;duration_s=600;load_steps=1 4 1 6 1 9;dial=save
 large organisms on Azure|big-organism.yml|organisms=tower,stack;size=100;reps=3;duration_s=2880
 kubernetes steady|benchmark-reps.yml|duration_s=900;arms=native compass;loadgen=open
+# The decision pace (docs/PACE_PREREGISTRATION.md, written before the omni-v16 campaign opened): native, Omni-Compass on
+# top at its default heartbeat of 15 s (the founder's word of 22 October), and the same deciding every 60, 10 and 5 s, five
+# arms in every repetition.
+kubernetes decision pace|benchmark-reps.yml|duration_s=900;arms=native compass compass60 compass10 compass5;loadgen=open
 kubernetes wandering|benchmark-reps.yml|duration_s=2700;arms=native compass;loadgen=open;load_steps=1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1
 kubernetes all four|benchmark-reps.yml|duration_s=2700;arms=native compass;loadgen=open;load_steps=1 2 3 4 5 6 7 8 7 6 5 4 3 2 1
 kubernetes fairness|benchmark-reps.yml|duration_s=900;arms=native compass;loadgen=open;two_app=1
@@ -129,3 +133,10 @@ kubernetes batch four ways on a group of two clusters through Open Cluster Manag
 # the hour it was pushed, after its trial, read back by their count in that workflow.
 added=2026-10-20T18:30:00Z
 kubernetes batch four ways on a group of two clusters through Armada|kind-group.yml|duration_s=1500;arms=nativebare native compassbare compass;orch=armada
+# Added on 22 October, afternoon, once the campaign was under way: released after every entry above, A, B and C. The levers
+# check on its rig as corrected that day (scripts/kind_levers.sh): each phase runs for the brain's own minutes at the default
+# heartbeat of 15 s. The first block's A, started at 13:50 UTC, failed two checks (rightsize, coldstart) on the old rig, whose
+# three decisions of 5 s gave omni-v16's brain 15 s where omni-v14 had counted each decision as a minute; it stands as the old
+# rig's record, and its B and C run on the corrected rig.
+added=2026-10-22T14:30:00Z
+Kubernetes levers, each phase the brain's own minutes|live-kind-levers.yml|

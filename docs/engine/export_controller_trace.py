@@ -8,15 +8,13 @@ engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html): the one place where the
 decision (the governor's six states, the nerves and each organ's grant, the compass law on the service, the verdict's
 trial, the release gate, the plug's writes).
 
-Two settings, each as the repository already wires it, on seeds 3000, 3001 and 3002 (runs A, B and C), six hours each,
-the controller deciding every 15 s, its own default (omni-v16: every clock counted in seconds; docs/OMNI_V16.md):
+Two settings, each as the repository already wires it, on seeds 3000, 3001 and 3002 (runs A, B and C), six hours each:
 
-  selfpilot  pilot/selfpilot.py's plant: the HPA with the Cluster Autoscaler (native) against the controller in nodepool
-             mode on top of the HPA, the Cluster Autoscaler off, the controller's own defaults (the max)
-  cloud      tools/toy_gate.py's cloud (cloud_toy: the shipped actuator's idle machines, every pod on its machine), the
-             cloud's setting: the cloud's own autoscaler makes and deletes machines in both arms; the controller (the
-             compass law, the tune-down, --give-back-only) only parks a machine that exists, after its verdict's trial and
-             above its warm reserve (nothing given back before the reserve's four hours are read), and wakes it on a breach
+  selfpilot  pilot/selfpilot.py run_day: the HPA with the Cluster Autoscaler (native) against the controller in
+             nodepool mode on top of the HPA, the Cluster Autoscaler off, the controller's own defaults (the max)
+  cloud      tools/toy_gate.py worker, the cloud's setting: the cloud's own autoscaler makes and deletes machines in both
+             arms; the controller (the compass law, the tune-down, --give-back-only) only parks a machine that exists,
+             after its verdict's trial, and wakes it on a breach
 
 Every 15 s tick, both arms: machines in service, booting or parked, the pods the HPAs want and the pods waiting for a
 place, the demand, and the response time of a queue on the running pods (the toy gate's own formula, computed the same
@@ -42,12 +40,65 @@ import numpy as np                                                       # noqa:
 from fleet.sim import ALLOC                                              # noqa: E402
 from pilot.selfpilot import SimCluster, SimKube                          # noqa: E402
 from omni_controller.controller import Controller, parser               # noqa: E402
-from tools.toy_gate import cloud_toy                                     # noqa: E402
 
 SEEDS = (3000, 3001, 3002)
 DAYS = 0.25
-INTERVAL = 15.0                                                          # the controller's own default decision period (omni-v16)
 SLO_MS, SERVICE_MS = 200.0, 20.0                                         # the toy gate's line and bare service time
+
+
+class CloudSim(SimCluster):
+    """tools/toy_gate.py CloudSim: the cloud's autoscaler makes machines in both arms; a parked machine is deleted after
+    ten minutes empty; the governor only parks a machine that exists and wakes one while it exists."""
+    PARK_TICKS = 40
+
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        self.c.pool.power_off = True
+        self.parked = []
+
+    def tick(self):
+        self.parked = [x - 1 for x in self.parked if x > 1]
+        super().tick()
+
+    def resize(self, n):
+        p = self.c.pool; n = max(p.min_nodes, int(n))
+        if n < p.nodes:
+            k = p.nodes - n; p.nodes -= k; self.parked += [self.PARK_TICKS] * k
+        elif n > p.nodes:
+            k = min(n - p.nodes, len(self.parked)); p.nodes += k; self.parked = self.parked[k:]
+
+
+def cloud_kube(sim):
+    IDLE = "omnicompass.io/idle"
+
+    class Kube(SimKube):
+        def get(self, *args):
+            if args[:2] == ("get", "nodes"):
+                p = self.sim.c.pool
+                node = lambda i, taints: {"metadata": {"name": f"n{i}", "labels": {}}, "spec": {"taints": taints},
+                                          "status": {"allocatable": {"cpu": str(p.cores)}, "conditions": [{"type": "Ready", "status": "True"}]}}
+                return {"items": [node(i, []) for i in range(p.nodes)]
+                        + [node(p.nodes + j, [{"key": IDLE, "effect": "PreferNoSchedule"}]) for j in range(len(self.sim.parked))]}
+            if args[:2] == ("get", "pods") and "-o" in args and args[args.index("-o") + 1] == "name":
+                c = self.sim.c
+                frac = min(1.0, c.alloc / c.reqs) if c.reqs > 0 else 1.0
+                return "\n".join(f"pod/p{i}" for i in range(sum(w.replicas - int(w.replicas * frac) for w in c.workloads)))
+            if args[:2] == ("get", "hpa"):
+                hp = super().get(*args)
+                for h, w in zip(hp["items"], self.sim.c.workloads):
+                    h["spec"].update({"minReplicas": int(w.min_rep), "maxReplicas": int(w.max_rep), "scaleTargetRef": {"kind": "Deployment", "name": w.name}})
+                return hp
+            if args[:2] == ("get", "deployment"):
+                w = next(x for x in self.sim.c.workloads if x.name == args[2]); cpu = f"{int(w.request * 1000)}m"
+                return {"metadata": {"name": w.name, "namespace": "default", "annotations": {}},
+                        "spec": {"replicas": int(w.replicas), "selector": {"matchLabels": {"app": w.name}}, "template": {"metadata": {"labels": {"app": w.name}},
+                                 "spec": {"containers": [{"name": "app", "resources": {"requests": {"cpu": cpu}, "limits": {"cpu": cpu}}}]}}},
+                        "status": {"replicas": int(w.replicas), "readyReplicas": int(w.replicas)}}
+            try:
+                return super().get(*args)
+            except ValueError:
+                raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy cluster")
+    return Kube(sim, None)
 
 
 def observe(sim, lat_rows, lat_path, rng):
@@ -104,7 +155,7 @@ def run(setting, seed, arm):
     tmp = Path(tempfile.mkdtemp())
     rng = np.random.default_rng(seed + 7)
     if setting == "cloud":
-        sim, kube, _ = cloud_toy(seed, DAYS)
+        sim = CloudSim(seed, DAYS, autoscaler="ca")
     else:
         sim = SimCluster(seed, DAYS, autoscaler="ca" if arm == "native" else "none")
     ticks, decisions, lat_rows = [], [], []
@@ -115,13 +166,13 @@ def run(setting, seed, arm):
         return ticks, decisions
     audit = tmp / "audit.jsonl"
     if setting == "cloud":
-        argv = ["--mode", "nodepool", "--law", "compass", "--dial", "save", "--sensed", "none/none", "--interval", str(INTERVAL),
+        argv = ["--mode", "nodepool", "--law", "compass", "--dial", "save", "--sensed", "none/none", "--interval", "60",
                 "--latency-file", str(lat_path), "--slo-ms", str(SLO_MS), "--audit", str(audit), "--kill-file", str(tmp / "kill"),
                 "--node-scale-cmd", "SIMSCALE {n}", "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.max_nodes),
-                "--headroom", "0.5", "--active-nodes-only", "--max-node-step", "1", "--floor-interval", "15", "--give-back-only"]
-        ctl = Controller(parser().parse_args(argv), kube=kube)
+                "--headroom", "0.5", "--active-nodes-only", "--max-node-step", "1", "--give-back-only"]
+        ctl = Controller(parser().parse_args(argv), kube=cloud_kube(sim))
     else:
-        argv = ["--mode", "nodepool", "--interval", str(INTERVAL), "--floor-interval", "15", "--audit", str(audit), "--kill-file", str(tmp / "kill"),
+        argv = ["--mode", "nodepool", "--interval", "0", "--audit", str(audit), "--kill-file", str(tmp / "kill"),
                 "--node-scale-cmd", "SIMSCALE {n}", "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.max_nodes),
                 "--headroom", "0.5"]
         ctl = Controller(parser().parse_args(argv), kube=SimKube(sim, None)); ctl.k.audit = ctl.audit   # pilot/selfpilot.py's own SimKube
@@ -132,13 +183,12 @@ def run(setting, seed, arm):
             sim.resize(int(cmd[1])); return subprocess.CompletedProcess(cmd, 0)
         return real_run(cmd, *k, **kw)
     seen = 0
-    every = max(1, int(round(INTERVAL / 15.0)))                         # a decision every INTERVAL s on the 15 s plant
     with mock.patch("omni_controller.controller.subprocess.run", side_effect=fake_run):
         while sim.t < sim.steps:
             sim.tick()
-            sim.c.alloc = (sim.c.pool.nodes + len(getattr(sim, "parked", []))) * sim.c.pool.cores * ALLOC
+            sim.c.alloc = sim.c.pool.nodes * sim.c.pool.cores * ALLOC
             ticks.append(observe(sim, lat_rows, lat_path, rng))
-            if sim.t % every == 0:
+            if sim.t % 4 == 0:
                 ctl.step()
                 lines = audit.read_text().splitlines() if audit.exists() else []
                 recs = [json.loads(x) for x in lines[seen:]]; seen = len(lines)
@@ -170,7 +220,7 @@ def reading(runs, aim):
 
 
 def main(out):
-    data = {"slo_ms": SLO_MS, "seeds": list(SEEDS), "days": DAYS, "interval_s": INTERVAL, "settings": {}}
+    data = {"slo_ms": SLO_MS, "seeds": list(SEEDS), "days": DAYS, "settings": {}}
     for setting in ("selfpilot", "cloud"):
         sec = {"runs": {}, "readings": {}}
         per = {}

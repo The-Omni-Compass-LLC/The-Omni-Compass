@@ -376,19 +376,12 @@ def robust_marks(d):
     return out
 
 
-ROBUST_INTERVAL_S = 60.0       # the governor's decision interval in the runs before omni-v16, whose files record none (--interval 60)
+ROBUST_INTERVAL_S = 60.0       # the decision interval of the robustness runs that predate omni_interval.txt (scripts/kind_bench.sh, --interval 60); a run that
+                               # carries the file (omni-v16 on) is read at its own, and its decision time from the governor's own decision_ms records,
+                               # because its loop keeps its schedule and the gap between decisions no longer holds the step's time
 ROBUST_DECISION_SHARE = 0.95   # fewer decisions than this share of the count the interval predicts reads INVALID (docs/ROBUSTNESS_PREREGISTRATION.md)
 ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again is marked
 ROBUST_LONG_MIN_S = 6840.0     # the decision-time ratio needs a span of at least 95% of the 7,200 s window, so the first and last hours do not overlap
-
-
-def run_interval(d):
-    """The governor's decision period in a run: recorded beside its files from omni-v16 on (scripts/kind_bench.sh,
-    governor_interval_s.txt, 15 s by default); 60 s in every run before it."""
-    try:
-        return float((Path(d) / "governor_interval_s.txt").read_text().split()[0])
-    except (OSError, ValueError, IndexError):
-        return ROBUST_INTERVAL_S
 
 
 def robust_decisions(d, window_s):
@@ -399,8 +392,17 @@ def robust_decisions(d, window_s):
     f = d / "audit.jsonl"
     if not f.exists() or not window_s:
         return None
-    times, failed, reasons = [], 0, []
+    try:
+        interval = float((d / "omni_interval.txt").read_text().split()[0]); own = True
+    except (OSError, ValueError, IndexError):
+        interval, own = ROBUST_INTERVAL_S, False
+    times, failed, reasons, step_ms = [], 0, [], []
     for line in open(f):
+        if own and '"decision_ms"' in line:
+            try:
+                step_ms.append((len(times), float(json.loads(line)["decision_ms"])))
+            except (ValueError, KeyError, TypeError):
+                pass
         if '"decision"' in line:
             try:
                 times.append(float(json.loads(line)["time"]))
@@ -421,16 +423,20 @@ def robust_decisions(d, window_s):
                 r = l.split("):", 1)[-1].strip() if "):" in l else l.strip()
                 r = re.sub(r"CalledProcessError\(\d+, \[.*?\]\)\s*", "", r)[:160]
                 reasons.append(r)
-    iv = run_interval(d)
-    expected = window_s / iv
-    out = {"decisions": len(times), "expected": expected, "interval_s": iv, "share": (len(times) / expected if expected else None), "failed": failed,
+    expected = window_s / interval
+    out = {"decisions": len(times), "expected": expected, "interval_s": interval, "share": (len(times) / expected if expected else None), "failed": failed,
            "failed_reasons": sorted(set(reasons)), "decision_time_ratio": None}
     if len(times) >= 4 and times[-1] - times[0] >= ROBUST_LONG_MIN_S:
         gaps = [(b - a, a) for a, b in zip(times, times[1:])]
         t0, t1 = times[0], times[-1]
         first = [g for g, t in gaps if t <= t0 + 3600]; last = [g for g, t in gaps if t >= t1 - 3600]
+        if own:
+            # the step's own time, as the governor timed it: decisions whose time falls in the first and the last hour
+            first = [ms / 1000.0 for i, ms in step_ms if i and times[i - 1] <= t0 + 3600]
+            last = [ms / 1000.0 for i, ms in step_ms if i and times[i - 1] >= t1 - 3600]
         if first and last:
-            a = max(sum(first) / len(first) - iv, 0.0); b = max(sum(last) / len(last) - iv, 0.0)
+            a = max(sum(first) / len(first) - (0.0 if own else ROBUST_INTERVAL_S), 0.0)
+            b = max(sum(last) / len(last) - (0.0 if own else ROBUST_INTERVAL_S), 0.0)
             out["decision_time_first_s"], out["decision_time_last_s"] = a, b
             out["decision_time_ratio"] = (b / a) if a >= 0.1 else None    # under a tenth of a second there is nothing to compare
     ks = d / "kill_switch.txt"
@@ -503,8 +509,7 @@ def robust_table(root, cols):
          f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
          f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The {ROBUST_AFTER_KILL_S} s after the kill mark are compared between the arms "
          "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`). In the long run the governor's own audit gives its decisions against "
-         f"the count its configured interval predicts for the window (60 s before omni-v16, 15 s from it, read from the run's own files; "
-         f"under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
+         f"the count its {ROBUST_INTERVAL_S:.0f} s interval predicts for the window (under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
          f"and its decision time (the gap between decisions less the interval it sleeps), mean of the last hour over the first (over {ROBUST_CYCLE_GROWTH} "
          "is marked); the reset check at the end says whether every setting was handed back.", "",
          "| Arm | Repetition | Mode | Seconds from the kill to every setting back | Within the allowance | Second governor | Watchdog hand-backs | Governor memory, last ten minutes / first ten | Decisions | Decisions of expected | Failed decisions | Decision time, last hour / first hour | Handed back at the end |",
@@ -744,11 +749,15 @@ def main(root):
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
+    # the decision pace (omni-v16): compass60, compass10, compass5 (any compassN) are the compass arm deciding every N s;
+    # the compass arm itself decides at the default, every 15 s (OMNI_INTERVAL in scripts/kind_bench.sh)
+    paces = sorted((a for a in runs if re.fullmatch(r"compass\d+", a)), key=lambda a: -int(a[7:]))
     cols = ([a for a in ("nativebare", "native") if a in runs] + tuned
-            + [a for a in ("watch", "omni", "compassbare", "compass", "strict") if a in runs])
+            + [a for a in ("watch", "omni", "compassbare", "compass") if a in runs] + paces + [a for a in ("strict",) if a in runs])
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",
              "nativebare": "the organism alone (no orchestrator)", "compassbare": "omni on the organism alone",
-             **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned}}
+             **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned},
+             **{a: f"omni, a decision every {a[7:]} s" for a in paces}}
     L += ["## All columns, mean over repetitions", "", "| Gauge | " + " | ".join(names[a] for a in cols) + " |",
           "|---|" + "---:|" * len(cols)]
     L += [f"| {LABEL.get(k, k)} | " + " | ".join(f"{out['means'][a][k]:.4g}" for a in cols) + " |" for k in keys]
@@ -768,6 +777,9 @@ def main(root):
     # every comparison: the arm, the arm it is read against, its key in the paired table, and its title; the four ways
     # (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6) add the organism alone, without and with Omni-Compass on top
     pairs = [(a, "native", a, None) for a in ("watch", "omni", "compass", "strict")] + [(a, b, f"{a}|{b}", t) for a, b, t in FOUR_WAYS]
+    # each pace against native, and against the compass arm at the default decision (15 s), paired in the repetition
+    pairs += [(a, "native", a, f"omni deciding every {a[7:]} s vs native") for a in paces]
+    pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni at its default, every 15 s") for a in paces]
     for a, base, key, four in pairs:
         if a not in runs or base not in runs:
             continue

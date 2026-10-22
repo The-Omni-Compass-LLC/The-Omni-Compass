@@ -25,44 +25,40 @@ def one_host(nodes) -> bool:
 
 
 class HostCpuSampler:
-    """Measure aggregate host CPU busy share from Linux /proc/stat.
-
-    span: the sample intervals the share is read over (omni-v16). The governor samples once a decision; at 1 the share
-    is the one since the previous decision (v13 at a decision a minute), and at a shorter period it passes the intervals
-    that make the same minute (4 at 15 s), so a guard that read the host's minute still reads its minute."""
+    """Measure aggregate host CPU busy share from Linux /proc/stat, over the last `span` intervals between samples
+    (omni-v16: the governor samples at each decision and reads the last minute's share at any decision period; span 1, the
+    share since the previous sample, is what every engine before omni-v16 read)."""
 
     def __init__(self, stat_path: str | os.PathLike[str] | None = None, span: int = 1):
         self.stat_path = Path(stat_path or os.environ.get("OMNI_HOST_PROC_STAT", "/proc/stat"))
         self.span = max(1, int(span))
-        self._samples: list[tuple[int, int]] = []
+        self._readings: list[tuple[int, int]] = []      # the last span + 1 valid readings, oldest first
         self.busy_share: float | None = None
 
     def sample(self) -> float | None:
-        """Update the busy share over the last span intervals (fewer while fewer are read), or None without two valid
-        samples."""
+        """Update the busy share over the last span intervals (fewer at the start), or None without two valid samples."""
         try:
             line = next(row for row in self.stat_path.read_text().splitlines() if row.startswith("cpu "))
             fields = [int(value) for value in line.split()[1:]]
             if len(fields) < 4:
-                self._samples = []
+                self._readings = []
                 self.busy_share = None
                 return None
             total = sum(fields)
             idle = fields[3] + (fields[4] if len(fields) > 4 else 0)
             current = (total, idle)
         except (OSError, StopIteration, ValueError):
-            self._samples = []
+            self._readings = []
             self.busy_share = None
             return None
 
-        self._samples = (self._samples + [current])[-(self.span + 1):]
-        if len(self._samples) < 2:
+        self._readings = (self._readings + [current])[-(self.span + 1):]
+        previous = self._readings[0] if len(self._readings) > 1 else None
+        if previous is None:
             self.busy_share = None
             return None
-        previous = self._samples[0]
         dt, di = current[0] - previous[0], current[1] - previous[1]
         if dt <= 0 or di < 0 or di > dt:
-            self._samples = [current]
             self.busy_share = None
             return None
         self.busy_share = (dt - di) / dt

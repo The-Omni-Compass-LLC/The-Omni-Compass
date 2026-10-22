@@ -83,26 +83,19 @@ class CompassLaw:
     kd: Optional[float] = None
     authority: float = 1.0
     smooth: float = 0.5          # the velocity estimate's smoothing (0: raw difference, near 1: heavily smoothed)
-    # omni-v16: the period the lever's rate and the smoothing are stated at, where the caller moves its lever at a rate in
-    # time rather than a step a decision (the live governor: its compass moves the target by period / 60 of a step each
-    # decision). The damping is then the critical damping of that rate, and the smoothing keeps its time constant, at any
-    # decision period. None: dt itself, every value as before
-    ref_dt: Optional[float] = None
     p: Optional[float] = field(default=None, init=False)
     v: float = field(default=0.0, init=False)
 
     def __post_init__(self):
         if self.kd is None:
             # a first-order muscle with response tau under a P-D pull: critical damping when kd = 2 sqrt(kp tau) - 1
-            # scaled to the period the lever's rate is stated at (the decision period, unless ref_dt); never negative
-            ref = self.ref_dt or self.dt
-            self.kd = max(0.0, 2.0 * math.sqrt(self.kp * self.tau / ref) - 1.0) * ref
+            # scaled to the decision period; never negative
+            self.kd = max(0.0, 2.0 * math.sqrt(self.kp * self.tau / self.dt) - 1.0) * self.dt
 
     def sense(self, reading: float) -> float:
         p = self.band.position(reading)
         if self.p is not None:
-            s = self.smooth if not self.ref_dt else self.smooth ** (self.dt / self.ref_dt)
-            self.v = s * self.v + (1.0 - s) * (p - self.p) / self.dt
+            self.v = self.smooth * self.v + (1.0 - self.smooth) * (p - self.p) / self.dt
         self.p = p
         return p
 

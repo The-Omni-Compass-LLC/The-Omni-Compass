@@ -1153,19 +1153,6 @@ version, with every rule above counted in seconds and the fast checks on their o
 shows it reads no LOSS on any gauge anywhere; until then the order holds as the founder put it: native's speed at least, faster only where it hurts nothing. The cloud's arms are native and Omni-Compass on top, nothing else (`ARMS`
 defaults to `native compass` in the workflow and in every cloud script); the steady run of the max had run those two.
 
-### Amendment (2026-10-22, omni-v16, written before any run on it): the full decision every 15 seconds, every clock in seconds
-
-The founder's order of 22 October: the full
-decision every 15 seconds, the pace of the HPA's own check, with every clock counted in seconds, 10 seconds tested and never
-above 60. Omni v16 states every rule of the table above in seconds, and every other clock the governor kept in decisions
-(the engine core, the cushion, the compass's damping, the closure law's step, the conveyance, the host reading;
-`docs/OMNI_V16.md`), so at any period the trial's phase is 1,200 s, the cool-down 180 s, cruise 120 s, the spacing 600 s and
-the recheck 7,200 s, as at 60 s. From omni-v16 every set runs the full decision every 15 seconds and the fast checks every
-5 seconds (`OMNI_INTERVAL=15`, the rig's default); each run records its period beside its files
-(`governor_interval_s.txt`) and the scorer reads it there; the rig refuses a period above 60 seconds or under the fast
-checks' own. The window's rule is unchanged: a window counts only with at least one decision a minute. Runs on the engines
-before omni-v16 ran at 60 seconds and stay their own engine's record; no reading is pooled across the two.
-
 ## In the cloud, the machines alone: a bill that can only fall or stay (the founder's order, 2026-10-14, night, before any run at the tune-down)
 
 The founder's order of 14 October: in the cloud Omni-Compass must never make the bill bigger. Read against the governor,
@@ -1342,6 +1329,19 @@ read as before.
   the next version's work, through the toy gate, after the founder is told; this amendment does not touch it.
 - **Run again.** The CruiseKube test runs again, A, B and C, on the corrected recorder (`scripts/reruns.txt`, block of
   19 October). The three-run table pools only runs of one recorder.
+
+## Amendment (2026-10-22, omni-v16, written before any run of it): the full decision every 15 s
+
+"The decision period in the cloud" above held every run at 60 s because four rules counted decisions. omni-v16 counts every
+clock of the governor in seconds (`docs/OMNI_V16.md`: the give-back trial, the cool-down, cruise and the trial spacing
+already counted seconds since omni-v7; now the brain's own minute, the compass's damping and smoothing, the edge's window and
+rates, the additions past the floor, a command's minute to land and the rest do too), so a period changes only how often the
+governor looks: at 15 s a give-back trial still lasts its 20 minutes, the wait after a breach its 3 minutes, and one machine is
+still given back at most once a minute. On the founder's word of 22 October ("15 sec all over heart beat"), the default
+decision period is 15 s, native's own pod autoscaler's pace, in every run from omni-v16's first on: the kind tests and the
+cloud sets alike (`scripts/kind_bench.sh`, `OMNI_INTERVAL`), the fast checks every 5 s as before. A window in which the
+governor made no write still needs its decisions to count, now one every 15 s. Runs before omni-v16 stand at the 60 s they
+ran at; nothing is read across engines.
 
 ---
 

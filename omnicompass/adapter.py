@@ -25,7 +25,7 @@ STACK_PARAMS = Params(alpha=4.2, beta_int=0.0, beta_ext=0.0, k=1.7, sigma_1=0.38
                       lambda_I=0.719, lambda_U=0.0)
 INITIAL_STATE = State(E=0.12, U=0.82, I_U=0.0, S=0.0, B=0.0, B_dot=0.0)
 ASSIMILATION = 0.339
-FLEET_DECISION_SECONDS = 60          # the period every constant of the law was stated at (one engine step a minute)
+REF_PERIOD_S = 60.0     # omni-v16: the step every per-step constant of the brain was set at (one decision a minute)
 
 
 def clamp(v: float, lo: float, hi: float) -> float:
@@ -51,8 +51,7 @@ def observe_vector(obs: Dict[str, float], conflicts: int) -> Dict[str, float]:
 
 
 def assimilate(x: State, o: Dict[str, float], p: Params, a: float = ASSIMILATION) -> State:
-    """Blend the observation into the engine state and set the forcing terms. a: the share of the observation taken in
-    (ASSIMILATION at a decision every FLEET_DECISION_SECONDS; Governor.step passes the share for its own period)."""
+    """Blend the observation into the engine state and set the forcing terms (a: the observation's weight in one step)."""
     q, load, pw, th, nw, dr, st, sec, cf = (o[k] for k in
         ("q", "load", "power", "thermal", "network", "drift", "stale", "security", "conflict"))
     e_obs = clamp(0.25 * q + 0.18 * max(0.0, load - 0.85) + 0.16 * pw + 0.13 * th + 0.10 * nw + 0.08 * dr
@@ -145,11 +144,8 @@ class Governor:
     last_push: float = 0.0
     log: deque = field(default_factory=lambda: deque(maxlen=4096))
     evolve: bool = True
-    # omni-v16: the seconds between two steps. The engine was built at a step every FLEET_DECISION_SECONDS (60), and its
-    # clocks are stated there; at any other period each keeps its time: the engine's own clock advances MACRO_DT x period
-    # / 60 a step and the observation is taken in at the share that blends the same amount a minute. The law's dwell is a
-    # count of readings that agree and stays one (docs/OMNI_V16.md, fault 9). At 60 s every value is the one omni-v15 used
-    period_s: float = float(FLEET_DECISION_SECONDS)
+    period_s: float = REF_PERIOD_S          # omni-v16: the caller's seconds between steps (step keeps the brain's own minute)
+    recent: Optional[deque] = None          # omni-v16: (added, removed) at each of the other steps of the last minute
 
     def kill(self) -> None:
         """Revoke authority; the engine continues to compute and log directives."""
@@ -165,18 +161,27 @@ class Governor:
         return self.mode == AUTOPILOT and not self.killed
 
     def step(self, obs: Dict[str, float], conflicts: int) -> Dict[str, Any]:
-        """Sense, assimilate, evolve, allocate."""
+        """Sense, assimilate, evolve, allocate.
+
+        omni-v16: the brain keeps its own minute whatever the caller's step. Its constants were set for one step a minute;
+        a caller stepping every period_s seconds moves the brain k = period_s / 60 of its minute each step: the
+        observation enters with weight 1 - (1 - 0.339)^k, the engine advances k of its macro interval, a dwell or a wait
+        counted in steps lasts as many seconds as at one step a minute, and (for a step shorter than a minute) the
+        machines added or removed over the last minute's steps stay within up_max and down_max. At 60 s every value is
+        the one the engines before omni-v16 used."""
+        k = self.period_s / REF_PERIOD_S
         o = observe_vector(obs, conflicts)
         U_before = self.x.U
-        r = float(self.period_s) / FLEET_DECISION_SECONDS        # this period in the engine's own steps (1 at 60 s)
-        xa = assimilate(self.x, o, self.p, a=ASSIMILATION if r == 1.0 else 1.0 - (1.0 - ASSIMILATION) ** r)
+        xa = assimilate(self.x, o, self.p, ASSIMILATION if k == 1.0 else 1.0 - (1.0 - ASSIMILATION) ** k)
         if self.evolve:
-            xn, _ = macro_step(xa, self.p, self.t, target=None, macro_dt=MACRO_DT * r)
+            xn, _ = macro_step(xa, self.p, self.t, target=None, macro_dt=MACRO_DT * k)
         else:
             xn = xa
         self.x = xn
-        self.t += MACRO_DT * r
+        self.t += 0.1 * k
         L = self.law
+        dwell, after = (L.down_dwell, L.down_after_add) if k == 1.0 else \
+            (max(1, int(round(L.down_dwell / k))), max(1, int(round(L.down_after_add / k))))
         n = int(self.nodes)
         u_push, _ = control_command(xn, self.p, self.t, +1)
         push = u_push / U_AUTHORITY
@@ -193,16 +198,25 @@ class Governor:
         if delta < 0 and (o["q"] >= L.guard_queue or n_req > n - L.down_band):
             delta = 0
         self.surplus_streak = self.surplus_streak + 1 if delta < 0 else 0
-        # the dwell is a count of readings that agree, never a clock (omni-v16, docs/OMNI_V16.md fault 9): counted in seconds,
-        # its hold after an add grew to five minutes at a reading every 15 s, while an add still comes at the first reading
-        # that calls for it, and the pool kept machines the load no longer needed with no fewer pods waiting
-        if delta < 0 and (self.surplus_streak < L.down_dwell or self.since_add < L.down_after_add):
+        if delta < 0 and (self.surplus_streak < dwell or self.since_add < after):
             delta = 0
         ceiling = L.power_ceiling_backlog if o["q"] >= L.guard_queue else L.power_ceiling
         if delta > 0 and (o["power"] >= ceiling or n >= L.max_nodes):
             delta = 0
         if o["security"] > 0.5:
             delta = min(delta, 0)
+        if k < 1.0:
+            # up_max and down_max a minute, not a step (omni-v16): this step with the other steps of the last minute
+            m = max(1, int(round(1.0 / k)))
+            if self.recent is None:
+                self.recent = deque()
+            if delta > 0:
+                delta = max(0, min(delta, L.up_max - sum(a_ for a_, _ in self.recent)))
+            elif delta < 0:
+                delta = min(0, max(delta, -(L.down_max - sum(r_ for _, r_ in self.recent))))
+            self.recent.append((max(0, delta), max(0, -delta)))
+            while len(self.recent) > m - 1:
+                self.recent.popleft()
         self.since_add = 0 if delta > 0 else self.since_add + 1
         if delta < 0:
             self.surplus_streak = 0
@@ -298,6 +312,7 @@ THROUGHPUT_MODE = dict(backlog_release=True, power_ceiling=9.0, power_ceiling_ba
 FLEET_MODE = dict(THROUGHPUT_MODE, rho0=0.829, rho_min=0.769, kI=0.072, kE=0.487, kq=0.635, down_band=3, down_dwell=1, down_after_add=5, push_release=0.053, cap_min=0.695, margin=0.131, U_gate=0.85, up_max=8)
 FLEET_BALANCED_MODE = dict(FLEET_MODE, push_release=0.0098, push_add=0.0098)
 FLEET_WEAR_MODE = dict(FLEET_MODE, push_release=0.0035, push_add=0.0035)
+FLEET_DECISION_SECONDS = 60
 
 
 def mode_law(mode: str, base: "AllocationLaw" = None) -> "AllocationLaw":

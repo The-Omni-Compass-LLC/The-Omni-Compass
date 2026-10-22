@@ -28,13 +28,14 @@
   {
    "file": "omnicompass/adapter.py",
    "from_sha256": [
-    "57ca59da4024ccea2769083998fdeb7b7c9c05b5c0dbca638375350be7dd93ac"
+    "57ca59da4024ccea2769083998fdeb7b7c9c05b5c0dbca638375350be7dd93ac",
+    "4486b388ac2ef34a1aacab7bba3de9986d1cac4405cb0b31f09e05bfe9b0b255"
    ],
-   "to_sha256": "ffa09b20997f4ebb5a5682c8fa8a3a5b882787e287fade7c4eb0fa3e5fa634c5",
-   "commit": "dfa4a3f481",
-   "reason": "omni-v16 (docs/OMNI_V16.md, sections 2 to 4): the brain's own clock in seconds. At a decision period other than the minute the engine core advanced one fixed step a decision (0.1 of its time) and blended 0.339 of each observation a decision, so at a decision every 15 s it ran four times as fast as its constants were selected for. Now its step is 0.1·r and its blend 1 − (1 − 0.339)^r (r = the period / 60 s; Governor.period_s); the fleet law's dwell stays a count of readings (fault 9); at a decision a minute (r = 1) every value is omni-v15's. The C++ twin changed identically (tests/test_cpp_governor_parity.py at 60, 15, 10 and 5 s, 0 mismatches; results/SEAL.json).",
-   "evidence": "Every pre-registered caller (the stack simulator, the benchmark, the fleet harness) builds the governor at its default period of 60 s, where r = 1 leaves every value as it was: verify.py re-runs the pre-registered held-out seeds and the fleet held-out runs with the amended file, and their checks pass unchanged.",
-   "to_fingerprint": "1e6ed337b4acff43dc6e575e370a7f1b420c8b7652a1f740b791a47531931364",
+   "to_sha256": "f7d84f63559daf37623b79885f00a2ca749a548052b3787e5522cbd7fb4e4170",
+   "commit": "381fb2643",
+   "reason": "omni-v16 (docs/OMNI_V16.md): the brain keeps its own minute whatever its caller's step. Governor.period_s (60 s unless the caller says otherwise): a step of k = period_s / 60 of the minute blends the observation with weight 1 - (1 - 0.339)^k, advances the engine k of its macro interval, counts the dwell and the wait before a give-back in seconds, and keeps the machines added or removed within up_max and down_max over the last minute's steps. At 60 s every value is omni-v15's. The Kubernetes governor passes its decision period (omni_controller/controller.py). C++ twin changed identically (tests/test_cpp_governor_parity.py at 60, 15, 10 and 5 s; results/SEAL.json).",
+   "evidence": "The stack simulator and the benchmark step the brain at its own minute (period_s 60), so every step takes omni-v15's path: verify.py re-runs the pre-registered held-out seeds and the fleet held-out runs with the amended file, and their checks pass unchanged.",
+   "to_fingerprint": "6ba2358c150bb0160c0c92a3a61191fa6debd51ba3a2ead8f8d485a6ae43eb73",
    "to_fingerprint_python": "3.12"
   }
  ]

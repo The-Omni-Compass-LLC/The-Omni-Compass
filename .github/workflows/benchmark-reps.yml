@@ -20,7 +20,6 @@ on:
       faults: {description: "1: the fault test (a machine dies, a traffic spike, a runaway pod, a blind probe; scripts/kind_faults.sh); 2: those four, then the API server frozen and the metrics server gone", default: ""}
       workload: {description: "web (the service under load) or batch (a queue of jobs: deploy/kind/batch-jobs.yaml)", default: "web"}
       batch_queue: {description: "With workload batch: kueue, volcano, kai, koordinator, vanilla or binpack, a queueing system of its own admitting a stream of jobs (docs/BATCH_QUEUE_PREREGISTRATION.md); empty: Kubernetes alone", default: ""}
-      interval: {description: "The governor's full decision every N seconds (omni-v16: 15, the pod autoscaler's own pace; 10 the test; 5 to 60, never above)", default: "15"}
   push:
     branches-ignore: [main, raw, "v[0-9]*", "gpu-omni-*", "archive/**"]   # a push to main or a level branch never starts it (20 October: every bot commit started 25 skipped runs and a cascade of cancelled page rebuilds)
 env:
@@ -62,6 +61,12 @@ jobs:
       - name: kind and kubectl again, if the first download was refused
         if: steps.kind.outcome == 'failure'
         run: bash scripts/kind_install.sh v0.31.0 v1.35.0
+      - name: The runner's own agent kept out of the kernel's choice when memory runs short
+        # 21 October (run 39657032525, repetition 9): a runner went silent 64 minutes in, "The hosted runner lost communication
+        # with the server", and left no file. A machine short of memory kills a process; when the process is the runner's own
+        # agent, the repetition's files go with it. With the agent protected the kernel takes a measured process instead, whose
+        # arm fails its own checks and is recorded; host_cpu.csv carries the memory left every 5 s (scripts/kind_bench.sh)
+        run: for p in $(pgrep -f 'Runner\.(Listener|Worker)'); do echo -1000 | sudo tee "/proc/$p/oom_score_adj" >/dev/null || true; done
       - run: bash scripts/kind_paired.sh
         env:
           REP: ${{ matrix.rep }}
@@ -74,7 +79,6 @@ jobs:
           REPLICA_CEILING: ${{ github.event.inputs.replica_ceiling || '' }}
           WORKLOAD: ${{ github.event.inputs.workload || 'web' }}
           BATCH_QUEUE: ${{ github.event.inputs.batch_queue || '' }}
-          OMNI_INTERVAL: ${{ github.event.inputs.interval || '15' }}
           LOADGEN: ${{ github.event.inputs.loadgen || (contains(github.event.head_commit.message, '[open-load]') && 'open' || 'closed') }}
       - name: Attach README, licenses and disclosures to this artifact
         id: omni_legal_export_1

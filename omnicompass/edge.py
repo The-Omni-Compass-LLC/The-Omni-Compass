@@ -25,6 +25,12 @@ knob has shown are kept as long as its own physics carries them.
 The balance point is 1 - cushion; the wall (where the law fails up at once) moves with the reaction part of it. The
 realms use this through realms/compass_arm_v5.py; the live controllers through omni_controller/ (--law v5). Pure math,
 no I/O; the frozen engine (omnicompass/core.py) is untouched.
+
+  pace      (omni-v16) the length of one reading in the knob's reference steps: the window, the narrowing, the floor's
+            forgetting and the memory are given per reference step and kept so in time, and the wobble is the spread of
+            the change over one reference step, so a knob read more often keeps every rule's time and only reads more
+            often. The Kubernetes governor's reference step is its minute (pace = its decision period / 60 s); at pace 1
+            every value is the one given, as every engine before omni-v16 read it
 """
 from __future__ import annotations
 
@@ -33,19 +39,19 @@ import math
 
 class Edge:
     def __init__(self, react: float, z: float = 3.09, window: int = 20, narrow: float = 0.05, start: float = 0.5,
-                 memory: float = 0.0, fall_decay: float = 0.9995, est: int = 2, per: float = 1.0, lag: int = 1):
-        # omni-v16: per is the reading period over the period the window, the narrowing, the memory and the fall's decay
-        # are stated at (the live governor: its decision period over 60 s), so each keeps its time at any period: the
-        # window covers the same seconds, the cushion narrows and forgets as much a minute. lag: the readings between two
-        # whose difference measures the wobble, so the two never share samples (one reading's own window); at per 1 and
-        # lag 1 every value is the one v13 used
+                 memory: float = 0.0, fall_decay: float = 0.9995, est: int = 2, pace: float = 1.0):
         self.react = max(1.0, float(react))
-        self.z, self.est = z, est
-        self.window = int(window) if per == 1.0 else max(3, int(round(window / per)))
-        self.narrow = narrow if per == 1.0 else 1.0 - (1.0 - narrow) ** per
-        self.mem = memory if (per == 1.0 or memory <= 0.0) else memory ** per
-        self.fall_decay = fall_decay if per == 1.0 else fall_decay ** per
-        self.lag = max(1, int(lag))
+        self.z, self.window, self.narrow, self.est = z, int(window), narrow, est
+        self.mem = memory
+        self.fall_decay = fall_decay
+        self.lag = 1                          # readings in one reference step (the wobble's and the climb's step)
+        if pace != 1.0:
+            # every count and rate given per reference step, kept in time at this pace (omni-v16)
+            self.window = max(int(window), int(round(window / pace)))
+            self.narrow = 1.0 - (1.0 - narrow) ** pace
+            self.fall_decay = fall_decay ** pace
+            self.mem = memory ** pace if memory > 0 else 0.0
+            self.lag = max(1, int(round(1.0 / pace)))
         self.hist = []
         self.cushion = 1.0 - start
         self.react_part = 0.05
@@ -62,23 +68,19 @@ class Edge:
         self.hist.append(min(p, 1.0))
         if len(self.hist) > self.window + 1:
             self.hist.pop(0)
-        h = self.hist
-        if len(h) >= 3 and self.est == 2:
+        h, lag = self.hist, self.lag
+        if len(h) >= lag + 2 and self.est == 2:
             r = max(1, int(round(self.react)))
-            d = [b - a for a, b in zip(h, h[1:])]
-            # the wobble from readings one reading's own window apart (lag), so a reading that shares samples with the next
-            # never makes the service look steadier than it is; with too few readings yet, the nearest that two allow
-            g = min(self.lag, max(1, len(h) - 2))
-            dw = d if g == 1 else [h[i + g] - h[i] for i in range(len(h) - g)]
-            md = sum(dw) / len(dw)
-            wob = math.sqrt(sum((x - md) ** 2 for x in dw) / max(1, len(dw) - 1)) / math.sqrt(2.0)
+            d = [b - a for a, b in zip(h, h[lag:])]               # the change over one reference step
+            md = sum(d) / len(d)
+            wob = math.sqrt(sum((x - md) ** 2 for x in d) / max(1, len(d) - 1)) / math.sqrt(2.0)
             if r < len(h):
                 rise = max(h[i + r] - h[i] for i in range(len(h) - r))
             else:
-                rise = max(0.0, max(d)) * r                       # longer than the window: the steepest climb, extrapolated
-            climb = max(0.0, rise) / r                            # per decision, so climb x reaction is the rise
-        elif len(h) >= 3:
-            climb = max(max(0.0, b - a) for a, b in zip(h, h[1:]))
+                rise = max(0.0, max(d)) / lag * r                 # longer than the window: the steepest climb, extrapolated
+            climb = max(0.0, rise) / r                            # per reading, so climb x reaction is the rise
+        elif len(h) >= lag + 2:
+            climb = max(max(0.0, b - a) for a, b in zip(h, h[lag:])) / lag
             m = sum(h) / len(h)
             wob = math.sqrt(sum((x - m) ** 2 for x in h) / (len(h) - 1))
         else:

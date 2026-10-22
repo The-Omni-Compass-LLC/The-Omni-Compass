@@ -1,8 +1,8 @@
-# Omni v15: the power cap's request through the line's own clear time, every wire in the fingerprint (the engine that stands since 21 October)
+# Omni v15: the power cap's request through the line's own clear time, every wire in the fingerprint (the engine that stood 21 to 22 October)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v15 has been the engine on main since 21 October, evening, under the founder's standing order that every fault found is
+Omni v15 was the engine on main from 21 October, evening, until omni-v16 (`docs/OMNI_V16.md`) landed on 22 October, under the founder's standing order that every fault found is
 fixed and every fix lands as the next version, told, not asked (19 October), and his word of 21 October ("push, push, push on
 GitHub, update, enhanced engine"). It is omni-v14 (`docs/OMNI_V14.md`) with one change to the brain and one to the fingerprint,
 each written before it was built and read in the toy gate against omni-v14 on the same seeds before it landed: the brain's
@@ -17,8 +17,9 @@ differ, the brain (`omnicompass/adapter.py`) and the card governor (`omni_contro
 taken into the fingerprint with this version, their bytes as they stood (`tools/run_redis.py`, `run_kafka.py`,
 `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`, `run_swarm.py`, `run_mujoco.py`, `run_cpu_power.py`). The C++ twin of the
 brain (`cpp/src/governor.cpp`) carries the same change and is proven equal to the Python again (`tests/test_cpp_governor_parity.py`,
-on an observation stream that now carries the line's clear flag; `results/SEAL.json`). Every benchmark runs again on omni-v15,
-A, B and C. Every earlier table stands as its own engine's result until its three runs on v15 land, and results from two
+on an observation stream that now carries the line's clear flag; `results/SEAL.json`). Every benchmark was to run again on omni-v15,
+A, B and C; none started before omni-v16 replaced it, because the grid's conductor read omni-v15's commits as no engine (its own
+copy of the version tool's scope predated the eight wires; fixed on 22 October, `CHANGELOG.md`). Every earlier table stands as its own engine's result until its three runs on v15 land, and results from two
 versions are never pooled. The readings from the toy gate are our own models (evidence class S), never a benchmark result. Run
 and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 

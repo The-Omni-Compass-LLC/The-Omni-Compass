@@ -44,10 +44,8 @@ int main(int argc, char** argv) {
     const std::string& c = f[0];
     if (c == "L") {
       const double kd = num(f[8]);
-      const double ref = f.size() > 11 ? num(f[11]) : std::nan("");   // the period the lever's rate is stated at (omni-v16)
       law = std::make_unique<CompassLaw>(Band{num(f[1]), num(f[2]), num(f[3]), num(f[4])}, num(f[5]), num(f[6]), num(f[7]),
-                                         std::isnan(kd) ? std::nullopt : std::optional<double>(kd), num(f[9]), num(f[10]),
-                                         std::isnan(ref) ? std::nullopt : std::optional<double>(ref));
+                                         std::isnan(kd) ? std::nullopt : std::optional<double>(kd), num(f[9]), num(f[10]));
       out << "L," << g(law->kd) << "\n";
     } else if (c == "F") {
       const double center = num(f[2]), cushion = num(f[3]), kd = num(f[4]);

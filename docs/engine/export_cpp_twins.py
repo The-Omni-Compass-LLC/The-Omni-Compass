@@ -81,8 +81,7 @@ class LawRecorder:
                     break
                 f = f.f_back
             law._twin = {"wired": wired, "organism": None, "muscle": None,
-                         "L": LP.law_line(law.band, law.dt, law.tau, law.kp, kd_arg, law.authority, law.smooth,
-                                         getattr(law, "ref_dt", None)),
+                         "L": LP.law_line(law.band, law.dt, law.tau, law.kp, kd_arg, law.authority, law.smooth),
                          "kd": law.kd, "F": [], "own": []}
             rec.laws.append(law._twin)
 
