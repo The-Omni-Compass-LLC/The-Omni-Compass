@@ -155,9 +155,9 @@ class MuscleClocks(unittest.TestCase):
 
 
 class PaceArms(unittest.TestCase):
-    """The real runs (docs/PACE_PREREGISTRATION.md): an arm named compass15, compass10 or compass5 is the compass arm deciding
-    every 15, 10 or 5 s (scripts/kind_paired.sh), and the receipt pairs each pace against native and against the 60 s arm
-    within the repetition (tools/live_reps.py)."""
+    """The real runs (docs/PACE_PREREGISTRATION.md): an arm named compass60, compass10 or compass5 is the compass arm deciding
+    every 60, 10 or 5 s (scripts/kind_paired.sh), and the receipt pairs each pace against native and against the compass arm
+    at its default of 15 s within the repetition (tools/live_reps.py)."""
     def test_the_runner_sets_the_pace_from_the_arm(self):
         text = (ROOT / "scripts" / "kind_paired.sh").read_text()
         self.assertIn('if [[ "$base" =~ ^compass([0-9]+)$ ]]; then pace="${BASH_REMATCH[1]}"; base=compass; fi', text)
