@@ -37,7 +37,7 @@ measurement exists.
 
 1. **Concept.** Where the idea comes from and what it adds, against supervisory control, reference governors, the
    Simplex fallback and online experiments (`docs/RELATED_WORK.md`).
-2. **Engine code.** 82% of the engine's 6,531 statements run under the tests (`docs/ENGINE_COVERAGE.md`, measured again on the omni-v12 tree); every proved
+2. **Engine code.** 71% of the engine's 9,685 statements run under the tests (`docs/ENGINE_COVERAGE.md`, measured again on the omni-v15 tree): 82% of the 6,579 in the files that stood before omni-v15, 49% of the 3,106 in the eight runners it took into the fingerprint, which their own benchmarks run whole on GitHub; every proved
    property checked on thousands of generated cases (`tests/test_engine_properties.py`); every static-scan finding fixed or
    reviewed (`docs/SECURITY_SCAN.md`). Held at B by a fault found in the swarm's wire, whose code did not do what its own
    comment says (`docs/LIMITATIONS.md`, section 3), and by the wires outside the fingerprint (`docs/CHANGE_CONTROL.md`).

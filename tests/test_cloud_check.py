@@ -3,10 +3,12 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Google Cloud's and Amazon's $0 check (18 October). A Google key cut short when it was copied, and an Amazon account on the
-Free plan, failed every set started there at the login, each using up its A or B. Now the key's shape is read before Google's
-login (never a character of it printed), each cloud's pre-flight names every short quota or Amazon's plan in plain words, the
-check stops before anything is built, and the conductor starts a cloud's sets only after that cloud's newest check passed."""
+"""The clouds' $0 check (Google Cloud and Amazon, 18 October; Azure, 22 October). A Google key cut short when it was copied,
+and an Amazon account on the Free plan, failed every set started there at the login, each using up its A or B; for a while on
+21 October the stored Azure key held a text Azure's login refuses, and Azure's own login step quoted its first characters on
+the run's page. Now the key's shape is read before Google's and every Azure login (never a character of it printed), each
+cloud's pre-flight names every short quota or Amazon's plan in plain words, the check stops before anything is built, and
+the conductor starts a cloud's sets only after that cloud's newest check passed."""
 import json
 import os
 import stat
@@ -72,6 +74,69 @@ class KeyShape(unittest.TestCase):
         self.assertEqual(out.returncode, 2)
         self.assertNotIn(SECRET[:12], out.stdout + out.stderr)
         self.assertIn("docs/GOOGLE_SETUP.md", out.stdout)
+
+
+AZ_SECRET = "Xq8Q~kLm.0aB1cD2eF3gH4iJ5kL6mN7oP8qR9sT0"
+
+
+def az_block(**over):
+    b = {"clientId": "0b1c2d3e-1111-2222-3333-444455556666", "clientSecret": AZ_SECRET,
+         "subscriptionId": "11111111-2222-3333-4444-555555555555", "tenantId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+         "activeDirectoryEndpointUrl": "https://login.microsoftonline.com", "resourceManagerEndpointUrl": "https://management.azure.com/"}
+    b.update(over)
+    return json.dumps(b, indent=2)
+
+
+class AzureKeyShape(unittest.TestCase):
+    def test_the_whole_block_passes(self):
+        self.assertEqual(cloud_key_check.azure_problems(az_block()), [])
+
+    def test_every_wrong_form_is_named_without_a_character_of_it(self):
+        whole = az_block()
+        cases = {AZ_SECRET: "client secret's value alone",
+                 "0b1c2d3e-1111-2222-3333-444455556666": "one identifier alone",
+                 whole[whole.index('"clientSecret"'):]: "piece from inside the block",
+                 whole[:150]: "cut short",
+                 whole.replace('",', '"', 1): "not whole JSON",
+                 json.dumps({"appId": "0b1c2d3e-1111-2222-3333-444455556666", "password": AZ_SECRET,
+                             "tenant": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"}): "fields missing: clientId, clientSecret, subscriptionId, tenantId",
+                 az_block(tenantId="contoso"): "not a 36-character GUID: tenantId",
+                 "": "the secret is empty"}
+        for raw, words in cases.items():
+            with self.subTest(words=words):
+                bad = " ".join(cloud_key_check.azure_problems(raw))
+                self.assertIn(words, bad)
+                for piece in (AZ_SECRET[:10], AZ_SECRET[-10:], "0b1c2d3e", "aaaaaaaa", "11111111"):
+                    self.assertNotIn(piece, bad)
+
+    def test_the_program_exits_two_and_prints_no_secret(self):
+        for raw in (AZ_SECRET, az_block()[:300]):
+            env = dict(os.environ, AZURE_CREDENTIALS=raw)
+            out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env, capture_output=True, text=True)
+            self.assertEqual(out.returncode, 2)
+            self.assertNotIn(AZ_SECRET[:10], out.stdout + out.stderr)
+            self.assertIn("docs/AZURE_SETUP.md", out.stdout)
+        env = dict(os.environ, AZURE_CREDENTIALS=az_block())
+        out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env, capture_output=True, text=True)
+        self.assertEqual(out.returncode, 0, out.stdout)
+        self.assertNotIn(AZ_SECRET[:10], out.stdout + out.stderr)
+
+    def test_every_azure_login_reads_the_key_shape_first(self):
+        """A key in another form never reaches azure/login, whose refusal quotes the stored text's first characters."""
+        seen = 0
+        for f in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+            w = yaml.safe_load(f.read_text())
+            for name, job in (w.get("jobs") or {}).items():
+                steps = job.get("steps") or []
+                for k, s in enumerate(steps):
+                    if str(s.get("uses", "")).startswith("azure/login@"):
+                        seen += 1
+                        prev = steps[k - 1]
+                        with self.subTest(workflow=f.name, job=name):
+                            self.assertIn("cloud_key_check.py azure", str(prev.get("run", "")))
+                            self.assertEqual(prev.get("env", {}).get("AZURE_CREDENTIALS"), "${{ secrets.AZURE_CREDENTIALS }}")
+                            self.assertEqual(prev.get("if"), s.get("if"))       # skipped exactly when the login is
+        self.assertGreaterEqual(seen, 10)
 
 
 def fake_bin(d, name, body):
@@ -184,9 +249,15 @@ class ConductorGate(unittest.TestCase):
     def test_the_workflow_titles_match_the_conductor(self):
         w = yaml.safe_load((ROOT / ".github" / "workflows" / "cloud-check.yml").read_text())
         self.assertEqual(w["run-name"], "cloud-check ${{ github.event.inputs.cloud || 'both' }}")
-        self.assertEqual(set(grid.CHECKS.values()), {"google", "amazon"})
+        self.assertEqual(set(grid.CHECKS.values()), {"google", "amazon", "azure"})
+        self.assertEqual(set(w["jobs"]), set(grid.CHECKS.values()))      # one job a cloud, its title the conductor's
         text = (ROOT / ".github" / "workflows" / "cloud-check.yml").read_text()
         self.assertEqual(text.count('PREFLIGHT_ONLY: "1"'), 2)          # it never builds a cluster
+        self.assertEqual(text.count("azure_capacity.py preflight"), 1)    # Azure's pre-flight waits for nothing and builds nothing
+        self.assertNotIn("az aks create", text)
+        self.assertNotIn("az group create", text)
+        for cloud, runs in (("google", ("google", "both", "all")), ("amazon", ("amazon", "both", "all")), ("azure", ("azure", "all"))):
+            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), github.event.inputs.cloud)")
         self.assertNotIn("eksctl create", text)
         self.assertNotIn("clusters create", text)
 
@@ -216,6 +287,29 @@ class ConductorGate(unittest.TestCase):
         self.assertTrue(posts)
         self.assertTrue(all("cloud-check.yml/dispatches" in p for p, _ in posts), posts)   # no set started
         self.assertEqual(sorted(d["inputs"]["cloud"] for _, d in posts), ["amazon", "google"])
+
+    def test_an_azure_set_waits_for_azures_check(self):
+        """22 October: an Azure set that failed at the login counted as started; Azure's sets now wait for its own check."""
+        calls = []
+
+        def api(path, method="GET", data=None, tries=4):
+            calls.append((method, path, data))
+            return {"workflow_runs": []} if "/runs" in path else {}
+        with mock.patch.object(grid, "api", side_effect=api), \
+             mock.patch.object(grid, "engine", return_value=grid.ENGINE), \
+             mock.patch.object(grid, "campaign_open", return_value=True), \
+             mock.patch.object(grid, "grid_runs", return_value=[]), \
+             mock.patch.object(grid, "next_dispatches", return_value=[]), \
+             mock.patch.object(grid, "rerun_queue", return_value=[]), \
+             mock.patch.object(grid, "yield_repair_coordinator", return_value=False), \
+             mock.patch.object(grid, "jobs_in_flight", return_value=(0, 0, [])), \
+             mock.patch.object(grid, "cloud_switch", side_effect=lambda p: "azure" in str(p)), \
+             mock.patch.object(grid.time, "sleep"), \
+             mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": os.devnull}):
+            self.assertEqual(grid.main(["tick", "--ref", "main"]), 0)
+        posts = [(p, d) for m, p, d in calls if m == "POST"]
+        self.assertEqual([(p.split("/")[-2], d["inputs"]) for p, d in posts], [("cloud-check.yml", {"cloud": "azure"})])
+        self.assertEqual(grid.check_state([], "Azure")[0], "check")
 
 
 if __name__ == "__main__":

@@ -43,6 +43,9 @@ def observe_vector(obs: Dict[str, float], conflicts: int) -> Dict[str, float]:
         "stale": clamp(float(obs.get("stale", 0.0)), 0.0, 1.0),
         "security": clamp(float(obs.get("security_block", 0.0)), 0.0, 1.0),
         "conflict": clamp(conflicts / 4.0, 0.0, 1.0),
+        # the response line clean for the governor's own clear time (omni-v15): the Kubernetes governor's slo_clean (its
+        # --slo-clear-s, 180 s) and the card governor's (its --slo-clear decisions); a caller that senses no line is clean
+        "clean": 1.0 if obs.get("slo_clean", True) else 0.0,
     }
 
 
@@ -82,7 +85,11 @@ class AllocationLaw:
     envelope   no capacity addition while observed power >= power_ceiling (power_ceiling_backlog while q >= guard_queue)
     security   no capacity addition while a security block is observed
     change     Terraform plans only while U >= U_gate, only in the direction of the live capacity decision
-    power      q < guard_queue and U >= U_gate: cap = clamp(cap_now * load * (1 + margin), cap_min, 1)   (trim to demand)
+    power      q < guard_queue and U >= U_gate and the line clean: cap = clamp(cap_now * load * (1 + margin), cap_min, 1)
+               (trim to demand). The line is clean when the caller's own clear time has passed since its last breach
+               (obs slo_clean: 180 s on the Kubernetes governor, 3 decisions on the card's; omni-v15), so the request
+               cannot switch back and forth at the one threshold; a release is never delayed (the branches below, and
+               cap = 1 while the line is not clean)
                q >= guard_queue at the power envelope: cap = max(cap_min, cap_now - spread_step)      (spread)
                q >= guard_queue below the envelope: cap held (capacity added as nodes; 1 at max_nodes)
                otherwise cap = 1; always cap <= 1 - cap_gain * max(0, B - B_cap)
@@ -190,7 +197,11 @@ class Governor:
         if delta < 0:
             self.surplus_streak = 0
         at_envelope = o["power"] >= ceiling
-        if o["q"] < L.guard_queue and xn.U >= L.U_gate:
+        if o["q"] < L.guard_queue and xn.U >= L.U_gate and o["clean"] >= 0.5:
+            # the trim to demand, only while the line has been clean for the caller's own clear time (omni-v15): on the
+            # omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and
+            # turned back at 123 of them, at the one threshold on the queue and the state; on the same decisions this
+            # gate leaves 35 moves (tests/test_cap_band.py). The card governor had applied the same gate outside the brain
             cap = clamp(self.current_cap * o["load"] * (1.0 + L.margin), L.cap_min, 1.0)
         elif o["q"] >= L.guard_queue and L.spread_step > 0.0:
             if at_envelope:

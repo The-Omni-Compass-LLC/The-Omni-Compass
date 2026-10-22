@@ -41,6 +41,11 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
               output.write('azure=' + ('false' if request.get('free_dispatches') else 'true') + '\n')
           PY_REQUEST
+      - name: The Azure key is whole (its shape only; not a character of it is printed; a key in another form never reaches the login, which would quote it)
+        if: steps.purpose.outputs.azure == 'true'
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: python3 tools/cloud_key_check.py azure
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
         if: steps.purpose.outputs.azure == 'true'
         with:

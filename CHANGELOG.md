@@ -2,6 +2,80 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-22 (night): Azure behind its own $0 check; every Azure login reads the key's shape first
+
+- **The fault.** For a while on the night of 21 October the stored `AZURE_CREDENTIALS` held a text that is not the JSON block
+  Azure's login takes (`docs/AZURE_SETUP.md`, section 3): the scheduled collect of the detached big organisms failed at the login
+  at 23:37 UTC (run 39694622506); by 00:00 UTC the block was whole again (the omni-v11 steady set's 56th repetition, run
+  39236324280, logged in at 00:00:41). Azure's sets had no check before them: a set that fails at the login counts as started,
+  so an Azure set started inside such a window would have spent its A, B or C on it, which the founder's order of 18 October
+  forbids. And Azure's own login step, refusing the text, quoted its first characters on the run's page, a public page.
+- **The fix.** The conductor starts an Azure set only after Azure's newest $0 check passed, as Google's and Amazon's
+  (`scripts/dispatch_grid.py`, `CHECKS`); `cloud-check azure` (`.github/workflows/cloud-check.yml`) reads the key's shape
+  (`tools/cloud_key_check.py azure`: the four fields Azure's login reads, never a character of the key; a client secret's value
+  alone, an identifier alone, a piece, a cut, each named), logs in, reads the subscription's state and runs the sets' pre-flight
+  (`scripts/azure_capacity.py preflight`: the machine offered and every allowance able to hold the fleet; capacity another run
+  holds now is no refusal; nothing waits, nothing is built). Every Azure login in every workflow now has the shape check
+  before it, skipped exactly when the login is (`tests/test_cloud_check.py` fails a push that leaves one without it). The
+  detached start job's checkout carried `scripts/` only while its receipt step, added on 15 October, reads
+  `tools/omni_version.py` and the engine: its next start would have failed there; it now checks out the tree but the raw runs.
+- **What the founder does**: nothing now; the key is whole again. If it is ever stored in another form, the check names it at no
+  cost and `docs/AZURE_SETUP.md`, section 7 (the Operator's Manual's appendix F) gives the steps, click by click.
+
+## 2026-10-21 (evening): omni-v15, the power cap's request through the line's own clear time; every wire in the fingerprint
+
+- **omni-v15 lands** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), under the founder's standing order that
+  every fault found is fixed and lands as the next version, told, not asked, and his word of 21 October ("push, push, push on GitHub,
+  update, enhanced engine"). The fault, from the next version's list (`docs/CHANGE_CONTROL.md`): on the omni-v11 long run the brain's
+  request for the power cap switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them, at
+  the one threshold on the queue and the state. The fix: the brain (`omnicompass/adapter.py`) trims to demand only while the response
+  line has been clean for the governor's own clear time, the flag the Kubernetes governor already declared for its muscles
+  (`--slo-clear-s`, 180 s) and the card governor applied outside the brain (3 decisions; it now hands the brain the flag). A breach, or
+  a line not yet clean, releases the request in the same decision; no constant is added to the law. On the run's own decisions, kept
+  as a fixture with the audits' SHA-256 (`tests/fixtures/robust_long_39173420146_decisions.json`), the recorded request is omni-v14's
+  rule decision for decision and the gate leaves 35 moves, 32 reversals and 28% of the travel (`tests/test_cap_band.py`). The C++ twin
+  (`cpp/src/governor.cpp`, `Observation.slo_clean`) carries the same rule, proven equal on an observation stream that now carries the
+  flag (`tests/test_cpp_governor_parity.py`; `cpp/tools/run_governor.cpp` reads the column when present; `cpp/tools/engine_runs.cpp`
+  passes the injection's flag to the brain); the seal is rewritten. A dwell with a glide (three calm decisions, then 0.05 a decision)
+  was built first and refused by the toy gate: seven small moves for one on the toy cluster (149 against 38 in a day on one seed), 25
+  limit writes for 16 on the toy card at the same travel and 0.17% more energy; it is not in omni-v15.
+
+- **Every wire in the fingerprint** (`tools/omni_version.py`): the data stores' runners (`tools/run_redis.py`, `run_kafka.py`,
+  `run_pgbench.py`, `run_sysbench.py`, `run_ycsb.py`), `run_swarm.py`, `run_mujoco.py` and `run_cpu_power.py` are inside the scope,
+  their bytes as they stood, so no rule can change without the version changing (the gap `docs/CHANGE_CONTROL.md` named since
+  omni-v12). A version declared before them is read without those eight wires and only those (any other file its list does
+  not name still makes the tree a different engine), and the tool prints a version's own digest and file count.
+
+- **The toy gate reads the request's wear and the card** (`tools/toy_gate.py`): the cluster toys now read the brain's request for
+  the power cap over the day (its moves, reversals and travel; wear, a resource held: a fall is a cut, a rise power given), and two
+  card toys run each checkout's GPU governor on the modelled card of `tools/gpu_physics_sim.py`, written into the gate so both
+  engines meet one model (the card whose voltage falls with its clock, and the card near its voltage floor): requests served and not
+  served, the 95th and 99th percentiles, energy, peak temperature, and the limit's writes, moves, reversals and travel.
+  `results/toy_gate/V15_VS_V14.md` is omni-v15's reading against omni-v14 on eight seeds.
+
+- **The kill test reads the 300 s after the kill** (`tools/live_reps.py`, `ROBUST_AFTER_KILL_S`; `tests/test_robust.py`), declared
+  before omni-v15's runs in `docs/ROBUSTNESS_PREREGISTRATION.md` ("On omni-v15"): the one tail rise of the omni-v11 kill test came 140
+  to 190 s after the kill, past the 120 s window. The omni-v11 kill table stands as read.
+
+- **Every page on omni-v15**: the README, the state of play, `CLAUDE.md`, the three manuals and their PDFs, the live engine page
+  (`data-engine`, its words; its records rebuilt by its workflow), the appraisal, the receipts, the limitations, the Lambda and
+  whole-system pages, the change-control record and the mechanism-of-action page (the cap rule); `docs/OMNI_V14.md` says when it
+  stood. Every benchmark runs again on omni-v15 (`scripts/reruns.txt`, the grid and the cloud sets restarted from 02:30 UTC on
+  22 October, a little after the push, so no run started by omni-v14's conductor is counted in its campaign); the GPU's run on
+  Lambda starts from `gpu-omni-v15`, one exact commit.
+
+- **The preregistration's lock on the brain, amended on record** (`results/LOCK_AMENDMENTS.json`): `omnicompass/adapter.py` is one
+  of the files the first preregistration locks by SHA-256. Its omni-v15 change is recorded with the exact old and new hashes and the
+  new program fingerprint; the stack simulator and its benchmark hand the brain no clear flag, so every decision there reads the line
+  clean and takes omni-v14's branch, and `verify.py` re-runs the preregistered held-out seeds and the fleet's held-out runs with the
+  amended file, which reproduce unchanged. The mechanism's identity (`results/MECHANISM_IDENTITY.json`) is recorded again: its
+  observation map, authority law and actuator parts carry the clear flag.
+
+- **The engine's coverage, measured on omni-v15's files** (`docs/ENGINE_COVERAGE.md`): 71% of 9,685 statements run under the
+  tests, where omni-v14's read 82% of 6,579. No test was lost: the files that stood before omni-v15 read 82% as they did, and the
+  eight runners it took into the fingerprint hold 3,106 statements, 49% run under the unit tests, because each is run whole by
+  its own benchmark on GitHub. The page says so itself (`tools/engine_coverage.py`).
+
 ## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 
 - **The poster on the live engine's title page** (the founder's order of 21 October): the owner's poster of the Omni-Compass, the
