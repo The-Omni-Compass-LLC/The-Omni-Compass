@@ -997,7 +997,7 @@ The shipped controller,
 runs the chain left to right: the senses, the six-state brain, the nerves and the machine organ's grant, the compass law on
 the service (the cloud setting), the verdict's trial, the release gate, the plug. Every value below the chain is the
 controller's own audit record of that decision, recorded by `docs/engine/export_controller_trace.py` on runs A, B and C (six
-hours each, a decision every 15 s, the controller's own default on omni-v14; class S). Three buttons choose the setting: *on top of the HPA, the max*; *the cloud: the
+hours each, a decision every 15 s, the controller's own default on omni-v16; class S). Three buttons choose the setting: *on top of the HPA, the max*; *the cloud: the
 tune-down, machines only*; and the Linux host and the card (the page's section 5f).
 
 ![One decision of the governor. Read the body (the senses), place every reading in its band, let the brain's state evolve, grant or refuse through the nerves, apply the compass law to each muscle (push or lift), run the verdict's trial on a step past native, pass the release gate, write through the plug and read it back, renew the lease. On the decision-trace monitor each box is one column of the audit, and *open the same controller, decision by decision* steps through them.](book/figures/loop.svg)

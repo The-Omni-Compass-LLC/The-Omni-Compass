@@ -9,7 +9,7 @@ decision (the governor's six states, the nerves and each organ's grant, the comp
 trial, the release gate, the plug's writes).
 
 Two settings, each as the repository already wires it, on seeds 3000, 3001 and 3002 (runs A, B and C), six hours each,
-the controller deciding every 15 s, its own default (omni-v14: every clock counted in seconds; docs/OMNI_V14.md):
+the controller deciding every 15 s, its own default (omni-v16: every clock counted in seconds; docs/OMNI_V16.md):
 
   selfpilot  pilot/selfpilot.py's plant: the HPA with the Cluster Autoscaler (native) against the controller in nodepool
              mode on top of the HPA, the Cluster Autoscaler off, the controller's own defaults (the max)
@@ -46,7 +46,7 @@ from tools.toy_gate import cloud_toy                                     # noqa:
 
 SEEDS = (3000, 3001, 3002)
 DAYS = 0.25
-INTERVAL = 15.0                                                          # the controller's own default decision period (omni-v14)
+INTERVAL = 15.0                                                          # the controller's own default decision period (omni-v16)
 SLO_MS, SERVICE_MS = 200.0, 20.0                                         # the toy gate's line and bare service time
 
 

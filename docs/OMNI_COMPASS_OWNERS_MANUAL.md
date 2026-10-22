@@ -2484,7 +2484,7 @@ max (`dial max`) belongs where the machines are already paid for (your own racks
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
 In the cloud, as everywhere, the governor's fast checks (the scheduling floor, the pod reflex, the conveyance's 15-second
-slot) run every 5 seconds, three times as fast as the HPA's own 15-second check, and on omni-v14 its full decision every 15
+slot) run every 5 seconds, three times as fast as the HPA's own 15-second check, and on omni-v16 its full decision every 15
 seconds, the HPA's own pace (every 60 seconds on the engines before it). Through
 v6 a shorter decision period was not a free setting: the give-back trial's phase (`max_trial`, 20 decisions), the breach
 cool-down (`--slo-clear`), cruise (`--cruise-after`) and the trial spacing counted in decisions, so at 5 seconds a trial
@@ -2494,15 +2494,15 @@ seconds (`--slo-clear-s 180`, `--cruise-after-s 120`, `--strict-window-s 300`, `
 `--verdict-recheck-s 7200`, `--verdict-trial-s 1200`) and converts each to decisions at the running period,
 n = max(1, round(seconds / period)), so at 60 seconds every count is v6's; the compass's step on the HPA target and its
 coasting are scaled by period / 60, so the target moves the same amount a minute, and a pool gives back at most one
-machine a minute at any period (`docs/OMNI_V7.md`, section 4). The default period stayed 60 seconds through omni-v13,
-because the governor core still advanced its own state one fixed step per decision. Omni v14 (the founder's order of 22
+machine a minute at any period (`docs/OMNI_V7.md`, section 4). The default period stayed 60 seconds through omni-v15,
+because the governor core still advanced its own state one fixed step per decision. Omni v16 (the founder's order of 22
 October) states every remaining clock in seconds: the core's step and its blend of each observation, the fleet law's
 dwell counts, the edge's window, narrowing, memory, wobble and lesson, the compass's damping and velocity smoothing, the
 closure law's step (once a minute), the conveyance (every 15 seconds of the governor's schedule), the shared host's busy
 reading, the modelled heat, the cold start and the batch's pace; a move away from native goes at most once a minute, a move
-toward native or safety at the first reading that calls for it. At 60 seconds every clock's value is omni-v13's; the
-default is 15 seconds (`docs/OMNI_V14.md`). In the cloud, where a machine given back is the cloud's to delete and the
-governor never adds one, omni-v14 also holds the closure law's warm reserve: no machine the largest requests of the last
+toward native or safety at the first reading that calls for it. At 60 seconds every clock's value is omni-v15's; the
+default is 15 seconds (`docs/OMNI_V16.md`). In the cloud, where a machine given back is the cloud's to delete and the
+governor never adds one, omni-v16 also holds the closure law's warm reserve: no machine the largest requests of the last
 four hours need, at the governor's own headroom, is given back, nothing is given back before those four hours are read, and
 no give-back trial starts inside the reserve. Its toy gate traced the fault it fixes: a machine given back in a midday dip,
 deleted ten minutes later, and pods waiting 90 seconds for a new one when the requests came back. In the cloud v7 also makes the whole rule one flag, `--give-back-only`, enforced in the governor

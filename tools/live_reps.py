@@ -376,14 +376,14 @@ def robust_marks(d):
     return out
 
 
-ROBUST_INTERVAL_S = 60.0       # the governor's decision interval in the runs before omni-v14, whose files record none (--interval 60)
+ROBUST_INTERVAL_S = 60.0       # the governor's decision interval in the runs before omni-v16, whose files record none (--interval 60)
 ROBUST_DECISION_SHARE = 0.95   # fewer decisions than this share of the count the interval predicts reads INVALID (docs/ROBUSTNESS_PREREGISTRATION.md)
 ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again is marked
 ROBUST_LONG_MIN_S = 6840.0     # the decision-time ratio needs a span of at least 95% of the 7,200 s window, so the first and last hours do not overlap
 
 
 def run_interval(d):
-    """The governor's decision period in a run: recorded beside its files from omni-v14 on (scripts/kind_bench.sh,
+    """The governor's decision period in a run: recorded beside its files from omni-v16 on (scripts/kind_bench.sh,
     governor_interval_s.txt, 15 s by default); 60 s in every run before it."""
     try:
         return float((Path(d) / "governor_interval_s.txt").read_text().split()[0])
@@ -503,7 +503,7 @@ def robust_table(root, cols):
          f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
          f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The {ROBUST_AFTER_KILL_S} s after the kill mark are compared between the arms "
          "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`). In the long run the governor's own audit gives its decisions against "
-         f"the count its configured interval predicts for the window (60 s before omni-v14, 15 s from it, read from the run's own files; "
+         f"the count its configured interval predicts for the window (60 s before omni-v16, 15 s from it, read from the run's own files; "
          f"under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
          f"and its decision time (the gap between decisions less the interval it sleeps), mean of the last hour over the first (over {ROBUST_CYCLE_GROWTH} "
          "is marked); the reset check at the end says whether every setting was handed back.", "",

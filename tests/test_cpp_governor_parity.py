@@ -60,5 +60,5 @@ if __name__ == "__main__":
     exe = sys.argv[1] if len(sys.argv) > 1 else str(ROOT / "cpp" / "build" / "oc_governor")
     for m_ in ("power_protect", "throughput", "fleet", "fleet_balanced", "fleet_wear"):
         main(exe, mode=m_)
-    for p_ in (15.0, 10.0):                   # omni-v14: the live governor's periods
+    for p_ in (15.0, 10.0):                   # omni-v16: the live governor's periods
         main(exe, mode="fleet", period=p_)

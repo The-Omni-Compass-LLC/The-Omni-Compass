@@ -13,7 +13,7 @@ struct Directive { int node_delta{}; bool change_permitted{}, rollback_authorize
                    double power_cap{}, demand{}, command{}, push{}; State x{}; };   // push: the brain's push u/U_AUTHORITY (Python last_push)
 class Governor {
  public:
-  // period_s: the seconds between two steps (omni-v14; the law's constants are stated at a step a minute, and every one
+  // period_s: the seconds between two steps (omni-v16; the law's constants are stated at a step a minute, and every one
   // keeps its time at another period, exactly as omnicompass/adapter.py's Governor.period_s)
   explicit Governor(AllocationLaw law = {}, bool evolve = true, double period_s = 60.0);
   Directive step(const Observation& obs, double current_cap, int nodes);

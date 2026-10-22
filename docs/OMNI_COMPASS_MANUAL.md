@@ -4766,7 +4766,7 @@ fault to find, never a cost to accept.
 
 **How fast does it act?** Its fast checks run every 5 seconds (a machine for pods that wait, a parked machine woken), three
 times as fast as the HPA's own 15-second check; its full decision runs every 15 seconds, the HPA's own pace, with every
-clock counted in seconds (section 3.4); engines before omni-v14 decided every 60 seconds. Native's own checks run
+clock counted in seconds (section 3.4); engines before omni-v16 decided every 60 seconds. Native's own checks run
 underneath, untouched, whatever the governor's period.
 
 **What happens if the governor crashes?** Nothing harmful. The watchdog puts every setting back from the records on the

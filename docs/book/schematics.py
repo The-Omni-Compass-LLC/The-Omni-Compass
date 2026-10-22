@@ -1095,7 +1095,7 @@ def t_clocks():
         ax.vlines(t, 3.0, 3.25, color=GREEN, lw=0.5)
     ax.text(T + 6, 0.15, "the governor's fast checks, every 5 s\n(a waiting pod wakes a machine; the floor)", va="center", color=GOLD)
     ax.text(T + 6, 1.15, "the HPA's own check, every 15 s\n(native, untouched)", va="center", color=GREY)
-    ax.text(T + 6, 2.3, "the full decision, every 15 s (omni-v14):\nthe state, the law, the gate, the verdict,\none write, one audit line", va="center", color=NAVY)
+    ax.text(T + 6, 2.3, "the full decision, every 15 s (omni-v16):\nthe state, the law, the gate, the verdict,\none write, one audit line", va="center", color=NAVY)
     ax.text(T + 6, 3.1, "the card governor, every 2 s", va="center", color=GREEN)
     ax.annotate("", xy=(180, -0.55), xytext=(0, -0.55), arrowprops=dict(arrowstyle="<->", color=INK))
     ax.text(90, -1.0, "a clean line for 180 s (12 decisions) before the pods,\nthe clock or the power give back (a machine: no breach now)",
@@ -1109,7 +1109,7 @@ def t_clocks():
 def t_band_step():
     """The law's own code answering a load step: CompassLaw on a first-order muscle (class S)."""
     from omnicompass.compass_law import Band, CompassLaw
-    # a decision every 15 s (omni-v14), the knob moving at a rate a minute and the law's damping stated at the minute
+    # a decision every 15 s (omni-v16), the knob moving at a rate a minute and the law's damping stated at the minute
     dt, tau = 15.0, 120.0
     law = CompassLaw(band=Band(lo=50.0, hi=500.0, center=0.4), dt=dt, tau=tau, kp=1.0, ref_dt=60.0)
     g_up, g_down, cover = 0.10, 0.02, (2.0, 12.0)

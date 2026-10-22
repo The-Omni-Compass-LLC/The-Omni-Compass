@@ -3,9 +3,9 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Every clock of the governor counts seconds (omni-v14, docs/OMNI_V14.md; the founder's order of 22 October: a full
+"""Every clock of the governor counts seconds (omni-v16, docs/OMNI_V16.md; the founder's order of 22 October: a full
 decision every 15 s, the pace of the pod autoscaler's own sync, every clock counted in seconds, 10 s tested, never above
-60). The decision period sets only how often the state is read: at 60 s every discrete value is the one omni-v13 used,
+60). The decision period sets only how often the state is read: at 60 s every discrete value is the one omni-v15 used,
 and at any other period each filter, memory, window, count and rate keeps its time."""
 import random
 import unittest
@@ -36,7 +36,7 @@ class TheDefault(unittest.TestCase):
         self.assertEqual((a.interval, a.floor_interval), (15.0, 5.0))
 
 
-class AtSixtySecondsEverythingIsV13s(unittest.TestCase):
+class AtSixtySecondsEverythingIsV15s(unittest.TestCase):
     """The identity: the period every constant was stated at changes nothing."""
 
     def test_the_engine_core(self):
@@ -76,7 +76,7 @@ class AtSixtySecondsEverythingIsV13s(unittest.TestCase):
         reads = iter(["cpu 100 0 100 800 0", "cpu 160 0 140 900 0", "cpu 200 0 200 1000 0"])
         s.stat_path = Mock(read_text=lambda: next(reads))
         self.assertIsNone(s.sample())
-        self.assertAlmostEqual(s.sample(), 100 / 200)             # since the previous sample, as v13
+        self.assertAlmostEqual(s.sample(), 100 / 200)             # since the previous sample, as v15
         self.assertAlmostEqual(s.sample(), 100 / 200)
 
 

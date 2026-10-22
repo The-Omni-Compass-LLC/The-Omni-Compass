@@ -17,7 +17,7 @@ static std::vector<std::string> split(const std::string& s) { std::vector<std::s
   while (std::getline(ss, x, ',')) { if (!x.empty() && x.back() == '\r') x.pop_back(); v.push_back(x); } return v; }
 int main(int argc, char** argv) {
   if (argc < 3 || argc > 5) { std::cerr << "usage: oc_governor OBS.csv OUT.csv [power_protect|throughput|fleet...] [period_s]\n"; return 2; }
-  const double period_s = argc == 5 ? std::stod(argv[4]) : 60.0;   // omni-v14: the seconds between two steps
+  const double period_s = argc == 5 ? std::stod(argv[4]) : 60.0;   // omni-v16: the seconds between two steps
   AllocationLaw law{};
   if (argc >= 4 && (std::string(argv[3]) == "throughput" || std::string(argv[3]).rfind("fleet", 0) == 0)) {
     law.backlog_release = true; law.power_ceiling = 9.0; law.power_ceiling_backlog = 9.0; law.spread_step = 0.0; law.B_cap = 9.0; law.size_at_full_cap = true;
