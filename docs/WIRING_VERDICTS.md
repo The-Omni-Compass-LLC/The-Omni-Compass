@@ -26,12 +26,12 @@ A modelled muscle (the 1,107 on their plants under its own load and work waiting
 
 | Where | Knobs or cases | Write | Operator's choice | Watch |
 |---|---:|---:|---:|---:|
-| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 26 | 8 | 5 | 13 |
+| Real stacks, three runs each (Kubernetes under seven demands; the pool, the consumer group, the memory ceiling, the storage-engine cache and the buffer pool, each under its untouched workloads) | 26 | 9 | 5 | 12 |
 | Independent simulators, three runs each (robot arms, grids, districts, swarms; evidence class S) | 38 | 20 | 15 | 3 |
 | The 1,107 modelled muscles, alone on their plants under two loads (evidence class S) | 1107 | 527 | 0 | 580 |
 | The organisms with the real cluster inside (GitHub at 10 and 100 copies; Azure at 1,000) | 14 | 12 | 1 | 1 |
 
-In words: on the real stacks Omni earns its wire in on 8 of 26 knob-cases, trades on 5 and watches on 13. Of the 1,107 modelled muscles, 527 earn a wire in and 580 stay native: 421 of the 580 are at their limit on native (the knob already at the top of its range: nothing to push, read and left native) and 159 read the same as native (nothing moved beyond the noise). A knob left native costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
+In words: on the real stacks Omni earns its wire in on 9 of 26 knob-cases, trades on 5 and watches on 12. Of the 1,107 modelled muscles, 527 earn a wire in and 580 stay native: 421 of the 580 are at their limit on native (the knob already at the top of its range: nothing to push, read and left native) and 159 read the same as native (nothing moved beyond the noise). A knob left native costs nothing and earns nothing; it needs no wire in, and the page below says so muscle by muscle.
 
 ## The real stacks (evidence class L: live software, three separate GitHub runs on the frozen engine)
 
@@ -91,11 +91,11 @@ The knob: the storage engine's cache size.
 
 | Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
-| b | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
-| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
-| c | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V11_YCSB.md` |
-| f | cache size held cut 0.9% to 1.0% | none | **write** | +0.2% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V11_YCSB.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_YCSB.md` |
+| b | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_YCSB.md` |
+| burst | cache size held cut 1.7% to 2.2% | none | **write** | +0.5% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V16_YCSB.md` |
+| c | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_YCSB.md` |
+| f | cache size held cut 0.8% to 1.0% | none | **write** | +0.2% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V16_YCSB.md` |
 
 ### Real database buffer pool (MySQL under sysbench, GitHub)
 
@@ -103,11 +103,11 @@ The knob: the buffer pool's size.
 
 | Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V12_SYSBENCH.md` |
-| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V12_SYSBENCH.md` |
-| read_only | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V12_SYSBENCH.md` |
-| read_write | none | none | **watch** | +0.0% | +0.0% | the runs disagree on pool held (-15% to +6%); everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). Nothing is settled here, so the knob stays native until three runs agree. | `results/live/V12_SYSBENCH.md` |
-| update_index | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V12_SYSBENCH.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
+| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
+| read_only | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
+| read_write | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
+| update_index | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
 
 ## Every LOSS and every power given in all three of our runs on a real stack, and why
 
