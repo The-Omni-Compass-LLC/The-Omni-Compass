@@ -116,9 +116,11 @@ def ladder(reports):
 
 
 def _cell(d):
+    """A change beside its word, wearing the word's sign (the founder's sign rule, tools/readings.py `by_word`)."""
     if d is None:
         return ""
-    return f"{100 * d['relative']:+.2f}% {d['word']}" if d["relative"] == d["relative"] else d["word"]
+    from tools.readings import by_word
+    return f"{by_word(100 * d['relative'], d['word'], digits=2)} {d['word']}" if d["relative"] == d["relative"] else d["word"]
 
 
 def _num(x, g):

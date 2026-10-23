@@ -36,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-from tools.readings import judged, landed, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
+from tools.readings import judged, landed, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN, word_sign  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "results" / "live"
@@ -204,6 +204,22 @@ def pct(x):
     return f"{v:+.2f}%" if 0 < abs(v) < 0.05 else f"{v:+.1f}%"
 
 
+def pw(x, word):
+    """A ratio's change beside its word, wearing the word's sign (the founder's sign rule, tools/readings.py): GAIN '+', LOSS
+    '−', EVEN '=', power given '+'. A column with no word of its own keeps pct's sign, read by the column's name."""
+    if x is None:
+        return ""
+    v = 100 * (x - 1)
+    size = f"{abs(v):.2f}%" if 0 < abs(v) < 0.05 else f"{abs(v):.1f}%"
+    sg = word_sign(word)
+    return f"{sg}{size}" if sg else pct(x)
+
+
+def with_word(x, word):
+    """'+4.3% GAIN', '+0.1% power given', '=0.0% EVEN'."""
+    return "" if x is None else f"{pw(x, word)} {word}".strip()
+
+
 def word_of(measure_, ratio_):
     """The word for a measure's ratio: above 1 is a GAIN; below 1 a LOSS for work and speed, and power given for machines
     and energy (a resource put in); exactly 1 is EVEN."""
@@ -239,7 +255,7 @@ def engines_sentence(ts):
     parts = [f"{len(v)} on omni-v{k}" for k, v in sorted(by.items(), reverse=True)]
     return ("Each test is read from its own newest three-run table: " + ", ".join(parts) + " (omni-v8, omni-v9 and omni-v10 changed only the "
             "CityLearn runner and the interval table, omni-v11 the Kubernetes governor's hold on a reading with no machine in service); "
-            "a test stands on an older engine's table only until its omni-v11 runs land, no table is pooled across engines, and every row "
+            "a test stands on an older engine's table only until its three runs on the engine that stands land, no table is pooled across engines, and every row "
             "below names its table.")
 
 
@@ -262,7 +278,7 @@ def main():
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
          "Every number is read from the test's own newest three-run table (`results/live/V<n>_*.json`, the newest engine with all three runs, made by "
          "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
-         f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pct(head)}, "
+         f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pw(head, index_word(head, head_s))}, "
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
          "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
@@ -274,11 +290,11 @@ def main():
          "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for c in list(REAL) + ["Modelled muscles (evidence S)"]:
         if c in cats:
-            L.append(f"| {c} | **{pct(cat_g[c])} {index_word(cat_g[c], cat_s.get(c))}** | {pct(cat_s.get(c))} {index_word(cat_s.get(c), cat_s.get(c))} | "
+            L.append(f"| {c} | **{with_word(cat_g[c], index_word(cat_g[c], cat_s.get(c)))}** | {with_word(cat_s.get(c), index_word(cat_s.get(c), cat_s.get(c)))} | "
                      f"{pct(avg(c, 'work'))} | {pct(avg(c, 'speed'))} | {pct(avg(c, 'machines'))} | {pct(avg(c, 'energy'))} | {len(cats[c])} |")
         elif c in PENDING:
             L.append(f"| {c} | pending | | | | | | {PENDING[c]} |")
-    L += ["", f"## The second reading, declared 2026-10-09: service alone, **{pct(head_s)}, {index_word(head_s, head_s)}** (work and speed scored; machines and energy shown, not scored)", "",
+    L += ["", f"## The second reading, declared 2026-10-09: service alone, **{pw(head_s, index_word(head_s, head_s))}, {index_word(head_s, head_s)}** (work and speed scored; machines and energy shown, not scored)", "",
           "The founder asked what a cache is for. Redis is bought for speed and spends memory to deliver it; when this reading was "
           "declared, the index counted that memory at the same weight as the speed, so the Redis table of that day read −25% while "
           "its work and hit rate were a GAIN in all three of our runs (the table that stands now, after the cost fixes of 9 to 10 "
@@ -309,13 +325,13 @@ def main():
                 return "not taken"
             rd = m[k].get("reading", "")
             if judged(rd):
-                return f"{pct(m[k]['ratio'])} {word_of(k, m[k]['ratio'])}"
+                return with_word(m[k]['ratio'], word_of(k, m[k]['ratio']))
             if rd.startswith("the same fixed-rate work"):
                 return "EVEN (equal by design)"
             c = classify(rd, "spent" if k in ("machines", "energy") else "higher" if k == "work" else "lower")
             return {"same": "EVEN, the same", "noise": "EVEN, inside the noise", "disagree": "the runs disagree (counted as 1)"}.get(c, rd)
-        ix = "" if t["index_pct"] is None else f"{pct(1 + t['index_pct'] / 100)} {index_word(1 + t['index_pct'] / 100, None if t['service_pct'] is None else 1 + t['service_pct'] / 100)}"
-        sx = "not taken" if t["service_pct"] is None else f"{pct(1 + t['service_pct'] / 100)} {index_word(1 + t['service_pct'] / 100, 1 + t['service_pct'] / 100)}"
+        ix = "" if t["index_pct"] is None else with_word(1 + t['index_pct'] / 100, index_word(1 + t['index_pct'] / 100, None if t['service_pct'] is None else 1 + t['service_pct'] / 100))
+        sx = "not taken" if t["service_pct"] is None else with_word(1 + t['service_pct'] / 100, index_word(1 + t['service_pct'] / 100, 1 + t['service_pct'] / 100))
         L.append(f"| {t['category']} | {t['test']} | **{ix}** | {sx} | {cell('work')} | {cell('speed')} | {cell('machines')} | "
                  f"{cell('energy')} | `{t['source']}` |")
     (ROOT / "results" / "OMNI_INDEX.md").write_text("\n".join(_legal_stamp(with_own_runs(L))) + "\n")

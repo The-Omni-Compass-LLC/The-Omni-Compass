@@ -79,9 +79,10 @@ SUBTITLE_HTML = ("The Master Manual:<br/>Its Philosophy, Its Mathematics, Its Me
                  "onto Your Stack" if OWNER else "How to Read the Live Engine:<br/>Its Monitors, Gauges and Knobs,<br/>Native beside "
                  "Omni-Compass" if LIVE else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
 LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F" if LIVE else "Appendix O"
-INTRO = ("Introduction: The Problem, the Idea and the Promise" if OWNER else
+INTRO = ("Introduction: The Idea and the Promise" if OWNER else
          "Introduction: The Page, Its Monitors and What This Manual Covers" if LIVE else
-         "Introduction: The Problem, the Idea and What This Manual Covers")
+         "Introduction: The Idea and What This Manual Covers")
+PROBLEM = "The Problem and the Answer"   # the front matter opens with it (the founder's order of 21 October)
 PRELUDE = "Prelude: A Night at the Wall" if LIVE else "Prelude: A Night on the Cluster"
 RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER else
                 "This book is the reading manual of the live engine page and carries no benchmark results of its own; every "
@@ -548,6 +549,21 @@ class GoldRule(Flowable):
         self.canv.line(0, self.space / 2, self.width, self.space / 2)
 
 
+class BookTable(Table):
+    """A table that ends a page at a row's end, unless a tall row would leave more than a few lines of the page empty: that
+    row is then split inside it. Split at the row's end, the rest started lower on the same page under its header again
+    (21 October: the header printed twice on one page, the problem and the solution's table, rows of eight lines)."""
+    GAP = 4 * LEAD
+
+    def split(self, availWidth, availHeight):
+        parts = super().split(availWidth, availHeight)
+        if len(parts) == 2 and self.splitInRow and availHeight - parts[0].wrap(availWidth, availHeight)[1] > self.GAP:
+            inrow = self._splitRows(availHeight, doInRowSplit=True)
+            if len(inrow) == 2:
+                return inrow
+        return parts
+
+
 def table(rows_txt, small=False):
     n = max(len(r) for r in rows_txt)
     rows_txt = [r + [""] * (n - len(r)) for r in rows_txt]
@@ -565,7 +581,7 @@ def table(rows_txt, small=False):
         big = sum(w for k, w in enumerate(widths) if k not in short)
         widths = [floor if k in short else w - extra * w / big for k, w in enumerate(widths)]
     data = [[Paragraph(tagged(c, "cell"), hs if k == 0 else cs) for c in r] for k, r in enumerate(rows_txt)]
-    t = Table(data, colWidths=widths, repeatRows=1, hAlign="LEFT", splitInRow=1)   # a row taller than a page breaks across it
+    t = BookTable(data, colWidths=widths, repeatRows=1, hAlign="LEFT", splitInRow=1)   # a row taller than a page breaks across it
     t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#b8b8b8")),
                            ("BACKGROUND", (0, 0), (-1, 0), NAVY),
                            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f4f1ea")]),
@@ -1272,6 +1288,7 @@ def prepare(src, nb, own=None):
 
 def chapter_flow(src, nb):
     kind, key = src
+    nb.m = nb.k = 0      # the printing pass numbers the headings again from the first: the first pass only made the labels
     if kind == "X" and key != "manifests":
         return special(key, nb)
     lines, shift = source_lines(src)
@@ -1467,8 +1484,7 @@ class Book(BaseDocTemplate):
         # the page number in both bottom corners (the founder's order of 17 October: the left and the right, everywhere)
         mid = (x0 + x1) / 2
         c.setFont("Serif-Italic", SMALL); c.setFillColor(GREY)
-        c.drawCentredString(mid, 0.64 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and "
-                            "simulation use only.")
+        c.drawCentredString(mid, 0.64 * inch, "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only.")   # one literal, so tools/legal.py reads it whole
         c.drawCentredString(mid, 0.51 * inch, "All patents, copyrights and trademarks filed in the USA.")
         c.setFont("Serif-Bold", 9); c.setFillColor(NAVY)
         c.drawCentredString(mid, 0.35 * inch, "www.omni-compass.com")
@@ -1733,10 +1749,10 @@ def build():
                                             "GitHub, in `docs/book/figures/`. A chart of a receipt is read by the "
                                             "reading key: it pictures the table and adds nothing to it."), BODY),
                            Spacer(1, 6), lof]
-    # the front matter, in full chapters, before a word about wiring (the founder's order of 14 October): first the problem
-    # the whole industry faces and Omni-Compass's answer (21 October), then the foreword, the preface, the prelude and the
-    # introduction, then the key, what a hooked-up system looks like and the card
-    story += front_chapter(doc, "The Problem and the Answer", MAN["The Problem and the Answer"])
+    # the front matter, in full chapters, before a word about wiring (the founder's order of 14 October): the problem the
+    # whole industry faces and Omni-Compass's solution first (21 October), then the foreword, the preface, the prelude and
+    # the introduction, then the key, what a hooked-up system looks like and the card
+    story += front_chapter(doc, PROBLEM, MAN[PROBLEM])
     story += front_chapter(doc, "Foreword", MAN["Foreword"])
     story += front_chapter(doc, "Preface", preface_lines())
     story += front_chapter(doc, PRELUDE, MAN[PRELUDE])
@@ -1750,7 +1766,7 @@ def build():
     md_parts = [f"# THE OMNI-COMPASS {EDITION_NAME.upper()}", "", BANNER_MD, "", EDITION, "", FILED, "",
                 "The printable book of this text, with its contents and appendices: "
                 f"`docs/{OUT_PDF.name}`. Built by `docs/book/build_book.py`" + (" --owner" if OWNER else " --live" if LIVE else "") + ".", ""]
-    md_parts += ["## The Problem and the Answer", ""] + front_lines(MAN["The Problem and the Answer"]) + [""]
+    md_parts += [f"## {PROBLEM}", ""] + front_lines(MAN[PROBLEM]) + [""]
     md_parts += ["## Foreword", ""] + front_lines(MAN["Foreword"]) + ["## Preface", ""] + front_lines(preface_lines()) + [""]
     for sec in (PRELUDE, INTRO,
                 "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report",

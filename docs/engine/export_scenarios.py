@@ -34,6 +34,7 @@ from omnicompass.verdict import Verdict                                  # noqa:
 
 GPU_SEEDS = (5100, 5101, 5102)
 from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
+from tools.readings import SIZE_FLOOR  # noqa: E402  (the one floor, written once)
 
 
 def reading(runs, aim):
@@ -53,6 +54,8 @@ def reading(runs, aim):
     if len(clear) < len(runs):
         return "EVEN"
     up = clear[0]["change"] > 0
+    if all(abs(r["change"]) < SIZE_FLOOR for r in runs):     # the founder's floor of 20 October: every run under 0.5% reads EVEN
+        return "EVEN, under the floor"
     if aim == "spent":
         return "power given" if up else "GAIN"
     if aim == "per":         # work bought with each unit of a resource (tools/readings.py WORK_PER): a fall is power given
@@ -210,7 +213,9 @@ def linux():
             out["readings"].setdefault(g, {"aim": aim, "runs": [], "single": True})["runs"].append(
                 {"native": a, "omni": b, "change": c, "lo": c, "hi": c})
     for g, v in out["readings"].items():
-        v["reading"] = reading(v["runs"], v["aim"])
+        # one value a run is no interval: three single values that agree cannot be judged (tools/confirm_abc.py verdict), so
+        # the gauge is shown, never GAIN or LOSS
+        v["reading"] = "shown, not judged (one value a run, no interval)" if v.get("single") else reading(v["runs"], v["aim"])
         print(f"linux {g:14s} {v['reading']:16s} " + "  ".join(f"{r['change']*100:+.2f}%" for r in v["runs"]))
     for sd in map(str, LINUX_SEEDS):                                   # the page draws every fifth second
         for arm in ("native", "omni"):
@@ -283,7 +288,7 @@ def receipt_word(rd):
     return "shown"
 
 
-NUM = r"[-+\u2212]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"
+NUM = r"[-+\u2212=]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"   # a cell beside EVEN carries "=" (the key's sign rule, 20 October)
 
 
 def even_reason(abc):
@@ -293,7 +298,7 @@ def even_reason(abc):
     still allows: 'tight' within 2%, 'within' within 10%, 'wide' past 10% (too noisy to tell at these repetitions); a table
     that prints no interval: 'changes', the largest change read."""
     import re
-    f = lambda x: float(x.replace(",", "").replace("\u2212", "-"))
+    f = lambda x: float(x.replace(",", "").replace("\u2212", "-").lstrip("="))
     runs, pct = [], False
     for c in abc:
         if not c:

@@ -56,8 +56,8 @@ the founder overrides one in the conversation.
   machine in service (the kind setting's first reading: machine-hours +17% and +21% against 60 s, the minutes over the line −72%);
   the cruise wait is now never fewer than two readings (`tests/test_pace_clocks.py`, failing on the unfixed rule), and nothing at
   80 s or faster moves. 54 of its 55 files are omni-v16's bytes. Corrected, the kind benchmark's setting reads at 90 s, against 60
-  s, the machine-hours −1.7% EVEN, the minutes over the line −4.7% EVEN, the pods waiting −12.1% EVEN, the 95th percentile −0.2%
-  EVEN; at 120 s the machine-hours −2.1% EVEN, the minutes over the line −3.7% EVEN, the pods waiting −29.6% GAIN; machines parked
+  s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%,
+  EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked
   over the eight days 190 and 119 against 329 at 60 s. The toy gate against omni-v16 (`results/toy_gate/V17_VS_V16.md`): Every toy
   that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped,
   omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. The ladder: Every beat
@@ -353,6 +353,45 @@ the founder overrides one in the conversation.
   Omni on top of the muscles, no Kubernetes ... they all need to be written in code ... put into the GitHub and push it all";
   then "Update, push, push, push in the bush". The three arms are always shown together (native, Omni on native, Omni direct;
   `omni_orchestrator/`, brains `yardstick`, `omni_native`, `omni`), and the push hold is lifted.
+- **Omni-Compass by itself, the third arm** (the founder's words: "we're going to be expanding out a whole nother omni-compass by
+  itself without any Kubernetes or any schedulers or any governors running direct muscles ... there's native, there's Omni and
+  native, and then there's Omni by itself ... the one that said Omni before is going to have to add the word and native"). Every
+  organism is shown three ways: native; Omni-Compass and native (the arm every table carried as "omni", its machine key unchanged);
+  Omni-Compass by itself, each muscle's own native controller switched off and Omni-Compass the only controller moving that knob (on
+  Kubernetes no pod autoscaler and no cluster autoscaler; Kubernetes' own scheduler and kubelet stay; where native is a setting rather
+  than a controller the two Omni-Compass arms are one arm). Preregistered before any run (`docs/SOLO_PREREGISTRATION.md`); the engine
+  that carries it (a pod muscle of its own, the models' arm with the pool's autoscaler off) lands as the next version through the toy
+  gate, and its runs go to GitHub's machines, three runs, read beside the other two. No cloud by itself without the founder's word
+  (the order of 14 October: nothing in a cloud adds a machine). The pages and the words say the three arms; the third's column appears
+  from its first run, nothing written for it before.
+- **The live engine is the operating control panel** (the founder's words: "build a live engine's mechanism, interpreting what it
+  sees, as well as giving it knobs and buttons ... in every canvas section block ... every monitor needs to have a light in it ...
+  gauging a couple percentage before ... there has to be a main button that puts it back"). Every monitor carries a light that reads
+  the series it draws: green inside its lines, amber before the line (within 3% of it, or its own slope over the last readings crossing
+  it within three readings), red over it, grey and said so where there is no line; the wall counts them and prints the engine's own
+  last act beside them, because the brain reads the same slope and acts before the line. One button, on the console, the dock, the
+  wall and every monitor's knobs, returns every knob to the factory tune and says what it put back; native alone stays the kill switch.
+- **The sign explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say gain
+  ... you need to now explain that wherever things are"). A number beside a word wears the word's sign (the order of 22 October), and
+  wherever it stands the reason stands with it: on the live engine every word and size carries it on hover, and the key says it once in
+  full ("How to read a number beside a word"); in prose a change is said in its verb with its reading ("pods waiting down 29.6%: fewer
+  waiting, GAIN"), never a bare sign beside a word.
+- **The factory beat is the best beat the sweeps read** (the founder's words: "whatever is the best one out of all that helps the best
+  system is the factory set one ... I think 45 you didn't try"). The main engine's beat is whichever the ladder reads best by the key
+  on the organism's gauges, not a number chosen for a reason of its own; the beats the ladder has not read (45, 40, 50, 20 s) are
+  read in the toy on the side first, and a beat that reads best lands as the next version through the toy gate. The knobs stay for
+  anyone to turn. Read the same evening (`results/toy_gate/V17_LADDER.md`, class S): against 60 s in the kind benchmark's setting the
+  minutes over the line GAIN at 20 s (+14.7%) and 40 s (+13.2%), EVEN at 45 and 50 s, every other gauge EVEN, the reads and the
+  governor's own processor power given; in the cloud's setting every gauge EVEN. 60 s is not the beat that reads best on the service.
+- **A LOSS at the factory tune is a fault to fix, never a number to accept** (the founder's words: "nothing should be shown as a loss
+  because it would have been fixed and never gone there. The only way we're going to ever see a loss is ... when people turn knobs").
+  Every LOSS row is still shown (Honesty); each one on the engine that stands is on the next version's list with its cause, and the
+  live engine's knobs are where a reader may break the engine and watch it break.
+- **Omni-Compass at every level** (the founder's words: "OmniCompass can go in the software side, in the hardware bare metal side ...
+  in the brain ... in muscles itself ... into a chip ... every level of mechanism"). Its own muscles, built from the ground up with the
+  compass's mathematics inside (a pod autoscaler of its own first), beside the open-source muscles it governs, each benchmarked native,
+  with Omni-Compass on top, and by itself, and all of it together: the next versions' work, each through the toy gate. A licensed
+  mechanism is never copied; an interface a project publishes (the Kubernetes API) is talked to, as any client does.
 
 ## Orders of 22 October
 
@@ -393,6 +432,36 @@ the founder overrides one in the conversation.
   pace runs (`docs/PACE_PREREGISTRATION.md`) read 15 s for real, against native and against 60, 10 and 5 s; a LOSS at 15 s there
   is root-caused and fixed in the next version. The same afternoon the dial above replaced it: omni-v16 stood at 15 s from the
   morning's landing to omni-v17's, and 15 s is now one setting of the dial, read beside native like every other.
+- **The heartbeat as a knob on the wall** (the founder's words, the same day: "5, 15, 30, 60 ... Then give me 75 90 And after 90,
+  I want 120 ... Heartbeat sweeps. With buttons in my monitor canvas dashboard of that wired mechanism of the heartbeat ... Maybe
+  somebody wants to pick a different one ... somebody might want to tune it to be something different"). The heartbeat sweep
+  (`tools/heartbeat_sweep.py`, our own model, class S; the record `results/toy_gate/HEARTBEAT_SWEEP.md`, written again from its
+  runs by `tests/test_heartbeat_sweep.py`) reads the engine that stands and the one before it at every beat from 5 to 120 s,
+  on-site and in the cloud. Each beat is read against native and against the same engine at 15 s and 60 s, with the engine's own
+  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 5c,
+  after the heart) has a button for each beat, setting, engine, zero line and gauge. The factory's beat is the main engine's 60 s since omni-v17
+  (the dial above); another beat is a changed tune, its receipts its own. On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in
+  pods waiting (GAIN +83.5% at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power
+  given +2.9%); a beat slower than 60 s waits more than the factory's 15 s (86% to 160% more, LOSS at 90 s) for at most 0.4 points
+  fewer machines than 60 s, and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines
+  alone, 5 to 15 s cut the machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next
+  version's list, as omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%.
+- **The number beside a word carries the word's sign** (the founder's words, 22 October, night: "If it's a gain, it should be a
+  plus 73 with the word gain. When you put a minus, it confuses me ... that word gain can never have a minus beside the word
+  gain"; the key's own rule of 20 October, said again). GAIN +, LOSS −, EVEN =, power given +: "+73.0% GAIN", "−16.8% LOSS",
+  "=0.9% EVEN"; an interval beside GAIN or LOSS is its two sizes with the word's sign ("+47.3% to +127.5%"), beside EVEN as it
+  lies. The heartbeat monitor had printed the gauge's raw direction ("−73% GAIN"); the key's formatter (`tools/readings.py`
+  `by_word`, `interval_by_word`) now prints every number beside a word in the three-run tables, the receipts, the toy gate, the
+  heartbeat sweep and the live engine's trading floor, index, verdict and heartbeat monitor.
+- **The beat, read right** (the same night: "73% gain means you're gaining more pods waiting ... Answer the question").
+  No: down 73% at 60 s means 73% fewer pods waiting than native, down 87% at 15 s means 87% fewer; both GAIN, 15 s the
+  larger. Native keeps its own 15 s autoscaler in both arms, so the benefit is not the beat: it is the governor sizing
+  the pool ahead of the load, where native's autoscaler adds a machine after pods wait; the beat sets only how often the
+  governor looks. The factory's beat was 15 s on omni-v16 and is 60 s on omni-v17 (the dial above). A beat shown to make the engine do too much work for
+  nothing (120 s) is kept on the monitor only to show why nobody would tune there; no run is spent proving it further.
+- **The page's order** (the same night: "my TOC is in order of comprehension ... there's too much shit before people see
+  some metrics ... the real monitor wall ... got to hit them right away"): open order; the founder goes through the
+  contents next.
 - **Another person's cloud account** (the founder's words: he logged into another person's Azure account to use their free credit
   for his benchmark). A key bills only the account it belongs to; nothing merges. Using it is his and that person's matter: only
   with that person's agreement. Asked whether they agreed, he answered "Yes yes yes" the same day: the Azure queue's switch, off while the

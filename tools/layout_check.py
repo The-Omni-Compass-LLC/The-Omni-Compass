@@ -16,7 +16,8 @@ Checks:
             uses falls off instead of piling up.
   engine    every page of the newest material that names the engine that stands names the newest one in
             tools/omni_version.py (VERSIONS, newest first), so no page is left calling an older engine the one that
-            stands; the history, the receipts, the change log and each older engine's own page keep the words of their day.
+            stands; the history, the receipts, the change log, each older engine's own page and the referees' reports (which quote
+            the page they read, docs/engine/audit_*/) keep the words of their day.
 
   python3 tools/layout_check.py        (exit 0: lined up; exit 1: what is out of line, one line each)
 """
@@ -78,7 +79,7 @@ def stale_engine(files):
     own_page = f"docs/OMNI_V{newest}.md"
     out = []
     for p in files:
-        if p.startswith(("results/", "release/", "docs/history/", "archive/", "OMNI_V")) or p in ("CHANGELOG.md", "RELEASE_MANIFEST.json") \
+        if p.startswith(("results/", "release/", "docs/history/", "archive/", "OMNI_V", "docs/engine/audit_")) or p in ("CHANGELOG.md", "RELEASE_MANIFEST.json") \
                 or not p.endswith((".md", ".py", ".txt", ".yml", ".yaml", ".cff", ".toml")) \
                 or (re.match(r"docs/OMNI_V\d+(_PLAN)?\.md$", p) and p != own_page):
             continue

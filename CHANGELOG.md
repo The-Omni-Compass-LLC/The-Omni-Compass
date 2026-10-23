@@ -43,6 +43,42 @@
   word before the sign; every tool to strengthen the engine) and `DISCLOSURES.md` section 3 (the factory tune is published only
   where it reads no LOSS; the live engine's knobs are where a LOSS is meant to be seen). The engine's fingerprint does not move:
   the orchestrator is its own files beside omni-v17.
+## 2026-10-23 (evening, the live engine): the sign explained where every number sits; a light on every monitor; one button back to the factory tune; the third arm named
+
+- **The sign, explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say
+  gain ... you need to now explain that wherever things are"). Every word and every coloured size the live engine writes carries its
+  reason on hover (`SIGN_WHY`, `whyOf`, `whyPass`): what the word means, why the number wears the word's sign, and where the page
+  knows the gauge (`runWord`), what rose or fell against native. The key (section iv) carries one paragraph, "How to read a number
+  beside a word", with the four cases spelled out; the Live Engine Manual's key says the same.
+- **A light on every monitor, leading the line** (the founder's words: "every monitor needs to have a light in it ... that could tell
+  when something is redlining ... gauging a couple percentage before"). Each monitor carries a light beside its number and in its
+  wall tile's corner (`LAMP`, `lampRead`, `lampSweep`): green inside its lines; amber before the line, when the gauge is within 3%
+  of it or when its own slope over the last readings, carried three readings ahead, crosses it; red over it; grey, and said so, where
+  there is no line to watch. The light reads the series its monitor draws: the live engine's muscles against their lines, a cluster
+  replay's 95th percentile against the 200 ms line and its pods waiting, the heart's decision time against half its beat, the CPU
+  host's busy share against 75%, the card's draw against its power limit, the page's own frames against 1.5 frames, a record's judged
+  rows (a LOSS row lights red and stays). Above the wall one line counts the lights, names the monitors heading for a line or over
+  one, and prints the engine's own last entry on its side, because the brain reads the same slope and acts before the line.
+- **Back to the factory tune, one button** (the founder's words: "there has to be a main button that puts it back ... once buttons
+  are touched"). On the console under the kill switch, on the dock, above the wall and in every monitor's knobs: every knob of the
+  page returns to the main engine as it ships (`factoryTune`): the max, Omni-Compass ON, demand ×1, noise σ 0, sense delay +0, no
+  fault held, every muscle driven, speed 1×, running, no frame load, the heartbeat monitor on the factory's 60 s; it says what it put
+  back. Native alone stays the kill switch.
+- **The three arms, named** (the founder's order: "the one that said Omni before is going to have to add the word and native"). The
+  title chips, every table head and every lane on the page read native, Omni-Compass and native, and Omni-Compass by itself; the key
+  and the whole organism (section 3) say what the third arm is (`docs/SOLO_PREREGISTRATION.md`) and that its column appears from its
+  first run on GitHub's machines, nothing written for it before.
+- **The beats the ladder had not read, 20, 40, 45 and 50 s, read on the side** (the founder's words: "I think 45 you didn't try"),
+  in our own models on omni-v17, eight seeds, both settings, and folded into the ladder's record (`results/toy_gate/V17_LADDER.md`,
+  the page's section 1j; class S). Against the main engine's 60 s in the kind benchmark's setting the minutes over the line read GAIN
+  at 20 s (+14.7%) and at 40 s (+13.2%), EVEN at 45 s (=9.0%) and 50 s (=5.8%); every other gauge EVEN; the reads a day and the
+  governor's own processor power given (+5% reads at 40 s, +22% at 20 s). In the cloud's setting every gauge reads EVEN against 60 s at
+  every beat. Against native the rows are the ladder's: pods waiting for a place LOSS at every beat in the kind setting (the
+  engine's, on the next version's list), the 95th percentile and the minutes over the line GAIN. By the key, 60 s is not the beat that
+  reads best on the service: 20 s and 40 s read GAIN against it with no LOSS, their cost power given; the factory beat is the next
+  version's decision, through the toy gate (the order of 23 October).
+- The page was opened headless at 1280 and 390 px after the change: no console error; the lights, the tooltips and the factory
+  button respond. The Live Engine Manual carries the lights (4.1), the button (18.1) and the sign (the key); its appendix is rebuilt.
 
 ## 2026-10-23 (afternoon): omni-v17, the heartbeat a dial; the main engine at 60 s
 
@@ -58,10 +94,10 @@
   decision (`max(1, round(120 / period))`), so one reading with a pod waiting put every machine in service; in the kind setting
   the first reading held 17% and 21% more machine-hours than at 60 s, the minutes over the line 72% fewer. The cruise wait is
   now never fewer than two readings (`max(2, ...)` when derived from seconds; a hand-set `--cruise-after` stands), so nothing
-  at 80 s or faster moves (`tests/test_pace_clocks.py`, which fails on the unfixed rule). Corrected: Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours −1.7% EVEN, the minutes over the line −4.7% EVEN, the pods waiting −12.1% EVEN, the 95th percentile −0.2% EVEN; at 120 s the machine-hours −2.1% EVEN, the minutes over the line −3.7% EVEN, the pods waiting −29.6% GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s.
-- **Every beat beside native, in our models** (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`, class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (+175% to +317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (+102% to +127%), the 95th percentile at 15 and 30 s (+0.5%, +0.4%), the minutes over the line at 15 s (+2.3%): the engine's, on the next version's list.
+  at 80 s or faster moves (`tests/test_pace_clocks.py`, which fails on the unfixed rule). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%, EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s.
+- **Every beat beside native, in our models** (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`, class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (down 12.0% at the main engine's 60 s, down 28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (up 175% to 317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (up 102% to 127%), the 95th percentile at 15 and 30 s (up 0.5% and 0.4%), the minutes over the line at 15 s (up 2.3%): the engine's, on the next version's list.
 - **What the slower main engine gives up against 15 s**, disclosed: in the kind benchmark's setting 23.75 minutes over the line a
-  day at 60 s against 20.25 at 15 s (+17.3%, LOSS against 15 s by the key; still 12.0% fewer than native's 27.0, GAIN); in the
+  day at 60 s against 20.25 at 15 s (up 17.3%, LOSS against 15 s by the key; still 12.0% fewer than native's 27.0, GAIN); in the
   cloud's setting 2.6% more energy per core-hour (power given). Against native the pods waiting for a place read LOSS at every
   beat, the main engine's included: the engine's, on the next version's list (`docs/CHANGE_CONTROL.md`).
 - **The toy gate against omni-v16** (`results/toy_gate/V17_VS_V16.md`): Every toy that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16.
@@ -93,6 +129,125 @@
 - **Next**: each beat's own combination of the other knobs, in the toy first, on development seeds (the founder's words: "you
   might need to click and change and turn certain things to achieve a more optimal state with a different combination of
   buttons"); a combination that reads GAIN with no LOSS at its beat lands as the next version.
+
+## 2026-10-23 (midday): the visual seat's last six closed; main's omni-v16 tables on the page
+
+- **Six monitors that printed over themselves on a phone** (the visual referee's V5 to V10, `docs/engine/CONSENSUS_AUDIT_2026-10-22.md`),
+  each fixed in its own drawing and rendered again at 390 and 1280 px:
+  - the cluster monitors (5a, 5e): the pods sit inside their machine's box, and a box past what it holds writes its count;
+  - the CPU host (5f): the "awaiting its machine" stamp takes its own line under the lane heads;
+  - the ring (6a): on a small ring the six gauges are ticks alone and the centre's words fit the circle, OFF in red with the switch off;
+  - the seven organisms (4): the three loads stack as three bands;
+  - the Azure bill (5a): a narrow bar carries its engine alone, and the reading line names the set, its pairs and its bill;
+  - GitHub's runs (1i): one workflow a row, its name above its bar.
+- **Main's omni-v16 tables** (Kafka, PostgreSQL's pooler, Redis, MySQL, MongoDB, each as shipped and as a service, landed on main by
+  the conductor) are merged into this branch, and the live engine's records are rebuilt from the merged tree: every one of the 39 new
+  runs played back from its raw files, each file matching its run's SHA-256 list.
+- **The toy gate keeps its two engines apart again.** A change of 22 October put the gate's own checkout first on Python's path, so
+  a worker meant for the engine that stands imported the candidate's engine; the gate's own check refused it at once (the engine
+  imported from the wrong checkout). The gate's checkout is last on the path again, as it was, and only the gate's own process
+  formats a reading.
+- **Omni-Compass by itself, preregistered** (the founder's order of 23 October; `docs/SOLO_PREREGISTRATION.md`): a third arm beside
+  native and Omni-Compass and native, with each muscle's own native controller switched off and Omni-Compass the only controller
+  moving the knob. The page says what it switches off and what stays (Kubernetes' scheduler and kubelet), where it is the same arm
+  (every service whose native is a setting; every actuator native's own loop drives), that the cloud waits for the founder's word,
+  and what is run once the next engine version carries a pod muscle of its own. The toy gate takes two settings for it (kind's
+  static pool, and by itself on it), read by `tools/solo_study.py`.
+- **The sign rule on the benefit sheet and the state of play.** Their one number now wears its own word's sign, as every three-run
+  table does: GAIN '+', LOSS '−', EVEN '=', power given '+'. The Redis row's one number read '-0.1% power given'; it reads '+0.1%
+  power given'. The modelled organisms' line says each change in its verb ('misses down 0.145 pp', 'power given +0.011%', or
+  'energy cut' where the energy fell). The raw values in the result files are unchanged.
+
+## 2026-10-23 (morning): the consensus audit of 22 October, its majors closed; the sweep's table carries the notice
+
+- **The audit** (`docs/engine/CONSENSUS_AUDIT_2026-10-22.md`; the seats' reports line for line in `docs/engine/audit_2026-10-22/`): five
+  referee seats read the live engine on omni-v16, one dimension each, none reading another's report first: the mathematics and the
+  readings **B**, the underwriting **B−**, the editing **B+**, the structure **B**, the visual layout as rendered **B** (desktop A−, phone
+  B−); consensus **B**, no blocker named, 33 distinct majors (38 as counted). Every number the seats traced equals its record, and the
+  page renders with no console error and no sideways scroll at either width; what held it at B is what it said about the record and six
+  of its drawings at a phone's width. 23 majors are closed below, 3 in part (two wait on the founder's decision on the page's order), 1
+  in its sentence, and the six phone overprints (V5 to V10) go in the next push. The grades are the referees' grades of the page they
+  read; the next audit grades the page again.
+- **The numbers first.** The verdict's keep rates (8c) no longer take a minus from the word before them: the page's word walker signs
+  only a number that follows a bare word. An interval that includes zero prints as it lies, whatever the word (`byWordRange`). Failed
+  requests read by the key's never-more rule in section 3 and in 5a alike, any rise in a run a LOSS, and both panels say so. The benefit
+  board and its tally take each benchmark's newest table whatever its engine, each row naming it, with the Omni index printed beside
+  them as a second reading of the same tables and no written explanation of any gap. Every realms word takes the key's floor. The
+  start-wait sentence counts Omni-Compass's own tables only.
+- **The words that contradicted the record or the key.** The key's own sentence on the sign in iv and in 4 (the number beside a word
+  carries the word's sign: GAIN +, LOSS −, EVEN =, power given +), every size and interval printed through the formatters where it is
+  made, the Ask panel's rule the same. The title page: every live view runs on omni-v16 and the recorded models name their own engines;
+  the tables prove the factory tune of the engine each names (`DISCLOSURES.md` section 3 and both manuals: every published result is the
+  factory tune of the engine its table names); the runs played back from raw files are told apart from the tables read as the repository
+  holds them; "found in its own models before any real run". The spine is the organism's; power given is blue in section 2 and in
+  monitor 11's registry text; a stack is bought two ways and the composition read four; the disclosures name the build's engine; 5f
+  states what the chip receipts will measure and no result; 1g names a knob only where the recorded cause is the governor's; 1d answers
+  a LOSS row only from the same setting's tables.
+- **The structure.** A part head for 10; every contents entry is its heading's text, held by `tests/test_live_toc.py`; the quick-start
+  guide under 6a; the registry in the page's order with each monitor's number; iii and iv fold to a lead paragraph each (18,231 visible
+  characters before the wall with the folds closed, against 32,277 open); the Omni index is the first line of the executive summary. The
+  structure seat's proposed order (the wall first) and its cost, and the cheaper cut of the front matter, stand in the audit for the
+  founder's decision.
+- **The visual seat's first four.** The title page's two lede paragraphs each take their own row (they printed over each other on the
+  first screen); power given wears its own class in the prose, blue, and blue on the market map, the quote board and the legends; the
+  last places the sign rule missed (1g's cells, iv's ranges, 5f's cells, the quote board, the radar) print the word's sign on every
+  number; the phase planes stack on a phone.
+- **Every reader of a three-run table reads both signs.** The tables written before the sign rule carry the gauge's raw direction and
+  those after it the word's (EVEN with "="): the live engine's exporter and cell formatters read "=" and both directions, and the
+  trading floor draws every judged row in its word's direction whichever way its table was written; the benefit sheet, the index and
+  the wiring verdicts read the tables' JSON, never their cells. `tools/confirm_abc.py` keeps the tables' interval shape ("(+33.3 to
+  +66.7)"), and its test asserts the word's sign for GAIN, LOSS and EVEN.
+- **The referees' reports keep the words of their day.** `tools/layout_check.py` reads `docs/engine/audit_*/` as it reads the history
+  and the receipts: a report quotes the page it read.
+- **The sweep's table** (`results/toy_gate/HEARTBEAT_SWEEP.md`) carries the notice under its title and at its end, written by the tool
+  (`tools/heartbeat_sweep.py`), as every toy-gate page does. The Live Engine Manual names the audit; all three PDFs are rebuilt; the
+  release manifest is regenerated.
+
+## 2026-10-22 (evening, the live engine): the heartbeat sweep on the wall, every beat from 5 to 120 s; main's omni-v16 merged
+
+- **The number beside a word carries the word's sign** (the founder's words of the same night: "If it's a gain, it should be a plus 73
+  with the word gain ... that word gain can never have a minus beside the word gain"; the key's rule of 20 October). The heartbeat
+  monitor had printed the gauge's raw direction ("−73% GAIN"). The key's formatter (`tools/readings.py` `by_word`, `interval_by_word`)
+  now prints every number beside a word with the word's sign (GAIN +, LOSS −, EVEN =, power given +) in the three-run tables,
+  the receipts, the toy gate, the heartbeat sweep and the live engine's trading floor, index, verdict and heartbeat monitor;
+  tables already written stand as the record of their day.
+- **The founder's order** ("5, 15, 30, 60 ... Then give me 75 90 And after 90, I want 120 ... Heartbeat sweeps. With buttons in
+  my monitor canvas dashboard of that wired mechanism of the heartbeat ... somebody might want to tune it to be something
+  different"). The live engine's new monitor, *The heartbeat sweep: every beat the governor can run at* (`beatCv`, section 5c,
+  after the heart), has a button for:
+  - each beat (5, 10, 15, 20, 30, 60, 75, 90 and 120 s);
+  - each setting (on-site, the governor sizing the pool; in the cloud, the machines alone);
+  - each engine (omni-v16, the engine that stands; omni-v15, the one before it);
+  - each zero line (native, or the same engine at 15 s or at 60 s);
+  - each gauge.
+
+  Its tiles give the chosen beat whole. Each gauge's change shows with its 95% interval and its word, together with the engine's
+  own processor time, cluster reads and writes a day, and the fast check's rescues (the machines added only after a pod already
+  waited). The chart gives the chosen gauge at every beat, and a cursor reads the beats in turn. The registry, the Grafana wall
+  (61 panels), the builder's record (`beatsweep`) and the Live Engine Manual (section 12.4) carry it.
+- **The record** (`results/toy_gate/HEARTBEAT_SWEEP.md` and `.json`, our own model, class S). It is written by
+  `tools/heartbeat_sweep.py --table` from its runs (`results/toy_gate/HEARTBEAT_SWEEP_RUNS.jsonl`), and
+  `tests/test_heartbeat_sweep.py` writes it again from them byte for byte. Its design:
+  - Eight seeds of a day at each beat, paired with native and read by the toy gate's rule.
+  - The sweep carries its own cloud plant, so every engine runs on the same one.
+  - A run counts the fast check's rescues from its own audit.
+
+  **What it reads.** On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in pods waiting (GAIN +83.5%
+  at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power given +2.9%); a beat slower
+  than 60 s waits more than the factory's 15 s (86% to 160% more, LOSS at 90 s) for at most 0.4 points fewer machines than 60 s,
+  and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines alone, 5 to 15 s cut the
+  machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next version's list, as
+  omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%. omni-v15, its rules
+  counted in beats, reads the same at 60 s and slower, and in the cloud at 5 to 15 s waits more (+20.5% to +22.2%, LOSS).
+- **Main's omni-v16 merged** (digest `5c5502f12b1c0ce4`, landed on main by another session on the founder's words). This branch
+  had built the same order in parallel without seeing it. Main's engine is taken whole, and the parallel build's own files are
+  reset to main's or removed. Its findings were handed to the work on the next version, through its toy gate:
+  - the fleet law's dwell restated in seconds;
+  - the cloud's order for machines already deleted;
+  - the closure law's warm reserve.
+
+  The live page, its builder, its registry and the Live Engine Manual keep this branch's work, with main's version words carried
+  in.
 
 ## 2026-10-22 (afternoon): the Azure sets back on; the conductor starts runs again; the levers rig at the brain's minutes
 
@@ -203,6 +358,36 @@
 - **What the founder does**: nothing now; the key is whole again. If it is ever stored in another form, the check names it at no
   cost and `docs/AZURE_SETUP.md`, section 7 (the Operator's Manual's appendix F) gives the steps, click by click.
 
+## 2026-10-21 (night): the consensus audit's nineteen majors closed
+
+The five referees' consensus audit (`docs/engine/CONSENSUS_AUDIT_2026-10-21.md`, consensus A−, no blocker) named nineteen majors,
+every one a sentence, a count or a drawing. Each is closed here, in the page, its exporter, its builder and the three manuals:
+
+- **The counts.** The executive summary counts the tables of Omni-Compass against its native (55) apart from the orchestrators' own
+  cost (30 four-ways tables in which Omni-Compass is in neither arm or on the other side), and says which engines the tables stand
+  on. The 0.5% floor of 20 October reads every judged word (GAIN, LOSS and power given), in the tables, the models' live judges, the
+  cloud's tally and the exporter (`docs/engine/export_scenarios.py`, from `tools/readings.py SIZE_FLOOR`). A model gauge with one
+  value a run has no interval: the Linux host's pod start wait and 95th percentile are shown, not judged. The appraisal's counts
+  (`docs/engine/APPRAISAL.md`) are written by the build from the records at every run (`write_appraisal`), and `--check` fails a
+  stale one; its stale sentences now point at them.
+- **The mechanism's words.** Section 10 names both laws: the engine's default allocation law, which the page's brain runs, and the
+  fleet law the shipped controller runs (its trace in 5e shows ρ* between 0.79 and 0.83). Section iii and the three manuals say what
+  the mechanism does: every give-back is tried in its own paired trial; a raise is held inside the muscle's bounds and judged by the
+  three-run tables; and do no harm is the aim, with every LOSS row kept, its cause found and the test run again. The builder, its
+  workflow, the appraisal and the manual say what the build does with a new engine (it stamps it and rebuilds every record; `--check`
+  fails a page whose engine differs), where they had said it "refuses".
+- **The LOSS rows' causes.** The two LOSS rows of Omni-Compass against its native that had no cause page (job turnaround under
+  Armada on the organism alone; alert minutes under Open Cluster Management) have one: `docs/LOSS_ROWS_UNDER_INVESTIGATION.md`, each
+  row's reading, what is known, what is suspected and not yet shown, and what decides it.
+- **The words.** The back matter is vi (it read iv); power given is blue everywhere, written once in the key; the organisms are the
+  seven and the orchestra the eighth, the whole stack a composition with two arms; the governors run four ways in every repetition;
+  LOSS rows are raised in 1d and answered in 1g; our own model is a model, never a simulator; the factory tune is `DISCLOSURES.md`
+  section 3; the awaited GPU run is omni-v13's; the benefit board takes omni-v5 and later (three omni-v3 rows go to the road); the
+  poster's caption says the ® and "registered 2026" are the artwork's words and the company's statement of record is "filed".
+- **The drawing.** The wall keeps every monitor's own shape (letterboxed, never stretched) and draws any monitor not yet drawn
+  before it copies it; no canvas type under 11 px; the red of LOSS is legible as text (AA); on a phone a native/Omni-Compass pair
+  stacks, native above, at full width; the nested three-run tables stay inside their cell; captions and badges at the page's floor.
+
 ## 2026-10-21 (evening): omni-v15, the power cap's request through the line's own clear time; every wire in the fingerprint
 
 - **omni-v15 lands** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), under the founder's standing order that
@@ -257,6 +442,102 @@
   tests, where omni-v14's read 82% of 6,579. No test was lost: the files that stood before omni-v15 read 82% as they did, and the
   eight runners it took into the fingerprint hold 3,106 statements, 49% run under the unit tests, because each is run whole by
   its own benchmark on GitHub. The page says so itself (`tools/engine_coverage.py`).
+
+## 2026-10-21 (late afternoon): the problem and Omni-Compass's solution at the head of the front matter; every tile of the wall titled
+
+- **The problem and Omni-Compass's solution** (the founder's order of 21 October: "in the beginning we have to state in front
+  matter the problem and omnicompasses solution, what the whole tech world is facing, and how omnicompass addresses it"). A new
+  first section of the front matter in the live engine page (section iii, `#s-problem`, after the title page; the executive
+  summary and key become iv, the contents v, the back matter vi and vii) and in all three manuals (the first chapter after the
+  contents), and in short in the README: what the whole industry faces (the International Energy Agency's 415 TWh for the
+  world's data centres in 2024 and about 945 TWh by 2030; Lawrence Berkeley National Laboratory's 4.4% of US electricity in 2023
+  and 6.7% to 12% by 2028; Cast AI's 8% processor and 20% memory use across the Kubernetes clusters it measured in 2025;
+  Flexera's 29% of cloud infrastructure and platform spend wasted, its respondents' own estimate; the Kubernetes autoscaler's
+  15-second sync and 5-minute scale-down window), the four costs of loops tuned alone (reaction latency, static
+  over-provisioning, uncoordinated coupling, the gaps closed by hand), Omni-Compass's solution, a table of how it addresses each
+  cost and how each is judged, what it does not do and how it is held to account. The outside figures are quoted for scale,
+  each source named: their authors' own, none measured or checked by us, none a result of Omni-Compass. The Owner's and the
+  Operator's Introductions no longer repeat the problem and open on the idea (The Idea and the Promise; The Idea and What This
+  Manual Covers). The Live Engine Manual's chapter 2 and Appendix A carry the page's new numbering; Appendix L names the title
+  page ii (it had printed iii, the executive summary's number) and reads the section's prose.
+- **The printed books' section numbers.** All three PDFs printed every section of every chapter under a number shifted from
+  the book's own: the Operator's Manual's 1.1 (Always on top of a native controller) was printed 1.6, and in the Live Engine
+  Manual all 176 numbered headings were off, while every reference in the text kept the right number, so "section 4.1" led
+  to no heading of that number. The book builder numbers every heading once to learn the labels and again to print them, and
+  the second pass counted on from the first; it now starts each chapter again from its first section
+  (`docs/book/build_book.py`). `docs/book/nav_check.py` now reads every numbered heading of the PDF against the number the
+  book's one-file text gives it and fails a book where one differs. The three manuals rebuilt.
+- **A table with tall rows no longer prints its header twice on one page.** Split at a row's end, the rest of such a table
+  was started lower on the same page under its header again; the book builder now splits the tall row inside it when a
+  row's end would leave more than four lines of the page empty (`BookTable`, `docs/book/build_book.py`). The new section's
+  table has three columns, so no word in it is broken across a line.
+- **The wall's tile titles in capital letters** (the founder's order of 21 October, evening); the wall's words and the Live Engine
+  Manual (4.1) say so.
+- **The owner's two illustrations beside the title, both live** (the founder's order of 21 October, evening): the stacks
+  Omni-Compass sits on top of as he pictures them on top, the unified control authority under it, in one stack in the title page's
+  right column (under the title on a phone). Over each the engine draws its own marks and nothing of the picture's own: a ring at
+  every decision of the live engine; on the rose two hands, native's (amber, the longer) and Omni-Compass's (blue), each at the
+  mean place of that side's muscles in their bands, calm at north, the line at south; on the control core a glow that grows with
+  the settings Omni-Compass wrote in that decision; under each, that decision's counts; OFF at the master switch, Omni-Compass's
+  marks take native's colour. Each caption says it is an illustration, not a result, that the marks in it belong to their owners
+  with no endorsement stated or implied, and the repository's legal line stays "filed in the USA". The Live Engine Manual (2.1)
+  says so; the overlays carry no id, so the monitors keep their numbers.
+- **Every tile of the monitor wall carries its title** (the founder's order of 21 October: "every monitor in the wall ... its title
+  alongside its number in its top"): at the top of each tile its number and its title, what the monitor shows, wrapped to two lines
+  on a desktop and four on a phone, never cut short, and under them its section and its state (live, replay, from the records, a
+  model, or awaiting its run); the monitor's picture under its head. The wall's own words and the Live Engine Manual (4.1) say so.
+- **The notice at the foot of every page of the three manuals** printed the word simulation with a small s, against the founder's
+  wording of 20 October (Simulation, as the LICENSE writes it): the book builder had split the line in two pieces, so the
+  notice check never read it whole. One piece now, a capital S, and the Operator's, the Owner's and the Live Engine Manual rebuilt.
+
+## 2026-10-21 (afternoon): every monitor moving and wired, its code to its Python to its C++; every dashboard on its section
+
+- **Every monitor moves** (the founder's order of 21 October: "I don't see some grids, charts, diagrams moving with real time"). A
+  photograph of every monitor 2.5 s apart had found 17 that did not change: records with nothing to scan, lines that took one point
+  a decision too small to see. Now a ring opens at the head of every live line as each decision lands, with the line's newest
+  value printed beside it (the scoreboard strip, the console, the controller's strip, the chip and the host, the official run, the
+  clouds' modelled lanes, the brain's wells and its bath, the first mode); every record monitor has a reading cursor that walks it
+  one row a decision and names the row it holds (GitHub's runs, the seven organisms, all 1,107 muscles, the grid, the Azure sets,
+  the orchestrators' road, the whole organism's pieces); every GitHub reading prints its age, counted every second; the modes mark
+  each decision's own motion on every bar; and the proof monitor checks the Python's set again without end, one run about twice a
+  second, the run boxed on all three lanes. The same photograph now finds all 60 moving.
+- **Every monitor's wiring** under it and in the monitor list (`docs/engine/monitors.json`, `wire`): the page's own code, the Python
+  it ports or reads, the C++ twin or why there is none, the checks that hold them equal, each file linked at the build's commit, and
+  how it moves. `tests/test_live_monitors.py` holds every name to the page's script and every file to the repository. The registry's
+  words were read against every canvas and corrected where they named something else (the body parts on the band, the brain's S
+  and B, the pipeline, the heart, the candles, the heat map, the bars, the telemetry strip, the controller's strip, the strip, the
+  console, the organisms); the tensor lab's six monitors and the cloud setting's two now say replay, as they play records.
+- **The motion meter**: the page photographs every monitor in view once a second, as the viewer sees it, and says on its badge and
+  in its row of the list whether it moved; a monitor off screen rests and keeps what it did when last in view. Scrolled once top to
+  bottom: 60 of 60 seen, 60 moving.
+- **The scale-out grid's monitor** drew the newest grid file, omni-v5's, whose squares are all empty; it now draws the engine that
+  stands' own campaign as GitHub runs it (each square's runs started and measured), the road on its button.
+- **Two closing tags**: one too many after the register's panel ended section 4 early and left the scale-out grid and every section
+  from 5 on outside the page's frame (full width on a wide screen, no section of their own for the grid's badge); one missing after
+  the benefit board nested the next three panels inside it. Both repaired; a test now walks every section's tags.
+- **Every dashboard on its section**: the Grafana wall carries a row for each section of the page, its panels under it, numbered as
+  the page numbers its monitors, each describing its wiring. A canvas text that fits is drawn whole, its ellipsis only where it is cut.
+- **The official-run playback, lined up with the Python's scorer** (`docs/engine/export_runs.py`). The page scores every repetition with
+  the repository's own scorer (`tools/live_reps.py`) and checks it against the run's own summary; for the three governors that run a
+  group of two clusters (Armada, Karmada, Open Cluster Management) it disagreed by 51% to 68%: the scorer was handed the repetition's
+  files laid flat, so a member cluster's capture overwrote the group's own and the page counted one cluster's machines, node-hours,
+  energy and writes. Every file now keeps its place in the folder: every run agrees to about 1e-16. And each of a governor's five
+  four-ways tables had replayed the same two arms (the orchestrator as shipped and Omni-Compass on top of it); each now plays its
+  own two arms, named on the lanes, the candles, the heat map and the repetition's table, with Omni-Compass's colour only on an arm
+  that carries it.
+
+## 2026-10-21 (midday): the trading floor; the Grafana wall in the page's order; the owner's illustration
+
+- **The trading floor** on the benefit board (the founder's order of 21 October, after a broker's wall of screens): every three-run
+  table on the page as a market map (a squarified treemap grouped by stack, each tile's area the gauges its table judged and its
+  colour its reading, an orchestrator's own cost grey and dashed) and as a quote board (a quote a table: its ticker and engine, the
+  gauge that moved most, that gauge in runs A, B and C as a candle of its 95% interval and value, its rows counted by word, a tape
+  of every headline), two registered monitors with their record on pointing; a reading cursor walks the map. Every figure is the
+  table's own. The monitors after them are numbered two higher: the numbers stay the order of appearance.
+- **The Grafana wall in the page's order** (`docs/engine/export_grafana.py`): its panels had been numbered in the registry's order
+  (its panel 2 was the page's monitor 4); every panel now carries its monitor's number on the page and the panels run left to right.
+- **The owner's illustration** beside the title on a desktop and under it on a phone (`docs/book/plates/unified_control_authority.webp`,
+  kept with the plates), captioned as an illustration, not a result.
 
 ## 2026-10-21: the Python's 500 runs through the C++ harness to the last bit; the verdict in C++; section 10b on the live engine
 

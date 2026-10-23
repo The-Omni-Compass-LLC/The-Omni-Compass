@@ -193,10 +193,18 @@ self-running engine, set at the factory. Every muscle in the catalog is wired, a
 its own card where one was found on development seeds and kept under the strict rule (364 muscles,
 `realms/muscle_cards_v5.csv`), the engine's own setting for every other muscle, all frozen and fingerprinted by version
 (`python3 tools/omni_version.py`). Muscles differ: no single setting is right for every muscle, family, sector, domain or
-realm, and none is presented as universal. Every published result is this factory tune. As with any engine, a licensee may
+realm, and none is presented as universal. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands. As with any engine, a licensee may
 then add on, retune, upgrade or tune down any muscle or any combination of muscles (the dial, the cards, the bands and the
 service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
 published ones.
+
+**The live engine's knobs.** The live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`; its own book, the Live
+Engine Manual) is a live tuning engine beside this one tuned engine: its knobs (the dial, the demand, the noise, the
+sense delay, the faults, the speed, the master switch, each muscle's own switch, the heartbeat, every monitor's own
+buttons) turn the engine in real time, so the mechanism of action can be watched under other settings, native alone,
+Omni-Compass on top, or both side by side. What a knob shows is that configuration's own reading, our own model (class
+S), never a benchmark result; the benchmarks prove the factory tune only, the tune found in our own models before any real run, and shipped. Like any engine, turn one part and the output moves: a changed
+tune's results are its own.
 
 **The wiring declaration.** Omni-Compass acts only through the wires it is given. A wrong reading, a wrong or shared
 lever, a wrong range, or a service line set for another workload makes it do exactly what its law says with the wrong
@@ -452,7 +460,7 @@ loss.
 Read the rest of the front matter before you touch a wire. It tells you what you are looking at and how to read
 what it tells you.
 
-## Introduction: The Problem, the Idea and What This Manual Covers
+## Introduction: The Idea and What This Manual Covers
 
 **The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
 Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
@@ -616,8 +624,8 @@ Read as one sentence: Omni-Compass takes the system in through a Data Exchange (
 
 ## Table of Contents
 
-**Front Matter** - The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
-Prelude: A Night on the Cluster; Introduction: The Problem, the Idea and What This Manual Covers; Quick Reference: The
+**Front Matter** - The Problem and the Answer; The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
+Prelude: A Night on the Cluster; Introduction: The Idea and What This Manual Covers; Quick Reference: The
 Card for the Glove Box
 
 **Part I - The Governor, from the Outside**
@@ -918,7 +926,7 @@ self-running engine, set at the factory, the way a vehicle leaves the plant with
 in the catalog is wired and runs on the setting found for it: its own card where one was found and kept (section 3.3),
 the engine's own setting for every other muscle. The whole tune is fixed and fingerprinted by version
 (`python3 tools/omni_version.py`), so an installation can always tell whether it is running the factory tune or a tune of
-its own. Every published result is the factory tune.
+its own. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands.
 
 No setting is universal. Muscles differ, and no single setting is right for every muscle, family, sector, domain or
 realm; none is presented as such. What the factory tune fixes is the starting point an installation can trust: each

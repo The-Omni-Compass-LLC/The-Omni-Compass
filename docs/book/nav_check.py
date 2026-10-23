@@ -229,6 +229,30 @@ def main(pdf, md_path):
                 dangling.append(m.group(0))
     print(f"cross-references checked {n_refs}; naming no heading of this book: {len(dangling)} {sorted(set(dangling))[:12]}")
     bad += bool(dangling)
+
+    # every numbered heading the PDF prints carries the number the book's one-file text gives it, so that a reference
+    # ("section 4.1") lands on the heading it names (21 October: the printing pass had counted on from the labelling pass)
+    # read in the book's order, so that two chapters with a section of the same title (the clouds' chapters) are told apart
+    md_heads = []
+    for ln in md:
+        m = re.match(r"^#{2,4} (\d+(?:\.\d+)+|[A-Z](?:\.\d+)+) (.+)$", ln)
+        if m:
+            md_heads.append((m.group(1), re.sub(r"\s+", " ", re.sub(r"[`*_]", "", m.group(2))).strip()[:40]))
+    wrong, n_num, at = [], 0, 0
+    for _lvl, t, _pg in doc.get_toc():
+        m = re.match(r"^(\d+(?:\.\d+)+|[A-Z](?:\.\d+)+) (.+)$", re.sub(r"\s+", " ", t).strip())
+        if not m:
+            continue
+        title = m.group(2)[:40]
+        k = next((k for k in range(at, len(md_heads)) if md_heads[k][1] == title), None)
+        if k is None:
+            continue
+        at = k + 1
+        n_num += 1
+        if md_heads[k][0] != m.group(1):
+            wrong.append((m.group(1), md_heads[k][0], title[:36]))
+    print(f"numbered headings checked against the book's text: {n_num}; printed under another number: {len(wrong)} {wrong[:6]}")
+    bad += bool(wrong) or not n_num
     return 1 if bad else 0
 
 

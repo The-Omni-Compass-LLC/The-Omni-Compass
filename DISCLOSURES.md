@@ -83,8 +83,9 @@ before its runs exist.
 tuned and ships it: self-running, set at the factory. Every muscle in the catalog is wired and runs on the setting found for it
 (its own card where one was found on development seeds and kept under the strict rule, 364 muscles in
 `realms/muscle_cards_v5.csv`; the engine's own setting for every other), frozen and fingerprinted by version (`python3
-tools/omni_version.py`); no setting is presented as universal. **Every published benchmark result is this one engine at this one
-tune**, chosen by a declared rule (`docs/THE_TUNE.md`, `tools/tune_study.py`): of the tunes that harm no gauge against native, the
+tools/omni_version.py`); no setting is presented as universal. **Every published benchmark result is one engine at its one
+factory tune**: the engine its table names (`python3 tools/omni_version.py`), run again on each engine that stands. From
+omni-v17 that tune is held to a declared rule (`docs/THE_TUNE.md`, `tools/tune_study.py`): of the tunes that harm no gauge against native, the
 one against which no other tune tried reads GAIN on one service gauge and LOSS on none, searched on development seeds and read
 again on untouched ones; the claim is non-dominance among the tunes searched, never a global optimum. The live engine page and the
 control panel are a live tuning engine: every knob, button and monitor turns in real time (the beat, the dial, the pedal, each

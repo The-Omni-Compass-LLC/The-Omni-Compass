@@ -227,19 +227,19 @@ self-running engine, set at the factory. Every muscle in the catalog is wired, a
 its own card where one was found on development seeds and kept under the strict rule (364 muscles,
 `realms/muscle_cards_v5.csv`), the engine's own setting for every other muscle, all frozen and fingerprinted by version
 (`python3 tools/omni_version.py`). Muscles differ: no single setting is right for every muscle, family, sector, domain or
-realm, and none is presented as universal. Every published result is this factory tune. As with any engine, a licensee may
+realm, and none is presented as universal. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands. As with any engine, a licensee may
 then add on, retune, upgrade or tune down any muscle or any combination of muscles (the dial, the cards, the bands and the
 service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
 published ones.
 
-**ONE TUNED ENGINE, AND A TUNING BENCH.** Every benchmark result in this book is one engine at one tune: the main engine, the
-engine that stands, at its factory tune. The live engine page and the control panel's buttons are a live tuning engine: every
+**ONE TUNED ENGINE, AND A TUNING BENCH.** Every benchmark result in this book is one engine at one tune: the engine its table
+names, at its factory tune, and every benchmark runs again on each engine that stands. The live engine page and the control panel's buttons are a live tuning engine: every
 knob, button and monitor turns in real time (the beat, the dial, the pedal, each muscle driven or left native, up or down, in or
 out, minus or plus) to show the mechanism of action with native alone, with Omni-Compass on top, or both side by side, and what
 the bench shows at any setting other than the factory tune demonstrates the engine's range, never a benchmark result. As on any
 engine, where the mixture, the intake, the exhaust, the firing and the pistons each change what it delivers, **turning any knob of
 Omni-Compass can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many
-ways, for many outputs. The factory tune is chosen by a declared rule, set out with its mathematics in section 4.4 and
+ways, for many outputs. From omni-v17 the factory tune is chosen by a declared rule, set out with its mathematics in section 4.4 and
 `docs/THE_TUNE.md`: among the tunes that harm no gauge against native, the one against which no other tried tune reads GAIN on one
 service gauge and LOSS on none, searched on development seeds and read again on untouched ones.
 
@@ -511,7 +511,7 @@ loss.
 Read the rest of the front matter before you touch a wire. It tells you what you are looking at and how to read
 what it tells you.
 
-## Introduction: The Problem, the Idea and the Promise
+## Introduction: The Idea and the Promise
 
 **The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
 Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
@@ -694,26 +694,26 @@ installed is a quarter off the bill.
 - **The engine on this checkout:** omni-v17, fingerprint 7c937d09e4031cc7 (55 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
-  - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
-  - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
-  - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+  - the organisms under the normal load: the spine: GAIN (fewer misses), misses down 0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.118 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses down 0.092 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
+  - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (more work + fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
+  - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
 - The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +4.3% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
   - Real database cache (MongoDB under YCSB, GitHub): +0.2% GAIN
   - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
-  - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
-  - Real cache (Redis, GitHub): -0.1% power given
+  - Real database (PostgreSQL behind PgBouncer, GitHub): =0.0% EVEN
+  - Real database buffer pool (MySQL under sysbench, GitHub): =0.0% EVEN
+  - Real cache (Redis, GitHub): +0.1% power given
 
 **On the engine that stands (omni-v17): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
 | Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +4.3% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v16 | -0.1% | GAIN, power given | L |
-| PostgreSQL, the pooler's pool size | omni-v16 | +0.0% | power given | L |
-| MySQL, the buffer pool's size | omni-v16 | +0.0% | EVEN | L |
+| Redis, the cache's memory ceiling | omni-v16 | +0.1% | GAIN, power given | L |
+| PostgreSQL, the pooler's pool size | omni-v16 | =0.0% | power given | L |
+| MySQL, the buffer pool's size | omni-v16 | =0.0% | EVEN | L |
 | MongoDB, the storage engine's cache size | omni-v16 | +0.2% | GAIN | L |
 | Kafka, the consumer group's size | omni-v16 | +0.1% | GAIN | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
@@ -727,10 +727,10 @@ installed is a quarter off the bill.
 | Real Kubernetes, demand that wanders | omni-v10 | +36.7% | GAIN | L |
 | Real Kubernetes, all four at once | omni-v10 | +39.7% | GAIN | L |
 | Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | +72.9% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | +0.0% | EVEN | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | =0.0% | EVEN | L |
 | Real Kubernetes, a queue of jobs | omni-v10 | +10.2% | GAIN | L |
 | Real Kubernetes, a public day of demand (Google 2011) | omni-v10 | +35.4% | GAIN, power given | L |
-| Real Kubernetes, a noisy neighbour | omni-v10 | +0.0% | GAIN | L |
+| Real Kubernetes, a noisy neighbour | omni-v10 | =0.0% | GAIN | L |
 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +59.7% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +41.0% | GAIN, power given | L |
 | Power grids (SimBench), both load models | omni-v11 | +5.8% | GAIN, power given | S |
@@ -761,8 +761,8 @@ written before the run, counted only when all three of our runs agree, and repor
 
 ## Table of Contents
 
-**Front Matter** - The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
-Prelude: A Night on the Cluster; Introduction: The Problem, the Idea and the Promise; Quick Reference: The Card for the
+**Front Matter** - The Problem and the Answer; The key: GAIN, EVEN and LOSS; What You Are Looking At; Notice and Disclaimer; Foreword; Preface;
+Prelude: A Night on the Cluster; Introduction: The Idea and the Promise; Quick Reference: The Card for the
 Glove Box; Executive Summary
 
 **Part I - The Governor**

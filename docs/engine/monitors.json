@@ -1,6 +1,6 @@
 {
  "file": "docs/engine/monitors.json",
- "rule": "every canvas the page draws is one monitor; the number is its order of appearance on the page, 1 first; the wall lays them out left to right, then the next row, and two monitors that sit side by side in their section stay side by side on the wall (the founder's orders of 20 and 21 October)",
+ "rule": "every canvas the page draws is one monitor; the number is its order of appearance on the page, 1 first; the wall lays them out left to right, then the next row, and two monitors that sit side by side in their section stay side by side on the wall (the founder's orders of 20 and 21 October); every monitor names its wiring: the page's own code, the Python it ports or reads, the C++ twin or why there is none, the checks that hold them equal, and how it moves (the founder's order of 21 October); the registry lists the monitors in that order, and n is each monitor's number",
  "layers": {
   "switch": "the switch above everything",
   "whole": "the whole organism",
@@ -112,6 +112,21 @@
    "what": "the chip's one run beside the count or in it",
    "where": "the monitor's own buttons"
   },
+  "beat": {
+   "label": "Beat",
+   "what": "the governor's full read of the state and its decision: every 5, 10, 15, 20, 30, 60, 75, 90 or 120 s in the heartbeat sweep's record; on a real governor its --interval (60 s at the factory since omni-v17, 15 s on omni-v16)",
+   "where": "the monitor's own buttons"
+  },
+  "engine": {
+   "label": "Engine",
+   "what": "which engine's record the monitor reads: the engine that stands or the one before it",
+   "where": "the monitor's own buttons"
+  },
+  "against": {
+   "label": "Against",
+   "what": "what each reading is set against: native, or the same engine at another setting",
+   "where": "the monitor's own buttons"
+  },
   "gauge": {
    "label": "Gauge",
    "what": "which gauge of the run is shown",
@@ -150,6 +165,7 @@
  },
  "monitors": [
   {
+   "n": 1,
    "id": "masterCv",
    "name": "The master switch and the kill switch",
    "layer": "switch",
@@ -172,9 +188,114 @@
    "grafana": {
     "type": "stat",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawMaster, masterSet",
+    "python": [
+     "omnicompass/master.py",
+     "tools/omni_switch.py",
+     "omnicompass/nervous_system.py"
+    ],
+    "cpp": [
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "tests/test_master_switch.py",
+     "tests/test_cpp_twins_parity.py"
+    ],
+    "moves": "every decision: the brain's pulse and the work flowing down to every muscle; the switch acts at once"
    }
   },
   {
+   "n": 2,
+   "id": "proofCv",
+   "name": "The Python's runs, reproduced here",
+   "layer": "proof",
+   "what": "The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.",
+   "cls": "S (the engine itself)",
+   "status": "live",
+   "awaiting": null,
+   "feed": {
+    "exporter": "tools/engine_runs.py (the Python) and this page",
+    "metrics": [],
+    "promql": []
+   },
+   "knobs": [
+    "runs",
+    "print"
+   ],
+   "grafana": {
+    "type": "stat",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawProof, engineRuns, proofRecheck",
+    "python": [
+     "tools/engine_runs.py"
+    ],
+    "cpp": [
+     "cpp/tools/engine_runs.cpp",
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "verify.py",
+     "tests/test_engine_runs.py",
+     ".github/workflows/engine-runs.yml"
+    ],
+    "moves": "the page recomputes one run of the Python's set from its own seed about twice a second, round after round, and holds its receipt against the Python's"
+   }
+  },
+  {
+   "n": 3,
+   "id": "hoCv",
+   "name": "The Python's 500 scenarios, replayed",
+   "layer": "proof",
+   "what": "benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.",
+   "cls": "S",
+   "status": "replay",
+   "awaiting": null,
+   "feed": {
+    "exporter": "benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv)",
+    "metrics": [],
+    "promql": []
+   },
+   "knobs": [
+    "seed",
+    "arm",
+    "gauge",
+    "speed",
+    "kill"
+   ],
+   "grafana": {
+    "type": "table",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawHeld",
+    "python": [
+     "benchmarks/stack_benchmark.py",
+     "omnicompass/adapter.py",
+     "omnicompass/shield.py",
+     "omnicompass/stack_sim.py",
+     "docs/engine/export_heldout.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp"
+    ],
+    "proof": [
+     "verify.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py"
+    ],
+    "moves": "the 500 scenarios replayed one after another from the record, every scenario's trace hash with it"
+   }
+  },
+  {
+   "n": 4,
    "id": "feed0",
    "name": "Golden signal: errors",
    "layer": "service",
@@ -205,9 +326,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": "ops"
+   },
+   "wire": {
+    "code": "drawFeed",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision of the live engine: each side's line takes a point"
    }
   },
   {
+   "n": 5,
    "id": "feed1",
    "name": "Golden signal: throughput",
    "layer": "service",
@@ -237,9 +382,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": "reqps"
+   },
+   "wire": {
+    "code": "drawFeed",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision of the live engine: each side's line takes a point"
    }
   },
   {
+   "n": 6,
    "id": "feed2",
    "name": "Golden signal: latency",
    "layer": "service",
@@ -269,9 +438,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": "s"
+   },
+   "wire": {
+    "code": "drawFeed",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision of the live engine: each side's line takes a point"
    }
   },
   {
+   "n": 7,
    "id": "feed3",
    "name": "Golden signal: saturation",
    "layer": "service",
@@ -301,9 +494,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": "percentunit"
+   },
+   "wire": {
+    "code": "drawFeed",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision of the live engine: each side's line takes a point"
    }
   },
   {
+   "n": 8,
    "id": "ciCv",
    "name": "GitHub Actions: the runs in flight",
    "layer": "ci",
@@ -327,9 +544,22 @@
    "grafana": {
     "type": "stat",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawCi",
+    "python": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: GitHub's own record of its runs, read from its API at the build",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the reading cursor walks the workflows, one a decision; the age of GitHub's reading counts up every second"
    }
   },
   {
+   "n": 9,
    "id": "fxBen",
    "name": "The benefit board",
    "layer": "whole",
@@ -349,9 +579,25 @@
    "grafana": {
     "type": "bargauge",
     "unit": "percent"
+   },
+   "wire": {
+    "code": "drawBenefit, fxCursor",
+    "python": [
+     "tools/benefit_sheet.py",
+     "tools/omni_index.py",
+     "tools/readings.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the repository's measured tables, read as written; no engine runs in the page for them",
+    "proof": [
+     "tests/test_benefit_sheet.py",
+     "tests/test_readings.py"
+    ],
+    "moves": "the reading cursor walks the bars, one benchmark at a time"
    }
   },
   {
+   "n": 10,
    "id": "fxFam",
    "name": "Where the benefit lives, gauge by gauge",
    "layer": "whole",
@@ -371,72 +617,100 @@
    "grafana": {
     "type": "bargauge",
     "unit": "percent"
+   },
+   "wire": {
+    "code": "drawFam",
+    "python": [
+     "tools/benefit_sheet.py",
+     "tools/readings.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the repository's measured tables, read as written; no engine runs in the page for them",
+    "proof": [
+     "tests/test_benefit_sheet.py",
+     "tests/test_readings.py"
+    ],
+    "moves": "the reading cursor walks the families, one at a time"
    }
   },
   {
-   "id": "gridCv",
-   "name": "The scale-out grid",
-   "layer": "organisms",
-   "what": "Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside.",
-   "cls": "S/L",
+   "n": 11,
+   "id": "tradeMap",
+   "name": "The market map: every three-run table a tile",
+   "layer": "whole",
+   "what": "Every three-run table on the page as a tile of a squarified treemap, grouped by stack: its area the gauges it judged, its colour its reading (GAIN green, LOSS red, EVEN yellow, power given the accent, an orchestrator's own cost grey and dashed).",
+   "cls": "L/S",
    "status": "record",
    "awaiting": null,
    "feed": {
-    "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
+    "exporter": "the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts)",
     "metrics": [],
     "promql": []
    },
    "knobs": [
-    "filter"
+    "kill"
    ],
    "grafana": {
-    "type": "heatmap",
-    "unit": ""
+    "type": "table",
+    "unit": "short"
+   },
+   "wire": {
+    "code": "drawTradeMap",
+    "python": [
+     "tools/confirm_abc.py",
+     "tools/readings.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the repository's measured tables, read as written; no engine runs in the page for them",
+    "proof": [
+     "tests/test_confirm_abc.py",
+     "tests/test_readings.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the scan cursor walks every tile, one every 1.5 s"
    }
   },
   {
-   "id": "orgCv",
-   "name": "The seven organisms, three loads",
-   "layer": "organisms",
-   "what": "Each organism's misses, work and energy against native under its own load, the climb and the line (the realms table).",
-   "cls": "S",
+   "n": 12,
+   "id": "tradeQuotes",
+   "name": "The quote board: every three-run table a quote",
+   "layer": "whole",
+   "what": "Every three-run table as a quote: its ticker and engine, the gauge that moved most with its mean change, that gauge in runs A, B and C as a candle (the 95% interval and the value), its rows counted by word, and a tape of every headline.",
+   "cls": "L/S",
    "status": "record",
    "awaiting": null,
    "feed": {
-    "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
+    "exporter": "the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts)",
     "metrics": [],
     "promql": []
    },
    "knobs": [
-    "filter"
+    "kill"
    ],
    "grafana": {
-    "type": "bargauge",
+    "type": "table",
     "unit": "percent"
-   }
-  },
-  {
-   "id": "muscleCv",
-   "name": "Every muscle of the catalog",
-   "layer": "muscles",
-   "what": "The 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle.",
-   "cls": "S",
-   "status": "record",
-   "awaiting": null,
-   "feed": {
-    "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
-    "metrics": [],
-    "promql": []
    },
-   "knobs": [
-    "filter"
-   ],
-   "grafana": {
-    "type": "heatmap",
-    "unit": ""
+   "wire": {
+    "code": "drawQuotes",
+    "python": [
+     "tools/confirm_abc.py",
+     "tools/readings.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the repository's measured tables, read as written; no engine runs in the page for them",
+    "proof": [
+     "tests/test_confirm_abc.py",
+     "tests/test_readings.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the tape of the headlines runs across the top at 55 px a second"
    }
   },
   {
+   "n": 13,
    "id": "whCv",
    "name": "The whole organism, composed",
    "layer": "whole",
@@ -458,9 +732,137 @@
    "grafana": {
     "type": "stat",
     "unit": "percent"
+   },
+   "wire": {
+    "code": "drawWhole",
+    "python": [
+     "tools/whole_system.py",
+     "docs/engine/export_whole.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: a composition of measured tables by the product law, read as tools/whole_system.py writes it",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "work flows down both columns; the reading cursor walks the pieces, one a decision"
    }
   },
   {
+   "n": 14,
+   "id": "orgCv",
+   "name": "The seven organisms, three loads",
+   "layer": "organisms",
+   "what": "Each organism's misses against native under its own load, the climb and the line (the realms table).",
+   "cls": "S",
+   "status": "record",
+   "awaiting": null,
+   "feed": {
+    "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
+    "metrics": [],
+    "promql": []
+   },
+   "knobs": [
+    "filter"
+   ],
+   "grafana": {
+    "type": "bargauge",
+    "unit": "percent"
+   },
+   "wire": {
+    "code": "drawOrgCv",
+    "python": [
+     "tools/run_realms_v5.py",
+     "realms/harness.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "tests/test_realms.py",
+     "tests/test_cpp_governor_parity.py"
+    ],
+    "moves": "the reading cursor walks every organism under every load, one a decision"
+   }
+  },
+  {
+   "n": 15,
+   "id": "muscleCv",
+   "name": "Every muscle of the catalog",
+   "layer": "muscles",
+   "what": "The 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle.",
+   "cls": "S",
+   "status": "record",
+   "awaiting": null,
+   "feed": {
+    "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
+    "metrics": [],
+    "promql": []
+   },
+   "knobs": [
+    "filter"
+   ],
+   "grafana": {
+    "type": "heatmap",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawMuscleCv",
+    "python": [
+     "tools/run_realms_v5.py",
+     "realms/harness.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "tests/test_realms.py",
+     "tests/test_cpp_governor_parity.py"
+    ],
+    "moves": "the reading cursor walks the 1,107 muscles, one a decision; a click holds one"
+   }
+  },
+  {
+   "n": 16,
+   "id": "gridCv",
+   "name": "The scale-out grid",
+   "layer": "organisms",
+   "what": "Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside.",
+   "cls": "S/L",
+   "status": "record",
+   "awaiting": null,
+   "feed": {
+    "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
+    "metrics": [],
+    "promql": []
+   },
+   "knobs": [
+    "filter"
+   ],
+   "grafana": {
+    "type": "heatmap",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawGridCv",
+    "python": [
+     "tools/grid_v5.py",
+     "scripts/dispatch_grid.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the grid's squares as its runs on GitHub write them",
+    "proof": [
+     "tests/test_grid_v5.py"
+    ],
+    "moves": "the reading cursor walks every square with runs started, one a decision; the age of GitHub's reading counts up every second"
+   }
+  },
+  {
+   "n": 17,
    "id": "azCv",
    "name": "Azure: the bill, run by run",
    "layer": "cloud",
@@ -485,9 +887,24 @@
    "grafana": {
     "type": "timeseries",
     "unit": "currencyUSD"
+   },
+   "wire": {
+    "code": "drawCloudBill",
+    "python": [
+     "tools/live_reps.py",
+     "tools/stop_rule.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the bill as Azure meters it",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the reading cursor walks the finished sets; the age of GitHub's reading counts up every second"
    }
   },
   {
+   "n": 18,
    "id": "gcpCv",
    "name": "Google Cloud: the gate and the bill",
    "layer": "cloud",
@@ -511,9 +928,36 @@
    "grafana": {
     "type": "timeseries",
     "unit": "currencyUSD"
+   },
+   "wire": {
+    "code": "drawCloudBill",
+    "python": [
+     "tools/cloud_key_check.py",
+     "omni_controller/controller.py",
+     "pilot/selfpilot.py",
+     "fleet/harness.py",
+     "tools/toy_gate.py",
+     "docs/engine/export_controller_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp",
+     "cpp/src/compass.cpp",
+     "cpp/src/hpa.cpp"
+    ],
+    "proof": [
+     "tests/test_cloud_check.py",
+     "docs/engine/check_records.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py",
+     "tests/test_cpp_hpa_parity.py"
+    ],
+    "moves": "until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head"
    }
   },
   {
+   "n": 19,
    "id": "awsCv",
    "name": "Amazon: the gate and the bill",
    "layer": "cloud",
@@ -537,15 +981,42 @@
    "grafana": {
     "type": "timeseries",
     "unit": "currencyUSD"
+   },
+   "wire": {
+    "code": "drawCloudBill",
+    "python": [
+     "tools/cloud_key_check.py",
+     "omni_controller/controller.py",
+     "pilot/selfpilot.py",
+     "fleet/harness.py",
+     "tools/toy_gate.py",
+     "docs/engine/export_controller_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp",
+     "cpp/src/compass.cpp",
+     "cpp/src/hpa.cpp"
+    ],
+    "proof": [
+     "tests/test_cloud_check.py",
+     "docs/engine/check_records.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py",
+     "tests/test_cpp_hpa_parity.py"
+    ],
+    "moves": "until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head"
    }
   },
   {
+   "n": 20,
    "id": "c4N",
    "name": "The cloud setting, live: native's machines",
    "layer": "cloud",
    "what": "The shipped controller's cloud mode on the toy cluster: the cloud's own autoscaler alone.",
    "cls": "S",
-   "status": "live",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format)",
@@ -565,15 +1036,40 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawCluster",
+    "python": [
+     "omni_controller/controller.py",
+     "pilot/selfpilot.py",
+     "fleet/harness.py",
+     "tools/toy_gate.py",
+     "docs/engine/export_controller_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp",
+     "cpp/src/compass.cpp",
+     "cpp/src/hpa.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py",
+     "tests/test_cpp_hpa_parity.py"
+    ],
+    "moves": "the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value"
    }
   },
   {
+   "n": 21,
    "id": "c4O",
    "name": "The cloud setting, live: Omni-Compass's machines",
    "layer": "cloud",
    "what": "The same autoscaler with Omni-Compass parking a machine only after its trial, waking it on a breach.",
    "cls": "S",
-   "status": "live",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format)",
@@ -595,9 +1091,34 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawCluster",
+    "python": [
+     "omni_controller/controller.py",
+     "pilot/selfpilot.py",
+     "fleet/harness.py",
+     "tools/toy_gate.py",
+     "docs/engine/export_controller_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp",
+     "cpp/src/compass.cpp",
+     "cpp/src/hpa.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py",
+     "tests/test_cpp_hpa_parity.py"
+    ],
+    "moves": "the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value"
    }
   },
   {
+   "n": 22,
    "id": "orchRoad",
    "name": "The orchestrators' road",
    "layer": "orchestrators",
@@ -616,9 +1137,24 @@
    "grafana": {
     "type": "stat",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawOrchRoad",
+    "python": [
+     "tools/governors_page.py",
+     "tools/confirm_abc.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the governors are live software on Kubernetes, run as their projects ship them",
+    "proof": [
+     "tests/test_governors_page.py"
+    ],
+    "moves": "a dot travels each governor's road, a running run pulses, and the reading cursor walks the governors, one a decision"
    }
   },
   {
+   "n": 23,
    "id": "orchCv",
    "name": "An orchestrator, four ways",
    "layer": "orchestrators",
@@ -643,13 +1179,28 @@
    "grafana": {
     "type": "bargauge",
     "unit": "percent"
+   },
+   "wire": {
+    "code": "drawOrch",
+    "python": [
+     "tools/governors_page.py",
+     "tools/run_orchestra.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the governors are live software on Kubernetes, run as their projects ship them",
+    "proof": [
+     "tests/test_governors_page.py",
+     "tests/test_orchestra.py"
+    ],
+    "moves": "work flows down the stack at the live engine's demand"
    }
   },
   {
+   "n": 24,
    "id": "opsPipeCv",
    "name": "The data pipeline, live: every stage from the GitHub Actions run to this page",
    "layer": "cluster",
-   "what": "The chosen Kubernetes run played back from its archived files: where every repetition stands.",
+   "what": "Every stage from the GitHub Actions run to this page: the run, the raw files archived, the SHA-256 check, the official scorer, the three-run tables, the build and the page, the stage being read lit.",
    "cls": "L",
    "status": "replay",
    "awaiting": null,
@@ -666,13 +1217,29 @@
    "grafana": {
     "type": "stat",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawPipe",
+    "python": [
+     "scripts/raw_archive.sh",
+     "tools/live_reps.py",
+     "tools/confirm_abc.py",
+     "docs/engine/build_live_engine.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the stages are GitHub's runs and the repository's own tools",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the stage being read lights in turn and the data moves between the stages"
    }
   },
   {
+   "n": 25,
    "id": "heartCv",
    "name": "The official run's heartbeat",
    "layer": "cluster",
-   "what": "Replicas, machines and the response line decision by decision, native beside Omni-Compass.",
+   "what": "The official run's heartbeat: native's own 15 s clock above, every beat of the governor's decision loop in the repetition below, native beside Omni-Compass.",
    "cls": "L",
    "status": "replay",
    "awaiting": null,
@@ -695,13 +1262,78 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawHeart",
+    "python": [
+     "docs/engine/export_runs.py",
+     "omni_controller/controller.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the chosen repetition replayed decision by decision; native's own 15 s clock beats above"
    }
   },
   {
+   "n": 26,
+   "id": "beatCv",
+   "name": "The heartbeat sweep: every beat the governor can run at",
+   "layer": "cluster",
+   "what": "The governor's beat as a knob: what a decision every 5 to 120 s does against native, or against the same engine at 15 s or 60 s, on-site and in the cloud, gauge by gauge with its 95% interval, and what each beat costs the engine; our own model.",
+   "cls": "S",
+   "status": "model",
+   "awaiting": null,
+   "feed": {
+    "exporter": "tools/omni_exporter.py (the governor's own audit, Prometheus text format)",
+    "metrics": [
+     "omni_decisions_total",
+     "omni_decision_seconds",
+     "omni_last_decision_timestamp_seconds",
+     "omni_own_cpu_cores"
+    ],
+    "promql": [
+     "60 * rate(omni_decisions_total[5m])",
+     "omni_own_cpu_cores",
+     "time() - omni_last_decision_timestamp_seconds"
+    ]
+   },
+   "knobs": [
+    "beat",
+    "scenario",
+    "engine",
+    "against",
+    "gauge",
+    "kill"
+   ],
+   "grafana": {
+    "type": "timeseries",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawBeat, beatSetup",
+    "python": [
+     "tools/heartbeat_sweep.py",
+     "tools/toy_gate.py",
+     "omni_controller/controller.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none here: the sweep runs the shipped Python controller on the toy cluster; the C++ governor twin is held to the Python's at 60 s and at 15, 10 and 5 s (tests/test_cpp_governor_parity.py)",
+    "proof": [
+     "results/toy_gate/HEARTBEAT_SWEEP.md",
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "a cursor reads the beats in turn and names the row it holds; every button redraws the chart from the record"
+   }
+  },
+  {
+   "n": 27,
    "id": "opsCandle",
    "name": "The official run: response time candles",
    "layer": "cluster",
-   "what": "Each repetition's response time range, native beside Omni-Compass.",
+   "what": "The response time of the chosen run as candles, one a half minute, native above and Omni-Compass below, on one logarithmic scale.",
    "cls": "L",
    "status": "replay",
    "awaiting": null,
@@ -722,13 +1354,28 @@
    "grafana": {
     "type": "candlestick",
     "unit": "ms"
+   },
+   "wire": {
+    "code": "drawCandle",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the chosen run replayed half minute by half minute"
    }
   },
   {
+   "n": 28,
    "id": "opsHeat",
    "name": "The official run: the heat map",
    "layer": "cluster",
-   "what": "The chosen gauge across repetitions and time.",
+   "what": "The responses of each half minute counted in eight response-time buckets, native above and Omni-Compass below.",
    "cls": "L",
    "status": "replay",
    "awaiting": null,
@@ -745,13 +1392,28 @@
    "grafana": {
     "type": "heatmap",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawHeat",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the chosen run replayed half minute by half minute"
    }
   },
   {
+   "n": 29,
    "id": "opsBars",
    "name": "The official run: paired bars",
    "layer": "cluster",
-   "what": "Every repetition's paired difference, native against Omni-Compass.",
+   "what": "The requests answered each half minute, native and Omni-Compass side by side, the failed requests marked.",
    "cls": "L",
    "status": "replay",
    "awaiting": null,
@@ -768,9 +1430,24 @@
    "grafana": {
     "type": "bargauge",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawBars",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the chosen run replayed half minute by half minute"
    }
   },
   {
+   "n": 30,
    "id": "opsReps",
    "name": "The official run: the repetitions",
    "layer": "cluster",
@@ -791,13 +1468,28 @@
    "grafana": {
     "type": "table",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawReps",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "each repetition's reading filled in as the run replays"
    }
   },
   {
+   "n": 31,
    "id": "ruStrip",
    "name": "Per-repetition run telemetry",
    "layer": "cluster",
-   "what": "The archived capture of one repetition second by second: machines ready, CPU used, pods pending, the autoscaler's replicas, native beside Omni-Compass.",
+   "what": "One repetition half minute by half minute from its archived capture: the 95th percentile of the response time, the replicas, the host's processor and the governor's heartbeat, native beside Omni-Compass.",
    "cls": "L",
    "status": "replay",
    "awaiting": null,
@@ -822,9 +1514,24 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawRuStrip",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the archived capture replayed half minute by half minute; a ring opens at each head with its newest value"
    }
   },
   {
+   "n": 32,
    "id": "cluN",
    "name": "The shipped controller's trace: native",
    "layer": "cluster",
@@ -849,9 +1556,34 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawCluster",
+    "python": [
+     "omni_controller/controller.py",
+     "pilot/selfpilot.py",
+     "fleet/harness.py",
+     "tools/toy_gate.py",
+     "docs/engine/export_controller_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp",
+     "cpp/src/compass.cpp",
+     "cpp/src/hpa.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py",
+     "tests/test_cpp_hpa_parity.py"
+    ],
+    "moves": "the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value"
    }
   },
   {
+   "n": 33,
    "id": "cluO",
    "name": "The shipped controller's trace: Omni-Compass",
    "layer": "cluster",
@@ -879,13 +1611,38 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawCluster",
+    "python": [
+     "omni_controller/controller.py",
+     "pilot/selfpilot.py",
+     "fleet/harness.py",
+     "tools/toy_gate.py",
+     "docs/engine/export_controller_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp",
+     "cpp/src/compass.cpp",
+     "cpp/src/hpa.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py",
+     "tests/test_cpp_hpa_parity.py"
+    ],
+    "moves": "the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value"
    }
   },
   {
+   "n": 34,
    "id": "cStrip",
    "name": "The shipped controller's trace: the strip",
    "layer": "cluster",
-   "what": "The compass position, the force and the writes over the run.",
+   "what": "The shipped controller's machines (in service, booting and parked) and the response time over the run, native beside Omni-Compass, replayed from its own audit.",
    "cls": "S",
    "status": "replay",
    "awaiting": null,
@@ -908,46 +1665,41 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
-   }
-  },
-  {
-   "id": "sStrip",
-   "name": "The chip and the host, modelled",
-   "layer": "chip",
-   "what": "The repository's own models of one GPU card and one Linux host, native beside Omni-Compass, second by second (class S).",
-   "cls": "S",
-   "status": "model",
-   "awaiting": null,
-   "feed": {
-    "exporter": "NVIDIA DCGM exporter; node_exporter",
-    "metrics": [
-     "DCGM_FI_DEV_POWER_USAGE",
-     "DCGM_FI_DEV_SM_CLOCK",
-     "node_cpu_scaling_frequency_hertz"
-    ],
-    "promql": [
-     "DCGM_FI_DEV_POWER_USAGE",
-     "DCGM_FI_DEV_SM_CLOCK"
-    ]
    },
-   "knobs": [
-    "stack",
-    "run",
-    "kill"
-   ],
-   "grafana": {
-    "type": "timeseries",
-    "unit": "watt"
+   "wire": {
+    "code": "drawCStrip",
+    "python": [
+     "omni_controller/controller.py",
+     "pilot/selfpilot.py",
+     "fleet/harness.py",
+     "tools/toy_gate.py",
+     "docs/engine/export_controller_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp",
+     "cpp/src/compass.cpp",
+     "cpp/src/hpa.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py",
+     "tests/test_cpp_hpa_parity.py"
+    ],
+    "moves": "the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value"
    }
   },
   {
+   "n": 35,
    "id": "gpuCv",
    "name": "The GPU card, metered: the one real run",
    "layer": "chip",
    "what": "The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit, clock and temperature, requests served and the 95th percentile, native beside Omni-Compass governing (or watching only), every write of the governor marked.",
    "cls": "P",
    "status": "replay",
-   "awaiting": "its omni-v12 run on Lambda (lambda-gpu.yml, one exact commit): the replaced controller's run stands until then, shown as such",
+   "awaiting": "its omni-v13 run on Lambda (lambda-gpu.yml, one exact commit): the replaced controller's run stands until then, shown as such",
    "feed": {
     "exporter": "NVIDIA DCGM exporter",
     "metrics": [
@@ -971,9 +1723,22 @@
    "grafana": {
     "type": "timeseries",
     "unit": "watt"
+   },
+   "wire": {
+    "code": "drawGpuRun",
+    "python": [
+     "docs/engine/export_gpu_run.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the 2 October run of an earlier controller, replayed from the card's own meter; today's GPU rules have their twin, cpp/src/gpu_rules.cpp, for the run on Lambda",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the card's own meter replayed at ten times the run's seconds"
    }
   },
   {
+   "n": 36,
    "id": "cpuCv",
    "name": "The CPU host, metered: awaiting its machine",
    "layer": "host",
@@ -1002,9 +1767,23 @@
    "grafana": {
     "type": "timeseries",
     "unit": "watt"
+   },
+   "wire": {
+    "code": "drawCpuHost",
+    "python": [
+     "docs/engine/export_cpu_model.py",
+     "tools/run_cpu_power.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the host's model until its run lands on a machine with its meter",
+    "proof": [
+     "tests/test_run_cpu_power.py"
+    ],
+    "moves": "the host's model replayed second by second until its run lands"
    }
   },
   {
+   "n": 37,
    "id": "gpu8Cv",
    "name": "An 8-card node: built and awaiting its run",
    "layer": "chip",
@@ -1030,9 +1809,78 @@
    "grafana": {
     "type": "timeseries",
     "unit": "watt"
+   },
+   "wire": {
+    "code": "drawGpu8",
+    "python": [
+     "realms/gpu_card.py",
+     "omni_controller/gpu_governor.py",
+     "scripts/gpu_8card.sh"
+    ],
+    "cpp": [
+     "cpp/src/gpu_rules.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_twins_parity.py"
+    ],
+    "moves": "the one-card model's native lanes replayed second by second; the Omni-Compass lanes wait for the 8-card run"
    }
   },
   {
+   "n": 38,
+   "id": "sStrip",
+   "name": "The chip and the host, modelled",
+   "layer": "chip",
+   "what": "The repository's own models of one GPU card and one Linux host, native beside Omni-Compass, second by second (class S).",
+   "cls": "S",
+   "status": "model",
+   "awaiting": null,
+   "feed": {
+    "exporter": "NVIDIA DCGM exporter; node_exporter",
+    "metrics": [
+     "DCGM_FI_DEV_POWER_USAGE",
+     "DCGM_FI_DEV_SM_CLOCK",
+     "node_cpu_scaling_frequency_hertz"
+    ],
+    "promql": [
+     "DCGM_FI_DEV_POWER_USAGE",
+     "DCGM_FI_DEV_SM_CLOCK"
+    ]
+   },
+   "knobs": [
+    "stack",
+    "run",
+    "kill"
+   ],
+   "grafana": {
+    "type": "timeseries",
+    "unit": "watt"
+   },
+   "wire": {
+    "code": "drawSStrip",
+    "python": [
+     "realms/gpu_card.py",
+     "omnicompass/compass_law.py",
+     "tools/toy_gate.py",
+     "omni_controller/muscles.py",
+     "omnicompass/conveyance.py",
+     "docs/engine/export_scenarios.py"
+    ],
+    "cpp": [
+     "cpp/src/conveyance.cpp",
+     "cpp/tools/engine_runs.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_conveyance_parity.py",
+     "verify.py"
+    ],
+    "moves": "the chip's and the host's models replayed second by second; a ring opens at each head with its newest value"
+   }
+  },
+  {
+   "n": 39,
    "id": "ringN",
    "name": "The organism, live: native",
    "layer": "organism",
@@ -1063,9 +1911,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawRing",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: each muscle moves to its position in the band"
    }
   },
   {
+   "n": 40,
    "id": "ringO",
    "name": "The organism, live: Omni-Compass",
    "layer": "organism",
@@ -1100,9 +1972,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawRing",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: each muscle moves to its position, the brain's grants and pushes pulse"
    }
   },
   {
+   "n": 41,
    "id": "immCv",
    "name": "The immune system",
    "layer": "organism",
@@ -1134,18 +2030,43 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawImm",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py",
+     "realms/compass_arm_v5.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: each side's pools, warmest room and muscles past the line take a point"
    }
   },
   {
+   "n": 42,
    "id": "swarm",
-   "name": "The swarm",
+   "name": "The body parts on the band",
    "layer": "organism",
-   "what": "The robot swarm's missions, native beside Omni-Compass with the proximity reflex.",
+   "what": "Each body part's muscles (the spine and the four realms) at their positions in the band, native above and Omni-Compass below, every decision.",
    "cls": "S",
    "status": "live",
    "awaiting": null,
    "feed": {
-    "exporter": "the swarm runner's own log (tools/run_swarm.py); no Prometheus feed",
+    "exporter": "the realms harness's own record (realms/harness.py, each body part's muscles at their positions in the band, recorded by docs/engine/export_harness_trace.py); no Prometheus feed",
     "metrics": [],
     "promql": []
    },
@@ -1156,15 +2077,39 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawSwarm",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: each muscle's dot moves to its position in the band"
    }
   },
   {
+   "n": 43,
    "id": "tCube",
    "name": "Telemetry tensor: the cube",
    "layer": "analytics",
-   "what": "The organism's telemetry as a tensor (muscle × gauge × time), native beside Omni-Compass.",
-   "cls": "S",
-   "status": "live",
+   "what": "The engine's harness record as a tensor (decisions × sixty muscles × two arms), native and Omni-Compass as two slabs, filling in on the live engine's clock.",
+   "cls": "S (the harness's record, realms/harness.py)",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "kube-state-metrics; the service's own metrics",
@@ -1184,15 +2129,33 @@
    "grafana": {
     "type": "heatmap",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawCube",
+    "python": [
+     "realms/harness.py",
+     "realms/compass_arm_v5.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py"
+    ],
+    "moves": "fills in decision by decision on the live engine's clock, and turns"
    }
   },
   {
+   "n": 44,
    "id": "tDelta",
    "name": "Telemetry tensor: the difference",
    "layer": "analytics",
    "what": "The difference of the two sides' tensors, cell by cell.",
-   "cls": "S",
-   "status": "live",
+   "cls": "S (the harness's record, realms/harness.py)",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
@@ -1212,15 +2175,33 @@
    "grafana": {
     "type": "heatmap",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawDelta",
+    "python": [
+     "realms/harness.py",
+     "realms/compass_arm_v5.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py"
+    ],
+    "moves": "one column a decision on the live engine's clock"
    }
   },
   {
+   "n": 45,
    "id": "tModes",
    "name": "Telemetry tensor: the modes",
    "layer": "analytics",
    "what": "The principal modes of the telemetry (its matrix decomposed).",
-   "cls": "S",
-   "status": "live",
+   "cls": "S (the harness's record, realms/harness.py)",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
@@ -1240,15 +2221,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawModes, tEig",
+    "python": [
+     "realms/harness.py",
+     "realms/compass_arm_v5.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: the line across each bar is that decision's own motion in the mode; the first mode's line takes a point, a ring at its head"
    }
   },
   {
+   "n": 46,
    "id": "tSlo",
    "name": "Service level: the objective",
    "layer": "analytics",
-   "what": "Time inside the response line against the objective, native beside Omni-Compass.",
-   "cls": "S",
-   "status": "live",
+   "what": "The share of each half minute's requests answered inside the 500 ms line, native beside Omni-Compass, through the official run chosen in section 5c.",
+   "cls": "L (the official run's request log, SHA-256-checked)",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "SLO recording rules (sloth, pyrra) over the service's histogram",
@@ -1272,15 +2271,30 @@
    "grafana": {
     "type": "stat",
     "unit": "percentunit"
+   },
+   "wire": {
+    "code": "drawSankey",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "half minute by half minute through the official run; its newest value printed at the head"
    }
   },
   {
+   "n": 47,
    "id": "tBurn",
    "name": "Service level: the error budget burn",
    "layer": "analytics",
-   "what": "How fast each side burns its error budget.",
-   "cls": "S",
-   "status": "live",
+   "what": "The requests over the 500 ms line counted up since the repetition began, native beside Omni-Compass: each side's error budget burned.",
+   "cls": "L (the official run's request log, SHA-256-checked)",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "SLO recording rules (sloth, pyrra)",
@@ -1304,15 +2318,30 @@
    "grafana": {
     "type": "timeseries",
     "unit": "percentunit"
+   },
+   "wire": {
+    "code": "drawSankey",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "half minute by half minute through the official run; its newest value printed at the head"
    }
   },
   {
+   "n": 48,
    "id": "tRadar",
    "name": "Telemetry radar",
    "layer": "analytics",
-   "what": "Every gauge family on one radar, native beside Omni-Compass.",
-   "cls": "S",
-   "status": "live",
+   "what": "Every gauge of the repetition replaying in section 5c against native's 0 line: GAIN to the right in green, LOSS to the left in red, its side the run's own reading.",
+   "cls": "L (the official run's own gauges)",
+   "status": "replay",
    "awaiting": null,
    "feed": {
     "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
@@ -1332,13 +2361,28 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawRadar",
+    "python": [
+     "docs/engine/export_runs.py",
+     "tools/live_reps.py",
+     "scripts/raw_archive.sh"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the live software's own measurements, played back from their SHA-256-checked files",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "each gauge of the repetition replaying in section 5c"
    }
   },
   {
+   "n": 49,
    "id": "deskCv",
    "name": "The console's response",
    "layer": "console",
-   "what": "The live engine's response to every knob of the console, plotted per decision, native beside Omni-Compass.",
+   "what": "The last 120 decisions of the live engine: the muscles past their line and the work, native beside Omni-Compass, every knob of the console turned marked.",
    "cls": "S",
    "status": "live",
    "awaiting": null,
@@ -1362,9 +2406,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawDeskCv",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: both lanes slide one decision, a ring opens at each head with its newest value; every knob turned is marked"
    }
   },
   {
+   "n": 50,
    "id": "frameCv",
    "name": "The frame budget",
    "layer": "console",
@@ -1383,9 +2451,18 @@
    "grafana": {
     "type": "timeseries",
     "unit": "ms"
+   },
+   "wire": {
+    "code": "drawFrameCv",
+    "python": [],
+    "cpp": [],
+    "cpp_none": "none: the page's own frame clock, measured in the browser; there is nothing to port",
+    "proof": [],
+    "moves": "every frame of this page"
    }
   },
   {
+   "n": 51,
    "id": "band",
    "name": "One control cycle, traced",
    "layer": "brain",
@@ -1417,9 +2494,24 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawBand",
+    "python": [
+     "omnicompass/compass_law.py"
+    ],
+    "cpp": [
+     "cpp/tools/engine_runs.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "verify.py"
+    ],
+    "moves": "one control cycle traced step by step on the followed muscle, every decision"
    }
   },
   {
+   "n": 52,
    "id": "phaseN",
    "name": "Phase plane: native",
    "layer": "brain",
@@ -1447,9 +2539,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawPhase",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: each muscle's point moves in position and velocity"
    }
   },
   {
+   "n": 53,
    "id": "phaseO",
    "name": "Phase plane: Omni-Compass",
    "layer": "brain",
@@ -1477,13 +2593,37 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawPhase",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision: each muscle's point moves in position and velocity"
    }
   },
   {
+   "n": 54,
    "id": "strip",
    "name": "The scoreboard strip",
    "layer": "brain",
-   "what": "Breaches, writes, holds and the brain's calm over the day, native beside Omni-Compass.",
+   "what": "The body's capacity in service and its demand (in the harness, its electrical power), the muscles past their line and the spread of positions over the day, native beside Omni-Compass.",
    "cls": "S",
    "status": "live",
    "awaiting": null,
@@ -1511,9 +2651,33 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawStrip",
+    "python": [
+     "omnicompass/adapter.py",
+     "omnicompass/core.py",
+     "omnicompass/nervous_system.py",
+     "omnicompass/compass_law.py",
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_twins_parity.py",
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision of the live engine (900 ms at 1×): the line takes a point, a ring opens at its head and its newest value is printed beside it"
    }
   },
   {
+   "n": 55,
    "id": "cvU",
    "name": "The brain's state: the well",
    "layer": "brain",
@@ -1541,13 +2705,30 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawBrain, drawWell",
+    "python": [
+     "omnicompass/core.py",
+     "omnicompass/adapter.py"
+    ],
+    "cpp": [
+     "cpp/src/core.cpp",
+     "cpp/src/governor.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py"
+    ],
+    "moves": "every decision the ball rolls to the brain's state and a ring opens where it lands"
    }
   },
   {
+   "n": 56,
    "id": "cvS",
-   "name": "The brain's state: the six variables",
+   "name": "The brain's state: stress S in its potential",
    "layer": "brain",
-   "what": "E, U, I, S, B and C integrated by RK4 every decision.",
+   "what": "Stress S on its cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS, rolling toward S*; the senses pull it back each decision (eqs. (5)–(6)).",
    "cls": "S",
    "status": "live",
    "awaiting": null,
@@ -1572,13 +2753,30 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawBrain, drawWell",
+    "python": [
+     "omnicompass/core.py",
+     "omnicompass/adapter.py"
+    ],
+    "cpp": [
+     "cpp/src/core.cpp",
+     "cpp/src/governor.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py"
+    ],
+    "moves": "every decision the ball rolls to the brain's state and a ring opens where it lands"
    }
   },
   {
+   "n": 57,
    "id": "cvB",
-   "name": "The brain's state: the organs",
+   "name": "The brain's state: the bath B",
    "layer": "brain",
-   "what": "Each organ's grant to expand or contract, decision by decision.",
+   "what": "The bath oscillator B, the slow tide of physical load, over the last 120 decisions (eq. (7)), its spring at the latest B.",
    "cls": "S",
    "status": "live",
    "awaiting": null,
@@ -1602,9 +2800,26 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawBrain",
+    "python": [
+     "omnicompass/core.py",
+     "omnicompass/adapter.py"
+    ],
+    "cpp": [
+     "cpp/src/core.cpp",
+     "cpp/src/governor.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "tests/test_cpp_governor_parity.py"
+    ],
+    "moves": "every decision the bath's line takes a point and a ring opens at its head"
    }
   },
   {
+   "n": 58,
    "id": "cvNat6c",
    "name": "Native's own controller beside the brain",
    "layer": "brain",
@@ -1632,9 +2847,23 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawNat6c",
+    "python": [
+     "realms/harness.py",
+     "docs/engine/export_harness_trace.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: native's own controllers, as the harness's record or the page's own model holds them",
+    "proof": [
+     "docs/engine/check_records.py"
+    ],
+    "moves": "every decision of the live engine"
    }
   },
   {
+   "n": 59,
    "id": "cvV",
    "name": "The verdict: one trial",
    "layer": "verdict",
@@ -1664,9 +2893,25 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
+   },
+   "wire": {
+    "code": "drawVerdict, vTick, judge",
+    "python": [
+     "omnicompass/verdict.py",
+     "omnicompass/student_t.py"
+    ],
+    "cpp": [
+     "cpp/tools/engine_runs.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "verify.py"
+    ],
+    "moves": "a cost measured every 28 ms until the verdict reads; a new trial starts 2.6 s after"
    }
   },
   {
+   "n": 60,
    "id": "cvV2",
    "name": "The verdict: every true cost",
    "layer": "verdict",
@@ -1688,56 +2933,25 @@
    "grafana": {
     "type": "timeseries",
     "unit": ""
-   }
-  },
-  {
-   "id": "proofCv",
-   "name": "The Python's runs, reproduced here",
-   "layer": "proof",
-   "what": "The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.",
-   "cls": "S (the engine itself)",
-   "status": "live",
-   "awaiting": null,
-   "feed": {
-    "exporter": "tools/engine_runs.py (the Python) and this page",
-    "metrics": [],
-    "promql": []
    },
-   "knobs": [
-    "runs",
-    "print"
-   ],
-   "grafana": {
-    "type": "stat",
-    "unit": ""
+   "wire": {
+    "code": "drawVerdict2, runTrialSync",
+    "python": [
+     "omnicompass/verdict.py",
+     "omnicompass/student_t.py"
+    ],
+    "cpp": [
+     "cpp/tools/engine_runs.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py",
+     "verify.py"
+    ],
+    "moves": "trials run in the browser's idle time; the shares fill as they run"
    }
   },
   {
-   "id": "hoCv",
-   "name": "The Python's 500 scenarios, replayed",
-   "layer": "proof",
-   "what": "benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.",
-   "cls": "S",
-   "status": "replay",
-   "awaiting": null,
-   "feed": {
-    "exporter": "benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv)",
-    "metrics": [],
-    "promql": []
-   },
-   "knobs": [
-    "seed",
-    "arm",
-    "gauge",
-    "speed",
-    "kill"
-   ],
-   "grafana": {
-    "type": "table",
-    "unit": ""
-   }
-  },
-  {
+   "n": 61,
    "id": "selfCv",
    "name": "Self-governed rendering",
    "layer": "page",
@@ -1757,6 +2971,19 @@
    "grafana": {
     "type": "timeseries",
     "unit": "ms"
+   },
+   "wire": {
+    "code": "drawSelf",
+    "python": [
+     "omnicompass/compass_law.py"
+    ],
+    "cpp": [
+     "cpp/tools/engine_runs.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_live_engine.py"
+    ],
+    "moves": "every frame: this page's own frame time under the compass law"
    }
   }
  ]

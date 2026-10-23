@@ -11,6 +11,8 @@ a monitor with a Prometheus expression becomes a panel on that expression (the d
 monitor the page computes from the repository's tables, or from its own clock, becomes a text panel saying so and where the
 number lives. Beside deploy/grafana/omni-compass.json (the governor's own eighteen panels on tools/omni_exporter.py) it is the
 whole wall for an operator's Grafana. The page embeds the same model and offers it for download; the builder writes the file.
+Every panel carries its monitor's number on the page, its order of appearance; the panels run left to right, then the next row, each
+under a row for the page's section that holds its monitor, and each says its wiring: the page's code, the Python, the C++, the checks.
 
   python3 docs/engine/export_grafana.py [OUT.json]      (default: deploy/grafana/omni-compass-wall.json)
 """
@@ -23,19 +25,74 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 REG = HERE / "monitors.json"
+PAGE = HERE / "OMNI_COMPASS_LIVE_ENGINE.html"
 OUT = ROOT / "deploy" / "grafana" / "omni-compass-wall.json"
 W, H, COLS = 12, 8, 2
 
 
+def page_order() -> list:
+    """The page's canvases in their order of appearance: the monitors' numbers, as the page itself counts them."""
+    import re
+    if not PAGE.exists():
+        return []
+    body = re.sub(r"<script[^>]*>.*?</script>", "", PAGE.read_text(encoding="utf-8"), flags=re.S)
+    return [m.group(1) for m in re.finditer(r'<canvas\b[^>]*\bid="([^"]+)"', body)]
+
+
+def page_sections() -> dict:
+    """Each canvas's section as the page numbers it, {canvas id: (number, title)}: the nearest section around it whose heading
+    carries a number, read from the page's own markup."""
+    import re
+    if not PAGE.exists():
+        return {}
+    body = re.sub(r"<script[^>]*>.*?</script>", "", PAGE.read_text(encoding="utf-8"), flags=re.S)
+    stack, out = [], {}
+    for t in re.finditer(r'<section\b[^>]*>|</section>|<h2\b[^>]*>(.*?)</h2>|<canvas\b[^>]*\bid="([^"]+)"', body, re.S):
+        tag = t.group(0)
+        if tag.startswith("<section"):
+            stack.append(None)
+        elif tag == "</section>":
+            stack.pop()
+        elif tag.startswith("<h2"):
+            sn = re.search(r'<span class="sn">([^<]*)</span>', t.group(1))
+            if stack and stack[-1] is None and sn:
+                stack[-1] = (sn.group(1), re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", t.group(1).replace(sn.group(0), ""))).strip())
+        else:
+            out[t.group(2)] = next((x for x in reversed(stack) if x), ("", ""))
+    return out
+
+
+def wiring(m: dict) -> str:
+    w = m.get("wire") or {}
+    if not w:
+        return ""
+    py = ", ".join(w.get("python") or []) or w.get("cpp_none", "none")
+    cpp = ", ".join(w.get("cpp") or []) or w.get("cpp_none", "none")
+    proof = f"; held equal by {', '.join(w['proof'])}" if w.get("proof") else ""
+    return f" Wired: the page's {w['code']} → the Python {py} → the C++ {cpp}{proof}. Moves: {w['moves']}."
+
+
 def dashboard(reg: dict) -> dict:
     panels = []
-    for i, m in enumerate(reg["monitors"]):
+    order = {cid: i for i, cid in enumerate(page_order())}   # every panel numbered as the page numbers its monitor, laid out left to right
+    sec, last, col, y = page_sections(), None, 0, 0
+    for i, m in enumerate(sorted(reg["monitors"], key=lambda m: order.get(m["id"], len(order)))):
         n = i + 1
-        x, y = (i % COLS) * W, (i // COLS) * H
+        sn, st = sec.get(m["id"], ("", ""))
+        if (sn, st) != last:   # each section of the page a row of the wall, its monitors under it
+            if col:
+                col, y = 0, y + H
+            panels.append({"id": 1000 + sum(1 for p in panels if p["type"] == "row"), "type": "row", "title": f"{sn} · {st}" if sn else (st or "the page"),
+                           "collapsed": False, "gridPos": {"x": 0, "y": y, "w": COLS * W, "h": 1}, "panels": []})
+            y, last = y + 1, (sn, st)
+        x = col * W
         title = f"{n} · {m['name']}"
         base = {"id": n, "title": title, "gridPos": {"x": x, "y": y, "w": W, "h": H},
-                "description": f"{m['what']} Evidence class {m['cls']}; on the live engine: {m['status']}. Feed: {m['feed']['exporter']}."
-                               + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "")}
+                "description": (f"Section {sn}, {st}. " if sn else "") + f"{m['what']} Evidence class {m['cls']}; on the live engine: {m['status']}. Feed: {m['feed']['exporter']}."
+                               + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "") + wiring(m)}
+        col += 1
+        if col == COLS:
+            col, y = 0, y + H
         if m["feed"]["promql"]:
             panels.append({**base, "type": m["grafana"]["type"] if m["grafana"]["type"] in ("timeseries", "stat", "bargauge", "heatmap", "table") else "timeseries",
                            "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
@@ -67,4 +124,5 @@ def main(out: str | None = None) -> dict:
 
 if __name__ == "__main__":
     d = main(sys.argv[1] if len(sys.argv) > 1 else None)
-    print(f"{len(d['panels'])} panels, {sum(1 for p in d['panels'] if p['type'] != 'text')} on Prometheus series")
+    mons = [p for p in d["panels"] if p["type"] != "row"]
+    print(f"{len(mons)} panels under {len(d['panels']) - len(mons)} section rows, {sum(1 for p in mons if p['type'] != 'text')} on Prometheus series")
