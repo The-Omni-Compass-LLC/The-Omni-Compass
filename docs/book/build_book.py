@@ -1177,6 +1177,8 @@ def rewrite_refs(text, kind, key, own, prev=""):
         return bool(EXTERNAL.search(ctx)) and not OWN_NAME.search(ctx[-70:])
 
     def man_chapter(t):
+        if not t.isdigit():                        # a lettered section (the live engine page's 1j) is no chapter of a manual
+            return None, None
         n = CHAPNUM.get(MAN_NUM.get(int(t), ""))
         return (str(n), "chapter") if n else (None, None)
 
