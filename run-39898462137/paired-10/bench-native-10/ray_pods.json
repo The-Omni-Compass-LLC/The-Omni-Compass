@@ -1,0 +1,4159 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "ray.io/ft-enabled": "false",
+                    "ray.io/kuberay-version": "v1.7.1",
+                    "ray.io/upgrade-strategy-recreate-hash": "T0IE6NOJFD1QPPJE8JKJDI5GEB7PFNBM"
+                },
+                "creationTimestamp": "2026-10-23T04:20:10Z",
+                "generateName": "omni-ray-head-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "headgroup",
+                    "ray.io/identifier": "omni-ray-head",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "head"
+                },
+                "name": "omni-ray-head-xlbqz",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "1972",
+                "uid": "b19e7a3e-ec03-41ce-a091-d9ec8f18e2d5"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start --head  --block  --dashboard-agent-listen-port=52365  --dashboard-host=0.0.0.0  --memory=5368709120  --metrics-export-port=8080  --no-monitor  --num-cpus=0 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start --head  --block  --dashboard-agent-listen-port=52365  --dashboard-host=0.0.0.0  --memory=5368709120  --metrics-export-port=8080  --no-monitor  --num-cpus=0 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "127.0.0.1:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_EXTRA_TAGS",
+                                "value": "kuberay_version=v1.7.1;kuberay_crd=RayCluster"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success \u0026\u0026 wget --tries 1 -T 10 -q -O- http://localhost:8265/api/gcs_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "name": "ray-head",
+                        "ports": [
+                            {
+                                "containerPort": 6379,
+                                "name": "gcs",
+                                "protocol": "TCP"
+                            },
+                            {
+                                "containerPort": 8265,
+                                "name": "dashboard",
+                                "protocol": "TCP"
+                            },
+                            {
+                                "containerPort": 10001,
+                                "name": "client",
+                                "protocol": "TCP"
+                            },
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success \u0026\u0026 wget --tries 1 -T 10 -q -O- http://localhost:8265/api/gcs_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "5Gi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "2Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/home/ray/omni",
+                                "name": "omni-ray-stream"
+                            },
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/tmp/ray",
+                                "name": "ray-logs"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4nvlz",
+                                "readOnly": true
+                            }
+                        ]
+                    },
+                    {
+                        "args": [
+                            "ray kuberay-autoscaler --cluster-name $(RAY_CLUSTER_NAME) --cluster-namespace $(RAY_CLUSTER_NAMESPACE)"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_HEAD_POD_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_CRD_VER",
+                                "value": "v1"
+                            },
+                            {
+                                "name": "KUBERAY_GEN_AUTOSCALER_START_CMD",
+                                "value": "ray kuberay-autoscaler --cluster-name $(RAY_CLUSTER_NAME) --cluster-namespace $(RAY_CLUSTER_NAMESPACE)"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "autoscaler",
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp/ray",
+                                "name": "ray-logs"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4nvlz",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "omni-bench-control-plane",
+                "nodeSelector": {
+                    "node-role.kubernetes.io/control-plane": ""
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "omni-ray",
+                "serviceAccountName": "omni-ray",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node-role.kubernetes.io/control-plane",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node-role.kubernetes.io/master",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "configMap": {
+                            "defaultMode": 493,
+                            "name": "omni-ray-stream"
+                        },
+                        "name": "omni-ray-stream"
+                    },
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "5Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "emptyDir": {},
+                        "name": "ray-logs"
+                    },
+                    {
+                        "name": "kube-api-access-4nvlz",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:20:12Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:20:10Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:20:23Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:20:23Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:20:10Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://084780b4930891d4dbaca3b8922889ccb716101b6d67c33986ee573922dfc7f9",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "autoscaler",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:20:11Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp/ray",
+                                "name": "ray-logs"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4nvlz",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "allocatedResources": {
+                            "cpu": "1",
+                            "memory": "2Gi"
+                        },
+                        "containerID": "containerd://0d31e0aa66e25043d261c3d1a1043251e9320b07d340e6808b8c9aeb6abdf752",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-head",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "5Gi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "2Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:20:11Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/home/ray/omni",
+                                "name": "omni-ray-stream"
+                            },
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/tmp/ray",
+                                "name": "ray-logs"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-4nvlz",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.6",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.6"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.0.9",
+                "podIPs": [
+                    {
+                        "ip": "10.244.0.9"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:20:10Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:22:33Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "0"
+                },
+                "name": "omni-ray-small-group-worker-894qf",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2695",
+                "uid": "3871be5b-2792-4086-9f2a-3d247e7de3e3"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-49mpf",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-49mpf",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-49mpf",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:34Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:46Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:33Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://9b60af230538c6b8b6a751365ff6244a4d371ef2191ae554f6f29b8094e17014",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:22:46Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-49mpf",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.7",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.7"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://300a8c530a0403d787e50a59fcdcccf6fc2fc5a4db818255a43cc933fed034e0",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://300a8c530a0403d787e50a59fcdcccf6fc2fc5a4db818255a43cc933fed034e0",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:22:46Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:22:34Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-49mpf",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.1.4",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.4"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:22:33Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:22:33Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "3"
+                },
+                "name": "omni-ray-small-group-worker-8sjhc",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2694",
+                "uid": "a0eed56e-3459-4e4c-8c70-65bfc502f8e4"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-s5rxb",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-s5rxb",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker3",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-s5rxb",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:34Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:47Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:33Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://c41f87e3d344d3b2a6801a087069f84954466a9b346ae4a200451648511747bb",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:22:47Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-s5rxb",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.4",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.4"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://88e999a14655de2d8af2182ed670054b760d87747fd4142e8a2a7227c4f3289a",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://88e999a14655de2d8af2182ed670054b760d87747fd4142e8a2a7227c4f3289a",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:22:46Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:22:34Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-s5rxb",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.4.5",
+                "podIPs": [
+                    {
+                        "ip": "10.244.4.5"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:22:33Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:23:10Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "6"
+                },
+                "name": "omni-ray-small-group-worker-dbdpp",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2904",
+                "uid": "0376e45b-4130-424c-a028-3bbeca09b86c"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-w2ztw",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-w2ztw",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-w2ztw",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:12Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:26Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:48Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:48Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:10Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://c98dded057c2b58d2a334dca5014a772a1d34d951797f5a342e628a12827698b",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:23:26Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-w2ztw",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.7",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.7"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://a810b18250a09ac13cd783735fdbf977d029c927338b566a65ef85b76678a0be",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://a810b18250a09ac13cd783735fdbf977d029c927338b566a65ef85b76678a0be",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:23:25Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:23:11Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-w2ztw",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.1.5",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.5"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:23:10Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:22:33Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "1"
+                },
+                "name": "omni-ray-small-group-worker-rd5rw",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2723",
+                "uid": "574d4d68-1d9c-42ee-8945-cebd43fc16d1"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-d4rkk",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-d4rkk",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker4",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-d4rkk",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:35Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:47Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:04Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:04Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:33Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://8d72de1a5590e9f96fba6bbd2da2b6bb5ea4bee44e72640ea1fcd04153bbf65d",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:22:47Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-d4rkk",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.5",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.5"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://2a51d2dd83393a6c366ca5540002a4d7408549d3ce82c3f60cadd4319d72bb16",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://2a51d2dd83393a6c366ca5540002a4d7408549d3ce82c3f60cadd4319d72bb16",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:22:46Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:22:34Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-d4rkk",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.3.5",
+                "podIPs": [
+                    {
+                        "ip": "10.244.3.5"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:22:33Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:22:33Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "4"
+                },
+                "name": "omni-ray-small-group-worker-wp878",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2703",
+                "uid": "7dc3ef64-e04b-45c7-a2ef-7c53e5ab391a"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-5lfl2",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-5lfl2",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker6",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-5lfl2",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:35Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:47Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:33Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://aa4fe0f8b40460896842b5802ddf9863db31f84f23a72cc6d45547789968e481",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:22:47Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-5lfl2",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.2",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.2"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://5ea3773001cad18f0a456de2e4f5d18afbed8bf0169fc53d18faa4a5a3d2bb9e",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://5ea3773001cad18f0a456de2e4f5d18afbed8bf0169fc53d18faa4a5a3d2bb9e",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:22:46Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:22:34Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-5lfl2",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.6.5",
+                "podIPs": [
+                    {
+                        "ip": "10.244.6.5"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:22:33Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:23:10Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "7"
+                },
+                "name": "omni-ray-small-group-worker-xbvcb",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2901",
+                "uid": "174de17f-0286-4e92-aa3f-797ed7ea3283"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-6v6gn",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-6v6gn",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker4",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-6v6gn",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:11Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:25Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:48Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:48Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:10Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://3087dc999ec641415c820ddc731bab1ba3a7e589367304ed178c7132f7976923",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:23:26Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-6v6gn",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.5",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.5"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://33479f2273ef7c92b8fb3ae7376f8f0ee2ee9e39456ae23de051b4deb3ad2faa",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://33479f2273ef7c92b8fb3ae7376f8f0ee2ee9e39456ae23de051b4deb3ad2faa",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:23:25Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:23:11Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-6v6gn",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.3.6",
+                "podIPs": [
+                    {
+                        "ip": "10.244.3.6"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:23:10Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:22:33Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "2"
+                },
+                "name": "omni-ray-small-group-worker-xpgjf",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2700",
+                "uid": "4b75b012-7cfa-4cfc-a7b7-ff8cb3e556ad"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-gj2nz",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-gj2nz",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker2",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-gj2nz",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:35Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:47Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:22:33Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://eb45e9c240c2791f097914c116513faea0fd365579ad156626128c75d5dcdb59",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:22:47Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-gj2nz",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.8",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.8"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://481bddc383539ac9e561986794ab14b21ce669fea4cb3257516997b42542bcb7",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://481bddc383539ac9e561986794ab14b21ce669fea4cb3257516997b42542bcb7",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:22:46Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:22:34Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-gj2nz",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.5.5",
+                "podIPs": [
+                    {
+                        "ip": "10.244.5.5"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:22:33Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2026-10-23T04:23:10Z",
+                "generateName": "omni-ray-small-group-worker-",
+                "generation": 1,
+                "labels": {
+                    "app": "omni-ray-stream-worker",
+                    "app.kubernetes.io/created-by": "kuberay-operator",
+                    "app.kubernetes.io/name": "kuberay",
+                    "ray.io/cluster": "omni-ray",
+                    "ray.io/group": "small-group",
+                    "ray.io/identifier": "omni-ray-worker",
+                    "ray.io/is-ray-node": "yes",
+                    "ray.io/node-type": "worker",
+                    "ray.io/worker-group-replica-index": "5"
+                },
+                "name": "omni-ray-small-group-worker-zr477",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "ray.io/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "RayCluster",
+                        "name": "omni-ray",
+                        "uid": "72e94c25-548d-44bd-ab67-43db2928f4a2"
+                    }
+                ],
+                "resourceVersion": "2881",
+                "uid": "c2f06a32-7338-4aa6-91d0-65a049425f4f"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "ulimit -n ${RAY_START_ULIMIT_OPEN_FILES:-65536}; ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/cluster']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLUSTER_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_CLOUD_INSTANCE_ID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "RAY_NODE_TYPE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.labels['ray.io/group']"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERAY_GEN_RAY_START_CMD",
+                                "value": "ray start  --address=omni-ray-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --memory=1073741824  --metrics-export-port=8080  --num-cpus=1 "
+                            },
+                            {
+                                "name": "RAY_PORT",
+                                "value": "6379"
+                            },
+                            {
+                                "name": "RAY_ADDRESS",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local:6379"
+                            },
+                            {
+                                "name": "RAY_USAGE_STATS_KUBERAY_IN_USE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE",
+                                "value": "1"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 120,
+                            "initialDelaySeconds": 30,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "name": "ray-worker",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "bash",
+                                    "-c",
+                                    "wget --tries 1 -T 2 -q -O- http://localhost:52365/api/local_raylet_healthz | grep success"
+                                ]
+                            },
+                            "failureThreshold": 10,
+                            "initialDelaySeconds": 10,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-kxg8k",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "initContainers": [
+                    {
+                        "args": [
+                            "\n\t\t\t\t\tSECONDS=0\n\t\t\t\t\twhile true; do\n\t\t\t\t\t\tif (( SECONDS \u003c= 120 )); then\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379 \u003e /dev/null 2\u003e\u00261; then\n\t\t\t\t\t\t\t\techo \"GCS is ready.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Waiting for GCS to be ready.\"\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tif ray health-check --address omni-ray-head-svc.default.svc.cluster.local:6379; then\n\t\t\t\t\t\t\t\techo \"GCS is ready. Any error messages above can be safely ignored.\"\n\t\t\t\t\t\t\t\tbreak\n\t\t\t\t\t\t\tfi\n\t\t\t\t\t\t\techo \"$SECONDS seconds elapsed: Still waiting for GCS to be ready. For troubleshooting, refer to the FAQ at https://docs.ray.io/en/master/cluster/kubernetes/troubleshooting.html.\"\n\t\t\t\t\t\tfi\n\t\t\t\t\t\tsleep 5\n\t\t\t\t\tdone\n\t\t\t\t"
+                        ],
+                        "command": [
+                            "/bin/bash",
+                            "-c",
+                            "--"
+                        ],
+                        "env": [
+                            {
+                                "name": "FQ_RAY_IP",
+                                "value": "omni-ray-head-svc.default.svc.cluster.local"
+                            },
+                            {
+                                "name": "RAY_IP",
+                                "value": "omni-ray-head-svc"
+                            }
+                        ],
+                        "image": "rayproject/ray:2.52.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "wait-gcs-ready",
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-kxg8k",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "omni-bench-worker5",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "medium": "Memory",
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "shared-mem"
+                    },
+                    {
+                        "name": "kube-api-access-kxg8k",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:12Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:25Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-23T04:23:10Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "1Gi"
+                        },
+                        "containerID": "containerd://2fb2d9d58fcb68f338caa0f37e1a1244893373bc382e2707050e58d0ad79f0d3",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "ray-worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "1Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-23T04:23:25Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/dev/shm",
+                                "name": "shared-mem"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-kxg8k",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.18.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.18.0.3"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "256Mi"
+                        },
+                        "containerID": "containerd://b9a0dc4bb400717a8af13fe26a447516eaba4328c59a2e849124167ee2da73c8",
+                        "image": "docker.io/rayproject/ray:2.52.0",
+                        "imageID": "sha256:89a409864ede42e7bcd9de9dd956c45ef3889d9d5f8518ec91d2f2d16d843f94",
+                        "lastState": {},
+                        "name": "wait-gcs-ready",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://b9a0dc4bb400717a8af13fe26a447516eaba4328c59a2e849124167ee2da73c8",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-23T04:23:24Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-23T04:23:11Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 100,
+                                "supplementalGroups": [
+                                    27,
+                                    100
+                                ],
+                                "uid": 1000
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-kxg8k",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.244.7.5",
+                "podIPs": [
+                    {
+                        "ip": "10.244.7.5"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-23T04:23:10Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
