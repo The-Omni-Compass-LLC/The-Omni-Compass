@@ -2204,7 +2204,7 @@ function spawnParticles() {
 }
 
 function drawRing(now, armSel) {
-  const cv = RING[armSel]; const {g, w, h} = fit(cv, 1);
+  const cv = RING[armSel]; const {g, w, h} = fit(cv, 1), narrowR = w < 400;   // a phone's ring: its centre holds fewer words, each fitted
   const geo = geos[armSel] = ringGeo(w); const {cx, cy, R, r0, r1, r2, r3, spread} = geo;
   g.clearRect(0, 0, w, h);
   const arm = W[armSel], omni = armSel === "omni", tint = REALM_TINT();
@@ -2250,12 +2250,14 @@ function drawRing(now, armSel) {
     for (let k = 0; k < 6; k++) { const a = -Math.PI/2 + k*Math.PI/3; const ri = r0*0.70, ro = ri + r0*0.24*clamp(vals[k], 0.06, 1);
       g.strokeStyle = alpha(css.muted, 0.25); g.lineWidth = 5; g.beginPath(); g.moveTo(cx + ri*Math.cos(a), cy + ri*Math.sin(a)); g.lineTo(cx + (ri + r0*0.24)*Math.cos(a), cy + (ri + r0*0.24)*Math.sin(a)); g.stroke();
       g.strokeStyle = k === 1 ? alpha(css.brass, 0.55) : css.brass; g.beginPath(); g.moveTo(cx + ri*Math.cos(a), cy + ri*Math.sin(a)); g.lineTo(cx + ro*Math.cos(a), cy + ro*Math.sin(a)); g.stroke();
-      g.fillStyle = css.muted; g.font = `${Math.max(10, R*0.034)}px "IBM Plex Sans", system-ui, sans-serif`; g.fillText(names[k], cx + r0*1.14*Math.cos(a), cy + r0*1.14*Math.sin(a)); }
-    g.fillStyle = W.killed ? css.bad : css.brass; g.font = `800 ${Math.max(13, R*0.06)}px "Big Shoulders Display", "Arial Narrow", sans-serif`;
-    g.fillText(W.killed ? "OMNI-COMPASS OFF" : "OMNI-COMPASS", cx, cy - r0*0.12);
-    g.fillStyle = css.muted; g.font = `600 ${Math.max(8, R*0.026)}px ${MONO}`; g.fillText("THE BRAIN", cx, cy - r0*0.42);
-    const lease = W.body === "harness" && W.t > HS().kill_at;
-    g.fillStyle = lease ? css.blood : css.ink; g.font = `500 ${Math.max(9, R*0.032)}px ${MONO}`; g.fillText(lease ? "lease: walking back" : (L ? "calm " + L.calm.toFixed(2) : "calm —"), cx, cy + r0*0.26);
+      if (!narrowR) { g.fillStyle = css.muted; g.font = `${Math.max(10, R*0.034)}px "IBM Plex Sans", system-ui, sans-serif`; g.fillText(names[k], cx + r0*1.14*Math.cos(a), cy + r0*1.14*Math.sin(a)); } }   // on a small ring the six gauges are ticks alone
+    const BIG = `"Big Shoulders Display", "Arial Narrow", sans-serif`, inW = 1.75*r0;   // the brain's words fitted inside its circle on a small ring
+    const fitIn = (txt, wt, fam, px, minPx) => { let s = px; g.font = `${wt} ${s}px ${fam}`; while (s > minPx && g.measureText(txt).width > inW) { s -= 0.5; g.font = `${wt} ${s}px ${fam}`; } };
+    const t1 = W.killed ? (narrowR ? "OFF" : "OMNI-COMPASS OFF") : "OMNI-COMPASS";
+    g.fillStyle = W.killed ? css.bad : css.brass; if (narrowR) fitIn(t1, 800, BIG, 13, 7); else g.font = `800 ${Math.max(13, R*0.06)}px ${BIG}`; g.fillText(t1, cx, cy - r0*0.12);
+    if (!narrowR) { g.fillStyle = css.muted; g.font = `600 ${Math.max(8, R*0.026)}px ${MONO}`; g.fillText("THE BRAIN", cx, cy - r0*0.42); }
+    const lease = W.body === "harness" && W.t > HS().kill_at, t3 = lease ? (narrowR ? "lease" : "lease: walking back") : (L ? "calm " + L.calm.toFixed(2) : "calm —");
+    g.fillStyle = lease ? css.blood : css.ink; if (narrowR) fitIn(t3, 500, MONO, 9, 7); else g.font = `500 ${Math.max(9, R*0.032)}px ${MONO}`; g.fillText(t3, cx, cy + r0*0.26);
     // blood: one heartbeat per decision, from the brain out to every muscle
     const age = (now - W.beat)/Math.max(160, 700/W.speed);
     if (!reduceMotion && age >= 0 && age < 1) { const rr = r0 + (r3 + 0.5*spread - r0)*age;
@@ -3011,7 +3013,10 @@ function drawCluster(armSel, cvId, st) {
   const running = Math.max(0, pods - pend); let podLeft = running; const perNode = Math.ceil(running/Math.max(1, n));
   for (let i = 0; i < Math.max(total, 1); i++) { const cx = x0 + (i % cols)*(sz + 6), cy = y0 + Math.floor(i/cols)*(sz + 6);
     if (i < n) { g.fillStyle = alpha(col, 0.22); g.fillRect(cx, cy, sz, sz); g.strokeStyle = col; g.lineWidth = 1.5; g.strokeRect(cx, cy, sz, sz);
-      const k = Math.min(perNode, podLeft); podLeft -= k; for (let j = 0; j < k; j++) { g.fillStyle = col; g.beginPath(); g.arc(cx + 6 + (j % 5)*((sz - 12)/4), cy + 8 + Math.floor(j/5)*8, 2.4, 0, Math.PI*2); g.fill(); } }
+      const k = Math.min(perNode, podLeft); podLeft -= k;   // the pods inside their box at any width; past what the box holds, its count in its corner
+      const ds = Math.max(3.5, Math.min(8.5, (sz - 10)/Math.max(1, Math.ceil(Math.sqrt(k))))), dc = Math.max(1, Math.floor((sz - 8)/ds)), dr = Math.max(1, Math.floor((sz - 10)/ds)), cap = dc*dr, show = k > cap ? cap - 1 : k, pr = Math.min(2.4, ds*0.32);
+      for (let j = 0; j < show; j++) { g.fillStyle = col; g.beginPath(); g.arc(cx + 5 + (j % dc)*ds, cy + 6 + Math.floor(j/dc)*ds, pr, 0, Math.PI*2); g.fill(); }
+      if (k > cap) { g.fillStyle = css.ink; g.font = `700 10px ${MONO}`; g.textAlign = "right"; g.textBaseline = "bottom"; g.fillText(String(k), cx + sz - 3, cy + sz - 2); g.font = `12px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; } }
     else if (i < n + bo) { g.setLineDash([3, 3]); g.strokeStyle = col; g.strokeRect(cx, cy, sz, sz); g.setLineDash([]); g.fillStyle = css.muted; g.textAlign = "center"; g.fillText("boot", cx + sz/2, cy + sz/2 - 6); }
     else { g.fillStyle = alpha(css.muted, 0.18); g.fillRect(cx, cy, sz, sz); g.strokeStyle = css.rule; g.strokeRect(cx, cy, sz, sz); g.fillStyle = css.muted; g.textAlign = "center"; g.fillText("parked", cx + sz/2, cy + sz/2 - 6); } }
   const rowsUsed = Math.ceil(Math.max(total, 1)/cols), yb = y0 + rowsUsed*(sz + 6) + 8;
@@ -5055,13 +5060,16 @@ function drawCpuHost(now) {
   const rep = CPUHOST.reps.find(r => r.rep === CH.rep) || CPUHOST.reps[0], N = rep.arms.native, O = rep.arms.omni; if (!N || !O) return;
   const span = Math.max(...N.samples.t, ...O.samples.t, 1); if (!W.paused) CH.k = ((now - CH.t0)/1000*(W.speed || 1)) % (span + 1); const T = CH.k;
   const lanes = monLanes(g, w, 56, 10, 26), aud = O.audit || [], acting = aud.filter(a => a[5] && /trial|act/.test(String(a[5]) + String(a[6]))).map(a => [a[0]]);
-  monPanelsT(g, w, h, 22, lanes, [
+  const narrowC = w < 640;   // on a narrow canvas the stamp takes its own line under the lane heads
+  monPanelsT(g, w, h, narrowC ? 40 : 22, lanes, [
     ["package power (W; the processor's own meter on the real machine, modelled here)", [N.samples.power_w, O.samples.power_w], null, null, null],
     ["frequency ceiling held (MHz, the knob) · dashed: the clock the governor ran at", [N.samples.ceiling_mhz, O.samples.ceiling_mhz], null, [N.samples.cur_mhz, O.samples.cur_mhz], [[], acting]],
     ["CPU busy (share of the second)", [N.samples.busy, O.samples.busy], null, null, null]], T, span,
     [[N.samples.t, O.samples.t], [N.samples.t, O.samples.t], [N.samples.t, O.samples.t]],
     `MODEL, class S: ${CPUHOST.note ? "the harness on its own modelled machine" : ""} · repetition ${rep.rep} of ${CPUHOST.reps.length} · the real run awaits a Linux machine with its energy counter (RAPL): register row 79, cpu-power.yml · the verdict: ${(O.verdict || {}).state || "—"}`);
-  g.fillStyle = alpha(css.even, 0.9); g.font = `700 12px ${MONO}`; g.textAlign = "right"; g.textBaseline = "top"; g.fillText("AWAITING ITS MACHINE · A MODEL, NOT A MEASUREMENT", w - 8, 4);
+  g.fillStyle = alpha(css.even, 0.9); g.textBaseline = "top";
+  if (narrowC) { g.font = `700 10px ${MONO}`; g.textAlign = "left"; g.fillText(cutToFit(g, "AWAITING ITS MACHINE · A MODEL, NOT A MEASUREMENT", w - 16), 8, 26); }
+  else { g.font = `700 12px ${MONO}`; g.textAlign = "right"; g.fillText("AWAITING ITS MACHINE · A MODEL, NOT A MEASUREMENT", w - 8, 4); }
   const clk = $("cpuClock"); if (clk) clk.textContent = `${T.toFixed(0)} s of ${span.toFixed(0)} s · writes ${(O.summary || {}).writes ?? "—"} · handed back ${(O.summary || {}).handed_back ? "yes" : "—"}`;
 }
 // the clouds: the bill run by run, the running set's progress, and each gate's own reason
@@ -5079,8 +5087,10 @@ function drawCloudBill(which) {
       if (x.native != null) { g.fillStyle = css.steel; g.fillRect(x0, Y(x.native), bw2 - 2, bot - Y(x.native)); }
       if (x.omni != null) { g.fillStyle = MASTER.off ? MASTER.sent : css.brass; g.fillRect(x0 + bw2, Y(x.omni), bw2 - 2, bot - Y(x.omni)); }
       const d = x.omni != null && x.native != null ? (x.omni - x.native)/x.native*100 : null, clear = x.ci95 && (x.ci95[0] > 0 || x.ci95[1] < 0), wd = d == null ? "unread" : !clear ? "EVEN" : d < 0 ? "GAIN" : "power given";
-      g.fillStyle = wordColor(wd); g.font = `700 11px ${MONO}`; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(wd === "EVEN" ? `EVEN =${Math.abs(d || 0).toFixed(1)}%` : wd === "GAIN" ? `GAIN +${Math.abs(d).toFixed(1)}%` : wd === "power given" ? `given +${Math.abs(d).toFixed(1)}%` : wd, x0 + bw2, Y(Math.max(x.native || 0, x.omni || 0)) - 3);
-      g.fillStyle = css.muted; g.font = `10px ${MONO}`; g.textBaseline = "top"; g.fillText(cutToFit(g, `${r.engine || "—"} · ${r.result.reps} pairs`, bw - 8), x0 + bw2, bot + 3); if (b.native != null) g.fillText(cutToFit(g, `$${b.native.toFixed(3)} → $${(b.omni || 0).toFixed(3)}`, bw - 8), x0 + bw2, bot + 15); });
+      g.fillStyle = wordColor(wd); g.font = `700 ${bw < 110 ? 10 : 11}px ${MONO}`; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(wd === "EVEN" ? `EVEN =${Math.abs(d || 0).toFixed(1)}%` : wd === "GAIN" ? `GAIN +${Math.abs(d).toFixed(1)}%` : wd === "power given" ? `given +${Math.abs(d).toFixed(1)}%` : wd, x0 + bw2, Y(Math.max(x.native || 0, x.omni || 0)) - 3);
+      const thin = bw < 110;   // a bar too narrow for its two label lines carries its engine alone
+      g.fillStyle = css.muted; g.font = `10px ${MONO}`; g.textBaseline = "top"; g.fillText(cutToFit(g, thin ? String(r.engine || "—").replace(/^omni-/, "") : `${r.engine || "—"} · ${r.result.reps} pairs`, bw - 8), x0 + bw2, bot + 3); if (b.native != null && !thin) g.fillText(cutToFit(g, `$${b.native.toFixed(3)} → $${(b.omni || 0).toFixed(3)}`, bw - 8), x0 + bw2, bot + 15);
+      if (thin && i === ri && b.native != null) { g.fillStyle = css.ink; g.textAlign = "left"; g.fillText(cutToFit(g, `reading: ${r.engine || "—"} · ${r.result.reps} pairs · $${b.native.toFixed(3)} → $${(b.omni || 0).toFixed(3)}`, w - 16), 8, bot + 17); g.textAlign = "center"; } });
   } else if (which !== "az" && CR.settings && CR.settings.cloud) {   // no set landed yet: the mechanism every cloud set runs, live on the cloud setting's model (class S), never this cloud's bill
     const R = CR.settings.cloud.runs[String(CR.seeds[C4.run])], A = R.native, O = R.omni, N = A.nodes.length, T = Math.min(4*C4.k + 3, N - 1), on = (S, t) => S.nodes[t] + S.boot[t];
     let hi = 1; for (let t = 0; t < N; t++) hi = Math.max(hi, on(A, t), on(O, t)); hi = Math.ceil(hi*1.15);
@@ -5103,14 +5113,18 @@ function drawCloudBill(which) {
 }
 // GitHub's pipeline: the runs in flight, the Azure set's repetitions, the clouds' gates
 function drawCi() {
-  const cv = $("ciCv"); if (!cv) return; const {g, w, h} = fit(cv, 360/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
+  const cv = $("ciCv"); if (!cv) return;
   const runs = OPS_BUILD.runs || [], by = {}; runs.forEach(r => { const k = r.workflow || "?"; by[k] = by[k] || {running: 0, waiting: 0}; by[k][r.status === "in_progress" ? "running" : "waiting"]++; });
   const keys = Object.keys(by).sort((a, b) => (by[b].running + by[b].waiting) - (by[a].running + by[a].waiting)).slice(0, 14);
+  const cw0 = Math.max(cv.clientWidth, 1), narrowG = cw0 < 600;   // a phone: one workflow a row, its name above its bar
+  const {g, w, h} = fit(cv, (narrowG ? 30 + keys.length*30 + 100 : 360)/cw0); g.clearRect(0, 0, w, h);
   g.font = `700 14px ${MONO}`; g.textBaseline = "top"; g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(cutToFit(g, `GitHub Actions at the build: ${runs.filter(r => r.status === "in_progress").length} running, ${runs.filter(r => r.status !== "in_progress").length} waiting${OPS_BUILD.runs_read_at ? ` (read ${OPS_BUILD.runs_read_at.replace("T", " ").slice(0, 16)} UTC, ${ago(OPS_BUILD.runs_read_at)})` : " (this build did not read GitHub: no token)"}`, w - 16), 8, 6);
-  const left = 180, right = w - 12, top = 30, rowH = Math.min(18, (h - 120)/Math.max(1, keys.length)), hi = Math.max(1, ...keys.map(k => by[k].running + by[k].waiting));
+  const left = narrowG ? 8 : 180, right = w - 12, top = 30, rowH = narrowG ? 30 : Math.min(18, (h - 120)/Math.max(1, keys.length)), hi = Math.max(1, ...keys.map(k => by[k].running + by[k].waiting));
   const ri = rdAt(keys.length);   // the reading cursor: one workflow a decision of the live engine
-  keys.forEach((k, i) => { const y = top + i*rowH, b = by[k]; if (i === ri) { g.fillStyle = alpha(css.accent, 0.12); g.fillRect(4, y, w - 8, rowH); rdBox(g, 4, y, w - 8, rowH, css.accent); } g.fillStyle = i === ri ? css.ink : css.muted; g.font = `${i === ri ? "700 " : ""}11px ${MONO}`; g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(cutToFit(g, k, left - 14), left - 8, y + rowH/2);
-    const sc = (right - left - 140)/hi; g.fillStyle = css.accent; g.fillRect(left, y + 3, b.running*sc, rowH - 6);   /* room after the longest bar for its words */ g.fillStyle = alpha(css.accent, 0.35); g.fillRect(left + b.running*sc, y + 3, b.waiting*sc, rowH - 6); g.fillStyle = css.ink; g.textAlign = "left"; g.fillText(`${b.running} running${b.waiting ? `, ${b.waiting} waiting` : ""}`, left + (b.running + b.waiting)*sc + 6, y + rowH/2); });
+  keys.forEach((k, i) => { const y = top + i*rowH, b = by[k]; if (i === ri) { g.fillStyle = alpha(css.accent, 0.12); g.fillRect(4, y, w - 8, rowH); rdBox(g, 4, y, w - 8, rowH, css.accent); } g.fillStyle = i === ri ? css.ink : css.muted; g.font = `${i === ri ? "700 " : ""}11px ${MONO}`;
+    if (narrowG) { g.textAlign = "left"; g.textBaseline = "top"; g.fillText(cutToFit(g, k, w - 16), left, y + 1); }
+    else { g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(cutToFit(g, k, left - 14), left - 8, y + rowH/2); }
+    const by0 = narrowG ? y + 15 : y + 3, bh = narrowG ? 10 : rowH - 6, sc = (right - left - 140)/hi; g.fillStyle = css.accent; g.fillRect(left, by0, b.running*sc, bh);   /* room after the longest bar for its words */ g.fillStyle = alpha(css.accent, 0.35); g.fillRect(left + b.running*sc, by0, b.waiting*sc, bh); g.fillStyle = css.ink; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText(`${b.running} running${b.waiting ? `, ${b.waiting} waiting` : ""}`, left + (b.running + b.waiting)*sc + 6, by0 + bh/2); });
   let y = h - 84; g.textAlign = "left"; g.textBaseline = "top"; g.font = `11px ${MONO}`;
   const aks = ((LEDGER.workflows || {})["aks-metered.yml"] || []).find(r => r.status !== "completed" && r.progress); if (aks) { const p = aks.progress; g.fillStyle = css.ink; g.fillText(cutToFit(g, `Azure: ${tTitle(aks.title)} · ${p.done} of ${p.total} repetitions measured, ${p.running} running`, w - 16), 8, y); y += 14; g.fillStyle = css.rule; g.fillRect(8, y, w - 16, 8); g.fillStyle = css.accent; g.fillRect(8, y, (w - 16)*p.done/Math.max(1, p.total), 8); y += 14; }
   ["cloud-check google", "cloud-check amazon"].forEach(t => { const gte = ((LEDGER.workflows || {})["cloud-check.yml"] || []).find(r => r.title === t && r.status === "completed"); if (!gte) return; const ok = gte.conclusion === "success"; g.fillStyle = ok ? css.ok : css.bad; g.beginPath(); g.arc(14, y + 7, 6, 0, 7); g.fill(); g.fillStyle = css.ink; g.fillText(cutToFit(g, `${t}: ${ok ? "ready" : "not ready"}${gte.reason ? " · " + gte.reason : ""}`, w - 36), 26, y); y += 14; });
@@ -5166,16 +5180,17 @@ function drawMuscleCv() {
 { const cv = $("muscleCv"); if (cv) cv.addEventListener("click", e => { const r = cv.getBoundingClientRect(), x = (e.clientX - r.left), y = (e.clientY - r.top), sc = cv.clientWidth ? (cv.width/ (window.devicePixelRatio || 1))/cv.clientWidth : 1; const i = Math.floor((y - MUS.top)/MUS.ch)*MUS.cols + Math.floor((x - 8)/MUS.cw); const M = (SC.realms || {}).muscles || []; MUS.pick = i >= 0 && i < M.length ? i : null; const n = $("muscleNote"); if (n && MUS.pick != null) { const m = M[MUS.pick]; n.innerHTML = `<b>${ESC(m[0])}</b> · ${ESC(m[1])} · realm ${ESC(m[2])} · template ${ESC(m[3])} · knob ${ESC(m[4])} · <span class="word ${rmWord(m[5])[1]}">${ESC(rmWord(m[5])[0])}</span>` + (Array.isArray(m[6]) ? `<div class="note">loads: ${m[6].map(l => `${ESC(String(l[0]))} (misses ${l[1]} native → ${l[2]} Omni-Compass)`).join("; ")}</div>` : ""); } drawMuscleCv(); }); }
 // the seven organisms under three loads
 function drawOrgCv() {
-  const cv = $("orgCv"); if (!cv) return; const O = (SC.realms || {}).organisms || {}; const {g, w, h} = fit(cv, (46 + Math.max(1, (O.normal || []).length)*30 + 40)/Math.max(cv.clientWidth, 1)); g.clearRect(0, 0, w, h);
+  const cv = $("orgCv"); if (!cv) return; const O = (SC.realms || {}).organisms || {}, cw0 = Math.max(cv.clientWidth, 1), narrowO = cw0 < 600, nO0 = Math.max(1, (O.normal || []).length), bandH = nO0*26 + 24;   // a phone: the three loads as three bands
+  const {g, w, h} = fit(cv, (narrowO ? 46 + 3*bandH + 30 : 46 + nO0*30 + 40)/cw0); g.clearRect(0, 0, w, h);
   const SHORT = {compute_ai_cloud: "compute", physics_robotics_autonomous: "physics", energy_facility_industrial: "energy", distribution_specialized: "distribution"};   // the realms by their short names, as the grid names them
   const loads = [["normal", "its own load"], ["climb", "the climb (1 2 3 2 3 4 …)"], ["line", "work waiting in line"]];
   g.font = `700 13px ${MONO}`; g.textBaseline = "top"; g.textAlign = "left"; g.fillStyle = css.ink; g.fillText(`The seven organisms, three loads: misses against native (the realms table, ${(SC.realms.run || {}).engine || ""}, ${((SC.realms.run || {}).seeds || []).length} seeds)`, 8, 6);
-  const top = 46, left = 120, gw = (w - left - 16)/3, orgs = (O.normal || []), rowH = Math.min(30, (h - top - 20)/Math.max(1, orgs.length));
+  const top = 46, left = narrowO ? 100 : 120, gw = narrowO ? w - left - 16 : (w - left - 16)/3, orgs = (O.normal || []), rowH = narrowO ? 26 : Math.min(30, (h - top - 20)/Math.max(1, orgs.length));
   const nO = orgs.length, ri = rdAt(loads.length*nO), rl = ri >= 0 ? Math.floor(ri/nO) : -1, ro = ri >= 0 ? ri % nO : -1;   // the reading cursor: one organism and load a decision
-  loads.forEach(([k, label], li) => { const x0 = left + li*gw; g.fillStyle = css.muted; g.font = `11px ${MONO}`; g.textAlign = "left"; g.fillText(label, x0, top - 16);
-    (O[k] || []).forEach((o, oi) => { const y = top + oi*rowH, cut = o.viol_native ? (o.viol_native - o.viol_max)/o.viol_native : 0, wd = rmWord(o.label)[2], col = wd === "loss" ? css.bad : wd === "gain" ? css.ok : css.even;
+  loads.forEach(([k, label], li) => { const x0 = narrowO ? left : left + li*gw, yb0 = narrowO ? top + li*bandH : top; g.fillStyle = css.muted; g.font = `${narrowO ? "700 " : ""}11px ${MONO}`; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(label, narrowO ? 8 : x0, yb0 - 16);
+    (O[k] || []).forEach((o, oi) => { const y = yb0 + oi*rowH, cut = o.viol_native ? (o.viol_native - o.viol_max)/o.viol_native : 0, wd = rmWord(o.label)[2], col = wd === "loss" ? css.bad : wd === "gain" ? css.ok : css.even;
       if (li === rl && oi === ro) { g.fillStyle = alpha(css.accent, 0.12); g.fillRect(x0 - 4, y + 2, gw - 6, rowH - 4); rdBox(g, x0 - 4, y + 2, gw - 6, rowH - 4, css.accent); }
-      if (li === 0) { g.fillStyle = css.muted; g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(cutToFit(g, `${SHORT[o.key] || o.key} (${o.n})`, left - 14), left - 8, y + rowH/2); }
+      if (li === 0 || narrowO) { g.fillStyle = css.muted; g.font = `11px ${MONO}`; g.textAlign = "right"; g.textBaseline = "middle"; g.fillText(cutToFit(g, `${SHORT[o.key] || o.key} (${o.n})`, left - 14), left - 8, y + rowH/2); }
       const bw = Math.min(gw - 70, Math.abs(cut)*(gw - 70)*2); g.fillStyle = col; g.fillRect(x0, y + 5, Math.max(2, bw), rowH - 10);
       g.fillStyle = css.ink; g.font = `10px ${MONO}`; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText(cutToFit(g, `${wd === "loss" ? "LOSS −" : wd === "gain" ? "GAIN +" : "EVEN ="}${(100*Math.abs(cut)).toFixed(1)}% misses${o.flagged ? ` · ${o.flagged} flagged` : ""}`, gw - bw - 10), x0 + Math.max(2, bw) + 6, y + rowH/2); }); });
   const rd = ri >= 0 ? (O[loads[rl][0]] || [])[ro] : null; if (rd) { g.fillStyle = css.ink; g.font = `11px ${MONO}`; g.textAlign = "left"; g.textBaseline = "bottom";

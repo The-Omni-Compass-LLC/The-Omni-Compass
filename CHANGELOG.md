@@ -2,6 +2,19 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-23 (midday): the visual seat's last six closed; main's omni-v16 tables on the page
+
+- **Six monitors that printed over themselves on a phone** (the visual referee's V5 to V10, `docs/engine/CONSENSUS_AUDIT_2026-10-22.md`),
+  each fixed in its own drawing and rendered again at 390 and 1280 px:
+  - the cluster monitors (5a, 5e): the pods sit inside their machine's box, and a box past what it holds writes its count;
+  - the CPU host (5f): the "awaiting its machine" stamp takes its own line under the lane heads;
+  - the ring (6a): on a small ring the six gauges are ticks alone and the centre's words fit the circle, OFF in red with the switch off;
+  - the seven organisms (4): the three loads stack as three bands;
+  - the Azure bill (5a): a narrow bar carries its engine alone, and the reading line names the set, its pairs and its bill;
+  - GitHub's runs (1i): one workflow a row, its name above its bar.
+- **Main's omni-v16 tables** (Kafka, PostgreSQL's pooler, Redis, MySQL, MongoDB, each as shipped and as a service, landed on main by
+  the conductor) are merged into this branch, and the live engine's records are rebuilt from the merged tree.
+
 ## 2026-10-23 (morning): the consensus audit of 22 October, its majors closed; the sweep's table carries the notice
 
 - **The audit** (`docs/engine/CONSENSUS_AUDIT_2026-10-22.md`; the seats' reports line for line in `docs/engine/audit_2026-10-22/`): five

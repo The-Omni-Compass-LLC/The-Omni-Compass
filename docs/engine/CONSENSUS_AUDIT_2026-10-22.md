@@ -20,10 +20,10 @@ scale called one, and both are closed.
 ## 0. Where the findings stand (23 October, morning)
 
 All five seats are in: 38 majors as counted, **33 distinct** (five found twice or more: the sign rule S1 = E3 = V3, power given's
-colour E4 = V2, the title page's "every model" S6 = M1, the title page's "confirmed as the best state" M9 = E1). Of the 33, **23 are
-closed** in the same push as this page, **3 are closed in part** and wait on the founder's decision on the page's order (ST1, ST2;
-section 4) or keep one small remainder (ST4), **1 is closed in its sentence** with the rest of its fix described (M3), and **6 are
-open**: the visual seat's phone-width overprints inside six monitors (V5 to V10), each with its fix in section 3, the next push.
+colour E4 = V2, the title page's "every model" S6 = M1, the title page's "confirmed as the best state" M9 = E1). Of the 33, **29 are
+closed** (23 in the push of this page, the visual seat's last six, V5 to V10, in the push after it), **3 are closed in part** and wait
+on the founder's decision on the page's order (ST1, ST2; section 4) or keep one small remainder (ST4), and **1 is closed in its
+sentence** with the rest of its fix described (M3). None is open.
 
 **Minors and nits.** The five seats name 94 minors (the mathematics 15, the underwriting 21, the editing 24, the structure 17, the
 visual 17) and their nits (the editor's 14 and the visual seat's 10 among them), each in its seat's report with its fix. Closed with this push where a major's fix covered them:
@@ -129,12 +129,12 @@ with the folds.
 | 1, 17 again | V3, V2 | 1g, iv, 5f, the quote board, the radar; the prose and two legends | On the 08:41 build the sign rule still missed five places (1g's cells printed the raw sign beside a LOSS chip; iv's ranges signed one end; 5f and the radar kept raw signs; the quote board's number stood without its word), and power given was green in the prose, the status board and two legends. | 1g's cells read through the page's cell formatter (LOSS −5.1% (−1.9% to −8.3%)); every range in iv and the readings carries the word's sign on both numbers (LOSS −5.1% to −9.1%); 5f's change and interval cells and the radar's sizes take the word's sign; the quote board prints the word beside its number; power given wears its own class in the prose, blue, and blue on the market map, the quote board's strip and the legends. |
 | 26 | V1 | ii | The two lede paragraphs shared one grid cell and printed over each other on the first screen, at 1280 and at 390 px. | Each lede has its own row at both widths (rendered and measured: the second starts 115 px below the first at 1280, 12 px at 390). |
 | 27 | V4 | 8b, monitors 52 and 53 | The phase planes stayed side by side at 167 px on a phone, axis labels colliding and captions cut. | They stack under 560 px, native above, as every pair does (rendered: one 342 px column). |
-| 28 | V5 | 5a monitors 20 and 21, 5e monitors 32 and 33 | At 390 px the pod dots print over their caption. | Open, the next push: the caption under the lowest machine row, or the boxes in a second row under 400 px. |
-| 29 | V6 | 5f monitor 36 | At 390 px the "awaiting its machine" stamp prints over the column heads. | Open, the next push: the stamp on its own line under 600 px. |
-| 30 | V7 | 6a monitor 40 | At a 308 px ring the centre's three lines and the state letters print over each other, worst with the switch OFF. | Open, the next push: the state letters as ticks and the words under the ring below 400 px. |
-| 31 | V8 | 4 monitor 14 | At 390 px the seven organisms' three load columns print over each other. | Open, the next push: the loads as three bands under 600 px. |
-| 32 | V9 | 5a monitor 17 | At 390 px the Azure sets' axis labels run together. | Open, the next push: the engine and price in the reading line only, under 600 px. |
-| 33 | V10 | 1i monitor 8 | At 390 px the workflow bars collapse and their count boxes cut the names. | Open, the next push: one row a workflow with its name above its bar, under 600 px. |
+| 28 | V5 | 5a monitors 20 and 21, 5e monitors 32 and 33 | At 390 px the pod dots print over their caption. | The pods sit inside their machine's box at any width; past what a box holds, its count is written in its corner (rendered at 390 and 1280 px). |
+| 29 | V6 | 5f monitor 36 | At 390 px the "awaiting its machine" stamp prints over the column heads. | Under 640 px the stamp takes its own line under the lane heads (rendered). |
+| 30 | V7 | 6a monitor 40 | At a 308 px ring the centre's three lines and the state letters print over each other, worst with the switch OFF. | On a ring under 400 px the six gauges are ticks alone and the centre's words are fitted inside the circle: OFF in red with the switch off, the calm or the lease under it (rendered ON and OFF). |
+| 31 | V8 | 4 monitor 14 | At 390 px the seven organisms' three load columns print over each other. | Under 600 px the three loads stack as three bands of the seven organisms, each under its own label (rendered). |
+| 32 | V9 | 5a monitor 17 | At 390 px the Azure sets' axis labels run together. | A bar too narrow for two label lines carries its engine alone; the reading line under the axis names the set the cursor is on, its pairs and its bill (rendered). |
+| 33 | V10 | 1i monitor 8 | At 390 px the workflow bars collapse and their count boxes cut the names. | Under 600 px one workflow a row, its name above its bar and the count after it; the canvas grows with the rows (rendered). |
 
 ## 4. The order of the page: the structure seat's proposal, its cost, and the founder's decision
 
@@ -174,9 +174,9 @@ Read on the 08:41 UTC build of 23 October at 1280 and 390 px, every finding nami
 desktop alone A−, phone alone B−; 10 majors, 17 minors, 10 nits (`docs/engine/audit_2026-10-22/seat_visual.md`). What holds: no console
 error, warning or page error in any load of either build; the page never scrolls sideways at either width, every wide table scrolling
 in its own frame; every one of the 61 monitors drawn; the notice first and last at both widths; the kill switch sets every Omni-Compass
-side to native's tint at one press and restores it. What it found is in section 3: four majors closed in this push (V1 to V4, V2 and V3
-with the editor's and the mathematics seat's findings), six open with their fixes (V5 to V10), each a phone-width overprint inside one
-monitor.
+side to native's tint at one press and restores it. What it found is in section 3: ten majors, all closed (V1 to V4 in the push of this
+page, V2 and V3 with the editor's and the mathematics seat's findings; V5 to V10, each a phone-width overprint inside one monitor, in the
+push after it, every one rendered again at 390 and 1280 px).
 
 ## 6. Method and limits
 
