@@ -348,7 +348,11 @@ the founder overrides one in the conversation.
   compasses engine"). Anything available that strengthens the mechanism or its proof is used and named; nothing is built from
   another orchestrator's or governor's code.
 - **Nothing is pushed until the founder says so** (23 October: "Don't push nothing"; "I don't want you to push shit until I
-  tell you"). Work is built, run and shown here; the push waits for his word.
+  tell you"). Work is built, run and shown here; the push waits for his word. His word came the same evening: "Native is
+  Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And then Omni direct is simply
+  Omni on top of the muscles, no Kubernetes ... they all need to be written in code ... put into the GitHub and push it all";
+  then "Update, push, push, push in the bush". The three arms are always shown together (native, Omni on native, Omni direct;
+  `omni_orchestrator/`, brains `yardstick`, `omni_native`, `omni`), and the push hold is lifted.
 
 ## Orders of 22 October
 

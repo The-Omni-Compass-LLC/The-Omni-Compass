@@ -22,9 +22,9 @@ on:
         type: boolean
         default: false
       room_rule:
-        description: "Omni's room rule: requests (Kubernetes' way) or busy (also under 75% of a machine's measured busy share)"
-        default: "requests"
-run-name: "orchestrator ${{ github.event.inputs.run || 'push' }} room=${{ github.event.inputs.room_rule || 'requests' }}${{ github.event.inputs.quick == 'true' && ' (quick)' || '' }}"
+        description: "Omni's room rule: busy (the engine's own: also under 75% of a machine's measured busy share) or requests (Kubernetes' way)"
+        default: "busy"
+run-name: "orchestrator ${{ github.event.inputs.run || 'push' }} room=${{ github.event.inputs.room_rule || 'busy' }}${{ github.event.inputs.quick == 'true' && ' (quick)' || '' }}"
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 # the token reads the code and nothing else: this workflow pushes nothing, starts nothing and reads no other run
@@ -54,7 +54,7 @@ jobs:
         run: |
           set +e
           q=""; [ "${{ github.event.inputs.quick }}" = "true" ] && q="--quick"
-          rr="${{ github.event.inputs.room_rule }}"; rr="${rr:-requests}"
+          rr="${{ github.event.inputs.room_rule }}"; rr="${rr:-busy}"
           sudo -E env "PATH=$PATH" python3 tools/orchestrator_show.py --out out --room-rule "$rr" $q > run.log 2>&1
           code=$?
           sudo chown -R "$(id -u):$(id -g)" out 2>/dev/null || true

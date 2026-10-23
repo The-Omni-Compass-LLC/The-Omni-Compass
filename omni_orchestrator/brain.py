@@ -86,7 +86,10 @@ class OmniBrain:
         step does not follow the count down: inside its 10% tolerance the yardstick's rule holds whatever stands)."""
         if twin is None:
             twin = self.twin.recommend(now, units, busy)
-        floor = max(self.mn, (twin if anchor is None else anchor) - max(0, int(depth)))
+        # during a phase the step is counted from the higher of the twin as the phase found it and the twin now: the floor
+        # never follows the count down (the twin's tolerance would accept the cut) and never stays below a twin the
+        # traffic has raised since the phase began
+        floor = max(self.mn, (twin if anchor is None else max(anchor, twin)) - max(0, int(depth)))
         f = self.law.force(p95_ms)
         reflex = min(self.max_step, int(waiting)) if waiting > 0 else 0
         if reflex or f > 0.05:

@@ -363,8 +363,11 @@ Omni-Compass also runs the organism as its own orchestrator, with no Kubernetes 
 Three arms are always shown together: native (Kubernetes' published autoscaling rule on the muscles, written by us as the
 yardstick), Omni on native (Omni on top of that rule) and Omni direct (Omni alone on the muscles). In the full form on one host
 (one run of each arm, class L) Omni direct read against native by the one key: work GAIN (up 4.7%), the 95th percentile GAIN
-(down 9.9%), units GAIN, a cut (down 10.3%), machines EVEN, nothing failed; the three-run reading runs on GitHub
-(`orchestrator.yml`). Why a muscle reads EVEN and where the room is, in theory and mathematics: [`docs/THE_ROOM.md`](docs/THE_ROOM.md).
+(down 9.9%), units GAIN, a cut (down 10.3%), machines EVEN, nothing failed. The three arms together, quick form (one run each):
+Omni on native against native, work GAIN (up 8.3%); Omni direct against native, work GAIN (up 9.1%); Omni direct against Omni
+on native, the 95th percentile GAIN (down 13.2%) and units GAIN, a cut (down 9.5%); no LOSS in any pair, after the fault the
+first three-arm showing found was fixed (a trial the traffic kept abandoning still cost a unit). The three-run reading runs on
+GitHub (`orchestrator.yml`). Why a muscle reads EVEN and where the room is, in theory and mathematics: [`docs/THE_ROOM.md`](docs/THE_ROOM.md).
 
 ## How it works
 

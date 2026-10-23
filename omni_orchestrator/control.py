@@ -87,6 +87,10 @@ class Control:
         self.phase_floor: dict[str, int] = {}             # asked for then: the trial counts only work served at its step
         self.phase_anchor: dict[str, int] = {}            # the twin as each phase found it: its steps are counted from there
         self.phase_rate: dict[str, float] = {}            # the arrivals (last 5 s) as each phase found them: its traffic
+        # a trial the traffic abandoned cost a unit below the twin and measured nothing; the next waits 6 beats, doubled at
+        # each abandonment in a row, up to the verdict's recheck (24 beats), and a trial judged to its end clears the hold
+        self.abandoned: dict[str, int] = {}
+        self.trial_hold: dict[str, int] = {}
         self.busy_raw: dict[str, float | None] = {}
         self.cpu_prev: dict[str, tuple[float, float]] = {}
         self.next_beat, self.next_yard = now + beat, now + 15.0
@@ -396,9 +400,14 @@ class Control:
                     if v.phase is not None and r0 is not None and abs(rate - r0) > 0.15 * max(r0, 5.0):
                         # a trial is paired under the same traffic (omnicompass/verdict.py): the arrivals moved by more
                         # than 15% since the phase began, so what it measured is the traffic, not the step; abandoned
+                        k = self.abandoned.get(name, 0) + 1
+                        wait = min(v.recheck, 6 * 2 ** (k - 1))
+                        self.abandoned[name], self.trial_hold[name] = k, v.t + 1 + wait
                         self.audit("verdict", service=name, verdict="trial abandoned (the traffic changed)", step=v.trial,
-                                   arrivals_5s_was=r0, arrivals_5s_now=rate)
+                                   arrivals_5s_was=r0, arrivals_5s_now=rate, next_trial_after_beats=wait)
                         calm = False
+                    elif v.phase is None and v.t + 1 < self.trial_hold.get(name, 0):
+                        calm = False                     # the traffic has been moving faster than a trial: none starts yet
                     # the work served over the last beat counts for the trial only if the units stood at its step the
                     # whole beat (the knob at the step the verdict asked for, and unchanged since)
                     if stats and stats.get("recent") and n == self.last_n.get(name) == self.phase_floor.get(name):
@@ -416,6 +425,8 @@ class Control:
                         if ev.get("verdict") == "trial":
                             self.phase_anchor[name] = twin   # the step is counted from the twin as the phase found it
                             self.phase_rate[name] = rate     # and judged only under the traffic the phase found
+                        elif str(ev.get("verdict", "")).startswith("step "):
+                            self.abandoned[name] = 0         # a trial judged to its end: the traffic held still for one
                     anchor = self.phase_anchor.get(name, twin) if trial else None
                 want, why = brain.decide(now, n, busy, reading, waiting, depth, trial, twin=twin, anchor=anchor)
                 why["busy_raw"] = None if self.busy_raw.get(name) is None else round(self.busy_raw[name], 3)

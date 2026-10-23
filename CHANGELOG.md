@@ -25,6 +25,15 @@
   in 20,452 requests; the batch job 16 of 16 beside the service; the drills (a unit killed, a machine lost and repaired, the
   control plane killed and started again, the kill switch) 3,308 requests, 0 failed. One run of each arm, not yet the
   three-run reading; the referee grades (`docs/OMNI_ORCHESTRATOR_GRADES.md`): B overall, not production.
+- **The three arms' first showing found a fault, fixed in the brain.** Quick form, one run each: Omni direct against Omni on
+  native read work LOSS (down 5.2%). Every trial the verdict began was abandoned by the traffic gate (the clients step every
+  15 s), yet each held a unit below the twin while it ran, and one trial counted its step from a twin the traffic had since
+  raised. Now a trial the traffic abandons holds the next off for 6 beats, doubled in a row up to the recheck (24 beats), cleared
+  by a trial judged to its end (`omni_orchestrator/control.py`), and a phase counts its step from the higher of the twin it found
+  and the twin now (`omni_orchestrator/brain.py`); two unit tests. After the fix, the same quick form: Omni on native against
+  native, work GAIN (up 8.3%); Omni direct against native, work GAIN (up 9.1%); Omni direct against Omni on native, the 95th
+  percentile GAIN (down 13.2%), units GAIN, a cut (down 9.5%); no LOSS in any pair; nothing failed. The workflow's room rule
+  defaults to the engine's busy rule, as the showing and the page do.
 - **The room, written** (`docs/THE_ROOM.md`, `docs/THE_ROOM_TABLE.md`, `tools/room_table.py`): the founder's law that a muscle
   with no gain is at its limit and a LOSS is never the muscle's; the catalog read by it (527 GAIN, 421 at their limit, 159 the
   same as native, 0 LOSS); the two walls found on 23 October (the processor core, wired by the busy rule; the unit's paper

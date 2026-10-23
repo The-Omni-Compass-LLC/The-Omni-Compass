@@ -101,6 +101,33 @@ class Brain(unittest.TestCase):
         self.assertEqual(b.decide(10.0, 6, 0.5, 60.0, 0, depth=2, trial=True, anchor=8)[0], 6)   # and stands there
         self.assertEqual(b.decide(15.0, 6, 0.5, 60.0, 1, depth=2, trial=True, anchor=8)[0], 7)   # work waits: the reflex
 
+    def test_a_trials_floor_rises_with_a_twin_the_traffic_raised(self):
+        # the phase began at a twin of 5; the traffic rose and the twin now says 6: one step below 6, never below 5 - 1
+        b = OmniBrain(line_ms=800, beat_s=5, mn=2, mx=12, hold=3)
+        want, why = b.decide(0.0, 5, 0.5, 60.0, 0, depth=1, trial=True, twin=6, anchor=5)
+        self.assertEqual((why["floor"], want), (5, 5))
+
+    def test_a_trial_the_traffic_keeps_abandoning_waits_longer_each_time(self):
+        d = tempfile.mkdtemp()
+        spec = {"routes": str(Path(d) / "routes.json"), "front_stats": "http://127.0.0.1:1/_stats",
+                "machines": [{"name": "m1", "url": "http://127.0.0.1:1", "cpu_m": 500}],
+                "services": [{"name": "web", "replicas": 2, "min": 2, "max": 6, "req_m": 250, "limit_m": 250, "k": 10,
+                              "line_ms": 800}]}
+        c = Control(spec, d, "omni", 5.0)
+        c.machine_brain = c.convey = lambda now: None        # the units' brain alone
+        v = c.verdicts["web"]
+        waits = []
+        for _ in range(4):
+            v.phase, v.trial = "ref", 1                       # a phase is on; the arrivals then move past 15%
+            c.phase_rate["web"] = 10.0
+            c.front_recent = lambda: {"p95_5s": 60.0, "line": 0, "hands": 1, "n_5s": 20.0, "recent": []}
+            c.think(0.0)
+            waits.append(c.trial_hold["web"] - v.t)
+        self.assertEqual(waits, [6, 12, 24, 24])             # 6 beats, doubled, up to the recheck
+        self.assertIsNone(v.phase)
+        c.think(0.0)                                         # inside the hold no trial starts, however calm the service
+        self.assertIsNone(v.phase)
+
     def test_conveyance_gives_a_unit_the_room_under_75_percent_of_its_machine(self):
         one, two = [{"id": "a", "req_m": 250}], [{"id": "a", "req_m": 250}, {"id": "b", "req_m": 250}]
         self.assertEqual(conveyed_limits(500, 100.0, one, 0.0), {"a": 370.0})     # alone: the room under 375 m, in 10 m steps

@@ -252,7 +252,10 @@ yardstick), Omni on native (Omni on top of that rule, the engine's strict form) 
 by sector (B overall, not production). Its brain carries the engine's own mechanisms (conveyance, the reflex, the twin read as
 Kubernetes would, the fold under the verdict), and in the full form on one host (18 steps of 25 s, one run of each arm, class
 L) Omni direct read against native by the one key: work GAIN (up 4.7%), the 95th percentile GAIN (down 9.9%), units GAIN, a cut
-(down 10.3%), machines EVEN, nothing failed. Not yet the three-run reading: A, B and C run on GitHub from one commit
+(down 10.3%), machines EVEN, nothing failed. The three arms together in the quick form (one run each, after a fault the first
+three-arm showing found was fixed: a trial the traffic kept abandoning still held a unit below the twin): Omni on native against
+native, work GAIN (up 8.3%); Omni direct against native, work GAIN (up 9.1%); Omni direct against Omni on native, the 95th
+percentile GAIN (down 13.2%) and units GAIN, a cut (down 9.5%); no LOSS in any pair. Not yet the three-run reading: A, B and C run on GitHub from one commit
 (`orchestrator.yml`), and the comparison against Kubernetes itself on the kind rig is the next step. The two walls found on the
 way and the mathematics of the unit count's edge are on `docs/THE_ROOM.md`.
 

@@ -169,7 +169,47 @@ the busy rule, packs, parks and wakes machines (brain `omni_native`, `omni_orche
 on the muscles, no Kubernetes (brain `omni`). Every pair is read by the one key, paired by step: Omni on native against native,
 Omni direct against native, and Omni direct against Omni on native. The showing runs all three in one go
 (`tools/orchestrator_show.py`), the report carries three columns, and the GitHub run (`orchestrator.yml`) prints the three.
-The three-arm readings are written below as the runs land.
+
+**The first three-arm showing, and the fault it found** (quick form: six steps of 15 s, one run of each arm, class L). Omni on
+native against native and Omni direct against native read no LOSS, but Omni direct against Omni on native read work LOSS (down
+5.2%, 10.5 requests a step fewer, every step at or below). The run's own files show why. Every trial the verdict began in that
+run was abandoned by the traffic gate, because the clients step every 15 s, faster than a trial can be judged; each trial still
+held one unit below the twin while it ran (5 to 15 s at a time), and one trial's step was counted from a twin the traffic had
+since raised (the phase began at a twin of 5, the twin rose to 6, the trial's step went to 4). The brain is fixed in two places,
+both the orchestrator's own (the verdict, `omnicompass/verdict.py`, is in the engine's fingerprint and untouched):
+
+- a trial the traffic abandons holds the next one off for 6 beats, doubled at each abandonment in a row up to the verdict's
+  recheck (24 beats), and a trial judged to its end clears the hold (`omni_orchestrator/control.py`); a trial that cannot be
+  judged is not paid for again and again;
+- during a phase the step is counted from the higher of the twin as the phase found it and the twin now
+  (`omni_orchestrator/brain.py`): the floor never follows the count down and never stays below a twin the traffic has raised.
+
+Both are held by unit tests (`tests/test_orchestrator.py`, 20 tests).
+
+**After the fix** (the same quick form, one run of each arm, class L; nothing failed and nothing wrong in any arm):
+
+| gauge | native | Omni on native | Omni direct |
+|---|---:|---:|---:|
+| requests answered | 1,167 | 1,264 | 1,273 |
+| 95th percentile (ms) | 149.9 | 141.3 | 126.6 |
+| 99th percentile (ms) | 210.1 | 206.5 | 167.8 |
+| machine-minutes | 9.0 | 8.5 | 8.5 |
+| unit-minutes | 6.17 | 8.42 | 7.62 |
+| failed, wrong | 0, 0 | 0, 0 | 0, 0 |
+
+Read by the one key, paired by step:
+
+- **Omni on native against native:** work GAIN, up 8.3%; the 95th percentile EVEN, down 1.9%; machines EVEN, down 5.6%; units
+  power given, up 36.5%.
+- **Omni direct against native:** work GAIN, up 9.1%; the 95th percentile EVEN, down 14.8%; machines EVEN, down 5.6%; units
+  power given, up 23.5%.
+- **Omni direct against Omni on native:** work EVEN, up 0.7%; the 95th percentile GAIN, down 13.2%; machines EVEN; units GAIN, a
+  cut, down 9.5%.
+
+The batch job beside the service: 746 requests, 0 failed; the drills: 1,711 requests, 0 failed. Two trials began in 90 s and
+the traffic gate abandoned both (the second held the next off for 12 beats), so no step was allowed: in the quick form Omni
+direct's edge over Omni on native is its own reflex and conveyance with fewer units, not the fold. One run of each arm on one
+host; the full form and its three runs (A, B and C on GitHub's machines, from one commit) are written here as they land.
 
 ## 3. What it covers, and what it does not yet
 
