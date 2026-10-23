@@ -127,6 +127,34 @@ class Panel(unittest.TestCase):
         code, page = self.call("/")
         self.assertIn("muscle:'cooling',on:false", page)
 
+    def test_the_beat_is_set_through_native_and_carried_into_the_governors_arguments(self):
+        """omni-v17: POST /v1/beat sets the heartbeat, the governor's full decision every so many seconds (5 to 120; the main
+        engine 60), through native like a dial press, and the console offers every stop of the dial."""
+        self.assertEqual(self.call("/v1/beat", "vera", {"seconds": 15})[0], 403)
+        for bad in (3, 121, "15", True, None):
+            self.assertEqual(self.call("/v1/beat", "otto", {"seconds": bad})[0], 400, bad)
+        self.assertTrue(self.call("/v1/beat", "otto", {"seconds": 60})[1]["unchanged"])      # the main engine's beat already
+        code, out = self.call("/v1/beat", "otto", {"seconds": 15})
+        self.assertEqual((code, out["beat_s"], out["applies"]), (200, 15.0, "at the next start"))
+        self.assertEqual(self.call("/v1/mode", "otto", {"mode": "autopilot"})[0], 200)
+        self.assertEqual(self.call("/v1/beat", "otto", {"seconds": 120})[0], 200)
+        t0 = time.time()
+        while len(self.starts()) < 3 and time.time() - t0 < 10:
+            time.sleep(0.05)
+        ev = self.starts()
+        self.assertEqual([("start" if "start" in e else "back") for e in ev], ["start", "back", "start"])
+        first, second = ev[0]["start"], ev[2]["start"]
+        self.assertEqual(first[first.index("--interval") + 1], "15")
+        self.assertEqual(second[second.index("--interval") + 1], "120")
+        self.assertEqual(json.loads((self.d / "state.json").read_text())["beat"], 120.0)
+        self.assertTrue(self.call("/v1/beat", "otto", {"seconds": 120})[1]["unchanged"])
+        self.assertEqual(self.call("/v1/status", "vera")[1]["beat_s"], 120.0)
+        self.assertIn("omni_control_beat_seconds 120", self.call("/metrics", "vera")[1])
+        page = self.call("/")[1]
+        for b in (5, 15, 30, 60, 75, 90, 120):
+            self.assertIn(f"go('beat',{{seconds:{b}}})", page)
+        self.assertIn("/v1/beat", self.call("/v1/openapi.json")[1]["paths"])
+
     def test_reset_needs_a_reason_then_hands_back_and_stops(self):
         self.call("/v1/mode", "otto", {"mode": "autopilot"})
         self.assertEqual(self.call("/v1/reset", "otto", {})[0], 400)

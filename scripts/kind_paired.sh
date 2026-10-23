@@ -53,11 +53,12 @@ for arm in "${order[@]}"; do
   # Omni-Compass on top (compassbare); the same cluster as the orchestrator's arms, in the same repetition
   base="${arm%bare}"; queue="${BATCH_QUEUE:-}"; addons="${ADDONS:-}"; cruise="${CRUISEKUBE:-}"
   if [ "$base" != "$arm" ]; then [ -z "$queue" ] || queue=vanilla; addons=""; cruise=""; fi
-  # the decision pace (omni-v16, docs/PACE_PREREGISTRATION.md): an arm named compass60, compass10 or compass5 is the compass
-  # arm deciding every 60, 10 or 5 s, its fast checks every 5 s as always; compass alone decides at the default, every 15 s
+  # the decision pace (docs/PACE_PREREGISTRATION.md): an arm named compassN (compass5, compass15, compass30, compass75, compass90,
+  # compass120) is the compass arm deciding every N s, its fast checks every 5 s as always; compass alone decides at the main
+  # engine's default, every 60 s (omni-v17)
   pace=""
   if [[ "$base" =~ ^compass([0-9]+)$ ]]; then pace="${BASH_REMATCH[1]}"; base=compass; fi
-  if ! OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-15}}" ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
+  if ! OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-60}}" ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
     # a run that fails its own checks is recorded as invalid and left out of the table, never silently counted
     echo "ARM $arm (repetition $REP) FAILED its checks: marked invalid" | tee "bench-$arm-$REP/INVALID"; fail=1
   fi
