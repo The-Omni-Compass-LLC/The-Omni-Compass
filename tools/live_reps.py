@@ -726,16 +726,27 @@ def capacity_table(root, cols):
     return L + [""], out
 
 
+def engine_default_s():
+    """The engine's own default decision period (omni_controller/controller.py, --interval: 60 s since omni-v17)."""
+    from omni_controller.controller import parser
+    return float(parser().get_default("interval"))
+
+
 def main(root):
-    root = Path(root); runs = {}; native_kept = {}
+    root = Path(root); runs = {}; native_kept = {}; beats = {}
     machines_only = any((d / "machines_only.txt").exists() for d in root.glob("bench-*-*"))
     for d in sorted(root.glob("bench-*-*")):
         _, arm, rep = arm_rep(d)
         if (d / "capture.csv").exists() and not (d / "INVALID").exists():
             runs.setdefault(arm, {})[rep] = arm_gauges(d)
+            try:                                              # the beat the arm ran at, as its run wrote it
+                beats.setdefault(arm, set()).add(float((d / "omni_interval.txt").read_text().split()[0]))
+            except (OSError, ValueError, IndexError):
+                pass
             if (d / "omni_stayed_native.txt").exists():      # the governor decided at every step and wrote nothing
                 native_kept.setdefault(arm, set()).add(rep)
     out = {"repetitions": {a: sorted(r) for a, r in runs.items()}, "means": {}, "paired": {}}
+    out["beats"] = {a: sorted(v) for a, v in beats.items()}   # the beat each arm ran at (omni_interval.txt), for the tables
     for a, r in runs.items():
         out["means"][a] = {k: float(np.nanmean([g.get(k, np.nan) for g in r.values()])) for k in KEYS}
     cloud = any(not math.isnan(m.get("machines billed, machine-hours", float("nan"))) for m in out["means"].values())
@@ -749,9 +760,11 @@ def main(root):
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
-    # the decision pace (omni-v16): compass60, compass10, compass5 (any compassN) are the compass arm deciding every N s;
-    # the compass arm itself decides at the default, every 15 s (OMNI_INTERVAL in scripts/kind_bench.sh)
+    # the decision pace: compass5 to compass120 (any compassN) are the compass arm deciding every N s; the compass arm itself
+    # decides at the engine's default, its beat read from its own runs (omni_interval.txt), else from the engine
     paces = sorted((a for a in runs if re.fullmatch(r"compass\d+", a)), key=lambda a: -int(a[7:]))
+    own = sorted(beats.get("compass", set()))
+    beat = f"{own[0] if len(own) == 1 else engine_default_s():g}"
     cols = ([a for a in ("nativebare", "native") if a in runs] + tuned
             + [a for a in ("watch", "omni", "compassbare", "compass") if a in runs] + paces + [a for a in ("strict",) if a in runs])
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",
@@ -777,9 +790,9 @@ def main(root):
     # every comparison: the arm, the arm it is read against, its key in the paired table, and its title; the four ways
     # (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6) add the organism alone, without and with Omni-Compass on top
     pairs = [(a, "native", a, None) for a in ("watch", "omni", "compass", "strict")] + [(a, b, f"{a}|{b}", t) for a, b, t in FOUR_WAYS]
-    # each pace against native, and against the compass arm at the default decision (15 s), paired in the repetition
+    # each pace against native, and against the compass arm at its default beat, paired in the repetition
     pairs += [(a, "native", a, f"omni deciding every {a[7:]} s vs native") for a in paces]
-    pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni at its default, every 15 s") for a in paces]
+    pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni at its default, every {beat} s") for a in paces]
     for a, base, key, four in pairs:
         if a not in runs or base not in runs:
             continue
