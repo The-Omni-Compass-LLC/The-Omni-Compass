@@ -13,7 +13,22 @@
   - the Azure bill (5a): a narrow bar carries its engine alone, and the reading line names the set, its pairs and its bill;
   - GitHub's runs (1i): one workflow a row, its name above its bar.
 - **Main's omni-v16 tables** (Kafka, PostgreSQL's pooler, Redis, MySQL, MongoDB, each as shipped and as a service, landed on main by
-  the conductor) are merged into this branch, and the live engine's records are rebuilt from the merged tree.
+  the conductor) are merged into this branch, and the live engine's records are rebuilt from the merged tree: every one of the 39 new
+  runs played back from its raw files, each file matching its run's SHA-256 list.
+- **The toy gate keeps its two engines apart again.** A change of 22 October put the gate's own checkout first on Python's path, so
+  a worker meant for the engine that stands imported the candidate's engine; the gate's own check refused it at once (the engine
+  imported from the wrong checkout). The gate's checkout is last on the path again, as it was, and only the gate's own process
+  formats a reading.
+- **Omni-Compass by itself, preregistered** (the founder's order of 23 October; `docs/SOLO_PREREGISTRATION.md`): a third arm beside
+  native and Omni-Compass and native, with each muscle's own native controller switched off and Omni-Compass the only controller
+  moving the knob. The page says what it switches off and what stays (Kubernetes' scheduler and kubelet), where it is the same arm
+  (every service whose native is a setting; every actuator native's own loop drives), that the cloud waits for the founder's word,
+  and what is run once the next engine version carries a pod muscle of its own. The toy gate takes two settings for it (kind's
+  static pool, and by itself on it), read by `tools/solo_study.py`.
+- **The sign rule on the benefit sheet and the state of play.** Their one number now wears its own word's sign, as every three-run
+  table does: GAIN '+', LOSS '−', EVEN '=', power given '+'. The Redis row's one number read '-0.1% power given'; it reads '+0.1%
+  power given'. The modelled organisms' line says each change in its verb ('misses down 0.145 pp', 'power given +0.011%', or
+  'energy cut' where the energy fell). The raw values in the result files are unchanged.
 
 ## 2026-10-23 (morning): the consensus audit of 22 October, its majors closed; the sweep's table carries the notice
 

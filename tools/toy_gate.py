@@ -53,8 +53,6 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools.readings import by_word  # noqa: E402  (a number beside a word carries the word's sign)
 
 ROOT = Path(__file__).resolve().parents[1]
 SLO_MS = 200.0                       # the toy service's line
@@ -67,6 +65,10 @@ BLINK_EVERY, BLINK = 1440, (700, 708)  # the blink toy: two minutes (8 ticks of 
 # names the tree its engine was imported from, and run() refuses a reading taken on the wrong one
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
+try:   # the number beside a word carries the word's sign (tools/readings.py); only the gate's own process formats a reading,
+    from tools.readings import by_word  # noqa: E402  so a worker run against an older checkout's tools never needs it
+except ImportError:
+    by_word = None
 try:   # the readings' table, keyed by degrees of freedom (the table it replaced was keyed by seeds and read one row early);
     from omnicompass.student_t import T95  # noqa: E402
 except ImportError:   # a worker on a checkout from before omni-v9 has none, and needs none: only the parent reads
@@ -180,7 +182,39 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
 
     if fine:
         fleet_sim.BOOT_TICKS = BOOT_TICKS * FINE_SUB           # a node boots in 90 s on the 5 s plant, as on the 15 s one
-    sim = (FineSim if fine else CloudSim)(seed, days, autoscaler="ca")
+    class StaticSim(CloudSim):
+        """The machines as the kind rig has them (scripts/kind_bench.sh: every worker made at the start, no cluster autoscaler):
+        the pool stays at its starting size in every arm; the governor may park a machine (marked idle and drained, kept) and
+        wake it, never add one past the pool. The arms then differ in the pods alone, as on the real rig."""
+
+        def resize(self, n):
+            p = self.c.pool; total = p.nodes + len(self.parked); n = max(p.min_nodes, min(total, int(n)))
+            if n < p.nodes:
+                k = p.nodes - n; p.nodes -= k; self.parked += [10 ** 9] * k      # parked and kept: never deleted
+            elif n > p.nodes:
+                k = min(n - p.nodes, len(self.parked)); p.nodes += k; self.parked = self.parked[k:]
+
+    class SoloSim(StaticSim):
+        """Omni-Compass by itself (the founder's order of 23 October, docs/SOLO_PREREGISTRATION.md): on kind's static pool, the
+        pod autoscaler switched off as well. Every workload's pods stay at the operator's own count unless the governor writes
+        it through the workload's own scale (omni-v17's pod muscle of its own); Kubernetes' own scheduler stays: a pod that
+        does not fit waits."""
+
+        def tick(self):
+            import pilot.selfpilot as _sp
+            real = _sp.hpa_step
+            _sp.hpa_step = lambda w, target: None             # no pod autoscaler: the count stays where it stands
+            try:
+                super().tick()
+            finally:
+                _sp.hpa_step = real
+
+    solo = setting == "solo"; static = setting in ("static", "solo")
+    sim = (SoloSim if solo else StaticSim if static else FineSim if fine else CloudSim)(seed, days, autoscaler="none" if static else "ca")
+    if solo:                                                   # the operator's own target and range, written on each workload
+        for w in sim.c.workloads:
+            w.ann = {"omnicompass.io/target-utilization": str(int(round(w.target * 100))),
+                     "omnicompass.io/replica-range": f"{int(w.min_rep)},{int(w.max_rep)}"}
     billed = []
     lat_path = out / "latency.csv"
     lat_rows, minute_ms, p95s = [], {}, []
@@ -230,15 +264,23 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
                 pend = sum(w.replicas - int(w.replicas * frac) for w in c.workloads)
                 return "\n".join(f"pod/p{i}" for i in range(pend))
             if args[:2] == ("get", "hpa"):                      # the HPA as Kubernetes shows it: its range and target
+                if solo:
+                    return {"items": []}                       # by itself: no pod autoscaler on any workload
                 hp = super().get(*args)
                 for h, w in zip(hp["items"], self.sim.c.workloads):
                     h["spec"].update({"minReplicas": int(w.min_rep), "maxReplicas": int(w.max_rep),
                                       "scaleTargetRef": {"kind": "Deployment", "name": w.name}})
                 return hp
+            if args[:2] == ("top", "pods"):                     # the pods' own usage, as metrics-server reports it
+                sel = args[args.index("-l") + 1] if "-l" in args else ""
+                w = next(x for x in self.sim.c.workloads if sel == f"app={x.name}")
+                c = self.sim.c; frac = min(1.0, c.alloc / c.reqs) if c.reqs > 0 else 1.0; run = int(w.replicas * frac)
+                per = w.metric * w.request * 1000.0 * (w.replicas / max(1, run)) if run else 0.0
+                return "\n".join(f"{w.name}-{i} {int(per)}m 10Mi" for i in range(run))
             if args[:2] == ("get", "deployment"):
                 w = next(x for x in self.sim.c.workloads if x.name == args[2])
                 cpu = f"{int(w.request * 1000)}m"
-                return {"metadata": {"name": w.name, "namespace": "default", "annotations": {}},
+                return {"metadata": {"name": w.name, "namespace": "default", "annotations": dict(getattr(w, "ann", {}) or {}) if solo else {}},
                         "spec": {"replicas": int(w.replicas), "selector": {"matchLabels": {"app": w.name}},
                                  "template": {"metadata": {"labels": {"app": w.name}}, "spec": {"containers": [
                                      {"name": "app", "resources": {"requests": {"cpu": cpu}, "limits": {"cpu": cpu}}}]}}},
@@ -248,18 +290,32 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
             except ValueError:
                 raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy cluster")
 
+    if solo:
+        _write = Kube.write
+
+        def write(self, args, why):
+            if args and args[0] == "scale":                      # the workload's own scale (the pod muscle of its own)
+                self.audit({"write": list(args), "why": why, "dry_run": False})
+                w = next(x for x in self.sim.c.workloads if x.name == args[2])
+                w.replicas = int(next(a_ for a_ in args if a_.startswith("--replicas="))[len("--replicas="):]); return None
+            return _write(self, args, why)
+        Kube.write = write
     if arm != "native":
         from omni_controller.controller import Controller, parser
         # the cloud's setting (the compass law at the tune-down, machines alone), or the kind benchmark's (omni-v16's pace
         # toys: the compass law at the max, every HPA sensed, as ARM=compass runs it in benchmark-reps.yml)
         law = ["--law", "compass", "--dial", "save", "--sensed", "none/none"] if setting == "cloud" else \
             ["--law", "compass", "--dial", "max"]
+        p0 = parser()
+        if solo and any("--own-replicas" in getattr(x, "option_strings", []) for x in p0._actions):
+            # by itself, every workload is the operator's to name to the pod muscle of its own (an engine before omni-v17 has none)
+            law += ["--own-replicas", ",".join(f"default/{w.name}" for w in sim.c.workloads)]
         # a period of 0 is the checkout's own default (the shipped toy); the fast checks come once a plant step, as
         # every toy has run them (15 s on the cluster's plant, 5 s on the fine one)
         argv = ["--mode", "nodepool", *law, *(["--interval", str(period)] if period > 0 else []),
                 "--floor-interval", str(tick_s), "--latency-file", str(lat_path), "--slo-ms", str(SLO_MS),
                 "--audit", str(out / "audit.jsonl"), "--kill-file", str(out / "kill"), "--node-scale-cmd", "SIMSCALE {n}",
-                "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.max_nodes), "--headroom", "0.5",
+                "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.nodes if static else sim.c.pool.max_nodes), "--headroom", "0.5",
                 "--active-nodes-only", "--max-node-step", "1"]
         p = parser()
         if setting == "cloud" and any("--give-back-only" in getattr(x, "option_strings", []) for x in p._actions):

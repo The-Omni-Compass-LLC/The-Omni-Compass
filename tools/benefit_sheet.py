@@ -43,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN  # noqa: E402
+from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, word_sign  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools import wiring_verdicts as wv                            # noqa: E402
 
@@ -136,13 +136,15 @@ def fmt_pct(x):
 
 
 def fmt_pct_words(x, loss=0):
-    """The one number with its word: '+31% GAIN'; a minus is a LOSS where a gauge read LOSS, otherwise power given (the
-    resources put in outweigh what they bought by this scoring); '0%: EVEN'."""
+    """The one number with its word, the number wearing the word's sign (the founder's sign rule, tools/readings.py): '+31%
+    GAIN'; a fall is a LOSS where a gauge read LOSS ('−25% LOSS'), otherwise power given, the resources put in outweighing
+    what they bought by this scoring ('+25% power given'); '0%: EVEN'."""
     if x is None:
         return "no number"
     if abs(x) < 0.05:
         return f"0%: {EVEN}"
-    return fmt_pct(x) + (f" {GAIN}" if x > 0 else f" {LOSS}" if loss else f" {GIVEN}")
+    w = GAIN if x > 0 else LOSS if loss else GIVEN
+    return f"{word_sign(w)}{fmt_pct(abs(x))[1:]} {w}"
 
 
 def verb(fell, aim):
