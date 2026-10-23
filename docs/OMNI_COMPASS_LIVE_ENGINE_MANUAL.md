@@ -58,6 +58,14 @@ differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
 
 Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
 
+**How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
+the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
+in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
+minutes means 2.3% more minutes over the line; EVEN =0.9% means a 0.9% difference the noise covers; power given +3.1% means 3.1%
+more of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
+coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
+or fell against native (the page's section iv, "How to read a number beside a word"; the founder's order of 23 October).
+
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
@@ -98,11 +106,13 @@ and every word on it (GAIN, EVEN, LOSS, power given) is that record's own readin
 nothing about any result and types nothing in. Where it plays the repository's own models (evidence class S) it says so, and
 a model is never proof.
 
-**What "native" and "Omni-Compass" mean on the page.** Two names, two sides, nothing else. *Native* is the whole system
+**What "native" and "Omni-Compass" mean on the page.** Two names today, a third ordered on 23 October (below). *Native* is the whole system
 running by itself: every autoscaler, scheduler, firmware, thermostat, orchestrator and controller it ships with, every muscle
 wired and moving by its own machinery. *Omni-Compass* always means Omni-Compass on top of native: the same whole system with
 all of that still running underneath, and the governor on top of all of it, wired in through the two-way plug. No third side
 exists anywhere on the page. Native is drawn in amber, Omni-Compass in blue, in every chart, table, tile and number.
+
+**The third arm, Omni-Compass by itself** (the founder's order of 23 October, `docs/SOLO_PREREGISTRATION.md`). The same system with each muscle's own native controller switched off and Omni-Compass the only controller moving that knob: on Kubernetes no pod autoscaler and no cluster autoscaler, while Kubernetes' own scheduler and kubelet stay. Where native is a setting rather than a controller (a cache's memory ceiling, a pool's size) the two Omni-Compass arms are one and the same arm. On the page the arm that was called Omni-Compass is now called Omni-Compass and native wherever an arm is named (the chips, the table heads, the lanes), and the third arm's column appears in every table from its first run on GitHub's machines, once the engine that carries it lands; nothing is written for it before. Until then every two-arm reading on the page is native against Omni-Compass and native.
 
 **What a monitor is.** The page is laid out as an operations monitor is: a wall of tiles at the top (the status board), each
 tile a small copy of a monitor further down the page; then the monitors themselves, section by section, each with its own
@@ -562,6 +572,18 @@ opened. Click a tile and the page scrolls to the monitor it copies. The page's o
 off screen; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to, and while the wall
 is in view the resting monitors are drawn in turn, one a frame, each by its own drawing code; a tile with the accent border is
 a monitor on screen now.
+
+**The light on every monitor** (the founder's order of 23 October). Each tile carries a light in its top right corner, and each
+monitor the same light beside its number on the page: green while the gauge the monitor draws is inside its lines; amber before
+the line, when the gauge is within 3% of it or when its own slope over the last readings, carried three readings ahead, crosses it;
+red when it is over; grey where the monitor has no line to watch (a bill, a count of runs, a digest check), and the light says so.
+The light reads the series the monitor draws and adds no number: on the live engine, the muscles against their lines; on a cluster
+replay, the 95th percentile against the 200 ms line and the pods waiting for a place; on the heart, the decision's own time against
+half its beat; on the CPU host, the busy share against the 75% line; on the card, the draw against its power limit; on the page's
+own governor, the time between frames against 1.5 frames; on a record, the judged rows of the newest tables (a LOSS row lights red
+and stays). Above the wall a line counts the lights and names the monitors heading for a line or over one, beside the engine's own
+last entry on its side, because the brain reads the same slope and acts before the line; the light only says so. Hover a light for
+its reading.
 
 ### 4.2 The order of the board
 
@@ -1228,6 +1250,12 @@ Omni-Compass. The engine these knobs turn is the engine's own mathematics runnin
 the verdict, proven equal to the Python and the C++ on every build. It governs the stress-test model's sixty muscles, each on
 top of its own native controller. The knobs move the live engine in the page's sections 6a and 8a to 8c, and the kill switch and the
 frame load also move the page's own render governor (the page's section 11).
+
+**Back to the factory tune.** One button, on the console under the kill switch, on the dock, above the wall and in every
+monitor's own knobs, returns every knob of the page to the main engine as it ships (`DISCLOSURES.md`, section 3): the dial at
+the max, Omni-Compass ON, demand ×1, noise σ 0, sense delay +0, no fault held, every muscle driven, speed 1×, running, no frame
+load, and the heartbeat monitor on the factory's 60 s. It says what it put back. Turn anything, break it, watch it break; this
+button brings all of it back (the founder's order of 23 October). Native alone is not a tune: it is the kill switch.
 
 ### 18.2 Do no harm, at the console
 

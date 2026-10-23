@@ -2,6 +2,34 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-23 (evening, the live engine): the sign explained where every number sits; a light on every monitor; one button back to the factory tune; the third arm named
+
+- **The sign, explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say
+  gain ... you need to now explain that wherever things are"). Every word and every coloured size the live engine writes carries its
+  reason on hover (`SIGN_WHY`, `whyOf`, `whyPass`): what the word means, why the number wears the word's sign, and where the page
+  knows the gauge (`runWord`), what rose or fell against native. The key (section iv) carries one paragraph, "How to read a number
+  beside a word", with the four cases spelled out; the Live Engine Manual's key says the same.
+- **A light on every monitor, leading the line** (the founder's words: "every monitor needs to have a light in it ... that could tell
+  when something is redlining ... gauging a couple percentage before"). Each monitor carries a light beside its number and in its
+  wall tile's corner (`LAMP`, `lampRead`, `lampSweep`): green inside its lines; amber before the line, when the gauge is within 3%
+  of it or when its own slope over the last readings, carried three readings ahead, crosses it; red over it; grey, and said so, where
+  there is no line to watch. The light reads the series its monitor draws: the live engine's muscles against their lines, a cluster
+  replay's 95th percentile against the 200 ms line and its pods waiting, the heart's decision time against half its beat, the CPU
+  host's busy share against 75%, the card's draw against its power limit, the page's own frames against 1.5 frames, a record's judged
+  rows (a LOSS row lights red and stays). Above the wall one line counts the lights, names the monitors heading for a line or over
+  one, and prints the engine's own last entry on its side, because the brain reads the same slope and acts before the line.
+- **Back to the factory tune, one button** (the founder's words: "there has to be a main button that puts it back ... once buttons
+  are touched"). On the console under the kill switch, on the dock, above the wall and in every monitor's knobs: every knob of the
+  page returns to the main engine as it ships (`factoryTune`): the max, Omni-Compass ON, demand ×1, noise σ 0, sense delay +0, no
+  fault held, every muscle driven, speed 1×, running, no frame load, the heartbeat monitor on the factory's 60 s; it says what it put
+  back. Native alone stays the kill switch.
+- **The three arms, named** (the founder's order: "the one that said Omni before is going to have to add the word and native"). The
+  title chips, every table head and every lane on the page read native, Omni-Compass and native, and Omni-Compass by itself; the key
+  and the whole organism (section 3) say what the third arm is (`docs/SOLO_PREREGISTRATION.md`) and that its column appears from its
+  first run on GitHub's machines, nothing written for it before.
+- The page was opened headless at 1280 and 390 px after the change: no console error; the lights, the tooltips and the factory
+  button respond. The Live Engine Manual carries the lights (4.1), the button (18.1) and the sign (the key); its appendix is rebuilt.
+
 ## 2026-10-23 (afternoon): omni-v17, the heartbeat a dial; the main engine at 60 s
 
 - **omni-v17 lands** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) on the founder's order of the afternoon,

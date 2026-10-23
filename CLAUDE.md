@@ -316,6 +316,46 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 23 October
+
+- **Omni-Compass by itself, the third arm** (the founder's words: "we're going to be expanding out a whole nother omni-compass by
+  itself without any Kubernetes or any schedulers or any governors running direct muscles ... there's native, there's Omni and
+  native, and then there's Omni by itself ... the one that said Omni before is going to have to add the word and native"). Every
+  organism is shown three ways: native; Omni-Compass and native (the arm every table carried as "omni", its machine key unchanged);
+  Omni-Compass by itself, each muscle's own native controller switched off and Omni-Compass the only controller moving that knob (on
+  Kubernetes no pod autoscaler and no cluster autoscaler; Kubernetes' own scheduler and kubelet stay; where native is a setting rather
+  than a controller the two Omni-Compass arms are one arm). Preregistered before any run (`docs/SOLO_PREREGISTRATION.md`); the engine
+  that carries it (a pod muscle of its own, the models' arm with the pool's autoscaler off) lands as the next version through the toy
+  gate, and its runs go to GitHub's machines, three runs, read beside the other two. No cloud by itself without the founder's word
+  (the order of 14 October: nothing in a cloud adds a machine). The pages and the words say the three arms; the third's column appears
+  from its first run, nothing written for it before.
+- **The live engine is the operating control panel** (the founder's words: "build a live engine's mechanism, interpreting what it
+  sees, as well as giving it knobs and buttons ... in every canvas section block ... every monitor needs to have a light in it ...
+  gauging a couple percentage before ... there has to be a main button that puts it back"). Every monitor carries a light that reads
+  the series it draws: green inside its lines, amber before the line (within 3% of it, or its own slope over the last readings crossing
+  it within three readings), red over it, grey and said so where there is no line; the wall counts them and prints the engine's own
+  last act beside them, because the brain reads the same slope and acts before the line. One button, on the console, the dock, the
+  wall and every monitor's knobs, returns every knob to the factory tune and says what it put back; native alone stays the kill switch.
+- **The sign explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say gain
+  ... you need to now explain that wherever things are"). A number beside a word wears the word's sign (the order of 22 October), and
+  wherever it stands the reason stands with it: on the live engine every word and size carries it on hover, and the key says it once in
+  full ("How to read a number beside a word"); in prose a change is said in its verb with its reading ("pods waiting down 29.6%: fewer
+  waiting, GAIN"), never a bare sign beside a word.
+- **The factory beat is the best beat the sweeps read** (the founder's words: "whatever is the best one out of all that helps the best
+  system is the factory set one ... I think 45 you didn't try"). The main engine's beat is whichever the ladder reads best by the key
+  on the organism's gauges, not a number chosen for a reason of its own; the beats the ladder has not read (45, 40, 50, 20 s) are
+  read in the toy on the side first, and a beat that reads best lands as the next version through the toy gate. The knobs stay for
+  anyone to turn.
+- **A LOSS at the factory tune is a fault to fix, never a number to accept** (the founder's words: "nothing should be shown as a loss
+  because it would have been fixed and never gone there. The only way we're going to ever see a loss is ... when people turn knobs").
+  Every LOSS row is still shown (Honesty); each one on the engine that stands is on the next version's list with its cause, and the
+  live engine's knobs are where a reader may break the engine and watch it break.
+- **Omni-Compass at every level** (the founder's words: "OmniCompass can go in the software side, in the hardware bare metal side ...
+  in the brain ... in muscles itself ... into a chip ... every level of mechanism"). Its own muscles, built from the ground up with the
+  compass's mathematics inside (a pod autoscaler of its own first), beside the open-source muscles it governs, each benchmarked native,
+  with Omni-Compass on top, and by itself, and all of it together: the next versions' work, each through the toy gate. A licensed
+  mechanism is never copied; an interface a project publishes (the Kubernetes API) is talked to, as any client does.
+
 ## Orders of 22 October
 
 - **One tuned engine, and a tuning bench; the main tune found, not guessed** (the founder's words, the night of 22 October: "what
