@@ -55,8 +55,8 @@ TOP = ("© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simula
 
 
 class Show:
-    def __init__(self, out: Path, quick: bool):
-        self.out, self.quick = out, quick
+    def __init__(self, out: Path, quick: bool, room_rule: str = "requests"):
+        self.out, self.quick, self.room_rule = out, quick, room_rule
         self.out.mkdir(parents=True, exist_ok=True)
         self.agents: dict[str, subprocess.Popen] = {}
         self.procs: list[subprocess.Popen] = []
@@ -135,6 +135,8 @@ class Show:
                             str(d / "routes.json"), "--stats", str(d / "front.jsonl")], f"{name}-front.log")
         ctl_args = ["omni_orchestrator.control", "--spec", str(d / "spec.json"), "--state-dir", str(d / "ctl"),
                     "--brain", brain, "--beat", "5", "--kill-file", str(d / "KILL")]
+        if brain == "omni":
+            ctl_args += ["--room-rule", self.room_rule]   # the yardstick places by requests alone, as Kubernetes does
         ctl = self.spawn(ctl_args, f"{name}-control.log")
         self.wait_ready(d, 2)
         cpu0, t0 = self.machine_cpu(), time.time()
@@ -149,7 +151,8 @@ class Show:
         self.stop(ctx["ctl"])
         self.stop(front)
         self.clear_units()
-        meta = {"phase": name, "brain": brain, "t_load": t0 + 6, "steps": steps, "step_s": step_s,
+        meta = {"phase": name, "brain": brain, "room_rule": self.room_rule if brain == "omni" else "requests",
+                "t_load": t0 + 6, "steps": steps, "step_s": step_s,
                 "cpu_s": {m: cpu1[m] - cpu0[m] for m in cpu0}, "wall_s": t1 - t0, "events": ctx.get("events", [])}
         (d / "meta.json").write_text(json.dumps(meta, indent=1))
         time.sleep(3)
@@ -574,12 +577,14 @@ def main(argv=None):
     ap.add_argument("--out", required=False)
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--report", help="rebuild the report of a finished showing")
+    ap.add_argument("--room-rule", choices=("requests", "busy"), default="requests",
+                    help="Omni's room rule: by requests alone, or also under 75%% of a machine's measured busy share")
     a = ap.parse_args(argv)
     if a.report:
         print(build_report(Path(a.report)))
         return
     out = Path(a.out)
-    Show(out, a.quick).run()
+    Show(out, a.quick, a.room_rule).run()
     print(build_report(out))
 
 

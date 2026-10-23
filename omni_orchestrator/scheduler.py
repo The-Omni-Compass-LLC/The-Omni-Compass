@@ -19,25 +19,34 @@ none). Two ways to choose among the machines that fit:
 from __future__ import annotations
 
 
-def room(machine: dict, units: list[dict]) -> float:
-    return machine["cpu_m"] - sum(u["req_m"] for u in units if u["machine"] == machine["name"])
+BUSY_TOP = 0.75     # the engine's own rule (omni_controller/capacity.py, omni-v7): no unit onto a machine this busy
 
 
-def place(req_m: float, service: str, machines: dict[str, dict], units: list[dict], how: str = "pack") -> str | None:
+def room(machine: dict, units: list[dict], rule: str = "requests") -> float:
+    """The room on a machine: its processor less the requests on it; under the busy rule also less what its measured
+    busy share leaves under 75% of its processor, so a machine at its top takes no unit whatever its requests say."""
+    by_req = machine["cpu_m"] - sum(u["req_m"] for u in units if u["machine"] == machine["name"])
+    if rule == "busy" and machine.get("busy_m") is not None:
+        return min(by_req, BUSY_TOP * machine["cpu_m"] - machine["busy_m"])
+    return by_req
+
+
+def place(req_m: float, service: str, machines: dict[str, dict], units: list[dict], how: str = "pack",
+          rule: str = "requests") -> str | None:
     awake = [m for m in machines.values() if m["state"] == "awake"]
-    fits = [m for m in awake if room(m, units) >= req_m]
+    fits = [m for m in awake if room(m, units, rule) >= req_m]
     if not fits:
         return None
     mine = {m["name"]: sum(1 for u in units if u["machine"] == m["name"] and u.get("service") == service) for m in awake}
     if how == "spread":
-        return min(fits, key=lambda m: (mine[m["name"]], -room(m, units), m["name"]))["name"]
+        return min(fits, key=lambda m: (mine[m["name"]], -room(m, units, rule), m["name"]))["name"]
     on = {name for name, n in mine.items() if n > 0}
     if len(on) == 1:
         # the service stands on one machine: its next unit goes to another machine where there is one with the room
         others = [m for m in fits if m["name"] not in on]
         if others:
             fits = others
-    return min(fits, key=lambda m: (room(m, units) - req_m, m["name"]))["name"]
+    return min(fits, key=lambda m: (room(m, units, rule) - req_m, m["name"]))["name"]
 
 # © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
 # monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

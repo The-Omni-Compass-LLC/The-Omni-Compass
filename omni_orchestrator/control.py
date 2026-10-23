@@ -35,7 +35,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from omni_orchestrator.brain import OmniBrain, Yardstick, machines_needed
-from omni_orchestrator.scheduler import place
+from omni_orchestrator.scheduler import BUSY_TOP, place
 
 ROOT = str(Path(__file__).resolve().parents[1])
 
@@ -48,8 +48,9 @@ def http(method: str, url: str, body: dict | None = None, timeout: float = 5.0):
 
 
 class Control:
-    def __init__(self, spec: dict, state_dir: str, brain: str, beat: float, kill_file: str | None = None):
-        self.spec, self.brain_kind, self.beat = spec, brain, beat
+    def __init__(self, spec: dict, state_dir: str, brain: str, beat: float, kill_file: str | None = None,
+                 room_rule: str = "requests"):
+        self.spec, self.brain_kind, self.beat, self.room_rule = spec, brain, beat, room_rule
         self.dir = Path(state_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
         self.journal_path, self.audit_path = self.dir / "journal.jsonl", self.dir / "audit.jsonl"
@@ -163,6 +164,11 @@ class Control:
                                units_lost=[u["id"] for u in lost])
                 continue
             m["miss"] = 0
+            prev = m.get("_cpu")                         # the machine's measured busy share, millicores, smoothed over its polls
+            m["_cpu"] = (st.get("time", now), st.get("cpu_s", 0.0))
+            if prev and m["_cpu"][0] > prev[0]:
+                rate = max(0.0, (m["_cpu"][1] - prev[1]) / (m["_cpu"][0] - prev[0]) * 1000.0)
+                m["busy_m"] = rate if m.get("busy_m") is None else 0.5 * m["busy_m"] + 0.5 * rate
             if m["state"] == "down":
                 self.record({"ev": "machine", "name": name, "state": "awake"})
                 self.audit("machine back", machine=name, why="its hand answers again; it joins empty")
@@ -211,7 +217,7 @@ class Control:
         self.pool.submit(go)
 
     def place_service(self, name: str, svc: dict) -> bool:
-        m = place(svc["req_m"], name, self.machines, list(self.units.values()), self.how)
+        m = place(svc["req_m"], name, self.machines, list(self.units.values()), self.how, self.room_rule)
         if m is None:
             victim = next((u for u in self.units.values() if u.get("kind") == "task" and u["state"] != "retiring"
                            and self.machines[u["machine"]]["state"] == "awake"), None)
@@ -230,7 +236,7 @@ class Control:
         return True
 
     def place_task(self, jname: str, j: dict, index: int) -> bool:
-        m = place(j["req_m"], f"job:{jname}", self.machines, list(self.units.values()), "pack")
+        m = place(j["req_m"], f"job:{jname}", self.machines, list(self.units.values()), "pack", self.room_rule)
         if m is None:
             return False
         uid = f"{jname}-{index}-{self.seq}"
@@ -332,7 +338,7 @@ class Control:
             self.machine_brain(now)
 
     def machine_brain(self, now: float) -> None:
-        room = max(m["cpu_m"] for m in self.machines.values())
+        room = max(m["cpu_m"] for m in self.machines.values()) * (BUSY_TOP if self.room_rule == "busy" else 1.0)
         req = max(s["req_m"] for s in self.services.values())
         tasks_m = sum(u["req_m"] for u in self.units.values() if u.get("kind") == "task" and u["state"] != "retiring")
         units = sum(self.desired.values())
@@ -458,8 +464,10 @@ def main(argv=None):
     ap.add_argument("--brain", choices=("omni", "yardstick", "off"), default="omni")
     ap.add_argument("--beat", type=float, default=60.0, help="the brain's beat in seconds (the dial: 5 to 120 s)")
     ap.add_argument("--kill-file", default=None)
+    ap.add_argument("--room-rule", choices=("requests", "busy"), default="requests",
+                    help="room by requests alone (Kubernetes' way), or also under 75%% of the machine's measured busy share")
     a = ap.parse_args(argv)
-    c = Control(json.loads(Path(a.spec).read_text()), a.state_dir, a.brain, a.beat, a.kill_file)
+    c = Control(json.loads(Path(a.spec).read_text()), a.state_dir, a.brain, a.beat, a.kill_file, a.room_rule)
     signal.signal(signal.SIGTERM, lambda *_: setattr(c, "stop", True))
     c.run()
 

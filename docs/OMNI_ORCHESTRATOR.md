@@ -59,8 +59,9 @@ fuller, each answer slower.
 The mechanism answer is already in the engine that stands and not yet in this orchestrator: on the kind rig no replica is
 added to a host while it is 75% busy (`omni_controller/capacity.py`, omni-v7). The room rule here counts requests only; its
 next form counts the machine's measured busy share as well, so a machine at its top takes no more units and the brain wakes
-another instead. That change goes through the toy gate like every other, is declared before it runs, and is read against this
-showing; nothing here was tuned after the reading.
+another instead. It is in the orchestrator as a declared option, `--room-rule busy` (`omni_orchestrator/scheduler.py`,
+`BUSY_TOP`), off by default; the showing that runs it is read against this one, and nothing here was tuned after the reading.
+The yardstick always places by requests alone, as Kubernetes' scheduler does.
 
 **One body.** A job of 16 batch tasks (about 2 s of processor each, four at a time) ran in the room the service left while
 the clients went 3 → 6 → 3: 16 of 16 tasks finished with their result files written, the service answered 603 requests, 0

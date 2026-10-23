@@ -45,6 +45,14 @@ class RoomRule(unittest.TestCase):
         # on two machines now: the best fit wins, m1 (250 m left, the unit fills it)
         self.assertEqual(place(250, "web", ms, us, "pack"), "m1")
 
+    def test_the_busy_rule_keeps_a_unit_off_a_machine_at_its_top(self):
+        ms = machines("awake", "awake")
+        ms["m1"]["busy_m"], ms["m2"]["busy_m"] = 380.0, 100.0       # m1 at 76% of its 500 m, m2 at 20%
+        self.assertEqual(place(250, "web", ms, [], "pack", "requests"), "m1")   # by requests both fit; pack picks the fullest by name
+        self.assertEqual(place(250, "web", ms, [], "pack", "busy"), "m2")       # under the busy rule m1 has no room
+        ms["m2"]["busy_m"] = 300.0                                      # 60%: 75 m of room under 75%, less than a unit
+        self.assertIsNone(place(250, "web", ms, [], "pack", "busy"))
+
     def test_spread_takes_the_machine_with_fewest_units_of_the_service(self):
         ms = machines("awake", "awake", "awake")
         us = [unit("m1"), unit("m2")]
