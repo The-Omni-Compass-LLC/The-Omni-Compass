@@ -16,30 +16,31 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v16, fingerprint 5c5502f12b1c0ce4 (55 files).
+- **The engine on this checkout:** omni-v17, fingerprint 7c937d09e4031cc7 (55 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 580, GAIN 527
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
   - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v12, each named in its table): +4.3% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +4.3% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
-  - Real cache (Redis, GitHub): +0.1% GAIN
+  - Real database cache (MongoDB under YCSB, GitHub): +0.2% GAIN
   - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real database cache (MongoDB under YCSB, GitHub): +0.1% GAIN
   - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
+  - Real cache (Redis, GitHub): -0.1% power given
 
-**On the engine that stands (omni-v16): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v17): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v12 | +4.3% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v12 | +0.1% | GAIN, power given | L |
-| PostgreSQL, the pooler's pool size | omni-v12 | +0.0% | EVEN | L |
-| MySQL, the buffer pool's size | omni-v12 | +0.0% | EVEN | L |
-| Kafka, the consumer group's size | omni-v12 | +0.1% | GAIN | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +4.3% | GAIN, power given | L |
+| Redis, the cache's memory ceiling | omni-v16 | -0.1% | GAIN, power given | L |
+| PostgreSQL, the pooler's pool size | omni-v16 | +0.0% | power given | L |
+| MySQL, the buffer pool's size | omni-v16 | +0.0% | EVEN | L |
+| MongoDB, the storage engine's cache size | omni-v16 | +0.2% | GAIN | L |
+| Kafka, the consumer group's size | omni-v16 | +0.1% | GAIN | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -58,7 +59,6 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 | Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +59.7% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +41.0% | GAIN, power given | L |
 | Power grids (SimBench), both load models | omni-v11 | +5.8% | GAIN, power given | S |
-| MongoDB, the storage engine's cache size | omni-v11 | +0.1% | GAIN | L |
 | Drone swarms, the three untouched cells | omni-v11 | +5.9% | GAIN | S |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN, power given | S |
 
@@ -98,24 +98,9 @@ with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and wh
 waits on the family allowance those machines hold.
 
 
-## In one paragraph (2026-10-22, the engine that stands is omni-v16)
+## In one paragraph (2026-10-22, the engine that stands is omni-v17)
 
-**The engine that stands is omni-v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`), on main since
-22 October on two words of the founder's: "Go" on the pace plan, and, once the models had read, "15 sec all over heart beat fix
-update code". Every clock of the Kubernetes governor counts seconds, so the period of its full decision changes only how often it
-looks, and that heartbeat now comes every 15 s, native's own pod autoscaler's pace (every engine before it: 60 s); the fast checks
-stay every 5 s. It is omni-v15 with the clocks changed and the heartbeat set, and nothing else (50 of its 55 files are omni-v15's
-bytes): the brain's minute (in the Python and its sealed C++ twin), the compass's damping and smoothing, the edge's window and
-rates, the additions past the scheduling floor, a command's minute to land, the host's busy share over a minute, the heat law's
-minute, one batch job a minute, the conveyance every 15 s whichever check falls due, and a loop that keeps its schedule. At 60 s it
-makes exactly omni-v15's decisions in the toy gate (4,578 audit records, none different; `results/toy_gate/V16_VS_V15.md`);
-as shipped, omni-v16 at its 15 s against omni-v15 at its 60 s reads every gauge EVEN, no LOSS. Against native, at 15 s two rows read
-LOSS in the cloud's setting, the pods waiting for a place (+122%, about twice native's) and the 95th percentile (+0.36%), which
-omni-v15 at 60 s reads EVEN only by the seeds' spread (+210%, +0.63%). In the pace study (`results/toy_gate/V16_PACE.md`), 15 s
-against 60 s: 14.7% fewer minutes over the line in the kind setting, 2.6% less energy per core in the cloud's (GAIN), every other
-reading EVEN; against native the pods waiting read LOSS at every pace, and in the cloud's setting at 15 s the 95th percentile
-(+0.47%) and the alert minutes (+2.31%). Those rows are the engine's, at every pace, and the next version's work. The real runs read 15 s against native
-and against 60, 10 and 5 s (`docs/PACE_PREREGISTRATION.md`, amendment 2). **omni-v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), on main from
+**The engine that stands is omni-v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`), on main since 23 October, afternoon, on the founder's order of 22 October, afternoon: the heartbeat is a dial ("5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're going to set OmniCompass is main engine"). The main engine takes its full decision every 60 s; any beat from 5 to 120 s can be set, the fast checks every 5 s at every beat; every beat is shown beside native with what it buys and what it costs (`results/toy_gate/V17_LADDER.md`; on the live engine page, the page's section 1j); the monitors scale with the beat (`omni_heartbeat_seconds`, the staleness alert at three beats, the control panel's `/v1/beat`). It is omni-v16 with two changes in `omni_controller/controller.py` (54 of 55 files are omni-v16's bytes): the default beat moved from 15 to 60 s, and the cruise wait never fewer than two readings, a fault the ladder found at 90 and 120 s before the version landed (the wait's 120 s had rounded to one decision there, and one reading with a pod waiting put every machine in service). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours −1.7% EVEN, the minutes over the line −4.7% EVEN, the pods waiting −12.1% EVEN, the 95th percentile −0.2% EVEN; at 120 s the machine-hours −2.1% EVEN, the minutes over the line −3.7% EVEN, the pods waiting −29.6% GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s. The toy gate against omni-v16 (`results/toy_gate/V17_VS_V16.md`): Every toy that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. The ladder (class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (+175% to +317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (+102% to +127%), the 95th percentile at 15 and 30 s (+0.5%, +0.4%), the minutes over the line at 15 s (+2.3%): the engine's, on the next version's list. The real runs read every beat against native and against 60 s (`docs/PACE_PREREGISTRATION.md`, amendment 3), and every benchmark runs again on omni-v17 from 17:00 UTC on 23 October. **omni-v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`), on main from the morning of 22 October to that evening, was omni-v15 with every clock of the Kubernetes governor in seconds and the heartbeat at 15 s, and nothing else; at 60 s it made exactly omni-v15's decisions (4,578 audit records, none different; `results/toy_gate/V16_VS_V15.md`), and its pace study (`results/toy_gate/V16_PACE.md`) is the first half of omni-v17's ladder. **omni-v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), on main from
 21 October, evening, under the founder's standing order that every fault found is fixed and lands as the next version, was
 omni-v14 with two changes: the brain's request for the power cap trims only while the response line has been clean for the governor's own clear time (on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them; on the same decisions the gate leaves 35 moves and 32 reversals), and every wire that holds a governor's rules is inside the fingerprint (eight taken in, their bytes as they stood); a dwell with a glide was built, read in the gate and refused (`docs/OMNI_V15.md`). The toy gate against omni-v14 (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two
 card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`), on main

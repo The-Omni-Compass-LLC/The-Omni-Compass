@@ -27,6 +27,17 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v17": ["OMNI_V17.json", "tools/omni_version.py", "docs/OMNI_V17.md", "omni_controller/controller.py",
+                   "tests/test_pace_clocks.py", "tests/test_time_correct.py", "tools/beat_ladder.py", "tests/test_beat_ladder.py",
+                   "tools/toy_gate.py", "results/toy_gate/V17_VS_V16.md", "results/toy_gate/V17_VS_V16.json",
+                   "results/toy_gate/V17_LADDER.md", "results/toy_gate/V17_LADDER.json", "docs/PACE_PREREGISTRATION.md",
+                   "docs/K8S_COMPASS_PREREGISTRATION.md", "scripts/kind_bench.sh", "scripts/kind_paired.sh", "scripts/kind_robust.sh",
+                   "scripts/kind_levers.sh", "scripts/kind_full.sh", "scripts/kind_pilot.sh", "deploy/install/omni-compass.yaml",
+                   "deploy/install/omni-compass-cloud.yaml", "deploy/controller.yaml", "tools/live_reps.py", "tools/confirm_abc.py",
+                   "tools/omni_exporter.py", "tests/test_omni_exporter.py", "tools/omni_control.py", "tests/test_omni_control.py",
+                   "deploy/prometheus/omni-compass-rules.yaml", "deploy/grafana/omni-compass.json", "docs/OBSERVABILITY.md",
+                   "docs/engine/build_live_engine.py", "docs/CHANGE_CONTROL.md", "docs/THE_TUNE.md",
+                   "tools/tune_study.py", "tests/test_tune_study.py", "DISCLOSURES.md"],
     "engine_v16": ["OMNI_V16.json", "tools/omni_version.py", "docs/OMNI_V16.md", "omnicompass/adapter.py", "omnicompass/edge.py",
                    "omni_controller/controller.py", "omni_controller/muscles.py", "omni_controller/capacity.py",
                    "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp", "cpp/tools/run_governor.cpp",

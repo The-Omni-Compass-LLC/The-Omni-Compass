@@ -2,7 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v16 (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files) stands on main since 22 October. Two words of the founder's
+Omni v16 (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files) stood on main on 22 October, from the morning until omni-v17
+landed that evening (`docs/OMNI_V17.md`: the same engine with the heartbeat a dial, the main engine at 60 s, and the cruise
+wait never under two readings at a slow beat). Two words of the founder's
 made it. That night ("Go"), on the plan put to him: put every clock of the Kubernetes governor in seconds, read the decision
 pace at 60, 15, 10 and 5 s in our own models, and run each pace three times on GitHub's own machines
 (`docs/PACE_PREREGISTRATION.md`). Then, once the models had read: "15 sec all over heart beat fix update code". So the

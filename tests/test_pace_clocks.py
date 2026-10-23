@@ -102,20 +102,28 @@ class EdgePace(unittest.TestCase):
 
 
 class ControllerClocks(unittest.TestCase):
-    def test_the_heartbeat_is_15_s(self):
-        """The founder's word of 22 October ("15 sec all over"): a full decision every 15 s by default, the fast checks
-        every 5 s, in the governor and in every place that starts it (the rigs and the install files)."""
+    def test_the_heartbeat_is_60_s(self):
+        """The founder's word of 22 October, afternoon: the main engine decides every 60 s by default, the beat a dial any
+        value can be set on (5, 15, 30, 60, 75, 90, 120 s), the fast checks every 5 s at every beat, in the governor and in
+        every place that starts it (the rigs, the install files and the alert rules' staleness bound)."""
         a = parser().parse_args(["--audit", ""])
-        self.assertEqual((a.interval, a.floor_interval), (15.0, 5.0))
-        self.assertIn('OMNI_INTERVAL="${OMNI_INTERVAL:-15}"', (ROOT / "scripts" / "kind_bench.sh").read_text())
+        self.assertEqual((a.interval, a.floor_interval), (60.0, 5.0))
+        self.assertIn('OMNI_INTERVAL="${OMNI_INTERVAL:-60}"', (ROOT / "scripts" / "kind_bench.sh").read_text())
         for f in ("deploy/install/omni-compass.yaml", "deploy/install/omni-compass-cloud.yaml", "deploy/controller.yaml"):
-            self.assertIn('"--interval", "15"', (ROOT / f).read_text(), f)
+            self.assertIn('"--interval", "60"', (ROOT / f).read_text(), f)
+        # the staleness bound follows the beat: three of the beats the exporter measures, at any setting of the dial
+        self.assertIn("omni_last_decision_timestamp_seconds > 3 * clamp_min(omni_heartbeat_seconds, 5)",
+                      (ROOT / "deploy/prometheus/omni-compass-rules.yaml").read_text())
+        for beat in ("5", "15", "30", "75", "90", "120"):         # every setting of the dial runs, each keeping its rules' time
+            c = controller("--interval", beat, "--law", "compass", "--floor-interval", "5")
+            self.assertEqual(c.g.period_s, float(beat))
+            self.assertEqual(c.n_convey, 3)
 
     def test_the_levers_rig_runs_the_brains_minutes(self):
         """The levers rig runs at the default heartbeat and gives each phase the 3, 2 and 3 minutes its checks were written
         for (three, two and three decisions of a brain minute before omni-v16), the idle time before cold start in seconds."""
         text = (ROOT / "scripts" / "kind_levers.sh").read_text()
-        self.assertIn('IV="${OMNI_INTERVAL:-15}"', text)
+        self.assertIn('IV="${OMNI_INTERVAL:-60}"', text)
         self.assertIn('--interval "$IV" --iterations "$n"', text)
         self.assertIn("--coldstart-idle-s 120", text)
         self.assertNotIn("--interval 5 ", text)
@@ -141,6 +149,15 @@ class ControllerClocks(unittest.TestCase):
             self.assertAlmostEqual(c.compass_law.smooth ** (60 / period), 0.3, places=12)
             self.assertEqual(c.g.period_s, float(period))
             self.assertEqual(c.edge.window * period, 20 * 60)
+
+    def test_cruise_waits_for_two_readings_at_any_beat(self):
+        """Cruise puts every machine in service when work waits for a place decision after decision: its 120 s is 2, 8 and 24
+        decisions at 60, 15 and 5 s, as before, and never fewer than two readings at a slow beat (omni-v17: at 90 and 120 s
+        it had rounded to one, and one reading with a pod waiting set every machine in service). A count set by hand stands."""
+        for beat, n in ((5, 24), (15, 8), (30, 4), (60, 2), (75, 2), (90, 2), (120, 2)):
+            self.assertEqual(controller("--interval", str(beat), "--floor-interval", "5").n_cruise_after, n, beat)
+        self.assertEqual(controller("--interval", "120", "--cruise-after", "1").n_cruise_after, 1)
+        self.assertEqual(controller("--interval", "120", "--cruise-after", "0").n_cruise_after, 0)
 
     def test_the_conveyance_runs_every_15_s_at_any_decision_period(self):
         """Every check counts, a decision as well as a fast check: at a decision every 5 s (no fast check between) the
@@ -183,19 +200,19 @@ class MuscleClocks(unittest.TestCase):
 
 
 class PaceArms(unittest.TestCase):
-    """The real runs (docs/PACE_PREREGISTRATION.md): an arm named compass60, compass10 or compass5 is the compass arm deciding
-    every 60, 10 or 5 s (scripts/kind_paired.sh), and the receipt pairs each pace against native and against the compass arm
-    at its default of 15 s within the repetition (tools/live_reps.py)."""
+    """The real runs (docs/PACE_PREREGISTRATION.md): an arm named compassN (compass5 to compass120) is the compass arm deciding
+    every N s (scripts/kind_paired.sh), and the receipt pairs each beat against native and against the compass arm at its
+    default within the repetition, the default read from the arm's own runs or else from the engine (tools/live_reps.py)."""
     def test_the_runner_sets_the_pace_from_the_arm(self):
         text = (ROOT / "scripts" / "kind_paired.sh").read_text()
         self.assertIn('if [[ "$base" =~ ^compass([0-9]+)$ ]]; then pace="${BASH_REMATCH[1]}"; base=compass; fi', text)
-        self.assertIn('OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-15}}" ARM="$base"', text)
+        self.assertIn('OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-60}}" ARM="$base"', text)
 
     def test_the_receipt_pairs_each_pace(self):
         import json
         import tools.live_reps as LR
         p95 = "response time (ms), 95th percentile"
-        level = {"native": 300.0, "compass": 200.0, "compass60": 190.0, "compass10": 185.0, "compass5": 188.0}
+        level = {"native": 300.0, "compass": 200.0, "compass15": 190.0, "compass10": 185.0, "compass5": 188.0}
 
         def fake(d):
             arm, rep = d.name.split("-")[1], int(d.name.split("-")[2])
@@ -213,12 +230,20 @@ class PaceArms(unittest.TestCase):
         finally:
             LR.arm_gauges = old
         out = json.loads((t / "LIVE_REPS.json").read_text())
-        for pace in (60, 10, 5):
+        for pace in (15, 10, 5):
             self.assertAlmostEqual(out["paired"][f"compass{pace}"][p95]["diff"], level[f"compass{pace}"] - 300.0, places=6)
             self.assertAlmostEqual(out["paired"][f"compass{pace}|compass"][p95]["diff"], level[f"compass{pace}"] - 200.0, places=6)
         md = (t / "LIVE_REPS.md").read_text()
-        self.assertIn("omni deciding every 60 s vs omni at its default, every 15 s", md)
+        self.assertIn("omni deciding every 15 s vs omni at its default, every 60 s", md)   # no beat written: the engine's default
         self.assertIn("omni, a decision every 5 s", md)
+        for r in (1, 2, 3):                                   # the compass arm's own beat, as its runs wrote it, names its default
+            (t / f"bench-compass-{r}" / "omni_interval.txt").write_text("90\n")
+        try:
+            LR.arm_gauges = fake
+            LR.main(str(t))
+        finally:
+            LR.arm_gauges = old
+        self.assertIn("omni deciding every 15 s vs omni at its default, every 90 s", (t / "LIVE_REPS.md").read_text())
 
 
 if __name__ == "__main__":
