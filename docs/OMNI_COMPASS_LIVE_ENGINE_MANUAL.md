@@ -85,6 +85,11 @@ Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are
 
 ## What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report
 
+**A live tuning engine, and one tuned engine.** The page is a live tuning engine: every knob, button and monitor on it turns in
+real time, native alone, Omni-Compass on top, or both, and **any knob can move every metric, up or down**. Every benchmark is
+one engine at one tune, the factory tune; any other setting shows the engine's range, never a benchmark result (the page's first
+box, `#tuningBench`; section 1.1).
+
 **What the live engine is.** The live engine is one web page, `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, built by the
 repository's own code (`docs/engine/build_live_engine.py`) from the engine that stands and from the repository's own
 results. It is a monitor of the engine and of the benchmark runs GitHub ran: every number on it is read from a record the
@@ -107,28 +112,26 @@ beside Omni-Compass on the same demand, the same seconds, so the one difference 
 
 **What a gauge is.** A gauge is one measured quantity of the system (the work waiting, the work done, a response time, the
 machines in service, the energy drawn, a bill). On the page each gauge is drawn for both sides with its paired reading: the
-change from native, its 95% interval, and its word. The word is decided by what the gauge is for (the key, above), never by
-the sign of its number. A rise in a resource reads *power given*, in green, never a loss.
+change from native, its 95% interval, and its word. The word is decided by what the gauge is for (the key, above), never by the
+sign of its number.
 
-**How to read the page, in order.** First the switch and the engine (the master switch at the top of the wall, and the
-engine's name, digest and commit in the title block). Then the four signals a service is watched by: the work waiting, the
-work done, the decisions past their line and the capacity held, native beside Omni-Compass. Then every reading that went
-against native, worst first (the alarms). Then the benefit board (the page's section 2), the whole organism, every way it is bought
-(the page's section 3), the measured effect in full (the page's section 4), the evidence stack by stack from the cloud down
-to the chip (the page's section 5), the organism live (the page's section 6), the console (the page's section 7) and the
-brain (the page's section 8). The back matter of the page (disclosures, governing law, contact) says what the page is and is
-not. This manual follows that order, chapter by chapter.
+**How to read the page, in order.** First the switch and the engine (the master switch at the top of the wall, and the engine's
+name, digest and commit in the title block). Then the four signals a service is watched by: the work waiting, the work done, the
+decisions past their line and the capacity held, native beside Omni-Compass. Then every reading that went against native, worst
+first (the alarms). Then the benefit board (the page's section 2), the whole organism, every way it is bought (the page's
+section 3), the measured effect in full (the page's section 4), the evidence stack by stack from the cloud down to the chip (the
+page's section 5), the organism live (the page's section 6), the console (the page's section 7) and the brain (the page's
+section 8). This manual follows that order, chapter by chapter.
 
-**What this manual is, and is not.** It is the interpretation of the page: how to follow the dashboard, read each gauge,
-turn each knob, and see the mechanism of action of Omni-Compass against native as the monitors show it. It does not explain
-how the engine is built (the Owner's Manual does), and it does not say how to wire Omni-Compass onto a stack (the Operator's
-Manual does). Nothing in it decides a result: the records of authority are the repository's result files, the raw files GitHub
-archived with their SHA-256 lists, the two other manuals and `DISCLOSURES.md`.
+**What this manual is, and is not.** It is the interpretation of the page: how to follow the dashboard, read each gauge, turn
+each knob, and see the mechanism of action of Omni-Compass against native as the monitors show it. Nothing in it decides a
+result: the records of authority are the repository's result files, the raw files GitHub archived with their SHA-256 lists, the
+two other manuals and `DISCLOSURES.md`.
 
 ## Notice and Disclaimer
 
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
-(omni-v16, `OMNI_V16.json`). The page names its engine on its own `<html>` element (`data-engine`) and refuses to be built on
+(omni-v17, `OMNI_V17.json`). The page names its engine on its own `<html>` element (`data-engine`) and refuses to be built on
 any other; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
 same push. The page's own table of contents (its section iv, "Engine table of contents") is the authority on the order and the
 numbering of its sections; this manual names every section by its title and its anchor (`#s-health`, `#s-ops`, and so on), which
@@ -286,7 +289,7 @@ back.
 **What this manual covers.** Every section of the page in the page's own order; every gauge, with its side, its aim and its
 word; every knob of the console, with what it acts on and what it leaves alone; the two tickers that show the mechanism of
 action; the trace from any tile to the record it came from; and what to do when a tile reads LOSS. It covers the page as
-built on omni-v16; a later engine renames itself on the page's title block and this book is realigned in the same push.
+built on omni-v17; a later engine renames itself on the page's title block and this book is realigned in the same push.
 
 **What this manual does not cover.** How the engine is built, its equations beyond the ones the page itself prints, the
 wiring of Omni-Compass onto any stack, and the benchmark results themselves as a body of evidence: those are the Owner's and
@@ -358,6 +361,21 @@ every record it replays is made again by the repository's own code on the checko
 write a page whose engine is not the one `python3 tools/omni_version.py` reads. So the page can never run ahead of the
 repository, and a new engine version is written into the page's words by a person before the page can be rebuilt on it.
 
+It is also a live tuning engine, a tuning bench. Its buttons turn the engine's knobs in real time: the heartbeat from 5 to 120
+s, the dial between the max and the tune-down, the pedal, each muscle driven or left native, up or down, in or out, minus or
+plus. Turning them shows the mechanism of action and its variations with native alone, with Omni-Compass on top of native, or
+both side by side. As on any engine, where the mixture, the intake, the exhaust, the firing or the pistons change what a car's
+engine delivers, **turning any knob of Omni-Compass can change every metric, up or down, in any direction a tuner chooses**: one
+engine for many vessels, tuned many ways, for many outputs. The records the page replays are something else: the main engine's
+one tune, the factory tune, as the benchmarks ran it. That tune is chosen by a declared rule: of the tunes that harm no gauge
+against native, the one against which no other tried tune reads GAIN on one service gauge and LOSS on none, searched on
+development seeds and read again on untouched ones (`docs/THE_TUNE.md`). What the page shows at any other setting demonstrates
+the engine's range and is never a benchmark result; a tune other than the factory tune belongs to its tuner, and so do its
+results. The first box at the top of the page says which is which (`#tuningBench`). The beat on the dial (the page's section 1j)
+is one such knob: the factory tune runs it at 60 s, and every other beat is shown beside native with what it buys and what it
+costs, as range, never as a result. Each muscle's own setting is part of the same factory tune: its card where one was found
+under the same rule, the engine's setting for the rest (`realms/muscle_cards_v5.csv`).
+
 ### 1.2 The five records
 
 The page carries five kinds of record, and every monitor says which it plays.
@@ -405,14 +423,14 @@ Omni-Compass as its owner pictures it (on a phone they sit under the title); eac
 under it: every result on the page is read from the repository's own records. The body is numbered 1 to 11; the back matter is v
 (disclosures, governing law and contact) and vi (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
-to 1i, one letter for each of its panels, with no unnumbered entry in the contents.
+to 1j, one letter for each of its panels, with no unnumbered entry in the contents.
 
-### 2.2 The sections, as built on omni-v16
+### 2.2 The sections, as built on omni-v17
 
 Appendix A lists every section with its anchor and the chapter of this book that
 reads it. In the page's order: 1 the monitor wall and the control panel (1a the control panel and the kill switch, 1b the
 monitor wall, 1c the monitor list, 1d the status board, 1e the master switch's wiring, 1f the Python's runs in the page, 1g
-every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
+every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline, 1j the heartbeat dial); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
 measured effect in full (the organisms, every muscle, the register, the grid and every three-run table); 5 the evidence by
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
@@ -423,7 +441,7 @@ specification and mathematics, 10b the C++ twin, the Python's runs through the C
 ### 2.3 Anchors
 
 Every section has an anchor that does not move when the page is reordered: `#p-health`, `#s-health`,
-`#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
+`#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-dial`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
 `#p-organism`, `#s-engines`, `#s-lab`, `#s-desk`, `#p-brain`, `#s-decision`, `#s-plane`, `#s-brain`, `#s-verdict`, `#s-fail`,
 `#s-math`, `#s-cpp`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
 contents links the same way. When this book names a section it gives its title and its anchor, so the reader finds it on a
@@ -629,6 +647,26 @@ every run of the campaign on the engine that stands, A of every benchmark, then 
 twice; it starts nothing while an Azure run, a grid report or a verify waits for a runner. So a pipeline monitor showing one
 Azure run queued and nothing else starting is the conductor holding, by its rule, not a fault. A long run on a free runner
 (the organisms at 1,000 copies) lists as in progress for its whole shard.
+
+### 7.4 The heartbeat dial (the page's section 1j, `#s-dial`)
+
+The governor's heartbeat, its full decision, is a dial from omni-v17 on: the main engine decides every 60 s, and the operator
+may set any beat (`--interval`: 5, 15, 30, 60, 75, 90 or 120 s, or any value between), the fast checks every 5 s at every beat.
+The section shows every beat beside native in two tables for each setting the models read (the cloud's: the tune-down, the
+machines alone; the kind benchmark's: the max, every autoscaler sensed). The first table gives each beat's value and its word
+against native: the reads of the cluster a day (what a beat buys: about 39,700 at 60 s and 86,400 at 5 s), the governor's own
+processor, the pods waiting for a place, the 95th percentile, the minutes over the line, the autoscaler's shortfall, the machine
+hours and the energy per core-hour; the main engine's row is set in bold. The second table gives each other beat's change
+against the main engine's 60 s, with its word. Read a row across: a beat whose service words read GAIN or EVEN against native
+and whose cost columns the operator accepts is a beat that can be set. A word of LOSS against native is the engine's at that
+beat and is listed with every other LOSS row (the page's section 1g, chapter 6). The values are our own models (class S), each
+beat's mean over seeded days on a plant that moves every 5 s; the real runs at every beat (`docs/PACE_PREREGISTRATION.md`,
+amendment 3) take their place in the note above the tables when their three runs land. The governor's own screen in Grafana
+shows the beat it runs at (`omni_heartbeat_seconds`, the median spacing of its last eleven decisions) and counts the time since
+its last decision in beats of that setting; the staleness alert fires after three, at any setting. The dial is the tuning
+bench's own example: the factory tune runs the main engine at 60 s, chosen and read again under the rule of `docs/THE_TUNE.md`;
+any other beat is the engine's range on the page, never a benchmark result, until its own three runs land on that beat and are
+read as that beat's. A beat set on a live system is the operator's own tune, and its results are its own.
 
 ---
 
@@ -1381,7 +1419,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 27.2 The engine's name
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v16). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v17). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines.
 
 ## 28. When a Tile Reads LOSS
@@ -1563,6 +1601,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 1g | `#s-loss` | Every LOSS row: its cause and its knob | 6, 28 |
 | 1h | `#s-feed` | The golden signals, the event log and the live metrics | 6 |
 | 1i | `#s-github` | CI pipeline: GitHub Actions | 7 |
+| 1j | `#s-dial` | The heartbeat dial: every beat beside native | 7 |
 | 2 | `#s-board` | The benefit board | 8 |
 | 3 | `#s-whole` | The whole organism, every way it is bought | 9 |
 | 4 | `#s-fleet` | Measured effect in full | 8 |

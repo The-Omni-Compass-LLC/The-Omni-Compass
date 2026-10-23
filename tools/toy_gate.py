@@ -49,6 +49,7 @@ import argparse
 import json
 import math
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -93,7 +94,7 @@ def cap_wear(caps):
 
 
 # ---- the worker: one arm, one seed, run inside one checkout --------------------------------------------------------
-def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud"):
+def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud", ctl=""):
     import csv
     from unittest import mock
     import numpy as np
@@ -258,7 +259,7 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
                 "--floor-interval", str(tick_s), "--latency-file", str(lat_path), "--slo-ms", str(SLO_MS),
                 "--audit", str(out / "audit.jsonl"), "--kill-file", str(out / "kill"), "--node-scale-cmd", "SIMSCALE {n}",
                 "--min-nodes", str(sim.c.pool.min_nodes), "--max-nodes", str(sim.c.pool.max_nodes), "--headroom", "0.5",
-                "--active-nodes-only", "--max-node-step", "1"]
+                "--active-nodes-only", "--max-node-step", "1", *shlex.split(ctl)]
         p = parser()
         if setting == "cloud" and any("--give-back-only" in getattr(x, "option_strings", []) for x in p._actions):
             argv.append("--give-back-only")
@@ -847,6 +848,7 @@ def main(argv=None):
     ap.add_argument("--quota", default="none", help=argparse.SUPPRESS)      # the convey toy's quota: none (readable, empty), unreadable, or refused (unreadable, every raise refused)
     ap.add_argument("--batch", action="store_true", help=argparse.SUPPRESS)  # the convey toy with the batch muscle beside the serving one
     ap.add_argument("--gamma", type=float, default=3.0, help=argparse.SUPPRESS)  # the card toy's clock-cost exponent
+    ap.add_argument("--ctl", default="", help=argparse.SUPPRESS)   # more of the governor's own arguments, one tune of its knobs (tools/tune_study.py)
     a = ap.parse_args(argv)
     if a.render:
         return render(*a.render)
@@ -857,7 +859,7 @@ def main(argv=None):
     if a.worker in ("card-native", "card-omni"):
         return worker_card(a.worker.split("-")[1], a.seed, a.gamma, a.dir)
     if a.worker:
-        return worker(a.worker, a.seed, a.days, a.period, a.dir, a.blink, a.fine, a.setting)
+        return worker(a.worker, a.seed, a.days, a.period, a.dir, a.blink, a.fine, a.setting, a.ctl)
     lo_s, _, hi_s = a.seeds.partition("-")
     seeds = list(range(int(lo_s), int(hi_s or lo_s) + 1))
     base, cand = Path(a.base).resolve(), Path(a.cand).resolve()

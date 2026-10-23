@@ -58,8 +58,9 @@ BMS="$OUT_DIR/bms_setpoints.log"
 # clock counts seconds, so a decision is no longer a minute of the brain's whatever the period, and the two levers that give
 # back (rightsize, coldstart) wait for the brain's calm, its contraction authority, which comes after about a minute. The
 # phases are the 3, 2 and 3 minutes the checks were written for (three, two and three decisions of a brain minute each before
-# omni-v16); the first omni-v16 run at three decisions of 5 s gave the brain 15 s and failed those two checks (22 October)
-IV="${OMNI_INTERVAL:-15}"
+# omni-v16); the first omni-v16 run at three decisions of 5 s gave the brain 15 s and failed those two checks (22 October).
+# At the main engine's 60 s (omni-v17) the phases are three, two and three decisions again
+IV="${OMNI_INTERVAL:-60}"
 run() {  # run the controller for SEC seconds of decisions (never fewer than one) with extra arguments
   local n=$(( $1 / IV )); shift; [ "$n" -ge 1 ] || n=1
   python -m omni_controller.controller --kubectl "$K" --mode target --interval "$IV" --iterations "$n" \

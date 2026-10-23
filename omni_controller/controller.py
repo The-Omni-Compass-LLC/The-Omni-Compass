@@ -344,7 +344,10 @@ class Controller:
         per = lambda sec: max(1, int(round(float(sec) / period)))
         pick = lambda n, sec: int(n) if n is not None else per(sec)
         self.n_slo_clear = pick(getattr(a, "slo_clear", None), getattr(a, "slo_clear_s", 180.0))
-        self.n_cruise_after = pick(getattr(a, "cruise_after", None), getattr(a, "cruise_after_s", 120.0)) \
+        # cruise waits for work that waits decision after decision: two readings at least, at any beat (omni-v17: at 90 and
+        # 120 s its 120 s rounded to one decision, and a single reading with a pod waiting put every machine in service)
+        self.n_cruise_after = (int(a.cruise_after) if getattr(a, "cruise_after", None) is not None
+                               else max(2, per(getattr(a, "cruise_after_s", 120.0)))) \
             if getattr(a, "cruise_after", None) != 0 else 0
         self.n_strict_window = pick(getattr(a, "strict_window", None), getattr(a, "strict_window_s", 300.0))
         self.n_verdict_every = pick(getattr(a, "verdict_every", None), getattr(a, "verdict_every_s", 600.0))
@@ -1173,9 +1176,10 @@ class Controller:
 def parser():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--mode", choices=["observe", "target", "nodepool"], default="observe")
-    # the heartbeat (omni-v16, the founder's word of 22 October: "15 sec all over"): a full decision every 15 s, native's own
-    # pod autoscaler's pace, and the fast checks every 5 s between; every rule counts seconds, so either can be turned alone
-    ap.add_argument("--interval", type=float, default=15.0, help="seconds between governor decisions (the heartbeat)")
+    # the heartbeat, a dial (omni-v17, the founder's word of 22 October, afternoon): the main engine decides every 60 s, and any
+    # beat can be set (5, 15, 30, 60, 75, 90, 120 s and every value between), each shown beside native; the fast checks run
+    # every 5 s at every beat. Every rule counts seconds (omni-v16), so either can be turned alone
+    ap.add_argument("--interval", type=float, default=60.0, help="seconds between governor decisions (the heartbeat, a dial; the main engine 60 s)")
     ap.add_argument("--floor-interval", type=float, default=5.0, help="seconds between the fast checks: the scheduling floor, the pod reflex, the conveyance's clock (nodepool mode)")
     ap.add_argument("--convey-every-s", type=float, default=15.0,
                     help="seconds between conveyance passes, counted on the checks (a fast check or a decision; omni-v16)")

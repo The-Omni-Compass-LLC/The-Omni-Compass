@@ -449,6 +449,8 @@ def main(argv=None):
     layers_real = {k: v for k, v in layers_all.items() if not k.startswith("1.")}
     sep = separability()
     side = beside()
+    from tools.omni_version import VERSIONS
+    standing = f"omni-{next(iter(VERSIONS))}"    # the engine that stands: the version list's newest
 
     results = {}
     for scope, layers in (("with the card's one run", layers_all), ("without the card (the cluster, the services and the cloud)", layers_real)):
@@ -619,7 +621,7 @@ def main(argv=None):
     L.append("## 6. What is missing, and what replaces what")
     L.append("")
     L.append("- **The machine** (the kernel, bare metal, Kepler and the machine's own meter; register row 79): not yet run. It enters as exactly 1.")
-    L.append("- **The card on the engine that stands**: the omni-v16 run on Lambda (`gpu-omni-v16`, one exact commit) replaces the 2 October row.")
+    L.append(f"- **The card on the engine that stands**: the {standing} run on Lambda (`gpu-{standing}`, one exact commit) replaces the 2 October row.")
     L.append("- **The cloud at the tune-down**: the omni-v12 Azure sets (A, B and C of the steady set, the two bursts and the real day) give the bill its "
              "three-run reading; Google and Amazon follow on the same harness.")
     L.append("- **Every cluster and service table on omni-v12**: the campaign (`scripts/reruns.txt`) reruns every benchmark; each row above is replaced by "
