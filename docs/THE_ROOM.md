@@ -77,8 +77,9 @@ first work of section 5.
    g the muscle moves; the worth Wᵤ and W_d read from the family's own model or its live receipts; and, for each wall,
    whether the wall is the **design** (a vendor's default, a published cap, a protocol's rule: movable by a muscle of our
    own) or the **physics** (a core does one thing at a time, a disk has one bandwidth, a chip has one power ceiling: not
-   movable by any muscle). That table is built by a tool from the catalog and the receipts, one row a family, and it is
-   what the next engine version tunes against.
+   movable by any muscle). That table is `docs/THE_ROOM_TABLE.md`, built by `tools/room_table.py` from the catalog, each
+   muscle's preset and the realms result, one row a family, plant and knob (235 rows), and it is what the next engine
+   version tunes against.
 2. **The 159 same-as-native muscles, one by one.** Each has room and no gain: either the law's gain on that knob is too
    small to move it inside the noise, the sense reads a gauge the knob does not move, or the trial's allowance never lets
    a step through. Each is a wiring question with an answer in the family's own files, and each answer is a change to the
