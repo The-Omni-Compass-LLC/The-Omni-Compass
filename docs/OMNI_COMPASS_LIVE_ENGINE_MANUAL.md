@@ -477,6 +477,12 @@ judges and in the cloud's tally. A model's gauge that has one value a run (the L
 has no interval, so it is shown, not judged, with the way it moved and its size. And the line says which engines the tables stand
 on, so a reader never takes a table of an older engine for the engine that stands.
 
+**The audit of 22 October** (`docs/engine/CONSENSUS_AUDIT_2026-10-22.md`). Five seats read the page again on omni-v16, each on
+one dimension: the mathematics and the readings, the underwriting (evidence, provenance, claims), the editing (tone, terms,
+consistency), the structure (hierarchy, order of comprehension, navigation) and the visual layout as rendered. That page carries
+each seat's grade part by part, the consensus grade, every finding merged with what was closed in the same push, and the order of
+the page the structure seat proposed, with its cost, for the founder's decision.
+
 ### 3.3 The sides are never a reading
 
 Blue does not mean good and amber does not mean bad: they name who is being read.

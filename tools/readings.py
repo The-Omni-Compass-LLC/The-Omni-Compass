@@ -445,7 +445,7 @@ def interval_by_word(lo, hi, word, unit="%", digits=1):
     +3.7%')."""
     sg = word_sign(word)
     f = lambda v: f"{abs(v):.{digits}f}{unit}"
-    if sg in ("+", "−"):
+    if sg in ("+", "−") and not (lo < 0 < hi):      # an interval that crosses zero lies as measured, whatever the word
         a, b = sorted((abs(lo), abs(hi)))
         return f"{sg}{f(a)} to {sg}{f(b)}"
     raw = lambda v: f"{'+' if v > 0 else '−' if v < 0 else '±'}{f(v)}"

@@ -20,7 +20,7 @@ Every row names the engine its table ran on (read from the table). Results are n
 
 | Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |
 |---|---|---|---|---:|---|---|
-| 2026-10-22 | Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v12 | **GAIN, power given** | **+4.3% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| 2026-10-23 | Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v12 | **GAIN, power given** | **+4.3% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
 | 2026-10-21 | Redis, the cache's memory ceiling | omni-v12 | **GAIN, power given** | **+0.1% GAIN** | memory ceiling held cut 2.2% to 2.3% (GAIN); memory used cut 0.8% to 0.9% (GAIN); work inside the line up 1.2% to 1.4% (GAIN); hit rate up 1.2% to 1.4% (GAIN); mean cut 1.7% to 2.3% (GAIN); memory ceiling held up 2.2% to 2.4% (power given); memory used up 1.7% to 2.0% (power given) | `results/live/V12_REDIS.md` |
 | 2026-10-21 | PostgreSQL, the pooler's pool size | omni-v12 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V12_PGBENCH.md` |
 | 2026-10-21 | MySQL, the buffer pool's size | omni-v12 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V12_SYSBENCH.md` |

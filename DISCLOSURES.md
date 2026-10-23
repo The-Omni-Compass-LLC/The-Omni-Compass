@@ -84,7 +84,7 @@ self-running engine, set at the factory. Every muscle in the catalog is wired, a
 its own card where one was found on development seeds and kept under the strict rule (364 muscles,
 `realms/muscle_cards_v5.csv`), the engine's own setting for every other muscle, all frozen and fingerprinted by version
 (`python3 tools/omni_version.py`). Muscles differ: no single setting is right for every muscle, family, sector, domain or
-realm, and none is presented as universal. Every published result is this factory tune. As with any engine, a licensee may
+realm, and none is presented as universal. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands. As with any engine, a licensee may
 then add on, retune, upgrade or tune down any muscle or any combination of muscles (the dial, the cards, the bands and the
 service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
 published ones. On a live system the verdict (`omnicompass/verdict.py`) measures it with paired

@@ -239,7 +239,7 @@ def engines_sentence(ts):
     parts = [f"{len(v)} on omni-v{k}" for k, v in sorted(by.items(), reverse=True)]
     return ("Each test is read from its own newest three-run table: " + ", ".join(parts) + " (omni-v8, omni-v9 and omni-v10 changed only the "
             "CityLearn runner and the interval table, omni-v11 the Kubernetes governor's hold on a reading with no machine in service); "
-            "a test stands on an older engine's table only until its omni-v11 runs land, no table is pooled across engines, and every row "
+            "a test stands on an older engine's table only until its three runs on the engine that stands land, no table is pooled across engines, and every row "
             "below names its table.")
 
 

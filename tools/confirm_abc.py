@@ -136,7 +136,7 @@ def cell(r, word=None):
     word's sign (tools/readings.py by_word: GAIN +, LOSS −, EVEN =), never the gauge's raw direction."""
     nat, diff, lo, hi = r["native"], r["diff"], r["ci95"][0], r["ci95"][1]
     if nat:
-        return f"{by_word(100 * diff / abs(nat), word)} ({interval_by_word(100 * lo / abs(nat), 100 * hi / abs(nat), word)})"
+        return f"{by_word(100 * diff / abs(nat), word)} ({interval_by_word(100 * lo / abs(nat), 100 * hi / abs(nat), word, unit='')})"
     return f"{by_word(diff, word, unit='', digits=4)} ({interval_by_word(lo, hi, word, unit='', digits=4)})"
 
 

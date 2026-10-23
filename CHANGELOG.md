@@ -2,6 +2,51 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-23 (morning): the consensus audit of 22 October, its majors closed; the sweep's table carries the notice
+
+- **The audit** (`docs/engine/CONSENSUS_AUDIT_2026-10-22.md`; the seats' reports line for line in `docs/engine/audit_2026-10-22/`): five
+  referee seats read the live engine on omni-v16, one dimension each, none reading another's report first: the mathematics and the
+  readings **B**, the underwriting **B−**, the editing **B+**, the structure **B**, the visual layout as rendered **B** (desktop A−, phone
+  B−); consensus **B**, no blocker named, 33 distinct majors (38 as counted). Every number the seats traced equals its record, and the
+  page renders with no console error and no sideways scroll at either width; what held it at B is what it said about the record and six
+  of its drawings at a phone's width. 23 majors are closed below, 3 in part (two wait on the founder's decision on the page's order), 1
+  in its sentence, and the six phone overprints (V5 to V10) go in the next push. The grades are the referees' grades of the page they
+  read; the next audit grades the page again.
+- **The numbers first.** The verdict's keep rates (8c) no longer take a minus from the word before them: the page's word walker signs
+  only a number that follows a bare word. An interval that includes zero prints as it lies, whatever the word (`byWordRange`). Failed
+  requests read by the key's never-more rule in section 3 and in 5a alike, any rise in a run a LOSS, and both panels say so. The benefit
+  board and its tally take each benchmark's newest table whatever its engine, each row naming it, with the Omni index printed beside
+  them as a second reading of the same tables and no written explanation of any gap. Every realms word takes the key's floor. The
+  start-wait sentence counts Omni-Compass's own tables only.
+- **The words that contradicted the record or the key.** The key's own sentence on the sign in iv and in 4 (the number beside a word
+  carries the word's sign: GAIN +, LOSS −, EVEN =, power given +), every size and interval printed through the formatters where it is
+  made, the Ask panel's rule the same. The title page: every live view runs on omni-v16 and the recorded models name their own engines;
+  the tables prove the factory tune of the engine each names (`DISCLOSURES.md` section 3 and both manuals: every published result is the
+  factory tune of the engine its table names); the runs played back from raw files are told apart from the tables read as the repository
+  holds them; "found in its own models before any real run". The spine is the organism's; power given is blue in section 2 and in
+  monitor 11's registry text; a stack is bought two ways and the composition read four; the disclosures name the build's engine; 5f
+  states what the chip receipts will measure and no result; 1g names a knob only where the recorded cause is the governor's; 1d answers
+  a LOSS row only from the same setting's tables.
+- **The structure.** A part head for 10; every contents entry is its heading's text, held by `tests/test_live_toc.py`; the quick-start
+  guide under 6a; the registry in the page's order with each monitor's number; iii and iv fold to a lead paragraph each (18,231 visible
+  characters before the wall with the folds closed, against 32,277 open); the Omni index is the first line of the executive summary. The
+  structure seat's proposed order (the wall first) and its cost, and the cheaper cut of the front matter, stand in the audit for the
+  founder's decision.
+- **The visual seat's first four.** The title page's two lede paragraphs each take their own row (they printed over each other on the
+  first screen); power given wears its own class in the prose, blue, and blue on the market map, the quote board and the legends; the
+  last places the sign rule missed (1g's cells, iv's ranges, 5f's cells, the quote board, the radar) print the word's sign on every
+  number; the phase planes stack on a phone.
+- **Every reader of a three-run table reads both signs.** The tables written before the sign rule carry the gauge's raw direction and
+  those after it the word's (EVEN with "="): the live engine's exporter and cell formatters read "=" and both directions, and the
+  trading floor draws every judged row in its word's direction whichever way its table was written; the benefit sheet, the index and
+  the wiring verdicts read the tables' JSON, never their cells. `tools/confirm_abc.py` keeps the tables' interval shape ("(+33.3 to
+  +66.7)"), and its test asserts the word's sign for GAIN, LOSS and EVEN.
+- **The referees' reports keep the words of their day.** `tools/layout_check.py` reads `docs/engine/audit_*/` as it reads the history
+  and the receipts: a report quotes the page it read.
+- **The sweep's table** (`results/toy_gate/HEARTBEAT_SWEEP.md`) carries the notice under its title and at its end, written by the tool
+  (`tools/heartbeat_sweep.py`), as every toy-gate page does. The Live Engine Manual names the audit; all three PDFs are rebuilt; the
+  release manifest is regenerated.
+
 ## 2026-10-22 (evening, the live engine): the heartbeat sweep on the wall, every beat from 5 to 120 s; main's omni-v16 merged
 
 - **The number beside a word carries the word's sign** (the founder's words of the same night: "If it's a gain, it should be a plus 73

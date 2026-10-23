@@ -429,6 +429,7 @@ def table(results, out_md):
     import collections
     sys.path.insert(0, str(HERE.parents[1]))
     from tools.toy_gate import reading
+    from tools.legal import stamp
     rows = [json.loads(l) for l in open(results)]
     by = collections.defaultdict(dict)
     for r in rows:                       # every governed row names the engine it ran on (--names); native's is native
@@ -497,7 +498,7 @@ def table(results, out_md):
                 L.append("")
         rec[f"{setting}|native"] = {g: sum(r[g] for r in nat.values()) / len(nat) for g in GAUGES}
         L += [f"Native's means over the seeds: " + "; ".join(f"{NAMES[g].lower()} {rec[f'{setting}|native'][g]:.3f}" for g in GAUGES) + ".", ""]
-    Path(out_md).write_text("\n".join(L) + "\n", encoding="utf-8")
+    Path(out_md).write_text("\n".join(stamp(L)) + "\n", encoding="utf-8")   # the notice under the title and at the end
     Path(out_md).with_suffix(".json").write_text(json.dumps(rec, indent=1) + "\n", encoding="utf-8")
     print(f"{out_md}: {len(rec)} rows")
 

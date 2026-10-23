@@ -862,7 +862,7 @@ self-running engine, set at the factory, the way a vehicle leaves the plant with
 in the catalog is wired and runs on the setting found for it: its own card where one was found and kept (section 4.3),
 the engine's own setting for every other muscle. The whole tune is fixed and fingerprinted by version
 (`python3 tools/omni_version.py`), so an installation can always tell whether it is running the factory tune or a tune of
-its own. Every published result is the factory tune.
+its own. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands.
 
 No setting is universal. Muscles differ, and no single setting is right for every muscle, family, sector, domain or
 realm; none is presented as such. What the factory tune fixes is the starting point an installation can trust: each

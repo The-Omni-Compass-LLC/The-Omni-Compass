@@ -1,6 +1,6 @@
 {
  "file": "docs/engine/monitors.json",
- "rule": "every canvas the page draws is one monitor; the number is its order of appearance on the page, 1 first; the wall lays them out left to right, then the next row, and two monitors that sit side by side in their section stay side by side on the wall (the founder's orders of 20 and 21 October); every monitor names its wiring: the page's own code, the Python it ports or reads, the C++ twin or why there is none, the checks that hold them equal, and how it moves (the founder's order of 21 October)",
+ "rule": "every canvas the page draws is one monitor; the number is its order of appearance on the page, 1 first; the wall lays them out left to right, then the next row, and two monitors that sit side by side in their section stay side by side on the wall (the founder's orders of 20 and 21 October); every monitor names its wiring: the page's own code, the Python it ports or reads, the C++ twin or why there is none, the checks that hold them equal, and how it moves (the founder's order of 21 October); the registry lists the monitors in that order, and n is each monitor's number",
  "layers": {
   "switch": "the switch above everything",
   "whole": "the whole organism",
@@ -165,6 +165,7 @@
  },
  "monitors": [
   {
+   "n": 1,
    "id": "masterCv",
    "name": "The master switch and the kill switch",
    "layer": "switch",
@@ -206,6 +207,95 @@
    }
   },
   {
+   "n": 2,
+   "id": "proofCv",
+   "name": "The Python's runs, reproduced here",
+   "layer": "proof",
+   "what": "The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.",
+   "cls": "S (the engine itself)",
+   "status": "live",
+   "awaiting": null,
+   "feed": {
+    "exporter": "tools/engine_runs.py (the Python) and this page",
+    "metrics": [],
+    "promql": []
+   },
+   "knobs": [
+    "runs",
+    "print"
+   ],
+   "grafana": {
+    "type": "stat",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawProof, engineRuns, proofRecheck",
+    "python": [
+     "tools/engine_runs.py"
+    ],
+    "cpp": [
+     "cpp/tools/engine_runs.cpp",
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/nervous_system.cpp"
+    ],
+    "proof": [
+     "verify.py",
+     "tests/test_engine_runs.py",
+     ".github/workflows/engine-runs.yml"
+    ],
+    "moves": "the page recomputes one run of the Python's set from its own seed about twice a second, round after round, and holds its receipt against the Python's"
+   }
+  },
+  {
+   "n": 3,
+   "id": "hoCv",
+   "name": "The Python's 500 scenarios, replayed",
+   "layer": "proof",
+   "what": "benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.",
+   "cls": "S",
+   "status": "replay",
+   "awaiting": null,
+   "feed": {
+    "exporter": "benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv)",
+    "metrics": [],
+    "promql": []
+   },
+   "knobs": [
+    "seed",
+    "arm",
+    "gauge",
+    "speed",
+    "kill"
+   ],
+   "grafana": {
+    "type": "table",
+    "unit": ""
+   },
+   "wire": {
+    "code": "drawHeld",
+    "python": [
+     "benchmarks/stack_benchmark.py",
+     "omnicompass/adapter.py",
+     "omnicompass/shield.py",
+     "omnicompass/stack_sim.py",
+     "docs/engine/export_heldout.py"
+    ],
+    "cpp": [
+     "cpp/src/governor.cpp",
+     "cpp/src/core.cpp",
+     "cpp/src/shield.cpp"
+    ],
+    "proof": [
+     "verify.py",
+     "tests/test_cpp_governor_parity.py",
+     "tests/test_cpp_shield_parity.py"
+    ],
+    "moves": "the 500 scenarios replayed one after another from the record, every scenario's trace hash with it"
+   }
+  },
+  {
+   "n": 4,
    "id": "feed0",
    "name": "Golden signal: errors",
    "layer": "service",
@@ -262,6 +352,7 @@
    }
   },
   {
+   "n": 5,
    "id": "feed1",
    "name": "Golden signal: throughput",
    "layer": "service",
@@ -317,6 +408,7 @@
    }
   },
   {
+   "n": 6,
    "id": "feed2",
    "name": "Golden signal: latency",
    "layer": "service",
@@ -372,6 +464,7 @@
    }
   },
   {
+   "n": 7,
    "id": "feed3",
    "name": "Golden signal: saturation",
    "layer": "service",
@@ -427,6 +520,7 @@
    }
   },
   {
+   "n": 8,
    "id": "ciCv",
    "name": "GitHub Actions: the runs in flight",
    "layer": "ci",
@@ -465,6 +559,7 @@
    }
   },
   {
+   "n": 9,
    "id": "fxBen",
    "name": "The benefit board",
    "layer": "whole",
@@ -502,6 +597,7 @@
    }
   },
   {
+   "n": 10,
    "id": "fxFam",
    "name": "Where the benefit lives, gauge by gauge",
    "layer": "whole",
@@ -538,6 +634,7 @@
    }
   },
   {
+   "n": 11,
    "id": "tradeMap",
    "name": "The market map: every three-run table a tile",
    "layer": "whole",
@@ -575,6 +672,7 @@
    }
   },
   {
+   "n": 12,
    "id": "tradeQuotes",
    "name": "The quote board: every three-run table a quote",
    "layer": "whole",
@@ -612,12 +710,13 @@
    }
   },
   {
-   "id": "gridCv",
-   "name": "The scale-out grid",
-   "layer": "organisms",
-   "what": "Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside.",
-   "cls": "S/L",
-   "status": "record",
+   "n": 13,
+   "id": "whCv",
+   "name": "The whole organism, composed",
+   "layer": "whole",
+   "what": "The pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought.",
+   "cls": "S (of P and L)",
+   "status": "composed",
    "awaiting": null,
    "feed": {
     "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
@@ -625,28 +724,31 @@
     "promql": []
    },
    "knobs": [
-    "filter"
+    "scenario",
+    "reading",
+    "chip",
+    "kill"
    ],
    "grafana": {
-    "type": "heatmap",
-    "unit": ""
+    "type": "stat",
+    "unit": "percent"
    },
    "wire": {
-    "code": "drawGridCv",
+    "code": "drawWhole",
     "python": [
-     "tools/grid_v5.py",
-     "scripts/dispatch_grid.py",
-     "docs/engine/build_live_engine.py"
+     "tools/whole_system.py",
+     "docs/engine/export_whole.py"
     ],
     "cpp": [],
-    "cpp_none": "none: the grid's squares as its runs on GitHub write them",
+    "cpp_none": "none: a composition of measured tables by the product law, read as tools/whole_system.py writes it",
     "proof": [
-     "tests/test_grid_v5.py"
+     "docs/engine/build_live_engine.py"
     ],
-    "moves": "the reading cursor walks every square with runs started, one a decision; the age of GitHub's reading counts up every second"
+    "moves": "work flows down both columns; the reading cursor walks the pieces, one a decision"
    }
   },
   {
+   "n": 14,
    "id": "orgCv",
    "name": "The seven organisms, three loads",
    "layer": "organisms",
@@ -685,6 +787,7 @@
    }
   },
   {
+   "n": 15,
    "id": "muscleCv",
    "name": "Every muscle of the catalog",
    "layer": "muscles",
@@ -723,12 +826,13 @@
    }
   },
   {
-   "id": "whCv",
-   "name": "The whole organism, composed",
-   "layer": "whole",
-   "what": "The pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought.",
-   "cls": "S (of P and L)",
-   "status": "composed",
+   "n": 16,
+   "id": "gridCv",
+   "name": "The scale-out grid",
+   "layer": "organisms",
+   "what": "Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside.",
+   "cls": "S/L",
+   "status": "record",
    "awaiting": null,
    "feed": {
     "exporter": "the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios)",
@@ -736,30 +840,29 @@
     "promql": []
    },
    "knobs": [
-    "scenario",
-    "reading",
-    "chip",
-    "kill"
+    "filter"
    ],
    "grafana": {
-    "type": "stat",
-    "unit": "percent"
+    "type": "heatmap",
+    "unit": ""
    },
    "wire": {
-    "code": "drawWhole",
+    "code": "drawGridCv",
     "python": [
-     "tools/whole_system.py",
-     "docs/engine/export_whole.py"
-    ],
-    "cpp": [],
-    "cpp_none": "none: a composition of measured tables by the product law, read as tools/whole_system.py writes it",
-    "proof": [
+     "tools/grid_v5.py",
+     "scripts/dispatch_grid.py",
      "docs/engine/build_live_engine.py"
     ],
-    "moves": "work flows down both columns; the reading cursor walks the pieces, one a decision"
+    "cpp": [],
+    "cpp_none": "none: the grid's squares as its runs on GitHub write them",
+    "proof": [
+     "tests/test_grid_v5.py"
+    ],
+    "moves": "the reading cursor walks every square with runs started, one a decision; the age of GitHub's reading counts up every second"
    }
   },
   {
+   "n": 17,
    "id": "azCv",
    "name": "Azure: the bill, run by run",
    "layer": "cloud",
@@ -801,6 +904,7 @@
    }
   },
   {
+   "n": 18,
    "id": "gcpCv",
    "name": "Google Cloud: the gate and the bill",
    "layer": "cloud",
@@ -853,6 +957,7 @@
    }
   },
   {
+   "n": 19,
    "id": "awsCv",
    "name": "Amazon: the gate and the bill",
    "layer": "cloud",
@@ -905,6 +1010,7 @@
    }
   },
   {
+   "n": 20,
    "id": "c4N",
    "name": "The cloud setting, live: native's machines",
    "layer": "cloud",
@@ -957,6 +1063,7 @@
    }
   },
   {
+   "n": 21,
    "id": "c4O",
    "name": "The cloud setting, live: Omni-Compass's machines",
    "layer": "cloud",
@@ -1011,6 +1118,7 @@
    }
   },
   {
+   "n": 22,
    "id": "orchRoad",
    "name": "The orchestrators' road",
    "layer": "orchestrators",
@@ -1046,6 +1154,7 @@
    }
   },
   {
+   "n": 23,
    "id": "orchCv",
    "name": "An orchestrator, four ways",
    "layer": "orchestrators",
@@ -1087,6 +1196,7 @@
    }
   },
   {
+   "n": 24,
    "id": "opsPipeCv",
    "name": "The data pipeline, live: every stage from the GitHub Actions run to this page",
    "layer": "cluster",
@@ -1125,6 +1235,7 @@
    }
   },
   {
+   "n": 25,
    "id": "heartCv",
    "name": "The official run's heartbeat",
    "layer": "cluster",
@@ -1167,6 +1278,7 @@
    }
   },
   {
+   "n": 26,
    "id": "beatCv",
    "name": "The heartbeat sweep: every beat the governor can run at",
    "layer": "cluster",
@@ -1217,6 +1329,7 @@
    }
   },
   {
+   "n": 27,
    "id": "opsCandle",
    "name": "The official run: response time candles",
    "layer": "cluster",
@@ -1258,6 +1371,7 @@
    }
   },
   {
+   "n": 28,
    "id": "opsHeat",
    "name": "The official run: the heat map",
    "layer": "cluster",
@@ -1295,6 +1409,7 @@
    }
   },
   {
+   "n": 29,
    "id": "opsBars",
    "name": "The official run: paired bars",
    "layer": "cluster",
@@ -1332,6 +1447,7 @@
    }
   },
   {
+   "n": 30,
    "id": "opsReps",
    "name": "The official run: the repetitions",
    "layer": "cluster",
@@ -1369,6 +1485,7 @@
    }
   },
   {
+   "n": 31,
    "id": "ruStrip",
    "name": "Per-repetition run telemetry",
    "layer": "cluster",
@@ -1414,6 +1531,7 @@
    }
   },
   {
+   "n": 32,
    "id": "cluN",
    "name": "The shipped controller's trace: native",
    "layer": "cluster",
@@ -1465,6 +1583,7 @@
    }
   },
   {
+   "n": 33,
    "id": "cluO",
    "name": "The shipped controller's trace: Omni-Compass",
    "layer": "cluster",
@@ -1519,6 +1638,7 @@
    }
   },
   {
+   "n": 34,
    "id": "cStrip",
    "name": "The shipped controller's trace: the strip",
    "layer": "cluster",
@@ -1572,6 +1692,143 @@
    }
   },
   {
+   "n": 35,
+   "id": "gpuCv",
+   "name": "The GPU card, metered: the one real run",
+   "layer": "chip",
+   "what": "The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit, clock and temperature, requests served and the 95th percentile, native beside Omni-Compass governing (or watching only), every write of the governor marked.",
+   "cls": "P",
+   "status": "replay",
+   "awaiting": "its omni-v13 run on Lambda (lambda-gpu.yml, one exact commit): the replaced controller's run stands until then, shown as such",
+   "feed": {
+    "exporter": "NVIDIA DCGM exporter",
+    "metrics": [
+     "DCGM_FI_DEV_POWER_USAGE",
+     "DCGM_FI_DEV_POWER_MGMT_LIMIT",
+     "DCGM_FI_DEV_SM_CLOCK",
+     "DCGM_FI_DEV_GPU_TEMP"
+    ],
+    "promql": [
+     "DCGM_FI_DEV_POWER_USAGE",
+     "DCGM_FI_DEV_POWER_MGMT_LIMIT",
+     "DCGM_FI_DEV_SM_CLOCK"
+    ]
+   },
+   "knobs": [
+    "rep",
+    "arm",
+    "speed",
+    "kill"
+   ],
+   "grafana": {
+    "type": "timeseries",
+    "unit": "watt"
+   },
+   "wire": {
+    "code": "drawGpuRun",
+    "python": [
+     "docs/engine/export_gpu_run.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the 2 October run of an earlier controller, replayed from the card's own meter; today's GPU rules have their twin, cpp/src/gpu_rules.cpp, for the run on Lambda",
+    "proof": [
+     "docs/engine/build_live_engine.py"
+    ],
+    "moves": "the card's own meter replayed at ten times the run's seconds"
+   }
+  },
+  {
+   "n": 36,
+   "id": "cpuCv",
+   "name": "The CPU host, metered: awaiting its machine",
+   "layer": "host",
+   "what": "The CPU power harness on the host: the frequency ceiling, the clock run at, the package power and the response line, native beside Omni-Compass; today its own modelled machine (class S), the real run the day a machine with its meter runs it.",
+   "cls": "S (model) until the run",
+   "status": "awaiting",
+   "awaiting": "a Linux machine whose processor exposes its energy counter (RAPL) and a writable frequency ceiling (register row 79, cpu-power.yml)",
+   "feed": {
+    "exporter": "node_exporter (rapl, cpufreq collectors); Kepler",
+    "metrics": [
+     "node_rapl_package_joules_total",
+     "node_cpu_scaling_frequency_hertz",
+     "node_cpu_scaling_frequency_max_hertz",
+     "kepler_node_package_joules_total"
+    ],
+    "promql": [
+     "rate(node_rapl_package_joules_total[1m])",
+     "avg(node_cpu_scaling_frequency_hertz)"
+    ]
+   },
+   "knobs": [
+    "rep",
+    "speed",
+    "kill"
+   ],
+   "grafana": {
+    "type": "timeseries",
+    "unit": "watt"
+   },
+   "wire": {
+    "code": "drawCpuHost",
+    "python": [
+     "docs/engine/export_cpu_model.py",
+     "tools/run_cpu_power.py"
+    ],
+    "cpp": [],
+    "cpp_none": "none: the host's model until its run lands on a machine with its meter",
+    "proof": [
+     "tests/test_run_cpu_power.py"
+    ],
+    "moves": "the host's model replayed second by second until its run lands"
+   }
+  },
+  {
+   "n": 37,
+   "id": "gpu8Cv",
+   "name": "An 8-card node: built and awaiting its run",
+   "layer": "chip",
+   "what": "Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one-card model (class S), each Omni-Compass lane empty until the 8-card run lands, 24 paired repetitions a test pooled across the cards.",
+   "cls": "S (native model) until the run",
+   "status": "awaiting",
+   "awaiting": "scripts/gpu_8card.sh on a rented machine with eight NVIDIA cards (docs/GPU_RUN_GUIDE.md, section D)",
+   "feed": {
+    "exporter": "NVIDIA DCGM exporter, card by card",
+    "metrics": [
+     "DCGM_FI_DEV_POWER_USAGE",
+     "DCGM_FI_DEV_POWER_MGMT_LIMIT",
+     "DCGM_FI_DEV_SM_CLOCK"
+    ],
+    "promql": [
+     "sum by (gpu) (DCGM_FI_DEV_POWER_USAGE)"
+    ]
+   },
+   "knobs": [
+    "speed",
+    "kill"
+   ],
+   "grafana": {
+    "type": "timeseries",
+    "unit": "watt"
+   },
+   "wire": {
+    "code": "drawGpu8",
+    "python": [
+     "realms/gpu_card.py",
+     "omni_controller/gpu_governor.py",
+     "scripts/gpu_8card.sh"
+    ],
+    "cpp": [
+     "cpp/src/gpu_rules.cpp"
+    ],
+    "proof": [
+     "docs/engine/check_records.py",
+     "tests/test_cpp_twins_parity.py"
+    ],
+    "moves": "the one-card model's native lanes replayed second by second; the Omni-Compass lanes wait for the 8-card run"
+   }
+  },
+  {
+   "n": 38,
    "id": "sStrip",
    "name": "The chip and the host, modelled",
    "layer": "chip",
@@ -1623,139 +1880,7 @@
    }
   },
   {
-   "id": "gpuCv",
-   "name": "The GPU card, metered: the one real run",
-   "layer": "chip",
-   "what": "The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit, clock and temperature, requests served and the 95th percentile, native beside Omni-Compass governing (or watching only), every write of the governor marked.",
-   "cls": "P",
-   "status": "replay",
-   "awaiting": "its omni-v13 run on Lambda (lambda-gpu.yml, one exact commit): the replaced controller's run stands until then, shown as such",
-   "feed": {
-    "exporter": "NVIDIA DCGM exporter",
-    "metrics": [
-     "DCGM_FI_DEV_POWER_USAGE",
-     "DCGM_FI_DEV_POWER_MGMT_LIMIT",
-     "DCGM_FI_DEV_SM_CLOCK",
-     "DCGM_FI_DEV_GPU_TEMP"
-    ],
-    "promql": [
-     "DCGM_FI_DEV_POWER_USAGE",
-     "DCGM_FI_DEV_POWER_MGMT_LIMIT",
-     "DCGM_FI_DEV_SM_CLOCK"
-    ]
-   },
-   "knobs": [
-    "rep",
-    "arm",
-    "speed",
-    "kill"
-   ],
-   "grafana": {
-    "type": "timeseries",
-    "unit": "watt"
-   },
-   "wire": {
-    "code": "drawGpuRun",
-    "python": [
-     "docs/engine/export_gpu_run.py"
-    ],
-    "cpp": [],
-    "cpp_none": "none: the 2 October run of an earlier controller, replayed from the card's own meter; today's GPU rules have their twin, cpp/src/gpu_rules.cpp, for the run on Lambda",
-    "proof": [
-     "docs/engine/build_live_engine.py"
-    ],
-    "moves": "the card's own meter replayed at ten times the run's seconds"
-   }
-  },
-  {
-   "id": "cpuCv",
-   "name": "The CPU host, metered: awaiting its machine",
-   "layer": "host",
-   "what": "The CPU power harness on the host: the frequency ceiling, the clock run at, the package power and the response line, native beside Omni-Compass; today its own modelled machine (class S), the real run the day a machine with its meter runs it.",
-   "cls": "S (model) until the run",
-   "status": "awaiting",
-   "awaiting": "a Linux machine whose processor exposes its energy counter (RAPL) and a writable frequency ceiling (register row 79, cpu-power.yml)",
-   "feed": {
-    "exporter": "node_exporter (rapl, cpufreq collectors); Kepler",
-    "metrics": [
-     "node_rapl_package_joules_total",
-     "node_cpu_scaling_frequency_hertz",
-     "node_cpu_scaling_frequency_max_hertz",
-     "kepler_node_package_joules_total"
-    ],
-    "promql": [
-     "rate(node_rapl_package_joules_total[1m])",
-     "avg(node_cpu_scaling_frequency_hertz)"
-    ]
-   },
-   "knobs": [
-    "rep",
-    "speed",
-    "kill"
-   ],
-   "grafana": {
-    "type": "timeseries",
-    "unit": "watt"
-   },
-   "wire": {
-    "code": "drawCpuHost",
-    "python": [
-     "docs/engine/export_cpu_model.py",
-     "tools/run_cpu_power.py"
-    ],
-    "cpp": [],
-    "cpp_none": "none: the host's model until its run lands on a machine with its meter",
-    "proof": [
-     "tests/test_run_cpu_power.py"
-    ],
-    "moves": "the host's model replayed second by second until its run lands"
-   }
-  },
-  {
-   "id": "gpu8Cv",
-   "name": "An 8-card node: built and awaiting its run",
-   "layer": "chip",
-   "what": "Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one-card model (class S), each Omni-Compass lane empty until the 8-card run lands, 24 paired repetitions a test pooled across the cards.",
-   "cls": "S (native model) until the run",
-   "status": "awaiting",
-   "awaiting": "scripts/gpu_8card.sh on a rented machine with eight NVIDIA cards (docs/GPU_RUN_GUIDE.md, section D)",
-   "feed": {
-    "exporter": "NVIDIA DCGM exporter, card by card",
-    "metrics": [
-     "DCGM_FI_DEV_POWER_USAGE",
-     "DCGM_FI_DEV_POWER_MGMT_LIMIT",
-     "DCGM_FI_DEV_SM_CLOCK"
-    ],
-    "promql": [
-     "sum by (gpu) (DCGM_FI_DEV_POWER_USAGE)"
-    ]
-   },
-   "knobs": [
-    "speed",
-    "kill"
-   ],
-   "grafana": {
-    "type": "timeseries",
-    "unit": "watt"
-   },
-   "wire": {
-    "code": "drawGpu8",
-    "python": [
-     "realms/gpu_card.py",
-     "omni_controller/gpu_governor.py",
-     "scripts/gpu_8card.sh"
-    ],
-    "cpp": [
-     "cpp/src/gpu_rules.cpp"
-    ],
-    "proof": [
-     "docs/engine/check_records.py",
-     "tests/test_cpp_twins_parity.py"
-    ],
-    "moves": "the one-card model's native lanes replayed second by second; the Omni-Compass lanes wait for the 8-card run"
-   }
-  },
-  {
+   "n": 39,
    "id": "ringN",
    "name": "The organism, live: native",
    "layer": "organism",
@@ -1812,6 +1937,7 @@
    }
   },
   {
+   "n": 40,
    "id": "ringO",
    "name": "The organism, live: Omni-Compass",
    "layer": "organism",
@@ -1872,6 +1998,7 @@
    }
   },
   {
+   "n": 41,
    "id": "immCv",
    "name": "The immune system",
    "layer": "organism",
@@ -1930,6 +2057,7 @@
    }
   },
   {
+   "n": 42,
    "id": "swarm",
    "name": "The body parts on the band",
    "layer": "organism",
@@ -1975,6 +2103,7 @@
    }
   },
   {
+   "n": 43,
    "id": "tCube",
    "name": "Telemetry tensor: the cube",
    "layer": "analytics",
@@ -2020,6 +2149,7 @@
    }
   },
   {
+   "n": 44,
    "id": "tDelta",
    "name": "Telemetry tensor: the difference",
    "layer": "analytics",
@@ -2065,6 +2195,7 @@
    }
   },
   {
+   "n": 45,
    "id": "tModes",
    "name": "Telemetry tensor: the modes",
    "layer": "analytics",
@@ -2110,6 +2241,7 @@
    }
   },
   {
+   "n": 46,
    "id": "tSlo",
    "name": "Service level: the objective",
    "layer": "analytics",
@@ -2156,6 +2288,7 @@
    }
   },
   {
+   "n": 47,
    "id": "tBurn",
    "name": "Service level: the error budget burn",
    "layer": "analytics",
@@ -2202,6 +2335,7 @@
    }
   },
   {
+   "n": 48,
    "id": "tRadar",
    "name": "Telemetry radar",
    "layer": "analytics",
@@ -2244,6 +2378,7 @@
    }
   },
   {
+   "n": 49,
    "id": "deskCv",
    "name": "The console's response",
    "layer": "console",
@@ -2297,6 +2432,7 @@
    }
   },
   {
+   "n": 50,
    "id": "frameCv",
    "name": "The frame budget",
    "layer": "console",
@@ -2326,6 +2462,7 @@
    }
   },
   {
+   "n": 51,
    "id": "band",
    "name": "One control cycle, traced",
    "layer": "brain",
@@ -2374,6 +2511,7 @@
    }
   },
   {
+   "n": 52,
    "id": "phaseN",
    "name": "Phase plane: native",
    "layer": "brain",
@@ -2427,6 +2565,7 @@
    }
   },
   {
+   "n": 53,
    "id": "phaseO",
    "name": "Phase plane: Omni-Compass",
    "layer": "brain",
@@ -2480,6 +2619,7 @@
    }
   },
   {
+   "n": 54,
    "id": "strip",
    "name": "The scoreboard strip",
    "layer": "brain",
@@ -2537,6 +2677,7 @@
    }
   },
   {
+   "n": 55,
    "id": "cvU",
    "name": "The brain's state: the well",
    "layer": "brain",
@@ -2583,6 +2724,7 @@
    }
   },
   {
+   "n": 56,
    "id": "cvS",
    "name": "The brain's state: stress S in its potential",
    "layer": "brain",
@@ -2630,6 +2772,7 @@
    }
   },
   {
+   "n": 57,
    "id": "cvB",
    "name": "The brain's state: the bath B",
    "layer": "brain",
@@ -2676,6 +2819,7 @@
    }
   },
   {
+   "n": 58,
    "id": "cvNat6c",
    "name": "Native's own controller beside the brain",
    "layer": "brain",
@@ -2719,6 +2863,7 @@
    }
   },
   {
+   "n": 59,
    "id": "cvV",
    "name": "The verdict: one trial",
    "layer": "verdict",
@@ -2766,6 +2911,7 @@
    }
   },
   {
+   "n": 60,
    "id": "cvV2",
    "name": "The verdict: every true cost",
    "layer": "verdict",
@@ -2805,92 +2951,7 @@
    }
   },
   {
-   "id": "proofCv",
-   "name": "The Python's runs, reproduced here",
-   "layer": "proof",
-   "what": "The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.",
-   "cls": "S (the engine itself)",
-   "status": "live",
-   "awaiting": null,
-   "feed": {
-    "exporter": "tools/engine_runs.py (the Python) and this page",
-    "metrics": [],
-    "promql": []
-   },
-   "knobs": [
-    "runs",
-    "print"
-   ],
-   "grafana": {
-    "type": "stat",
-    "unit": ""
-   },
-   "wire": {
-    "code": "drawProof, engineRuns, proofRecheck",
-    "python": [
-     "tools/engine_runs.py"
-    ],
-    "cpp": [
-     "cpp/tools/engine_runs.cpp",
-     "cpp/src/governor.cpp",
-     "cpp/src/core.cpp",
-     "cpp/src/nervous_system.cpp"
-    ],
-    "proof": [
-     "verify.py",
-     "tests/test_engine_runs.py",
-     ".github/workflows/engine-runs.yml"
-    ],
-    "moves": "the page recomputes one run of the Python's set from its own seed about twice a second, round after round, and holds its receipt against the Python's"
-   }
-  },
-  {
-   "id": "hoCv",
-   "name": "The Python's 500 scenarios, replayed",
-   "layer": "proof",
-   "what": "benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.",
-   "cls": "S",
-   "status": "replay",
-   "awaiting": null,
-   "feed": {
-    "exporter": "benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv)",
-    "metrics": [],
-    "promql": []
-   },
-   "knobs": [
-    "seed",
-    "arm",
-    "gauge",
-    "speed",
-    "kill"
-   ],
-   "grafana": {
-    "type": "table",
-    "unit": ""
-   },
-   "wire": {
-    "code": "drawHeld",
-    "python": [
-     "benchmarks/stack_benchmark.py",
-     "omnicompass/adapter.py",
-     "omnicompass/shield.py",
-     "omnicompass/stack_sim.py",
-     "docs/engine/export_heldout.py"
-    ],
-    "cpp": [
-     "cpp/src/governor.cpp",
-     "cpp/src/core.cpp",
-     "cpp/src/shield.cpp"
-    ],
-    "proof": [
-     "verify.py",
-     "tests/test_cpp_governor_parity.py",
-     "tests/test_cpp_shield_parity.py"
-    ],
-    "moves": "the 500 scenarios replayed one after another from the record, every scenario's trace hash with it"
-   }
-  },
-  {
+   "n": 61,
    "id": "selfCv",
    "name": "Self-governed rendering",
    "layer": "page",

@@ -288,7 +288,7 @@ def receipt_word(rd):
     return "shown"
 
 
-NUM = r"[-+\u2212]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"
+NUM = r"[-+\u2212=]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"   # a cell beside EVEN carries "=" (the key's sign rule, 20 October)
 
 
 def even_reason(abc):
@@ -298,7 +298,7 @@ def even_reason(abc):
     still allows: 'tight' within 2%, 'within' within 10%, 'wide' past 10% (too noisy to tell at these repetitions); a table
     that prints no interval: 'changes', the largest change read."""
     import re
-    f = lambda x: float(x.replace(",", "").replace("\u2212", "-"))
+    f = lambda x: float(x.replace(",", "").replace("\u2212", "-").lstrip("="))
     runs, pct = [], False
     for c in abc:
         if not c:

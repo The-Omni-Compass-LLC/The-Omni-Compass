@@ -328,7 +328,7 @@ the founder overrides one in the conversation.
   ... If you turn and tweak any piece of an engine ... can change the mechanism of action's output"). The live engine's
   title page, the Live Engine Manual's front matter and the two other manuals' factory-tune notice say so in the same
   words: the knobs show variations of the mechanism (class S); the benchmarks prove the factory tune only, the tune
-  found and confirmed as the best state for the organism in our own models before any real run; a changed tune's results
+  found in our own models before any real run; a changed tune's results
   are its own. Finding and confirming that tune, gauge by gauge, is the standing work of the sweeps (the heartbeat sweep
   first).
 - **The beat, read right** (the same night: "73% gain means you're gaining more pods waiting ... Answer the question").
