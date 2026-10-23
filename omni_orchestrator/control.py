@@ -86,6 +86,7 @@ class Control:
         self.last_n: dict[str, int] = {}                  # the units standing at the last beat, and the step the phase
         self.phase_floor: dict[str, int] = {}             # asked for then: the trial counts only work served at its step
         self.phase_anchor: dict[str, int] = {}            # the twin as each phase found it: its steps are counted from there
+        self.phase_rate: dict[str, float] = {}            # the arrivals (last 5 s) as each phase found them: its traffic
         self.busy_raw: dict[str, float | None] = {}
         self.cpu_prev: dict[str, tuple[float, float]] = {}
         self.next_beat, self.next_yard = now + beat, now + 15.0
@@ -377,6 +378,14 @@ class Control:
                 depth, trial, anchor = 0, False, None
                 if v is not None:
                     calm = waiting == 0 and brain.law.band.position(reading) < brain.law.band.wall_high
+                    rate = float((stats or {}).get("n_5s", 0.0))      # the arrivals of the last 5 s
+                    r0 = self.phase_rate.get(name)
+                    if v.phase is not None and r0 is not None and abs(rate - r0) > 0.15 * max(r0, 5.0):
+                        # a trial is paired under the same traffic (omnicompass/verdict.py): the arrivals moved by more
+                        # than 15% since the phase began, so what it measured is the traffic, not the step; abandoned
+                        self.audit("verdict", service=name, verdict="trial abandoned (the traffic changed)", step=v.trial,
+                                   arrivals_5s_was=r0, arrivals_5s_now=rate)
+                        calm = False
                     # the work served over the last beat counts for the trial only if the units stood at its step the
                     # whole beat (the knob at the step the verdict asked for, and unchanged since)
                     if stats and stats.get("recent") and n == self.last_n.get(name) == self.phase_floor.get(name):
@@ -393,6 +402,7 @@ class Control:
                         self.audit("verdict", service=name, **ev)
                         if ev.get("verdict") == "trial":
                             self.phase_anchor[name] = twin   # the step is counted from the twin as the phase found it
+                            self.phase_rate[name] = rate     # and judged only under the traffic the phase found
                     anchor = self.phase_anchor.get(name, twin) if trial else None
                 want, why = brain.decide(now, n, busy, reading, waiting, depth, trial, twin=twin, anchor=anchor)
                 why["busy_raw"] = None if self.busy_raw.get(name) is None else round(self.busy_raw[name], 3)

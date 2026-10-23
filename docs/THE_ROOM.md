@@ -116,6 +116,76 @@ limit wired (a machine's room measured as the processor it can still give at ful
 same showing read work EVEN, the 95th percentile EVEN and the machines cut 5.4%: the harm gone, the cut kept. The law held;
 the wall had to be wired.
 
+## 7. The second wall of 23 October: the unit's own paper quota, and the engine's conveyance
+
+With the busy rule wired the showing read EVEN on work and on the 95th percentile, and EVEN is the reading of a room not taken
+(section 3). The files said where the room was. In both arms no request ever waited in line (the front's line read 0 at every
+second of every step), so the response time was not a shortage of units; it was the unit's own wall: a request of about 40 ms
+of processor inside a quota of 250 millicores (25 ms of every 100 ms period) takes 115 ms or more of wall-clock time, and
+sometimes a second period. The yardstick (Kubernetes' rule) answers a slow response by adding units, each walled the same, so
+each answer stays as slow; and Omni's brain, holding the yardstick's own count (the twin floor) with a force that never fired
+under the 800 ms line, was the same mechanism with packing. The wall here is **the design**: a paper quota the operator wrote,
+on a machine with processor to spare. The engine already has the muscle that moves it, **conveyance** (omni-v7 and omni-v13,
+`omni_controller/muscles.py`): a unit's wall is raised to the room its machine can still give under 75%, shared among the
+units on it, never under the request, and handed back at the top. Put into Omni's own orchestrator (23 October, evening): a
+lone unit on a half-processor machine stands at 370 m instead of 250 m and answers at the machine's speed. By section 2 the
+gain is bounded by the worth of the room: the response time can fall at most to the unit's own service time at machine speed,
+and the work (closed-loop clients) can rise at most by the same factor; neither can move further, because the clients' 100 ms
+of thought between requests is the organism's own limit.
+
+Read on the quick form (six steps of 15 s, one run of each arm, class L): the 50th percentile 90 → 79 ms, the 95th 176 → 146 ms
+(down 13%, EVEN at six pairs), the work up 3.6% (EVEN), machines down 6.6% (EVEN), units up 23% (power given: the twin follows
+the work; see section 8), 0 failed, 0 wrong. The full form is read next. The same mechanism stands in the engine on top of
+Kubernetes (the kind rigs: the pods' limits conveyed), so this is one mechanism read at two levels, by itself and on top of
+native, as the founder's order of 23 October requires.
+
+## 8. The unit count's own edge, in mathematics
+
+Kubernetes' rule holds the units at u_K = ⌈u × b ÷ 0.5⌉, b being the processor the units use over their requests. At its
+equilibrium b = 0.5, so u_K = 2a, where a is the **offered load**: the mean number of units working at once (the Erlangs of
+the service, a = λ × s, arrivals a second times the service time). The organism's own edge is the fewest units at which a
+request still almost never waits. For arrivals at random and u units, the share of requests that wait is Erlang's C formula,
+
+  C(u, a) = [ aᵘ/u! × u/(u − a) ] ÷ [ Σₖ₌₀^{u−1} aᵏ/k! + aᵘ/u! × u/(u − a) ]
+
+and the count that holds C near a small constant as the load grows is the square-root law, u* = ⌈a + β√a⌉ (Halfin and Whitt;
+the staffing rule of every call centre). With β = 2:
+
+| offered load a | Kubernetes' count 2a | waiting share at 2a | the edge u* = ⌈a + 2√a⌉ | waiting share at u* | units the edge cuts |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 2 | 0.333 | 3 | 0.091 | none (one more) |
+| 2 | 4 | 0.174 | 5 | 0.060 | none (one more) |
+| 4 | 8 | 0.059 | 8 | 0.059 | 0% |
+| 8 | 16 | 0.009 | 14 | 0.039 | 12.5% |
+| 16 | 32 | 0.000 | 24 | 0.043 | 25.0% |
+| 32 | 64 | 0.000 | 44 | 0.029 | 31.2% |
+| 64 | 128 | 0.000 | 80 | 0.035 | 37.5% |
+| 128 | 256 | 0.000 | 151 | 0.030 | 41.0% |
+| 256 | 512 | 0.000 | 288 | 0.031 | 43.8% |
+
+So the room on the unit count against Kubernetes' rule is
+
+  r(a) = 1 − (a + β√a) / 2a = ½ − β / (2√a),  which rises to ½ as the load grows;
+
+and the mean wait a request pays at the edge, C(u*, a) ÷ (u* − a) service times, is 2% of one service time at a = 2 and 0.1%
+at a = 128. Two things follow for the showing of 23 October and for the engine:
+
+1. **On the showing's rig the count has no room.** Its clients offer a ≈ 1 to 3 (one to four clients, each working about half
+   the time): there u* is at or above 2a, the yardstick's count is already the edge, and the only room was the quota (section
+   7). That is why the units read power given (the twin follows the work: faster answers bring more requests from closed-loop
+   clients, more processor is used, and Kubernetes' rule asks for more units) and why a cut in machines cannot come from the
+   count at this size. The edge is a property of the load, not of the brain.
+2. **At the scale a company runs, the count's room is close to half.** A service carrying 64 units of work holds 128 units
+   under Kubernetes' rule and 80 at the edge with 3.5% of requests waiting a mean of a thousandth of a service time; its
+   machines fall with the units. The brain takes that room live not by assuming random arrivals but by the verdict
+   (`omnicompass/verdict.py`): one unit fewer than the twin is tried on the service's own response times under the same
+   traffic, kept only where it reads no LOSS within 2%, one step at a time, and a request waiting in line hands a step back.
+   The square-root law says where the trials will end; the verdict measures it on the organism itself.
+
+The order of the work stands as in section 5: the theory first (this section), the tuning next (the verdict's pace and the
+reflex, read in the full showing and then in three runs), and the muscles Omni-Compass builds itself where the wall is the
+design.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

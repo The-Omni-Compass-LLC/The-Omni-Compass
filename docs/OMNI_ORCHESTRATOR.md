@@ -77,6 +77,53 @@ and repaired (it joined empty), the control plane killed for 10 s and started ag
 journal and took every unit back as it stood, none started again; 0 failed), the kill switch on (the brain off, the declared
 two units and every machine held) and off. 1,507 requests through the drills, 1,507 answered, 0 failed, 0 wrong.
 
+## 2b. The showing with the engine's own mechanisms, 23 October evening (quick form)
+
+The two showings above read EVEN where the organism had room, and EVEN is the reading of a room not taken (`docs/THE_ROOM.md`,
+section 3). The files said where it was: in both arms no request ever waited in line at any second of any step, so the
+response time was not a shortage of units but **the unit's own paper quota** (a 40 ms request inside 250 m, 25 ms of every
+100 ms period, takes 115 ms or more). Omni's brain, holding the yardstick's own count with a force that never fired under the
+800 ms line, was the same mechanism with packing. What was missing was the engine's own: **conveyance** (`docs/THE_ROOM.md`,
+section 7), the **reflex** on work in line, the yardstick twin read as Kubernetes would read it, and the **fold under the
+verdict**; all four are in the brain now (section 1). The same rig and clients, the quick form, one run of each arm:
+
+| gauge | yardstick | Omni | Omni against it |
+|---|---:|---:|---|
+| requests answered (work) | 1,182 | 1,224 | up 3.6% |
+| requests failed | 0 | 0 | none in either |
+| answers wrong | 0 | 0 | none in either |
+| response time, 50th percentile (ms) | 90 | 79 | down 12% |
+| response time, 95th percentile (ms) | 176 | 146 | down 17% |
+| response time, 99th percentile (ms) | 210 | 216 | up 3% |
+| machine-minutes on (the bill) | 9.0 | 8.3 | down 8% |
+| unit-minutes | 6.2 | 7.5 | up 21% |
+| processor conveyed above the requests (core-minutes) | 0 | 0.6 | Omni's walls raised; Kubernetes never moves one |
+| processor-seconds used by the units | 52.6 | 55.6 | up 6%: more work done |
+
+Read by the one key, step by step (six pairs, the exact Student t interval): requests answered **EVEN**, up 3.6% a step
+(−6.7 to +20.7); the 95th percentile **EVEN**, down 13.3% a step (−50.4 to +7.7 ms); machines on **EVEN**, down 6.6% a step
+(−0.9 to +0.2); units standing **power given**, up 23.4% a step (+0.4 to +1.6). No row reads LOSS. Six pairs of 15 s are
+too few for a 13% fall in the 95th percentile to clear zero; the full form (18 steps of 25 s) is read next, and the three-run
+reading after it.
+
+What the files say happened. Omni's lone units stood at 370 m (the room under 75% of a half-processor machine), read back
+from the kernel's own `cpu.max`; two were handed back to 250 m when a second unit joined their machine. The units Omni held
+rose above the yardstick's (2 → 4 → 5 → 6 → 7 → 9 against 2 → 2.5 → 4 → 5 → 5 → 6): the twin follows the work, and Omni's
+faster answers brought more requests from the closed-loop clients, so more processor was used and Kubernetes' rule asked for
+more units. The one mechanism that takes units back below the twin, the verdict, ran one trial in 90 s and refused it as a
+LOSS: its reference phase measured under one client and its trial phase under two (the clients stepped between them), so what
+it read was the traffic, not the step. A trial is paired under the same traffic; the brain now abandons a phase whose
+arrivals move by more than 15% (the traffic gate, written after this run, before the full form). On this rig the count has
+no room in any case (`docs/THE_ROOM.md`, section 8: with one to four clients the yardstick's count is already the edge); the
+room here was the quota, and conveyance took it.
+
+**One body**, quick form (3 → 6 → 3 clients over 36 s): 612 requests, 0 failed, 0 wrong, the 95th percentile 279 ms beside
+the batch; 8 of 16 tasks finished inside the 36 s window (the full form runs the job to its end). **The drills**, with four
+clients running through all of them: a unit killed and started again, a machine lost with two units (placed again) and
+repaired, the control plane killed for 10 s and started again (nine units kept, the same nine after the replay), the kill
+switch on (every wall back to its request, the declared state held) and off: 1,680 requests, 1,680 answered, 0 failed,
+0 wrong.
+
 ## 3. What it covers, and what it does not yet
 
 Covered and shown: the desired state kept and survived (the journal), placement by room, a unit's whole life (start, probe,
@@ -92,9 +139,11 @@ the same organism and load, runs on the kind rig on GitHub and has not run yet.
 
 Omni-Compass can run the showing's organism (a checked service and a batch job) without Kubernetes, with its own scheduling,
 scaling, lifecycle, recovery and coordination, on one host, with no request lost through a unit's death, a machine's loss,
-the control plane's death or the kill switch. Against the yardstick on this rig it held the same units on fewer machines and
-answered slower and less: the trade of packing, with its mechanism named above. Equivalent output and complete functional
-coverage of a declared organism are targets to engineer toward, not results this showing establishes.
+the control plane's death or the kill switch. With the engine's own mechanisms in its brain (conveyance, the reflex, the twin
+read as Kubernetes would, the fold under the verdict) it answered faster and did more work than the yardstick on the same
+machines in the quick form (section 2b), with no row reading LOSS; at six pairs those readings are EVEN, and the full form
+and the three-run reading are what will say whether they are GAIN. Equivalent output and complete functional coverage of a
+declared organism are targets to engineer toward, not results this showing establishes.
 
 ---
 
