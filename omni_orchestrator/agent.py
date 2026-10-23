@@ -245,7 +245,7 @@ def main(argv=None):
     cores = {int(c) for c in a.cores.split(",") if c.strip()}
     agent = Agent(a.name, cores, a.cpu_m, a.mem_mb, a.state_dir)
     threading.Thread(target=agent.supervise, daemon=True).start()
-    signal.signal(signal.SIGTERM, lambda *_: (agent.stop_all(), os._exit(0)))
+    signal.signal(signal.SIGTERM, lambda *_: (agent.stop_all(), agent.walls.remove(), os._exit(0)))
     serve(agent, a.port)
 
 

@@ -182,7 +182,15 @@ class Control:
                         self.audit("stray unit stopped", machine=name, unit=uid, why="not in the ledger")
                     self.stop_unit(m, uid)
                     continue
-                u.update(ready=bool(r["ready"]), agent_state=r["state"], restarts=r["restarts"], cpu_s=r["cpu_s"])
+                u.update(ready=bool(r["ready"]), agent_state=r["state"], restarts=r["restarts"], cpu_s=r["cpu_s"],
+                         ever_ready=u.get("ever_ready", False) or bool(r["ready"]))
+                if u.get("kind") == "service" and not u["ever_ready"] and r["restarts"] >= 2 and u["state"] != "retiring":
+                    # a unit that cannot come up where it stands (its port taken, its machine lying) is placed again
+                    # elsewhere with a new port, instead of being started on the same spot forever
+                    self.audit("unit replaced", unit=uid, machine=name, why=f"{r['restarts']} starts and never ready")
+                    self.record({"ev": "gone", "id": uid})
+                    self.stop_unit(m, uid)
+                    continue
                 if u.get("kind") == "task" and r["state"] in ("succeeded", "failed") and u["state"] != "retiring":
                     if r["state"] == "succeeded":
                         self.record({"ev": "task_done", "job": u["job"], "index": u["index"]})

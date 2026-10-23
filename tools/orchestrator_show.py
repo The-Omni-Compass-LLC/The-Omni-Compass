@@ -135,8 +135,9 @@ class Show:
                             str(d / "routes.json"), "--stats", str(d / "front.jsonl")], f"{name}-front.log")
         ctl_args = ["omni_orchestrator.control", "--spec", str(d / "spec.json"), "--state-dir", str(d / "ctl"),
                     "--brain", brain, "--beat", "5", "--kill-file", str(d / "KILL")]
-        if brain == "omni":
-            ctl_args += ["--room-rule", self.room_rule]   # the yardstick places by requests alone, as Kubernetes does
+        # Omni's room rule is the engine's own (the machine's measured busy share under 75%); the yardstick places by
+        # requests alone, as Kubernetes' scheduler does
+        ctl_args += ["--room-rule", self.room_rule if brain == "omni" else "requests"]
         ctl = self.spawn(ctl_args, f"{name}-control.log")
         self.wait_ready(d, 2)
         cpu0, t0 = self.machine_cpu(), time.time()
@@ -159,6 +160,14 @@ class Show:
         return meta
 
     def run(self) -> None:
+        # a fresh rig: nothing left running in any machine's group from an earlier showing (the 23 October full run's batch
+        # part failed to bind a port held by a unit the quick showing had left behind)
+        for pid in Walls().pids():
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except OSError:
+                pass
+        Walls().remove()
         self.k = calibrate(40.0)
         self.k_task = calibrate(2000.0)
         (self.out / "calibration.json").write_text(json.dumps({"k_40ms": self.k, "k_task_2s": self.k_task}))
@@ -577,8 +586,8 @@ def main(argv=None):
     ap.add_argument("--out", required=False)
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--report", help="rebuild the report of a finished showing")
-    ap.add_argument("--room-rule", choices=("requests", "busy"), default="requests",
-                    help="Omni's room rule: by requests alone, or also under 75%% of a machine's measured busy share")
+    ap.add_argument("--room-rule", choices=("requests", "busy"), default="busy",
+                    help="Omni's room rule: the engine's own, under 75%% of a machine's measured busy share (busy), or by requests alone")
     a = ap.parse_args(argv)
     if a.report:
         print(build_report(Path(a.report)))
