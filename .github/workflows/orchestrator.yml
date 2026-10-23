@@ -63,7 +63,7 @@ jobs:
       - name: The reading, on this job's page
         if: always()
         run: |
-          python3 - <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          python3 - <<'EOF' | tee -a "$GITHUB_STEP_SUMMARY"
           import json
           from pathlib import Path
           p = Path("out/summary.json")
@@ -166,7 +166,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: orchestrator-${{ github.event.inputs.run || 'push' }}-${{ github.event.inputs.room_rule || 'requests' }}-${{ github.run_id }}
+          name: orchestrator-${{ github.event.inputs.run || 'push' }}-${{ github.event.inputs.room_rule || 'busy' }}-${{ github.run_id }}
           path: "${{ steps.omni_legal_export_1.outputs.paths }}"
           if-no-files-found: warn
       - name: Legal notice at the end of this job's report
