@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Repeated live runs: aggregate native / watch (Omni runs, writes nothing) / omni (B) / strict (C) arms over repetitions of scripts/kind_bench.sh.
@@ -48,8 +48,12 @@ QUEUE = {"queue: job wait, submitted to its first pod running, mean (s)",
 KEYS[KEYS.index("batch: worker machines in service after the queue finished, mean") + 1:KEYS.index("batch: worker machines in service after the queue finished, mean") + 1] = [
     "queue: job wait, submitted to its first pod running, mean (s)", "queue: job wait, submitted to its first pod running, 95th percentile (s)",
     "queue: job turnaround, submitted to done, mean (s)", "queue: jobs unfinished at the window's end"]
-# the robustness test only (ROBUST=kill, scripts/kind_robust.sh): the same 120 s after the kill mark in both arms
-ROBUST = {"robust: time over the line in the 120 s after the kill (% of samples)", "robust: failed requests in the 120 s after the kill (%)"}
+# the robustness test only (ROBUST=kill, scripts/kind_robust.sh): the same 300 s after the kill mark in both arms (120 s up to
+# omni-v14; omni-v15 reads 300 s, declared in docs/ROBUSTNESS_PREREGISTRATION.md before its runs: the one tail rise of the
+# omni-v11 kill test came 140 to 190 s after the kill, past the 120 s window)
+ROBUST_AFTER_KILL_S = 300
+ROBUST = {f"robust: time over the line in the {ROBUST_AFTER_KILL_S} s after the kill (% of samples)",
+          f"robust: failed requests in the {ROBUST_AFTER_KILL_S} s after the kill (%)"}
 KEYS += sorted(ROBUST)
 # the machine's own meter (METER=rapl, scripts/kind_bench.sh; a machine with the processor's RAPL counters only) beside
 # the declared model; and Kepler's readings of the same counters (KEPLER=1), shown beside it and never judged
@@ -372,7 +376,9 @@ def robust_marks(d):
     return out
 
 
-ROBUST_INTERVAL_S = 60.0       # the governor's configured decision interval in the robustness runs (scripts/kind_bench.sh, --interval 60)
+ROBUST_INTERVAL_S = 60.0       # the decision interval of the robustness runs that predate omni_interval.txt (scripts/kind_bench.sh, --interval 60); a run that
+                               # carries the file (omni-v16 on) is read at its own, and its decision time from the governor's own decision_ms records,
+                               # because its loop keeps its schedule and the gap between decisions no longer holds the step's time
 ROBUST_DECISION_SHARE = 0.95   # fewer decisions than this share of the count the interval predicts reads INVALID (docs/ROBUSTNESS_PREREGISTRATION.md)
 ROBUST_CYCLE_GROWTH = 1.5      # the governor's decision time, last hour over the first: more than half again is marked
 ROBUST_LONG_MIN_S = 6840.0     # the decision-time ratio needs a span of at least 95% of the 7,200 s window, so the first and last hours do not overlap
@@ -386,8 +392,17 @@ def robust_decisions(d, window_s):
     f = d / "audit.jsonl"
     if not f.exists() or not window_s:
         return None
-    times, failed, reasons = [], 0, []
+    try:
+        interval = float((d / "omni_interval.txt").read_text().split()[0]); own = True
+    except (OSError, ValueError, IndexError):
+        interval, own = ROBUST_INTERVAL_S, False
+    times, failed, reasons, step_ms = [], 0, [], []
     for line in open(f):
+        if own and '"decision_ms"' in line:
+            try:
+                step_ms.append((len(times), float(json.loads(line)["decision_ms"])))
+            except (ValueError, KeyError, TypeError):
+                pass
         if '"decision"' in line:
             try:
                 times.append(float(json.loads(line)["time"]))
@@ -408,15 +423,20 @@ def robust_decisions(d, window_s):
                 r = l.split("):", 1)[-1].strip() if "):" in l else l.strip()
                 r = re.sub(r"CalledProcessError\(\d+, \[.*?\]\)\s*", "", r)[:160]
                 reasons.append(r)
-    expected = window_s / ROBUST_INTERVAL_S
-    out = {"decisions": len(times), "expected": expected, "share": (len(times) / expected if expected else None), "failed": failed,
+    expected = window_s / interval
+    out = {"decisions": len(times), "expected": expected, "interval_s": interval, "share": (len(times) / expected if expected else None), "failed": failed,
            "failed_reasons": sorted(set(reasons)), "decision_time_ratio": None}
     if len(times) >= 4 and times[-1] - times[0] >= ROBUST_LONG_MIN_S:
         gaps = [(b - a, a) for a, b in zip(times, times[1:])]
         t0, t1 = times[0], times[-1]
         first = [g for g, t in gaps if t <= t0 + 3600]; last = [g for g, t in gaps if t >= t1 - 3600]
+        if own:
+            # the step's own time, as the governor timed it: decisions whose time falls in the first and the last hour
+            first = [ms / 1000.0 for i, ms in step_ms if i and times[i - 1] <= t0 + 3600]
+            last = [ms / 1000.0 for i, ms in step_ms if i and times[i - 1] >= t1 - 3600]
         if first and last:
-            a = max(sum(first) / len(first) - ROBUST_INTERVAL_S, 0.0); b = max(sum(last) / len(last) - ROBUST_INTERVAL_S, 0.0)
+            a = max(sum(first) / len(first) - (0.0 if own else ROBUST_INTERVAL_S), 0.0)
+            b = max(sum(last) / len(last) - (0.0 if own else ROBUST_INTERVAL_S), 0.0)
             out["decision_time_first_s"], out["decision_time_last_s"] = a, b
             out["decision_time_ratio"] = (b / a) if a >= 0.1 else None    # under a tenth of a second there is nothing to compare
     ks = d / "kill_switch.txt"
@@ -430,7 +450,7 @@ def robust_decisions(d, window_s):
 
 
 def robust_window(d, slo):
-    """Both arms: in the 120 s after the kill mark, the share of response samples over the line or failed, and the share failed."""
+    """Both arms: in the ROBUST_AFTER_KILL_S after the kill mark, the share of response samples over the line or failed, and the share failed."""
     m = robust_marks(d)
     if "kill_epoch" not in m:
         return {}
@@ -439,12 +459,13 @@ def robust_window(d, slo):
     except (OSError, ValueError, IndexError):
         return {}
     k = m["kill_epoch"]
-    win = [r for r in rows if k <= t0 + float(r["elapsed_seconds"]) <= k + 120]
+    win = [r for r in rows if k <= t0 + float(r["elapsed_seconds"]) <= k + ROBUST_AFTER_KILL_S]
     if not win:
         return {}
     over = 100.0 * sum(1 for r in win if not (r.get("ok") == "1" and float(r["latency_ms"]) <= slo)) / len(win)
     failed = 100.0 * sum(1 for r in win if r.get("ok") != "1") / len(win)
-    return {"robust: time over the line in the 120 s after the kill (% of samples)": over, "robust: failed requests in the 120 s after the kill (%)": failed}
+    return {f"robust: time over the line in the {ROBUST_AFTER_KILL_S} s after the kill (% of samples)": over,
+            f"robust: failed requests in the {ROBUST_AFTER_KILL_S} s after the kill (%)": failed}
 
 
 def robust_memory(d):
@@ -486,7 +507,7 @@ def robust_table(root, cols):
          f"from the lease it left; the harness asks the cluster every 2 s until the HPA target, the replica range, every CPU limit, every worker "
          f"and the records are at the operator's. Preregistered: within {ROBUST_HANDBACK_S:.0f} s, or the repetition is marked. A second governor "
          f"starts at 50% and governs to the end. The governor's resident memory is sampled from the process table; the mean of the last ten "
-         f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The 120 s after the kill mark are compared between the arms "
+         f"minutes over the first ten above {ROBUST_MEMORY_LIMIT} is marked a leak. The {ROBUST_AFTER_KILL_S} s after the kill mark are compared between the arms "
          "in the paired table above (`docs/ROBUSTNESS_PREREGISTRATION.md`). In the long run the governor's own audit gives its decisions against "
          f"the count its {ROBUST_INTERVAL_S:.0f} s interval predicts for the window (under {ROBUST_DECISION_SHARE:.0%} reads INVALID), its failed decisions, "
          f"and its decision time (the gap between decisions less the interval it sleeps), mean of the last hour over the first (over {ROBUST_CYCLE_GROWTH} "
@@ -705,34 +726,51 @@ def capacity_table(root, cols):
     return L + [""], out
 
 
+def engine_default_s():
+    """The engine's own default decision period (omni_controller/controller.py, --interval: 60 s since omni-v17)."""
+    from omni_controller.controller import parser
+    return float(parser().get_default("interval"))
+
+
 def main(root):
-    root = Path(root); runs = {}; native_kept = {}
+    root = Path(root); runs = {}; native_kept = {}; beats = {}
     machines_only = any((d / "machines_only.txt").exists() for d in root.glob("bench-*-*"))
     for d in sorted(root.glob("bench-*-*")):
         _, arm, rep = arm_rep(d)
         if (d / "capture.csv").exists() and not (d / "INVALID").exists():
             runs.setdefault(arm, {})[rep] = arm_gauges(d)
+            try:                                              # the beat the arm ran at, as its run wrote it
+                beats.setdefault(arm, set()).add(float((d / "omni_interval.txt").read_text().split()[0]))
+            except (OSError, ValueError, IndexError):
+                pass
             if (d / "omni_stayed_native.txt").exists():      # the governor decided at every step and wrote nothing
                 native_kept.setdefault(arm, set()).add(rep)
     out = {"repetitions": {a: sorted(r) for a, r in runs.items()}, "means": {}, "paired": {}}
+    out["beats"] = {a: sorted(v) for a, v in beats.items()}   # the beat each arm ran at (omni_interval.txt), for the tables
     for a, r in runs.items():
         out["means"][a] = {k: float(np.nanmean([g.get(k, np.nan) for g in r.values()])) for k in KEYS}
     cloud = any(not math.isnan(m.get("machines billed, machine-hours", float("nan"))) for m in out["means"].values())
     two = any(not math.isnan(m.get("second app: failed requests (%)", float("nan"))) for m in out["means"].values())
     host = any(not math.isnan(m.get("host cores (the real machine under kind)", float("nan"))) for m in out["means"].values())
     bat = any(not math.isnan(m.get("batch: queue finished (s)", float("nan"))) for m in out["means"].values())
-    rob = any(not math.isnan(m.get("robust: failed requests in the 120 s after the kill (%)", float("nan"))) for m in out["means"].values())
+    rob = any(not math.isnan(m.get(f"robust: failed requests in the {ROBUST_AFTER_KILL_S} s after the kill (%)", float("nan"))) for m in out["means"].values())
     que = any(not math.isnan(m.get("queue: jobs unfinished at the window's end", float("nan"))) for m in out["means"].values())
     keys = [k for k in KEYS if (k not in BILL or cloud) and (k not in SECOND or two) and (k not in HOST or host) and (k not in BATCH or bat) and (k not in ROBUST or rob)
             and (k not in QUEUE or que)]
     L = [f"# Repeated live runs on {'Azure Kubernetes Service (AKS), billed machines' if cloud else 'kind'} "
          "(native against omni: Omni-Compass on top of native)", "", *receipt_key(), ""]
     tuned = sorted((a for a in runs if re.fullmatch(r"native\d+", a)), key=lambda a: -int(a[6:]))
+    # the decision pace: compass5 to compass120 (any compassN) are the compass arm deciding every N s; the compass arm itself
+    # decides at the engine's default, its beat read from its own runs (omni_interval.txt), else from the engine
+    paces = sorted((a for a in runs if re.fullmatch(r"compass\d+", a)), key=lambda a: -int(a[7:]))
+    own = sorted(beats.get("compass", set()))
+    beat = f"{own[0] if len(own) == 1 else engine_default_s():g}"
     cols = ([a for a in ("nativebare", "native") if a in runs] + tuned
-            + [a for a in ("watch", "omni", "compassbare", "compass", "strict") if a in runs])
+            + [a for a in ("watch", "omni", "compassbare", "compass") if a in runs] + paces + [a for a in ("strict",) if a in runs])
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",
              "nativebare": "the organism alone (no orchestrator)", "compassbare": "omni on the organism alone",
-             **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned}}
+             **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned},
+             **{a: f"omni, a decision every {a[7:]} s" for a in paces}}
     L += ["## All columns, mean over repetitions", "", "| Gauge | " + " | ".join(names[a] for a in cols) + " |",
           "|---|" + "---:|" * len(cols)]
     L += [f"| {LABEL.get(k, k)} | " + " | ".join(f"{out['means'][a][k]:.4g}" for a in cols) + " |" for k in keys]
@@ -752,6 +790,9 @@ def main(root):
     # every comparison: the arm, the arm it is read against, its key in the paired table, and its title; the four ways
     # (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6) add the organism alone, without and with Omni-Compass on top
     pairs = [(a, "native", a, None) for a in ("watch", "omni", "compass", "strict")] + [(a, b, f"{a}|{b}", t) for a, b, t in FOUR_WAYS]
+    # each pace against native, and against the compass arm at its default beat, paired in the repetition
+    pairs += [(a, "native", a, f"omni deciding every {a[7:]} s vs native") for a in paces]
+    pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni at its default, every {beat} s") for a in paces]
     for a, base, key, four in pairs:
         if a not in runs or base not in runs:
             continue

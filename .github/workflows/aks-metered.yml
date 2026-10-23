@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The bill on a real cloud: native Kubernetes (Azure Kubernetes Service with its own cluster autoscaler) against the
@@ -44,7 +44,7 @@ concurrency:
   group: azure-benchmark-${{ github.event.inputs.location || 'eastus' }}
   cancel-in-progress: false
 env:
-  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 # the token reads the code and nothing else: this workflow pushes nothing, starts nothing and reads no other run
 # (docs/THREAT_MODEL.md, T9)
 permissions:
@@ -127,6 +127,11 @@ jobs:
           if [ -z "${{ github.event.inputs.stop_looks }}" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           mkdir -p prior
           python3 tools/stop_rule.py prior --rep "${{ matrix.rep }}" --looks "${{ github.event.inputs.stop_looks }}" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: The Azure key is whole (its shape only; not a character of it is printed; a key in another form never reaches the login, which would quote it)
+        if: steps.stop.outputs.run == 'true'
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: python3 tools/cloud_key_check.py azure
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
         if: steps.stop.outputs.run == 'true'
         with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
@@ -173,7 +178,7 @@ jobs:
           #!/usr/bin/env python3
           # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
           # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
           # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
           # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
           """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
@@ -295,7 +300,7 @@ jobs:
           #!/usr/bin/env python3
           # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
           # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
           # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
           # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
           """Attach the exact legal bundle inside an artifact without changing its result-file layout."""

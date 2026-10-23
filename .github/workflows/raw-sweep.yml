@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The raw receipts' sweep (18 October): every archived run lives on the branch raw (scripts/raw_archive.sh), and main's
@@ -18,13 +18,15 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-concurrency: {group: raw-sweep, cancel-in-progress: false}
 env:
-  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
   sweep:
     # a run that skipped hands in no files: nothing to sweep
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'skipped'
+    # one sweep at a time, on the job: a start whose job is skipped never queues, so none is left waiting to be cancelled
+    # (21 October: on the whole workflow the skipped starts after every front page queued and were cancelled)
+    concurrency: {group: raw-sweep, cancel-in-progress: false}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Energy to where the work is, against the fake kubectl: each machine's idle CPU (inside the living band, less the
@@ -47,7 +47,9 @@ def limits(p):
 
 
 def args(tmp):
-    a = parser().parse_args(["--kubectl", FAKE, "--audit", str(Path(tmp) / "audit.jsonl"), "--kill-file", str(Path(tmp) / "kill"),
+    # a decision a minute and a check every 15 s, the defaults this test was written against before omni-v16 set 15 s and 5 s
+    a = parser().parse_args(["--interval", "60", "--floor-interval", "15",
+                             "--kubectl", FAKE, "--audit", str(Path(tmp) / "audit.jsonl"), "--kill-file", str(Path(tmp) / "kill"),
                              "--cap-deployments", "default/web", "--security-configmap", "default/omni-security",
                              "--latency-file", str(Path(tmp) / "latency.csv"), "--mode", "target"])
     return a

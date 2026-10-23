@@ -1,6 +1,6 @@
 # The referee's grades, category by category, and the plan to raise each
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Our own grading of Omni-Compass in twenty categories, the way a referee or an underwriter would grade a study and a
 product: the grade given on the morning of 19 October, the grade the evidence supports now, the highest grade the
@@ -37,7 +37,7 @@ measurement exists.
 
 1. **Concept.** Where the idea comes from and what it adds, against supervisory control, reference governors, the
    Simplex fallback and online experiments (`docs/RELATED_WORK.md`).
-2. **Engine code.** 82% of the engine's 6,531 statements run under the tests (`docs/ENGINE_COVERAGE.md`, measured again on the omni-v12 tree); every proved
+2. **Engine code.** 71% of the engine's 9,685 statements run under the tests (`docs/ENGINE_COVERAGE.md`, measured again on the omni-v15 tree): 82% of the 6,579 in the files that stood before omni-v15, 49% of the 3,106 in the eight runners it took into the fingerprint, which their own benchmarks run whole on GitHub; every proved
    property checked on thousands of generated cases (`tests/test_engine_properties.py`); every static-scan finding fixed or
    reviewed (`docs/SECURITY_SCAN.md`). Held at B by a fault found in the swarm's wire, whose code did not do what its own
    comment says (`docs/LIMITATIONS.md`, section 3), and by the wires outside the fingerprint (`docs/CHANGE_CONTROL.md`).
@@ -120,4 +120,4 @@ measures energy; the Lambda runs measure the GPU from one exact commit; a pilot 
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

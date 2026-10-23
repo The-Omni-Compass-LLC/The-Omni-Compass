@@ -1,6 +1,6 @@
 # Omni-Compass: mechanism of action, from the equations to the muscles
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Every statement here is tied to code in this repository, and the measured numbers are reproduced by
 `python tools/mechanism.py`, which writes `results/MECHANISM_OF_ACTION.json`. The engine files are frozen. Their SHA-256
@@ -73,7 +73,8 @@ push     = u(x) / 25,  u(x) = clip(−f[U](x) + 12 (1 − U), −25, 25)        
 ρ*     = clamp(ρ₀ − k[I] I[U] − k[E] E, ρ[min], ρ₀)                      target utilisation (the HPA target)
 n[req]    = ceil(n load / ρ*) + ceil(k[q] q n)                               machines wanted
 release  only while push ≤ push_release (the engine reports convergence), after band and dwell
-cap      = clamp(cap_now load (1 + margin), cap_min, 1) when calm and U ≥ U[gate]; 1 under backlog;
+cap      = clamp(cap_now load (1 + margin), cap_min, 1) when calm, U ≥ U[gate] and the line clean for the governor's
+           own clear time (omni-v15: the request cannot switch back and forth at one threshold); 1 under backlog or a breach;
            always ≤ 1 − cap_gain max(0, B − B[cap])                         the bath limits the power cap
 change   permitted only while U ≥ U[gate] and no security block
 rollback authorised if S ≥ S[rollback], U is falling, or a security block is seen
@@ -339,4 +340,4 @@ Without that proof it reads LESS WORK PER ENERGY.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

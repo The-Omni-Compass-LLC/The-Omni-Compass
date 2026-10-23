@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The release's one identity: RELEASE_MANIFEST.json.
@@ -27,6 +27,42 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v17": ["OMNI_V17.json", "tools/omni_version.py", "docs/OMNI_V17.md", "omni_controller/controller.py",
+                   "tests/test_pace_clocks.py", "tests/test_time_correct.py", "tools/beat_ladder.py", "tests/test_beat_ladder.py",
+                   "tools/toy_gate.py", "results/toy_gate/V17_VS_V16.md", "results/toy_gate/V17_VS_V16.json",
+                   "results/toy_gate/V17_LADDER.md", "results/toy_gate/V17_LADDER.json", "docs/PACE_PREREGISTRATION.md",
+                   "docs/K8S_COMPASS_PREREGISTRATION.md", "scripts/kind_bench.sh", "scripts/kind_paired.sh", "scripts/kind_robust.sh",
+                   "scripts/kind_levers.sh", "scripts/kind_full.sh", "scripts/kind_pilot.sh", "deploy/install/omni-compass.yaml",
+                   "deploy/install/omni-compass-cloud.yaml", "deploy/controller.yaml", "tools/live_reps.py", "tools/confirm_abc.py",
+                   "tools/omni_exporter.py", "tests/test_omni_exporter.py", "tools/omni_control.py", "tests/test_omni_control.py",
+                   "deploy/prometheus/omni-compass-rules.yaml", "deploy/grafana/omni-compass.json", "docs/OBSERVABILITY.md",
+                   "docs/engine/build_live_engine.py", "docs/CHANGE_CONTROL.md", "docs/THE_TUNE.md",
+                   "tools/tune_study.py", "tests/test_tune_study.py", "DISCLOSURES.md"],
+    "engine_v16": ["OMNI_V16.json", "tools/omni_version.py", "docs/OMNI_V16.md", "omnicompass/adapter.py", "omnicompass/edge.py",
+                   "omni_controller/controller.py", "omni_controller/muscles.py", "omni_controller/capacity.py",
+                   "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp", "cpp/tools/run_governor.cpp",
+                   "tests/test_cpp_governor_parity.py", "tests/test_pace_clocks.py", "tests/test_loop_schedule.py", "tools/toy_gate.py",
+                   "results/toy_gate/V16_VS_V15.md", "results/toy_gate/V16_VS_V15.json", "results/toy_gate/V16_PACE.md",
+                   "results/toy_gate/V16_PACE.json", "docs/PACE_PREREGISTRATION.md", "scripts/kind_paired.sh", "scripts/kind_bench.sh",
+                   "tools/live_reps.py", "tools/confirm_abc.py", "docs/CHANGE_CONTROL.md", "results/SEAL.json",
+                   "results/LOCK_AMENDMENTS.json"],
+    "engine_v15": ["OMNI_V15.json", "tools/omni_version.py", "docs/OMNI_V15.md", "omnicompass/adapter.py",
+                   "omni_controller/gpu_governor.py", "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp",
+                   "cpp/tools/run_governor.cpp", "cpp/tools/engine_runs.cpp", "tests/test_cap_band.py",
+                   "tests/fixtures/robust_long_39173420146_decisions.json", "tests/test_cpp_governor_parity.py", "tools/toy_gate.py",
+                   "results/toy_gate/V15_VS_V14.md", "results/toy_gate/V15_VS_V14.json", "tools/live_reps.py", "tests/test_robust.py",
+                   "docs/ROBUSTNESS_PREREGISTRATION.md", "docs/CHANGE_CONTROL.md", "docs/MECHANISM_OF_ACTION.md", "results/SEAL.json"],
+    "engine_v14": ["OMNI_V14.json", "tools/omni_version.py", "docs/OMNI_V14.md", "omni_controller/controller.py",
+                   "omni_controller/muscles.py", "tools/wall_meter.py", "tools/omni_control.py", "tests/test_native_muscles.py",
+                   "tests/test_operator_cmd.py", "results/toy_gate/V14_VS_V13.md", "results/toy_gate/V14_VS_V13.json",
+                   "tools/toy_gate.py"],
+    "cpp_twin_compass_law": ["cpp/include/omnicompass/compass_law.hpp", "cpp/src/compass_law.cpp", "cpp/tools/run_compass_law.cpp",
+                             "cpp/CMakeLists.txt", "tests/test_cpp_compass_law_parity.py", "docs/engine/export_cpp_twins.py",
+                             "tools/seal.py", "results/SEAL.json"],
+    "cpp_engine_runs": ["cpp/include/omnicompass/verdict.hpp", "cpp/src/verdict.cpp", "cpp/tools/run_verdict.cpp",
+                        "cpp/tools/engine_runs.cpp", "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp",
+                        "tests/test_cpp_verdict_parity.py", "tests/test_cpp_engine_runs_parity.py", "tools/engine_runs.py",
+                        ".github/workflows/engine-runs.yml"],
     "engine_v13": ["OMNI_V13.json", "tools/omni_version.py", "docs/OMNI_V13.md", "omni_controller/muscles.py", "tests/test_convey_handback.py",
                    "results/toy_gate/V13_VS_V12.md", "results/toy_gate/V13_VS_V12.json"],
     "engine_v12_refused_raise": ["OMNI_V12.json", "omni_controller/muscles.py", "tools/omni_version.py", "docs/OMNI_V12.md",

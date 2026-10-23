@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The governor's gauges for Prometheus and Grafana, read from its own audit (read-only: it writes nothing anywhere).
@@ -21,6 +21,9 @@ deploy/grafana/omni-compass.json.
 The gauges (names as Prometheus shows them):
   omni_decisions_total, omni_decision_seconds_sum/_count, omni_decision_seconds_last   the governor's decisions and their time
   omni_last_decision_timestamp_seconds                                                 its heartbeat: alert when it stops moving
+  omni_heartbeat_seconds                                                               its beat as measured: the median time between
+                                                                                         its last eleven full decisions (the dial's
+                                                                                         setting it runs at, 5 to 120 s; omni-v17)
   omni_writes_total{why}                                                                the settings commands it wrote, by reason
   omni_recommended{setting}                                                             the setting its last decision recommends
   omni_recommended_moves_total{setting}, omni_recommended_reversals_total{setting}      how often each recommendation moved, and
@@ -43,6 +46,7 @@ The gauges (names as Prometheus shows them):
 from __future__ import annotations
 
 import argparse, json, math, os, re, sys, threading, time
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -67,6 +71,7 @@ class Gauges:
         self.records = self.unreadable = self.decisions = 0
         self.decision_s_sum, self.decision_s_last, self.decision_count = 0.0, None, 0
         self.last_decision_t = None
+        self.beat_t = deque(maxlen=11)                # when the last eleven decisions finished: the beat, measured
         self.writes: dict[str, int] = {}
         self.setting: dict[str, float] = {}
         self.moves: dict[str, int] = {}
@@ -107,6 +112,8 @@ class Gauges:
             self.decision_s_sum += ms / 1000.0
             self.decision_s_last = ms / 1000.0
             self.last_decision_t = t if t is not None else self.last_decision_t
+            if t is not None:
+                self.beat_t.append(t)
         d = r.get("decision")
         if isinstance(d, dict):
             self.decisions += 1
@@ -137,6 +144,14 @@ class Gauges:
         if r.get("error"):
             kind = str(r["error"]).split(":", 1)[0].strip()[:40] or "unstated"
             self.errors[kind] = self.errors.get(kind, 0) + 1
+
+    def beat(self):
+        """The median spacing of the last eleven decisions (a skipped slot moves it less than a mean would); None before two."""
+        gaps = sorted(b - a for a, b in zip(self.beat_t, list(self.beat_t)[1:]) if b > a)
+        if not gaps:
+            return None
+        m = len(gaps) // 2
+        return gaps[m] if len(gaps) % 2 else (gaps[m - 1] + gaps[m]) / 2.0
 
     def _zone(self, pos, wall, t):
         """Where the compass stood at a decision, and the time from the first decision at the wall to the first back inside."""
@@ -188,6 +203,8 @@ class Gauges:
             g("omni_decision_seconds_last", "gauge", "Time the last decision took, seconds.", [({}, self.decision_s_last)])
             g("omni_last_decision_timestamp_seconds", "gauge", "Unix time of the last finished decision (the heartbeat).",
               [({}, self.last_decision_t)])
+            g("omni_heartbeat_seconds", "gauge", "The governor's beat as measured: the median time between its last eleven "
+              "full decisions, seconds (the dial's setting it runs at).", [({}, self.beat())])
             g("omni_writes_total", "counter", "Settings commands the governor wrote, by the head of their reason.",
               [({"why": k}, v) for k, v in sorted(self.writes.items())])
             g("omni_recommended", "gauge", "The setting the governor's last decision recommends (not necessarily written).",
@@ -295,5 +312,5 @@ def main(argv=None):
 if __name__ == "__main__":
     sys.exit(main())
 
-# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
 # monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

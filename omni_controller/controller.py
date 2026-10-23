@@ -50,13 +50,15 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass import master
-from omnicompass.adapter import Governor, mode_law, OBSERVE
+from omnicompass.adapter import Governor, mode_law, OBSERVE, REF_PERIOD_S
 from omnicompass.shield import enforce, ShieldLimits
-from omni_controller.muscles import Muscles, add_args as add_muscle_args
+from omni_controller.muscles import Muscles, add_args as add_muscle_args, run_operator_cmd
 from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling, one_host
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
 RELEASE_PERIOD_S = 60.0   # the pool gives back at most one machine a minute (v7: a rate in time, not in decisions)
+ADD_PERIOD_S = 60.0       # omni-v16: and adds at most --max-node-step machines a minute past the scheduling floor
+LAND_S = 60.0             # omni-v16: a command is given a minute to land before proprioception lets it go
 COMPASS_UP, COMPASS_DOWN, COMPASS_RELEASE = 0.10, 0.02, -0.2   # the compass's gains, the same on every muscle (realms/compass_arm.py)
 DEMAND_RISE = 0.05     # the demand moves: more than 5% between its least and its most over one HPA window
 RANGE_ANN = "omnicompass.io/original-replica-range"
@@ -243,6 +245,28 @@ def apply_give_back_only(a):
         a.mode = "nodepool"
 
 
+# the muscles the operator can leave native, one by one (omni-v14; the founder's order of 20 October: "knobs on every monitor
+# to turn off and on such a mechanism, a muscle"). A muscle named here is never written by the governor: it stays where native
+# runs it, and every other muscle runs as before. The engine decides with the whole body in view either way.
+MUSCLES = {"machines": "the node pool's size (the operator's node-scale command)",
+           "replicas": "the pod autoscaler's target, the pod reflex's replica floor and the replica cap",
+           "cpu": "the serving pods' CPU limits (the conveyance and the pod power cap)",
+           "clock": "the processors' frequency ceiling", "gpu": "the GPU's power limit",
+           "rollout": "the rollout guard (pause and undo)", "batch": "the batch admission and pacing",
+           "rightsize": "the pods' rightsizing", "coldstart": "the cold-start reserve", "contain": "the namespaces' containment",
+           "cooling": "the cooling setpoint"}
+
+
+def native_muscles(text) -> frozenset:
+    """The muscles left native, from --native (or OMNI_NATIVE): a comma list of MUSCLES' names; an unknown name is refused,
+    never ignored, so a muscle the operator meant to leave native is never driven by a misspelling."""
+    names = frozenset(x.strip() for x in str(text or "").split(",") if x.strip())
+    bad = sorted(names - set(MUSCLES))
+    if bad:
+        raise SystemExit(f"--native: unknown muscle {', '.join(bad)} (the muscles: {', '.join(MUSCLES)})")
+    return names
+
+
 def autoscaler_room(k):
     """The machines the cluster's own autoscaler may still add, read live from its status (kube-system/
     cluster-autoscaler-status: per node group, its maxSize less the machines registered); None where no autoscaler reports
@@ -308,6 +332,11 @@ class Controller:
     def __init__(self, a, kube: Kube | None = None):
         self.a = a
         apply_give_back_only(a)
+        a.native_muscles = native_muscles(getattr(a, "native", ""))        # omni-v14: the muscles left native
+        if a.native_muscles:
+            a.pod_reflex_writes = False if "replicas" in a.native_muscles else getattr(a, "pod_reflex_writes", False)
+            a.strict_replicas = False if "replicas" in a.native_muscles else getattr(a, "strict_replicas", False)
+            a.replica_ceiling = 0 if "replicas" in a.native_muscles else getattr(a, "replica_ceiling", -1)
         # v7: every rule of the governor counts in seconds; its count of decisions follows from the decision period, so
         # the period can change without changing any rule's time (at --interval 60 every count is the one v6 used)
         # --interval 0 is a model's or a test's loop that does not sleep: each call is one decision of the shipped minute
@@ -315,7 +344,10 @@ class Controller:
         per = lambda sec: max(1, int(round(float(sec) / period)))
         pick = lambda n, sec: int(n) if n is not None else per(sec)
         self.n_slo_clear = pick(getattr(a, "slo_clear", None), getattr(a, "slo_clear_s", 180.0))
-        self.n_cruise_after = pick(getattr(a, "cruise_after", None), getattr(a, "cruise_after_s", 120.0)) \
+        # cruise waits for work that waits decision after decision: two readings at least, at any beat (omni-v17: at 90 and
+        # 120 s its 120 s rounded to one decision, and a single reading with a pod waiting put every machine in service)
+        self.n_cruise_after = (int(a.cruise_after) if getattr(a, "cruise_after", None) is not None
+                               else max(2, per(getattr(a, "cruise_after_s", 120.0)))) \
             if getattr(a, "cruise_after", None) != 0 else 0
         self.n_strict_window = pick(getattr(a, "strict_window", None), getattr(a, "strict_window_s", 300.0))
         self.n_verdict_every = pick(getattr(a, "verdict_every", None), getattr(a, "verdict_every_s", 600.0))
@@ -323,21 +355,34 @@ class Controller:
         self.n_verdict_trial = per(getattr(a, "verdict_trial_s", 1200.0))
         self.step_scale = period / 60.0                # the compass's gains are per minute: a decision moves its share of one
         self.n_release = per(RELEASE_PERIOD_S)         # decisions between two machines given back (at most one a minute)
+        # omni-v16: the rest of the governor's clocks in seconds as well, so the decision period changes only how often it
+        # looks: the brain's minute, the compass's damping and smoothing, the edge, the additions, a command's time to
+        # land, the host's busy share and the conveyance (at --interval 60 every value is the one omni-v15 used)
+        self.pace = period / REF_PERIOD_S              # one decision's share of the brain's minute
+        self.n_add = per(ADD_PERIOD_S)                 # decisions between two additions past the scheduling floor
+        self.n_land = per(LAND_S)                      # decisions a command is watched for landing
+        self.n_convey = max(1, int(round(float(getattr(a, "convey_every_s", 15.0)) / float(getattr(a, "floor_interval", 15.0) or 15.0))))
+        self.last_add = None                           # the decision at which the pool last added a machine
+        self.cmd_at = {}                               # "nodes" or (ns, hpa) -> the decision its last command was written at
+        self.checks = 0                                # checks taken, a fast check or a decision: the conveyance's clock
         self.decisions = 0                             # decisions taken, the governor's own clock for the rules above
         self.last_release = None                       # the decision at which the pool last gave a machine back
         self.log = open(a.audit, "a") if a.audit else None
         self.k = kube or Kube(a.kubectl, a.dry_run, self.audit, proxy=not getattr(a, "no_api_proxy", False))
         self.k.audit = self.audit
-        self.host_cpu = HostCpuSampler()   # shared-host signal for kind; None means no scale-out proof
-        self.g = Governor(law=mode_law("fleet")); self.g.set_mode(OBSERVE)
+        # shared-host signal for kind (None means no scale-out proof), the busy share over the last minute (omni-v16)
+        self.host_cpu = HostCpuSampler(span=per(60.0))
+        self.g = Governor(law=mode_law("fleet"), period_s=period); self.g.set_mode(OBSERVE)
         # the machine organ's own engine view: fed with machine-attributable pressure only (pods waiting for a place)
-        self.gn = Governor(law=mode_law("fleet")); self.gn.set_mode(OBSERVE)
+        self.gn = Governor(law=mode_law("fleet"), period_s=period); self.gn.set_mode(OBSERVE)
         self.rec_n = None
         self.refused_at = None         # the first machine count the pool refused (its top, read live), if any
         self.changed = {}
         self.target_at = {}            # (ns, hpa) -> when I last set its target
         self.nodes_restored = False
         self.m = Muscles(self.k, a, self.audit)
+        if a.native_muscles:
+            self.audit({"native_muscles": sorted(a.native_muscles), "why": "left native by the operator (--native): never written"})
         self.cl = None
         if getattr(a, "closure", ""):
             from omnicompass.closure import ClosureLaw, ClosureNodes
@@ -371,14 +416,19 @@ class Controller:
             center = getattr(a, "compass_center", None)
             if center is None:
                 center = 0.3 if self.dial == "max" else 0.4
-            # one decision every --interval s; the service follows a target in about one HPA sync plus a pod start (tau)
-            self.compass_law = CompassLaw(Band(0.0, 1.0, center=center), dt=a.interval,
-                             tau=getattr(a, "compass_tau", 60.0), kp=1.0, smooth=0.3)
+            # one decision every --interval s; the service follows a target in about one HPA sync plus a pod start (tau).
+            # The damping and the velocity's smoothing are set for a decision a minute and kept in time at any period
+            # (omni-v16): kd is critical damping at the minute (compass_law.py's rule with dt = 60 s; the compass's moves
+            # are per minute, step_scale), and the smoothing 0.3 a minute
+            tau = getattr(a, "compass_tau", 60.0)
+            self.compass_law = CompassLaw(Band(0.0, 1.0, center=center), dt=period, tau=tau, kp=1.0,
+                                          kd=max(0.0, 2.0 * math.sqrt(1.0 * tau / REF_PERIOD_S) - 1.0) * REF_PERIOD_S,
+                                          smooth=0.3 if self.pace == 1.0 else 0.3 ** self.pace)
             self.compass_law.kd *= 3.0                    # the same push as on every realm muscle (realms/compass_arm.py)
             # the v5 edge (the tune-down only): the knob's reaction is the time the service takes to follow it (one HPA
-            # sync and a pod start, --compass-tau), in decisions
+            # sync and a pod start, --compass-tau), in decisions; its window and rates per minute (omni-v16)
             from omnicompass.edge import Edge
-            self.edge = Edge(react=getattr(a, "compass_tau", 60.0) / a.interval) if self.dial == "save" else None
+            self.edge = Edge(react=tau / period, pace=self.pace) if self.dial == "save" else None
             self.edge_base = center
             from omnicompass.verdict import Verdict
             self.verdict = Verdict(tolerance=getattr(a, "allow", 0.02), min_samples=getattr(a, "verdict_samples", 200),
@@ -473,6 +523,9 @@ class Controller:
     def _pool_command(self, n, n_now, why, **extra):
         """One node-pool command (the operator's own, --node-scale-cmd). A count the pool refuses is its top, read live:
         the lever stays one under it from then on, and the decision goes on (nothing else is held back by it)."""
+        if "machines" in getattr(self.a, "native_muscles", ()):
+            self.audit({"held": "machines", "why": f"{why}: the machines are left native (--native); {n} not written"})
+            return False
         cmd = self.a.node_scale_cmd.format(n=n)
         self.audit({"write": shlex.split(cmd), "why": why, "dry_run": self.a.dry_run, **extra})
         if self.a.dry_run:
@@ -691,7 +744,7 @@ class Controller:
         floor to what that rule needs now and hands it back the moment the queue no longer needs it: no padding, no new
         target, the operator's own promise met sooner. Zero cluster reads while the queue is calm."""
         lf = getattr(self.a, "latency_file", "")
-        if not lf or self.killed() or self.a.mode not in ("target", "nodepool"):
+        if not lf or self.killed() or self.a.mode not in ("target", "nodepool") or "replicas" in getattr(self.a, "native_muscles", ()):
             return None
         from omni_controller.muscles import latency_window
         w = latency_window(lf, getattr(self.a, "reflex_window_s", 30.0))
@@ -755,19 +808,17 @@ class Controller:
         """Fast path between governor decisions: add the nodes that pending and running pod requests need (nodepool mode)."""
         if self.killed() or self.a.mode != "nodepool" or not self.a.node_scale_cmd:
             return None
+        due = self._convey_due()
         if getattr(self, "cruise", False):
             # cruise (rule 7, amendment 12): every machine is already in service, so a floor check can add nothing; and a
             # queue of other work starves the service's responses without any load on it, which the reflex would read as
             # a queue and answer with idle pods. Omni steps back: no reads, no reflex, no conveyance until cruise ends
             return None
         self.pod_reflex()
-        # energy to where the work is: a new serving pod gets its machine's idle CPU within three checks, not a decision
-        self.ticks = getattr(self, "ticks", 0) + 1
-        if getattr(self.a, "latency_file", "") and self.ticks % 3 == 0:
-            try:
-                self.m.convey()
-            except Exception as e:  # a failed conveyance writes nothing more; the next one comes on time
-                self.audit({"error": f"convey: {e}"})
+        # energy to where the work is: a new serving pod gets its machine's idle CPU within --convey-every-s (15 s), not a
+        # decision
+        if getattr(self.a, "latency_file", "") and due:
+            self._convey()
         # one light read every check; the full snapshot (nodes, all pods, node metrics, HPAs) only when a pod waits. The
         # controller shares CPUs with the service it protects (on kind, one 4-core runner), so its reads cost latency
         if not str(self.k.get("get", "pods", "-A", "--field-selector=status.phase=Pending", "-o", "name")).strip():
@@ -784,8 +835,22 @@ class Controller:
                 return floor
         return None
 
+    def _convey_due(self):
+        """The conveyance's clock (omni-v16): every check counts, a fast check or a decision, and the conveyance runs on
+        every n-th, n = --convey-every-s / --floor-interval (15 s at the 5 s checks), whatever the decision period. Before
+        omni-v16 it ran on every third fast check and a decision was never one, so at a decision every 5 s it never ran."""
+        self.checks += 1
+        return self.checks % self.n_convey == 0
+
+    def _convey(self):
+        try:
+            self.m.convey()
+        except Exception as e:  # a failed conveyance writes nothing more; the next one comes on time
+            self.audit({"error": f"convey: {e}"})
+
     def step(self):
         self.decisions += 1
+        convey_due = self._convey_due() if self.a.mode == "nodepool" and self.a.node_scale_cmd else False
         self.host_cpu.sample()              # two adjacent controller ticks provide a host CPU busy share
         if self.killed():
             self.restore()
@@ -807,7 +872,7 @@ class Controller:
         power_stress = 0.0; blind = {}
         if self.a.power_cmd and self.a.site_limit_w:
             try:
-                power_stress = float(subprocess.run(self.a.power_cmd, shell=True, capture_output=True, text=True).stdout.strip()) / self.a.site_limit_w
+                power_stress = float(run_operator_cmd(self.a.power_cmd).stdout.strip()) / self.a.site_limit_w
                 blind["power"] = False
             except ValueError:
                 power_stress = 0.0; blind["power"] = True
@@ -822,7 +887,12 @@ class Controller:
                 if cur_t is not None:
                     drift["hpa " + "/".join(key)] = abs(cur_t - self.cmd_hpa[key]) / max(1, self.cmd_hpa[key])
         nodes_landed = drift.get("nodes", 0.0) == 0.0
-        self.cmd_nodes = None; self.cmd_hpa = {}
+        # a command is given LAND_S to land, however often the governor decides (omni-v16): every decision reads its drift
+        # until it has landed or its minute has passed (at a decision a minute, the next decision only, as before)
+        keep = lambda key, d_: d_ > 0.0 and self.decisions - self.cmd_at.get(key, self.decisions) < self.n_land
+        if self.cmd_nodes is not None and not keep("nodes", drift.get("nodes", 0.0)):
+            self.cmd_nodes = None
+        self.cmd_hpa = {k_: v_ for k_, v_ in self.cmd_hpa.items() if keep(k_, drift.get("hpa " + "/".join(k_), 0.0))}
         obs = {"queue_ratio": min(2.0, s["pending"] / max(1, repl)), "load_ratio": min(2.0, s["used_m"] / max(1.0, self.rec_n * per_node)),
                "power_stress": power_stress, "thermal": 0.0, "network_stress": 0.0, "drift_ratio": max(drift.values(), default=0.0),
                "stale": 0.0, "security_block": 0.0}
@@ -887,7 +957,7 @@ class Controller:
                 # and the wall move with the service's own climb and wobble (never behind the earlier law's own point
                 # unless that lesson says so)
                 if breach_now and self.n_native is not None and n < self.n_native:
-                    self.edge.learn_fall(0.1)
+                    self.edge.learn_fall(0.1 * self.pace)           # 0.1 a minute of breach (omni-v16)
                 center = self.edge.update(pos)
                 base = self.edge_base if self.edge.floor <= 0.0 else 0.0
                 self.compass_law.band.center = min(0.995, max(0.0, max(base, center)))
@@ -1060,7 +1130,8 @@ class Controller:
                     # window, never in one jump; a demand that comes back half way finds the pods still running and is
                     # met at once by the lower target, with no pod started again. More pods (a lower target) is never
                     # limited: the gas is always immediate
-                    want_h = min(want_h, cur + max(1, int(round(self.a.coast_step * self.step_scale))))
+                    # (a raise comes at most once a window, below, so the step is per raise at any period: omni-v16)
+                    want_h = min(want_h, cur + max(1, int(round(self.a.coast_step))))
                 # the autoscaler takes its window to answer a target. A raise inside that window moves the muscle
                 # mid-movement and removes pods it then starts again, so a raise is held for one window. A lower target
                 # (more pods, the safe direction) is never held: on a step up the pods are asked for at once, before the
@@ -1069,24 +1140,35 @@ class Controller:
                 # handing the operator's own target back is never held: it is where native stands
                 if obs["slo_clean"] and last is not None and time.time() - last < win and not back and want_h > cur:
                     continue
+                if "replicas" in self.a.native_muscles:
+                    continue     # omni-v14: the replicas are left native; the decision is audited, nothing written
                 self.target_at[(ns, name)] = time.time()
                 self.changed.setdefault((ns, name), int(h["metadata"].get("annotations", {}).get(ANNOTATION, cur)))
                 self.k.write(["annotate", "hpa", name, "-n", ns, "--overwrite", f"{ANNOTATION}={self.changed[(ns, name)]}"], "record original target")
                 self.k.write(["patch", "hpa", name, "-n", ns, "--type=json", "-p",
                               json.dumps([{"op": "replace", "path": f"/spec/metrics/{idx}/resource/target/averageUtilization", "value": want_h}])],
                              f"HPA target to rho* = {want_h}%" + ("" if obs["slo_clean"] else " (SLO reflex: not tighter than native)"))
-                self.cmd_hpa[(ns, name)] = want_h
+                self.cmd_hpa[(ns, name)] = want_h; self.cmd_at[(ns, name)] = self.decisions
             self.m.push(d, obs)
         if self.a.mode in ("target", "nodepool"):
             self.pod_reflex()
-        if self.a.mode == "nodepool" and self.a.node_scale_cmd and rec_n != n:
+        want_n = rec_n
+        if rec_n > n and self.last_add is not None and self.decisions - self.last_add < self.n_add:
+            # machines past the scheduling floor are added at most --max-node-step a minute, however often the governor
+            # decides (omni-v16; the pool gives back at most one a minute since v7); the floor's machines at once
+            want_n = max(n, min(rec_n, floor))
+        if self.a.mode == "nodepool" and self.a.node_scale_cmd and want_n != n:
             cfg = SimpleNamespace(minimum_nodes=self.a.min_nodes, maximum_nodes=self._max_nodes(s))
-            acts, hits = enforce([{"action": "nodes", "target": rec_n, "direction": 1 if rec_n > n else -1}],
+            if want_n > n:
+                self.last_add = self.decisions
+            acts, hits = enforce([{"action": "nodes", "target": want_n, "direction": 1 if want_n > n else -1}],
                                  {"actual_nodes": n, "power_cap": 1.0}, {"power_stress": power_stress, "security_block": obs["security_block"]}, cfg,
                                  ShieldLimits(power_limit=1e9, max_node_step=max(self.a.max_node_step, floor - n)))
             for act in acts:
                 if self._pool_command(int(act["target"]), n, "node pool size", shield_interventions=hits) and not self.a.dry_run:
-                    self.cmd_nodes = int(act["target"])
+                    self.cmd_nodes = int(act["target"]); self.cmd_at["nodes"] = self.decisions
+        if convey_due and getattr(self.a, "latency_file", "") and not self.cruise and not self.killed():
+            self._convey()
         self.rec_n = rec_n
         return out
 
@@ -1094,8 +1176,13 @@ class Controller:
 def parser():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--mode", choices=["observe", "target", "nodepool"], default="observe")
-    ap.add_argument("--interval", type=float, default=60.0, help="seconds between governor decisions")
-    ap.add_argument("--floor-interval", type=float, default=15.0, help="seconds between scheduling-floor checks (nodepool mode)")
+    # the heartbeat, a dial (omni-v17, the founder's word of 22 October, afternoon): the main engine decides every 60 s, and any
+    # beat can be set (5, 15, 30, 60, 75, 90, 120 s and every value between), each shown beside native; the fast checks run
+    # every 5 s at every beat. Every rule counts seconds (omni-v16), so either can be turned alone
+    ap.add_argument("--interval", type=float, default=60.0, help="seconds between governor decisions (the heartbeat, a dial; the main engine 60 s)")
+    ap.add_argument("--floor-interval", type=float, default=5.0, help="seconds between the fast checks: the scheduling floor, the pod reflex, the conveyance's clock (nodepool mode)")
+    ap.add_argument("--convey-every-s", type=float, default=15.0,
+                    help="seconds between conveyance passes, counted on the checks (a fast check or a decision; omni-v16)")
     ap.add_argument("--iterations", type=int, default=0, help="0 = run until stopped")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--kubectl", default="kubectl")
@@ -1166,6 +1253,8 @@ def parser():
     add_muscle_args(ap)
     ap.add_argument("--power-cmd", default="")
     ap.add_argument("--site-limit-w", type=float, default=0.0)
+    ap.add_argument("--native", default=os.environ.get("OMNI_NATIVE", ""),
+                    help="muscles left native, never written (omni-v14): a comma list of " + ", ".join(MUSCLES))
     return ap
 
 
@@ -1217,21 +1306,38 @@ def main(argv=None):
         c.audit({"overhead": {"cpu_s": round(cpu, 2), "wall_s": round(time.time() - t0, 1),
                               "cores_mean": round(cpu / max(1e-9, time.time() - t0), 4)}})
     atexit.register(overhead)
+    # the loop keeps its own schedule (omni-v16): a decision every --interval s and a fast check every --floor-interval s
+    # between, each slept to its time from the schedule, never --interval after the last step ended, so the steps' own
+    # time does not stretch every clock (before omni-v16 a decision of 60 s came every 62 to 67 s on kind, and one of 5 s
+    # would have come every 7). A step that overruns its slot is followed at once by the next due one; missed slots are
+    # skipped, never run in a burst, and the lateness is in the audit
+    due = time.time()
     while a.iterations == 0 or i < a.iterations:
         master.heartbeat()
         t_dec = time.time()
         fails = safe_step(c, fails); i += 1
         c.audit({"decision_ms": round(1000 * (time.time() - t_dec), 1)})
         if a.iterations == 0 or i < a.iterations:
-            waited = 0.0
-            while waited + 1e-9 < a.interval:
-                dt = min(a.floor_interval, a.interval - waited) if a.mode == "nodepool" else a.interval - waited
-                time.sleep(dt); waited += dt
-                if a.mode == "nodepool" and waited + 1e-9 < a.interval:
+            nxt = due + a.interval
+            if a.mode == "nodepool":
+                k = 1
+                while due + k * a.floor_interval < nxt - 1e-6:
+                    slot = due + k * a.floor_interval
+                    if time.time() > slot + a.floor_interval:                 # this slot is long gone: skip it
+                        k += 1
+                        continue
+                    time.sleep(max(0.0, slot - time.time()))
                     try:
                         c.floor_step()
                     except Exception as e:
                         c.audit({"error": "floor check: " + repr(e)[:500], "stderr": str(getattr(e, "stderr", "") or "")[-500:]})
+                    k += 1
+            late = time.time() - nxt
+            if a.interval > 0 and late > a.interval:
+                c.audit({"behind_s": round(late, 1), "why": "a step outran its slot; the slots missed are skipped, not run at once"})
+                nxt = time.time()
+            time.sleep(max(0.0, nxt - time.time()))
+            due = nxt
 
 
 if __name__ == "__main__":

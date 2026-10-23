@@ -1,8 +1,8 @@
 # Limitations and threats to validity
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-What the newest three-run tables (omni-v11's; omni-v13, the engine that stands since 20 October, runs every benchmark again)
+What the newest three-run tables (omni-v11's; omni-v17, the engine that stands since 23 October, runs every benchmark again)
 can and cannot support, written the way a referee reads a
 study: who ran it, what could bias a comparison, what a gauge really measures, how often the reading rule could be fooled,
 and how far a result travels. Each limitation names what would remove it. Run and scored by The Omni-Compass LLC's own
@@ -49,7 +49,7 @@ code. No outside party has reviewed or approved these results.
 - **A margin no gauge judges, and a fault it hid.** In the drone swarm the judged safety gauge is the near miss (two drones
   under half the 0.3 m keep-out, 0.15 m). The closest approach is shown, not judged. With Omni-Compass on top it fell from
   about 0.30 m to as low as 0.156 m (run C, the short cell). There was no near miss and no collision in any counted run, but
-  the margin native keeps was spent to fly faster. On mission draws outside the preregistered seeds it was worse: on the mixed
+  the margin native keeps was spent to fly faster. On mission draws outside the preregistered seeds it read LOSS: on the mixed
   cell with draw 214, the omni-v11 wire let two drones come within 0.083 m, with 5 near-miss ticks and 3 collision ticks, where
   native flew the same draw with none (`results/toy_gate/V12_SWARM_REFLEX.md`). A preregistered set of seeds could not show
   it, and only flying draws the wire was never tuned on did.
@@ -91,10 +91,11 @@ code. No outside party has reviewed or approved these results.
 
 ## 6. The engine changed often
 
-Nine versions in nine days (omni-v5 to omni-v13, `docs/CHANGE_CONTROL.md`), each a fault found in a real run and fixed.
+Twelve versions in twelve days (omni-v5 to omni-v16, `docs/CHANGE_CONTROL.md`), each through omni-v15 a fault found in a real
+run and fixed, and omni-v16 the decision pace made a clean setting on the founder's word.
 No table mixes engines, and each benchmark runs again on every version; the cost is that each version's three-run tables
 take a day or more to land, so the newest tables of some benchmarks are an older engine's until they do.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

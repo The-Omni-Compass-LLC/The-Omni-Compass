@@ -1,0 +1,216 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""The one metered chip run, second by second, for the live engine's GPU card monitor (class P: the card's own meter).
+
+results/gpu/run-20261002T082232Z is the NVIDIA A10 run of 2 October (10 paired repetitions, 600 s an arm, the card controller
+of commit c908054, replaced since): the only run in the repository where a real card's own meter recorded native beside
+Omni-Compass. The monitor replays it as it was recorded: every arm's power draw, enforced power limit, clock and temperature
+from nvidia-smi (200 ms samples, binned to 2 s), its requests served and 95th-percentile response in 10 s windows, and the
+governor's decisions from its own audit. Nothing is modelled; a lane with no file stays empty. The run's total table is carried
+as GPU_REPS.md prints it, each row re-read by the one key (tools/readings.py), so the words follow the gauge's aim.
+
+  python3 docs/engine/export_gpu_run.py OUT.json
+"""
+from __future__ import annotations
+
+import csv
+import datetime
+import json
+import re
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+sys.path.insert(0, str(ROOT))
+
+RUN = ROOT / "results" / "gpu" / "run-20261002T082232Z"
+ARMS = ("native", "watch", "omni")
+BIN_S = 2.0
+REQ_BIN_S = 10.0
+# every gauge of the run's total table by what it is for (the one key): time waited is LOWER, work is HIGHER, a resource is SPENT
+AIMS = {"work per energy": "WORK_PER", "work per wall energy": "WORK_PER", "energy": "SPENT", "power": "SPENT", "requests served": "HIGHER",
+        "requests not served": "LOWER", "response time": "LOWER", "temperature": "SPENT", "power-capped share": "SHOWN"}
+
+
+def _aim(gauge: str) -> str:
+    g = gauge.lower().strip("* ")
+    for k, v in AIMS.items():
+        if g.startswith(k):
+            return v
+    return "SHOWN"
+
+
+def _word(aim: str, change: str, interval: str) -> str:
+    """The word by the gauge's aim from the row's own interval (clear of zero or not) and the sign of its change."""
+    if aim == "SHOWN":
+        return "shown, not judged"
+    m = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?", interval.replace("−", "-"))
+    if len(m) < 2:
+        return "unread"
+    lo, hi = float(m[0].replace(",", "")), float(m[1].replace(",", ""))
+    if lo <= 0 <= hi:
+        return "EVEN"
+    up = hi > 0
+    if aim == "HIGHER":
+        return "GAIN" if up else "LOSS"
+    if aim == "LOWER":
+        return "LOSS" if up else "GAIN"
+    if aim == "WORK_PER":
+        return "GAIN" if up else "power given"
+    return "power given" if up else "GAIN"          # SPENT: a resource that rose is power given, one that fell a cut
+
+
+def _stamp(s: str) -> float:
+    return datetime.datetime.strptime(s.strip(), "%Y/%m/%d %H:%M:%S.%f").timestamp()
+
+
+def smi(path: Path) -> dict:
+    """nvidia-smi's 200 ms samples binned to BIN_S: mean draw (W), the power limit as written and the limit the card enforced at the
+    bin's end (W), mean SM clock (MHz), mean temperature (C), mean utilisation (%), the time axis from the arm's first sample."""
+    rows = []
+    with path.open(encoding="utf-8") as f:
+        for ln in f:
+            c = [x.strip() for x in ln.split(",")]
+            if len(c) < 8 or not c[0][:4].isdigit():
+                continue
+            try:
+                rows.append((_stamp(c[0]), float(c[2]), float(c[3]), float(c[4]), float(c[7]), float(c[6]), float(c[5])))
+            except ValueError:
+                continue
+    if not rows:
+        return {}
+    t0 = rows[0][0]
+    bins: dict[int, list] = {}
+    for t, draw, temp, util, lim, clk, plim in rows:
+        bins.setdefault(int((t - t0) // BIN_S), []).append((draw, temp, util, lim, clk, plim))
+    ks = sorted(bins)
+    mean = lambda xs: round(sum(xs) / len(xs), 2)
+    return {"t": [round(k * BIN_S, 1) for k in ks],
+            "draw_w": [mean([r[0] for r in bins[k]]) for k in ks],
+            "temp_c": [mean([r[1] for r in bins[k]]) for k in ks],
+            "util": [mean([r[2] for r in bins[k]]) for k in ks],
+            "enforced_w": [bins[k][-1][3] for k in ks],
+            "limit_w": [bins[k][-1][5] for k in ks],
+            "clock_mhz": [mean([r[4] for r in bins[k]]) for k in ks],
+            "samples": len(rows)}
+
+
+def requests(path: Path, offset: float) -> dict:
+    """Requests in REQ_BIN_S windows on the arm's own axis: served, failed, the 95th-percentile and mean response (ms)."""
+    bins: dict[int, list] = {}
+    served = failed = 0
+    with path.open(encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            try:
+                done = float(r["done_s"]) + offset
+                lat = float(r["latency_ms"])
+                ok = int(float(r.get("ok", "1")))
+            except (KeyError, ValueError):
+                continue
+            bins.setdefault(int(done // REQ_BIN_S), []).append((lat, ok))
+            served += ok
+            failed += 1 - ok
+    ks = sorted(bins)
+    p95 = lambda xs: sorted(xs)[min(len(xs) - 1, int(round(0.95 * (len(xs) - 1))))]
+    return {"t": [round((k + 1) * REQ_BIN_S, 1) for k in ks],
+            "served": [sum(o for _, o in bins[k]) for k in ks],
+            "p95_ms": [round(p95([l for l, o in bins[k] if o]) if any(o for _, o in bins[k]) else 0.0, 1) for k in ks],
+            "mean_ms": [round(sum(l for l, o in bins[k] if o) / max(1, sum(o for _, o in bins[k])), 1) for k in ks],
+            "served_total": served, "failed_total": failed}
+
+
+def audit(path: Path, t_start: float) -> dict:
+    """The governor's decisions from its own audit: the limit it wanted (W) and what decided it; every limit write (W) and every
+    clock write (the SM clock range it locked, MHz), each on the arm's own axis."""
+    out, writes, clocks, kinds, last = [], [], [], {}, None
+    with path.open(encoding="utf-8") as f:
+        for ln in f:
+            try:
+                d = json.loads(ln)
+            except json.JSONDecodeError:
+                continue
+            t = round(float(d.get("time", 0)) - t_start, 1)
+            for k in d:
+                if k != "time":
+                    kinds[k] = kinds.get(k, 0) + 1
+            dec = (d.get("decision") or {}).get("0")
+            if dec:
+                want, by = dec.get("want_w"), dec.get("decided_by") or ""
+                if want is not None and (last is None or want != last or len(out) % 10 == 0):
+                    out.append([t, want, by])
+                    last = want
+            w = d.get("write")
+            if isinstance(w, list) and "-pl" in w:
+                try:
+                    writes.append([t, float(w[w.index("-pl") + 1])])
+                except (ValueError, IndexError):
+                    pass
+            cw = d.get("clock_write")
+            if isinstance(cw, list) and "-lgc" in cw:
+                try:
+                    lo, hi = cw[cw.index("-lgc") + 1].split(",")
+                    clocks.append([t, float(lo), float(hi)])
+                except (ValueError, IndexError):
+                    pass
+    return {"decisions": out, "limit_writes": writes, "clock_writes": clocks, "records": kinds}
+
+
+def total_table(md: str) -> list[dict]:
+    rows, grab = [], False
+    for ln in md.split("\n"):
+        if ln.startswith("## Total"):
+            grab = True
+            continue
+        if grab and ln.startswith("## "):
+            break
+        if grab and ln.startswith("|") and not ln.startswith("|---") and "Gauge" not in ln:
+            c = [x.strip() for x in ln.strip("|").split("|")]
+            if len(c) >= 6:
+                aim = _aim(c[0])
+                rows.append({"gauge": c[0].strip("* "), "primary": "(primary)" in c[0], "native": c[1], "omni": c[2], "change": c[3],
+                             "interval": c[4], "verdict_as_printed": c[5], "aim": aim, "word": _word(aim, c[3], c[4]) if c[1] != "UNAVAILABLE" else "no meter"})
+    return rows
+
+
+def main(out: str) -> None:
+    if not RUN.exists():
+        Path(out).write_text(json.dumps({"missing": str(RUN.relative_to(ROOT))}), encoding="utf-8")
+        return
+    receipt = json.loads((RUN / "receipt.json").read_text(encoding="utf-8"))
+    md = (RUN / "GPU_REPS.md").read_text(encoding="utf-8")
+    reps = []
+    for rd in sorted(RUN.glob("rep-*"), key=lambda p: int(p.name.split("-")[1])):
+        rep = {"rep": int(rd.name.split("-")[1]), "arms": {}}
+        for arm in ARMS:
+            ad = rd / arm
+            if not (ad / "smi.csv").exists():
+                continue
+            ws = float((ad / "window_start.txt").read_text().strip()) if (ad / "window_start.txt").exists() else None
+            summ = json.loads((ad / "summary.json").read_text(encoding="utf-8")) if (ad / "summary.json").exists() else {}
+            offset = (float(summ["t0_epoch"]) - ws) if ws is not None and "t0_epoch" in summ else 0.0
+            a = {"smi": smi(ad / "smi.csv"), "req": requests(ad / "requests.csv", offset) if (ad / "requests.csv").exists() else {},
+                 "limit_start_w": (ad / "limit_start.txt").read_text().strip() if (ad / "limit_start.txt").exists() else None,
+                 "limit_end_w": (ad / "limit_end.txt").read_text().strip() if (ad / "limit_end.txt").exists() else None,
+                 "served": summ.get("served"), "not_served": summ.get("not_served"), "duration_s": summ.get("duration_s")}
+            if arm != "native" and (ad / "audit.jsonl").exists() and ws is not None:
+                a["audit"] = audit(ad / "audit.jsonl", ws)
+            rep["arms"][arm] = a
+        reps.append(rep)
+    data = {"source": str(RUN.relative_to(ROOT)), "table": "results/gpu/run-20261002T082232Z/GPU_REPS.md",
+            "card": receipt.get("gpu_name"), "driver": receipt.get("driver"), "engine_commit": receipt.get("git"),
+            "engine_note": "the card controller of commit c908054 (2 October), replaced since; its omni-v12 run on Lambda is the next receipt",
+            "reps_n": receipt.get("reps"), "duration_s": receipt.get("duration_s"), "sample_ms": receipt.get("sample_ms"),
+            "limit_default_w": receipt.get("power_limit_default_w"), "limit_min_w": receipt.get("power_limit_min_w"), "envelope": receipt.get("envelope"),
+            "workload": receipt.get("workload"), "bin_s": BIN_S, "req_bin_s": REQ_BIN_S, "arms": list(ARMS),
+            "arm_words": {"native": "the card as shipped, its own driver governing", "watch": "Omni-Compass wired, watching only (the switch OFF: it reads, writes nothing)",
+                          "omni": "Omni-Compass governing the power limit"},
+            "total": total_table(md), "reps": reps}
+    Path(out).write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1] if len(sys.argv) > 1 else "gpu_run.json")

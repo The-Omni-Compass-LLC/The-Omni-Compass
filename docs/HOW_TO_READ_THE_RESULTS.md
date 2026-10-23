@@ -1,6 +1,6 @@
 # How to Read the Results
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
@@ -20,6 +20,8 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -136,7 +138,7 @@ Every benchmark since the engine was frozen runs three separate times, A, B and 
 shows all three beside each gauge, each with its own 95% interval. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
 in all three, every interval clear of zero; a resource spent that rose reads **power given**), **EVEN, no difference beyond the noise** (an interval over zero in at least one
 run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
-confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V10_` or `V11_` in the name is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
+confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V<n>_` in a table's name (`V10_`, `V11_`, `V12_` and so on) is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
 a table never mixes engines, and a reading is never carried from one engine to another. Every LOSS and every power given is in the table beside
 the GAINs. On the omni-v11 tables there is no LOSS. Power given appears in the grid's dissipated energy in four grids, the tap
 operations in one, PgBouncer's connections, MySQL's pool from its factory size, Redis's memory and CityLearn's distance from net
@@ -178,7 +180,7 @@ size. The robustness tables (`results/live/V11_ROBUST_KILL.md` and `V11_ROBUST_L
 arm alone, since native has no governor to kill: the seconds from the kill until every setting was back at the operator's
 (the allowance is 60 s, declared before the run), whether a second governor started and governed to the end, and the
 governor's memory in the last ten minutes over the first ten (a quarter's growth is a leak, declared before the run); the
-120 s after the kill are compared between the arms like any paired gauge.
+300 s after the kill (120 s on the tables up to omni-v14's) are compared between the arms like any paired gauge.
 
 ## The organisms with a real cluster inside (`SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V3_BIG_ORGANISM.md`)
 
@@ -245,4 +247,4 @@ and where every number stands today are in the Owner's Manual, chapter 3, *Where
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """How much of the engine the tests run: line coverage of every Python file in the engine that stands, under the whole
@@ -63,6 +63,26 @@ def measure() -> dict:
     return {"engine": ver, "commit": sha, "files": per}
 
 
+def late_wires_line(d: dict) -> list[str]:
+    """The share the eight runners omni-v15 took into the fingerprint hold (tools/omni_version.py, LATE_WIRES), apart from
+    the rest: they are run chiefly by their own benchmarks on GitHub, so the whole engine's figure fell when they came in
+    while the files that were in it before kept theirs."""
+    from tools import omni_version as ov
+    late = [f for f in d["files"] if f in ov.LATE_WIRES]
+    if not late:
+        return []
+    def share(fs):
+        s = sum(d["files"][f]["statements"] for f in fs); m = sum(d["files"][f]["missed"] for f in fs)
+        return s, 100 * (s - m) / max(1, s)
+    ls, lp = share(late)
+    rs, rp = share([f for f in d["files"] if f not in ov.LATE_WIRES])
+    return [f"The {len(late)} runners omni-v15 took into the fingerprint (the data stores', the swarm's, MuJoCo's and the CPU "
+            f"power runner, `tools/run_*.py`) hold {ls:,} of these statements, {lp:.0f}% of them run under the tests: each is "
+            f"run whole by its own benchmark on GitHub, A, B and C, rather than by a unit test. The other {len(d['files']) - len(late)} Python "
+            f"files, the engine as it stood before them, hold {rs:,}, {rp:.0f}% run. The whole figure fell when those runners "
+            "came in; no test was lost.", ""]
+
+
 def page(d: dict) -> str:
     tot = sum(v["statements"] for v in d["files"].values())
     miss = sum(v["missed"] for v in d["files"].values())
@@ -76,14 +96,16 @@ def page(d: dict) -> str:
          f"**{100 * (tot - miss) / tot:.0f}% of the engine's {tot:,} statements run under the tests** "
          f"({tot - miss:,} run, {miss:,} not). Coverage counts lines a test executes, not what it asserts: the properties "
          "the tests check are in `tests/test_engine_properties.py`, and the proofs of the core in `docs/ENGINE_PROOFS.md`.", "",
+         *late_wires_line(d),
          "| Engine file | Statements | Run by the tests | Coverage |", "|---|---:|---:|---:|"]
     for f, v in rows:
         s, m = v["statements"], v["missed"]
         L.append(f"| `{f}` | {s:,} | {s - m:,} | {100 * (s - m) / max(1, s):.0f}% |")
     low = [f for f, v in rows if v["statements"] and (v["statements"] - v["missed"]) / v["statements"] < 0.6]
     L += ["", "## Where the tests reach least", "",
-          "Files under 60%: " + (", ".join(f"`{f}`" for f in low) if low else "none") + ". The CityLearn runner is "
-          "exercised by its own benchmark on GitHub (`citylearn.yml`, three runs on every engine) rather than by a unit test; "
+          "Files under 60%: " + (", ".join(f"`{f}`" for f in low) if low else "none") + ". The CityLearn runner and the "
+          "runners of the data stores and the swarm are exercised by their own benchmarks on GitHub (`citylearn.yml`, "
+          "`redis.yml` and the rest, three runs on every engine) rather than by a unit test; "
           "the stack simulator, the shield and the speed and mathdrive modules hold paths the live governors do not call. "
           "Raising each to the level of the rest is the next tests' work: no engine file changes for a test.", ""]
     return "\n".join(L) + "\n"

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The five added live levers against the fake kubectl: rightsize sets pod CPU requests from use in place and the kill
@@ -42,7 +42,8 @@ def load(p): return json.loads(Path(p).read_text())
 def main():
     t = tempfile.mkdtemp(); p = setup(t)
     cool = Path(t) / "bms.log"
-    a = parser().parse_args(["--kubectl", FAKE, "--audit", str(Path(t) / "audit.jsonl"),
+    # a decision a minute, the default this test was written against before omni-v16 set 15 s (one batch step a minute)
+    a = parser().parse_args(["--interval", "60", "--floor-interval", "15", "--kubectl", FAKE, "--audit", str(Path(t) / "audit.jsonl"),
                              "--rightsize-deployments", "default/web", "--coldstart-deployments", "default/svc",
                              "--coldstart-signal", "default/work", "--coldstart-idle", "2", "--batch-pace",
                              "--contain-namespaces", "agents", "--contain-cpu-m", "1000",

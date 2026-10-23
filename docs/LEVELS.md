@@ -1,6 +1,6 @@
 # Every level: Omni-Compass on top of the muscle, the organism, the cluster, the service, the plant, the cloud
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
@@ -16,7 +16,7 @@ The founder's order of 17 October: Omni-Compass is shown on top at every level, 
 | The organism, the stack: the seven organisms under three loads (own load, the climb, work waiting in line) | omni-v8 | S (our model) | 21 | 0 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
 | The cluster: real Kubernetes, native its own HPA and scheduler | omni-v10, omni-v11 | L | 32 | 93 | 4 | 0 | 0 | no LOSS; resources put in shown as power given |
 | The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v10, omni-v11 | L | 17 | 40 | 7 | 0 | 0 | no LOSS; resources put in shown as power given |
-| A muscle inside a running service: database, broker, cache | omni-v12 | L | 17 | 280 | 5 | 0 | 2 | **yes: 2, listed below** |
+| A muscle inside a running service: database, broker, cache | omni-v16 | L | 19 | 329 | 9 | 0 | 2 | **yes: 2, listed below** |
 | A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms | omni-v11 | independent simulator | 113 | 132 | 15 | 0 | 0 | no LOSS; resources put in shown as power given |
 | The organism with the real cluster inside (the grid, at 1, 10, 100 and on GitHub's machines 1,000 copies) | older engines' tables; the grid runs again on the engine that stands | L, the cluster; S, the organism | – | – | – | – | – | no table on the engine that stands yet; the grid's runs (results/grid_v8/) are going |
 | The cluster in a cloud: Azure Kubernetes Service, the bill | single runs, omni-v5 to omni-v7 | L, the bill metered | – | – | – | – | – | no three-run table yet: eight single runs at the tune-down, machines billed −6.5% to +7.6%, every one EVEN; the fleet (about 1.9 of 4 machines busy) leaves no whole machine to give back |
@@ -48,13 +48,13 @@ Tables: `results/live/V11_KEDA_REQUESTS.md`, `results/live/V11_KEDA_CPU_REQUESTS
 
 ### A muscle inside a running service: database, broker, cache
 
-Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v12. Evidence: L.
-Tables: `results/live/V12_REDIS.md`, `results/live/V12_REDIS_SERVICE.md`, `results/live/V12_KAFKA.md`, `results/live/V12_KAFKA_SERVICE.md`, `results/live/V12_PGBENCH.md`, `results/live/V12_SYSBENCH.md`, `results/live/V12_YCSB.md`.
+Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v16. Evidence: L.
+Tables: `results/live/V16_REDIS.md`, `results/live/V16_REDIS_SERVICE.md`, `results/live/V16_KAFKA.md`, `results/live/V16_KAFKA_SERVICE.md`, `results/live/V16_PGBENCH.md`, `results/live/V16_SYSBENCH.md`, `results/live/V16_YCSB.md`.
 
 Goes the other way:
 
-- V12_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumers running, mean (the resources held) (the runs disagree)
-- V12_SYSBENCH.md: read_write: sysbench oltp_read_write, 18 statements a transaction, 200 a second offered; the transaction line 10.8 ms, 3 paired repetitions a run: buffer pool held, mean (MB; the knob, the resource) (the runs disagree)
+- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumers running, mean (the resources held) (the runs disagree)
+- V16_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 95th percentile (ms) (the runs disagree)
 
 ### A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms
 
@@ -80,4 +80,4 @@ No run at this level yet, real or modelled, on the engine that stands (`k8s_flee
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

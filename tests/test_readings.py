@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The words rule (tools/readings.py): GAIN, EVEN and LOSS, set by what the gauge is for and never by its sign."""
@@ -50,6 +50,39 @@ class Words(unittest.TestCase):
                   R.OWN_RUNS):
             self.assertIn(w, text)
         self.assertEqual(R.check_pages(), [], "a page lacks the key word for word: python3 tools/readings.py --fix")
+
+
+class Landed(unittest.TestCase):
+    """A newer engine's table takes its benchmark's place only once its three runs share a reading (20 October: the three
+    omni-v12 YCSB runs each failed partway, their table held no workload in all three, and the benchmark fell off the
+    benefit sheet and the Omni index instead of omni-v11's table standing)."""
+
+    def test_a_table_whose_runs_share_no_workload_has_not_landed(self):
+        import json, tempfile
+        from tools import benefit_sheet, omni_index
+        run = {"native": 1.0, "omni": 0.9, "diff": -0.1, "ci95": [-0.2, -0.05]}
+        with tempfile.TemporaryDirectory() as td:
+            live = Path(td)
+            (live / "V11_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"f": {"g": {"reading": "x", "runs": [run, run, run]}}}}))
+            (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {}}))
+            (live / "V12_DEMO.md").write_text("# demo\n")
+            self.assertTrue(R.landed(live / "V11_DEMO.json"))
+            self.assertFalse(R.landed(live / "V12_DEMO.json"))
+            self.assertFalse(R.landed(live / "V12_DEMO.md"))          # read through its JSON twin
+            keep = (benefit_sheet.LIVE, omni_index.LIVE)
+            benefit_sheet.LIVE = omni_index.LIVE = live
+            try:
+                self.assertEqual(benefit_sheet.newest_table("V7_DEMO.json"), "V11_DEMO.json")
+                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V11_DEMO.json")
+                (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"tuning": {"g": {"runs": [run, run, run]}}}}))
+                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V11_DEMO.json")   # the tuning workload alone reads nothing
+                (live / "V12_ORG.json").write_text(json.dumps({"organisms": {"spine": {}}}))
+                self.assertTrue(R.landed(live / "V12_ORG.json"))                       # another table's shape: its writer decides
+                (live / "V12_DEMO.json").write_text(json.dumps({"runs": [{}, {}, {}], "workloads": {"f": {"g": {"runs": [run, run, run]}}}}))
+                self.assertEqual(benefit_sheet.newest_table("V7_DEMO.json"), "V12_DEMO.json")
+                self.assertEqual(omni_index.newest("V7_DEMO.json"), "V12_DEMO.json")
+            finally:
+                benefit_sheet.LIVE, omni_index.LIVE = keep
 
 
 if __name__ == "__main__":

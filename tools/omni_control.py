@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The control panel: the governor's buttons behind an authenticated API, each press audited (the engine untouched).
@@ -28,6 +28,14 @@ The buttons (each a POST carrying a bearer token; JSON body):
   POST /v1/arm    {"reason": ...}                                       role security
         the master switch ON again, only when two different holders of the security role press it within ten minutes
         (the two-person rule); the first press is recorded and answered 202
+  POST /v1/muscle {"muscle": NAME, "on": true|false, "reason": ...}     role operator
+        one muscle on (Omni-Compass drives it) or left native (never written), omni-v14's --native; the muscles are the
+        governor's own list (omni_controller/controller.py, MUSCLES). Like a dial press, it passes through native: the
+        governor hands every setting back and starts again with the new list
+  POST /v1/beat   {"seconds": 5 to 120, "reason": ...}                  role operator
+        the heartbeat, a dial (omni-v17): the governor's full decision every so many seconds (the main engine 60 s; the
+        dial's stops 5, 15, 30, 60, 75, 90 and 120 s and any value between), its fast checks every 5 s at every beat; like
+        a dial press it passes through native, and the governor starts again with --interval set to the beat
 The reads (role viewer): GET /v1/status (the switch, the desired and the actual state, the governor's process, the
 registry and its leases, the age of the last decision), GET /v1/presses (the last presses), GET /metrics. The console
 (GET /) and the OpenAPI document (GET /v1/openapi.json) carry no data and need no token; every call the console makes
@@ -58,9 +66,13 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omnicompass import master                    # noqa: E402
 from tools import omni_switch                     # noqa: E402
 from tools.legal import PLAIN                     # noqa: E402
+from omni_controller.controller import MUSCLES    # noqa: E402
 
-BUTTONS = {"mode": "operator", "dial": "operator", "reset": "operator", "kill": "security", "arm": "security"}
+BUTTONS = {"mode": "operator", "dial": "operator", "reset": "operator", "kill": "security", "arm": "security", "muscle": "operator",
+           "beat": "operator"}
 MODES, DIALS = ("autopilot", "watch", "off"), ("max", "save")
+MAIN_BEAT, BEAT_RANGE = 60.0, (5.0, 120.0)            # the heartbeat dial (omni-v17): the main engine's beat and the dial's span
+BEAT_STOPS = (5, 15, 30, 60, 75, 90, 120)              # the stops the console offers; any value in the span can be pressed
 ARM_WINDOW_S = 600.0              # the two-person rule: two different holders of the security role within ten minutes
 MAX_BODY = 4096
 
@@ -104,24 +116,41 @@ class Panel:
         self.cmd = list(governor)
         self.kill_file = Path(kill_file)
         self.state_path, self.log_path, self.audit = state, log, audit
-        self.flags = {"kill": "--kill-file", "dial": "--dial", "watch": "--dry-run", **(flags or {})}
+        self.flags = {"kill": "--kill-file", "dial": "--dial", "watch": "--dry-run", "native": "--native", "beat": "--interval",
+                      **(flags or {})}
         self.handback_s = handback_s
         self.lock = threading.Lock()
         self.proc = None
         self.arms = {}                                    # security holder -> time of their arm press
         self.counts = {}                                  # (button, outcome) -> presses
-        self.desired = {"mode": "off", "dial": "max"}
+        self.desired = {"mode": "off", "dial": "max", "native": [], "beat": None}   # beat None: the command's own (else 60 s)
         if state and Path(state).exists():
             try:
                 d = json.loads(Path(state).read_text(encoding="utf-8"))
                 self.desired.update({k: d[k] for k in ("dial",) if d.get(k) in DIALS})
+                self.desired["native"] = sorted(m for m in (d.get("native") or []) if m in MUSCLES)
+                b = d.get("beat")
+                if isinstance(b, (int, float)) and not isinstance(b, bool) and BEAT_RANGE[0] <= b <= BEAT_RANGE[1]:
+                    self.desired["beat"] = float(b)
             except (OSError, ValueError):
                 pass                                      # a panel never starts a governor by itself: mode starts off
 
     # the governor's process
     def args(self):
         a = self.cmd + [self.flags["kill"], str(self.kill_file), self.flags["dial"], self.desired["dial"]]
+        a += [self.flags["native"], ",".join(self.desired["native"])] if self.desired["native"] else []
+        a += [self.flags["beat"], f"{self.desired['beat']:g}"] if self.desired["beat"] is not None else []
         return a + ([self.flags["watch"]] if self.desired["mode"] == "watch" else [])
+
+    def beat(self):
+        """The beat the governor runs at: the one pressed, else the one its own command sets, else the main engine's 60 s."""
+        if self.desired["beat"] is not None:
+            return self.desired["beat"]
+        flag = self.flags["beat"]
+        try:
+            return float(self.cmd[len(self.cmd) - 1 - self.cmd[::-1].index(flag) + 1])
+        except (ValueError, IndexError):
+            return MAIN_BEAT
 
     def running(self):
         return self.proc is not None and self.proc.poll() is None
@@ -210,6 +239,38 @@ class Panel:
         out.update(self._start())
         return {"dial": d, **out}
 
+    def _muscle(self, who, body):
+        m, on = body.get("muscle"), body.get("on")
+        if m not in MUSCLES:
+            raise Refused(400, f"muscle must be one of {', '.join(MUSCLES)}")
+        if not isinstance(on, bool):
+            raise Refused(400, "on must be true (Omni-Compass drives it) or false (left native)")
+        native = set(self.desired["native"])
+        if (m not in native) == on:
+            return {"muscle": m, "on": on, "unchanged": True}
+        (native.discard if on else native.add)(m)
+        self.desired["native"] = sorted(native)
+        if not self.running():
+            return {"muscle": m, "on": on, "native": self.desired["native"], "applies": "at the next start"}
+        out = {"hand_back": self._hand_back()}
+        out.update(self._start())
+        return {"muscle": m, "on": on, "native": self.desired["native"], **out}
+
+    def _beat(self, who, body):
+        s = body.get("seconds")
+        if isinstance(s, bool) or not isinstance(s, (int, float)) or not BEAT_RANGE[0] <= s <= BEAT_RANGE[1]:
+            raise Refused(400, f"seconds must be a number from {BEAT_RANGE[0]:g} to {BEAT_RANGE[1]:g} (the dial's stops "
+                               f"{', '.join(str(b) for b in BEAT_STOPS)}; the main engine {MAIN_BEAT:g})")
+        s = float(s)
+        if s == self.beat():
+            return {"beat_s": s, "unchanged": True}
+        self.desired["beat"] = s
+        if not self.running():
+            return {"beat_s": s, "applies": "at the next start"}
+        out = {"hand_back": self._hand_back()}
+        out.update(self._start())
+        return {"beat_s": s, **out}
+
     def _reset(self, who, body):
         out = self._hand_back()
         self.desired["mode"] = "off"
@@ -250,7 +311,7 @@ class Panel:
         if self.proc is not None and not self.running() and self.desired["mode"] != "off":
             gov["note"] = "exited on its own: not restarted by the panel; its lease hands back what it wrote"
         return {"notice": PLAIN, "master_switch": "OFF" if master.is_off() else "ON", "master_reason": master.reason(),
-                "desired": dict(self.desired), "governor": gov,
+                "desired": dict(self.desired), "beat_s": self.beat(), "governor": gov,
                 "registered": [{"name": r.get("name"), "pid": r.get("pid"), "lease_age_s": round(now - r.get("lease", 0), 1)}
                                for r in recs],
                 "orphans": len(master.orphans(now)), "last_decision_age_s": self.last_decision_age(now),
@@ -289,6 +350,8 @@ class Panel:
               "# TYPE omni_control_governor_up gauge", f"omni_control_governor_up {int(self.running())}",
               "# HELP omni_control_master_switch_on 1 while the master switch is ON.",
               "# TYPE omni_control_master_switch_on gauge", f"omni_control_master_switch_on {int(not master.is_off())}",
+              "# HELP omni_control_beat_seconds The heartbeat the panel starts the governor at, seconds (the dial; omni-v17).",
+              "# TYPE omni_control_beat_seconds gauge", f"omni_control_beat_seconds {self.beat():g}",
               "# HELP omni_control_orphans Governors that died or hung without handing back (the watchdog's work).",
               "# TYPE omni_control_orphans gauge", f"omni_control_orphans {len(master.orphans())}"]
         return "\n".join(L) + "\n"
@@ -329,9 +392,18 @@ def openapi():
                       "/v1/dial": post("the max or the tune-down", "operator", {"dial": {"type": "string", "enum": list(DIALS)}}),
                       "/v1/reset": post("every setting handed back to native; the governor stops", "operator"),
                       "/v1/kill": post("the master switch OFF for every governor on the machine (security)", "security"),
-                      "/v1/arm": post("the master switch ON again: two holders of the security role within ten minutes", "security")}}
+                      "/v1/arm": post("the master switch ON again: two holders of the security role within ten minutes", "security"),
+                      "/v1/muscle": post("one muscle on (Omni-Compass drives it) or left native (never written); passes through native",
+                                         "operator", {"muscle": {"type": "string", "enum": list(MUSCLES)}, "on": {"type": "boolean"}}),
+                      "/v1/beat": post("the heartbeat: seconds between the governor's full decisions, 5 to 120 (the main engine 60); "
+                                       "passes through native", "operator",
+                                       {"seconds": {"type": "number", "minimum": BEAT_RANGE[0], "maximum": BEAT_RANGE[1]}})}}
 
 
+MUSCLE_ROWS = "".join(f'<div><small>{m}: {d}</small><br><button onclick="go(\'muscle\',{{muscle:\'{m}\',on:true}})">On</button>'
+                      f'<button onclick="go(\'muscle\',{{muscle:\'{m}\',on:false}})">Native</button></div>' for m, d in MUSCLES.items())
+BEAT_ROWS = "".join(f'<button onclick="go(\'beat\',{{seconds:{b}}})">{b} s{" (main)" if b == MAIN_BEAT else ""}</button>'
+                    for b in BEAT_STOPS)
 CONSOLE = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Omni-Compass control</title><style>
 :root{--bg:#fff;--fg:#111;--muted:#555;--line:#ccc;--kill:#b00020}
@@ -344,7 +416,9 @@ pre{white-space:pre-wrap;border:1px solid var(--line);padding:8px;overflow-x:aut
 <label>Bearer token<input id="t" type="password" autocomplete="off"></label><label>Reason (written to the control log)<input id="r"></label>
 <fieldset><legend>Mode</legend><button onclick="go('mode',{mode:'autopilot'})">Autopilot</button><button onclick="go('mode',{mode:'watch'})">Watch (writes nothing)</button><button onclick="go('mode',{mode:'off'})">Off (hand back)</button></fieldset>
 <fieldset><legend>Dial</legend><button onclick="go('dial',{dial:'max'})">Max</button><button onclick="go('dial',{dial:'save'})">Tune-down</button></fieldset>
+<fieldset><legend>Heartbeat: seconds between full decisions (the main engine 60)</legend>BEAT_ROWS</fieldset>
 <fieldset><legend>Native</legend><button onclick="go('reset',{})">Reset: every setting back to native</button></fieldset>
+<fieldset><legend>Muscles: on, or left native</legend>MUSCLE_ROWS</fieldset>
 <fieldset><legend>Security</legend><button class="kill" onclick="if(confirm('Master switch OFF for every governor on this machine?'))go('kill',{})">Kill switch</button><button onclick="go('arm',{})">Arm (two holders)</button></fieldset>
 <button onclick="look()">Refresh status</button><pre id="o"></pre><p><small>NOTICE_TEXT</small></p>
 <script>
@@ -377,7 +451,8 @@ def server(panel: Panel, tokens_path: Path, bind: str, port: int, cert=None, key
         def do_GET(self):
             path = self.path.split("?", 1)[0]
             if path == "/":
-                return self._send(200, CONSOLE.replace("NOTICE_TEXT", PLAIN), "text/html")
+                return self._send(200, CONSOLE.replace("NOTICE_TEXT", PLAIN).replace("MUSCLE_ROWS", MUSCLE_ROWS)
+                                  .replace("BEAT_ROWS", BEAT_ROWS), "text/html")
             if path == "/v1/openapi.json":
                 return self._send(200, openapi())
             if path not in ("/v1/status", "/v1/presses", "/metrics"):
@@ -466,5 +541,5 @@ def main(argv=None):
 if __name__ == "__main__":
     sys.exit(main())
 
-# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
 # monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

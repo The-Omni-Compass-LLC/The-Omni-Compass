@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # One paired repetition on a real, billed Amazon Elastic Kubernetes Service cluster (.github/workflows/eks-metered.yml):
@@ -21,7 +21,7 @@
 # Usage: REP=n ARMS="native compass" [AWS_REGION=us-east-1 EKS_INSTANCE=m5.large EKS_MAX_NODES=4 RUN_ID=...]
 #        bash scripts/eks_paired.sh            (credentials from the environment: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 set -euo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native compass}"
 REGION="${AWS_REGION:-us-east-1}"; TYPE="${EKS_INSTANCE:-m5.large}"; MAX="${EKS_MAX_NODES:-4}"; RUNID="${RUN_ID:-local}"
 K8S="${EKS_VERSION:-}"; MS_VERSION="${METRICS_SERVER_EKS:-v0.7.2}"   # EKS_VERSION empty: eksctl's default, a supported version

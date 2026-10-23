@@ -1,6 +1,6 @@
 # THE OMNI-COMPASS OPERATOR'S MANUAL
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 ## How to Embed, Wire, Tune and Run Omni-Compass on Your Stack
 
@@ -12,6 +12,52 @@ All patents, copyrights and trademarks covering the Omni-Compass engine, its mat
 ---
 
 # FRONT MATTER
+
+## The Problem and the Answer
+
+**What the whole industry faces.** Every computing system in service, from one server to a cloud region, from a GPU to a
+building's chillers, a grid feeder or a robot cell, is run by a stack of native controllers: the Kubernetes autoscalers and
+scheduler, the cloud's node pools, the GPU's power and clock firmware, the database's cache and connection pools, the
+building's cooling loops, the battery's management system, the servo's loop. Each was designed and tuned alone, against its own
+setpoint, with margins sized for the worst case it might meet. Three costs follow, on every stack:
+
+1. **Capacity held idle.** Worst-case margins stay in place through the common case. Machines, power caps, caches and cooling
+   run far inside their limits, and the room between the operating point and the limit is paid for and seldom used.
+2. **Late reaction.** Reactive loops act on averaged, lagging signals and wait out deliberate cooldowns, so queues and
+   response-time tails form before capacity arrives.
+3. **Loops at cross purposes.** The loops share power, cooling, connections and memory. One loop's correction is another
+   loop's disturbance, and no loop sees the whole.
+
+Demand for computing, above all for AI and the cloud, is growing faster than the power, cooling and hardware that can be built
+for it. The usual answer is to add: more machines, more power, more people watching thresholds. Replacing the native
+controllers is not an answer most operators will take: they are proven, often certified, and the people on call know them.
+
+**What Omni-Compass does about it.** Omni-Compass is a supervisory governor. It sits on top of those native controllers and
+never replaces them. It plugs into each setting a native controller already exposes, through a two-way plug (one wire in, the
+reading; one wire out, the setting), takes a snapshot of every setting before its first write, and governs the whole stack as
+one body, the organism: every muscle driven as far as its own limit and never past it, and, on the engine that stands, never
+below native; where it cannot bring a muscle a GAIN, that muscle stays native. It acts before a line is crossed instead of
+after, reads back every write, puts every give-back to its own trial, records every decision with its reason, walks every
+setting home if it stops (the lease) and stops at once on the kill switch. Its first rule is do no harm, judged at the
+organism: never less work or health than native (`DISCLOSURES.md`, section 3). The aim is the one headline: more work,
+faster, on fewer machines, with less energy, from the hardware and the controllers already in place; in a cloud, the same
+work for a smaller bill.
+
+**Where the proof is.** This book shows how to wire, tune, run and check Omni-Compass. The mechanism, the mathematics and
+every result, each a paired comparison of native and Omni-Compass on top of native run three times, every row kept, LOSS
+included, are in the Owner's Manual and in `results/`. The only number that applies to your system is the one your own paired
+runs produce.
+
+**What is not claimed.** No new physics, no new model of computation, and no promise for any system Omni-Compass was not
+run on. It does not make a system immune to failure, delay or drift: it keeps each muscle inside its own limits and shows, row
+by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
+differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
+
+**What is protected, and how.** Omni-Compass belongs to The Omni-Compass LLC. Its source, manuals and records are its
+copyrighted work; all patents, copyrights and trademarks filed in the USA. The repository is licensed for Evaluation and
+Simulation use only (`LICENSE`); any commercial use, monetization or production use requires a signed, paid Omni-Compass
+Enterprise License (`ENTERPRISE_LICENSE.md`). What a licensee acquires is the working whole: the engine, the wiring and the
+factory card of every muscle, the harness that measures it against native, and the receipts.
 
 <!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
 ## The key: GAIN, EVEN and LOSS
@@ -31,6 +77,8 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
+- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -263,7 +311,7 @@ guess.
 | You are | Read |
 |---|---|
 | CTO, architect, head of platform | the front matter; Part I (what the governor is, your stack as one body, the factory tune); chapter 6 (the eight levels) to plan the rollout; Part V (checking it on your own system) |
-| CEO, CFO, CIO, board member | the Foreword; the front matter's "Disclosures, Declarations and Disclaimers"; chapter 1 (what it is, do no harm, the one pedal and the two switches); sections 3.1 and 3.6 (the factory tune; a changed tune is your own); chapter 19 (the bill in a cloud: what can fall, what can never rise); chapters 11 and 12 (what a receipt proves and what it does not; the engine version and the three-run rule); chapter 31 and Appendices O to T (the license, the Enterprise License's standard terms, the patents and trademarks, the security policy) |
+| CEO, CFO, CIO, board member | the front matter's "The Problem and the Answer"; the Foreword; the front matter's "Disclosures, Declarations and Disclaimers"; chapter 1 (what it is, do no harm, the one pedal and the two switches); sections 3.1 and 3.6 (the factory tune; a changed tune is your own); chapter 19 (the bill in a cloud: what can fall, what can never rise); chapters 11 and 12 (what a receipt proves and what it does not; the engine version and the three-run rule); chapter 31 and Appendices O to T (the license, the Enterprise License's standard terms, the patents and trademarks, the security policy) |
 | The implementer putting it on a cloud (Azure, Google Cloud, Amazon) | Part VI, in order: the path, the permissions, your cloud's chapter, the feed and the line, the cloud mode, day two; Appendices F to J. Then chapters 4, 5 and 8 |
 | The engineer wiring it | everything, in order. Do not skip the wire check (section 4.4) or the watch level (section 6.3, level 1) |
 | Platform engineer for one stack | chapter 4 (the plug), chapter 5 (the rules the wires obey), the section of chapter 7 for your stack, chapter 8 (the switches) |
@@ -406,7 +454,8 @@ what it tells you.
 
 ## Introduction: The Problem, the Idea and What This Manual Covers
 
-**The problem.** Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
+**The problem.** Stated in brief at the front of this book ("The Problem and the Answer"); here in engineering terms.
+Production systems are governed by many local feedback loops: horizontal autoscalers, firmware
 power and clock governors, building-management loops, battery-management systems, connection pools, servo controllers.
 Each loop is tuned in isolation, against its own setpoint, with margins sized for a worst-case disturbance. Three costs
 follow, and every operator pays them:
@@ -687,13 +736,14 @@ Kubernetes; thirty requests on a card). The step is read as a receipt reads a ro
 cost: an interval wholly above zero is a LOSS and the step is refused; an interval wider than the 2% allowance measures
 on, up to three times the number; otherwise the step is allowed only if the trial's median cost and its mean change are
 both no more than 2% above the reference and above the cost first measured at native. A refused step is not tried again
-for a set number of decisions (120 decisions, two hours, on Kubernetes; 900 decisions, thirty minutes, on a card). A
-trial that sees the service leave calm, or a phase that outlasts its limit (20 decisions on Kubernetes; 30 on a card), is
+for a set time (two hours, 7,200 s, on Kubernetes, 120 decisions at the main engine's 60 s beat, 480 at a beat of 15 s; 900
+decisions, thirty minutes, on a card). A trial that sees the service leave calm, or a phase that outlasts its limit (1,200 s on Kubernetes; 30 decisions on
+a card), is
 abandoned and the knob goes back, the step neither allowed nor refused. Where no step passes, the trial reads **left native**,
 the knob is never moved, and the receipt for that muscle says "nothing for Omni to move". Gains are not capped; the 2%
 allowance caps only what may be spent in the trial to look for them.
 
-![Block diagram: the verdict's paired trial around a slow knob, read GAIN, EVEN or LOSS. The reference r is the cost of n requests at the deepest step already allowed (on a card, at native; n = 200 on Kubernetes, 30 on a card); the trial t is the cost of n more one step past it under the same traffic. The reading is the 95% interval of d = mean ln c[t] − mean ln c[r], stepwise also against the costs first measured at native: an interval wholly above zero is a LOSS and the step is refused; an interval wider than τ = ln(1 + a) measures on, up to 3n; otherwise the step is allowed only if median t ≤ min(r, c[native])·(1 + a) and d ≤ τ, with a = 0.02. A refused step is not tried again for R decisions (120 on Kubernetes, 7,200 s; 900 on a card, 30 min). Steps cannot add up beyond the allowance, because every step is judged against the native cost too.](book/figures/c_verdict.svg)
+![Block diagram: the verdict's paired trial around a slow knob, read GAIN, EVEN or LOSS. The reference r is the cost of n requests at the deepest step already allowed (on a card, at native; n = 200 on Kubernetes, 30 on a card); the trial t is the cost of n more one step past it under the same traffic. The reading is the 95% interval of d = mean ln c[t] − mean ln c[r], stepwise also against the costs first measured at native: an interval wholly above zero is a LOSS and the step is refused; an interval wider than τ = ln(1 + a) measures on, up to 3n; otherwise the step is allowed only if median t ≤ min(r, c[native])·(1 + a) and d ≤ τ, with a = 0.02. A refused step is not tried again for R (7,200 s on Kubernetes, 480 decisions at the 15 s heartbeat; 900 decisions on a card, 30 min). Steps cannot add up beyond the allowance, because every step is judged against the native cost too.](book/figures/c_verdict.svg)
 
 For an installation this has two consequences. A knob the operator grants is not a knob Omni-Compass will move: it is a
 knob Omni-Compass may move once the muscle itself has shown the step costs it nothing. And a muscle that never passes a
@@ -874,6 +924,18 @@ No setting is universal. Muscles differ, and no single setting is right for ever
 realm; none is presented as such. What the factory tune fixes is the starting point an installation can trust: each
 muscle on the setting that was found for it, every muscle wired, nothing switched off.
 
+**One tuned engine, and a tuning bench.** Every benchmark result is one engine at one tune: the engine that stands at its factory
+tune. The live engine page (the Live Engine Manual) and the control panel's buttons (section 9) are a tuning bench. On the bench
+every knob can be turned in real time: the beat, the dial, the pedal, each muscle driven or left native, up or down, in or out,
+minus or plus. It shows the mechanism of action with native alone, with Omni-Compass on top, or both side by side. Treat
+Omni-Compass as you would any engine. Turning the mixture, the intake, the exhaust, the firing or the pistons changes what a car's
+engine delivers. In the same way, **turning any knob can change every metric, up or down, in any direction you choose**, which is
+why one engine can serve many stacks, tuned many ways. What you read on the bench at a setting other than the factory tune shows
+the range; it is not a benchmark result. A tune you write is your own configuration, its results are your own, and they are read
+again, native against Omni-Compass, before you rely on them. The factory tune is not set by hand. Of the tunes that harm no gauge
+against native, it is the one against which no other tried tune reads GAIN on one service gauge and LOSS on none, searched on
+development seeds and read again on untouched ones. How that search is done is in the Owner's Manual.
+
 ### 3.2 The max, and the dial that tunes it down
 
 The factory setting is **the max**: every muscle runs up to its own limit, read live from the system, never past it and
@@ -925,15 +987,17 @@ written down before the first counted run:
 | **The floor** | the least a pool may run on | two machines by default; never below 1 for any muscle |
 | **The allowance** (`--allow`) | the most a step on trial may cost the muscle's own work | 2%, the same on every muscle |
 | **The site's limits** (`--site-limit-w`, `--cooling-min-c`, `--cooling-max-c`, `--cooling-restore-c`) | the facility's power limit and the setpoint band | the facility engineer, inside the equipment's ratings |
+| **The heartbeat** (`--interval`) | how often the governor takes its full decision: the main engine every 60 s, a dial from 5 to 120 s; the fast checks stay every 5 s | the factory's 60 s, or the operator's own beat; the live engine page shows every beat beside native, with what it buys and what it costs (the page's section 1j) |
 
 ![The compass band and the smoothing of the force. (a) The service reading placed in its band as a position p from 0, calm, to 1, the operator's line; the walls at 0.05 and 0.95 leave a cushion of 5% at each edge, and the centre c is where the needle comes to rest (0.5 by default; on a service 0.3 at the max and 0.4 at the tune-down). (b) The force F = A·tanh(r/A) against the raw force r = K[P]·(p − c) + K[D]·v, the pull toward the centre plus the push against the reading's motion: near the centre a spring, far out a curve that flattens into the authority A and never passes it. Past the upper wall the up side goes to A at once, and the down side may not act until the reading is back inside the band.](book/figures/band.svg)
 
-Three settings are deliberately not on that list. The governor's decision period, its damping and how fast each muscle
-answers are the muscle's own declaration, read from the catalog or measured from the system at the start; an
-installation does not tune them (on a Kubernetes cluster the declared decision period is 60 seconds and the fast checks
-run every 5 seconds, three times as fast as the autoscaler's own 15-second check; a shorter decision period changes rules
-the governor counts in decisions, so it is not an installation setting), and a receipt that needed them changed is a receipt to read as wiring first (section
-4.5).
+Two settings are deliberately not on that list. The governor's damping and how fast each muscle answers are the muscle's
+own declaration, read from the catalog or measured from the system at the start; an installation does not tune them, and a
+receipt that needed them changed is a receipt to read as wiring first (section 4.5). The heartbeat is on the list since
+omni-v17: every rule the governor keeps counts seconds, so the beat changes only how often it looks, and an operator may set
+any beat, a fast one for its reads of the cluster at the cost of the governor's own processor, or a slow one. Each beat may
+want its own combination of the other settings; a beat other than 60 s is the operator's own configuration and its results
+are its own (section 3.6).
 
 ### 3.5 Profiles: service and batch
 
@@ -1184,7 +1248,7 @@ that an installer must know because they decide what a receipt can show:
 - **Expand is always allowed** (except under a security hold, section 9): adding capacity, power, cooling or protection
   never waits.
 - **Contract needs calm and a clean service record:** giving anything back is allowed only while the muscle is calm and
-  the service has been inside its line for the last three decisions; a continuous muscle gives back at most its calm
+  the service has been inside its line for the clear time, 180 s (`--slo-clear-s`); a continuous muscle gives back at most its calm
   share of its surplus per decision, a discrete one one unit at a time, through a release gate (section 5.1).
 - **Fail up:** while the service is past the wall (95% of the band) the knob returns at once to full capacity, the
   operator's own setting or the cover's top, whichever the muscle's direction asks.
@@ -1192,7 +1256,7 @@ that an installer must know because they decide what a receipt can show:
 
 The rules are asymmetric on purpose. Adding is cheap to undo and expensive to delay, so it is never gated beyond the
 security hold. Taking back is cheap to delay and expensive to get wrong, so it is gated three ways: by calm, by the service
-record (inside the line for the last three decisions, not merely this one), and by the release gate, whose reasons are
+record (inside the line for the last 180 s, not merely at this decision), and by the release gate, whose reasons are
 written into the audit every time it holds.
 
 ![One decision of the governor. It wakes on its period, reads every sense, and holds if any sense is blind or stale: nothing is given back, and adding capacity is still allowed. The engine blends its state toward the observations and moves one macro step; the compass law turns the reading's position into a force. A positive force adds capacity at once, gated by nothing but the security hold. A negative force must pass the release gate (calm, the line clean for three decisions, nothing pending, every sense live) and, on a slow knob, the verdict's paired trial at the 2% line. What survives is one write through the plug, read back, and one line in the audit that records every sense, the state, the force, the gate's reason and the value sent and taken, whether or not anything was written.](book/figures/loop.svg)
@@ -1286,12 +1350,22 @@ respect a limit the wires do not carry.
 
 ### 5.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v13** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
-quoted here ran on omni-v7, whose rules omni-v13 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
+The engine that stands in this edition is **omni-v17** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
+quoted here ran on omni-v7, whose rules omni-v17 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
 the operator's on a shared host at its top while another workload there has room of its own, and counts every other pod by its
-own limit). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write. The guard shows in the audit: when the cluster's
+own limit; omni-v14 runs the operator's own commands
+without a shell unless they hold a pipe, a redirect or a variable, and takes `--native` to leave any muscle where native runs
+it; omni-v15 asks for the power cap's trim only while the response line has been clean for the governor's own clear time, its
+`--slo-clear-s`, so the request cannot switch back and forth at one threshold, and holds every wire in its fingerprint;
+omni-v16 keeps every time the governor counts in seconds, so `--interval` changes only how often it decides, and omni-v17
+makes the beat a dial, the full decision every 60 s by default (the main engine) and any beat from 5 to 120 s on the command
+line: the conveyance
+runs every `--convey-every-s` (15 s) whichever check falls due, a quiet deployment is scaled to zero after
+`--coldstart-idle-s` (180 s), and a step that runs past its slot is skipped, never run in a burst, with `behind_s` in the
+audit). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write; a muscle left native shows as `"native_muscles"` at the start and `"held"` on each write
+it withholds. The guard shows in the audit: when the cluster's
 reading shows no machine in service (every worker cordoned, tainted NoSchedule or unreachable at once), the decision is recorded
 as `held: the cluster's reading shows no machine in service; nothing decided, nothing written`, and the governor takes up again
 at the first reading with machines. A held decision is never an error and needs no action from anyone; several in a row point
@@ -1299,7 +1373,7 @@ at the cluster's nodes, not at Omni-Compass. Its
 mechanism is the Owner's Manual's; five of its rules show in the wiring, the settings and the audit, and are stated here so
 that a line in the audit is read for what it is.
 
-![Timing diagram: the governor's clocks against the native controllers' own, over five minutes. The card governor decides every 2 s; the Kubernetes governor's fast checks run every 5 s (a waiting pod wakes a machine; the floor); native's own autoscaler keeps its 15-second check underneath, untouched; the full decision (the state, the law, the gate, the verdict, one write, one audit line) runs every 60 s, and nothing is given back until the line has been clean for three decisions, 180 s.](book/figures/t_clocks.svg)
+![Timing diagram: the governor's clocks against the native controllers' own, over five minutes. The card governor decides every 2 s; the Kubernetes governor's fast checks run every 5 s (a waiting pod wakes a machine; the floor); native's own autoscaler keeps its 15-second check underneath, untouched; the full decision (the state, the law, the gate, the verdict, one write, one audit line) runs every 15 s, and nothing is given back until the line has been clean for 180 s, twelve decisions.](book/figures/t_clocks.svg)
 
 **Conveyance obeys the namespace's own quota.** Where the governor conveys a machine's idle processor to the serving pods on
 it (`--cap-deployments`, level 3), every raise of a pod's CPU limit is bounded by the namespace's ResourceQuota as Kubernetes
@@ -1322,9 +1396,12 @@ clear time after a breach (`--slo-clear-s`, 180 s), the cruise wait (`--cruise-a
 (`--strict-window-s`, 300 s), the verdict's spacing, recheck and trial (`--verdict-every-s` 600 s, `--verdict-recheck-s`
 7,200 s, `--verdict-trial-s` 1,200 s) and the reflex window (`--reflex-window-s`, 30 s). Each is converted to a count of
 decisions at the running period, n = max(1, round(seconds / period)), so a governor deciding every 15 s waits the same
-minutes as one deciding every 60 s. The compass moves an autoscaler's target by the same amount a minute at any period, and
-the node pool gives back at most one machine a minute. The decision period itself stays 60 s (section 3.4); the fast
-checks run every 5 s underneath it, and native's own autoscaler keeps its own 15-second check untouched.
+minutes as one deciding every 60 s; the cruise wait is never fewer than two decisions, because work that waits decision
+after decision takes two readings to see (at a beat of 90 or 120 s its 120 s would round to one). The compass moves an autoscaler's target by the same amount a minute at any period, and
+the node pool gives back at most one machine a minute. The full decision comes every 60 s by default, the main engine's
+beat, and the beat is a dial (section 3.4): any value from 5 to 120 s may be set with `--interval`, 15 s among them, the pace
+of native's own autoscaler; the fast checks run every 5 s at every beat, and native's own autoscaler keeps its own 15-second
+check untouched.
 
 **The verdict reads a trial in the words of a receipt.** Before a knob moves one step further from native, the step runs as
 a trial and its cost per piece of work is compared with the cost at the reference, on the logarithm of each piece's cost,
@@ -1438,7 +1515,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v13 (digest 0088837333c6f0fc, 47 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v17 (digest 7c937d09e4031cc7, 55 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
 
 **Level 1 - Watch (read-only).**
 
@@ -1450,7 +1527,7 @@ kubectl -n omni-compass logs deploy/omni-compass -f
 The install file grants a read-only identity; `scripts/pilot_shadow.sh` records `kubectl auth can-i` receipts that
 show it cannot write. Every decision it would take is logged with its reason.
 Pass: zero writes, and readings your operators agree with.
-What you should see: an audit with a `decision` record every 60 s and no `write` record at all (`jq -c 'select(.write)' audit.jsonl` prints nothing); `authority.senses.blind` false for every sense once the feed is wired; `nodes_recommended` at or below `nodes_observed` while the service is calm and above it when it is not. A `write` here is a wiring fault (the identity can write: chapter 9); a sense that stays blind is a feed fault (section 5.3).
+What you should see: an audit with a `decision` record every 60 s (the main engine's beat, or the beat you set) and no `write` record at all (`jq -c 'select(.write)' audit.jsonl` prints nothing); `authority.senses.blind` false for every sense once the feed is wired; `nodes_recommended` at or below `nodes_observed` while the service is calm and above it when it is not. A `write` here is a wiring fault (the identity can write: chapter 9); a sense that stays blind is a feed fault (section 5.3).
 
 **Level 2 - The pods, on top of your autoscalers. WRITES.**
 1. Grant `patch horizontalpodautoscalers` and `patch pods/resize` (`deploy/rbac-target.yaml`).
@@ -1551,9 +1628,9 @@ What you should see: site power stress entering the decisions (the `compass` rec
 Every knob is wired out first and in last, and the wire in is connected only by a measurement the governor makes on the
 knob itself. The steps, for any stack:
 
-![Flowchart: the verdict's trial on one step, from the reference to the reading. While the service is calm and nothing waits, and P decisions after the last trial began (10 on Kubernetes, 600 s; 8 on a card), the reference is measured fresh at the deepest step already allowed (on a card, at native): n requests (200 response times on Kubernetes; 30 of a card's own service time). One step deeper, under the same traffic, n more are the trial. A phase that sees the service leave calm or outlasts its limit (20 decisions on Kubernetes, 1,200 s; 30 on a card) is abandoned: the knob goes back, the step neither allowed nor refused. The reading is the 95% interval of the change in log cost. Continued in the next figure.](book/figures/f_trial.svg)
+![Flowchart: the verdict's trial on one step, from the reference to the reading. While the service is calm and nothing waits, and P after the last trial began (600 s on Kubernetes, 10 decisions at the main engine's 60 s; 8 decisions on a card), the reference is measured fresh at the deepest step already allowed (on a card, at native): n requests (200 response times on Kubernetes; 30 of a card's own service time). One step deeper, under the same traffic, n more are the trial. A phase that sees the service leave calm or outlasts its limit (1,200 s on Kubernetes, 20 decisions at the main engine's 60 s; 30 decisions on a card) is abandoned: the knob goes back, the step neither allowed nor refused. The reading is the 95% interval of the change in log cost. Continued in the next figure.](book/figures/f_trial.svg)
 
-![Flowchart: the verdict's trial on one step, from the reading to the step allowed or refused. An interval wholly above zero is a LOSS: the step is refused, the knob goes back, and the step is not tried again for R decisions (120 on Kubernetes, 7,200 s; 900 on a card). An interval wider than the allowance with fewer than 3n trial requests measures on. Otherwise the step is allowed only if the trial's median is within the allowance of the reference and of native and the mean change is within it too; else it is refused, past the allowance. An allowed step moves the deepest allowed step one deeper.](book/figures/f_trial_b.svg)
+![Flowchart: the verdict's trial on one step, from the reading to the step allowed or refused. An interval wholly above zero is a LOSS: the step is refused, the knob goes back, and the step is not tried again for R (7,200 s on Kubernetes, 120 decisions at the main engine's 60 s; 900 decisions on a card). An interval wider than the allowance with fewer than 3n trial requests measures on. Otherwise the step is allowed only if the trial's median is within the allowance of the reference and of native and the mean change is within it too; else it is refused, past the allowance. An allowed step moves the deepest allowed step one deeper.](book/figures/f_trial_b.svg)
 
 1. **Wire out, everything.** Every muscle's readings reach the governor, one wire out per muscle. Nothing is written. This
    is watch mode (section 1.3): where every installation starts, and where any knob returns the moment it stops paying.
@@ -1583,7 +1660,7 @@ and Omni-Compass reads it. The body's result is then the sum of the knobs that e
 for the whole system. The live stacks of chapter 7 (the pooler, the broker, the cache, the storage engine's cache and the
 buffer pool) carry this trial on their knob, and on Kubernetes it guards every machine given back (section 1.2).
 
-![Timing diagram: a give-back trial from reference to verdict, in decisions. The reference (n requests at the deepest allowed step; on a card, at native), the trial (n more at one step deeper under the same traffic, measuring on up to 3n while the interval is wider than the allowance), the verdict in one decision, and, on a refusal, the quiet period in which the step is not tried again (120 decisions on Kubernetes, 7,200 s; 900 on a card, 30 min). A phase that outlasts its limit (20 decisions on Kubernetes; 30 on a card), or sees the service leave calm, is abandoned: the knob goes back, the step neither allowed nor refused.](book/figures/t_trial.svg)
+![Timing diagram: a give-back trial from reference to verdict, in decisions. The reference (n requests at the deepest allowed step; on a card, at native), the trial (n more at one step deeper under the same traffic, measuring on up to 3n while the interval is wider than the allowance), the verdict in one decision, and, on a refusal, the quiet period in which the step is not tried again (7,200 s on Kubernetes, 120 decisions at the main engine's 60 s; 900 decisions on a card, 30 min). A phase that outlasts its limit (1,200 s on Kubernetes; 30 decisions on a card), or sees the service leave calm, is abandoned: the knob goes back, the step neither allowed nor refused.](book/figures/t_trial.svg)
 
 ## 7. Stack by Stack
 
@@ -1622,7 +1699,7 @@ and never governed), and one or several **work pools** under Azure's own cluster
 Omni-Compass idling the machines it gives back, which the autoscaler then deletes on its own schedule. The bill counts
 every work machine that exists, every 15 seconds, priced at Azure's list price for its family; each cluster is deleted when its arm ends, so nothing keeps billing.
 
-![Wiring schematic: a managed cloud cluster, the machines alone (the cloud mode). The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the probe's feed, the pods waiting and the machines in service; the only motors park a machine (a PreferNoSchedule taint), wake it (the taint removed) and mark its pods first to go; no autoscaler is moved, no processor conveyed, no power capped. A machine is parked only after its own trial (the response time holds within 2%) and woken on a breach: at the next decision (60 s) for a response time over the line, at the next fast check (5 s) for a waiting pod. No cloud credential: the governor holds a Kubernetes service account that can read, taint and annotate, nothing more.](book/figures/s_cloud_machines.svg)
+![Wiring schematic: a managed cloud cluster, the machines alone (the cloud mode). The schematic is read top to bottom as an electrical drawing: the governor (the control unit) with its sense terminals S1, S2, … on the left and its motor terminals M1, M2, … on its lower edge; the motor bus through the kill switch into the plug, the system's own command written and read back; the plug into the native controller; the native controller setting the muscle, drawn as a potentiometer with its cover; the system under native carrying the meters; and the meters back along one bus, the wire in, to the sense terminals. The audit stands beside the governor. The senses are the probe's feed, the pods waiting and the machines in service; the only motors park a machine (a PreferNoSchedule taint), wake it (the taint removed) and mark its pods first to go; no autoscaler is moved, no processor conveyed, no power capped. A machine is parked only after its own trial (the response time holds within 2%) and woken on a breach: at the next decision (15 s) for a response time over the line, at the next fast check (5 s) for a waiting pod. No cloud credential: the governor holds a Kubernetes service account that can read, taint and annotate, nothing more.](book/figures/s_cloud_machines.svg)
 
 **Sizing the fleet to the lever.** The smallest saving a fleet can show is one machine. On 4 workers one machine is
 25% of the fleet, so only a saving of about 30% or more can clear the noise; on 15 workers about 10%; on 96 about 3%.
@@ -1648,8 +1725,8 @@ max (`dial max`) belongs where the machines are already paid for (your own racks
 where more work from the same machines is the gain; in a cloud it buys speed with machines, and every machine it adds is
 on the bill. The benefit of the max is taken before the cloud, in the service's own engine, or after it, in the chip.
 In the cloud, as everywhere, the governor's fast check (a parked machine woken for pods that wait) runs every 5 seconds,
-three times as fast as the autoscaler's own 15-second check, and its full decision every 60 seconds; a pod's start and a
-new machine's join are not shortened by deciding faster, so the governor acts on the reading while it climbs, before the
+three times as fast as the autoscaler's own 15-second check, and its full decision every 60 seconds, the main engine's beat
+(a dial: 15 seconds, the autoscaler's own pace, is one of its settings); a pod's start and a new machine's join are not shortened by deciding faster, so the governor acts on the reading while it climbs, before the
 line. On machines already paid for, the fast checks also give the running pods the processor their machine already has,
 which takes seconds and needs no new pod; in the cloud mode that lever is off, because a pod given more processor reads
 busier to its autoscaler, which then asks for more pods and, through them, more machines.
@@ -2982,7 +3059,7 @@ machines is the gain; it is never used in a cloud, and a run of the max in a clo
 | `--min-nodes` and `MIN_NODES` | 2, or the operator's floor | never fewer machines in service |
 | `--max-node-step` | 1 | one machine a decision |
 | `--max-nodes` | the work pools' top (the sum of their autoscaler maxima) | the most machines the lever counts on; it never asks for more than exist |
-| `--interval`, `--floor-interval` | 60 and 5 | the full decision every minute, the fast checks every 5 seconds |
+| `--interval`, `--floor-interval` | 60 and 5 | the full decision every 60 seconds (the main engine's beat; a dial from 5 to 120 seconds, section 3.4), the fast checks every 5 seconds |
 | `--closure` | `/app/law/closure.json` | shipped in the image |
 | `--audit`, `--kill-file` | `/var/log/omni/audit.jsonl`, `/tmp/omni.kill` | the record and the switch |
 | `WORKER_SEL` (environment) | `omni-role=work` | which machines may be parked |
@@ -3373,7 +3450,8 @@ python3 tools/omni_exporter.py once --audit audit.jsonl      # a finished run's 
 
 | Gauge | What it shows |
 |---|---|
-| `omni_last_decision_timestamp_seconds` | the heartbeat: alert when `time()` less it passes three minutes |
+| `omni_last_decision_timestamp_seconds` | the heartbeat: alert when `time()` less it passes three beats |
+| `omni_heartbeat_seconds` | the beat the governor runs at, as measured: the median spacing of its last eleven decisions |
 | `omni_master_switch` | 1 while governing, 0 once the kill switch has handed every setting back |
 | `omni_verdict_state{state}` | where the trial of a step stands: left native, trial, kept, given back |
 | `omni_sense_blind{sense}` | 1 while a feed is blind; the governor then holds |
@@ -3421,8 +3499,9 @@ with its severity, its meaning and the action to take: the governor stale (no de
 governing; critical), a governor orphaned (died or hung without handing back; critical), writes hammering (more than 300
 settings commands an hour), write errors, a recommendation oscillating (more than 20 reversals an hour), a sense blind for
 five minutes, the service at its line in more than 10% of decisions, the master switch off (information), the audit
-unreadable, and the governor's own processor above half a core. The thresholds assume a decision every 60 s; scale the
-windows with `--interval`. The alert that matters most is not the governor's: it is the service's own line.
+unreadable, and the governor's own processor above half a core. The staleness bound is three of the governor's own beats
+as the exporter measures them (180 s at the main engine's 60 s, 45 s at 15 s, 360 s at 120 s), so it needs no edit when the
+dial is turned; the other rules count in minutes and hours, not in decisions. The alert that matters most is not the governor's: it is the service's own line.
 An installation in the cloud mode is judged first by whether that alert fires more often with the governor than without
 it, and the paired receipt's alert-minutes row (section 19.6) is the same measure taken under control.
 
@@ -3449,6 +3528,8 @@ python3 tools/omni_control.py serve --tokens /etc/omni/tokens.json --audit /var/
 | Watch | `POST /v1/mode {"mode": "watch"}` | operator | the governor runs, decides and audits every decision, and writes nothing (its `--dry-run`) |
 | Off | `POST /v1/mode {"mode": "off"}` | operator | every setting handed back; the governor stops |
 | Max, tune-down | `POST /v1/dial {"dial": "max" or "save"}` | operator | the governor handed back and started again on the new dial |
+| One muscle on, or left native | `POST /v1/muscle {"muscle": NAME, "on": true or false}` | operator | the governor handed back and started again with `--native` naming every muscle left native; a muscle left native is never written (omni-v14; the names are `machines`, `replicas`, `cpu`, `clock`, `gpu`, `rollout`, `batch`, `rightsize`, `coldstart`, `contain`, `cooling`) |
+| Heartbeat | `POST /v1/beat {"seconds": 5 to 120}` | operator | the governor handed back and started again with `--interval` set to the beat: its full decision every so many seconds (the main engine 60; the console's buttons 5, 15, 30, 60, 75, 90 and 120), the fast checks every 5 s at every beat (omni-v17) |
 | Reset | `POST /v1/reset {"reason": ...}` | operator | every setting handed back to native; mode off until the next press |
 | Kill switch | `POST /v1/kill {"reason": ...}` | security | the master switch OFF for every Omni-Compass governor on the machine; each restores and exits; none starts while it is OFF |
 | Arm | `POST /v1/arm {"reason": ...}` | security | the master switch ON again once two different holders of the security role press it within ten minutes |
@@ -4315,7 +4396,7 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/args
         value: ["--mode", "nodepool", "--law", "compass", "--dial", "save", "--sensed", "none/none",
-                "--active-nodes-only", "--interval", "60", "--floor-interval", "5",
+                "--active-nodes-only", "--interval", "15", "--floor-interval", "5",
                 "--min-nodes", "3", "--max-nodes", "24", "--max-node-step", "1",
                 "--node-scale-cmd", "bash /app/scripts/kind_nodepool.sh {n}",
                 "--node-restore-cmd", "bash /app/scripts/kind_nodepool.sh 100000",
@@ -4698,8 +4779,8 @@ alert minutes in both arms (section 19.6), and the aim in a cloud is none on the
 fault to find, never a cost to accept.
 
 **How fast does it act?** Its fast checks run every 5 seconds (a machine for pods that wait, a parked machine woken), three
-times as fast as the HPA's own 15-second check; its full decision runs every 60 seconds, the period it was built and
-tested at (section 3.4). Native's own checks run underneath, untouched, whatever the governor's period.
+times as fast as the HPA's own 15-second check; its full decision runs every 15 seconds, the HPA's own pace (section
+3.4). Native's own checks run underneath, untouched, whatever the governor's period.
 
 **What happens if the governor crashes?** Nothing harmful. The watchdog puts every setting back from the records on the
 objects themselves (section 20.2); a parked machine never blocks a pod even before that, because its taint is
@@ -5112,8 +5193,9 @@ changes one runs a changed tune, whose receipts are its own (section 3.6).
 | `--audit` | `omni_audit.jsonl` | `/var/log/omni/audit.jsonl` | the audit file (section 20.4) |
 | `--kill-file` | `/tmp/omni.kill` | `/tmp/omni.kill` | the file whose presence turns the governor OFF (section 20.3) |
 | `--dry-run` | off | on for the first day, then removed | decide and record every command, write none |
+| `--native` (and `OMNI_NATIVE`) | none | none, or the muscles the site keeps on its own controller | the muscles left where native runs them, never written: `machines`, `replicas`, `cpu`, `clock`, `gpu`, `rollout`, `batch`, `rightsize`, `coldstart`, `contain`, `cooling`; a name that is not one of them stops the start (omni-v14; the control panel's muscle button sets it) |
 | `--kubectl` | `kubectl` | `kubectl` | the client the governor reads and writes through |
-| `--site-limit-w`, `--power-cmd` | none | absent | a site's power limit and the command that prints its watts (level 7; never in a cloud) |
+| `--site-limit-w`, `--power-cmd` | none | absent | a site's power limit and the command that prints its watts (level 7; never in a cloud); the command runs without a shell unless it holds a pipe, a redirect or a variable |
 | `--cooling-cmd`, `--cooling-min-c`, `--cooling-max-c`, `--cooling-restore-c` | none; 18, 27, 22 °C | absent | the facility's cooling setpoint command and band (section 7.10) |
 
 ### K.2 The settings the cloud mode fixes
@@ -5122,8 +5204,8 @@ changes one runs a changed tune, whose receipts are its own (section 3.6).
 |---|---|---|---|
 | `--mode` | `observe` | `nodepool` | `observe` writes nothing; `target` moves autoscaler targets; `nodepool` also moves machines |
 | `--law` | `governor` | `compass` | the law the governor holds the service with |
-| `--interval` | 60 s | 60 s | the full decision period (section 3.4) |
-| `--floor-interval` | 15 s | 5 s | the fast checks' period, between decisions, in `nodepool` mode |
+| `--interval` | 15 s | 15 s | the full decision period (section 3.4) |
+| `--floor-interval` | 5 s | 5 s | the fast checks' period, between decisions, in `nodepool` mode |
 | `--max-node-step` | 2 | 1 | the most machines one decision moves |
 | `--active-nodes-only` | off | on | count only machines in service |
 | `--closure` | none | `/app/law/closure.json` | the shipped setting file the image carries |
@@ -5158,7 +5240,7 @@ These turn on muscles of levels 2 to 7 (section 6.3) on machines already paid fo
 `--compass-center`, `--cruise-after-s`, `--idle-demand`, `--coast-step`, `--min-target-change`, `--headroom`,
 `--reflex-window-s`, `--strict-window-s`, `--latency-window-s`, `--slo-clear-s`, `--convey-on`, `--convey-off`, `--cap-min`, `--cap-min-change-m`,
 `--cap-headroom`, `--batch-load-max`, `--batch-power-max`, `--pace-high`, `--pace-low`, `--pace-heat`,
-`--rightsize-headroom`, `--rightsize-min-m`, `--coldstart-idle`.
+`--rightsize-headroom`, `--rightsize-min-m`, `--coldstart-idle-s`, `--convey-every-s`.
 
 Each has its shipped value as its default, and the receipts of an installation are read on those values. Two of them
 bear on planning and are stated here for that reason only. `--headroom` (half again, by default) is the spare the
@@ -5167,9 +5249,11 @@ that would leave the pods' requests, plus that spare, without a place (section 2
 machine given back on trial may add to the service's response time before the trial takes it back (section 19.1).
 
 Every setting that names a time is stated in seconds (the `-s` settings) and keeps its time at any decision period
-(`--interval`). The older count forms, `--verdict-every`, `--verdict-recheck`, `--cruise-after`, `--strict-window` and
-`--slo-clear`, are still read, as a number of decisions, and win where they are given. Whatever the period, the node
-pool gives back at most one machine a minute.
+(`--interval`). The older count forms, `--verdict-every`, `--verdict-recheck`, `--cruise-after`, `--strict-window`,
+`--slo-clear` and `--coldstart-idle`, are still read, as a number of decisions, and win where they are given. Whatever the
+period, the node pool gives back at most one machine a minute and adds past the scheduling floor at most one step a minute,
+the conveyance runs every `--convey-every-s`, and a decision that falls behind its slot is skipped and written in the audit
+(`behind_s`), never run in a burst: since omni-v16 the period changes only how often the governor looks.
 
 ### K.5 The card governors' settings
 
@@ -5428,4 +5512,4 @@ in `SECURITY.md`, never a public issue.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

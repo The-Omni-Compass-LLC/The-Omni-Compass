@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The legal tool: one notice under every title and at every end, older notices replaced and never doubled, headers rewritten
@@ -20,11 +20,11 @@ OLD_TOP = ("> **PROPRIETARY - EVALUATION AND SIMULATION USE ONLY.** Copyright (c
            "open-source software (`SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0`). Any commercial use requires a "
            "signed, paid **Omni-Compass Enterprise License** from The Omni-Compass LLC. All patent " + "applications, copyright "
            "registrations and trademark applications covering the Omni-Compass engine have been filed in the United States.")
-OLD_END = ("*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use requires a signed, paid\n"
+OLD_END = ("*Evaluation and Simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use requires a signed, paid\n"
            "Omni-Compass Enterprise License from The Omni-Compass LLC. All rights reserved.*")
 
 WORKFLOW = """# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
-# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid
+# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only; any other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE.
 name: demo
 on:
@@ -95,6 +95,14 @@ class TestMarkdown(unittest.TestCase):
         self.assertTrue(any("older filing" in p for p in legal.problems("x.md", page, "md")))
         self.assertTrue(legal.problems("y.md", "# T\n\nno notice\n", "md"))
 
+    def test_simulation_in_lower_case_is_a_problem(self):
+        # the founder's order of 20 October: Simulation with a capital S, as the LICENSE writes it; a table a bot wrote with the
+        # older notice fails the check until --fix rewrites it
+        good = f"# T\n\n> {legal.TOP}\n\n---\n\n*" + legal.NOTICE + "*\n"
+        self.assertEqual(legal.problems("x.md", good, "md"), [])
+        low = good.replace("Evaluation and Simulation", "Evaluation and " + "simulation")
+        self.assertTrue(any("lower case" in p for p in legal.problems("x.md", low, "md")))
+
     def test_the_notice_closes_with_the_website_and_the_struck_wording_is_a_problem(self):
         # the founder's order of 10 October (night): the filing sentence, then the website, nothing after it; the two struck
         # sentences stand nowhere (spelled word by word here too, so this file carries neither)
@@ -114,7 +122,7 @@ class TestMarkdown(unittest.TestCase):
 
 class TestHeaders(unittest.TestCase):
     def test_header_rewritten_after_the_shebang_and_idempotent(self):
-        src = "#!/usr/bin/env python3\n# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0\n# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid\n# Omni-Compass Enterprise License. See LICENSE.\n# What this script does.\nprint(1)\n"
+        src = "#!/usr/bin/env python3\n# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0\n# Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only; any other use requires a signed, paid\n# Omni-Compass Enterprise License. See LICENSE.\n# What this script does.\nprint(1)\n"
         out = legal.normalize_header(src, "#")
         lines = out.split("\n")
         self.assertEqual(lines[0], "#!/usr/bin/env python3")

@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The robustness test's readings (tools/live_reps.py, docs/ROBUSTNESS_PREREGISTRATION.md) without a cluster: the kill and
-hand-back marks are read from robust.log, the 120 s after the kill are compared in both arms from the probe's own records,
+hand-back marks are read from robust.log, the 300 s after the kill (120 s up to omni-v14) are compared in both arms from the probe's own records,
 the governor's memory ratio comes from the process-table samples, a hand-back past the allowance or a memory growth past
 the limit is marked, and the three-run rows read the same in all three of our runs only when every run's every repetition was handed back."""
 import json
@@ -42,10 +42,11 @@ def arm(root, name, rep, t0, kill_at, handed_back, mode="kill", rss=(50000, 5200
             if second:
                 lines.append(f"{t0 + 450} second governor started: pid 2345, 7 decisions to the end of the window")
     (d / "robust.log").write_text("\n".join(lines) + "\n")
-    # the probe: a sample every 5 s; slow and failed samples only in the 120 s after the kill of the native arm
+    # the probe: a sample every 5 s; slow and failed samples only in the window after the kill of the native arm (the rise
+    # of the omni-v11 kill test, 140 to 190 s after the kill, lies inside the 300 s window omni-v15 reads)
     rows = ["elapsed_seconds,latency_ms,ok"]
     for e in range(0, 900, 5):
-        slow = native and kill_at <= e <= kill_at + 120 and e % 10 == 0
+        slow = native and kill_at <= e <= kill_at + R.ROBUST_AFTER_KILL_S and e % 10 == 0
         rows.append(f"{e},{900.0 if slow else 100.0},{0 if (native and e == kill_at + 20) else 1}")
     (d / "latency.csv").write_text("\n".join(rows) + "\n")
     if not native:
@@ -68,7 +69,8 @@ def main():
         assert m["kill_epoch"] == t0 + 360 and m["handed_back_s"] == 12 and m["second_governor"] and m["mode"] == "kill", m
         assert R.robust_marks(n)["kill_epoch"] == t0 + 360 and "handed_back_s" not in R.robust_marks(n), "native carries the mark only"
         wn, wo = R.robust_window(n, 500.0), R.robust_window(o, 500.0)
-        over, failed = "robust: time over the line in the 120 s after the kill (% of samples)", "robust: failed requests in the 120 s after the kill (%)"
+        assert R.ROBUST_AFTER_KILL_S == 300, "omni-v15 reads the 300 s after the kill (docs/ROBUSTNESS_PREREGISTRATION.md)"
+        over, failed = ("robust: time over the line in the 300 s after the kill (% of samples)", "robust: failed requests in the 300 s after the kill (%)")
         assert wn[over] > wo[over] == 0.0 and wn[failed] > wo[failed] == 0.0, (wn, wo)
         assert abs(R.robust_memory(o)["ratio"] - 52000 / 50000) < 1e-9
         L, s = R.robust_table(root, ["native", "compass"])
@@ -93,7 +95,7 @@ def main():
         lines, rows = C.robust_rows([("1", {}, 10, good), ("2", {}, 10, bad), ("3", {}, 10, good)])
         assert "not handed back within the allowance in a repetition" in lines[0] and "a leak" in lines[2]
         assert C.robust_rows([("1", {}, 10, good), ("2", {}, 10, None), ("3", {}, 10, good)]) == ([], {}), "a run without the block makes no robustness rows"
-        assert set(R.ROBUST) <= set(R.KEYS) and all(C.aim_of_row(k) == "lower" for k in R.ROBUST), "the 120 s after the kill is time over the line and failed requests: a rise is a LOSS"
+        assert set(R.ROBUST) <= set(R.KEYS) and all(C.aim_of_row(k) == "lower" for k in R.ROBUST), "the 300 s after the kill is time over the line and failed requests: a rise is a LOSS"
     with tempfile.TemporaryDirectory() as t:
         # the long run: 7,200 s, decisions every 62 s (60 s interval + 2 s of the governor's own), the reset check at the end
         root = Path(t); t0 = 1_800_000_000.0
@@ -131,7 +133,7 @@ def main():
         lines, rows = C.robust_rows([("1", {}, 3, good), ("2", {}, 3, bad), ("3", {}, 3, good)])
         assert "INVALID" in lines[1] and "shown, not judged: API 500" in lines[2] and "grew" not in lines[2] and "grew by more than half" in lines[3] \
             and "not handed back at the end" in lines[4], lines
-    print("PASS  robustness readings: the kill and hand-back marks, the 120 s after the kill in both arms, the memory ratio; a late hand-back, a leak or a missing "
+    print("PASS  robustness readings: the kill and hand-back marks, the 300 s after the kill in both arms, the memory ratio; a late hand-back, a leak or a missing "
           "second governor is marked; the long run's decisions of expected, failed decisions, decision-time growth and hand-back at the end; "
           "the three-run rows read the same in all three of our runs only when every run's every repetition was handed back within the allowance")
 

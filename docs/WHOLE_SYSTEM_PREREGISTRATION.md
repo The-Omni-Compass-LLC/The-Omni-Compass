@@ -1,6 +1,6 @@
 # The stacked run: Omni-Compass at every layer at once, preregistered
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Written 20 October 2026, before any stacked run. Run and scored by The Omni-Compass LLC's own code. No outside party has
 reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs;
@@ -40,7 +40,7 @@ repetitions a run, three runs A, B and C (`tools/confirm_abc.py`).
    card bench (`scripts/gpu_paired.sh`) while the same machine hosts a kind cluster of stack 1; the card's governor and the
    cluster's governor are one body (one registry, one kill switch). Gauges: the card's primary (served requests per kJ),
    its energy, its 95th percentile, and stack 1's gauges. Starts only after the CPU side is done and on the founder's word,
-   from one exact commit of `gpu-omni-v13`.
+   from one exact commit of `gpu-omni-v16`.
 
 The machine layer (bare metal, Kepler and the machine's own meter; register row 79) joins stack 3 when its own benchmark
 has run; until then it enters the composition as exactly 1 and the stacked run does not claim it.
@@ -55,10 +55,10 @@ and its cause is found in the mechanism or the wiring (`DISCLOSURES.md`, section
 
 ## 5. What is fixed before the first run
 
-The engine that stands (omni-v13, or the newest that stands when the run starts; a run names its engine), the loads named
+The engine that stands (omni-v17, or the newest that stands when the run starts; a run names its engine), the loads named
 above, the gauges above, the stopping rule of the cloud stack (`tools/stop_rule.py`), and the arms. Any change after this
 page is an amendment below it, dated, before the run it governs.
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

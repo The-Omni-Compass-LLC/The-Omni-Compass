@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C three-run table (docs/OMNI_V1.md): one v1 benchmark run three times as separate GitHub runs on the same
@@ -33,7 +33,12 @@ ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-
 # tools/live_reps.py keys it, each cell the first against the second; unset, the Omni arm against native
 PAIR = None
 PAIR_WORDS = {"nativebare": "the organism alone", "compassbare": "Omni-Compass on the organism alone",
-              "native": "the orchestrator as shipped", "compass": "Omni-Compass on top of the orchestrator"}
+              "native": "the orchestrator as shipped", "compass": "Omni-Compass on top of the orchestrator",
+              # the decision pace, the heartbeat dial (docs/PACE_PREREGISTRATION.md): compass5|compass, compass5 (against
+              # native) and so on; the compass arm decides at its engine's default (every 60 s from omni-v17, every 15 s on
+              # omni-v16), its beat read from the runs' own receipts (BEATS)
+              **{f"compass{p}": f"Omni-Compass deciding every {p} s" for p in (5, 10, 15, 30, 60, 75, 90, 120)}}
+BEATS = {}   # run id -> {arm: [the beats it ran at]}, from each run's LIVE_REPS.json (tools/live_reps.py, omni-v17 on)
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge)"
 from tools.omni_index import CAPACITY as CAPACITY_RECORDED  # noqa: E402  (the same row's name in the tables written before 13 October)
 AIM_HIGHER = {CAPACITY, CAPACITY_RECORDED}
@@ -119,6 +124,7 @@ def load(d):
     first, second = arm.split("|") if "|" in arm else (arm, "native")
     n = len(set(reps.get(second, [])) & set(reps.get(first, []))) if isinstance(reps, dict) else reps
     paired = dict(j["paired"][arm])
+    BEATS[run] = j.get("beats") or {}
     cap = j.get("capacity")                                # the capacity test (a rising load): its own block in the run file
     if cap and arm in cap and "capacity_rps" in cap.get("native", {}):
         nat, om = cap["native"]["capacity_rps"], cap[arm]["capacity_rps"]
@@ -163,7 +169,8 @@ def verdict(k, rs):
     if not all(clear):
         n = sum(1 for c in clear if not c)
         return even_noise("all three runs") if n == len(rs) else even_noise(f"{n} of {len(rs)} runs")
-    return in_all_three(signs[0] == -1, aim_of_row(k))
+    sizes = [abs(r["diff"]) / abs(r["native"]) for r in rs if r["native"]]
+    return in_all_three(signs[0] == -1, aim_of_row(k), max(sizes) if len(sizes) == len(rs) else None)
 
 
 def rig(d):
@@ -202,6 +209,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     global PAIR
     PAIR = a.pair
+    BEATS.clear()
     runs = [load(d) for d in (a.a, a.b, a.c)]
     title = re.sub(r":\s*the A/B/C (?:confirmation|three-run table) \(Omni v\d\)\s*$", "", a.title)   # never twice
     L = [f"# {title}: the A/B/C three-run table (Omni v1)", "", *receipt_key(), "",
@@ -216,10 +224,16 @@ def main(argv=None):
          "the test itself is unstable there. Every row is shown, LOSS included.", "", OWN_RUNS, ""]
     if PAIR and "|" in PAIR:                               # one comparison of the four ways: the cells name its two arms
         first, second = PAIR.split("|")
+        pace = first.startswith("compass") and first[7:].isdigit()
+        src = ("the decision pace, `docs/PACE_PREREGISTRATION.md`" if pace
+               else "the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6")
+        own = {b for r in BEATS.values() for b in r.get("compass", [])}
+        default = (f"Omni-Compass at its default, deciding every {next(iter(own)):g} s" if len(own) == 1 else
+                   "Omni-Compass at its engine's default beat (every 60 s from omni-v17, every 15 s on omni-v16)")
+        words2 = default if pace and second == "compass" else PAIR_WORDS.get(second, second)
         L += [f"**The comparison.** In this table \"omni\" stands for {PAIR_WORDS.get(first, first)} and \"native\" for "
-              f"{PAIR_WORDS.get(second, second)}: each cell is the first against the second, paired within one repetition "
-              "(the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6), and each word is read by the gauge's aim "
-              "for the first.", ""]
+              f"{words2}: each cell is the first against the second, paired within one repetition "
+              f"({src}), and each word is read by the gauge's aim for the first.", ""]
     L += ["| Run | GitHub run | Commit | Engine | Paired repetitions |", "|---|---|---|---|---:|"]
     off, meta = [], []
     for tag, (run, _, n, _) in zip("ABC", runs):

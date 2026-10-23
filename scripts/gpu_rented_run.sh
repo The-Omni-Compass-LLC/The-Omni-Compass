@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The whole GPU test on a rented NVIDIA machine, one command (docs/GPU_RUN_GUIDE.md, section C):
@@ -31,7 +31,7 @@
 #    300 s; if it cannot install or start, the stage says so and nothing before it is affected (SKIP_LLM=1);
 # 10. packs every result folder into one file to send back, and prints the label each table chose by rule.
 set -euo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 cd "$(dirname "$0")/.."
 SMI="${NVIDIA_SMI:-nvidia-smi}"; PY="${PYTHON:-python3}"; GPU="${GPU:-0}"
 STAMP="${STAMP:-$(date -u +%Y%m%dT%H%M%SZ)}${CARD_TAG:+-$CARD_TAG}"   # CARD_TAG: one folder per card (scripts/gpu_8card.sh)

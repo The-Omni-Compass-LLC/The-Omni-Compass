@@ -13,7 +13,7 @@ from collections import deque
 from dataclasses import dataclass, asdict, field
 from typing import Any, Dict, List, Optional
 
-from .core import State, Params, macro_step, v_eff, control_command, U_AUTHORITY
+from .core import State, Params, macro_step, v_eff, control_command, U_AUTHORITY, MACRO_DT
 
 OBSERVE = "observe"
 AUTOPILOT = "autopilot"
@@ -25,6 +25,7 @@ STACK_PARAMS = Params(alpha=4.2, beta_int=0.0, beta_ext=0.0, k=1.7, sigma_1=0.38
                       lambda_I=0.719, lambda_U=0.0)
 INITIAL_STATE = State(E=0.12, U=0.82, I_U=0.0, S=0.0, B=0.0, B_dot=0.0)
 ASSIMILATION = 0.339
+REF_PERIOD_S = 60.0     # omni-v16: the step every per-step constant of the brain was set at (one decision a minute)
 
 
 def clamp(v: float, lo: float, hi: float) -> float:
@@ -43,11 +44,14 @@ def observe_vector(obs: Dict[str, float], conflicts: int) -> Dict[str, float]:
         "stale": clamp(float(obs.get("stale", 0.0)), 0.0, 1.0),
         "security": clamp(float(obs.get("security_block", 0.0)), 0.0, 1.0),
         "conflict": clamp(conflicts / 4.0, 0.0, 1.0),
+        # the response line clean for the governor's own clear time (omni-v15): the Kubernetes governor's slo_clean (its
+        # --slo-clear-s, 180 s) and the card governor's (its --slo-clear decisions); a caller that senses no line is clean
+        "clean": 1.0 if obs.get("slo_clean", True) else 0.0,
     }
 
 
-def assimilate(x: State, o: Dict[str, float], p: Params) -> State:
-    """Blend the observation into the engine state and set the forcing terms."""
+def assimilate(x: State, o: Dict[str, float], p: Params, a: float = ASSIMILATION) -> State:
+    """Blend the observation into the engine state and set the forcing terms (a: the observation's weight in one step)."""
     q, load, pw, th, nw, dr, st, sec, cf = (o[k] for k in
         ("q", "load", "power", "thermal", "network", "drift", "stale", "security", "conflict"))
     e_obs = clamp(0.25 * q + 0.18 * max(0.0, load - 0.85) + 0.16 * pw + 0.13 * th + 0.10 * nw + 0.08 * dr
@@ -56,7 +60,6 @@ def assimilate(x: State, o: Dict[str, float], p: Params) -> State:
     s_obs = clamp(0.36 * th + 0.28 * pw + 0.18 * nw + 0.10 * sec + 0.08 * st - 0.20 * q, -1.0, 1.0)
     b_obs = clamp(0.52 * pw + 0.26 * th + 0.22 * dr, -1.0, 1.5)
     i_obs = clamp(q + dr + cf, 0.0, 2.0)
-    a = ASSIMILATION
     p.beta_int = clamp(0.58 * q + 0.42 * max(0.0, load - 0.75), 0.0, 1.0)
     p.beta_ext = clamp(0.33 * pw + 0.27 * th + 0.20 * nw + 0.12 * st + 0.08 * sec, 0.0, 1.0)
     return State(E=(1 - a) * x.E + a * e_obs, U=(1 - a) * x.U + a * u_obs, I_U=(1 - a) * x.I_U + a * i_obs,
@@ -82,7 +85,11 @@ class AllocationLaw:
     envelope   no capacity addition while observed power >= power_ceiling (power_ceiling_backlog while q >= guard_queue)
     security   no capacity addition while a security block is observed
     change     Terraform plans only while U >= U_gate, only in the direction of the live capacity decision
-    power      q < guard_queue and U >= U_gate: cap = clamp(cap_now * load * (1 + margin), cap_min, 1)   (trim to demand)
+    power      q < guard_queue and U >= U_gate and the line clean: cap = clamp(cap_now * load * (1 + margin), cap_min, 1)
+               (trim to demand). The line is clean when the caller's own clear time has passed since its last breach
+               (obs slo_clean: 180 s on the Kubernetes governor, 3 decisions on the card's; omni-v15), so the request
+               cannot switch back and forth at the one threshold; a release is never delayed (the branches below, and
+               cap = 1 while the line is not clean)
                q >= guard_queue at the power envelope: cap = max(cap_min, cap_now - spread_step)      (spread)
                q >= guard_queue below the envelope: cap held (capacity added as nodes; 1 at max_nodes)
                otherwise cap = 1; always cap <= 1 - cap_gain * max(0, B - B_cap)
@@ -137,6 +144,8 @@ class Governor:
     last_push: float = 0.0
     log: deque = field(default_factory=lambda: deque(maxlen=4096))
     evolve: bool = True
+    period_s: float = REF_PERIOD_S          # omni-v16: the caller's seconds between steps (step keeps the brain's own minute)
+    recent: Optional[deque] = None          # omni-v16: (added, removed) at each of the other steps of the last minute
 
     def kill(self) -> None:
         """Revoke authority; the engine continues to compute and log directives."""
@@ -152,17 +161,27 @@ class Governor:
         return self.mode == AUTOPILOT and not self.killed
 
     def step(self, obs: Dict[str, float], conflicts: int) -> Dict[str, Any]:
-        """Sense, assimilate, evolve, allocate."""
+        """Sense, assimilate, evolve, allocate.
+
+        omni-v16: the brain keeps its own minute whatever the caller's step. Its constants were set for one step a minute;
+        a caller stepping every period_s seconds moves the brain k = period_s / 60 of its minute each step: the
+        observation enters with weight 1 - (1 - 0.339)^k, the engine advances k of its macro interval, a dwell or a wait
+        counted in steps lasts as many seconds as at one step a minute, and (for a step shorter than a minute) the
+        machines added or removed over the last minute's steps stay within up_max and down_max. At 60 s every value is
+        the one the engines before omni-v16 used."""
+        k = self.period_s / REF_PERIOD_S
         o = observe_vector(obs, conflicts)
         U_before = self.x.U
-        xa = assimilate(self.x, o, self.p)
+        xa = assimilate(self.x, o, self.p, ASSIMILATION if k == 1.0 else 1.0 - (1.0 - ASSIMILATION) ** k)
         if self.evolve:
-            xn, _ = macro_step(xa, self.p, self.t, target=None)
+            xn, _ = macro_step(xa, self.p, self.t, target=None, macro_dt=MACRO_DT * k)
         else:
             xn = xa
         self.x = xn
-        self.t += 0.1
+        self.t += 0.1 * k
         L = self.law
+        dwell, after = (L.down_dwell, L.down_after_add) if k == 1.0 else \
+            (max(1, int(round(L.down_dwell / k))), max(1, int(round(L.down_after_add / k))))
         n = int(self.nodes)
         u_push, _ = control_command(xn, self.p, self.t, +1)
         push = u_push / U_AUTHORITY
@@ -179,18 +198,34 @@ class Governor:
         if delta < 0 and (o["q"] >= L.guard_queue or n_req > n - L.down_band):
             delta = 0
         self.surplus_streak = self.surplus_streak + 1 if delta < 0 else 0
-        if delta < 0 and (self.surplus_streak < L.down_dwell or self.since_add < L.down_after_add):
+        if delta < 0 and (self.surplus_streak < dwell or self.since_add < after):
             delta = 0
         ceiling = L.power_ceiling_backlog if o["q"] >= L.guard_queue else L.power_ceiling
         if delta > 0 and (o["power"] >= ceiling or n >= L.max_nodes):
             delta = 0
         if o["security"] > 0.5:
             delta = min(delta, 0)
+        if k < 1.0:
+            # up_max and down_max a minute, not a step (omni-v16): this step with the other steps of the last minute
+            m = max(1, int(round(1.0 / k)))
+            if self.recent is None:
+                self.recent = deque()
+            if delta > 0:
+                delta = max(0, min(delta, L.up_max - sum(a_ for a_, _ in self.recent)))
+            elif delta < 0:
+                delta = min(0, max(delta, -(L.down_max - sum(r_ for _, r_ in self.recent))))
+            self.recent.append((max(0, delta), max(0, -delta)))
+            while len(self.recent) > m - 1:
+                self.recent.popleft()
         self.since_add = 0 if delta > 0 else self.since_add + 1
         if delta < 0:
             self.surplus_streak = 0
         at_envelope = o["power"] >= ceiling
-        if o["q"] < L.guard_queue and xn.U >= L.U_gate:
+        if o["q"] < L.guard_queue and xn.U >= L.U_gate and o["clean"] >= 0.5:
+            # the trim to demand, only while the line has been clean for the caller's own clear time (omni-v15): on the
+            # omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and
+            # turned back at 123 of them, at the one threshold on the queue and the state; on the same decisions this
+            # gate leaves 35 moves (tests/test_cap_band.py). The card governor had applied the same gate outside the brain
             cap = clamp(self.current_cap * o["load"] * (1.0 + L.margin), L.cap_min, 1.0)
         elif o["q"] >= L.guard_queue and L.spread_step > 0.0:
             if at_envelope:

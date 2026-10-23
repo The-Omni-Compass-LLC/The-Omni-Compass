@@ -1,6 +1,6 @@
 # Preregistration: the compass law on real Kubernetes (set 26)
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Written and committed before the run. The run's commit is the one that carries this file; nothing in the law, the
 harness or this rule changes after it starts.
@@ -1014,7 +1014,7 @@ modelled grid (`six`) is run again on the new engine too (its numbers are expect
 unchanged but for comments, headers and one label's name), because no result is read across engine versions.
 
 ---
-*Evaluation and simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
+*Evaluation and Simulation use only. Copyright (c) 2026 The Omni-Compass LLC. Commercial use, commercialization or
 monetization of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC.
 All rights reserved. See `LICENSE` and `NOTICE` at the root of this repository. All patents, copyrights and trademarks
 filed in the USA. www.omni-compass.com*
@@ -1330,6 +1330,29 @@ read as before.
 - **Run again.** The CruiseKube test runs again, A, B and C, on the corrected recorder (`scripts/reruns.txt`, block of
   19 October). The three-run table pools only runs of one recorder.
 
+## Amendment (2026-10-22, omni-v16, written before any run of it): the full decision every 15 s
+
+"The decision period in the cloud" above held every run at 60 s because four rules counted decisions. omni-v16 counts every
+clock of the governor in seconds (`docs/OMNI_V16.md`: the give-back trial, the cool-down, cruise and the trial spacing
+already counted seconds since omni-v7; now the brain's own minute, the compass's damping and smoothing, the edge's window and
+rates, the additions past the floor, a command's minute to land and the rest do too), so a period changes only how often the
+governor looks: at 15 s a give-back trial still lasts its 20 minutes, the wait after a breach its 3 minutes, and one machine is
+still given back at most once a minute. On the founder's word of 22 October ("15 sec all over heart beat"), the default
+decision period is 15 s, native's own pod autoscaler's pace, in every run from omni-v16's first on: the kind tests and the
+cloud sets alike (`scripts/kind_bench.sh`, `OMNI_INTERVAL`), the fast checks every 5 s as before. A window in which the
+governor made no write still needs its decisions to count, now one every 15 s. Runs before omni-v16 stand at the 60 s they
+ran at; nothing is read across engines.
+
+## Amendment (2026-10-22, omni-v17, written before any run of it): the main engine every 60 s, the beat a dial
+
+On the founder's word of 22 October, afternoon, the heartbeat is a dial (`docs/OMNI_V17.md`): the main engine takes its full
+decision every 60 s, and any beat may be set (5, 15, 30, 60, 75, 90, 120 s and every value between), each shown beside native
+with what it buys and what it costs. From omni-v17's first run on, every run of this preregistration, the kind tests and the
+cloud sets alike, decides every 60 s by default (`scripts/kind_bench.sh`, `OMNI_INTERVAL`), the fast checks every 5 s as
+before; every clock counts seconds since omni-v16, so a give-back trial still lasts its 20 minutes, the wait after a breach its
+3 minutes, and one machine is given back at most once a minute. The beats other than 60 s are read in their own runs
+(`docs/PACE_PREREGISTRATION.md`, amendment 3). Runs on omni-v16 stand at the 15 s they ran at; nothing is read across engines.
+
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

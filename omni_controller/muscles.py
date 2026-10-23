@@ -18,7 +18,7 @@ the muscle back, and tags every write with its muscle name in the audit log.
   security    pull: ConfigMap key "hold" == "true" means a security hold; the shield then blocks every expansion
   rollout     push: pause a deployment's rollout while the governor does not permit change; resume it when it does;
               undo a rollout that has exceeded its progress deadline when the governor authorises rollback
-  batch       push: admit (unsuspend) held batch Jobs, one per decision, only when change is permitted and load and power
+  batch       push: admit (unsuspend) held batch Jobs, one a minute, only when change is permitted and load and power
               stress are under the compass's wall less one cushion (0.95 - 0.05: one click under, the nervous system's
               own admit gate); running Jobs are never suspended
   latency     pull: 95th-percentile response time over the last --latency-window-s from --latency-file (CSV written by
@@ -36,10 +36,10 @@ the muscle back, and tags every write with its muscle name in the audit log.
               pods/resize subresource (no restart); never above the limit, never below --rightsize-min-m; no decrease while
               the SLO is breached, no increase during a security hold; kill restores every original request
   coldstart   push: a deployment with no work waiting (ConfigMap key "queue" == 0, the queue a KEDA scaler would read) for
-              --coldstart-idle decisions is scaled to zero; it is scaled back to its recorded replica count the moment
+              --coldstart-idle-s seconds is scaled to zero; it is scaled back to its recorded replica count the moment
               work is waiting; kill restores the recorded count
   batch_pace  push: while power stress or heat is high, one running Job labelled omnicompass.io/pausable=true is suspended
-              per decision (checkpointed training pauses instead of the site going over its limit); it is resumed when
+              a minute (checkpointed training pauses instead of the site going over its limit); it is resumed when
               stress and heat are back down; kill resumes every Job Omni paused
   contain     push: an agent namespace whose measured CPU use exceeds --contain-cpu-m, or any namespace during a security
               hold, gets a ResourceQuota (limits.cpu = budget) and its running pods' CPU limits are scaled in place so the
@@ -97,6 +97,23 @@ def ref(s):
     return ns, name
 
 
+# what only a shell reads in a command: a pipe, a list, a redirect, a subshell, a variable or a substitution, a glob, a
+# home directory, a comment, a line break (quotes are read by shlex.split as a shell reads them, and need no shell)
+SHELL_ONLY = set("|&;<>()$`*?[]{}~#\n")
+
+
+def run_operator_cmd(cmd, timeout=None):
+    """The operator's own configured command (a site power reading, a muscle's read command, a wall meter's `cmd:`),
+    with the governor's own rights, never text read from the cluster or the network. omni-v14: a command that holds nothing
+    only a shell reads is split into its words and run directly, without a shell; one that does (a pipe, a redirect, a
+    variable, VAR=value before the command) runs through the shell as before, so no operator's wiring changes. The
+    static scan's three high findings were these calls (docs/SECURITY_SCAN.md)."""
+    words = shlex.split(cmd) if not (set(cmd) & SHELL_ONLY) else None
+    if words and "=" not in words[0]:
+        return subprocess.run(words, capture_output=True, text=True, timeout=timeout)
+    return subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+
+
 class Muscles:
     def __init__(self, k, a, audit):
         self.k, self.a, self.audit = k, a, audit
@@ -106,6 +123,19 @@ class Muscles:
         self.thermal = 0.32  # harness initial thermal state
         self.gpu_min_w = 0.0     # the card's own minimum power limit, read live (0 until the card reports it)
         self.gpu_heat_c = 0.0    # one degree under the card's own slowdown temperature, read live (0: not reported)
+        # omni-v16: the governor's decision period, so every muscle rule written per decision keeps its time at any period
+        # (--interval 0 is a model's loop: each call one decision of the minute)
+        self.period = float(getattr(a, "interval", 60.0) or 0.0) or 60.0
+        self.pace = self.period / 60.0
+        self.pushes = 0          # decisions this side has acted on: the clock of the rules below
+
+    def _per(self, sec):
+        """Decisions in sec seconds at this decision period (never fewer than one)."""
+        return max(1, int(round(float(sec) / self.period)))
+
+    def native(self, muscle):
+        """omni-v14: a muscle the operator left native (--native) is never written; every other runs as before."""
+        return muscle in getattr(self.a, "native_muscles", ())
 
     def at_max(self):
         """The max (the default dial): no level is ever set under what native runs."""
@@ -115,7 +145,9 @@ class Muscles:
     def sense(self, power_stress):
         o = {}
         if getattr(self.a, "thermal_model", False):
-            self.thermal = min(1.35, max(0.0, 0.86 * self.thermal + 0.14 * (0.34 + 0.62 * min(1.35, power_stress))))
+            # the heat law's step is a minute (0.86 of the heat kept a minute, omni-v16 at any decision period)
+            keep, take = (0.86, 0.14) if self.pace == 1.0 else (0.86 ** self.pace, 1.0 - 0.86 ** self.pace)
+            self.thermal = min(1.35, max(0.0, keep * self.thermal + take * (0.34 + 0.62 * min(1.35, power_stress))))
             o["thermal"] = self.thermal
         if getattr(self.a, "rapl_cmd", ""):
             o["cpu_watts"] = self._read(self.a.rapl_cmd)
@@ -154,7 +186,7 @@ class Muscles:
         return o
 
     def _run_out(self, cmd):
-        return subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout.strip()
+        return run_operator_cmd(cmd).stdout.strip()
 
     def _read(self, cmd):
         try:
@@ -172,15 +204,20 @@ class Muscles:
     def push(self, d, obs, killed=False):
         if killed:
             return
+        self.pushes += 1
         cap = 1.0 if self.at_max() else float(d["power_cap"])     # the max: never under native
-        self._power_cap(cap, obs)
+        if not self.native("cpu"):
+            self._power_cap(cap, obs)
         self._hardware(cap, obs)
-        self._rollout(bool(d["change_permitted"]), bool(d["rollback_authorized"]))
-        self._batch(bool(d["change_permitted"]), obs)
-        for name, fn in (("rightsize", lambda: self._rightsize(obs)), ("coldstart", self._coldstart),
-                         ("batch_pace", lambda: self._batch_pace(obs)), ("contain", lambda: self._contain(obs)),
-                         ("cooling", lambda: self._cooling(obs))):
-            self._guard(name, fn)
+        if not self.native("rollout"):
+            self._rollout(bool(d["change_permitted"]), bool(d["rollback_authorized"]))
+        if not self.native("batch"):
+            self._batch(bool(d["change_permitted"]), obs)
+        for name, muscle, fn in (("rightsize", "rightsize", lambda: self._rightsize(obs)), ("coldstart", "coldstart", self._coldstart),
+                                 ("batch_pace", "batch", lambda: self._batch_pace(obs)), ("contain", "contain", lambda: self._contain(obs)),
+                                 ("cooling", "cooling", lambda: self._cooling(obs))):
+            if not self.native(muscle):
+                self._guard(name, fn)
 
     def _may(self, organ, what):
         """Nervous-system authority for an organ ("expand", "contract", "admit", "pause"); without it, everything allowed."""
@@ -251,6 +288,8 @@ class Muscles:
         except Exception:
             return
         self._idle = getattr(self, "_idle", 0) + 1 if q <= 0 else 0
+        n_idle = int(self.a.coldstart_idle) if getattr(self.a, "coldstart_idle", None) is not None \
+            else self._per(getattr(self.a, "coldstart_idle_s", 180.0))           # the idle time in seconds (omni-v16)
         for target in filter(None, getattr(self.a, "coldstart_deployments", "").split(",")):
             ns, name = ref(target)
             dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
@@ -258,7 +297,7 @@ class Muscles:
             rep = int(dep["spec"].get("replicas", 1))
             if q > 0 and rep == 0 and REPL_ANN in ann:
                 self.k.write(["scale", "deployment", name, "-n", ns, f"--replicas={ann[REPL_ANN]}"], f"coldstart: wake to {ann[REPL_ANN]} (queue {q:g})")
-            elif self._idle >= self.a.coldstart_idle and rep > 0 and self._may("pods", "contract"):
+            elif self._idle >= n_idle and rep > 0 and self._may("pods", "contract"):
                 self.k.write(["annotate", "deployment", name, "-n", ns, "--overwrite", f"{REPL_ANN}={rep}"], "coldstart: record replicas")
                 self.k.write(["scale", "deployment", name, "-n", ns, "--replicas=0"], f"coldstart: scale to zero (idle {self._idle} decisions)")
 
@@ -268,6 +307,8 @@ class Muscles:
         hot = obs.get("power_stress", 0.0) >= self.a.pace_high or obs.get("thermal", 0.0) >= self.a.pace_heat \
             or (getattr(self, "auth", None) is not None and self._may("batch", "pause"))
         calm = obs.get("power_stress", 1.0) <= self.a.pace_low and obs.get("thermal", 1.0) < self.a.pace_heat - 0.06
+        if self.pushes - getattr(self, "_paced_at", -10 ** 9) < self._per(60.0):
+            return               # one job paused or resumed a minute, however often the governor decides (omni-v16)
         jobs = self.k.get("get", "jobs", "-A", "-l", PAUSABLE_LABEL, "-o", "json")["items"]
         if hot:
             run = [j for j in jobs if not j["spec"].get("suspend")]
@@ -276,10 +317,12 @@ class Muscles:
                 self.k.write(["annotate", "job", name, "-n", ns, "--overwrite", f"{PACE_ANN}=true"], "batch_pace: record pause")
                 self.k.write(["patch", "job", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"suspend": True}})],
                              f"batch_pace: pause job (power stress {obs.get('power_stress', 0.0):.2f}, heat {obs.get('thermal', 0.0):.2f})")
+                self._paced_at = self.pushes
         elif calm:
             paced = [j for j in jobs if j["spec"].get("suspend") and (j["metadata"].get("annotations") or {}).get(PACE_ANN) == "true"]
             if paced:
                 self._resume_job(paced[0], "batch_pace: resume job (stress and heat back down)")
+                self._paced_at = self.pushes
 
     def _resume_job(self, j, why):
         ns, name = j["metadata"]["namespace"], j["metadata"]["name"]
@@ -448,7 +491,7 @@ class Muscles:
         from omnicompass.nervous_system import BAND
         obs = obs or {}
         targets = [ref(t) for t in filter(None, getattr(self.a, "cap_deployments", "").split(","))]
-        if not targets:
+        if not targets or self.native("cpu"):
             return None
         engaged = self._convey_engaged()
         from omni_controller.capacity import HostCpuSampler, KIND_SCALE_OUT_BUSY_LIMIT, one_host
@@ -569,12 +612,12 @@ class Muscles:
             cap = min(cap, getattr(self, "_last_cap", 1.0))  # shield I1: no expansion during a security hold
         if abs(cap - getattr(self, "_last_cap", 1.0)) < 0.02:
             return
-        if getattr(self.a, "cpufreq_policy_root", ""):
+        if getattr(self.a, "cpufreq_policy_root", "") and not self.native("clock"):
             self._cpufreq_sysfs(cap, obs)
-        if getattr(self.a, "cpufreq_cmd", "") and self.a.cpu_max_khz:
+        if getattr(self.a, "cpufreq_cmd", "") and self.a.cpu_max_khz and not self.native("clock"):
             lo, hi = self._envelope("cpufreq", [0.0, 1.0]); cap = min(max(cap, lo), hi)
             self._hw(self.a.cpufreq_cmd, self.a.cpu_max_khz * cap, f"cpu_pstate: frequency ceiling {int(self.a.cpu_max_khz * cap)} kHz (cap {cap:.3f})")
-        if getattr(self.a, "gpu_power_cmd", "") and self.a.gpu_max_w:
+        if getattr(self.a, "gpu_power_cmd", "") and self.a.gpu_max_w and not self.native("gpu"):
             w = max(self.gpu_min_w, self.a.gpu_max_w * cap)               # never under the card's own minimum
             self._hw(self.a.gpu_power_cmd, w, f"gpu: power limit {int(w)} W (cap {cap:.3f})")
         self._last_cap = cap
@@ -626,12 +669,15 @@ class Muscles:
             return
         if not self._may("batch", "admit"):
             return
+        if self.pushes - getattr(self, "_admitted_at", -10 ** 9) < self._per(60.0):
+            return               # one held job admitted a minute, however often the governor decides (omni-v16)
         jobs = self.k.get("get", "jobs", "-A", "-l", BATCH_LABEL, "-o", "json")["items"]
         held = sorted((j for j in jobs if j["spec"].get("suspend")), key=lambda j: j["metadata"].get("creationTimestamp", ""))
         if held:
             j = held[0]; ns, name = j["metadata"]["namespace"], j["metadata"]["name"]
             self.k.write(["patch", "job", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"suspend": False}})],
                          "batch: admit held job (headroom)")
+            self._admitted_at = self.pushes
 
     # ---- kill -------------------------------------------------------------------------------------------------------
     def restore(self):
@@ -799,7 +845,8 @@ def add_args(ap):
     ap.add_argument("--rightsize-min-m", type=int, default=50)
     ap.add_argument("--coldstart-deployments", default="", help="ns/name[,ns/name]: scaled to zero when idle, woken on work")
     ap.add_argument("--coldstart-signal", default="", help="ns/name of a ConfigMap whose key 'queue' is the waiting work")
-    ap.add_argument("--coldstart-idle", type=int, default=3, help="idle decisions before scaling to zero")
+    ap.add_argument("--coldstart-idle", type=int, default=None, help="idle decisions before scaling to zero (unset: --coldstart-idle-s)")
+    ap.add_argument("--coldstart-idle-s", type=float, default=180.0, help="idle seconds before scaling to zero (omni-v16)")
     ap.add_argument("--batch-pace", action="store_true", help="batch_pace muscle: pause Jobs labelled " + PAUSABLE_LABEL + " under stress")
     ap.add_argument("--pace-high", type=float, default=0.95, help="power stress that pauses a job")
     ap.add_argument("--pace-low", type=float, default=0.8, help="power stress under which a paused job resumes")

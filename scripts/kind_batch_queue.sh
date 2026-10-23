@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 #
@@ -359,8 +359,12 @@ spec:
       containers:
         - {name: done, image: "registry.k8s.io/pause:3.10", resources: {requests: {cpu: 1m, memory: 4Mi}}}
 EOF
+  # (the image is already on every node when the runner's copy was loaded into the cluster, scripts/kind_bench.sh; a pull
+  # that still never finishes leaves what each puller pod says in the arm's own files)
   kubectl -n kube-system rollout status daemonset/rig-prepull-batch --timeout=300s >/dev/null \
-    || { echo "INVALID RUN: the stream's image was not pulled onto every worker"; exit 1; }
+    || { { kubectl -n kube-system get pods -l app=rig-prepull-batch -o wide; kubectl -n kube-system describe pods -l app=rig-prepull-batch; } \
+           > "$OUT_DIR/prepull_batch_failed.txt" 2>&1 || true
+         echo "INVALID RUN: the stream's image was not pulled onto every worker (prepull_batch_failed.txt)"; exit 1; }
   kubectl -n kube-system delete daemonset rig-prepull-batch --wait=true --timeout=120s >/dev/null
   kubectl -n kube-system wait --for=delete pod -l app=rig-prepull-batch --timeout=120s >/dev/null 2>&1 || true
   echo "busybox:1.36 pre-pulled on every worker" >> "$OUT_DIR/batch_queue.txt"
@@ -470,5 +474,5 @@ PY
 *) echo "PHASE must be install, submit or end"; exit 1 ;;
 esac
 
-# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
 # monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

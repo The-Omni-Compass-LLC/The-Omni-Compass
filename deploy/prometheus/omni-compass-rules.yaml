@@ -1,22 +1,24 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 #
 # The governor's alert rules for Prometheus: load with `rule_files:` (or wrap the `groups:` list in a PrometheusRule for the
 # Prometheus Operator). Every expression reads only gauges that tools/omni_exporter.py (job omni-exporter) or the control
-# panel, tools/omni_control.py (job omni-control), serve; tests/test_alert_rules.py checks that. The thresholds assume the
-# governor's full decision every 60 s (--interval 60); scale the "for" windows and the staleness bound with the interval.
+# panel, tools/omni_control.py (job omni-control), serve; tests/test_alert_rules.py checks that. The governor's heartbeat is a
+# dial (--interval, 5 to 120 s; the main engine 60 s since omni-v17): the staleness bound is three of its beats as the
+# exporter measures them (omni_heartbeat_seconds, the median spacing of its last eleven decisions; never under 5 s), so it
+# holds at every setting without an edit: 180 s at 60 s, 45 s at 15 s, 360 s at 120 s.
 groups:
   - name: omni-compass-governor
     rules:
       - alert: OmniGovernorStale
-        expr: time() - omni_last_decision_timestamp_seconds > 180 and omni_master_switch == 1
+        expr: time() - omni_last_decision_timestamp_seconds > 3 * clamp_min(omni_heartbeat_seconds, 5) and omni_master_switch == 1
         for: 2m
         labels: {severity: critical}
         annotations:
-          summary: "No governor decision for more than three intervals while it is meant to be governing."
+          summary: "No governor decision for more than three of its beats while it is meant to be governing."
           action: "Check the governor's process and its log; if it hung, its lease hands every setting back (tools/omni_switch.py watchdog)."
       - alert: OmniGovernorOrphaned
         expr: omni_control_orphans > 0
@@ -81,5 +83,5 @@ groups:
         annotations:
           summary: "The governor's own processor use is above half a core."
           action: "Read omni_decision_seconds; the governor's cost counts in the body's load."
-# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and simulation use only; any commercialization or
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
 # monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

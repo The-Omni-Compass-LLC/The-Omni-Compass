@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The free GitHub grid: all seven organisms (the spine, the four realms, the four stacked, the whole tower) at 1, 10, 100
@@ -37,16 +37,17 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "results" / "grid_v13" / "DISPATCHED.json"
+MANIFEST = ROOT / "results" / "grid_v17" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-20T20:31:00Z"  # only this campaign, omni-v13 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
-ENGINE = "omni-v13"                 # the engine whose grid this is (tools/omni_version.py)
+SINCE = "2026-10-23T17:00:00Z"  # only this campaign, omni-v17 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
+ENGINE = "omni-v17"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
 RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
 TIERS = (10, 100, 1000)             # smaller prefixes first
@@ -105,7 +106,7 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "2026-10-20T20:31:00Z"   # omni-v13: every benchmark runs again from the moment the engine landed on main (19 October)
+RERUN_SINCE = "2026-10-23T17:00:00Z"   # omni-v17: every benchmark runs again from a little after the moment the engine landed on main (23 October)
 # the kind rig as amended on 18 October (scripts/kind_bench.sh pulls the served image onto every worker before each arm,
 # docs/POD_START_WAIT.md): a run of a workflow that builds a kind cluster counts only when its own commit carries the
 # pre-puller (RIG_FILE, read from GitHub at the run's head commit), so no table mixes the two rigs and no run is counted on
@@ -128,19 +129,20 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
 # (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-20T20:31:00Z"   # omni-v13: every Azure set runs again on the engine that stands; the sets of earlier engines already
-                                       # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v13 table
+AZURE_SINCE = "2026-10-23T17:00:00Z"   # omni-v17: every Azure set runs again on the engine that stands; the sets of earlier engines already
+                                       # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v17 table
 AZURE_WF = "aks-metered.yml"
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
           ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
           ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"))
-# Google Cloud and Amazon start a set only after their $0 check passed (.github/workflows/cloud-check.yml: the login, the
-# key's shape, the machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's
-# Free plan failed every set started there at the login, each using up its A or B). The conductor starts a check itself when the
-# cloud has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder
-# stores is so taken up within the hour, and a cloud that cannot rent never uses up a set. Azure's sets carry their own.
+# A cloud starts a set only after its $0 check passed (.github/workflows/cloud-check.yml: the login, the key's shape, the
+# machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's Free plan failed
+# every set started there at the login, each using up its A or B; Azure since 22 October, after its stored key held, for a
+# while on 21 October, a text Azure's login refuses, and a failed set counts as started). The conductor starts a check itself when the cloud
+# has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder stores is
+# so taken up within the hour, and a cloud that cannot rent never uses up a set.
 CHECK_WF = "cloud-check.yml"
-CHECKS = {"Google Cloud": "google", "Amazon": "amazon"}
+CHECKS = {"Google Cloud": "google", "Amazon": "amazon", "Azure": "azure"}
 CHECK_FRESH_H = 24
 CHECK_RETRY_MIN = 60
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
@@ -342,29 +344,31 @@ def campaign_open(now=None):
 
 def engine():
     """The engine the runs started now will carry. On GitHub that is the newest commit of the branch they start on, which
-    every tick fetches (FETCH_HEAD), read by that commit's own fingerprints: a tick that began before a new engine landed
-    starts the new engine's runs at its next round, not after its five hours (17 October: omni-v8 landed during a tick).
+    every tick fetches (FETCH_HEAD), read by that commit's own version tool and fingerprints: a tick that began before a new
+    engine landed starts the new engine's runs at its next round, not after its five hours (17 October: omni-v8 landed during
+    a tick). The conductor keeps no copy of the tool's scope or rule: its copy went stale once (omni-v15 took eight wires into
+    the fingerprint, the copy read every commit after it as unknown, and nothing started; 22 October).
     Elsewhere, this checkout's HEAD, by its version tool; a partial checkout without the engine's files reads it from git."""
-    def git(*a):
-        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True, timeout=120)
+    def git(*a, text=True, check=False):
+        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=text, check=check, timeout=120)
     try:
         if os.environ.get("GITHUB_ACTIONS") == "true" and git("rev-parse", "-q", "--verify", "FETCH_HEAD").returncode == 0:
-            scope = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py",
-                     "tools/run_pandapower.py")              # tools/omni_version.py's SCOPE
-            files = {}
-            for n in sorted(git("ls-tree", "-r", "--name-only", "FETCH_HEAD", "--", *scope).stdout.split()):
-                if n.endswith((".py", ".csv")) and "__pycache__" not in n:
-                    data = subprocess.run(["git", "show", f"FETCH_HEAD:{n}"], cwd=ROOT, capture_output=True, check=True,
-                                          timeout=120).stdout
-                    files[n] = hashlib.sha256(data).hexdigest()
-            d = hashlib.sha256("".join(f"{h}  {n}\n" for n, h in sorted(files.items())).encode()).hexdigest()
-            for f in git("ls-tree", "--name-only", "FETCH_HEAD").stdout.split():
-                if re.fullmatch(r"OMNI_V\d+\.json", f) and json.loads(git("show", f"FETCH_HEAD:{f}").stdout).get("digest") == d:
-                    return f"omni-v{f[6:-5]}"
-            return "unknown"
-        r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", "HEAD"], cwd=ROOT,
-                           capture_output=True, text=True, timeout=120)
-        return r.stdout.split()[0] if r.stdout.strip() else "unknown"
+            with tempfile.TemporaryDirectory() as tmp:
+                # the fetched commit's version tool and fingerprints, run on that commit's tree in this repository: with
+                # GIT_DIR naming the repository, git takes the folder it runs in as the top of the tree
+                (Path(tmp) / "tools").mkdir()
+                prints = [f for f in git("ls-tree", "--name-only", "FETCH_HEAD").stdout.split() if re.fullmatch(r"OMNI_V\d+\.json", f)]
+                for f in ("tools/omni_version.py", *prints):
+                    (Path(tmp) / f).write_bytes(git("show", f"FETCH_HEAD:{f}", text=False, check=True).stdout)
+                env = {k: v for k, v in os.environ.items() if k != "GIT_WORK_TREE"}
+                env["GIT_DIR"] = git("rev-parse", "--absolute-git-dir", check=True).stdout.strip()
+                r = subprocess.run([sys.executable, str(Path(tmp) / "tools" / "omni_version.py"), "--commit", "FETCH_HEAD"],
+                                   cwd=tmp, env=env, capture_output=True, text=True, timeout=600)
+        else:
+            r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", "HEAD"], cwd=ROOT,
+                               capture_output=True, text=True, timeout=120)
+        out = r.stdout.split()
+        return out[0] if r.returncode == 0 and out and re.fullmatch(r"omni-v\d+", out[0]) else "unknown"
     except (OSError, subprocess.SubprocessError, ValueError):
         return "unknown"
 
@@ -944,7 +948,7 @@ def main(argv=None):
             left = reruns_to_start(family_reruns, rerun_counts or {}) if family_reruns else []
             nxt = cloud_next(queue, azure_runs(wf)[0], left)
             if nxt and cloud in CHECKS:
-                # Google and Amazon: a set starts only once the cloud's $0 check passed (CHECK_WF)
+                # every cloud: a set starts only once the cloud's $0 check passed (CHECK_WF)
                 checks = api(f"repos/{REPO}/actions/workflows/{CHECK_WF}/runs?event=workflow_dispatch&per_page=30")
                 state, why = check_state(checks.get("workflow_runs", []), cloud)
                 if state == "check" and not a.dry:

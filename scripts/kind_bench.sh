@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # One arm of the native-vs-Omni benchmark on the six-worker kind cluster (deploy/kind/cluster-full.yaml).
@@ -212,10 +212,30 @@ kubectl -n kube-system rollout status deployment/coredns --timeout=300s
 # window opens (deploy/kind/prepull.yaml; amendment of 18 October, docs/POD_START_WAIT.md): a serving pod started inside
 # the window no longer downloads and unpacks the image on the one machine every kind node shares. The same in every arm;
 # a puller not finished on every worker fails the arm's checks (marked invalid), so no arm runs on the other rig
+# busybox:1.36 (the load generator, the batch stream, the probe) is pulled once onto the runner and loaded from that copy into
+# every node of this cluster (kind load), so no node asks Docker Hub for it: Docker Hub limits anonymous pulls, and the fresh
+# clusters of one repetition asked it six times each (repetition 10 of run 39666341432, the bin-packing set's A, lost its
+# third and fourth arms to a pull that never finished in 300 s). The same in every arm; where the load cannot be made, the
+# nodes pull it themselves, as before, and the preflight says so
+kname="${KIND_CLUSTER:-$(kubectl config current-context 2>/dev/null | sed -n 's/^kind-//p')}"
+for t in 1 2 3; do
+  docker image inspect busybox:1.36 >/dev/null 2>&1 || docker pull -q busybox:1.36 >/dev/null 2>&1 && break
+  echo "busybox:1.36 not pulled onto the runner (try $t)"; sleep 20
+done
+if [ -n "$kname" ] && kind load docker-image busybox:1.36 --name "$kname" >/dev/null 2>&1; then
+  echo "busybox: loaded into every node from the runner's own copy (kind load)" | tee -a "$OUT_DIR/preflight.txt"
+else
+  echo "busybox: not loaded from the runner; the nodes pull it themselves" | tee -a "$OUT_DIR/preflight.txt"
+fi
 kubectl apply -f deploy/kind/prepull.yaml >/dev/null
 for t in 1 2 3; do
   kubectl -n kube-system rollout status daemonset/rig-prepull --timeout=300s && break
-  [ "$t" = 3 ] && { echo "the image pre-puller did not finish on every worker (3 tries)"; exit 1; }
+  if [ "$t" = 3 ]; then
+    # what each puller pod says, kept in the arm's own files, so a pull that never finishes is read from its own record
+    { kubectl -n kube-system get pods -l app=rig-prepull -o wide; kubectl -n kube-system describe pods -l app=rig-prepull; } \
+      > "$OUT_DIR/prepull_failed.txt" 2>&1 || true
+    echo "the image pre-puller did not finish on every worker (3 tries; prepull_failed.txt)"; exit 1
+  fi
   echo "image pre-puller not finished on every worker (try $t): waiting again"; sleep 20
 done
 echo "images=pre-pulled on every worker before the arm (deploy/kind/prepull.yaml)" | tee -a "$OUT_DIR/preflight.txt"
@@ -590,21 +610,23 @@ fi
 # count say how full the machine that does the work actually is (Omni never reads this file)
 host_pid=""
 if [ "$PLATFORM" != aks ]; then
-  ( echo "epoch_s,busy,cores"; read -r _ a b c d e f g h _ < /proc/stat; pt=$((a+b+c+d+e+f+g+h)); pi=$((d+e))
+  # (and the memory the machine has left, every 5 s: 22 October, a runner went silent with no file left, run 39657032525)
+  ( echo "epoch_s,busy,cores,mem_avail_mb"; read -r _ a b c d e f g h _ < /proc/stat; pt=$((a+b+c+d+e+f+g+h)); pi=$((d+e))
     while sleep 5; do read -r _ a b c d e f g h _ < /proc/stat; t=$((a+b+c+d+e+f+g+h)); i=$((d+e))
-      echo "$(date -u +%s),$(awk -v dt=$((t-pt)) -v di=$((i-pi)) 'BEGIN{printf "%.4f", (dt > 0 ? 1 - di / dt : 0)}'),$(nproc)"; pt=$t; pi=$i; done ) > "$OUT_DIR/host_cpu.csv" &
+      echo "$(date -u +%s),$(awk -v dt=$((t-pt)) -v di=$((i-pi)) 'BEGIN{printf "%.4f", (dt > 0 ? 1 - di / dt : 0)}'),$(nproc),$(awk '/^MemAvailable:/ {printf "%d", $2 / 1024}' /proc/meminfo)"; pt=$t; pi=$i; done ) > "$OUT_DIR/host_cpu.csv" &
   host_pid=$!
 fi
 kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
 watch_pid=$!
 omni_pid=""
-# the governor's full decision every OMNI_INTERVAL seconds and its fast checks (the scheduling floor, the pod reflex,
-# conveyance on every third) every OMNI_FLOOR_INTERVAL seconds: 60 and 5, the periods the engine was built and tested at.
-# Four of the governor's rules count in decisions (a give-back trial's 20-decision phase, the breach cool-down, cruise,
-# the trial spacing), so a shorter decision period changes them; it belongs to the next engine version, with those rules
-# in seconds (docs/K8S_COMPASS_PREREGISTRATION.md, "The decision period in the cloud"). The fast checks run only between
-# decisions, so their period must stay under the decision's
+# the governor's full decision every OMNI_INTERVAL seconds and its fast checks (the scheduling floor, the pod reflex, and
+# the conveyance every 15 s) every OMNI_FLOOR_INTERVAL seconds: 60 and 5 by default (omni-v17, the founder's word of 22
+# October, afternoon: the main engine at 60 s, the heartbeat a dial). Every clock of the governor counts seconds, so the
+# decision period changes only how often it looks (docs/PACE_PREREGISTRATION.md; the pace arms compass5 to compass120 of
+# scripts/kind_paired.sh set it); the fast checks' period stays under the decision's. The period is written beside the
+# run's files, so a receipt reads each run at its own (tools/live_reps.py)
 export OMNI_INTERVAL="${OMNI_INTERVAL:-60}" OMNI_FLOOR_INTERVAL="${OMNI_FLOOR_INTERVAL:-5}"
+mkdir -p "$OUT_DIR" && printf '%s\n' "$OMNI_INTERVAL" > "$OUT_DIR/omni_interval.txt"
 # the governor's command line, once, so the robustness test (below) can start a second governor with the same wiring
 start_controller() {   # $1 decisions to make, $2 log file
   $GOV_PIN nice -n "$OMNI_NICE" python -m omni_controller.controller $DRY --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --interval "$OMNI_INTERVAL" --floor-interval "$OMNI_FLOOR_INTERVAL" --reflex-window-s 15 \

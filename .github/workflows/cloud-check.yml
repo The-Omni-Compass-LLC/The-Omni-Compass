@@ -1,30 +1,31 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-# Google Cloud's and Amazon's check, at no cost (18 October): the cloud's login, the stored key's shape, and the sets'
-# pre-flight (the machine type offered, every quota a set needs), then it stops: nothing is built and nothing is billed.
+# Google Cloud's and Amazon's check, at no cost (18 October), and Azure's (22 October, after the stored Azure key held, for a
+# while on 21 October, a text Azure's login refuses): the cloud's login, the stored key's shape, and the sets' pre-flight (the machine type
+# offered, every quota a set needs), then it stops: nothing is built and nothing is billed.
 # The conductor (scripts/dispatch_grid.py) starts a cloud's sets only after that cloud's newest check passed (and again
 # after a day), and starts a check itself when there is none, the last one failed over an hour ago, or the last pass is a
 # day old; so once the founder's fix is stored (a whole Google key, Amazon's Paid plan), the sets start on their own within
 # the hour, and a cloud that cannot rent never uses up a set's A, B or C. On Amazon, a quota short of a set is asked of
 # Amazon here (the founder's order of 18 October: raised with the cloud, never shrunk to fit). Started by hand: cloud =
-# google, amazon or both.
+# google, amazon, azure, both (Google and Amazon) or all.
 name: cloud-check
-# the title the conductor reads a check back by: cloud-check google | cloud-check amazon
+# the title the conductor reads a check back by: cloud-check google | cloud-check amazon | cloud-check azure
 run-name: cloud-check ${{ github.event.inputs.cloud || 'both' }}
 on:
   workflow_dispatch:
     inputs:
-      cloud: {description: "google, amazon or both", default: "both"}
+      cloud: {description: "google, amazon, azure, both (google and amazon) or all", default: "both"}
 permissions:
   contents: read
 env:
-  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 jobs:
   google:
-    if: github.event.inputs.cloud != 'amazon'
+    if: contains(fromJSON('["google", "both", "all"]'), github.event.inputs.cloud)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -67,7 +68,7 @@ jobs:
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
   amazon:
-    if: github.event.inputs.cloud != 'google'
+    if: contains(fromJSON('["amazon", "both", "all"]'), github.event.inputs.cloud)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -100,6 +101,46 @@ jobs:
             echo "**Amazon: ready.** The keys log in, the instance type is offered and the processor quota has room: the conductor starts the sets." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "**Amazon: not ready.** Nothing built, nothing billed; the failed step above says why, and docs/AMAZON_SETUP.md how to fix it." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  azure:
+    if: contains(fromJSON('["azure", "all"]'), github.event.inputs.cloud)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HAS_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS != '' }}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - name: The secret this cloud needs
+        if: env.HAS_CREDENTIALS != 'true'
+        run: |
+          echo "::error::AZURE_CREDENTIALS is not in this repository's secrets: docs/AZURE_SETUP.md, sections 3 and 4."
+          exit 2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: {sparse-checkout: "scripts\ntools"}
+      - name: The Azure key is whole (its shape only; not a character of it is printed)
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: python3 tools/cloud_key_check.py azure
+      - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
+        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+      - name: The subscription is on (costs nothing)
+        run: |
+          state=$(az account show --query state -o tsv)
+          [ "$state" = Enabled ] || { echo "::error::pre-flight: the Azure subscription is not enabled (it reads $state); docs/AZURE_SETUP.md, section 5"; exit 2; }
+      - name: The sets' pre-flight, then stop
+        # the default set's fleet (aks-metered.yml: Standard_D2s_v4 in eastus, the system machine and up to 4 workers)
+        run: python3 scripts/azure_capacity.py preflight --location eastus --system-size Standard_D2s_v4 --pools Standard_D2s_v4:4
+      - name: What this check found
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = success ]; then
+            echo "**Azure: ready.** The key is whole and logs in, the subscription is on, the machine is offered and the allowance holds the fleet: the conductor starts the sets." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "**Azure: not ready.** Nothing built, nothing billed; the failed step above says why, and docs/AZURE_SETUP.md how to fix it." >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Legal notice at the end of this job's report
         if: always()

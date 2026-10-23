@@ -1,6 +1,6 @@
 # Robustness: the governor killed outright, the long run, and its own cost, preregistered
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Written 2026-10-08, before any counted run. This is register row 31 (robustness, every platform) and proof-program row 9.
 It is not a benchmark of a gain: it is a benchmark of Omni-Compass itself, of what it leaves behind when it dies, of
@@ -57,7 +57,7 @@ what is tested.
 | seconds from the kill to every setting back at the operator's (omni only) | **the aim is lower; shown with its interval**; an arm not handed back within 60 s reads **LOSS**, and an arm never handed back is INVALID and a LOSS |
 | settings after the hand-back equal the operator's; no record left (omni only) | **any failure is marked** |
 | the second governor's snapshot equals the operator's settings (omni only) | **any difference is marked** |
-| time over the response line and failed requests in the 120 s after the kill, native against omni | the aim is lower (the paired reading, as the fault test reads its windows) |
+| time over the response line and failed requests in the 300 s after the kill (120 s up to omni-v14; "On omni-v15" below), native against omni | the aim is lower (the paired reading, as the fault test reads its windows) |
 | the whole window's gauges, as in every Kubernetes test: work inside the line, p95, p99, time over the line, failed requests, machines, standby-model energy | by the usual directions: a governor killed and restarted mid-run must not leave omni behind native over the window |
 | the watchdog's own record: which governor, hung or dead, which commands, each exit code | shown |
 
@@ -231,6 +231,17 @@ response, time over the line and alert minutes GAIN in all three of our runs; HP
 node-hours and energy EVEN; the 95th and 99th percentiles and failed requests EVEN (three pairs give wide intervals). The
 governor's own CPU 0.0104 to 0.0108 of a core.
 
+## On omni-v15 (21 October): the after-kill reading is 300 s, declared before its runs
+
+As proposed above from the omni-v11 kill test (its one tail rise came 140 to 190 s after the kill, past the 120 s window), the
+kill scenario's two paired gauges, the time over the response line and the failed requests after the kill, are read over the
+**300 s** after the kill mark from omni-v15's first kill run on (`tools/live_reps.py`, `ROBUST_AFTER_KILL_S`; `tests/test_robust.py`
+holds the value). Nothing else in the scenario changes: the kill at 40% of the 900 s window, the second governor at 50%, the
+hand-back allowance of 60 s, the probe through the whole window. The omni-v11 kill table (`results/live/V11_ROBUST_KILL.md`)
+stands as it was read, over 120 s; a table on omni-v15 names its window in its row. The long run's request for the power cap,
+whose switching this scenario's audits showed (126 of 350 decisions), is the fault omni-v15 fixes in the brain
+(`docs/OMNI_V15.md`, section 1); omni-v15's long runs read it again in `results/STEERING.md`'s rows.
+
 ## What is declared before the first run
 
 The 60-second hand-back allowance is the sum of the watchdog's pass (5 s), the restore command's own run (one kubectl per
@@ -241,9 +252,9 @@ because nothing is tuned.
 
 ---
 
-© 2026 The Omni-Compass LLC. Evaluation and simulation use only; any other use requires a signed, paid Omni-Compass
+© 2026 The Omni-Compass LLC. Evaluation and Simulation use only; any other use requires a signed, paid Omni-Compass
 Enterprise License. All rights reserved. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

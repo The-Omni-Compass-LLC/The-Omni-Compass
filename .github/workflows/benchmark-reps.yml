@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: benchmark-reps
@@ -23,7 +23,7 @@ on:
   push:
     branches-ignore: [main, raw, "v[0-9]*", "gpu-omni-*", "archive/**"]   # a push to main or a level branch never starts it (20 October: every bot commit started 25 skipped runs and a cascade of cancelled page rebuilds)
 env:
-  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 # the token reads the code and nothing else: this workflow pushes nothing, starts nothing and reads no other run
 # (docs/THREAT_MODEL.md, T9)
 permissions:
@@ -36,7 +36,7 @@ jobs:
       max-parallel: 16   # 20 runners on this plan: 4 stay free for Azure and the big organisms (one job each)
       matrix: {rep: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
     runs-on: ubuntu-24.04
-    timeout-minutes: 150
+    timeout-minutes: 240   # the decision pace's eight arms back to back (omni-v17), about 20 minutes each; GitHub allows 360
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -61,6 +61,12 @@ jobs:
       - name: kind and kubectl again, if the first download was refused
         if: steps.kind.outcome == 'failure'
         run: bash scripts/kind_install.sh v0.31.0 v1.35.0
+      - name: The runner's own agent kept out of the kernel's choice when memory runs short
+        # 21 October (run 39657032525, repetition 9): a runner went silent 64 minutes in, "The hosted runner lost communication
+        # with the server", and left no file. A machine short of memory kills a process; when the process is the runner's own
+        # agent, the repetition's files go with it. With the agent protected the kernel takes a measured process instead, whose
+        # arm fails its own checks and is recorded; host_cpu.csv carries the memory left every 5 s (scripts/kind_bench.sh)
+        run: for p in $(pgrep -f 'Runner\.(Listener|Worker)'); do echo -1000 | sudo tee "/proc/$p/oom_score_adj" >/dev/null || true; done
       - run: bash scripts/kind_paired.sh
         env:
           REP: ${{ matrix.rep }}
@@ -85,7 +91,7 @@ jobs:
           #!/usr/bin/env python3
           # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
           # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
           # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
           # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
           """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
@@ -189,7 +195,7 @@ jobs:
           #!/usr/bin/env python3
           # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
           # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-          # Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
           # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
           # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
           """Attach the exact legal bundle inside an artifact without changing its result-file layout."""

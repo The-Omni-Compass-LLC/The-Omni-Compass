@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # Paired live repetition: every arm runs back to back on the SAME runner (same CPUs, same host, same noise), each on a
@@ -10,7 +10,7 @@
 # p95 on their own).
 # Usage: REP=n ARMS="native omni" bash scripts/kind_paired.sh   (Omni governs the muscles it is given: native vs Omni on top)
 set -euo pipefail
-echo "Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
+echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 REP="${REP:?set REP}"; read -r -a arms <<< "${ARMS:-native omni}"
 [ -z "${LOAD_STEPS_IN:-}" ] || export LOAD_STEPS="$LOAD_STEPS_IN"   # the capacity test's rising steps (benchmark-reps input)
 # the window from a measured step (protocol 3, 13 Oct): with the organism inside, the heavier arm (the model with
@@ -53,7 +53,12 @@ for arm in "${order[@]}"; do
   # Omni-Compass on top (compassbare); the same cluster as the orchestrator's arms, in the same repetition
   base="${arm%bare}"; queue="${BATCH_QUEUE:-}"; addons="${ADDONS:-}"; cruise="${CRUISEKUBE:-}"
   if [ "$base" != "$arm" ]; then [ -z "$queue" ] || queue=vanilla; addons=""; cruise=""; fi
-  if ! ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
+  # the decision pace (docs/PACE_PREREGISTRATION.md): an arm named compassN (compass5, compass15, compass30, compass75, compass90,
+  # compass120) is the compass arm deciding every N s, its fast checks every 5 s as always; compass alone decides at the main
+  # engine's default, every 60 s (omni-v17)
+  pace=""
+  if [[ "$base" =~ ^compass([0-9]+)$ ]]; then pace="${BASH_REMATCH[1]}"; base=compass; fi
+  if ! OMNI_INTERVAL="${pace:-${OMNI_INTERVAL:-60}}" ARM="$base" BATCH_QUEUE="$queue" ADDONS="$addons" CRUISEKUBE="$cruise" OUT_DIR="bench-$arm-$REP" bash scripts/kind_bench.sh; then
     # a run that fails its own checks is recorded as invalid and left out of the table, never silently counted
     echo "ARM $arm (repetition $REP) FAILED its checks: marked invalid" | tee "bench-$arm-$REP/INVALID"; fail=1
   fi

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # Full-engine live pilot on a multi-node kind cluster (deploy/kind/cluster-full.yaml): real API server, scheduler,
@@ -45,7 +45,7 @@ env $CAPTURE OUT="$OUT_DIR/baseline.csv" bash fleet/capture/kube_capture.sh
 wait
 
 echo "== Phase B: full engine (HPA target + node pool + power sensing)"
-python -m omni_controller.controller --mode nodepool --active-nodes-only --interval 60 --floor-interval 15 \
+python -m omni_controller.controller --mode nodepool --active-nodes-only --interval 60 --floor-interval 5 \
   --iterations $((PHASE_S / 60)) --min-nodes "${MIN_NODES:-2}" --max-nodes "$(( WORKERS - ${NODE_CUSHION:-0} ))" --max-node-step 1 \
   --node-scale-cmd "bash scripts/kind_nodepool.sh {n}" --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" \
   --power-cmd "bash scripts/kind_power.sh" --site-limit-w "$SITE_LIMIT_W" \

@@ -1,6 +1,6 @@
 # The max, formally: definitions, what the code guarantees, and what the runs measure
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 This page states the engine's default brain, the max (`realms/compass_arm_v5.py`, `V5CFG`, engine omni-v5 by
 `tools/omni_version.py`), in definitions and properties. Each property carries its class: **V** a property of the code,
@@ -244,7 +244,7 @@ own load, about 1.9 under the climb, 1.7 to 1.8 with work waiting in line):
 | Seeds | Own load: global → cards | The climb: global → cards | Work in line: global → cards | Plants with less work or more misses |
 |---|---|---|---|---:|
 | 7100-7109 (the cards chosen here) | 0.078 → 0.094 points | 0.153 → 0.293 points | 0.088 → 0.161 points | 0 |
-| 7200-7209 (the cards confirmed here) | 0.074 → 0.087 points | 0.145 → 0.282 points | 0.086 → 0.149 points | 0 |
+| 7200-7209 (the cards checked here, on untouched seeds) | 0.074 → 0.087 points | 0.145 → 0.282 points | 0.086 → 0.149 points | 0 |
 
 Work is unchanged within a millionth, and the power given is lower than the global setting's in the organisms where it
 moves at all (Compute under its own load +0.058% → +0.011%). The preregistered result, on seeds the search never read,
@@ -271,4 +271,4 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 ---
 
-*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The Omni index: one number for more for the same, or the same for less (docs/K8S_COMPASS_PREREGISTRATION.md).
@@ -36,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-from tools.readings import judged, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
+from tools.readings import judged, landed, with_own_runs, classify, GAIN, EVEN, LOSS, GIVEN  # noqa: E402  (a reading in all three of our runs, or an older "confirmed")
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "results" / "live"
@@ -96,7 +96,7 @@ WORKLOAD_TABLES = [
 ]
 DB_FILE = WORKLOAD_TABLES[0][1]
 AIM_LOWER = {"speed", "machines", "energy"}   # the measures whose declared aim is lower (work aims higher)
-PENDING = {"Real cloud (Azure AKS, billed)": "the omni-v13 Azure sets run one at a time at the tune-down with native's cap (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day of Google 2011; A, B and C, `scripts/azure_queue.txt`); the category joins as their three-run tables land",
+PENDING = {"Real cloud (Azure AKS, billed)": "the omni-v17 Azure sets run one at a time at the tune-down with native's cap (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day of Google 2011; A, B and C, `scripts/azure_queue.txt`); the category joins as their three-run tables land",
            "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
 
 
@@ -122,14 +122,9 @@ def measure(row, m):
 
 def whole(path):
     """A table that carries a result: a gauge row, or a workload beside the tuning one. A table written from runs that
-    failed (its workloads or rows empty) is not whole, and the test is read from the newest whole table until its runs land."""
-    try:
-        d = json.loads(path.read_text())
-    except (OSError, ValueError):
-        return False
-    if d.get("rows"):
-        return True
-    return any(wl != "tuning" for wl in (d.get("workloads") or {}))
+    failed (its workloads or rows empty) is not whole, and the test is read from the newest whole table until its runs land.
+    The rule is written once, in tools/readings.py (landed), and read by every tool that picks a benchmark's newest table."""
+    return landed(path)
 
 
 def newest(fname):
@@ -272,7 +267,7 @@ def main():
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
          "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
          "nothing inside the noise is claimed either way. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
-         "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v13 runs land, Azure and the card as their three-run tables land. A category's "
+         "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v17 runs land, Azure and the card as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. Each table names the engine it ran on.", "",
          "| Category | Index (work, speed, machines, energy) | Service reading (work and speed only) | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |",

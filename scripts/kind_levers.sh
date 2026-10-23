@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # Live proof of the added levers on a real Kubernetes API server (kind): rightsize, coldstart, batch pace, containment
@@ -54,11 +54,18 @@ SA="system:serviceaccount:omni-compass:omni-compass"; can() { kubectl auth can-i
 ! sed -n '/== cannot/,$p' "$OUT_DIR/rbac_levers.txt" | grep ": yes$" >/dev/null || { echo "has a forbidden permission"; exit 1; }
 K="$(pwd)/scripts/kubectl_omni.sh"
 BMS="$OUT_DIR/bms_setpoints.log"
-run() {  # run the controller for N decisions with extra arguments
-  local n=$1; shift
-  python -m omni_controller.controller --kubectl "$K" --mode target --interval 5 --iterations "$n" \
+# every phase runs for the brain's own time at the governor's default heartbeat, as a deployment runs it: since omni-v16 every
+# clock counts seconds, so a decision is no longer a minute of the brain's whatever the period, and the two levers that give
+# back (rightsize, coldstart) wait for the brain's calm, its contraction authority, which comes after about a minute. The
+# phases are the 3, 2 and 3 minutes the checks were written for (three, two and three decisions of a brain minute each before
+# omni-v16); the first omni-v16 run at three decisions of 5 s gave the brain 15 s and failed those two checks (22 October).
+# At the main engine's 60 s (omni-v17) the phases are three, two and three decisions again
+IV="${OMNI_INTERVAL:-60}"
+run() {  # run the controller for SEC seconds of decisions (never fewer than one) with extra arguments
+  local n=$(( $1 / IV )); shift; [ "$n" -ge 1 ] || n=1
+  python -m omni_controller.controller --kubectl "$K" --mode target --interval "$IV" --iterations "$n" \
     --rightsize-deployments default/php-apache --coldstart-deployments default/idle-worker --coldstart-signal default/omni-work \
-    --coldstart-idle 2 --batch-pace --contain-namespaces agents --cooling-cmd "sh -c 'echo {c} >> $BMS'" \
+    --coldstart-idle-s 120 --batch-pace --contain-namespaces agents --cooling-cmd "sh -c 'echo {c} >> $BMS'" \
     --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" "$@" >> "$OUT_DIR/controller.log" 2>&1
 }
 req() { kubectl get pods -l run=php-apache -o jsonpath='{range .items[*]}{.spec.containers[0].resources.requests.cpu}{" "}{end}'; }
@@ -68,17 +75,17 @@ susp() { kubectl get job train-a -o jsonpath='{.spec.suspend}'; }
 quota() { (kubectl get resourcequota omni-containment -n agents --no-headers 2>/dev/null || true) | wc -l; }
 R0="$(req)"; L0="$(lim)"
 echo "== phase 1: no work waiting, power stress over the pace threshold, agents over budget"
-run 3 --pace-high 0 --contain-cpu-m 200
+run 180 --pace-high 0 --contain-cpu-m 200
 R1="$(req)"; L1="$(lim)"; P1="$(rep)"; S1="$(susp)"; Q1="$(quota)"
 echo "== phase 2: work waiting, calm, budget raised"
 kubectl patch configmap omni-work --type=merge -p '{"data":{"queue":"5"}}'
-run 2 --pace-high 5 --pace-low 5 --contain-cpu-m 100000
+run 120 --pace-high 5 --pace-low 5 --contain-cpu-m 100000
 P2="$(rep)"; S2="$(susp)"; Q2="$(quota)"; L2="$(lim)"
 echo "== phase 3: stress again, then the reset from a fresh process"
 kubectl patch configmap omni-work --type=merge -p '{"data":{"queue":"0"}}'
-run 3 --pace-high 0 --contain-cpu-m 200
+run 180 --pace-high 0 --contain-cpu-m 200
 P3="$(rep)"; S3="$(susp)"; Q3="$(quota)"
-touch "$OUT_DIR/kill"; run 1 --contain-cpu-m 200
+touch "$OUT_DIR/kill"; run 0 --contain-cpu-m 200
 R4="$(req)"; L4="$(lim)"; P4="$(rep)"; S4="$(susp)"; Q4="$(quota)"
 left=$( (kubectl get deployment php-apache idle-worker -o json | jq -r '.items[].metadata.annotations // {} | keys[]'; \
          kubectl get job train-a -o json | jq -r '.metadata.annotations // {} | keys[]') | grep '^omnicompass.io/' || true)

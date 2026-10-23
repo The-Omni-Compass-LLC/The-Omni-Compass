@@ -3,7 +3,8 @@
 #include <cmath>
 namespace omnicompass {
 static State add_scaled(const State&a,const State&b,double s) noexcept{return {a.E+s*b.E,a.U+s*b.U,a.I_U+s*b.I_U,a.S+s*b.S,a.B+s*b.B,a.B_dot+s*b.B_dot};}
-static State combine(const State&s,const State&k1,const State&k2,const State&k3,const State&k4,double h) noexcept{return {s.E+h*(k1.E+2*k2.E+2*k3.E+k4.E)/6.0,s.U+h*(k1.U+2*k2.U+2*k3.U+k4.U)/6.0,s.I_U+h*(k1.I_U+2*k2.I_U+2*k3.I_U+k4.I_U)/6.0,s.S+h*(k1.S+2*k2.S+2*k3.S+k4.S)/6.0,s.B+h*(k1.B+2*k2.B+2*k3.B+k4.B)/6.0,s.B_dot+h*(k1.B_dot+2*k2.B_dot+2*k3.B_dot+k4.B_dot)/6.0};}
+// a + (h/6)(k1 + 2k2 + 2k3 + k4), in omnicompass/core.py rk4_step's own order of operations, so the C++ state is the Python's to the last bit
+static State combine(const State&s,const State&k1,const State&k2,const State&k3,const State&k4,double h) noexcept{const double c=h/6.0;return {s.E+c*(k1.E+2*k2.E+2*k3.E+k4.E),s.U+c*(k1.U+2*k2.U+2*k3.U+k4.U),s.I_U+c*(k1.I_U+2*k2.I_U+2*k3.I_U+k4.I_U),s.S+c*(k1.S+2*k2.S+2*k3.S+k4.S),s.B+c*(k1.B+2*k2.B+2*k3.B+k4.B),s.B_dot+c*(k1.B_dot+2*k2.B_dot+2*k3.B_dot+k4.B_dot)};}
 int basin_sign(double U) noexcept {if(std::abs(U-1.0)<=BASIN_TOL)return 1;if(std::abs(U+1.0)<=BASIN_TOL)return -1;return 0;}
 int nearest_basin_sign(double U) noexcept {return std::abs(U-1.0)<=std::abs(U+1.0)?1:-1;}
 double v_eff(const State&s,const Parameters&p,double t) noexcept {double z=p.lambda_0+p.lambda_1*(s.U-0.5)+p.lambda_2*s.S;return std::cos(0.5*p.omega_B*t)*(p.c*std::tanh(z));}
