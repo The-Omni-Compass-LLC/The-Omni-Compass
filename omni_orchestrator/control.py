@@ -13,14 +13,17 @@ machines are taken back as they are, none started again. Every second it:
   1. asks every machine's hand for its status; a machine silent three times running is down, and its units are placed
      again elsewhere; a unit a machine runs that the ledger does not know is stopped;
   2. stops the units retiring once their drain is over (out of the routes first, so no request is lost);
-  3. on the brain's beat, decides the units of each service and, for Omni, the machines (wake before any unit would wait,
-     park one at a time after the load has held low for three beats, its units moved first);
+  3. on the brain's beat, decides the units of each service (brain.py: the reflex on work in line, the compass law on the
+     95th percentile, the yardstick twin less the depth the verdict has allowed on the service's own response times) and,
+     for Omni, the machines (wake before any unit would wait, park one at a time after the load has held low for three
+     beats, its units moved first) and each unit's CPU wall (the engine's conveyance: the room its machine can still
+     give under 75%, journaled, written to the hand and read back);
   4. places the units the ledger lacks (the scheduler's room rule), retires the extra ones, and lets batch tasks into
      the room the services leave (a task yields its room the moment a service needs it);
   5. writes the routes for the front (only ready units) and one line of the timeline.
 
 The kill switch is a file: while it exists the brain is off and the declared state is held (the declared units, every
-machine on). Every decision is a line in the audit with its reason.
+machine on, every wall at its request). Every decision is a line in the audit with its reason.
 """
 from __future__ import annotations
 
@@ -34,8 +37,9 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from omni_orchestrator.brain import OmniBrain, Yardstick, machines_needed
+from omni_orchestrator.brain import OmniBrain, Yardstick, conveyed_limits, machines_needed
 from omni_orchestrator.scheduler import BUSY_TOP, place
+from omnicompass.verdict import Verdict
 
 ROOT = str(Path(__file__).resolve().parents[1])
 
@@ -73,6 +77,16 @@ class Control:
         self.brains = {n: OmniBrain(s["line_ms"], beat, s["min"], s["max"], spec.get("max_step", 3), self.hold)
                        for n, s in self.services.items()}
         self.yard = {n: Yardstick(s["min"], s["max"]) for n, s in self.services.items()}
+        # the verdict (omnicompass/verdict.py), one a service: a unit fewer than the twin is tried on the service's own
+        # response times, stepwise, within the 2% allowance; a trial every 2 beats at the earliest, a refused step tried
+        # again after 24 beats, a phase given up after 12 beats
+        self.verdicts = {n: Verdict(tolerance=0.02, min_samples=30, probe_every=2, recheck=24, max_steps=s["max"],
+                                    max_trial=12, incremental=True) for n, s in self.services.items()} if brain == "omni" else {}
+        self.front_seq = 0                                # the front's answers already handed to the verdict
+        self.last_n: dict[str, int] = {}                  # the units standing at the last beat, and the step the phase
+        self.phase_floor: dict[str, int] = {}             # asked for then: the trial counts only work served at its step
+        self.phase_anchor: dict[str, int] = {}            # the twin as each phase found it: its steps are counted from there
+        self.busy_raw: dict[str, float | None] = {}
         self.cpu_prev: dict[str, tuple[float, float]] = {}
         self.next_beat, self.next_yard = now + beat, now + 15.0
         self.short: dict[str, int] = {}
@@ -103,6 +117,9 @@ class Control:
                 m.update(state=ev["state"], until=ev.get("until", 0.0), since=ev.get("t", time.time()))
         elif k == "task_done":
             self.done.setdefault(ev["job"], set()).add(ev["index"])
+        elif k == "limit":
+            if ev["id"] in self.units:
+                self.units[ev["id"]]["conveyed_m"] = ev["limit_m"]
 
     def record(self, ev: dict) -> None:
         ev = {"t": time.time(), **ev}
@@ -183,7 +200,7 @@ class Control:
                     self.stop_unit(m, uid)
                     continue
                 u.update(ready=bool(r["ready"]), agent_state=r["state"], restarts=r["restarts"], cpu_s=r["cpu_s"],
-                         ever_ready=u.get("ever_ready", False) or bool(r["ready"]))
+                         limit_m=r.get("limit_m"), ever_ready=u.get("ever_ready", False) or bool(r["ready"]))
                 if u.get("kind") == "service" and not u["ever_ready"] and r["restarts"] >= 2 and u["state"] != "retiring":
                     # a unit that cannot come up where it stands (its port taken, its machine lying) is placed again
                     # elsewhere with a new port, instead of being started on the same spot forever
@@ -305,7 +322,11 @@ class Control:
             return None
 
     def busy(self, name: str, now: float) -> float | None:
-        used = req = 0.0
+        """The service's busy share as the yardstick reads it: the processor its units used over their requests, each
+        unit's use capped at its request (a Kubernetes pod never uses more than its limit, here its request; a unit
+        Omni has conveyed more to would otherwise read as more pods than Kubernetes would hold). The uncapped share is
+        kept in busy_raw for the audit."""
+        used = raw = req = 0.0
         for u in self.units.values():
             if u.get("service") != name or u["state"] == "retiring" or "cpu_s" not in u:
                 continue
@@ -313,12 +334,25 @@ class Control:
             self.cpu_prev[u["id"]] = (now, u["cpu_s"])
             if prev is None or now - prev[0] <= 0:
                 continue
-            used += max(0.0, u["cpu_s"] - prev[1])
-            req += u["req_m"] / 1000.0 * (now - prev[0])
+            dt = now - prev[0]
+            d = max(0.0, u["cpu_s"] - prev[1])
+            raw += d
+            used += min(d, u["req_m"] / 1000.0 * dt)
+            req += u["req_m"] / 1000.0 * dt
+        self.busy_raw[name] = raw / req if req > 0 else None
         return used / req if req > 0 else None
 
+    def front_recent(self) -> dict | None:
+        """The front's reading with every answer's response time since the last beat (for the verdict)."""
+        try:
+            out = http("GET", f"{self.spec['front_stats']}?since={self.front_seq}", timeout=1.0)
+            self.front_seq = int(out.get("seq", self.front_seq))
+            return out
+        except Exception:
+            return None
+
     def think(self, now: float) -> None:
-        stats = self.front_stats() if self.brain_kind == "omni" else None
+        stats = self.front_recent() if self.brain_kind == "omni" else None
         for name, svc in self.services.items():
             n = len([u for u in self.units.values() if u.get("service") == name and u["state"] != "retiring"
                      and self.machines[u["machine"]]["state"] != "draining"])
@@ -338,12 +372,76 @@ class Control:
                 reading = p95
                 if stats and waiting > 2 * max(1, int(stats.get("hands", 1))):
                     reading = svc["line_ms"]             # work waiting in line past twice the hands: at the wall
-                want, why = self.brains[name].decide(now, n, busy, reading, waiting)
+                brain, v = self.brains[name], self.verdicts.get(name)
+                twin = brain.twin.recommend(now, n, busy)
+                depth, trial, anchor = 0, False, None
+                if v is not None:
+                    calm = waiting == 0 and brain.law.band.position(reading) < brain.law.band.wall_high
+                    # the work served over the last beat counts for the trial only if the units stood at its step the
+                    # whole beat (the knob at the step the verdict asked for, and unchanged since)
+                    if stats and stats.get("recent") and n == self.last_n.get(name) == self.phase_floor.get(name):
+                        v.observe(stats["recent"])
+                    if waiting > 0 and v.allowed > 0:
+                        # the immune reaction: work waited under an allowed depth, so one step goes back to the twin and
+                        # is not tried again until the recheck has passed
+                        v.allowed -= 1
+                        v.refused_until[v.allowed + 1] = v.t + v.recheck
+                        self.audit("verdict", service=name, verdict="depth handed back: work waited in line",
+                                   step=v.allowed + 1, waiting=waiting)
+                    depth, trial, ev = v.tick(calm)
+                    if ev:
+                        self.audit("verdict", service=name, **ev)
+                        if ev.get("verdict") == "trial":
+                            self.phase_anchor[name] = twin   # the step is counted from the twin as the phase found it
+                    anchor = self.phase_anchor.get(name, twin) if trial else None
+                want, why = brain.decide(now, n, busy, reading, waiting, depth, trial, twin=twin, anchor=anchor)
+                why["busy_raw"] = None if self.busy_raw.get(name) is None else round(self.busy_raw[name], 3)
+                self.last_n[name], self.phase_floor[name] = n, why["floor"]
             if want != self.desired[name]:
                 self.audit("units", service=name, was=self.desired[name], now=want, why=why)
                 self.record({"ev": "desired", "service": name, "n": want})
         if self.brain_kind == "omni":
             self.machine_brain(now)
+            self.convey(now)
+
+    def _set_limit(self, url: str, uid: str, limit_m: float) -> None:
+        try:
+            http("POST", f"{url}/units/{uid}/limit", {"limit_m": limit_m}, timeout=5.0)
+        except Exception:
+            pass                                         # not taken: the read-back differs and the next beat writes again
+
+    def convey(self, now: float) -> None:
+        """The engine's conveyance (omni-v7, omni-v13) on Omni's own machines: each service unit's CPU wall set to the
+        room its machine can still give under 75%, shared among the service's units there, never under the request;
+        batch tasks on the machine are the other workload, counted by their limits. Written to the hand, journaled,
+        read back; audited when the intention changes."""
+        for m in self.machines.values():
+            if m["state"] != "awake":
+                continue
+            on = [u for u in self.units.values() if u["machine"] == m["name"] and u["state"] != "retiring"]
+            ours = [u for u in on if u.get("kind") == "service"]
+            others_m = sum(float(u.get("conveyed_m") or u["req_m"]) for u in on if u.get("kind") != "service")
+            want = conveyed_limits(m["cpu_m"], m.get("busy_m"), ours, others_m)
+            if want is None:
+                continue
+            for u in ours:
+                w = want[u["id"]]
+                meant = float(u.get("conveyed_m") or u["req_m"])
+                if abs(w - meant) >= 10.0:
+                    self.record({"ev": "limit", "id": u["id"], "limit_m": w})
+                    self.audit("limit conveyed" if w > meant else "limit handed back", unit=u["id"], machine=m["name"],
+                               was=meant, now=w, why=f"the machine {m['busy_m']:.0f} m busy of {m['cpu_m']} m; "
+                               f"{len(ours)} unit(s) share the room under 75%, other workloads {others_m:.0f} m")
+                held = u.get("limit_m")
+                if abs(w - meant) >= 10.0 or (held is not None and abs(held - w) >= 10.0):
+                    self.pool.submit(self._set_limit, m["url"], u["id"], w)
+
+    def hand_back_limits(self) -> None:
+        """Every conveyed wall back to the request (the declared state), as the kill switch asks."""
+        for u in self.units.values():
+            if u.get("kind") == "service" and u.get("conveyed_m") and u["conveyed_m"] != u["req_m"]:
+                self.record({"ev": "limit", "id": u["id"], "limit_m": float(u["req_m"])})
+                self.pool.submit(self._set_limit, self.machines[u["machine"]]["url"], u["id"], float(u["req_m"]))
 
     def machine_brain(self, now: float) -> None:
         room = max(m["cpu_m"] for m in self.machines.values()) * (BUSY_TOP if self.room_rule == "busy" else 1.0)
@@ -407,7 +505,9 @@ class Control:
                     self.record({"ev": "machine", "name": m["name"], "state": "awake"})
                 elif m["state"] == "parked":
                     self.record({"ev": "machine", "name": m["name"], "state": "booting", "until": now + self.boot_s})
-            self.audit("kill switch on", why="the brain is off; the declared state is held: the declared units, every machine on")
+            self.hand_back_limits()
+            self.audit("kill switch on", why="the brain is off; the declared state is held: the declared units, every "
+                       "machine on, every wall at its request")
         elif not on and self.killed:
             self.killed = False
             self.audit("kill switch off", why="the brain resumes")
@@ -436,7 +536,12 @@ class Control:
                                 and u["state"] != "retiring") for n in self.services},
                "machines": states, "short": dict(self.short),
                "tasks_running": sum(1 for u in self.units.values() if u.get("kind") == "task" and u["state"] != "retiring"),
-               "tasks_done": {j: len(d) for j, d in self.done.items()}}
+               "tasks_done": {j: len(d) for j, d in self.done.items()},
+               # the processor conveyed above the requests (millicores, every service unit standing) and the verdict's state
+               "conveyed_m": sum(max(0.0, float(u.get("conveyed_m") or u["req_m"]) - u["req_m"]) for u in self.units.values()
+                                 if u.get("kind") == "service" and u["state"] != "retiring"),
+               "depth": {n: v.allowed for n, v in self.verdicts.items()},
+               "trial": {n: v.phase for n, v in self.verdicts.items() if v.phase}}
         with open(self.timeline_path, "a") as f:
             f.write(json.dumps(row) + "\n")
 

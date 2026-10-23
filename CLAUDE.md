@@ -239,6 +239,40 @@ the founder overrides one in the conversation.
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 23 October
+
+- **Omni-Compass by itself, and on top of native: both, and both to the best** (the founder's words: "Within the native, we do
+  whatever the native can be pushed to. And in our own, with no goddamn Kubernetes, we have our own Omni Compass ... We're gonna
+  push it to the best with Omni Direct. We're gonna push it to the best with Omni on a native"; "the way you're writing this
+  should be making OmniCompass better when it's on top of the native, as well as by itself on the organism as the orchestrator,
+  replacing Kubernetes and whatever other managers, orchestrators in the system that OmniCompass is able to become"). Omni's own
+  orchestrator (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`) is built from scratch, no orchestrator's code in it, and read
+  against the yardstick (Kubernetes' published autoscaling rule, written by us) by the one key; every mechanism it gains is the
+  engine's own (conveyance, the verdict, the reflex, the compass law) so the same gain goes to Omni on top of native. Every
+  level is benchmarked on its own (nothing paid for with another), then all joined and benchmarked whole.
+- **The brain finds the win; nobody turns a knob for it** (the founder's words: "the brain should have fucking wired it out";
+  "it's supposed to be built in omnicompasses mechanism, defensive system, immune system, nervous system, pathways of signals
+  moving through ... it should react with the same benefit ... Unless by taking less can show more, or vice versa"). A result
+  that reads EVEN where the organism has room is a mechanism not yet wired, found in the files and wired (23 October: the
+  response time was the unit's own paper quota, not a shortage of units; the engine's conveyance gives the unit the processor
+  its machine can spare: faster, with no unit and no machine added). The win is said only when the run's own files read it.
+- **Where a LOSS may ever be seen** (the founder's words: "Nothing should be shown as a loss because it would have been fixed
+  and never gone there. The only way we're going to ever see a loss ... is in the live engine when people turn knobs and turn
+  and tweak it to a point that fucks it up ... and that's the only benchmark proof that needs to be"). The factory tune reads
+  no LOSS anywhere; a LOSS found in our own runs is a fault, fixed before anything is published, never shown as a result. The
+  live engine's knobs (the dial, the heartbeat, the sizes 1, 10, 100, more or less load) exist so a person can see the system
+  react, break it by hand and watch the brain hold or recover: that is the one place a LOSS is ever shown, as the proof that
+  the factory tune is the best state and that the mechanism can be broken only by leaving it.
+- **A reading leads with the word, never the sign** (the founder's words: "a loss can be a gain and a gain can be a loss
+  depending on ... don't because it's minus and plus"). Every reading to the founder and on every page is written as the word
+  first, then the direction in words (down 4.8%, a cut, GAIN), never a bare signed number.
+- **Every tool to strengthen the engine** (the founder's words: "all you got in access to in libraries kits formalization tools
+  all of the open source mechanisms on everything you can learn and figure and find and build and give me and strength in Omni
+  compasses engine"). Anything available that strengthens the mechanism or its proof is used and named; nothing is built from
+  another orchestrator's or governor's code.
+- **Nothing is pushed until the founder says so** (23 October: "Don't push nothing"; "I don't want you to push shit until I
+  tell you"). Work is built, run and shown here; the push waits for his word.
+
 ## Orders of 20 October
 
 - **The governors four ways** (the founder's words: "We can show what they do natively on top of the system organism. And

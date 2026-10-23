@@ -14,7 +14,9 @@ request in hand and takes no more.
 
 HTTP on 127.0.0.1:<port>: any GET is the service's (GET /work?n=...); GET /_stats is this front's own reading: the
 answers of the last 5 and 10 s (count, failures, the 50th, 95th and 99th percentiles of the response time), the line's
-length and the hands working. Every second the same reading is appended to the stats file.
+length and the hands working; GET /_stats?since=<seq> adds every answer's response time after that sequence number
+(the pieces of work the control plane's verdict measures a trial on). Every second the same reading is appended to the
+stats file.
 """
 from __future__ import annotations
 
@@ -24,6 +26,7 @@ import http.client
 import json
 import threading
 import time
+import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -85,6 +88,8 @@ class Front:
         self.cv = threading.Condition()
         self.hands: dict[str, Hand] = {}
         self.done: collections.deque = collections.deque(maxlen=200_000)   # (time, ms, ok)
+        self.recent: collections.deque = collections.deque(maxlen=20_000)  # (seq, ms) of the answers, for the verdict
+        self.seq = 0
         self.mtime = 0.0
         self.busy = 0
 
@@ -95,8 +100,19 @@ class Front:
             self.cv.notify()
         if not j.done.wait(30):
             j.status, j.body = 504, b"no answer in 30 s"
-        self.done.append((time.time(), 1000.0 * (time.time() - j.t0), j.status == 200))
+        ms = 1000.0 * (time.time() - j.t0)
+        self.done.append((time.time(), ms, j.status == 200))
+        if j.status == 200:
+            with self.cv:
+                self.seq += 1
+                self.recent.append((self.seq, ms))
         return j
+
+    def since(self, seq: int) -> dict:
+        """The response times of every answer after sequence number seq (the last 5,000 at most), and the newest seq."""
+        with self.cv:
+            xs = [ms for s, ms in self.recent if s > seq]
+            return {"seq": self.seq, "recent": [round(x, 2) for x in xs[-5000:]]}
 
     def take(self, hand: Hand) -> Job | None:
         with self.cv:
@@ -170,8 +186,12 @@ def main(argv=None):
         protocol_version = "HTTP/1.1"
 
         def do_GET(self):
-            if self.path == "/_stats":
-                body, code = json.dumps(front.reading()).encode(), 200
+            if self.path == "/_stats" or self.path.startswith("/_stats?"):
+                q = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+                out = front.reading()
+                if "since" in q:
+                    out.update(front.since(int(q["since"][0])))
+                body, code = json.dumps(out).encode(), 200
             else:
                 j = front.submit(self.path)
                 body, code = j.body, j.status

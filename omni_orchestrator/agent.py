@@ -16,6 +16,8 @@ HTTP on 127.0.0.1:<port>:
   GET  /status          the machine, its walls, the processor it used, and every unit with its state
   POST /units           start a unit: {"id", "kind": "service"|"task", "cmd": [...], "port", "limit_m", "mem_mb",
                         "health", "env"}
+  POST /units/<id>/limit  move the unit's CPU wall: {"limit_m"}; answers with the wall as the kernel now holds it
+                        (the control plane's conveyance: a unit given the processor its machine can spare, or handed back)
   DELETE /units/<id>    stop a unit: SIGTERM to its process group, SIGKILL after 3 s, its walls removed
   POST /stop_all        stop every unit
 """
@@ -136,6 +138,17 @@ class Agent:
             self.stop_unit(uid)
         return len(ids)
 
+    def set_limit(self, uid: str, limit_m: float) -> float | None:
+        """Move a unit's CPU wall and read back what the kernel holds; None when the unit is not here."""
+        with self.lock:
+            u = self.units.get(uid)
+            if u is None:
+                return None
+            u.spec["limit_m"] = limit_m                  # a unit started again keeps the wall it was given
+        w = Walls(self.name, uid)
+        w.set_cpu(limit_m)
+        return w.cpu_limit_m()
+
     # ---- the watch -----------------------------------------------------------------------------------------------
     def supervise(self) -> None:
         while True:
@@ -187,7 +200,8 @@ class Agent:
                 "cores": sorted(self.cores), "cpu_s": self.walls.cpu_s(), "time": time.time(),
                 "units": [{"id": u.id, "kind": u.kind, "state": u.state, "ready": u.ready, "restarts": u.restarts,
                            "pid": u.proc.pid if u.proc else None, "port": u.spec.get("port"),
-                           "exit_code": u.exit_code, "cpu_s": Walls(self.name, u.id).cpu_s()} for u in units]}
+                           "exit_code": u.exit_code, "cpu_s": Walls(self.name, u.id).cpu_s(),
+                           "limit_m": Walls(self.name, u.id).cpu_limit_m()} for u in units]}
 
 
 def serve(agent: Agent, port: int) -> None:
@@ -214,6 +228,9 @@ def serve(agent: Agent, port: int) -> None:
             if self.path == "/units":
                 agent.start_unit(self._body())
                 self._send(200, {"ok": True})
+            elif self.path.startswith("/units/") and self.path.endswith("/limit"):
+                got = agent.set_limit(self.path.split("/")[2], float(self._body()["limit_m"]))
+                self._send(200 if got is not None else 404, {"limit_m": got})
             elif self.path == "/stop_all":
                 self._send(200, {"stopped": agent.stop_all()})
             else:

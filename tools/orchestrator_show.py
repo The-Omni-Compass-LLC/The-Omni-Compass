@@ -12,8 +12,10 @@ limit), each answer a 40 ms chain of hashes whose digest the client checks.
 
   1. the yardstick  Kubernetes' published autoscaling rule (every 15 s, 50% target, 300 s before a fall), the units
                     spread as Kubernetes' scheduler spreads them, every machine on (a fixed cluster)
-  2. Omni           the compass law on the 95th percentile at a 5 s beat, never below its native twin, units packed,
-                    machines parked and woken (two at least, a 10 s boot)
+  2. Omni           at a 5 s beat: the reflex on work in line, the compass law on the 95th percentile, the yardstick
+                    twin less the depth the verdict allows on the service's own response times, each unit's CPU wall
+                    conveyed to the room its machine can spare (the engine's rule), units packed, machines parked and
+                    woken (two at least, a 10 s boot)
      the same clients for both: 1 2 3 2 3 4 3 4 5 4 5 6 5 6 7 6 7 8, 25 s a step
   3. one body       a batch job of 16 tasks beside the service, Omni deciding; the service grows midway
   4. the drills     with Omni: a unit killed, a machine lost and repaired, the control plane killed and started
@@ -288,25 +290,29 @@ def summary(d: Path, meta: dict) -> dict:
             "wrong": sum(1 for r in rq if r["ok"] and not r["right"]),
             "p50_ms": pct(ok, 0.5), "p95_ms": pct(ok, 0.95), "p99_ms": pct(ok, 0.99),
             "machine_min": sum(on(r) for r in tl) / 60.0, "unit_min": sum(r["units"]["web"] for r in tl) / 60.0,
+            "conveyed_core_min": sum(r.get("conveyed_m", 0.0) for r in tl) / 1000.0 / 60.0,
+            "depth_max": max([r.get("depth", {}).get("web", 0) for r in tl] or [0]),
             "cpu_s": sum(meta["cpu_s"].values()), "seconds": len(tl)}
 
 
 def per_step(d: Path, meta: dict) -> dict[str, list[float]]:
     rq = requests(d)
     tl = jsonl(d / "ctl" / "timeline.jsonl")
-    out = {"requests": [], "p95_ms": [], "machines": []}
+    out = {"requests": [], "p95_ms": [], "machines": [], "units": []}
     for i in range(len(meta["steps"])):
         a, b = i * meta["step_s"], (i + 1) * meta["step_s"]
         xs = [r for r in rq if a <= r["t"] < b]
         out["requests"].append(float(sum(1 for r in xs if r["ok"])))
         out["p95_ms"].append(pct([r["ms"] for r in xs if r["ok"]], 0.95))
-        ms = [sum(v for k, v in r["machines"].items() if k in ("awake", "booting", "draining")) for r in tl
-              if meta["t_load"] + a <= r["t"] < meta["t_load"] + b]
+        rows = [r for r in tl if meta["t_load"] + a <= r["t"] < meta["t_load"] + b]
+        ms = [sum(v for k, v in r["machines"].items() if k in ("awake", "booting", "draining")) for r in rows]
         out["machines"].append(sum(ms) / len(ms) if ms else float("nan"))
+        us = [r["units"]["web"] for r in rows]
+        out["units"].append(sum(us) / len(us) if us else float("nan"))
     return out
 
 
-AIMS = {"requests": "work", "p95_ms": "wait", "machines": "resource"}
+AIMS = {"requests": "work", "p95_ms": "wait", "machines": "resource", "units": "resource"}
 
 
 def word(gauge: str, diffs: list[float], base: list[float]) -> dict:
@@ -399,7 +405,7 @@ def build_report(out: Path) -> Path:
     readings = {}
     if y and o:
         py, po = per_step(out / "yardstick", y), per_step(out / "omni", o)
-        for g in ("requests", "p95_ms", "machines"):
+        for g in ("requests", "p95_ms", "machines", "units"):
             pairs = [(a, b) for a, b in zip(po[g], py[g]) if a == a and b == b]
             readings[g] = word(g, [a - b for a, b in pairs], [b for _, b in pairs])
     rows = []
@@ -411,7 +417,9 @@ def build_report(out: Path) -> Path:
                                 ("response time, 95th percentile (ms)", "p95_ms", "{:,.0f}"),
                                 ("response time, 99th percentile (ms)", "p99_ms", "{:,.0f}"),
                                 ("machine-minutes on (the bill)", "machine_min", "{:,.1f}"),
-                                ("unit-minutes", "unit_min", "{:,.1f}"), ("processor-seconds used by the units", "cpu_s", "{:,.0f}")):
+                                ("unit-minutes", "unit_min", "{:,.1f}"), ("processor-seconds used by the units", "cpu_s", "{:,.0f}"),
+                                ("processor conveyed above the requests (core-minutes)", "conveyed_core_min", "{:,.2f}"),
+                                ("units below the twin the verdict allowed, at most", "depth_max", "{:,.0f}")):
             rows.append((label, fmt.format(sy[key]), fmt.format(so[key]), rel(so[key], sy[key])))
     css = """
 :root{--bg:#ffffff;--fg:#1d2330;--muted:#5b6475;--line:#e3e6ec;--card:#f6f7f9}
@@ -444,7 +452,8 @@ code{font-size:.88em}
     cal = json.loads((out / "calibration.json").read_text()) if (out / "calibration.json").exists() else {}
     H.append("<div class='card'><b>The rig.</b> Six machines of half a processor each, walled by the kernel's own CPU quotas "
              "(two machines on each of three cores); the control plane, the front, the six machines' hands and the clients "
-             "on the fourth core. The service's units: 250 millicores each (request and limit). Each request: a chain of "
+             "on the fourth core. The service's units: 250 millicores each (request and limit on the yardstick, as "
+             "Kubernetes holds them; on Omni the wall is conveyed to the room the machine can spare). Each request: a chain of "
              f"{cal.get('k_40ms', '?'):,} SHA-256 hashes (about 40 ms of processor), its digest checked by the client. "
              "The clients: closed loop, 0.1 s of thought between requests, stepping by one.</div>")
     if rows:
@@ -452,9 +461,13 @@ code{font-size:.88em}
         H.append("<p><b>Yardstick:</b> Kubernetes' published autoscaling rule (every 15 s; 50% of the request; 10% "
                  "tolerance; a fall only to the highest count of the last 300 s), the units spread as Kubernetes' scheduler "
                  "spreads them, all six machines on, as a fixed cluster runs. Written by us from its documentation as the "
-                 "measure; it is not Kubernetes itself. <b>Omni:</b> the compass law on the 95th percentile every 5 s, "
-                 "never below its native twin (the yardstick's rule on the same readings), units packed, machines parked "
-                 "and woken (two at least; a parked machine takes 10 s to come back).</p>")
+                 "measure; it is not Kubernetes itself. <b>Omni:</b> every 5 s, the reflex (work waiting in line adds "
+                 "units now), the compass law on the 95th percentile, and the yardstick twin (what Kubernetes would hold "
+                 "for this work) less the depth the verdict has allowed on the service's own response times (a unit fewer "
+                 "tried, kept only where the response time reads no LOSS within 2%); each unit's CPU wall conveyed to the "
+                 "room its machine can spare under 75% (the engine's rule: a unit answers at its machine's speed, not its "
+                 "paper quota's); units packed, machines parked and woken (two at least; a parked machine takes 10 s to "
+                 "come back).</p>")
         H.append("<table><tr><th>gauge</th><th class='num'>yardstick</th><th class='num'>Omni</th><th class='num'>Omni against it</th></tr>")
         for r in rows:
             H.append(f"<tr><td>{html.escape(r[0])}</td><td class='num'>{r[1]}</td><td class='num'>{r[2]}</td><td class='num'>{r[3]}</td></tr>")
@@ -463,7 +476,8 @@ code{font-size:.88em}
             H.append("<p><b>Read by the one key</b>, step by step (each step of the clients a pair, its 95% interval on "
                      f"{len(y['steps'])} pairs; one run of each arm, not yet the three-run reading):</p><table>"
                      "<tr><th>gauge</th><th class='num'>Omni minus yardstick, mean a step</th><th class='num'>95% interval</th><th>reading</th></tr>")
-            names = {"requests": "requests answered a step", "p95_ms": "95th percentile a step (ms)", "machines": "machines on, mean a step"}
+            names = {"requests": "requests answered a step", "p95_ms": "95th percentile a step (ms)",
+                     "machines": "machines on, mean a step", "units": "units standing, mean a step"}
             for g, r in readings.items():
                 cls = "GAIN" if r["word"].startswith("GAIN") else "EVEN" if r["word"] == "EVEN" else "LOSS" if r["word"] == "LOSS" else "given"
                 H.append(f"<tr><td>{names[g]}</td><td class='num'>{r['mean']:+.1f} ({100 * r['rel']:+.1f}%)</td>"
@@ -540,12 +554,21 @@ code{font-size:.88em}
         H.append("<h2>4. What Omni's brain decided, in its own words (the first 14 lines of the arm)</h2><table>"
                  "<tr><th>s</th><th>decision</th><th>why</th></tr>")
         t0 = metas["omni"]["t_load"]
-        picked = [a for a in au if a["kind"] in ("units", "machine woken", "machine draining", "machine parked")][:14]
+        picked = [a for a in au if a["kind"] in ("units", "machine woken", "machine draining", "machine parked",
+                                                 "limit conveyed", "limit handed back", "verdict")][:14]
         for a in picked:
             why = a.get("why")
-            why = (f"force {why.get('force')}, p95 {why.get('p95_ms')} ms, twin {why.get('twin')}, busy {why.get('busy')}"
+            why = (f"force {why.get('force')}, p95 {why.get('p95_ms')} ms, twin {why.get('twin')}, floor {why.get('floor')} "
+                   f"(depth {why.get('depth')}), busy {why.get('busy')}, waiting {why.get('waiting')}"
                    if isinstance(why, dict) else why)
-            what = f"units {a.get('was')} → {a.get('now')}" if a["kind"] == "units" else f"{a['kind']} {a.get('machine', '')}"
+            if a["kind"] == "units":
+                what = f"units {a.get('was')} → {a.get('now')}"
+            elif a["kind"] in ("limit conveyed", "limit handed back"):
+                what = f"{a['kind']}: {a.get('unit')} {a.get('was'):.0f} → {a.get('now'):.0f} m"
+            elif a["kind"] == "verdict":
+                what, why = f"verdict: {a.get('verdict')}", f"step {a.get('step')}" + (f", {a.get('reading')}" if a.get("reading") else "")
+            else:
+                what = f"{a['kind']} {a.get('machine', '')}"
             H.append(f"<tr><td class='num'>{a['t'] - t0:.0f}</td><td>{html.escape(what)}</td><td>{html.escape(str(why))}</td></tr>")
         H.append("</table>")
     H.append("<h2>5. What it covers, and what it does not yet</h2><table><tr><th>what an orchestrator does</th><th>Omni's own piece</th><th>shown here</th></tr>")
@@ -555,7 +578,8 @@ code{font-size:.88em}
                     ("health checks", "the hand's probe, three misses and it is restarted", "yes"),
                     ("isolation of processor and memory", "the kernel's control groups (cgroup.py)", "yes: CPU walls for every machine and unit"),
                     ("one address for a service, spread the load", "the front (front.py)", "yes"),
-                    ("scale units with the load", "the compass law, never below the native twin (brain.py)", "yes"),
+                    ("scale units with the load", "the reflex on work in line, the compass law, the yardstick twin less the verdict's depth (brain.py)", "yes"),
+                    ("give a unit the processor its machine can spare", "conveyance, the engine's own rule (brain.py, control.py, the hand's wall)", "yes"),
                     ("scale machines", "wake before a unit waits, park after the load holds low", "yes"),
                     ("batch jobs and a queue", "tasks in the room the service leaves, yielding to it", "yes"),
                     ("a machine lost", "silent three times: its units placed again", "yes"),

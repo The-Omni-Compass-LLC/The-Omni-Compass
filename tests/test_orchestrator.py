@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from omni_orchestrator.brain import OmniBrain, Yardstick, machines_needed  # noqa: E402
+from omni_orchestrator.brain import OmniBrain, Yardstick, conveyed_limits, machines_needed  # noqa: E402
 from omni_orchestrator.control import Control  # noqa: E402
 from omni_orchestrator.scheduler import place, room  # noqa: E402
 from omni_orchestrator.workload import chain  # noqa: E402
@@ -86,6 +86,33 @@ class Brain(unittest.TestCase):
         self.assertEqual(got[:2], [6, 6])
         self.assertLessEqual(got[2], 6)
 
+    def test_the_reflex_adds_a_unit_for_each_request_waiting_in_line(self):
+        b = OmniBrain(line_ms=800, beat_s=5, mn=2, mx=12, max_step=3)
+        self.assertEqual(b.decide(0.0, 4, 0.5, 100.0, 2)[0], 6)     # two waiting: two units now, the response still calm
+        self.assertEqual(b.decide(5.0, 6, 0.5, 100.0, 5)[0], 9)     # five waiting: the step at most
+
+    def test_the_verdicts_depth_lowers_the_floor_and_a_trial_walks_to_it_one_unit_a_beat(self):
+        b = OmniBrain(line_ms=800, beat_s=5, mn=2, mx=12, hold=3)
+        want, why = b.decide(0.0, 8, 0.5, 60.0, 0, depth=2, trial=True)
+        self.assertEqual((why["twin"], why["floor"]), (8, 6))        # busy at target: the twin holds 8; two below it allowed
+        self.assertEqual(want, 7)                                    # one unit a beat toward the step
+        # the step is counted from the twin as the phase found it (anchor 8), so the floor does not follow the count down
+        self.assertEqual(b.decide(5.0, 7, 0.5, 60.0, 0, depth=2, trial=True, anchor=8)[0], 6)
+        self.assertEqual(b.decide(10.0, 6, 0.5, 60.0, 0, depth=2, trial=True, anchor=8)[0], 6)   # and stands there
+        self.assertEqual(b.decide(15.0, 6, 0.5, 60.0, 1, depth=2, trial=True, anchor=8)[0], 7)   # work waits: the reflex
+
+    def test_conveyance_gives_a_unit_the_room_under_75_percent_of_its_machine(self):
+        one, two = [{"id": "a", "req_m": 250}], [{"id": "a", "req_m": 250}, {"id": "b", "req_m": 250}]
+        self.assertEqual(conveyed_limits(500, 100.0, one, 0.0), {"a": 370.0})     # alone: the room under 375 m, in 10 m steps
+        self.assertEqual(conveyed_limits(500, 100.0, two, 0.0), {"a": 250.0, "b": 250.0})  # shared: never under the request
+        self.assertEqual(conveyed_limits(500, 100.0, one, 100.0), {"a": 270.0})   # another workload's 100 m counted off
+        self.assertIsNone(conveyed_limits(500, None, one, 0.0))                   # busy share unread: nothing moves
+        self.assertIsNone(conveyed_limits(500, 360.0, one, 0.0))                  # 72%: between the lines, held
+        self.assertIsNone(conveyed_limits(500, 380.0, one, 0.0))                  # 76%: no new raise, what stands stands
+        self.assertEqual(conveyed_limits(500, 380.0, one, 0.0, others_room=True), {"a": 250.0})  # ...beside another's room: back
+        self.assertEqual(conveyed_limits(500, 0.0, one, 0.0)["a"], 370.0)         # never over the machine, in any case
+        self.assertEqual(conveyed_limits(2000, 0.0, one, 0.0)["a"], 1500.0)
+
     def test_machines_hold_room_for_the_next_step_and_never_fall_below_two(self):
         self.assertEqual(machines_needed(1, 250, 500, 2, 2), 2)
         self.assertEqual(machines_needed(8, 250, 500, 2, 2), 5)
@@ -108,6 +135,32 @@ class Ledger(unittest.TestCase):
         self.assertEqual(set(again.units), {"web-0"})
         self.assertEqual(again.machines["m1"]["state"], "draining")
         self.assertEqual(again.port, 9101)                      # no port is ever given twice
+
+    def test_the_twins_busy_share_is_read_capped_at_the_request(self):
+        d = tempfile.mkdtemp()
+        spec = {"routes": str(Path(d) / "routes.json"), "front_stats": "http://127.0.0.1:1/_stats",
+                "machines": [{"name": "m1", "url": "http://127.0.0.1:1", "cpu_m": 500}],
+                "services": [{"name": "web", "replicas": 1, "min": 1, "max": 12, "req_m": 250, "limit_m": 250, "k": 10,
+                              "line_ms": 800}]}
+        c = Control(spec, d, "omni", 5.0)
+        c.units["web-0"] = {"id": "web-0", "kind": "service", "service": "web", "machine": "m1", "req_m": 250,
+                            "state": "placed", "cpu_s": 0.0}
+        c.busy("web", 0.0)
+        c.units["web-0"]["cpu_s"] = 1.6                          # 1.6 s of processor in 4 s: 400 m, over a 250 m request
+        self.assertAlmostEqual(c.busy("web", 4.0), 1.0)         # what Kubernetes' pod, walled at its request, could use
+        self.assertAlmostEqual(c.busy_raw["web"], 1.6)          # what the conveyed unit used, for the audit
+
+    def test_a_conveyed_wall_is_journaled_and_replayed(self):
+        d = tempfile.mkdtemp()
+        spec = {"routes": str(Path(d) / "routes.json"), "front_stats": "http://127.0.0.1:1/_stats",
+                "machines": [{"name": "m1", "url": "http://127.0.0.1:1", "cpu_m": 500}],
+                "services": [{"name": "web", "replicas": 1, "min": 1, "max": 12, "req_m": 250, "limit_m": 250, "k": 10,
+                              "line_ms": 800}]}
+        c = Control(spec, d, "omni", 5.0)
+        c.record({"ev": "unit", "u": {"id": "web-0", "seq": 0, "kind": "service", "service": "web", "machine": "m1",
+                                      "port": 9100, "req_m": 250, "state": "placed", "born": 0.0}})
+        c.record({"ev": "limit", "id": "web-0", "limit_m": 370.0})
+        self.assertEqual(Control(spec, d, "omni", 5.0).units["web-0"]["conveyed_m"], 370.0)
 
 
 class Work(unittest.TestCase):

@@ -89,7 +89,12 @@ then add on, retune, upgrade or tune down any muscle or any combination of muscl
 service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
 published ones. On a live system the verdict (`omnicompass/verdict.py`) measures it with paired
 trials on the muscle itself before every step. Every result reports each measure, and where one read LOSS at all, by
-however little, the result says so and by how much.
+however little, the result says so and by how much. The factory tune is published only where it reads no LOSS: a LOSS found
+in The Omni-Compass LLC's own runs is treated as a fault in the mechanism or its wiring, found and fixed before the result is
+published, never as a number to live with (the founder's order of 23 October 2026). The one place a LOSS is meant to be seen
+is the live engine, when a person turns its knobs away from the factory tune (the dial, the heartbeat, the sizes, the load)
+to watch the system react and the brain hold or recover: that showing is the proof that the mechanism can be broken only by
+leaving it, and a changed tune's readings are the licensee's own.
 
 ## 4. The wiring declaration
 

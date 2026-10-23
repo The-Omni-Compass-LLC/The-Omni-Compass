@@ -76,6 +76,25 @@ class Walls:
         except OSError:
             return False
 
+    def set_cpu(self, cpu_m: float) -> bool:
+        """Move the group's CPU wall to cpu_m millicores (the quota the kernel enforces); True when the kernel took it."""
+        q = str(int(cpu_m * PERIOD_US / 1000))
+        if v2():
+            return _write(self._dir() / "cpu.max", f"{q} {PERIOD_US}")
+        return _write(self._dir("cpu") / "cpu.cfs_quota_us", q)
+
+    def cpu_limit_m(self) -> float | None:
+        """The group's CPU wall as it stands, in millicores (None: no wall, or none readable)."""
+        try:
+            if v2():
+                q, p = (self._dir() / "cpu.max").read_text().split()
+                return None if q == "max" else int(q) * 1000.0 / int(p)
+            q = int((self._dir("cpu") / "cpu.cfs_quota_us").read_text())
+            p = int((self._dir("cpu") / "cpu.cfs_period_us").read_text())
+            return None if q < 0 else q * 1000.0 / p
+        except (OSError, ValueError):
+            return None
+
     # ---- join, read, list, remove --------------------------------------------------------------------------------
     def join(self, pid: int) -> None:
         if v2():
