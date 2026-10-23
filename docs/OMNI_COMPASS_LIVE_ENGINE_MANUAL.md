@@ -58,14 +58,6 @@ differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
 
 Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
 
-**How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
-the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
-in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
-minutes means 2.3% more minutes over the line; EVEN =0.9% means a 0.9% difference the noise covers; power given +3.1% means 3.1%
-more of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
-coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
-or fell against native (the page's section iv, "How to read a number beside a word"; the founder's order of 23 October).
-
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
@@ -90,6 +82,14 @@ Why these three words: they are the words of underwriting and actuarial work, wh
 
 Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
+
+**How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
+the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
+in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
+minutes means 2.3% more minutes over the line; EVEN =0.9% means a 0.9% difference the noise covers; power given +3.1% means 3.1%
+more of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
+coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
+or fell against native (the page's section iv, "How to read a number beside a word"; the founder's order of 23 October).
 
 ## What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report
 
@@ -576,14 +576,17 @@ a monitor on screen now.
 **The light on every monitor** (the founder's order of 23 October). Each tile carries a light in its top right corner, and each
 monitor the same light beside its number on the page: green while the gauge the monitor draws is inside its lines; amber before
 the line, when the gauge is within 3% of it or when its own slope over the last readings, carried three readings ahead, crosses it;
-red when it is over; grey where the monitor has no line to watch (a bill, a count of runs, a digest check), and the light says so.
+red when it is over; grey where the monitor has no line to watch (a bill, a count of runs), and the light says so.
 The light reads the series the monitor draws and adds no number: on the live engine, the muscles against their lines; on a cluster
 replay, the 95th percentile against the 200 ms line and the pods waiting for a place; on the heart, the decision's own time against
 half its beat; on the CPU host, the busy share against the 75% line; on the card, the draw against its power limit; on the page's
-own governor, the time between frames against 1.5 frames; on a record, the judged rows of the newest tables (a LOSS row lights red
-and stays). Above the wall a line counts the lights and names the monitors heading for a line or over one, beside the engine's own
-last entry on its side, because the brain reads the same slope and acts before the line; the light only says so. Hover a light for
-its reading.
+own governor, the time between frames against 1.5 frames; on the proof, the page's runs against the Python's (green when the
+digests match and every number is within 1e-9, red when they differ); on the governors and orchestrators, their own three-run
+tables; on a record, the judged rows of the newest tables (a LOSS row lights red and stays). A light fed by our own models says
+so (class S). Above the wall a line counts the lights and names the monitors heading for a line or over one, beside the engine's
+own last entry on its side. The three-reading projection is the light's own: the brain's law acts on the position inside its
+band and damps on the position's rate of change, with a fail-up at the band's 95% wall; it projects nothing ahead. Hover a light
+for its reading.
 
 ### 4.2 The order of the board
 
@@ -1018,8 +1021,9 @@ choice does. Its five rows of buttons pick the record to read:
 - **Beat:** 5, 10, 15, 20, 30, 60, 75, 90 or 120 s.
 - **Setting:** on-site, where the governor sizes the pool on top of the pod autoscaler, or in the cloud, the machines alone.
 - **Engine:** omni-v16, every clock in seconds, or omni-v15, its rules counted in beats.
-- **Against:** what each reading is set against: native, the same engine at 15 s (the factory's beat), or the same engine at
-  60 s.
+- **Against:** what each reading is set against: native, the same engine at 15 s (omni-v16's factory beat), or the same
+  engine at 60 s (omni-v17's). The sweep's record is omni-v16's and omni-v15's; the dial's ladder (the page's section 1j, section 7.4) reads omni-v17.
+  The monitor opens on 60 s, the factory's beat on the engine that stands.
 - **Gauge:** pods waiting for a place, machine-hours, energy per used core-hour, the 95th and 99th percentile response, the
   minutes over the line, and the engine's own cost: its processor time, its reads of the cluster and its writes a day, and
   the fast check's rescues, the machines its 5-second check added only after a pod already waited.
@@ -1252,9 +1256,10 @@ top of its own native controller. The knobs move the live engine in the page's s
 frame load also move the page's own render governor (the page's section 11).
 
 **Back to the factory tune.** One button, on the console under the kill switch, on the dock, above the wall and in every
-monitor's own knobs, returns every knob of the page to the main engine as it ships (`DISCLOSURES.md`, section 3): the dial at
-the max, Omni-Compass ON, demand ×1, noise σ 0, sense delay +0, no fault held, every muscle driven, speed 1×, running, no frame
-load, and the heartbeat monitor on the factory's 60 s. It says what it put back. Turn anything, break it, watch it break; this
+monitor's own knobs, puts back two things at once: the engine's tune as it ships (`DISCLOSURES.md`, section 3: the dial at
+the max, every muscle driven, Omni-Compass ON, the 60 s beat) and the page's plant at rest (the day as written, demand ×1, noise
+σ 0, sense delay +0, no fault held, speed 1×, running, no frame load, and the heartbeat monitor on 60 s, on-site, pods waiting,
+against native). It says what it put back. Turn anything, break it, watch it break; this
 button brings all of it back (the founder's order of 23 October). Native alone is not a tune: it is the kill switch.
 
 ### 18.2 Do no harm, at the console

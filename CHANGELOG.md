@@ -27,6 +27,15 @@
   title chips, every table head and every lane on the page read native, Omni-Compass and native, and Omni-Compass by itself; the key
   and the whole organism (section 3) say what the third arm is (`docs/SOLO_PREREGISTRATION.md`) and that its column appears from its
   first run on GitHub's machines, nothing written for it before.
+- **The beats the ladder had not read, 20, 40, 45 and 50 s, read on the side** (the founder's words: "I think 45 you didn't try"),
+  in our own models on omni-v17, eight seeds, both settings, and folded into the ladder's record (`results/toy_gate/V17_LADDER.md`,
+  the page's section 1j; class S). Against the main engine's 60 s in the kind benchmark's setting the minutes over the line read GAIN
+  at 20 s (+14.7%) and at 40 s (+13.2%), EVEN at 45 s (=9.0%) and 50 s (=5.8%); every other gauge EVEN; the reads a day and the
+  governor's own processor power given (+5% reads at 40 s, +22% at 20 s). In the cloud's setting every gauge reads EVEN against 60 s at
+  every beat. Against native the rows are the ladder's: pods waiting for a place LOSS at every beat in the kind setting (the
+  engine's, on the next version's list), the 95th percentile and the minutes over the line GAIN. By the key, 60 s is not the beat that
+  reads best on the service: 20 s and 40 s read GAIN against it with no LOSS, their cost power given; the factory beat is the next
+  version's decision, through the toy gate (the order of 23 October).
 - The page was opened headless at 1280 and 390 px after the change: no console error; the lights, the tooltips and the factory
   button respond. The Live Engine Manual carries the lights (4.1), the button (18.1) and the sign (the key); its appendix is rebuilt.
 

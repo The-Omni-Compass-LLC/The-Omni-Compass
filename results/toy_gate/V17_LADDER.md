@@ -4,7 +4,7 @@
 
 The Kubernetes governor's full decision, its heartbeat, is a dial from omni-v17 on (`docs/OMNI_V17.md`; the founder's order of 22 October): any beat can be set, the main engine ships at 60 s, and every beat is shown beside native with what it buys and what it costs, because an operator may want a fast beat for its reads and accept what it costs, or a slow one, and each beat may want its own combination of the other knobs. This page reads the beats in our own models (evidence class S): the engine alone on a plant that moves every 5 s (the toy cluster's step cut to 5 s), the fast checks every 5 s at every beat, seeds 1 to 8, 1 day each, the same seeds and plant at every beat. Each beat is paired by seed against the main engine's 60 s and against native (the mean change, its 95% interval over the seeds, the word by the gauge's aim: `tools/readings.py`). A reading here says what a beat does in a model, never what a benchmark found; the real runs at every beat are `docs/PACE_PREREGISTRATION.md`, amendment 3.
 
-Built by `tools/beat_ladder.py` from `results/toy_gate/V16_PACE.json` and `the 30 and 75 s run of 22 October on omni-v16, whose counts at those beats omni-v17 keeps (tools/toy_gate.py --toys pace_cloud,pace_kind --pace-periods 60,30,75 --seeds 1-8 --days 1)` and `the 90 and 120 s run of 22 October on omni-v17 with the cruise fix (tools/toy_gate.py --toys pace_cloud,pace_kind --pace-periods 60,90,120 --seeds 1-8 --days 1)`. What two of them share (native and the 60 s beat) reads the same seed by seed on every modelled gauge, to the twelfth digit (the power cap's travel, a long sum of moves, differs in its last bits between Python 3.11's float sum and 3.12's); Omni's own processor is timed on the machine that ran each report, so each beat's processor is read against the 60 s beat of its own report.
+Built by `tools/beat_ladder.py` from `results/toy_gate/V16_PACE.json` and `the 30 and 75 s run of 22 October on omni-v16, whose counts at those beats omni-v17 keeps (tools/toy_gate.py --toys pace_cloud,pace_kind --pace-periods 60,30,75 --seeds 1-8 --days 1)` and `the 90 and 120 s run of 22 October on omni-v17 with the cruise fix (tools/toy_gate.py --toys pace_cloud,pace_kind --pace-periods 60,90,120 --seeds 1-8 --days 1)` and `the side study of 23 October on omni-v17, the beats between 15 and 60 s the ladder had not read, 20, 40, 45 and 50 s (tools/toy_gate.py --toys pace_cloud,pace_kind --pace-periods 60,45,40,50,20 --seeds 1-8 --days 1; the founder's words: 'I think 45 you didn't try'); its native and 60 s rows read the same seed by seed on every modelled gauge, the power cap's travel to its last bits and the governor's own processor apart, which is read against its own report's 60 s`. What two of them share (native and the 60 s beat) reads the same seed by seed on every modelled gauge, to the twelfth digit (the power cap's travel, a long sum of moves, differs in its last bits between Python 3.11's float sum and 3.12's); Omni's own processor is timed on the machine that ran each report, so each beat's processor is read against the 60 s beat of its own report.
 
 ## The cloud's setting
 
@@ -18,7 +18,11 @@ What each beat buys and what it costs, against native (the value, then the word)
 | every 5 s | 86,412 | 5.51 | 16.52 LOSS | 80.18 EVEN | 27.50 EVEN | 1.20 EVEN | 129.67 EVEN | 0.0344 GAIN |
 | every 10 s | 60,924 | 3.38 | 15.92 EVEN | 80.11 EVEN | 27.12 EVEN | 1.20 EVEN | 133.40 EVEN | 0.0346 GAIN |
 | every 15 s | 52,545 | 2.68 | 18.36 LOSS | 80.31 LOSS | 27.62 LOSS | 1.20 EVEN | 131.48 EVEN | 0.0341 GAIN |
+| every 20 s | 48,082 | 1.54 | 15.13 EVEN | 80.16 EVEN | 27.25 EVEN | 1.20 EVEN | 131.80 EVEN | 0.0348 GAIN |
 | every 30 s | 44,009 | 2.07 | 18.59 LOSS | 80.22 LOSS | 27.38 EVEN | 1.20 EVEN | 132.19 EVEN | 0.0347 GAIN |
+| every 40 s | 41,810 | 1.19 | 21.40 EVEN | 80.25 EVEN | 27.50 EVEN | 1.20 EVEN | 129.84 EVEN | 0.0345 GAIN |
+| every 45 s | 41,204 | 1.16 | 18.62 EVEN | 80.27 EVEN | 27.50 EVEN | 1.20 EVEN | 128.44 EVEN | 0.0345 GAIN |
+| every 50 s | 40,664 | 1.12 | 25.69 EVEN | 80.51 EVEN | 27.25 EVEN | 1.21 EVEN | 133.25 EVEN | 0.0349 EVEN |
 | every 60 s (the main engine) | 39,691 | 1.69 | 20.88 EVEN | 80.33 EVEN | 27.50 EVEN | 1.20 EVEN | 131.98 EVEN | 0.0350 EVEN |
 | every 75 s | 38,928 | 1.66 | 19.30 EVEN | 80.20 EVEN | 27.38 EVEN | 1.20 EVEN | 131.21 GAIN | 0.0350 GAIN |
 | every 90 s | 38,396 | 1.60 | 18.27 EVEN | 80.35 EVEN | 27.62 EVEN | 1.20 EVEN | 131.29 GAIN | 0.0350 GAIN |
@@ -31,7 +35,11 @@ Each beat against the main engine's 60 s:
 | every 5 s | +117.71% power given | +227.12% power given | =20.91% EVEN | =0.19% EVEN | =0.00% EVEN | =0.11% EVEN | =1.75% EVEN | =1.79% EVEN |
 | every 10 s | +53.50% power given | +100.45% power given | =23.75% EVEN | =0.28% EVEN | =1.36% EVEN | =0.14% EVEN | =1.08% EVEN | =1.12% EVEN |
 | every 15 s | +32.39% power given | +59.14% power given | =12.08% EVEN | =0.02% EVEN | =0.45% EVEN | =0.18% EVEN | =0.38% EVEN | +2.57% GAIN |
+| every 20 s | +21.14% power given | +42.05% power given | =27.55% EVEN | =0.21% EVEN | =0.91% EVEN | =0.07% EVEN | =0.14% EVEN | =0.48% EVEN |
 | every 30 s | +10.88% power given | +16.57% power given | =11.00% EVEN | =0.14% EVEN | =0.45% EVEN | =0.18% EVEN | =0.15% EVEN | =0.95% EVEN |
+| every 40 s | +5.34% power given | +9.78% power given | =2.49% EVEN | =0.11% EVEN | =0.00% EVEN | =0.00% EVEN | =1.62% EVEN | =1.45% EVEN |
+| every 45 s | +3.81% power given | +6.93% power given | =10.85% EVEN | =0.08% EVEN | =0.00% EVEN | =0.07% EVEN | =2.69% EVEN | =1.55% EVEN |
+| every 50 s | +2.45% power given | +3.88% power given | =23.01% EVEN | =0.22% EVEN | =0.91% EVEN | =0.14% EVEN | =0.96% EVEN | =0.22% EVEN |
 | every 75 s | =1.92% EVEN | +6.31% GAIN | =7.57% EVEN | =0.17% EVEN | =0.45% EVEN | =0.22% EVEN | =0.59% EVEN | =0.13% EVEN |
 | every 90 s | +3.26% GAIN | +6.07% GAIN | =12.52% EVEN | =0.02% EVEN | =0.45% EVEN | =0.11% EVEN | =0.53% EVEN | =0.06% EVEN |
 | every 120 s | +5.73% GAIN | +7.37% GAIN | =32.91% EVEN | =0.31% EVEN | =1.36% EVEN | =0.11% EVEN | =0.80% EVEN | =0.66% EVEN |
@@ -84,6 +92,22 @@ Each beat against the main engine's 60 s:
 | Omni's own processor (s an hour) | 0.00 | 1.69 | 2.68 | +59.14% power given |  |
 | Reads of the cluster (an hour) | 0.00 | 1,653.79 | 2,189.38 | +32.39% power given |  |
 
+### Every 20 s
+
+| Gauge | Native | Every 60 s | Every 20 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 131.98 | 131.80 | =0.14% EVEN | =0.96% EVEN |
+| Energy per core-hour (kWh) | 0.0357 | 0.0350 | 0.0348 | =0.48% EVEN | +2.42% GAIN |
+| Pods waiting for a place (minutes an hour) | 8.18 | 20.88 | 15.13 | =27.55% EVEN | =84.89% EVEN |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.20 | 1.20 | =0.07% EVEN | =0.14% EVEN |
+| 95th percentile response (ms) | 79.94 | 80.33 | 80.16 | =0.21% EVEN | =0.28% EVEN |
+| Minutes over the line (a day) | 27.00 | 27.50 | 27.25 | =0.91% EVEN | =0.93% EVEN |
+| Power-cap request: moves (a day) | 0.00 | 63.50 | 72.50 | =14.17% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 62.50 | 70.62 | =13.00% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 19.22 | 21.63 | =12.49% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.54 | +42.05% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,653.79 | 2,003.40 | +21.14% power given |  |
+
 ### Every 30 s
 
 | Gauge | Native | Every 60 s | Every 30 s | Against every 60 s | Against native |
@@ -99,6 +123,54 @@ Each beat against the main engine's 60 s:
 | Power-cap request: travel (a day) | 0.00 | 19.22 | 24.33 | =26.53% EVEN | power given |
 | Omni's own processor (s an hour) | 0.00 | 1.78 | 2.07 | +16.57% power given |  |
 | Reads of the cluster (an hour) | 0.00 | 1,653.79 | 1,833.70 | +10.88% power given |  |
+
+### Every 40 s
+
+| Gauge | Native | Every 60 s | Every 40 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 131.98 | 129.84 | =1.62% EVEN | =2.43% EVEN |
+| Energy per core-hour (kWh) | 0.0357 | 0.0350 | 0.0345 | =1.45% EVEN | +3.36% GAIN |
+| Pods waiting for a place (minutes an hour) | 8.18 | 20.88 | 21.40 | =2.49% EVEN | =161.58% EVEN |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.20 | 1.20 | =0.00% EVEN | =0.22% EVEN |
+| 95th percentile response (ms) | 79.94 | 80.33 | 80.25 | =0.11% EVEN | =0.39% EVEN |
+| Minutes over the line (a day) | 27.00 | 27.50 | 27.50 | =0.00% EVEN | =1.85% EVEN |
+| Power-cap request: moves (a day) | 0.00 | 63.50 | 71.38 | =12.40% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 62.50 | 70.25 | =12.40% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 19.22 | 21.67 | =12.70% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.19 | +9.78% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,653.79 | 1,742.08 | +5.34% power given |  |
+
+### Every 45 s
+
+| Gauge | Native | Every 60 s | Every 45 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 131.98 | 128.44 | =2.69% EVEN | =3.48% EVEN |
+| Energy per core-hour (kWh) | 0.0357 | 0.0350 | 0.0345 | =1.55% EVEN | +3.47% GAIN |
+| Pods waiting for a place (minutes an hour) | 8.18 | 20.88 | 18.62 | =10.85% EVEN | =127.52% EVEN |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.20 | 1.20 | =0.07% EVEN | =0.14% EVEN |
+| 95th percentile response (ms) | 79.94 | 80.33 | 80.27 | =0.08% EVEN | =0.41% EVEN |
+| Minutes over the line (a day) | 27.00 | 27.50 | 27.50 | =0.00% EVEN | =1.85% EVEN |
+| Power-cap request: moves (a day) | 0.00 | 63.50 | 57.88 | =8.86% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 62.50 | 56.75 | =9.20% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 19.22 | 17.61 | =8.38% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.16 | +6.93% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,653.79 | 1,716.85 | +3.81% power given |  |
+
+### Every 50 s
+
+| Gauge | Native | Every 60 s | Every 50 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 131.98 | 133.25 | =0.96% EVEN | =0.13% EVEN |
+| Energy per core-hour (kWh) | 0.0357 | 0.0350 | 0.0349 | =0.22% EVEN | =2.17% EVEN |
+| Pods waiting for a place (minutes an hour) | 8.18 | 20.88 | 25.69 | =23.01% EVEN | =213.92% EVEN |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.20 | 1.21 | =0.14% EVEN | =0.36% EVEN |
+| 95th percentile response (ms) | 79.94 | 80.33 | 80.51 | =0.22% EVEN | =0.72% EVEN |
+| Minutes over the line (a day) | 27.00 | 27.50 | 27.25 | =0.91% EVEN | =0.93% EVEN |
+| Power-cap request: moves (a day) | 0.00 | 63.50 | 84.25 | =32.68% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 62.50 | 82.75 | =32.40% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 19.22 | 25.31 | =31.67% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.12 | +3.88% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,653.79 | 1,694.33 | +2.45% power given |  |
 
 ### Every 60 s (the main engine)
 
@@ -164,7 +236,7 @@ Each beat against the main engine's 60 s:
 | Omni's own processor (s an hour) | 0.00 | 1.71 | 1.58 | +7.37% GAIN |  |
 | Reads of the cluster (an hour) | 0.00 | 1,653.79 | 1,558.96 | +5.73% GAIN |  |
 
-Counts over all seeds, by beat: decisions 5 s 138,240, 10 s 69,120, 15 s 46,080, 30 s 23,040, 60 s 11,520, 75 s 9,216, 90 s 7,680, 120 s 5,760; machines_parked 5 s 1,654, 10 s 1,706, 15 s 1,712, 30 s 1,509, 60 s 1,486, 75 s 1,056, 90 s 886, 120 s 722; errors 5 s 0, 10 s 0, 15 s 0, 30 s 0, 60 s 0, 75 s 0, 90 s 0, 120 s 0; steps_allowed 5 s 66, 10 s 67, 15 s 73, 30 s 62, 60 s 54, 75 s 50, 90 s 63, 120 s 56; steps_refused 5 s 78, 10 s 76, 15 s 68, 30 s 75, 60 s 78, 75 s 83, 90 s 82, 120 s 85; trials_abandoned 5 s 127, 10 s 137, 15 s 259, 30 s 151, 60 s 125, 75 s 90, 90 s 63, 120 s 17
+Counts over all seeds, by beat: decisions 5 s 138,240, 10 s 69,120, 15 s 46,080, 20 s 34,560, 30 s 23,040, 40 s 17,280, 45 s 15,360, 50 s 13,824, 60 s 11,520, 75 s 9,216, 90 s 7,680, 120 s 5,760; machines_parked 5 s 1,654, 10 s 1,706, 15 s 1,712, 20 s 1,571, 30 s 1,509, 40 s 1,304, 45 s 1,664, 50 s 1,714, 60 s 1,486, 75 s 1,056, 90 s 886, 120 s 722; errors 5 s 0, 10 s 0, 15 s 0, 20 s 0, 30 s 0, 40 s 0, 45 s 0, 50 s 0, 60 s 0, 75 s 0, 90 s 0, 120 s 0; steps_allowed 5 s 66, 10 s 67, 15 s 73, 20 s 50, 30 s 62, 40 s 68, 45 s 62, 50 s 48, 60 s 54, 75 s 50, 90 s 63, 120 s 56; steps_refused 5 s 78, 10 s 76, 15 s 68, 20 s 76, 30 s 75, 40 s 76, 45 s 79, 50 s 74, 60 s 78, 75 s 83, 90 s 82, 120 s 85; trials_abandoned 5 s 127, 10 s 137, 15 s 259, 20 s 159, 30 s 151, 40 s 147, 45 s 97, 50 s 199, 60 s 125, 75 s 90, 90 s 63, 120 s 17
 
 ## The kind benchmark's setting
 
@@ -178,7 +250,11 @@ What each beat buys and what it costs, against native (the value, then the word)
 | every 5 s | 86,412 | 5.55 | 28.55 LOSS | 76.88 GAIN | 19.38 GAIN | 1.12 GAIN | 149.67 power given | 0.0385 power given |
 | every 10 s | 60,942 | 3.43 | 28.80 LOSS | 76.85 GAIN | 19.38 GAIN | 1.12 GAIN | 149.17 power given | 0.0384 power given |
 | every 15 s | 52,490 | 2.66 | 33.51 LOSS | 76.93 GAIN | 20.25 GAIN | 1.14 GAIN | 151.78 power given | 0.0389 power given |
+| every 20 s | 48,154 | 1.55 | 29.80 LOSS | 76.83 GAIN | 20.25 GAIN | 1.13 GAIN | 150.15 power given | 0.0386 power given |
 | every 30 s | 43,869 | 2.01 | 34.09 LOSS | 76.99 GAIN | 21.25 GAIN | 1.16 GAIN | 151.78 power given | 0.0389 power given |
+| every 40 s | 41,460 | 1.19 | 32.91 LOSS | 76.83 GAIN | 20.62 GAIN | 1.15 GAIN | 151.74 power given | 0.0389 power given |
+| every 45 s | 41,090 | 1.18 | 32.65 LOSS | 77.04 GAIN | 21.62 GAIN | 1.17 GAIN | 151.26 power given | 0.0388 power given |
+| every 50 s | 40,011 | 1.12 | 33.62 LOSS | 76.95 GAIN | 22.38 GAIN | 1.17 GAIN | 151.94 power given | 0.0389 power given |
 | every 60 s (the main engine) | 39,444 | 1.58 | 31.96 LOSS | 77.18 GAIN | 23.75 GAIN | 1.19 EVEN | 151.29 power given | 0.0388 power given |
 | every 75 s | 38,836 | 1.66 | 29.15 LOSS | 77.17 GAIN | 21.75 GAIN | 1.19 EVEN | 149.50 power given | 0.0384 power given |
 | every 90 s | 38,254 | 1.52 | 28.10 LOSS | 77.01 GAIN | 22.62 GAIN | 1.20 EVEN | 148.78 power given | 0.0383 power given |
@@ -191,7 +267,11 @@ Each beat against the main engine's 60 s:
 | every 5 s | +119.08% power given | +250.98% power given | =10.66% EVEN | =0.39% EVEN | +18.42% GAIN | +5.78% GAIN | =1.07% EVEN | =0.66% EVEN |
 | every 10 s | +54.50% power given | +117.14% power given | =9.89% EVEN | =0.44% EVEN | +18.42% GAIN | +6.00% GAIN | =1.40% EVEN | =0.92% EVEN |
 | every 15 s | +33.07% power given | +68.11% power given | =4.84% EVEN | =0.33% EVEN | +14.74% GAIN | =4.13% EVEN | =0.33% EVEN | =0.30% EVEN |
+| every 20 s | +22.08% power given | +43.17% power given | =6.75% EVEN | =0.46% EVEN | +14.74% GAIN | +5.05% GAIN | =0.76% EVEN | =0.44% EVEN |
 | every 30 s | +11.22% power given | +17.25% power given | =6.65% EVEN | =0.26% EVEN | +10.53% GAIN | =2.52% EVEN | =0.32% EVEN | =0.29% EVEN |
+| every 40 s | +5.11% power given | +9.93% power given | =2.97% EVEN | =0.46% EVEN | +13.16% GAIN | =2.93% EVEN | =0.30% EVEN | =0.25% EVEN |
+| every 45 s | +4.17% power given | +8.85% power given | =2.17% EVEN | =0.19% EVEN | =8.95% EVEN | =1.68% EVEN | =0.02% EVEN | =0.05% EVEN |
+| every 50 s | +1.44% power given | +3.84% power given | =5.18% EVEN | =0.31% EVEN | =5.79% EVEN | =1.72% EVEN | =0.43% EVEN | =0.33% EVEN |
 | every 75 s | +1.54% GAIN | =3.07% EVEN | =8.79% EVEN | =0.01% EVEN | =8.42% EVEN | =0.11% EVEN | =1.18% EVEN | =0.84% EVEN |
 | every 90 s | +3.02% GAIN | +12.37% GAIN | =12.07% EVEN | =0.23% EVEN | =4.74% EVEN | =1.46% EVEN | =1.66% EVEN | =1.21% EVEN |
 | every 120 s | +4.84% GAIN | +15.56% GAIN | +29.56% GAIN | =0.25% EVEN | =3.68% EVEN | =4.17% EVEN | =2.06% EVEN | =1.35% EVEN |
@@ -244,6 +324,22 @@ Each beat against the main engine's 60 s:
 | Omni's own processor (s an hour) | 0.00 | 1.58 | 2.66 | +68.11% power given |  |
 | Reads of the cluster (an hour) | 0.00 | 1,643.50 | 2,187.08 | +33.07% power given |  |
 
+### Every 20 s
+
+| Gauge | Native | Every 60 s | Every 20 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 151.29 | 150.15 | =0.76% EVEN | +12.83% power given |
+| Energy per core-hour (kWh) | 0.0357 | 0.0388 | 0.0386 | =0.44% EVEN | +8.10% power given |
+| Pods waiting for a place (minutes an hour) | 8.18 | 31.96 | 29.80 | =6.75% EVEN | −264.21% LOSS |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.19 | 1.13 | +5.05% GAIN | +6.25% GAIN |
+| 95th percentile response (ms) | 79.94 | 77.18 | 76.83 | =0.46% EVEN | +3.89% GAIN |
+| Minutes over the line (a day) | 27.00 | 23.75 | 20.25 | +14.74% GAIN | +25.00% GAIN |
+| Power-cap request: moves (a day) | 0.00 | 33.25 | 32.38 | =2.63% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 32.25 | 31.38 | =2.71% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 10.14 | 9.87 | =2.63% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.55 | +43.17% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,643.50 | 2,006.43 | +22.08% power given |  |
+
 ### Every 30 s
 
 | Gauge | Native | Every 60 s | Every 30 s | Against every 60 s | Against native |
@@ -259,6 +355,54 @@ Each beat against the main engine's 60 s:
 | Power-cap request: travel (a day) | 0.00 | 10.14 | 10.22 | =0.75% EVEN | power given |
 | Omni's own processor (s an hour) | 0.00 | 1.72 | 2.01 | +17.25% power given |  |
 | Reads of the cluster (an hour) | 0.00 | 1,643.50 | 1,827.86 | +11.22% power given |  |
+
+### Every 40 s
+
+| Gauge | Native | Every 60 s | Every 40 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 151.29 | 151.74 | =0.30% EVEN | +14.03% power given |
+| Energy per core-hour (kWh) | 0.0357 | 0.0388 | 0.0389 | =0.25% EVEN | +8.85% power given |
+| Pods waiting for a place (minutes an hour) | 8.18 | 31.96 | 32.91 | =2.97% EVEN | −302.17% LOSS |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.19 | 1.15 | =2.93% EVEN | +4.15% GAIN |
+| 95th percentile response (ms) | 79.94 | 77.18 | 76.83 | =0.46% EVEN | +3.89% GAIN |
+| Minutes over the line (a day) | 27.00 | 23.75 | 20.62 | +13.16% GAIN | +23.61% GAIN |
+| Power-cap request: moves (a day) | 0.00 | 33.25 | 32.75 | =1.50% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 32.25 | 31.75 | =1.55% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 10.14 | 9.99 | =1.50% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.19 | +9.93% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,643.50 | 1,727.52 | +5.11% power given |  |
+
+### Every 45 s
+
+| Gauge | Native | Every 60 s | Every 45 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 151.29 | 151.26 | =0.02% EVEN | +13.66% power given |
+| Energy per core-hour (kWh) | 0.0357 | 0.0388 | 0.0388 | =0.05% EVEN | +8.64% power given |
+| Pods waiting for a place (minutes an hour) | 8.18 | 31.96 | 32.65 | =2.17% EVEN | −299.05% LOSS |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.19 | 1.17 | =1.68% EVEN | +2.92% GAIN |
+| 95th percentile response (ms) | 79.94 | 77.18 | 77.04 | =0.19% EVEN | +3.62% GAIN |
+| Minutes over the line (a day) | 27.00 | 23.75 | 21.62 | =8.95% EVEN | +19.91% GAIN |
+| Power-cap request: moves (a day) | 0.00 | 33.25 | 32.50 | =2.26% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 32.25 | 31.50 | =2.33% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 10.14 | 9.91 | =2.26% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.18 | +8.85% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,643.50 | 1,712.06 | +4.17% power given |  |
+
+### Every 50 s
+
+| Gauge | Native | Every 60 s | Every 50 s | Against every 60 s | Against native |
+|---|---:|---:|---:|---|---|
+| Machine hours (a day) | 133.08 | 151.29 | 151.94 | =0.43% EVEN | +14.17% power given |
+| Energy per core-hour (kWh) | 0.0357 | 0.0388 | 0.0389 | =0.33% EVEN | +8.94% power given |
+| Pods waiting for a place (minutes an hour) | 8.18 | 31.96 | 33.62 | =5.18% EVEN | −310.82% LOSS |
+| Pod autoscaler short of its target (minutes an hour) | 1.20 | 1.19 | 1.17 | =1.72% EVEN | +2.96% GAIN |
+| 95th percentile response (ms) | 79.94 | 77.18 | 76.95 | =0.31% EVEN | +3.74% GAIN |
+| Minutes over the line (a day) | 27.00 | 23.75 | 22.38 | =5.79% EVEN | +17.13% GAIN |
+| Power-cap request: moves (a day) | 0.00 | 33.25 | 33.25 | =0.00% EVEN | power given |
+| Power-cap request: reversals (a day) | 0.00 | 32.25 | 32.25 | =0.00% EVEN | power given |
+| Power-cap request: travel (a day) | 0.00 | 10.14 | 10.14 | =0.00% EVEN | power given |
+| Omni's own processor (s an hour) | 0.00 | 1.08 | 1.12 | +3.84% power given |  |
+| Reads of the cluster (an hour) | 0.00 | 1,643.50 | 1,667.14 | +1.44% power given |  |
 
 ### Every 60 s (the main engine)
 
@@ -324,7 +468,7 @@ Each beat against the main engine's 60 s:
 | Omni's own processor (s an hour) | 0.00 | 1.74 | 1.47 | +15.56% GAIN |  |
 | Reads of the cluster (an hour) | 0.00 | 1,643.50 | 1,564.00 | +4.84% GAIN |  |
 
-Counts over all seeds, by beat: decisions 5 s 138,240, 10 s 69,120, 15 s 46,080, 30 s 23,040, 60 s 11,520, 75 s 9,216, 90 s 7,680, 120 s 5,760; machines_parked 5 s 341, 10 s 357, 15 s 338, 30 s 339, 60 s 329, 75 s 196, 90 s 190, 120 s 119; errors 5 s 0, 10 s 0, 15 s 0, 30 s 0, 60 s 0, 75 s 0, 90 s 0, 120 s 0; steps_allowed 5 s 80, 10 s 65, 15 s 68, 30 s 72, 60 s 56, 75 s 57, 90 s 50, 120 s 52; steps_refused 5 s 87, 10 s 90, 15 s 88, 30 s 86, 60 s 85, 75 s 89, 90 s 86, 120 s 85; trials_abandoned 5 s 15, 10 s 7, 15 s 12, 30 s 17, 60 s 21, 75 s 13, 90 s 14, 120 s 14
+Counts over all seeds, by beat: decisions 5 s 138,240, 10 s 69,120, 15 s 46,080, 20 s 34,560, 30 s 23,040, 40 s 17,280, 45 s 15,360, 50 s 13,824, 60 s 11,520, 75 s 9,216, 90 s 7,680, 120 s 5,760; machines_parked 5 s 341, 10 s 357, 15 s 338, 20 s 355, 30 s 339, 40 s 290, 45 s 375, 50 s 423, 60 s 329, 75 s 196, 90 s 190, 120 s 119; errors 5 s 0, 10 s 0, 15 s 0, 20 s 0, 30 s 0, 40 s 0, 45 s 0, 50 s 0, 60 s 0, 75 s 0, 90 s 0, 120 s 0; steps_allowed 5 s 80, 10 s 65, 15 s 68, 20 s 57, 30 s 72, 40 s 58, 45 s 64, 50 s 57, 60 s 56, 75 s 57, 90 s 50, 120 s 52; steps_refused 5 s 87, 10 s 90, 15 s 88, 20 s 89, 30 s 86, 40 s 89, 45 s 88, 50 s 89, 60 s 85, 75 s 89, 90 s 86, 120 s 85; trials_abandoned 5 s 15, 10 s 7, 15 s 12, 20 s 18, 30 s 17, 40 s 12, 45 s 15, 50 s 17, 60 s 21, 75 s 13, 90 s 14, 120 s 14
 
 ## The first reading of every 90 and 120 s, before the fix
 

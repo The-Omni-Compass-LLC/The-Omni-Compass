@@ -186,14 +186,6 @@ the Operator's Manuals and `docs/STATE_OF_PLAY.md`.
 
 Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
 
-**How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
-the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
-in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
-minutes means 2.3% more minutes over the line; EVEN =0.9% means a 0.9% difference the noise covers; power given +3.1% means 3.1%
-more of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
-coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
-or fell against native (the page's section iv, "How to read a number beside a word"; the founder's order of 23 October).
-
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
@@ -219,6 +211,14 @@ Why these three words: they are the words of underwriting and actuarial work, wh
 Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
 
+**How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
+the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
+in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
+minutes means 2.3% more minutes over the line; EVEN =0.9% means a 0.9% difference the noise covers; power given +3.1% means 3.1%
+more of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
+coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
+or fell against native (the page's section iv, "How to read a number beside a word"; the founder's order of 23 October).
+
 
 ## What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report
 
@@ -236,11 +236,13 @@ and every word on it (GAIN, EVEN, LOSS, power given) is that record's own readin
 nothing about any result and types nothing in. Where it plays the repository's own models (evidence class S) it says so, and
 a model is never proof.
 
-**What "native" and "Omni-Compass" mean on the page.** Two names, two sides, nothing else. *Native* is the whole system
+**What "native" and "Omni-Compass" mean on the page.** Two names today, a third ordered on 23 October (below). *Native* is the whole system
 running by itself: every autoscaler, scheduler, firmware, thermostat, orchestrator and controller it ships with, every muscle
 wired and moving by its own machinery. *Omni-Compass* always means Omni-Compass on top of native: the same whole system with
 all of that still running underneath, and the governor on top of all of it, wired in through the two-way plug. No third side
 exists anywhere on the page. Native is drawn in amber, Omni-Compass in blue, in every chart, table, tile and number.
+
+**The third arm, Omni-Compass by itself** (the founder's order of 23 October, `docs/SOLO_PREREGISTRATION.md`). The same system with each muscle's own native controller switched off and Omni-Compass the only controller moving that knob: on Kubernetes no pod autoscaler and no cluster autoscaler, while Kubernetes' own scheduler and kubelet stay. Where native is a setting rather than a controller (a cache's memory ceiling, a pool's size) the two Omni-Compass arms are one and the same arm. On the page the arm that was called Omni-Compass is now called Omni-Compass and native wherever an arm is named (the chips, the table heads, the lanes), and the third arm's column appears in every table from its first run on GitHub's machines, once the engine that carries it lands; nothing is written for it before. Until then every two-arm reading on the page is native against Omni-Compass and native.
 
 **What a monitor is.** The page is laid out as an operations monitor is: a wall of tiles at the top (the status board), each
 tile a small copy of a monitor further down the page; then the monitors themselves, section by section, each with its own
@@ -537,14 +539,17 @@ a monitor on screen now.
 **The light on every monitor** (the founder's order of 23 October). Each tile carries a light in its top right corner, and each
 monitor the same light beside its number on the page: green while the gauge the monitor draws is inside its lines; amber before
 the line, when the gauge is within 3% of it or when its own slope over the last readings, carried three readings ahead, crosses it;
-red when it is over; grey where the monitor has no line to watch (a bill, a count of runs, a digest check), and the light says so.
+red when it is over; grey where the monitor has no line to watch (a bill, a count of runs), and the light says so.
 The light reads the series the monitor draws and adds no number: on the live engine, the muscles against their lines; on a cluster
 replay, the 95th percentile against the 200 ms line and the pods waiting for a place; on the heart, the decision's own time against
 half its beat; on the CPU host, the busy share against the 75% line; on the card, the draw against its power limit; on the page's
-own governor, the time between frames against 1.5 frames; on a record, the judged rows of the newest tables (a LOSS row lights red
-and stays). Above the wall a line counts the lights and names the monitors heading for a line or over one, beside the engine's own
-last entry on its side, because the brain reads the same slope and acts before the line; the light only says so. Hover a light for
-its reading.
+own governor, the time between frames against 1.5 frames; on the proof, the page's runs against the Python's (green when the
+digests match and every number is within 1e-9, red when they differ); on the governors and orchestrators, their own three-run
+tables; on a record, the judged rows of the newest tables (a LOSS row lights red and stays). A light fed by our own models says
+so (class S). Above the wall a line counts the lights and names the monitors heading for a line or over one, beside the engine's
+own last entry on its side. The three-reading projection is the light's own: the brain's law acts on the position inside its
+band and damps on the position's rate of change, with a fail-up at the band's 95% wall; it projects nothing ahead. Hover a light
+for its reading.
 
 ### 4.3 The order of the board
 
@@ -1001,8 +1006,9 @@ choice does. Its five rows of buttons pick the record to read:
 - **Beat:** 5, 10, 15, 20, 30, 60, 75, 90 or 120 s.
 - **Setting:** on-site, where the governor sizes the pool on top of the pod autoscaler, or in the cloud, the machines alone.
 - **Engine:** omni-v16, every clock in seconds, or omni-v15, its rules counted in beats.
-- **Against:** what each reading is set against: native, the same engine at 15 s (the factory's beat), or the same engine at
-  60 s.
+- **Against:** what each reading is set against: native, the same engine at 15 s (omni-v16's factory beat), or the same
+  engine at 60 s (omni-v17's). The sweep's record is omni-v16's and omni-v15's; the dial's ladder (the page's section 1j, section 7.4) reads omni-v17.
+  The monitor opens on 60 s, the factory's beat on the engine that stands.
 - **Gauge:** pods waiting for a place, machine-hours, energy per used core-hour, the 95th and 99th percentile response, the
   minutes over the line, and the engine's own cost: its processor time, its reads of the cluster and its writes a day, and
   the fast check's rescues, the machines its 5-second check added only after a pod already waited.
@@ -1248,9 +1254,10 @@ top of its own native controller. The knobs move the live engine in the page's s
 frame load also move the page's own render governor (the page's section 11).
 
 **Back to the factory tune.** One button, on the console under the kill switch, on the dock, above the wall and in every
-monitor's own knobs, returns every knob of the page to the main engine as it ships (`DISCLOSURES.md`, section 3): the dial at
-the max, Omni-Compass ON, demand ×1, noise σ 0, sense delay +0, no fault held, every muscle driven, speed 1×, running, no frame
-load, and the heartbeat monitor on the factory's 60 s. It says what it put back. Turn anything, break it, watch it break; this
+monitor's own knobs, puts back two things at once: the engine's tune as it ships (`DISCLOSURES.md`, section 3: the dial at
+the max, every muscle driven, Omni-Compass ON, the 60 s beat) and the page's plant at rest (the day as written, demand ×1, noise
+σ 0, sense delay +0, no fault held, speed 1×, running, no frame load, and the heartbeat monitor on 60 s, on-site, pods waiting,
+against native). It says what it put back. Turn anything, break it, watch it break; this
 button brings all of it back (the founder's order of 23 October). Native alone is not a tune: it is the kill switch.
 
 ### 18.2 Do no harm, at the console
@@ -2208,7 +2215,7 @@ reported to its own maintainers.
 
 
 
-This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-23 16:51 UTC on omni-v17 (digest 7c937d09e4031cc7) from commit 2bff92758d31.
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-23 20:25 UTC on omni-v17 (digest 7c937d09e4031cc7) from commit 517bc8952c30.
 
 
 Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
@@ -2217,7 +2224,7 @@ Each part below is one section of the page, in the page's order and under its nu
 
 **The page, in its own words.**
 
-A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere today: Native, the whole system running by itself, and Omni-Compass and native, the same system with Omni-Compass on top of all of it; the third, Omni-Compass by itself (each muscle's own native controller switched off, Omni-Compass the only controller on its knob), joins every table once the engine that carries it lands and its runs are in. Beside this title stand the owner's two pictures, the stacks Omni-Compass sits on top of and the control authority, each with the engine's live marks over it. It is laid out as a book, read from the top down: this title page first, then the problem and the answer, what the whole industry faces and how Omni-Compass addresses it, then the executive summary and the reading key, then the table of contents, then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v17: omni-v16 with its full decision, the heartbeat, every 60 s by default and a dial from 5 to 120 s, each beat shown beside native with what it buys and what it costs (section L.14), and the cruise wait never under two readings (docs/OMNI_V17.md); omni-v16 was omni-v15 with every clock of the Kubernetes governor in seconds, so its decision period changes only how often it looks (at 60 s every value is omni-v15's); omni-v15 was omni-v14 with the brain's request for the power cap trimming only while the response line has been clean for the governor's own clear time, and every wire that holds a governor's rules inside the fingerprint (docs/OMNI_V15.md). Before it, omni-v14 was omni-v13 with a knob that leaves any muscle native, never written, and the operator's own commands run without a shell (docs/OMNI_V14.md); and omni-v13 fixed one fault found on its own runs: on a shared host at its top, while another workload there has room of its own, the governor's conveyance hands every processor limit it gave back to the operator's, and it counts every other pod by what it may use (docs/OMNI_V13.md). Before that, omni-v12 fixed two faults found on omni-v11's runs. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
+A live monitor of the Omni-Compass engine and of every benchmark GitHub has run on it: each run played back from its own SHA-256-checked files, each model run by the repository's own code, so the engine can be watched moving instead of only read. Two sides everywhere today: Native, the whole system running by itself, and Omni-Compass and native, the same system with Omni-Compass on top of all of it; the third, Omni-Compass by itself (each muscle's own native controller switched off, Omni-Compass the only controller on its knob), joins every table where native is a controller that can be switched off (on Kubernetes and in our models) once the engine that carries it lands and its runs are in; where native is a setting, or its own loop is the actuator, the two Omni-Compass arms are one, and the cloud waits for the founder's word (docs/SOLO_PREREGISTRATION.md). Beside this title stand the owner's two pictures, the stacks Omni-Compass sits on top of and the control authority, each with the engine's live marks over it. It is laid out as a book, read from the top down: this title page first, then the problem and the answer, what the whole industry faces and how Omni-Compass addresses it, then the executive summary and the reading key, then the table of contents, then the monitor wall with the control panel and the kill switch, every monitor at once with its number and its knobs, then the benefit board, then the whole organism composed every way it is bought, then every part from the whole down to the smallest: the measured effect in full, the evidence by stack from the cloud down to the chip, the organism and its muscles, the control console, the brain and its verdict, the failure modes, the component specification, and this page's own rendering. The disclosures close it. The engine that stands is omni-v17: omni-v16 with its full decision, the heartbeat, every 60 s by default and a dial from 5 to 120 s, each beat shown beside native with what it buys and what it costs (section L.14), and the cruise wait never under two readings (docs/OMNI_V17.md); omni-v16 was omni-v15 with every clock of the Kubernetes governor in seconds, so its decision period changes only how often it looks (at 60 s every value is omni-v15's); omni-v15 was omni-v14 with the brain's request for the power cap trimming only while the response line has been clean for the governor's own clear time, and every wire that holds a governor's rules inside the fingerprint (docs/OMNI_V15.md). Before it, omni-v14 was omni-v13 with a knob that leaves any muscle native, never written, and the operator's own commands run without a shell (docs/OMNI_V14.md); and omni-v13 fixed one fault found on its own runs: on a shared host at its top, while another workload there has room of its own, the governor's conveyance hands every processor limit it gave back to the operator's, and it counts every other pod by what it may use (docs/OMNI_V13.md). Before that, omni-v12 fixed two faults found on omni-v11's runs. A processor-limit raise that the cluster's admission refuses is held until the pod's limit changes, the raise shrinks or a wait passes; omni-v11 wrote it again at every fast check. The swarm's proximity reflex hands back the planner's cruise in the tick it is triggered. omni-v11's guard stays in it: a reading that shows no machine in service is blind, and nothing is decided or written from it.
 
 THIS PAGE IS A LIVE TUNING ENGINE. THE BENCHMARKS ARE ONE TUNED ENGINE. Every knob, button and monitor on this page can be turned in real time: the heartbeat from 5 to 120 s, the dial between the max and the tune-down, the pedal, each muscle driven or left native, up or down, in or out, minus or plus, to see and produce the variations of the mechanism of action with native alone, with Omni-Compass on top of native, or both side by side. Like any engine, where turning the mixture, the intake, the exhaust, the firing or the pistons changes what it delivers, turning any knob can change every metric, up or down, in any direction a tuner chooses: that range is the engine's versatility, one engine for many vessels, tuned many ways, for many outputs. What the page shows at any setting other than the factory tune demonstrates that range and is never a benchmark result. Every benchmark result is one engine at its one factory tune: the engine its table names, every benchmark run again on the engine that stands (section L.13). From omni-v17 the factory tune is chosen by a declared rule: of the tunes that harm no gauge against native, the one against which no other tried tune reads GAIN on one service gauge and LOSS on none, searched on development seeds and read again on untouched ones (docs/THE_TUNE.md; DISCLOSURES.md, section L.16). A tune other than the factory tune is the tuner's own, and its results are its own.
 
@@ -2624,7 +2631,7 @@ Omni-Compass is wired into every piece of a stack through its own two-way plug: 
 
 **The page, in its own words.**
 
-The third arm, Omni-Compass by itself. Every composition on this page is bought two ways today, native and Omni-Compass and native. The founder's order of 23 October adds a third to every one of them: Omni-Compass by itself, the muscle's own native controller switched off and Omni-Compass alone on its knob (docs/SOLO_PREREGISTRATION.md). Its column appears here from its first run on GitHub's machines, read from the raw files like every other; nothing is written for it before then.
+The third arm, Omni-Compass by itself. Every composition on this page is bought two ways today, native and Omni-Compass and native. The founder's order of 23 October adds a third wherever native is a controller that can be switched off: Omni-Compass by itself, the muscle's own native controller switched off and Omni-Compass alone on its knob (docs/SOLO_PREREGISTRATION.md). Its column appears here from its first run on GitHub's machines, read from the raw files like every other; nothing is written for it before then.
 
 DISCLOSURE: THE CLOUD'S BACK END IS NOT OURS TO METER. Through the cloud, the bare metal at the back end belongs to the provider: no tenant can read its power meter or write its chips' limits, so no run here reaches it. What a tenant can measure is what the cloud meters and bills: the machines it counts every fifteen seconds and the bill at list price (section L.19); that difference, native against Omni-Compass on top of the cloud's own autoscaler, is the cloud piece's benefit, and it is the provider's own health on its own hardware too, fewer machines held for the same work. The bare-metal piece is gauged on hardware we can meter (the card's own meter, the CPU host's energy counter, section L.24) and claimed for the provider's bare metal only as the same mechanism on the same kind of part: the composition multiplies it in as a modelled factor (class S of class P), never as a measurement of the provider's machines. Four ways are composed: on-site bare metal (the owner's own racks and chips: software × bare metal); through the cloud (the cloud's build, its bare metal at the back end and the software; and the cloud as two pieces, the back end left to the provider); in the device (Omni-Compass built into the bare metal alone, the card and the machine, nothing else wired: for an owner who ships hardware); as a service (the software alone, run for an owner with neither bare metal of their own nor a cloud account: the transport of the software only). This whole stack is a composition with two arms, native and with Omni-Compass on top of every piece; it is not counted among the organisms (the seven, and the orchestra the eighth). Each piece is its own newest measurement, on the engine its record names (the cloud piece Azure's runs on omni-v1, the chip piece the card run of 2 October under a controller since replaced, the software pieces their newest three-run tables): the composition is across those engines, names each, and is remade as each piece's run on the engine that stands lands.
 

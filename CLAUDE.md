@@ -345,7 +345,9 @@ the founder overrides one in the conversation.
   system is the factory set one ... I think 45 you didn't try"). The main engine's beat is whichever the ladder reads best by the key
   on the organism's gauges, not a number chosen for a reason of its own; the beats the ladder has not read (45, 40, 50, 20 s) are
   read in the toy on the side first, and a beat that reads best lands as the next version through the toy gate. The knobs stay for
-  anyone to turn.
+  anyone to turn. Read the same evening (`results/toy_gate/V17_LADDER.md`, class S): against 60 s in the kind benchmark's setting the
+  minutes over the line GAIN at 20 s (+14.7%) and 40 s (+13.2%), EVEN at 45 and 50 s, every other gauge EVEN, the reads and the
+  governor's own processor power given; in the cloud's setting every gauge EVEN. 60 s is not the beat that reads best on the service.
 - **A LOSS at the factory tune is a fault to fix, never a number to accept** (the founder's words: "nothing should be shown as a loss
   because it would have been fixed and never gone there. The only way we're going to ever see a loss is ... when people turn knobs").
   Every LOSS row is still shown (Honesty); each one on the engine that stands is on the next version's list with its cause, and the
