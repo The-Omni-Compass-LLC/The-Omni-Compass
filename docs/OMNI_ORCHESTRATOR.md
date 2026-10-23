@@ -124,6 +124,53 @@ repaired, the control plane killed for 10 s and started again (nine units kept, 
 switch on (every wall back to its request, the declared state held) and off: 1,680 requests, 1,680 answered, 0 failed,
 0 wrong.
 
+## 2c. The full form, 23 October evening: native against Omni direct, 18 steps of 25 s
+
+The same rig and brain as 2b, the long form (the clients 1 2 3 2 3 4 3 4 5 4 5 6 5 6 7 6 7 8, 25 s a step, 450 s an arm; one
+run of each arm, class L, every number from the run's own files):
+
+| gauge | native | Omni direct | Omni direct against native |
+|---|---:|---:|---|
+| requests answered (work) | 9,991 | 10,461 | up 4.7% |
+| requests failed | 0 | 0 | none in either |
+| answers wrong | 0 | 0 | none in either |
+| response time, 50th percentile (ms) | 100 | 90 | down 11% |
+| response time, 95th percentile (ms) | 184 | 168 | down 9% |
+| response time, 99th percentile (ms) | 218 | 216 | down 1% |
+| machine-minutes on (the bill) | 45.0 | 44.2 | down 2% |
+| unit-minutes | 61.1 | 54.8 | down 10% |
+| processor conveyed above the requests (core-minutes) | 0 | 1.2 | Omni's walls raised; Kubernetes never moves one |
+| units below the twin the verdict allowed, at most | 0 | 1 | one step, kept |
+
+**Read by the one key, step by step (18 pairs, the exact Student t interval):** requests answered **GAIN**, up 4.7% a step
+(+14.8 to +37.4 requests a step, the interval clear of zero); the 95th percentile **GAIN**, down 9.9% a step (−31.3 to −4.9 ms,
+clear of zero); units standing **GAIN, a cut**, down 10.3% a step (−1.5 to −0.2 units, clear of zero); machines on **EVEN**,
+down 1.7% (−0.2 to +0.0). No row reads LOSS. More work, faster, on fewer units, on the same machines, nothing failed: the
+first reading of Omni-Compass by itself against Kubernetes' own rule that the key calls GAIN, and still one run of each arm,
+not the three-run reading.
+
+Where it came from, in the files. Conveyance stood a mean of 160 m above the requests across the run (18 walls raised, 2 handed
+back when a second unit joined a machine), so the lone units answered at their machines' speed: the 50th percentile 100 → 90 ms.
+The verdict ran 12 trials: 9 abandoned by the traffic gate (the arrivals moved more than 15% inside the phase), 2 refused (the
+muscle was slower at the step), 1 allowed at 140 s (the response times at one unit below the twin read GAIN within the
+allowance), kept to the end: that is the unit cut, 10% fewer units for more work. Machines stayed EVEN because on this rig the
+count has no room (`docs/THE_ROOM.md`, section 8) and six half-processor machines are the whole fleet; the cut would reach the
+machines on a fleet where the count has room. **One body** (3 → 6 → 3 clients, 120 s): 16 of 16 tasks finished, the service
+2,447 requests, 0 failed, 0 wrong, 95th percentile 162 ms. **The drills** (four clients): a unit killed, a machine lost and
+repaired, the control plane killed and started again (every unit taken back), the kill switch on and off: 3,308 requests,
+0 failed, 0 wrong.
+
+## 2d. The three arms together: native, Omni on native, Omni direct
+
+The founder's order of 23 October, evening: the three arms are always shown together. **Native:** Kubernetes' rule on the
+muscles (the yardstick). **Omni on native:** Omni-Compass on top of that rule, the engine's strict form as on the kind rigs: the
+units are the rule's and never fewer, Omni adds a unit the beat work waits and past the wall, conveys each unit's wall, places by
+the busy rule, packs, parks and wakes machines (brain `omni_native`, `omni_orchestrator/control.py`). **Omni direct:** Omni alone
+on the muscles, no Kubernetes (brain `omni`). Every pair is read by the one key, paired by step: Omni on native against native,
+Omni direct against native, and Omni direct against Omni on native. The showing runs all three in one go
+(`tools/orchestrator_show.py`), the report carries three columns, and the GitHub run (`orchestrator.yml`) prints the three.
+The three-arm readings are written below as the runs land.
+
 ## 3. What it covers, and what it does not yet
 
 Covered and shown: the desired state kept and survived (the journal), placement by room, a unit's whole life (start, probe,
@@ -140,10 +187,12 @@ the same organism and load, runs on the kind rig on GitHub and has not run yet.
 Omni-Compass can run the showing's organism (a checked service and a batch job) without Kubernetes, with its own scheduling,
 scaling, lifecycle, recovery and coordination, on one host, with no request lost through a unit's death, a machine's loss,
 the control plane's death or the kill switch. With the engine's own mechanisms in its brain (conveyance, the reflex, the twin
-read as Kubernetes would, the fold under the verdict) it answered faster and did more work than the yardstick on the same
-machines in the quick form (section 2b), with no row reading LOSS; at six pairs those readings are EVEN, and the full form
-and the three-run reading are what will say whether they are GAIN. Equivalent output and complete functional coverage of a
-declared organism are targets to engineer toward, not results this showing establishes.
+read as Kubernetes would, the fold under the verdict), in one full-form run of each arm on this rig (section 2c) it read
+against Kubernetes' own rule: work GAIN (up 4.7%), the 95th percentile GAIN (down 9.9%), units GAIN, a cut (down 10.3%),
+machines EVEN, nothing failed and nothing wrong. That is one run of each arm, class L, on one host: the three-run reading (A,
+B and C on GitHub's machines from one commit) and the comparison against Kubernetes itself on the kind rig are what would make
+it a benchmark result. Equivalent output and complete functional coverage of a declared organism are targets to engineer
+toward, not results this showing establishes.
 
 ---
 

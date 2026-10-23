@@ -2,6 +2,39 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-23 (evening): Omni-Compass's own orchestrator with the engine's mechanisms in its brain; the three arms; the room's two walls
+
+- **Omni-Compass by itself, the organism run without Kubernetes** (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`; the
+  founder's order of 23 October: "Build it in your chat before you"). Built from scratch on Python's standard library and the
+  compass law, no orchestrator's code in it: the walls (the kernel's control groups, version 2 and 1), the machine's hand, the
+  front, the room rule, the brain, the control plane with its journal and kill switch, the checked workload, the clients.
+  The yardstick it is read against is Kubernetes' published autoscaling rule, written by us. Three arms, always together (the
+  founder's order of the same evening): **native** (the rule on the muscles), **Omni on native** (Omni on top of the rule, the
+  engine's strict form as on the kind rigs: the rule's units never fewer, Omni's reflex, conveyance, packing and machines on
+  top; brain `omni_native`) and **Omni direct** (Omni alone on the muscles; brain `omni`); every pair read by the one key,
+  paired by step (`tools/orchestrator_show.py`, `.github/workflows/orchestrator.yml`).
+- **The brain's win is the engine's own mechanisms.** The first showings read LOSS, then EVEN: Omni held the yardstick's count
+  with the same walls, and the response time was the unit's own paper quota (no request ever waited in line). Four mechanisms,
+  all the engine's, went into the brain: conveyance (each unit's CPU wall set to the room its machine can spare under 75%,
+  journaled, written to the hand, read back from `cpu.max`; omni-v7 and omni-v13's rule), the reflex (work in line adds units
+  in the beat), the yardstick twin read as Kubernetes would (busy capped at the request) and the fold under the verdict
+  (`omnicompass/verdict.py`, a unit fewer than the twin tried on the service's own response times under the same traffic, kept
+  only where it reads no LOSS within 2%; a trial whose arrivals move 15% is abandoned; work in line hands a step back). The
+  full form (18 steps of 25 s, one run of each arm, class L), Omni direct against native, by the one key: **work GAIN, up 4.7%
+  a step; the 95th percentile GAIN, down 9.9%; units GAIN, a cut, down 10.3%; machines EVEN, down 1.7%**; 0 failed, 0 wrong
+  in 20,452 requests; the batch job 16 of 16 beside the service; the drills (a unit killed, a machine lost and repaired, the
+  control plane killed and started again, the kill switch) 3,308 requests, 0 failed. One run of each arm, not yet the
+  three-run reading; the referee grades (`docs/OMNI_ORCHESTRATOR_GRADES.md`): B overall, not production.
+- **The room, written** (`docs/THE_ROOM.md`, `docs/THE_ROOM_TABLE.md`, `tools/room_table.py`): the founder's law that a muscle
+  with no gain is at its limit and a LOSS is never the muscle's; the catalog read by it (527 GAIN, 421 at their limit, 159 the
+  same as native, 0 LOSS); the two walls found on 23 October (the processor core, wired by the busy rule; the unit's paper
+  quota, moved by conveyance); the unit count's own edge in mathematics (Erlang's C, the square-root law against Kubernetes'
+  2a: no room at this rig's load, near half at a company's scale).
+- **The orders of 23 October** in `CLAUDE.md` (both arms to the best; the brain finds the win; where a LOSS may ever be seen; the
+  word before the sign; every tool to strengthen the engine) and `DISCLOSURES.md` section 3 (the factory tune is published only
+  where it reads no LOSS; the live engine's knobs are where a LOSS is meant to be seen). The engine's fingerprint does not move:
+  the orchestrator is its own files beside omni-v17.
+
 ## 2026-10-23 (afternoon): omni-v17, the heartbeat a dial; the main engine at 60 s
 
 - **omni-v17 lands** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) on the founder's order of the afternoon,

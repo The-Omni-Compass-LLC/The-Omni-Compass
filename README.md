@@ -356,6 +356,16 @@ The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for lin
 | Real card, NVIDIA A10 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. The first run (2026-10-02) used a card controller since replaced (it answered slower); the current controller's run is next | P |
 | The 1,107 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
 
+## Omni-Compass by itself: the organism run without Kubernetes (23 October)
+
+Omni-Compass also runs the organism as its own orchestrator, with no Kubernetes or other orchestrator's code in it
+([`docs/OMNI_ORCHESTRATOR.md`](docs/OMNI_ORCHESTRATOR.md), graded in [`docs/OMNI_ORCHESTRATOR_GRADES.md`](docs/OMNI_ORCHESTRATOR_GRADES.md)).
+Three arms are always shown together: native (Kubernetes' published autoscaling rule on the muscles, written by us as the
+yardstick), Omni on native (Omni on top of that rule) and Omni direct (Omni alone on the muscles). In the full form on one host
+(one run of each arm, class L) Omni direct read against native by the one key: work GAIN (up 4.7%), the 95th percentile GAIN
+(down 9.9%), units GAIN, a cut (down 10.3%), machines EVEN, nothing failed; the three-run reading runs on GitHub
+(`orchestrator.yml`). Why a muscle reads EVEN and where the room is, in theory and mathematics: [`docs/THE_ROOM.md`](docs/THE_ROOM.md).
+
 ## How it works
 
 Omni-Compass is a supervisory governor. It does not replace your autoscaler or your firmware: it sits on top, reads

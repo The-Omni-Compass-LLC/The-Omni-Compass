@@ -10,13 +10,16 @@ Six machines of half a processor each (the kernel's CPU quotas; two machines on 
 plane, the front, the machines' hands and the clients on core 3. The service: units of 250 millicores (request and
 limit), each answer a 40 ms chain of hashes whose digest the client checks.
 
-  1. the yardstick  Kubernetes' published autoscaling rule (every 15 s, 50% target, 300 s before a fall), the units
-                    spread as Kubernetes' scheduler spreads them, every machine on (a fixed cluster)
-  2. Omni           at a 5 s beat: the reflex on work in line, the compass law on the 95th percentile, the yardstick
-                    twin less the depth the verdict allows on the service's own response times, each unit's CPU wall
-                    conveyed to the room its machine can spare (the engine's rule), units packed, machines parked and
-                    woken (two at least, a 10 s boot)
-     the same clients for both: 1 2 3 2 3 4 3 4 5 4 5 6 5 6 7 6 7 8, 25 s a step
+  1. native         the yardstick: Kubernetes' published autoscaling rule (every 15 s, 50% target, 300 s before a fall),
+                    the units spread as Kubernetes' scheduler spreads them, every machine on (a fixed cluster)
+  1b. Omni on native  Omni on top of that rule, the engine's strict form as on the kind rigs: the units are the rule's
+                    (never fewer); Omni adds a unit when work waits and past the wall, conveys each unit's CPU wall to
+                    the room its machine can spare, places by the busy rule, packs, parks and wakes machines
+  2. Omni direct    Omni alone on the machines, at a 5 s beat: the reflex on work in line, the compass law on the 95th
+                    percentile, the yardstick twin less the depth the verdict allows on the service's own response
+                    times, each unit's CPU wall conveyed (the engine's rule), units packed, machines parked and woken
+                    (two at least, a 10 s boot)
+     the same clients for all three: 1 2 3 2 3 4 3 4 5 4 5 6 5 6 7 6 7 8, 25 s a step
   3. one body       a batch job of 16 tasks beside the service, Omni deciding; the service grows midway
   4. the drills     with Omni: a unit killed, a machine lost and repaired, the control plane killed and started
                     again, the kill switch on and off, the clients running through all of it
@@ -139,7 +142,7 @@ class Show:
                     "--brain", brain, "--beat", "5", "--kill-file", str(d / "KILL")]
         # Omni's room rule is the engine's own (the machine's measured busy share under 75%); the yardstick places by
         # requests alone, as Kubernetes' scheduler does
-        ctl_args += ["--room-rule", self.room_rule if brain == "omni" else "requests"]
+        ctl_args += ["--room-rule", self.room_rule if brain in ("omni", "omni_native") else "requests"]
         ctl = self.spawn(ctl_args, f"{name}-control.log")
         self.wait_ready(d, 2)
         cpu0, t0 = self.machine_cpu(), time.time()
@@ -154,9 +157,10 @@ class Show:
         self.stop(ctx["ctl"])
         self.stop(front)
         self.clear_units()
-        meta = {"phase": name, "brain": brain, "room_rule": self.room_rule if brain == "omni" else "requests",
+        meta = {"phase": name, "brain": brain, "room_rule": self.room_rule if brain in ("omni", "omni_native") else "requests",
                 "t_load": t0 + 6, "steps": steps, "step_s": step_s,
-                "cpu_s": {m: cpu1[m] - cpu0[m] for m in cpu0}, "wall_s": t1 - t0, "events": ctx.get("events", [])}
+                # a machine lost and repaired inside a phase starts its kernel counter afresh: never a negative use
+                "cpu_s": {m: max(0.0, cpu1[m] - cpu0[m]) for m in cpu0}, "wall_s": t1 - t0, "events": ctx.get("events", [])}
         (d / "meta.json").write_text(json.dumps(meta, indent=1))
         time.sleep(3)
         return meta
@@ -178,8 +182,9 @@ class Show:
         time.sleep(2)
         steps, step_s = (STEPS[:6], 15.0) if self.quick else (STEPS, 25.0)
         try:
-            self.phase("yardstick", "yardstick", 8101, steps, step_s)
-            self.phase("omni", "omni", 8102, steps, step_s)
+            self.phase("yardstick", "yardstick", 8101, steps, step_s)          # native: Kubernetes' rule alone
+            self.phase("omni_native", "omni_native", 8105, steps, step_s)      # Omni on top of the native rule
+            self.phase("omni", "omni", 8102, steps, step_s)                    # Omni direct: Omni alone on the machines
             job = [{"name": "crunch", "tasks": 16, "parallel": 4, "req_m": 250, "limit_m": 250, "k": self.k_task,
                     "out": str(self.out / "batch" / "results")}]
             self.phase("batch", "omni", 8103, [3, 3, 3, 6, 6, 6, 3, 3, 3, 3] if not self.quick else [3, 6, 3], 12.0, jobs=job)
@@ -335,7 +340,7 @@ def word(gauge: str, diffs: list[float], base: list[float]) -> dict:
 
 
 # ---- the report ---------------------------------------------------------------------------------------------------------
-AMBER, BLUE, RED, GREY = "#c77d0a", "#2563c9", "#c0392b", "#888888"
+AMBER, BLUE, GREEN, RED, GREY = "#c77d0a", "#2563c9", "#1e8e3e", "#c0392b", "#888888"
 
 
 def svg_lines(series: list[tuple[str, str, list[tuple[float, float]]]], title: str, ylab: str, w=720, h=220,
@@ -398,19 +403,25 @@ def line_series(tl: list[dict], t0: float, f) -> list[tuple[float, float]]:
 
 def build_report(out: Path) -> Path:
     metas = {m["phase"]: m for m in (json.loads((out / p / "meta.json").read_text()) for p in
-                                     ("yardstick", "omni", "batch", "drills") if (out / p / "meta.json").exists())}
+                                     ("yardstick", "omni_native", "omni", "batch", "drills") if (out / p / "meta.json").exists())}
     S = {p: summary(out / p, m) for p, m in metas.items()}
     on = lambda r: sum(v for k, v in r["machines"].items() if k in ("awake", "booting", "draining"))
-    y, o = metas.get("yardstick"), metas.get("omni")
+    y, o, on_ = metas.get("yardstick"), metas.get("omni"), metas.get("omni_native")
+    # the three arms (the founder's order of 23 October): native (Kubernetes' rule on the machines), Omni on native (Omni on
+    # top of that rule) and Omni direct (Omni alone on the machines); every pair of them read by the one key, paired by step
+    ARMS = {"yardstick": "native", "omni_native": "Omni on native", "omni": "Omni direct"}
+    COMPARISONS = [("omni_native", "yardstick"), ("omni", "yardstick"), ("omni", "omni_native")]
+    steps_of = {p: per_step(out / p, metas[p]) for p in ARMS if p in metas}
     readings = {}
-    if y and o:
-        py, po = per_step(out / "yardstick", y), per_step(out / "omni", o)
-        for g in ("requests", "p95_ms", "machines", "units"):
-            pairs = [(a, b) for a, b in zip(po[g], py[g]) if a == a and b == b]
-            readings[g] = word(g, [a - b for a, b in pairs], [b for _, b in pairs])
+    for a, b in COMPARISONS:
+        if a in steps_of and b in steps_of:
+            for g in ("requests", "p95_ms", "machines", "units"):
+                pairs = [(x, z) for x, z in zip(steps_of[a][g], steps_of[b][g]) if x == x and z == z]
+                if pairs:
+                    readings[f"{ARMS[a]} against {ARMS[b]}: {g}"] = word(g, [x - z for x, z in pairs], [z for _, z in pairs])
+    arms = [p for p in ARMS if p in metas]
     rows = []
-    if y and o:
-        sy, so = S["yardstick"], S["omni"]
+    if len(arms) >= 2:
         rel = lambda a, b: f"{100 * (a - b) / b:+.1f}%" if b else "—"
         for label, key, fmt in (("requests answered (work)", "answered", "{:,.0f}"), ("requests failed", "failed", "{:,.0f}"),
                                 ("answers wrong", "wrong", "{:,.0f}"), ("response time, 50th percentile (ms)", "p50_ms", "{:,.0f}"),
@@ -420,7 +431,8 @@ def build_report(out: Path) -> Path:
                                 ("unit-minutes", "unit_min", "{:,.1f}"), ("processor-seconds used by the units", "cpu_s", "{:,.0f}"),
                                 ("processor conveyed above the requests (core-minutes)", "conveyed_core_min", "{:,.2f}"),
                                 ("units below the twin the verdict allowed, at most", "depth_max", "{:,.0f}")):
-            rows.append((label, fmt.format(sy[key]), fmt.format(so[key]), rel(so[key], sy[key])))
+            base = S[arms[0]][key]
+            rows.append((label, *[fmt.format(S[p][key]) for p in arms], *[rel(S[p][key], base) for p in arms[1:]]))
     css = """
 :root{--bg:#ffffff;--fg:#1d2330;--muted:#5b6475;--line:#e3e6ec;--card:#f6f7f9}
 @media (prefers-color-scheme: dark){:root{--bg:#12151b;--fg:#e8ebf0;--muted:#a0a8b8;--line:#2a2f3a;--card:#1a1e26}}
@@ -457,43 +469,46 @@ code{font-size:.88em}
              f"{cal.get('k_40ms', '?'):,} SHA-256 hashes (about 40 ms of processor), its digest checked by the client. "
              "The clients: closed loop, 0.1 s of thought between requests, stepping by one.</div>")
     if rows:
-        H.append("<h2>1. The yardstick against Omni, the same clients</h2>")
-        H.append("<p><b>Yardstick:</b> Kubernetes' published autoscaling rule (every 15 s; 50% of the request; 10% "
-                 "tolerance; a fall only to the highest count of the last 300 s), the units spread as Kubernetes' scheduler "
-                 "spreads them, all six machines on, as a fixed cluster runs. Written by us from its documentation as the "
-                 "measure; it is not Kubernetes itself. <b>Omni:</b> every 5 s, the reflex (work waiting in line adds "
-                 "units now), the compass law on the 95th percentile, and the yardstick twin (what Kubernetes would hold "
-                 "for this work) less the depth the verdict has allowed on the service's own response times (a unit fewer "
-                 "tried, kept only where the response time reads no LOSS within 2%); each unit's CPU wall conveyed to the "
-                 "room its machine can spare under 75% (the engine's rule: a unit answers at its machine's speed, not its "
-                 "paper quota's); units packed, machines parked and woken (two at least; a parked machine takes 10 s to "
-                 "come back).</p>")
-        H.append("<table><tr><th>gauge</th><th class='num'>yardstick</th><th class='num'>Omni</th><th class='num'>Omni against it</th></tr>")
+        H.append("<h2>1. Native, Omni on native and Omni direct, the same clients</h2>")
+        H.append("<p><b>Native</b> (the yardstick): Kubernetes' published autoscaling rule on the machines (every 15 s; 50% of "
+                 "the request; 10% tolerance; a fall only to the highest count of the last 300 s), the units spread as "
+                 "Kubernetes' scheduler spreads them, all six machines on, as a fixed cluster runs; written by us from its "
+                 "documentation as the measure, it is not Kubernetes itself. <b>Omni on native:</b> Omni-Compass on top of "
+                 "that rule, the engine's strict form as on the kind rigs: the units are the rule's, never fewer; Omni adds a "
+                 "unit the beat work waits in line and past the wall, conveys each unit's CPU wall to the room its machine can "
+                 "spare under 75% (the engine's rule: a unit answers at its machine's speed, not its paper quota's), places by "
+                 "the busy rule, packs, parks and wakes machines. <b>Omni direct:</b> Omni-Compass alone on the machines, no "
+                 "Kubernetes: every 5 s the reflex, the compass law on the 95th percentile, the yardstick twin (what "
+                 "Kubernetes would hold for this work) less the depth the verdict has allowed on the service's own response "
+                 "times (a unit fewer tried under the same traffic, kept only where the response time reads no LOSS within "
+                 "2%), conveyance, packing, machines parked and woken (two at least; a parked machine takes 10 s to come back).</p>")
+        heads = "".join(f"<th class='num'>{ARMS[p]}</th>" for p in arms) + "".join(f"<th class='num'>{ARMS[p]} against native</th>" for p in arms[1:])
+        H.append(f"<table><tr><th>gauge</th>{heads}</tr>")
         for r in rows:
-            H.append(f"<tr><td>{html.escape(r[0])}</td><td class='num'>{r[1]}</td><td class='num'>{r[2]}</td><td class='num'>{r[3]}</td></tr>")
+            H.append(f"<tr><td>{html.escape(r[0])}</td>" + "".join(f"<td class='num'>{c}</td>" for c in r[1:]) + "</tr>")
         H.append("</table>")
         if readings:
             H.append("<p><b>Read by the one key</b>, step by step (each step of the clients a pair, its 95% interval on "
                      f"{len(y['steps'])} pairs; one run of each arm, not yet the three-run reading):</p><table>"
-                     "<tr><th>gauge</th><th class='num'>Omni minus yardstick, mean a step</th><th class='num'>95% interval</th><th>reading</th></tr>")
+                     "<tr><th>comparison and gauge</th><th class='num'>difference, mean a step</th><th class='num'>95% interval</th><th>reading</th></tr>")
             names = {"requests": "requests answered a step", "p95_ms": "95th percentile a step (ms)",
                      "machines": "machines on, mean a step", "units": "units standing, mean a step"}
-            for g, r in readings.items():
+            for key, r in readings.items():
+                cmp_, g = key.rsplit(": ", 1)
                 cls = "GAIN" if r["word"].startswith("GAIN") else "EVEN" if r["word"] == "EVEN" else "LOSS" if r["word"] == "LOSS" else "given"
-                H.append(f"<tr><td>{names[g]}</td><td class='num'>{r['mean']:+.1f} ({100 * r['rel']:+.1f}%)</td>"
+                H.append(f"<tr><td>{html.escape(cmp_)}: {names[g]}</td><td class='num'>{r['mean']:+.1f} ({100 * r['rel']:+.1f}%)</td>"
                          f"<td class='num'>{r['lo']:+.1f} to {r['hi']:+.1f}</td><td class='{cls}'>{r['word']}</td></tr>")
             H.append("</table>")
-        ry, ro = requests(out / "yardstick"), requests(out / "omni")
+        colours = {"yardstick": AMBER, "omni_native": GREEN, "omni": BLUE}
         end = len(y["steps"]) * y["step_s"]
-        H.append(svg_lines([("yardstick", AMBER, windows(ry, 10, end)), ("Omni", BLUE, windows(ro, 10, end))],
+        H.append(svg_lines([(ARMS[p], colours[p], windows(requests(out / p), 10, end)) for p in arms],
                            "95th percentile response time, 10 s windows", "ms"))
-        tly, tlo = jsonl(out / "yardstick" / "ctl" / "timeline.jsonl"), jsonl(out / "omni" / "ctl" / "timeline.jsonl")
-        H.append(svg_lines([("yardstick", AMBER, line_series(tly, y["t_load"], lambda r: r["units"]["web"])),
-                            ("Omni", BLUE, line_series(tlo, o["t_load"], lambda r: r["units"]["web"]))], "units of the service", "units"))
-        H.append(svg_lines([("yardstick", AMBER, line_series(tly, y["t_load"], on)),
-                            ("Omni", BLUE, line_series(tlo, o["t_load"], on))], "machines on", "machines"))
+        tls = {p: jsonl(out / p / "ctl" / "timeline.jsonl") for p in arms}
+        H.append(svg_lines([(ARMS[p], colours[p], line_series(tls[p], metas[p]["t_load"], lambda r: r["units"]["web"])) for p in arms],
+                           "units of the service", "units"))
+        H.append(svg_lines([(ARMS[p], colours[p], line_series(tls[p], metas[p]["t_load"], on)) for p in arms], "machines on", "machines"))
         H.append(svg_lines([("clients", GREY, [(i * y["step_s"] + d, c) for i, c in enumerate(y["steps"]) for d in (0, y["step_s"])])],
-                           "the clients (the same in both arms)", "clients"))
+                           "the clients (the same in every arm)", "clients"))
     if "batch" in metas:
         b = metas["batch"]
         tl = jsonl(out / "batch" / "ctl" / "timeline.jsonl")

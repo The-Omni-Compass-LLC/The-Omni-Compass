@@ -70,12 +70,13 @@ jobs:
           if not p.exists():
               print("no summary: the showing did not finish"); raise SystemExit
           d = json.loads(p.read_text())
-          print("| gauge | yardstick | Omni |\n|---|---:|---:|")
-          y, o = d["summary"].get("yardstick", {}), d["summary"].get("omni", {})
+          arms = [(k, n) for k, n in (("yardstick", "native"), ("omni_native", "Omni on native"), ("omni", "Omni direct")) if k in d["summary"]]
+          print("| gauge | " + " | ".join(n for _, n in arms) + " |\n|---|" + "---:|" * len(arms))
           for k, lab in (("answered", "requests answered"), ("failed", "failed"), ("wrong", "wrong"), ("p95_ms", "95th percentile (ms)"),
-                         ("machine_min", "machine-minutes on"), ("cpu_s", "processor-seconds")):
-              print(f"| {lab} | {y.get(k, 0):,.1f} | {o.get(k, 0):,.1f} |")
-          print("\n| gauge | Omni against the yardstick | reading |\n|---|---:|---|")
+                         ("machine_min", "machine-minutes on"), ("unit_min", "unit-minutes"), ("conveyed_core_min", "processor conveyed (core-min)"),
+                         ("cpu_s", "processor-seconds")):
+              print(f"| {lab} | " + " | ".join(f"{d['summary'][a].get(k, 0):,.1f}" for a, _ in arms) + " |")
+          print("\n| comparison and gauge | difference a step | reading |\n|---|---:|---|")
           for g, r in d.get("readings", {}).items():
               print(f"| {g} | {100 * float(r['rel']):+.1f}% ({float(r['lo']):+.1f} to {float(r['hi']):+.1f}) | {r['word']} |")
           for ph in ("batch", "drills"):

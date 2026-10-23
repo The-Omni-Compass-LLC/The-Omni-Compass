@@ -150,6 +150,17 @@ class Ledger(unittest.TestCase):
         self.assertAlmostEqual(c.busy("web", 4.0), 1.0)         # what Kubernetes' pod, walled at its request, could use
         self.assertAlmostEqual(c.busy_raw["web"], 1.6)          # what the conveyed unit used, for the audit
 
+    def test_the_three_arms_are_three_brains_of_one_control_plane(self):
+        spec = {"routes": "r.json", "front_stats": "http://127.0.0.1:1/_stats",
+                "machines": [{"name": "m1", "url": "http://127.0.0.1:1", "cpu_m": 500}],
+                "services": [{"name": "web", "replicas": 1, "min": 1, "max": 12, "req_m": 250, "limit_m": 250, "k": 10,
+                              "line_ms": 800}]}
+        native = Control(spec, tempfile.mkdtemp(), "yardstick", 5.0)          # Kubernetes' rule alone: spread, no verdict
+        on_native = Control(spec, tempfile.mkdtemp(), "omni_native", 5.0)    # Omni on top of it: packs, conveys, no verdict
+        direct = Control(spec, tempfile.mkdtemp(), "omni", 5.0)              # Omni alone: packs, conveys, the verdict
+        self.assertEqual((native.how, on_native.how, direct.how), ("spread", "pack", "pack"))
+        self.assertEqual((set(native.verdicts), set(on_native.verdicts), set(direct.verdicts)), (set(), set(), {"web"}))
+
     def test_a_conveyed_wall_is_journaled_and_replayed(self):
         d = tempfile.mkdtemp()
         spec = {"routes": str(Path(d) / "routes.json"), "front_stats": "http://127.0.0.1:1/_stats",

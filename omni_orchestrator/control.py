@@ -63,7 +63,7 @@ class Control:
         self.kill_file = Path(kill_file) if kill_file else self.dir / "KILL"
         self.floor, self.boot_s, self.drain_s = spec.get("floor_machines", 2), spec.get("boot_s", 10), spec.get("drain_s", 2)
         self.step_units, self.hold = spec.get("step_units", 2), spec.get("park_hold_beats", 3)
-        self.how = "pack" if brain == "omni" else "spread"
+        self.how = "pack" if brain in ("omni", "omni_native") else "spread"
         now = time.time()
         self.machines = {m["name"]: {"name": m["name"], "url": m["url"], "cpu_m": m["cpu_m"], "state": "awake",
                                      "miss": 0, "until": 0.0, "since": now} for m in spec["machines"]}
@@ -353,7 +353,7 @@ class Control:
             return None
 
     def think(self, now: float) -> None:
-        stats = self.front_recent() if self.brain_kind == "omni" else None
+        stats = self.front_recent() if self.brain_kind in ("omni", "omni_native") else None
         for name, svc in self.services.items():
             n = len([u for u in self.units.values() if u.get("service") == name and u["state"] != "retiring"
                      and self.machines[u["machine"]]["state"] != "draining"])
@@ -366,6 +366,19 @@ class Control:
                 busy = self.busy(name, now)
                 want = self.yard[name].recommend(now, n, busy)
                 why = {"rule": "the yardstick: Kubernetes' published autoscaling rule", "busy": busy}
+            elif self.brain_kind == "omni_native":
+                # Omni on top of the native rule (the engine's strict form, as on the kind rigs): the units are the
+                # yardstick's, Kubernetes' rule on the same readings, never fewer; Omni's reflex and fail-up add above it;
+                # no fold below the twin and no verdict; Omni's conveyance, room rule, packing and machines on top
+                busy = self.busy(name, now)
+                p95 = (stats or {}).get("p95_5s", 0.0)
+                waiting = int((stats or {}).get("line", 0))
+                reading = svc["line_ms"] if stats and waiting > 2 * max(1, int(stats.get("hands", 1))) else p95
+                brain = self.brains[name]
+                twin = brain.twin.recommend(now, n, busy)
+                want, why = brain.decide(now, n, busy, reading, waiting, 0, False, twin=twin)
+                why["rule"] = "Omni on native: the yardstick's units at least; Omni's reflex, conveyance and machines on top"
+                why["busy_raw"] = None if self.busy_raw.get(name) is None else round(self.busy_raw[name], 3)
             else:
                 busy = self.busy(name, now)
                 p95 = (stats or {}).get("p95_5s", 0.0)
@@ -410,7 +423,7 @@ class Control:
             if want != self.desired[name]:
                 self.audit("units", service=name, was=self.desired[name], now=want, why=why)
                 self.record({"ev": "desired", "service": name, "n": want})
-        if self.brain_kind == "omni":
+        if self.brain_kind in ("omni", "omni_native"):
             self.machine_brain(now)
             self.convey(now)
 
@@ -584,7 +597,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--spec", required=True)
     ap.add_argument("--state-dir", required=True)
-    ap.add_argument("--brain", choices=("omni", "yardstick", "off"), default="omni")
+    ap.add_argument("--brain", choices=("omni", "omni_native", "yardstick", "off"), default="omni",
+                    help="omni: Omni direct, Omni alone on the machines; omni_native: Omni on top of the native rule "
+                         "(Kubernetes' autoscaling rule holds the units, Omni conveys, places, parks and adds above it); "
+                         "yardstick: the native rule alone; off: the declared units, no brain")
     ap.add_argument("--beat", type=float, default=60.0, help="the brain's beat in seconds (the dial: 5 to 120 s)")
     ap.add_argument("--kill-file", default=None)
     ap.add_argument("--room-rule", choices=("requests", "busy"), default="requests",

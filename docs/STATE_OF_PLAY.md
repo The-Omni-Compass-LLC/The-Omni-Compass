@@ -243,6 +243,19 @@ repetitions). The composition is class S over class P and L tables and across en
 run (Omni-Compass at every layer at once) is the measurement that would replace it, and the page is remade as each layer's
 omni-v16 runs land. The numbers stand on that page, never copied here.
 
+## Omni-Compass by itself: the organism run without Kubernetes (23 October)
+
+The founder's order of 23 October: build Omni-Compass's own orchestrator, no Kubernetes or other orchestrator's code in it,
+and show the three arms together: native (Kubernetes' published autoscaling rule on the muscles, written by us as the
+yardstick), Omni on native (Omni on top of that rule, the engine's strict form) and Omni direct (Omni alone on the muscles).
+`omni_orchestrator/` and `docs/OMNI_ORCHESTRATOR.md` are what was built; `docs/OMNI_ORCHESTRATOR_GRADES.md` grades it sector
+by sector (B overall, not production). Its brain carries the engine's own mechanisms (conveyance, the reflex, the twin read as
+Kubernetes would, the fold under the verdict), and in the full form on one host (18 steps of 25 s, one run of each arm, class
+L) Omni direct read against native by the one key: work GAIN (up 4.7%), the 95th percentile GAIN (down 9.9%), units GAIN, a cut
+(down 10.3%), machines EVEN, nothing failed. Not yet the three-run reading: A, B and C run on GitHub from one commit
+(`orchestrator.yml`), and the comparison against Kubernetes itself on the kind rig is the next step. The two walls found on the
+way and the mathematics of the unit count's edge are on `docs/THE_ROOM.md`.
+
 ## Open
 
 1. **Every benchmark on omni-v11**: released A, then B, then C by the conductor from `scripts/reruns.txt` (the steady and
