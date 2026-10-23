@@ -133,16 +133,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-23 18:54 | benchmark-reps | success | [39997246416](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39997246416) |
+| 2026-10-23 19:25 | benchmark-reps | success | [39997253524](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39997253524) |
+| 2026-10-23 19:23 | swarm | success | [40010161561](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40010161561) |
+| 2026-10-23 19:23 | live-engine | success | [40008082206](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40008082206) |
+| 2026-10-23 19:16 | cloud-check amazon | failure | [40010103022](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40010103022) |
+| 2026-10-23 19:16 | cloud-check google | failure | [40010095776](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40010095776) |
+| 2026-10-23 19:16 | kind-addons | success | [39999409439](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39999409439) |
+| 2026-10-23 19:02 | mujoco | success | [40008056329](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40008056329) |
+| 2026-10-23 19:01 | raw-sweep | success | [40008082241](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40008082241) |
 | 2026-10-23 18:43 | big-organism-detached collect | failure | [40005603251](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40005603251) |
-| 2026-10-23 18:42 | raw-sweep | success | [40005450458](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40005450458) |
 | 2026-10-23 18:30 | kind-goldilocks | success | [39994794165](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39994794165) |
-| 2026-10-23 18:24 | live-engine | success | [39994841314](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39994841314) |
-| 2026-10-23 18:19 | capacity A: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | success | [39994801775](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39994801775) |
-| 2026-10-23 18:13 | cloud-check amazon | failure | [40001511017](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40001511017) |
-| 2026-10-23 18:13 | cloud-check google | failure | [40001502879](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40001502879) |
-| 2026-10-23 17:37 | realms-v5 | success | [39995063676](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39995063676) |
-| 2026-10-23 17:34 | benchmark | success | [39992638123](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39992638123) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
