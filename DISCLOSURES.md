@@ -79,17 +79,22 @@ output comes out ahead, judged on the organism and on every muscle's health, is 
 built and proven in our own models first (the toy gate), every benchmark is run again on it, and no result claims it
 before its runs exist.
 
-**The factory tune.** The engine in this repository is presented as The Omni-Compass LLC tuned it and ships it: a
-self-running engine, set at the factory. Every muscle in the catalog is wired, and each runs on the setting found for it:
-its own card where one was found on development seeds and kept under the strict rule (364 muscles,
-`realms/muscle_cards_v5.csv`), the engine's own setting for every other muscle, all frozen and fingerprinted by version
-(`python3 tools/omni_version.py`). Muscles differ: no single setting is right for every muscle, family, sector, domain or
-realm, and none is presented as universal. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands. As with any engine, a licensee may
-then add on, retune, upgrade or tune down any muscle or any combination of muscles (the dial, the cards, the bands and the
-service lines are all exposed); a changed tune is the licensee's own configuration, and its results are its own, not the
-published ones. On a live system the verdict (`omnicompass/verdict.py`) measures it with paired
-trials on the muscle itself before every step. Every result reports each measure, and where one read LOSS at all, by
-however little, the result says so and by how much.
+**The factory tune: one tuned engine, and a tuning bench.** The engine in this repository is presented as The Omni-Compass LLC
+tuned and ships it: self-running, set at the factory. Every muscle in the catalog is wired and runs on the setting found for it
+(its own card where one was found on development seeds and kept under the strict rule, 364 muscles in
+`realms/muscle_cards_v5.csv`; the engine's own setting for every other), frozen and fingerprinted by version (`python3
+tools/omni_version.py`); no setting is presented as universal. **Every published benchmark result is one engine at its one
+factory tune**: the engine its table names (`python3 tools/omni_version.py`), run again on each engine that stands. From
+omni-v17 that tune is held to a declared rule (`docs/THE_TUNE.md`, `tools/tune_study.py`): of the tunes that harm no gauge against native, the
+one against which no other tune tried reads GAIN on one service gauge and LOSS on none, searched on development seeds and read
+again on untouched ones; the claim is non-dominance among the tunes searched, never a global optimum. The live engine page and the
+control panel are a live tuning engine: every knob, button and monitor turns in real time (the beat, the dial, the pedal, each
+muscle driven or left native, up or down, in or out, minus or plus) to show the mechanism of action with native alone, with
+Omni-Compass on top, or both side by side; what it shows at any other setting is the engine's range, never a benchmark result. As
+on any engine, where the mixture, the intake, the exhaust, the firing or the pistons change what it delivers, **turning any knob
+of Omni-Compass can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many
+ways, for many outputs. A licensee may add on, retune, upgrade or tune down any muscle or combination (the dial, the cards, the
+bands and the service lines are exposed); a changed tune is the licensee's own, and so are its results.
 
 ## 4. The wiring declaration
 
@@ -196,7 +201,7 @@ models) and its state: live (the engine's port, proven equal to the Python and t
 built and awaiting its run. A monitor awaiting its run carries no invented number: its native lane shows what exists, its
 Omni-Compass lane stays empty, and the page names the run that fills it. The CPU host monitor plays the harness on its own
 modelled machine until a machine with its energy counter runs it; the GPU card monitor replays the one metered run of 2
-October, made by a card controller replaced since, until its omni-v14 run on Lambda lands. The kill switch on the page acts on what
+October, made by a card controller replaced since, until its run on Lambda on the engine that stands lands. The kill switch on the page acts on what
 runs in the page: every Omni-Compass side follows native at once, and a recorded result changes its colour, never a value, a
 word or a row. The page's own seeded runs reproduce the Python's (`tools/engine_runs.py`) receipt by receipt, with one
 SHA-256 digest on each side; the 500 scenarios of `benchmarks/stack_benchmark.py` are replayed from their record with every

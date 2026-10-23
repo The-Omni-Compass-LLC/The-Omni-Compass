@@ -21,6 +21,8 @@ Every record the page replays is made again here by the repository's own code on
   cpptwin    docs/engine/export_cpp_twins.py: the Python's own runs fed through the C++ engine (cpp/): every Python/C++
              twin's parity check, every compass law the runs above wired (recorded as they ran), and the seven organisms
              at the tune-down, every muscle's law, reading by reading through the C++ compass law
+  dial       the heartbeat dial (omni-v17): every beat of the Kubernetes governor in our own models, from the newest
+             beat ladder (results/toy_gate/V<n>_LADDER.json, tools/beat_ladder.py), beside native and the main engine's 60 s
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
@@ -866,6 +868,22 @@ def register_places(limit: bool = True) -> list:
     return out
 
 
+def dial() -> dict:
+    """The heartbeat dial (omni-v17): every beat of the Kubernetes governor read in our own models, from the newest ladder
+    tools/beat_ladder.py wrote (results/toy_gate/V<n>_LADDER.json), without its per-seed records; the real runs' place from
+    the pace entry's three-run tables once they exist (results/live/V<n>_PACE*.md). Empty until a ladder exists."""
+    lads = sorted((ROOT / "results" / "toy_gate").glob("V*_LADDER.json"), key=lambda f: int(re.sub(r"\D", "", f.stem) or 0))
+    if not lads:
+        return {}
+    lad = json.loads(lads[-1].read_text(encoding="utf-8"))
+    pace = sorted((ROOT / "results" / "live").glob("V*_PACE*.md"))
+    return {"file": str(lads[-1].relative_to(ROOT)), "seeds": lad["seeds"], "days": lad["days"], "main_s": lad["main_s"],
+            "real": ("three-run tables in " + ", ".join(f"results/live/{f.name}" for f in pace)) if pace else
+                    "not yet run (docs/PACE_PREREGISTRATION.md, amendment 3: eight arms in every repetition, three runs)",
+            "toys": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
+                            for k, t in lad["toys"].items()})}   # a change against a zero (native's power cap) is NaN: null
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -916,7 +934,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep()}
+            "beatsweep": beat_sweep(), "dial": dial()}
 
 
 def embedded(page: str, key: str):
@@ -1071,7 +1089,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep")
+                          "beatsweep", "dial")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1089,7 +1107,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep"):
+              "beatsweep", "dial"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

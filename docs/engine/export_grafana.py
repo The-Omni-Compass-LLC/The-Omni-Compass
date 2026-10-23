@@ -9,7 +9,7 @@ The live engine's monitors (docs/engine/monitors.json) are, in the founder's wor
 wired to the organism. This writes that dashboard (deploy/grafana/omni-compass-wall.json, Grafana's dashboard model, schema 39):
 a monitor with a Prometheus expression becomes a panel on that expression (the datasource a variable, ${DS_PROMETHEUS}); a
 monitor the page computes from the repository's tables, or from its own clock, becomes a text panel saying so and where the
-number lives. Beside deploy/grafana/omni-compass.json (the governor's own seventeen panels on tools/omni_exporter.py) it is the
+number lives. Beside deploy/grafana/omni-compass.json (the governor's own eighteen panels on tools/omni_exporter.py) it is the
 whole wall for an operator's Grafana. The page embeds the same model and offers it for download; the builder writes the file.
 Every panel carries its monitor's number on the page, its order of appearance; the panels run left to right, then the next row, each
 under a row for the page's section that holds its monitor, and each says its wiring: the page's code, the Python, the C++, the checks.

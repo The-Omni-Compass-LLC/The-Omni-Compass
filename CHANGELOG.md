@@ -2,6 +2,56 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-23 (afternoon): omni-v17, the heartbeat a dial; the main engine at 60 s
+
+- **omni-v17 lands** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) on the founder's order of the afternoon,
+  once he had read the reads of the cluster a day in the pace study (about 86,000 at 5 s against 39,700 at 60 s): the heartbeat
+  is a dial ("5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're going to set OmniCompass is main
+  engine"). The main engine takes its full decision every 60 s (`--interval 60`, the parser's default in
+  `omni_controller/controller.py`, the one engine file changed; 54 of 55 are omni-v16's bytes); any beat from 5 to 120 s can be
+  set, the fast checks every 5 s at every beat. Every rig, install file and cloud run starts it at 60 s (`OMNI_INTERVAL` in
+  `scripts/kind_bench.sh`, `kind_paired.sh`, `kind_robust.sh`, `kind_levers.sh`, `kind_full.sh`, `kind_pilot.sh`,
+  `deploy/install/*.yaml`, `deploy/controller.yaml`).
+- **A fault the dial's ladder found, fixed before landing**: at 90 and 120 s the cruise rule's wait (120 s) rounded to one
+  decision (`max(1, round(120 / period))`), so one reading with a pod waiting put every machine in service; in the kind setting
+  the first reading held 17% and 21% more machine-hours than at 60 s, the minutes over the line 72% fewer. The cruise wait is
+  now never fewer than two readings (`max(2, ...)` when derived from seconds; a hand-set `--cruise-after` stands), so nothing
+  at 80 s or faster moves (`tests/test_pace_clocks.py`, which fails on the unfixed rule). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%, EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s.
+- **Every beat beside native, in our models** (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`, class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (down 12.0% at the main engine's 60 s, down 28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (up 175% to 317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (up 102% to 127%), the 95th percentile at 15 and 30 s (up 0.5% and 0.4%), the minutes over the line at 15 s (up 2.3%): the engine's, on the next version's list.
+- **What the slower main engine gives up against 15 s**, disclosed: in the kind benchmark's setting 23.75 minutes over the line a
+  day at 60 s against 20.25 at 15 s (up 17.3%, LOSS against 15 s by the key; still 12.0% fewer than native's 27.0, GAIN); in the
+  cloud's setting 2.6% more energy per core-hour (power given). Against native the pods waiting for a place read LOSS at every
+  beat, the main engine's included: the engine's, on the next version's list (`docs/CHANGE_CONTROL.md`).
+- **The toy gate against omni-v16** (`results/toy_gate/V17_VS_V16.md`): Every toy that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16.
+- **The monitors scale with the beat**: the exporter serves `omni_heartbeat_seconds` (the median spacing of the last eleven
+  decisions, `tools/omni_exporter.py`); the governor's Grafana screen shows the beat and counts the time since the last decision
+  in beats (`deploy/grafana/omni-compass.json`, eighteen panels); the staleness alert fires after three beats at any setting
+  (`deploy/prometheus/omni-compass-rules.yaml`: 180 s at 60 s, 45 s at 15 s, 360 s at 120 s); the control panel carries the dial
+  as a button (`POST /v1/beat`, 5 to 120 s, one console button a stop; `tools/omni_control.py`, `omni_control_beat_seconds`);
+  the live engine page carries "The heartbeat dial" (section 1j, every beat beside native from the ladder), read by the Live Engine
+  Manual (section 7.4); the receipts record each arm's beat and a three-run table names the beat its compass arm ran at
+  (`tools/live_reps.py`, `tools/confirm_abc.py`).
+- **The real runs**: `docs/PACE_PREREGISTRATION.md`, amendment 3, written before any omni-v17 run: eight arms in every repetition
+  (native; Omni-Compass at 60 s; and at 5, 15, 30, 75, 90 and 120 s), three runs of 10 repetitions on GitHub's own machines, each
+  beat read against native and against 60 s; a repetition's job may run four hours. The Kubernetes preregistration takes its
+  amendment of the same day (`docs/K8S_COMPASS_PREREGISTRATION.md`). Every benchmark runs again on omni-v17
+  (`scripts/reruns.txt`, the campaign from 17:00 UTC on 23 October); omni-v16's runs stand as its record.
+- **One tuned engine, and a tuning bench** (the founder's order of the night of 22 October): every benchmark is the main
+  engine at its one factory tune; the live engine page is a live tuning engine, whose every knob, button and monitor turns in
+  real time (native alone, Omni-Compass on top, or both), and what it shows at any other setting is the engine's range, never a
+  benchmark result; turning any knob can change every metric in any direction, as on any engine. Written into `DISCLOSURES.md`
+  section 3, the README, the live page's first box (`#tuningBench`) and all three manuals. The factory tune is chosen by a
+  declared rule, formalized in `docs/THE_TUNE.md` and the Owner's Manual section 4.4 and coded in `tools/tune_study.py`
+  (`tests/test_tune_study.py`): admissible tunes harm no gauge against native (in a cloud, no rise in the bill); the factory tune stands when no admissible tune searched dominates it; searched on development seeds, read again on untouched ones,
+  landed only through the toy gate; the claim is non-dominance among the tunes searched, never a global optimum. The first
+  search (the beat from 15 to 120 s and the compass's balance point, both settings, seeds 101 to 108) runs in our models and is
+  read on its own page in `results/toy_gate/` when it finishes. The toy's worker passes any governor argument through (`--ctl`).
+- **Two findings of the live-engine session, on the next version's list** (`docs/CHANGE_CONTROL.md`, not yet reproduced here):
+  the brain's dwell restated in seconds at the fast beats, and the cloud's floor check and warm reserve under `--give-back-only`.
+- **Next**: each beat's own combination of the other knobs, in the toy first, on development seeds (the founder's words: "you
+  might need to click and change and turn certain things to achieve a more optimal state with a different combination of
+  buttons"); a combination that reads GAIN with no LOSS at its beat lands as the next version.
+
 ## 2026-10-23 (midday): the visual seat's last six closed; main's omni-v16 tables on the page
 
 - **Six monitors that printed over themselves on a phone** (the visual referee's V5 to V10, `docs/engine/CONSENSUS_AUDIT_2026-10-22.md`),
