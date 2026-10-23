@@ -66,7 +66,10 @@ class Show:
     def spawn(self, args: list[str], log: str, core: int = CTL_CORE) -> subprocess.Popen:
         f = open(self.out / log, "a")
         p = subprocess.Popen([PY, "-m", *args], cwd=ROOT, stdout=f, stderr=subprocess.STDOUT, start_new_session=True)
-        os.sched_setaffinity(p.pid, {core})
+        try:
+            os.sched_setaffinity(p.pid, {core})
+        except OSError:
+            pass                                          # a host with fewer cores: the piece runs where the kernel puts it
         self.procs.append(p)
         return p
 
