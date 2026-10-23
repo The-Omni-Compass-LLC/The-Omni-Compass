@@ -80,10 +80,23 @@ first work of section 5.
    movable by any muscle). That table is `docs/THE_ROOM_TABLE.md`, built by `tools/room_table.py` from the catalog, each
    muscle's preset and the realms result, one row a family, plant and knob (235 rows), and it is what the next engine
    version tunes against.
-2. **The 159 same-as-native muscles, one by one.** Each has room and no gain: either the law's gain on that knob is too
-   small to move it inside the noise, the sense reads a gauge the knob does not move, or the trial's allowance never lets
-   a step through. Each is a wiring question with an answer in the family's own files, and each answer is a change to the
-   engine or to a muscle card, through the toy gate, as the next version.
+2. **The 159 same-as-native muscles, one by one.** Each has room and no gain. The first reading, from the result file's
+   own columns (the writes the governor made a run, the work and the misses against native, `results/realms_v5/MUSCLES_V5.csv`):
+   - **111 are process loops' setpoints, and the governor never wrote one** (0 writes a run). The law's loop rule holds the
+     setpoint native whenever the loop's own reach, the excursion its disturbance already makes from the setpoint plus its
+     climb, fills the band (`realms/compass_arm_v5.py`, `loop_clamp`: room = (1 − reach) × half-band, native once that room
+     is gone). These loops use their whole band under their own controller; a setpoint moved toward the calm end would be
+     carried across the line by the next swing. Omni on top of such a loop can take nothing without harm. The wall here is
+     **the loop's own controller**, which is design, not physics: a tighter loop (the same actuator, less swing) opens room
+     the law can then take. These 111 are the first muscles for Omni-Compass to build itself (section 5.3).
+   - **36 are thermal zones** (19 setpoints, 17 capacity knobs): the governor writes (39 setpoint writes a run), the work
+     is the plant's own fixed load and the misses are none in both arms, so no aim moves; what Omni buys is margin ahead of
+     the heat, power given by the key. No room on the aims to take; the gauge that moves is energy, and the max does not
+     shave it.
+   - **12 are batteries' power knobs**: the governor writes (27 a run) and the misses fall 0.11 points, inside the noise.
+     Room taken, worth too small to read at this size; the lever itself is the question (section 5.3 for a bigger store).
+   Each answer is a change to the engine, to a muscle card or to a muscle of our own, through the toy gate, as the next
+   version.
 3. **Omni-Compass's own muscles, where the wall is the design.** Where a family's wall is the vendor's design and not the
    physics, the muscle is rebuilt from its published mechanism with the wall as a dial and the compass law inside it
    (the orchestrator of 23 October, `docs/OMNI_ORCHESTRATOR.md`, is the first: Kubernetes' scheduler, autoscaler, node
