@@ -54,6 +54,7 @@ class Exporter(unittest.TestCase):
         self.assertAlmostEqual(value(p, "omni_decision_seconds_sum"), 1.8)
         self.assertAlmostEqual(value(p, "omni_decision_seconds_last"), 0.6)
         self.assertAlmostEqual(value(p, "omni_last_decision_timestamp_seconds"), 121.3)
+        self.assertAlmostEqual(value(p, "omni_heartbeat_seconds"), 60.0)
         self.assertEqual(value(p, "omni_writes_total", '{why="HPA target"}'), 1)
         self.assertEqual(value(p, "omni_writes_total", '{why="convey"}'), 1)
         self.assertAlmostEqual(value(p, "omni_recommended", '{setting="hpa_target"}'), 0.72)
@@ -135,6 +136,16 @@ class Exporter(unittest.TestCase):
             self.assertEqual(e.exception.code, 501)                  # no method but GET: nothing can be changed through it
         finally:
             stop.set(); srv.shutdown(); srv.server_close()
+
+    def test_the_beat_is_measured_at_any_setting(self):
+        """The heartbeat is a dial (omni-v17): the exporter serves the beat the governor runs at, the median spacing of its last
+        eleven decisions, so a skipped slot or a slow decision moves it little, and nothing before two decisions."""
+        one = value(gauges([{"time": 5.0, "decision_ms": 9.0}]).page(), "omni_heartbeat_seconds")
+        self.assertTrue(one != one)                                                                # NaN: not yet measured
+        for beat in (5.0, 15.0, 30.0, 60.0, 75.0, 90.0, 120.0):
+            ts = [beat * k for k in range(12) if k != 7]                                         # one slot skipped
+            p = gauges([{"time": t, "decision_ms": 40.0} for t in ts]).page()
+            self.assertAlmostEqual(value(p, "omni_heartbeat_seconds"), beat)
 
     def test_the_grafana_screen_reads_only_what_the_exporter_serves(self):
         dash = json.loads((ROOT / "deploy" / "grafana" / "omni-compass.json").read_text(encoding="utf-8"))

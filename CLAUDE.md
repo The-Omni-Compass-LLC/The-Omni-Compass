@@ -43,9 +43,32 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v16 stands (v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v17 stands (v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`) stands on main since 22 October, on two
+- **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stands on main since 23 October,
+  morning, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
+  decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and
+  cloud run), any beat from 5 to 120 s can be set, and every beat is shown beside native with what it buys and what it costs
+  (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 1j; the real runs,
+  `docs/PACE_PREREGISTRATION.md`, amendment 3, eight arms). The monitors scale with the beat (`omni_heartbeat_seconds`, the
+  staleness alert at three beats, the control panel's `POST /v1/beat`). One fault the dial's ladder found before it landed is
+  fixed in it: at 90 and 120 s the cruise wait (120 s) rounded to one decision, so one reading with a pod waiting put every
+  machine in service (the kind setting's first reading: machine-hours +17% and +21% against 60 s, the minutes over the line −72%);
+  the cruise wait is now never fewer than two readings (`tests/test_pace_clocks.py`, failing on the unfixed rule), and nothing at
+  80 s or faster moves. 54 of its 55 files are omni-v16's bytes. Corrected, the kind benchmark's setting reads at 90 s, against 60
+  s, the machine-hours −1.7% EVEN, the minutes over the line −4.7% EVEN, the pods waiting −12.1% EVEN, the 95th percentile −0.2%
+  EVEN; at 120 s the machine-hours −2.1% EVEN, the minutes over the line −3.7% EVEN, the pods waiting −29.6% GAIN; machines parked
+  over the eight days 190 and 119 against 329 at 60 s. The toy gate against omni-v16 (`results/toy_gate/V17_VS_V16.md`): Every toy
+  that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped,
+  omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. The ladder: Every beat
+  reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s
+  of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native
+  (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against
+  native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (+175% to +317%); and in the
+  cloud's pods waiting for a place at 5, 15 and 30 s (+102% to +127%), the 95th percentile at 15 and 30 s (+0.5%, +0.4%), the
+  minutes over the line at 15 s (+2.3%): the engine's, on the next version's list. Every benchmark runs again on it from 17:00 UTC
+  on 23 October.
+- **Omni v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`) stood on main on 22 October, from the morning to the evening, on two
   words of the founder's: "Go opus" on the plan put to him that night (every clock of the Kubernetes governor in seconds, the pace
   read at 60, 15, 10 and 5 s in our models, three runs at each pace on GitHub's own machines), and, once the models had read,
   "15 sec all over heart beat fix update code". **The heartbeat is 15 s**: the governor's full decision comes every 15 s by default
@@ -295,13 +318,43 @@ the founder overrides one in the conversation.
 
 ## Orders of 22 October
 
+- **One tuned engine, and a tuning bench; the main tune found, not guessed** (the founder's words, the night of 22 October: "what
+  the live engine is versus the main ... benchmark engine is two different things ... the real benchmarks that we're showing are
+  proving a one set tuned engine ... and must explain and disclose that any turns and tweaks of knobs can change all metrics in
+  any form"; "like any regular engine, carburetor to intake, outtake to pistons, to fires ... to show the versatility of an engine
+  that can be put in many vessels, tuned many ways, achieve many outputs"; and "the main engine ... is the most tuned engine in its
+  most optimal state that you will go through and find and confirm"). Every benchmark is the main engine at its one factory tune;
+  the live engine page is a live tuning engine (every knob, button and monitor turned in real time, native alone, Omni-Compass on
+  top, or both), whose readings at any other setting show the engine's range and are never a benchmark result; every page says
+  that turning any knob can change every metric in any direction (`DISCLOSURES.md` section 3, the README, the live page's first
+  box `#tuningBench`, all three manuals). The factory tune is chosen by a declared rule (`docs/THE_TUNE.md`, the Owner's Manual
+  section 4.4, `tools/tune_study.py`): admissible = no gauge reads LOSS against native (in a cloud no rise in the bill); the
+  factory tune stands when no admissible tune searched dominates it (against it no service gauge LOSS, one GAIN); searched
+  on development seeds (101 to 108), read again on the gate's untouched seeds, landed as the next version only through the toy
+  gate; the claim is non-dominance in the tunes searched, never a global optimum. Every new search widens the grid (the cruise
+  wait, the trial, the dwell in readings, each muscle's card at each beat).
+- **The heartbeat a dial; the main engine at 60 s** (the founder's words, the afternoon of 22 October, once he had read the reads a
+  day in the pace study, about 86,000 at 5 s against 39,700 at 60 s: "who knows if maybe the purpose is somebody wants to set it at 5
+  seconds ... I know why we have to scale out 5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're going to
+  set OmniCompass is main engine"; and before it: "we are going to write the engine to have the 60 ... we have to actually have to
+  be able to show the same 15 second beats"). omni-v17 (`docs/OMNI_V17.md`): the main engine takes its full decision every 60 s; any beat can be set
+  (`--interval`, 5 to 120 s and every value between); every beat is shown beside native with what it buys (its reads of the
+  cluster) and what it costs (its own processor, and every service row against native and against 60 s), in our models
+  (`results/toy_gate/V17_LADDER.md`), on the live engine page (section 1j, "The heartbeat dial") and in its real runs
+  (`docs/PACE_PREREGISTRATION.md`, amendment 3: eight arms, native and 5, 15, 30, 60, 75, 90 and 120 s). The monitors scale with
+  the beat: the exporter serves the beat the governor runs at (`omni_heartbeat_seconds`), the governor's Grafana screen counts the
+  time since its last decision in beats, and the staleness alert fires after three beats at any setting. The engine "can always be
+  tweaked, tuned, and turned with any knob, any button"; at each beat the other knobs may want their own combination to reach the organism's
+  best state, and that per-beat tuning is the next study, in the toy first (each beat's combination lands as a version only when it
+  reads no LOSS). Nothing is read across beats as one result: every beat is its own row beside native.
 - **The heartbeat at 15 s, "all over"** (the founder's words, once the pace models had read: "15 seconds back to, instead of 60
   seconds in the clock, the heartbeat"; "15 sec all over heart beat fix update code"). Who set 60 s: we did, on 26 September, with
   no reason recorded; native's pod autoscaler checks every 15 s by the Kubernetes project's default. omni-v16 puts every clock in
   seconds, so the pace changes only how often the governor looks, and sets the full decision every 15 s everywhere, the fast checks
   every 5 s. A longer period is not a bigger cushion: it is a longer blind spot (his question of the same night, answered so). The
   pace runs (`docs/PACE_PREREGISTRATION.md`) read 15 s for real, against native and against 60, 10 and 5 s; a LOSS at 15 s there
-  is root-caused and fixed in the next version.
+  is root-caused and fixed in the next version. The same afternoon the dial above replaced it: omni-v16 stood at 15 s from the
+  morning's landing to omni-v17's, and 15 s is now one setting of the dial, read beside native like every other.
 - **Another person's cloud account** (the founder's words: he logged into another person's Azure account to use their free credit
   for his benchmark). A key bills only the account it belongs to; nothing merges. Using it is his and that person's matter: only
   with that person's agreement. Asked whether they agreed, he answered "Yes yes yes" the same day: the Azure queue's switch, off while the
@@ -400,7 +453,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v16` since 22 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v17` since 23 October, afternoon), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -656,8 +709,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v16` (the engine that stands, 22 October), stay in
-  sync, and `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v16`,
+  One version is always the main one; `main` and the working branch, `v17` (the engine that stands, 23 October, afternoon), stay in
+  sync, and `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v17`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

@@ -107,6 +107,33 @@ and the same at 60, 10 and 5 s (the table above, written before the first run). 
 against native, and 60, 10 and 5 s against 15 s. A row that reads LOSS at 15 s, against native or (on work done, time waited,
 missed or failed) against 60 s, is root-caused and fixed in the next version, and he hears it, as every other.
 
+## Amendment 3 (22 October, afternoon, written before any omni-v17 run): the beat a dial, the main engine at 60 s
+
+The founder's word the same afternoon, once he had read the reads a day in the pace study (about 86,000 at 5 s against 39,700
+at 60 s): the heartbeat is a dial. Any beat can be set, and every setting is shown beside native with what it buys and what
+it costs, because an operator may want a fast beat for its reads and accept what it costs, or a slow one, and each beat may
+want its own combination of the other knobs. The main engine decides every 60 s (omni-v17, `docs/OMNI_V17.md`). No rule picks
+a default from these runs: he set it. No omni-v16 run of this entry had started when this was written.
+
+The runs on omni-v17 carry eight arms in every repetition, in an order rotated by repetition, on the same runner:
+
+| Arm | What governs |
+|---|---|
+| native | Kubernetes alone (the HPA at its target, the scheduler); Omni-Compass not started |
+| compass | Omni-Compass on top of native, the compass law at the max, at the main engine's beat: a full decision every 60 s |
+| compass5, compass15, compass30 | the same, a full decision every 5, 15 and 30 s |
+| compass75, compass90, compass120 | the same, a full decision every 75, 90 and 120 s |
+
+Everything else stands as written above: the fast checks every 5 s in every Omni arm, the steady load, the line, the reset.
+Each beat is read against native and against the compass arm at 60 s, paired within the repetition, by the one key, three
+runs of 10 repetitions; a repetition's job may run four hours (`.github/workflows/benchmark-reps.yml`). A row that reads LOSS
+at any beat against native is the engine's at that beat: it is named on the dial's page (the live engine page, "The heartbeat
+dial") and root-caused like any other, in the toy first. The seven beats were read first in our own models
+(`results/toy_gate/V17_LADDER.md`), and that reading found one fault before the version landed: at 90 and 120 s the cruise
+wait (120 s) had rounded to one decision, so one reading with a pod waiting put every machine in service. omni-v17 carries the
+fix (the cruise wait never fewer than two readings; `docs/OMNI_V17.md`, section 3), so the compass90 and compass120 arms run
+the corrected rule; every other arm's counts are unchanged by it.
+
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ---
