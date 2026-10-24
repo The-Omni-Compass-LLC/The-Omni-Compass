@@ -88,8 +88,14 @@ def page(d: dict) -> str:
     miss = sum(v["missed"] for v in d["files"].values())
     rows = sorted(((f, v) for f, v in d["files"].items() if v["statements"]),        # an empty __init__.py has nothing to run
                   key=lambda kv: (kv[1]["statements"] - kv[1]["missed"]) / kv[1]["statements"])
+    from tools.omni_version import VERSIONS                     # newest first: the engine that stands
+    newest = f"omni-{next(iter(VERSIONS))}"
+    # the record names the engine it was measured on; after a landing it is the engine before the one that stands until the
+    # next --measure, and the page says so rather than calling the measured engine the one that stands (24 October, omni-v19)
+    which = (f"the engine that stands ({d['engine']})" if d["engine"] == newest else
+             f"the engine it was measured on ({d['engine']}; {newest}, the engine that stands since, is measured at the next `--measure`)")
     L = ["# How much of the engine the tests run", "",
-         f"Line coverage of every Python file in the engine that stands ({d['engine']}), under the whole test suite: the "
+         f"Line coverage of every Python file in {which}, under the whole test suite: the "
          "unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 "
          f"tools/engine_coverage.py --measure` on {d['commit']}; `tools/engine_coverage.py --check`, run by "
          "`verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.", "",

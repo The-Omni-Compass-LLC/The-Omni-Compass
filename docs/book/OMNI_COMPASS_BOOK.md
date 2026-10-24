@@ -1301,8 +1301,8 @@ respect a limit the wires do not carry.
 
 ### 6.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v18** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
-quoted here ran on omni-v7, whose rules omni-v18 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
+The engine that stands in this edition is **omni-v19** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
+quoted here ran on omni-v7, whose rules omni-v19 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
 the operator's on a shared host at its top while another workload there has room of its own, and counts every other pod by its
@@ -1313,8 +1313,13 @@ it; omni-v15 asks for the power cap's trim only while the response line has been
 omni-v16 keeps every time the governor counts in seconds, so `--interval` changes only how often it decides, and omni-v17
 makes the beat a dial, the full decision every 60 s by default (the main engine) and any beat from 5 to 120 s on the command
 line; omni-v18 carries Omni direct, Omni-Compass run on the muscles with no Kubernetes beneath it (`omni_orchestrator/`), as
-part of the engine, so its three arms (native, Omni on native, Omni direct) run from one fingerprint: the conveyance
-runs every `--convey-every-s` (15 s) whichever check falls due, a quiet deployment is scaled to zero after
+part of the engine, so its three arms (native, Omni on native, Omni direct) run from one fingerprint; omni-v19 takes
+`--own-replicas namespace/name,...` (or `OMNI_OWN_REPLICAS`), Omni-Compass by itself on Kubernetes: for a workload no autoscaler
+governs, the governor sets its replica count itself through the workload's own scale, every `--own-every-s` (15 s), its target and
+range read from the workload's `omnicompass.io/target-utilization` and `omnicompass.io/replica-range` annotations (else
+`--own-target`), never below the workload's own count at the max (the tune-down may go to the range's floor), the count recorded on the workload
+and handed back by the reset; a workload an autoscaler governs is left to it, and `--native replicas` leaves the muscle native; and the
+conveyance runs every `--convey-every-s` (15 s) whichever check falls due, a quiet deployment is scaled to zero after
 `--coldstart-idle-s` (180 s), and a step that runs past its slot is skipped, never run in a burst, with `behind_s` in the
 audit). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write; a muscle left native shows as `"native_muscles"` at the start and `"held"` on each write
 it withholds. The guard shows in the audit: when the cluster's
@@ -1472,7 +1477,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v18 (digest 1cb92edb64c4391d, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v19 (digest 36ee67284c035235, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
 
 **Level 1 - Watch (read-only).**
 
@@ -7458,25 +7463,86 @@ and delete the `AZURE_CREDENTIALS` secret in GitHub.
 ### F.7 When Azure's check says the key is not whole
 
 Every Azure set, and the conductor's own check at no cost (the run **cloud-check azure** on the **Actions** tab), reads the
-shape of `AZURE_CREDENTIALS` before Azure's login and says what is wrong without printing a character of it: that it does not
-start with `{`, that it holds a client secret's value alone, that it was cut short, or which field is missing. Store it again,
-whole:
+shape of the login before Azure's login and says what is wrong without printing a character of it: that a box is empty, that
+it holds an ID where a password goes, that it was cut short, or which field is missing.
+
+#### F.7.1 The four boxes, one value each (the simplest way)
+
+Since 24 October the login can be stored one value to a box, exactly as the portal shows each value, with nothing to type
+around it. The check builds the block from them; the boxes are read only when `AZURE_CREDENTIALS` does not hold the whole
+block. All four values come from the same app.
+
+1. In the Azure portal, search **App registrations**, click **All applications**, and open the app (or **+ New
+   registration**, name `omni-compass-github-2`, **Register**). Its **Overview** shows three numbers; skip **Object ID**.
+2. On GitHub, open **https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/settings/secrets/actions**. For each box
+   below, click its pencil (or **New repository secret** if it is not listed), paste the one value, and save:
+   - `AZURE_CLIENT_ID`: the app's **Application (client) ID**.
+   - `AZURE_TENANT_ID`: the app's **Directory (tenant) ID**.
+   - `AZURE_SUBSCRIPTION_ID`: search **Subscriptions** in the portal, open yours, copy its **Subscription ID**.
+   - `AZURE_CLIENT_SECRET`: on the app, **Certificates & secrets**, **+ New client secret**, **Add**, then copy the
+     **Value** column at once (about 40 characters; Azure shows it once). Never the **Secret ID** beside it: that is
+     another 36-character number, not a password.
+3. Let the app build machines: **Subscriptions**, yours, **Access control (IAM)**, **+ Add**, **Add role assignment**,
+   **Privileged administrator roles**, **Contributor**, **Next**, **+ Select members**, the app's name, **Select**,
+   **Review + assign**.
+4. Leave `AZURE_CREDENTIALS` as it is or empty it; while it is not the whole block, the four boxes are used.
+
+#### F.7.2 The one box, the whole block
+
+A set already running keeps the key it started with: on 24 October the steady set started on 19 October was still signing in
+at every repetition while new runs read 88 characters in the box (the size of a storage account's access key, not the block).
+So make the new block under a new name, which leaves the login a running set still uses untouched; running the line of
+section F.3 with its old name again can replace that login's password, and a repetition that cannot sign in at its end cannot
+delete what it built.
 
 1. In the Azure portal, click **>_** (Cloud Shell) and choose **Bash**, as in section F.2.
-2. Paste the one line of section F.3 again and press **Enter**. It prints a new block that starts with `{` and ends with `}`.
+2. Paste this line and press **Enter** (the line of section F.3 with the name `omni-compass-github-2`). It prints a new block
+   that starts with `{` and ends with `}`:
+
+   ```bash
+   az ad sp create-for-rbac --name omni-compass-github-2 --role contributor --scopes /subscriptions/$(az account show --query id -o tsv) --sdk-auth
+   ```
 3. Select all of it, from `{` to `}`, and copy it.
 4. On GitHub, open the repository, then **Settings**, then **Secrets and variables**, then **Actions**.
 5. Beside `AZURE_CREDENTIALS`, click the pencil (**Update**).
 6. Paste the whole block as the new value and click **Update secret**.
-7. To retire every older password of the same login: in the Azure portal search **App registrations**, open
-   **omni-compass-github**, then **Certificates & secrets**, and delete every client secret but the newest.
+7. Once no Azure set is running (the **Actions** tab shows no run named `aks-metered` in progress or queued), the older
+   login may be retired: in the Azure portal search **App registrations**, open **omni-compass-github**, and click
+   **Delete**. Nothing in the repository names it.
 
 The conductor runs Azure's check again within the hour, and the sets start on their own once it passes. Nothing is built and
 nothing is billed while it fails.
 
+### F.8 The second way in: the sign-in without a password (OIDC)
+
+Since 23 October, evening, the repository also holds a sign-in with no password at all: three IDs (`AZURE_CLIENT_ID`,
+`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`) and a rule in Azure that trusts this repository's own runs. The inventory
+(`azure-inventory.yml`) uses it. On 24 October it was refused: Azure answered that no trust rule matched the name GitHub
+presented (`AADSTS700213`), because GitHub now presents this repository by its ID numbers, and the rule in Azure names it the
+older way. One rule with the exact name makes it work:
+
+1. In the Azure portal, search **App registrations** and open the app whose **Application (client) ID** is the one stored as
+   `AZURE_CLIENT_ID`.
+2. Click **Certificates & secrets**, then the tab **Federated credentials**, then **+ Add credential**.
+3. **Federated credential scenario**: choose **Other issuer**.
+4. **Issuer**: `https://token.actions.githubusercontent.com`
+5. **Subject identifier** (type it exactly, or copy it from this page): 
+   `repo:The-Omni-Compass-LLC@334396871/The-Omni-Compass@1390458092:ref:refs/heads/main`
+6. **Name**: `github-main`. Leave **Audience** at `api://AzureADTokenExchange`. Click **Add**.
+7. The app needs a role on the subscription: **Subscriptions**, the subscription, **Access control (IAM)**, **Add role
+   assignment**, **Reader** for the inventory.
+
+The benchmark sets keep the key of section F.3. A sign-in without a password holds for about an hour and cannot renew itself
+inside a job, while one Azure repetition runs about 70 minutes and must still be signed in at its end to delete what it built;
+a lapsed sign-in there could leave machines running and billing. So the sets, and Azure's $0 check that clears them, sign in
+with a password: `AZURE_CREDENTIALS` whole, or the four boxes of section F.7.1 (the three IDs here and `AZURE_CLIENT_SECRET`),
+and nothing is started while neither is whole.
+
 ## Appendix G. The Google Cloud Account, Click by Click
 
 
+
+**Status (24 October): not yet run, its queue switched off.** The key has not been stored whole. Everything here stays ready, wired as Azure's sets run (the same harness and 60 s beat, 100 paired repetitions a set under the stopping rule, the $0 check first); the founder switches it on once the key is stored whole (section G.4), and nothing is built or billed before.
 
 This connects GitHub to a Google Cloud account so two workflows can run the same tests Azure runs:
 
@@ -7487,6 +7553,8 @@ This connects GitHub to a Google Cloud account so two workflows can run the same
   design as Azure's `aks-metered` (`docs/K8S_COMPASS_PREREGISTRATION.md`).
 - **`cloud-organism`** with `cloud` = `gcp`: the big organisms (the whole tower and the four stacked, the
   real cluster inside, at 100 copies) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
+  With `test` = `direct` the same button runs Omni direct's three arms instead (native, Omni on native and Omni direct,
+  no Kubernetes; `docs/OMNI_V18.md`), `reps` runs on the one machine; it starts only on the founder's word.
 
 About fifteen minutes, once. New accounts get **$300 of free credit for 90 days**; Google does not charge the card during the
 free trial.
@@ -7593,6 +7661,8 @@ To remove GitHub's access: in the console menu ☰ **IAM & Admin**, **Service Ac
 
 
 
+**Status (24 October): not yet run, its queue switched off.** The account is on Amazon's Free plan, which Amazon will not raise before the $100 credit is spent or the account is six months old. Everything here stays ready, wired as Azure's sets run (the same harness and 60 s beat, 100 paired repetitions a set under the stopping rule, the $0 check first); the founder switches it on once the account is on the Paid plan (section H.2), and nothing is built or billed before.
+
 This connects GitHub to an Amazon Web Services (AWS) account so two workflows can run the same tests Azure runs:
 
 - **`eks-metered`**: a real Amazon Elastic Kubernetes Service cluster, native Kubernetes (with its own cluster autoscaler)
@@ -7602,6 +7672,8 @@ This connects GitHub to an Amazon Web Services (AWS) account so two workflows ca
   design as Azure's `aks-metered` (`docs/K8S_COMPASS_PREREGISTRATION.md`).
 - **`cloud-organism`** with `cloud` = `aws`: the big organisms (the whole tower and the four stacked, the
   real cluster inside, at 100 copies) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
+  With `test` = `direct` the same button runs Omni direct's three arms instead (native, Omni on native and Omni direct,
+  no Kubernetes; `docs/OMNI_V18.md`), `reps` runs on the one machine; it starts only on the founder's word.
 
 About fifteen minutes, once. New accounts get **$100 of credit at sign-up and up to $100 more** for trying services, used
 before the card.

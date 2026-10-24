@@ -43,10 +43,32 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v18 stands (v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v19 stands (v18, v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v18** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) stands on main since 23 October, night,
-  on the founder's orders of that evening ("Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on
+- **Omni v19** (`OMNI_V19.json`, digest `36ee67284c035235`, 62 files; `docs/OMNI_V19.md`) stands on main since 24 October, 16:54
+  UTC, under the founder's order of 23 October (Orders of 23 October, the third arm, Omni-Compass by itself) and the standing order
+  that every change lands as the next version, told, not asked: omni-v18 with a pod muscle of its own (`--own-replicas`,
+  `omni_controller/controller.py` `_own_pods`): for a workload the operator names and no autoscaler governs, the governor sets the
+  replicas itself through the workload's own scale by strict C's rule, at the target the compass moves inside the autoscaler's
+  cover, never below the operator's count at the max, reconciled every 15 s on the fast checks (`--own-every-s`, the pod
+  autoscaler's sync), the compass moving the target only in a decision, the operator's count handed back by the reset; and the
+  models' arm by itself (`realms/harness.py` `SOLO`, `realms/plants.py` `native_off`). 59 of its 62 files are omni-v18's bytes.
+  **One name, two engines, reconciled**: the change was first landed on the live engine's branch on 24 October, 01:30 UTC, under the
+  name omni-v18 (digest `22486290b19349eb`, 55 files, on omni-v17) while main's omni-v18 stood; that engine never stood on main and
+  none of its records is read as main's omni-v18; its change, taken onto main's omni-v18 and gated again against it, is omni-v19
+  (the code's comments that named the branch's numbers now name omni-v19; every rule is the branch's). The toy gate against omni-v18
+  (`results/toy_gate/V19_VS_V18.md`) read every gauge of all 11 toys identical, seed for seed, every table the one the branch's own
+  gate against omni-v17 printed; no LOSS against omni-v18; in the models the native and max arms read byte-identical on both engines
+  (806 readings on the development seeds). By itself in our own model (`results/toy_gate/SOLO_V19.md`, class S) against native on
+  the same machines: the 95th percentile GAIN (down 19.4%), the minutes over the response line GAIN (down 64.9%), machines and
+  energy EVEN; against omni-v18 by itself, which holds every workload at the operator's count
+  (`results/toy_gate/SOLO_V19_VS_V18.md`), the 95th percentile GAIN (down 100.0%) and the minutes over the line GAIN (down 99.3%). A
+  fault found on the branch before it landed there (at the 60 s beat the first candidate moved pods once a minute; the minutes over
+  the line read LOSS) is fixed in it. The real arm: `ARM=solo` on kind (`docs/SOLO_PREREGISTRATION.md`; `kubernetes by itself` in
+  `scripts/reruns.txt`), three runs; in our models the organisms runner's third arm (`tools/run_realms_v5.py`). Every benchmark runs
+  again on it from 16:54:55 UTC on 24 October.
+- **Omni v18** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) stood on main from 23 October, night,
+  to 24 October, afternoon, when omni-v19 landed on it, on the founder's orders of that evening ("Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on
   top of the muscles. And then Omni direct is simply Omni on top of the muscles, no Kubernetes ... they all need to be written in
   code"; "It should be not 17 anymore, it should be 18"): omni-v17 with Omni direct taken into the engine. The seven files of
   Omni-Compass's own orchestrator that hold its rules (`omni_orchestrator/`: the brain, the control plane, the room rule, the
@@ -62,7 +84,9 @@ the founder overrides one in the conversation.
   LOSS in any pair. The three runs on GitHub's machines (full form, `results/orchestrator/V18_THREE_ARMS_ABC.md`): both Omni
   arms against native work GAIN and the 95th percentile GAIN in all three, machines EVEN, units power given or EVEN; Omni direct
   against Omni on native EVEN on every gauge; no LOSS. The toy gate against omni-v17 (`results/toy_gate/V18_VS_V17.md`) reads omni-v17's numbers on every toy (none
-  of its 55 files moved). Every benchmark runs again on it from 21:19 UTC on 23 October.
+  of its 55 files moved). Every benchmark ran again on it from 21:19 UTC on 23 October; its runs stay its own record. (Not to be
+  confused with the live engine's branch's own omni-v18 of 24 October, digest `22486290b19349eb`, 55 files, which never stood on
+  main: its change is omni-v19's.)
 - **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stood on main on 23 October, from the
   morning to the night, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
   decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and
@@ -597,7 +621,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v18` since 23 October, night), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v19` from omni-v19's push, 24 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -853,8 +877,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v18` (the engine that stands, 23 October, night), stay in
-  sync, and `v17`, `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v18`,
+  One version is always the main one; `main` and the working branch, `v19` (the engine that stands, 24 October), stay in
+  sync, and `v18`, `v17`, `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v19`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

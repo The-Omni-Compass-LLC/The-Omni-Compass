@@ -2,6 +2,39 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (late afternoon): omni-v19, Omni-Compass by itself, a pod muscle of its own; the two engines named omni-v18 reconciled
+
+- **omni-v19** (`OMNI_V19.json`, digest `36ee67284c035235`, 62 files; `docs/OMNI_V19.md`), landed under the founder's order of 23
+  October (three arms: native; Omni-Compass and native; Omni-Compass by itself) and the standing order that every change lands as
+  the next version, told, not asked. omni-v18 (Omni direct in the fingerprint) with a pod muscle of its own (`--own-replicas`): for a
+  workload the operator names and no autoscaler governs, the Kubernetes governor sets the replicas itself through the workload's own
+  scale, at the target the compass moves, reconciled every 15 s on the fast checks, never below the operator's count at the max, the
+  operator's count handed back by the reset; and the models' arm by itself (`realms/harness.py`, `realms/plants.py`). 59 of its 62
+  files are omni-v18's bytes.
+- **Two engines had one name.** The change was first landed on the live engine's branch on 24 October, 01:30 UTC, as that branch's
+  own omni-v18 (digest `22486290b19349eb`, 55 files, on omni-v17), while main's omni-v18 (digest `1cb92edb64c4391d`) stood. By the
+  standing rules (one number, one engine; nothing read across engines) that engine never stood on main and none of its records is read
+  as main's omni-v18; its three engine files are applied onto main's omni-v18 and land as omni-v19, gated again against main's
+  omni-v18. The code's comments that named the branch's numbers name omni-v19; every rule is the branch's. Main's omni-v18 files and
+  records are untouched.
+- **The toy gate against omni-v18** (`results/toy_gate/V19_VS_V18.md`, every toy, 8 seeds): every gauge of all 11 toys identical,
+  seed for seed (95 rows and the verdict), the numbers the branch's own gate against omni-v17 read; no LOSS against omni-v18. The
+  rows against native that read LOSS are omni-v18's and omni-v17's, unchanged, each on the next version's list. In the models, the
+  native and max arms read byte-identical on both engines (806 readings on the development seeds 7101 and 7102: 67 muscles under
+  their own load, the climb and the line, and one body of 60 muscles). **By itself** (`results/toy_gate/SOLO_V19.md`, class S) against native on the same
+  machines: the 95th percentile GAIN (down 19.4%), the minutes over the response line GAIN (down 64.9%), machines and energy EVEN;
+  against omni-v18 by itself, arm by arm (`results/toy_gate/SOLO_V19_VS_V18.md`): native and Omni-Compass and native identical, by
+  itself the 95th percentile GAIN (down 100.0%) and the minutes over the line GAIN (down 99.3%), omni-v18 having no pod muscle.
+- **Brought with it** (the arm by itself, and only that): `tests/test_own_replicas.py` (11 tests); the kind rig's `ARM=solo`
+  (`scripts/kind_bench.sh`, `fleet/capture/kube_capture.sh`, `tests/test_robust_restart.py`) and its readings (`tools/confirm_abc.py`,
+  `tools/live_reps.py`); the organisms runner's third arm (`tools/run_realms_v5.py`); the solo study (`tools/solo_study.py`, its arm
+  table corrected to the setting it runs: no Cluster Autoscaler, 12 machines in every arm); and `kubernetes by itself` in
+  `scripts/reruns.txt`, written before the omni-v19 campaign opened (the queue 192, `tests/test_release_campaign.py`).
+- Every place that names the engine that stands says omni-v19 (`tools/land_engine.py v19 --since 2026-10-24T16:54:55Z`): the fingerprint, the
+  version list, the conductor's campaign, the grid manifest and workflows, the package 0.19.0, the root list, the release group;
+  the words by hand: the version page, README, CLAUDE.md, the Operator's Manual, the state of play, this changelog, the live
+  engine's engine mark (its prose stays omni-v18's until the page is rebuilt).
+
 ## 2026-10-24 (afternoon): the conductor ticks again on omni-v18
 
 - **Why no benchmark started from 07:05 UTC**: the conductor (`grid.yml`) and the grid's own jobs (`six`, `six-kube`, both

@@ -767,9 +767,10 @@ def main(root):
     own = sorted(beats.get("compass", set()))
     beat = f"{own[0] if len(own) == 1 else engine_default_s():g}"
     cols = ([a for a in ("nativebare", "native") if a in runs] + tuned
-            + [a for a in ("watch", "omni", "compassbare", "compass") if a in runs] + paces + [a for a in ("strict",) if a in runs])
+            + [a for a in ("watch", "omni", "compassbare", "compass") if a in runs] + paces + [a for a in ("strict", "solo") if a in runs])
     names = {"native": "native", "watch": "omni, watching (writes nothing)", "omni": "omni (allocation law)", "compass": "omni", "strict": "omni alone (not on top: earlier sets only)",
              "nativebare": "the organism alone (no orchestrator)", "compassbare": "omni on the organism alone",
+             "solo": "Omni-Compass by itself (no pod autoscaler; its own pod muscle)",
              **{a: f"Native tuned, HPA target {a[6:]}" for a in tuned},
              **{a: f"omni, a decision every {a[7:]} s" for a in paces}}
     L += ["## All columns, mean over repetitions", "", "| Gauge | " + " | ".join(names[a] for a in cols) + " |",
@@ -794,6 +795,9 @@ def main(root):
     # each pace against native, and against the compass arm at its default beat, paired in the repetition
     pairs += [(a, "native", a, f"omni deciding every {a[7:]} s vs native") for a in paces]
     pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni at its default, every {beat} s") for a in paces]
+    # Omni-Compass by itself (omni-v19, docs/SOLO_PREREGISTRATION.md): against native, and against Omni-Compass and native
+    pairs += [("solo", "native", "solo", "Omni-Compass by itself (the pod autoscaler removed, its own pod muscle) vs native"),
+              ("solo", "compass", "solo|compass", "Omni-Compass by itself vs Omni-Compass and native")]
     for a, base, key, four in pairs:
         if a not in runs or base not in runs:
             continue
