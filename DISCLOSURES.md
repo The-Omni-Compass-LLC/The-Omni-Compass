@@ -226,18 +226,14 @@ and Omni-Compass direct (native's own pool autoscalers off, `realms/harness.py` 
 None is a product.
 
 **The live engine.** `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` is a monitor of the repository's records and of the engine's
-own mathematics running in the page. Every monitor carries its evidence class (P a physical meter, L live software, S our own
-models) and its state: live (the engine's port, proven equal to the Python and the C++ on every build by
+own mathematics running in the page, and the live tuning bench: a setting other than the factory profile shows a variation of
+the mechanism, never a result. Every monitor carries its evidence class (P a physical meter, L live software, S our own models)
+and its state: live (the engine's port, proven equal to the Python and the C++ on every build by
 `docs/engine/check_live_engine.py`), a replay of a recorded run from its own files, a reading of the repository's tables, or
-built and awaiting its run. A monitor awaiting its run carries no invented number: its native lane shows what exists, its
-Omni-Compass lane stays empty, and the page names the run that fills it. The CPU host monitor plays the harness on its own
-modelled machine until a machine with its energy counter runs it; the GPU card monitor replays the one metered run of 2
-October, made by a card controller replaced since, until its run on Lambda on the engine that stands lands. The kill switch on the page acts on what
-runs in the page: every Omni-Compass side follows native at once, and a recorded result changes its colour, never a value, a
-word or a row. The page's own seeded runs reproduce the Python's (`tools/engine_runs.py`) receipt by receipt, with one
-SHA-256 digest on each side; the 500 scenarios of `benchmarks/stack_benchmark.py` are replayed from their record with every
-trace hash, not recomputed in the page. The wall's Grafana dashboard (`deploy/grafana/omni-compass-wall.json`) names the
-open-source exporters and series that would carry each monitor on a running system; the page itself reads no live system.
+built and awaiting its run, with no invented number and the run that fills it named. The page's seeded runs reproduce the
+Python's (`tools/engine_runs.py`) receipt by receipt, one SHA-256 digest on each side. The kill switch on the page acts on what
+runs in the page, and a recorded result changes its colour, never a value, a word or a row. Pointed at an owner's own
+Prometheus, the page only reads it: it writes to no system.
 
 **The three manuals.** The Operator's Manual wires and runs Omni-Compass; the Owner's Manual holds the whole mechanism and every
 result; the Live Engine Manual reads the live engine top to bottom, monitor by monitor and knob by knob. Each carries this
