@@ -3559,6 +3559,15 @@ dial is turned; the other rules count in minutes and hours, not in decisions. Th
 An installation in the cloud mode is judged first by whether that alert fires more often with the governor than without
 it, and the paired receipt's alert-minutes row (section 19.6) is the same measure taken under control.
 
+**The whole wall in one command** (`docs/MISSION_CONTROL.md`). `deploy/monitoring/` stands up Prometheus, Grafana, Node Exporter,
+Alertmanager, the governor's exporter and the alert bridge with `docker compose up -d`, every image pinned and no password written,
+both Omni-Compass boards loaded at start. The monitor wall carries knobs (route, provider, machine, rate window, the control panel's
+address), the signals' row (redlining, steady, accelerating, each at its alarm's own threshold) and the control panel's buttons as a
+link. Its alarms press the panel's operator buttons through the alert bridge (`tools/omni_alert_bridge.py`): Return to native when
+the governor goes stale, watch when its writes hammer or are refused. The bridge writes what it would press until it is told to
+press, and never touches the kill switch or its arming. List your machines and clouds in `deploy/monitoring/targets/`, each with its
+route and provider.
+
 ### 22.5 The control panel: the buttons, behind sign-in, every press logged
 
 `tools/omni_control.py` runs the governor as its child and serves its buttons over an authenticated HTTP API, with a console

@@ -18,6 +18,15 @@
 - **Five more clouds wired**, switched off and not yet run: Oracle, DigitalOcean, Alibaba Cloud, Linode, IBM Cloud
   (`byoc-metered.yml`, `scripts/byoc_paired.sh`, `docs/BYOC_SETUP.md`, the kubeconfig shape check).
 - **The page never scrolls sideways on a phone**: a wide table scrolls in its own box, the wall's counts wrap.
+- **Mission control** (`docs/MISSION_CONTROL.md`, `deploy/monitoring/`): Prometheus, Grafana, Node Exporter, Alertmanager, the governor's
+  exporter and the alert bridge in one `docker compose up -d`, every image pinned, no password written, both boards loaded at start.
+  The Grafana monitor wall carries knobs (route, provider, machine, rate window, the control panel), a row of signals in the road's
+  words at each alarm's own threshold, native orange and Omni-Compass blue, and the panel's buttons as a link; every expression is
+  valid PromQL. The alarms press the panel's operator buttons through `tools/omni_alert_bridge.py`, which writes what it would press
+  until told and never touches the kill switch or its arming.
+- **The control panel's Restore factory profile** (`POST /v1/factory`): autopilot, the max, every muscle driven, the command's own
+  beat, passing through native; its console shows both restoring controls and the six beat stops.
+- **The switchboard** beside the live engine's wall: a breaker for every monitor, one for each part and the main breaker.
 
 ## 2026-10-24 (night): the A100 on Lambda, omni-v18's card governor on a real card
 

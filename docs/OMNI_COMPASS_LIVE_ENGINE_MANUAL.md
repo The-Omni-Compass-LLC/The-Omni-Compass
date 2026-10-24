@@ -672,7 +672,7 @@ Python's set as GitHub ran it (`tools/engine_runs.py`, its run linked), the same
 C++ twins (`cpp/tools/engine_runs.cpp`), and this page's own port, one SHA-256 digest each beside the digest of the draws
 themselves; the three must be one. Once that first check ends, the page checks the set again without end: one run at a time,
 about twice a second, each run recomputed from its own seed by the page's engine and held against the Python's receipt; the run
-being checked is boxed on all three lanes and its result printed under the digests. Appendix L lists every monitor under its number.
+being checked is boxed on all three lanes and its result printed under the digests. Appendix L lists every monitor under its number. On Grafana the wall opens with its own row of signals in the same words (the heartbeat, the senses, the master switch, the alarms firing), its knobs at the top (route, provider, machine, rate window, the control panel's address) and the panel's buttons as a link; `docs/MISSION_CONTROL.md` stands it up beside Omni-Compass in one command, with the alarms wired to the panel's operator buttons through the alert bridge.
 
 **Every monitor's wiring.** Under every monitor one line names its wiring (`docs/engine/monitors.json`): the page's own code, the
 Python it ports or reads, the C++ twin or why there is none, the checks that hold them equal, each file linked at the build's

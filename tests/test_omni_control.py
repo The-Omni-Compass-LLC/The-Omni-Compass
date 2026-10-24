@@ -151,8 +151,10 @@ class Panel(unittest.TestCase):
         self.assertEqual(self.call("/v1/status", "vera")[1]["beat_s"], 120.0)
         self.assertIn("omni_control_beat_seconds 120", self.call("/metrics", "vera")[1])
         page = self.call("/")[1]
-        for b in (5, 15, 30, 60, 75, 90, 120):
+        for b in (10, 15, 30, 60, 90, 120):                 # the six stops (the founder's order of 24 October)
             self.assertIn(f"go('beat',{{seconds:{b}}})", page)
+        for b in (5, 75):
+            self.assertNotIn(f"go('beat',{{seconds:{b}}})", page)
         self.assertIn("/v1/beat", self.call("/v1/openapi.json")[1]["paths"])
 
     def test_reset_needs_a_reason_then_hands_back_and_stops(self):
@@ -161,6 +163,20 @@ class Panel(unittest.TestCase):
         code, out = self.call("/v1/reset", "otto", {"reason": "maintenance window"})
         self.assertEqual((code, out["mode"], out["reset"]["handed_back"]), (200, "off", True))
         self.assertFalse(self.panel.running())
+
+    def test_restore_factory_profile_reapplies_the_released_configuration(self):
+        # Restore factory profile and Return to native are two controls (the founder's master specification of 24 October)
+        self.call("/v1/mode", "otto", {"mode": "watch"})
+        self.call("/v1/dial", "otto", {"dial": "save"})
+        self.assertEqual(self.call("/v1/factory", "vera", {})[0], 403)                      # a viewer cannot press it
+        code, out = self.call("/v1/factory", "otto", {"reason": "back to the factory profile"})
+        self.assertEqual((code, out["profile"], out["mode"], out["dial"], out["native"]), (200, "factory", "autopilot", "max", []))
+        self.assertTrue(self.panel.running())
+        self.assertTrue(self.call("/v1/factory", "otto", {})[1]["unchanged"])
+        page = self.call("/")[1]
+        self.assertIn("Restore factory profile", page)
+        self.assertIn("Return to native", page)
+        self.assertIn("/v1/factory", self.call("/v1/openapi.json")[1]["paths"])
 
     def test_the_kill_switch_is_security_only_and_holds_until_two_arm_it(self):
         self.call("/v1/mode", "otto", {"mode": "autopilot"})

@@ -16,6 +16,18 @@ PAGE = ROOT / "docs" / "engine" / "OMNI_COMPASS_LIVE_ENGINE.html"
 REG = ROOT / "docs" / "engine" / "monitors.json"
 
 
+
+def monitor_panels(d):
+    """The wall's panels that stand for the page's monitors: every row and panel after the signals row, which reads the
+    governor's own alarms in the road's words and stands for no monitor of the page (docs/engine/export_grafana.py, signals_row)."""
+    out, skip = [], False
+    for p in d["panels"]:
+        if p["type"] == "row":
+            skip = p["title"].startswith("The signals")
+        if not skip:
+            out.append(p)
+    return out
+
 class LiveMonitors(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -43,7 +55,7 @@ class LiveMonitors(unittest.TestCase):
 
     def test_the_grafana_wall_has_a_panel_a_monitor(self):
         d = json.loads((ROOT / "deploy" / "grafana" / "omni-compass-wall.json").read_text(encoding="utf-8"))
-        mons = [p for p in d["panels"] if p["type"] != "row"]
+        mons = [p for p in monitor_panels(d) if p["type"] != "row"]
         self.assertEqual(len(mons), len(self.reg["monitors"]))
         for p in mons:
             if p["type"] != "text":
@@ -59,7 +71,7 @@ class LiveMonitors(unittest.TestCase):
         order = {c: i for i, c in enumerate(XGF.page_order())}
         ids = [m["id"] for m in sorted(self.reg["monitors"], key=lambda m: order.get(m["id"], len(order)))]
         row, n = None, 0
-        for p in d["panels"]:
+        for p in monitor_panels(d):
             if p["type"] == "row":
                 row = p["title"]
                 continue

@@ -21,7 +21,10 @@ The buttons (each a POST carrying a bearer token; JSON body):
   POST /v1/dial   {"dial": "max"|"save", "reason": ...}                role operator
         the max (the factory default) or the tune-down
   POST /v1/reset  {"reason": ...}                                       role operator
-        every setting handed back to native; the governor stops (mode off) until the next mode press
+        Return to native: every setting handed back to native; the governor stops (mode off) until the next mode press
+  POST /v1/factory {"reason": ...}                                      role operator
+        Restore factory profile: the released configuration reapplied (autopilot, the max, every muscle driven, the
+        command's own beat), passing through native like every press
   POST /v1/kill   {"reason": ...}                                       role security
         the master switch OFF for every Omni-Compass governor on the machine (omnicompass/master.py): the security switch,
         instant; every governor restores its settings and exits, and none starts while it is OFF
@@ -69,10 +72,10 @@ from tools.legal import PLAIN                     # noqa: E402
 from omni_controller.controller import MUSCLES    # noqa: E402
 
 BUTTONS = {"mode": "operator", "dial": "operator", "reset": "operator", "kill": "security", "arm": "security", "muscle": "operator",
-           "beat": "operator"}
+           "beat": "operator", "factory": "operator"}
 MODES, DIALS = ("autopilot", "watch", "off"), ("max", "save")
 MAIN_BEAT, BEAT_RANGE = 60.0, (5.0, 120.0)            # the heartbeat dial (omni-v17): the main engine's beat and the dial's span
-BEAT_STOPS = (5, 15, 30, 60, 75, 90, 120)              # the stops the console offers; any value in the span can be pressed
+BEAT_STOPS = (10, 15, 30, 60, 90, 120)                 # the stops the console offers (the founder's order of 24 October); any value in the span can be pressed
 ARM_WINDOW_S = 600.0              # the two-person rule: two different holders of the security role within ten minutes
 MAX_BODY = 4096
 
@@ -271,6 +274,17 @@ class Panel:
         out.update(self._start())
         return {"beat_s": s, **out}
 
+    def _factory(self, who, body):
+        """Restore factory profile: the released configuration reapplied, every knob back (autopilot, the max, every muscle driven,
+        the command's own beat); like every press it passes through native. Return to native is the other control (reset)."""
+        factory = {"mode": "autopilot", "dial": "max", "native": [], "beat": None}
+        if {k: self.desired.get(k) for k in factory} == factory and self.running():
+            return {"profile": "factory", "unchanged": True}
+        out = {"hand_back": self._hand_back()}
+        self.desired.update(factory)
+        out.update(self._start())
+        return {"profile": "factory", "mode": "autopilot", "dial": "max", "native": [], "beat_s": self.beat(), **out}
+
     def _reset(self, who, body):
         out = self._hand_back()
         self.desired["mode"] = "off"
@@ -390,7 +404,8 @@ def openapi():
                       "/v1/mode": post("autopilot, watch (decides, writes nothing) or off (hands back and stops)", "operator",
                                        {"mode": {"type": "string", "enum": list(MODES)}}),
                       "/v1/dial": post("the max or the tune-down", "operator", {"dial": {"type": "string", "enum": list(DIALS)}}),
-                      "/v1/reset": post("every setting handed back to native; the governor stops", "operator"),
+                      "/v1/reset": post("Return to native: every setting handed back to native; the governor stops", "operator"),
+                      "/v1/factory": post("Restore factory profile: autopilot, the max, every muscle driven, the command's own beat", "operator"),
                       "/v1/kill": post("the master switch OFF for every governor on the machine (security)", "security"),
                       "/v1/arm": post("the master switch ON again: two holders of the security role within ten minutes", "security"),
                       "/v1/muscle": post("one muscle on (Omni-Compass drives it) or left native (never written); passes through native",
@@ -417,7 +432,7 @@ pre{white-space:pre-wrap;border:1px solid var(--line);padding:8px;overflow-x:aut
 <fieldset><legend>Mode</legend><button onclick="go('mode',{mode:'autopilot'})">Autopilot</button><button onclick="go('mode',{mode:'watch'})">Watch (writes nothing)</button><button onclick="go('mode',{mode:'off'})">Off (hand back)</button></fieldset>
 <fieldset><legend>Dial</legend><button onclick="go('dial',{dial:'max'})">Max</button><button onclick="go('dial',{dial:'save'})">Tune-down</button></fieldset>
 <fieldset><legend>Heartbeat: seconds between full decisions (the main engine 60)</legend>BEAT_ROWS</fieldset>
-<fieldset><legend>Native</legend><button onclick="go('reset',{})">Reset: every setting back to native</button></fieldset>
+<fieldset><legend>The two restoring controls</legend><button onclick="go('factory',{})">Restore factory profile</button><button onclick="go('reset',{})">Return to native: every setting back to native</button></fieldset>
 <fieldset><legend>Muscles: on, or left native</legend>MUSCLE_ROWS</fieldset>
 <fieldset><legend>Security</legend><button class="kill" onclick="if(confirm('Master switch OFF for every governor on this machine?'))go('kill',{})">Kill switch</button><button onclick="go('arm',{})">Arm (two holders)</button></fieldset>
 <button onclick="look()">Refresh status</button><pre id="o"></pre><p><small>NOTICE_TEXT</small></p>

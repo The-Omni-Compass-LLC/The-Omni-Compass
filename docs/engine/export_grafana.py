@@ -19,6 +19,7 @@ under a row for the page's section that holds its monitor, and each says its wir
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -72,10 +73,69 @@ def wiring(m: dict) -> str:
     return f" Wired: the page's {w['code']} → the Python {py} → the C++ {cpp}{proof}. Moves: {w['moves']}."
 
 
+SCOPED = re.compile(r"\b((?:omni|node|http)_[a-z0-9_]+)(\{([^}]*)\})?")
+KNOBS = 'route=~"$route",provider=~"$provider",instance=~"$instance"'
+
+
+def scoped(expr: str) -> str:
+    """A panel's expression read through the wall's knobs: every omni_, node_ and http_ series filtered by the route, the provider
+    and the machine chosen, and a five-minute rate window set by the window knob (a series without the label matches All)."""
+    def one(m):
+        inner = m.group(3)
+        return f"{m.group(1)}{{{inner + ',' if inner else ''}{KNOBS}}}"
+    return SCOPED.sub(one, expr).replace("[5m]", "[$window]")
+
+
+# the knobs on the wall (the founder's order of 24 October: knob it, tune it, give it all its buttons): which route, which
+# provider, which machine, the rate window, and the control panel whose buttons the wall's links open
+def knobs() -> list:
+    q = lambda name, label, query: {"name": name, "label": label, "type": "query", "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+                                   "query": {"query": query, "refId": name}, "definition": query, "includeAll": True, "multi": True,
+                                   "allValue": ".*", "current": {"selected": True, "text": "All", "value": "$__all"}, "refresh": 2, "sort": 1}
+    return [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "query": "prometheus", "current": {}, "hide": 0},
+            q("route", "Route (on-site or cloud)", "label_values(up, route)"),
+            q("provider", "Provider", 'label_values(up{route=~"$route"}, provider)'),
+            q("instance", "Machine", 'label_values(up{route=~"$route",provider=~"$provider"}, instance)'),
+            {"name": "window", "label": "Rate window", "type": "interval", "query": "1m,5m,15m,1h", "auto": False,
+             "current": {"text": "5m", "value": "5m"}},
+            {"name": "control", "label": "Control panel", "type": "textbox", "query": "http://localhost:9465",
+             "current": {"text": "http://localhost:9465", "value": "http://localhost:9465"}}]
+
+
+# the key's colours on every panel: native orange, Omni-Compass blue (a series whose name says which side it is)
+SIDES = [{"matcher": {"id": "byRegexp", "options": "/native/i"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "#ff8a1f"}}]},
+         {"matcher": {"id": "byRegexp", "options": "/omni|compass/i"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "#4e97d1"}}]}]
+
+
+def signals_row() -> list:
+    """The wall's first row: the governor's signals as stat panels in the road's shapes' words (redlining red, steady yellow,
+    accelerating green), each threshold the alert rule's own (deploy/prometheus/omni-compass-rules.yaml)."""
+    def stat(i, x, title, expr, steps, words, desc, unit="short"):
+        return {"id": 900 + i, "type": "stat", "title": title, "description": desc, "gridPos": {"x": x, "y": 1, "w": 6, "h": 5},
+                "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+                "targets": [{"refId": "A", "expr": scoped(expr), "legendFormat": "{{instance}}"}],
+                "options": {"colorMode": "background", "graphMode": "area", "reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "value_and_name"},
+                "fieldConfig": {"defaults": {"unit": unit, "thresholds": {"mode": "absolute", "steps": steps},
+                                             "mappings": [{"type": "range", "options": {"from": a, "to": b, "result": {"text": w}}} for a, b, w in words]},
+                                "overrides": []}}
+    g, y, r = "#50c878", "#f5c518", "#ff4d55"
+    return [{"id": 899, "type": "row", "title": "The signals: redlining, steady, accelerating", "collapsed": False, "gridPos": {"x": 0, "y": 0, "w": COLS * W, "h": 1}, "panels": []},
+            stat(1, 0, "The heartbeat: beats since the last decision", "(time() - omni_last_decision_timestamp_seconds) / clamp_min(omni_heartbeat_seconds, 5)",
+                 [{"color": g, "value": None}, {"color": y, "value": 1.5}, {"color": r, "value": 3}],
+                 [(0, 1.5, "accelerating"), (1.5, 3, "steady"), (3, 1e9, "redlining")],
+                 "Beats since the governor's last decision; three beats is the staleness alert's line (OmniGovernorStale)."),
+            stat(2, 6, "The senses: blind readings", "omni_sense_blind", [{"color": g, "value": None}, {"color": r, "value": 1}],
+                 [(0, 0.5, "accelerating"), (0.5, 1e9, "redlining")], "1 while a sense the governor needs is unread; the engine holds and says why."),
+            stat(3, 12, "The master switch", "omni_master_switch", [{"color": r, "value": None}, {"color": g, "value": 1}],
+                 [(-1, 0.5, "OFF: native alone"), (0.5, 2, "ON")], "ON: Omni-Compass governs; OFF: the kill switch is pulled and native runs alone."),
+            stat(4, 18, "Alerts firing", 'sum(ALERTS{alertstate="firing"}) or vector(0)', [{"color": g, "value": None}, {"color": y, "value": 1}, {"color": r, "value": 2}],
+                 [(0, 0.5, "accelerating"), (0.5, 1.5, "steady"), (1.5, 1e9, "redlining")], "Alerts firing now across the wall (Prometheus's ALERTS series).")]
+
+
 def dashboard(reg: dict) -> dict:
     panels = []
     order = {cid: i for i, cid in enumerate(page_order())}   # every panel numbered as the page numbers its monitor, laid out left to right
-    sec, last, col, y = page_sections(), None, 0, 0
+    sec, last, col, y = page_sections(), None, 0, 6       # under the signals row
     for i, m in enumerate(sorted(reg["monitors"], key=lambda m: order.get(m["id"], len(order)))):
         n = i + 1
         sn, st = sec.get(m["id"], ("", ""))
@@ -96,8 +156,8 @@ def dashboard(reg: dict) -> dict:
         if m["feed"]["promql"]:
             panels.append({**base, "type": m["grafana"]["type"] if m["grafana"]["type"] in ("timeseries", "stat", "bargauge", "heatmap", "table") else "timeseries",
                            "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
-                           "fieldConfig": {"defaults": {"unit": m["grafana"].get("unit") or "short"}, "overrides": []},
-                           "targets": [{"refId": chr(65 + j), "expr": e, "legendFormat": m["feed"]["metrics"][j] if j < len(m["feed"]["metrics"]) else e}
+                           "fieldConfig": {"defaults": {"unit": m["grafana"].get("unit") or "short"}, "overrides": SIDES},
+                           "targets": [{"refId": chr(65 + j), "expr": scoped(e), "legendFormat": m["feed"]["metrics"][j] if j < len(m["feed"]["metrics"]) else e}
                                        for j, e in enumerate(m["feed"]["promql"])]})
         else:
             panels.append({**base, "type": "text", "options": {"mode": "markdown", "content":
@@ -106,10 +166,13 @@ def dashboard(reg: dict) -> dict:
                            f"this panel marks its place on the wall (monitor {n})."}})
     return {"uid": "omni-compass-wall", "title": "Omni-Compass: the monitor wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "time": {"from": "now-6h", "to": "now"}, "refresh": "30s",
-            "templating": {"list": [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "query": "prometheus", "current": {}, "hide": 0}]},
+            "templating": {"list": knobs()},
             "links": [{"title": "The governor's own screen", "type": "dashboards", "tags": ["omni-compass"], "asDropdown": False},
+                      {"title": "The control panel's buttons: Restore factory profile, Return to native, mode, dial, beat, each muscle", "type": "link",
+                       "url": "${control}/", "targetBlank": True, "icon": "bolt"},
+                      {"title": "Alertmanager: the alarms and their silences", "type": "link", "url": "http://localhost:9093", "targetBlank": True},
                       {"title": "The live engine", "type": "link", "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
-            "panels": panels,
+            "panels": signals_row() + panels,
             "__notice": "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com"}
 
 
