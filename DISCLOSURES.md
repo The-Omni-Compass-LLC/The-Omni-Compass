@@ -195,9 +195,26 @@ hardware. The bare-metal piece is gauged on hardware we can meter (a card's own 
 and is carried to the provider's bare metal only as the same mechanism on the same kind of part, a modelled factor, never as a
 measurement of the provider's machines.
 
+**The cloud is a wire.** A cloud is the wire between the software end (the owner's programs, Kubernetes and the open-source
+orchestrators, managers and autoscalers that carry the work) and the hardware end (the bare metal: the GPU chips, the Linux
+racks, the data center, on-site or off-site). Omni-Compass can live in all three places. On the wire alone, as every cloud run
+in this repository is set (the tune-down on the machines only, the pods exactly native's), it can only park machines the
+cloud's own autoscaler already made, after its own trial; so a cloud run alone can show at most a small cut in the bill of the
+wire. It cannot show the work and the speed gained at the software end, nor the energy and the throughput gained at the bare
+metal, because neither end is under it; those are measured where Omni-Compass sits on them (the cluster and the services; the
+card and the machine), and composed with the wire into one organism and one bill by the law above. A cloud provider that ran
+Omni-Compass on its own back end would see that benefit on its own chips and racks; no tenant can meter it, so it is never
+claimed here as a measurement. The company's expected ranges for the three places (the founder's figures of 24 October: about
+3 to 4% from the software end, 2 to 3% from the bare metal, about 5% from the two together, 1 to 2% from the wire alone) are
+an expectation, written as such wherever they appear, never a result; the measured readings stand beside them, and where they
+differ the measurement stands.
+
 **The organisms.** The seven organisms of the catalog (the spine, the four realms, the four stacked, the tower), the orchestra
-beside them, and the whole stack composed above, counted by the founder as the eighth organism running native and the ninth
-with Omni-Compass on top of every piece. Every one is read native against Omni-Compass on top of native; none is a product.
+beside them, the live engine's own sixty-muscle organism, and the whole organism in its three places (the software end, the
+cloud's wire, the bare metal) composed above: ten organisms. Each is read three ways, native, Omni-Compass on top of native,
+and Omni-Compass direct (native's own pool autoscalers off, `realms/harness.py` SOLO): thirty scenarios, recorded in
+`results/scenarios/SCENARIOS_30.json` (class S, our own models, three runs), every cell with no run reading "not yet run".
+None is a product.
 
 **The live engine.** `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` is a monitor of the repository's records and of the engine's
 own mathematics running in the page. Every monitor carries its evidence class (P a physical meter, L live software, S our own
