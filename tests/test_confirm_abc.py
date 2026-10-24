@@ -5,9 +5,9 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C three-run table rule (tools/confirm_abc.py, docs/OMNI_V1.md): GAIN or LOSS in all three of our runs only when all
 three runs move the same way with every 95% interval clear of zero, the word given by what the gauge is for (a response time
-that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given); an interval that includes
-zero reads EVEN, no difference beyond the noise, with the count of such runs; runs clear of the noise that point different ways
-read as a disagreement; a rounding-level change reads EVEN, the same; unjudged rows stay unjudged."""
+that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given); a change of 0.5% or more,
+the runs' mean, reads by its aim by the mean of the three runs with the count of runs beyond the noise (the founder's order of
+24 October 2026); EVEN only under 0.5%; runs that moved 0.5% or more in opposite directions read as a disagreement; a rounding-level change reads EVEN, the same; unjudged rows stay unjudged."""
 import json
 import sys
 import tempfile
@@ -27,11 +27,14 @@ def main():
     fell = r(300, -150, -200, -100)
     assert C.verdict(P95, [fell] * 3) == "**GAIN in all three of our runs**", "a response time cut in all three is a GAIN (a minus that reads GAIN)"
     assert C.verdict(P95, [r(300, 30, 10, 50)] * 3) == "**LOSS in all three of our runs**", "a slower response in all three is a LOSS"
-    assert C.verdict(P95, [fell, fell, r(300, -20, -60, 5)]) == "EVEN, no difference beyond the noise (1 of 3 runs)", "one interval crosses zero"
-    assert C.verdict(P95, [r(300, -5, -40, 30), r(300, 8, -20, 36), r(300, -2, -30, 26)]) == "EVEN, no difference beyond the noise (all three runs)"
+    # the founder's order of 24 October 2026: a change of 0.5% or more (the runs' mean) is a change; EVEN only under 0.5%
+    assert C.verdict(P95, [fell, fell, r(300, -20, -60, 5)]) == "**GAIN by the mean of our three runs, beyond the noise in 2 of 3**", "one interval crosses zero: the mean still moved"
+    assert C.verdict(P95, [r(300, -5, -40, 30), r(300, 8, -20, 36), r(300, -2, -30, 26)]) == "**the runs disagree**", "runs moved 0.5% or more both ways"
+    assert C.verdict(P95, [r(300, -1, -40, 30), r(300, 0.5, -20, 36), r(300, -0.4, -30, 26)]) == "EVEN, under the floor (the three runs' mean 0.10%)"
     assert C.verdict(P95, [fell, fell, r(300, 40, 10, 70)]) == "**the runs disagree**", "one run flips the sign, clear of the noise"
     assert C.verdict(P95, [fell, r(300, -20, -60, 5), r(300, 40, 10, 70)]) == "**the runs disagree**", "a disagreement outranks a noisy run"
-    assert C.verdict(P95, [fell, fell, r(300, 20, -5, 45)]) == "EVEN, no difference beyond the noise (1 of 3 runs)", "a flipped sign inside the noise is noise"
+    assert C.verdict(P95, [fell, fell, r(300, 20, -5, 45)]) == "**the runs disagree**", "a run that moved 0.5% or more the other way disagrees, inside the noise or not"
+    assert C.verdict(P95, [fell, fell, r(300, 1, -5, 7)]) == "**GAIN by the mean of our three runs, beyond the noise in 2 of 3**", "a run the other way under the floor does not disagree"
     assert C.verdict(P95, [r(300, 1e-7, 5e-8, 2e-7)] * 3) == "EVEN, the same", "a change under one part in a million"
     assert C.verdict("CPU used (cores), mean", [r(2.0, -0.5, -0.7, -0.3)] * 3) == "shown, not judged"
     # one pair a run (the 24-hour robustness run on rented machines): no interval, read by sign alone, never a confirmation
@@ -76,7 +79,7 @@ def main():
         assert C.rig(new) == "pre-pulled on every worker before the arm (deploy/kind/prepull.yaml)", C.rig(new)
         assert C.rig(Path(t) / "none") == "not recorded"
     print("PASS  A/B/C three-run table rule: GAIN or LOSS in all three of our runs only with the same sign and every interval clear of zero in all three, "
-          "the word by what the gauge is for (a resource spent that rose: power given); an interval over zero reads EVEN; clear runs pointing different ways read as a disagreement")
+          "the word by what the gauge is for (a resource spent that rose: power given); a change of 0.5% or more reads by its aim, in all three runs or by their mean; EVEN only under 0.5%; clear runs pointing different ways read as a disagreement")
 
 
 if __name__ == "__main__":

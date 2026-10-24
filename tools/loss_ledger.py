@@ -4,7 +4,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The LOSS ledger: every row that reads LOSS in all three runs, in every benchmark's newest three-run table, on one page.
+"""The LOSS ledger: every row that reads LOSS across its three runs (in all three, or by their mean), in every benchmark's newest three-run table, on one page.
 
 Built from the tables as they stand (results/live/V<n>_*.json and results/orchestrator/V<n>_*.json, each benchmark read from
 its newest whole table by tools/readings.py `landed`), never typed in. Every row is placed by what its two arms are:
@@ -82,7 +82,7 @@ def newest_tables():
 
 
 def loss_rows(data):
-    """(gauge, row) for every row that reads LOSS in all three runs, wherever the table keeps it (rows, or workloads' gauges)."""
+    """(gauge, row) for every row that reads LOSS across its three runs, wherever the table keeps it (rows, or workloads' gauges)."""
     found = []
 
     def walk(o, path):
@@ -145,13 +145,14 @@ def build():
 def render(built):
     rows, engines = built
     mine = rows[SECTIONS[0]]
-    L = ["# The LOSS ledger: every row that reads LOSS in all three runs, in every benchmark's newest table", "",
+    L = ["# The LOSS ledger: every row that reads LOSS across its three runs, in every benchmark's newest table", "",
          "Every row of every three-run table stands where its table stands, LOSS included; this page gathers the LOSS rows so "
-         "none of them is found only by reading every table. A LOSS row is a gauge that moved away from its declared aim in all "
-         "three of the benchmark's runs, A, B and C, every run's 95% interval clear of zero (`tools/readings.py`). Each benchmark "
+         "none of them is found only by reading every table. A LOSS row is a gauge that moved away from its declared aim by 0.5% "
+         "or more across the benchmark's three runs, A, B and C (the founder's order of 24 October 2026, `tools/readings.py`): in all "
+         "three, every run's 95% interval clear of zero, or by the mean of the three, with the count of runs beyond the noise. Each benchmark "
          "is read from its newest whole table; an older engine's table stands only until the engine that stands has run that "
          "benchmark three times, and the engine each row ran on is printed beside it.", "",
-         f"Rows that read LOSS in all three runs: **{sum(len(v) for v in rows.values())}**. Against my own native, the readings "
+         f"Rows that read LOSS across their three runs: **{sum(len(v) for v in rows.values())}**. Against my own native, the readings "
          f"do no harm is judged by: **{len(mine)}**. In place of a controller: **{len(rows[SECTIONS[1]])}**. Without me, or two "
          f"changes at once: **{len(rows[SECTIONS[2]])}**. By engine: "
          + (", ".join(f"omni-v{n}: {c}" for n, c in sorted(engines.items(), reverse=True)) or "none") + ".", ""]
@@ -171,7 +172,7 @@ def render(built):
         title, intro = heads[s]
         L += [f"## {title}", "", intro, ""]
         if not rows[s]:
-            L += ["No row reads LOSS in all three runs.", ""]
+            L += ["No row reads LOSS.", ""]
             continue
         if s == SECTIONS[0]:
             L += ["| Engine | Benchmark | Gauge | Each run's size | Cause | Fixed in | What decides it |", "|---|---|---|---|---|---|---|"]

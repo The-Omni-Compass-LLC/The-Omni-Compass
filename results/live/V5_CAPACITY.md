@@ -6,6 +6,8 @@ Three separate GitHub runs of the same preregistered test on the same engine: A 
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 | Run | GitHub run | Label | Commit | Engine | Pairs per cap |
 |---|---|---|---|---|---:|
 | A | 38339841468 | A | `148565d2550d` | omni-v5 (digest 5648f2902f1fae68, 44 files) | 5 |
@@ -23,7 +25,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | 3 | completed work (requests answered within the line over the window; the aim is higher) | -0.5% (-2.6 to +1.5) | +0.6% (-2.0 to +3.1) | -1.6% (-4.3 to +1.1) | EVEN, no difference beyond the noise (all three runs) |
 | 3 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | -0.80 req/s (-2.16 to +0.56) | +0.40 req/s (-0.71 to +1.51) | -0.40 req/s (-1.51 to +0.71) | EVEN, no difference beyond the noise (all three runs) |
 
-Readings: 7 EVEN, no difference beyond the noise (all three runs), 1 EVEN, no difference beyond the noise in 2 of 3 runs.
+Readings: 7 no difference beyond the noise, 1 no difference beyond the noise in 2 of 3 runs.
 
 How to read it: where the cap holds native back, a higher count for Omni-Compass on top at the same cap is more work from the same capacity; where neither arm can do more under the cap, the rows show no difference beyond the noise, and that is the result. Each run's own table, with its audit lines and what each step up in the cap gives each arm: `CAPACITY.md` in its archived folder.
 

@@ -340,6 +340,29 @@ the founder overrides one in the conversation.
 
 ## Orders of 24 October
 
+- **Every change of 0.5% or more is a change** (the founder's words: "Any gauge that gives anything over a 0.5 percent change
+  either way is a change. I don't want to see even on shit that shows a 0.5% change up or down ... Not everything can just stay
+  even ... because it's 2-3% away. That's not even"; and "You have to interpretate the muscle and what it's doing to know if a
+  gain is a benefit or a minus is a plus"). The one key (`tools/readings.py` `three_run_reading`): the change is the mean of the
+  three runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all
+  three of our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of
+  runs beyond the noise; EVEN is kept for a mean under 0.5% (EVEN, under the floor) or no change at all; runs that moved 0.5% or
+  more in opposite directions read "the runs disagree"; a count that must never rise has no floor. Each run's own number wears
+  that run's own word. Every table was read again from its own data by `tools/reread.py` (24 October: 4,037 readings in 194
+  tables; the index's headline GAIN, up 3.4%), the toy gate reads by the same floor, and the live engine's own key with it.
+- **The immune system catches a LOSS under Omni** (the founder's words: "the only way anything can show a real loss would be ...
+  Omni direct or native by itself. Everything else with Omni in it ... has Omni-Compass's mechanism of immune system and pathways
+  ... that should have pushed signals when something is in its in a negative state, and adjusted ... like any human body"). A
+  muscle whose own markers turn against native (pods waiting, a response over its line, failures) sends its signal to the muscle
+  that caused it, and that muscle backs off toward native: the next version's work, through the toy gate (first: the autoscaler
+  target never asks for more pods than the machines can place while pods wait, the pods-waiting LOSS's root cause).
+- **The live engine in the order a watcher needs it** (the founder's words of 24 October): the page, its contents and its
+  instructions laid out by importance to the operator watching the system, first to last; on every monitor of Omni on native a
+  switch that turns native off and leaves Omni direct on the organism with no other governor; live knobs, buttons and switches on
+  every muscle that can scale out, up or down, each acting on the running code; buttons that run another set of the Python's 500
+  runs (and the C++ harness's) from a new seed; and the page wired to a live governor through the control API
+  (`tools/omni_control.py`), so a system owner can hook a system up and watch and drive it from these monitors.
+
 - **Google and Amazon kept in, wired as Azure is, shown as not yet run** (the founder's words, the same morning he had ordered
   them taken out: "You leave the Google and Amazon runs in everywhere and just show it not ran yet, because someday, some way,
   I'm going to have it run and put in here ... It's got to be built everywhere as a mechanism, the code, regardless if we run it

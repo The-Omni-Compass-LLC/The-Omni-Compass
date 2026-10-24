@@ -25,9 +25,9 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import OWN_RUNS, receipt_key, in_all_three, word, aim, EVEN_SAME, even_noise, SHOWN, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
+from tools.readings import OWN_RUNS, receipt_key, in_all_three, word, aim, EVEN_SAME, even_noise, SHOWN, three_run_reading, run_word, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
 from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
-from tools.readings import by_word, interval_by_word
+from tools.readings import by_word, interval_by_word, word_sign, reading_kind
 
 ARMS = ("compass", "bowl")        # the Omni arm's name in the run files (bench-bowl-N folders predate the rename)
 # --pair: one comparison of the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6), "first|second" as
@@ -138,6 +138,8 @@ def cell(r, word=None):
     """One run's change, in percent of native where native is not zero, with its 95% interval; the number carries the row's
     word's sign (tools/readings.py by_word: GAIN +, LOSS −, EVEN =), never the gauge's raw direction."""
     nat, diff, lo, hi = r["native"], r["diff"], r["ci95"][0], r["ci95"][1]
+    if word_sign(word) in ("+", "−") and diff and (word_sign(word) == "+") != (diff > 0):
+        lo, hi = -hi, -lo                    # the word turned the number's sign: its interval turns with it, so the two agree
     if nat:
         return f"{by_word(100 * diff / abs(nat), word)} ({interval_by_word(100 * lo / abs(nat), 100 * hi / abs(nat), word, unit='')})"
     return f"{by_word(diff, word, unit='', digits=4)} ({interval_by_word(lo, hi, word, unit='', digits=4)})"
@@ -165,14 +167,7 @@ def verdict(k, rs):
         if len(set(signs)) > 1:
             return "single pairs point different ways (one pair a run, no interval)"
         return f"three single pairs agree: {word(signs[0] == -1, aim_of_row(k))} (one pair a run, no interval, so the noise cannot be judged)"
-    clear = [r["ci95"][0] > 0 or r["ci95"][1] < 0 for r in rs]
-    if len({s for s, c in zip(signs, clear) if c}) > 1:
-        return "**the runs disagree**"
-    if not all(clear):
-        n = sum(1 for c in clear if not c)
-        return even_noise("all three runs") if n == len(rs) else even_noise(f"{n} of {len(rs)} runs")
-    sizes = [abs(r["diff"]) / abs(r["native"]) for r in rs if r["native"]]
-    return in_all_three(signs[0] == -1, aim_of_row(k), max(sizes) if len(sizes) == len(rs) else None)
+    return three_run_reading(rs, aim_of_row(k), SAME_REL)
 
 
 def rig(d):
@@ -265,10 +260,11 @@ def main(argv=None):
         if any(r is None for r in rs):
             continue
         v = verdict(k, rs)
-        tally[v] = tally.get(v, 0) + 1
+        tally[reading_kind(v)] = tally.get(reading_kind(v), 0) + 1
         rows[k] = {"reading": v.strip("*"), "aim": aim_of_row(k) if k not in NEUTRAL else None,
                    "runs": [{"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": list(r["ci95"])} for r in rs]}
-        L.append(f"| {LABEL.get(k, k)} | {cell(rs[0], v)} | {cell(rs[1], v)} | {cell(rs[2], v)} | {v} |")
+        a_ = aim_of_row(k) if k not in NEUTRAL else None
+        L.append(f"| {LABEL.get(k, k)} | " + " | ".join(cell(r, run_word(r, a_)) for r in rs) + f" | {v} |")
     rob_l, rob_rows = robust_rows(runs)           # the robustness test's own rows (omni only, by rule, not paired)
     for line in rob_l:
         v = line.rsplit("|", 2)[-2].strip(); tally[v] = tally.get(v, 0) + 1

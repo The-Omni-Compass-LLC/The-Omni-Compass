@@ -2,6 +2,25 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (night): every change of 0.5% or more is a change
+
+- **The key** (`tools/readings.py` `three_run_reading`, the founder's order of 24 October): the change is the mean of the three
+  runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all three of
+  our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of runs
+  beyond the noise. EVEN is kept for a mean under 0.5% or no change at all; runs that moved 0.5% or more in opposite directions
+  disagree; a count that must never rise has no floor. Each run's own number in a kind table wears that run's own word, and an
+  interval turns with its number where the word turns the number's sign.
+- **Every table read again from its own data** (`tools/reread.py`, idempotent, checked by `verify.py`): 4,037 readings in 194
+  tables; the numbers are the runs' own, only the words were read again, and each table says so under its title. The kind,
+  stack and three-arm writers read by the same rule from now on; the deterministic simulators (CityLearn, pandapower, MuJoCo, the
+  swarms) put a mean under 0.5% at EVEN, under the floor.
+- **What moved**: the index's headline reads GAIN, up 3.4% (up 4.3% before); the LOSS ledger holds 331 rows read LOSS across their
+  three runs (160 against Omni-Compass's own native, 284 of all of them on omni-v12, none on omni-v18, whose three runs have not
+  landed); the real knobs' verdicts read 4 write, 21 the operator's choice, 1 watch (9, 5 and 12 before).
+- **The toy gate and the live engine read by the same floor**: the gate's mean change across its seeds from 0.5% up reads by its
+  aim, with whether it stands beyond the seeds' noise beside it; the live engine's own key (`threeRun`, `pairedReading`) the same,
+  each run's number wearing its own word, and how firmly a word stands printed beside it.
+
 ## 2026-10-24 (evening): no table stands on two engines; every LOSS row on one page
 
 - **Ten three-run tables held two engines**: `V17_KAFKA`, `V17_KAFKA_SERVICE`, `V17_PGBENCH`, `V17_REDIS`, `V17_REDIS_SERVICE`,
