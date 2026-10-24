@@ -29,6 +29,7 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
@@ -68,22 +69,89 @@ def jupyter(d: dict) -> tuple[str, str] | None:
     return f"https://{u.netloc}", tok
 
 
+class Jupyter:
+    """A session with the machine's Jupyter server, opened the ways a Jupyter server behind a proxy accepts: the token in the
+    Authorization header; the token in the address; or the browser's way, the token in the address once for a login cookie,
+    then the cookie with the _xsrf cookie echoed in X-XSRFToken. Only status codes are ever printed, never the token."""
+
+    def __init__(self, base: str, tok: str):
+        import http.cookiejar
+        self.base, self.tok = base, tok
+        self.jar = http.cookiejar.CookieJar()
+        self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
+        self.way = None
+
+    def _xsrf(self) -> str:
+        return next((c.value for c in self.jar if c.name == "_xsrf"), "")
+
+    def _send(self, way: str, method: str, path: str, body: dict | None) -> tuple[int, str]:
+        url, headers = self.base + path, {"Content-Type": "application/json", "Referer": self.base + "/"}
+        if way == "header":
+            headers["Authorization"] = f"token {self.tok}"
+        elif way == "query":
+            url += ("&" if "?" in url else "?") + urllib.parse.urlencode({"token": self.tok})
+        elif way == "cookie":
+            x = self._xsrf()
+            if x:
+                headers["X-XSRFToken"] = x
+        r = urllib.request.Request(url, method=method, data=None if body is None else json.dumps(body).encode(),
+                                   headers=headers)
+        try:
+            with self.opener.open(r, timeout=60) as f:
+                return f.status, f.read().decode(errors="replace")
+        except urllib.error.HTTPError as e:
+            return e.code, ""
+        except OSError as e:
+            return 0, type(e).__name__
+
+    def login(self) -> None:
+        """The browser's first visit: the token in the address once, the cookies kept."""
+        for path in ("/?token=", "/lab?token=", "/tree?token="):
+            try:
+                with self.opener.open(urllib.request.Request(self.base + path + urllib.parse.quote(self.tok)), timeout=60) as f:
+                    print(f"  jupyter login page {path.split('?')[0]}: {f.status}; cookies {sorted(c.name for c in self.jar)}")
+                    return
+            except urllib.error.HTTPError as e:
+                print(f"  jupyter login page {path.split('?')[0]}: {e.code}")
+            except OSError as e:
+                print(f"  jupyter login page {path.split('?')[0]}: {type(e).__name__}")
+
+    def req(self, method: str, path: str, body: dict | None = None) -> dict:
+        ways = [self.way] if self.way else ["header", "query", "cookie"]
+        for way in ways:
+            if way == "cookie" and not any(True for _ in self.jar):
+                self.login()
+            code, text = self._send(way, method, path, body)
+            if not self.way:
+                print(f"  jupyter {method} {path} by {way}: {code}")
+            if 200 <= code < 300:
+                self.way = way
+                return json.loads(text) if text.strip() else {}
+        raise SystemExit(f"the machine's Jupyter server refused {method} {path} every way (header, address, cookie)")
+
+    def ws_url_headers(self, path: str) -> tuple[str, list[str]]:
+        url = self.base.replace("https://", "wss://", 1) + path
+        headers = []
+        if self.way == "header":
+            headers.append(f"Authorization: token {self.tok}")
+        elif self.way == "query":
+            url += "?" + urllib.parse.urlencode({"token": self.tok})
+        cookies = "; ".join(f"{c.name}={c.value}" for c in self.jar)
+        if cookies:
+            headers.append(f"Cookie: {cookies}")
+        return url, headers
+
+
 def run_code(base: str, tok: str, code: str) -> tuple[str, str]:
     """One piece of Python run in a kernel of the machine's Jupyter server; the kernel is shut down after. Returns the
     reply's status and everything the code printed."""
     import websocket  # websocket-client (pip install websocket-client), on the workflow's runner only
 
-    def req(method: str, path: str, body: dict | None = None) -> dict:
-        r = urllib.request.Request(base + path, method=method, data=None if body is None else json.dumps(body).encode(),
-                                   headers={"Authorization": f"token {tok}", "Content-Type": "application/json"})
-        with urllib.request.urlopen(r, timeout=60) as f:
-            text = f.read().decode()
-        return json.loads(text) if text else {}
-
-    kid = req("POST", "/api/kernels", {"name": "python3"})["id"]
+    j = Jupyter(base, tok)
+    kid = j.req("POST", "/api/kernels", {"name": "python3"})["id"]
     try:
-        ws = websocket.create_connection(base.replace("https://", "wss://", 1) + f"/api/kernels/{kid}/channels",
-                                         header=[f"Authorization: token {tok}"], timeout=120, suppress_origin=True)
+        url, headers = j.ws_url_headers(f"/api/kernels/{kid}/channels")
+        ws = websocket.create_connection(url, header=headers, timeout=120, suppress_origin=True)
         mid = uuid.uuid4().hex
         ws.send(json.dumps({"header": {"msg_id": mid, "username": "omni-compass", "session": uuid.uuid4().hex,
                                        "msg_type": "execute_request", "version": "5.3", "date": ""},
@@ -107,8 +175,8 @@ def run_code(base: str, tok: str, code: str) -> tuple[str, str]:
         return status, "".join(out)
     finally:
         try:
-            req("DELETE", f"/api/kernels/{kid}")
-        except Exception:  # noqa: BLE001  (a kernel left over is the machine's own; it dies with the machine)
+            j.req("DELETE", f"/api/kernels/{kid}")
+        except (Exception, SystemExit):  # noqa: BLE001  (a kernel left over is the machine's own; it dies with the machine)
             pass
 
 
