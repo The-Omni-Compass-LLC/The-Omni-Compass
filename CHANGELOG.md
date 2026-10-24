@@ -2,6 +2,22 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (night): omni-v18, Omni-Compass by itself, a pod muscle of its own
+
+- **omni-v18** (`OMNI_V18.json`, digest `22486290b19349eb`, 55 files; `docs/OMNI_V18.md`), landed under the founder's order of 23
+  October (three arms: native; Omni-Compass and native; Omni-Compass by itself) and the standing order that every change lands as
+  the next version, told, not asked. omni-v17 with a pod muscle of its own (`--own-replicas`): for a workload the operator names and
+  no autoscaler governs, the governor sets the replicas itself through the workload's own scale, at the target the compass moves,
+  reconciled every 15 s on the fast checks, never below the operator's count at the max; and the models' arm by itself
+  (`realms/harness.py`, `realms/plants.py`). 52 of its 55 files are omni-v17's bytes.
+- **The toy gate against omni-v17** (`results/toy_gate/V18_VS_V17.md`, every toy, 8 seeds): every gauge of all 11 toys identical,
+  because nothing moves unless a workload is named. **By itself** (`results/toy_gate/SOLO_V18.md`, class S) against native on the
+  same machines: the 95th percentile +19.4% GAIN, the minutes over the response line +64.9% GAIN, machines and energy EVEN.
+- **The fault found before it landed**: rebuilt on omni-v17's 60 s beat, the first candidate moved pods once a minute and read the
+  minutes over the line LOSS against native (26.4 to 34.8 a day); the muscle now keeps the pod autoscaler's 15 s pace between
+  decisions (two unit tests). `tools/solo_study.py` writes its closing words from the engine it reads.
+- Every place that names the engine that stands says omni-v18 (`tools/land_engine.py v18`); omni-v17's page in its past tense.
+
 ## 2026-10-23 (evening, the live engine): the sign explained where every number sits; a light on every monitor; one button back to the factory tune; the third arm named
 
 - **The sign, explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say

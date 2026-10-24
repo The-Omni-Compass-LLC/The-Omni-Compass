@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v17 (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files) stands on main since 23 October, afternoon. The founder's order of the afternoon
+Omni v17 (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files) stood on main from 23 October, afternoon, to 24 October, when omni-v18 (`docs/OMNI_V18.md`) landed with a pod muscle of its own; its results stay its own. The founder's order of the afternoon
 before (22 October), once he had read the reads of the cluster a day in the pace study (about 86,000 at 5 s against 39,700 at 60 s): the
 governor's heartbeat, its full decision, is a dial, "5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're
 going to set OmniCompass is main engine", because "who knows if maybe the purpose is somebody wants to set it at 5 seconds"; and

@@ -1,10 +1,10 @@
-# Omni-Compass by itself on the toy cluster (differs)
+# Omni-Compass by itself on the toy cluster (omni-v18)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Our own model (evidence class S), never a benchmark result. The founder's order of 23 October: beside native and Omni-Compass and native, a third arm, Omni-Compass by itself, with native's controllers switched off (`docs/SOLO_PREREGISTRATION.md`). This page reads what the engine that stands does by itself on the toy cluster: 8 seeds of a day, the same seeds in every arm, read by the toy gate's own rule (`tools/toy_gate.py`: the mean change over the seeds, its 95% interval by Student t, the word by the gauge's aim; a resource that rose is power given).
 
-Engine: differs from omni-v17: omni_controller/controller.py. Written by `python3 tools/solo_study.py`; every seed's reading of every arm is in its JSON twin (`per_seed`).
+Engine: omni-v18 (digest 22486290b19349eb, 55 files). Written by `python3 tools/solo_study.py`; every seed's reading of every arm is in its JSON twin (`per_seed`).
 
 | Arm | What governs |
 |---|---|
@@ -58,9 +58,9 @@ Engine: differs from omni-v17: omni_controller/controller.py. Written by `python
 
 ## What it says
 
-On the engine that stands (differs) the governor moves a workload's pods only through the pod autoscaler's own object (its range and its target); with the pod autoscaler switched off it has no pod muscle of its own, so by itself it holds every workload at the operator's count: its 95th percentile response 64 ms and 9 minutes over the line in the day, against native's 80.0 ms and 26.4 minutes.
+On the engine that stands (omni-v18) the governor has a pod muscle of its own (`--own-replicas`, omni-v18): with the pod autoscaler switched off it sets each named workload's pods itself, through the workload's own scale, at the target the compass moves, reconciled every 15 s on the fast checks: its 95th percentile response 64 ms and 9.2 minutes over the line in the day, against native's 80.0 ms and 26.4 minutes, on the same machines.
 
-Our own model, class S: it shows the mechanism, never a benchmark result. The real arm runs on kind (`ARM=solo`, `scripts/kind_bench.sh`) once the engine that carries the muscle stands (`docs/SOLO_PREREGISTRATION.md`).
+Our own model, class S: it shows the mechanism, never a benchmark result. The real arm runs on kind (`ARM=solo`, `scripts/kind_bench.sh`) on omni-v18, the engine that carries the muscle (`docs/SOLO_PREREGISTRATION.md`).
 
 ---
 
