@@ -139,15 +139,15 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-24 19:42 | health | success | [40126519572](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40126519572) |
+| 2026-10-24 19:38 | benchmark | success | [40124238611](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40124238611) |
+| 2026-10-24 19:12 | raw-sweep | success | [40124199368](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40124199368) |
 | 2026-10-24 19:00 | big-organism-detached collect | success | [40123276024](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40123276024) |
 | 2026-10-24 19:00 | citylearn | success | [40118288651](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40118288651) |
-| 2026-10-24 18:59 | benchmark-reps | success | [40115845720](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40115845720) |
 | 2026-10-24 18:51 | robustness | success | [40119481235](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40119481235) |
-| 2026-10-24 18:21 | raw-sweep | success | [40120288797](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40120288797) |
 | 2026-10-24 18:17 | swarm | success | [40119476867](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40119476867) |
 | 2026-10-24 18:06 | live-engine | success | [40116337891](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116337891) |
 | 2026-10-24 17:56 | orchestrator push room=busy | success | [40116226797](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116226797) |
-| 2026-10-24 17:29 | engine-runs | success | [40116224274](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116224274) |
 | 2026-10-24 17:29 | aks-client-check | success | [40116249873](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116249873) |
 <!-- front-page:runs:end -->
 
