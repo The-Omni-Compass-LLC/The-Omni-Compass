@@ -1263,6 +1263,8 @@ def main() -> int:
             bad.append("the appraisal's counts (docs/engine/APPRAISAL.md)")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         for k in bad:
+            if k not in rec:          # the appraisal's counts are a file, not a record: named above, no record to compare
+                continue
             where = first_difference(embedded(page, k), rec[k])
             if where:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
