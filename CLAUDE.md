@@ -224,10 +224,14 @@ the founder overrides one in the conversation.
 - Any change to a rule, gain, guard, preset or muscle makes **the next version**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first; telling is not asking (19 October, night): a version
   that passes the toy gate with no LOSS lands, and he hears what it changed.
-- Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
-  readings: GAIN or LOSS in all three of our runs (the same sign in all three, every 95% interval clear of zero, the word
-  set by the gauge's aim; a resource spent that rose is power given); EVEN, no difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
-  pointing different ways: the test is unstable there, look into it). Never write "confirmed" or "not confirmed"
+- Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one reading by the one
+  rule (`tools/readings.py` judge_runs; the founder's order of 24 October, below): EVEN only when every run's change is under
+  0.5% either way (EVEN, under the floor) or none moved (EVEN, the same); otherwise the runs that moved 0.5% or more decide.
+  All the same way: the word by the gauge's aim (a resource spent that rose is power given), written GAIN or LOSS in all
+  three of our runs when all three moved 0.5% or more the same way with every 95% interval clear of zero, and otherwise with
+  its qualifier in the same cell, the noise count always shown ("**GAIN** (the same way in all three runs; 2 of 3 clear of
+  the noise)"). Pointing different ways: the runs disagree (the test is unstable there, look into it). A count that must
+  never rise (failed requests, lost messages) reads LOSS on any rise in any run. Never write "confirmed" or "not confirmed"
   (the founder's order of 11 October: nobody outside approved these results); every three-run table says "Run and
   scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results."
   (`tools/readings.py`).
@@ -326,6 +330,23 @@ the founder overrides one in the conversation.
   goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
+
+## Orders of 24 October
+
+- **Any change of 0.5% or more is a change, and shows its word** (the founder's words: "Any gauge that gives anything over a
+  0.5 percent change either way is a change. I don't want to see even on shit that shows a 0.5% change up or down, it has to
+  show its loss or gain. Not everything can just stay even because it's 2-3% away. That's not even. In the tech world that is
+  a whole lot of value"). The rule is written once (`tools/readings.py` judge_runs over runs, judge_one for one paired
+  comparison) and every tool that decides a word calls it: EVEN only under the 0.5% floor in every run, or the same; from 0.5%
+  up the word comes from what the gauge is for (LOWER, HIGHER, SPENT, NEVER_MORE, NEVER_LESS, WORK_PER, SHOWN), never from
+  the sign, with the count of runs clear of the noise beside it whenever not all three are; runs that moved 0.5% or more
+  pointing different ways read the runs disagree; a count that must never rise keeps its strict rule. The model gates
+  (`tools/toy_gate.py` and every study that reads by it) read a paired change the same way, "(not clear of the noise)" beside
+  the word where its interval crosses zero. Every published table was read again by it from its own numbers
+  (`tools/reread_key.py`, `--check` in the same push); `results/REREAD_KEY.md` counts what moved and names every row that
+  now reads LOSS, and every LOSS that the floor now reads EVEN. The Omni index and the benefit sheet's numbers still count a
+  reading only where it holds in all three of our runs; their words count every word. The five store runners and the
+  engine harness are in the fingerprint: their own one-run words take the rule with the next engine version.
 
 ## Orders of 23 October
 
