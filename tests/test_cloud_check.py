@@ -63,6 +63,8 @@ class KeyShape(unittest.TestCase):
                  "ya29." + "a0AfB_xyZ-9q." * 45: "token",
                  "omni-compass-github@omni-compass-123456.iam.gserviceaccount.com": "account's address",
                  "GCP_CREDENTIALS = " + whole: "18 characters stand before its first {",
+                 'P=$(gcloud config get-value project)\ngcloud iam service-accounts keys create key.json --iam-account "x"':
+                     "the setup lines that are run in Google's Cloud Shell",
                  "Created key of type json for\n" + SECRET[:300] + " (see https://console.cloud.google.com)":
                      "2 lines, with spaces, a web address in it"}
         for raw, words in cases.items():

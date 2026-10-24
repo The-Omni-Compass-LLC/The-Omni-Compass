@@ -37,6 +37,9 @@ def what_it_holds(raw: str) -> str:
         return ("it holds the settings of a GitHub link made without a key (a Workload Identity provider"
                 + (" and a service account" if "service_account" in raw or ".iam.gserviceaccount.com" in raw else "")
                 + "), not the key file")
+    if "gcloud " in raw:
+        return ("it holds commands (lines that start with gcloud), the setup lines that are run in Google's Cloud Shell; the "
+                "key file they make, key.json, is what goes in the box")
     if any(f'"{f}"' in raw for f in FIELDS):
         return "it holds a piece from inside the file (its first line, the {, is missing): the copy started part of the way in"
     if "-----BEGIN PRIVATE KEY-----" in raw or "PRIVATE KEY-----" in raw:
