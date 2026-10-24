@@ -13,8 +13,9 @@
   python3 scripts/lambda_gpu.py wait ID [--timeout 1800]    until it is running; prints its address
   python3 scripts/lambda_gpu.py status ID                   its state and address
   python3 scripts/lambda_gpu.py list [--prefix omni-]       our machines, with how long each has been up
-  python3 scripts/lambda_gpu.py terminate [ID ...] [--name N]   gives them back (by id, or the machine of that name) and
-                                                            confirms each one; the bill stops
+  python3 scripts/lambda_gpu.py terminate [ID ...] [--name N] [--prefix omni-...]   gives them back (by id, the machine
+                                                            of that name, or every machine whose name starts so; only
+                                                            omni- names) and confirms each one; the bill stops
   python3 scripts/lambda_gpu.py keycheck --name K --private-file F   the SSH key pair, at no cost: Lambda holds a key named
                                                             K, and F is its private half; rents nothing
 
@@ -207,11 +208,18 @@ def terminate(a) -> int:
     """Give machines back and confirm each one: a machine already given back is fine; one that Lambda neither lists as
     given back nor reports as terminating is still billing, and that is exit 2 with its id (never a quiet success)."""
     ids = [i for i in a.ids if i]
-    if a.name:
+    prefix = getattr(a, "prefix", "") or ""
+    if prefix and not prefix.startswith("omni-"):
+        # only the machines this workflow names (omni-...); a machine launched by hand on Lambda's page is never touched
+        print(f"refused: --prefix must start with omni- (the names this workflow gives), not {prefix!r}", file=sys.stderr)
+        return 2
+    if a.name or prefix:
         ids += [d.get("id") for d in call("GET", "/instances").get("data", [])
-                if d.get("name") == a.name and d.get("id") not in ids]
+                if (d.get("name") == a.name or (prefix and (d.get("name") or "").startswith(prefix)))
+                and d.get("id") not in ids]
     if not ids:
-        print("nothing to give back" + (f" (no machine named {a.name})" if a.name else ""))
+        print("nothing to give back" + (f" (no machine named {a.name})" if a.name else "")
+              + (f" (no machine whose name starts {prefix})" if prefix else ""))
         return 0
     live = [i for i in ids if state(i) not in GONE]
     for i in ids:
@@ -345,6 +353,7 @@ def main(argv=None) -> int:
     p.add_argument("--every", type=float, default=15.0); p.set_defaults(fn=wait)
     p = sub.add_parser("list"); p.add_argument("--prefix", default="omni-"); p.set_defaults(fn=list_)
     p = sub.add_parser("terminate"); p.add_argument("ids", nargs="*"); p.add_argument("--name", default="")
+    p.add_argument("--prefix", default="", help="every machine whose name starts with this (omni-... only)")
     p.set_defaults(fn=terminate)
     p = sub.add_parser("keycheck"); p.add_argument("--name", required=True); p.add_argument("--private-file", required=True)
     p.add_argument("--resolved-out", default="")

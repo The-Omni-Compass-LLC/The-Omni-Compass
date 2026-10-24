@@ -167,6 +167,17 @@ def test_lambda_launcher_end_to_end():
         assert rc == 0 and "inst1" in o and STATE["instances"]["inst1"]["status"] == "terminated", o
         rc, o = run(["wait", "inst1", "--timeout", "1", "--every", "0.01"]); printed += o
         assert rc == 5, o                                                             # a given-back machine never runs
+        rc, o = run(["launch", "--type", "gpu_1x_a10", "--name", f"omni-1card-{int(time.time())}-9",
+                     "--ssh-key-name", "omni-key"]); printed += o
+        stuck = o.strip()
+        STATE["instances"]["hand"] = {"id": "hand", "name": "my-a100", "status": "active", "ip": None,
+                                      "region": {"name": "us-east-1"}}            # one launched by hand on Lambda's page
+        rc, o = run(["terminate", "--prefix", "my-"]); printed += o
+        assert rc == 2 and STATE["instances"]["hand"]["status"] == "active", o        # only names this workflow gives
+        rc, o = run(["terminate", "--prefix", "omni-1card-"]); printed += o
+        assert rc == 0 and STATE["instances"][stuck]["status"] == "terminated", o     # a stuck run's card, by its name
+        assert STATE["instances"]["hand"]["status"] == "active", o                    # the hand-launched one untouched
+        del STATE["instances"]["hand"]
         os.environ["LAMBDA_API_KEY"] = "wrong"
         rc, o = run(["list"]); printed += o
         assert rc == 2 and "HTTP 401" in o, o                                         # a refused key is reported

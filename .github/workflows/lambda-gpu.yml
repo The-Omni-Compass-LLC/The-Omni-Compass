@@ -9,7 +9,8 @@ name: lambda-gpu
 # It shows the price first and rents nothing on a dry run (the default). Otherwise it rents one machine, ships the
 # committed tree to it, starts the run, watches it from GitHub, brings every result file back as this run's artifact,
 # and always gives the machine back: when the run prints its last line, or at the hour budget plus one hour whatever
-# happens, or at the very end of this workflow if anything before failed. Needs three repository secrets:
+# happens, or at the very end of this workflow if anything before failed; the test giveback gives back a stuck run's machine
+# by its name and rents nothing. Needs three repository secrets:
 # LAMBDA_API_KEY, LAMBDA_SSH_PRIVATE_KEY and LAMBDA_SSH_KEY_NAME (docs/LAMBDA_SETUP.md, click by click). Before anything
 # is rented, on a dry run too, it checks at no cost that the key logs in to Lambda, that Lambda holds the SSH key named, and
 # that the stored private key is its other half; a missing secret or a wrong pair turns the run red and rents nothing.
@@ -17,13 +18,14 @@ name: lambda-gpu
 on:
   workflow_dispatch:
     inputs:
-      test: {description: "8card (the 8-GPU result) or 1card (the one-card test)", default: "8card"}
+      test: {description: "8card (the 8-GPU result), 1card (the one-card test), or giveback (give back a stuck run's machine: no test, nothing rented)", default: "8card"}
       mode: {description: "pooled, fast or full (8card: about 10, 3.5 or 18 hours; 1card: fast about 7, full about 30)", default: "pooled"}
       instance_type: {description: "Lambda machine type (empty: gpu_8x_a100_80gb_sxm4 for 8card, gpu_1x_a10 for 1card)", default: ""}
       region: {description: "Lambda region (empty: the first with a machine free)", default: ""}
       max_cost: {description: "Ceiling in US dollars for the hour budget plus one hour; above it nothing is rented", default: "400"}
       dry_run: {description: "Show the price and the plan, rent nothing (yes/no)", default: "yes"}
       hil_profile: {description: "Prepared organism scales: standard or 1-10-100", default: "1-10-100"}
+      give_back: {description: "giveback only: the name, or the start of the name, of the machines to give back (omni-1card-, omni-8card-, or a whole name)", default: ""}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
     branches-ignore: [main, raw, "v[0-9]*", "gpu-omni-*", "archive/**"]   # a push to main or a level branch never starts it (20 October: every bot commit started 25 skipped runs and a cascade of cancelled page rebuilds)
 permissions:
@@ -35,8 +37,34 @@ env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
   LAMBDA_API_KEY: ${{ secrets.LAMBDA_API_KEY }}
 jobs:
+  giveback:
+    # a run whose watch can no longer end it (a card idle under a run cancelled by hand: the watch jobs run on through a
+    # cancel so a give-back is never lost, and wait for the deadline): the machines named are given back at once, from
+    # here, and that run's watch sees its machine gone and ends; only omni- names, so a machine launched by hand on
+    # Lambda's page is never touched. Its own queue (the test's name), so it never waits behind the run it frees.
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test == 'giveback'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: {sparse-checkout: "scripts"}
+      - name: Give the machines back
+        env:
+          WHICH: ${{ github.event.inputs.give_back }}
+        run: |
+          [ -n "$LAMBDA_API_KEY" ] || { echo "::error::LAMBDA_API_KEY is not in this repository's secrets."; exit 2; }
+          case "$WHICH" in omni-?*) ;; *) echo "::error::give_back must start with omni- (omni-1card-, omni-8card-, or a whole name)."; exit 2;; esac
+          python3 scripts/lambda_gpu.py list | sed 's/^/  listed before: /' || true
+          python3 scripts/lambda_gpu.py terminate --prefix "$WHICH" | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 scripts/lambda_gpu.py list | sed 's/^/  still listed: /' || true
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
   launch:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test != 'giveback'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
