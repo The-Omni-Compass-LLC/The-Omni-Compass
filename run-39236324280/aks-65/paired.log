@@ -1,0 +1,187 @@
+Omni-Compass: evaluation and simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE).
+repetition 65, order: native compass, work pools Standard_D2s_v4:4 (up to 4 workers) in eastus
+Azure CPU capacity confirmed for the complete requested fleet.
+Azure CPU capacity confirmed for the complete requested fleet.
+######## creating omni-native-65
+WARNING: SSH key files '/home/runner/.ssh/id_rsa' and '/home/runner/.ssh/id_rsa.pub' have been generated under ~/.ssh to allow SSH access to the VM. If using machines without permanent storage like Azure Cloud Shell without an attached file share, back up your keys to a safe location
+WARNING: Merged "omni-native-65-admin" as current context in /home/runner/.kube/config
+/home/runner/work/_temp/omni-aks-kubectl/kubectl
+{"client": "v1.36.4", "server": "v1.36.4", "resize_required": false}
+node/aks-system-18666596-vmss000000 condition met
+node/aks-work0-13032928-vmss000000 condition met
+node/aks-work0-13032928-vmss000001 condition met
+node/aks-work0-13032928-vmss000002 condition met
+node/aks-work0-13032928-vmss000003 condition met
+######## ARM native (repetition 65)
+date_utc=2026-10-22T10:12:30Z
+arm=native
+git_commit=bdcdf72ee3c5f4292cec3e662ac5934c2b695f05
+docker=Docker version 28.0.4, build b8034c0
+kind=kind v0.33.0 go1.26.7 linux/amd64
+kubectl=v1.36.4
+server=v1.36.4
+python=Python 3.12.15
+metrics_server=v0.9.0 sha256=1cec29a5267809306a2c6ec74a3e449abbb705b4a8beed0c8a1963910f72c79b
+workers=4
+deployment.apps/php-apache created
+service/php-apache created
+horizontalpodautoscaler.autoscaling/php-apache created
+service/php-apache-edge created
+poddisruptionbudget.policy/php-apache created
+Waiting for deployment "php-apache" rollout to finish: 0 of 1 updated replicas are available...
+deployment "php-apache" successfully rolled out
+service/php-apache-edge patched
+probe_url=http://135.237.117.243:80/ (Service via kube-proxy on the control plane)
+configmap/omni-security created
+deployment.apps/load-generator created
+loadgen_node=aks-system-18666596-vmss000000
+deployment.apps/load-generator patched
+loadgen=open
+Waiting for deployment "load-generator" rollout to finish: 0 of 1 updated replicas are available...
+deployment "load-generator" successfully rolled out
+== warm-up 120s (both arms)
+== ARM native: Omni-Compass not running; Kubernetes alone
+rows captured: 49
+Azure CPU capacity confirmed for the complete requested fleet.
+######## creating omni-compass-65
+WARNING: Merged "omni-compass-65-admin" as current context in /home/runner/.kube/config
+/home/runner/work/_temp/omni-aks-kubectl/kubectl
+{"client": "v1.36.4", "server": "v1.36.4", "resize_required": false}
+node/aks-system-10448077-vmss000000 condition met
+node/aks-work0-27731473-vmss000000 condition met
+node/aks-work0-27731473-vmss000001 condition met
+node/aks-work0-27731473-vmss000002 condition met
+node/aks-work0-27731473-vmss000003 condition met
+######## ARM compass (repetition 65)
+date_utc=2026-10-22T10:44:24Z
+arm=compass
+git_commit=bdcdf72ee3c5f4292cec3e662ac5934c2b695f05
+docker=Docker version 28.0.4, build b8034c0
+kind=kind v0.33.0 go1.26.7 linux/amd64
+kubectl=v1.36.4
+server=v1.36.4
+python=Python 3.12.15
+metrics_server=v0.9.0 sha256=1cec29a5267809306a2c6ec74a3e449abbb705b4a8beed0c8a1963910f72c79b
+workers=4
+deployment.apps/php-apache created
+service/php-apache created
+horizontalpodautoscaler.autoscaling/php-apache created
+service/php-apache-edge created
+poddisruptionbudget.policy/php-apache created
+Waiting for deployment "php-apache" rollout to finish: 0 of 1 updated replicas are available...
+deployment "php-apache" successfully rolled out
+service/php-apache-edge patched
+probe_url=http://20.237.110.191:80/ (Service via kube-proxy on the control plane)
+configmap/omni-security created
+deployment.apps/load-generator created
+loadgen_node=aks-system-10448077-vmss000000
+deployment.apps/load-generator patched
+loadgen=open
+Waiting for deployment "load-generator" rollout to finish: 0 of 1 updated replicas are available...
+deployment "load-generator" successfully rolled out
+namespace/omni-compass created
+serviceaccount/omni-compass created
+clusterrole.rbac.authorization.k8s.io/omni-compass-sense created
+clusterrole.rbac.authorization.k8s.io/omni-compass-nodes created
+clusterrolebinding.rbac.authorization.k8s.io/omni-compass-sense created
+clusterrolebinding.rbac.authorization.k8s.io/omni-compass-nodes created
+role.rbac.authorization.k8s.io/omni-compass-app created
+rolebinding.rbac.authorization.k8s.io/omni-compass-app created
+== can (each muscle's push)
+patch hpa/php-apache (hpa): yes
+Warning: resource 'nodes' is not namespace scoped
+
+patch nodes (node pool: idle mark): yes
+create pods/eviction (node pool: drain): yes
+patch pods/resize (power cap, in place): yes
+patch pods (make before break: which pods leave first): yes
+get pods/resize (power cap reads before it writes): yes
+patch deployment/php-apache (rollout guard, cap record): yes
+get configmap/omni-security (security afferent): yes
+== cannot
+Warning: resource 'nodes' is not namespace scoped
+
+delete nodes: no
+create pods: no
+delete pods: no
+delete deployments: no
+patch deployment/load-generator: no
+patch deployments in kube-system: no
+patch hpa in kube-system: no
+get secrets (any namespace): no
+Warning: resource 'namespaces' is not namespace scoped
+
+create namespaces: no
+patch configmap/omni-security: no
+== warm-up 120s (both arms)
+== ARM compass: Omni-Compass driving HPA target + node pool + power sensing
+== reset
+omni writes during the run: 25
+open workers: 2 (wanted 2)
+the operator's CPU limit on the Deployment after kill: 500m (the governor moved the machines alone: no processor conveyed)
+HPA replica range after kill: 1,10
+restored target: 50
+workers in service: 2 of 4
+Omni records left after kill: none
+rows captured: 50
+== controller: decisions inside the window 15 of 15 (one every 63.8 s; 15 in all), failed decisions or checks 0
+-- controller's own cost (CPU of the process and every command it ran): {"time": 1792666918.6737242, "overhead": {"cpu_s": 5.5, "wall_s": 894.7, "cores_mean": 0.0062}}
+-- my writes by muscle (count, first words of why)
+     15 node pool size: 
+      2 scheduling floor (pending pods): 
+      2 rollout: resume (change permitted)
+      2 rollout: record pause
+      2 rollout: pause (change not
+      2 rollout: clear pause record
+-- conveyed CPU limits (last 8)
+-- pod reflex (last 8)
+-- controller.log (last 40 lines)
+open workers: 1 (wanted 1)
+open workers: 1 (wanted 1)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+open workers: 2 (wanted 2)
+-- audit errors (last 10)
+-- decision trail (nodes seen -> recommended | p95 ms | SLO clean | calm | node-view calm | node gate)
+  compass: Β >  90.0° Dispersion: peak extension, the turn | Ω held | G·n≤0 yes | L 880.0783 | axle S 0.1357 (rest 2.3686) | circles 0
+  1 -> 2 | p95 None | clean False | calm 0.424 | node calm 0.505 | gate one machine left; latency breached now; util after inf > rho 0.77; node organ has no contraction authority; a sense is blind | queue 0.0 | U 0.914 | blind ['latency'] | latency age 1.1 s | proprioception {}
+  compass: Α +   6.0° Expansion: rising through rest | Ω held | G·n≤0 yes | L 881.3905 +1.3123 (forced) | axle S 0.1335 (rest 2.3686) | circles 0
+  1 -> 2 | p95 980.1 | clean False | calm 0.15 | node calm 0.632 | gate one machine left; latency breached now; util after inf > rho 0.77; node organ has no contraction authority; last node command did not land | queue 0.96 | U 0.892 | blind [] | latency age 1.9 s | proprioception {'nodes': 0.5}
+  compass: Μ ⊤ 152.2° Dispersion: dispersion, the ceiling holds | Ω: machine_fill above the ceiling, returning | G·n≤0 yes | L 855.2394 -26.1511 | axle S 0.1728 (rest 2.3686) | circles 0
+  1 -> 2 | p95 677.4 | clean False | calm 0.23 | node calm 0.469 | gate one machine left; pods waiting; latency breached now; util after inf > rho 0.77; node organ has no contraction authority; last node command did not land | queue 0.355 | U 0.926 | blind [] | latency age 1.4 s | proprioception {'nodes': 0.5}
+  compass: Α +   6.7° Expansion: rising through rest | Ω held | G·n≤0 yes | L 904.2343 +48.9949 (forced) | axle S 0.0998 (rest 2.3686) | circles 0
+  2 -> 3 | p95 1416.3 | clean False | calm 0.005 | node calm 0.698 | gate latency breached now; util after 0.81 > rho 0.77; node organ has no contraction authority | queue 1.833 | U 0.859 | blind [] | latency age 4.7 s | proprioception {'nodes': 0.0}
+  compass: Ε +  15.2° Expansion: rising through rest | Ω held | G·n≤0 yes | L 943.7750 +39.5407 (forced) | axle S 0.0417 (rest 2.3686) | circles 0
+  2 -> 3 | p95 1496.3 | clean False | calm 0.0 | node calm 0.683 | gate latency breached now; util after 0.98 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 1.993 | U 0.824 | blind [] | latency age 5.0 s | proprioception {'nodes': 0.333}
+  compass: Ν − 161.0° Dispersion: falling through rest | Ω held | G·n≤0 yes | L 931.6806 -12.0944 | axle S 0.0595 (rest 2.3686) | circles 0
+  2 -> 3 | p95 1080.5 | clean False | calm 0.0 | node calm 0.673 | gate latency breached now; util after 0.90 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 1.161 | U 0.867 | blind [] | latency age 16.6 s | proprioception {'nodes': 0.333}
+  compass: Ε +  17.7° Expansion: rising through rest | Ω held | G·n≤0 yes | L 962.0643 +30.3836 (forced) | axle S 0.0151 (rest 2.3686) | circles 0
+  2 -> 3 | p95 8374.1 | clean False | calm 0.0 | node calm 0.667 | gate latency breached now; util after 1.39 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 2.0 | U 0.830 | blind [] | latency age 13.5 s | proprioception {'nodes': 0.333}
+  compass: Ω − 175.4° Dispersion: falling through rest | Ω held | G·n≤0 yes | L 872.7828 -89.2814 | axle S 0.1469 (rest 2.3686) | circles 0
+  2 -> 3 | p95 None | clean False | calm 0.026 | node calm 0.61 | gate latency breached now; util after 1.43 > rho 0.77; node organ has no contraction authority; a sense is blind; last node command did not land | queue 0.0 | U 0.930 | blind ['latency'] | latency age 21.2 s | proprioception {'nodes': 0.333}
+  compass: Β >  95.7° Dispersion: peak extension, the turn | Ω held | G·n≤0 yes | L 866.6881 -6.0948 | axle S 0.1561 (rest 2.3686) | circles 0
+  2 -> 3 | p95 802.4 | clean False | calm 0.039 | node calm 0.652 | gate latency breached now; util after 1.49 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 0.75 | U 0.924 | blind [] | latency age 1.6 s | proprioception {'nodes': 0.333}
+  compass: Ω − 173.3° Dispersion: falling through rest | Ω held | G·n≤0 yes | L 833.6989 -32.9892 | axle S 0.2058 (rest 2.3686) | circles 0
+  2 -> 3 | p95 539.7 | clean False | calm 0.224 | node calm 0.664 | gate latency breached now; util after 1.17 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 0.097 | U 0.958 | blind [] | latency age 5.6 s | proprioception {'nodes': 0.333}
+  compass: Ε +  17.2° Expansion: rising through rest | Ω held | G·n≤0 yes | L 836.6894 +2.9905 (forced) | axle S 0.2013 (rest 2.3686) | circles 0
+  2 -> 3 | p95 825.0 | clean False | calm 0.156 | node calm 0.667 | gate latency breached now; node organ has no contraction authority; last node command did not land | queue 0.65 | U 0.935 | blind [] | latency age 2.2 s | proprioception {'nodes': 0.333}
+  compass: Ε +  14.0° Expansion: rising through rest | Ω held | G·n≤0 yes | L 850.9903 +14.3009 (forced) | axle S 0.1797 (rest 2.3686) | circles 0
+  2 -> 3 | p95 964.9 | clean False | calm 0.067 | node calm 0.668 | gate latency breached now; util after 0.80 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 0.93 | U 0.912 | blind [] | latency age 6.6 s | proprioception {'nodes': 0.333}
+  compass: Ε +   8.7° Expansion: rising through rest | Ω held | G·n≤0 yes | L 891.5193 +40.5290 (forced) | axle S 0.1192 (rest 2.3686) | circles 0
+  2 -> 3 | p95 1312.6 | clean False | calm 0.0 | node calm 0.669 | gate latency breached now; util after 0.89 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 1.625 | U 0.862 | blind [] | latency age 0.0 s | proprioception {'nodes': 0.333}
+  compass: Ω − 173.7° Dispersion: falling through rest | Ω held | G·n≤0 yes | L 863.2199 -28.2995 | axle S 0.1613 (rest 2.3686) | circles 0
+  2 -> 3 | p95 702.9 | clean False | calm 0.039 | node calm 0.671 | gate latency breached now; util after 0.91 > rho 0.77; node organ has no contraction authority; last node command did not land | queue 0.406 | U 0.926 | blind [] | latency age 1.4 s | proprioception {'nodes': 0.333}
+  compass: Ω − 172.7° Dispersion: falling through rest | Ω held | G·n≤0 yes | L 836.4022 -26.8176 | axle S 0.2017 (rest 2.3686) | circles 0
+  2 -> 3 | p95 606.5 | clean False | calm 0.189 | node calm 0.673 | gate latency breached now; node organ has no contraction authority; last node command did not land | queue 0.213 | U 0.954 | blind [] | latency age 4.7 s | proprioception {'nodes': 0.333}
