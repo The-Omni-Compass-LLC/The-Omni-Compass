@@ -6,7 +6,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Every row of every three-run table stands where its table stands, LOSS included; this page gathers the LOSS rows so none of them is found only by reading every table. A LOSS row is a gauge that moved away from its declared aim by 0.5% or more across the benchmark's three runs, A, B and C (the founder's order of 24 October 2026, `tools/readings.py`): in all three, every run's 95% interval clear of zero, or by the mean of the three, with the count of runs beyond the noise. Each benchmark is read from its newest whole table; an older engine's table stands only until the engine that stands has run that benchmark three times, and the engine each row ran on is printed beside it.
 
-Rows that read LOSS across their three runs: **331**. Against my own native, the readings do no harm is judged by: **160**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v17: 9, omni-v16: 28, omni-v12: 284, omni-v11: 2, omni-v10: 8.
+Rows that read LOSS across their three runs: **328**. Against my own native, the readings do no harm is judged by: **157**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v18: 10, omni-v17: 2, omni-v16: 22, omni-v12: 284, omni-v11: 2, omni-v10: 8.
 
 ## Against my own native
 
@@ -46,11 +46,9 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), mean | 1.4%, 0.9%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), 95th percentile | 1.5%, 3.0%, 0.5% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), 99th percentile | 1.3%, 3.1%, 2.7% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_KAFKA.json` | workload burst / p99_ms | 0.1%, 0.1%, 1.9% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_KAFKA.json` | workload burst / lag_max | 2.2%, 1.2%, 0.5% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_KAFKA.json` | workload heavy / mean_ms | 2.9%, 0.3%, 3.0% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_KAFKA.json` | workload heavy / lag_max | 2.3%, 1.2%, 2.3% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_KAFKA.json` | workload heavy / lag_mean | 2.6%, 1.3%, 3.6% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA.json` | workload burst / lag_max | 1.1%, 0.4%, 0.6% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA.json` | workload light / work_inside_line_mps | 0.2%, 0.1%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA.json` | workload light / p95_ms | 1.1%, 1.0%, 70.9% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_KAFKA_SERVICE.json` | workload burst / mean_ms | 1.0%, 0.6%, 0.8% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KAI.json` | response time (ms), 99th percentile | 0.7%, 9.7%, 5.7% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KAI.json` | time over the response line (% of samples) | 8.8%, 42.3%, 6.5% | not yet written | — | the benchmark's three runs on the engine that stands |
@@ -133,11 +131,14 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v16 | `results/live/V16_PGBENCH.json` | workload tpcb_hot / p95_ms | 430.3%, 75.3%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v17 | `results/live/V17_PGBENCH_SERVICE.json` | workload simple_update / p50_ms | 0.3%, 37.2%, 1.634 to 30.65 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v17 | `results/live/V17_PGBENCH_SERVICE.json` | workload tpcb_hot / work_inside_line_tps | 0.0%, 0.0%, 3.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_REDIS_SERVICE.json` | workload small / p99_ms | 2.2%, 0.2%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_REDIS_SHIPPED.json` | workload large / p95_ms | 1.4%, 1.7%, 1.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v11 | `results/live/V11_ROBUST_LONG.json` | pod start wait, total (s) | 268.2%, 135.7%, 138.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_SYSBENCH.json` | workload read_write / work_inside_line_tps | 5.7%, 0.0%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_SYSBENCH.json` | workload read_write / mean_ms | 28.5%, 0.1%, 6.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_SYSBENCH_SERVICE.json` | workload update_index / work_inside_line_tps | 4.7%, 2.5%, 22.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_SYSBENCH_SERVICE.json` | workload update_index / p95_ms | 9.6%, 9.2%, 6.1% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_SYSBENCH_SERVICE.json` | workload update_index / p99_ms | 21.9%, 4.7%, 15.0% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_SYSBENCH_SERVICE.json` | workload update_index / mean_ms | 5.8%, 8.4%, 13.7% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_SYSBENCH_SHIPPED.json` | workload read_only / mean_ms | 1.5%, 0.6%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v10 | `results/live/V10_TRACE_GOOGLE2011.json` | pod start wait, total (s) | 76.1%, 116.3%, 45.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_VANILLA.json` | response time (ms), 95th percentile | 0.2%, 9.1%, 5.3% | not yet written | — | the benchmark's three runs on the engine that stands |
@@ -161,13 +162,9 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v16 | `results/live/V16_YCSB.json` | workload c / p99_ms | 0.4%, 1.4%, 1.5% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_YCSB.json` | workload c / mean_ms | 1.1%, 3.6%, 7.0% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_YCSB.json` | workload f / p95_ms | 0.3%, 0.5%, 11.6% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v17 | `results/live/V17_YCSB_SERVICE.json` | workload b / p95_ms | 11.4%, 2.7%, 1.3% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v17 | `results/live/V17_YCSB_SERVICE.json` | workload b / p99_ms | 2.8%, 2.8%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v17 | `results/live/V17_YCSB_SERVICE.json` | workload b / mean_ms | 2.3%, 1.6%, 0.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v17 | `results/live/V17_YCSB_SERVICE.json` | workload burst / p95_ms | 0.7%, 0.9%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v17 | `results/live/V17_YCSB_SERVICE.json` | workload burst / mean_ms | 0.7%, 1.5%, 0.7% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v17 | `results/live/V17_YCSB_SERVICE.json` | workload c / p95_ms | 1.3%, 1.0%, 2.0% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v17 | `results/live/V17_YCSB_SERVICE.json` | workload c / mean_ms | 0.5%, 1.0%, 2.1% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_YCSB_SERVICE.json` | workload b / p95_ms | 1.2%, 0.3%, 1.7% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_YCSB_SERVICE.json` | workload burst / p95_ms | 2.3%, 0.2%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_YCSB_SERVICE.json` | workload burst / mean_ms | 1.6%, 0.3%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_YCSB_SHIPPED.json` | workload burst / p95_ms | 1.2%, 3.6%, 0.9% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_YCSB_SHIPPED.json` | workload burst / p99_ms | 1.5%, 5.2%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_YCSB_SHIPPED.json` | workload burst / mean_ms | 0.8%, 2.3%, 0.0% | not yet written | — | the benchmark's three runs on the engine that stands |
