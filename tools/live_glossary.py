@@ -336,7 +336,7 @@ def arms() -> list[dict]:
                  "Kubernetes on top of the muscles. The arm every table carried as \"omni\", its machine key unchanged."),
          "sources": [{"file": "CLAUDE.md", "quote": "Omni on native is Omni on top of Kubernetes on top of the muscles"},
                      {"file": "CLAUDE.md", "quote": "Omni-Compass and native (the arm every table carried as \"omni\", its machine key unchanged)"}]},
-        {"key": SOLO, "name": "Omni-Compass direct", "colour": "violet", "hex": "#b48ef0",
+        {"key": SOLO, "name": "Omni-Compass direct", "colour": "violet", "hex": "#c77dff",
          "aka": ["Omni-Compass direct", "Omni-Compass by itself", "Omni direct"],
          "def": ("Omni-Compass alone on the muscles, no orchestrator: each muscle's own native controller switched off and "
                  "Omni-Compass the only controller moving that knob (on Kubernetes no pod autoscaler and no cluster autoscaler; "
@@ -389,6 +389,7 @@ def T(term, group, d, sources, aka=(), note=None):
 R, A, L, B, D, P, C, G, W = ("Reading a result", "The arms and where Omni-Compass sits", "The law and the plug", "The brain and its nerves",
                              "Driving it", "Proof and evidence", "The catalog and the organisms", "The runs and the grid",
                              "The page")
+FP = "docs/FACTORY_PROFILE.md"    # the common language of the factory profile, the tuning bench and the bill (24 October)
 PAGE_F, CL, DIS, RD, MAN = ("docs/engine/OMNI_COMPASS_LIVE_ENGINE.html", "CLAUDE.md", "DISCLOSURES.md", "tools/readings.py",
                             "docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md")
 LAW, NERV, CORE, ARM5, THEO = ("omnicompass/compass_law.py", "omnicompass/nervous_system.py", "omnicompass/core.py",
@@ -399,10 +400,10 @@ TERMS = [
       "failures, or a resource cut. Decided by what the gauge is for, never by the plus or minus sign of its number; the number "
       "beside it wears a plus (+73.0% GAIN). G.A.I.N.: Growth, Advantage, Improvement, Net-positive. Green.",
       [(RD, "the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures")]),
-    T("EVEN", R, "No change of 0.5% or more either way in any run (under the floor), or the same, or a knob native already runs "
-      "at the top of its range (at its limit on native). A change of 0.5% or more is never EVEN. The number beside it wears = "
-      "(=0.3% EVEN). E.V.E.N.: Equalized, Verified baseline, Equilibrium, Neutral. Yellow.",
-      [(RD, "no change of 0.5% or more either way in any run (under the floor), or the same; a change of 0.5% or more is never EVEN")]),
+    T("EVEN", R, "A change under 0.5% (the mean of the three runs' changes under the floor), no change at all, or a knob native "
+      "already runs at the top of its range (at its limit on native). A change of 0.5% or more is never EVEN. The number beside "
+      "it wears = (=0.3% EVEN). E.V.E.N.: Equalized, Verified baseline, Equilibrium, Neutral. Yellow.",
+      [(RD, "EVEN is kept for a change under 0.5%"), (RD, "the top of its range is EVEN, at its limit on native")]),
     T("LOSS", R, "The gauge moved away from its declared aim against native: less work done, a longer wait, more misses or "
       "failures. A LOSS row is never cut: its cause is found and fixed (our own wiring first, then native's setup, then the "
       "scoring) and the test is run again. The number beside it wears − (−16.8% LOSS). L.O.S.S.: Leakage, Off-track, Setback, "
@@ -415,17 +416,17 @@ TERMS = [
       "reading.",
       [(RD, "A rise is **power given**: what Omni put in to buy the work"),
        (MAN, "on a reading, power given")], aka=["power given"]),
-    T("the runs disagree", R, "Runs that moved 0.5% or more pointing different ways: the test is unstable there and is looked "
-      "into.", [(RD, "runs that moved 0.5% or more pointing different ways read **the runs disagree**")],
+    T("the runs disagree", R, "Runs that moved 0.5% or more in opposite directions: the test is unstable there and is looked "
+      "into.", [(RD, "**The runs disagree**: runs moved 0.5% or more in opposite")],
       aka=["the runs disagree", "runs disagree"]),
     T("shown, not judged", R, "A gauge declared in advance as shown only, such as the knob's own setting; counted in no total. "
       "Grey.", [(RD, "SHOWN = \"shown, not judged\"                 # declared in advance as shown only")], aka=["shown, not judged"]),
-    T("the 0.5% floor", R, "A change under half of one percent (0.5%) either way, in every run, reads EVEN, under the floor; the "
-      "row keeps its measured size. A change of 0.5% or more either way is a change and never reads EVEN: it reads GAIN, LOSS or "
-      "power given by the gauge's aim, with the count of runs clear of the noise beside the word. The floor is the founder's "
-      "order of 20 October 2026; that a change of 0.5% or more always shows its word, his order of 24 October.",
-      [(RD, "a change under half of one percent (0.5%) either way, in"),
-       (RD, "or more is a change and never reads EVEN (the founder's order of 24 October 2026)")],
+    T("the 0.5% floor", R, "A change of half of one percent (0.5%) or more either way is a change: GAIN, LOSS or power given by "
+      "what the gauge is for. The change is the mean of the three runs' changes, each in percent of native; a mean under 0.5% "
+      "reads EVEN, under the floor, with its size. The floor is the founder's order of 20 October 2026; that every change of "
+      "0.5% or more shows its word, his order of 24 October.",
+      [(RD, "percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge "),
+       (RD, "A mean under 0.5% reads **EVEN, under the floor**, with its size.")],
       aka=["the floor", "under the floor", "0.5%"]),
     T("the sign beside a word", R, "The number next to a word carries the word's sign, never the gauge's raw direction: GAIN +, "
       "LOSS −, EVEN =, power given +. A bill cut 3% reads GAIN +3%; failed requests up 2% read LOSS −2%.",
@@ -767,11 +768,10 @@ TERMS = [
     T("modelled", P, "The word for our own models (class S) in every report; live software is the real thing (class L); a meter is "
       "class P.", [(CL, "they are \"modelled\" (class S)")], aka=["modelled", "our own models"]),
     T("three runs A, B and C", P, "Each benchmark runs three times as separate GitHub runs, A, B and C, on the same frozen engine. "
-      "Only the runs that moved 0.5% or more decide a reading's direction; \"GAIN in all three of our runs\" means all three "
-      "moved 0.5% or more the same way with every 95% interval clear of zero, and otherwise the word carries how many runs moved "
-      "and how many were clear of the noise. Run and scored by The Omni-Compass LLC's own code; no outside party has reviewed or "
-      "approved these results.",
-      [(RD, "A reading is decided over our three runs, A, B and C. Only the runs that moved 0.5% or more decide its direction"),
+      "\"GAIN in all three of our runs\" means A, B and C moved the same way with every 95% interval clear of zero; otherwise "
+      "a change of 0.5% or more reads by the mean of our three runs, with the count of runs beyond the noise. Run and scored by "
+      "The Omni-Compass LLC's own code; no outside party has reviewed or approved these results.",
+      [(RD, "**GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, "),
        ("tools/confirm_abc.py", "one v1 benchmark run three times as separate GitHub runs on the same")],
       aka=["A, B and C", "three runs", "all three of our runs"]),
     T("the 95% interval on Student's t", P, "Every interval is the two-sided 95% point of Student's t for its degrees of freedom, "
@@ -908,24 +908,63 @@ TERMS = [
       "belongs to native's side wear it, the founder's order of 24 October. Red is only a LOSS and the alarm.",
       [(PAGE_F, "the sides: --brass is Omni-Compass (blue), --steel is Native (orange, the founder's order of 24 October; red is only LOSS and the alarm)"),
        (MAN, "| Orange | native |")], aka=["orange"]),
-    T("the heartbeat's five buttons", D, "On the page the governor's full decision comes at one of five beats, 15, 30, 60, 90 or "
-      "120 s, and no other; the stock beat is the engine's own. The sweep runs the page's own model at every beat and shows what "
-      "each buys and costs; the fast checks and native's own check go on underneath at every beat.",
-      [(PAGE_F, "the heartbeat (15, 30, 60, 90 or 120 s)")], aka=["heartbeat buttons", "the five beats"]),
-    T("lock the tune", D, "The main control panel's lock: the heartbeat and every knob of the mechanism held as set, so nothing "
-      "turns them until the tune is unlocked. A locked tune is a variation of the mechanism (class S) unless it is the factory's.",
-      [(PAGE_F, "Lock the tune"), (PAGE_F, "every knob of the mechanism held as set")], aka=["locked tune", "the lock"]),
-    T("stock", D, "The engine as it ships, Omni-Compass on, every knob of the mechanism and the heartbeat on their stock settings. "
-      "Unlocking the tune hands every knob back to stock.",
-      [(PAGE_F, "unlocked to stock: the engine as it ships, every knob of the mechanism and the heartbeat back to their stock settings, Omni-Compass still on")],
-      aka=["stock", "Unlock to stock", "unlock to stock"]),
+    T("the heartbeat's six buttons", D, "On the page the governor's full decision comes at one of six beats, 10, 15, 30, 60, 90 or "
+      "120 s; 10 s shows a beat below the 15 s standard. The factory's beat is the engine's own (60 s on omni-v19). The page's "
+      "live model steps every 15 s, so at 10 s two full decisions land in every other step, both on that step's reading.",
+      [(PAGE_F, "the heartbeat (10, 15, 30, 60, 90 or 120 s)"), (FP, "Δ ∈ {10, 15, 30, 60, 90, 120} s")],
+      aka=["heartbeat buttons", "the six beats", "the five beats"]),
+    T("governing engine", A, "The executable mathematical rules that turn observations and internal state into governing decisions.",
+      [(FP, "The executable mathematical rules that turn observations and internal state into governing decisions.")],
+      aka=["governing engine", "the governing engine"]),
+    T("native baseline", A, "The system's documented configuration and behaviour with no Omni-Compass governing it: every muscle "
+      "under its own native controller, as its vendor ships it.",
+      [(FP, "The system's documented configuration and behaviour with no Omni-Compass governing it")], aka=["native baseline"]),
+    T("factory profile", D, "The complete, versioned set of Omni-Compass default settings shipped together: the governing rules, "
+      "gains, margins, decision interval and every other default. Selected after the mechanisms are verified, candidates are tested "
+      "together and the choice is validated on fresh workloads; frozen at release, while the engine's state, commands and "
+      "allocations go on responding. Today's is omni-v19's; the best validated factory profile is not yet established.",
+      [(FP, "The complete, versioned set of Omni-Compass default settings shipped together."),
+       (FP, "Freezing the factory profile fixes the released rules and default tuning.")], aka=["factory profile", "the factory profile"]),
+    T("candidate profile", D, "A proposed combination of settings under evaluation; on the page, the best beat of a sweep with the "
+      "factory's other knobs (\"Try the candidate\"). It becomes a factory profile only after validation and a new release.",
+      [(FP, "A proposed combination of settings under evaluation."), (PAGE_F, "Try the candidate")], aka=["candidate profile", "candidate"]),
+    T("active profile", D, "The settings actually governing the current run, named on the page as factory, candidate or custom with "
+      "its fingerprint.", [(FP, "The settings actually governing the current run.")], aka=["active profile"]),
+    T("custom profile", D, "An identifiable configuration that differs from the released factory profile; its fingerprint names it "
+      "and its results are its own.", [(FP, "An identifiable configuration that differs from the released factory profile.")],
+      aka=["custom profile"]),
+    T("live tuning bench", W, "The interface that operates the engine's controls and displays their effects through the connected "
+      "backend: the live engine's main control panel.",
+      [(FP, "The interface that operates the engine's controls and displays their effects through the connected backend.")],
+      aka=["tuning bench", "the bench"]),
+    T("harness", P, "The machinery that supplies workloads, executes comparisons, checks requirements and records results.",
+      [(FP, "The machinery that supplies workloads, executes comparisons, checks requirements and records results.")], aka=["harness"]),
+    T("defensive system", B, "Constraint enforcement, fault detection, containment, recovery and restoration: the bone and the twins, "
+      "the lease's walk back, the kill switch.", [(FP, "Constraint enforcement, fault detection, containment, recovery and restoration.")],
+      aka=["defensive system"]),
+    T("health", R, "The explicit operating requirements: correctness, service limits, resource bounds and every applicable hardware "
+      "limit.", [(FP, "The explicit operating requirements: correctness, service limits, resource bounds and every applicable hardware limit.")],
+      aka=["health"]),
+    T("Restore factory profile", D, "The control that reapplies the released Omni-Compass configuration: every knob of the mechanism "
+      "and the heartbeat back to the factory's, Omni-Compass still on.",
+      [(FP, "| Restore factory profile | Reapply the released Omni-Compass configuration. |"), (PAGE_F, "Restore factory profile")],
+      aka=["Restore factory profile"]),
+    T("Return to native", D, "The control that hands governance back and restores the recorded native settings, as the adapter "
+      "supports.", [(FP, "| Return to native | Hand governance back and restore the recorded native settings, as the adapter supports. |")],
+      aka=["Return to native"]),
+    T("actuation feedback", W, "Each decision's requested settings, those that landed as asked, those held at a muscle's limit, and "
+      "those still moving toward their setting; requested, commanded and acknowledged settings are kept distinct.",
+      [(FP, "so the requested, the commanded and"), (PAGE_F, "actuation, this decision")], aka=["actuation"]),
+    T("the bill of a route", R, "C(r, a) = Σₖ c(r, a, k), the sum of a route's cost components inside the declared boundary, and "
+      "the saving S(r, a) = (C(r, native) − C(r, a)) / C(r, native); a component with no recorded price leaves the total unresolved.",
+      [(FP, "C(r, a) = Σₖ c(r, a, k),"), (FP, "S(r, a) = (C(r, native) − C(r, a)) / C(r, native),")], aka=["the bill", "deployment route"]),
     T("Omni-Compass's blue", W, "Blue (#4e97d1, the page's --brass and --omni): Omni-Compass's side and its name; on a reading, "
       "blue always means power given. While the master switch is OFF, Omni-Compass's side follows native in a lighter tint of "
       "native's own colour.",
       [(PAGE_F, "the sides: --brass is Omni-Compass (blue)"), (MAN, "| Blue | Omni-Compass; on a reading, power given |"),
        (PAGE_F, "OFF at the master switch: every Omni-Compass side is drawn in native's own colour, a lighter tint of it")],
       aka=["blue"]),
-    T("direct's violet", W, "Violet (#b48ef0, the page's --direct): Omni-Compass direct, the third arm, Omni-Compass alone on the "
+    T("direct's violet", W, "Violet (#c77dff, the page's --direct): Omni-Compass direct, the third arm, Omni-Compass alone on the "
       "muscles; never a reading's colour.",
       [(PAGE_F, "Omni-Compass direct, the third arm (Omni-Compass alone on the muscles): violet, never a reading's colour")],
       aka=["violet"]),

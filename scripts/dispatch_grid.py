@@ -44,10 +44,10 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "results" / "grid_v18" / "DISPATCHED.json"
+MANIFEST = ROOT / "results" / "grid_v19" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-24T02:51:00Z"  # only this campaign, omni-v18 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
-ENGINE = "omni-v18"                 # the engine whose grid this is (tools/omni_version.py)
+SINCE = "2026-10-24T16:54:55Z"  # only this campaign, omni-v19 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
+ENGINE = "omni-v19"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
 RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
 TIERS = (10, 100, 1000)             # smaller prefixes first
@@ -106,7 +106,7 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "2026-10-24T02:51:00Z"   # omni-v18: every benchmark runs again from the moment the engine reached main (24 October, 02:51 UTC)
+RERUN_SINCE = "2026-10-24T16:54:55Z"   # omni-v19: every benchmark runs again from a little after the moment the engine landed on main (24 October)
 # the kind rig as amended on 18 October (scripts/kind_bench.sh pulls the served image onto every worker before each arm,
 # docs/POD_START_WAIT.md): a run of a workflow that builds a kind cluster counts only when its own commit carries the
 # pre-puller (RIG_FILE, read from GitHub at the run's head commit), so no table mixes the two rigs and no run is counted on
@@ -129,8 +129,8 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
 # (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-24T02:51:00Z"   # omni-v18: every Azure set runs again on the engine that stands; the sets of earlier engines already
-                                       # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v18 table
+AZURE_SINCE = "2026-10-24T16:54:55Z"   # omni-v19: every Azure set runs again on the engine that stands; the sets of earlier engines already
+                                       # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v19 table
 AZURE_WF = "aks-metered.yml"
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
           ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
@@ -599,8 +599,8 @@ ENGINE_FILE = f"OMNI_V{ENGINE.rsplit('v', 1)[1]}.json"   # the standing engine's
 
 def on_engine(sha, seen):
     """True when the commit carries the standing engine's fingerprint file, so a run counts in this campaign only where it ran
-    the engine that stands (24 October: omni-v18's campaign opened at 21:19 UTC on 23 October, the engine reached main at 02:51
-    UTC on 24 October, and the runs started between counted as omni-v18's while they ran omni-v17's commits; the tables they
+    the engine that stands (24 October: an engine's campaign opened at 21:19 UTC on 23 October, the engine reached main at 02:51
+    UTC on 24 October, and the runs started between counted as its runs while they ran the engine before it; the tables they
     made held two engines)."""
     return carries(sha, ENGINE_FILE, seen)
 

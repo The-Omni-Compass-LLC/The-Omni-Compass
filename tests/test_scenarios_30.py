@@ -101,7 +101,7 @@ class Reading(unittest.TestCase):
         self.assertTrue(S.three_run(self.runs(-5, -6, -7), LOWER).strip("*").startswith("GAIN in all three"))
         self.assertTrue(S.three_run(self.runs(5, 6, 7), SPENT).strip("*").startswith("power given in all three"))
         # a change of 0.5% or more shows its word, with how many runs were clear of the noise (the founder's order of 24 October)
-        self.assertEqual(S.three_run(self.runs(5, 0.5, 7), HIGHER), "**GAIN** (the same way in all three runs; 2 of 3 clear of the noise)")
+        self.assertEqual(S.three_run(self.runs(5, 0.5, 7), HIGHER), "**GAIN by the mean of our three runs, beyond the noise in 2 of 3**")
         self.assertTrue(S.three_run(self.runs(0.3, 0.2, 0.4, half=0.1), HIGHER).startswith("EVEN, under the floor"))
         self.assertEqual(S.three_run(self.runs(5, -6, 7), HIGHER).strip("*"), DISAGREE)
         self.assertTrue(S.three_run(self.runs(0, 0, 0, half=0), HIGHER).startswith("EVEN, the same"))

@@ -262,9 +262,10 @@ def organism_job(args):
 
 # ------------------------------------------------------------------------------------------------------------- the reading
 def three_run(runs, aim_):
-    """The key's three-run reading of one gauge (tools/readings.py stack_reading: GAIN, LOSS or power given in all three of
-    our runs by the gauge's aim, EVEN the same, EVEN no difference beyond the noise, the runs disagree), with the founder's
-    half-percent floor (in_all_three with the largest run's change) where the reference is not zero."""
+    """The key's three-run reading of one gauge (tools/readings.py stack_reading, the founder's rule of 24 October: GAIN, LOSS or
+    power given in all three of our runs, or by the mean of our three runs with the count beyond the noise, by the gauge's aim;
+    EVEN under the floor or the same; the runs disagree), with the half-percent floor (in_all_three with the largest run's
+    change) where the reference is not zero."""
     rs = [{"native": r["base"], "diff": r["diff"], "significant": r["lo"] > 0 or r["hi"] < 0} for r in runs]
     reading = stack_reading(rs, aim_, SAME_REL)
     if IN_ALL_THREE in reading and all(r["base"] for r in runs):

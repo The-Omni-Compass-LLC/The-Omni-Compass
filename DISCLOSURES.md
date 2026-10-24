@@ -101,6 +101,15 @@ is the live engine, when a person turns its knobs away from the factory tune (th
 to watch the system react and the brain hold or recover: that showing is the proof that the mechanism can be broken only by
 leaving it, and a changed tune's readings are the licensee's own.
 
+**The factory profile, and the profile that comes next.** The factory tune is one complete configuration profile, the factory
+profile: every governing rule, gain, margin, decision interval and default setting shipped together, versioned and fingerprinted.
+Today's is omni-v19's. The best validated factory profile for the declared operating conditions is not yet established: it is
+chosen only after every mechanism is verified, every knob combination is tested together on development workloads, and the choice
+is validated on fresh ones; then it is frozen, carried into every implementation (the C++ harness included) and released under its
+own identity. Until then no other profile is presented as the baseline; on the live engine a candidate is evaluated, never
+released, and a custom profile's readings are its own. The words, the mathematics and the bill's arithmetic are written once in
+`docs/FACTORY_PROFILE.md`.
+
 ## 4. The wiring declaration
 
 **THE PUBLISHED BENCHMARKS ARE THE RECORD OF WHAT OMNI-COMPASS DID ON THE SYSTEMS, LOADS AND ENGINE THEY NAME, EACH WITH ITS EVIDENCE CLASS. WHERE A RESULT ON ANY OTHER SYSTEM DIFFERS FROM THEM, OR ANYTHING LOOKS WRONG, THE FIRST PRESUMPTION IS THE WIRING, THE SETTINGS, OR HOW OMNI-COMPASS WAS IMPLEMENTED OR READ, NOT THE LAW. CHECK THOSE FIRST (THE MANUAL'S "WIRED RIGHT OR WIRED WRONG") BEFORE DRAWING ANY CONCLUSION ABOUT OMNI-COMPASS.**

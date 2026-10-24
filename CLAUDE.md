@@ -363,6 +363,27 @@ the founder overrides one in the conversation.
 
 ## Orders of 24 October
 
+- **One factory profile, found and then frozen; the live engine its tuning bench** (the founder's words of 24 October, late night:
+  "once every knob is tuned for every organism ... lock that as its package tuned one setting system engine ... anybody can tweak
+  and turn anything ... We ain't got to the basic yet. You just keep building it right, and we will sim it sooner or later once I
+  know all the mechanisms are right"; then his master specification, the same night). The common language is written once,
+  `docs/FACTORY_PROFILE.md`: the governing engine, its muscle adapters, the complete configuration profile and the validation
+  harness; the factory, candidate, active and custom profiles; the mathematics of a fixed tune governing a changing system
+  (θ(k + 1) = θ(k) = θ_factory while x, z and u change); the two objectives (the most healthy production; the least cost per
+  unit of completed production); the eight steps that establish **the best validated factory profile for the declared operating
+  conditions**; the contract every implementation (Python, C++, the browser) shares; and the two restoring controls, Restore
+  factory profile and Return to native. No profile is locked as the baseline before those steps: the released factory profile
+  (omni-v19's) stands, the live engine names the active profile (factory, candidate or custom, with its fingerprint), and a
+  candidate is evaluated, never released, until it is validated and declared.
+- **Red only as a stop sign** (the founder's words: "That red sign is never to be a circle. It is an eight stop sign shape
+  octagon ... The yield is the diamond ... the circle is green only everywhere it lives"). Every red light and red mark is an
+  octagon (a red word is shaped as a stop sign, white on red), every yellow one a yield diamond, every green one round, on every
+  monitor, badge, breaker and canvas (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`).
+- **Six heartbeat buttons: 10, 15, 30, 60, 90 and 120 s** (the founder's words: "We need that 10 because we need to show less
+  than what's already standard"). The factory's beat stays the engine's own until the sims and the founder choose the next.
+- **The bill is the sum of the costs** (the master specification): for each deployment route, on site and through the cloud,
+  C(r, a) = Σₖ c(r, a, k) inside the declared boundary and S(r, a) = (C(r, native) − C(r, a)) / C(r, native); a component's
+  percentage is a supporting measurement; a missing price or an incomplete workload stays visibly unresolved.
 - **Every change of 0.5% or more is a change** (the founder's words: "Any gauge that gives anything over a 0.5 percent change
   either way is a change. I don't want to see even on shit that shows a 0.5% change up or down ... Not everything can just stay
   even ... because it's 2-3% away. That's not even"; and "You have to interpretate the muscle and what it's doing to know if a
