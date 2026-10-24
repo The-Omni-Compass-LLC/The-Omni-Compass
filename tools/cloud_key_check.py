@@ -163,17 +163,75 @@ def azure_problems(raw: str | None) -> list[str]:
     return out
 
 
+# Azure's four boxes (24 October): the same login typed one value to a box, as the portal shows each value on its own, so no
+# block is assembled by hand. The three IDs are the boxes the sign-in without a password already reads (docs/AZURE_SETUP.md,
+# section 8); the password is AZURE_CLIENT_SECRET, or AZURE_CREDENTIALS when that box holds a password's value alone.
+AZURE_BOXES = (("AZURE_CLIENT_ID", "clientId", "the Application (client) ID"),
+               ("AZURE_TENANT_ID", "tenantId", "the Directory (tenant) ID"),
+               ("AZURE_SUBSCRIPTION_ID", "subscriptionId", "the Subscription ID"))
+
+
+def _secret_value(s: str) -> bool:
+    """A client secret's value as the portal's Value column gives it: one line of 30 to 48 characters, no spaces, no { },
+    and not an ID (the Secret ID column beside it is a 36-character GUID, never the password; a storage account's key is
+    88 characters)."""
+    return bool(s) and not _guid(s) and not s.startswith("{") and " " not in s and "\n" not in s and 30 <= len(s) <= 48
+
+
+def azure_login(env) -> tuple[str | None, str, list[str]]:
+    """The block azure/login's creds takes, from AZURE_CREDENTIALS whole or from the four boxes: (block, where it came from,
+    problems). Every problem names a box and what is wrong with its shape, never a character of it."""
+    raw = (env.get("AZURE_CREDENTIALS") or "").strip()
+    one = azure_problems(raw)
+    if not one:
+        return json.dumps(json.loads(raw), separators=(",", ":")), "AZURE_CREDENTIALS, the whole block", []
+    secret = (env.get("AZURE_CLIENT_SECRET") or "").strip()
+    secret_box = "AZURE_CLIENT_SECRET"
+    if not secret and _secret_value(raw):
+        secret, secret_box = raw, "AZURE_CREDENTIALS"
+    four, block = [], {}
+    for box, field, what in AZURE_BOXES:
+        v = (env.get(box) or "").strip()
+        if not v:
+            four.append(f"{box} is empty (it takes {what}, a 36-character ID)")
+        elif not _guid(v):
+            four.append(f"{box} is not a 36-character ID ({len(v)} characters stored; it takes {what})")
+        else:
+            block[field] = v
+    if not secret:
+        four.append("AZURE_CLIENT_SECRET is empty (it takes the password's Value from Certificates & secrets, about 40 "
+                    "characters)")
+    elif _guid(secret):
+        four.append(f"{secret_box} holds a 36-character ID, not a password: on Certificates & secrets copy the Value column, "
+                    "never the Secret ID beside it")
+    elif not _secret_value(secret):
+        four.append(f"{secret_box} is not a password's value ({len(secret)} characters stored, {n_lines(secret)} line(s))")
+    else:
+        block["clientSecret"] = secret
+    if not four:
+        block = {f: block[f] for f in AZURE_FIELDS}
+        return json.dumps(block, separators=(",", ":")), f"the four boxes (the password from {secret_box})", []
+    return None, "", ["AZURE_CREDENTIALS: " + "; ".join(one), "the four boxes: " + "; ".join(four)]
+
+
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
     if args[:1] == ["azure"]:
-        bad = azure_problems(os.environ.get("AZURE_CREDENTIALS"))
-        if not bad:
-            print("AZURE_CREDENTIALS: the whole block, its four fields present")
+        block, where, bad = azure_login(os.environ)
+        if block:
+            print(f"Azure's login: whole, from {where}")
+            out = os.environ.get("GITHUB_ENV")
+            if out:
+                # the next step's azure/login reads it as env.AZ_CREDS; masked first, so no log line can carry it
+                print(f"::add-mask::{block}")
+                with open(out, "a", encoding="utf-8") as fh:
+                    fh.write(f"AZ_CREDS={block}\n")
             return 0
         for b in bad:
-            print(f"::error::AZURE_CREDENTIALS: {b}. Nothing built, nothing billed. Store it again, whole: docs/AZURE_SETUP.md, "
-                  "section 7 (make a new block under a new name in Azure's own terminal, copy everything from { to }, and "
-                  "paste it as the secret's new value).")
+            print(f"::error::{b}.")
+        print("::error::Nothing built, nothing billed. Fill either way (docs/AZURE_SETUP.md, section 7): the four boxes, one "
+              "value each, from the app's Overview page, its Certificates & secrets and the subscription; or "
+              "AZURE_CREDENTIALS with the whole block from { to }.")
         return 2
     bad = problems(os.environ.get("GCP_CREDENTIALS"), os.environ.get("GCP_PROJECT", ""))
     if not bad:

@@ -67,9 +67,31 @@ and delete the `AZURE_CREDENTIALS` secret in GitHub.
 ## 7. When Azure's check says the key is not whole
 
 Every Azure set, and the conductor's own check at no cost (the run **cloud-check azure** on the **Actions** tab), reads the
-shape of `AZURE_CREDENTIALS` before Azure's login and says what is wrong without printing a character of it: that it does not
-start with `{`, that it holds a client secret's value alone, that it was cut short, or which field is missing. Store it again,
-whole:
+shape of the login before Azure's login and says what is wrong without printing a character of it: that a box is empty, that
+it holds an ID where a password goes, that it was cut short, or which field is missing.
+
+### 7a. The four boxes, one value each (the simplest way)
+
+Since 24 October the login can be stored one value to a box, exactly as the portal shows each value, with nothing to type
+around it. The check builds the block from them; the boxes are read only when `AZURE_CREDENTIALS` does not hold the whole
+block. All four values come from the same app.
+
+1. In the Azure portal, search **App registrations**, click **All applications**, and open the app (or **+ New
+   registration**, name `omni-compass-github-2`, **Register**). Its **Overview** shows three numbers; skip **Object ID**.
+2. On GitHub, open **https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/settings/secrets/actions**. For each box
+   below, click its pencil (or **New repository secret** if it is not listed), paste the one value, and save:
+   - `AZURE_CLIENT_ID`: the app's **Application (client) ID**.
+   - `AZURE_TENANT_ID`: the app's **Directory (tenant) ID**.
+   - `AZURE_SUBSCRIPTION_ID`: search **Subscriptions** in the portal, open yours, copy its **Subscription ID**.
+   - `AZURE_CLIENT_SECRET`: on the app, **Certificates & secrets**, **+ New client secret**, **Add**, then copy the
+     **Value** column at once (about 40 characters; Azure shows it once). Never the **Secret ID** beside it: that is
+     another 36-character number, not a password.
+3. Let the app build machines: **Subscriptions**, yours, **Access control (IAM)**, **+ Add**, **Add role assignment**,
+   **Privileged administrator roles**, **Contributor**, **Next**, **+ Select members**, the app's name, **Select**,
+   **Review + assign**.
+4. Leave `AZURE_CREDENTIALS` as it is or empty it; while it is not the whole block, the four boxes are used.
+
+### 7b. The one box, the whole block
 
 A set already running keeps the key it started with: on 24 October the steady set started on 19 October was still signing in
 at every repetition while new runs read 88 characters in the box (the size of a storage account's access key, not the block).
@@ -116,8 +138,9 @@ older way. One rule with the exact name makes it work:
 
 The benchmark sets keep the key of section 3. A sign-in without a password holds for about an hour and cannot renew itself
 inside a job, while one Azure repetition runs about 70 minutes and must still be signed in at its end to delete what it built;
-a lapsed sign-in there could leave machines running and billing. So the sets, and Azure's $0 check that clears them, read only
-`AZURE_CREDENTIALS`, and nothing is started while that key is not whole (section 7).
+a lapsed sign-in there could leave machines running and billing. So the sets, and Azure's $0 check that clears them, sign in
+with a password: `AZURE_CREDENTIALS` whole, or the four boxes of section 7a (the three IDs here and `AZURE_CLIENT_SECRET`),
+and nothing is started while neither is whole.
 
 ---
 

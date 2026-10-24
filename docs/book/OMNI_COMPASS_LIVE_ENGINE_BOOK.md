@@ -938,8 +938,9 @@ every quota), at no cost. The monitor shows a failed check as the cloud's status
 cut short (the stored secret shorter than a whole key file) is stored again whole (`docs/GOOGLE_SETUP.md`, section 4); an Amazon
 account on the Free plan, whose organization policy denies every machine read, is moved to the Paid plan
 (`docs/AMAZON_SETUP.md`, section 1a); an Azure key stored in another form than the whole block from `{` to `}` (a client
-secret's value alone, or a storage account's access key, for two) is stored again whole under a new name, which leaves a
-running set's login untouched (`docs/AZURE_SETUP.md`, section 7; Azure joined the check on 22 October). Nothing is built and nothing is billed until the check passes.
+secret's value alone, or a storage account's access key, for two) is stored again: one value to each of four boxes, or the
+whole block under a new name, which leaves a running set's login untouched (`docs/AZURE_SETUP.md`, section 7; Azure joined the
+check on 22 October). Nothing is built and nothing is billed until the check passes.
 
 
 ## 11. The Orchestrators and Governors

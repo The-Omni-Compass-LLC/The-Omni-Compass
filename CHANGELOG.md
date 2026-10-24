@@ -4,6 +4,15 @@
 
 ## 2026-10-24: the clouds' keys read to the letter of their shape
 
+- **Azure's login in four boxes, one value each** (the founder pasting the portal's numbers one at a time): the Azure sets and
+  Azure's $0 check sign in with `AZURE_CREDENTIALS` when it holds the whole block, or else with the block built from four boxes,
+  each holding one value as the portal shows it: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (the boxes the
+  sign-in without a password already reads) and `AZURE_CLIENT_SECRET` (or the password's value alone in `AZURE_CREDENTIALS`).
+  `tools/cloud_key_check.py azure` builds it, masks it and hands it to the login as `env.AZ_CREDS`; every failure names the box
+  and what is wrong with its shape (an empty box, an ID where the password goes, the Secret ID copied for the Value), never a
+  character of it. All nine logins with a password read it (`tests/test_cloud_check.py`); `docs/AZURE_SETUP.md` section 7a
+  gives the clicks.
+
 - **What the Azure box holds, named** (the founder's order: "if they don't run, you better dig in ... and find out why. So I can
   fix them"): Azure's own login still works (the steady set started on 19 October signed in at its repetition 99, 02:46 UTC on 24
   October, and carries the key it started with), while every new run reads 88 characters in `AZURE_CREDENTIALS`, the size of a

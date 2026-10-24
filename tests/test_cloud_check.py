@@ -148,9 +148,75 @@ class AzureKeyShape(unittest.TestCase):
                         prev = steps[k - 1]
                         with self.subTest(workflow=f.name, job=name):
                             self.assertIn("cloud_key_check.py azure", str(prev.get("run", "")))
-                            self.assertEqual(prev.get("env", {}).get("AZURE_CREDENTIALS"), "${{ secrets.AZURE_CREDENTIALS }}")
+                            for box in ("AZURE_CREDENTIALS", "AZURE_CLIENT_ID", "AZURE_TENANT_ID", "AZURE_SUBSCRIPTION_ID",
+                                        "AZURE_CLIENT_SECRET"):
+                                self.assertEqual(prev.get("env", {}).get(box), "${{ secrets.%s }}" % box)
+                            # the login reads the block the check wrote, from the one box or the four
+                            self.assertEqual(given.get("creds"), "${{ env.AZ_CREDS }}")
                             self.assertEqual(prev.get("if"), s.get("if"))       # skipped exactly when the login is
         self.assertGreaterEqual(seen, 9)      # the nine logins with the key (the inventory signs in without one since 23 October)
+
+
+AZ_IDS = {"AZURE_CLIENT_ID": "0b1c2d3e-1111-2222-3333-444455556666", "AZURE_TENANT_ID": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+          "AZURE_SUBSCRIPTION_ID": "11111111-2222-3333-4444-555555555555"}
+
+
+class AzureFourBoxes(unittest.TestCase):
+    """24 October: the login typed one value to a box, as the portal shows each value, so no block is assembled by hand."""
+
+    def test_the_whole_block_still_wins(self):
+        block, where, bad = cloud_key_check.azure_login({"AZURE_CREDENTIALS": az_block()})
+        self.assertEqual(bad, [])
+        self.assertEqual(json.loads(block)["clientSecret"], AZ_SECRET)
+        self.assertIn("whole block", where)
+
+    def test_four_boxes_make_the_block(self):
+        block, where, bad = cloud_key_check.azure_login(dict(AZ_IDS, AZURE_CLIENT_SECRET=AZ_SECRET))
+        self.assertEqual(bad, [])
+        self.assertEqual(json.loads(block), {"clientId": AZ_IDS["AZURE_CLIENT_ID"], "clientSecret": AZ_SECRET,
+                                             "subscriptionId": AZ_IDS["AZURE_SUBSCRIPTION_ID"],
+                                             "tenantId": AZ_IDS["AZURE_TENANT_ID"]})
+        self.assertIn("four boxes", where)
+
+    def test_the_password_alone_in_the_one_box_with_the_three_ids(self):
+        block, where, bad = cloud_key_check.azure_login(dict(AZ_IDS, AZURE_CREDENTIALS=AZ_SECRET))
+        self.assertEqual(bad, [])
+        self.assertIn("AZURE_CREDENTIALS", where)
+
+    def test_each_wrong_box_is_named_without_a_character_of_it(self):
+        cases = [(dict(AZ_IDS, AZURE_CREDENTIALS=AZ_IDS["AZURE_CLIENT_ID"]), "AZURE_CLIENT_SECRET is empty"),
+                 (dict(AZ_IDS, AZURE_CLIENT_SECRET="99999999-8888-7777-6666-555555555555"), "never the Secret ID"),
+                 ({"AZURE_CLIENT_SECRET": AZ_SECRET}, "AZURE_CLIENT_ID is empty"),
+                 (dict(AZ_IDS, AZURE_TENANT_ID="contoso", AZURE_CLIENT_SECRET=AZ_SECRET), "AZURE_TENANT_ID is not a 36-character ID"),
+                 (dict(AZ_IDS, AZURE_CREDENTIALS="Ab9+" * 21 + "Xy=="), "storage account's access key")]
+        for env, words in cases:
+            with self.subTest(words=words):
+                block, _, bad = cloud_key_check.azure_login(env)
+                self.assertIsNone(block)
+                said = " ".join(bad)
+                self.assertIn(words, said)
+                for piece in (AZ_SECRET[:10], "0b1c2d3e", "aaaaaaaa", "11111111", "99999999"):
+                    self.assertNotIn(piece, said)
+
+    def test_the_program_writes_the_masked_block_for_the_login(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "env"
+            env = dict(os.environ, GITHUB_ENV=str(out), AZURE_CREDENTIALS="", AZURE_CLIENT_SECRET=AZ_SECRET, **AZ_IDS)
+            run = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env,
+                                 capture_output=True, text=True)
+            self.assertEqual(run.returncode, 0, run.stdout)
+            written = out.read_text()
+            self.assertTrue(written.startswith("AZ_CREDS={"))
+            self.assertEqual(json.loads(written.split("=", 1)[1])["clientSecret"], AZ_SECRET)
+            # the only line that carries it is the mask command, which the runner swallows
+            shown = [ln for ln in run.stdout.splitlines() if AZ_SECRET in ln]
+            self.assertTrue(shown and all(ln.startswith("::add-mask::") for ln in shown))
+            bad = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"],
+                                 env=dict(os.environ, AZURE_CREDENTIALS="0b1c2d3e-1111-2222-3333-444455556666"),
+                                 capture_output=True, text=True)
+            self.assertEqual(bad.returncode, 2)
+            self.assertIn("AZURE_CLIENT_SECRET", bad.stdout)
+            self.assertIn("docs/AZURE_SETUP.md", bad.stdout)
 
 
 def fake_bin(d, name, body):
