@@ -57,6 +57,7 @@ jobs:
           [ -n "$LAMBDA_API_KEY" ] || { echo "::error::LAMBDA_API_KEY is not in this repository's secrets."; exit 2; }
           case "$WHICH" in omni-?*) ;; *) echo "::error::give_back must start with omni- (omni-1card-, omni-8card-, or a whole name)."; exit 2;; esac
           python3 scripts/lambda_gpu.py list --prefix "" | sed 's/^/  on the account (every machine, by hand or by a run): /' || true   # read only: what bills now
+          python3 -c "import sys; sys.path.insert(0, 'scripts'); import lambda_gpu as L; [print('  machine:', d.get('id'), '|', d.get('name') or '(no name: launched by hand on Lambda)', '|', d.get('status'), '|', (d.get('instance_type') or {}).get('name'), '|', (d.get('instance_type') or {}).get('price_cents_per_hour'), 'cents an hour |', (d.get('region') or {}).get('name')) for d in L.call('GET', '/instances').get('data', [])]" || true   # read only: type and price of each
           python3 scripts/lambda_gpu.py list | sed 's/^/  listed before: /' || true
           python3 scripts/lambda_gpu.py terminate --prefix "$WHICH" | tee -a "$GITHUB_STEP_SUMMARY"
           python3 scripts/lambda_gpu.py list | sed 's/^/  still listed: /' || true
