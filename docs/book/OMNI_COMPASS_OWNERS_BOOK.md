@@ -599,24 +599,24 @@ installed is a quarter off the bill.
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (more work + fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
   - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +4.3% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v17 and omni-v18, each named in its table): +4.6% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
-  - Real database cache (MongoDB under YCSB, GitHub): +0.2% GAIN
+  - Real database (PostgreSQL behind PgBouncer, GitHub): +1.3% GAIN
+  - Real cache (Redis, GitHub): +0.1% GAIN
   - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real database (PostgreSQL behind PgBouncer, GitHub): =0.0% EVEN
+  - Real database cache (MongoDB under YCSB, GitHub): =0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): =0.0% EVEN
-  - Real cache (Redis, GitHub): +0.1% power given
 
 **On the engine that stands (omni-v18): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +4.3% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v16 | +0.1% | GAIN, power given | L |
-| PostgreSQL, the pooler's pool size | omni-v16 | =0.0% | power given | L |
-| MySQL, the buffer pool's size | omni-v16 | =0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | omni-v16 | +0.2% | GAIN | L |
-| Kafka, the consumer group's size | omni-v16 | +0.1% | GAIN | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v17 and omni-v18 | +4.6% | GAIN, power given | L |
+| Redis, the cache's memory ceiling | omni-v17 and omni-v18 | +0.1% | GAIN, power given | L |
+| PostgreSQL, the pooler's pool size | omni-v17 and omni-v18 | +1.3% | GAIN | L |
+| MySQL, the buffer pool's size | omni-v17 and omni-v18 | =0.0% | EVEN | L |
+| MongoDB, the storage engine's cache size | omni-v17 and omni-v18 | =0.0% | EVEN | L |
+| Kafka, the consumer group's size | omni-v17 and omni-v18 | +0.1% | GAIN | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
@@ -3650,11 +3650,11 @@ cluster.
 
 
 
-Line coverage of every Python file in the engine that stood when it was measured (omni-v17; omni-v18 adds only Omni direct's seven files, measured by their own tests), under the whole test suite: the unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 tools/engine_coverage.py --measure` on commit `32ba6d2f45bd`; `tools/engine_coverage.py --check`, run by `verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.
+Line coverage of every Python file in the engine that stands (omni-v18), under the whole test suite: the unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 tools/engine_coverage.py --measure` on commit `79e60a53bf27`; `tools/engine_coverage.py --check`, run by `verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.
 
-**72% of the engine's 9,763 statements run under the tests** (6,989 run, 2,774 not). Coverage counts lines a test executes, not what it asserts: the properties the tests check are in `tests/test_engine_properties.py`, and the proofs of the core in `docs/ENGINE_PROOFS.md`.
+**70% of the engine's 10,318 statements run under the tests** (7,241 run, 3,077 not). Coverage counts lines a test executes, not what it asserts: the properties the tests check are in `tests/test_engine_properties.py`, and the proofs of the core in `docs/ENGINE_PROOFS.md`.
 
-The 8 runners omni-v15 took into the fingerprint (the data stores', the swarm's, MuJoCo's and the CPU power runner, `tools/run_*.py`) hold 3,106 of these statements, 49% of them run under the tests: each is run whole by its own benchmark on GitHub, A, B and C, rather than by a unit test. The other 38 Python files, the engine as it stood before them, hold 6,657, 82% run. The whole figure fell when those runners came in; no test was lost.
+The 8 runners omni-v15 took into the fingerprint (the data stores', the swarm's, MuJoCo's and the CPU power runner, `tools/run_*.py`) hold 3,106 of these statements, 49% of them run under the tests: each is run whole by its own benchmark on GitHub, A, B and C, rather than by a unit test. The other 42 Python files, the engine as it stood before them, hold 7,212, 79% run. The whole figure fell when those runners came in; no test was lost.
 
 | Engine file | Statements | Run by the tests | Coverage |
 |---|---:|---:|---:|
@@ -3662,6 +3662,7 @@ The 8 runners omni-v15 took into the fingerprint (the data stores', the swarm's,
 | `tools/run_citylearn.py` | 166 | 41 | 25% |
 | `omnicompass/stack_sim.py` | 210 | 55 | 26% |
 | `tools/run_kafka.py` | 373 | 122 | 33% |
+| `omni_orchestrator/control.py` | 476 | 176 | 37% |
 | `omnicompass/closure.py` | 151 | 61 | 40% |
 | `omnicompass/speed.py` | 60 | 25 | 42% |
 | `tools/run_ycsb.py` | 394 | 173 | 44% |
@@ -3677,8 +3678,8 @@ The 8 runners omni-v15 took into the fingerprint (the data stores', the swarm's,
 | `omni_controller/gpu_compass.py` | 295 | 227 | 77% |
 | `tools/run_mujoco.py` | 205 | 165 | 80% |
 | `omnicompass/master.py` | 77 | 63 | 82% |
+| `tools/run_cpu_power.py` | 554 | 474 | 86% |
 | `realms/harness.py` | 413 | 354 | 86% |
-| `tools/run_cpu_power.py` | 554 | 475 | 86% |
 | `omni_controller/quota.py` | 86 | 75 | 87% |
 | `omnicompass/compass.py` | 82 | 75 | 91% |
 | `realms/compass_arm_v5.py` | 838 | 770 | 92% |
@@ -3696,15 +3697,17 @@ The 8 runners omni-v15 took into the fingerprint (the data stores', the swarm's,
 | `omnicompass/compass_law.py` | 95 | 90 | 95% |
 | `realms/compass_arm.py` | 107 | 102 | 95% |
 | `omnicompass/authority_contract.py` | 26 | 25 | 96% |
+| `omni_orchestrator/brain.py` | 58 | 56 | 97% |
 | `realms/gpu_card.py` | 172 | 167 | 97% |
 | `omnicompass/verdict.py` | 109 | 108 | 99% |
+| `omni_orchestrator/scheduler.py` | 21 | 21 | 100% |
 | `omnicompass/ce_score.py` | 7 | 7 | 100% |
 | `omnicompass/nervous_system.py` | 65 | 65 | 100% |
 | `realms/presets.py` | 41 | 41 | 100% |
 
 ### 29.1 Where the tests reach least
 
-Files under 60%: `tools/run_pgbench.py`, `tools/run_citylearn.py`, `omnicompass/stack_sim.py`, `tools/run_kafka.py`, `omnicompass/closure.py`, `omnicompass/speed.py`, `tools/run_ycsb.py`, `omnicompass/mathdrive.py`, `tools/run_redis.py`, `tools/run_sysbench.py`, `omnicompass/shield.py`, `tools/run_swarm.py`. The CityLearn runner and the runners of the data stores and the swarm are exercised by their own benchmarks on GitHub (`citylearn.yml`, `redis.yml` and the rest, three runs on every engine) rather than by a unit test; the stack simulator, the shield and the speed and mathdrive modules hold paths the live governors do not call. Raising each to the level of the rest is the next tests' work: no engine file changes for a test.
+Files under 60%: `tools/run_pgbench.py`, `tools/run_citylearn.py`, `omnicompass/stack_sim.py`, `tools/run_kafka.py`, `omni_orchestrator/control.py`, `omnicompass/closure.py`, `omnicompass/speed.py`, `tools/run_ycsb.py`, `omnicompass/mathdrive.py`, `tools/run_redis.py`, `tools/run_sysbench.py`, `omnicompass/shield.py`, `tools/run_swarm.py`. The CityLearn runner and the runners of the data stores and the swarm are exercised by their own benchmarks on GitHub (`citylearn.yml`, `redis.yml` and the rest, three runs on every engine) rather than by a unit test; the stack simulator, the shield and the speed and mathdrive modules hold paths the live governors do not call. Raising each to the level of the rest is the next tests' work: no engine file changes for a test.
 
 # Part Three. The Physics: the Compass and the Nervous System
 
@@ -7828,12 +7831,12 @@ Every row names the engine its table ran on (read from the table). Results are n
 
 | Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |
 |---|---|---|---|---:|---|---|
-| 2026-10-24 | Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | **GAIN, power given** | **+4.3% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
-| 2026-10-23 | Redis, the cache's memory ceiling | omni-v16 | **GAIN, power given** | **+0.1% power given** | work inside the line up 1.2% to 1.3% (GAIN); hit rate up 1.2% to 1.3% (GAIN); mean cut 1.7% to 1.8% (GAIN); memory ceiling held up 2.2% to 2.7% (power given); memory used up 1.9% to 2.1% (power given) | `results/live/V16_REDIS.md` |
-| 2026-10-23 | PostgreSQL, the pooler's pool size | omni-v16 | **power given** | **0%: EVEN** | connections most at once up 8% to 10% (power given) | `results/live/V16_PGBENCH.md` |
-| 2026-10-23 | MySQL, the buffer pool's size | omni-v16 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V16_SYSBENCH.md` |
-| 2026-10-23 | MongoDB, the storage engine's cache size | omni-v16 | **GAIN** | **+0.2% GAIN** | cache size held cut 0.8% to 2.2% (GAIN) | `results/live/V16_YCSB.md` |
-| 2026-10-23 | Kafka, the consumer group's size | omni-v16 | **GAIN** | **+0.1% GAIN** | consumers running cut 0.3% to 0.8% (GAIN) | `results/live/V16_KAFKA.md` |
+| 2026-10-24 | Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v17 and omni-v18 | **GAIN, power given** | **+4.6% GAIN** | the six real categories together; each stack's own words are in its row | `results/OMNI_INDEX.md` |
+| 2026-10-24 | Redis, the cache's memory ceiling | omni-v17 and omni-v18 | **GAIN, power given** | **+0.1% GAIN** | memory ceiling held cut 2.2% to 2.3% (GAIN); memory used cut 0.9% to 1.0% (GAIN); work inside the line up 1.1% to 1.3% (GAIN); hit rate up 1.2% to 1.3% (GAIN); memory ceiling held up 2.2% to 2.4% (power given); memory used up 1.9% to 2.1% (power given) | `results/live/V17_REDIS.md` |
+| 2026-10-24 | PostgreSQL, the pooler's pool size | omni-v17 and omni-v18 | **GAIN** | **+1.3% GAIN** | connections held open cut 7% to 11% (GAIN) | `results/live/V17_PGBENCH.md` |
+| 2026-10-24 | MySQL, the buffer pool's size | omni-v17 and omni-v18 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V17_SYSBENCH.md` |
+| 2026-10-24 | MongoDB, the storage engine's cache size | omni-v17 and omni-v18 | **EVEN** | **0%: EVEN** | EVEN: nothing moved the same way in all three of our runs | `results/live/V17_YCSB.md` |
+| 2026-10-24 | Kafka, the consumer group's size | omni-v17 and omni-v18 | **GAIN** | **+0.1% GAIN** | consumers running cut 0.8% (GAIN) | `results/live/V17_KAFKA.md` |
 | 2026-10-20 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | **GAIN, power given** | **+5.3% GAIN** | p95 cut 32% to 52% (GAIN); time over the line cut 8% to 36% (GAIN); replicas up 0.6% (power given); failed requests cut 8.4% to 8.5% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN) | `results/live/V3_SIX_KUBE.md` |
 | 2026-10-20 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | **GAIN** | **+155% GAIN** | p95 cut 95% to 98% (GAIN); p99 cut 97% to 98% (GAIN) | `results/live/V3_BIG_ORGANISM.md` |
 | 2026-10-20 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | **GAIN** | **+0.3% GAIN** | work per energy up 0.3% (GAIN) | `results/realms/REALMS.md` |
@@ -7859,11 +7862,11 @@ Every row names the engine its table ran on (read from the table). Results are n
 
 Where a row sums several workloads, grids, districts, cells or robots, each part with its own number, the same way round:
 
-- **Redis, the cache's memory ceiling**: burst 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); large 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); small +0.3% power given (GAIN, power given: work inside the line up 1.2% to 1.3% (GAIN); hit rate up 1.2% to 1.3% (GAIN); mean cut 1.7% to 1.8% (GAIN); memory ceiling held up 2.2% to 2.7% (power given); memory used up 1.9% to 2.1% (power given)).
-- **PostgreSQL, the pooler's pool size**: select 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); simple_update 0%: EVEN (power given: connections most at once up 8% to 10% (power given)); tpcb_hot 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs).
+- **Redis, the cache's memory ceiling**: burst +0.6% GAIN (GAIN: memory ceiling held cut 2.2% to 2.3% (GAIN); memory used cut 0.9% to 1.0% (GAIN)); large 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); small +0.3% power given (GAIN, power given: work inside the line up 1.1% to 1.3% (GAIN); hit rate up 1.2% to 1.3% (GAIN); memory ceiling held up 2.2% to 2.4% (power given); memory used up 1.9% to 2.1% (power given)).
+- **PostgreSQL, the pooler's pool size**: select +1.8% GAIN (GAIN: connections held open cut 6.6% to 7.3% (GAIN)); simple_update 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); tpcb_hot +2.2% GAIN (GAIN: connections held open cut 7% to 11% (GAIN)).
 - **MySQL, the buffer pool's size**: burst 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); read_only 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); read_write 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); update_index 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs).
-- **MongoDB, the storage engine's cache size**: b 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); burst +0.5% GAIN (GAIN: cache size held cut 1.7% to 2.2% (GAIN)); c 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); f +0.2% GAIN (GAIN: cache size held cut 0.8% to 1.0% (GAIN)).
-- **Kafka, the consumer group's size**: burst +0.2% GAIN (GAIN: consumers running cut 0.8% (GAIN)); heavy +0.1% GAIN (GAIN: consumers running cut 0.3% (GAIN)); light 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs).
+- **MongoDB, the storage engine's cache size**: b 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); burst 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); c 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); f 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs).
+- **Kafka, the consumer group's size**: burst +0.2% GAIN (GAIN: consumers running cut 0.8% (GAIN)); heavy 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); light 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs).
 - **The six organisms with the real cluster inside, 10 and 100 copies**: compute_ai_cloud at 10 copies +14% GAIN (GAIN: p95 cut 50% (GAIN); time over the line cut 32% (GAIN)); physics_robotics_autonomous at 10 copies 0%: EVEN (EVEN: EVEN: nothing moved the same way in all three of our runs); energy_facility_industrial at 10 copies +5.0% GAIN (GAIN, power given: time over the line cut 33% (GAIN); replicas up 0.6% (power given)); distribution_specialized at 10 copies +16% GAIN (GAIN: p95 cut 52% (GAIN); time over the line cut 36% (GAIN)); tower at 10 copies +11% GAIN (GAIN: p95 cut 42% (GAIN); time over the line cut 20% (GAIN); failed requests cut 8.4% (GAIN)); stack at 10 copies +2.8% GAIN (GAIN: time over the line cut 12% (GAIN); failed requests cut 8.5% (GAIN)); compute_ai_cloud at 100 copies +1.3% GAIN (GAIN: time over the line cut 9.8% (GAIN)); physics_robotics_autonomous at 100 copies +1.1% GAIN (GAIN: time over the line cut 8.4% (GAIN)); energy_facility_industrial at 100 copies +2.1% GAIN (GAIN: time over the line cut 15% (GAIN); parked-worker energy cut 0.3% (GAIN); standby-model energy cut 0.3% (GAIN)); distribution_specialized at 100 copies +8.2% GAIN (GAIN: p95 cut 32% (GAIN); time over the line cut 22% (GAIN)); tower at 100 copies +1.3% GAIN (GAIN: time over the line cut 8.7% (GAIN)); stack at 100 copies +2.3% GAIN (GAIN: time over the line cut 15% (GAIN)).
 - **The big organisms with the real cluster inside, 1,000 copies on Azure**: tower at 1000 copies +159% GAIN (GAIN: p95 cut 98% (GAIN); p99 cut 98% (GAIN)); stack at 1000 copies +151% GAIN (GAIN: p95 cut 95% (GAIN); p99 cut 97% (GAIN)).
 - **Robot arms (MuJoCo), the three untouched robots**: kinova_gen3 +12% GAIN (GAIN: energy per takt cut 0.8% (GAIN); copper heating per cycle cut 11% (GAIN); mechanical work per cycle cut 6.6% (GAIN); peak joint torque cut 29% (GAIN); tracking error, RMS cut 21% (GAIN); end-point error at the waypoints cut 11% (GAIN)); kuka_iiwa_14 (left native by the engine's own trial) 0%: EVEN (EVEN: EVEN: nothing moved); universal_robots_ur5e (left native by the engine's own trial) 0%: EVEN (EVEN: EVEN: nothing moved).
@@ -7896,7 +7899,7 @@ The founder's order of 17 October: Omni-Compass is shown on top at every level, 
 | The organism, the stack: the seven organisms under three loads (own load, the climb, work waiting in line) | omni-v8 | S (our model) | 21 | 0 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
 | The cluster: real Kubernetes, native its own HPA and scheduler | omni-v10, omni-v11 | L | 32 | 93 | 4 | 0 | 0 | no LOSS; resources put in shown as power given |
 | The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v10, omni-v11 | L | 17 | 40 | 7 | 0 | 0 | no LOSS; resources put in shown as power given |
-| A muscle inside a running service: database, broker, cache | omni-v16 | L | 19 | 329 | 9 | 0 | 2 | **yes: 2, listed below** |
+| A muscle inside a running service: database, broker, cache | omni-v17 | L | 20 | 331 | 7 | 0 | 1 | **yes: 1, listed below** |
 | A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms | omni-v11 | independent simulator | 113 | 132 | 15 | 0 | 0 | no LOSS; resources put in shown as power given |
 | The organism with the real cluster inside (the grid, at 1, 10, 100 and on GitHub's machines 1,000 copies) | older engines' tables; the grid runs again on the engine that stands | L, the cluster; S, the organism | – | – | – | – | – | no table on the engine that stands yet; the grid's runs (results/grid_v8/) are going |
 | The cluster in a cloud: Azure Kubernetes Service, the bill | single runs, omni-v5 to omni-v7 | L, the bill metered | – | – | – | – | – | no three-run table yet: eight single runs at the tune-down, machines billed −6.5% to +7.6%, every one EVEN; the fleet (about 1.9 of 4 machines busy) leaves no whole machine to give back |
@@ -7928,13 +7931,12 @@ Tables: `results/live/V11_KEDA_REQUESTS.md`, `results/live/V11_KEDA_CPU_REQUESTS
 
 #### 55.1.5 A muscle inside a running service: database, broker, cache
 
-Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v16. Evidence: L.
-Tables: `results/live/V16_REDIS.md`, `results/live/V16_REDIS_SERVICE.md`, `results/live/V16_KAFKA.md`, `results/live/V16_KAFKA_SERVICE.md`, `results/live/V16_PGBENCH.md`, `results/live/V16_SYSBENCH.md`, `results/live/V16_YCSB.md`.
+Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v17. Evidence: L.
+Tables: `results/live/V17_REDIS.md`, `results/live/V17_REDIS_SERVICE.md`, `results/live/V17_KAFKA.md`, `results/live/V17_KAFKA_SERVICE.md`, `results/live/V17_PGBENCH.md`, `results/live/V17_SYSBENCH.md`, `results/live/V17_YCSB.md`.
 
 Goes the other way:
 
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumers running, mean (the resources held) (the runs disagree)
-- V16_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 95th percentile (ms) (the runs disagree)
+- V17_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumers running, mean (the resources held) (the runs disagree)
 
 #### 55.1.6 A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms
 
@@ -7964,7 +7966,7 @@ No run at this level yet, real or modelled, on the engine that stands (`k8s_flee
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `dc1b1b5aa`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `963c86040`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 56.1 The mechanism, and proof that it is the one that ran
 
@@ -8966,9 +8968,9 @@ The knob: the pooler's pool size (server connections).
 
 | Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| select | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_PGBENCH.md` |
-| simple_update | none | power given: connections most at once up 8% to 10% | **watch** | +0.0% | +0.0% | Why: connections most at once up 8% to 10% (power given), because amendment 1's add rule ("slow, clients waiting for a server: add") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch. | `results/live/V16_PGBENCH.md` |
-| tpcb_hot | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_PGBENCH.md` |
+| select | connections held open cut 6.6% to 7.3% | none | **write** | +1.8% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V17_PGBENCH.md` |
+| simple_update | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_PGBENCH.md` |
+| tpcb_hot | connections held open cut 7% to 11% | none | **write** | +2.2% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V17_PGBENCH.md` |
 
 #### 61.3.3 Real messaging (Apache Kafka, GitHub)
 
@@ -8976,10 +8978,10 @@ The knob: the consumer group's size.
 
 | Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | the runs disagree on consumers running (-0% to +21%); everything EVEN in all three of our runs (12 gauges inside the noise, 1 the same). Nothing is settled here, so the knob stays native until three runs agree. | `results/live/V16_KAFKA.md` |
-| burst | consumers running cut 0.8% | none | **write** | +0.2% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V16_KAFKA.md` |
-| heavy | consumers running cut 0.3% | none | **write** | +0.1% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V16_KAFKA.md` |
-| light | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (13 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_KAFKA.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | the runs disagree on consumers running (-0% to +19%); everything EVEN in all three of our runs (12 gauges inside the noise, 1 the same). Nothing is settled here, so the knob stays native until three runs agree. | `results/live/V17_KAFKA.md` |
+| burst | consumers running cut 0.8% | none | **write** | +0.2% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V17_KAFKA.md` |
+| heavy | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (13 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_KAFKA.md` |
+| light | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (13 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_KAFKA.md` |
 
 #### 61.3.4 Real cache (Redis, GitHub)
 
@@ -8987,10 +8989,10 @@ The knob: the cache's memory ceiling.
 
 | Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | work inside the line up 0.8% to 1.1%, hit rate up 0.8% to 1.2% | power given: memory ceiling held up 1.9% to 2.9%, memory used up 1.4% to 2.0% | **operator's choice** (not counted) |  |  | Why: memory ceiling held up 1.9% to 2.9% (power given), because the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges); memory used up 1.4% to 2.0% (power given), because the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held. | `results/live/V16_REDIS.md` |
-| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_REDIS.md` |
-| large | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 2 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_REDIS.md` |
-| small | work inside the line up 1.2% to 1.3%, hit rate up 1.2% to 1.3%, mean cut 1.7% to 1.8% | power given: memory ceiling held up 2.2% to 2.7%, memory used up 1.9% to 2.1% | **operator's choice** | -0.3% | +0.6% | Why: memory ceiling held up 2.2% to 2.7% (power given), because the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges); memory used up 1.9% to 2.1% (power given), because the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held. The trade pays under the service reading (+0.6%) and not under the resource reading (-0.3%, the preregistered headline): the operator who runs Redis for its speed and has the memory wires in; the operator who counts the memory as the cost watches. | `results/live/V16_REDIS.md` |
+| tuning (tuning workload: shown, never counted) | work inside the line up 0.8% to 1.2%, hit rate up 0.8% to 1.2%, mean cut 2.5% to 4.3% | power given: memory ceiling held up 1.9% to 2.9%, memory used up 1.4% to 2.2% | **operator's choice** (not counted) |  |  | Why: memory ceiling held up 1.9% to 2.9% (power given), because the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges); memory used up 1.4% to 2.2% (power given), because the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held. | `results/live/V17_REDIS.md` |
+| burst | memory ceiling held cut 2.2% to 2.3%, memory used cut 0.9% to 1.0% | none | **write** | +0.6% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V17_REDIS.md` |
+| large | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 2 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_REDIS.md` |
+| small | work inside the line up 1.1% to 1.3%, hit rate up 1.2% to 1.3% | power given: memory ceiling held up 2.2% to 2.4%, memory used up 1.9% to 2.1% | **operator's choice** | -0.3% | +0.6% | Why: memory ceiling held up 2.2% to 2.4% (power given), because the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges); memory used up 1.9% to 2.1% (power given), because the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held. The trade pays under the service reading (+0.6%) and not under the resource reading (-0.3%, the preregistered headline): the operator who runs Redis for its speed and has the memory wires in; the operator who counts the memory as the cost watches. | `results/live/V17_REDIS.md` |
 
 #### 61.3.5 Real database cache (MongoDB under YCSB, GitHub)
 
@@ -8998,11 +9000,11 @@ The knob: the storage engine's cache size.
 
 | Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_YCSB.md` |
-| b | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_YCSB.md` |
-| burst | cache size held cut 1.7% to 2.2% | none | **write** | +0.5% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V16_YCSB.md` |
-| c | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_YCSB.md` |
-| f | cache size held cut 0.8% to 1.0% | none | **write** | +0.2% | +0.0% |  No LOSS and no power given: Omni holds the knob. | `results/live/V16_YCSB.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_YCSB.md` |
+| b | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_YCSB.md` |
+| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_YCSB.md` |
+| c | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_YCSB.md` |
+| f | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (10 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_YCSB.md` |
 
 #### 61.3.6 Real database buffer pool (MySQL under sysbench, GitHub)
 
@@ -9010,11 +9012,11 @@ The knob: the buffer pool's size.
 
 | Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |
 |---|---|---|---|---:|---:|---|---|
-| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
-| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
-| read_only | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
-| read_write | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
-| update_index | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V16_SYSBENCH.md` |
+| tuning (tuning workload: shown, never counted) | none | none | **watch** (not counted) |  |  | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_SYSBENCH.md` |
+| burst | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_SYSBENCH.md` |
+| read_only | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_SYSBENCH.md` |
+| read_write | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_SYSBENCH.md` |
+| update_index | none | none | **watch** | +0.0% | +0.0% | everything EVEN in all three of our runs (11 gauges inside the noise, 1 the same). EVEN under this workload: the knob stays native and Omni reads it. | `results/live/V17_SYSBENCH.md` |
 
 ### 61.4 Every LOSS and every power given in all three of our runs on a real stack, and why
 
@@ -9024,9 +9026,8 @@ The founder's question was where the negatives are and why each is there. Every 
 - **Kubernetes, pods started: a public day of demand (Google 2011) up 120% to 193%, power given** (5.8 → 15.3 in run A). See the table. Verdict: **operator's choice**.
 - **Kubernetes, parked-worker energy: With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.1% to 1.8%, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.6% to 2.2%, power given** (157.6 / 159 → 160.7 to 161.1 in run A). See the table. Verdict: **operator's choice** on every workload named.
 - **Kubernetes, standby-model energy: With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.1% to 1.8%, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs up 1.6% to 2.2%, power given** (157.6 / 159 → 160.7 to 161.1 in run A). See the table. Verdict: **operator's choice** on every workload named.
-- **PostgreSQL, connections most at once: simple_update up 8% to 10%, power given** (20 → 21.67 in run A). See the table. Verdict: **watch**.
-- **Redis, memory ceiling held: small up 2.2% to 2.7%, power given** (64 → 65.39 in run A). See the table. Verdict: **operator's choice**.
-- **Redis, memory used: small up 1.9% to 2.1%, power given** (60.7 → 61.85 in run A). See the table. Verdict: **operator's choice**.
+- **Redis, memory ceiling held: small up 2.2% to 2.4%, power given** (64 → 65.41 in run A). See the table. Verdict: **operator's choice**.
+- **Redis, memory used: small up 1.9% to 2.1%, power given** (60.7 → 61.86 in run A). See the table. Verdict: **operator's choice**.
 
 What these have in common: every one is power given, a resource spent to buy the service the knob exists for (consumers and the CPU they poll with, memory, pages, connections), each declared in advance in its preregistration as the gauge expected to rise, or found on the first counted set and disclosed. None is a LOSS: on no real stack did work inside the line, p95 or failed requests read LOSS in all three of our runs. Where the resource was given and nothing was bought (PostgreSQL's `simple_update`), the verdict is watch; where it bought service, the verdict is the operator's, and both index readings say what the trade is worth.
 
@@ -14360,24 +14361,24 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (more work + fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
   - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +4.3% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v17 and omni-v18, each named in its table): +4.6% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
-  - Real database cache (MongoDB under YCSB, GitHub): +0.2% GAIN
+  - Real database (PostgreSQL behind PgBouncer, GitHub): +1.3% GAIN
+  - Real cache (Redis, GitHub): +0.1% GAIN
   - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real database (PostgreSQL behind PgBouncer, GitHub): =0.0% EVEN
+  - Real database cache (MongoDB under YCSB, GitHub): =0.0% EVEN
   - Real database buffer pool (MySQL under sysbench, GitHub): =0.0% EVEN
-  - Real cache (Redis, GitHub): +0.1% power given
 
 **On the engine that stands (omni-v18): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +4.3% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v16 | +0.1% | GAIN, power given | L |
-| PostgreSQL, the pooler's pool size | omni-v16 | =0.0% | power given | L |
-| MySQL, the buffer pool's size | omni-v16 | =0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | omni-v16 | +0.2% | GAIN | L |
-| Kafka, the consumer group's size | omni-v16 | +0.1% | GAIN | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v17 and omni-v18 | +4.6% | GAIN, power given | L |
+| Redis, the cache's memory ceiling | omni-v17 and omni-v18 | +0.1% | GAIN, power given | L |
+| PostgreSQL, the pooler's pool size | omni-v17 and omni-v18 | +1.3% | GAIN | L |
+| MySQL, the buffer pool's size | omni-v17 and omni-v18 | =0.0% | EVEN | L |
+| MongoDB, the storage engine's cache size | omni-v17 and omni-v18 | =0.0% | EVEN | L |
+| Kafka, the consumer group's size | omni-v17 and omni-v18 | +0.1% | GAIN | L |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
