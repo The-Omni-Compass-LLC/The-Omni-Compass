@@ -686,6 +686,14 @@ three seconds without a change reads **● still** (and says so when the engine 
 own governor rests it (chapter 27), and its row keeps what it did when it was last in view; the note under the list counts the
 monitors seen so far and how many of them moved. Scroll the page once from top to bottom and every row reads what its monitor does.
 
+**The switchboard** stands with the wall, between its signals and its tiles: one breaker for every monitor, numbered as the wall
+numbers them and grouped by the page's parts, a breaker for each part (*all*) and the **main breaker**. A breaker off cuts that
+monitor's feed: its tile leaves the wall, its canvas in its section is drawn dimmed and says it was switched off at the
+switchboard, and its signal reads no line; a breaker on brings it back. A part's breaker throws every monitor of that part together,
+and the main breaker every monitor on the page. Each breaker carries its monitor's own signal (the stop-sign octagon, the diamond, the
+circle, the grey bar), so the box reads at a glance which circuits are redlining. The switchboard changes what is watched, never the
+engine: no setting, knob or profile moves when a breaker is thrown.
+
 ### 6.1 What the wall is
 
 The wall (the page's section 1c, `#s-wall`) is every monitor of the page in one view: the same

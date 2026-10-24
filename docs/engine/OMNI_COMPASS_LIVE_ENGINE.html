@@ -167,7 +167,7 @@ span.ocw,span.nw,span.tw-g,span.tw-e,span.tw-l,span.tw-p{font-size:inherit!impor
 .lamp::before{content:"";display:inline-block;width:9px;height:4px;border-radius:1px;margin-right:4px;background:var(--rule);vertical-align:2px}
 .lamp.lit-ok::before{width:8px;height:8px;border-radius:50%;vertical-align:0}
 .lamp.lit-ok::before{background:var(--ok);box-shadow:0 0 6px var(--ok)}
-.lamp.lit-bad::before{background:var(--bad);border-radius:0;width:9px;height:9px;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%)}
+.lamp.lit-bad::before{background:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M4.4 .6H9.6L13.4 4.4V9.6L9.6 13.4H4.4L.6 9.6V4.4Z' fill='%23ff4d55'/%3E%3Cpath d='M4.9 1.9H9.1L12.1 4.9V9.1L9.1 12.1H4.9L1.9 9.1V4.9Z' fill='none' stroke='white' stroke-width='.9'/%3E%3C/svg%3E") center/contain no-repeat;border-radius:0;width:12px;height:12px}
 /* parts */
 .parts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px}
 @media (max-width:760px){.parts{grid-template-columns:minmax(0,1fr)}}
@@ -458,11 +458,20 @@ body{padding-bottom:96px}
 .mlamp::before{content:"";display:inline-block;width:11px;height:4px;border-radius:1px;background:var(--rule);flex:none}   /* no line to watch: a grey bar, never a circle */
 .mlamp.lv-ok::before{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}   /* go: the circle, and only green is ever a circle */
 .mlamp.lv-lead::before{width:9px;height:9px;border-radius:1px;transform:rotate(45deg);margin:0 2px;background:var(--even);box-shadow:0 0 8px var(--even);animation:lampLead 1.2s ease-in-out infinite}   /* yield: the diamond */
-.mlamp.lv-red::before{width:12px;height:12px;border-radius:0;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%);background:var(--bad);animation:lampRed .7s steps(2,end) infinite}   /* stop: the octagon, blinking */
+.mlamp.lv-red::before{width:16px;height:16px;border-radius:0;background:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M4.4 .6H9.6L13.4 4.4V9.6L9.6 13.4H4.4L.6 9.6V4.4Z' fill='%23ff4d55'/%3E%3Cpath d='M4.9 1.9H9.1L12.1 4.9V9.1L9.1 12.1H4.9L1.9 9.1V4.9Z' fill='none' stroke='white' stroke-width='.9'/%3E%3C/svg%3E") center/contain no-repeat;animation:lampRed .7s steps(2,end) infinite}   /* stop: the octagon, blinking */
 .mlamp.lv-lead{color:var(--even)} .mlamp.lv-red{color:var(--bad)} .mlamp.lv-ok{color:var(--ok)}
 @keyframes lampLead{50%{opacity:.45}} @keyframes lampRed{50%{opacity:.3}}
 @media (prefers-reduced-motion: reduce){.mlamp::before{animation:none!important}}
 .mlamp.slamp{margin-left:12px;font-size:12px;vertical-align:middle}   /* a section's light, beside its heading */
+.fuseBox{border:2px solid var(--rule);border-radius:8px;padding:10px 12px;background:var(--panel2);display:flex;flex-direction:column;gap:8px}
+.fuseBox .fbRow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fuseBox .fbPart{font-family:var(--f-mono);font-size:12px;color:var(--muted);min-width:64px}
+.fuseBox button{font-family:var(--f-mono);font-size:12px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:4px;padding:3px 7px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;min-height:28px}
+.fuseBox button[aria-pressed="false"]{opacity:.45;text-decoration:line-through}
+.fuseBox button.fbMain{font-family:var(--f-display);font-size:15px;letter-spacing:.04em;text-transform:uppercase;border:2px solid var(--accent)}
+.fuseBox button.fbGroup{border-color:var(--accent)}
+.fuseBox .mlamp{font-size:0;gap:0}
+canvas.switchedOff{opacity:.22;filter:grayscale(1)}
 .lampBar{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;font-size:15px;color:var(--muted);border:1px solid var(--rule);border-radius:6px;padding:8px 12px}
 .lampBar b{color:var(--ink)} .lampBar .mlamp{font-size:13px;text-transform:none;letter-spacing:0;white-space:normal;display:inline}
 .lampBar .mlamp::before{display:inline-block;margin-right:5px;vertical-align:middle}   /* the counts wrap on a phone; the shape stays before its word */
@@ -678,6 +687,7 @@ html[data-master="off"] .ctlPanel{border-top-color:var(--bad)}
     <div class="lampBar" id="wallLamps"><span><b>The lights.</b> reading…</span></div>
     <div class="lampBar" id="profileBar" aria-live="polite"><span><b>The bench.</b> reading…</span></div>
     <div class="row" style="gap:10px;align-items:center"><button class="factoryBtn" id="wFactory" title="Restore factory profile: every knob of this page back to the main engine's own tune: the max, Omni-Compass ON, demand ×1, no noise, no added delay, no fault held, every muscle driven, speed 1×. Return to native is the other control">Restore factory profile</button><span class="note" style="margin:0" id="wFactoryNote">One button, wherever the knobs were turned: the engine's tune as it ships (<code>DISCLOSURES.md</code> section 3) and this page's plant at rest. Native alone is the kill switch, beside it on the console.</span></div>
+    <div class="fuseBox" id="fuseBox" aria-label="The switchboard: every monitor's breaker, by part, and the main breaker"><b>The switchboard.</b> reading…</div>
     <canvas id="wallCv" aria-label="Every monitor of this page drawn small in one wall: the same canvases, live"></canvas>
     <p class="note">The same canvases the sections draw, copied small four times a second; nothing is drawn twice from different data. The page's own governor (section 8d) leaves a monitor resting while it is off screen, so while this wall is in view the resting monitors are drawn in turn, one a frame, each through its own drawing code; every monitor is drawn once as the page opens, so no tile waits for its section to be scrolled to. Two monitors that sit side by side in their section, native beside Omni-Compass, sit side by side on the wall too: a pair never splits across two rows. Each tile's head is its number and its title in capital letters, then its section and its state (live, replay, from the records, a model, or awaiting its run). A tile with the accent border is a monitor on screen now; the list of every monitor by its number follows in section 8a.</p>
   </div>
@@ -5163,6 +5173,7 @@ function lampSweep(now) {
     const el = document.querySelector(`[data-lamp="${m.id}"]`); if (el) { const cls = "mlamp lv-" + lv; if (el.className !== cls) el.className = cls; const txt = SIGNAL_WORD[lv] || SIGNAL_WORD.none; if (el.textContent !== txt) el.textContent = txt; const tt = `the light: ${why}`; if (el.title !== tt) el.title = tt; } });
   try { sectionLampSweep(); } catch (e) {}
   try { profileSweep(); } catch (e) {}
+  try { fuseLamps(); } catch (e) {}
   const bar = $("wallLamps"); if (!bar) return;
   const last = (CQ.log || []).slice().reverse().find(e => e.comp !== "native" && e.comp !== "desk");
   const list = ns => ns.length ? ` (monitor${ns.length > 1 ? "s " : " "}${ns.join(", ")})` : "";
@@ -5234,6 +5245,30 @@ function profileSweep() {
   const html = `<span><b>The bench.</b> Architecture: <b>${arch}</b>. Active profile: ${prof}. Backend: ${back}. <b>Restore factory profile</b> reapplies the released configuration; <b>Return to native</b> hands governance back to native.</span>`;
   if (bar._set !== html) { bar._set = html; bar.innerHTML = html; } }
 
+// ============================================================== the switchboard (the founder's order of 24 October): a breaker for every
+// monitor, grouped by the page's parts, a breaker for each part and the main breaker, beside the wall. A breaker off cuts that
+// monitor's feed: its tile leaves the wall, its canvas on the page is drawn dimmed and says so, and its signal reads no line. Each
+// breaker carries the monitor's own signal, so the box reads at a glance which circuits are redlining.
+WALL.off = new Set();
+function fuseSet(ids, on) { ids.forEach(id => { if (on) WALL.off.delete(id); else WALL.off.add(id); const el = $(id); if (el) { el.classList.toggle("switchedOff", !on); el.title = on ? "" : "switched off at the switchboard beside the wall"; } }); fuseSync(); }
+function fuseSync() {
+  document.querySelectorAll("#fuseBox button[data-mon]").forEach(b => b.setAttribute("aria-pressed", String(!WALL.off.has(b.dataset.mon))));
+  document.querySelectorAll("#fuseBox button[data-part]").forEach(b => { const ids = (FUSE.parts[b.dataset.part] || []).map(m => m.id); b.setAttribute("aria-pressed", String(ids.some(id => !WALL.off.has(id)))); });
+  const main = document.querySelector("#fuseBox .fbMain"); if (main) { const on = MON.list.some(m => !WALL.off.has(m.id)); main.setAttribute("aria-pressed", String(on)); main.textContent = on ? "Main breaker: every monitor on" : "Main breaker: every monitor off"; } }
+const FUSE = {parts: {}};
+function buildFuseBox() {
+  const box = $("fuseBox"); if (!box || !MON.list.length) return;
+  FUSE.parts = {}; MON.list.forEach(m => { const k = String(m.sn || "").match(/^\d+/) ? String(m.sn).match(/^\d+/)[0] : "—"; (FUSE.parts[k] = FUSE.parts[k] || []).push(m); });
+  const keys = Object.keys(FUSE.parts).sort((a, b) => (+a || 99) - (+b || 99));
+  box.innerHTML = `<div class="fbRow"><b>The switchboard.</b> <button type="button" class="fbMain" aria-pressed="true">Main breaker: every monitor on</button><span class="note" style="margin:0">One breaker a monitor, by part; a part's breaker and the main breaker throw them together. A breaker off takes its monitor off the wall and dims it on the page; nothing of the engine changes. Each breaker carries its monitor's signal.</span></div>`
+    + keys.map(k => `<div class="fbRow"><span class="fbPart">Part ${ESC(k)}</span><button type="button" class="fbGroup" data-part="${ESC(k)}" aria-pressed="true">all</button>`
+      + FUSE.parts[k].map(m => `<button type="button" data-mon="${ESC(m.id)}" aria-pressed="true" title="Monitor ${m.n}: ${ESC(m.name)}"><span class="mlamp lv-none" data-fuse="${ESC(m.id)}"></span>${m.n}</button>`).join("") + `</div>`).join("");
+  box.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+    if (b.classList.contains("fbMain")) { const on = b.getAttribute("aria-pressed") !== "true"; fuseSet(MON.list.map(m => m.id), on); logKnob(`the main breaker ${on ? "on: every monitor's feed back" : "off: every monitor's feed cut"}`); return; }
+    if (b.dataset.part) { const on = b.getAttribute("aria-pressed") !== "true"; fuseSet((FUSE.parts[b.dataset.part] || []).map(m => m.id), on); logKnob(`part ${b.dataset.part}'s breaker ${on ? "on" : "off"}`); return; }
+    if (b.dataset.mon) { const on = WALL.off.has(b.dataset.mon); fuseSet([b.dataset.mon], on); } }); }
+function fuseLamps() { document.querySelectorAll("#fuseBox [data-fuse]").forEach(el => { const id = el.dataset.fuse, lv = WALL.off.has(id) ? "none" : (LAMP.lv[id] || "none"), cls = "mlamp lv-" + lv; if (el.className !== cls) el.className = cls; }); }
+
 function monInit() {
   const byId = {}; (MONREG.monitors || []).forEach(m => { byId[m.id] = m; });
   const cvs = [...document.querySelectorAll("canvas")].filter(c => c.id && c.id !== "wallCv" && (!(MONREG.monitors || []).length || byId[c.id]));   // the registered monitors: a canvas drawn inside a table or a tile is part of its view, not a monitor
@@ -5242,7 +5277,7 @@ function monInit() {
     const sn = h2 && h2.querySelector(".sn");
     m.n = i + 1; m.el = c; m.section = sec ? sec.id : ""; m.sn = sn ? sn.textContent : ""; m.sectionTitle = h2 ? h2.textContent.replace(sn ? sn.textContent : "", "").trim() : ""; return m; });
   MON.list.forEach(m => { MON.byId[m.id] = m; m.grp = m.el.closest(".twin, .grid-2, .grid-3, .feedgrid"); });   // the monitors that sit side by side in their section
-  monBadges(); monKnobs(); monInventory(); monKill(); buildLossKnobs(); proofInit(); hoInit(); gpuInit(); cpuInit(); monToc(); MON.ready = true;
+  monBadges(); monKnobs(); monInventory(); monKill(); buildLossKnobs(); proofInit(); hoInit(); gpuInit(); cpuInit(); monToc(); MON.ready = true; try { buildFuseBox(); } catch (e) {}
   { const b = $("mHand"); if (b) b.addEventListener("click", () => { if (W.mOff.has(W.sel)) W.mOff.delete(W.sel); else W.mOff.add(W.sel); mHandSync(); });
     const a = $("mHandAll"); if (a) a.addEventListener("click", () => { W.mOff.clear(); mHandSync(); }); mHandSync();
     const k = $("mKnobs"); if (k) k.addEventListener("click", e => { const b = e.target.closest("button[data-mk]"); if (b) mKnob(b.dataset.mk); }); }
@@ -5485,7 +5520,7 @@ function wallSlots(srcs, cols) {   // left to right, then the next row; a group 
 function drawWall(now) {
   const cv = $("wallCv"); if (!cv) return;
   const order = {}; MON.list.forEach(m => { order[m.id] = m.n; });
-  const srcs = WALL.reg.map(([id, fn]) => ({id, fn, el: $(id)})).filter(t => t.el).sort((a, b) => (order[a.id] || 999) - (order[b.id] || 999));
+  const srcs = WALL.reg.map(([id, fn]) => ({id, fn, el: $(id)})).filter(t => t.el && !(WALL.off && WALL.off.has(t.id))).sort((a, b) => (order[a.id] || 999) - (order[b.id] || 999));
   const rest = srcs.filter(t => !onScreen(t.id)); if (rest.length) wallForce(rest[WALL.rr++ % rest.length], now);   // one resting monitor drawn a frame, in turn
   if (now - WALL.at < 250) return; WALL.at = now;
   const cols = cv.clientWidth < 560 ? 2 : cv.clientWidth < 900 ? 3 : 4, slot = wallSlots(srcs, cols), rows = Math.max(1, (slot.length ? slot[slot.length - 1][0] : 0) + 1), cw = Math.max(1, cv.clientWidth)/cols;

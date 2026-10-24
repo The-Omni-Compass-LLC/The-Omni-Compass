@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-24 20:04 UTC on omni-v18 (digest 1cb92edb64c4391d) from commit 01eeb7c3b923.
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-24 21:29 UTC on omni-v18 (digest 1cb92edb64c4391d) from commit 791ad0fd93b1.
 
 
 Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
@@ -18,6 +18,14 @@ THIS PAGE IS A LIVE TUNING ENGINE. THE BENCHMARKS ARE ONE TUNED ENGINE. Every kn
 DISCLOSURE: REAL RUNS, A REAL ENGINE, NOTHING HARDWIRED. Every run played back on this page (sections 4c and 4d) is read from the raw files of benchmark runs executed on GitHub's own machines, each file checked against its run's SHA-256 list before a single number is drawn; every three-run table is read as the repository holds it, each naming its runs, and the raw branch holds their folders as they are archived (a table whose folders are not yet there says so in section 8c). Every model view runs the engine's own code (the compass law, the brain, the verdict) live in this page, linked through software to the repository's Python and C++ and checked against them on every build. GitHub rebuilds the page from the repository whenever the engine, a model or a result changes, and every three hours: no number on it is typed in by hand, and when the repository changes, the page changes with it.
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
+
+## 0 The answer first: is Omni-Compass a benefit against native?
+
+**The page, in its own words.**
+
+**The two bills**
+
+**Its monitors.** This section draws no canvas: it is words and their sources, written in the page itself.
 
 ## iii The problem and the answer: what the whole industry faces, and how Omni-Compass addresses it
 
@@ -160,7 +168,7 @@ The live organism's four golden signals, native beside Omni-Compass, one point a
 
 **Golden-signal feed, live: the last 240 decisions, native beside Omni-Compass**
 
-One point per decision streamed from the live engine, gapless, each signal on its own axis, with each arm's last, mean and maximum as a time-series dashboard reports them; a kill-switch window is shaded red. Native in amber, Omni-Compass in blue, the same demand on both.
+One point per decision streamed from the live engine, gapless, each signal on its own axis, with each arm's last, mean and maximum as a time-series dashboard reports them; a kill-switch window is shaded red. Native in orange, Omni-Compass in blue, the same demand on both.
 
 **Engine event log, newest first**
 
@@ -244,7 +252,7 @@ From omni-v18 Omni direct is part of the engine: Omni-Compass's own orchestrator
 
 **Three runs on GitHub's machines (A, B and C from one commit)**
 
-How to read it: each word is the pair's reading by the gauge's aim (the key at the top of the page), from the mean of the step-by-step differences and its 95% interval on Student's t; the direction follows the word in words. Work aims up; the 95th percentile aims down; units and machines are resources, so a fall is a cut, a GAIN, and a rise is power given. The amber line on native is the native arm drawn; Omni-Compass's arms are blue, Omni on native dashed and Omni direct solid. The tables above are one run of each arm on one host (the quick form); the three-run table under them is the full form on GitHub's own machines, A, B and C from one commit, combined by the one rule (the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim (in all three when every run's interval is clear of zero on the same side, otherwise by the mean of the three with the count beyond the noise); under 0.5% it reads EVEN, under the floor; runs that moved 0.5% or more in opposite ways disagree.
+How to read it: each word is the pair's reading by the gauge's aim (the key at the top of the page), from the mean of the step-by-step differences and its 95% interval on Student's t; the direction follows the word in words. Work aims up; the 95th percentile aims down; units and machines are resources, so a fall is a cut, a GAIN, and a rise is power given. The orange line on native is the native arm drawn; Omni-Compass's arms are blue, Omni on native dashed and Omni direct solid. The tables above are one run of each arm on one host (the quick form); the three-run table under them is the full form on GitHub's own machines, A, B and C from one commit, combined by the one rule (the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim (in all three when every run's interval is clear of zero on the same side, otherwise by the mean of the three with the count beyond the noise); under 0.5% it reads EVEN, under the floor; runs that moved 0.5% or more in opposite ways disagree.
 
 **Its monitors.**
 
@@ -622,7 +630,7 @@ In a cloud, Omni-Compass shows one thing: the same work as native for a smaller 
 
 **The bill monitors: Azure, Google Cloud and Amazon Web Services, native against Omni-Compass**
 
-One monitor a provider, the same harness, mechanism and tuning in all three (Azure is the measure of the other two). Each bar pair is a finished set: native's machine-hours (amber) beside Omni-Compass's (blue), the word by the one key (the bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given), the bill at list price under it. A provider with no finished set shows its empty frame and the reason its hourly gate holds, in its own job's words; nothing is drawn for a run that has not run.
+One monitor a provider, the same harness, mechanism and tuning in all three (Azure is the measure of the other two). Each bar pair is a finished set: native's machine-hours (orange) beside Omni-Compass's (blue), the word by the one key (the bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given), the bill at list price under it. A provider with no finished set shows its empty frame and the reason its hourly gate holds, in its own job's words; nothing is drawn for a run that has not run.
 
 **The bill on Azure, run by run, each with the engine it ran on**
 
@@ -814,7 +822,7 @@ The governor's beat as a knob: what a decision every 5 to 120 s does against nat
 - **Feed.** tools/omni_exporter.py (the governor's own audit, Prometheus text format); series `omni_decisions_total`, `omni_decision_seconds`, `omni_last_decision_timestamp_seconds`, `omni_own_cpu_cores`; on a running system: `60 * rate(omni_decisions_total[5m])`; `omni_own_cpu_cores`; `time() - omni_last_decision_timestamp_seconds`.
 - **Wired.** This page's `drawBeat, beatSetup` → the Python `tools/heartbeat_sweep.py`, `tools/toy_gate.py`, `omni_controller/controller.py` → the C++ none here: the sweep runs the shipped Python controller on the toy cluster; the C++ governor twin is held to the Python's at 60 s and at 15, 10 and 5 s (tests/test_cpp_governor_parity.py); held equal by `results/toy_gate/HEARTBEAT_SWEEP.md`, `docs/engine/build_live_engine.py`.
 - **Moves.** A cursor reads the beats in turn and names the row it holds; every button redraws the chart from the record.
-- **Knobs.** Beat: the governor's full read of the state and its decision: every 5, 10, 15, 20, 30, 60, 75, 90 or 120 s in the heartbeat sweep's record; on a real governor its --interval (60 s at the factory since omni-v17, 15 s on omni-v16); Scenario: on-site bare metal, through the cloud, in the device, as a service; Engine: which engine's record the monitor reads: the engine that stands or the one before it; Against: what each reading is set against: native, or the same engine at another setting; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
+- **Knobs.** Beat: the governor's full read of the state and its decision: at the bench's six stops, 10, 15, 30, 60, 90 or 120 s (the heartbeat sweep's record holds 5, 20 and 75 s too, read in its file); on a real governor its --interval (60 s at the factory since omni-v17, 15 s on omni-v16); Scenario: on-site bare metal, through the cloud, in the device, as a service; Engine: which engine's record the monitor reads: the engine that stands or the one before it; Against: what each reading is set against: native, or the same engine at another setting; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
 - **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
 
@@ -1100,7 +1108,7 @@ How to read the plane. It is a phase portrait, the picture control engineers use
 
 **Live stat panels: native beside Omni-Compass, now and over the last 120 decisions**
 
-Each panel is one gauge of the live organism, read every decision on both sides, as an operations dashboard shows it. It gives native's value now and Omni-Compass's, the last 120 decisions of both (native solid amber, Omni-Compass blue), and the running paired reading in the tables' words. With the master switch OFF the decisions are shaded red and Omni-Compass's side follows native: its value equals native's and its line is drawn in native's colour, dashed on top of native's, so both stay in view.
+Each panel is one gauge of the live organism, read every decision on both sides, as an operations dashboard shows it. It gives native's value now and Omni-Compass's, the last 120 decisions of both (native solid orange, Omni-Compass blue), and the running paired reading in the tables' words. With the master switch OFF the decisions are shaded red and Omni-Compass's side follows native: its value equals native's and its line is drawn in native's colour, dashed on top of native's, so both stay in view.
 
 **Native against Omni-Compass**
 
@@ -1681,7 +1689,7 @@ This page's own render loop governed by the compass law: the frame time against 
 | Scenario | on-site bare metal, through the cloud, in the device, as a service | the monitor's own buttons |
 | Reading | every measured piece carried, or the index's strict rule | the monitor's own buttons |
 | The chip's run | the chip's one run beside the count or in it | the monitor's own buttons |
-| Beat | the governor's full read of the state and its decision: every 5, 10, 15, 20, 30, 60, 75, 90 or 120 s in the heartbeat sweep's record; on a real governor its --interval (60 s at the factory since omni-v17, 15 s on omni-v16) | the monitor's own buttons |
+| Beat | the governor's full read of the state and its decision: at the bench's six stops, 10, 15, 30, 60, 90 or 120 s (the heartbeat sweep's record holds 5, 20 and 75 s too, read in its file); on a real governor its --interval (60 s at the factory since omni-v17, 15 s on omni-v16) | the monitor's own buttons |
 | Engine | which engine's record the monitor reads: the engine that stands or the one before it | the monitor's own buttons |
 | Against | what each reading is set against: native, or the same engine at another setting | the monitor's own buttons |
 | Gauge | which gauge of the run is shown | the monitor's own buttons |

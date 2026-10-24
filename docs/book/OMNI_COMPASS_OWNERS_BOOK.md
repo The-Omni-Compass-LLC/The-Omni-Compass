@@ -1916,8 +1916,9 @@ P ∈ [5, 120] s, the compass's balance point c ∈ (0, 1), the dial, the verdic
 muscle's card. The factory tune is one point, θ*, fingerprinted with the engine. On an organism S under a load L, each seed
 s ∈ Ω (Ω the set of seeds) gives native's gauges g⁰(s) ∈ ℝⁿ and Omni-Compass on top of native at tune θ gives g(θ, s). The one key reads each gauge j
 from the paired differences dⱼ(θ; s) = gⱼ(θ, s) − g⁰ⱼ(s): their mean d̄ⱼ, their 95% interval [ℓⱼ, uⱼ] by Student's t on
-|Ω| − 1 degrees of freedom, the word Rⱼ(θ) (EVEN when ℓⱼ ≤ 0 ≤ uⱼ; else GAIN on the side the gauge's aim serves; else LOSS for a
-time waited, missed or failed and for work, power given for a resource) and the size rⱼ(θ) = d̄ⱼ ⁄ ḡ⁰ⱼ.
+|Ω| − 1 degrees of freedom, the size rⱼ(θ) = d̄ⱼ ⁄ ḡ⁰ⱼ, and the word Rⱼ(θ) by the founder's order of 24 October (EVEN when
+|rⱼ(θ)| < 0.005; else GAIN on the side the gauge's aim serves; else LOSS for a time waited, missed or failed and for work, power
+given for a resource), the interval printed beside it.
 
 **Admissible tunes** harm no gauge against native: A = { θ ∈ Θ : Rⱼ(θ) ≠ LOSS for every j, every muscle within its own limit },
 and in a cloud R[bill] (θ) ≠ power given as well. This is do no harm in the strict form the engine that stands keeps.
@@ -1940,6 +1941,26 @@ search never saw against the engine that stands, landed as the next version only
 times on every benchmark. The rule is code, `tools/tune_study.py`, held by `tests/test_tune_study.py`; the first search (the beat
 from 15 to 120 s and the balance point, in the kind benchmark's setting and the cloud's, seeds 101 to 108) is read on its own page in
 `results/toy_gate/` when it finishes.
+
+**The common language** (the founder's master specification of 24 October; `docs/THE_TUNE.md`, sections 5 to 8, in full). Omni-Compass
+consists of a governing engine, its muscle adapters, a complete configuration profile and a validation harness. The **factory
+profile** is the complete, versioned set of defaults shipped together, θ*; a **candidate profile** is a combination under
+evaluation; the **active profile** is the one governing the current run; a **custom profile** is any identifiable configuration
+that differs from θ*. With x the governed system's state, z the governor's internal state, y its observations and Δ ∈ {10, 15, 30, 60,
+90, 120} s the decision interval, z[k+1] = F_θ(z[k], y[k]) and u_req[k] = G_θ(z[k], y[k]), the command Π_C(u_req[k]) inside the
+operating limits C, and the system evolves on the command that actually landed, x[k+1] = Φ(x[k], u_ack[k], w[k]), w the workload
+and its disturbances. After release θ = θ* is fixed while x, z and y keep changing: one fixed factory tune governs a changing
+workload. "One setting" is the whole vector θ, evaluated jointly, against one of two explicit objectives: the most healthy
+production P(θ), or the least cost per production completed, B(θ) ⁄ P(θ). The factory baseline is established in eight steps:
+verify the mechanisms; exercise the six intervals and the knob combinations; tune on development workloads; validate on fresh
+workloads (bursts, sustained demand, declared failures); record every adverse result; freeze the profile with its engine identity
+and receipts; verify every implementation, the C++ harness included; release the identified package. That is the best validated
+factory profile for the declared operating conditions, and the final factory tune is not yet established. **Healthy production**
+is the useful output delivered while every health requirement holds (correctness, service limits, resource bounds, hardware
+limits); the **whole-workload benefit** is the bill of each deployment route, Bᵣ(a) = Σᵢ cᵣ,ᵢ(a) over the route's non-overlapping
+cost components, its saving Sᵣ(a) = 1 − Bᵣ(a) ⁄ Bᵣ(native), unresolved wherever a price or a component is missing; the **scope of
+validation** is what the receipts of the identified engine and profile demonstrated, on the systems, loads and boundaries they
+name, and nothing beyond them.
 
 ![One decision of the governor. It wakes on its period, reads every sense, and holds if any sense is blind or stale: nothing is given back, and adding capacity is still allowed. The engine blends its state toward the observations and moves one macro step; the compass law turns the reading's position into a force. A positive force adds capacity at once, gated by nothing but the security hold. A negative force must pass the release gate (calm, the line clean for three decisions, nothing pending, every sense live) and, on a slow knob, the verdict's paired trial at the 2% line. What survives is one write through the plug, read back, and one line in the audit that records every sense, the state, the force, the gate's reason and the value sent and taken, whether or not anything was written.](figures/loop.svg)
 
@@ -5902,6 +5923,8 @@ OFF. Native is always the stack's own controller left as shipped; omni is that c
 
 ### 46.1 Managed Kubernetes on Azure: the bill as the gauge
 
+**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. OMNI-COMPASS ON THE CLOUD ALONE CAN GIVE ONLY A SMALL CUT IN THE BILL, FROM THE MACHINES THE CLOUD'S OWN AUTOSCALER MADE; THE BENEFIT LIVES AT THE TWO ENDS, IN THE SOFTWARE AND IN THE BARE METAL, AND THE CLOUD CARRIES IT.**
+
 On Azure Kubernetes Service the muscle is the same as on kind (Chapter 45, levels 1 to 3) and one thing is new: the
 bill is real. The workflow `aks-metered` builds a fresh cluster for every arm the same way: a system pool of one
 machine, tainted so no workload lands on it (Azure's add-ons and the load generator live there; it is never measured
@@ -7606,7 +7629,19 @@ Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are
 This chapter teaches you to read every table Omni-Compass produces. You do not need to know Kubernetes or GPUs to
 follow it. Read the five ideas first, then go to the table you have in front of you.
 
-### 53.2 The five ideas behind every table
+### 53.2 What every result names, and how a bill is read
+
+Every result names five things, and a reading is never carried to another of any of them: **the engine** (its fingerprint,
+`python3 tools/omni_version.py`), **the profile** (the factory profile, or a custom or candidate profile and how it differs), **the
+hardware or model** (and its evidence class: P a physical meter, L live software, S our own models), **the workload** (its load, its
+service line, its seeds or runs), and **the measurement boundary** (what is counted inside it and what is not). It also names its
+**objective**: the most healthy production (work done while every health requirement holds), or the least cost per production
+completed. A **bill** is a total: each deployment route's native total cost, then Omni-Compass's, then the saving, 1 − (the
+Omni-Compass total ÷ the native total), each total the sum of its non-overlapping cost components inside the boundary, on a matched
+workload. A component's own percent (the machines, the energy) is a supporting measurement, never the bill, and a bill whose price or
+component is missing reads **unresolved** (`docs/THE_TUNE.md`, section 8; the answer at the top of the README, `tools/headline.py`).
+
+### 53.3 The five ideas behind every table
 
 1. **Native, and native with Omni-Compass on top.** Omni-Compass never runs a machine by itself. Every result compares
    a system running alone ("native": Kubernetes alone, the card's own firmware alone, a building's own controller
@@ -7640,7 +7675,7 @@ follow it. Read the five ideas first, then go to the table you have in front of 
 
    Only **P** speaks for hardware energy.
 
-### 53.3 The words in the tables
+### 53.4 The words in the tables
 
 | Word | What it means | Its aim |
 |---|---|---|
@@ -7657,7 +7692,7 @@ follow it. Read the five ideas first, then go to the table you have in front of 
 | Knobs handed back, restored | at the end every setting Omni-Compass touched was put back exactly | True / yes |
 | Label | the verdict, chosen by a rule written before the run, never by hand | see each table |
 
-### 53.4 The GPU card (`results/gpu/run-<stamp>/GPU_REPS.md`)
+### 53.5 The GPU card (`results/gpu/run-<stamp>/GPU_REPS.md`)
 
 One card, three arms, many repetitions:
 - **native**: the card's firmware alone;
@@ -7682,7 +7717,7 @@ Read it in this order:
 The file `omni-gpu-<stamp>-confirmations.tar.gz` holds two such tables: compute-bound work (matrix products) and AI
 token generation (memory-bound work).
 
-### 53.5 The card inside the seven organisms (`results/hil/run-<stamp>/HIL.md`)
+### 53.6 The card inside the seven organisms (`results/hil/run-<stamp>/HIL.md`)
 
 The real card is wired into each of the seven organisms (the spine, the four realms, the four stacked, the whole tower) at four
 sizes (1, 10, 100 and 1,000 copies). Each row is one size, one organism and one part:
@@ -7693,7 +7728,7 @@ sizes (1, 10, 100 and 1,000 copies). Each row is one size, one organism and one 
 The second table lists the card's own receipts for every arm: its energy, requests served, p95, and its power limit at
 the start and at the end, which must be equal.
 
-### 53.6 Real Kubernetes (`results/live/LIVE_REPS_<n>.md`)
+### 53.7 Real Kubernetes (`results/live/LIVE_REPS_<n>.md`)
 
 Each set is 10 paired repetitions on a real Kubernetes cluster (kind): native Kubernetes (its HPA and scheduler)
 against the same Kubernetes with Omni-Compass on top. Read:
@@ -7706,7 +7741,7 @@ against the same Kubernetes with Omni-Compass on top. Read:
 
 Energy on kind is a declared model, not a meter: kind keeps every machine powered.
 
-### 53.7 The three-run tables (`results/live/V<engine>_<TEST>.md`, for example `V7_GOLDILOCKS.md`, `V8_CITYLEARN.md`)
+### 53.8 The three-run tables (`results/live/V<engine>_<TEST>.md`, for example `V7_GOLDILOCKS.md`, `V8_CITYLEARN.md`)
 
 Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
 shows all three beside each gauge, each with its own 95% interval. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
@@ -7731,7 +7766,7 @@ interval is wide). Every EVEN is printed with the three intervals that decided i
 pandapower, MuJoCo) reproduce to the digit, so there the three runs check the harness, not the noise; their EVEN means
 the same to one part in a million.
 
-### 53.8 The workload tables (`V<engine>_PGBENCH.md`, `_KAFKA.md`, `_REDIS.md`, `_YCSB.md`, `_SYSBENCH.md`) and the swarm table (`V<engine>_SWARM.md`)
+### 53.9 The workload tables (`V<engine>_PGBENCH.md`, `_KAFKA.md`, `_REDIS.md`, `_YCSB.md`, `_SYSBENCH.md`) and the swarm table (`V<engine>_SWARM.md`)
 
 The database, the broker and the cache share one shape. The head names the three runs, their commits and the engine each
 carried. Then one section per **workload**: the tuning workload first, marked "shown and not counted" because the rules were
@@ -7746,7 +7781,7 @@ rows toward their aims, away from them and disagreeing across the untouched work
 of workloads, with collisions voiding a cell, and with a declared reproduction tolerance (one part in a thousand) because
 PyBullet does not reproduce to the bit across machines; its amendment says so.
 
-### 53.9 The governor's own cost (`V3_OWN_COST.md`) and the robustness tables (`V<engine>_ROBUST_KILL.md`, `V<engine>_ROBUST_LONG.md`)
+### 53.10 The governor's own cost (`V3_OWN_COST.md`) and the robustness tables (`V<engine>_ROBUST_KILL.md`, `V<engine>_ROBUST_LONG.md`)
 
 `V3_OWN_COST.md` is Omni-Compass's own CPU, from the `overhead` record every omni arm's audit carries, by organism and
 copies, under the engine each run carried; it is shown and not judged, and it is a few thousandths of one core at every
@@ -7756,21 +7791,21 @@ arm alone, since native has no governor to kill: the seconds from the kill until
 governor's memory in the last ten minutes over the first ten (a quarter's growth is a leak, declared before the run); the
 300 s after the kill (120 s on the tables up to omni-v14's) are compared between the arms like any paired gauge.
 
-### 53.10 The organisms with a real cluster inside (`SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V3_BIG_ORGANISM.md`)
+### 53.11 The organisms with a real cluster inside (`SIX_KUBE.md`, `V3_SIX_KUBE.md`, `V3_BIG_ORGANISM.md`)
 
 Two kinds of rows, kept apart: **the cluster** (real Kubernetes, measured) and **the organism** (the modelled stacks
 around it, evidence S). "Organism behind its window (s)" is shown and not judged; a repetition reads **OFF THE CLOCK**
 when either arm ended more than 5% of its window late (its last steps saw a cluster whose load had already ended). The
 pairing stands, the mark stays, and the remedy is a longer window for that size on that machine.
 
-### 53.11 The one number (`results/OMNI_INDEX.md`)
+### 53.12 The one number (`results/OMNI_INDEX.md`)
 
 Every measure is a ratio oriented so that above 1 is a GAIN for Omni-Compass on top of native: work, speed, machines,
 energy. A test's index is the geometric mean of its ratios, a category's of its tests, the headline of the real
 categories, each weighted the same. A measure enters only as its three-run reading allows; no difference beyond the
 noise enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
 
-### 53.12 The seven organisms grid (`results/grid_v5/GRID.md`; each engine's runs in `results/grid_v<engine>/`)
+### 53.13 The seven organisms grid (`results/grid_v5/GRID.md`; each engine's runs in `results/grid_v<engine>/`)
 
 Columns are **copies × runs**: 1, 10 and 100 clustered copies, each at 1, 10 and 100 paired runs, and on GitHub's own
 machines 1,000 of each as well (paid cloud and card runs stop at 100). Rows are the seven organisms: the spine, the four
@@ -7778,14 +7813,14 @@ realms, the four stacked and the whole tower. Each square shows the modelled val
 inside. Read a square as "with Omni-Compass on top, against native, at this many copies, over this many runs". A square
 still running says so, and one beyond a free runner's memory or time is listed as pending runner capacity, never rented.
 
-### 53.13 Kubernetes at scale (`KWOK.md`, from the `kwok-scale` workflow)
+### 53.14 Kubernetes at scale (`KWOK.md`, from the `kwok-scale` workflow)
 
 Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects with no machines behind them):
 - **decision time** is how long Omni-Compass takes to decide, at that size;
 - **memory** is what it uses;
 - **master switch** must read "yes": everything handed back.
 
-### 53.14 One number, one word (`docs/BENEFIT_SHEET.md`)
+### 53.15 One number, one word (`docs/BENEFIT_SHEET.md`)
 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
 the Reading column gives its word, GAIN, EVEN or LOSS, by what the gauge is for (the key above). The benefit sheet turns
@@ -7796,7 +7831,7 @@ neither can be misread against a table that shows the same changes as "-65%" and
 the index's own rule, with its word beside it. Read that sheet first; read the tables for
 the rows behind a number, and read their Reading column, never the sign alone. The wiring page uses the same words.
 
-### 53.15 Wire in, or watch (`docs/WIRING_VERDICTS.md`)
+### 53.16 Wire in, or watch (`docs/WIRING_VERDICTS.md`)
 
 One of three words per knob, by one rule from the tables above. **Write**: a gauge GAIN in all three of our runs
 and none LOSS or power given in all three of our runs; Omni holds the knob. **Watch**: nothing GAIN in all three of our runs; the knob stays native and Omni only
@@ -7804,14 +7839,14 @@ reads it (one wire out, no wire in), and a loss in all three of our runs is name
 muscle takes its word from its label: superior is write, a tradeoff label is the operator's choice, the rest is watch. The
 CSV beside the page (`results/WIRING_VERDICTS.csv`) has one row per knob and per muscle.
 
-### 53.16 Where to start
+### 53.17 Where to start
 
 1. `docs/STATE_OF_PLAY.md`: one page, every result and how strong it is.
 2. `docs/DOSSIER.md`: every result with its chart.
 3. This chapter, next to the table in front of you.
 4. `DISCLOSURES.md`: what a result is and is not.
 
-### 53.17 Reading the benefit: more work, or the same work for less
+### 53.18 Reading the benefit: more work, or the same work for less
 
 With the work held equal in both arms, the gain from Omni-Compass on top is *G = C[native] / C[omni] − 1*, where *C* is a
 resource (machine-hours, CPU core-hours, joules). The same work then needs *1 / (1 + G)* of the resources, a saving of
@@ -8667,7 +8702,7 @@ omni-v11, the engine that stood until omni-v12 landed on 19 October (Chapter 59)
 
 **On top of Goldilocks and the VPA's recommender** (`V11_GOLDILOCKS.md`; runs 39171064099, 39175675418, 39177950720). Native is the service rightsized by Goldilocks from the VPA recommender's figures, with the HPA under it; omni is the same with Omni-Compass on top. The response time fell at the mean 47% to 48%, at the 95th percentile 61% to 64% and at the 99th 68% to 70%; the time over the line fell 98% to 100% and the alert minutes 100%; pods started fell 53% to 61% and the total pod start wait 48% to 63%: all GAIN in all three of our runs. Failed requests were zero in both arms. Machines in service, node-hours, HPA replicas and the mean pod start wait read EVEN. The energy counted with every parked worker at idle power rose 1.7% to 2.3%, power given in all three of our runs: the governor's own settings commands (16 to 18 a run, shown and not judged) conveyed processor time to the pods, the service drew 43% to 51% more CPU and answered faster for it, and the energy per core-hour fell 28% to 31% (shown).
 
-![Receipt chart: Omni-Compass on top of Goldilocks and the VPA's recommender (omni-v11), the judged rows. Each row is one gauge; each line is one run's paired change against native with its 95% interval (runs A, B, C from top); green GAIN, amber power given, red LOSS, grey EVEN, by the reading key. The chart pictures results/live/V11_GOLDILOCKS.md and adds nothing to it.](figures/r_goldilocks.svg)
+![Receipt chart: Omni-Compass on top of Goldilocks and the VPA's recommender (omni-v11), the judged rows. Each row is one gauge; each line is one run's paired change against native with its 95% interval (runs A, B, C from top); green GAIN, blue power given, red LOSS, yellow EVEN, by the reading key. The chart pictures results/live/V11_GOLDILOCKS.md and adds nothing to it.](figures/r_goldilocks.svg)
 
 ![Receipt chart: on top of Goldilocks, the rows shown and not judged. The governor's own inputs and the mechanism's traces (the settings commands it wrote, the pods pending, the utilisation, the CPU used, its own CPU, the energy per core-hour, the host's busy share and cores), as the change in runs A, B and C. These rows explain how the judged rows came to be; they are not judged themselves.](figures/r_goldilocks_shown.svg)
 

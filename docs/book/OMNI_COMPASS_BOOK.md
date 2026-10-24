@@ -941,7 +941,7 @@ receipt that needed them changed is a receipt to read as wiring first (section 5
 omni-v17: every rule the governor keeps counts seconds, so the beat changes only how often it looks, and an operator may set
 any beat, a fast one for its reads of the cluster at the cost of the governor's own processor, or a slow one. Each beat may
 want its own combination of the other settings; a beat other than 60 s is the operator's own configuration and its results
-are its own (section 4.6).
+are its own (section 4.7).
 
 ### 4.5 Profiles: service and batch
 
@@ -951,7 +951,38 @@ while work waits for a place, and idle takes them straight to the floor when the
 installation running a queue of jobs chooses batch for that service and service for everything else, and writes the
 choice down beside the dial's position.
 
-### 4.6 A changed tune is your own configuration
+### 4.6 Profiles: factory, candidate, active and custom; the two restoring controls
+
+Omni-Compass consists of a governing engine, its muscle adapters, a complete configuration profile and a validation harness. Four
+words name the profile, and they are kept apart in every log, page and report:
+
+| Profile | What it is |
+|---|---|
+| Factory profile | The complete, versioned set of Omni-Compass default settings shipped together: the factory tune of section 4.1. |
+| Candidate profile | A proposed combination of settings undergoing evaluation; never published as a result. |
+| Active profile | The settings actually governing the current run, as the governor's own audit records them. |
+| Custom profile | An identifiable configuration differing from the released factory profile: yours, with its own receipts. |
+
+"One setting" means one complete profile: the beat, the dial, the band, the waits, the cards and which muscles are driven, read
+together, since turning one can move what another does. Freezing the factory profile fixes the released rules and default tuning;
+the engine's internal state, its commands and the resources it moves keep answering the system as it changes.
+
+**Start from the factory profile.** Install, wire and run with no setting of your own (Chapters 5 to 10): that is the factory profile,
+and `python3 tools/omni_version.py` names the engine it belongs to. **Make a custom profile** by writing the settings you change on
+the governor's command line or through the control panel (Chapter 10), each with its reason; the governor records its active
+profile in its audit at every start, so a run always says which profile governed it.
+
+**Read the command's acknowledgement.** Every setting lives in three states, kept apart in the audit and on the control panel: the
+setting requested, the setting the panel accepted (pending until the governor reads it applied at its next decision), and the
+setting the system acknowledged when it was read back. A refused request changes nothing and says why (a missing role, a value out
+of range, a muscle's own limit).
+
+**Two controls restore, and they mean different things.** **Restore factory profile** reapplies the released Omni-Compass
+configuration: every knob back, Omni-Compass still governing. **Return to native** hands governance back and restores native's own
+recorded settings as the adapter supports (the kill switch, Chapter 10): Omni-Compass stops governing. Use the first to leave a custom
+profile; use the second to take Omni-Compass out of the loop.
+
+### 4.7 A changed tune is your own configuration
 
 As with any engine, a licensee may add on, retune, upgrade or tune down any muscle or any combination of muscles: the
 dial, the cards, the bands and the service lines are all exposed. A changed tune is the licensee's own configuration, and
@@ -960,7 +991,7 @@ tune: write the change down before the paired runs, run native and omni three ti
 receipts against the tune that ran. Where a changed tune reads differently from the factory tune, the change is the first
 thing to look at, and then the wiring.
 
-### 4.7 The output follows the input
+### 4.8 The output follows the input
 
 Every number Omni-Compass produces is the result of three inputs, and a reader who changes any one of them has changed the
 result: **the tune** (the factory tune as shipped, or the dial turned down, or a card changed), **the wiring** (which muscles
@@ -2187,7 +2218,7 @@ resource that rose on your receipt is read beside the work and the speed it boug
 Appendix L: what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the
 top of its range (the knob is at its limit on native, and the governor leaves it there by design, section 6.5), and a machine count
 that does not fall where no machine can be given back without a LOSS (the audit's `node_gate.reason` names the gate that held).
-What the table cannot give is your number: the same engine on another stack is another result, and it is yours (section 4.7).
+What the table cannot give is your number: the same engine on another stack is another result, and it is yours (section 4.8).
 
 
 ## 12. Evidence Classes and How to Read a Receipt
@@ -2255,7 +2286,7 @@ python3 tools/omni_version.py --commit <sha>    # the engine at the commit any r
 
 A receipt names the commit it ran on, and every table made by rule checks each run's commit against the fingerprint and
 heads itself with a warning if any run is not the engine it claims or if the three are not separate runs. An operator's
-own tune (section 4.6) does not change the engine's fingerprint, and must therefore be written down beside the receipt.
+own tune (section 4.7) does not change the engine's fingerprint, and must therefore be written down beside the receipt.
 
 **The three-run rule.** A result is run as **A, B and C**, three separate runs on the same engine version. Every judged
 row gets one of these readings, and all three runs are shown beside it:
@@ -2999,6 +3030,8 @@ holds, and a breach wakes it at the next decision.
 ## 20. Running in the Cloud: the Machines Alone, the Bill and the Alarm Minutes
 
 
+**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. OMNI-COMPASS ON THE CLOUD ALONE CAN GIVE ONLY A SMALL CUT IN THE BILL, FROM THE MACHINES THE CLOUD'S OWN AUTOSCALER MADE; THE BENEFIT LIVES AT THE TWO ENDS, IN THE SOFTWARE AND IN THE BARE METAL, AND THE CLOUD CARRIES IT.**
+
 ### 20.1 Why the governor moves the machines alone in a cloud
 
 In a public cloud every machine that exists is billed, whether it carries work or not, so the benefit a cloud can show
@@ -3138,6 +3171,20 @@ a machine; never deletes a machine (the cloud's autoscaler does, on its own sche
 evicts or deletes a pod; and never holds a cloud credential. Each of those is checked from outside the governor at the
 end of every paired arm: every HPA back at the operator's, every pod's limit at its shipped value, every machine back in
 service, no `omnicompass.io/` record left on any object.
+
+### 20.8 Any other cloud: a cluster built in the provider's own console
+
+Oracle (OKE), DigitalOcean (DOKS), Alibaba Cloud (ACK), Linode (LKE), IBM Cloud (IKS) or any conformant managed Kubernetes run the
+same paired sets as Azure, Google and Amazon, on the same harness, through one workflow, `byoc-metered`. You build the cluster in the
+provider's console to one shape: a system pool of exactly one machine labelled `omni-role=system` and tainted
+`CriticalAddonsOnly=true:NoSchedule`, and a work pool labelled `omni-role=work` and `agentpool=work0` under the provider's own
+cluster autoscaler (minimum 1). You store a kubeconfig whose user holds a service-account token in the repository secret named for
+the cloud (`KUBECONFIG_ORACLE`, `KUBECONFIG_DIGITALOCEAN`, `KUBECONFIG_ALIBABA`, `KUBECONFIG_LINODE`, `KUBECONFIG_IBM` or
+`KUBECONFIG_OTHER`); a kubeconfig that logs in only through the provider's own command line is refused by name before anything is
+measured. `cloud-check` with the cloud's name reads the kubeconfig's shape and the cluster's, at no cost, and stops. Each arm starts
+from the work pool's own minimum; the bill is the work machines counted every 15 s times the list price you give for one
+machine-hour. This repository builds and deletes nothing in your account, and you delete the cluster when the set ends. Every step,
+click by click, is in `docs/BYOC_SETUP.md`. These clouds are wired and not yet run.
 
 
 ## 21. Day Two: Running Omni-Compass in Production
@@ -4824,7 +4871,7 @@ reasons (section 21.4). No request payload and no personal data, which it never 
 
 **Can we tune it?** The factory tune is the engine as shipped (section 4.1); an installation writes the settings of section
 3.4 (the line, the floor, the dial, the ceiling of a growing lever) from its own system. A changed tune is the
-installation's own configuration, and its receipts are its own (section 4.6).
+installation's own configuration, and its receipts are its own (section 4.7).
 
 **How do we know it is working?** The audit shows every decision and every write with its reason; the receipt of a paired
 run on the company's own cluster shows what it did against native, row by row, read GAIN, EVEN or LOSS (chapters 11 and
@@ -7840,7 +7887,7 @@ are kept with the installation record (section 15.7).
 Every setting of the Kubernetes governor (`python -m omni_controller.controller`), grouped by who writes it. A setting
 not given on the command line takes its default. Settings in the last group are the factory tune (section 4.1): they are
 listed so that a command line can be read in full, and an installation leaves them as shipped; a command line that
-changes one runs a changed tune, whose receipts are its own (section 4.6).
+changes one runs a changed tune, whose receipts are its own (section 4.7).
 
 ### K.1 The settings an installation writes
 
