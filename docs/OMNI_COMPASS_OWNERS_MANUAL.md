@@ -698,22 +698,23 @@ installed is a quarter off the bill.
   - the organisms under the climb load: the spine: GAIN (fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
   - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +3.4% GAIN on the resource reading (work, speed, machines, energy), +9.4% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16 and omni-v18, each named in its table): +3.1% GAIN on the resource reading (work, speed, machines, energy), +8.8% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
   - Real database buffer pool (MySQL under sysbench, GitHub): +1.6% GAIN
-  - Real cache (Redis, GitHub): +0.1% power given
-  - Real messaging (Apache Kafka, GitHub): +0.1% power given
+  - Real cache (Redis, GitHub): +0.2% GAIN
   - Real database cache (MongoDB under YCSB, GitHub): −1.4% LOSS
+  - Real messaging (Apache Kafka, GitHub): −1.9% LOSS
   - Real database (PostgreSQL behind PgBouncer, GitHub): −4.9% LOSS
 
-**On the engine that stands (omni-v18): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v18): 2 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +3.4% | GAIN AND LOSS | L |
+| Redis, the cache's memory ceiling | omni-v18 | +0.2% | GAIN, power given | L |
+| Kafka, the consumer group's size | omni-v18 | −1.9% | GAIN AND LOSS | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 and omni-v18 | +3.1% | GAIN AND LOSS | L |
 | Robustness: the two-hour run | omni-v11 | −4.2% | GAIN AND LOSS | L |
 | Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v16 | +0.1% | GAIN, power given | L |
 | Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
 | Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
 | Real Kubernetes, demand that wanders | omni-v10 | +36.5% | GAIN AND LOSS | L |
@@ -729,7 +730,6 @@ installed is a quarter off the bill.
 | PostgreSQL, the pooler's pool size | omni-v16 | −4.9% | GAIN AND LOSS | L |
 | MySQL, the buffer pool's size | omni-v16 | +1.6% | GAIN AND LOSS | L |
 | MongoDB, the storage engine's cache size | omni-v16 | −1.4% | GAIN AND LOSS | L |
-| Kafka, the consumer group's size | omni-v16 | −0.1% | GAIN AND LOSS | L |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN | S |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
