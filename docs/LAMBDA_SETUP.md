@@ -67,14 +67,16 @@ budget plus one hour: above it nothing is rented.
 
 | `test` `mode` | What runs | Hour budget (given back by) | At Lambda's list price |
 |---|---|---|---|
-| `1card` `fast` | the compute counted run on one A10 | 8 h (9 h) | one A10 about $0.75 an hour: about $7 |
+| `1card` `fast` | the compute counted run on one A10 | 8 h (9 h) | one A10 $1.29 an hour on 24 October: about $12 |
+| `1card` `stacks` | the whole stacks with the card inside: the wire check and smoke, then the seven organisms at 1, 10 and 100 copies, native and Omni-Compass, the preregistered 5, 3 and 2 repetitions by size (`hil_profile` `standard`) | 24 h (25 h) | about $32 a run; A, B and C (`tag`) each rent their own A10 and run side by side |
 | `8card` `pooled` (default) | every stage on eight A100 cards, repetitions pooled across the cards | 10.5 h (11.5 h) | about $14.32 an hour: about $165 at most |
 | `8card` `fast` | a short look, never the result to show | 4 h (5 h) | about $72 at most |
-| `1card` `full` | the whole one-card test | 32 h (33 h) | about $25 |
+| `1card` `full` | the whole one-card test | 32 h (33 h) | about $43 |
 | `8card` `full` | the whole design on eight cards | 26 h (27 h) | about $387 at most |
 
 The price the dry run prints is Lambda's own at that moment; the table is an example. The one-card and the eight-card tests
-may run at the same time (one run of each at once; a second press of the same test waits for the first).
+may run at the same time (one run of each at once; a second press of the same test waits for the first, unless its `tag`,
+A, B or C, differs: each tag is its own machine).
 
 The machine is given back when the run prints its last line, or at the hour budget plus one hour whatever happens, or at the
 end of the workflow if anything before it failed. Each give-back is acknowledged by Lambda; if Lambda does not acknowledge it,
