@@ -18,7 +18,10 @@
   stripped. Its watch would have kept the idle card to the deadline (a run cancelled by hand keeps watching, so no give-back is
   lost): the watch now gives the card back as soon as the test stops before its last line, and the new test `giveback` gives back
   every machine whose name starts as given (omni- names only, never one launched by hand), in its own queue. The A10 went back
-  after about 15 minutes; the next run rents an A100.
+  after about 15 minutes. The A100 run that followed (40079645681) had its card up in four minutes, then its start step waited
+  on one connection to the card until the launch job's 60-minute limit cut it off; its watch took over with the card. Since
+  then every machine carries the run's number at the end of its name (-r<run id>) and both give-backs find it by that number,
+  so a launch job cut off before it hands the machine's id on still gets its machine back; the launch job's limit is 90 minutes.
 
 ## 2026-10-24: the clouds' keys read to the letter of their shape
 

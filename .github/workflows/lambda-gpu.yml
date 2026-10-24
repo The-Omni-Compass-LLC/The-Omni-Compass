@@ -66,7 +66,7 @@ jobs:
   launch:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.test != 'giveback'
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 90                # Lambda allows a machine 30 minutes to boot; the wait, the login and the shipping fit
     outputs:
       launched: ${{ steps.go.outputs.launched }}
       ownkey: ${{ steps.go.outputs.ownkey }}
@@ -159,7 +159,7 @@ jobs:
           { echo '```'; cat plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           [ "$rc" = 0 ] || { echo "::warning::$(tail -n 1 plan.txt) Nothing rented."; echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; [ -z "$OWN" ] || python3 scripts/lambda_gpu.py delkey --name "$OWN"; rm -f key; exit 0; }
           if [ "$DRY" = yes ]; then echo "Dry run: the API key and an SSH key pair are ready; nothing rented." >> "$GITHUB_STEP_SUMMARY"; [ -z "$OWN" ] || python3 scripts/lambda_gpu.py delkey --name "$OWN"; rm -f key; exit 0; fi
-          NAME="omni-$TEST-$(date +%s)-${BUDGET%.*}"
+          NAME="omni-$TEST-$(date +%s)-${BUDGET%.*}-r$GITHUB_RUN_ID"   # the run number last: its machines are found by it alone
           echo "name=$NAME" >> "$GITHUB_OUTPUT"      # a launch that fails after renting is still found by its name
           ID=$(python3 scripts/lambda_gpu.py launch --type "$TYPE" --name "$NAME" --ssh-key-name "$KEY_NAME" ${REGION:+--region "$REGION"})
           echo "id=$ID" >> "$GITHUB_OUTPUT"; echo "launched=true" >> "$GITHUB_OUTPUT"
@@ -182,10 +182,12 @@ jobs:
           echo "Started; the watch below carries on until it is over." >> "$GITHUB_STEP_SUMMARY"
           rm -f key
       - name: Give the machine back if starting failed
-        if: failure() && steps.go.outputs.name != ''
+        # a failed start, and a start cut off by the job's time limit or a cancel (whose outputs may never be handed on): every
+        # machine of this run is found by the run number its name ends with
+        if: failure() || cancelled()
         run: |
-          python3 scripts/lambda_gpu.py terminate ${{ steps.go.outputs.id }} --name "${{ steps.go.outputs.name }}"
-          [ -z "${{ steps.go.outputs.ownkey }}" ] || python3 scripts/lambda_gpu.py delkey --name "${{ steps.go.outputs.ownkey }}"
+          python3 scripts/lambda_gpu.py terminate ${{ steps.go.outputs.id }} --run "$GITHUB_RUN_ID"
+          python3 scripts/lambda_gpu.py delkey --name "omni-gh-$GITHUB_RUN_ID"
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -903,7 +905,9 @@ jobs:
   give-back:
     # whatever happened above, the machine goes back (asking twice; an already given-back machine is fine)
     needs: [launch, watch1, watch2, watch3, watch4, watch5, watch6]
-    if: always() && needs.launch.outputs.launched == 'true'
+    # whenever the launch job ran at all: a launch cut off by its time limit may never hand on "launched", and its machine is
+    # still found by this run's number
+    if: always() && needs.launch.result != 'skipped'
     runs-on: ubuntu-24.04
     steps:
       - name: Legal notice at the top of this job's report
@@ -918,10 +922,10 @@ jobs:
         run: |
           # terminate confirms each machine given back (exit 2 otherwise); asked twice, then a red run that says so
           id="${{ needs.launch.outputs.id }}"; bad=0
-          python3 scripts/lambda_gpu.py terminate "$id" || { sleep 30; python3 scripts/lambda_gpu.py terminate "$id"; } || {
-            bad=1; echo "::error::Lambda did not confirm machine $id given back: it may still be billing. Terminate it by hand: cloud.lambda.ai, Instances, tick it, Terminate."; }
+          python3 scripts/lambda_gpu.py terminate $id --run "$GITHUB_RUN_ID" || { sleep 30; python3 scripts/lambda_gpu.py terminate $id --run "$GITHUB_RUN_ID"; } || {
+            bad=1; echo "::error::Lambda did not confirm this run's machine given back: it may still be billing. Terminate it by hand: cloud.lambda.ai, Instances, tick it, Terminate."; }
           python3 scripts/lambda_gpu.py list | sed 's/^/  still listed: /' || true
-          [ -z "${{ needs.launch.outputs.ownkey }}" ] || python3 scripts/lambda_gpu.py delkey --name "${{ needs.launch.outputs.ownkey }}" || true
+          python3 scripts/lambda_gpu.py delkey --name "omni-gh-$GITHUB_RUN_ID" || true
           exit $bad
       - name: Where the results are
         if: always()

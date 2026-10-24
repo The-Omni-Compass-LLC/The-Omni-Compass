@@ -13,9 +13,10 @@
   python3 scripts/lambda_gpu.py wait ID [--timeout 1800]    until it is running; prints its address
   python3 scripts/lambda_gpu.py status ID                   its state and address
   python3 scripts/lambda_gpu.py list [--prefix omni-]       our machines, with how long each has been up
-  python3 scripts/lambda_gpu.py terminate [ID ...] [--name N] [--prefix omni-...]   gives them back (by id, the machine
-                                                            of that name, or every machine whose name starts so; only
-                                                            omni- names) and confirms each one; the bill stops
+  python3 scripts/lambda_gpu.py terminate [ID ...] [--name N] [--prefix omni-...] [--run RUN]   gives them back (by id,
+                                                            the machine of that name, every machine whose name starts so
+                                                            (only omni- names), or every machine a workflow run rented,
+                                                            its name ending -r<run id>) and confirms each one; the bill stops
   python3 scripts/lambda_gpu.py keycheck --name K --private-file F   the SSH key pair, at no cost: Lambda holds a key named
                                                             K, and F is its private half; rents nothing
 
@@ -213,13 +214,18 @@ def terminate(a) -> int:
         # only the machines this workflow names (omni-...); a machine launched by hand on Lambda's page is never touched
         print(f"refused: --prefix must start with omni- (the names this workflow gives), not {prefix!r}", file=sys.stderr)
         return 2
-    if a.name or prefix:
+    run = getattr(a, "run", "") or ""
+    if a.name or prefix or run:
+        # a run's own machines by the run number its name ends with (-r<run id>): found even when the launch job was cut off
+        # before it could hand the machine's id on
         ids += [d.get("id") for d in call("GET", "/instances").get("data", [])
-                if (d.get("name") == a.name or (prefix and (d.get("name") or "").startswith(prefix)))
+                if (d.get("name") == a.name or (prefix and (d.get("name") or "").startswith(prefix))
+                    or (run and (d.get("name") or "").endswith(f"-r{run}")))
                 and d.get("id") not in ids]
     if not ids:
         print("nothing to give back" + (f" (no machine named {a.name})" if a.name else "")
-              + (f" (no machine whose name starts {prefix})" if prefix else ""))
+              + (f" (no machine whose name starts {prefix})" if prefix else "")
+              + (f" (no machine of run {run})" if run else ""))
         return 0
     live = [i for i in ids if state(i) not in GONE]
     for i in ids:
@@ -354,6 +360,7 @@ def main(argv=None) -> int:
     p = sub.add_parser("list"); p.add_argument("--prefix", default="omni-"); p.set_defaults(fn=list_)
     p = sub.add_parser("terminate"); p.add_argument("ids", nargs="*"); p.add_argument("--name", default="")
     p.add_argument("--prefix", default="", help="every machine whose name starts with this (omni-... only)")
+    p.add_argument("--run", default="", help="every machine a workflow run rented (its name ends -r<run id>)")
     p.set_defaults(fn=terminate)
     p = sub.add_parser("keycheck"); p.add_argument("--name", required=True); p.add_argument("--private-file", required=True)
     p.add_argument("--resolved-out", default="")

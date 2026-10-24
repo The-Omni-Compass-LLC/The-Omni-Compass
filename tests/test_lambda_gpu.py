@@ -177,6 +177,16 @@ def test_lambda_launcher_end_to_end():
         rc, o = run(["terminate", "--prefix", "omni-1card-"]); printed += o
         assert rc == 0 and STATE["instances"][stuck]["status"] == "terminated", o     # a stuck run's card, by its name
         assert STATE["instances"]["hand"]["status"] == "active", o                    # the hand-launched one untouched
+        rc, o = run(["launch", "--type", "gpu_1x_a10", "--name", f"omni-1card-{int(time.time())}-9-r4242",
+                     "--ssh-key-name", "omni-key"]); printed += o
+        cut = o.strip()
+        rc, o = run(["terminate", "--run", "424"]); printed += o
+        assert rc == 0 and STATE["instances"][cut]["status"] != "terminated", o     # another run's number never matches
+        rc, o = run(["terminate", "--run", "4242"]); printed += o
+        assert rc == 0 and STATE["instances"][cut]["status"] == "terminated", o     # a launch cut off: found by its run
+        assert STATE["instances"]["hand"]["status"] == "active", o
+        rc, o = run(["list"]); printed += o
+        assert rc == 0 and " 0.00h" in o, o                                           # its age still read from its name
         del STATE["instances"]["hand"]
         os.environ["LAMBDA_API_KEY"] = "wrong"
         rc, o = run(["list"]); printed += o
