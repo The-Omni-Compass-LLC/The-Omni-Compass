@@ -60,10 +60,17 @@ def info(a) -> int:
     return 0 if d.get("status") == "active" and d.get("ip") else 2
 
 
+# Lambda's Jupyter address sits behind a web front that refuses Python's default User-Agent (403 on every request of the
+# run of 24 October, 22:22 UTC, whatever the token's place); the session speaks as a browser does.
+AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+
+
 def jupyter(d: dict) -> tuple[str, str] | None:
-    """The machine's Jupyter server and its token, as Lambda hands them out; https only."""
+    """The machine's Jupyter server and its token, as Lambda hands them out (the token field, else the one in the address);
+    https only."""
     url, tok = str(d.get("jupyter_url") or ""), str(d.get("jupyter_token") or "")
     u = urllib.parse.urlsplit(url)
+    tok = tok or (urllib.parse.parse_qs(u.query).get("token") or [""])[0]
     if not tok or u.scheme != "https" or not u.hostname:
         return None
     return f"https://{u.netloc}", tok
@@ -79,13 +86,28 @@ class Jupyter:
         self.base, self.tok = base, tok
         self.jar = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
+        self.opener.addheaders = [("User-Agent", AGENT)]
         self.way = None
 
     def _xsrf(self) -> str:
         return next((c.value for c in self.jar if c.name == "_xsrf"), "")
 
+    def _logged_in(self) -> bool:
+        """Jupyter's own login cookie (username-...), not a cookie the web front set on the way."""
+        return any(c.name.startswith("username-") for c in self.jar)
+
+    def _why(self, e: urllib.error.HTTPError) -> str:
+        """Who refused: the server's name and the first words of its page, the token cut out wherever it appears."""
+        try:
+            body = e.read(400).decode(errors="replace")
+        except OSError:
+            body = ""
+        body = " ".join(body.replace(self.tok, "<token>").split())[:160]
+        return f"server {e.headers.get('Server', '?')}{', cf-ray' if e.headers.get('CF-Ray') else ''}: {body!r}"
+
     def _send(self, way: str, method: str, path: str, body: dict | None) -> tuple[int, str]:
-        url, headers = self.base + path, {"Content-Type": "application/json", "Referer": self.base + "/"}
+        url, headers = self.base + path, {"Content-Type": "application/json", "Referer": self.base + "/",
+                                          "User-Agent": AGENT}
         if way == "header":
             headers["Authorization"] = f"token {self.tok}"
         elif way == "query":
@@ -100,7 +122,7 @@ class Jupyter:
             with self.opener.open(r, timeout=60) as f:
                 return f.status, f.read().decode(errors="replace")
         except urllib.error.HTTPError as e:
-            return e.code, ""
+            return e.code, self._why(e)
         except OSError as e:
             return 0, type(e).__name__
 
@@ -112,18 +134,18 @@ class Jupyter:
                     print(f"  jupyter login page {path.split('?')[0]}: {f.status}; cookies {sorted(c.name for c in self.jar)}")
                     return
             except urllib.error.HTTPError as e:
-                print(f"  jupyter login page {path.split('?')[0]}: {e.code}")
+                print(f"  jupyter login page {path.split('?')[0]}: {e.code}; {self._why(e)}")
             except OSError as e:
                 print(f"  jupyter login page {path.split('?')[0]}: {type(e).__name__}")
 
     def req(self, method: str, path: str, body: dict | None = None) -> dict:
         ways = [self.way] if self.way else ["header", "query", "cookie"]
         for way in ways:
-            if way == "cookie" and not any(True for _ in self.jar):
+            if way == "cookie" and not self._logged_in():
                 self.login()
             code, text = self._send(way, method, path, body)
             if not self.way:
-                print(f"  jupyter {method} {path} by {way}: {code}")
+                print(f"  jupyter {method} {path} by {way}: {code}" + ("" if 200 <= code < 300 else f"; {text}"), flush=True)
             if 200 <= code < 300:
                 self.way = way
                 return json.loads(text) if text.strip() else {}
@@ -131,7 +153,7 @@ class Jupyter:
 
     def ws_url_headers(self, path: str) -> tuple[str, list[str]]:
         url = self.base.replace("https://", "wss://", 1) + path
-        headers = []
+        headers = [f"User-Agent: {AGENT}"]
         if self.way == "header":
             headers.append(f"Authorization: token {self.tok}")
         elif self.way == "query":
