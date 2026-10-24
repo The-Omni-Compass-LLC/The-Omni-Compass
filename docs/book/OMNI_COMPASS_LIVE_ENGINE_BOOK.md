@@ -488,6 +488,19 @@ bar of a record monitor is its reading cursor: it walks the record one row for e
 holds is named under the monitor; the record itself changes only when GitHub's next run rebuilds the page. An age printed
 beside a reading of GitHub ("read 06:16 UTC, 41 min 07 s ago") counts up every second.
 
+
+### 3.5 A live governor, driven from the control panel
+
+Under the control panel stands **A live governor**. Everything else on the page runs in the page; this box talks to a real
+governor through its own control panel (`tools/omni_control.py serve`, started with `--allow-origin` naming the address the page
+is served from, and HTTPS beyond the loopback). Give the panel's address and a token of yours (held in the page's memory only,
+never stored) and press **Read its status**: the switch, the desired and the actual state, the governor's process and the age of
+its last decision, read again every 15 seconds. The buttons are the panel's own: **Autopilot**, **Watch** (it decides and audits
+every decision and writes nothing), **Off** (it hands every setting back and stops), **The max** and **Tune-down**, **Set the
+beat** (5 to 120 seconds), **Reset to native**, and the **Kill switch**. Each press carries a reason, needs its role (a viewer
+reads, an operator presses, the kill switch needs the security role, and arming it again needs two holders of that role), and
+is written to the panel's control log; every change passes through native, the governor handing back and starting again with
+the new setting. A wrong token is answered 401, a missing role 403, and the box says so.
 ---
 
 
@@ -2397,6 +2410,10 @@ The first view after the front matter: the control panel that drives every monit
 The kill switch. While Omni-Compass governs on top of native the switch reads ON in green. Pressed, it turns red: at the next decision every governor puts every setting it wrote back, reads each one back and stops (omnicompass/master.py, tools/omni_switch.py); the word OFF stands white, and every Omni-Compass side of every monitor follows native, drawn in native's colour. Native's own controllers under every muscle never stop and never see the switch. A recorded result never changes with it: its colour does, never a value, a word or a row. The same switch stands at the head of every section and in every monitor's own knobs; one press anywhere is one press everywhere. It is for security and is instant; the walk back after a crash is the lease, separate.
 
 The three manuals. The Live Engine Manual reads this page top to bottom: how to read, operate, tune and watch it, native beside Omni-Compass, chapter by chapter in the page's own order, and, in its last appendix, the page word for word, every section, every monitor under its number and every knob, written from this page at every build. The Operator's Manual wires and runs Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. Each carries the notice, the LICENSE, the NOTICE and DISCLOSURES.md.
+
+**A live governor: hook a system up and drive it from here**
+
+Everything above runs in this page. This box talks to a real governor through its control panel (tools/omni_control.py serve --allow-origin naming this page's address): the panel's address and a token of yours, held in this page's memory only and never stored. Every press is the panel's own button, behind your token's role and written to its control log; every change passes through native (the governor hands back, then starts again with the new setting). A viewer token reads; an operator token presses; the kill switch needs the security role.
 
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 

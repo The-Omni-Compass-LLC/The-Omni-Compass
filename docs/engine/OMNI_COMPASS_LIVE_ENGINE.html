@@ -614,6 +614,23 @@ html[data-master="off"] .ctlPanel{border-top-color:var(--bad)}
     <p class="note"><b>The kill switch.</b> While Omni-Compass governs on top of native the switch reads <span class="onword">ON</span> in green. Pressed, it turns red: at the next decision every governor puts every setting it wrote back, reads each one back and stops (<code>omnicompass/master.py</code>, <code>tools/omni_switch.py</code>); the word <span class="offword">OFF</span> stands white, and every Omni-Compass side of every monitor follows native, drawn in native's colour. Native's own controllers under every muscle never stop and never see the switch. A recorded result never changes with it: its colour does, never a value, a word or a row. The same switch stands at the head of every section and in every monitor's own knobs; one press anywhere is one press everywhere. It is for security and is instant; the walk back after a crash is the lease, separate.</p>
     <p class="note"><b>The three manuals.</b> The Live Engine Manual reads this page top to bottom: how to read, operate, tune and watch it, native beside Omni-Compass, chapter by chapter in the page's own order, and, in its last appendix, the page word for word, every section, every monitor under its number and every knob, written from this page at every build. The Operator's Manual wires and runs Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. Each carries the notice, the LICENSE, the NOTICE and <code>DISCLOSURES.md</code>.</p>
   </div>
+  <div class="panel stack" style="gap:8px;border-color:var(--brass)" id="liveGov">
+    <h3 style="margin:0">A live governor: hook a system up and drive it from here</h3>
+    <p class="note" style="margin:0">Everything above runs in this page. This box talks to a real governor through its control panel (<code>tools/omni_control.py serve --allow-origin</code> naming this page's address): the panel's address and a token of yours, held in this page's memory only and never stored. Every press is the panel's own button, behind your token's role and written to its control log; every change passes through native (the governor hands back, then starts again with the new setting). A viewer token reads; an operator token presses; the kill switch needs the security role.</p>
+    <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
+      <label class="note" style="margin:0">Panel <input id="lgUrl" type="url" placeholder="https://your-host:9465" style="width:22ch" aria-label="the control panel's address"></label>
+      <label class="note" style="margin:0">Token <input id="lgTok" type="password" autocomplete="off" style="width:18ch" aria-label="your bearer token"></label>
+      <label class="note" style="margin:0">Reason <input id="lgWhy" type="text" placeholder="why this press" style="width:20ch" aria-label="the reason written with the press"></label>
+      <button id="lgConnect">Read its status</button>
+    </div>
+    <div class="row" style="gap:6px;flex-wrap:wrap" id="lgButtons" role="group" aria-label="The live governor's buttons">
+      <button data-lg="mode" data-v="autopilot">Autopilot</button><button data-lg="mode" data-v="watch">Watch (decides, writes nothing)</button><button data-lg="mode" data-v="off">Off (hands back, stops)</button>
+      <button data-lg="dial" data-v="max">The max</button><button data-lg="dial" data-v="save">Tune-down</button>
+      <select id="lgBeat" aria-label="the heartbeat, seconds"><option>5</option><option>15</option><option>30</option><option selected>60</option><option>75</option><option>90</option><option>120</option></select><button data-lg="beat">Set the beat</button>
+      <button data-lg="reset">Reset to native</button><button data-lg="kill" class="mKill">Kill switch (security)</button>
+    </div>
+    <pre class="mono note" id="lgOut" style="white-space:pre-wrap;max-height:16em;overflow:auto;margin:0">Not connected.</pre>
+  </div>
 </section>
 
 <section class="stack" id="s-status" aria-label="The status board">
@@ -5755,6 +5772,38 @@ function monFrame(now) {
   if (MON.ready && now - (MON.syncAt || 0) > 500) { MON.syncAt = now; monSync(); }
 }
 
+// ============================================================== a live governor: the page as its control panel (tools/omni_control.py)
+// The founder's order of 24 October: a system owner hooks a system up and watches and drives it from these monitors. The page
+// talks to the governor's own control panel (its API, its tokens, its log); it adds no authority of its own: every press is the
+// panel's button, behind the token's role, and the token lives in this page's memory only.
+const LG = {url: "", tok: "", poll: null};
+async function lgCall(path, body) {
+  const url = ($("lgUrl").value || "").trim().replace(/\/+$/, ""), tok = ($("lgTok").value || "").trim();
+  if (!/^https?:\/\//.test(url) || !tok) { $("lgOut").textContent = "Give the panel's address (http or https) and your token."; return null; }
+  LG.url = url; LG.tok = tok;
+  try {
+    const r = await fetch(url + path, {method: body ? "POST" : "GET", headers: {"Authorization": "Bearer " + tok, "Content-Type": "application/json"},
+                                       body: body ? JSON.stringify(body) : undefined, mode: "cors", cache: "no-store"});
+    const j = await r.json().catch(() => ({}));
+    return {status: r.status, body: j};
+  } catch (e) { $("lgOut").textContent = `No answer from ${url}: ${e}. The panel must be served with --allow-origin naming this page's address.`; return null; }
+}
+function lgShow(r, what) {
+  if (!r) return;
+  const b = r.body || {}, sw = b.master_switch || (b.switch && b.switch.state) || "";
+  $("lgOut").textContent = `${what}: ${r.status}${r.status === 401 ? " (no valid token)" : r.status === 403 ? " (your token lacks this role)" : ""}\n` + JSON.stringify(b, null, 1).slice(0, 4000);
+  if (typeof evLog === "function") evLog(r.status < 300 ? "INFO" : "WARN", "live governor", `${what}: ${r.status}${sw ? " · switch " + sw : ""}`);
+}
+async function lgStatus() { lgShow(await lgCall("/v1/status"), "status"); }
+$("lgConnect").addEventListener("click", async () => { await lgStatus(); if (LG.poll) clearInterval(LG.poll); LG.poll = setInterval(lgStatus, 15000); });
+$("lgButtons").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-lg]"); if (!b) return;
+  const k = b.dataset.lg, why = ($("lgWhy").value || "").trim() || "pressed on the live engine page";
+  const body = k === "mode" ? {mode: b.dataset.v} : k === "dial" ? {dial: b.dataset.v} : k === "beat" ? {seconds: +$("lgBeat").value} : {};
+  body.reason = why;
+  if ((k === "kill" || k === "reset") && !confirm(k === "kill" ? "The master switch OFF for every governor on that machine?" : "Every setting handed back to native, the governor stopped?")) return;
+  lgShow(await lgCall("/v1/" + k, body), k);
+});
 // ============================================================== the clock
 let lastDecide = 0;
 function frame(now) {

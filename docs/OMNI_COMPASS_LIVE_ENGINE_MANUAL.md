@@ -535,6 +535,19 @@ bar of a record monitor is its reading cursor: it walks the record one row for e
 holds is named under the monitor; the record itself changes only when GitHub's next run rebuilds the page. An age printed
 beside a reading of GitHub ("read 06:16 UTC, 41 min 07 s ago") counts up every second.
 
+
+### 4.5 A live governor, driven from the control panel
+
+Under the control panel stands **A live governor**. Everything else on the page runs in the page; this box talks to a real
+governor through its own control panel (`tools/omni_control.py serve`, started with `--allow-origin` naming the address the page
+is served from, and HTTPS beyond the loopback). Give the panel's address and a token of yours (held in the page's memory only,
+never stored) and press **Read its status**: the switch, the desired and the actual state, the governor's process and the age of
+its last decision, read again every 15 seconds. The buttons are the panel's own: **Autopilot**, **Watch** (it decides and audits
+every decision and writes nothing), **Off** (it hands every setting back and stops), **The max** and **Tune-down**, **Set the
+beat** (5 to 120 seconds), **Reset to native**, and the **Kill switch**. Each press carries a reason, needs its role (a viewer
+reads, an operator presses, the kill switch needs the security role, and arming it again needs two holders of that role), and
+is written to the panel's control log; every change passes through native, the governor handing back and starting again with
+the new setting. A wrong token is answered 401, a missing role 403, and the box says so.
 ---
 
 # PART II. WATCH FIRST: THE SWITCH, THE ALARMS, THE WALL AND EVERY LOSS

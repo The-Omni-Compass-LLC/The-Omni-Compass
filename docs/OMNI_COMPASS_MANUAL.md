@@ -3529,6 +3529,11 @@ python3 tools/omni_control.py serve --tokens /etc/omni/tokens.json --audit /var/
     --governor "python3 -m omni_controller.controller --mode nodepool --audit /var/log/omni/audit.jsonl --interval 60"
 ```
 
+To drive the governor from the live engine page served at another address, name that address when the panel is started:
+`--allow-origin https://the-page-host` (repeat it for more, or `OMNI_CONTROL_ALLOW_ORIGIN` as a comma list). Only a named origin
+is answered across addresses (its browser's preflight and its calls); every call still carries its bearer token and its role,
+and a bind beyond the loopback still needs `--cert` and `--key`. None is named by default.
+
 | Button | Request | Role | What happens |
 |---|---|---|---|
 | Autopilot | `POST /v1/mode {"mode": "autopilot"}` | operator | the governor runs and writes |

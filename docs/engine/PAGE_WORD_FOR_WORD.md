@@ -106,6 +106,10 @@ The kill switch. While Omni-Compass governs on top of native the switch reads ON
 
 The three manuals. The Live Engine Manual reads this page top to bottom: how to read, operate, tune and watch it, native beside Omni-Compass, chapter by chapter in the page's own order, and, in its last appendix, the page word for word, every section, every monitor under its number and every knob, written from this page at every build. The Operator's Manual wires and runs Omni-Compass on a stack; the Owner's Manual holds the whole mechanism, its mathematics, its source and every result. Each carries the notice, the LICENSE, the NOTICE and DISCLOSURES.md.
 
+**A live governor: hook a system up and drive it from here**
+
+Everything above runs in this page. This box talks to a real governor through its control panel (tools/omni_control.py serve --allow-origin naming this page's address): the panel's address and a token of yours, held in this page's memory only and never stored. Every press is the panel's own button, behind your token's role and written to its control log; every change passes through native (the governor hands back, then starts again with the new setting). A viewer token reads; an operator token presses; the kill switch needs the security role.
+
 **Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.
 
 ## 1b The status board: the tiles, the alarms and the watch items

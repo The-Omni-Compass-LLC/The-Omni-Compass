@@ -193,6 +193,30 @@ class Panel(unittest.TestCase):
             self.assertNotIn(t, stored)
         self.assertEqual(oct(self.tokens.stat().st_mode & 0o777), "0o600")
 
+    def test_only_a_named_origin_may_call_across_and_it_still_needs_a_token(self):
+        page = "https://the-omni-compass-llc.github.io"
+        srv = C.server(self.panel, self.tokens, "127.0.0.1", 0, allow_origins=[page])
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        url = f"http://127.0.0.1:{srv.server_address[1]}"
+        try:
+            def ask(method, origin, token=None):
+                req = urllib.request.Request(url + "/v1/status", method=method)
+                req.add_header("Origin", origin)
+                if token:
+                    req.add_header("Authorization", "Bearer " + token)
+                try:
+                    with urllib.request.urlopen(req, timeout=30) as r:
+                        return r.status, r.headers.get("Access-Control-Allow-Origin"), r.headers.get("Access-Control-Allow-Headers")
+                except urllib.error.HTTPError as e:
+                    return e.code, e.headers.get("Access-Control-Allow-Origin"), e.headers.get("Access-Control-Allow-Headers")
+            self.assertEqual(ask("OPTIONS", page), (204, page, "Authorization, Content-Type"))
+            self.assertEqual(ask("OPTIONS", "https://elsewhere.example")[:2], (403, None))
+            self.assertEqual(ask("GET", page)[:2], (401, page))                      # the header, and still no data without a token
+            self.assertEqual(ask("GET", page, self.tok["vera"])[:2], (200, page))
+            self.assertEqual(ask("GET", "https://elsewhere.example", self.tok["vera"])[:2], (200, None))   # its browser refuses it
+        finally:
+            srv.shutdown(); srv.server_close()
+
     def test_a_bind_beyond_the_loopback_needs_https(self):
         with self.assertRaises(SystemExit):
             C.server(self.panel, self.tokens, "0.0.0.0", 0)
