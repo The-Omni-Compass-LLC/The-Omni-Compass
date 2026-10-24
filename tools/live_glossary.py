@@ -312,18 +312,18 @@ def whole_organism() -> dict:
                     "software at one end (the cluster, its add-ons, its governors and the services on it), the bare metal at "
                     "the other (the card and the machine), and the cloud as the wire between them (the machines it bills, "
                     "metered). No run has stacked the layers yet: the composition is class S of class P and L measurements. "
-                    "The founder counts it as the eighth organism running native and the ninth with Omni-Compass on top of "
-                    "every piece. It has layers, not catalog muscles."),
+                    "It is the tenth of the ten organisms, read like each of the others native, with Omni-Compass on top of "
+                    "native and with Omni-Compass direct. It has layers, not catalog muscles."),
         "sources": [{"file": "DISCLOSURES.md", "quote": "composes each layer's own measured ratio, native against Omni-Compass on top of native, into one benefit for a whole stack"},
                     {"file": "tools/whole_system.py", "quote": "the cloud is the wire between the chip at one end and the software at the other"},
-                    {"file": "DISCLOSURES.md", "quote": "counted by the founder as the eighth organism running native and the ninth with Omni-Compass on top of every piece"}],
+                    {"file": "DISCLOSURES.md", "quote": "and the whole organism in its three places (the software end, the cloud's wire, the bare metal) composed above: ten organisms"}],
         "aka": ["the whole organism", "whole system"]}
 
 
 # ------------------------------------------------------------------------------------------------------------- the arms
 def arms() -> list[dict]:
     return [
-        {"key": "native", "name": "native", "colour": "amber", "hex": "#c08332", "aka": ["native"],
+        {"key": "native", "name": "native", "colour": "orange", "hex": "#ff8a1f", "aka": ["native"],
          "def": ("The whole system by itself with everything it ships with: every muscle under its own native controller "
                  "(the Kubernetes pod autoscaler, the GPU's firmware, the cooling, the batteries, a grid's tap changer, a "
                  "robot's servo). In the models, the plant and its native controller alone."),
@@ -399,10 +399,10 @@ TERMS = [
       "failures, or a resource cut. Decided by what the gauge is for, never by the plus or minus sign of its number; the number "
       "beside it wears a plus (+73.0% GAIN). G.A.I.N.: Growth, Advantage, Improvement, Net-positive. Green.",
       [(RD, "the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures")]),
-    T("EVEN", R, "Native and Omni-Compass could not be told apart: the same, or no difference beyond the noise (a 95% interval "
-      "includes zero, and that is the result), or a knob native already runs at the top of its range (at its limit on native). "
-      "The number beside it wears = (=0.9% EVEN). E.V.E.N.: Equalized, Verified baseline, Equilibrium, Neutral. Yellow.",
-      [(RD, "native and Omni could not be told apart: the same, or no difference beyond the noise")]),
+    T("EVEN", R, "No change of 0.5% or more either way in any run (under the floor), or the same, or a knob native already runs "
+      "at the top of its range (at its limit on native). A change of 0.5% or more is never EVEN. The number beside it wears = "
+      "(=0.3% EVEN). E.V.E.N.: Equalized, Verified baseline, Equilibrium, Neutral. Yellow.",
+      [(RD, "no change of 0.5% or more either way in any run (under the floor), or the same; a change of 0.5% or more is never EVEN")]),
     T("LOSS", R, "The gauge moved away from its declared aim against native: less work done, a longer wait, more misses or "
       "failures. A LOSS row is never cut: its cause is found and fixed (our own wiring first, then native's setup, then the "
       "scoring) and the test is run again. The number beside it wears − (−16.8% LOSS). L.O.S.S.: Leakage, Off-track, Setback, "
@@ -415,15 +415,17 @@ TERMS = [
       "reading.",
       [(RD, "A rise is **power given**: what Omni put in to buy the work"),
        (MAN, "on a reading, power given")], aka=["power given"]),
-    T("the runs disagree", R, "Runs A, B and C each clear of the noise but pointing different ways: the test is unstable there "
-      "and is looked into.", [(RD, "runs clear of the noise point different ways: the test is unstable there")],
+    T("the runs disagree", R, "Runs that moved 0.5% or more pointing different ways: the test is unstable there and is looked "
+      "into.", [(RD, "runs that moved 0.5% or more pointing different ways read **the runs disagree**")],
       aka=["the runs disagree", "runs disagree"]),
     T("shown, not judged", R, "A gauge declared in advance as shown only, such as the knob's own setting; counted in no total. "
       "Grey.", [(RD, "SHOWN = \"shown, not judged\"                 # declared in advance as shown only")], aka=["shown, not judged"]),
     T("the 0.5% floor", R, "A change under half of one percent (0.5%) either way, in every run, reads EVEN, under the floor; the "
-      "row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the "
-      "gauge's aim. The repository dates the floor to the founder's order of 20 October 2026.",
-      [(RD, "a change under half of one percent either way, in every run, reads EVEN")],
+      "row keeps its measured size. A change of 0.5% or more either way is a change and never reads EVEN: it reads GAIN, LOSS or "
+      "power given by the gauge's aim, with the count of runs clear of the noise beside the word. The floor is the founder's "
+      "order of 20 October 2026; that a change of 0.5% or more always shows its word, his order of 24 October.",
+      [(RD, "a change under half of one percent (0.5%) either way, in"),
+       (RD, "or more is a change and never reads EVEN (the founder's order of 24 October 2026)")],
       aka=["the floor", "under the floor", "0.5%"]),
     T("the sign beside a word", R, "The number next to a word carries the word's sign, never the gauge's raw direction: GAIN +, "
       "LOSS −, EVEN =, power given +. A bill cut 3% reads GAIN +3%; failed requests up 2% read LOSS −2%.",
@@ -700,8 +702,8 @@ TERMS = [
       [("omnicompass/master.py", "one switch in a human hand turns Omni-Compass's governing off everywhere at once")],
       aka=["kill switch", "master switch"]),
     T("the heartbeat", D, "The governor's full decision, one turn of its loop: read, decide, write, renew the lease. The main "
-      "engine takes it every 60 s (omni-v17); any beat from 5 to 120 s can be set, and every beat is shown beside native with "
-      "what it buys and what it costs.",
+      "engine takes it every 60 s (omni-v17 on); the controller takes any beat from 5 to 120 s (--interval), and the page offers "
+      "five, 15, 30, 60, 90 and 120 s, each shown beside native with what it buys and what it costs.",
       [(CL, "the main engine takes its full decision every 60 s"),
        (MAN, "One turn of the governor's loop: read, decide, write, renew the lease.")], aka=["heartbeat", "beat", "the heart"]),
     T("the fast checks", D, "The governor's checks between its beats, every 5 s at every beat: the scheduling floor, the pod "
@@ -765,9 +767,11 @@ TERMS = [
     T("modelled", P, "The word for our own models (class S) in every report; live software is the real thing (class L); a meter is "
       "class P.", [(CL, "they are \"modelled\" (class S)")], aka=["modelled", "our own models"]),
     T("three runs A, B and C", P, "Each benchmark runs three times as separate GitHub runs, A, B and C, on the same frozen engine. "
-      "A reading counts only when it holds the same way in all three, with every 95% interval clear of zero: \"GAIN in all three "
-      "of our runs\". Run and scored by The Omni-Compass LLC's own code; no outside party has reviewed or approved these results.",
-      [(RD, "A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear"),
+      "Only the runs that moved 0.5% or more decide a reading's direction; \"GAIN in all three of our runs\" means all three "
+      "moved 0.5% or more the same way with every 95% interval clear of zero, and otherwise the word carries how many runs moved "
+      "and how many were clear of the noise. Run and scored by The Omni-Compass LLC's own code; no outside party has reviewed or "
+      "approved these results.",
+      [(RD, "A reading is decided over our three runs, A, B and C. Only the runs that moved 0.5% or more decide its direction"),
        ("tools/confirm_abc.py", "one v1 benchmark run three times as separate GitHub runs on the same")],
       aka=["A, B and C", "three runs", "all three of our runs"]),
     T("the 95% interval on Student's t", P, "Every interval is the two-sided 95% point of Student's t for its degrees of freedom, "
@@ -885,21 +889,36 @@ TERMS = [
       [(CL, "green inside its lines, amber before the line (within 3% of it, or its own slope over the last readings crossing it within three readings), red over it"),
        (CL, "green working, yellow heading for its line or EVEN on a record, red an alert"),
        (MAN, "| Yellow | EVEN |")], aka=["traffic signal", "traffic light", "light", "lights"]),
-    T("REDLINING", W, "Red on the traffic signal: a monitor over its line (an alert), or a LOSS on a record.",
-      [(CL, "red an alert"), (MAN, "| Red | LOSS;")], aka=["REDLINING"],
-      note="The label word is not yet written anywhere in the repository at this commit; the meaning is the red light's."),
-    T("STEADY", W, "Yellow on the traffic signal: EVEN on a record, or a monitor heading for its line (within 3% of it, or its own "
-      "slope crossing it within three readings).",
-      [(CL, "yellow heading for its line or EVEN on a record")], aka=["STEADY"],
-      note="The label word is not yet written anywhere in the repository at this commit; the meaning is the yellow light's."),
-    T("THRIVING", W, "Green on the traffic signal: a monitor inside its lines (working), or a GAIN on a record.",
-      [(CL, "green working"), (MAN, "| Green | GAIN |")], aka=["THRIVING"],
-      note="The label word is not yet written anywhere in the repository at this commit; the meaning is the green light's."),
-    T("native's colour", W, "Amber, an orange (#c08332, the page's --steel): every line, bar, tile and number that belongs to "
-      "native's side wears it, the founder's order of 18 October.",
-      [(PAGE_F, "the sides: --brass is Omni-Compass (blue), --steel is Native (amber), the founder's order of 18 October"),
-       (MAN, "| Amber | native |")], aka=["amber", "orange"],
-      note="The page and the Live Engine Manual name native's colour amber."),
+    T("REDLINING", W, "Red on the traffic signal, blinking: a monitor over its line, or Omni-Compass behind native now (a LOSS): "
+      "the alarm. Red means LOSS and the alarm only, never native.",
+      [(PAGE_F, "REDLINING: over its line, or Omni-Compass behind native now (a LOSS): the alarm"), (CL, "red an alert")],
+      aka=["REDLINING"]),
+    T("STEADY", W, "Yellow on the traffic signal: no difference beyond the noise (EVEN, inside 0.5%), or a monitor heading for its "
+      "line and watched before it gets there.",
+      [(PAGE_F, "STEADY: no difference beyond the noise (EVEN, inside 0.5%), or heading for its line and watched before it gets there")],
+      aka=["STEADY"]),
+    T("THRIVING", W, "Green on the traffic signal: a monitor working inside its lines with room to give, or Omni-Compass ahead of "
+      "native now (a GAIN).",
+      [(PAGE_F, "THRIVING: working inside its lines with room to give, or Omni-Compass ahead of native now (a GAIN)")],
+      aka=["THRIVING"]),
+    T("AWAITING", W, "A dark light, never green: the run that fills this monitor has not landed yet, and the light stays dark until "
+      "it does.", [(PAGE_F, "AWAITING: the run that fills this monitor has not landed yet; its light stays dark until it does, never green")],
+      aka=["AWAITING"]),
+    T("native's colour", W, "Orange (#ff8a1f, the page's --steel): the word native and every line, bar, lane, tile and number that "
+      "belongs to native's side wear it, the founder's order of 24 October. Red is only a LOSS and the alarm.",
+      [(PAGE_F, "the sides: --brass is Omni-Compass (blue), --steel is Native (orange, the founder's order of 24 October; red is only LOSS and the alarm)"),
+       (MAN, "| Orange | native |")], aka=["orange"]),
+    T("the heartbeat's five buttons", D, "On the page the governor's full decision comes at one of five beats, 15, 30, 60, 90 or "
+      "120 s, and no other; the stock beat is the engine's own. The sweep runs the page's own model at every beat and shows what "
+      "each buys and costs; the fast checks and native's own check go on underneath at every beat.",
+      [(PAGE_F, "the heartbeat (15, 30, 60, 90 or 120 s)")], aka=["heartbeat buttons", "the five beats"]),
+    T("lock the tune", D, "The main control panel's lock: the heartbeat and every knob of the mechanism held as set, so nothing "
+      "turns them until the tune is unlocked. A locked tune is a variation of the mechanism (class S) unless it is the factory's.",
+      [(PAGE_F, "Lock the tune"), (PAGE_F, "every knob of the mechanism held as set")], aka=["locked tune", "the lock"]),
+    T("stock", D, "The engine as it ships, Omni-Compass on, every knob of the mechanism and the heartbeat on their stock settings. "
+      "Unlocking the tune hands every knob back to stock.",
+      [(PAGE_F, "unlocked to stock: the engine as it ships, every knob of the mechanism and the heartbeat back to their stock settings, Omni-Compass still on")],
+      aka=["stock", "Unlock to stock", "unlock to stock"]),
     T("Omni-Compass's blue", W, "Blue (#4e97d1, the page's --brass and --omni): Omni-Compass's side and its name; on a reading, "
       "blue always means power given. While the master switch is OFF, Omni-Compass's side follows native in a lighter tint of "
       "native's own colour.",

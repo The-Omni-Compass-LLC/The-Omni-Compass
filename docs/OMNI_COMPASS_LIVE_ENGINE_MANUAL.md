@@ -110,7 +110,7 @@ a model is never proof.
 running by itself: every autoscaler, scheduler, firmware, thermostat, orchestrator and controller it ships with, every muscle
 wired and moving by its own machinery. *Omni-Compass* always means Omni-Compass on top of native: the same whole system with
 all of that still running underneath, and the governor on top of all of it, wired in through the two-way plug. No third side
-exists anywhere on the page. Native is drawn in amber, Omni-Compass in blue, in every chart, table, tile and number.
+exists anywhere on the page. Native is drawn in orange, Omni-Compass in blue, in every chart, table, tile and number.
 
 **The third arm, Omni-Compass by itself** (the founder's order of 23 October, `docs/SOLO_PREREGISTRATION.md`). The same system with each muscle's own native controller switched off and Omni-Compass the only controller moving that knob: on Kubernetes no pod autoscaler and no cluster autoscaler, while Kubernetes' own scheduler and kubelet stay. Where native is a setting rather than a controller (a cache's memory ceiling, a pool's size) the two Omni-Compass arms are one and the same arm. On the page the arm that was called Omni-Compass is now called Omni-Compass and native wherever an arm is named (the chips, the table heads, the lanes), and the third arm's column appears in every table from its first run on GitHub's machines, on omni-v18, the engine that carries it; its column fills from its first run, and nothing is written for it before. Until then every two-arm reading on the page is native against Omni-Compass and native.
 
@@ -194,7 +194,7 @@ receipt seem to differ, the receipt governs, and the page is rebuilt.
 | Procurement, counsel and attorneys | `LICENSE`, `NOTICE`, `PATENTS.md`, `TRADEMARKS.md`, `DISCLOSURES.md`, `LICENSING_FAQ.md`, `ENTERPRISE_LICENSE.md`, `SECURITY.md`, bound into this book in full (the front matter's Disclosures; Appendices F to K); chapter 30 |
 
 **Conventions.** `code` is a command, file, anchor or switch exactly as typed. "Native" means the system as it runs today,
-without Omni-Compass, drawn in amber. "Omni-Compass" means that same native system with Omni-Compass on top of it, drawn in
+without Omni-Compass, drawn in orange. "Omni-Compass" means that same native system with Omni-Compass on top of it, drawn in
 blue; there is no third side and no other name. "Muscle" means any machine, service or controller Omni-Compass can read and
 set. "Knob" or "lever" means one setting on a muscle; on the page, a knob is also a control in a monitor's "Controls" bar, and
 the text says which is meant. "The band" is a reading's safe range, from calm (p = 0) through its center (p = 0.5) to its line
@@ -256,8 +256,8 @@ every gauge on the wall, the colours and marks, troubleshooting, and the papers 
 
 It is a quarter past two. The on-call engineer has the wall open on one screen and the cluster's own console on the other.
 On the wall the switch is green and reads ON. Under it the four signals of the service: the work waiting, the work done, the
-decisions past their line, the capacity held; native in amber on the left of each tile, Omni-Compass in blue on the right,
-both moving on the same demand. The amber line of the work waiting climbs as the night's batch starts; the blue line climbs
+decisions past their line, the capacity held; native in orange on the left of each tile, Omni-Compass in blue on the right,
+both moving on the same demand. The orange line of the work waiting climbs as the night's batch starts; the blue line climbs
 too, then bends sooner, because the governor's ticker (the page's section 5c) shows the pedal pushed at the first decision
 the compass left its center, and two machines recommended before native's autoscaler had seen its first late sample.
 
@@ -268,7 +268,7 @@ all, because the interval includes zero. The row stays on the page, as every row
 document the tile links to, `docs/POD_START_WAIT.md`, and reads that a pod's start on a shared host is the test machine's
 own unpacking of an image, the same on both sides at the same host load. Nothing to do tonight; the record is complete.
 
-At three the batch is done. The blue line of the capacity held eases back a step at a time toward the amber one: the pedal
+At three the batch is done. The blue line of the capacity held eases back a step at a time toward the orange one: the pedal
 lifted, the lease walking every setting toward native. The engineer scrolls to the page's section 8b, the phase plane, and watches sixty
 dots drift from the right edge back toward the middle line, native's a few decisions behind. Then back to the wall. Switch
 green, four signals calm, the alarms row empty but for the one red tile that will stay until its runs B and C land and the
@@ -310,7 +310,7 @@ the Operator's Manuals and `docs/STATE_OF_PLAY.md`.
 
 Keep this card beside the screen that shows the wall. Every line is explained in the chapter named beside it.
 
-**The two sides** (chapter 3). Amber is native, the system by itself. Blue is Omni-Compass on top of native. Nothing else is
+**The two sides** (chapter 3). Orange is native, the system by itself. Blue is Omni-Compass on top of native. Nothing else is
 drawn.
 
 **The three words** (the key). Green GAIN, yellow EVEN, red LOSS. A resource that rose is *power given*, blue. White with a
@@ -434,7 +434,7 @@ and the contents after them. Beside the title, on a desktop, stand the owner's t
 illustrations, one above the other (on a phone they sit under the title): the stacks Omni-Compass sits on top of as he pictures
 them, and under it the Omni-Compass as the unified control authority. Each says under it that it is an illustration, not a result,
 that the product marks in it belong to their owners with no endorsement stated or implied, and what the engine draws over it: a
-ring at every decision of the live engine; on the rose two hands, native's (amber, the longer) and Omni-Compass's (blue), each at
+ring at every decision of the live engine; on the rose two hands, native's (orange, the longer) and Omni-Compass's (blue), each at
 the mean place of that side's muscles in their bands, calm at north and the line at south; on the control core a glow that grows
 with the settings Omni-Compass wrote in that decision; and under each, that decision's counts. The marks are the engine's state
 (the page's section 6a), never a number of the picture's own. The body is numbered 1 to 11; the back matter is vi
@@ -477,7 +477,7 @@ brain). The disclosures close the page as they open it.
 
 ### 3.1 The sides
 
-Native is amber, Omni-Compass is blue, everywhere: every line, bar, tile and number that belongs to one
+Native is orange, Omni-Compass is blue, everywhere: every line, bar, tile and number that belongs to one
 side wears that side's colour, in every chart and table. Where a monitor draws the two sides on one axis, native is the left
 lane or the upper row; where it draws them as two instances (the organism, the phase plane), native is on the left.
 
@@ -506,9 +506,9 @@ the page the structure seat proposed, with its cost, for the founder's decision.
 
 ### 3.3 The sides are never a reading
 
-Blue does not mean good and amber does not mean bad: they name who is being read.
+Blue does not mean good and orange does not mean bad: they name who is being read.
 Where the two sides look the same, they are the same, and that is EVEN. Where Omni-Compass's blue line sits closer to a
-muscle's line than native's amber one, that is the max at work: every muscle to its own limit, never past it, and the
+muscle's line than native's orange one, that is the max at work: every muscle to its own limit, never past it, and the
 capacity it holds there is power given, shown beside the work and the speed it bought.
 
 ![Flowchart: how a gauge's number becomes a word. The gauge's declared aim is read first: time waited, missed or failed, where a fall is GAIN; work done, where a rise is GAIN; a resource spent or held, where a fall is a cut (GAIN) and a rise is power given. Then the paired change and its 95% interval: an interval that includes zero reads EVEN; clear of zero, the word follows the aim. Three runs A, B and C: GAIN or LOSS only when all three point the same way with every interval clear of zero; EVEN when any interval includes zero; the runs disagree when clear runs point different ways. The page draws exactly this rule, as tools/readings.py writes it.](book/figures/f_reading.svg)
@@ -708,16 +708,16 @@ with no reading says what it shows.
 
 ### 4.3 Reading a signal tile
 
-Each signal tile holds the last 120 decisions of both sides, native solid amber and
+Each signal tile holds the last 120 decisions of both sides, native solid orange and
 Omni-Compass blue, each side's value now, and the running paired reading in the tables' words. With the master switch OFF the
 decisions are shaded red and Omni-Compass's side follows native: its value equals native's and its line is drawn in native's
 colour, dashed on top of native's, so both stay in view.
 
 | Signal | What it is | Its aim | A GAIN reads |
 |---|---|---|---|
-| The work waiting | the queue in front of the muscles: requests, jobs or pods not yet served | time waited: lower | the blue line under the amber one |
-| The work done | the requests served, the jobs finished, the work inside the line | work done: higher | the blue line over the amber one |
-| The decisions past their line | the share of decisions where a muscle's reading stood past its line (a miss) | missed: lower | the blue line under the amber one |
+| The work waiting | the queue in front of the muscles: requests, jobs or pods not yet served | time waited: lower | the blue line under the orange one |
+| The work done | the requests served, the jobs finished, the work inside the line | work done: higher | the blue line over the orange one |
+| The decisions past their line | the share of decisions where a muscle's reading stood past its line (a miss) | missed: lower | the blue line under the orange one |
 | The capacity held | the machines, replicas or clock a side holds in service | a resource held: a fall is a cut, a rise is power given | either way is shown beside the three above; a rise that bought nothing is a cost to find |
 
 ### 4.4 Reading an alarm tile
@@ -782,7 +782,7 @@ a table not yet complete, or a run that stopped before a result; INFO is a watch
 
 One point per decision streamed from the live engine, gapless, the last 240 decisions, each
 signal on its own axis, with each side's last, mean and maximum as a time-series dashboard reports them; a kill-switch window
-shaded red; native in amber, Omni-Compass in blue, the same demand on both. The feed is the four signals of the wall at full
+shaded red; native in orange, Omni-Compass in blue, the same demand on both. The feed is the four signals of the wall at full
 size and full history.
 
 ### 6.3 The event log
@@ -1086,7 +1086,7 @@ them together one body, native and with Omni-Compass on top (modelled, class S; 
 Omni-Compass's own orchestrator (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`) runs the organism, a checked web service
 and a batch job on six half-processor machines, with no Kubernetes and no other orchestrator. Each showing GitHub runs
 (`.github/workflows/orchestrator.yml`) puts the same clients through every arm, one after another, on the same machines:
-**native**, Kubernetes' published autoscaling rule on the muscles, written by us (the yardstick, drawn amber); **Omni-Compass
+**native**, Kubernetes' published autoscaling rule on the muscles, written by us (the yardstick, drawn orange); **Omni-Compass
 and native**, Omni-Compass on top of that rule, its units never fewer than the rule's (blue); **Omni-Compass direct**,
 Omni-Compass alone on the muscles (violet, dashed). The section plays back the showing chosen with the Showing buttons from
 its own files on the branch raw, 5 s at a time: the requests answered a second, the 95th percentile response, the units
@@ -1341,7 +1341,7 @@ The engine's own record is a tensor: two sides × every decision × sixty muscle
 each entry a muscle's compass position (0 calm, 0.5 the center of its band, 1 its line), recorded from `realms/harness.py`
 (class S). It fills in decision by decision as the page's section 6a plays: the tensor, the difference matrix and the principal
 motions replay that record on the live engine's clock, and no knob of the console changes them. Read it as a sheet of heat: a column (one decision) that is
-light on the blue side and dark on the amber side is a body Omni-Compass held nearer calm at that moment.
+light on the blue side and dark on the orange side is a body Omni-Compass held nearer calm at that moment.
 
 ### 17.2 The difference matrix and the principal motions
 
@@ -1424,7 +1424,7 @@ Appendix B lists each control in a table. In reading order:
 Press *Surge ×2* and watch the page's section 8b: both sides' dots for that body part move up and right;
 native's controllers each see their own reading one to three decisions late and add in the middle of their range; the
 compass law pushes at the first decision the position leaves the center, so the blue dots turn back before the right edge
-while amber ones cross it. Press *A sense goes blind* and the governor's hand-backs stop while its additions go on (blind means
+while orange ones cross it. Press *A sense goes blind* and the governor's hand-backs stop while its additions go on (blind means
 hold, never a guess). Press *Security hold* and every addition stops while hand-backs go on. In every case the native side is
 put through the same fault, so the difference is Omni-Compass alone.
 
@@ -1448,7 +1448,7 @@ Follow the particles: in along the wires from the muscles' meters to the inner a
 through the brain's six spokes; out through the nerves (the grant), the compass (the force) and the plug (the write). Each
 stress on the console lasts 40 decisions from the moment it is pressed, and both sides meet the same demand, so a cycle
 watched during a surge shows the push on the blue side and the native controllers' late, middle-of-the-range moves on the
-amber one.
+orange one.
 
 ## 20. The Phase Plane and the Scoreboard
 
@@ -1467,7 +1467,7 @@ single field is drawn.
 ### 20.2 The scoreboard
 
 Each panel is one gauge of the live organism, read every decision on both sides, as an operations
-dashboard shows it: native's value now and Omni-Compass's, the last 120 decisions of both (native solid amber, Omni-Compass
+dashboard shows it: native's value now and Omni-Compass's, the last 120 decisions of both (native solid orange, Omni-Compass
 blue), and the running paired reading in the tables' words. With the master switch OFF the decisions are shaded red and
 Omni-Compass's side follows native.
 
@@ -1513,7 +1513,7 @@ hand-back was refused.
 ### 21.4 Native, beside
 
 Native has no brain to draw: each of its controllers reads one reading, its own muscle's, and moves.
-The amber panel draws, live from the same decisions, the mean position native's muscles' readings put them at, the share of its
+The orange panel draws, live from the same decisions, the mean position native's muscles' readings put them at, the share of its
 muscles past their line, and how many of its own controllers moved their setting this decision. Native has no nerves: nothing
 grants or refuses a controller, and a blind sense or a security hold changes nothing it does.
 
@@ -1639,7 +1639,7 @@ Each native controller reads one reading, its own muscle's, one to three decisio
 autoscaler one sync every 15 s), and moves its one setting toward the middle of its range, because protecting its one thing is
 its whole job. It has no heart (nothing proves it is still there), no brain (no state, no memory of need, no stress, no tide),
 and no nerves (nothing grants or refuses it, and a blind sense or a security hold changes nothing it does). Its moves are the
-second ticker of the page's section 5c and the amber panel of the page's section 8c.
+second ticker of the page's section 5c and the orange panel of the page's section 8c.
 
 ### 26.2 What Omni-Compass does, on top
 
@@ -1657,7 +1657,7 @@ running underneath, untouched; Omni-Compass moves only the settings they already
 On the official run playback (chapter 12): the first ticker shows the pedal pushed at
 the compass position's first move off the center and the machines recommended before native's first late sample; the second
 ticker shows native's autoscaler adding replicas a sync or two later. On the phase plane (chapter 20): the blue dots turn back
-before the right edge where the amber ones cross it. On the scoreboard: the work waiting lower, the decisions past their line
+before the right edge where the orange ones cross it. On the scoreboard: the work waiting lower, the decisions past their line
 fewer, the capacity held higher during the climb (power given) and eased back after it (the lift). On the brain (chapter 21):
 calm falling under a surge and the grant refused until the line is clean again, which native has no equivalent of.
 
@@ -1847,7 +1847,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **Live / Recorded.** A knob marked Live acts on the live engine; one marked Recorded data chooses a record and modifies nothing.
 - **Master switch.** The one switch at the top of the organism: ON (green), the kill switch engaged (red), OFF (white).
 - **Monitor.** One section of the page that draws a record or the live engine; its small copy on the wall is a tile.
-- **Native.** The whole system by itself with everything it ships with; amber.
+- **Native.** The whole system by itself with everything it ships with; orange.
 - **Omni-Compass.** Omni-Compass on top of native; blue.
 - **Pedal.** Push for more, lift for less; the force column of the governor's ticker.
 - **Power given.** A resource spent or held that rose: what Omni-Compass put in to buy the work and speed beside it; green.
@@ -1937,8 +1937,8 @@ A copy whose page, engine or records differ from what these print is not a copy 
 
 | Gauge | Side | Aim | GAIN reads | Power given reads | Where it comes from |
 |---|---|---|---|---|---|
-| The work waiting | both | time waited: lower | the blue line under the amber | — | the live engine; on the official runs, pending pods and the queue |
-| The work done | both | work done: higher | the blue line over the amber | — | requests served, jobs finished, work inside the line |
+| The work waiting | both | time waited: lower | the blue line under the orange | — | the live engine; on the official runs, pending pods and the queue |
+| The work done | both | work done: higher | the blue line over the orange | — | requests served, jobs finished, work inside the line |
 | The decisions past their line | both | missed: lower | fewer blue past the line | — | the compass positions over 1 |
 | The capacity held | both | a resource held | a fall (a cut) | a rise | machines, replicas, clock in service |
 | Response time, mean, 95th, 99th | both | time waited: lower | a fall | — | the runs' own samples, binned |
@@ -1956,14 +1956,14 @@ A copy whose page, engine or records differ from what these print is not a copy 
 
 | Mark | Meaning |
 |---|---|
-| Amber | native |
+| Orange | native |
 | Blue | Omni-Compass; on a reading, power given |
 | Green | GAIN |
 | Yellow | EVEN |
 | Red | LOSS; the kill switch and its window; the master switch engaged |
 | White, dashed edge | the runs disagree; the runs differ; not a reading |
 | Grey | shown, not judged; a monitor with no record yet |
-| Dashed blue on amber | Omni-Compass's side following native with the switch OFF |
+| Dashed blue on orange | Omni-Compass's side following native with the switch OFF |
 | Accent border on a tile | the monitor it copies is on screen now |
 | Red shading across a time axis | a kill-switch window |
 | A bar on a ring | a room's heat debt (the immune system) |

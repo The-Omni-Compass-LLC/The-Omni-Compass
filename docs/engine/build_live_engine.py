@@ -1033,6 +1033,13 @@ def scenarios30() -> dict:
     return {"file": str(f.relative_to(ROOT)), "title": d.get("title"), "run": d.get("run"), "gauges": d.get("gauges"), "organisms": orgs}
 
 
+def glossary() -> dict:
+    """The glossary and index at the back of the page (tools/live_glossary.py, docs/engine/glossary.json): every term in the words of
+    the file it names, the ten organisms, the three arms and their thirty scenarios, every muscle of the catalog, and the index."""
+    f = ROOT / "docs" / "engine" / "glossary.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -1088,7 +1095,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct(), "coremc": core_mc(), "threearms": three_arms(), "scenarios": scenarios30()}
+            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct(), "coremc": core_mc(), "threearms": three_arms(), "scenarios": scenarios30(), "glossary": glossary()}
 
 
 def embedded(page: str, key: str):
@@ -1243,7 +1250,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial", "coremc", "threearms", "scenarios")
+                          "beatsweep", "dial", "coremc", "threearms", "scenarios", "glossary")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1261,7 +1268,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "direct", "coremc", "threearms", "scenarios"):
+              "beatsweep", "dial", "direct", "coremc", "threearms", "scenarios", "glossary"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand
