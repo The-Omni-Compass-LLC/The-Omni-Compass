@@ -6,7 +6,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Every row of every three-run table stands where its table stands, LOSS included; this page gathers the LOSS rows so none of them is found only by reading every table. A LOSS row is a gauge that moved away from its declared aim by 0.5% or more across the benchmark's three runs, A, B and C (the founder's order of 24 October 2026, `tools/readings.py`): in all three, every run's 95% interval clear of zero, or by the mean of the three, with the count of runs beyond the noise. Each benchmark is read from its newest whole table; an older engine's table stands only until the engine that stands has run that benchmark three times, and the engine each row ran on is printed beside it.
 
-Rows that read LOSS across their three runs: **328**. Against my own native, the readings do no harm is judged by: **157**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v18: 10, omni-v17: 2, omni-v16: 22, omni-v12: 284, omni-v11: 2, omni-v10: 8.
+Rows that read LOSS across their three runs: **333**. Against my own native, the readings do no harm is judged by: **162**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v18: 17, omni-v17: 2, omni-v16: 20, omni-v12: 284, omni-v11: 2, omni-v10: 8.
 
 ## Against my own native
 
@@ -49,7 +49,13 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v18 | `results/live/V18_KAFKA.json` | workload burst / lag_max | 1.1%, 0.4%, 0.6% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v18 | `results/live/V18_KAFKA.json` | workload light / work_inside_line_mps | 0.2%, 0.1%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v18 | `results/live/V18_KAFKA.json` | workload light / p95_ms | 1.1%, 1.0%, 70.9% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_KAFKA_SERVICE.json` | workload burst / mean_ms | 1.0%, 0.6%, 0.8% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA_SERVICE.json` | workload burst / mean_ms | 2.3%, 0.8%, 0.4% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA_SERVICE.json` | workload burst / lag_mean | 2.2%, 0.6%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA_SERVICE.json` | workload light / p95_ms | 2.0%, 9.2%, 1.3% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA_SERVICE.json` | workload light / p99_ms | 0.6%, 7.9%, 0.3% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA_SERVICE.json` | workload light / mean_ms | 2.0%, 10.6%, 1.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA_SERVICE.json` | workload light / lag_max | 0.5%, 2.8%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v18 | `results/live/V18_KAFKA_SERVICE.json` | workload light / lag_mean | 1.9%, 9.7%, 1.5% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KAI.json` | response time (ms), 99th percentile | 0.7%, 9.7%, 5.7% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KAI.json` | time over the response line (% of samples) | 8.8%, 42.3%, 6.5% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KAI.json` | alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | 28.6%, 61.1%, 0.0% | not yet written | — | the benchmark's three runs on the engine that stands |
@@ -131,7 +137,6 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v16 | `results/live/V16_PGBENCH.json` | workload tpcb_hot / p95_ms | 430.3%, 75.3%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v17 | `results/live/V17_PGBENCH_SERVICE.json` | workload simple_update / p50_ms | 0.3%, 37.2%, 1.634 to 30.65 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v17 | `results/live/V17_PGBENCH_SERVICE.json` | workload tpcb_hot / work_inside_line_tps | 0.0%, 0.0%, 3.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v16 | `results/live/V16_REDIS_SHIPPED.json` | workload large / p95_ms | 1.4%, 1.7%, 1.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v11 | `results/live/V11_ROBUST_LONG.json` | pod start wait, total (s) | 268.2%, 135.7%, 138.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_SYSBENCH.json` | workload read_write / work_inside_line_tps | 5.7%, 0.0%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v16 | `results/live/V16_SYSBENCH.json` | workload read_write / mean_ms | 28.5%, 0.1%, 6.9% | not yet written | — | the benchmark's three runs on the engine that stands |
