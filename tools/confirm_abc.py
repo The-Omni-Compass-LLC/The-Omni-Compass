@@ -4,13 +4,13 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C three-run table (docs/OMNI_V1.md): one v1 benchmark run three times as separate GitHub runs on the same
-frozen engine, A the result, B and C the replications. Every judged row gets one of three readings, all three runs shown:
-GAIN or LOSS in all three of our runs (judged by what the gauge is for, never by the sign of its number; a resource spent
-that rose reads power given, never a loss: tools/readings.py, the founder's order of 13 October) when all three runs move
-the same way and each run's 95% interval of the paired difference (omni minus native) is clear of zero; EVEN, no
-difference beyond the noise, when a run's interval includes zero (native and omni could not be told apart on that measure,
-which is itself the result, with the count of such runs); the runs disagree when runs clear of the noise point different
-ways (the test itself is then unstable, and is looked into).
+frozen engine, A the result, B and C the replications. Every judged row gets one reading by the one rule
+(tools/readings.py judge_runs, the founder's order of 24 October), all three runs shown: EVEN, under the floor, when every
+run's change is under 0.5% either way; otherwise the runs that moved 0.5% or more decide: all the same way, the gauge's word
+by what it is for, never by the sign of its number (a resource spent that rose reads power given, never a loss), "in all
+three of our runs" when all three moved 0.5% or more the same way and each run's 95% interval of the paired difference (omni
+minus native) is clear of zero, else the word with its qualifier (how many runs moved 0.5% or more, how many were clear of
+the noise); pointing different ways, the runs disagree (the test itself is then unstable, and is looked into).
 Rows that are shown but never judged (tools/live_reps.py NEUTRAL) stay unjudged. Every row is reported, losses included.
 Usage: python tools/confirm_abc.py "TITLE" A_DIR B_DIR C_DIR --out results/live/V1_<NAME>.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding live-reps/LIVE_REPS.json, or one native setup's folder
@@ -25,7 +25,8 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import OWN_RUNS, receipt_key, in_all_three, word, aim, EVEN_SAME, even_noise, SHOWN, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
+from tools.readings import OWN_RUNS, receipt_key, word, aim, EVEN_SAME, SHOWN, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
+from tools.readings import judge_runs, rel_change, plain, THREE_RUN_RULE  # noqa: E402
 from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
 from tools.readings import by_word, interval_by_word
 
@@ -152,9 +153,9 @@ def aim_of_row(k):
 
 
 def verdict(k, rs):
-    """The row's reading over the three runs, by rule: GAIN, LOSS or power given in all three of our runs (by what the gauge
-    is for), EVEN (no difference the test can measure, or the same), or a disagreement between runs. Every judged row gets
-    exactly one."""
+    """The row's reading over the three runs, by the one rule (tools/readings.py judge_runs): GAIN, LOSS or power given by what
+    the gauge is for (in all three of our runs, or with its qualifier), EVEN (under the floor in every run, or the same), or a
+    disagreement between runs. Every judged row gets exactly one."""
     if k in NEUTRAL:
         return SHOWN
     if all(abs(r["diff"]) <= SAME_REL * abs(r["native"]) for r in rs):
@@ -167,14 +168,8 @@ def verdict(k, rs):
         if len(set(signs)) > 1:
             return "single pairs point different ways (one pair a run, no interval)"
         return f"three single pairs agree: {word(signs[0] == -1, aim_of_row(k))} (one pair a run, no interval, so the noise cannot be judged)"
-    clear = [r["ci95"][0] > 0 or r["ci95"][1] < 0 for r in rs]
-    if len({s for s, c in zip(signs, clear) if c}) > 1:
-        return "**the runs disagree**"
-    if not all(clear):
-        n = sum(1 for c in clear if not c)
-        return even_noise("all three runs") if n == len(rs) else even_noise(f"{n} of {len(rs)} runs")
-    sizes = [abs(r["diff"]) / abs(r["native"]) for r in rs if r["native"]]
-    return in_all_three(signs[0] == -1, aim_of_row(k), max(sizes) if len(sizes) == len(rs) else None)
+    clear = [not s and (r["ci95"][0] > 0 or r["ci95"][1] < 0) for r, s in zip(rs, single)]
+    return judge_runs([rel_change(r["native"], r["diff"]) for r in rs], clear, aim_of_row(k))
 
 
 def rig(d):
@@ -219,13 +214,9 @@ def main(argv=None):
     L = [f"# {title}: the A/B/C three-run table (Omni v1)", "", *receipt_key(), "",
          "Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C "
          "are the replications. Each cell is omni against native, the paired change in percent of native with its 95% "
-         "interval. Every judged row gets one of three readings. **GAIN** or **LOSS in all three of our runs**: all three "
-         "runs move the same way and every interval is clear of zero, and the word says what that means for the gauge's "
-         "declared aim, never the sign of its number (a response time that fell is GAIN; a resource spent that fell is a cut, "
-         "a GAIN, and one that rose is **power given**, never a loss: the key, `docs/HOW_TO_READ_THE_RESULTS.md`). **EVEN, no "
-         "difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told "
-         "apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so "
-         "the test itself is unstable there. Every row is shown, LOSS included.", "", OWN_RUNS, ""]
+         "interval. Every judged row gets one reading by the one rule (the key, `docs/HOW_TO_READ_THE_RESULTS.md`; a response "
+         "time that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is **power given**, never a loss). "
+         + THREE_RUN_RULE + " Every row is shown, LOSS included.", "", OWN_RUNS, ""]
     if PAIR == "solo":                                     # Omni-Compass by itself against native (omni-v17)
         L += ["**The comparison.** In this table \"omni\" stands for Omni-Compass by itself (the pod autoscaler removed, "
               "Omni-Compass's own pod muscle on the workload) and \"native\" for native: each cell is the first against the "
@@ -274,19 +265,19 @@ def main(argv=None):
             continue
         v = verdict(k, rs)
         tally[v] = tally.get(v, 0) + 1
-        rows[k] = {"reading": v.strip("*"), "aim": aim_of_row(k) if k not in NEUTRAL else None,
+        rows[k] = {"reading": plain(v), "aim": aim_of_row(k) if k not in NEUTRAL else None,
                    "runs": [{"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": list(r["ci95"])} for r in rs]}
         L.append(f"| {LABEL.get(k, k)} | {cell(rs[0], v)} | {cell(rs[1], v)} | {cell(rs[2], v)} | {v} |")
     rob_l, rob_rows = robust_rows(runs)           # the robustness test's own rows (omni only, by rule, not paired)
     for line in rob_l:
         v = line.rsplit("|", 2)[-2].strip(); tally[v] = tally.get(v, 0) + 1
     L += rob_l; rows.update(rob_rows)
-    L += ["", "Readings: " + ", ".join(f"{n} {v.strip('*')}" for v, n in sorted(tally.items())) + "."]
+    L += ["", "Readings: " + ", ".join(f"{n} {plain(v)}" for v, n in sorted(tally.items())) + "."]
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(_legal_stamp(L)) + "\n")
     # the same table as data, for the Omni index (tools/omni_index.py): every run's values and the reading, by rule
     out.with_suffix(".json").write_text(json.dumps({"title": a.title, "v1": not off, "runs": meta, "rows": rows}, indent=1) + "\n")
-    print(f"{out}: " + ", ".join(f"{n} {v.strip('*')}" for v, n in sorted(tally.items())))
+    print(f"{out}: " + ", ".join(f"{n} {plain(v)}" for v, n in sorted(tally.items())))
     return 0
 
 

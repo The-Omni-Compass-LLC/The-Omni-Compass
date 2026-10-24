@@ -5,8 +5,9 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the robot arms (docs/OMNI_V1.md, docs/ROBOTICS_PREREGISTRATION.md): each robot run three times as
 separate GitHub runs on the same frozen engine (tools/run_mujoco.py). MuJoCo is deterministic, so the runs must give the
-same numbers: a gauge reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the
-gauge is for, never by its sign; energy, force and copper heating are resources spent, so a rise reads power given), EVEN
+same numbers: a gauge reads GAIN or LOSS in all three of our runs when all three runs moved 0.5% or more with the same sign (judged by what the
+gauge is for, never by its sign; energy, force and copper heating are resources spent, so a rise reads power given), EVEN, under the floor, when every run's change is under 0.5% (24 October 2026: a change
+of 0.5% or more is a change), EVEN, the same,
 when the change is under one part in a million, and "the runs differ" when they do not reproduce. A robot whose paired
 physics trial left the override native is listed as "nothing for Omni to move"; a robot whose own servo cannot do the task
 is listed with the runner's reason. Every row is reported, LOSS included.
@@ -22,7 +23,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, judge_runs, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 from tools.run_mujoco import GAUGES
 
 SAME_REL = 1e-6
@@ -68,7 +69,7 @@ def verdict(recs, k, direction):
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return in_all_three(signs == {-1}, aim(direction, k))
+    return judge_runs(ch, None, aim(direction, k))
 
 
 def engine(run):

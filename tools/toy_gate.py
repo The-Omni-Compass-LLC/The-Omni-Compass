@@ -41,7 +41,9 @@ the cloud setting). The card toys read the requests served and not served, the 9
 energy and peak temperature, and the power limit's writes, moves, reversals and travel in watts.
 The candidate is read against the standing engine paired by seed: the mean change, its 95% interval over the seeds
 (Student's t), and the word by the gauge's aim (tools/readings.py): a fall in time waited, missed or over the line is a
-GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; an interval across zero is EVEN.
+GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given. By the one rule (tools/readings.py
+judge_one, the founder's order of 24 October 2026): a mean change under 0.5% of the base reads EVEN, under the floor; one of
+0.5% or more reads its word, "(not clear of the noise)" beside it where the interval crosses zero.
 """
 from __future__ import annotations
 
@@ -793,16 +795,22 @@ def reading(gauge, diffs, base_vals, gauges=None):
     t = T95.get(n - 1, 2.0); lo, hi = m - t * sd / math.sqrt(n), m + t * sd / math.sqrt(n)
     if sd == 0.0:
         lo = hi = m
-    if lo <= 0.0 <= hi and not (lo == hi == 0.0):
-        word = "EVEN"
-    elif lo == hi == 0.0:
-        word = "EVEN (identical)"
-    elif (hi < 0) == (aim == "lower"):
-        word = "GAIN"
-    else:
-        word = "power given" if spent else "LOSS"
     b = sum(base_vals) / n
+    if lo == hi == 0.0:
+        word = "EVEN (identical)"
+    else:
+        word = model_word(m, b, not (lo <= 0.0 <= hi), aim, spent)
     return {"mean_change": m, "ci95": [lo, hi], "relative": m / b if b else float("nan"), "word": word}
+
+
+def model_word(mean, base, clear, aim, spent):
+    """A model's paired word by the one rule (tools/readings.py judge_one, the founder's order of 24 October 2026): under 0.5% of
+    the base EVEN, under the floor; from 0.5% up the word by the gauge's aim (a resource spent that rose is power given), with
+    "(not clear of the noise)" beside it where the interval crosses zero. A base of zero sizes any move as a change."""
+    from tools.readings import judge_one, EVEN_FLOOR, SPENT as AIM_SPENT
+    rel = mean / abs(base) if base else (0.0 if mean == 0 else math.copysign(math.inf, mean))
+    w = judge_one(rel, clear, AIM_SPENT if spent else aim)
+    return EVEN_FLOOR if w.startswith(EVEN_FLOOR) else w
 
 
 def render(report_path, out_md):

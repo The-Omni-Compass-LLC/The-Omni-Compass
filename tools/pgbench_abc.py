@@ -6,9 +6,11 @@
 """The A/B/C table for the database benchmark (docs/OMNI_V1.md, docs/POSTGRES_PREREGISTRATION.md): the untouched pgbench
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_pgbench.py), each run holding
 three paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions
-gives a 95% interval; across the three runs a gauge reads GAIN or LOSS in all three of our runs (by what it is for, never by its sign; a resource
-spent that rose reads power given) when all three move the same way with every interval clear of zero, EVEN, no difference beyond the noise, when a run's interval includes zero (with the count
-of such runs), and the runs disagree when runs clear of the noise point different ways. Failed transactions: any rise
+gives a 95% interval; across the three runs a gauge reads by the one rule (tools/readings.py judge_runs, the founder's order of 24 October 2026): EVEN only
+when every run's change is under 0.5% either way (or the same); from 0.5% up its word by what it is for, never by its sign (a
+resource spent that rose reads power given), in all three of our runs when all three moved 0.5% or more the same way with
+every interval clear of zero, else with its qualifier beside it; the runs disagree when runs that moved 0.5% or more point
+different ways. Failed transactions: any rise
 in any run is marked. The pool size is shown, never judged. Every row is reported, LOSS included; no energy is claimed.
 Usage: python tools/pgbench_abc.py A_DIR B_DIR C_DIR --out results/live/V3_PGBENCH.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding pgbench-<workload>/.../<workload>.json"""
@@ -22,7 +24,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
+from tools.readings import THREE_RUN_RULE, plain, with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
 from tools.run_pgbench import GAUGES, SAME_REL, paired  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 
@@ -81,10 +83,7 @@ def main(argv=None):
     eng = [engine(d) for d in a.dirs]
     L = ["# PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table", "",
          "PostgreSQL as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on the pool size through "
-         "PgBouncer's own console (`docs/POSTGRES_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired "
-         "difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a "
-         "reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **EVEN, no difference beyond the "
-         "noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed transactions: "
+         "PgBouncer's own console (`docs/POSTGRES_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run says whether that run is clear of the noise. " + THREE_RUN_RULE + " Failed transactions: "
          "any rise in any run reads **LOSS in at least one of our runs**. Every row is shown, LOSS included. The host's CPU-seconds are measured on GitHub's "
          "shared runner; no energy is claimed.", "",
          "| Run | GitHub run | Commit | Engine | Workloads |", "|---|---|---|---|---:|"]
@@ -119,7 +118,7 @@ def main(argv=None):
             tally.add(v, dr, k)
             nat = fmt(rs[0]["native"]) if rs[0] else "n/a"; om = fmt(rs[0]["omni"]) if rs[0] else "n/a"
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
-            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
+            out["workloads"][wl][k] = {"reading": plain(v), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
         L += ["", f"The knob handed back and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
         vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}

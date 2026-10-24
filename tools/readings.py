@@ -14,8 +14,9 @@ the front of the manual, in the README, in docs/HOW_TO_READ_THE_RESULTS.md and i
 the repository (python3 tools/summary.py). This module is the one place the words are written.
 
 Nobody outside The Omni-Compass LLC has checked or approved these results, so no table says "confirmed": a reading that
-holds the same way in runs A, B and C, with every 95% interval clear of zero, says "in all three of our runs", and every
-table carries OWN_RUNS. classify() reads a reading in any words the repository has used (GAIN/EVEN/LOSS; lower and higher
+moved 0.5% or more the same way in runs A, B and C, with every 95% interval clear of zero, says "in all three of our runs";
+a change of 0.5% or more that holds its direction but not that strictly still shows its word, with the count of runs clear
+of the noise beside it (judge_runs, the founder's order of 24 October 2026); and every table carries OWN_RUNS. classify() reads a reading in any words the repository has used (GAIN/EVEN/LOSS; lower and higher
 of 13 October; toward and away; better, worse and "confirmed" of the older tables) so every scorer reads every table alike.
 
   python3 tools/readings.py --key      the key, as plain text
@@ -24,6 +25,7 @@ of 13 October; toward and away; better, worse and "confirmed" of the older table
 """
 from __future__ import annotations
 
+import math
 import re
 import sys
 from pathlib import Path
@@ -105,22 +107,133 @@ def word(fell: bool, aim_: str) -> str:
     return GAIN if fell else LOSS                     # lower, never more
 
 
-SIZE_FLOOR = 0.005           # the founder's floor of 20 October 2026: a change under half of one percent either way, in every run, reads EVEN
-EVEN_FLOOR = f"{EVEN}, under the floor"              # held the same way in all three runs, every run's change under SIZE_FLOOR
+SIZE_FLOOR = 0.005           # the founder's floor (20 October 2026; 24 October: a change of 0.5% or more either way is a change and
+                             # shows its word): under half of one percent either way, in every run, reads EVEN; from 0.5% up it is a change
+EVEN_FLOOR = f"{EVEN}, under the floor"              # every run's change under SIZE_FLOOR
+CLEAR_OF_NOISE = "clear of the noise"                # a run whose 95% interval of the paired difference excludes zero
 SIGN_OF = {GAIN: "+", LOSS: "−", EVEN: "="}          # the number beside a word carries the word's sign, never the gauge's raw direction (20 October)
+_COUNT = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
 
 
 def even_floor(size: float) -> str:
-    """The reading of a change that held the same way in all three runs but under the floor in every one of them."""
+    """The reading of a gauge whose change was under the floor in every run."""
     return f"{EVEN_FLOOR} (every run under {100 * SIZE_FLOOR:g}%; the largest {100 * size:.2f}%)"
 
 
 def in_all_three(fell: bool, aim_: str, size: float | None = None) -> str:
-    """The three-run reading of a number that went the same way in all three runs, every interval clear of zero. size, where the
-    caller has it, is the largest run's relative change: under the founder's floor in every run the reading is EVEN, under the floor."""
+    """The three-run reading of a number that went the same way in all three runs, every run at or above the floor and every
+    interval clear of zero. size, where the caller has it, is the largest run's relative change: under the founder's floor in every
+    run the reading is EVEN, under the floor. judge_runs() is the whole rule; this is its strictest case."""
     if size is not None and size < SIZE_FLOOR:
         return even_floor(size)
     return f"**{word(fell, aim_)} {IN_ALL_THREE}**"
+
+
+def rel_change(native, diff) -> float:
+    """A run's paired change as a share of native, signed (omni − native) / |native|; where native is zero, an arm that moved is
+    an unbounded change (±inf) and one that did not is 0.0."""
+    if native:
+        return diff / abs(native)
+    return 0.0 if not diff else math.copysign(math.inf, diff)
+
+
+def judge_runs(changes, clear, aim_) -> str:
+    """The one rule for a gauge read over several runs (the founder's order of 24 October 2026: "Any gauge that gives anything
+    over a 0.5 percent change either way is a change ... it has to show its loss or gain"). Every tool that decides a word over
+    runs calls it.
+
+    changes: each run's paired change as a share of native, signed (rel_change); the sign is omni against native.
+    clear:   each run's 95% interval of the paired difference clear of zero (True or False), or None where the runs carry no
+             interval (a deterministic simulator, whose runs reproduce exactly).
+    aim_:    what the gauge is for (LOWER, HIGHER, SPENT, WORK_PER, NEVER_MORE, NEVER_LESS), or None for a gauge shown only.
+
+    1. Every run under SIZE_FLOOR (0.5%) either way: EVEN, under the floor. (EVEN, the same is the caller's own measure of no
+       change at all, read before this.)
+    2. Otherwise only the runs that moved 0.5% or more decide the direction. All the same way: the gauge's word by its aim
+       (GAIN, LOSS, or power given for a resource spent that rose; a cut of a resource spent is GAIN), whatever the intervals say.
+       All runs moved 0.5% or more the same way with every interval clear of zero: "**GAIN in all three of our runs**", as
+       before; else the word stands and its qualifier follows in the same cell, the noise count always shown: "**GAIN** (the same
+       way in all three runs; 2 of 3 clear of the noise)", "**LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the
+       floor; 1 of 3 clear of the noise)".
+    3. The runs that moved 0.5% or more point different ways: the runs disagree.
+    A count that must never rise (NEVER_MORE) keeps its strict rule: any rise in any run reads LOSS. The count of runs clear of
+    the noise always stands beside a word that is not in all three of our runs."""
+    if aim_ is None:
+        return SHOWN
+    changes = [float(c) for c in changes]
+    n = len(changes)
+    if aim_ == NEVER_MORE:
+        if clear is None and n and all(c > 0 for c in changes):       # a deterministic simulator's runs reproduce: all three rose
+            return f"**{LOSS} {IN_ALL_THREE}**"
+        if any(c > 0 for c in changes):
+            return f"**{NEVER_MORE_UP}**"
+        if clear is None and n and all(c < 0 for c in changes):
+            return f"**{GAIN} {IN_ALL_THREE}**"
+        return EVEN_SAME if all(c == 0 for c in changes) else f"**{NEVER_MORE_HELD}**"
+    sizes = [abs(c) for c in changes]
+    movers = [i for i, s in enumerate(sizes) if s >= SIZE_FLOOR]
+    if not movers:
+        return even_floor(max(sizes) if sizes else 0.0)
+    ways = {changes[i] > 0 for i in movers}
+    if len(ways) > 1:
+        return f"**{DISAGREE}**"
+    fell = ways == {False}
+    w = word(fell, aim_)
+    nn = _COUNT.get(n, str(n))
+    if len(movers) == n:
+        moved = f"the same way in all {nn} runs"
+    elif len(movers) == 1:
+        moved = f"1 of {n} runs moved {100 * SIZE_FLOOR:g}% or more, {n - 1} under the floor"
+    else:
+        moved = f"{len(movers)} of {n} runs moved {100 * SIZE_FLOOR:g}% or more, the same way, {n - len(movers)} under the floor"
+    if clear is None:                                   # a deterministic simulator: the runs reproduce, no interval to read
+        if len(movers) == n:
+            return f"**{w} {IN_ALL_THREE}**" if n == 3 else f"**{w} in all {nn} of our runs**"
+        return f"**{w}** ({moved}; no interval: the runs reproduce exactly)"
+    k = sum(1 for c, ok in zip(changes, clear) if ok and c != 0 and (c < 0) == fell)
+    if len(movers) == n and k == n:
+        return f"**{w} {IN_ALL_THREE}**" if n == 3 else f"**{w} in all {nn} of our runs**"
+    return f"**{w}** ({moved}; {k} of {n} {CLEAR_OF_NOISE})"
+
+
+def judge_one(change, clear, aim_) -> str:
+    """The same rule for one paired comparison (one run, or a model's seeds paired with the engine that stands): under the floor
+    EVEN, under the floor; from 0.5% up the gauge's word by its aim, and "(not clear of the noise)" after it where the 95% interval
+    includes zero. clear None: no interval (a deterministic comparison)."""
+    if aim_ is None:
+        return SHOWN
+    c = float(change)
+    if aim_ == NEVER_MORE:
+        return LOSS if c > 0 else EVEN_SAME if c == 0 else GAIN
+    if abs(c) < SIZE_FLOOR:
+        return f"{EVEN_FLOOR} ({100 * abs(c):.2f}%, under {100 * SIZE_FLOOR:g}%)"
+    w = word(c < 0, aim_)
+    return w if (clear or clear is None) else f"{w} (not {CLEAR_OF_NOISE})"
+
+
+def plain(reading) -> str:
+    """A reading without its Markdown emphasis, as the tables' JSON twins keep it."""
+    return (reading or "").replace("**", "").strip()
+
+
+def bare_word(reading) -> str:
+    """A reading's word alone, its qualifier dropped, for a page that colours a cell by its word: GAIN, LOSS, power given,
+    EVEN, under the floor, EVEN, the same, the runs disagree, or the reading as it stands."""
+    r = plain(reading)
+    for w in (GAIN, LOSS, GIVEN, EVEN_FLOOR, EVEN_SAME, DISAGREE, SHOWN):
+        if r.startswith(w):
+            return LOSS if r.startswith(NEVER_MORE_UP) else w
+    return r
+
+
+def judge_word(changes, clear, aim_) -> str:
+    """judge_runs() reduced to its word (bare_word): the live engine's exporters colour a cell by it."""
+    return bare_word(judge_runs(changes, clear, aim_))
+
+
+# the aims as the live engine's exporters name them
+EXPORT_AIMS = {"spent": SPENT, "per": WORK_PER, "up": HIGHER, "down": LOWER, "higher": HIGHER, "lower": LOWER, "shown": None,
+               "HIGHER": HIGHER, "LOWER": LOWER, "SPENT": SPENT, "WORK_PER": WORK_PER, "SHOWN": None}
 
 
 def cut_or_up(fell: bool) -> str:
@@ -129,23 +242,29 @@ def cut_or_up(fell: bool) -> str:
 
 
 EVEN_SAME = f"{EVEN}, the same"                     # under one part in a million of the value (amendment 11), or exactly
+# The reading the tables wrote until 24 October 2026 for a run whose interval included zero, whatever the size of the change.
+# No tool writes it now (a change of 0.5% or more shows its word: judge_runs); classify() still reads it in older records.
 EVEN_NOISE = f"{EVEN}, no difference beyond the noise"
 
 
 def even_noise(detail: str = "") -> str:
-    """No difference beyond the noise: in the runs counted the interval includes zero, so native and Omni could not be told
-    apart on that gauge; that is the result. detail names the runs, '2 of 3 runs'."""
+    """The reading of 13 to 24 October 2026 for a run whose interval included zero; kept so the older records read alike.
+    Nothing writes it now: judge_runs() is the rule."""
     return f"{EVEN_NOISE} ({detail})" if detail else EVEN_NOISE
 
 
 NEVER_MORE_UP = f"{LOSS} in at least one of our runs"            # a count that must never rise rose in a run
 NEVER_MORE_HELD = f"{GAIN} or {EVEN} {IN_ALL_THREE}"              # ... and rose in none, and fell in at least one
 
-STACK_RULE = ("Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with "
-              "every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs**, "
-              "judged by what the gauge is for and never by its sign (a resource spent that rose reads **power given**, never a "
-              "loss); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such "
-              "runs); clear runs pointing different ways read **the runs disagree**.")
+THREE_RUN_RULE = ("A gauge whose change stayed under 0.5% either way in every run reads **EVEN, under the floor**. A change of 0.5% "
+                  "or more is a change and never reads EVEN (the founder's order of 24 October 2026): when the runs that moved 0.5% "
+                  "or more all move the same way the row reads its word, judged by what the gauge is for and never by its sign (a "
+                  "resource spent that rose reads **power given**, never a loss; a cut is GAIN), written **GAIN** or **LOSS in all "
+                  "three of our runs** when all three runs moved 0.5% or more the same way with every 95% interval clear of zero, and "
+                  "otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three "
+                  "were clear of the noise); runs that moved 0.5% or more pointing different ways read **the runs disagree**.")
+STACK_RULE = ("Each run holds three paired repetitions; the paired difference's 95% interval within a run says whether that run is "
+              "clear of the noise. " + THREE_RUN_RULE)
 
 
 def never_more_rule(what: str) -> str:
@@ -169,13 +288,7 @@ def stack_reading(rs, direction, same_rel, key=None):
         return EVEN_SAME if all(abs(r["diff"]) <= 1e-12 for r in rs) else f"**{NEVER_MORE_HELD}**"
     if all(abs(r["diff"]) <= same_rel * max(abs(r["native"]), 1e-12) for r in rs):
         return EVEN_SAME
-    clear = [r for r in rs if r["significant"]]
-    signs = {(r["diff"] > 0) - (r["diff"] < 0) for r in clear}
-    if len(signs) > 1:
-        return f"**{DISAGREE}**"
-    if len(clear) < len(rs):
-        return even_noise(f"{len(rs) - len(clear)} of {len(rs)} runs")
-    return in_all_three(rs[0]["diff"] < 0, a)
+    return judge_runs([rel_change(r["native"], r["diff"]) for r in rs], [bool(r["significant"]) for r in rs], a)
 
 
 # --------------------------------------------------------------------------------------------- reading any table's words
@@ -354,30 +467,38 @@ def labelled(label) -> str:
 
 # ------------------------------------------------------------------------------------- the count under a three-run table
 class Tally:
-    """The count under a three-run table: judged gauge-rows that read GAIN, LOSS and power given in all three of our runs,
-    rows that read EVEN, and rows where the runs disagree."""
+    """The count under a three-run table: gauge-rows that read GAIN, LOSS and power given (and how many of each in all three of
+    our runs, every interval clear of zero), rows that read EVEN, and rows where the runs disagree."""
 
     def __init__(self):
         self.gain = self.loss = self.given = self.even = self.disagree = 0
+        self.gain3 = self.loss3 = self.given3 = 0
 
     def add(self, reading, direction, key=None):
         c = classify(reading, aim(direction, key))
+        strict = IN_ALL_THREE in (reading or "") and not (reading or "").lstrip("*").lower().startswith("gain or even")
         self.gain += c == "gain"
         self.loss += c == "loss"
         self.given += c == "given"
+        self.gain3 += c == "gain" and strict
+        self.loss3 += c == "loss" and strict
+        self.given3 += c == "given" and strict
         self.even += c in ("noise", "same")
         self.disagree += c == "disagree"
 
     def sentence(self, n, what="workloads"):
-        return (f"**Across {n} {what}: {self.gain} gauge-rows GAIN in all three of our runs, {self.loss} LOSS, {self.given} "
-                f"power given, {self.even} EVEN, {self.disagree} where the runs disagree.**")
+        return (f"**Across {n} {what}: {self.gain} gauge-rows GAIN ({self.gain3} in all three of our runs), {self.loss} LOSS "
+                f"({self.loss3} in all three of our runs), {self.given} power given ({self.given3} in all three of our runs), "
+                f"{self.even} EVEN, {self.disagree} where the runs disagree.**")
 
     def counts(self):
         return f"{self.gain} GAIN, {self.loss} LOSS, {self.given} power given, {self.even} EVEN, {self.disagree} disagree"
 
 
-DETERMINISTIC_RULE = ("a gauge reads **GAIN** or **LOSS in all three of our runs** when all three runs give the same sign, judged by "
-                      "what the gauge is for and never by its sign (a resource spent that rose reads **power given**)")
+DETERMINISTIC_RULE = ("a gauge reads **GAIN** or **LOSS in all three of our runs** when all three runs moved 0.5% or more with the same "
+                      "sign, judged by what the gauge is for and never by its sign (a resource spent that rose reads **power given**); a "
+                      "change under 0.5% in every run reads **EVEN, under the floor** (the founder's floor of 20 October 2026, a change "
+                      "of 0.5% or more always a change: 24 October)")
 ACROSS_HEAD = "GAIN in all three of our runs | LOSS in all three of our runs | Power given in all three of our runs | EVEN | The runs differ"
 ACROSS_RULE = "|---|---:|---:|---:|---:|---:|"
 
@@ -462,8 +583,8 @@ LETTERS = (
      "resource cut"),
     (EVEN, "the break-even baseline: equilibrium", (("E", "Equalized", "zero variance"), ("V", "Verified baseline", "expected norm"),
                                                     ("E", "Equilibrium", "balanced risk"), ("N", "Neutral", "no net change")),
-     "native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at "
-     "the top of its range is EVEN, at its limit on native"),
+     "no change of 0.5% or more either way in any run (under the floor), or the same; a change of 0.5% or more is never EVEN; "
+     "a knob native already runs at the top of its range is EVEN, at its limit on native"),
     (LOSS, "actuarial deficit and exposure", (("L", "Leakage", "capital drain"), ("O", "Off-track", "adverse selection"),
                                               ("S", "Setback", "claim liability"), ("S", "Subpar", "negative variance")),
      "the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures"),
@@ -491,21 +612,29 @@ def key_lines():
           "- **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; "
           "a fall is power given, because it falls when more power is given for the same work.",
           "- So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).",
-          "- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every "
-          "run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in "
-          "all three runs reads GAIN or LOSS by the gauge's aim.",
+          "- **The floor** (the founder's orders of 20 and 24 October 2026): a change under half of one percent (0.5%) either way, in "
+          "every run, reads **EVEN, under the floor**; the row keeps its measured size. A change of 0.5% or more either way is a "
+          "change and never reads EVEN: \"Any gauge that gives anything over a 0.5 percent change either way is a change ... it has "
+          "to show its loss or gain\" (24 October). It reads GAIN, LOSS or power given by the gauge's aim, with the count of runs "
+          "clear of the noise beside the word.",
           "- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw "
           "direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads "
-          "GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.", "",
+          "GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the floor reads EVEN =0.3%.", "",
           "Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN "
           "GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: "
           + "; ".join(f"{k} reads {v}" for k, v in LABEL_SHOWN.items() if k not in ("WORSE", "MIXED", "AWAY FROM ITS AIM", "INVALID"))
           + ". A run that breaks its own validity checks reads INVALID and carries no word.", "",
-          "A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear "
-          "of zero: \"GAIN in all three of our runs\". The other readings are **EVEN, no difference beyond the noise** (in a run "
-          "the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** "
-          "(clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge "
-          "declared in advance as shown only, such as the knob's own setting).", "",
+          "A reading is decided over our three runs, A, B and C. Only the runs that moved 0.5% or more decide its direction; when "
+          "they all move the same way the gauge reads its word. \"GAIN in all three of our runs\" means all three runs moved 0.5% "
+          "or more the same way with every 95% interval clear of zero. Where a run's interval includes zero, or a run stayed under "
+          "the floor, the word stands and its qualifier follows in the same cell, the count of runs clear of the noise always shown: "
+          "\"GAIN (the same way in all three runs; 2 of 3 clear of the noise)\", \"LOSS (2 of 3 runs moved 0.5% or more, the same "
+          "way, 1 under the floor; 1 of 3 clear of the noise)\". The other readings are **EVEN, under the floor** (every run under "
+          "0.5%), **EVEN, the same** (no change at all), **the runs disagree** (runs that moved 0.5% or more pointing different ways: "
+          "the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such "
+          "as the knob's own setting). A count that must never rise (failed requests, lost messages) reads LOSS on any rise in any "
+          "run. Tables written before 24 October 2026 read a run whose interval included zero as \"EVEN, no difference beyond the "
+          "noise\" whatever its size; every published table has been read again by this rule (`tools/reread_key.py`).", "",
           "Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as "
           "surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never "
           "to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no "
@@ -553,16 +682,17 @@ def receipt_key_lines():
     return [
         "**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by "
         "the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, "
-        "a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart "
-        "(the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the "
+        "a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: no change of 0.5% or more either way in any run "
+        "(under the floor), the same, or the knob at its limit on native; a change of 0.5% or more is never EVEN. **LOSS**: the "
         "gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, "
         "the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear) that fell is a cut, a GAIN; one "
         "that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and "
         "never called a loss; work bought with each unit of a resource (work per energy) that fell is power given too. So a minus "
         "can read GAIN (a "
-        "response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three "
-        "of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not "
-        "judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring "
+        "response time cut) and a plus can read LOSS (failed requests up). A reading holds **in all three of our runs** when runs A, "
+        "B and C all moved 0.5% or more the same way with every interval clear of zero; otherwise its word carries beside it how "
+        "many runs moved 0.5% or more and how many were clear of the noise; **the runs disagree** names runs that moved 0.5% or "
+        "more in different ways, a test unstable there; **shown, not judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring "
         "and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, "
         "section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. " + OWN_RUNS,
     ]

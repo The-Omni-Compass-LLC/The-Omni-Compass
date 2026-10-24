@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The Redis A/B/C rule (tools/redis_abc.py): GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three
-runs; an interval over zero reads EVEN, no difference beyond the noise, with its count; clear runs pointing different ways read
+runs; a change of 0.5% or more the same way reads its word with the count of runs clear of the noise (the rule of 24 October 2026), under 0.5% in every run EVEN, under the floor; clear runs pointing different ways read
 the runs disagree; any failed request is marked; the knob's moves are shown; the tuning workload is shown and not counted."""
 import json
 import sys
@@ -40,7 +40,7 @@ def main():
     assert M.verdict([pr(+3, +1, +5)] * 3, "spent") == "**power given in all three of our runs**", "more memory held is power given, never a LOSS"
     assert M.verdict([pr(+3, +1, +5)] * 3, "lower") == "**LOSS in all three of our runs**", "a longer wait is a LOSS"
     assert M.verdict([pr(+3, +1, +5)] * 3, "higher") == "**GAIN in all three of our runs**", "more work is a GAIN"
-    assert M.verdict([pr(-20, -30, -10), pr(-20, -30, -10), pr(-2, -10, +6)], "lower") == "EVEN, no difference beyond the noise (1 of 3 runs)"
+    assert M.verdict([pr(-20, -30, -10), pr(-20, -30, -10), pr(-2, -10, +6)], "lower") == "**GAIN** (the same way in all three runs; 2 of 3 clear of the noise)", "past the floor the same way in all three, one interval across zero: the word stands, with its count"
     assert M.verdict([pr(-20, -30, -10), pr(+20, +10, +30), pr(-20, -30, -10)], "lower") == "**the runs disagree**"
     assert M.verdict([pr(0, -1, 1, native=0)] * 3, "never more") == "EVEN, the same"
     assert M.verdict([pr(0, -1, 1, native=0), pr(1, 0, 2, native=0), pr(0, -1, 1, native=0)], "never more") == "**LOSS in at least one of our runs**", "a failed request in any run is marked"
@@ -60,7 +60,7 @@ def main():
         assert "| memory ceiling held, mean (MB; the knob, the resource) | 64.0 | 150.0 |" in txt and "power given in all three of our runs" in txt
         assert json.loads(out.with_suffix(".json").read_text())["workloads"]["small"]["p95_ms"]["reading"] == "GAIN in all three of our runs"
     print("PASS  Redis A/B/C rule: GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three runs; an interval over zero "
-          "reads EVEN, no difference beyond the noise, with its count; any failed request is marked; more memory held reads power given; the tuning workload is not counted")
+          "reads its word with the count of runs clear of the noise; any failed request is marked; more memory held reads power given; the tuning workload is not counted")
 
 
 if __name__ == "__main__":

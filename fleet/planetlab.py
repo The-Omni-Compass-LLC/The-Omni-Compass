@@ -19,7 +19,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from fleet.harness import Workload, Pool, Cluster, Scenario, STEPS
 from fleet.sim import run, arms_for
-from tools.readings import GAIN, LOSS, GIVEN, EVEN_NOISE, word, LOWER as AIM_LOWER, HIGHER as AIM_HIGHER, SPENT  # noqa: E402
+from tools.readings import GAIN, LOSS, GIVEN, judge_one, word, LOWER as AIM_LOWER, HIGHER as AIM_HIGHER, SPENT  # noqa: E402
 
 
 def load_dir(d):
@@ -72,9 +72,11 @@ def main():
                 A = {r["seed"]: r[m] for r in rows if r["arm"] == base}; B = {r["seed"]: r[m] for r in rows if r["arm"] == cand}
                 d = np.array([B[k] - A[k] for k in sorted(A)]); bs = d[rng.integers(0, len(d), (4000, len(d)))].mean(axis=1)
                 lo, hi = np.percentile(bs, [2.5, 97.5])
+                ref = float(np.mean([A[k] for k in A]))
+                rel = float(d.mean()) / abs(ref) if ref else (0.0 if d.mean() == 0 else float(np.sign(d.mean())) * float("inf"))
+                # the one rule (tools/readings.py judge_one, the founder's order of 24 October 2026)
                 res.append({"metric": m, "delta": float(d.mean()), "ci95": [float(lo), float(hi)],
-                            "verdict": word(hi < 0, SPENT if m == "energy_kwh" else (AIM_LOWER if lower else AIM_HIGHER))
-                                       if (hi < 0 or lo > 0) else EVEN_NOISE})
+                            "verdict": judge_one(rel, bool(hi < 0 or lo > 0), SPENT if m == "energy_kwh" else (AIM_LOWER if lower else AIM_HIGHER))})
             paired[f"{cand}_vs_{base}"] = res
     summ = {"trace_dir": str(a.dir), "traces": len(traces), "scenarios": a.scenarios, "seed_base": a.seed_base, "means": means,
             "observe_identical": obs, "paired": paired}
