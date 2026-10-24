@@ -349,7 +349,9 @@ the founder overrides one in the conversation.
   runs beyond the noise; EVEN is kept for a mean under 0.5% (EVEN, under the floor) or no change at all; runs that moved 0.5% or
   more in opposite directions read "the runs disagree"; a count that must never rise has no floor. Each run's own number wears
   that run's own word. Every table was read again from its own data by `tools/reread.py` (24 October: 4,037 readings in 194
-  tables; the index's headline GAIN, up 3.4%), the toy gate reads by the same floor, and the live engine's own key with it.
+  tables; the index's headline GAIN, up 3.4%), the toy gate reads by the same floor, and the live engine's own key with it; every toy-gate
+  record from its own seeds (`tools/toy_reread.py`), and every muscle of the catalog and the seven organisms from theirs
+  (`tools/realms_reread.py`: 123 of 2,214 labels moved; GAIN 530 muscles, more work 12, fewer misses 445, LOSS 0).
 - **The immune system catches a LOSS under Omni** (the founder's words: "the only way anything can show a real loss would be ...
   Omni direct or native by itself. Everything else with Omni in it ... has Omni-Compass's mechanism of immune system and pathways
   ... that should have pushed signals when something is in its in a negative state, and adjusted ... like any human body"). A

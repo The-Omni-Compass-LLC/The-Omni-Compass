@@ -245,9 +245,12 @@ def main(argv=None):
                           "test_suite_sha256": sha_files(tests)},
          "files": {g: {p: sha(p) for p in fs} for g, fs in GROUPS.items()},
          "live_evidence": LIVE,
-         "physical_meter_results": ("NVIDIA A10 on Lambda, 2026-10-02, 10 paired runs (results/gpu/run-20261002T082232Z/GPU_REPS.md): "
-                                    "work per energy +3.6% (proven), p95 +58.5%, label energy improvement with service tradeoff; "
-                                    "the governor corrected in GPU amendments 6 and 7 has not yet run on a card")}
+         "physical_meter_results": ("NVIDIA A100 SXM4 40 GB on Lambda, 2026-10-24, omni-v18's card governor (commit e3b05dc), one run of "
+                                    "10 paired repetitions (results/gpu/run-20261024T091235Z/GPU_REPS.md): every service gauge EVEN "
+                                    "(work per energy up 0.2%, the 95th percentile up 0.2%, requests served the same), the temperature "
+                                    "up 1.4% to 1.5% (power given); the governor wrote nothing, both knobs at their top on native (at its "
+                                    "limit on native). The NVIDIA A10 run of 2026-10-02 (results/gpu/run-20261002T082232Z, the "
+                                    "card controller of commit c908054, replaced since) stays as its own record")}
     MANIFEST.write_text(json.dumps(m, indent=1) + "\n")
     r = subprocess.run([sys.executable, str(ROOT / "verify.py"), "--quick"], capture_output=True, text=True, cwd=ROOT)
     RECEIPT.write_text(f"verify.py --quick at commit {m['written_at_commit']}, {m['written_at']}\n\n" + r.stdout)

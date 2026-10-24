@@ -2,6 +2,32 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (night): the A100 on Lambda, omni-v18's card governor on a real card
+
+- **The receipt** (`results/gpu/run-20261024T091235Z`, Lambda workflow run 40079645681, one NVIDIA A100 SXM4 40 GB, the card's own
+  meter, ten paired repetitions of 600 s an arm, native, Omni-Compass watching only and Omni-Compass governing): every service gauge
+  EVEN (work per energy up 0.2%, the 95th percentile up 0.2%, requests served the same, none lost), the card's temperature up 1.4% to
+  1.5% (power given); wire check 7 of 7, fault drill 5 of 5. The card's own setting already holds both knobs at their top (400 W of
+  400 W, the clock unlocked to 1,410 MHz), so the factory tune's governor asked for exactly that in its 3,050 decisions and wrote
+  nothing: at its limit on native. One run; B and C, and the 8-card pooled run with its organisms at 1, 10 and 100, not yet run (no
+  8-card machine of any kind free on Lambda on 24 October).
+- **What it cost**: 6.7 hours of the one card at $1.29 an hour, and 25 minutes of a first try whose start stopped on a fault of the
+  rig (the shipped tree had no git history), given back at once.
+- **The archive bot** takes a cancelled run that handed in files (the run's start step was cancelled at its time limit while its
+  watch finished every repetition); the live engine's card monitor, the whole-system table, the register, the evidence ledger and the
+  README read the A100 run; the A10 run of 2 October stays as its own record. The whole-system table's words follow the one key that
+  stands (0.5% either way).
+
+## 2026-10-24 (late night): every muscle of the catalog and the seven organisms read again by the 0.5% rule
+
+- **The realms read by size** (`tools/realms_reread.py`, checked by `verify.py`): the runner frozen with the results labelled a
+  muscle by its intervals over the seeds alone, so a change of a thousandth of a percent clear of the noise was a GAIN and a change
+  of several percent inside it was not counted. Every muscle and organism is read again from its own seeds: the mean change of the
+  work, of the misses (against native's own share of decisions over the line) and of the time to clear a line counts from 0.5% up,
+  clear of the noise or not; the runner, its engine and its run are untouched, and the page says it was read again.
+- **What moved**: 123 of 2,214 muscle-and-load labels. Every muscle alone: GAIN 530 (527 before), of them more work 12 (33),
+  fewer misses 445 (409), the line cleared sooner 493; EVEN, the same as native 156 (159); LOSS 0. The seven organisms read GAIN
+  for fewer misses, no longer for more work: their work moved by less than 0.5%.
 ## 2026-10-24 (late night): the live engine in the order the person watching needs it; a native switch on every monitor
 
 - **The page's order** (the founder's order of 24 October: "in its hierarchy of importance to the operator studying and watching
@@ -23,8 +49,8 @@
   through `tools/readings.py` instead of their own copy of the old rule; the GPU reader (`tools/gpu_reps.py`) reads 0.5% or more of
   the base as a change, clear of the noise or not; every benchmark tool's page note and the three-arm writer say the rule from the
   key; the two figures that draw the rule, their captions, the manuals' rule sections and the reading guide are drawn and written
-  to it; every toy-gate record read again from its own runs (`tools/toy_reread.py`). The realms runner's per-muscle labels are the
-  one reading not yet on it: next.
+  to it; every toy-gate record read again from its own runs (`tools/toy_reread.py`); the realms runner's per-muscle labels read again
+  from their own seeds (`tools/realms_reread.py`, below).
 - **The body map** (`docs/THE_BODY.md`) and **the landscape** (`docs/LANDSCAPE.md`): every part of the organism with the file that
   is it, what Omni-Compass can and cannot help; every product in its category and the operator's screens closest to the live
   engine, graded on seven measures written before the grades.
