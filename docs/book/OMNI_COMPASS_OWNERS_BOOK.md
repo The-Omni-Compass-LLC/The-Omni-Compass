@@ -599,22 +599,23 @@ installed is a quarter off the bill.
   - the organisms under the climb load: the spine: GAIN (fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
   - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +3.4% GAIN on the resource reading (work, speed, machines, energy), +9.4% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16 and omni-v18, each named in its table): +3.1% GAIN on the resource reading (work, speed, machines, energy), +8.8% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
   - Real database buffer pool (MySQL under sysbench, GitHub): +1.6% GAIN
-  - Real cache (Redis, GitHub): +0.1% power given
-  - Real messaging (Apache Kafka, GitHub): +0.1% power given
+  - Real cache (Redis, GitHub): +0.2% GAIN
   - Real database cache (MongoDB under YCSB, GitHub): −1.4% LOSS
+  - Real messaging (Apache Kafka, GitHub): −1.9% LOSS
   - Real database (PostgreSQL behind PgBouncer, GitHub): −4.9% LOSS
 
-**On the engine that stands (omni-v18): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v18): 2 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +3.4% | GAIN AND LOSS | L |
+| Redis, the cache's memory ceiling | omni-v18 | +0.2% | GAIN, power given | L |
+| Kafka, the consumer group's size | omni-v18 | −1.9% | GAIN AND LOSS | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 and omni-v18 | +3.1% | GAIN AND LOSS | L |
 | Robustness: the two-hour run | omni-v11 | −4.2% | GAIN AND LOSS | L |
 | Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v16 | +0.1% | GAIN, power given | L |
 | Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
 | Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
 | Real Kubernetes, demand that wanders | omni-v10 | +36.5% | GAIN AND LOSS | L |
@@ -630,7 +631,6 @@ installed is a quarter off the bill.
 | PostgreSQL, the pooler's pool size | omni-v16 | −4.9% | GAIN AND LOSS | L |
 | MySQL, the buffer pool's size | omni-v16 | +1.6% | GAIN AND LOSS | L |
 | MongoDB, the storage engine's cache size | omni-v16 | −1.4% | GAIN AND LOSS | L |
-| Kafka, the consumer group's size | omni-v16 | −0.1% | GAIN AND LOSS | L |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN | S |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
@@ -1947,8 +1947,8 @@ consists of a governing engine, its muscle adapters, a complete configuration pr
 profile** is the complete, versioned set of defaults shipped together, θ*; a **candidate profile** is a combination under
 evaluation; the **active profile** is the one governing the current run; a **custom profile** is any identifiable configuration
 that differs from θ*. With x the governed system's state, z the governor's internal state, y its observations and Δ ∈ {10, 15, 30, 60,
-90, 120} s the decision interval, z[k+1] = F_θ(z[k], y[k]) and u_req[k] = G_θ(z[k], y[k]), the command Π_C(u_req[k]) inside the
-operating limits C, and the system evolves on the command that actually landed, x[k+1] = Φ(x[k], u_ack[k], w[k]), w the workload
+90, 120} s the decision interval, z[k+1] = F[θ](z[k], y[k]) and u[req][k] = G[θ](z[k], y[k]), the command Π[C](u[req][k]) inside the
+operating limits C, and the system evolves on the command that actually landed, x[k+1] = Φ(x[k], u[ack][k], w[k]), w the workload
 and its disturbances. After release θ = θ* is fixed while x, z and y keep changing: one fixed factory tune governs a changing
 workload. "One setting" is the whole vector θ, evaluated jointly, against one of two explicit objectives: the most healthy
 production P(θ), or the least cost per production completed, B(θ) ⁄ P(θ). The factory baseline is established in eight steps:
@@ -6940,14 +6940,16 @@ budget plus one hour: above it nothing is rented.
 
 | `test` `mode` | What runs | Hour budget (given back by) | At Lambda's list price |
 |---|---|---|---|
-| `1card` `fast` | the compute counted run on one A10 | 8 h (9 h) | one A10 about $0.75 an hour: about $7 |
+| `1card` `fast` | the compute counted run on one A10 | 8 h (9 h) | one A10 $1.29 an hour on 24 October: about $12 |
+| `1card` `stacks` | the whole stacks with the card inside: the wire check and smoke, then the seven organisms at 1, 10 and 100 copies, native and Omni-Compass, the preregistered 5, 3 and 2 repetitions by size (`hil_profile` `standard`) | 24 h (25 h) | about $32 a run; A, B and C (`tag`) each rent their own A10 and run side by side |
 | `8card` `pooled` (default) | every stage on eight A100 cards, repetitions pooled across the cards | 10.5 h (11.5 h) | about $14.32 an hour: about $165 at most |
 | `8card` `fast` | a short look, never the result to show | 4 h (5 h) | about $72 at most |
-| `1card` `full` | the whole one-card test | 32 h (33 h) | about $25 |
+| `1card` `full` | the whole one-card test | 32 h (33 h) | about $43 |
 | `8card` `full` | the whole design on eight cards | 26 h (27 h) | about $387 at most |
 
 The price the dry run prints is Lambda's own at that moment; the table is an example. The one-card and the eight-card tests
-may run at the same time (one run of each at once; a second press of the same test waits for the first).
+may run at the same time (one run of each at once; a second press of the same test waits for the first, unless its `tag`,
+A, B or C, differs: each tag is its own machine).
 
 The machine is given back when the run prints its last line, or at the hour budget plus one hour whatever happens, or at the
 end of the workflow if anything before it failed. Each give-back is acknowledged by Lambda; if Lambda does not acknowledge it,
@@ -7944,7 +7946,7 @@ The founder's order of 17 October: Omni-Compass is shown on top at every level, 
 | The organism, the stack: the seven organisms under three loads (own load, the climb, work waiting in line) | omni-v8 | S (our model) | 21 | 0 | 0 | 0 | 0 | no: every judged gauge GAIN or EVEN |
 | The cluster: real Kubernetes, native its own HPA and scheduler | omni-v10, omni-v11 | L | 46 | 48 | 11 | 5 | 19 | **yes: 24, listed below** |
 | The cluster with its add-ons native: KEDA, Goldilocks, CruiseKube | omni-v10, omni-v11 | L | 24 | 20 | 9 | 4 | 7 | **yes: 11, listed below** |
-| A muscle inside a running service: database, broker, cache | omni-v16 | L | 70 | 119 | 52 | 24 | 94 | **yes: 118, listed below** |
+| A muscle inside a running service: database, broker, cache | omni-v16, omni-v18 | L | 68 | 124 | 41 | 27 | 99 | **yes: 126, listed below** |
 | A physical plant in an independent simulator: buildings, power grids, robot arms, drone swarms | omni-v11 | independent simulator | 101 | 149 | 10 | 0 | 0 | no LOSS; resources put in shown as power given |
 | The organism with the real cluster inside (the grid, at 1, 10, 100 and on GitHub's machines 1,000 copies) | older engines' tables; the grid runs again on the engine that stands | L, the cluster; S, the organism | – | – | – | – | – | no table on the engine that stands yet; the grid's runs (results/grid_v8/) are going |
 | The cluster in a cloud: Azure Kubernetes Service, the bill | single runs, omni-v5 to omni-v7 | L, the bill metered | – | – | – | – | – | no three-run table yet: eight single runs at the tune-down, machines billed −6.5% to +7.6%, every one EVEN; the fleet (about 1.9 of 4 machines busy) leaves no whole machine to give back |
@@ -8017,69 +8019,77 @@ Goes the other way:
 
 #### 55.1.5 A muscle inside a running service: database, broker, cache
 
-Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v16. Evidence: L.
-Tables: `results/live/V16_REDIS.md`, `results/live/V16_REDIS_SERVICE.md`, `results/live/V16_KAFKA.md`, `results/live/V16_KAFKA_SERVICE.md`, `results/live/V16_PGBENCH.md`, `results/live/V16_SYSBENCH.md`, `results/live/V16_YCSB.md`.
+Native at this level: the server as shipped but for the one setting an operator sets (each table names it). Engine: omni-v16, omni-v18. Evidence: L.
+Tables: `results/live/V18_REDIS.md`, `results/live/V18_REDIS_SERVICE.md`, `results/live/V18_KAFKA.md`, `results/live/V18_KAFKA_SERVICE.md`, `results/live/V16_PGBENCH.md`, `results/live/V16_SYSBENCH.md`, `results/live/V16_YCSB.md`.
 
 Goes the other way:
 
-- V16_REDIS.md: tuning: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds per 1,000 requests inside the line (the runs disagree)
-- V16_REDIS.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
-- V16_REDIS.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
-- V16_REDIS.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
-- V16_REDIS_SERVICE.md: tuning: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU busy (share of the run) (the runs disagree)
-- V16_REDIS_SERVICE.md: tuning: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds (the runs disagree)
-- V16_REDIS_SERVICE.md: tuning: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds per 1,000 requests inside the line (the runs disagree)
-- V16_REDIS_SERVICE.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
-- V16_REDIS_SERVICE.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
-- V16_REDIS_SERVICE.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
-- V16_REDIS_SERVICE.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: latency, 99th percentile (ms) (LOSS)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 95th percentile (ms) (the runs disagree)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 99th percentile (ms) (the runs disagree)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, mean (ms) (the runs disagree)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, most messages waiting at once (the runs disagree)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, mean messages waiting (the runs disagree)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU busy (share of the run) (the runs disagree)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds (the runs disagree)
-- V16_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds per 1,000 messages inside the line (the runs disagree)
-- V16_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
-- V16_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (LOSS)
-- V16_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (LOSS)
-- V16_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
-- V16_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
-- V16_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
-- V16_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (LOSS)
-- V16_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (LOSS)
-- V16_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (LOSS)
-- V16_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 messages inside the line (the runs disagree)
-- V16_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
-- V16_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
-- V16_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (the runs disagree)
-- V16_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (the runs disagree)
-- V16_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
-- V16_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 95th percentile (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 99th percentile (ms) (LOSS)
-- V16_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, mean (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, most messages waiting at once (the runs disagree)
-- V16_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, mean messages waiting (the runs disagree)
-- V16_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, median (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (LOSS)
-- V16_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (the runs disagree)
-- V16_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: work inside the response line (messages a second handled within the line) (the runs disagree)
-- V16_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (the runs disagree)
-- V16_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
-- V16_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 messages inside the line (the runs disagree)
-- V16_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (the runs disagree)
-- V16_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (the runs disagree)
-- V16_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
-- V16_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
-- V16_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
-- V16_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 messages inside the line (the runs disagree)
+- V18_REDIS.md: burst: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_REDIS.md: burst: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_REDIS.md: burst: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
+- V18_REDIS.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_REDIS.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_REDIS.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
+- V18_REDIS.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_REDIS.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_REDIS.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
+- V18_REDIS_SERVICE.md: burst: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_REDIS_SERVICE.md: burst: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_REDIS_SERVICE.md: burst: 8192 B values, working set 2,500 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
+- V18_REDIS_SERVICE.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_REDIS_SERVICE.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_REDIS_SERVICE.md: large: 32768 B values, working set 625 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
+- V18_REDIS_SERVICE.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_REDIS_SERVICE.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_REDIS_SERVICE.md: small: 2048 B values, working set 10,000 keys × notch; line 2 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 requests inside the line (the runs disagree)
+- V18_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 99th percentile (ms) (LOSS)
+- V18_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, mean (ms) (the runs disagree)
+- V18_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, most messages waiting at once (the runs disagree)
+- V18_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, mean messages waiting (the runs disagree)
+- V18_KAFKA.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds per 1,000 messages inside the line (the runs disagree)
+- V18_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
+- V18_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
+- V18_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (the runs disagree)
+- V18_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (LOSS)
+- V18_KAFKA.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
+- V18_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
+- V18_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
+- V18_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (the runs disagree)
+- V18_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (the runs disagree)
+- V18_KAFKA.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
+- V18_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: work inside the response line (messages a second handled within the line) (LOSS)
+- V18_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (LOSS)
+- V18_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
+- V18_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (the runs disagree)
+- V18_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (the runs disagree)
+- V18_KAFKA.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
+- V18_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, 95th percentile (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): end-to-end latency, mean (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, most messages waiting at once (the runs disagree)
+- V18_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): consumer lag, mean messages waiting (the runs disagree)
+- V18_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU busy (share of the run) (the runs disagree)
+- V18_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds (the runs disagree)
+- V18_KAFKA_SERVICE.md: tuning: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run (the tuning workload, shown and not counted): host CPU-seconds per 1,000 messages inside the line (the runs disagree)
+- V18_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, median (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (LOSS)
+- V18_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (LOSS)
+- V18_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_KAFKA_SERVICE.md: burst: 2.0 ms of work a message, 256 B; line 500 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (the runs disagree)
+- V18_KAFKA_SERVICE.md: heavy: 5.0 ms of work a message, 1024 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (the runs disagree)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 95th percentile (ms) (LOSS)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, 99th percentile (ms) (LOSS)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, median (ms) (the runs disagree)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: end-to-end latency, mean (ms) (LOSS)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, most messages waiting at once (LOSS)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: consumer lag, mean messages waiting (LOSS)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: host CPU busy (share of the run) (the runs disagree)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: host CPU-seconds (the runs disagree)
+- V18_KAFKA_SERVICE.md: light: 1.0 ms of work a message, 128 B; line 500 ms, 3 paired repetitions a run: host CPU-seconds per 1,000 messages inside the line (the runs disagree)
 - V16_PGBENCH.md: select (-S, scale 20): line 50 ms, 3 paired repetitions a run: latency, 95th percentile (ms, lag included) (the runs disagree)
 - V16_PGBENCH.md: select (-S, scale 20): line 50 ms, 3 paired repetitions a run: latency, 99th percentile (ms) (the runs disagree)
 - V16_PGBENCH.md: select (-S, scale 20): line 50 ms, 3 paired repetitions a run: latency, median (ms) (LOSS)
@@ -8169,7 +8179,7 @@ No run at this level yet, real or modelled, on the engine that stands (`k8s_flee
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `96ebf2913`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `d97f9b2c3`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 56.1 The mechanism, and proof that it is the one that ran
 
@@ -14601,22 +14611,23 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - the organisms under the climb load: the spine: GAIN (fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
   - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +3.4% GAIN on the resource reading (work, speed, machines, energy), +9.4% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16 and omni-v18, each named in its table): +3.1% GAIN on the resource reading (work, speed, machines, energy), +8.8% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
   - Real database buffer pool (MySQL under sysbench, GitHub): +1.6% GAIN
-  - Real cache (Redis, GitHub): +0.1% power given
-  - Real messaging (Apache Kafka, GitHub): +0.1% power given
+  - Real cache (Redis, GitHub): +0.2% GAIN
   - Real database cache (MongoDB under YCSB, GitHub): −1.4% LOSS
+  - Real messaging (Apache Kafka, GitHub): −1.9% LOSS
   - Real database (PostgreSQL behind PgBouncer, GitHub): −4.9% LOSS
 
-**On the engine that stands (omni-v18): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v18): 2 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +3.4% | GAIN AND LOSS | L |
+| Redis, the cache's memory ceiling | omni-v18 | +0.2% | GAIN, power given | L |
+| Kafka, the consumer group's size | omni-v18 | −1.9% | GAIN AND LOSS | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 and omni-v18 | +3.1% | GAIN AND LOSS | L |
 | Robustness: the two-hour run | omni-v11 | −4.2% | GAIN AND LOSS | L |
 | Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v16 | +0.1% | GAIN, power given | L |
 | Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
 | Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
 | Real Kubernetes, demand that wanders | omni-v10 | +36.5% | GAIN AND LOSS | L |
@@ -14632,7 +14643,6 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 | PostgreSQL, the pooler's pool size | omni-v16 | −4.9% | GAIN AND LOSS | L |
 | MySQL, the buffer pool's size | omni-v16 | +1.6% | GAIN AND LOSS | L |
 | MongoDB, the storage engine's cache size | omni-v16 | −1.4% | GAIN AND LOSS | L |
-| Kafka, the consumer group's size | omni-v16 | −0.1% | GAIN AND LOSS | L |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN | S |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |

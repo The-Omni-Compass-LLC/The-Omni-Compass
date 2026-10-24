@@ -78,10 +78,13 @@ if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"
 # in every arm CruiseKube right-sizes the service itself, in place and at admission, from a Prometheus of its own, beside
 # KEDA's HTTP add-on scaling it on requests in flight (CruiseKube skips any workload whose HPA scales on CPU or memory, by
 # its own design), learning longer than its hour before the arms are told apart (scripts/kind_addons_cruisekube.sh);
-# Omni-Compass's moves are its own, on top, the CPU limit left to CruiseKube, which resizes it itself. Empty (the
-# default): every other set, unchanged
+# Omni-Compass's moves are its own, on top, the CPU limit left to CruiseKube, which resizes it itself. ADDONS=vpa
+# (docs/COMPETITORS_PREREGISTRATION.md): in every arm that carries it the Vertical Pod Autoscaler resizes the service's
+# memory in place (update mode InPlaceOrRecreate) beside the HPA on its processor, learning while the load runs its own
+# steps before the warm-up and acting through the window (scripts/kind_addons_vpa.sh); Omni-Compass's moves are its own, on
+# top, the VPA and the memory it sets left to it. Empty (the default): every other set, unchanged
 ADDONS="${ADDONS:-}"
-case "$ADDONS" in ""|keda|goldilocks|crane) ;; *) echo "ADDONS must be empty, keda, goldilocks or crane (got $ADDONS)"; exit 1;; esac
+case "$ADDONS" in ""|keda|goldilocks|crane|vpa) ;; *) echo "ADDONS must be empty, keda, goldilocks, crane or vpa (got $ADDONS)"; exit 1;; esac
 # BATCH_QUEUE=kueue, volcano, kai, koordinator, kuberay, godel, vanilla or binpack, with WORKLOAD=batch
 # (docs/BATCH_QUEUE_PREREGISTRATION.md; register rows 63, 88, 89, 91, 92, 93): the batch test's work arrives as a stream of jobs
 # and a queueing system of its own admits and places it (kuberay: the same work as Ray jobs on one Ray cluster, scaled by
@@ -312,6 +315,9 @@ elif [ "$ADDONS" = goldilocks ]; then
   # Goldilocks and the VPA's recommender installed the same way in every arm; the recommendation is learned and applied
   # once the load runs (below), before the warm-up
   OUT_DIR="$OUT_DIR" PHASE=install bash scripts/kind_addons_goldilocks.sh
+elif [ "$ADDONS" = vpa ]; then
+  # the Vertical Pod Autoscaler, installed the same way in every arm that carries it, before the arms are told apart
+  OUT_DIR="$OUT_DIR" PHASE=install bash scripts/kind_addons_vpa.sh
 fi
 if [ -n "$CRUISEKUBE" ]; then
   # CruiseKube, its Prometheus and its exporters installed the same way in every arm, beside KEDA's HTTP add-on; it is
@@ -398,6 +404,12 @@ if [ "$ADDONS" = goldilocks ]; then
   EXPECT_LIMIT=$(cat "$OUT_DIR/goldilocks_limit.txt")
   echo "addons=goldilocks: requests from Goldilocks's recommendation, CPU limit $EXPECT_LIMIT (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
 fi
+if [ "$ADDONS" = vpa ]; then
+  # the VPA learns the service while the load runs its own steps, the same in every arm that carries it, before the arms
+  # are told apart (Omni-Compass is not started yet); it keeps resizing the memory in place through the window
+  OUT_DIR="$OUT_DIR" PHASE=learn LOAD_STEPS="$LOAD_STEPS" bash scripts/kind_addons_vpa.sh
+  echo "addons=vpa: in place on the service's memory beside the HPA on its processor (addons.txt)" | tee -a "$OUT_DIR/preflight.txt"
+fi
 if [ -n "$CRUISEKUBE" ]; then
   # CruiseKube in Cruise mode on the service, learning while the load runs its own steps until it has applied a change;
   # the same in every arm, before the arms are told apart (Omni-Compass is not started yet)
@@ -458,6 +470,7 @@ if [ -z "$NATIVE" ]; then
     [ -z "$CRANE" ] || echo "patch deployments in crane-system (Crane itself): $(can patch deployments -n crane-system)"
     [ "$ADDONS" != goldilocks ] || echo "patch verticalpodautoscalers (Goldilocks's VPA: its recommendation is the operator's): $(can patch verticalpodautoscalers.autoscaling.k8s.io -n default)"
     [ "$ADDONS" != goldilocks ] || echo "patch deployments in goldilocks (Goldilocks itself): $(can patch deployments -n goldilocks)"
+    [ "$ADDONS" != vpa ] || echo "patch verticalpodautoscalers (the VPA's own object): $(can patch verticalpodautoscalers.autoscaling.k8s.io -n default)"
     [ -z "$CRUISEKUBE" ] || echo "patch deployments in cruisekube-system (CruiseKube itself): $(can patch deployments -n cruisekube-system)"
     [ -z "$CRUISEKUBE" ] || echo "get secrets in cruisekube-system (CruiseKube's database): $(can get secrets -n cruisekube-system)"
   } | tee "$OUT_DIR/rbac_omni.txt"
@@ -745,6 +758,12 @@ elif [ "$ADDONS" = goldilocks ]; then   # Goldilocks's VPA as the window left it
   end_read "$OUT_DIR/vpa_end.json" get vpa goldilocks-php-apache -o json
   kubectl -n goldilocks logs deployment/goldilocks-controller --tail=300 --request-timeout=20s > "$OUT_DIR/goldilocks-controller.log" 2>&1 || true
   kubectl -n kube-system logs deployment/vpa-recommender --tail=300 --request-timeout=20s > "$OUT_DIR/vpa-recommender.log" 2>&1 || true
+elif [ "$ADDONS" = vpa ]; then   # the VPA's own record of the window: its object, the pods it resized, its three parts' last words
+  end_read "$OUT_DIR/vpa_end.json" get vpa php-apache -o json
+  end_read "$OUT_DIR/vpa_pods_end.json" get pods -n default -l run=php-apache -o json
+  for d in vpa-recommender vpa-updater vpa-admission-controller; do
+    kubectl -n kube-system logs deployment/"$d" --tail=300 --request-timeout=20s > "$OUT_DIR/$d.log" 2>&1 || true
+  done
 fi
 if [ -n "$CRUISEKUBE" ]; then   # CruiseKube's own record of the window: its audit events, its workload view, its logs
   OUT_DIR="$OUT_DIR" PHASE=end bash scripts/kind_addons_cruisekube.sh || true
