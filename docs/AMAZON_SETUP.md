@@ -2,6 +2,8 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+**Status (24 October): not yet run, its queue switched off.** The account is on Amazon's Free plan, which Amazon will not raise before the $100 credit is spent or the account is six months old. Everything here stays ready, wired as Azure's sets run (the same harness and 60 s beat, 100 paired repetitions a set under the stopping rule, the $0 check first); the founder switches it on once the account is on the Paid plan (section 1a), and nothing is built or billed before.
+
 This connects GitHub to an Amazon Web Services (AWS) account so two workflows can run the same tests Azure runs:
 
 - **`eks-metered`**: a real Amazon Elastic Kubernetes Service cluster, native Kubernetes (with its own cluster autoscaler)
@@ -11,6 +13,8 @@ This connects GitHub to an Amazon Web Services (AWS) account so two workflows ca
   design as Azure's `aks-metered` (`docs/K8S_COMPASS_PREREGISTRATION.md`).
 - **`cloud-organism`** with `cloud` = `aws`: the big organisms (the whole tower and the four stacked, the
   real cluster inside, at 100 copies) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
+  With `test` = `direct` the same button runs Omni direct's three arms instead (native, Omni on native and Omni direct,
+  no Kubernetes; `docs/OMNI_V18.md`), `reps` runs on the one machine; it starts only on the founder's word.
 
 About fifteen minutes, once. New accounts get **$100 of credit at sign-up and up to $100 more** for trying services, used
 before the card.

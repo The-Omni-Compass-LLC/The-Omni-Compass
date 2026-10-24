@@ -269,7 +269,7 @@ class Plant:
 # ---------------------------------------------------------------------------------------------------------------
 class ComputePool(Plant):
     template = "compute_pool"
-    # Omni-Compass by itself (omni-v17, docs/SOLO_PREREGISTRATION.md): the pool's own autoscaler switched off, so the count
+    # Omni-Compass by itself (omni-v19, docs/SOLO_PREREGISTRATION.md): the pool's own autoscaler switched off, so the count
     # holds where it stands unless the brain's floor or ceiling moves it; set on a plant (and on its twin) by the arm solo only
     native_off = False
 

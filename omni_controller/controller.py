@@ -367,7 +367,7 @@ class Controller:
         self.n_add = per(ADD_PERIOD_S)                 # decisions between two additions past the scheduling floor
         self.n_land = per(LAND_S)                      # decisions a command is watched for landing
         self.n_convey = max(1, int(round(float(getattr(a, "convey_every_s", 15.0)) / float(getattr(a, "floor_interval", 15.0) or 15.0))))
-        # omni-v18: the pod muscle of its own keeps the pace of the controller it stands in for (the pod autoscaler syncs every
+        # omni-v19: the pod muscle of its own keeps the pace of the controller it stands in for (the pod autoscaler syncs every
         # 15 s), whatever the decision period: a reconciliation every --own-every-s on the fast checks, its window of fewer pods
         # counted in those reconciliations (the strict window's seconds); the compass moves its target only in a decision
         self.n_own = max(1, int(round(float(getattr(a, "own_every_s", 15.0)) / float(getattr(a, "floor_interval", 15.0) or 15.0))))
@@ -761,7 +761,7 @@ class Controller:
                              f"strict: replica floor {cur} -> {want} decided by Omni-Compass (utilisation {util}%, target {orig_t}%); growth stays free up to {hi0}")
 
     def _own_pods(self, s, obs, rho, move=True):
-        """The pod muscle of its own (omni-v17, the founder's order of 23 October: Omni-Compass by itself, running the muscles
+        """The pod muscle of its own (omni-v19, the founder's order of 23 October: Omni-Compass by itself, running the muscles
         directly; docs/SOLO_PREREGISTRATION.md). For a workload the operator names (--own-replicas) and no autoscaler governs,
         Omni-Compass sets the replica count itself, through the workload's own scale, by strict C's rule: replicas =
         ceil(current x measured busy share / target), up at once, down only to the highest recommendation of the last
@@ -770,7 +770,7 @@ class Controller:
         --own-target), down to 60% of it, the most pods the cover allows past the wall. Never below the operator's own count
         at the max (the tune-down may go to the range's floor), never above the range's top, never below one pod. The count
         it shipped is recorded once on the workload and handed back by the reset (restore). With move False (a fast check
-        between decisions, omni-v18) the target stays where the last decision set it and only the count is reconciled."""
+        between decisions) the target stays where the last decision set it and only the count is reconciled."""
         if "replicas" in self.a.native_muscles:
             return None                  # omni-v14: the replicas are left native; nothing written
         if move:
@@ -918,7 +918,7 @@ class Controller:
         return out
 
     def _own_check(self):
-        """Between decisions, the pod muscle of its own at the pod autoscaler's pace (omni-v18): every n-th fast check
+        """Between decisions, the pod muscle of its own at the pod autoscaler's pace (omni-v19): every n-th fast check
         (--own-every-s, 15 s), the count reconciled to the busy share at the target the last decision set."""
         if not self.own or self._own_last is None:
             return None
@@ -1391,7 +1391,7 @@ def parser():
                     help="seconds between two reconciliations of the pod muscle of its own on the fast checks (the pod autoscaler's sync)")
     ap.add_argument("--own-replicas", default=os.environ.get("OMNI_OWN_REPLICAS", ""),
                     help="ns/deployment,... no autoscaler governs, whose replica count Omni-Compass sets itself through the "
-                         "workload's own scale (omni-v17, Omni-Compass by itself): its target from the workload's "
+                         "workload's own scale (omni-v19, Omni-Compass by itself): its target from the workload's "
                          "omnicompass.io/target-utilization annotation (else --own-target), its range from omnicompass.io/replica-range")
     ap.add_argument("--own-target", type=float, default=None,
                     help="the busy share (percent of the CPU request) a workload of its own is held at when it names none")

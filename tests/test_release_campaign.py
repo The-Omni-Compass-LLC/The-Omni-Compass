@@ -44,7 +44,7 @@ class ReleaseCampaign(unittest.TestCase):
                                                  # docs/PACE_PREREGISTRATION.md, 22 October, eight arms on the heartbeat
                                                  # dial since omni-v17; omni-v16's second levers block, its rig fixed
                                                  # before the omni-v17 campaign opened, is not carried into it; Omni-Compass
-                                                 # by itself, the steady load with three arms, written before the omni-v18
+                                                 # by itself, the steady load with three arms, written before the omni-v19
                                                  # campaign opened, 24 October)
         shipped = [row for row in queue if row[3].get('native') == 'shipped']
         for wf in ('redis.yml', 'kafka.yml', 'sysbench.yml', 'ycsb.yml', 'pgbench.yml'):   # the max is the default brain (12 October)
@@ -82,7 +82,7 @@ class ReleaseCampaign(unittest.TestCase):
              'mysql resource, native as shipped', 'redis resource, native as shipped', 'mongodb resource, native as shipped',
              'robot arms', 'power grids', 'buildings and batteries', 'drone swarms', 'robustness kill', 'robustness long',
              'kubernetes batch through kueue', 'kubernetes batch through volcano'],   # written before the omni-v12 campaign opened;
-                                                                                      # Omni-Compass by itself before the omni-v18
+                                                                                      # Omni-Compass by itself before the omni-v19
                                                                                       # campaign opened (24 October), no run of it started;
                                                                                       # the decision pace before the omni-v16 campaign
                                                                                       # opened (22 October), when no run of it had started,
@@ -204,6 +204,13 @@ class ReleaseCampaign(unittest.TestCase):
                     self.assertEqual(grid.engine(), 'unknown')          # a commit no fingerprint matches starts nothing
             finally:
                 grid.ROOT = old
+
+    def test_a_conductor_that_failed_before_its_ticks_starts_no_successor(self):
+        # 24 October: the receipt failed in seconds on omni-v18 and each failed conductor started the next, one every 15 s
+        steps = yaml.safe_load((ROOT / '.github/workflows/grid.yml').read_text())['jobs']['tick']['steps']
+        nxt = next(s for s in steps if s.get('name', '').startswith('The next conductor'))
+        self.assertIn('success()', nxt['if'])
+        self.assertNotIn('!cancelled()', nxt['if'])
 
     def test_six_stage_burst_is_the_workflow_and_queue_default(self):
         text = (ROOT / '.github/workflows/aks-metered-full.yml').read_text()

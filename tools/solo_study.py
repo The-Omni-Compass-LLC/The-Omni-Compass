@@ -11,7 +11,7 @@ the kind rig has them (every worker made at the start, no cluster autoscaler; to
   native                     the pod autoscaler, as Kubernetes ships it
   Omni-Compass and native    the shipped governor on top of it (the compass law at the max, as ARM=compass runs it)
   Omni-Compass by itself     the pod autoscaler switched off: the pods at the operator's own count unless the governor
-                             writes it through the workload's own scale (the pod muscle of its own, from omni-v17)
+                             writes it through the workload's own scale (the pod muscle of its own, from omni-v19)
 
 With --cand, each arm runs on both checkouts, and the candidate is read against the engine that stands arm by arm.
 
@@ -97,9 +97,12 @@ def main(argv=None):
          "a resource that rose is power given).", "",
          f"Engine: {eng_line}. Written by `python3 tools/solo_study.py`; every seed's reading of every arm is in its JSON twin (`per_seed`).", "",
          "| Arm | What governs |", "|---|---|",
-         "| native | the pod autoscaler (its target 70%) and the Cluster Autoscaler, as Kubernetes ships them |",
-         "| Omni-Compass and native | the shipped governor on top of both, the compass law at the max (as ARM=compass runs it) |",
-         "| Omni-Compass by itself | both native controllers switched off: every workload's pods at the operator's own count, the pool "
+         "| native | the pod autoscaler (its target 70%), as Kubernetes ships it, on the machines as the kind rig has them (every worker "
+         "made at the start, no Cluster Autoscaler: 12 machines) |",
+         "| Omni-Compass and native | the shipped governor on top of the pod autoscaler, the compass law at the max (as ARM=compass "
+         "runs it), on the same 12 machines |",
+         "| Omni-Compass by itself | the pod autoscaler switched off: every workload's pods at the operator's own count unless the "
+         "governor writes it through the workload's own scale, the pool "
          "at its starting size (12 machines); the shipped governor the only controller, the compass law at the max |", "",
          "## The means over the seeds", "", "| Gauge | native | Omni-Compass and native | Omni-Compass by itself |", "|---|---:|---:|---:|"]
     for g in gauges:
@@ -127,7 +130,7 @@ def main(argv=None):
     base_eng = engine(tree)[0]
     own = "--own-replicas" in (Path(tree) / "omni_controller" / "controller.py").read_text()   # the engine carries the pod muscle of its own
     L += ["", "## What it says", "",
-          (f"On the engine that stands ({base_eng}) the governor has a pod muscle of its own (`--own-replicas`, omni-v18): with the pod "
+          (f"On the engine that stands ({base_eng}) the governor has a pod muscle of its own (`--own-replicas`, omni-v19): with the pod "
            "autoscaler switched off it sets each named workload's pods itself, through the workload's own scale, at the target the compass "
            "moves, reconciled every 15 s on the fast checks: its 95th percentile response "
            f"{m('base', 'solo', 'p95_ms'):,.0f} ms and {m('base', 'solo', 'alert_minutes'):,.1f} minutes over the line in the day, against "
@@ -144,10 +147,10 @@ def main(argv=None):
               f"{m('cand', 'solo', 'p95_ms'):,.1f} ms and {m('cand', 'solo', 'alert_minutes'):,.1f} minutes over the line. Native and "
               "Omni-Compass and native read the same on both engines, gauge for gauge (the table above): the muscle acts only "
               "where the operator names a workload no autoscaler governs. Its own cost: the governor reads each workload it scales "
-              f"twice a decision ({m('cand', 'solo', 'reads_per_hour'):,.0f} reads an hour here, twelve workloads, against "
+              f"twice at each reconciliation, every 15 s ({m('cand', 'solo', 'reads_per_hour'):,.0f} reads an hour here, twelve workloads, against "
               f"{m('cand', 'omni', 'reads_per_hour'):,.0f} on top of native)."]
     L += ["", "Our own model, class S: it shows the mechanism, never a benchmark result. The real arm runs on kind (`ARM=solo`, "
-          "`scripts/kind_bench.sh`) on omni-v18, the engine that carries the muscle (`docs/SOLO_PREREGISTRATION.md`).", ""]
+          "`scripts/kind_bench.sh`) on omni-v19, the engine that carries the muscle (`docs/SOLO_PREREGISTRATION.md`).", ""]
     out_md.write_text("\n".join(stamp(L)) + "\n", encoding="utf-8")
     out_md.with_suffix(".json").write_text(json.dumps(rec, indent=1) + "\n", encoding="utf-8")
     print(f"{out_md}: {len(gauges)} gauges, {len(seeds)} seeds")

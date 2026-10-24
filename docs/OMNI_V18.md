@@ -1,88 +1,86 @@
-# Omni v18: Omni-Compass by itself, a pod muscle of its own
+# Omni v18: Omni direct in the engine; the three arms
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v18 (`OMNI_V18.json`, digest `22486290b19349eb`, 55 files) lands on 24 October, 01:30 UTC, under the founder's order of
-23 October that every organism is shown three ways: native; Omni-Compass and native; and Omni-Compass by itself, "running direct
-muscles" with native's own controller of that muscle switched off ("there's native, there's Omni and native, and then there's Omni
-by itself"). It is omni-v17 (`docs/OMNI_V17.md`) with one muscle added, in `omni_controller/controller.py`, and the models' arm
-that runs it, in `realms/harness.py` and `realms/plants.py` (52 of its 55 files are omni-v17's bytes). Nothing moves unless the
-operator names a workload to the muscle: with no workload named the engine is omni-v17, decision for decision (the toy gate below).
-Preregistered before any run (`docs/SOLO_PREREGISTRATION.md`). Read in the toy gate against omni-v17 on the same seeds
-(`results/toy_gate/V18_VS_V17.md`) and by itself beside native and beside Omni-Compass and native
-(`results/toy_gate/SOLO_V18.md`) before it was pushed. The readings are our own models (evidence class S), never a benchmark result.
-Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+Omni v18 (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files) stands on main since 23 October, night. The founder's orders of
+the same evening: "Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And
+then Omni direct is simply Omni on top of the muscles, no Kubernetes ... they all need to be written in code and toned in ...
+and push it all"; and, once it was pushed, "It should be not 17 anymore, it should be 18 ... Give me this new live engine wired
+up now to where you're at".
 
-## The pod muscle of its own
+omni-v18 is omni-v17 (`docs/OMNI_V17.md`) with Omni direct taken into the engine: the seven files of Omni-Compass's own
+orchestrator that hold its rules are fingerprinted like every other wire, so no rule of Omni direct can change without the
+version changing (the principle omni-v15 set for the eight wires it took in). 55 of its 62 files are omni-v17's bytes; the
+seven new ones are `omni_orchestrator/__init__.py`, `agent.py` (the machine's hand), `brain.py` (the brain), `cgroup.py` (the
+walls), `control.py` (the control plane), `front.py` (the front) and `scheduler.py` (the room rule). The showing's workload and
+clients (`omni_orchestrator/workload.py`, `load.py`) are the harness and stay outside. A version declared before omni-v18 is read
+without the seven (`tools/omni_version.py`, `ORCHESTRATOR_WIRES`), so every earlier commit keeps the version it ran on.
 
-On every engine before it, the Kubernetes governor moved a workload's pods only through the pod autoscaler's own object (its range
-and its target): with the pod autoscaler switched off it had no pod muscle, so "by itself" held every workload at the operator's
-count. omni-v18 gives it one (`--own-replicas`, `_own_pods`). For each workload the operator names and no autoscaler governs, the
-governor sets the replica count itself, through the workload's own scale, by strict C's rule: replicas = ⌈current × measured busy
-share / target⌉, up at once, down only to the highest recommendation of the last 300 s, inside a tolerance of a tenth. The target is
-the one the compass moves for an autoscaler: the operator's own (the workload's target annotation, else `--own-target`), down to
-60% of it, the most pods the cover allows past the wall. Never below the operator's own count at the max, never above the range's
-top, never below one pod; the count it shipped is recorded once on the workload and handed back by the reset. A workload an
-autoscaler governs keeps its autoscaler: the muscle writes nothing there. The muscle keeps the pace of the controller it stands in
-for: a reconciliation every 15 s on the fast checks (`--own-every-s`, the pod autoscaler's sync), at the target the last decision
-set; the compass moves the target only in a decision.
+## The three arms
 
-## The fault the gate found before it landed
+Every organism the orchestrator runs is shown three ways, all three in one showing and every pair read by the one key, paired
+by step (`tools/orchestrator_show.py`, `.github/workflows/orchestrator.yml`, `docs/OMNI_ORCHESTRATOR.md`):
 
-Rebuilt on omni-v17, whose main engine decides every 60 s, the first candidate moved its pods only at a decision, once a minute.
-By itself in the toy it then read the minutes over the response line **LOSS** against native (26.4 to 34.8 minutes a day), the 95th
-percentile still a GAIN. The pod autoscaler it stands in for syncs every 15 s. The muscle now reconciles every 15 s between
-decisions; its window of fewer pods counts those reconciliations (the strict window's 300 s at any beat). Two unit tests hold it
-(`tests/test_own_replicas.py`, 11 in all).
+| arm | what moves the muscles | brain |
+|---|---|---|
+| native | Kubernetes' published autoscaling rule, written by us, every machine on, units spread | `yardstick` |
+| Omni on native | that rule's units, never fewer; Omni's reflex and fail-up above it; Omni's conveyance, busy room rule, packing and machines on top; no fold, no verdict (the engine's strict form, as on the kind rigs) | `omni_native` |
+| Omni direct | Omni alone on the muscles, no Kubernetes: everything Omni on native does, and the fold below the rule's count under the verdict | `omni` |
 
-## By itself, in our own model (`results/toy_gate/SOLO_V18.md`, 8 seeds of a day, class S)
+## What Omni direct carries
 
-| Gauge | native | Omni-Compass and native | Omni-Compass by itself |
-|---|---:|---:|---:|
-| machine-hours | 288.0 | 288.0 | 288.0 |
-| pods waiting for a place (pod-minutes an hour) | 0.0 | 0.0 | 0.0 |
-| 95th percentile response (ms) | 80.0 | 76.8 | 64.4 |
-| minutes over the response line (a day) | 26.4 | 22.0 | 9.3 |
+Every mechanism in Omni direct's brain is the engine's own, so the same gain goes to Omni on top of native:
 
-By the one key, Omni-Compass by itself against native: the 95th percentile **+19.4% GAIN** (+12.2% to +26.6%), the minutes over the
-line **+64.9% GAIN** (+32.4% to +97.5%), machine-hours, energy per core-hour and pods waiting EVEN (identical machines). Against
-Omni-Compass and native: the 95th percentile **+16.0% GAIN**, the minutes over the line **+58.0% GAIN**, the rest EVEN.
-Omni-Compass and native against native: the 95th percentile **+4.0% GAIN**, the minutes over the line **+16.6% GAIN**.
+- **conveyance** (omni-v7, omni-v13): each unit's processor wall set to the room its machine can spare under 75% busy, shared
+  among the service's units there, never under the request, handed back between 70% and 75% and at the top beside another
+  workload's room; journaled, written to the hand, read back from the kernel's `cpu.max`;
+- **the reflex**: work waiting in line adds as many units as there are requests waiting, up to the step, in the same beat;
+- **the twin**: Kubernetes' rule read on the same readings, each unit's use counted no higher than its request, as Kubernetes
+  would see it; Omni never holds fewer units than the twin unless the verdict allowed the step;
+- **the fold under the verdict** (`omnicompass/verdict.py`): a unit fewer than the twin tried on the service's own response
+  times, under the same traffic (a trial whose arrivals move more than 15% is abandoned), kept only where it reads no LOSS
+  within 2%; work waiting hands a step back at once (the immune reaction);
+- **the hold on trials the traffic keeps abandoning** (new with omni-v18): a trial the traffic abandons holds the next off for
+  6 beats, doubled at each abandonment in a row up to the verdict's recheck (24 beats), cleared by a trial judged to its end; a
+  phase counts its step from the higher of the twin it found and the twin now. Found on the first three-arm showing, where every
+  trial was abandoned yet each held a unit below the twin while it ran (Omni direct against Omni on native, work LOSS, down
+  5.2%); fixed before the version landed (`docs/OMNI_ORCHESTRATOR.md`, section 2d);
+- **the busy room rule** (omni-v7, `omni_controller/capacity.py`): no unit placed onto a machine at 75% of its measured busy
+  share; the units packed onto the fewest machines, machines parked and woken;
+- **the journal and the kill switch**: every change journaled before it is acted on and replayed when the control plane starts
+  again; the kill switch holds the declared state and hands every conveyed wall back.
 
-## The toy gate against omni-v17 (`results/toy_gate/V18_VS_V17.md`)
+## What it read before it landed
 
-Every toy, 8 seeds: the cluster in the cloud's setting at 60 and 15 s, the blink, the shipped default, the four conveyance toys, the
-card and the card near its voltage floor, and the verdict. Every gauge of every toy reads **identical** to omni-v17, because no toy
-names a workload to the muscle. No LOSS against the engine that stands.
+Our own showing on one host, class L, one run of each arm (`docs/OMNI_ORCHESTRATOR.md`, sections 2c and 2d):
 
-## The rows against native that read LOSS (the engine's, as on omni-v17)
+- **The three arms, quick form** (six steps of 15 s, after the fix): Omni on native against native, work GAIN, up 8.3%; Omni
+  direct against native, work GAIN, up 9.1%; Omni direct against Omni on native, the 95th percentile GAIN, down 13.2%, and units
+  GAIN, a cut, down 9.5%. No LOSS in any pair; nothing failed or wrong in any arm, the batch job or the drills.
+- **Omni direct against native, full form** (18 steps of 25 s): work GAIN, up 4.7%; the 95th percentile GAIN, down 9.9%; units
+  GAIN, a cut, down 10.3%; machines EVEN, down 1.7%; 0 failed and 0 wrong in 20,452 requests.
 
-The same toys read against native carry the rows omni-v17 carries, unchanged, each on the next version's list with its cause:
-pods waiting at a 15 s decision in the cloud's setting (−121.6% LOSS) and its 95th percentile (−0.36% LOSS); alert minutes with
-the machines blinking out of the reading (−2.35% LOSS); the start wait in the conveyance toy (−9.0% LOSS, its 95th percentile
-−10.0% LOSS) beside +64.2% GAIN in requests served and +53.1% GAIN in the 95th percentile; in the batch toy the requests served
-(−2.11% LOSS), the alert minutes (−9.82% LOSS) and the batch turnaround (−0.05% LOSS); the card's 95th percentile (−2.38% LOSS;
-near its voltage floor −5.78% LOSS) beside its energy (+4.72% GAIN; +1.30% GAIN). Every row is shown.
+The toy gate against omni-v17 (`results/toy_gate/V18_VS_V17.md`): every toy reads omni-v17's numbers, because none of omni-v17's
+55 files moved; the gate's toys do not run the orchestrator, whose own gate is the showing above.
 
-## Where it runs
+And after it landed, the three runs on GitHub's machines (the full form, A, B and C from one commit) read Omni on native against native work GAIN in all three (up 5.2% to 7.4%) and the 95th percentile GAIN in all three (down 7.5% to 12.1%), Omni direct against native work GAIN in all three (up 5.7% to 9.4%) and the 95th percentile GAIN in all three (down 9.8% to 15.7%), machines EVEN, the units power given or EVEN, and Omni direct against Omni on native EVEN on every gauge; no LOSS in any pair in any run (`results/orchestrator/V18_THREE_ARMS_ABC.md`).
 
-On Kubernetes, the kind rig's `ARM=solo` (`scripts/kind_bench.sh`): the pod autoscaler removed, the operator's target and range
-written on the workload, Omni-Compass the only controller of its pods; Kubernetes' own scheduler and kubelet stay. The three-run
-tables read it against native (`solo`) and against Omni-Compass and native (`solo|compass`) (`tools/confirm_abc.py`,
-`tools/live_reps.py`). In our models, the organisms runner's third arm (`tools/run_realms_v5.py`): every pool whose own autoscaler
-can be switched off. Where native is a setting, or its own loop is the actuator, the two Omni-Compass arms are one. No cloud runs
-by itself without the founder's word (the order of 14 October: nothing in a cloud adds a machine).
+## What runs on it
 
-## Beside it: Omni-Compass direct
+Every benchmark runs again on omni-v18: the conductor's campaign opened at 21:19 UTC on 23 October (`scripts/dispatch_grid.py`,
+`scripts/reruns.txt`), and the clouds' sets run on it once each cloud's own $0 check passes. In the clouds nothing changes: Omni
+on top of the cloud's Kubernetes at the tune-down, on the machines alone (the order of 14 October). Omni direct runs on GitHub's
+own machines, three runs from one commit (`orchestrator.yml`). Omni direct is ready on a rented machine in each cloud and runs
+there only on the founder's word: the test `direct` on the one-machine buttons (`big-organism-detached.yml` on Azure,
+`cloud-organism.yml` on Google and Amazon; `scripts/organism_detached.sh`) rents one 8-processor machine, ships it the exact
+commit, runs the same full form `reps` times one after another, brings every run's files back and gives the machine back; a
+dry run (the default) shows the price and rents nothing. The GPU runs on Lambda start from `gpu-omni-v18`, one exact commit.
 
-Omni-Compass's own orchestrator (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`) runs the organism with no Kubernetes at all,
-its own walls, hands, front, room rule, brain and control plane. It is its own files beside the engine, not in the fingerprint; it
-uses the engine's compass law and verdict, and its showings on GitHub play back on the live engine (section 5g).
+## What it does not claim
 
-## The real runs
-
-Every benchmark runs again on omni-v18 (`scripts/reruns.txt`; the conductor's campaign from the moment it stands on main), and
-`ARM=solo` joins the kind sets beside native and Omni-Compass and native, three runs, read by the one key.
+The three-run reading is the full form on GitHub's machines from one commit, on one host each; no cloud machine has run it yet. The comparison of Omni direct against Kubernetes itself on the kind rig is the next
+step. The trade between muscles judged on the organism stays the next version's work, through the toy gate. Run and scored by
+The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ---
 

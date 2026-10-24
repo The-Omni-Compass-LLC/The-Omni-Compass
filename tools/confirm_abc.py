@@ -40,7 +40,7 @@ PAIR_WORDS = {"nativebare": "the organism alone", "compassbare": "Omni-Compass o
               # native) and so on; the compass arm decides at its engine's default (every 60 s from omni-v17, every 15 s on
               # omni-v16), its beat read from the runs' own receipts (BEATS)
               **{f"compass{p}": f"Omni-Compass deciding every {p} s" for p in (5, 10, 15, 30, 60, 75, 90, 120)},
-              # Omni-Compass by itself (omni-v18, docs/SOLO_PREREGISTRATION.md): solo (against native), solo|compass
+              # Omni-Compass by itself (omni-v19, docs/SOLO_PREREGISTRATION.md): solo (against native), solo|compass
               "solo": "Omni-Compass by itself"}
 BEATS = {}   # run id -> {arm: [the beats it ran at]}, from each run's LIVE_REPS.json (tools/live_reps.py, omni-v17 on)
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge)"

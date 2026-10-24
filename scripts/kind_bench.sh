@@ -38,7 +38,7 @@ set -euo pipefail
 ARM="${ARM:?set ARM=native, ARM=watch (Omni watches, writes nothing), ARM=omni (B: Omni on top), ARM=compass (B with the compass law), ARM=strict (C: Omni decides replicas and nodes) or ARM=solo (Omni-Compass by itself: the pod autoscaler removed, Omni-Compass's own pod muscle on the workload)}"
 STRICT=""; [ "$ARM" = "strict" ] && STRICT="--strict-replicas"
 LAW=""; { [ "$ARM" = "compass" ] || [ "$ARM" = "solo" ]; } && LAW="--law compass"
-OWN=""   # ARM=solo: the workload Omni-Compass scales itself (omni-v17's pod muscle of its own; docs/SOLO_PREREGISTRATION.md)
+OWN=""   # ARM=solo: the workload Omni-Compass scales itself (omni-v19's pod muscle of its own; docs/SOLO_PREREGISTRATION.md)
 DRY=""; [ "$ARM" = "watch" ] && DRY="--dry-run"
 # native tuned harder (the cost-to-match test): ARM=native40, native30, native20 is Kubernetes alone with its HPA target
 # lowered to that value by the operator, no Omni-Compass; it shows what native needs to reach Omni-Compass's response times
@@ -695,7 +695,7 @@ if [ -n "${ROBUST:-}" ]; then
     export -f start_controller
     # (17 Oct: GIVE_BACK_ONLY, added on 15 October, was missing here, so the second governor stopped on an unbound variable
     # before it began and every kill run of omni-v7 was marked invalid; tests/test_robust_restart.py now checks the list,
-    # and caught GOV_PIN, the governor's own core, on 20 October before any run, and OWN, omni-v18's pod muscle of its own, on
+    # and caught GOV_PIN, the governor's own core, on 20 October before any run, and OWN, omni-v19's pod muscle of its own, on
     # 24 October before any run of ARM=solo)
     export CAP_ARGS DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD GIVE_BACK_ONLY GOV_PIN OWN
   fi

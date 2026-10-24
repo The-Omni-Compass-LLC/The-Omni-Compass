@@ -42,7 +42,7 @@ from .presets import STEPS_SINGLE, ORGANISM_STEPS, CAL_SEED, params_for
 ROOT = Path(__file__).resolve().parents[1]
 LAWS = {"compass": compass_apply, "v5": lambda p, k: max_apply(p, k, V5CFG), "v5save": apply_v5_save}
 ARMS = ("native", "watch", "compass")   # native; Omni watching (writes nothing); the compass law on top (amendment, 2026-10-05)
-SOLO = "solo"     # Omni-Compass by itself (omni-v17, docs/SOLO_PREREGISTRATION.md): the max, with every pool whose own count is
+SOLO = "solo"     # Omni-Compass by itself (omni-v19, docs/SOLO_PREREGISTRATION.md): the max, with every pool whose own count is
                   # the muscle's knob run with its autoscaler switched off (and its twin, the brain's sense of native, too)
 
 

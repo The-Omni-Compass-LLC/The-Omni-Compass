@@ -38,16 +38,15 @@ ROOT_ALLOWED = {
     # the same rules for every AI assistant that reads this repository (Codex, Copilot, Gemini, Cursor)
     "AGENTS.md", "GEMINI.md", ".cursorrules", "llms.txt",   # llms.txt: read by AI crawlers at the root, the notice in it
     # build, verification and metadata
-    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "OMNI_V6.json", "OMNI_V7.json", "OMNI_V8.json", "OMNI_V9.json", "OMNI_V10.json", "OMNI_V11.json", "OMNI_V12.json", "OMNI_V13.json", "OMNI_V14.json", "OMNI_V15.json", "OMNI_V16.json", "OMNI_V17.json", "OMNI_V18.json", "codemeta.json",
+    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "OMNI_V6.json", "OMNI_V7.json", "OMNI_V8.json", "OMNI_V9.json", "OMNI_V10.json", "OMNI_V11.json", "OMNI_V12.json", "OMNI_V13.json", "OMNI_V14.json", "OMNI_V15.json", "OMNI_V16.json", "OMNI_V17.json", "OMNI_V18.json", "OMNI_V19.json", "codemeta.json",
     "docker-compose.yml", ".gitignore", ".gitattributes", ".dockerignore", ".github", ".fossa.yml", ".snyk",
     # code and evidence
     "omnicompass", "omni_controller", "omni_orchestrator", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",
     "k8s_controlplane", "k8s_fleet", "omnilab", "hardware", "benchmarks", "tuning", "reference", "fixtures", "sbom",
-    "systems",   # your own system through the core's Monte Carlo (systems/README.md; the founder's words of 24 October)
     "results", "docs", "release",
 }
 PATH_PREFIXES = ("results/", "docs/", "tools/", "scripts/", "realms/", "omnicompass/", "omni_controller/", "tests/",
-                 ".github/", "deploy/", "tuning/", "cpp/", "systems/")
+                 ".github/", "deploy/", "tuning/", "cpp/")
 LINK = re.compile(r"\]\(([^)\s#]+)(?:#[^)]*)?\)")
 TICK = re.compile(r"`([A-Za-z0-9_.\-/]+)`")
 

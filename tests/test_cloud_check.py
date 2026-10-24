@@ -24,6 +24,10 @@ from scripts import dispatch_grid as grid
 from tools import cloud_key_check
 
 ROOT = Path(__file__).resolve().parents[1]
+# the environment a test hands the program, without a runner's own GITHUB_ENV and GITHUB_OUTPUT: on GitHub's runners the
+# program's masked hand-off line (and its write to the job's env file) would otherwise run inside the test, print the test
+# block on the mask line and leave it in the job's environment (24 October: main's verify failed so, never on a laptop)
+CLEAN = {k: v for k, v in os.environ.items() if k not in ("GITHUB_ENV", "GITHUB_OUTPUT")}
 SECRET = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7" * 30
 
 
@@ -61,7 +65,12 @@ class KeyShape(unittest.TestCase):
                  json.loads(whole)["private_key"]: "private key alone",
                  SECRET[:600]: "encoded string",
                  "ya29." + "a0AfB_xyZ-9q." * 45: "token",
-                 "omni-compass-github@omni-compass-123456.iam.gserviceaccount.com": "account's address"}
+                 "omni-compass-github@omni-compass-123456.iam.gserviceaccount.com": "account's address",
+                 "GCP_CREDENTIALS = " + whole: "18 characters stand before its first {",
+                 'P=$(gcloud config get-value project)\ngcloud iam service-accounts keys create key.json --iam-account "x"':
+                     "the setup lines that are run in Google's Cloud Shell",
+                 "Created key of type json for\n" + SECRET[:300] + " (see https://console.cloud.google.com)":
+                     "2 lines, with spaces, a web address in it"}
         for raw, words in cases.items():
             with self.subTest(words=words):
                 bad = cloud_key_check.problems(raw)[0]
@@ -69,7 +78,7 @@ class KeyShape(unittest.TestCase):
                 self.assertNotIn(SECRET[:12], bad)
 
     def test_the_program_exits_two_and_prints_no_secret(self):
-        env = dict(os.environ, GCP_CREDENTIALS=key()[:1200], GCP_PROJECT="omni-compass-123456")
+        env = dict(CLEAN, GCP_CREDENTIALS=key()[:1200], GCP_PROJECT="omni-compass-123456")
         out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py")], env=env, capture_output=True, text=True)
         self.assertEqual(out.returncode, 2)
         self.assertNotIn(SECRET[:12], out.stdout + out.stderr)
@@ -99,6 +108,9 @@ class AzureKeyShape(unittest.TestCase):
                  "0b1c2d3e-1111-2222-3333-444455556666": "one identifier alone",
                  whole[whole.index('"clientSecret"'):]: "piece from inside the block",
                  whole[:150]: "cut short",
+                 "'" + whole + "'": "1 character stands before its first {",
+                 "Ab9+" * 21 + "Xy==": "storage account's access key",
+                 "see https://portal.azure.com for the key " + AZ_SECRET: "1 line, with spaces, a web address in it",
                  whole.replace('",', '"', 1): "not whole JSON",
                  json.dumps({"appId": "0b1c2d3e-1111-2222-3333-444455556666", "password": AZ_SECRET,
                              "tenant": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"}): "fields missing: clientId, clientSecret, subscriptionId, tenantId",
@@ -113,12 +125,12 @@ class AzureKeyShape(unittest.TestCase):
 
     def test_the_program_exits_two_and_prints_no_secret(self):
         for raw in (AZ_SECRET, az_block()[:300]):
-            env = dict(os.environ, AZURE_CREDENTIALS=raw)
+            env = dict(CLEAN, AZURE_CREDENTIALS=raw)
             out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env, capture_output=True, text=True)
             self.assertEqual(out.returncode, 2)
             self.assertNotIn(AZ_SECRET[:10], out.stdout + out.stderr)
             self.assertIn("docs/AZURE_SETUP.md", out.stdout)
-        env = dict(os.environ, AZURE_CREDENTIALS=az_block())
+        env = dict(CLEAN, AZURE_CREDENTIALS=az_block())
         out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env, capture_output=True, text=True)
         self.assertEqual(out.returncode, 0, out.stdout)
         self.assertNotIn(AZ_SECRET[:10], out.stdout + out.stderr)
@@ -132,13 +144,87 @@ class AzureKeyShape(unittest.TestCase):
                 steps = job.get("steps") or []
                 for k, s in enumerate(steps):
                     if str(s.get("uses", "")).startswith("azure/login@"):
+                        given = s.get("with") or {}
+                        if "creds" not in given:
+                            # the sign-in without a password (OIDC, the inventory since 23 October): no stored key text
+                            # reaches azure/login, only the three IDs, and the job asks GitHub for its token
+                            with self.subTest(workflow=f.name, job=name, login="oidc"):
+                                self.assertTrue({"client-id", "tenant-id", "subscription-id"} <= set(given))
+                                self.assertEqual((w.get("permissions") or job.get("permissions") or {}).get("id-token"), "write")
+                            continue
                         seen += 1
                         prev = steps[k - 1]
                         with self.subTest(workflow=f.name, job=name):
                             self.assertIn("cloud_key_check.py azure", str(prev.get("run", "")))
-                            self.assertEqual(prev.get("env", {}).get("AZURE_CREDENTIALS"), "${{ secrets.AZURE_CREDENTIALS }}")
+                            for box in ("AZURE_CREDENTIALS", "AZURE_CLIENT_ID", "AZURE_TENANT_ID", "AZURE_SUBSCRIPTION_ID",
+                                        "AZURE_CLIENT_SECRET"):
+                                self.assertEqual(prev.get("env", {}).get(box), "${{ secrets.%s }}" % box)
+                            # the login reads the block the check wrote, from the one box or the four
+                            self.assertEqual(given.get("creds"), "${{ env.AZ_CREDS }}")
                             self.assertEqual(prev.get("if"), s.get("if"))       # skipped exactly when the login is
-        self.assertGreaterEqual(seen, 10)
+        self.assertGreaterEqual(seen, 9)      # the nine logins with the key (the inventory signs in without one since 23 October)
+
+
+AZ_IDS = {"AZURE_CLIENT_ID": "0b1c2d3e-1111-2222-3333-444455556666", "AZURE_TENANT_ID": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+          "AZURE_SUBSCRIPTION_ID": "11111111-2222-3333-4444-555555555555"}
+
+
+class AzureFourBoxes(unittest.TestCase):
+    """24 October: the login typed one value to a box, as the portal shows each value, so no block is assembled by hand."""
+
+    def test_the_whole_block_still_wins(self):
+        block, where, bad = cloud_key_check.azure_login({"AZURE_CREDENTIALS": az_block()})
+        self.assertEqual(bad, [])
+        self.assertEqual(json.loads(block)["clientSecret"], AZ_SECRET)
+        self.assertIn("whole block", where)
+
+    def test_four_boxes_make_the_block(self):
+        block, where, bad = cloud_key_check.azure_login(dict(AZ_IDS, AZURE_CLIENT_SECRET=AZ_SECRET))
+        self.assertEqual(bad, [])
+        self.assertEqual(json.loads(block), {"clientId": AZ_IDS["AZURE_CLIENT_ID"], "clientSecret": AZ_SECRET,
+                                             "subscriptionId": AZ_IDS["AZURE_SUBSCRIPTION_ID"],
+                                             "tenantId": AZ_IDS["AZURE_TENANT_ID"]})
+        self.assertIn("four boxes", where)
+
+    def test_the_password_alone_in_the_one_box_with_the_three_ids(self):
+        block, where, bad = cloud_key_check.azure_login(dict(AZ_IDS, AZURE_CREDENTIALS=AZ_SECRET))
+        self.assertEqual(bad, [])
+        self.assertIn("AZURE_CREDENTIALS", where)
+
+    def test_each_wrong_box_is_named_without_a_character_of_it(self):
+        cases = [(dict(AZ_IDS, AZURE_CREDENTIALS=AZ_IDS["AZURE_CLIENT_ID"]), "AZURE_CLIENT_SECRET is empty"),
+                 (dict(AZ_IDS, AZURE_CLIENT_SECRET="99999999-8888-7777-6666-555555555555"), "never the Secret ID"),
+                 ({"AZURE_CLIENT_SECRET": AZ_SECRET}, "AZURE_CLIENT_ID is empty"),
+                 (dict(AZ_IDS, AZURE_TENANT_ID="contoso", AZURE_CLIENT_SECRET=AZ_SECRET), "AZURE_TENANT_ID is not a 36-character ID"),
+                 (dict(AZ_IDS, AZURE_CREDENTIALS="Ab9+" * 21 + "Xy=="), "storage account's access key")]
+        for env, words in cases:
+            with self.subTest(words=words):
+                block, _, bad = cloud_key_check.azure_login(env)
+                self.assertIsNone(block)
+                said = " ".join(bad)
+                self.assertIn(words, said)
+                for piece in (AZ_SECRET[:10], "0b1c2d3e", "aaaaaaaa", "11111111", "99999999"):
+                    self.assertNotIn(piece, said)
+
+    def test_the_program_writes_the_masked_block_for_the_login(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "env"
+            env = dict(CLEAN, GITHUB_ENV=str(out), AZURE_CREDENTIALS="", AZURE_CLIENT_SECRET=AZ_SECRET, **AZ_IDS)
+            run = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env,
+                                 capture_output=True, text=True)
+            self.assertEqual(run.returncode, 0, run.stdout)
+            written = out.read_text()
+            self.assertTrue(written.startswith("AZ_CREDS={"))
+            self.assertEqual(json.loads(written.split("=", 1)[1])["clientSecret"], AZ_SECRET)
+            # the only line that carries it is the mask command, which the runner swallows
+            shown = [ln for ln in run.stdout.splitlines() if AZ_SECRET in ln]
+            self.assertTrue(shown and all(ln.startswith("::add-mask::") for ln in shown))
+            bad = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"],
+                                 env=dict(CLEAN, AZURE_CREDENTIALS="0b1c2d3e-1111-2222-3333-444455556666"),
+                                 capture_output=True, text=True)
+            self.assertEqual(bad.returncode, 2)
+            self.assertIn("AZURE_CLIENT_SECRET", bad.stdout)
+            self.assertIn("docs/AZURE_SETUP.md", bad.stdout)
 
 
 def fake_bin(d, name, body):
@@ -178,7 +264,7 @@ class PreFlight(unittest.TestCase):
             fake_bin(d, "aws", AWS)
             for tool in ("eksctl", "kubectl", "helm"):          # the pre-flight stops before any of them is reached
                 fake_bin(d, tool, f'echo "{tool} reached" >&2; exit 9\n')
-            e = dict(os.environ, PATH=f"{d}:{os.environ['PATH']}", REP="1", PREFLIGHT_ONLY="1", GCP_PROJECT="p",
+            e = dict(CLEAN, PATH=f"{d}:{os.environ['PATH']}", REP="1", PREFLIGHT_ONLY="1", GCP_PROJECT="p",
                      ASKED=str(Path(d) / "asked"), **env)
             out = subprocess.run(["bash", str(ROOT / "scripts" / script)], env=e, capture_output=True, text=True, cwd=d)
             asked = (Path(d) / "asked").read_text() if (Path(d) / "asked").exists() else ""
@@ -259,7 +345,8 @@ class ConductorGate(unittest.TestCase):
         self.assertNotIn("az aks create", text)
         self.assertNotIn("az group create", text)
         for cloud, runs in (("google", ("google", "both", "all")), ("amazon", ("amazon", "both", "all")), ("azure", ("azure", "all"))):
-            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), github.event.inputs.cloud)")
+            # a push of this file to main runs the two free checks as "both" (23 October); a hand or conductor start names its cloud
+            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), (github.event.inputs.cloud || 'both'))")
         self.assertNotIn("eksctl create", text)
         self.assertNotIn("clusters create", text)
 
@@ -283,7 +370,7 @@ class ConductorGate(unittest.TestCase):
              mock.patch.object(grid, "jobs_in_flight", return_value=(0, 0, [])), \
              mock.patch.object(grid, "cloud_switch", side_effect=lambda p: "azure" not in str(p)), \
              mock.patch.object(grid.time, "sleep"), \
-             mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": os.devnull}):
+             mock.patch.dict(CLEAN, {"GITHUB_STEP_SUMMARY": os.devnull}):
             self.assertEqual(grid.main(["tick", "--ref", "main"]), 0)
         posts = [(p, d) for m, p, d in calls if m == "POST"]
         self.assertTrue(posts)
@@ -307,7 +394,7 @@ class ConductorGate(unittest.TestCase):
              mock.patch.object(grid, "jobs_in_flight", return_value=(0, 0, [])), \
              mock.patch.object(grid, "cloud_switch", side_effect=lambda p: "azure" in str(p)), \
              mock.patch.object(grid.time, "sleep"), \
-             mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": os.devnull}):
+             mock.patch.dict(CLEAN, {"GITHUB_STEP_SUMMARY": os.devnull}):
             self.assertEqual(grid.main(["tick", "--ref", "main"]), 0)
         posts = [(p, d) for m, p, d in calls if m == "POST"]
         self.assertEqual([(p.split("/")[-2], d["inputs"]) for p, d in posts], [("cloud-check.yml", {"cloud": "azure"})])

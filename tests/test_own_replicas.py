@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""omni-v17: Omni-Compass by itself (the founder's order of 23 October; docs/SOLO_PREREGISTRATION.md). The pod muscle of its own
+"""omni-v19: Omni-Compass by itself (the founder's order of 23 October; docs/SOLO_PREREGISTRATION.md). The pod muscle of its own
 sets the replica count of a workload the operator names (--own-replicas) and no autoscaler governs, through the workload's own
 scale, by strict C's rule at the compass's target; it holds where an autoscaler governs the workload, never goes below the
 operator's count at the max, writes nothing when the replicas are left native, and the reset hands the operator's count back.
@@ -58,7 +58,7 @@ def decide(c, k, slo_clean=True):
 
 
 class OwnPace(unittest.TestCase):
-    """omni-v18: between decisions the pod muscle of its own keeps the pod autoscaler's pace (every 15 s on the fast checks),
+    """omni-v19: between decisions the pod muscle of its own keeps the pod autoscaler's pace (every 15 s on the fast checks),
     at the target the last decision set; the compass moves the target only in a decision."""
 
     def test_a_check_between_decisions_adds_pods_at_once(self):

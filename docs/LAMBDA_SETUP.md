@@ -5,7 +5,7 @@
 This connects GitHub to a Lambda Cloud account so one button, the **`lambda-gpu`** workflow, can rent one GPU machine, run
 the GPU test on it at the exact commit the button is pressed on (`scripts/gpu_8card.sh` on eight cards, or
 `scripts/gpu_rented_run.sh` on one), bring every result file back as the run's artifact, and give the machine back. The GPU
-runs start from the branch **`gpu-omni-v16`** (the engine that stands; the run's page prints the exact commit). The design is
+runs start from the branch **`gpu-omni-v18`** (the engine that stands; the run's page prints the exact commit). The design is
 `docs/GPU_PREREGISTRATION.md`; what each stage measures is `docs/GPU_RUN_GUIDE.md`, sections C and D.
 
 About ten minutes, once. Lambda bills the card on file from the moment a machine starts until it is given back; nothing
@@ -50,7 +50,7 @@ it to anyone. These three are passwords for this one purpose: never paste them a
 ## 4. The dry run (free)
 
 1. On GitHub, **Actions**, then **lambda-gpu** on the left, then **Run workflow** (on the right).
-2. Branch: **gpu-omni-v16**. `test`: `1card`. `mode`: `fast`. Leave `dry_run` at **yes**. Click **Run workflow**.
+2. Branch: **gpu-omni-v18**. `test`: `1card`. `mode`: `fast`. Leave `dry_run` at **yes**. Click **Run workflow**.
 3. In about a minute the run's page shows, at no cost:
    - the SSH key check: "SSH key omni-key: Lambda holds it, and the stored private key is its other half";
    - the price an hour, the regions with a machine free now, and the estimate for the hour budget plus one hour;
@@ -80,6 +80,13 @@ The machine is given back when the run prints its last line, or at the hour budg
 end of the workflow if anything before it failed. Each give-back is acknowledged by Lambda; if Lambda does not acknowledge it,
 the run turns red and says so. Then, by hand: **cloud.lambda.ai**, **Instances**, tick the machine (its name starts
 `omni-`), **Terminate**.
+
+A run cancelled by hand keeps watching its machine (the watch jobs run on through a cancel, so a give-back is never lost),
+and a run whose test stopped early is given back at once by the watch since 24 October. For a machine still left billing
+under an older run: **Actions**, **lambda-gpu**, **Run workflow**, **test** `giveback`, **give_back** `omni-1card-` (or
+`omni-8card-`, or the machine's whole name). It gives back every machine whose name starts so, rents nothing, and never
+touches a machine launched by hand on Lambda's page; the stuck run then sees its machine gone and ends, and the next run of
+that test starts.
 
 ## 6. Afterwards
 

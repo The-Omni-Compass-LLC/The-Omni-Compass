@@ -27,9 +27,12 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
-    "engine_v18": ["OMNI_V18.json", "tools/omni_version.py", "docs/OMNI_V18.md", "omni_controller/controller.py", "realms/harness.py",
-                   "realms/plants.py", "tests/test_own_replicas.py", "results/toy_gate/V18_VS_V17.md", "results/toy_gate/V18_VS_V17.json",
-                   "results/toy_gate/SOLO_V18.md", "results/toy_gate/SOLO_V18.json", "docs/SOLO_PREREGISTRATION.md", "scripts/kind_bench.sh"],
+    "engine_v19": ["OMNI_V19.json", "tools/omni_version.py", "docs/OMNI_V19.md", "omni_controller/controller.py", "realms/harness.py",
+                   "realms/plants.py", "tests/test_own_replicas.py", "results/toy_gate/V19_VS_V18.md", "results/toy_gate/V19_VS_V18.json",
+                   "results/toy_gate/SOLO_V19.md", "results/toy_gate/SOLO_V19.json", "results/toy_gate/SOLO_V19_VS_V18.md",
+                   "results/toy_gate/SOLO_V19_VS_V18.json", "docs/SOLO_PREREGISTRATION.md", "tools/solo_study.py", "scripts/kind_bench.sh",
+                   "fleet/capture/kube_capture.sh", "tools/confirm_abc.py", "tools/live_reps.py", "tools/run_realms_v5.py"],
+    "engine_v18": ["OMNI_V18.json", "tools/omni_version.py", "docs/OMNI_V18.md"],   # extend with the files omni-v18 changed
     "engine_v17": ["OMNI_V17.json", "tools/omni_version.py", "docs/OMNI_V17.md", "omni_controller/controller.py",
                    "tests/test_pace_clocks.py", "tests/test_time_correct.py", "tools/beat_ladder.py", "tests/test_beat_ladder.py",
                    "tools/toy_gate.py", "results/toy_gate/V17_VS_V16.md", "results/toy_gate/V17_VS_V16.json",
@@ -66,11 +69,6 @@ GROUPS = {
                         "cpp/tools/engine_runs.cpp", "cpp/include/omnicompass/governor.hpp", "cpp/src/governor.cpp",
                         "tests/test_cpp_verdict_parity.py", "tests/test_cpp_engine_runs_parity.py", "tools/engine_runs.py",
                         ".github/workflows/engine-runs.yml"],
-    "core_monte_carlo": ["omnicompass/core.py", "benchmarks/core_evidence.py", "results/core_evidence.json", "tools/core_runs.py",
-                         "tests/test_core_runs.py", "results/core_runs/CORE_RUNS_500_1369407155.json", "results/core_runs/CORE_RUNS_500_1369407155.md",
-                         ".github/workflows/engine-runs.yml", "docs/engine/OMNI_COMPASS_LIVE_ENGINE.html", "cpp/tools/core_runs.cpp",
-                         "cpp/CMakeLists.txt", "tests/test_cpp_core_runs_parity.py", ".github/workflows/monte-carlo.yml", "systems/README.md",
-                         "systems/example_heavy_swing.json", "tools/seal.py", "results/SEAL.json"],
     "engine_v13": ["OMNI_V13.json", "tools/omni_version.py", "docs/OMNI_V13.md", "omni_controller/muscles.py", "tests/test_convey_handback.py",
                    "results/toy_gate/V13_VS_V12.md", "results/toy_gate/V13_VS_V12.json"],
     "engine_v12_refused_raise": ["OMNI_V12.json", "omni_controller/muscles.py", "tools/omni_version.py", "docs/OMNI_V12.md",

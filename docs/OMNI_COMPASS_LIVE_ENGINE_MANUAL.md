@@ -440,14 +440,14 @@ with the settings Omni-Compass wrote in that decision; and under each, that deci
 (the page's section 6a), never a number of the picture's own. The body is numbered 1 to 11; the back matter is vi
 (disclosures, governing law and contact) and vii (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
-to 1j, one letter for each of its panels, with no unnumbered entry in the contents.
+to 1k, one letter for each of its panels, with no unnumbered entry in the contents.
 
 ### 2.2 The sections, as built on omni-v18
 
 Appendix A lists every section with its anchor and the chapter of this book that
 reads it. In the page's order: 1 the monitor wall and the control panel (1a the control panel and the kill switch, 1b the
 monitor wall, 1c the monitor list, 1d the status board, 1e the master switch's wiring, 1f the Python's runs in the page, 1g
-every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline, 1j the heartbeat dial); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
+every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline, 1j the heartbeat dial, 1k Omni direct: the three arms); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
 measured effect in full (the organisms, every muscle, the register, the grid and every three-run table); 5 the evidence by
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host, 5g Omni-Compass direct, the
@@ -845,6 +845,33 @@ bench's own example: the factory tune runs the main engine at 60 s, chosen and r
 any other beat is the engine's range on the page, never a benchmark result, until its own three runs land on that beat and are
 read as that beat's. A beat set on a live system is the operator's own tune, and its results are its own.
 
+### 7.5 Omni direct: the three arms (the page's section 1k, `#s-direct`)
+
+From omni-v18 Omni-Compass's own orchestrator is part of the engine, and every organism it runs is shown three ways. **Native** is
+Kubernetes' published autoscaling rule on the muscles (written by The Omni-Compass LLC from the published rule), every machine on and
+the units spread. **Omni on native** is Omni-Compass on top of that rule: the rule's units and never fewer, with Omni-Compass's
+reflex, conveyance, room rule, packing and parked machines above them. **Omni direct** is Omni-Compass alone on the muscles, no
+Kubernetes beneath it. The section draws the three arms from the showing's own record (`results/orchestrator/`), class L.
+
+The arm buttons (**All three**, **Native**, **Omni on native**, **Omni direct**) choose the arms drawn on the four monitors: the
+work answered each step, the 95th percentile each step (with the service's line), the units serving each step (with the units'
+top) and the machines on each step (with the machines there are). Native is amber, the two Omni-Compass arms blue, Omni on native
+dashed and Omni direct solid. The step slider walks the run step by step, and every monitor's light reads the step it stands on.
+The master switch shows native alone.
+
+Under the monitors stand three tables. The first reads every pair (Omni on native against native, Omni direct against native, Omni
+direct against Omni on native) on the four gauges by the one key, each word with its direction in words, from the one run of each
+arm on one host (the quick form). The second gives each arm's totals in that run: requests answered, failed and wrong, the 95th
+and 99th percentiles, machine-minutes, unit-minutes and the processor conveyed. The third is the full form's three runs on
+GitHub's own machines, A, B and C from one commit (`results/orchestrator/V18_THREE_ARMS_ABC.md`): each pair and gauge with each
+run's word and the one rule's reading of the three, GAIN, LOSS or power given in all three when every run's interval is clear of
+zero on the same side, EVEN when any run's interval holds zero, the runs disagree when clear runs point different ways. Work aims
+up; the 95th percentile aims down; units and machines are resources, so a fall is a cut, a GAIN, and a rise is power given.
+
+On a real machine each arm is the control plane started with its brain (`python3 -m omni_orchestrator.control --brain yardstick`,
+`omni_native` or `omni`), and its kill switch is the control plane's kill file: the brain off, the declared state held, every
+conveyed wall handed back.
+
 ---
 
 # PART III. THE MEASURED EFFECT AND THE WHOLE
@@ -1000,7 +1027,8 @@ bigger one. Every cloud set runs Omni-Compass at the tune-down on the machines a
 `--give-back-only`): no pod autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's. It parks
 only a machine the cloud already made, after its own trial, and wakes it on a breach. The bill and the machines aim lower;
 work, speed and failures must read EVEN or GAIN. Azure runs first and is the measure of the other two (Google Cloud, Amazon
-Web Services): the same tuning, mechanism and harness.
+Web Services): the same tuning, mechanism and harness. Google's and Amazon's sets are not yet run: their queues are switched off
+(24 October), kept ready as Azure's sets run, and the page reads each of their rows "not yet run" until the founder switches it on.
 
 ### 10.2 The monitor (the page's section 5a, `#s-cloud`)
 
@@ -1039,8 +1067,9 @@ every quota), at no cost. The monitor shows a failed check as the cloud's status
 cut short (the stored secret shorter than a whole key file) is stored again whole (`docs/GOOGLE_SETUP.md`, section 4); an Amazon
 account on the Free plan, whose organization policy denies every machine read, is moved to the Paid plan
 (`docs/AMAZON_SETUP.md`, section 1a); an Azure key stored in another form than the whole block from `{` to `}` (a client
-secret's value alone, for one) is stored again whole (`docs/AZURE_SETUP.md`, sections 3 and 4; Azure joined the check on
-22 October). Nothing is built and nothing is billed until the check passes.
+secret's value alone, or a storage account's access key, for two) is stored again: one value to each of four boxes, or the
+whole block under a new name, which leaves a running set's login untouched (`docs/AZURE_SETUP.md`, section 7; Azure joined the
+check on 22 October). Nothing is built and nothing is billed until the check passes.
 
 ## 11. The Orchestrators and Governors
 
@@ -1878,6 +1907,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 1h | `#s-feed` | The golden signals, the event log and the live metrics | 6 |
 | 1i | `#s-github` | CI pipeline: GitHub Actions | 7 |
 | 1j | `#s-dial` | The heartbeat dial: every beat beside native | 7 |
+| 1k | `#s-direct` | Omni direct: the three arms, native, Omni on native and Omni direct | 7 |
 | 2 | `#s-board` | The benefit board | 8 |
 | 3 | `#s-whole` | The whole organism, every way it is bought | 9 |
 | 4 | `#s-fleet` | Measured effect in full | 8 |

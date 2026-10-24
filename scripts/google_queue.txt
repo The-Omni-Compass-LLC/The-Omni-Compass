@@ -20,8 +20,13 @@
 # the conductor starts a set here only after Google's newest check passed (the key whole, the login, the machine type and
 # every quota), so a broken key or a short quota uses up no set's A, B or C, and once the founder stores the key whole
 # (docs/GOOGLE_SETUP.md, section 4) the sets start on their own within the hour.
-switch=on
-steady|dial=save;replica_ceiling=0
-burst 1 4 1 6 1 9|load_steps=1 4 1 6 1 9;duration_s=1800;reps=5;max_workers=4;zone=us-central1-a;machine=e2-standard-2;dial=save;replica_ceiling=0
-burst 1 6 1 8 1 6|load_steps=1 6 1 8 1 6;duration_s=1800;reps=5;max_workers=4;zone=us-central1-a;machine=e2-standard-2;dial=save;replica_ceiling=0
-the real day on 1 to 9|load_steps=2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5;duration_s=2592;reps=5;max_workers=4;zone=us-central1-a;machine=e2-standard-2;dial=save;replica_ceiling=0
+# Off on 24 October, kept and wired as Azure is (the founder's words: "you leave the Google and Amazon runs in everywhere and
+# just show it not ran yet, because someday, some way, I'm going to have it run"): the key has not been stored whole, so
+# no set has run on Google. Off, the conductor neither checks nor starts anything here; every page reads it "not yet
+# run". Every set runs as Azure's do: to the paid cap of 100 paired repetitions under the preregistered stopping rule
+# (stop_looks; tools/stop_rule.py). On again on the founder's word, once the key is stored whole.
+switch=off
+steady|dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70
+burst 1 4 1 6 1 9|load_steps=1 4 1 6 1 9;duration_s=1800;max_workers=4;zone=us-central1-a;machine=e2-standard-2;dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70
+burst 1 6 1 8 1 6|load_steps=1 6 1 8 1 6;duration_s=1800;max_workers=4;zone=us-central1-a;machine=e2-standard-2;dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70
+the real day on 1 to 9|load_steps=2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5;duration_s=2592;max_workers=4;zone=us-central1-a;machine=e2-standard-2;dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70

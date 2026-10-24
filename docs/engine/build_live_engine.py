@@ -375,7 +375,7 @@ def board(runs: list, camp: dict | None = None) -> list:
             label = x.split("|")[0]
             out.append({"group": f"the cloud: {cloud}, at the tune-down on the machines alone (the bill)", "name": label, "workflow": wf,
                         "tables": [], "now": ("running now" if label.split()[0] in running_titles else "in the queue") if on else
-                        "switched off until the founder turns it on"})
+                        "not yet run: switched off until the founder turns it on"})
     gp = ROOT / "scripts" / "gpu_campaign_profiles.json"
     if gp.exists():
         g = json.loads(gp.read_text(encoding="utf-8"))

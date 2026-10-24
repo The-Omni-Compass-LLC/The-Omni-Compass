@@ -795,7 +795,7 @@ def main(root):
     # each pace against native, and against the compass arm at its default beat, paired in the repetition
     pairs += [(a, "native", a, f"omni deciding every {a[7:]} s vs native") for a in paces]
     pairs += [(a, "compass", f"{a}|compass", f"omni deciding every {a[7:]} s vs omni at its default, every {beat} s") for a in paces]
-    # Omni-Compass by itself (omni-v18, docs/SOLO_PREREGISTRATION.md): against native, and against Omni-Compass and native
+    # Omni-Compass by itself (omni-v19, docs/SOLO_PREREGISTRATION.md): against native, and against Omni-Compass and native
     pairs += [("solo", "native", "solo", "Omni-Compass by itself (the pod autoscaler removed, its own pod muscle) vs native"),
               ("solo", "compass", "solo|compass", "Omni-Compass by itself vs Omni-Compass and native")]
     for a, base, key, four in pairs:
