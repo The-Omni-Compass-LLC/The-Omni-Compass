@@ -108,12 +108,13 @@ jobs:
           # the key pair, at no cost: Lambda holds the key named, and the stored private key is its other half (a wrong pair
           # would otherwise show only after a machine is rented and refuses the login)
           install -m 600 /dev/null key; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > key
-          set +e; python3 scripts/lambda_gpu.py keycheck --name "$KEY_NAME" --private-file key 2>&1 | tee keycheck.txt; krc=${PIPESTATUS[0]}; set -e
+          set +e; python3 scripts/lambda_gpu.py keycheck --name "$KEY_NAME" --private-file key --resolved-out keyname.txt 2>&1 | tee keycheck.txt; krc=${PIPESTATUS[0]}; set -e
           { echo '```'; cat keycheck.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           if [ "$krc" != 0 ]; then
             echo "::error::$(tail -n 1 keycheck.txt) Nothing rented; docs/LAMBDA_SETUP.md, steps 2 and 3."
             echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 1
           fi
+          [ -s keyname.txt ] && KEY_NAME=$(head -n 1 keyname.txt)       # the name Lambda holds for the stored key's other half
           set +e; python3 scripts/lambda_gpu.py plan --type "$TYPE" --hours "$HOURS" --max-cost "$MAX_COST" 2>&1 | tee plan.txt; rc=${PIPESTATUS[0]}; set -e
           { echo '```'; cat plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           [ "$rc" = 0 ] || { echo "::warning::$(tail -n 1 plan.txt) Nothing rented."; echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 0; }

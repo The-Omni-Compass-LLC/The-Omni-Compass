@@ -229,8 +229,11 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
             keys[k] = tmp_path / k; keys[k].write_text(body + "\n"); keys[k].chmod(0o600)
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["good"])]); printed += o
         assert rc == 0 and "its other half" in o, o
-        rc, o = run(["keycheck", "--name", "omni-kye", "--private-file", str(keys["good"])]); printed += o
-        assert rc == 7 and "no SSH key by that name" in o and "omni-key" in o, o
+        out = tmp_path / "resolved"
+        rc, o = run(["keycheck", "--name", "omni-key.pem", "--private-file", str(keys["good"]), "--resolved-out", str(out)]); printed += o
+        assert rc == 0 and "found by its own half" in o and out.read_text().strip() == "omni-key", o   # Lambda's name is used
+        rc, o = run(["keycheck", "--name", "omni-kye", "--private-file", str(keys["other"])]); printed += o
+        assert rc == 7 and "no SSH key by that name" in o and "omni-key" in o and "none of Lambda's keys" in o, o
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["other"])]); printed += o
         assert rc == 7 and "not the private half" in o, o
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["cut"])]); printed += o
