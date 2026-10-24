@@ -68,8 +68,11 @@ and delete the `AZURE_CREDENTIALS` secret in GitHub.
 
 Every Azure set, and the conductor's own check at no cost (the run **cloud-check azure** on the **Actions** tab), reads the
 shape of `AZURE_CREDENTIALS` before Azure's login and says what is wrong without printing a character of it: that it does not
-start with `{`, that it holds a client secret's value alone, that it was cut short, or which field is missing. Store it again,
-whole:
+start with `{`, that it holds a client secret's value alone, that it holds a storage account's access key (88 characters
+ending in `==`, copied from a storage account's **Access keys** page: a key to stored files, not a login), that it was cut
+short, or which field is missing. There is one Azure slot, `AZURE_CREDENTIALS`: whatever was stored last replaced the one
+before, and GitHub keeps no older value. To use either Azure account, make its block in that account's own Cloud Shell and
+store it whole:
 
 1. In the Azure portal, click **>_** (Cloud Shell) and choose **Bash**, as in section 2.
 2. Paste the one line of section 3 again and press **Enter**. It prints a new block that starts with `{` and ends with `}`.

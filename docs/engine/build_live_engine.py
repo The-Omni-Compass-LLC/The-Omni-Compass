@@ -947,6 +947,51 @@ def direct() -> dict:
             "read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")} if out else {}
 
 
+def core_mc() -> dict:
+    """The Python's Monte Carlo (benchmarks/core_evidence.py, the founder's words of 24 October: "the Python's Monte Carlo, our 4K
+    Runge-Kutta, 20-step macro, 10-step micro in each macro ... how each Python run comes out and starts at zero, and how long in
+    steps OmniCompass gets it into the basin and holds it there and certifies the count"): the canonical 500-run population
+    (numpy's generator from seed 223387268, the record's own), each run through omnicompass/core.simulate, 20 macro steps of
+    10 RK4 micro steps, in four variants (controlled; uncontrolled, u = 0; aimed at the wrong basin; the double well's mu at 0).
+    Kept per run: U at every macro step (three decimals), the macro step its five-in-a-row in the basin completes (convey) and
+    its ten-in-a-row (cert), and its basin; the counts beside the record's (results/core_evidence.json), one SHA-256 digest of
+    the paths. Class S, the engine's own mathematics."""
+    import hashlib
+    from dataclasses import replace
+    import numpy as np
+    from omnicompass import core as C
+    seed, runs = 223387268, 500
+    rng = np.random.default_rng(seed)
+    pop = [(C.sample_state(rng), C.sample_params(rng)) for _ in range(runs)]
+    rec = json.loads((ROOT / "results" / "core_evidence.json").read_text(encoding="utf-8"))
+    out = {}
+    for name in ("controlled", "uncontrolled", "wrong_target", "controlled_mu0"):
+        U, cv, ce, tg = [], [], [], []
+        for x0, p in pop:
+            pp = replace(p, mu=0.0) if name == "controlled_mu0" else p
+            tgt = -C.nearest_basin_sign(x0.U) if name == "wrong_target" else None
+            r = C.simulate(x0, pp, target=tgt, controlled=(name != "uncontrolled"))
+            U.append([round(float(u), 3) for u in r.U_hist]); cv.append(int(r.convey_confirm) if r.convey else 0)
+            ce.append(int(r.cert_complete) if r.cert else 0); tg.append(int(r.target_sign))
+        out[name] = {"U": U, "convey": cv, "cert": ce, "target": tg, "n_convey": sum(1 for c in cv if c), "n_cert": sum(1 for c in ce if c),
+                     "record": {"convey5": (rec.get(name) or {}).get("convey5"), "cert10": (rec.get(name) or {}).get("cert10")},
+                     "digest": hashlib.sha256(json.dumps(U, separators=(",", ":")).encode()).hexdigest()}
+    return {"seed": seed, "runs": runs, "macro": C.MACRO_STEPS, "micro": C.MICRO_STEPS, "dt": C.MACRO_DT, "tol": C.BASIN_TOL,
+            "convey_window": C.CONVEY_WINDOW, "cert_window": C.CERT_WINDOW, "kp": C.KP, "file": "results/core_evidence.json",
+            "tool": "benchmarks/core_evidence.py", "variants": out, "sets": core_sets()}
+
+
+def core_sets() -> list:
+    """Every set of the core's Monte Carlo that tools/core_runs.py has written from the jump generator (results/core_runs/), oldest
+    first: its base, runs, digest and counts, and the GitHub run that wrote it, so a set the page runs is checked against the Python's."""
+    out = []
+    for f in sorted((ROOT / "results" / "core_runs").glob("CORE_RUNS_*.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        out.append({"base": d.get("base"), "runs": d.get("runs"), "digest": d.get("digest"), "summary": d.get("summary"), "file": str(f.relative_to(ROOT)),
+                    "written": d.get("written", ""), "github": (d.get("github") or {}).get("url")})
+    return sorted(out, key=lambda x: (x["written"], x["file"]))
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -979,6 +1024,11 @@ def records(runs: bool) -> dict:
         eruns = json.loads(er_files[-1].read_text(encoding="utf-8")) if er_files else {"missing": "results/engine_runs"}
         if er_files:
             eruns["file"] = str(er_files[-1].relative_to(ROOT))
+            # every set the Python has run (the founder's words of 23 October: "running it again runs another 500 and again another
+            # 500"): its base, its runs and its digest, so a set run again on the page is checked against the Python's own record
+            eruns["sets"] = sorted(({"base": d.get("base"), "runs": d.get("runs"), "digest": d.get("digest"), "file": str(f.relative_to(ROOT)),
+                                     "written": d.get("written", "")} for f in er_files for d in [json.loads(f.read_text(encoding="utf-8"))]),
+                                   key=lambda x: (x["written"], x["file"]))
         # the same record's set through the C++ engine at this build (cpp/tools/engine_runs.cpp), receipt by receipt
         XT.main(str(t / "x.json"), live_laws=laws.laws, engine_runs=eruns if er_files else None)
         h, c, s, rr, wh, gpu, cpu, ho, x = (json.loads((t / f).read_text(encoding="utf-8")) for f in
@@ -997,7 +1047,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct()}
+            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct(), "coremc": core_mc()}
 
 
 def embedded(page: str, key: str):
@@ -1152,7 +1202,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial")
+                          "beatsweep", "dial", "coremc")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1170,7 +1220,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "direct"):
+              "beatsweep", "dial", "direct", "coremc"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

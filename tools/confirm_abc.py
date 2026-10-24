@@ -38,7 +38,9 @@ PAIR_WORDS = {"nativebare": "the organism alone", "compassbare": "Omni-Compass o
               # the decision pace, the heartbeat dial (docs/PACE_PREREGISTRATION.md): compass5|compass, compass5 (against
               # native) and so on; the compass arm decides at its engine's default (every 60 s from omni-v17, every 15 s on
               # omni-v16), its beat read from the runs' own receipts (BEATS)
-              **{f"compass{p}": f"Omni-Compass deciding every {p} s" for p in (5, 10, 15, 30, 60, 75, 90, 120)}}
+              **{f"compass{p}": f"Omni-Compass deciding every {p} s" for p in (5, 10, 15, 30, 60, 75, 90, 120)},
+              # Omni-Compass by itself (omni-v18, docs/SOLO_PREREGISTRATION.md): solo (against native), solo|compass
+              "solo": "Omni-Compass by itself"}
 BEATS = {}   # run id -> {arm: [the beats it ran at]}, from each run's LIVE_REPS.json (tools/live_reps.py, omni-v17 on)
 CAPACITY = "work inside the response line (requests a second; the capacity test's own gauge)"
 from tools.omni_index import CAPACITY as CAPACITY_RECORDED  # noqa: E402  (the same row's name in the tables written before 13 October)
@@ -224,15 +226,21 @@ def main(argv=None):
          "difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told "
          "apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so "
          "the test itself is unstable there. Every row is shown, LOSS included.", "", OWN_RUNS, ""]
+    if PAIR == "solo":                                     # Omni-Compass by itself against native (omni-v17)
+        L += ["**The comparison.** In this table \"omni\" stands for Omni-Compass by itself (the pod autoscaler removed, "
+              "Omni-Compass's own pod muscle on the workload) and \"native\" for native: each cell is the first against the "
+              "second, paired within one repetition (`docs/SOLO_PREREGISTRATION.md`), and each word is read by the gauge's aim.", ""]
     if PAIR and "|" in PAIR:                               # one comparison of the four ways: the cells name its two arms
         first, second = PAIR.split("|")
         pace = first.startswith("compass") and first[7:].isdigit()
-        src = ("the decision pace, `docs/PACE_PREREGISTRATION.md`" if pace
-               else "the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6")
+        solo = first == "solo"
+        src = ("the decision pace, `docs/PACE_PREREGISTRATION.md`" if pace else "Omni-Compass by itself, `docs/SOLO_PREREGISTRATION.md`"
+               if solo else "the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6")
         own = {b for r in BEATS.values() for b in r.get("compass", [])}
         default = (f"Omni-Compass at its default, deciding every {next(iter(own)):g} s" if len(own) == 1 else
                    "Omni-Compass at its engine's default beat (every 60 s from omni-v17, every 15 s on omni-v16)")
-        words2 = default if pace and second == "compass" else PAIR_WORDS.get(second, second)
+        words2 = (default if pace and second == "compass" else
+                  "Omni-Compass and native" if solo and second == "compass" else PAIR_WORDS.get(second, second))
         L += [f"**The comparison.** In this table \"omni\" stands for {PAIR_WORDS.get(first, first)} and \"native\" for "
               f"{words2}: each cell is the first against the second, paired within one repetition "
               f"({src}), and each word is read by the gauge's aim for the first.", ""]

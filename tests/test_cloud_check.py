@@ -77,6 +77,7 @@ class KeyShape(unittest.TestCase):
 
 
 AZ_SECRET = "Xq8Q~kLm.0aB1cD2eF3gH4iJ5kL6mN7oP8qR9sT0"
+AZ_STORAGE = "Ab" * 43 + "=="   # the shape of a storage account's access key (88 characters of base64), made up
 
 
 def az_block(**over):
@@ -94,6 +95,7 @@ class AzureKeyShape(unittest.TestCase):
     def test_every_wrong_form_is_named_without_a_character_of_it(self):
         whole = az_block()
         cases = {AZ_SECRET: "client secret's value alone",
+                 AZ_STORAGE: "a storage account's access key",
                  "0b1c2d3e-1111-2222-3333-444455556666": "one identifier alone",
                  whole[whole.index('"clientSecret"'):]: "piece from inside the block",
                  whole[:150]: "cut short",
@@ -106,7 +108,7 @@ class AzureKeyShape(unittest.TestCase):
             with self.subTest(words=words):
                 bad = " ".join(cloud_key_check.azure_problems(raw))
                 self.assertIn(words, bad)
-                for piece in (AZ_SECRET[:10], AZ_SECRET[-10:], "0b1c2d3e", "aaaaaaaa", "11111111"):
+                for piece in (AZ_SECRET[:10], AZ_SECRET[-10:], AZ_STORAGE[:10], "0b1c2d3e", "aaaaaaaa", "11111111"):
                     self.assertNotIn(piece, bad)
 
     def test_the_program_exits_two_and_prints_no_secret(self):

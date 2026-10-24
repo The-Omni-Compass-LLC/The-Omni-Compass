@@ -1358,8 +1358,8 @@ respect a limit the wires do not carry.
 
 ### 5.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v17** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
-quoted here ran on omni-v7, whose rules omni-v17 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
+The engine that stands in this edition is **omni-v18** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
+quoted here ran on omni-v7, whose rules omni-v18 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
 the operator's on a shared host at its top while another workload there has room of its own, and counts every other pod by its
@@ -1523,7 +1523,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v17 (digest 7c937d09e4031cc7, 55 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v18 (digest 22486290b19349eb, 55 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
 
 **Level 1 - Watch (read-only).**
 
@@ -5202,6 +5202,8 @@ changes one runs a changed tune, whose receipts are its own (section 3.6).
 | `--kill-file` | `/tmp/omni.kill` | `/tmp/omni.kill` | the file whose presence turns the governor OFF (section 20.3) |
 | `--dry-run` | off | on for the first day, then removed | decide and record every command, write none |
 | `--native` (and `OMNI_NATIVE`) | none | none, or the muscles the site keeps on its own controller | the muscles left where native runs them, never written: `machines`, `replicas`, `cpu`, `clock`, `gpu`, `rollout`, `batch`, `rightsize`, `coldstart`, `contain`, `cooling`; a name that is not one of them stops the start (omni-v14; the control panel's muscle button sets it) |
+| `--own-replicas` (and `OMNI_OWN_REPLICAS`) | none | absent (no cloud runs by itself without the owner's word) | omni-v18: the workloads (`namespace/name`, comma-separated) whose pods Omni-Compass runs by itself, with no autoscaler on them: their target from the workload's `omnicompass.io/target-utilization` annotation (else `--own-target`), their range from `omnicompass.io/replica-range` (`min,max`); a workload an autoscaler governs keeps its autoscaler and nothing is written; the count the workload shipped with is recorded on it and handed back by the reset |
+| `--own-every-s` | 15 | 15 | seconds between two reconciliations of those workloads' pods on the fast checks, the pod autoscaler's own sync |
 | `--kubectl` | `kubectl` | `kubectl` | the client the governor reads and writes through |
 | `--site-limit-w`, `--power-cmd` | none | absent | a site's power limit and the command that prints its watts (level 7; never in a cloud); the command runs without a shell unless it holds a pipe, a redirect or a variable |
 | `--cooling-cmd`, `--cooling-min-c`, `--cooling-max-c`, `--cooling-restore-c` | none; 18, 27, 22 °C | absent | the facility's cooling setpoint command and band (section 7.10) |

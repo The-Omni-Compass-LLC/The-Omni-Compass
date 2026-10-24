@@ -43,10 +43,21 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v17 stands (v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v18 stands (v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stands on main since 23 October,
-  morning, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
+- **Omni v18** (`OMNI_V18.json`, digest `22486290b19349eb`, 55 files; `docs/OMNI_V18.md`) lands on 24 October under the founder's
+  order of 23 October (the third arm, Omni-Compass by itself): omni-v17 with a pod muscle of its own (`--own-replicas`,
+  `omni_controller/controller.py` `_own_pods`): for a workload the operator names and no autoscaler governs, the governor sets the
+  replicas itself through the workload's own scale by strict C's rule, at the target the compass moves inside the autoscaler's cover,
+  never below the operator's count at the max, reconciled every 15 s on the fast checks (`--own-every-s`, the pod autoscaler's sync),
+  the compass moving the target only in a decision; and the models' arm by itself (`realms/harness.py` `SOLO`, `realms/plants.py`).
+  52 of its 55 files are omni-v17's bytes. Nothing moves unless a workload is named: the toy gate against omni-v17
+  (`results/toy_gate/V18_VS_V17.md`) read every gauge of all 11 toys identical. By itself in our own model
+  (`results/toy_gate/SOLO_V18.md`, class S) against native on the same machines: the 95th percentile +19.4% GAIN, the minutes over the
+  response line +64.9% GAIN. A fault found before it landed (at the 60 s beat the first candidate moved pods once a minute; the
+  minutes over the line read LOSS) is fixed in it. The real arm: `ARM=solo` on kind (`docs/SOLO_PREREGISTRATION.md`), three runs.
+- **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stood on main from 23 October to 24 October,
+  landed 23 October, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
   decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and
   cloud run), any beat from 5 to 120 s can be set, and every beat is shown beside native with what it buys and what it costs
   (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 1j; the real runs,
@@ -573,7 +584,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v17` since 23 October, afternoon), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v18`, cut from main once omni-v18 lands there; until then the GPU branch of omni-v17, `gpu-omni-v17`, since 23 October, afternoon), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -829,8 +840,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v17` (the engine that stands, 23 October, afternoon), stay in
-  sync, and `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v17`,
+  One version is always the main one; `main` and the working branch, `v18` (the engine that stands, 24 October; its branch is cut when it reaches main), stay in
+  sync, and `v17`, `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v17`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

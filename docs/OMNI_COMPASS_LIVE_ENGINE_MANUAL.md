@@ -112,7 +112,7 @@ wired and moving by its own machinery. *Omni-Compass* always means Omni-Compass 
 all of that still running underneath, and the governor on top of all of it, wired in through the two-way plug. No third side
 exists anywhere on the page. Native is drawn in amber, Omni-Compass in blue, in every chart, table, tile and number.
 
-**The third arm, Omni-Compass by itself** (the founder's order of 23 October, `docs/SOLO_PREREGISTRATION.md`). The same system with each muscle's own native controller switched off and Omni-Compass the only controller moving that knob: on Kubernetes no pod autoscaler and no cluster autoscaler, while Kubernetes' own scheduler and kubelet stay. Where native is a setting rather than a controller (a cache's memory ceiling, a pool's size) the two Omni-Compass arms are one and the same arm. On the page the arm that was called Omni-Compass is now called Omni-Compass and native wherever an arm is named (the chips, the table heads, the lanes), and the third arm's column appears in every table from its first run on GitHub's machines, once the engine that carries it lands; nothing is written for it before. Until then every two-arm reading on the page is native against Omni-Compass and native.
+**The third arm, Omni-Compass by itself** (the founder's order of 23 October, `docs/SOLO_PREREGISTRATION.md`). The same system with each muscle's own native controller switched off and Omni-Compass the only controller moving that knob: on Kubernetes no pod autoscaler and no cluster autoscaler, while Kubernetes' own scheduler and kubelet stay. Where native is a setting rather than a controller (a cache's memory ceiling, a pool's size) the two Omni-Compass arms are one and the same arm. On the page the arm that was called Omni-Compass is now called Omni-Compass and native wherever an arm is named (the chips, the table heads, the lanes), and the third arm's column appears in every table from its first run on GitHub's machines, on omni-v18, the engine that carries it; its column fills from its first run, and nothing is written for it before. Until then every two-arm reading on the page is native against Omni-Compass and native.
 
 **What a monitor is.** The page is laid out as an operations monitor is: a wall of tiles at the top (the status board), each
 tile a small copy of a monitor further down the page; then the monitors themselves, section by section, each with its own
@@ -141,7 +141,7 @@ two other manuals and `DISCLOSURES.md`.
 ## Notice and Disclaimer
 
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
-(omni-v17, `OMNI_V17.json`). The page names its engine on its own `<html>` element (`data-engine`); the build stamps the engine that stands
+(omni-v18, `OMNI_V18.json`). The page names its engine on its own `<html>` element (`data-engine`); the build stamps the engine that stands
 on it and rebuilds every record, and `--check` fails a page whose engine differs; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
 same push. The page's own table of contents (its section v, "Engine table of contents") is the authority on the order and the
 numbering of its sections; this manual names every section by its title and its anchor (`#s-health`, `#s-ops`, and so on), which
@@ -300,7 +300,7 @@ back.
 **What this manual covers.** Every section of the page in the page's own order; every gauge, with its side, its aim and its
 word; every knob of the console, with what it acts on and what it leaves alone; the two tickers that show the mechanism of
 action; the trace from any tile to the record it came from; and what to do when a tile reads LOSS. It covers the page as
-built on omni-v17; a later engine renames itself on the page's title block and this book is realigned in the same push.
+built on omni-v18; a later engine renames itself on the page's title block and this book is realigned in the same push.
 
 **What this manual does not cover.** How the engine is built, its equations beyond the ones the page itself prints, the
 wiring of Omni-Compass onto any stack, and the benchmark results themselves as a body of evidence: those are the Owner's and
@@ -442,7 +442,7 @@ with the settings Omni-Compass wrote in that decision; and under each, that deci
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
 to 1j, one letter for each of its panels, with no unnumbered entry in the contents.
 
-### 2.2 The sections, as built on omni-v17
+### 2.2 The sections, as built on omni-v18
 
 Appendix A lists every section with its anchor and the chapter of this book that
 reads it. In the page's order: 1 the monitor wall and the control panel (1a the control panel and the kill switch, 1b the
@@ -563,6 +563,69 @@ three seconds without a change reads **● still** (and says so when the engine 
 own governor rests it (chapter 25), and its row keeps what it did when it was last in view; the note under the list counts the
 monitors seen so far and how many of them moved. Scroll the page once from top to bottom and every row reads what its monitor does.
 
+
+**The switchboard** (the founder's words of 23 October, night: "knobs, buttons that allow you to switch amongst all the different
+organisms ... direct, native, Omni on native ... 1, 10, 100 ... A, B, and C runs ... 5 seconds ... 45 ... 120 seconds in the
+heartbeat"). In the control panel one row of knobs reaches every monitor that carries the variation it names, through that
+monitor's own setter, and the line under it names the monitors that moved. **Arm**: native engages the kill switch, so every
+Omni-Compass side follows native; Omni-Compass and native releases it; Omni-Compass by itself goes to where its runs land (the kind
+rig's `ARM=solo` and our models, on omni-v18; the live organism here carries native and Omni-Compass on top, and the line says so);
+Omni-Compass direct opens section 5g on its newest showing. **Organism**: the spine, the four realms, the four stacked or the tower:
+the grid's row is marked, and for the spine and the realms the live body's part on the console follows. **Copies** and **runs** (1,
+10, 100, 1,000): the grid's square is marked on both its halves. **Run**: A, B or C on every replay that holds three runs and on the
+live organism's own record. **Beat**: 5, 10, 15, 30, 45, 60, 90 or 120 s; the heartbeat monitor moves to that beat, or to the
+sweep's nearest one and says which. A monitor that does not carry a variation is left as it is.
+
+**The reports.** Four buttons in the control panel write a report from the page's own records at the moment they are pressed:
+the engineer's (every benchmark on the board with its reading, size, rows and record, the Python's runs and their digests, Omni-
+Compass direct's showings by their run numbers, the clouds' finished sets, the lights at that moment), the CTO's (the summary, what
+stands and what runs, the board, Omni-Compass direct), the board's (the summary, what is proven and what is modelled, the clouds)
+and the CFO's (the summary, every cloud set's machine-hours and bill at list price by the one key, the rows of power given and
+the cuts). Each opens the browser's print, to print or save as a PDF, and downloads the same report as a page; the notice stands
+first and last, every reading is the key's word with the word's sign, and every number names its engine and its run.
+
+**Running the Python's runs again.** In the proof (the page's section 1f, `#s-proof`), beside "Run a new set here", the button
+"Run another 500" runs the next set from the base after the last one, and "Run three more sets" runs three in a row; the table
+under the monitor lists every set run on the page with its digest and, where the Python has run the same base, the Python's record
+and whether the two digests match; where it has not, the line names the engine-runs workflow on GitHub with the runs and the base
+that make the Python run the same set.
+
+**The Python's jump generator: the switch** (the founder's words of 24 October: "some button that allows them to activate the
+Python's jump generator ... running it again and again and again, and every time it's run it has an output of the 500 runs ...
+when the button's not on, it's in some other form of running"). In the control panel, under the button that runs the Python's 500,
+a switch reads **Jump generator · OFF** until it is pressed. **ON**, the page draws set after set from the Python's jump generator
+(500 runs a set unless 100 or 1,000 is chosen; run k of a set takes the seed base + k·0x9E3779B9 mod 2³², its stream mulberry32, the
+same generator `tools/engine_runs.py` and `tools/core_runs.py` write bit for bit), one base after another from the first base shown,
+which opens on the newest base the Python has run, so the first set reproduces the Python's own. Each set runs twice in the browser:
+through the engine's runs (the proof monitor, 1f) and through the core's Monte Carlo (the Monte Carlo monitor, 1f). Each set's output
+is its runs, their counts and one SHA-256 digest; where the Python has run the same base its digest stands beside the page's, and
+they must be equal. The line under the switch counts the sets drawn, the runs of the set in hand and the next base; the switch rests
+while the page is hidden and runs until pressed again. **OFF** is the page's standing mode, the one it opens in: nothing new is
+drawn from the generator; the Monte Carlo monitor plays the Python's own 500 (numpy's generator from seed 223387268), the proof
+monitor recomputes once, as the page opens, the newest set GitHub ran in the Python and checks it digest for digest, then re-checks
+it one run at a time; the 500 scenarios a seed replay from their record; GitHub's runs play back from their own raw files; and the
+organism's model day runs on its own seeded stream, the same at every opening. Class S throughout: the engine's own mathematics on
+draws, never a measurement.
+
+**The Monte Carlo monitor** (the page's section 1f, `#mcPanel`, monitor 4; the founder's words of 24 October: "the Python's Monte
+Carlo, our 4K Runge-Kutta, 20-step macro, 10-step micro in each macro ... how each Python run comes out and starts at zero, and how
+long in steps that OmniCompass gets it into the basin and holds it there and certifies the count"). Every line is one run of the
+engine's core (`omnicompass/core.py`: six states, the fourth-order Runge–Kutta step 10 times a macro step of 0.1 s, 20 macro steps),
+its U from step 0 to step 20, drawn up to a cursor that sweeps the 20 steps in 10 seconds and holds 3. The left lane is native: the
+same plant with no command (u = 0), left to its own double well. The right lane is Omni-Compass on top: the bounded command toward the
+nearest basin (|u| ≤ 25, held across the four stages), or, by the knob, toward the far basin, or with the double well switched off
+(μ = 0). The green bands are the basins, |U ∓ 1| ≤ 0.10. A run is conveyed when it has stayed in one basin 5 macro steps in a row and
+certified at 10; each lane's counters read at the cursor (in a basin, conveyed, certified, of 500), a run's head turns green once
+certified, and the bars under each lane count the macro step each run was conveyed and certified. The set the page opens on is the
+Python's own 500 (`benchmarks/core_evidence.py`, numpy's generator from seed 223387268), whose counts must be its record's
+(`results/core_evidence.json`: Omni-Compass on top conveyed 500 and certified 500, at macro steps 4 to 6; native alone conveyed 476 and
+certified 427). A set the page draws from the jump generator is computed by the page's own port of the core, line for line, and its
+digest must be the one `tools/core_runs.py` writes for the same base (`tools/core_runs.py --verify` runs the page's port in node and
+compares; the engine-runs workflow writes the Python's record of every base it runs). The table under the monitor lists every set,
+its counts on both sides and whether its digest matches the Python's. The monitor's light reads the set shown: green when Omni-Compass
+on top certified more runs than native alone, yellow when the same, red when fewer or when the page's digest differs from the Python's
+record of the same base.
+
 ### 4.1 What the wall is
 
 The wall (the page's section 1b, `#s-wall`) is every monitor of the page in one view: the same
@@ -576,7 +639,9 @@ a monitor on screen now.
 
 **The light on every monitor: green, yellow, red** (the founder's orders of 23 and 24 October: "Every monitor is to have a red and
 green button as red is alert ... green has got to be good"; "they're supposed to be a yellow too. Yellow would mean it's even").
-Each tile carries a light in its top right corner, and each monitor the same light, a button, beside its number on the page.
+Each tile and each monitor carries its light as a signal under its number, on the left, standing like a traffic signal (the
+founder's order of 24 October): green on top, yellow in the middle, red at the bottom, shaped as an octagon like a stop sign; one lamp
+is lit, and on the page a button beside the number carries the light's words.
 **Green, working**: the gauge the monitor draws is inside its lines, or the monitor has no line to cross (a bill, a count of runs),
 and the button says which. **Yellow**: heading for its line (within 3% of it, or its own slope over the last readings, carried
 three readings ahead, crosses it), blinking slowly; on a record, EVEN, no difference beyond the noise (the key's yellow).
@@ -585,8 +650,9 @@ carries three lights in one button: native's and Omni-Compass's, each read from 
 reading now, Omni-Compass against native by the key (GAIN green, EVEN yellow, LOSS red), each by whether the gauge helps or hurts the
 muscle and the organism, never by its sign: fewer muscles over their line, fewer pods waiting, a faster 95th percentile beyond 2% is
 GAIN. So the moment one side turns a colour the other does not is seen as it happens; a live light compares that moment, and the
-judged readings stay in the record's tables. On the wall every tile carries three lamps in its corner, green round, yellow a diamond
-and red an octagon like a stop sign, the lit one moving with the monitor's reading. Click the button for each side's reason; a red or yellow one
+judged readings stay in the record's tables. On the wall the signal stands under each tile's number, green round, yellow a diamond
+and red an octagon, the lit one moving with the monitor's reading; a click on the signal under a monitor's number on the page opens
+the same reason as its button. Click the button for each side's reason; a red or yellow one
 offers the way back to the factory tune, because a light the knobs turned is a light the factory tune puts back.
 
 What the page's organism is. The sixty muscles replay the repository's own model (`realms/harness.py`, class S) under the climb,
@@ -1596,7 +1662,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 27.2 The engine's name
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v17). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v18). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines.
 
 ## 28. When a Tile Reads LOSS
@@ -1782,7 +1848,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 1c | `#s-monlist` | The monitor list: every monitor by its number | 4 |
 | 1d | `#s-status` | The status board: tiles, alarms and watch items | 4, 6 |
 | 1e | `#s-master` | The master switch's wiring | 5 |
-| 1f | `#s-proof` | The Python's runs, in this page | 4, 31 |
+| 1f | `#s-proof` | The Python's runs, in this page, and the core's Monte Carlo | 4, 31 |
 | 1g | `#s-loss` | Every LOSS row: its cause and its knob | 6, 28 |
 | 1h | `#s-feed` | The golden signals, the event log and the live metrics | 6 |
 | 1i | `#s-github` | CI pipeline: GitHub Actions | 7 |

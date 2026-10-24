@@ -125,12 +125,18 @@ def main(argv=None):
             L.append(f"| {GAUGE_NAME[g]} | " + " | ".join(cells) + " |")
     m = lambda k, arm, g: sum(both[k][arm][s][g] for s in seeds) / len(seeds)
     base_eng = engine(tree)[0]
+    own = "--own-replicas" in (Path(tree) / "omni_controller" / "controller.py").read_text()   # the engine carries the pod muscle of its own
     L += ["", "## What it says", "",
-          f"On the engine that stands ({base_eng}) the governor moves a workload's pods only through the pod autoscaler's own object "
-          "(its range and its target); with the pod autoscaler switched off it has no pod muscle of its own, so by itself it holds "
-          f"every workload at the operator's count: its 95th percentile response {m('base', 'solo', 'p95_ms'):,.0f} ms and "
-          f"{m('base', 'solo', 'alert_minutes'):,.0f} minutes over the line in the day, against native's "
-          f"{m('base', 'native', 'p95_ms'):,.1f} ms and {m('base', 'native', 'alert_minutes'):,.1f} minutes."]
+          (f"On the engine that stands ({base_eng}) the governor has a pod muscle of its own (`--own-replicas`, omni-v18): with the pod "
+           "autoscaler switched off it sets each named workload's pods itself, through the workload's own scale, at the target the compass "
+           "moves, reconciled every 15 s on the fast checks: its 95th percentile response "
+           f"{m('base', 'solo', 'p95_ms'):,.0f} ms and {m('base', 'solo', 'alert_minutes'):,.1f} minutes over the line in the day, against "
+           f"native's {m('base', 'native', 'p95_ms'):,.1f} ms and {m('base', 'native', 'alert_minutes'):,.1f} minutes, on the same machines.") if own else
+          (f"On the engine that stands ({base_eng}) the governor moves a workload's pods only through the pod autoscaler's own object "
+           "(its range and its target); with the pod autoscaler switched off it has no pod muscle of its own, so by itself it holds "
+           f"every workload at the operator's count: its 95th percentile response {m('base', 'solo', 'p95_ms'):,.0f} ms and "
+           f"{m('base', 'solo', 'alert_minutes'):,.0f} minutes over the line in the day, against native's "
+           f"{m('base', 'native', 'p95_ms'):,.1f} ms and {m('base', 'native', 'alert_minutes'):,.1f} minutes.")]
     if cand:
         L += ["", f"The candidate ({ceng}) gives it a pod muscle of its own (`omni_controller/controller.py`, `_own_pods`): the "
               "replica count set through the workload's own scale by strict C's rule, at the target the compass moves inside the "
@@ -141,7 +147,7 @@ def main(argv=None):
               f"twice a decision ({m('cand', 'solo', 'reads_per_hour'):,.0f} reads an hour here, twelve workloads, against "
               f"{m('cand', 'omni', 'reads_per_hour'):,.0f} on top of native)."]
     L += ["", "Our own model, class S: it shows the mechanism, never a benchmark result. The real arm runs on kind (`ARM=solo`, "
-          "`scripts/kind_bench.sh`) once the engine that carries the muscle stands (`docs/SOLO_PREREGISTRATION.md`).", ""]
+          "`scripts/kind_bench.sh`) on omni-v18, the engine that carries the muscle (`docs/SOLO_PREREGISTRATION.md`).", ""]
     out_md.write_text("\n".join(stamp(L)) + "\n", encoding="utf-8")
     out_md.with_suffix(".json").write_text(json.dumps(rec, indent=1) + "\n", encoding="utf-8")
     print(f"{out_md}: {len(gauges)} gauges, {len(seeds)} seeds")

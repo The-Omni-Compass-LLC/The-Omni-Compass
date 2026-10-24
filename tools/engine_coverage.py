@@ -88,8 +88,11 @@ def page(d: dict) -> str:
     miss = sum(v["missed"] for v in d["files"].values())
     rows = sorted(((f, v) for f, v in d["files"].items() if v["statements"]),        # an empty __init__.py has nothing to run
                   key=lambda kv: (kv[1]["statements"] - kv[1]["missed"]) / kv[1]["statements"])
+    now, _ = engine_manifest()
+    where = (f"in the engine that stands ({d['engine']})" if d["engine"] == now else      # a record measured before the newest engine landed says so
+             f"in the engine as it stood when measured ({d['engine']}; the engine that stands is {now}, measured again by the next `--measure`)")
     L = ["# How much of the engine the tests run", "",
-         f"Line coverage of every Python file in the engine that stands ({d['engine']}), under the whole test suite: the "
+         f"Line coverage of every Python file {where}, under the whole test suite: the "
          "unittest suite and every file `tools/function_tests.py` runs. Measured with coverage.py by `python3 "
          f"tools/engine_coverage.py --measure` on {d['commit']}; `tools/engine_coverage.py --check`, run by "
          "`verify.py`, fails a push where this page is not what `results/ENGINE_COVERAGE.json` records.", "",

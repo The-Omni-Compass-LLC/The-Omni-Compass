@@ -2,6 +2,57 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (night, the live engine): the switchboard, the reports, the Python's runs again; the page on omni-v18
+
+- **The Python's Monte Carlo, a monitor** (the founder's words: "the Python's Monte Carlo, our 4K Runge-Kutta, 20-step macro, 10-step
+  micro in each macro ... how long in steps that OmniCompass gets it into the basin and holds it there and certifies the count"):
+  monitor 4 (section 1f, `#mcPanel`) draws the engine's core (`omnicompass/core.py`) over 500 runs, each from step 0, every run's U
+  across the 20 macro steps of 10 RK4 micro steps, native (the plant alone, u = 0) beside Omni-Compass on top (toward the nearest
+  basin, the far basin, or with the double well off), the basins at ±1, and the macro step each run was conveyed (5 in a row) and
+  certified (10 in a row). It opens on the Python's own 500 (`benchmarks/core_evidence.py`, seed 223387268; its counts are the
+  record's: 500 and 500 on top, 476 and 427 native alone). A set drawn on the page runs through its own port of the core, line for
+  line; `tools/core_runs.py` (new) runs the same set in the Python from the jump generator and writes one digest, `--verify` holds
+  the page's port to it (500 runs, four ways: 2,000 lines identical), and the engine-runs workflow writes the Python's record of every
+  base it runs (`results/core_runs/`, first record base 1369407155). Class S.
+- **The Python's jump generator: one switch in the control panel** (the founder's words: "some button that allows them to activate
+  the Python's jump generator ... running it again and again and again ... when the button's not on, it's in some other form of
+  running"): ON, set after set of 500 (or 100, or 1,000) from one base after another, each run in the browser through the engine's
+  runs and through the core's Monte Carlo, each with its digest beside the Python's where the Python has run the base; OFF, the
+  page's standing mode, its records played, written under the switch in plain words.
+- **The lights as a traffic signal** (the founder's order: "underneath the monitor's number on the left side ... the green, yellow,
+  red vertical stop sign order"): on every monitor's badge and every wall tile the three lamps stand under the number, green on top,
+  yellow in the middle, red at the bottom as an octagon; the signal opens the light's reason like its button.
+
+- **The switchboard** (the founder's words: "knobs, buttons that allow you to switch amongst all the different organisms ... direct,
+  native, Omni on native ... 1, 10, 100 ... A, B, and C runs ... 5 seconds ... 45 ... 120 seconds in the heartbeat"): one row of
+  knobs in the control panel, the arm, the organism, the copies, the runs, the run letter and the beat, each reaching every monitor
+  that carries that variation through its own setter and naming the monitors it moved; the grid marks the chosen square.
+- **The reports** (the founder's words: "physical buttons that shows these reports in some form of PDF ... engineers and software
+  CTOs ... boards and all the CFOs"): the engineer's, the CTO's, the board's and the CFO's, each written from the page's records when
+  pressed, opened for print or a PDF and downloaded, the notice first and last, every reading by the one key with the word's sign,
+  every number with its engine and its run.
+- **The Python's runs again** (the founder's words: "the Python is a 500 run mechanism, and running it again runs another 500"):
+  "Run another 500" and "Run three more sets" beside "Run a new set here"; every set run on the page is listed with its digest and
+  checked against every set the Python has run (the build now lists them all, `build_live_engine.py`, `eruns["sets"]`).
+- **The page on omni-v18**: its records rebuilt on the engine that stands, its words realigned (the engine, the third arm's engine).
+  The Live Engine Manual reads the switchboard, the reports and the Python's buttons in 4.0.
+
+## 2026-10-24 (night): omni-v18, Omni-Compass by itself, a pod muscle of its own
+
+- **omni-v18** (`OMNI_V18.json`, digest `22486290b19349eb`, 55 files; `docs/OMNI_V18.md`), landed under the founder's order of 23
+  October (three arms: native; Omni-Compass and native; Omni-Compass by itself) and the standing order that every change lands as
+  the next version, told, not asked. omni-v17 with a pod muscle of its own (`--own-replicas`): for a workload the operator names and
+  no autoscaler governs, the governor sets the replicas itself through the workload's own scale, at the target the compass moves,
+  reconciled every 15 s on the fast checks, never below the operator's count at the max; and the models' arm by itself
+  (`realms/harness.py`, `realms/plants.py`). 52 of its 55 files are omni-v17's bytes.
+- **The toy gate against omni-v17** (`results/toy_gate/V18_VS_V17.md`, every toy, 8 seeds): every gauge of all 11 toys identical,
+  because nothing moves unless a workload is named. **By itself** (`results/toy_gate/SOLO_V18.md`, class S) against native on the
+  same machines: the 95th percentile +19.4% GAIN, the minutes over the response line +64.9% GAIN, machines and energy EVEN.
+- **The fault found before it landed**: rebuilt on omni-v17's 60 s beat, the first candidate moved pods once a minute and read the
+  minutes over the line LOSS against native (26.4 to 34.8 a day); the muscle now keeps the pod autoscaler's 15 s pace between
+  decisions (two unit tests). `tools/solo_study.py` writes its closing words from the engine it reads.
+- Every place that names the engine that stands says omni-v18 (`tools/land_engine.py v18`); omni-v17's page in its past tense.
+
 ## 2026-10-23 (night, the live engine): Omni-Compass direct on the page, section 5g; the orchestrator merged; the phone page fits its width
 
 - **Section 5g, Omni-Compass direct: the organism with no orchestrator, the three arms** (the founder's order of 23 October:

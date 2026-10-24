@@ -104,6 +104,9 @@ def azure_what_it_holds(raw: str) -> str:
                 "the line in section 3 prints, the secret one of its fields")
     if "=" in one and ";" in one:
         return "it looks like a connection string, not the block"
+    if "\n" not in one and " " not in one and len(one) == 88 and one.endswith("==") and all(c.isalnum() or c in "+/=" for c in one):
+        return ("it has the shape of a storage account's access key (88 characters of base64 ending in ==, from a storage "
+                "account's Access keys page), not the login: the login is the whole block the line in section 3 prints")
     return "it is not the block"
 
 
