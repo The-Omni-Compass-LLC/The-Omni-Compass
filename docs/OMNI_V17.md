@@ -131,7 +131,7 @@ to be root-caused, beside the blink toy's alert minutes (LOSS against native at 
   last decision in beats of that setting (yellow past one and a half, red past three).
 - The staleness alert (`OmniGovernorStale`, `deploy/prometheus/omni-compass-rules.yaml`) fires after three beats as measured: 180 s
   at the main engine's 60 s, 45 s at 15 s, 360 s at 120 s; the other rules count in minutes and hours, not decisions.
-- The live engine page carries the dial (the page's section 1j, "The heartbeat dial"): every beat beside native, from the ladder, with the
+- The live engine page carries the dial (the page's section 2d, "The heartbeat dial"): every beat beside native, from the ladder, with the
   real runs' place; its manual reads it (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`, section 7.4).
 - The control panel (`tools/omni_control.py`) carries the dial as a button: `POST /v1/beat {"seconds": 5 to 120}`, role
   operator, one console button for each stop (5, 15, 30, 60, 75, 90, 120 s); like a dial press it hands every setting back

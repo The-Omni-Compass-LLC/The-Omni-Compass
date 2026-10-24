@@ -2569,7 +2569,7 @@ sec all over heart beat"), and the same afternoon, having read the reads of the 
 5 s against 39,700 at 60 s), made it a dial with the main engine at 60 s (omni-v17, `docs/OMNI_V17.md`): the default
 `--interval` is 60 s and `--floor-interval` 5 s in the governor, every rig and every install file; any beat may be set (5,
 15, 30, 60, 75, 90, 120 s and every value between), each shown beside native with what it buys and what it costs
-(`results/toy_gate/V17_LADDER.md`; on the live engine page, the page's section 1j, `#s-dial`), and three runs read every beat against native and
+(`results/toy_gate/V17_LADDER.md`; on the live engine page, the page's section 2d, `#s-dial`), and three runs read every beat against native and
 against 60 s (`docs/PACE_PREREGISTRATION.md`, amendment 3). The cushion each muscle keeps is set in
 seconds by its own climb, wobble and reaction time, so it is the same at any pace; a longer period would not widen it, only
 leave the governor blind for longer between looks. In the cloud v7 also makes the whole rule one flag, `--give-back-only`, enforced in the governor

@@ -68,7 +68,7 @@ the founder overrides one in the conversation.
   morning to the night, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
   decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and
   cloud run), any beat from 5 to 120 s can be set, and every beat is shown beside native with what it buys and what it costs
-  (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 1j; the real runs,
+  (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 2d; the real runs,
   `docs/PACE_PREREGISTRATION.md`, amendment 3, eight arms). The monitors scale with the beat (`omni_heartbeat_seconds`, the
   staleness alert at three beats, the control panel's `POST /v1/beat`). One fault the dial's ladder found before it landed is
   fixed in it: at 90 and 120 s the cruise wait (120 s) rounded to one decision, so one reading with a pod waiting put every
@@ -478,7 +478,7 @@ the founder overrides one in the conversation.
   be able to show the same 15 second beats"). omni-v17 (`docs/OMNI_V17.md`): the main engine takes its full decision every 60 s; any beat can be set
   (`--interval`, 5 to 120 s and every value between); every beat is shown beside native with what it buys (its reads of the
   cluster) and what it costs (its own processor, and every service row against native and against 60 s), in our models
-  (`results/toy_gate/V17_LADDER.md`), on the live engine page (section 1j, "The heartbeat dial") and in its real runs
+  (`results/toy_gate/V17_LADDER.md`), on the live engine page (section 2d, "The heartbeat dial") and in its real runs
   (`docs/PACE_PREREGISTRATION.md`, amendment 3: eight arms, native and 5, 15, 30, 60, 75, 90 and 120 s). The monitors scale with
   the beat: the exporter serves the beat the governor runs at (`omni_heartbeat_seconds`), the governor's Grafana screen counts the
   time since its last decision in beats, and the staleness alert fires after three beats at any setting. The engine "can always be
@@ -499,7 +499,7 @@ the founder overrides one in the conversation.
   (`tools/heartbeat_sweep.py`, our own model, class S; the record `results/toy_gate/HEARTBEAT_SWEEP.md`, written again from its
   runs by `tests/test_heartbeat_sweep.py`) reads the engine that stands and the one before it at every beat from 5 to 120 s,
   on-site and in the cloud. Each beat is read against native and against the same engine at 15 s and 60 s, with the engine's own
-  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 5c,
+  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 4c,
   after the heart) has a button for each beat, setting, engine, zero line and gauge. The factory's beat is the main engine's 60 s since omni-v17
   (the dial above); another beat is a changed tune, its receipts its own. On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in
   pods waiting (GAIN +83.5% at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power
