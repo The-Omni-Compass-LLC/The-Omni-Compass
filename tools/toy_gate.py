@@ -251,7 +251,10 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
             if args[:2] == ("get", "nodes"):                    # in service, then parked (marked idle) until deleted
                 p = self.sim.c.pool
                 node = lambda i, taints: {"metadata": {"name": f"n{i}", "labels": {}},
-                                          "spec": {"taints": taints}, "status": {"allocatable": {"cpu": str(p.cores)},
+                                          # a node's allocatable as the scheduler places pods on it (the plant's ALLOC of its
+                                          # cores, fleet/sim.py), as a real cluster reports it (24 October: the toy said all of
+                                          # its cores, so the governor's floor counted room the plant did not place pods in)
+                                          "spec": {"taints": taints}, "status": {"allocatable": {"cpu": f"{int(round(p.cores * ALLOC * 1000))}m"},
                                           "conditions": [{"type": "Ready", "status": "True"}]}}
                 # the blink (omni-v11): four times a day every machine in service leaves service for two minutes in the
                 # governor's reading, while the toy cluster serves on, as the kind cluster of the CruiseKube test did on 18
@@ -260,6 +263,15 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
                 gone = [{"key": "node.kubernetes.io/unreachable", "effect": "NoSchedule"}] if out_now else []
                 return {"items": [node(i, list(gone)) for i in range(p.nodes)]
                         + [node(p.nodes + j, [{"key": IDLE, "effect": "PreferNoSchedule"}]) for j in range(len(self.sim.parked))]}
+            if args[:2] == ("get", "pods") and "-o" in args and args[args.index("-o") + 1] == "json":
+                # every running pod on a machine in service, by name, as a real cluster lists it (24 October: the toy's pods
+                # carried no node, so the governor's count of what the machines in service hold, which reads a running pod by
+                # its node, came out 0 and every rule that reads the room saw an empty fleet)
+                got = super().get(*args)
+                n = max(1, self.sim.c.pool.nodes)
+                for i, pod in enumerate(x for x in got["items"] if x["status"].get("phase") == "Running"):
+                    pod["spec"]["nodeName"] = f"n{i % n}"
+                return got
             if args[:2] == ("get", "pods") and "-o" in args and args[args.index("-o") + 1] == "name":
                 c = self.sim.c
                 frac = min(1.0, c.alloc / c.reqs) if c.reqs > 0 else 1.0
@@ -272,6 +284,10 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
                 for h, w in zip(hp["items"], self.sim.c.workloads):
                     h["spec"].update({"minReplicas": int(w.min_rep), "maxReplicas": int(w.max_rep),
                                       "scaleTargetRef": {"kind": "Deployment", "name": w.name}})
+                    # the pods' mean CPU over their request, as the autoscaler's status reports it (24 October: the toy
+                    # reported none, so every rule of the governor that reads the service's demand from it was silent)
+                    h.setdefault("status", {})["currentMetrics"] = [{"type": "Resource", "resource": {
+                        "name": "cpu", "current": {"averageUtilization": int(round(100 * getattr(w, "metric", 0.0)))}}}]
                 return hp
             if args[:2] == ("top", "pods"):                     # the pods' own usage, as metrics-server reports it
                 sel = args[args.index("-l") + 1] if "-l" in args else ""
