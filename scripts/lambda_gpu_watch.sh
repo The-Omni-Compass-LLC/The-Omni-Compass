@@ -39,7 +39,9 @@ while :; do
   fi
   # the run stopped without its last line (it refused to start, or died): nothing more will come, so the card goes back now
   # instead of billing to the deadline; only a clear answer counts (a lost connection is not a stopped run)
-  alive=$("${SSH[@]}" "pgrep -f 'gpu_rented_run.sh|gpu_8card.sh' > /dev/null && echo running || echo stopped" 2>/dev/null)
+  # the brackets keep the pattern from matching the shell that runs this very check (its own command line holds the
+  # names; unbracketed, every check read "running" and a stopped run kept its card to the deadline: 24 October)
+  alive=$("${SSH[@]}" "pgrep -f '[g]pu_rented_run.sh|[g]pu_8card.sh' > /dev/null && echo running || echo stopped" 2>/dev/null)
   if [ "$alive" = stopped ] && ! "${SSH[@]}" "grep -q 'send this one file back' omni/run.log" 2>/dev/null; then
     echo "the run stopped before its last line: fetching what exists and giving the machine back"
     "${SSH[@]}" "tail -n 5 omni/run.log" 2>/dev/null | sed 's/^/  run: /'
