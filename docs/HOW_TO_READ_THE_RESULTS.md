@@ -10,7 +10,7 @@ Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** o
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | no change of 0.5% or more either way in any run (under the floor), or the same; a change of 0.5% or more is never EVEN; a knob native already runs at the top of its range is EVEN, at its limit on native |
 | **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
 
 How the sign of a number becomes a word:
@@ -20,12 +20,12 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
-- **The floor** (the founder's order of 20 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. From 0.5% up, a change that holds the same way in all three runs reads GAIN or LOSS by the gauge's aim.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
+- **The floor** (the founder's orders of 20 and 24 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. A change of 0.5% or more either way is a change and never reads EVEN: "Any gauge that gives anything over a 0.5 percent change either way is a change ... it has to show its loss or gain" (24 October). It reads GAIN, LOSS or power given by the gauge's aim, with the count of runs clear of the noise beside the word.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the floor reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
-A reading counts only when it holds the same way in all three of our runs, A, B and C, with every 95% interval clear of zero: "GAIN in all three of our runs". The other readings are **EVEN, no difference beyond the noise** (in a run the interval includes zero, so native and Omni could not be told apart: that is the result), **the runs disagree** (clear runs pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting).
+A reading is decided over our three runs, A, B and C. Only the runs that moved 0.5% or more decide its direction; when they all move the same way the gauge reads its word. "GAIN in all three of our runs" means all three runs moved 0.5% or more the same way with every 95% interval clear of zero. Where a run's interval includes zero, or a run stayed under the floor, the word stands and its qualifier follows in the same cell, the count of runs clear of the noise always shown: "GAIN (the same way in all three runs; 2 of 3 clear of the noise)", "LOSS (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 1 of 3 clear of the noise)". The other readings are **EVEN, under the floor** (every run under 0.5%), **EVEN, the same** (no change at all), **the runs disagree** (runs that moved 0.5% or more pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting). A count that must never rise (failed requests, lost messages) reads LOSS on any rise in any run. Tables written before 24 October 2026 read a run whose interval included zero as "EVEN, no difference beyond the noise" whatever its size; every published table has been read again by this rule (`tools/reread_key.py`).
 
 Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
@@ -50,9 +50,11 @@ follow it. Read the five ideas first, then go to the table you have in front of 
    repetitions of the whole experiment; it is not a 95% chance about this one range.
    - If the whole range is on one side of zero, the difference is **clear of the noise** (a table's "significant"
      column says "yes"); its word is GAIN, LOSS or power given, by the gauge's aim.
-   - If the range includes zero, the reading is **EVEN, no difference beyond the noise**: this test could not tell the
-     arms apart. It does not show that they are equal; how small a difference the test could have seen is the
-     interval's half-width, printed beside it.
+   - If the range includes zero, the run is **not clear of the noise**. Since the founder's order of 24 October 2026 that
+     no longer makes the reading EVEN: a change of 0.5% or more either way is a change and reads its word, with the count
+     of runs clear of the noise beside it ("**GAIN** (the same way in all three runs; 2 of 3 clear of the noise)"). Only a
+     change under 0.5% in every run reads **EVEN, under the floor**. The interval's half-width, printed beside each run,
+     says how small a difference the run could have resolved.
 4. **The word, not the sign.** Every judged reading is GAIN, EVEN or LOSS (the key above). For response time,
    failures and time over the line a fall is GAIN; for work and work per energy a rise is GAIN; for energy, machines
    and every other resource spent or held a fall is a cut, a GAIN, and a rise is **power given**, never a loss.
@@ -94,9 +96,11 @@ One card, three arms, many repetitions:
 Read it in this order:
 1. **The verdict line** at the top, one of the labels chosen by rule (`docs/GPU_PREREGISTRATION.md`, amendment 1):
    SUPERIOR WITHIN GUARDRAILS, ENERGY IMPROVEMENT WITH SERVICE TRADEOFF, NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED,
-   AWAY FROM ITS AIM, NOT ATTRIBUTABLE or INVALID; each gauge reads GAIN, LOSS or power given **clear of the noise**, or
-   **EVEN, no difference beyond the noise** (amendment 14; the first counted run of 2 October printed "proven" and "not
-   proven" for the same rule).
+   AWAY FROM ITS AIM, NOT ATTRIBUTABLE or INVALID; each gauge reads GAIN, LOSS or power given **clear of the noise** or
+   **not clear of the noise** (a change of 0.5% or more of the base whose interval includes zero, by the rule of 24 October
+   2026), or **EVEN, under the floor** (under 0.5%); tables written before 24 October read a change inside the noise
+   **EVEN, no difference beyond the noise** whatever its size (amendment 14; the first counted run of 2 October printed
+   "proven" and "not proven" for the same rule). The preregistered label is frozen as written.
 2. **Work per energy** (requests per kilojoule): the headline. A plus sign with a range wholly above zero is a GAIN
    clear of the noise.
 3. **Requests served** must be equal in every arm. More energy saved by serving less work would be cheating; the bench
@@ -135,9 +139,15 @@ Energy on kind is a declared model, not a meter: kind keeps every machine powere
 ## The three-run tables (`results/live/V<engine>_<TEST>.md`, for example `V7_GOLDILOCKS.md`, `V8_CITYLEARN.md`)
 
 Every benchmark since the engine was frozen runs three separate times, A, B and C, on the same bytes, and the table
-shows all three beside each gauge, each with its own 95% interval. Read the last column first: **GAIN** or **LOSS in all three of our runs** (the same sign
-in all three, every interval clear of zero; a resource spent that rose reads **power given**), **EVEN, no difference beyond the noise** (an interval over zero in at least one
-run: that is the result), or **the runs disagree** (the test is unstable there and is looked into). Nothing reads "confirmed" or "not
+shows all three beside each gauge, each with its own 95% interval. Read the last column first, by the one rule (`tools/readings.py`
+judge_runs, the founder's order of 24 October 2026: "Any gauge that gives anything over a 0.5 percent change either way is a
+change"): **GAIN** or **LOSS in all three of our runs** (all three runs moved 0.5% or more the same way, every interval clear
+of zero; a resource spent that rose reads **power given**); the word with its qualifier beside it in the same cell where the
+runs that moved 0.5% or more went the same way but not every run was clear of the noise or at the floor ("**LOSS** (2 of 3
+runs moved 0.5% or more, the same way, 1 under the floor; 1 of 3 clear of the noise)"); **EVEN, under the floor** (every run
+under 0.5%), **EVEN, the same**, or **the runs disagree** (runs that moved 0.5% or more pointing different ways: the test is
+unstable there and is looked into). Every published table was read again by this rule on 24 October 2026 from its own
+numbers (`tools/reread_key.py`; what moved is counted in `results/REREAD_KEY.md`, every row now reading LOSS named there). Nothing reads "confirmed" or "not
 confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V<n>_` in a table's name (`V10_`, `V11_`, `V12_` and so on) is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
 a table never mixes engines, and a reading is never carried from one engine to another. Every LOSS and every power given is in the table beside
 the GAINs. On the omni-v11 tables there is no LOSS. Power given appears in the grid's dissipated energy in four grids, the tap
@@ -145,17 +155,20 @@ operations in one, PgBouncer's connections, MySQL's pool from its factory size, 
 zero in one district. An earlier engine's LOSS stays in its own table, for example CityLearn's energy not served on omni-v7.
 
 **How often the rule reads a difference that is not there.** Under no true difference, one run's 95% interval falls
-wholly above zero with probability 0.025 and wholly below with 0.025. A row reads GAIN or LOSS only when all three
-independent runs fall on the same side, so its chance of a false reading is 2 × 0.025³ ≈ 3.1 × 10⁻⁵. Over a table of 30
+wholly above zero with probability 0.025 and wholly below with 0.025. A row reads GAIN or LOSS **in all three of our runs**
+only when all three independent runs fall on the same side, so its chance of a false reading is 2 × 0.025³ ≈ 3.1 × 10⁻⁵.
+A word with its qualifier (moved 0.5% or more, not clear of the noise in every run) carries no such bound: it says which way
+the runs moved and how many of them the noise could not hide, and that count stands beside it. Over a table of 30
 judged rows the chance that any one is false is at most 30 × 3.1 × 10⁻⁵ ≈ 0.09% (a union bound, as Bonferroni's), and over
 the 798 judged rows of the omni-v11 tables that carry noise (1,039 judged rows in 23 tables, less the 241 of the deterministic
 simulators) the expected number of false readings is 798 × 3.1 × 10⁻⁵ ≈ 0.02. The
 bound assumes the three runs independent; runs on the same kind of machine can share a bias, which three runs cannot
 remove and the bound does not cover. The price of the rule is power: a small true difference must clear the noise three
-times, so many EVEN rows are differences too small for a run's pairs to resolve (with 3 pairs a run, t = 4.303 and the
-interval is wide). Every EVEN is printed with the three intervals that decided it. The deterministic simulators (CityLearn,
+times, so before 24 October 2026 many EVEN rows were differences too small for a run's pairs to resolve (with 3 pairs a
+run, t = 4.303 and the interval is wide); since then such a row shows its word and its count of runs clear of the noise.
+Every row is printed with the three intervals that decided it. The deterministic simulators (CityLearn,
 pandapower, MuJoCo) reproduce to the digit, so there the three runs check the harness, not the noise; their EVEN means
-the same to one part in a million.
+the same to one part in a million, or a change under the 0.5% floor in every run (EVEN, under the floor).
 
 ## The workload tables (`V<engine>_PGBENCH.md`, `_KAFKA.md`, `_REDIS.md`, `_YCSB.md`, `_SYSBENCH.md`) and the swarm table (`V<engine>_SWARM.md`)
 
@@ -193,8 +206,8 @@ pairing stands, the mark stays, and the remedy is a longer window for that size 
 
 Every measure is a ratio oriented so that above 1 is a GAIN for Omni-Compass on top of native: work, speed, machines,
 energy. A test's index is the geometric mean of its ratios, a category's of its tests, the headline of the real
-categories, each weighted the same. A measure enters only as its three-run reading allows; no difference beyond the
-noise enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
+categories, each weighted the same. A measure enters only as its three-run reading allows: a reading in all three of our
+runs enters with its ratio; anything else (EVEN, a word with its qualifier, the runs disagree) enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
 
 ## The seven organisms grid (`results/grid_v5/GRID.md`; each engine's runs in `results/grid_v<engine>/`)
 
@@ -216,8 +229,7 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
 the Reading column gives its word, GAIN, EVEN or LOSS, by what the gauge is for (the key above). The benefit sheet turns
 every gauge the same way round against **its declared aim**: plus is a GAIN, minus a LOSS or power given, whatever the
-gauge measures, and 0% is EVEN, nothing beyond the noise. Beside it every change the same in all three of our runs is
-written out in words, never as a bare sign: "p95 cut 65% (GAIN)", "memory ceiling held up 215% (power given)", so
+gauge measures, and 0% is EVEN. Beside it every change that reads a word is written out in words, never as a bare sign: "p95 cut 65% (GAIN)", "memory ceiling held up 215% (power given)", so
 neither can be misread against a table that shows the same changes as "-65%" and "+215%". One number per benchmark, by
 the index's own rule, with its word beside it. Read that sheet first; read the tables for
 the rows behind a number, and read their Reading column, never the sign alone. The wiring page uses the same words.

@@ -2,6 +2,10 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
+**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the JSON twin's exact values; every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
+<!-- end: read again -->
+
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
 Source: GitHub Actions workflow `big-organism`, run 37359820055 (the tower: one rented Azure machine per repetition, eastus, `Standard_D8as_v4`, 2,880 s window, commit `a004a8f`, Omni v1 for everything but the power grid) and workflow `big-organism-detached`, collection run 37575930111 (the four stacked: one rented machine, westus3, `Standard_D8as_v7`, three repetitions in turn under nohup, 2,880 s window, commit `f162ce8`, Omni v1; the machine collected and deleted when all three had finished); raw files under `results/live/raw/run-37359820055/` and `results/live/raw/run-37575930111/`. A fresh six-worker kind cluster per arm, the organism at 1,000 copies with the real cluster inside. Made by `tools/six_kube_report.py` from both. The stack's compass arm ended 300 to 615 s after its 2,880 s window in every repetition (native 14 s): marked OFF THE CLOCK; the v3 stack runs with a 10,800 s window for that reason.
@@ -34,7 +38,7 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 
 ## Each organism: omni against native, paired by repetition
 
-### The whole tower, every muscle once, 1,000 copies: toward their aims on 6, away from them on 1 (organism work), inside the noise on 5; OFF THE CLOCK in 1 of 3 repetitions (the organism ended up to 2,392 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
+### The whole tower, every muscle once, 1,000 copies: GAIN on 5 (response time (ms), 95th percentile; response time (ms), 99th percentile; time over the response line (% of samples); failed requests (%), not clear of the noise; pods started, not clear of the noise), LOSS on 0, power given on 0, EVEN (under the 0.5% floor) on 7; OFF THE CLOCK in 1 of 3 repetitions (the organism ended up to 2,392 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
 
 3 paired repetitions.
 
@@ -43,21 +47,21 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 | response time (ms), 95th percentile | 4104 | 203.8 | -95.0% | -6804 to -996.3 | GAIN |
 | response time (ms), 99th percentile | 6372 | 257.8 | -96.0% | -8153 to -4075 | GAIN |
 | time over the response line (% of samples) | 64.02 | 0.1645 | -99.7% | -99.52 to -28.19 | GAIN |
-| failed requests (%) | 22.25 | 0 | -100.0% | -115.6 to +71.11 | EVEN, inside the noise (cut) |
-| HPA replicas, mean | 9.886 | 9.894 | +0.1% | -0.01703 to +0.0345 | EVEN, inside the noise (up) |
-| pods started | 5 | 4.667 | -6.7% | -1.768 to +1.101 | EVEN, inside the noise (cut) |
+| failed requests (%) | 22.25 | 0 | -100.0% | -115.6 to +71.11 | GAIN (not clear of the noise) |
+| HPA replicas, mean | 9.886 | 9.894 | +0.1% | -0.01703 to +0.0345 | EVEN, under the floor (up 0.09%) |
+| pods started | 5 | 4.667 | -6.7% | -1.768 to +1.101 | GAIN (not clear of the noise) |
 | worker nodes in service, mean | 6 | 6 | +0.0% | -9.779e-16 to +1.57e-15 | EVEN, the same (under one part in a million) |
-| energy, parked workers still on at idle power (Wh, declared model) | 541.8 | 540.8 | -0.2% | -6.524 to +4.494 | EVEN, inside the noise (cut) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 541.8 | 540.8 | -0.2% | -6.524 to +4.494 | EVEN, inside the noise (cut) |
+| energy, parked workers still on at idle power (Wh, declared model) | 541.8 | 540.8 | -0.2% | -6.524 to +4.494 | EVEN, under the floor (cut 0.19%) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 541.8 | 540.8 | -0.2% | -6.524 to +4.494 | EVEN, under the floor (cut 0.19%) |
 | CPU used with Omni's own (cores), mean | 4.263 | 4.188 | -1.8% | -0.6641 to +0.5131 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
 | host CPU busy, the real machine under kind (%) | 69.33 | 69.92 | +0.9% | -6.106 to +7.288 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
-| organism work | 5.629e+13 | 5.629e+13 | -0.0% | -9.426e+07 to -9.426e+07 | LOSS |
-| organism energy (J) | 6.387e+13 | 6.375e+13 | -0.2% | -1.168e+11 to -1.168e+11 | GAIN |
-| organism time over the line (% of steps) | 2.722 | 2.714 | -0.3% | -0.00788 to -0.00788 | GAIN |
-| organism work per energy | 0.8814 | 0.883 | +0.2% | +0.001614 to +0.001614 | GAIN |
+| organism work | 5.629e+13 | 5.629e+13 | -0.0% | -9.426e+07 to -9.426e+07 | EVEN, under the floor (cut 0.00%) |
+| organism energy (J) | 6.387e+13 | 6.375e+13 | -0.2% | -1.168e+11 to -1.168e+11 | EVEN, under the floor (cut 0.18%) |
+| organism time over the line (% of steps) | 2.722 | 2.714 | -0.3% | -0.00788 to -0.00788 | EVEN, under the floor (cut 0.29%) |
+| organism work per energy | 0.8814 | 0.883 | +0.2% | +0.001614 to +0.001614 | EVEN, under the floor (up 0.18%) |
 | organism behind its window (s) | 802.5 | 408.3 | -49.1% | -2104 to +1315 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
-### The four stacked, duplicates kept, 1,000 copies: toward their aims on 5, away from them on 1 (organism work), inside the noise on 4; OFF THE CLOCK in 3 of 3 repetitions (the organism ended up to 615 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
+### The four stacked, duplicates kept, 1,000 copies: GAIN on 4 (response time (ms), 95th percentile; response time (ms), 99th percentile; time over the response line (% of samples), not clear of the noise; organism time over the line (% of steps)), LOSS on 0, power given on 0, EVEN (under the 0.5% floor) on 6; OFF THE CLOCK in 3 of 3 repetitions (the organism ended up to 615 s after its window: the machine could not step this many muscles in time, and the cell's last steps saw a cluster at rest)
 
 3 paired repetitions.
 
@@ -65,19 +69,19 @@ How to read it: every change is omni against native (omni is Omni-Compass on top
 |---|---:|---:|---:|---:|---|
 | response time (ms), 95th percentile | 273.7 | 70.23 | -74.3% | -252.9 to -154 | GAIN |
 | response time (ms), 99th percentile | 453.6 | 77.04 | -83.0% | -492.5 to -260.6 | GAIN |
-| time over the response line (% of samples) | 0.7166 | 0 | -100.0% | -1.702 to +0.269 | EVEN, inside the noise (cut) |
+| time over the response line (% of samples) | 0.7166 | 0 | -100.0% | -1.702 to +0.269 | GAIN (not clear of the noise) |
 | failed requests (%) | 0 | 0 | +0 | +0 to +0 | EVEN, the same |
-| HPA replicas, mean | 9.788 | 9.764 | -0.2% | -0.08812 to +0.03989 | EVEN, inside the noise (cut) |
+| HPA replicas, mean | 9.788 | 9.764 | -0.2% | -0.08812 to +0.03989 | EVEN, under the floor (cut 0.25%) |
 | pods started | 7 | 7 | +0.0% | +0 to +0 | EVEN, the same |
 | worker nodes in service, mean | 6 | 6 | +0.0% | -9.779e-16 to +1.57e-15 | EVEN, the same (under one part in a million) |
-| energy, parked workers still on at idle power (Wh, declared model) | 504 | 504.9 | +0.2% | -4.344 to +6.001 | EVEN, inside the noise (up) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 504 | 504.9 | +0.2% | -4.344 to +6.001 | EVEN, inside the noise (up) |
+| energy, parked workers still on at idle power (Wh, declared model) | 504 | 504.9 | +0.2% | -4.344 to +6.001 | EVEN, under the floor (up 0.16%) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 504 | 504.9 | +0.2% | -4.344 to +6.001 | EVEN, under the floor (up 0.16%) |
 | CPU used with Omni's own (cores), mean | 1.775 | 1.802 | +1.5% | -0.4546 to +0.5072 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
 | host CPU busy, the real machine under kind (%) | 36.5 | 37.89 | +3.8% | -5.031 to +7.823 | shown, not judged (more or less is neither GAIN nor LOSS by itself) |
-| organism work | 1.067e+14 | 1.067e+14 | -0.0% | -5.684e+08 to -5.684e+08 | LOSS |
-| organism energy (J) | 9.605e+13 | 9.59e+13 | -0.2% | -1.539e+11 to -1.539e+11 | GAIN |
+| organism work | 1.067e+14 | 1.067e+14 | -0.0% | -5.684e+08 to -5.684e+08 | EVEN, under the floor (cut 0.00%) |
+| organism energy (J) | 9.605e+13 | 9.59e+13 | -0.2% | -1.539e+11 to -1.539e+11 | EVEN, under the floor (cut 0.16%) |
 | organism time over the line (% of steps) | 2.568 | 2.546 | -0.9% | -0.02235 to -0.02235 | GAIN |
-| organism work per energy | 1.111 | 1.112 | +0.2% | +0.001777 to +0.001777 | GAIN |
+| organism work per energy | 1.111 | 1.112 | +0.2% | +0.001777 to +0.001777 | EVEN, under the floor (up 0.16%) |
 | organism behind its window (s) | 14.5 | 456.8 | +3050.1% | +86.26 to +798.3 | shown, not judged (0 is on the clock; past 5% of the window the repetition is off the clock) |
 
 ## Not in this run

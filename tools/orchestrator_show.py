@@ -328,14 +328,15 @@ def word(gauge: str, diffs: list[float], base: list[float]) -> dict:
     lo, hi = m - half, m + half
     rel = m / (sum(base) / n) if sum(base) else float("nan")
     aim = AIMS[gauge]
-    if lo <= 0 <= hi:
-        w = "EVEN"
-    elif aim == "work":
-        w = "GAIN" if lo > 0 else "LOSS"
-    elif aim == "wait":
-        w = "GAIN" if hi < 0 else "LOSS"
-    else:
-        w = "GAIN (a cut)" if hi < 0 else "power given"
+    # the one rule (tools/readings.py judge_one, the founder's order of 24 October 2026): under 0.5% EVEN, under the floor; from
+    # 0.5% up the word by the gauge's aim, "(not clear of the noise)" beside it where the interval includes zero
+    from tools.readings import judge_one, HIGHER, LOWER, SPENT, EVEN_FLOOR
+    size = rel if rel == rel else (0.0 if m == 0 else math.copysign(math.inf, m))
+    w = judge_one(size, not (lo <= 0 <= hi), {"work": HIGHER, "wait": LOWER}.get(aim, SPENT))
+    if w.startswith(EVEN_FLOOR):
+        w = EVEN_FLOOR
+    elif aim == "resource" and w.startswith("GAIN"):
+        w = w.replace("GAIN", "GAIN (a cut)", 1).replace(") (", "; ", 1)
     return {"mean": m, "lo": lo, "hi": hi, "rel": rel, "word": w}
 
 
@@ -495,7 +496,7 @@ code{font-size:.88em}
                      "machines": "machines on, mean a step", "units": "units standing, mean a step"}
             for key, r in readings.items():
                 cmp_, g = key.rsplit(": ", 1)
-                cls = "GAIN" if r["word"].startswith("GAIN") else "EVEN" if r["word"] == "EVEN" else "LOSS" if r["word"] == "LOSS" else "given"
+                cls = "GAIN" if r["word"].startswith("GAIN") else "EVEN" if r["word"].startswith("EVEN") else "LOSS" if r["word"].startswith("LOSS") else "given"
                 H.append(f"<tr><td>{html.escape(cmp_)}: {names[g]}</td><td class='num'>{r['mean']:+.1f} ({100 * r['rel']:+.1f}%)</td>"
                          f"<td class='num'>{r['lo']:+.1f} to {r['hi']:+.1f}</td><td class='{cls}'>{r['word']}</td></tr>")
             H.append("</table>")

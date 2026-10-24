@@ -61,7 +61,12 @@ class ToyGate(unittest.TestCase):
         self.assertEqual(tg.reading("machine_hours", [1.0, 1.1, 0.9, 1.2], [10.0] * 4)["word"], "power given")
         self.assertEqual(tg.reading("p95_ms", [1.0, 1.1, 0.9, 1.2], [10.0] * 4)["word"], "LOSS")
         self.assertEqual(tg.reading("p95_ms", [-1.0, -1.1, -0.9, -1.2], [10.0] * 4)["word"], "GAIN")
-        self.assertEqual(tg.reading("p95_ms", [-1.0, 1.1, -0.9, 1.2], [10.0] * 4)["word"], "EVEN")
+        # the founder's order of 24 October 2026: a change of 0.5% or more is a change, its word kept, the noise said beside it
+        self.assertEqual(tg.reading("p95_ms", [-1.0, 1.1, -0.9, 1.2], [10.0] * 4)["word"], "LOSS (not clear of the noise)")
+        self.assertEqual(tg.reading("machine_hours", [-1.0, 1.1, -0.9, 1.2], [10.0] * 4)["word"], "power given (not clear of the noise)")
+        self.assertEqual(tg.reading("p95_ms", [-0.01, 0.011, -0.009, 0.012], [10.0] * 4)["word"], "EVEN, under the floor")
+        self.assertEqual(tg.reading("p95_ms", [0.03, 0.03, 0.03, 0.03], [10.0] * 4)["word"], "EVEN, under the floor", "0.3%, clear, under the floor")
+        self.assertEqual(tg.reading("p95_ms", [0.0] * 4, [10.0] * 4)["word"], "EVEN (identical)")
         self.assertEqual(tg.reading("requests_served", [1.0, 1.1, 0.9, 1.2], [10.0] * 4, tg.CONVEY_GAUGES)["word"], "GAIN")
 
 

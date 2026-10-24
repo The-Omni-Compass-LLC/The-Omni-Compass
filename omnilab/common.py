@@ -22,7 +22,7 @@ from typing import Dict, List
 import numpy as np
 
 from omnicompass.adapter import Governor, mode_law, AUTOPILOT
-from tools.readings import GAIN, LOSS, EVEN_SAME, EVEN_NOISE  # noqa: E402
+from tools.readings import GAIN, LOSS, EVEN_SAME, EVEN_FLOOR, SIZE_FLOOR  # noqa: E402
 
 
 class Engine:
@@ -95,8 +95,15 @@ def paired(native: List[Dict], omni: List[Dict], gauges: Dict[str, str], rng_see
             rel = (ma - mb) / abs(ma) if direction == "lower" else (mb - ma) / abs(ma)
         else:
             rel = 0.0 if abs(mb) < 1e-12 else (-1.0 if direction == "lower" else 1.0)
-        gain = (hi < 0) if direction == "lower" else (lo > 0)
-        loss = (lo > 0) if direction == "lower" else (hi < 0)
-        out[g] = {"native": ma, "omni": mb, "gain_by": rel, "ci95": [lo, hi],
-                  "verdict": GAIN if gain else LOSS if loss else (EVEN_SAME if np.allclose(a, b) else EVEN_NOISE)}
+        clear = hi < 0 or lo > 0
+        # the one rule (tools/readings.py, the founder's order of 24 October 2026): the same, EVEN; under 0.5% EVEN, under the
+        # floor; from 0.5% up the word by the gauge's aim, "(not clear of the noise)" beside it where the interval includes zero
+        if np.allclose(a, b):
+            verdict = EVEN_SAME
+        elif abs(rel) < SIZE_FLOOR:
+            verdict = f"{EVEN_FLOOR} ({100 * abs(rel):.2f}%, under {100 * SIZE_FLOOR:g}%)"
+        else:
+            w = GAIN if rel > 0 else LOSS
+            verdict = w if clear else f"{w} (not clear of the noise)"
+        out[g] = {"native": ma, "omni": mb, "gain_by": rel, "ci95": [lo, hi], "verdict": verdict}
     return out

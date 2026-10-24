@@ -34,7 +34,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp  # noqa: E402
 from tools.live_reps import T95  # noqa: E402
-from tools.readings import GAIN, LOSS, EVEN_NOISE, receipt_key  # noqa: E402  (the words every table uses)
+from tools.readings import GAIN, LOSS, HIGHER, EVEN_SAME, judge_one, receipt_key  # noqa: E402  (the words every table uses)
 
 LATENCY_SHARE = 0.95      # a step keeps the latency limit when at least 95% of its requests are answered within the line
 FAIL_SHARE = 0.01         # and the failure limit when no more than 1% failed or were never sent
@@ -115,16 +115,18 @@ def paired(diffs):
     return m, m - h, m + h
 
 
-def reading(lo, hi, n) -> str:
-    """Completed work and capacity are work done, so their aim is higher: a rise clear of the noise is GAIN, a fall LOSS
-    (tools/readings.py)."""
+def reading(lo, hi, n, mean=None, base=None) -> str:
+    """Completed work and capacity are work done, so their aim is higher: by the one rule (tools/readings.py judge_one, the
+    founder's order of 24 October 2026), a change under 0.5% of native is EVEN, under the floor; from 0.5% up a rise is GAIN and a
+    fall LOSS, with "(not clear of the noise)" beside the word where the 95% interval includes zero."""
     if n < 2 or math.isnan(lo):
         return "one pair (no reading)"
-    if lo > 0:
-        return GAIN
-    if hi < 0:
-        return LOSS
-    return EVEN_NOISE
+    if lo == hi == 0 and not mean:
+        return EVEN_SAME                                    # every pair the same: nothing moved
+    if mean is None or not base:
+        mean, base = (lo + hi) / 2, None
+    change = mean / abs(base) if base else (0.0 if mean == 0 else math.copysign(math.inf, mean))
+    return judge_one(change, lo > 0 or hi < 0, HIGHER)
 
 
 def row(cap, prs):
@@ -150,10 +152,10 @@ def row(cap, prs):
     p95o = sum(p[1]["p95_ms"] for p in prs) / n
     r = {"cap_m": cap, "pairs": n, "slo_ms": slo, "offered": offered,
          "work_native": base, "work_omni": sum(wo) / n, "work_diff": m, "work_lo": lo, "work_hi": hi,
-         "work_pct": pct(m), "work_pct_lo": pct(lo), "work_pct_hi": pct(hi), "work_reading": reading(lo, hi, n),
+         "work_pct": pct(m), "work_pct_lo": pct(lo), "work_pct_hi": pct(hi), "work_reading": reading(lo, hi, n, m, base),
          "served_native": sn, "served_omni": so, "fail_native": fn, "fail_omni": fo,
          "capacity_native": sum(cn) / n, "capacity_omni": sum(co) / n, "capacity_diff": cm, "capacity_lo": clo,
-         "capacity_hi": chi, "capacity_reading": reading(clo, chi, n), "p95_native": p95n, "p95_omni": p95o}
+         "capacity_hi": chi, "capacity_reading": reading(clo, chi, n, cm, sum(cn) / n), "p95_native": p95n, "p95_omni": p95o}
     r["audit"] = audit(r)
     return r
 
@@ -171,15 +173,15 @@ def audit(r) -> str:
     cap_line = (f" The highest load served within both limits: {r['capacity_native']:.1f} → {r['capacity_omni']:.1f} "
                 f"requests a second ({r['capacity_reading']}).")
     lim = f" Failed or never sent: {r['fail_native']:.1%} → {r['fail_omni']:.1%}."
-    if r["work_reading"] == GAIN:
+    if r["work_reading"].startswith(GAIN):
         return (f"At {cap}, Omni on top completed {r['work_diff']:,.0f} more requests within {r['slo_ms']:.0f} ms than "
-                f"native alone ({r['work_pct']:+.1f}%{iv}): a GAIN, more work from the same cap.{cap_line}{lim}")
-    if r["work_reading"] == LOSS:
+                f"native alone ({r['work_pct']:+.1f}%{iv}): a {r['work_reading']}, more work from the same cap.{cap_line}{lim}")
+    if r["work_reading"].startswith(LOSS):
         return (f"At {cap}, Omni on top completed {abs(r['work_diff']):,.0f} fewer requests within {r['slo_ms']:.0f} ms "
-                f"than native alone ({r['work_pct']:+.1f}%{iv}): a LOSS, reported as it stands, its cause looked for in our "
+                f"than native alone ({r['work_pct']:+.1f}%{iv}): a {r['work_reading']}, reported as it stands, its cause looked for in our "
                 f"own wiring first.{cap_line}{lim}")
-    return (f"At {cap}, the difference in completed work ({r['work_pct']:+.1f}%{iv}) is inside the noise: EVEN, no "
-            f"difference beyond the noise at this cap.{cap_line}{lim}")
+    return (f"At {cap}, the difference in completed work ({r['work_pct']:+.1f}%{iv}) is under the 0.5% floor: "
+            f"{r['work_reading']} at this cap.{cap_line}{lim}")
 
 
 def steps_up(rows):
@@ -244,8 +246,9 @@ def main(argv=None):
           "for Omni on top at the same cap is more work from the same capacity, a GAIN.",
           "- **Each step up in the cap**: if both arms do more as the cap rises, the step table shows which turns each "
           "added core into more completed work.",
-          "- Completed work and capacity are work done, so a rise is GAIN and a fall is LOSS; inside the noise is EVEN (the "
-          "key: `docs/HOW_TO_READ_THE_RESULTS.md`). A LOSS is reported as it stands; its cause is looked for in our own "
+          "- Completed work and capacity are work done, so a rise is GAIN and a fall is LOSS; a change under 0.5% is EVEN, "
+          "under the floor, and one of 0.5% or more shows its word with \"(not clear of the noise)\" beside it where its interval "
+          "includes zero (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). A LOSS is reported as it stands; its cause is looked for in our own "
           "wiring, setup and scoring first."]
     if left_out:
         L += ["", "Left out (listed, never dropped silently):", ""] + [f"- {x}" for x in left_out]

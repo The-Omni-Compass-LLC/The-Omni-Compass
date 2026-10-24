@@ -73,13 +73,11 @@ def layer_no(name: str) -> int | None:
 
 
 def word_of(gauge: str, mu: float, sigma: float) -> str:
-    """The word of a composed factor from its 95% interval, by the gauge's aim (the file's own convention for a carried reading)."""
-    lo, hi = mu - Z95 * sigma, mu + Z95 * sigma
-    if lo > 0:
-        return GAIN
-    if hi < 0:
-        return GIVEN if gauge in SPENT else LOSS
-    return EVEN
+    """The word of a composed factor (its log ratio toward the gauge's aim) by the one rule (tools/readings.py, the founder's
+    order of 24 October 2026): within 0.5% EVEN; from 0.5% up the word by the gauge's aim, clear of the noise or not."""
+    if abs(math.exp(mu) - 1.0) < 0.005:
+        return EVEN
+    return GAIN if mu > 0 else (GIVEN if gauge in SPENT else LOSS)
 
 
 def factor(mu: float | None, sigma: float | None, gauge: str) -> dict | None:

@@ -52,9 +52,15 @@ def _word(aim: str, change: str, interval: str) -> str:
     if len(m) < 2:
         return "unread"
     lo, hi = float(m[0].replace(",", "")), float(m[1].replace(",", ""))
-    if lo <= 0 <= hi:
-        return "EVEN"
-    up = hi > 0
+    # the one rule (tools/readings.py, the founder's order of 24 October 2026): a change printed in percent under 0.5% is EVEN,
+    # under the floor; from 0.5% up the word by the gauge's aim, clear of the noise or not
+    c = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?", (change or "").replace("−", "-"))
+    pct = float(c[0].replace(",", "")) if c and "%" in (change or "") else None
+    if pct is not None and abs(pct) < 0.5:
+        return "EVEN, under the floor"
+    if pct is None and lo <= 0 <= hi:
+        return "EVEN"                                  # no size printed: the interval alone decides
+    up = (pct > 0) if pct is not None else hi > 0
     if aim == "HIGHER":
         return "GAIN" if up else "LOSS"
     if aim == "LOWER":

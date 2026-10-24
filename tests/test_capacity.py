@@ -58,7 +58,7 @@ class CapacityReport(unittest.TestCase):
             self.assertIn("more work from the same cap", one["audit"])
             self.assertIn("never reached", four["audit"])
             self.assertIn("not more work", four["audit"])
-            self.assertEqual(four["work_reading"], "one pair (no reading)" if four["pairs"] < 2 else "EVEN, no difference beyond the noise")
+            self.assertEqual(four["work_reading"], "one pair (no reading)" if four["pairs"] < 2 else "EVEN, the same")
             self.assertTrue(any("INVALID" in x or "failed its checks" in x for x in d["left_out"]))
             text = out.read_text()
             self.assertIn("No outside party has reviewed or approved these results.", text)
@@ -103,7 +103,8 @@ class CapacityThreeRuns(unittest.TestCase):
             rows = json.loads(out.with_suffix(".json").read_text())["rows"]
             self.assertEqual(rows["1000:work"]["reading"], "GAIN in all three of our runs")
             self.assertEqual(rows["1000:capacity"]["reading"], "GAIN in all three of our runs")
-            self.assertEqual(rows["2000:work"]["reading"], "EVEN, no difference beyond the noise (2 of 3 runs)")
+            # -2.4%, -1.8% and +1.9%: every run past the 0.5% floor, two one way and one the other (the rule of 24 October 2026)
+            self.assertEqual(rows["2000:work"]["reading"], "the runs disagree")
             self.assertEqual(rows["2000:capacity"]["reading"], "EVEN, the same")
             text = out.read_text()
             self.assertIn("No outside party has reviewed or approved these results.", text)

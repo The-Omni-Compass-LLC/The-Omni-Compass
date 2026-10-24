@@ -204,19 +204,11 @@ GAUGES = {"machines": ("spent", lambda t: t["nodes"] + t["boot"] + t["parked"]),
 
 
 def reading(runs, aim):
-    """The three-run rule as the tables read it (tools/confirm_abc.py verdict): clear runs pointing different ways disagree,
-    whatever the others read; then any run whose interval holds zero makes the row EVEN; else the word by the gauge's aim."""
+    """The one three-run rule (tools/readings.py judge_runs, the founder's order of 24 October 2026), reduced to its word."""
+    from tools.readings import judge_word, EXPORT_AIMS, LOWER
     if not runs:
         return "EVEN"
-    clear = [r for r in runs if r["lo"] > 0 or r["hi"] < 0]
-    if len({r["change"] > 0 for r in clear}) > 1:
-        return "the runs disagree"
-    if len(clear) < len(runs):
-        return "EVEN"
-    up = clear[0]["change"] > 0
-    if aim == "spent":
-        return "power given" if up else "GAIN"
-    return "GAIN" if (up if aim == "up" else not up) else "LOSS"
+    return judge_word([r["change"] for r in runs], [r["lo"] > 0 or r["hi"] < 0 for r in runs], EXPORT_AIMS.get(aim, LOWER))
 
 
 def main(out):

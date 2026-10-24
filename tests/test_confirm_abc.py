@@ -3,11 +3,12 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The A/B/C three-run table rule (tools/confirm_abc.py, docs/OMNI_V1.md): GAIN or LOSS in all three of our runs only when all
-three runs move the same way with every 95% interval clear of zero, the word given by what the gauge is for (a response time
-that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given); an interval that includes
-zero reads EVEN, no difference beyond the noise, with the count of such runs; runs clear of the noise that point different ways
-read as a disagreement; a rounding-level change reads EVEN, the same; unjudged rows stay unjudged."""
+"""The A/B/C three-run table rule (tools/confirm_abc.py, the one rule in tools/readings.py judge_runs, the founder's order of
+24 October 2026): EVEN only when every run's change is under 0.5% (EVEN, under the floor) or rounding-level (EVEN, the same);
+otherwise the runs that moved 0.5% or more decide. All the same way: the word by what the gauge is for (a response time that
+fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given), "in all three of our runs" when
+all three moved 0.5% or more with every 95% interval clear of zero, else with its qualifier and the count of runs clear of the
+noise; pointing different ways: the runs disagree; unjudged rows stay unjudged."""
 import json
 import sys
 import tempfile
@@ -27,11 +28,24 @@ def main():
     fell = r(300, -150, -200, -100)
     assert C.verdict(P95, [fell] * 3) == "**GAIN in all three of our runs**", "a response time cut in all three is a GAIN (a minus that reads GAIN)"
     assert C.verdict(P95, [r(300, 30, 10, 50)] * 3) == "**LOSS in all three of our runs**", "a slower response in all three is a LOSS"
-    assert C.verdict(P95, [fell, fell, r(300, -20, -60, 5)]) == "EVEN, no difference beyond the noise (1 of 3 runs)", "one interval crosses zero"
-    assert C.verdict(P95, [r(300, -5, -40, 30), r(300, 8, -20, 36), r(300, -2, -30, 26)]) == "EVEN, no difference beyond the noise (all three runs)"
+    assert C.verdict(P95, [fell, fell, r(300, -20, -60, 5)]) == "**GAIN** (the same way in all three runs; 2 of 3 clear of the noise)", "one interval crosses zero: the word stands, with its count"
+    # the founder's own case (24 October): a latency row at -3.0%, -2.3% and -3.7%, one interval across zero, is a GAIN
+    assert C.verdict(P95, [r(100, -3.0, -3.6, -2.5), r(100, -2.3, -5.4, 0.8), r(100, -3.7, -4.3, -3.1)]) == \
+        "**GAIN** (the same way in all three runs; 2 of 3 clear of the noise)"
+    assert C.verdict(P95, [r(300, -5, -40, 30), r(300, 8, -20, 36), r(300, -2, -30, 26)]) == "**the runs disagree**", "runs past the floor pointing different ways"
+    assert C.verdict(P95, [r(100, 0.3, -1, 1.6), r(100, -0.4, -2, 1.2), r(100, 0.2, 0.1, 0.3)]) == \
+        "EVEN, under the floor (every run under 0.5%; the largest 0.40%)", "every run under 0.5%: EVEN, whatever the intervals"
+    assert C.verdict(P95, [r(100, 2.0, -1, 5), r(100, -2.0, -5, 1), r(100, 2.0, -1, 5)]) == "**the runs disagree**", "+2% and -2%"
+    assert C.verdict(P95, [r(100, 2.0, -1, 5), r(100, 0.2, -1, 1.4), r(100, 1.0, 0.5, 1.5)]) == \
+        "**LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 1 of 3 clear of the noise)"
     assert C.verdict(P95, [fell, fell, r(300, 40, 10, 70)]) == "**the runs disagree**", "one run flips the sign, clear of the noise"
     assert C.verdict(P95, [fell, r(300, -20, -60, 5), r(300, 40, 10, 70)]) == "**the runs disagree**", "a disagreement outranks a noisy run"
-    assert C.verdict(P95, [fell, fell, r(300, 20, -5, 45)]) == "EVEN, no difference beyond the noise (1 of 3 runs)", "a flipped sign inside the noise is noise"
+    assert C.verdict(P95, [fell, fell, r(300, 20, -5, 45)]) == "**the runs disagree**", "a run past the floor the other way disagrees, inside the noise or not"
+    assert C.verdict(P95, [fell, fell, r(300, 1, -5, 7)]) == "**GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 2 of 3 clear of the noise)", \
+        "a run under the floor does not decide the direction"
+    assert C.verdict("energy (Wh)", [r(100.0, 1.0, -0.5, 2.5)] * 3) == "**power given** (the same way in all three runs; 0 of 3 clear of the noise)", "energy +1% in all three: power given"
+    assert C.verdict("failed requests (%)", [r(0.0, 0.0, 0.0, 0.0), r(0.0, 0.0, 0.0, 0.0), r(0.0, 1.0, -1.0, 3.0)]) == \
+        "**LOSS** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise)", "failed requests up from none in one run: LOSS"
     assert C.verdict(P95, [r(300, 1e-7, 5e-8, 2e-7)] * 3) == "EVEN, the same", "a change under one part in a million"
     assert C.verdict("CPU used (cores), mean", [r(2.0, -0.5, -0.7, -0.3)] * 3) == "shown, not judged"
     # one pair a run (the 24-hour robustness run on rented machines): no interval, read by sign alone, never a confirmation
@@ -75,8 +89,8 @@ def main():
         assert C.rig(old) == "pulled by each node at each start", C.rig(old)
         assert C.rig(new) == "pre-pulled on every worker before the arm (deploy/kind/prepull.yaml)", C.rig(new)
         assert C.rig(Path(t) / "none") == "not recorded"
-    print("PASS  A/B/C three-run table rule: GAIN or LOSS in all three of our runs only with the same sign and every interval clear of zero in all three, "
-          "the word by what the gauge is for (a resource spent that rose: power given); an interval over zero reads EVEN; clear runs pointing different ways read as a disagreement")
+    print("PASS  A/B/C three-run table rule (24 October): EVEN only under the 0.5% floor in every run or the same; from 0.5% up the word by what the gauge "
+          "is for, in all three of our runs or with its count of runs clear of the noise; runs past the floor pointing different ways disagree")
 
 
 if __name__ == "__main__":

@@ -8,8 +8,9 @@
 times as separate GitHub runs on the same frozen engine (tools/run_swarm.py). PyBullet is deterministic for a fixed step,
 so the runs must give the same numbers to within one part in a thousand (PyBullet's floating point differs by that much
 from one GitHub machine to the next; amendment 1 of the preregistration, made after the first A, B, C were seen and said
-so): a gauge reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the gauge is
-for, never by its sign; energy is a resource spent, so a rise reads power given), EVEN when the change is under one part in a
+so): a gauge reads GAIN or LOSS in all three of our runs when all three runs moved 0.5% or more with the same sign (judged by what the gauge is
+for, never by its sign; energy is a resource spent, so a rise reads power given), EVEN, under the floor, when every run's change is under 0.5% (24 October 2026: a change
+of 0.5% or more is a change), EVEN, the same, when the change is under one part in a
 million, and "the runs differ" when they do not reproduce. A cell whose paired physics trial left the cruise native is listed
 as "nothing for Omni to move"; a cell with a collision in either arm is void and listed as such. From omni-v12's runs on
 (amendment 2, written before them) a cell is void only when native itself collides, and a collision with Omni-Compass on top
@@ -26,7 +27,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, judge_runs, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 from tools.run_swarm import GAUGES, TRIAL_OVERRIDE, with_collisions
 
 SAME_REL = 1e-6
@@ -75,7 +76,7 @@ def verdict(recs, k, direction):
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return in_all_three(signs == {-1}, aim(direction, k))
+    return judge_runs(ch, None, aim(direction, k))
 
 
 def engine(run):
@@ -110,7 +111,7 @@ def main(argv=None):
          "charged over the whole fleet window. Three separate GitHub runs on the same frozen engine: PyBullet reproduces to about one "
          "part in a thousand across GitHub's machines (disclosed in the preregistration's amendment 1, made after the first three runs "
          "were seen), so a gauge reads **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its "
-         "sign; energy is a resource spent, so a rise reads **power given**) when all three runs reproduce to that tolerance and give the same sign, **EVEN, the same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster "
+         "sign; energy is a resource spent, so a rise reads **power given**) when all three runs reproduce to that tolerance and moved 0.5% or more with the same sign, **EVEN, under the floor** when every run's change is under 0.5% (the founder's floor, a change of 0.5% or more always a change), **EVEN, the same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster "
          "mission no cheaper, or not inside the safe tracking error, is listed as nothing for Omni to move; a cell with a "
          "collision in either arm is void. Every row is shown, LOSS included.", "",
          "| Run | GitHub run | Commit | Engine | Cells in the run |", "|---|---|---|---|---:|"]

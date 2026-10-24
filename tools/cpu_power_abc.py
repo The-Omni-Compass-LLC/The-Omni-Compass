@@ -20,7 +20,7 @@ except ImportError:
     import pathlib as _p; sys.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
+from tools.readings import THREE_RUN_RULE, plain, with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
 from tools.run_cpu_power import GAUGES, SAME_REL, paired  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 
@@ -80,10 +80,7 @@ def main(argv=None):
          "The machine as it runs is native: the kernel's frequency governor as shipped under the operator's ceiling, the top clock. Omni is "
          "the compass law on the ceiling through the kernel's own interface inside [half the top, the top], holding the service's own request "
          "latency at 40% of the 20 ms line, every notch down allowed only by a paired trial on the machine itself under the declared objective "
-         "(`docs/CPU_POWER_PREREGISTRATION.md`). Each run holds its paired repetitions; the paired difference's 95% interval within a run, and "
-         "the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a "
-         "run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different "
-         "ways read **the runs disagree**. Failed requests: any rise in any run reads **LOSS in at least one of our runs**. Energy is the processor's own meter (RAPL, class P, "
+         "(`docs/CPU_POWER_PREREGISTRATION.md`). Each run holds its paired repetitions; the paired difference's 95% interval within a run says whether that run is clear of the noise. " + THREE_RUN_RULE + " Failed requests: any rise in any run reads **LOSS in at least one of our runs**. Energy is the processor's own meter (RAPL, class P, "
          "the processor's calibrated counter); the whole machine at the wall where a plug was fitted. The tuning workload is shown and not "
          "counted. Every row is shown, LOSS included.", "",
          "| Run | Run folder | Commit | Engine | Machine | Workloads |", "|---|---|---|---|---|---:|"]
@@ -124,7 +121,7 @@ def main(argv=None):
                 tally.add(v, dr, k)
             nat = fmt(rs[0]["native"]) if rs[0] else "n/a"; om = fmt(rs[0]["omni"]) if rs[0] else "n/a"
             L.append(f"| {label} | {nat} | {om} | " + " | ".join(cell(r, k) for r in rs) + f" | {v} |")
-            out["workloads"][wl][k] = {"reading": v.strip("*"), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
+            out["workloads"][wl][k] = {"reading": plain(v), "aim": aim_of(dr, k), "runs": [None if r is None else {"native": r["native"], "omni": r["omni"], "diff": r["diff"], "ci95": r["ci95"]} for r in rs]}
         hb = all(all(x["omni"].get("handed_back") for x in r["reps"]) for r in recs)
         L += ["", f"The ceiling handed back to the operator's and read back at the end of every omni arm in every run: {'yes' if hb else '**NO**'}."]
         vr = {t: [x["omni"]["verdict"] for x in r["reps"] if x["omni"].get("verdict")] for t, r in zip("ABC", recs)}

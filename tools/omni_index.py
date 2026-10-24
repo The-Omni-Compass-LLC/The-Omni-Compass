@@ -45,8 +45,9 @@ LIVE = ROOT / "results" / "live"
 # its reading by rule. (category, test, file, {measure: row key}, work). work: "equal" (the same fixed-rate work was sent
 # to both arms and none failed: ratio 1), "capacity" (the capacity row of that table), or None (not taken). A measure
 # counts only as its reading allows: GAIN, LOSS or power given in all three of our runs gives the geometric mean of
-# the three runs' ratios; EVEN (no difference beyond the noise, or the same) or the runs disagree gives exactly 1 (nothing
-# is claimed either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
+# the three runs' ratios; anything else (a word with its qualifier: moved 0.5% or more but not clear of the noise in every
+# run, the rule of 24 October 2026; EVEN, under the floor or the same; the runs disagree) gives exactly 1 (nothing is claimed
+# either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
 P95 = "response time (ms), 95th percentile"
 MEAN = "response time (ms), mean"
 NODES = "worker nodes in service, mean"
@@ -281,8 +282,9 @@ def main():
          f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pw(head, index_word(head, head_s))}, "
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
-         "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
-         "nothing inside the noise is claimed either way. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
+         "runs counts, as the geometric mean of the runs' ratios; anything else counts as exactly 1 (EVEN, the runs disagree, and a "
+         "word with its qualifier, a change of 0.5% or more that the founder's rule of 24 October 2026 shows as its word but that was not "
+         "clear of the noise in every run), so nothing inside the noise is claimed either way. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
          "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v18 runs land, Azure and the card as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. Each table names the engine it ran on.", "",
@@ -329,7 +331,10 @@ def main():
             if rd.startswith("the same fixed-rate work"):
                 return "EVEN (equal by design)"
             c = classify(rd, "spent" if k in ("machines", "energy") else "higher" if k == "work" else "lower")
-            return {"same": "EVEN, the same", "noise": "EVEN, inside the noise", "disagree": "the runs disagree (counted as 1)"}.get(c, rd)
+            if c in ("gain", "loss", "given"):
+                return f"{rd} (counted as 1)"
+            return {"same": rd if rd.startswith("EVEN, under the floor") else "EVEN, the same", "noise": "EVEN, inside the noise",
+                    "disagree": "the runs disagree (counted as 1)"}.get(c, rd)
         ix = "" if t["index_pct"] is None else with_word(1 + t['index_pct'] / 100, index_word(1 + t['index_pct'] / 100, None if t['service_pct'] is None else 1 + t['service_pct'] / 100))
         sx = "not taken" if t["service_pct"] is None else with_word(1 + t['service_pct'] / 100, index_word(1 + t['service_pct'] / 100, 1 + t['service_pct'] / 100))
         L.append(f"| {t['category']} | {t['test']} | **{ix}** | {sx} | {cell('work')} | {cell('speed')} | {cell('machines')} | "

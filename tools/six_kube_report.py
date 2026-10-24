@@ -15,8 +15,9 @@ Two kinds of rows, kept apart:
                energy from the declared power model; on AKS the bill from Azure's own count of machines)
   the organism the simulated stacks around it (evidence S, models): work, energy, time over the line
 
-Each organism's line names which gauges read GAIN, LOSS or power given against native, by any amount, and which read
-EVEN because they are inside the noise (the interval crosses zero). The word is decided by what the gauge is for, never by
+Each organism's line names which gauges read GAIN, LOSS or power given against native, and which read EVEN, by the one
+rule (tools/readings.py judge_one, the founder's order of 24 October 2026): a change under 0.5% is EVEN, under the floor; one
+of 0.5% or more reads its word, marked "not clear of the noise" where its interval crosses zero. The word is decided by what the gauge is for, never by
 the sign of its number (tools/readings.py, the founder's order of 13 October): the organism's work and work per energy are
 work done; response times, time over the line and failed requests are time waited, missed or failed; replicas, pods,
 machines, energy and the bill are resources spent, so a rise reads power given. CPU and host load are shown, not judged.
@@ -45,7 +46,7 @@ from tools.live_reps import arm_rep, arm_gauges, T95, LABEL, NEUTRAL, SAME_REL  
 from tools.run_hil import NAMES, REALMS  # noqa: E402
 from tools.run_realms_v5 import SPINE  # noqa: E402  (the seventh organism, listed first)
 from realms.harness import STACK, TOWER, organism_name  # noqa: E402
-from tools.readings import word as gel_word, aim as gel_aim, receipt_key, WORK_PER  # noqa: E402  (the words every table uses)
+from tools.readings import word as gel_word, aim as gel_aim, receipt_key, WORK_PER, judge_one, EVEN_FLOOR, SIZE_FLOOR  # noqa: E402  (the words every table uses)
 
 ORDER = [SPINE] + list(REALMS) + [TOWER, STACK]      # the spine first (16 October); a report with the spine in it crashed without it
 OMNI = ("compass", "omni")
@@ -152,6 +153,38 @@ def paired(runs_o, a, k):
             "gain": w == "GAIN", "word": w, "lower": bool(m < 0), "neutral": k in NEUTRAL, "same": bool(same)}
 
 
+def row_size(v) -> float:
+    """A row's change as a share of native (±inf where native is zero and the arm moved)."""
+    if abs(v["native"]) > 1e-12:
+        return v["diff"] / abs(v["native"])
+    return 0.0 if v["diff"] == 0 else math.copysign(math.inf, v["diff"])
+
+
+def row_reading(v) -> str:
+    """A judged row's reading by the one rule (tools/readings.py judge_one): under 0.5% EVEN, under the floor; from 0.5% up its
+    word, "(not clear of the noise)" beside it where its interval crosses zero (or a single repetition gives none)."""
+    size = row_size(v)
+    if abs(size) < SIZE_FLOOR:
+        return f"{EVEN_FLOOR} ({'cut' if v['diff'] < 0 else 'up'} {100 * abs(size):.2f}%)"
+    sure = v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
+    return v["word"] if sure else f"{v['word']} (not clear of the noise)"
+
+
+def organism_line(judged) -> str:
+    """The organism's line: the gauges that read GAIN, LOSS and power given (those not clear of the noise marked so), and the
+    count that read EVEN, under the 0.5% floor."""
+    by = {w: [] for w in ("GAIN", "LOSS", "power given")}
+    even = 0
+    for k, v in judged.items():
+        if abs(row_size(v)) < SIZE_FLOOR:
+            even += 1
+            continue
+        sure = v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
+        by.setdefault(v["word"], []).append(LABEL.get(k, k) + ("" if sure else ", not clear of the noise"))
+    return (", ".join(f"{w} on {len(xs)}" + (f" ({'; '.join(xs)})" if xs else "") for w, xs in by.items())
+            + f", EVEN (under the 0.5% floor) on {even}")
+
+
 def main(root, *more, out=None, reps=None):
     root = Path(root)
     runs = collect(root, *more)
@@ -174,7 +207,8 @@ def main(root, *more, out=None, reps=None):
          "`docs/HOW_TO_READ_THE_RESULTS.md`): response times, time over the line and failed requests are time waited, missed or "
          "failed, so a fall is GAIN; the organism's work and work per energy are work done, so a rise is GAIN; pods started, "
          "replicas, machines, energy and the bill are resources spent, so a fall is a cut, a GAIN, and a rise is **power given**, "
-         "never a loss. A change whose interval crosses zero reads EVEN, inside the noise. The organism must keep the window's clock: "
+         "never a loss. A change under 0.5% reads EVEN, under the floor; one of 0.5% or more reads its word, with \"(not clear of the "
+         "noise)\" beside it where its interval crosses zero (the founder's order of 24 October 2026). The organism must keep the window's clock: "
          "the row \"organism behind its window\" says how long after the window its last step ended (0 is on the clock), and a "
          "repetition where either arm ended more than 5% of the window late is marked OFF THE CLOCK in the organism's line, "
          "because its last steps saw a cluster whose load schedule had already ended.", "",
@@ -210,10 +244,7 @@ def main(root, *more, out=None, reps=None):
         off = sorted({r for a in ("native", arm) for r, g in runs[o][a].items()
                       if r in pairs and g.get("_window_s") and g.get(BEHIND, 0.0) > OFF_CLOCK_SHARE * g["_window_s"]})
         worst = max((g.get(BEHIND, 0.0) for a in ("native", arm) for r, g in runs[o][a].items() if r in pairs), default=0.0)
-        by = {w: [LABEL.get(k, k) for k, v in judged.items() if sure(v) and v["word"] == w] for w in ("GAIN", "LOSS", "power given")}
-        noise = [LABEL.get(k, k) for k, v in judged.items() if not sure(v)]
-        verdict = (", ".join(f"{w} on {len(xs)}" + (f" ({'; '.join(xs)})" if xs else "") for w, xs in by.items())
-                   + f", EVEN (inside the noise) on {len(noise)}") if n >= 2 else "ONE REPETITION"
+        verdict = organism_line(judged) if n >= 2 else "ONE REPETITION"
         if not restored:
             verdict += "; INVALID: a simulated knob was not handed back"
         if off:
@@ -233,8 +264,7 @@ def main(root, *more, out=None, reps=None):
             elif v["same"]:
                 rd = "EVEN, the same" if v["diff"] == 0.0 else "EVEN, the same (under one part in a million)"
             else:
-                sure = v["n"] > 1 and (v["lo"] > 0 or v["hi"] < 0)
-                rd = v["word"] if sure else f"EVEN, inside the noise ({'cut' if v['diff'] < 0 else 'up'})"
+                rd = row_reading(v)
             L.append(f"| {LABEL.get(k, k)} | {v['native']:.4g} | {v['omni']:.4g} | {ch} | {ci} | {rd} |")
         L.append("")
     missing = [o for o in ORDER if not any(organism_name(k.split("@")[0]) == o for k in runs)]

@@ -7,7 +7,10 @@
 
 Primary comparison: omni_k8s_throughput vs k8s_ref_70. Primary metric: energy_kwh.
 Secondary metrics are tested with a paired sign-flip permutation test (two-sided, 10,000 permutations per test,
-seeded) and Holm-Bonferroni adjusted across all secondary metrics and both held-out seeds together.
+seeded) and Holm-Bonferroni adjusted across all secondary metrics and both held-out seeds together. Each secondary reads
+by the one rule (tools/readings.py judge_one, the founder's order of 24 October 2026): a mean change under 0.5% of the base
+arm's mean is EVEN, under the floor; from 0.5% up the word by the metric's aim, with "(not clear of the noise)" beside it
+where the Holm-adjusted p is 0.05 or more.
 """
 import csv, json, sys
 from pathlib import Path
@@ -15,7 +18,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.readings import EVEN_NOISE, word, LOWER as AIM_LOWER, HIGHER as AIM_HIGHER, SPENT  # noqa: E402
+from tools.readings import judge_one, word, LOWER as AIM_LOWER, HIGHER as AIM_HIGHER, SPENT  # noqa: E402
 PRIMARY = "energy_kwh"
 SECONDARY = [("time_healthy", False), ("recovery_minutes", True), ("recovered", False), ("sla_violation_physical", True),
              ("violation_backlog", True), ("violation_power", True), ("violation_heat", True), ("availability", False),
@@ -29,6 +32,13 @@ def diffs(sd, metric):
     a = {r["scenario_id"]: float(r[metric]) for r in rows if r["arm"] == BASE}
     b = {r["scenario_id"]: float(r[metric]) for r in rows if r["arm"] == CAND}
     return np.array([b[k] - a[k] for k in sorted(a)])
+
+
+def base_mean(sd, metric):
+    """The base arm's mean of the metric on the seed, the yardstick a change is sized against."""
+    rows = list(csv.DictReader(open(ROOT / "results" / f"heldout_seed_{sd}" / "RUNS.csv")))
+    v = [float(r[metric]) for r in rows if r["arm"] == BASE]
+    return sum(v) / len(v)
 
 
 def perm_p(d, rng):
@@ -51,14 +61,17 @@ def main(out=ROOT / "results" / "MULTIPLICITY.json"):
     for sd in seeds:
         for m, lower in SECONDARY:
             d = diffs(sd, m)
+            b = base_mean(sd, m)
             tests.append({"seed": sd, "metric": m, "mean_delta": float(d.mean()), "p": perm_p(d, rng),
-                          "direction": word(d.mean() < 0, AIM_LOWER if lower else AIM_HIGHER) if d.mean() != 0 else "none"})
+                          "direction": word(d.mean() < 0, AIM_LOWER if lower else AIM_HIGHER) if d.mean() != 0 else "none",
+                          "relative": float(d.mean() / abs(b)) if b else (0.0 if d.mean() == 0 else float(np.sign(d.mean())) * float("inf")),
+                          "aim": AIM_LOWER if lower else AIM_HIGHER})
     order = sorted(range(len(tests)), key=lambda i: tests[i]["p"])
     k = len(tests); running = 0.0
     for rank, i in enumerate(order):
         running = max(running, min(1.0, (k - rank) * tests[i]["p"]))
         tests[i]["p_holm"] = running
-        tests[i]["verdict"] = tests[i]["direction"] if running < 0.05 else EVEN_NOISE
+        tests[i]["verdict"] = judge_one(tests[i]["relative"], running < 0.05, tests[i].pop("aim"))
     res["secondary"] = tests
     Path(out).write_text(json.dumps(res, indent=2))
     for sd, r in res["primary"].items():

@@ -5,9 +5,10 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for CityLearn (docs/OMNI_V1.md): the same districts run three times as separate GitHub runs on the
 same frozen engine (tools/run_citylearn.py). CityLearn is a deterministic simulator, so the three runs must give the same
-numbers: a row reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the score
+numbers: a row reads GAIN or LOSS in all three of our runs when all three runs moved 0.5% or more with the same sign (judged by what the score
 is for, never by its sign: CITYLEARN_AIMS; the electricity bought, the bill and the carbon are resources spent, so a fall is a
-cut, a GAIN, and a rise is power given), EVEN when the change is under one part in a million, and "the runs differ" when they
+cut, a GAIN, and a rise is power given), EVEN, under the floor, when every run's change is under 0.5% (24 October 2026: a change
+of 0.5% or more is a change), EVEN, the same, when the change is under one part in a million, and "the runs differ" when they
 do not reproduce each other, which is a finding about the simulator or the harness and is said so. A district with no electric battery gets nothing from Omni (the runner moves
 only `electrical_storage` commands; a water tank stays native), so it is listed as "nothing for Omni to move", and any
 native/omni difference in it is CityLearn's own run-to-run variation, never an Omni result. A district CityLearn cannot
@@ -24,7 +25,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, EVEN_SAME, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, judge_runs, EVEN_SAME, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
 from tools.run_citylearn import KPIS, WORDS as KPI_NAMES
 
 # What each CityLearn score is for (tools/readings.py, one key for every gauge). CityLearn aims every score lower. The
@@ -84,7 +85,7 @@ def verdict(recs, k):
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return in_all_three(signs == {-1}, aim_of(k))
+    return judge_runs(ch, None, aim_of(k))
 
 
 def engine(run):
@@ -116,7 +117,8 @@ def main(argv=None):
          "same controller with the compass law on top of its electric battery commands only (`tools/run_citylearn.py`). The "
          "same districts ran three times as separate GitHub runs on the same frozen engine. Because the simulator is "
          "deterministic, the runs must reproduce each other: a score reads **GAIN** or **LOSS in all three of our runs** when all "
-         "three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill, "
+         "three runs moved 0.5% or more with the same sign (under 0.5% in every run it reads **EVEN, under the floor**: the "
+         "founder's floor, a change of 0.5% or more always a change), judged by what the score is for and never by its sign: the electricity bought, the bill, "
          "the carbon, the peaks, the swings and the unevenness are the power the district draws and holds and the wear of moving it, "
          "so a fall is a cut, a GAIN, and a rise is **power given**; a rise in the energy not served or the time uncomfortable (the "
          "occupants' misses) is a LOSS. **EVEN, the same** when the change is under one part "

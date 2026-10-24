@@ -369,7 +369,8 @@ def enforced():
     from tools.gpu_reps import verdict
     assert verdict("energy, GPU (J)", 5.0, 1.0, 10) == "power given, clear of the noise", "a card's energy up is power given, never a LOSS"
     assert verdict("energy, GPU (J)", -5.0, 1.0, 10) == "GAIN, clear of the noise", "energy cut is a GAIN"
-    assert verdict("response time, 95th percentile (ms)", 5.0, 9.0, 10) == "EVEN, no difference beyond the noise"
+    assert verdict("response time, 95th percentile (ms)", 5.0, 9.0, 10) == "LOSS, not clear of the noise", "a change past the floor inside the noise keeps its word (24 October)"
+    assert verdict("response time, 95th percentile (ms)", 0.2, 9.0, 10, 100.0) == "EVEN, under the floor (0.20%, under 0.5%)", "under 0.5% of the base: EVEN"
     assert verdict("work per energy (served requests per kJ)", 5.0, 1.0, 10) == "GAIN, clear of the noise"
 
 
