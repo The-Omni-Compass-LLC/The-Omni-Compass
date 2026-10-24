@@ -29,28 +29,28 @@ What the composition is, and is not. No run here stacked the layers: each factor
 | Layer | Tests | Gauge | By the index's rule | With every interval carried | Word (carried) |
 |---|---:|---|---|---|---|
 | 1. the card (the chip), class P | 1 | work (more) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0000 (+0.00%; +0.00% to +0.00%) | EVEN |
-|  |  | speed (the 95th percentile response, lower) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.6309 (-36.9%; -40.6% to -33.0%) | LOSS |
-|  |  | energy (less) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0359 (+3.6%; +2.8% to +4.4%) | GAIN |
+|  |  | speed (the 95th percentile response, lower) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9981 (-0.2%; -1.1% to +0.7%) | EVEN |
+|  |  | energy (less) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0024 (+0.2%; -1.0% to +1.5%) | EVEN |
 | 3. the cluster (Kubernetes, its add-ons, its governors), class L | 22 | work (more) | ×1.2447 (+24.5%; +21.4% to +27.6%) | ×1.2447 (+24.5%; +21.4% to +27.6%) | GAIN |
 |  |  | speed (the 95th percentile response, lower) | ×1.4330 (+43.3%; +40.1% to +46.6%) | ×1.4375 (+43.8%; +40.5% to +47.1%) | GAIN |
 |  |  | machines (fewer) | ×1.0668 (+6.7%; +5.9% to +7.4%) | ×1.0668 (+6.7%; +5.9% to +7.4%) | GAIN |
 |  |  | energy (less) | ×1.0428 (+4.3%; +3.8% to +4.8%) | ×1.0433 (+4.3%; +3.8% to +4.8%) | GAIN |
 | 4. the services on the cluster, class L | 17 | work (more) | ×1.0013 (+0.1%; +0.1% to +0.2%) | ×1.0039 (+0.4%; -0.4% to +1.2%) | EVEN |
-|  |  | speed (the 95th percentile response, lower) | ×0.9981 (-0.2%; -0.8% to +0.4%) | ×0.9832 (-1.7%; -4.4% to +1.1%) | EVEN |
+|  |  | speed (the 95th percentile response, lower) | ×0.9981 (-0.2%; -0.8% to +0.4%) | ×0.9832 (-1.7%; -4.4% to +1.1%) | LOSS |
 |  |  | machines (fewer) | ×1.0190 (+1.9%; +1.6% to +2.2%) | ×1.0174 (+1.7%; +1.3% to +2.2%) | GAIN |
 |  |  | energy (less) | ×0.9901 (-1.0%; -1.8% to -0.2%) | ×0.9849 (-1.5%; -2.6% to -0.4%) | power given |
-| 5. the cloud (Azure, the bill metered), class L | 3 | speed (the 95th percentile response, lower) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0440 (+4.4%; -21.5% to +38.8%) | EVEN |
-|  |  | machines (fewer) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9761 (-2.4%; -10.0% to +5.8%) | EVEN |
-|  |  | the bill (smaller) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9918 (-0.8%; -18.8% to +21.2%) | EVEN |
+| 5. the cloud (Azure, the bill metered), class L | 3 | speed (the 95th percentile response, lower) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×1.0440 (+4.4%; -21.5% to +38.8%) | GAIN |
+|  |  | machines (fewer) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9761 (-2.4%; -10.0% to +5.8%) | power given |
+|  |  | the bill (smaller) | ×1.0000 (+0.00%; +0.00% to +0.00%) | ×0.9918 (-0.8%; -18.8% to +21.2%) | power given |
 | 2. the machine (the kernel, bare metal, Kepler) | 0 | every gauge | not yet run (register row 79): enters as exactly 1 | not yet run | not measured |
 
-The card's primary gauge, work per energy (served requests per kJ): ×1.0359 (+3.6%; +2.8% to +4.4%) in its one run, native 50.79 → 52.62, GAIN by the one key (work bought with each unit of energy rose); the same run read the 95th percentile response +58.5% (LOSS) and the energy drawn -3.5% (GAIN). That controller was replaced (the orders of 12 October: every earlier GPU result is obsolete); the card's omni-v12 run on Lambda replaces this row the day it lands. It is carried here because it is the only real-meter measurement of the chip layer, and the totals are given with and without it.
+The card's primary gauge, work per energy (served requests per kJ): ×1.0021 (+0.2%; -1.0% to +1.4%) in its one run, native 40.48 → 40.56, EVEN by the one key; the same run read the 95th percentile response +0.2% (EVEN) and the energy drawn -0.2% (EVEN). It is omni-v18's card governor at the factory tune, one run (B and C not yet run): the card's own setting already holds both knobs at their top, so the governor wrote nothing (at its limit on native). It is carried here because it is the only real-meter measurement of the chip layer, and the totals are given with and without it.
 
 ### Every test behind the layers
 
 **1. the card (the chip), class P**
 
-- NVIDIA A10, the card's own meter, Omni-Compass writing the power limit, 10 paired repetitions, one run (2 October, the replaced controller) (the card controller of commit c908054 (2 October), replaced since; `results/gpu/run-20261002T082232Z/GPU_REPS.md`): work: ×1.0000 (+0.00%; +0.00% to +0.00%), one run: the interval includes zero; speed: ×0.6309 (-36.9%; -40.6% to -33.0%), one run: clear of the noise; energy: ×1.0359 (+3.6%; +2.8% to +4.4%), one run: clear of the noise
+- NVIDIA A100 (SXM4, 40 GB) on Lambda, the card's own meter, Omni-Compass on the power limit and the clock ceiling, 10 paired repetitions, one run (24 October; at its limit on native: the governor wrote nothing) (omni-v18 (the card governor at commit e3b05dc, the branch gpu-omni-v18); `results/gpu/run-20261024T091235Z/GPU_REPS.md`): work: ×1.0000 (+0.00%; +0.00% to +0.00%), one run: the interval includes zero; speed: ×0.9981 (-0.2%; -1.1% to +0.7%), one run: the interval includes zero; energy: ×1.0024 (+0.2%; -1.0% to +1.5%), one run: the interval includes zero
 
 **3. the cluster (Kubernetes, its add-ons, its governors), class L**
 
@@ -114,11 +114,11 @@ The card's primary gauge, work per energy (served requests per kJ): ×1.0359 (+3
 | with the card's one run | by the index's rule | the bill (smaller) | ×1.0000 | +0.00% (+0.00% to +0.00%) | EVEN |
 | with the card's one run | by the index's rule | **the index over the gauges** | **×1.1488** | **+14.9%** (gauges independent +14.0% to +15.7%; gauges correlated +13.4% to +16.4%) | GAIN |
 | with the card's one run | every interval carried | work (more) | ×1.2495 | +24.9% (+21.7% to +28.3%) | GAIN |
-| with the card's one run | every interval carried | speed (the 95th percentile response, lower) | ×0.9308 | -6.9% (-30.6% to +24.9%) | EVEN |
-| with the card's one run | every interval carried | machines (fewer) | ×1.0594 | +5.9% (-2.3% to +14.9%) | EVEN |
-| with the card's one run | every interval carried | energy (less) | ×1.0645 | +6.4% (+4.9% to +8.0%) | GAIN |
-| with the card's one run | every interval carried | the bill (smaller) | ×0.9918 | -0.8% (-18.8% to +21.2%) | EVEN |
-| with the card's one run | every interval carried | **the index over the gauges** | **×1.0540** | **+5.4%** (gauges independent -2.0% to +13.4%; gauges correlated -6.8% to +19.2%) | EVEN |
+| with the card's one run | every interval carried | speed (the 95th percentile response, lower) | ×1.4727 | +47.3% (+10.5% to +96.3%) | GAIN |
+| with the card's one run | every interval carried | machines (fewer) | ×1.0594 | +5.9% (-2.3% to +14.9%) | GAIN |
+| with the card's one run | every interval carried | energy (less) | ×1.0300 | +3.0% (+1.3% to +4.8%) | GAIN |
+| with the card's one run | every interval carried | the bill (smaller) | ×0.9918 | -0.8% (-18.8% to +21.2%) | power given |
+| with the card's one run | every interval carried | **the index over the gauges** | **×1.1477** | **+14.8%** (gauges independent +6.8% to +23.4%; gauges correlated +1.5% to +29.7%) | GAIN |
 | without the card (the cluster, the services and the cloud) | by the index's rule | work (more) | ×1.2463 | +24.6% (+21.5% to +27.8%) | GAIN |
 | without the card (the cluster, the services and the cloud) | by the index's rule | speed (the 95th percentile response, lower) | ×1.4302 | +43.0% (+39.7% to +46.4%) | GAIN |
 | without the card (the cluster, the services and the cloud) | by the index's rule | machines (fewer) | ×1.0871 | +8.7% (+7.9% to +9.5%) | GAIN |
@@ -127,12 +127,12 @@ The card's primary gauge, work per energy (served requests per kJ): ×1.0359 (+3
 | without the card (the cluster, the services and the cloud) | by the index's rule | **the index over the gauges** | **×1.1488** | **+14.9%** (gauges independent +14.0% to +15.7%; gauges correlated +13.4% to +16.4%) | GAIN |
 | without the card (the cluster, the services and the cloud) | every interval carried | work (more) | ×1.2495 | +24.9% (+21.7% to +28.3%) | GAIN |
 | without the card (the cluster, the services and the cloud) | every interval carried | speed (the 95th percentile response, lower) | ×1.4754 | +47.5% (+10.7% to +96.7%) | GAIN |
-| without the card (the cluster, the services and the cloud) | every interval carried | machines (fewer) | ×1.0594 | +5.9% (-2.3% to +14.9%) | EVEN |
+| without the card (the cluster, the services and the cloud) | every interval carried | machines (fewer) | ×1.0594 | +5.9% (-2.3% to +14.9%) | GAIN |
 | without the card (the cluster, the services and the cloud) | every interval carried | energy (less) | ×1.0276 | +2.8% (+1.5% to +4.0%) | GAIN |
-| without the card (the cluster, the services and the cloud) | every interval carried | the bill (smaller) | ×0.9918 | -0.8% (-18.8% to +21.2%) | EVEN |
+| without the card (the cluster, the services and the cloud) | every interval carried | the bill (smaller) | ×0.9918 | -0.8% (-18.8% to +21.2%) | power given |
 | without the card (the cluster, the services and the cloud) | every interval carried | **the index over the gauges** | **×1.1476** | **+14.8%** (gauges independent +6.8% to +23.3%; gauges correlated +1.6% to +29.6%) | GAIN |
 
-Read: the headline is the row **without the card, by the index's rule**: it counts only what held the same way in all three of our runs, on real machines (class L), and composes the cluster, the services on it and the cloud: **+14.9%** over the gauges, speed +43.0%, machines +8.7%, energy +3.3%, work +24.6%, the bill +0.00%. With every interval carried the same layers read **+14.8%** (gauges correlated: +1.6% to +29.6%); the cloud's wide one-run intervals (4 and 5 paired repetitions) are what widen it. With the card's one old run carried the chip's speed LOSS of that run pulls the index to **+5.4%** and its energy GAIN adds to the energy row; the card's omni-v12 run replaces that row.
+Read: the headline is the row **without the card, by the index's rule**: it counts only what held the same way in all three of our runs, on real machines (class L), and composes the cluster, the services on it and the cloud: **+14.9%** over the gauges, speed +43.0%, machines +8.7%, energy +3.3%, work +24.6%, the bill +0.00%. With every interval carried the same layers read **+14.8%** (gauges correlated: +1.6% to +29.6%); the cloud's wide one-run intervals (4 and 5 paired repetitions) are what widen it. With the card's one old run carried the chip's speed LOSS of that run pulls the index to **+14.8%** and its energy GAIN adds to the energy row; the card's omni-v12 run replaces that row.
 
 The cloud is the wire, and it has its own factor: the bill. On Azure's own autoscaler the bill read EVEN (×1.000 inside the noise, four paired repetitions on the compass law; the v1 fleet's steady set and burst EVEN too), so the cloud layer multiplies the total by 1 so far: the benefit measured is at the two ends and the layers between, and the cloud carries it without adding or taking. The omni-v12 Azure sets at the tune-down (the bill at native's work, `scripts/azure_queue.txt`) are the measurement of that factor; the bill row here changes the day their three-run tables land.
 
