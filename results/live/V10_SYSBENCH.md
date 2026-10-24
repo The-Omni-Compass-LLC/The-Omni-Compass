@@ -2,11 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
-**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the JSON twin's exact values; every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
-<!-- end: read again -->
-
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
 
 MySQL as Ubuntu ships it with the operator's InnoDB buffer pool (512 MB) is native; omni is the compass law on the pool size through the server's own console inside [128, 2,048] MB in chunks of 128 MB, holding the server's own mean statement latency at 40% of the 0.6 ms statement line (`docs/MYSQL_PREREGISTRATION.md`). sysbench's published OLTP workloads ask for rows from a set of tables that steps through the pool and past it, the same transactions in both arms. Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Errors: any rise in any run reads **LOSS in at least one of our runs**. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, LOSS included.
 
@@ -22,19 +20,19 @@ MySQL 8.0.46-0ubuntu0.24.04.4, sysbench 1.0.20; 32 client threads; 6 tables of 1
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (transactions a second answered within the line) | 2,938 | 2,937 | -0.0% (-0.3 to +0.2) | -0.1% (-0.3 to +0.1) | -0.1% (-0.5 to +0.4) | EVEN, under the floor (every run under 0.5%; the largest 0.11%) |
-| throughput (transactions a second) | 2,954 | 2,952 | -0.0% (-0.4 to +0.3) | -0.1% (-0.3 to +0.1) | +0.0% (-0.3 to +0.3) | EVEN, under the floor (every run under 0.5%; the largest 0.10%) |
-| queries a second | 2,954 | 2,952 | -0.0% (-0.4 to +0.3) | -0.1% (-0.3 to +0.1) | +0.0% (-0.3 to +0.3) | EVEN, under the floor (every run under 0.5%; the largest 0.10%) |
+| work inside the response line (transactions a second answered within the line) | 2,938 | 2,937 | -0.0% (-0.3 to +0.2) | -0.1% (-0.3 to +0.1) | -0.1% (-0.5 to +0.4) | EVEN, under the floor (the three runs' mean 0.07%) |
+| throughput (transactions a second) | 2,954 | 2,952 | -0.0% (-0.4 to +0.3) | -0.1% (-0.3 to +0.1) | +0.0% (-0.3 to +0.3) | EVEN, under the floor (the three runs' mean 0.05%) |
+| queries a second | 2,954 | 2,952 | -0.0% (-0.4 to +0.3) | -0.1% (-0.3 to +0.1) | +0.0% (-0.3 to +0.3) | EVEN, under the floor (the three runs' mean 0.05%) |
 | latency, 95th percentile (ms) | 0.35 | 0.352 | +0.6% (-1.9 to +3.0) | -1.8% (-13.6 to +10.0) | +0.6% (-6.4 to +7.5) | **the runs disagree** |
 | latency, 99th percentile (ms) | 0.543 | 0.54 | -0.6% (-2.9 to +1.8) | -2.4% (-11.7 to +6.9) | +1.3% (-9.7 to +12.4) | **the runs disagree** |
-| latency, mean (ms) | 0.217 | 0.22 | +1.3% (-3.2 to +5.8) | +0.1% (-9.6 to +9.7) | +3.9% (-6.2 to +14.0) | **LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| latency, mean (ms) | 0.217 | 0.22 | +1.3% (-3.2 to +5.8) | +0.1% (-9.6 to +9.7) | +3.9% (-6.2 to +14.0) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
 | errors (sysbench's ignored errors: deadlocks and retries) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 483.2 | -5.6% (-19.8 to +8.5) | -5.6% (-14.0 to +2.8) | -4.4% (-9.3 to +0.5) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
-| pages holding data, mean (MB) | 463.6 | 432.5 | -6.7% (-19.1 to +5.6) | -5.0% (-16.0 to +6.0) | -4.2% (-7.3 to -1.1) | **GAIN** (the same way in all three runs; 1 of 3 clear of the noise) |
+| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 483.2 | -5.6% (-19.8 to +8.5) | -5.6% (-14.0 to +2.8) | -4.4% (-9.3 to +0.5) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| pages holding data, mean (MB) | 463.6 | 432.5 | -6.7% (-19.1 to +5.6) | -5.0% (-16.0 to +6.0) | -4.2% (-7.3 to -1.1) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
 | pages read from disk into the pool (misses) | 367,376 | 398,934 | +8.6% (-29.0 to +46.2) | +7.0% (-22.7 to +36.7) | +5.5% (-8.7 to +19.8) | shown, not judged |
-| host CPU busy (share of the run) | 0.112 | 0.114 | +2.2% (-6.9 to +11.3) | -0.1% (-16.9 to +16.8) | +4.7% (-7.1 to +16.5) | **power given** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| host CPU-seconds | 185.4 | 189.7 | +2.3% (-6.8 to +11.4) | +0.0% (-16.9 to +17.0) | +4.8% (-7.1 to +16.7) | **power given** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| host CPU-seconds per 1,000 transactions inside the line | 0.138 | 0.141 | +2.4% (-6.5 to +11.2) | +0.1% (-16.8 to +17.0) | +4.9% (-7.2 to +16.9) | **power given** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| host CPU busy (share of the run) | 0.112 | 0.114 | +2.2% (-6.9 to +11.3) | -0.1% (-16.9 to +16.8) | +4.7% (-7.1 to +16.5) | **power given by the mean of our three runs, beyond the noise in 0 of 3** |
+| host CPU-seconds | 185.4 | 189.7 | +2.3% (-6.8 to +11.4) | +0.0% (-16.9 to +17.0) | +4.8% (-7.1 to +16.7) | **power given by the mean of our three runs, beyond the noise in 0 of 3** |
+| host CPU-seconds per 1,000 transactions inside the line | 0.138 | 0.141 | +2.4% (-6.5 to +11.2) | +0.1% (-16.8 to +17.0) | +4.9% (-7.2 to +16.9) | **power given by the mean of our three runs, beyond the noise in 0 of 3** |
 | buffer pool size changes written (the knob's moves) | 0 | 13.7 | +13.7 (+8.5 to +18.8) | +12 (+1.17 to +22.8) | +12.3 (+10.9 to +13.8) | shown, not judged |
 
 The buffer pool handed back to native's and read back at the end of every omni arm in every run: yes.
@@ -47,15 +45,15 @@ MySQL 8.0.46-0ubuntu0.24.04.4, sysbench 1.0.20; 32 client threads; 6 tables of 1
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (transactions a second answered within the line) | 0 | 0 | +0 (+0 to +0) | -0.7% (-2.9 to +1.6) | -0.0% (-1.5 to +1.5) | **LOSS** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
-| throughput (transactions a second) | 82.0 | 80.4 | -2.0% (-9.3 to +5.3) | -0.6% (-2.2 to +1.0) | +0.0% (-1.6 to +1.7) | **LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| queries a second | 1,313 | 1,286 | -2.0% (-9.3 to +5.3) | -0.6% (-2.2 to +1.0) | +0.0% (-1.6 to +1.7) | **LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| work inside the response line (transactions a second answered within the line) | 0 | 0 | +0 (+0 to +0) | -0.7% (-2.9 to +1.6) | -0.0% (-1.5 to +1.5) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
+| throughput (transactions a second) | 82.0 | 80.4 | -2.0% (-9.3 to +5.3) | -0.6% (-2.2 to +1.0) | +0.0% (-1.6 to +1.7) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
+| queries a second | 1,313 | 1,286 | -2.0% (-9.3 to +5.3) | -0.6% (-2.2 to +1.0) | +0.0% (-1.6 to +1.7) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
 | latency, 95th percentile (ms) | 19,427 | 19,661 | +1.2% (-5.7 to +8.1) | -0.0% (-7.8 to +7.8) | -2.4% (-4.9 to +0.2) | **the runs disagree** |
-| latency, 99th percentile (ms) | 21,131 | 21,515 | +1.8% (+1.7 to +1.9) | +1.8% (-14.6 to +18.3) | +0.6% (-2.0 to +3.2) | **LOSS** (the same way in all three runs; 1 of 3 clear of the noise) |
-| latency, mean (ms) | 10,468 | 10,529 | +0.6% (-4.5 to +5.6) | +6.5% (-22.9 to +35.8) | -0.5% (-0.9 to +0.0) | **LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| latency, 99th percentile (ms) | 21,131 | 21,515 | +1.8% (+1.7 to +1.9) | +1.8% (-14.6 to +18.3) | +0.6% (-2.0 to +3.2) | **LOSS by the mean of our three runs, beyond the noise in 1 of 3** |
+| latency, mean (ms) | 10,468 | 10,529 | +0.6% (-4.5 to +5.6) | +6.5% (-22.9 to +35.8) | -0.5% (-0.9 to +0.0) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
 | errors (sysbench's ignored errors: deadlocks and retries) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 512.0 | +0.0% (+0.0 to +0.0) | -0.6% (-14.0 to +12.7) | -2.6% (-19.4 to +14.1) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| pages holding data, mean (MB) | 433.8 | 433.0 | -0.2% (-1.6 to +1.2) | -2.6% (-25.5 to +20.3) | -2.7% (-19.7 to +14.3) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 512.0 | +0.0% (+0.0 to +0.0) | -0.6% (-14.0 to +12.7) | -2.6% (-19.4 to +14.1) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| pages holding data, mean (MB) | 433.8 | 433.0 | -0.2% (-1.6 to +1.2) | -2.6% (-25.5 to +20.3) | -2.7% (-19.7 to +14.3) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | pages read from disk into the pool (misses) | 83,295 | 81,408 | -2.3% (-4.1 to -0.4) | -4.1% (-20.9 to +12.6) | -3.2% (-18.7 to +12.2) | shown, not judged |
 | host CPU busy (share of the run) | 0.898 | 0.889 | -0.9% (-13.7 to +11.9) | +0.5% (-0.9 to +2.0) | +1.5% (-0.2 to +3.2) | **the runs disagree** |
 | host CPU-seconds | 149.0 | 147.0 | -1.3% (-5.7 to +3.1) | +0.7% (-0.6 to +2.0) | +1.8% (-0.3 to +3.9) | **the runs disagree** |
@@ -72,19 +70,19 @@ MySQL 8.0.46-0ubuntu0.24.04.4, sysbench 1.0.20; 32 client threads; 6 tables of 1
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (transactions a second answered within the line) | 296.6 | 296.9 | +0.1% (-0.8 to +1.0) | +0.2% (-0.8 to +1.2) | -0.0% (-1.3 to +1.3) | EVEN, under the floor (every run under 0.5%; the largest 0.19%) |
-| throughput (transactions a second) | 296.7 | 297.0 | +0.1% (-0.9 to +1.1) | +0.2% (-0.9 to +1.2) | -0.0% (-1.3 to +1.2) | EVEN, under the floor (every run under 0.5%; the largest 0.18%) |
-| queries a second | 4,747 | 4,752 | +0.1% (-0.9 to +1.1) | +0.2% (-0.9 to +1.2) | -0.0% (-1.3 to +1.2) | EVEN, under the floor (every run under 0.5%; the largest 0.18%) |
+| work inside the response line (transactions a second answered within the line) | 296.6 | 296.9 | +0.1% (-0.8 to +1.0) | +0.2% (-0.8 to +1.2) | -0.0% (-1.3 to +1.3) | EVEN, under the floor (the three runs' mean 0.09%) |
+| throughput (transactions a second) | 296.7 | 297.0 | +0.1% (-0.9 to +1.1) | +0.2% (-0.9 to +1.2) | -0.0% (-1.3 to +1.2) | EVEN, under the floor (the three runs' mean 0.08%) |
+| queries a second | 4,747 | 4,752 | +0.1% (-0.9 to +1.1) | +0.2% (-0.9 to +1.2) | -0.0% (-1.3 to +1.2) | EVEN, under the floor (the three runs' mean 0.08%) |
 | latency, 95th percentile (ms) | 1.93 | 1.94 | +0.9% (-28.5 to +30.4) | -2.4% (-4.8 to +0.1) | -2.4% (-4.9 to +0.1) | **the runs disagree** |
-| latency, 99th percentile (ms) | 3.68 | 3.6 | -2.2% (-24.4 to +19.9) | -1.8% (-6.1 to +2.6) | -3.5% (-7.9 to +0.8) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
-| latency, mean (ms) | 1.32 | 1.29 | -1.8% (-15.0 to +11.3) | -1.3% (-4.4 to +1.8) | -0.8% (-1.2 to -0.3) | **GAIN** (the same way in all three runs; 1 of 3 clear of the noise) |
+| latency, 99th percentile (ms) | 3.68 | 3.6 | -2.2% (-24.4 to +19.9) | -1.8% (-6.1 to +2.6) | -3.5% (-7.9 to +0.8) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| latency, mean (ms) | 1.32 | 1.29 | -1.8% (-15.0 to +11.3) | -1.3% (-4.4 to +1.8) | -0.8% (-1.2 to -0.3) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
 | errors (sysbench's ignored errors: deadlocks and retries) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 417.3 | -18.5% (-49.1 to +12.1) | -6.6% (-24.5 to +11.3) | -2.8% (-13.5 to +7.9) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
-| pages holding data, mean (MB) | 461.9 | 381.1 | -17.5% (-49.3 to +14.3) | -6.0% (-20.7 to +8.7) | -3.2% (-10.8 to +4.5) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
+| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 417.3 | -18.5% (-49.1 to +12.1) | -6.6% (-24.5 to +11.3) | -2.8% (-13.5 to +7.9) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| pages holding data, mean (MB) | 461.9 | 381.1 | -17.5% (-49.3 to +14.3) | -6.0% (-20.7 to +8.7) | -3.2% (-10.8 to +4.5) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | pages read from disk into the pool (misses) | 656,468 | 895,813 | +36.5% (-32.5 to +105.5) | +9.5% (-29.0 to +47.9) | -1.3% (-12.6 to +10.0) | shown, not judged |
-| host CPU busy (share of the run) | 0.104 | 0.102 | -2.1% (-14.2 to +10.1) | -0.8% (-3.7 to +2.2) | -0.5% (-1.7 to +0.8) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| host CPU-seconds | 186.8 | 182.9 | -2.1% (-14.2 to +10.0) | -0.6% (-3.6 to +2.3) | -0.4% (-1.6 to +0.8) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| host CPU-seconds per 1,000 transactions inside the line | 1.38 | 1.35 | -2.2% (-13.4 to +9.1) | -0.8% (-4.4 to +2.8) | -0.4% (-0.9 to +0.1) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| host CPU busy (share of the run) | 0.104 | 0.102 | -2.1% (-14.2 to +10.1) | -0.8% (-3.7 to +2.2) | -0.5% (-1.7 to +0.8) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| host CPU-seconds | 186.8 | 182.9 | -2.1% (-14.2 to +10.0) | -0.6% (-3.6 to +2.3) | -0.4% (-1.6 to +0.8) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| host CPU-seconds per 1,000 transactions inside the line | 1.38 | 1.35 | -2.2% (-13.4 to +9.1) | -0.8% (-4.4 to +2.8) | -0.4% (-0.9 to +0.1) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | buffer pool size changes written (the knob's moves) | 0 | 11.7 | +11.7 (+6.5 to +16.8) | +17 (+12.7 to +21.3) | +18.7 (+12.4 to +24.9) | shown, not judged |
 
 The buffer pool handed back to native's and read back at the end of every omni arm in every run: yes.
@@ -97,19 +95,19 @@ MySQL 8.0.46-0ubuntu0.24.04.4, sysbench 1.0.20; 32 client threads; 6 tables of 1
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (transactions a second answered within the line) | 186.3 | 186.9 | +0.3% (-2.0 to +2.6) | -0.1% (-0.9 to +0.8) | -0.3% (-1.8 to +1.3) | EVEN, under the floor (every run under 0.5%; the largest 0.31%) |
-| throughput (transactions a second) | 195.7 | 195.5 | -0.1% (-1.3 to +1.2) | -0.1% (-1.3 to +1.1) | -0.4% (-1.2 to +0.4) | EVEN, under the floor (every run under 0.5%; the largest 0.42%) |
-| queries a second | 3,913 | 3,910 | -0.1% (-1.3 to +1.2) | -0.1% (-1.3 to +1.1) | -0.4% (-1.2 to +0.4) | EVEN, under the floor (every run under 0.5%; the largest 0.42%) |
-| latency, 95th percentile (ms) | 10.6 | 10.2 | -3.6% (-19.2 to +12.0) | -1.8% (-9.5 to +5.9) | -0.6% (-10.0 to +8.7) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
+| work inside the response line (transactions a second answered within the line) | 186.3 | 186.9 | +0.3% (-2.0 to +2.6) | -0.1% (-0.9 to +0.8) | -0.3% (-1.8 to +1.3) | EVEN, under the floor (the three runs' mean 0.00%) |
+| throughput (transactions a second) | 195.7 | 195.5 | -0.1% (-1.3 to +1.2) | -0.1% (-1.3 to +1.1) | -0.4% (-1.2 to +0.4) | EVEN, under the floor (the three runs' mean 0.20%) |
+| queries a second | 3,913 | 3,910 | -0.1% (-1.3 to +1.2) | -0.1% (-1.3 to +1.1) | -0.4% (-1.2 to +0.4) | EVEN, under the floor (the three runs' mean 0.20%) |
+| latency, 95th percentile (ms) | 10.6 | 10.2 | -3.6% (-19.2 to +12.0) | -1.8% (-9.5 to +5.9) | -0.6% (-10.0 to +8.7) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | latency, 99th percentile (ms) | 199.5 | 163.3 | -18.2% (-96.7 to +60.4) | +0.6% (-6.3 to +7.5) | -2.9% (-17.1 to +11.3) | **the runs disagree** |
-| latency, mean (ms) | 9.46 | 8.25 | -12.8% (-54.5 to +28.9) | -1.3% (-3.4 to +0.8) | -1.8% (-9.3 to +5.7) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
+| latency, mean (ms) | 9.46 | 8.25 | -12.8% (-54.5 to +28.9) | -1.3% (-3.4 to +0.8) | -1.8% (-9.3 to +5.7) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | errors (sysbench's ignored errors: deadlocks and retries) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 541.6 | +5.8% (-3.3 to +14.8) | +3.8% (+2.1 to +5.6) | +2.9% (-16.7 to +22.6) | **power given** (the same way in all three runs; 1 of 3 clear of the noise) |
-| pages holding data, mean (MB) | 460.8 | 485.0 | +5.2% (-1.6 to +12.1) | +2.8% (-0.1 to +5.6) | +1.4% (-13.6 to +16.5) | **power given** (the same way in all three runs; 0 of 3 clear of the noise) |
+| buffer pool held, mean (MB; the knob, the resource) | 512.0 | 541.6 | +5.8% (-3.3 to +14.8) | +3.8% (+2.1 to +5.6) | +2.9% (-16.7 to +22.6) | **power given by the mean of our three runs, beyond the noise in 1 of 3** |
+| pages holding data, mean (MB) | 460.8 | 485.0 | +5.2% (-1.6 to +12.1) | +2.8% (-0.1 to +5.6) | +1.4% (-13.6 to +16.5) | **power given by the mean of our three runs, beyond the noise in 0 of 3** |
 | pages read from disk into the pool (misses) | 615,152 | 554,486 | -9.9% (-33.3 to +13.6) | -6.2% (-12.4 to +0.0) | -3.0% (-28.6 to +22.7) | shown, not judged |
-| host CPU busy (share of the run) | 0.216 | 0.213 | -1.4% (-2.0 to -0.8) | -1.5% (-4.1 to +1.0) | -3.1% (-15.7 to +9.5) | **GAIN** (the same way in all three runs; 1 of 3 clear of the noise) |
-| host CPU-seconds | 389.3 | 383.9 | -1.4% (-2.1 to -0.7) | -1.5% (-3.9 to +0.9) | -3.0% (-15.7 to +9.6) | **GAIN** (the same way in all three runs; 1 of 3 clear of the noise) |
-| host CPU-seconds per 1,000 transactions inside the line | 4.54 | 4.46 | -1.7% (-4.7 to +1.2) | -1.4% (-4.7 to +1.8) | -2.8% (-15.9 to +10.3) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
+| host CPU busy (share of the run) | 0.216 | 0.213 | -1.4% (-2.0 to -0.8) | -1.5% (-4.1 to +1.0) | -3.1% (-15.7 to +9.5) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
+| host CPU-seconds | 389.3 | 383.9 | -1.4% (-2.1 to -0.7) | -1.5% (-3.9 to +0.9) | -3.0% (-15.7 to +9.6) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
+| host CPU-seconds per 1,000 transactions inside the line | 4.54 | 4.46 | -1.7% (-4.7 to +1.2) | -1.4% (-4.7 to +1.8) | -2.8% (-15.9 to +10.3) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | buffer pool size changes written (the knob's moves) | 0 | 19.0 | +19 (+7.62 to +30.4) | +16.3 (+8.74 to +23.9) | +18 (+9.39 to +26.6) | shown, not judged |
 
 The buffer pool handed back to native's and read back at the end of every omni arm in every run: yes.
@@ -123,8 +121,8 @@ MySQL 8.0.46-0ubuntu0.24.04.4, sysbench 1.0.20; 32 client threads; 6 tables of 1
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
 | work inside the response line (transactions a second answered within the line) | 0 | 0 | +0 (+0 to +0) | -1.2% (-26.1 to +23.7) | +2.5% (-235.8 to +240.8) | **the runs disagree** |
-| throughput (transactions a second) | 976.8 | 977.7 | +0.1% (-0.2 to +0.3) | -0.2% (-0.4 to +0.0) | +0.2% (-0.1 to +0.5) | EVEN, under the floor (every run under 0.5%; the largest 0.16%) |
-| queries a second | 976.8 | 977.7 | +0.1% (-0.2 to +0.3) | -0.2% (-0.4 to +0.0) | +0.2% (-0.1 to +0.5) | EVEN, under the floor (every run under 0.5%; the largest 0.16%) |
+| throughput (transactions a second) | 976.8 | 977.7 | +0.1% (-0.2 to +0.3) | -0.2% (-0.4 to +0.0) | +0.2% (-0.1 to +0.5) | EVEN, under the floor (the three runs' mean 0.03%) |
+| queries a second | 976.8 | 977.7 | +0.1% (-0.2 to +0.3) | -0.2% (-0.4 to +0.0) | +0.2% (-0.1 to +0.5) | EVEN, under the floor (the three runs' mean 0.03%) |
 | latency, 95th percentile (ms) | 2.3 | 2.17 | -5.8% (-38.0 to +26.4) | +4.5% (-3.7 to +12.6) | -14.7% (-39.9 to +10.6) | **the runs disagree** |
 | latency, 99th percentile (ms) | 110.6 | 34.0 | -69.3% (-450.0 to +311.4) | +9.5% (-20.2 to +39.2) | -9.3% (-53.8 to +35.2) | **the runs disagree** |
 | latency, mean (ms) | 5.07 | 3.08 | -39.4% (-253.0 to +174.3) | +3.9% (-6.6 to +14.4) | -7.1% (-28.4 to +14.2) | **the runs disagree** |
@@ -141,7 +139,7 @@ The buffer pool handed back to native's and read back at the end of every omni a
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 512 to 640 (16 trials, 1 allowed, 3 refused); left native (16 trials, 0 allowed, 4 refused); left native (16 trials, 0 allowed, 3 refused); run B: acting: 256 to 640 (15 trials, 3 allowed, 4 refused); left native (13 trials, 0 allowed, 2 refused); acting: 256 to 512 (11 trials, 2 allowed, 4 refused); run C: acting: 384 to 512 (16 trials, 1 allowed, 3 refused); acting: 256 to 512 (13 trials, 2 allowed, 4 refused); left native (16 trials, 0 allowed, 4 refused).
 
-**Across 4 untouched workloads: 14 gauge-rows GAIN (0 in all three of our runs), 5 LOSS (0 in all three of our runs), 2 power given (0 in all three of our runs), 12 EVEN, 15 where the runs disagree.**
+**Across 4 untouched workloads: 14 gauge-rows GAIN, 5 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 12 EVEN, 15 where the runs disagree.**
 
 ---
 

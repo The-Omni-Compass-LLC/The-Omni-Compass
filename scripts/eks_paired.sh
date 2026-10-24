@@ -102,7 +102,18 @@ managedNodeGroups:
 YAML
   eksctl create cluster -f "/tmp/eks-$name.yaml"
   aws eks update-kubeconfig --name "$name" --region "$REGION"
-  kubectl wait --for=condition=Ready nodes --all --timeout=900s
+  # 24 October: in 3 of the steady set's first 9 repetitions the work machines did not read Ready within 600 s and the
+  # repetition ended before any measurement. The nodes' own conditions and the pools' states are kept in the repetition's
+  # files whenever the wait runs out, so the cause is read from the run, and the wait is given once more before it fails
+  if ! kubectl wait --for=condition=Ready nodes --all --timeout=900s; then
+    mkdir -p "bench-$arm-$REP"
+    kubectl get nodes -o wide > "bench-$arm-$REP/nodes_not_ready.txt" 2>&1 || true
+    kubectl describe nodes > "bench-$arm-$REP/nodes_describe.txt" 2>&1 || true
+    kubectl get events -A --sort-by=.lastTimestamp > "bench-$arm-$REP/events.txt" 2>&1 || true
+    : # the node groups' states are in the cluster's own events above
+    echo "######## $name: a node not Ready after 900 s (its conditions kept in bench-$arm-$REP); one more wait of 600 s"
+    kubectl wait --for=condition=Ready nodes --all --timeout=600s
+  fi
   # the Kubernetes cluster autoscaler (EKS ships none): auto-discovery by the work group's tags, AKS's scale-down profile,
   # on the system machine (it tolerates the taint)
   helm repo add autoscaler https://kubernetes.github.io/autoscaler >/dev/null 2>&1 || true

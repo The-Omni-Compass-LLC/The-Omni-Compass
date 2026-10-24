@@ -5,9 +5,8 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The A/B/C table for the power grid (docs/OMNI_V1.md): the untouched SimBench grids run three times as separate GitHub
 runs on the same frozen engine (tools/run_pandapower.py), both load models each. pandapower is deterministic, so the three
-runs must give the same numbers: a gauge reads GAIN or LOSS in all three of our runs when all three moved 0.5% or more with the same sign (judged
-by what the gauge is for, never by its sign; a resource spent that rose reads power given), EVEN, under the floor, when every run's change is under 0.5% (24 October 2026: a change
-of 0.5% or more is a change), EVEN, the same, when the change is under one
+runs must give the same numbers: a gauge reads GAIN or LOSS in all three of our runs when all three agree on the sign (judged
+by what the gauge is for, never by its sign; a resource spent that rose reads power given), EVEN when the change is under one
 part in a million, and "the runs differ" when they do not reproduce, which is a finding about the simulator or the harness and
 is said so. Aims are the preregistration's (docs/PANDAPOWER_PREREGISTRATION.md): energy drawn, the energy dissipated in lines
 and transformers, net import and tap operations are resources spent (a fall is a cut, a GAIN; tap operations were declared in
@@ -24,7 +23,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, judge_runs, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts, reproduced_reading  # noqa: E402  (every table says whose runs these are)
 
 SAME_REL = 1e-6          # a change under one part in a million of the value reads "same" (amendment 11)
 REPRO_REL = 1e-9         # two runs of a deterministic simulator agree to this, or they did not reproduce
@@ -82,7 +81,7 @@ def verdict(recs, model, k, direction):
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return judge_runs(ch, None, aim(direction, k))
+    return reproduced_reading(ch, aim(direction, k))
 
 
 def engine(run):

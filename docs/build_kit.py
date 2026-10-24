@@ -29,15 +29,12 @@ def pr(sd, comp, k):
 
 
 def verdict(sd, comp, k, lower):
-    """The one rule (tools/readings.py judge_one, the founder's order of 24 October 2026): under 0.5% of the base EVEN, under
-    the floor; from 0.5% up the word by the metric's aim, "(not clear of the noise)" beside it where the interval includes zero."""
-    import sys
-    sys.path.insert(0, str(ROOT))
-    from tools.readings import judge_one, LOWER, HIGHER
     r = pr(sd, comp, k); lo, hi = r["ci95"]
-    b = r.get("base_mean") or 0.0
-    rel = r["mean_delta"] / abs(b) if b else (0.0 if r["mean_delta"] == 0 else float("inf") * (1 if r["mean_delta"] > 0 else -1))
-    return judge_one(rel, lo > 0 or hi < 0, LOWER if lower else HIGHER)
+    if hi < 0:
+        return "GAIN" if lower else "LOSS"
+    if lo > 0:
+        return "LOSS" if lower else "GAIN"
+    return "EVEN, no difference beyond the noise"
 
 
 REFS = ("k8s_ref_50", "k8s_ref_60", "k8s_ref_70", "k8s_ref_80")
@@ -45,9 +42,9 @@ REFS = ("k8s_ref_50", "k8s_ref_60", "k8s_ref_70", "k8s_ref_80")
 
 def across(arm, k, lower=True):
     vs = [verdict(sd, f"{arm}_vs_{b}", k, lower) for sd in (S1, S2) for b in REFS]
-    n = sum(v.startswith("GAIN") for v in vs)
-    w = sum(v.startswith("LOSS") for v in vs)
-    return f"GAIN in {n}, LOSS in {w}, EVEN (under the 0.5% floor) in {len(vs) - n - w} of {len(vs)} seed-target combinations"
+    n = sum(v == "GAIN" for v in vs)
+    w = sum(v == "LOSS" for v in vs)
+    return f"GAIN in {n}, LOSS in {w}, EVEN (no difference beyond the noise) in {len(vs) - n - w} of {len(vs)} seed-target combinations"
 
 
 def both(arm, k, fmt, base="k8s_ref_70", lower=True):
@@ -59,7 +56,7 @@ pct = lambda v: f"{100 * v:.1f}%"; f1 = lambda v: f"{v:.1f}"; f2 = lambda v: f"{
 rate_bound = 3.0 / SOAK["decisions"]
 
 PRIMARY_TXT = "; ".join("seed %s: %+.2f kWh, p = %.1e" % (sd, r["mean_delta"], r["p"]) for sd, r in MULT["primary"].items())
-SECONDARY_TXT = "GAIN on %d, LOSS on %d, EVEN (under the 0.5% floor) on %d" % tuple(sum(t["verdict"].startswith(v) for t in MULT["secondary"]) for v in ("GAIN", "LOSS", "EVEN"))
+SECONDARY_TXT = "GAIN on %d, LOSS on %d, EVEN (no difference beyond the noise) on %d" % tuple(sum(t["verdict"].startswith(v) for t in MULT["secondary"]) for v in ("GAIN", "LOSS", "EVEN"))
 
 FS = json.loads((R / "fleet" / "heldout" / "SUMMARY.json").read_text())
 def _fl(v):

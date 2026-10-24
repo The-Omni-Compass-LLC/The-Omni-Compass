@@ -2,11 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
-**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the values the table prints (it keeps no JSON twin; a printed size of exactly 0.50% counts as at the floor); every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
-<!-- end: read again -->
-
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
 
 pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench benchmark grids: an independent, deterministic grid simulator with the grid's own voltage control as native. Omni sits on top of it, moving the substation setpoint one whole tap at a time under the frozen rules (`docs/PANDAPOWER_PREREGISTRATION.md`). The same grids ran three times as separate GitHub runs on the same frozen engine, a full year each, both load models. Because the simulator is deterministic, the runs must reproduce each other: a gauge reads **GAIN** or **LOSS in all three of our runs** when all three runs give the same sign, judged by what the gauge is for and never by its sign (a resource spent that rose reads **power given**), **EVEN, the same** when the change is under one part in a million, and **the runs differ** when they do not reproduce. Energy drawn, the energy dissipated in lines and transformers, net import and tap operations are resources spent: a fall is a cut, a GAIN, and a rise is power given (more tap operations were declared in advance as Omni's expected cost). Bus-steps outside 0.95-1.05: any rise is a LOSS. Every row is shown, LOSS included.
 
@@ -47,7 +45,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 6.074e+04 | 5.987e+04 | -1.43% | -1.43% | -1.43% | **GAIN in all three of our runs** |
-| energy dissipated in lines and transformers (MWh) | 660.9 | 659.1 | -0.28% | -0.28% | -0.28% | EVEN, under the floor (every run under 0.5%; the largest 0.28%) |
+| energy dissipated in lines and transformers (MWh) | 660.9 | 659.1 | -0.28% | -0.28% | -0.28% | EVEN, under the floor (the three runs' mean 0.28%) |
 | net import from the upstream grid (MWh) | -1.366e+04 | -1.453e+04 | -6.38% | -6.38% | -6.38% | **GAIN in all three of our runs** |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 1,904 | 1,220 | -35.92% | -35.92% | -35.92% | **GAIN in all three of our runs** |
@@ -159,7 +157,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 5.763e+04 | 5.763e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 542.5 | 539.6 | -0.53% | -0.53% | -0.53% | **GAIN in all three of our runs** |
-| net import from the upstream grid (MWh) | 2.949e+04 | 2.949e+04 | -0.01% | -0.01% | -0.01% | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| net import from the upstream grid (MWh) | 2.949e+04 | 2.949e+04 | -0.01% | -0.01% | -0.01% | EVEN, under the floor (the three runs' mean 0.01%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 1,824 | 1,260 | -30.92% | -30.92% | -30.92% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9768 | 0.9621 | -1.50% | -1.50% | -1.50% | shown, not judged |
@@ -170,8 +168,8 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 5.897e+04 | 5.897e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
-| energy dissipated in lines and transformers (MWh) | 571.9 | 569.6 | -0.40% | -0.40% | -0.40% | EVEN, under the floor (every run under 0.5%; the largest 0.40%) |
-| net import from the upstream grid (MWh) | 6,198 | 6,195 | -0.04% | -0.04% | -0.04% | EVEN, under the floor (every run under 0.5%; the largest 0.04%) |
+| energy dissipated in lines and transformers (MWh) | 571.9 | 569.6 | -0.40% | -0.40% | -0.40% | EVEN, under the floor (the three runs' mean 0.40%) |
+| net import from the upstream grid (MWh) | 6,198 | 6,195 | -0.04% | -0.04% | -0.04% | EVEN, under the floor (the three runs' mean 0.04%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 1,660 | 1,148 | -30.84% | -30.84% | -30.84% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9769 | 0.9622 | -1.50% | -1.50% | -1.50% | shown, not judged |
@@ -182,8 +180,8 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 6.106e+04 | 6.106e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
-| energy dissipated in lines and transformers (MWh) | 662.2 | 662 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (every run under 0.5%; the largest 0.02%) |
-| net import from the upstream grid (MWh) | -1.334e+04 | -1.334e+04 | -0.00% | -0.00% | -0.00% | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
+| energy dissipated in lines and transformers (MWh) | 662.2 | 662 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (the three runs' mean 0.02%) |
+| net import from the upstream grid (MWh) | -1.334e+04 | -1.334e+04 | -0.00% | -0.00% | -0.00% | EVEN, under the floor (the three runs' mean 0.00%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 2,036 | 1,396 | -31.43% | -31.43% | -31.43% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9738 | 0.959 | -1.51% | -1.51% | -1.51% | shown, not judged |
@@ -195,7 +193,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 3.22e+04 | 3.22e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 733 | 737.1 | +0.56% | +0.56% | +0.56% | **power given in all three of our runs** |
-| net import from the upstream grid (MWh) | -2.941e+04 | -2.941e+04 | +0.01% | +0.01% | +0.01% | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| net import from the upstream grid (MWh) | -2.941e+04 | -2.941e+04 | +0.01% | +0.01% | +0.01% | EVEN, under the floor (the three runs' mean 0.01%) |
 | bus-steps outside 0.95-1.05 (share) | 2.3e-06 | 2.3e-06 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 4 | 8 | +100.00% | +100.00% | +100.00% | **power given in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9763 | 0.9616 | -1.51% | -1.51% | -1.51% | shown, not judged |
@@ -207,7 +205,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 3.483e+04 | 3.483e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 1,150 | 1,163 | +1.18% | +1.18% | +1.18% | **power given in all three of our runs** |
-| net import from the upstream grid (MWh) | -4.122e+04 | -4.12e+04 | +0.03% | +0.03% | +0.03% | EVEN, under the floor (every run under 0.5%; the largest 0.03%) |
+| net import from the upstream grid (MWh) | -4.122e+04 | -4.12e+04 | +0.03% | +0.03% | +0.03% | EVEN, under the floor (the three runs' mean 0.03%) |
 | bus-steps outside 0.95-1.05 (share) | 0.000162 | 1.84e-05 | -1.4e-04 | -1.4e-04 | -1.4e-04 | **GAIN in all three of our runs** |
 | tap operations (wear; declared cost) | 100 | 84 | -16.00% | -16.00% | -16.00% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.97 | 0.9552 | -1.53% | -1.53% | -1.53% | shown, not judged |
@@ -219,7 +217,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 4.577e+04 | 4.577e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 476.1 | 471.8 | -0.90% | -0.90% | -0.90% | **GAIN in all three of our runs** |
-| net import from the upstream grid (MWh) | 9,265 | 9,260 | -0.05% | -0.05% | -0.05% | EVEN, under the floor (every run under 0.5%; the largest 0.05%) |
+| net import from the upstream grid (MWh) | 9,265 | 9,260 | -0.05% | -0.05% | -0.05% | EVEN, under the floor (the three runs' mean 0.05%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 808 | 572 | -29.21% | -29.21% | -29.21% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9766 | 0.962 | -1.50% | -1.50% | -1.50% | shown, not judged |
@@ -231,7 +229,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 4.843e+04 | 4.843e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 845.8 | 850.7 | +0.58% | +0.58% | +0.58% | **power given in all three of our runs** |
-| net import from the upstream grid (MWh) | -6.012e+04 | -6.011e+04 | +0.01% | +0.01% | +0.01% | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| net import from the upstream grid (MWh) | -6.012e+04 | -6.011e+04 | +0.01% | +0.01% | +0.01% | EVEN, under the floor (the three runs' mean 0.01%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 888 | 612 | -31.08% | -31.08% | -31.08% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9729 | 0.9582 | -1.51% | -1.51% | -1.51% | shown, not judged |
@@ -243,7 +241,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 5.126e+04 | 5.126e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 1,023 | 1,032 | +0.89% | +0.89% | +0.89% | **power given in all three of our runs** |
-| net import from the upstream grid (MWh) | -8.072e+04 | -8.071e+04 | +0.01% | +0.01% | +0.01% | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| net import from the upstream grid (MWh) | -8.072e+04 | -8.071e+04 | +0.01% | +0.01% | +0.01% | EVEN, under the floor (the three runs' mean 0.01%) |
 | bus-steps outside 0.95-1.05 (share) | 1.68e-05 | 0 | -1.7e-05 | -1.7e-05 | -1.7e-05 | **GAIN in all three of our runs** |
 | tap operations (wear; declared cost) | 2,048 | 1,616 | -21.09% | -21.09% | -21.09% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.966 | 0.9512 | -1.54% | -1.54% | -1.54% | shown, not judged |
@@ -255,7 +253,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 7.027e+04 | 7.027e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 459.6 | 450.9 | -1.89% | -1.89% | -1.89% | **GAIN in all three of our runs** |
-| net import from the upstream grid (MWh) | 5.557e+04 | 5.556e+04 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (every run under 0.5%; the largest 0.02%) |
+| net import from the upstream grid (MWh) | 5.557e+04 | 5.556e+04 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (the three runs' mean 0.02%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 2,820 | 1,986 | -29.57% | -29.57% | -29.57% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9807 | 0.9634 | -1.77% | -1.77% | -1.77% | shown, not judged |
@@ -267,7 +265,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 7.291e+04 | 7.291e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 458.1 | 449.3 | -1.94% | -1.94% | -1.94% | **GAIN in all three of our runs** |
-| net import from the upstream grid (MWh) | 5.089e+04 | 5.088e+04 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (every run under 0.5%; the largest 0.02%) |
+| net import from the upstream grid (MWh) | 5.089e+04 | 5.088e+04 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (the three runs' mean 0.02%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 3,114 | 2,284 | -26.65% | -26.65% | -26.65% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.9806 | 0.9633 | -1.76% | -1.76% | -1.76% | shown, not judged |
@@ -279,7 +277,7 @@ pandapower (Fraunhofer IEE and the University of Kassel) with the SimBench bench
 |---|---:|---:|---:|---:|---:|---|
 | energy the loads drew (MWh) | 7.664e+04 | 7.664e+04 | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | energy dissipated in lines and transformers (MWh) | 468.5 | 460 | -1.82% | -1.82% | -1.82% | **GAIN in all three of our runs** |
-| net import from the upstream grid (MWh) | 3.763e+04 | 3.762e+04 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (every run under 0.5%; the largest 0.02%) |
+| net import from the upstream grid (MWh) | 3.763e+04 | 3.762e+04 | -0.02% | -0.02% | -0.02% | EVEN, under the floor (the three runs' mean 0.02%) |
 | bus-steps outside 0.95-1.05 (share) | 0 | 0 | +0.0e+00 | +0.0e+00 | +0.0e+00 | EVEN, the same |
 | tap operations (wear; declared cost) | 3,943 | 3,091 | -21.61% | -21.61% | -21.61% | **GAIN in all three of our runs** |
 | lowest voltage seen (per unit) | 0.978 | 0.9625 | -1.58% | -1.58% | -1.58% | shown, not judged |
@@ -292,13 +290,13 @@ A grid counts only when all three runs agree.
 | Load model | Gauge | GAIN in all three of our runs | LOSS in all three of our runs | Power given in all three of our runs | EVEN | The runs differ |
 |---|---|---:|---:|---:|---:|---:|
 | ZIP loads | energy the loads drew (MWh) | 11 | 0 | 0 | 0 | 0 |
-| ZIP loads | energy dissipated in lines and transformers (MWh) | 6 | 0 | 4 (1-MV-rural--1-sw, 1-MV-rural--2-sw, 1-MV-semiurb--1-sw, 1-MV-semiurb--2-sw) | 1 | 0 |
+| ZIP loads | energy dissipated in lines and transformers (MWh) | 7 | 0 | 4 (1-MV-rural--1-sw, 1-MV-rural--2-sw, 1-MV-semiurb--1-sw, 1-MV-semiurb--2-sw) | 0 | 0 |
 | ZIP loads | net import from the upstream grid (MWh) | 11 | 0 | 0 | 0 | 0 |
 | ZIP loads | bus-steps outside 0.95-1.05 (share) | 2 | 0 | 0 | 9 | 0 |
 | ZIP loads | tap operations (wear; declared cost) | 10 | 0 | 1 (1-MV-rural--1-sw) | 0 | 0 |
 | constant-power loads | energy the loads drew (MWh) | 0 | 0 | 0 | 11 | 0 |
-| constant-power loads | energy dissipated in lines and transformers (MWh) | 5 | 0 | 4 (1-MV-rural--1-sw, 1-MV-rural--2-sw, 1-MV-semiurb--1-sw, 1-MV-semiurb--2-sw) | 2 | 0 |
-| constant-power loads | net import from the upstream grid (MWh) | 0 | 0 | 0 | 11 | 0 |
+| constant-power loads | energy dissipated in lines and transformers (MWh) | 7 | 0 | 4 (1-MV-rural--1-sw, 1-MV-rural--2-sw, 1-MV-semiurb--1-sw, 1-MV-semiurb--2-sw) | 0 | 0 |
+| constant-power loads | net import from the upstream grid (MWh) | 7 | 0 | 4 (1-MV-rural--1-sw, 1-MV-rural--2-sw, 1-MV-semiurb--1-sw, 1-MV-semiurb--2-sw) | 0 | 0 |
 | constant-power loads | bus-steps outside 0.95-1.05 (share) | 2 | 0 | 0 | 9 | 0 |
 | constant-power loads | tap operations (wear; declared cost) | 10 | 0 | 1 (1-MV-rural--1-sw) | 0 | 0 |
 

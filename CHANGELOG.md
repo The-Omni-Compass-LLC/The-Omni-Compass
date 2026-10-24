@@ -34,6 +34,42 @@
   version list, the conductor's campaign, the grid manifest and workflows, the package 0.19.0, the root list, the release group;
   the words by hand: the version page, README, CLAUDE.md, the Operator's Manual, the state of play, this changelog, the live
   engine's engine mark (its prose stays omni-v18's until the page is rebuilt).
+## 2026-10-24 (night): every change of 0.5% or more is a change
+
+- **The key** (`tools/readings.py` `three_run_reading`, the founder's order of 24 October): the change is the mean of the three
+  runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all three of
+  our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of runs
+  beyond the noise. EVEN is kept for a mean under 0.5% or no change at all; runs that moved 0.5% or more in opposite directions
+  disagree; a count that must never rise has no floor. Each run's own number in a kind table wears that run's own word, and an
+  interval turns with its number where the word turns the number's sign.
+- **Every table read again from its own data** (`tools/reread.py`, idempotent, checked by `verify.py`): 4,037 readings in 194
+  tables; the numbers are the runs' own, only the words were read again, and each table says so under its title. The kind,
+  stack and three-arm writers read by the same rule from now on; the deterministic simulators (CityLearn, pandapower, MuJoCo, the
+  swarms) put a mean under 0.5% at EVEN, under the floor.
+- **What moved**: the index's headline reads GAIN, up 3.4% (up 4.3% before); the LOSS ledger holds 331 rows read LOSS across their
+  three runs (160 against Omni-Compass's own native, 284 of all of them on omni-v12, none on omni-v18, whose three runs have not
+  landed); the real knobs' verdicts read 4 write, 21 the operator's choice, 1 watch (9, 5 and 12 before).
+- **The toy gate and the live engine read by the same floor**: the gate's mean change across its seeds from 0.5% up reads by its
+  aim, with whether it stands beyond the seeds' noise beside it; the live engine's own key (`threeRun`, `pairedReading`) the same,
+  each run's number wearing its own word, and how firmly a word stands printed beside it.
+
+## 2026-10-24 (evening): no table stands on two engines; every LOSS row on one page
+
+- **Ten three-run tables held two engines**: `V17_KAFKA`, `V17_KAFKA_SERVICE`, `V17_PGBENCH`, `V17_REDIS`, `V17_REDIS_SERVICE`,
+  `V17_REDIS_SHIPPED`, `V17_SYSBENCH`, `V17_SYSBENCH_SHIPPED`, `V17_YCSB` and `V17_YCSB_SHIPPED` carry runs A and B on omni-v17 and
+  run C on omni-v18. Each printed its own warning, and the index, the benefit sheet and every page that picks a benchmark's newest
+  table still counted it. `tools/readings.py` `landed`, the one rule those pages read, now refuses a table whose runs ran on two
+  engines; each of those benchmarks stands on its newest table on one engine (omni-v16 for most) until its three runs on the
+  engine that stands land. The index's headline moves from GAIN, up 4.6%, to GAIN, up 4.3%.
+- **The campaign counted runs of the engine before**: omni-v18's campaign was opened at 21:19 UTC on 23 October, when the engine
+  landed on its working branch; it reached main at 02:51 UTC on 24 October. The runs started between ran omni-v17's commits and
+  counted as omni-v18's. The conductor now counts a run in the campaign only when its own commit carries the standing engine's
+  fingerprint file (`scripts/dispatch_grid.py` `on_engine`), and the campaign's start reads 02:51 UTC on 24 October
+  (`tests/test_release_campaign.py`).
+- **The LOSS ledger** (`docs/LOSS_LEDGER.md`, `tools/loss_ledger.py`, checked by `verify.py`): every row that reads LOSS in all
+  three runs, in every benchmark's newest table, placed by what its two arms are. Against Omni-Compass's own native, the readings
+  do no harm is judged by: 7 rows, all on omni-v12, each with its cause where one is written. In place of an orchestrator (the four
+  ways' VS): 14. Without Omni-Compass in one arm, or two changes at once (ORCH, BOTH): 89.
 
 ## 2026-10-24 (afternoon): the conductor ticks again on omni-v18
 

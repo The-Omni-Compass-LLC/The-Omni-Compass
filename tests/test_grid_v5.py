@@ -49,19 +49,16 @@ class Grid(unittest.TestCase):
             self.assertIn("10 copies: run 222", text)
             self.assertIn("GAIN (fewer misses): misses -0.100 pp, work +0.000%, power given +0.050% (10 of 10 runs)", text)
             self.assertIn("not in the receipt", text)                            # the tower at 100 runs
-            # the rule of 24 October 2026: failed requests up 1% (its interval across zero) is a LOSS, named not clear of the noise;
-            # the organism's energy up 0.05% is under the 0.5% floor, EVEN
-            self.assertIn("| 10 repetitions: GAIN on 1 (response time (ms), 95th percentile), LOSS on 1 (failed requests (%), not clear of the "
-                          "noise), power given on 0, EVEN (under the 0.5% floor) on 0 |", text)
-            self.assertIn("10 repetitions: GAIN on 1 (response time (ms), 95th percentile), LOSS on 0, power given on 0, "
-                          "EVEN (under the 0.5% floor) on 1; OFF THE CLOCK in 2 of 10 repetitions (late) |", text)
+            self.assertIn("| 10 repetitions: GAIN on 1 (response time (ms), 95th percentile), LOSS on 0, power given on 0, EVEN (inside the noise) on 1 |", text)
+            self.assertIn("10 repetitions: GAIN on 1 (response time (ms), 95th percentile), LOSS on 0, power given on 1 (organism energy (J)), "
+                          "EVEN (inside the noise) on 0; OFF THE CLOCK in 2 of 10 repetitions (late) |", text)
             self.assertIn("not in the report", text)
             # the one line the front page reads, counted from the squares (20 modelled with the spine: 13 of 10 and 100 runs, 7 single)
             self.assertIn("**Across the grid: modelled, 13 of 13 squares of 10 and 100 runs GAIN (fewer misses); the 7 single runs: "
                           "7 with fewer misses; work +0.000%; power given +0.050%; with the cluster "
                           "inside, 2 squares: 0 single repetitions (no reading); of the 2 of 10 and 100 repetitions, by gauge: "
-                          "\"response time (ms), 95th percentile\" GAIN in 2, LOSS in 0, \"failed requests (%)\" GAIN in 0, "
-                          "LOSS in 1; off the clock in 1; invalid in 0.**", text)
+                          "\"response time (ms), 95th percentile\" GAIN in 2, LOSS in 0, \"organism energy (J)\" GAIN in 0, "
+                          "power given in 1; off the clock in 1; invalid in 0.**", text)
             # the test machine at each size, from native's own rows (the shown-only gauges)
             self.assertIn("### The test machine at each size", text)
             self.assertIn("| 10 copies (10 repetitions) | 100% | 100% | -2.0 to -1.2% | The whole tower 2 of 10 |", text)

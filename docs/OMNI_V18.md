@@ -67,7 +67,7 @@ And after it landed, the three runs on GitHub's machines (the full form, A, B an
 
 ## What runs on it
 
-Every benchmark runs again on omni-v18: the conductor's campaign opened at 21:19 UTC on 23 October (`scripts/dispatch_grid.py`,
+Every benchmark runs again on omni-v18: the conductor's campaign counts from 02:51 UTC on 24 October, when the engine reached main, and only runs whose own commit carries `OMNI_V18.json` (`scripts/dispatch_grid.py`,
 `scripts/reruns.txt`), and the clouds' sets run on it once each cloud's own $0 check passes. In the clouds nothing changes: Omni
 on top of the cloud's Kubernetes at the tune-down, on the machines alone (the order of 14 October). Omni direct runs on GitHub's
 own machines, three runs from one commit (`orchestrator.yml`). Omni direct is ready on a rented machine in each cloud and runs

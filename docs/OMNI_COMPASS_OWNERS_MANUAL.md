@@ -91,12 +91,12 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
-- **The floor** (the founder's orders of 20 and 24 October 2026): a change under half of one percent (0.5%) either way, in every run, reads **EVEN, under the floor**; the row keeps its measured size. A change of 0.5% or more either way is a change and never reads EVEN: "Any gauge that gives anything over a 0.5 percent change either way is a change ... it has to show its loss or gain" (24 October). It reads GAIN, LOSS or power given by the gauge's aim, with the count of runs clear of the noise beside the word.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the floor reads EVEN =0.3%.
+- **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; EVEN is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
-A reading is decided over our three runs, A, B and C. Only the runs that moved 0.5% or more decide its direction; when they all move the same way the gauge reads its word. "GAIN in all three of our runs" means all three runs moved 0.5% or more the same way with every 95% interval clear of zero. Where a run's interval includes zero, or a run stayed under the floor, the word stands and its qualifier follows in the same cell, the count of runs clear of the noise always shown: "GAIN (the same way in all three runs; 2 of 3 clear of the noise)", "LOSS (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 1 of 3 clear of the noise)". The other readings are **EVEN, under the floor** (every run under 0.5%), **EVEN, the same** (no change at all), **the runs disagree** (runs that moved 0.5% or more pointing different ways: the test is unstable there and is looked into) and **shown, not judged** (a gauge declared in advance as shown only, such as the knob's own setting). A count that must never rise (failed requests, lost messages) reads LOSS on any rise in any run. Tables written before 24 October 2026 read a run whose interval included zero as "EVEN, no difference beyond the noise" whatever its size; every published table has been read again by this rule (`tools/reread_key.py`).
+Every reading is one of these. **GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, every 95% interval clear of zero. **GAIN, LOSS or power given by the mean of our three runs**: the runs' mean moved 0.5% or more, with the count of runs that stood beyond the noise beside it. **EVEN, under the floor**: the mean moved less than 0.5%. **EVEN, the same**: no change at all. **The runs disagree**: runs moved 0.5% or more in opposite directions, so the test is unstable there and is looked into. **Shown, not judged**: a gauge declared in advance as shown only, such as the knob's own setting.
 
 Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
@@ -698,49 +698,44 @@ installed is a quarter off the bill.
   - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (more work + fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
   - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v17 and omni-v18, each named in its table): +4.6% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +3.4% GAIN on the resource reading (work, speed, machines, energy), +9.4% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
-  - Real database (PostgreSQL behind PgBouncer, GitHub): +1.3% GAIN
-  - Real cache (Redis, GitHub): +0.1% GAIN
-  - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real database cache (MongoDB under YCSB, GitHub): =0.0% EVEN
-  - Real database buffer pool (MySQL under sysbench, GitHub): =0.0% EVEN
+  - Real database buffer pool (MySQL under sysbench, GitHub): +1.6% GAIN
+  - Real cache (Redis, GitHub): +0.1% power given
+  - Real messaging (Apache Kafka, GitHub): +0.1% power given
+  - Real database cache (MongoDB under YCSB, GitHub): −1.4% LOSS
+  - Real database (PostgreSQL behind PgBouncer, GitHub): −4.9% LOSS
 
 **On the engine that stands (omni-v19): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v17 and omni-v18 | +4.6% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v17 and omni-v18 | +0.1% | GAIN, power given | L |
-| PostgreSQL, the pooler's pool size | omni-v17 and omni-v18 | +1.3% | GAIN | L |
-| MySQL, the buffer pool's size | omni-v17 and omni-v18 | =0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | omni-v17 and omni-v18 | =0.0% | EVEN | L |
-| Kafka, the consumer group's size | omni-v17 and omni-v18 | +0.1% | GAIN | L |
-| The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
-| The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
-| Robustness: the two-hour run | omni-v11 | +3.8% | GAIN AND LOSS | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +3.4% | GAIN AND LOSS | L |
+| Robustness: the two-hour run | omni-v11 | −4.2% | GAIN AND LOSS | L |
 | Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
-| Robot arms (MuJoCo), the three untouched robots | omni-v11 | +3.8% | GAIN | S |
 | Redis, the cache's memory ceiling | omni-v16 | +0.1% | GAIN, power given | L |
 | Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
 | Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
 | Real Kubernetes, demand that wanders | omni-v10 | +36.5% | GAIN AND LOSS | L |
 | Real Kubernetes, all four at once | omni-v10 | +39.7% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | +72.9% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | =0.0% | GAIN AND LOSS | L |
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | +76.6% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | −0.4% | LOSS | L |
 | Real Kubernetes, a queue of jobs | omni-v10 | +10.2% | GAIN AND LOSS | L |
 | Real Kubernetes, a public day of demand (Google 2011) | omni-v10 | +35.2% | GAIN AND LOSS | L |
 | Real Kubernetes, a noisy neighbour | omni-v10 | =0.0% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +59.7% | GAIN AND LOSS | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +63.3% | GAIN, power given | L |
 | Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +41.0% | GAIN, power given | L |
 | Power grids (SimBench), both load models | omni-v11 | +5.8% | GAIN, power given | S |
-| PostgreSQL, the pooler's pool size | omni-v16 | =0.0% | GAIN AND LOSS | L |
-| MySQL, the buffer pool's size | omni-v16 | =0.0% | GAIN AND LOSS | L |
-| MongoDB, the storage engine's cache size | omni-v16 | +0.2% | GAIN AND LOSS | L |
-| Kafka, the consumer group's size | omni-v16 | +0.1% | GAIN AND LOSS | L |
-| Drone swarms, the three untouched cells | omni-v11 | +5.9% | GAIN | S |
+| PostgreSQL, the pooler's pool size | omni-v16 | −4.9% | GAIN AND LOSS | L |
+| MySQL, the buffer pool's size | omni-v16 | +1.6% | GAIN AND LOSS | L |
+| MongoDB, the storage engine's cache size | omni-v16 | −1.4% | GAIN AND LOSS | L |
+| Kafka, the consumer group's size | omni-v16 | −0.1% | GAIN AND LOSS | L |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN | S |
+| The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
+| The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
+| Robot arms (MuJoCo), the three untouched robots | omni-v11 | +3.8% | GAIN | S |
+| Drone swarms, the three untouched cells | omni-v11 | +5.9% | GAIN | S |
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 

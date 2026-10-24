@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The YCSB A/B/C rule (tools/ycsb_abc.py): GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three
-runs; a change of 0.5% or more the same way reads its word with the count of runs clear of the noise (the rule of 24 October 2026), under 0.5% in every run EVEN, under the floor; clear runs pointing different
+runs; an interval over zero reads EVEN, no difference beyond the noise, with the count of such runs; clear runs pointing different
 ways read as a disagreement; a failed operation added in any run is marked; the resource held reads power given when it grows."""
 import sys
 from pathlib import Path
@@ -22,7 +22,7 @@ def main():
     assert A.verdict([r(5, 2, 8), r(6, 3, 9), r(4, 1, 7)], "spent") == "**power given in all three of our runs**", "a resource that grows is power given"
     assert A.verdict([r(5, 2, 8), r(6, 3, 9), r(4, 1, 7)], "lower", "cache_mb_mean") == "**power given in all three of our runs**", "the cache size is a resource"
     assert A.verdict([r(5, 2, 8), r(6, 3, 9), r(4, 1, 7)], "lower") == "**LOSS in all three of our runs**", "a longer wait is a LOSS"
-    assert A.verdict([r(5, 2, 8), r(1, -2, 4), r(4, 1, 7)], "higher") == "**GAIN** (the same way in all three runs; 2 of 3 clear of the noise)", "past the floor the same way in all three, one interval across zero: the word stands, with its count"
+    assert A.verdict([r(5, 2, 8), r(1, -2, 4), r(4, 1, 7)], "higher") == "**GAIN by the mean of our three runs, beyond the noise in 2 of 3**"
     assert A.verdict([r(5, 2, 8), r(-6, -9, -3), r(4, 1, 7)], "higher") == "**the runs disagree**"
     assert A.verdict([r(0, -1, 1), r(0, -1, 1), r(0, -1, 1)], "higher") == "EVEN, the same"
     assert A.verdict([r(0, 0, 0), r(1, 1, 1), r(0, 0, 0)], "never more") == "**LOSS in at least one of our runs**", "one failed operation more in any run is marked"
@@ -30,8 +30,8 @@ def main():
     assert A.verdict([r(1, 0, 2), None, r(1, 0, 2)], "higher") == "no value"
     assert A.verdict([r(9, 1, 2)], "shown") == "shown, not judged"
     assert A.cell(r(5, 2, 8), "ops") == "+5.0% (+2.0 to +8.0)" and A.cell(r(2, 1, 3, native=0.0), "failed") == "+2 (+1 to +3)"
-    print("PASS  YCSB A/B/C rule: GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three runs; an interval over zero leaves the word "
-          "standing with the count of runs clear of the noise; runs past the floor pointing different ways read as a disagreement; a failed operation added is marked")
+    print("PASS  YCSB A/B/C rule: GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three runs; an interval over zero reads EVEN, no "
+          "difference beyond the noise, with the count; clear runs pointing different ways read as a disagreement; a failed operation added is marked")
 
 
 if __name__ == "__main__":

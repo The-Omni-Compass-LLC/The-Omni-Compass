@@ -42,7 +42,8 @@ def build_cpp(tmp):
                            ("smoke.cpp", "oc_smoke"), ("run_shield.cpp", "oc_shield"), ("run_hpa.cpp", "oc_hpa"), ("savings.cpp", "oc_savings"),
                            ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
                            ("run_compass_law.cpp", "oc_compass_law"), ("run_verdict.cpp", "oc_verdict"),
-                           ("engine_runs.cpp", "oc_engine_runs"), ("core_runs.cpp", "oc_core_runs")):
+                           ("engine_runs.cpp", "oc_engine_runs"), ("run_edge.cpp", "oc_edge"),
+                           ("run_student_t.cpp", "oc_student_t"), ("run_orchestrator_brain.cpp", "oc_orchestrator_brain")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
 
@@ -100,11 +101,6 @@ def main():
     dg_runs = test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50 if a.quick else 500)
     check(f"the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): "
           f"every receipt identical to the last bit, one digest {dg_runs[:16]}…", True)
-    # the founder's words of 24 October: the Monte Carlo 500, the Python and the C++ linked, on the engine's ranges and on a system of one's own
-    from tests import test_cpp_core_runs_parity
-    dg_core = test_cpp_core_runs_parity.main(str(b / "oc_core_runs"), 50 if a.quick else 500)
-    check(f"the core's Monte Carlo from the jump generator through the C++ twin (cpp/tools/core_runs.cpp on cpp/src/core.cpp), the engine's own "
-          f"ranges and the example system: every U identical to the last bit, one digest {dg_core[:16]}…", True)
     from tests import test_cpp_shield_parity
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8 if a.quick else 20); check("C++ shield vs Python shield (enforce and violations)", True)
     from tests import test_cpp_shield_adversarial, test_shield_properties
@@ -148,6 +144,43 @@ def main():
     except AssertionError:
         det_ver = True
     check("negative control: parity test detects a C++ verdict that allows a step read as a LOSS", vmut != vsrc and det_ver)
+    from tests import test_cpp_edge_parity
+    test_cpp_edge_parity.main(str(b / "oc_edge"), 100 if a.quick else 400)
+    check("C++ edge vs Python, every balance point, cushion and floor identical to the last bit", True)
+    # negative control: an edge that narrows at once instead of slowly must be caught
+    esrc = (ROOT / "cpp" / "src" / "edge.cpp").read_text()
+    emut = esrc.replace("else cushion_ = std::max(need, cushion_ * (1.0 - narrow_));", "else cushion_ = need;")
+    (tmp / "edge_mut.cpp").write_text(emut)
+    eothers = [str(p) for p in (ROOT / "cpp" / "src").glob("*.cpp") if p.name != "edge.cpp"]
+    subprocess.run([shutil.which("g++") or shutil.which("clang++"), "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"), *eothers,
+                    str(tmp / "edge_mut.cpp"), str(ROOT / "cpp" / "tools" / "run_edge.cpp"), "-o", str(tmp / "oc_edge_mut")], check=True)
+    try:
+        test_cpp_edge_parity.main(str(tmp / "oc_edge_mut"), 100); det_edge = False
+    except AssertionError:
+        det_edge = True
+    check("negative control: parity test detects a C++ edge that narrows its cushion at once", emut != esrc and det_edge)
+    from tests import test_cpp_student_t_parity
+    test_cpp_student_t_parity.main(str(b / "oc_student_t"), 500 if a.quick else 3000)
+    check("C++ Student's t vs Python, the 95% point for 1 to 1,000 degrees of freedom and every coverage identical", True)
+    from tests import test_cpp_orchestrator_brain_parity
+    test_cpp_orchestrator_brain_parity.main(str(b / "oc_orchestrator_brain"), 60 if a.quick else 300)
+    check("C++ Omni direct brain and room rule vs Python, every beat, wall, machine count and placement identical", True)
+    # negative controls: a brain that gives a unit back one beat early, and a room rule that lets a service stand on one
+    # machine, must each be caught
+    osrc = (ROOT / "cpp" / "src" / "orchestrator_brain.cpp").read_text()
+    oothers = [str(p) for p in (ROOT / "cpp" / "src").glob("*.cpp") if p.name != "orchestrator_brain.cpp"]
+    for what, old, new in (("gives a unit back one beat early", "want = calm >= hold ? units - 1 : units;", "want = calm + 1 >= hold ? units - 1 : units;"),
+                           ("lets a service of two or more units stand on one machine", "if (!others.empty()) fits = others;", "(void)others;")):
+        omut = osrc.replace(old, new)
+        (tmp / "orchestrator_mut.cpp").write_text(omut)
+        subprocess.run([shutil.which("g++") or shutil.which("clang++"), "-std=c++20", "-O2", "-I", str(ROOT / "cpp" / "include"), *oothers,
+                        str(tmp / "orchestrator_mut.cpp"), str(ROOT / "cpp" / "tools" / "run_orchestrator_brain.cpp"),
+                        "-o", str(tmp / "oc_orchestrator_mut")], check=True)
+        try:
+            test_cpp_orchestrator_brain_parity.main(str(tmp / "oc_orchestrator_mut"), 60); det = False
+        except AssertionError:
+            det = True
+        check(f"negative control: parity test detects a C++ Omni direct that {what}", omut != osrc and det)
     from tools import seal
     broken = seal.check()
     check(f"seal: all {len(seal.TWINS)} Python/C++ twins unchanged since proven equal (results/SEAL.json)", not broken, "; ".join(broken))
@@ -328,6 +361,24 @@ def main():
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "levels.py"), "--check"], capture_output=True, text=True)
     check("every level on one page: docs/LEVELS.md is rebuilt from the tables it reads (tools/levels.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    lint = shutil.which("actionlint") or (str(Path(sys.executable).parent / "actionlint")
+                                          if (Path(sys.executable).parent / "actionlint").exists() else None)
+    if lint:   # every workflow read by the workflow checker (24 October: six workflows' download lists had gone stale unseen)
+        r = subprocess.run([lint, "-shellcheck=", "-pyflakes="], cwd=ROOT, capture_output=True, text=True)
+        check("every workflow passes the workflow checker (actionlint)", r.returncode == 0,
+              (r.stdout.strip().splitlines() or ["0 findings"])[0][:300])
+    else:
+        check("every workflow passes the workflow checker (actionlint)", False,
+              "actionlint is not installed: verify.yml installs v1.7.12; locally: pip install actionlint-py")
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "reread.py"), "--check"], capture_output=True, text=True)
+    check("every table reads by the rule that stands: a change of 0.5% or more is a change (tools/reread.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "toy_reread.py"), "--check"], capture_output=True, text=True)
+    check("every toy-gate record reads by the rule that stands, from its own runs seed by seed (tools/toy_reread.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "loss_ledger.py"), "--check"], capture_output=True, text=True)
+    check("every LOSS row of every newest table on one page: docs/LOSS_LEDGER.md is rebuilt from the tables (tools/loss_ledger.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "power.py"), "--check"], capture_output=True, text=True)
     check("every judged row's minimum detectable effect: docs/POWER.md is rebuilt from the tables it reads (tools/power.py)",

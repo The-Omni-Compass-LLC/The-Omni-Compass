@@ -100,11 +100,11 @@ def judge(study):
                   for g in GAUGES}
             vm = None if name == main_key else {
                 g: reading(g, [by[s][g] - main[s][g] for s in seeds], [main[s][g] for s in seeds], PACE_GAUGES) for g in PACE_GAUGES}
-            admissible = all(not vn[g]["word"].startswith("LOSS") for g in GAUGES) and \
-                not (setting == "cloud" and vn[BILL]["word"].startswith("power given"))
+            admissible = all(vn[g]["word"] != "LOSS" for g in GAUGES) and \
+                not (setting == "cloud" and vn[BILL]["word"] == "power given")
             dominates = vm is not None and admissible and \
-                all(not vm[g]["word"].startswith(("LOSS", "power given")) for g in aims) and any(vm[g]["word"].startswith("GAIN") for g in aims)
-            gains = [g for g in aims if vn[g]["word"].startswith("GAIN")]
+                all(vm[g]["word"] not in ("LOSS", "power given") for g in aims) and any(vm[g]["word"] == "GAIN" for g in aims)
+            gains = [g for g in aims if vn[g]["word"] == "GAIN"]
             score = (len(gains), sum(-vn[g]["relative"] for g in gains))
             mean = {g: sum(by[s][g] for s in seeds) / len(seeds) for g in PACE_GAUGES}
             rows[name] = {"tune": next(t for t in tunes(setting) if key(t) == name), "mean": mean, "vs_native": vn,

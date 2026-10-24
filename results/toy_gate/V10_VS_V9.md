@@ -2,22 +2,18 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
-**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_one, as `tools/toy_gate.py` reads a model now): a paired change of 0.5% or more either way is a change and never reads EVEN; it reads its word by the gauge's aim, with "(not clear of the noise)" beside it where its 95% interval over the seeds crosses zero; under 0.5% it reads EVEN, under the floor. Each reading was decided again from the JSON twin's own mean, interval and relative change, and every row whose words moved is printed again, its numbers wearing their words' signs; every seed, number and row is as first written. Where a paragraph below says EVEN for an interval across zero, this rule replaces it. Evidence class S, our own models, never a benchmark result.
-<!-- end: read again -->
-
 Seeds 1 to 8, 1.0 day each where a day is run; the standing engine omni-v9, the candidate omni-v10. Evidence class S, our own models: a reading here says whether a change shows promise before a real run, never what a benchmark found. Each candidate reading is paired by seed with the standing engine's (the mean change, its 95% interval over the seeds, the word by the gauge's aim: tools/readings.py).
 
 ## cluster (a decision every 60 s)
 
 | Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |
 |---|---:|---:|---:|---|---|---|
-| machine_hours | 133.057 | 131.119 | 131.119 | =0.00% EVEN (identical) | +1.46% GAIN (not clear of the noise) | +1.46% GAIN (not clear of the noise) |
-| kwh_per_core_hour | 0.036 | 0.035 | 0.035 | +0.00% EVEN (identical) | -2.71% GAIN | -2.71% GAIN |
-| pending_pod_minutes_per_hour | 7.311 | 22.651 | 22.651 | =0.00% EVEN (identical) | −209.81% LOSS (not clear of the noise) | −209.81% LOSS (not clear of the noise) |
-| hpa_shortfall_minutes_per_hour | 3.605 | 3.612 | 3.612 | =0.00% EVEN (identical) | =0.18% EVEN, under the floor | =0.18% EVEN, under the floor |
-| p95_ms | 80.147 | 80.653 | 80.653 | =0.00% EVEN (identical) | −0.63% LOSS (not clear of the noise) | −0.63% LOSS (not clear of the noise) |
-| alert_minutes | 26.625 | 27.125 | 27.125 | =0.00% EVEN (identical) | −1.88% LOSS (not clear of the noise) | −1.88% LOSS (not clear of the noise) |
+| machine_hours | 133.057 | 131.119 | 131.119 | =0.00% EVEN (identical) | +1.46% GAIN | +1.46% GAIN |
+| kwh_per_core_hour | 0.036 | 0.035 | 0.035 | =0.00% EVEN (identical) | +2.71% GAIN | +2.71% GAIN |
+| pending_pod_minutes_per_hour | 7.311 | 22.651 | 22.651 | =0.00% EVEN (identical) | −209.81% LOSS | −209.81% LOSS |
+| hpa_shortfall_minutes_per_hour | 3.605 | 3.612 | 3.612 | =0.00% EVEN (identical) | =0.18% EVEN | =0.18% EVEN |
+| p95_ms | 80.147 | 80.653 | 80.653 | =0.00% EVEN (identical) | −0.63% LOSS | −0.63% LOSS |
+| alert_minutes | 26.625 | 27.125 | 27.125 | =0.00% EVEN (identical) | −1.88% LOSS | −1.88% LOSS |
 
 Counts over all seeds: steps_allowed {'base': 54, 'cand': 54}, steps_refused {'base': 77, 'cand': 77}, trials_abandoned {'base': 136, 'cand': 136}, machines_parked {'base': 1464, 'cand': 1464}, errors {'base': 0, 'cand': 0}
 
@@ -25,12 +21,12 @@ Counts over all seeds: steps_allowed {'base': 54, 'cand': 54}, steps_refused {'b
 
 | Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |
 |---|---:|---:|---:|---|---|---|
-| machine_hours | 133.057 | 133.505 | 133.505 | =0.00% EVEN (identical) | =0.34% EVEN, under the floor | =0.34% EVEN, under the floor |
-| kwh_per_core_hour | 0.036 | 0.035 | 0.035 | +0.00% EVEN (identical) | -3.19% GAIN | -3.19% GAIN |
-| pending_pod_minutes_per_hour | 7.311 | 15.480 | 15.480 | +0.00% EVEN (identical) | +111.74% LOSS | +111.74% LOSS |
-| hpa_shortfall_minutes_per_hour | 3.605 | 3.605 | 3.605 | =0.00% EVEN (identical) | =0.00% EVEN, under the floor | =0.00% EVEN, under the floor |
-| p95_ms | 80.147 | 80.413 | 80.413 | =0.00% EVEN (identical) | =0.33% EVEN, under the floor | =0.33% EVEN, under the floor |
-| alert_minutes | 26.625 | 27.000 | 27.000 | =0.00% EVEN (identical) | −1.41% LOSS (not clear of the noise) | −1.41% LOSS (not clear of the noise) |
+| machine_hours | 133.057 | 133.505 | 133.505 | =0.00% EVEN (identical) | =0.34% EVEN | =0.34% EVEN |
+| kwh_per_core_hour | 0.036 | 0.035 | 0.035 | =0.00% EVEN (identical) | +3.19% GAIN | +3.19% GAIN |
+| pending_pod_minutes_per_hour | 7.311 | 15.480 | 15.480 | =0.00% EVEN (identical) | −111.74% LOSS | −111.74% LOSS |
+| hpa_shortfall_minutes_per_hour | 3.605 | 3.605 | 3.605 | =0.00% EVEN (identical) | =0.00% EVEN | =0.00% EVEN |
+| p95_ms | 80.147 | 80.413 | 80.413 | =0.00% EVEN (identical) | =0.33% EVEN | =0.33% EVEN |
+| alert_minutes | 26.625 | 27.000 | 27.000 | =0.00% EVEN (identical) | −1.41% LOSS | −1.41% LOSS |
 
 Counts over all seeds: steps_allowed {'base': 63, 'cand': 63}, steps_refused {'base': 70, 'cand': 70}, trials_abandoned {'base': 225, 'cand': 225}, machines_parked {'base': 4212, 'cand': 4212}, errors {'base': 0, 'cand': 0}
 
@@ -38,14 +34,14 @@ Counts over all seeds: steps_allowed {'base': 63, 'cand': 63}, steps_refused {'b
 
 | Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |
 |---|---:|---:|---:|---|---|---|
-| requests_served | 31419.002 | 51593.967 | 51593.967 | +0.00% EVEN (identical) | +64.21% GAIN | +64.21% GAIN |
-| start_wait_s | 9.787 | 10.667 | 10.667 | +0.00% EVEN (identical) | +8.99% LOSS | +8.99% LOSS |
-| start_wait_p95_s | 10.000 | 11.000 | 11.000 | +0.00% EVEN (identical) | +10.00% LOSS | +10.00% LOSS |
-| p95_ms | 228.740 | 107.294 | 107.294 | +0.00% EVEN (identical) | -53.09% GAIN | -53.09% GAIN |
+| requests_served | 31419.002 | 51593.967 | 51593.967 | =0.00% EVEN (identical) | +64.21% GAIN | +64.21% GAIN |
+| start_wait_s | 9.787 | 10.667 | 10.667 | =0.00% EVEN (identical) | −8.99% LOSS | −8.99% LOSS |
+| start_wait_p95_s | 10.000 | 11.000 | 11.000 | =0.00% EVEN (identical) | −10.00% LOSS | −10.00% LOSS |
+| p95_ms | 228.740 | 107.294 | 107.294 | =0.00% EVEN (identical) | +53.09% GAIN | +53.09% GAIN |
 | alert_minutes | 0.000 | 0.000 | 0.000 | EVEN (identical) | EVEN (identical) | EVEN (identical) |
-| host_busy | 0.282 | 0.371 | 0.371 | +0.00% EVEN (identical) | +31.53% power given | +31.53% power given |
-| limit_given_m | 4134.375 | 11062.167 | 11062.167 | +0.00% EVEN (identical) | +167.57% power given | +167.57% power given |
-| pod_seconds | 29767.500 | 35178.750 | 35178.750 | +0.00% EVEN (identical) | +18.18% power given | +18.18% power given |
+| host_busy | 0.282 | 0.371 | 0.371 | =0.00% EVEN (identical) | +31.53% power given | +31.53% power given |
+| limit_given_m | 4134.375 | 11062.167 | 11062.167 | =0.00% EVEN (identical) | +167.57% power given | +167.57% power given |
+| pod_seconds | 29767.500 | 35178.750 | 35178.750 | =0.00% EVEN (identical) | +18.18% power given | +18.18% power given |
 
 Counts over all seeds: starts {'native': 216, 'base': 168, 'cand': 168}, starts_past_75 {'native': 0, 'base': 0, 'cand': 0}
 
@@ -53,18 +49,20 @@ Counts over all seeds: starts {'native': 216, 'base': 168, 'cand': 168}, starts_
 
 | Gauge | Native | Standing | Candidate | Candidate against standing | Standing against native | Candidate against native |
 |---|---:|---:|---:|---|---|---|
-| requests_served | 31419.002 | 51593.967 | 51593.967 | +0.00% EVEN (identical) | +64.21% GAIN | +64.21% GAIN |
-| start_wait_s | 9.787 | 10.667 | 10.667 | +0.00% EVEN (identical) | +8.99% LOSS | +8.99% LOSS |
-| start_wait_p95_s | 10.000 | 11.000 | 11.000 | +0.00% EVEN (identical) | +10.00% LOSS | +10.00% LOSS |
-| p95_ms | 228.740 | 107.294 | 107.294 | +0.00% EVEN (identical) | -53.09% GAIN | -53.09% GAIN |
+| requests_served | 31419.002 | 51593.967 | 51593.967 | =0.00% EVEN (identical) | +64.21% GAIN | +64.21% GAIN |
+| start_wait_s | 9.787 | 10.667 | 10.667 | =0.00% EVEN (identical) | −8.99% LOSS | −8.99% LOSS |
+| start_wait_p95_s | 10.000 | 11.000 | 11.000 | =0.00% EVEN (identical) | −10.00% LOSS | −10.00% LOSS |
+| p95_ms | 228.740 | 107.294 | 107.294 | =0.00% EVEN (identical) | +53.09% GAIN | +53.09% GAIN |
 | alert_minutes | 0.000 | 0.000 | 0.000 | EVEN (identical) | EVEN (identical) | EVEN (identical) |
-| host_busy | 0.282 | 0.371 | 0.371 | +0.00% EVEN (identical) | +31.53% power given | +31.53% power given |
-| limit_given_m | 4134.375 | 11062.167 | 11062.167 | +0.00% EVEN (identical) | +167.57% power given | +167.57% power given |
-| pod_seconds | 29767.500 | 35178.750 | 35178.750 | +0.00% EVEN (identical) | +18.18% power given | +18.18% power given |
+| host_busy | 0.282 | 0.371 | 0.371 | =0.00% EVEN (identical) | +31.53% power given | +31.53% power given |
+| limit_given_m | 4134.375 | 11062.167 | 11062.167 | =0.00% EVEN (identical) | +167.57% power given | +167.57% power given |
+| pod_seconds | 29767.500 | 35178.750 | 35178.750 | =0.00% EVEN (identical) | +18.18% power given | +18.18% power given |
 
 Counts over all seeds: starts {'native': 216, 'base': 168, 'cand': 168}, starts_past_75 {'native': 0, 'base': 0, 'cand': 0}
 
 ## verdict
+
+20 pieces of work a decision, their log spread 0.25:
 
 | True extra cost of a give-back step | Allowed, standing | Allowed, candidate |
 |---|---|---|

@@ -25,9 +25,9 @@ stand warmer than their twins (inflamed), the body's heat debt (the signal that 
 whether the body gave back (no room on the bone's lines, or a heat debt), and the machines held over the pools' twins.
 
 The three-run readings: for each gauge, the paired change per decision, averaged over blocks of ten decisions, with its
-95% interval (Student's t over the blocks), in each run; read by the one rule (tools/readings.py judge_runs, the founder's
-order of 24 October 2026): EVEN only when every run's change is under 0.5%; from 0.5% up the word by the gauge's aim when the
-runs that moved 0.5% or more point the same way; "the runs disagree" when they point different ways. Evidence class S. Usage: python3 docs/engine/export_harness_trace.py OUT.json
+95% interval (Student's t over the blocks), in each run; GAIN or LOSS when all three runs point the same way with every
+interval clear of zero (the word by the gauge's aim), EVEN when an interval includes zero, "the runs disagree" when clear
+runs point different ways (tools/readings.py). Evidence class S. Usage: python3 docs/engine/export_harness_trace.py OUT.json
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from realms.harness import (native_off_pool, Body, KILL_AT, WALK, aggregate, catalog, make_plant, scale_load, scale_load_plant,  # noqa: E402
+from realms.harness import (Body, KILL_AT, WALK, aggregate, catalog, make_plant, scale_load, scale_load_plant,  # noqa: E402
                             walk_back)
 from realms.compass_arm_v5 import Bone, V5CFG, heat_debt, machines, max_apply, max_body_step, v5_position   # noqa: E402
 from realms.presets import ORGANISM_STEPS                                                     # noqa: E402
@@ -104,13 +104,7 @@ def run(rs, seed, arm):
     b = Body(rs, seed)
     scale_load(b, "climb")
     n, kill_at = len(b.plants), int(KILL_AT * ORGANISM_STEPS)
-    bone = Bone(b, V5CFG) if arm in ("omni", "solo") else None
-    if arm == "solo":   # Omni-Compass by itself (realms/harness.py SOLO): the max, every pool whose count is its knob with its own autoscaler off, its twin too
-        for i, (p, r) in enumerate(zip(b.plants, b.rows)):
-            if native_off_pool(p.template, r["knob"]):
-                p.native_off = True
-                if i in bone.twins:
-                    bone.twins[i].native_off = True
+    bone = Bone(b, V5CFG) if arm == "omni" else None
     last = [None] * n
     rec = {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power_kw": [], "obs": [], "imm": [], "mach": [], "troom": [], "own": []}
     own_st = [{} for _ in b.plants]
@@ -129,7 +123,7 @@ def run(rs, seed, arm):
     for k in range(ORGANISM_STEPS):
         b.couple()
         wrote = [0] * n
-        if arm in ("omni", "solo"):
+        if arm == "omni":
             if k >= kill_at:
                 for p in b.plants:
                     walk_back(p, kill_at + WALK - k)
@@ -184,17 +178,15 @@ def run_alone(row, seed, arm, load="line"):
     knob, steps = row["knob"], plant.steps
     kill_at = int(KILL_AT * steps)
     twin = None
-    if arm in ("omni", "solo"):
+    if arm == "omni":
         twin = make_plant(row, seed)
         scale_load_plant(twin, load)
-        if arm == "solo" and native_off_pool(row["template"], knob):   # by itself: the pool's own autoscaler off, in the plant and its twin
-            plant.native_off = twin.native_off = True
     last, rec, pv, pw = None, {"p": [], "over": [], "held": [], "wrote": [], "work": [], "power": [], "obs": [], "own": []}, 0, 0.0
     own_st = {}
     own_last = own_cmd(plant, own_st)
     for k in range(steps):
         wrote = 0
-        if arm in ("omni", "solo"):
+        if arm == "omni":
             if k < kill_at:
                 twin.step()
                 v = max_apply(plant, knob, V5CFG, twin)
@@ -266,12 +258,21 @@ def gauges(nat, omn):
 
 
 def reading(per_run, aim):
-    """The one three-run rule (tools/readings.py judge_runs, the founder's order of 24 October 2026) on the per-run intervals
-    [(change, lo, hi)], each relative to native, reduced to its word."""
-    from tools.readings import judge_word, EXPORT_AIMS, LOWER
+    """The three-run rule on the per-run intervals [(mean, lo, hi)]."""
     if aim == "shown":
         return "shown"          # a gauge no rule of the engine aims at: its change is shown, never judged
-    return judge_word([m for m, _, _ in per_run], [(lo > 0) or (hi < 0) for _, lo, hi in per_run], EXPORT_AIMS.get(aim, LOWER))
+    clear = [(lo > 0) or (hi < 0) for _, lo, hi in per_run]
+    if not all(clear):
+        return "EVEN"
+    signs = {m > 0 for m, _, _ in per_run}
+    if len(signs) > 1:
+        return "the runs disagree"
+    rose = signs.pop()
+    if aim == "shown":
+        return "shown"
+    if aim == "spent":
+        return "power given" if rose else "GAIN"
+    return "GAIN" if (rose if aim == "up" else not rose) else "LOSS"
 
 
 def pack(rec, n):
@@ -291,30 +292,18 @@ def pack(rec, n):
 
 def section(rs, runner, steps, kill_at):
     sec = {"steps": steps, "kill_at": kill_at, "walk": WALK, "seeds": list(SEEDS), "runs": {}, "readings": {}}
-    per, per_solo = {}, {}
+    per = {}
     for sd in SEEDS:
-        nat, omn, solo = runner(rs, sd, "native"), runner(rs, sd, "omni"), runner(rs, sd, "solo")
-        g, gs = gauges(nat, omn), gauges(nat, solo)
+        nat, omn = runner(rs, sd, "native"), runner(rs, sd, "omni")
+        g = gauges(nat, omn)
         if "line" in nat:            # each muscle alone: the share of its run each arm took to clear its line
             pairs = [(x, y) for x, y in zip(nat["line"], omn["line"]) if x is not None and y is not None]
             g["line"] = ([x for x, _ in pairs], [y for _, y in pairs], "down")
-        pn, po, ps = pack(nat, len(rs)), pack(omn, len(rs)), pack(solo, len(rs))
-        pn["wk"], po["wk"], ps["wk"] = [round(x, 6) for x in g["work"][0]], [round(x, 6) for x in g["work"][1]], [round(x, 6) for x in gs["work"][1]]
+        pn, po = pack(nat, len(rs)), pack(omn, len(rs))
+        pn["wk"], po["wk"] = [round(x, 6) for x in g["work"][0]], [round(x, 6) for x in g["work"][1]]
         if "line" in nat:
-            pn["line"], po["line"], ps["line"] = nat["line"], omn["line"], solo["line"]
-        sec["runs"][str(sd)] = {"native": pn, "omni": po, "solo": ps}
-        if "line" in nat:
-            pairs = [(x, y) for x, y in zip(nat["line"], solo["line"]) if x is not None and y is not None]
-            gs["line"] = ([x for x, _ in pairs], [y for _, y in pairs], "down")
-        for key, (x, y, aim) in gs.items():   # Omni-Compass by itself against native, read the same way
-            d = [b2 - a2 for a2, b2 in zip(x, y)]
-            if key == "line":
-                m = st.mean(d); half = t95(len(d) - 1) * st.stdev(d) / math.sqrt(len(d)); lo, hi = m - half, m + half
-            else:
-                m, lo, hi = interval(d)
-            base = st.mean(x) or 1e-12
-            per_solo.setdefault(key, {"aim": aim, "runs": []})["runs"].append(
-                {"seed": sd, "native": st.mean(x), "solo": st.mean(y), "change": m / base, "lo": lo / base, "hi": hi / base})
+            pn["line"], po["line"] = nat["line"], omn["line"]
+        sec["runs"][str(sd)] = {"native": pn, "omni": po}
         for key, (x, y, aim) in g.items():
             d = [b2 - a2 for a2, b2 in zip(x, y)]
             if key == "line":            # paired over the muscles that hold a line, not over blocks of decisions
@@ -328,10 +317,6 @@ def section(rs, runner, steps, kill_at):
         v["reading"] = reading([(r["change"], r["lo"], r["hi"]) for r in v["runs"]], v["aim"])
         print(f"  {key:7s} {v['reading']:18s} " + "  ".join(f"{r['change']*100:+.4f}% [{r['lo']*100:+.4f}, {r['hi']*100:+.4f}]" for r in v["runs"]))
     sec["readings"] = per
-    for key, v in per_solo.items():
-        v["reading"] = reading([(r["change"], r["lo"], r["hi"]) for r in v["runs"]], v["aim"])
-        print(f"  by itself {key:7s} {v['reading']:18s} " + "  ".join(f"{r['change']*100:+.4f}%" for r in v["runs"]))
-    sec["readings_solo"] = per_solo
     return sec
 
 

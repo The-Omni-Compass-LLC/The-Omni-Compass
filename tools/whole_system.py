@@ -152,16 +152,16 @@ def interval(est):
 
 
 def word_for(gauge, est):
-    """The word for a composed ratio (toward the gauge's aim above 1) by the one rule (tools/readings.py, the founder's order of
-    24 October 2026): within 0.5% of 1 EVEN, under the floor; from 0.5% up GAIN above 1, and below 1 a LOSS for work and speed
-    and power given for a resource or the bill, "(not clear of the noise)" beside the word where the interval includes 1."""
+    """The word for a composed ratio: GAIN when its whole interval is above 1; below 1 a LOSS for work and speed and power given
+    for a resource or the bill; EVEN when the interval includes 1."""
     if est is None:
         return "not measured"
     r, lo, hi = interval(est)
-    if abs(r - 1.0) < readings.SIZE_FLOOR:
-        return readings.EVEN_FLOOR
-    w = readings.GAIN if r > 1.0 else (readings.LOSS if AIM[gauge] in ("higher", "lower") else readings.GIVEN)
-    return w if (lo > 1.0 or hi < 1.0) else f"{w} (not clear of the noise)"
+    if lo > 1.0:
+        return readings.GAIN
+    if hi < 1.0:
+        return readings.LOSS if AIM[gauge] in ("higher", "lower") else readings.GIVEN
+    return readings.EVEN
 
 
 def pct(r):

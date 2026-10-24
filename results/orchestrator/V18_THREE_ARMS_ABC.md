@@ -2,22 +2,22 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni direct's three arms, three runs on GitHub's own machines (A, B and C from one commit), the full form: 18 steps of 25 s, clients 1 2 3 2 3 4 ..., the busy room rule. Commit `0ca2bbdac97f`, engine omni-v18 (digest 1cb92edb64c4391d, 62 files); runs A 40023524338, B 40023529155, C 40023534013 (their files on the branch `raw`, `run-<id>/`). Native is Kubernetes' published autoscaling rule on the muscles, written by us; Omni on native is Omni-Compass on top of that rule; Omni direct is Omni-Compass alone on the muscles, no Kubernetes. Each run reads every pair by the one key, paired by step; the three runs are combined by the one rule (tools/readings.py): GAIN, LOSS or power given in all three when every run's interval is clear of zero on the same side, EVEN when any run's interval holds zero, the runs disagree when clear runs point different ways.
+Omni direct's three arms, three runs on GitHub's own machines (A, B and C from one commit), the full form: 18 steps of 25 s, clients 1 2 3 2 3 4 ..., the busy room rule. Commit `0ca2bbdac97f`, engine omni-v18 (digest 1cb92edb64c4391d, 62 files); runs A 40023524338, B 40023529155, C 40023534013 (their files on the branch `raw`, `run-<id>/`). Native is Kubernetes' published autoscaling rule on the muscles, written by us; Omni on native is Omni-Compass on top of that rule; Omni direct is Omni-Compass alone on the muscles, no Kubernetes. Each run reads every pair by the one key, paired by step; the three runs are combined by the one rule (tools/readings.py, the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim, in all three of our runs where every run moved the same way clear of zero, otherwise by the mean of our three runs with the count of runs beyond the noise; EVEN under 0.5%; the runs disagree when runs moved 0.5% or more in opposite directions. Each run's own word stands beside its number by the same floor.
 
 | Pair | Gauge | Three runs | A | B | C |
 |---|---|---|---|---|---|
-| Omni on native against native | Work (requests a step) | **GAIN in all three** | GAIN, up 5.2% | GAIN, up 5.3% | GAIN, up 7.4% |
-| Omni on native against native | The 95th percentile (ms) | **GAIN in all three** | GAIN, down 9.0% | GAIN, down 12.1% | GAIN, down 7.5% |
-| Omni on native against native | Machines | **EVEN (2 of 3 runs within the noise)** | EVEN, down 2.2% | GAIN (a cut), down 4.6% | EVEN, down 2.4% |
-| Omni on native against native | Units | **power given in all three** | power given, up 11.0% | power given, up 8.9% | power given, up 10.8% |
-| Omni direct against native | Work (requests a step) | **GAIN in all three** | GAIN, up 7.3% | GAIN, up 5.7% | GAIN, up 9.4% |
-| Omni direct against native | The 95th percentile (ms) | **GAIN in all three** | GAIN, down 9.8% | GAIN, down 15.7% | GAIN, down 10.8% |
-| Omni direct against native | Machines | **EVEN (3 of 3 runs within the noise)** | EVEN, down 2.2% | EVEN, down 3.1% | EVEN, down 2.2% |
-| Omni direct against native | Units | **EVEN (1 of 3 runs within the noise)** | power given, up 6.9% | EVEN, down 0.3% | power given, up 9.0% |
-| Omni direct against Omni on native | Work (requests a step) | **EVEN (2 of 3 runs within the noise)** | EVEN, up 2.0% | EVEN, up 0.4% | GAIN, up 1.9% |
-| Omni direct against Omni on native | The 95th percentile (ms) | **EVEN (3 of 3 runs within the noise)** | EVEN, down 0.9% | EVEN, down 4.0% | EVEN, down 3.6% |
-| Omni direct against Omni on native | Machines | **EVEN (3 of 3 runs within the noise)** | EVEN, unchanged | EVEN, up 1.6% | EVEN, up 0.2% |
-| Omni direct against Omni on native | Units | **EVEN (2 of 3 runs within the noise)** | EVEN, down 3.7% | GAIN (a cut), down 8.5% | EVEN, down 1.7% |
+| Omni on native against native | Work (requests a step) | **GAIN in all three of our runs** | GAIN, up 5.2% | GAIN, up 5.3% | GAIN, up 7.4% |
+| Omni on native against native | The 95th percentile (ms) | **GAIN in all three of our runs** | GAIN, down 9.0% | GAIN, down 12.1% | GAIN, down 7.5% |
+| Omni on native against native | Machines | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** | GAIN, down 2.2% | GAIN, down 4.6% | GAIN, down 2.4% |
+| Omni on native against native | Units | **power given in all three of our runs** | power given, up 11.0% | power given, up 8.9% | power given, up 10.8% |
+| Omni direct against native | Work (requests a step) | **GAIN in all three of our runs** | GAIN, up 7.3% | GAIN, up 5.7% | GAIN, up 9.4% |
+| Omni direct against native | The 95th percentile (ms) | **GAIN in all three of our runs** | GAIN, down 9.8% | GAIN, down 15.7% | GAIN, down 10.8% |
+| Omni direct against native | Machines | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** | GAIN, down 2.2% | GAIN, down 3.1% | GAIN, down 2.2% |
+| Omni direct against native | Units | **power given by the mean of our three runs, beyond the noise in 2 of 3** | power given, up 6.9% | EVEN, down 0.3% | power given, up 9.0% |
+| Omni direct against Omni on native | Work (requests a step) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** | GAIN, up 2.0% | EVEN, up 0.4% | GAIN, up 1.9% |
+| Omni direct against Omni on native | The 95th percentile (ms) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** | GAIN, down 0.9% | GAIN, down 4.0% | GAIN, down 3.6% |
+| Omni direct against Omni on native | Machines | **power given by the mean of our three runs, beyond the noise in 0 of 3** | EVEN, unchanged | power given, up 1.6% | EVEN, up 0.2% |
+| Omni direct against Omni on native | Units | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** | GAIN, down 3.7% | GAIN, down 8.5% | GAIN, down 1.7% |
 
 Each arm's totals in each run (requests answered, failed, wrong, the 95th percentile in ms, machine-minutes, unit-minutes):
 

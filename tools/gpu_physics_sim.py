@@ -137,13 +137,8 @@ def table(gamma, nat, om):
     m, lo, hi = paired(nat, om, kj)
     base95 = statistics.mean(x[p95] for x in nat); _, _, hi95 = paired(nat, om, p95)
     guard = hi95 <= 0.10 * base95
-    base_kj = statistics.mean(x[kj] for x in nat)
-    rel = m / abs(base_kj) if base_kj else 0.0
-    # the one rule (tools/readings.py, the founder's order of 24 October 2026): under 0.5% EVEN, under the floor; from 0.5% up the
-    # change in its words, clear of the noise or not
-    word = (f"EVEN, under the floor ({100 * abs(rel):.2f}%, under 0.5%)" if abs(rel) < 0.005
-            else "more requests per kJ, clear of the noise" if lo > 0 else "fewer requests per kJ, clear of the noise" if hi < 0
-            else f"{'more' if m > 0 else 'fewer'} requests per kJ, not clear of the noise")
+    word = ("more requests per kJ, clear of the noise" if lo > 0 else "fewer requests per kJ, clear of the noise" if hi < 0
+            else "EVEN, no difference beyond the noise")
     if lo > 0 and not guard:
         word = "more requests per kJ, fails the service guardrail"
     out += ["", f"Guardrail (preregistered): 95th-percentile response time not above +10%: "

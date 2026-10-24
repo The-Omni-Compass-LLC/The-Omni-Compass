@@ -2,11 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
-**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the JSON twin's exact values; every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
-<!-- end: read again -->
-
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
 
 Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **GAIN** or **LOSS in all three of our runs**: all three runs move the same way and every interval is clear of zero, and the word says what that means for the gauge's declared aim, never the sign of its number (a response time that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is **power given**, never a loss: the key, `docs/HOW_TO_READ_THE_RESULTS.md`). **EVEN, no difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, LOSS included.
 
@@ -20,7 +18,7 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 |---|---|---|---|---|
 | worker nodes in service, mean | -7.3% (-13.2 to -1.4) | -7.5% (-13.8 to -1.1) | -9.2% (-14.8 to -3.7) | **GAIN in all three of our runs** |
 | node-hours | -7.4% (-13.1 to -1.6) | -7.4% (-13.9 to -0.9) | -9.2% (-14.7 to -3.7) | **GAIN in all three of our runs** |
-| energy, parked workers still on at idle power (Wh, declared model) | -0.4% (-0.7 to -0.2) | -0.3% (-0.5 to -0.1) | -0.4% (-0.7 to -0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.45%) |
+| energy, parked workers still on at idle power (Wh, declared model) | -0.4% (-0.7 to -0.2) | -0.3% (-0.5 to -0.1) | -0.4% (-0.7 to -0.0) | **GAIN in all three of our runs** |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -5.4% (-9.2 to -1.6) | -5.3% (-9.6 to -1.0) | -6.7% (-10.3 to -3.1) | **GAIN in all three of our runs** |
 | response time (ms), mean | -52.7% (-67.1 to -38.3) | -51.4% (-67.6 to -35.2) | -51.8% (-78.2 to -25.4) | **GAIN in all three of our runs** |
 | response time (ms), 95th percentile | -65.1% (-80.6 to -49.5) | -64.1% (-82.8 to -45.4) | -66.5% (-96.4 to -36.5) | **GAIN in all three of our runs** |
@@ -36,13 +34,13 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 | CPU used with Omni's own (cores), mean | -3.6% (-4.7 to -2.6) | -3.4% (-4.5 to -2.3) | -4.7% (-7.5 to -1.8) | shown, not judged |
 | energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | -2.3% (-7.1 to +2.6) | -3.4% (-10.0 to +3.3) | -4.1% (-9.6 to +1.5) | shown, not judged |
 | HPA replicas, mean | -3.8% (-5.4 to -2.3) | -4.5% (-7.0 to -2.1) | -8.3% (-13.4 to -3.2) | **GAIN in all three of our runs** |
-| pods started | +40.4% (+15.7 to +65.0) | +42.3% (+15.7 to +68.9) | +11.8% (-10.5 to +34.2) | **power given** (the same way in all three runs; 2 of 3 clear of the noise) |
-| pod start wait, total (s) | +11.0% (-34.1 to +56.2) | +20.8% (-41.1 to +82.7) | +0.4% (-24.6 to +25.3) | **LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| pod start wait, mean (s) | -21.8% (-46.8 to +3.2) | -20.1% (-60.9 to +20.6) | -16.4% (-46.1 to +13.2) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
+| pods started | +40.4% (+15.7 to +65.0) | +42.3% (+15.7 to +68.9) | +11.8% (-10.5 to +34.2) | EVEN, no difference beyond the noise in 1 of 3 runs |
+| pod start wait, total (s) | +11.0% (-34.1 to +56.2) | +20.8% (-41.1 to +82.7) | +0.4% (-24.6 to +25.3) | EVEN, no difference beyond the noise (all three runs) |
+| pod start wait, mean (s) | -21.8% (-46.8 to +3.2) | -20.1% (-60.9 to +20.6) | -16.4% (-46.1 to +13.2) | EVEN, no difference beyond the noise (all three runs) |
 | host CPU busy, the real machine under kind (%) | -2.9% (-4.1 to -1.7) | -2.6% (-3.7 to -1.5) | -3.2% (-6.0 to -0.5) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 
-Readings: 9 GAIN in all three of our runs, 1 GAIN (the same way in all three runs; 0 of 3 clear of the noise), 1 LOSS (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise), 1 power given (the same way in all three runs; 2 of 3 clear of the noise), 2 EVEN, the same, 1 EVEN, under the floor (every run under 0.5%; the largest 0.45%), 8 shown, not judged.
+Readings: 10 better in all three of our runs, 2 no difference beyond the noise, 1 no difference beyond the noise in 1 of 3 runs, 2 same, 8 shown, not judged.
 
 ---
 

@@ -2,11 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
-**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the JSON twin's exact values; every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
-<!-- end: read again -->
-
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
 
 Redis exactly as shipped (no memory ceiling, noeviction) is native: the knob is at its limit on native, and omni reads and writes nothing (`docs/REDIS_PREREGISTRATION.md`, amendment 4); otherwise omni is the compass law on the ceiling through Redis's own console inside [16, 512] MB, holding the application's own request latency at 40% of the 2 ms line, a hit inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed requests: any rise in any run reads **LOSS in at least one of our runs**. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, LOSS included.
 
@@ -22,15 +20,15 @@ Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms sto
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,393 | 1,392 | -0.1% (-0.4 to +0.3) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.1) | EVEN, under the floor (every run under 0.5%; the largest 0.08%) |
-| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
-| cache hit rate | 0.929 | 0.929 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
-| latency, 95th percentile (ms) | 5.52 | 5.55 | +0.5% (-1.6 to +2.5) | -0.1% (-0.2 to +0.1) | -0.0% (-0.3 to +0.2) | EVEN, under the floor (every run under 0.5%; the largest 0.46%) |
-| latency, 99th percentile (ms) | 5.69 | 5.8 | +2.0% (-6.4 to +10.3) | +0.0% (-0.1 to +0.1) | +0.0% (-0.3 to +0.4) | **LOSS** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
-| latency, mean (ms) | 0.514 | 0.539 | +4.9% (-14.3 to +24.1) | +0.2% (-0.0 to +0.4) | -0.2% (-1.0 to +0.5) | **LOSS** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| work inside the response line (requests a second answered within the line) | 1,393 | 1,392 | -0.1% (-0.4 to +0.3) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.1) | EVEN, under the floor (the three runs' mean 0.02%) |
+| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| cache hit rate | 0.929 | 0.929 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| latency, 95th percentile (ms) | 5.52 | 5.55 | +0.5% (-1.6 to +2.5) | -0.1% (-0.2 to +0.1) | -0.0% (-0.3 to +0.2) | EVEN, under the floor (the three runs' mean 0.12%) |
+| latency, 99th percentile (ms) | 5.69 | 5.8 | +2.0% (-6.4 to +10.3) | +0.0% (-0.1 to +0.1) | +0.0% (-0.3 to +0.4) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
+| latency, mean (ms) | 0.514 | 0.539 | +4.9% (-14.3 to +24.1) | +0.2% (-0.0 to +0.4) | -0.2% (-1.0 to +0.5) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
 | memory ceiling held, mean (MB; the knob, the resource) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| memory used, mean (MB) | 333.1 | 333.1 | +0.0% (-0.0 to +0.1) | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.02%) |
+| memory used, mean (MB) | 333.1 | 333.1 | +0.0% (-0.0 to +0.1) | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.01%) |
 | keys evicted | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | shown, not judged |
 | host CPU busy (share of the run) | 0.0897 | 0.107 | +19.0% (-45.7 to +83.7) | -13.6% (-32.8 to +5.5) | +9.2% (-10.7 to +29.1) | **the runs disagree** |
 | host CPU-seconds | 157.9 | 190.2 | +20.5% (-51.3 to +92.3) | -15.2% (-36.8 to +6.5) | +10.2% (-11.3 to +31.6) | **the runs disagree** |
@@ -45,15 +43,15 @@ Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms sto
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,327 | 1,327 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| work inside the response line (requests a second answered within the line) | 1,327 | 1,327 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
 | throughput (requests a second) | 1,500 | 1,500 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, the same |
-| cache hit rate | 0.885 | 0.885 | -0.0% (-0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
-| latency, 95th percentile (ms) | 5.71 | 5.71 | +0.1% (-0.1 to +0.2) | -0.1% (-0.5 to +0.2) | +0.1% (-0.3 to +0.5) | EVEN, under the floor (every run under 0.5%; the largest 0.13%) |
-| latency, 99th percentile (ms) | 5.77 | 5.77 | +0.1% (-0.0 to +0.2) | -0.2% (-0.7 to +0.3) | +0.2% (-0.3 to +0.7) | EVEN, under the floor (every run under 0.5%; the largest 0.19%) |
-| latency, mean (ms) | 0.809 | 0.81 | +0.1% (-0.9 to +1.0) | -0.2% (-1.0 to +0.7) | +0.4% (-1.3 to +2.1) | EVEN, under the floor (every run under 0.5%; the largest 0.42%) |
+| cache hit rate | 0.885 | 0.885 | -0.0% (-0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| latency, 95th percentile (ms) | 5.71 | 5.71 | +0.1% (-0.1 to +0.2) | -0.1% (-0.5 to +0.2) | +0.1% (-0.3 to +0.5) | EVEN, under the floor (the three runs' mean 0.01%) |
+| latency, 99th percentile (ms) | 5.77 | 5.77 | +0.1% (-0.0 to +0.2) | -0.2% (-0.7 to +0.3) | +0.2% (-0.3 to +0.7) | EVEN, under the floor (the three runs' mean 0.01%) |
+| latency, mean (ms) | 0.809 | 0.81 | +0.1% (-0.9 to +1.0) | -0.2% (-1.0 to +0.7) | +0.4% (-1.3 to +2.1) | EVEN, under the floor (the three runs' mean 0.11%) |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
 | memory ceiling held, mean (MB; the knob, the resource) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| memory used, mean (MB) | 199.9 | 199.9 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| memory used, mean (MB) | 199.9 | 199.9 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.01%) |
 | keys evicted | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | shown, not judged |
 | host CPU busy (share of the run) | 0.0993 | 0.0949 | -4.4% (-43.0 to +34.1) | +14.8% (-28.8 to +58.4) | -9.0% (-72.7 to +54.7) | **the runs disagree** |
 | host CPU-seconds | 66.4 | 63.4 | -4.6% (-47.0 to +37.9) | +17.2% (-32.5 to +67.0) | -9.9% (-79.3 to +59.4) | **the runs disagree** |
@@ -68,15 +66,15 @@ Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms sto
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,472 | 1,472 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
-| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
-| cache hit rate | 0.981 | 0.981 | -0.0% (-0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
+| work inside the response line (requests a second answered within the line) | 1,472 | 1,472 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| cache hit rate | 0.981 | 0.981 | -0.0% (-0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
 | latency, 95th percentile (ms) | 0.159 | 0.168 | +5.1% (-6.4 to +16.6) | -1.2% (-3.3 to +0.9) | -3.7% (-16.0 to +8.6) | **the runs disagree** |
-| latency, 99th percentile (ms) | 5.42 | 5.46 | +0.8% (-1.6 to +3.1) | -0.1% (-0.4 to +0.2) | -0.0% (-0.4 to +0.3) | **LOSS** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| latency, 99th percentile (ms) | 5.42 | 5.46 | +0.8% (-1.6 to +3.1) | -0.1% (-0.4 to +0.2) | -0.0% (-0.4 to +0.3) | EVEN, under the floor (the three runs' mean 0.22%) |
 | latency, mean (ms) | 0.214 | 0.218 | +1.9% (-2.9 to +6.6) | -0.5% (-3.0 to +2.0) | +0.1% (-2.7 to +2.9) | **the runs disagree** |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
 | memory ceiling held, mean (MB; the knob, the resource) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| memory used, mean (MB) | 348.4 | 348.4 | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| memory used, mean (MB) | 348.4 | 348.4 | +0.0% (+0.0 to +0.0) | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.01%) |
 | keys evicted | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | shown, not judged |
 | host CPU busy (share of the run) | 0.0768 | 0.078 | +1.5% (-20.6 to +23.6) | -6.5% (-52.0 to +39.0) | +51.0% (-20.7 to +122.7) | **the runs disagree** |
 | host CPU-seconds | 136.2 | 137.9 | +1.2% (-21.9 to +24.3) | -6.8% (-56.9 to +43.2) | +55.3% (-22.6 to +133.2) | **the runs disagree** |
@@ -91,15 +89,15 @@ Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms sto
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (requests a second answered within the line) | 1,174 | 1,174 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
-| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
-| cache hit rate | 0.783 | 0.783 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
-| latency, 95th percentile (ms) | 5.54 | 5.55 | +0.2% (-0.8 to +1.2) | -0.1% (-0.4 to +0.2) | +0.0% (-0.1 to +0.2) | EVEN, under the floor (every run under 0.5%; the largest 0.24%) |
-| latency, 99th percentile (ms) | 5.63 | 5.64 | +0.2% (-0.7 to +1.1) | -0.0% (-0.3 to +0.2) | +0.0% (-0.1 to +0.2) | EVEN, under the floor (every run under 0.5%; the largest 0.22%) |
-| latency, mean (ms) | 1.29 | 1.29 | +0.4% (-0.9 to +1.7) | -0.1% (-0.5 to +0.3) | +0.0% (-0.4 to +0.5) | EVEN, under the floor (every run under 0.5%; the largest 0.42%) |
+| work inside the response line (requests a second answered within the line) | 1,174 | 1,174 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| throughput (requests a second) | 1,500 | 1,500 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| cache hit rate | 0.783 | 0.783 | -0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.00%) |
+| latency, 95th percentile (ms) | 5.54 | 5.55 | +0.2% (-0.8 to +1.2) | -0.1% (-0.4 to +0.2) | +0.0% (-0.1 to +0.2) | EVEN, under the floor (the three runs' mean 0.07%) |
+| latency, 99th percentile (ms) | 5.63 | 5.64 | +0.2% (-0.7 to +1.1) | -0.0% (-0.3 to +0.2) | +0.0% (-0.1 to +0.2) | EVEN, under the floor (the three runs' mean 0.07%) |
+| latency, mean (ms) | 1.29 | 1.29 | +0.4% (-0.9 to +1.7) | -0.1% (-0.5 to +0.3) | +0.0% (-0.4 to +0.5) | EVEN, under the floor (the three runs' mean 0.12%) |
 | failed requests | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
 | memory ceiling held, mean (MB; the knob, the resource) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| memory used, mean (MB) | 257.3 | 257.3 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.01%) |
+| memory used, mean (MB) | 257.3 | 257.3 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, under the floor (the three runs' mean 0.01%) |
 | keys evicted | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | shown, not judged |
 | host CPU busy (share of the run) | 0.111 | 0.109 | -1.5% (-32.6 to +29.5) | -1.4% (-14.8 to +12.1) | +0.6% (-36.5 to +37.6) | **the runs disagree** |
 | host CPU-seconds | 198.5 | 194.6 | -2.0% (-36.1 to +32.1) | -1.5% (-16.9 to +13.9) | +0.5% (-41.6 to +42.7) | **the runs disagree** |
@@ -108,7 +106,7 @@ Redis 7.0.15; 1500 requests a second offered; a miss costs the declared 5 ms sto
 
 The ceiling handed back to native's and read back at the end of every omni arm in every run: yes.
 
-**Across 3 untouched workloads: 0 gauge-rows GAIN (0 in all three of our runs), 1 LOSS (0 in all three of our runs), 0 power given (0 in all three of our runs), 24 EVEN, 11 where the runs disagree.**
+**Across 3 untouched workloads: 0 gauge-rows GAIN, 0 LOSS, 0 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 25 EVEN, 11 where the runs disagree.**
 
 ---
 

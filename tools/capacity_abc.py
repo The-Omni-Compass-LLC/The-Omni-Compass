@@ -6,9 +6,8 @@
 """The capacity test's A/B/C three-run table (docs/CAPACITY_PREREGISTRATION.md): the same test run three times as separate
 GitHub runs on the same engine, each run's own table built by tools/capacity_report.py (CAPACITY.json in each archived run,
 results/live/raw/capacity-run-<id>/). Each cap level gets two judged rows, completed work and capacity, each with the three
-readings every three-run table uses (the one rule, tools/readings.py judge_runs: EVEN only under the 0.5% floor in every
-run or the same; from 0.5% up the word, in all three of our runs or with its qualifier; or the runs disagree; both rows are
-work done, so a rise is GAIN). Every row is shown, LOSS
+readings every three-run table uses (tools/confirm_abc.py's rule: GAIN or LOSS in all three of our runs, EVEN with no
+difference beyond the noise, or the runs disagree; both rows are work done, so a rise is GAIN). Every row is shown, LOSS
 included.
 
   python3 tools/capacity_abc.py A_DIR B_DIR C_DIR --out results/live/V5_CAPACITY.md
@@ -24,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.confirm_abc import CAPACITY, cell, engine, verdict   # noqa: E402
 from tools.legal import stamp                                   # noqa: E402
-from tools.readings import OWN_RUNS, receipt_key, THREE_RUN_RULE, plain  # noqa: E402
+from tools.readings import OWN_RUNS, receipt_key                # noqa: E402
 
 WORK = "completed work (requests answered within the line over the window)"
 
@@ -58,8 +57,10 @@ def main(argv=None):
          "replications. The cap is a quota on the served app's CPU, the same in both arms and enforced by the cluster; the "
          "load rises step by step past what the cap can serve. Each cell is omni against native at one cap, the paired change "
          "with its 95% interval (completed work in percent of native; capacity in requests a second). Every judged row gets "
-         "one reading by the one rule; completed work and capacity are work done, so more is GAIN and less is LOSS. "
-         + THREE_RUN_RULE + " Every row is shown, LOSS included. Evidence class **L** "
+         "one of three readings. **GAIN** or **LOSS in all three of our runs**: all three runs move the same way and every "
+         "interval is clear of zero; completed work and capacity are work done, so more is GAIN and less is LOSS. **EVEN, no "
+         "difference beyond the noise**: in the runs counted, the interval includes zero; that is the result. **The runs "
+         "disagree**: runs clear of the noise point different ways. Every row is shown, LOSS included. Evidence class **L** "
          "(the real thing: a real Kubernetes cluster, real requests, every answer counted).", "",
          OWN_RUNS, "", "| Run | GitHub run | Label | Commit | Engine | Pairs per cap |", "|---|---|---|---|---|---:|"]
     engines = []
@@ -85,11 +86,11 @@ def main(argv=None):
             rs = [pair(rows[cap], key) for _, _, rows in runs]
             v = verdict(CAPACITY, rs)               # both rows are work done: the capacity row's aim, higher
             tally[v] = tally.get(v, 0) + 1
-            data[f"{cap}:{key}"] = {"reading": plain(v), "runs": rs}
+            data[f"{cap}:{key}"] = {"reading": v.strip("*"), "runs": rs}
             cells = [cell(r) if key == "work" else f"{r['diff']:+.2f} req/s ({r['ci95'][0]:+.2f} to {r['ci95'][1]:+.2f})"
                      for r in rs]
             L.append(f"| {cap / 1000:g} | {label} | {cells[0]} | {cells[1]} | {cells[2]} | {v} |")
-    L += ["", "Readings: " + ", ".join(f"{n} {plain(v)}" for v, n in sorted(tally.items())) + ".", "",
+    L += ["", "Readings: " + ", ".join(f"{n} {v.strip('*')}" for v, n in sorted(tally.items())) + ".", "",
           "How to read it: where the cap holds native back, a higher count for Omni-Compass on top at the same cap is more work "
           "from the same capacity, a GAIN; where neither arm can do more under the cap, the rows read EVEN, no difference beyond "
           "the noise, and that is the result. Each run's own table, with its audit lines and what each step up in the cap gives each "
@@ -99,7 +100,7 @@ def main(argv=None):
     out.write_text("\n".join(stamp(L)) + "\n", encoding="utf-8")
     out.with_suffix(".json").write_text(json.dumps({"runs": [r for r, _, _ in runs], "engines": engines, "rows": data},
                                                    indent=1) + "\n")
-    print(f"{out}: " + ", ".join(f"{n} {plain(v)}" for v, n in sorted(tally.items())))
+    print(f"{out}: " + ", ".join(f"{n} {v.strip('*')}" for v, n in sorted(tally.items())))
     return 0
 
 

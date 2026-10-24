@@ -34,20 +34,33 @@ from omnicompass.verdict import Verdict                                  # noqa:
 
 GPU_SEEDS = (5100, 5101, 5102)
 from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
-from tools.readings import SIZE_FLOOR, judge_word, EXPORT_AIMS, LOWER  # noqa: E402  (the one floor and the one rule, written once)
+from tools.readings import SIZE_FLOOR  # noqa: E402  (the one floor, written once)
 
 
 def reading(runs, aim):
-    """The one three-run rule (tools/readings.py judge_runs, the founder's order of 24 October 2026), reduced to its word: EVEN
-    only under the 0.5% floor in every run (or the same); from 0.5% up the word by the gauge's aim whatever the intervals say,
-    when the runs that moved 0.5% or more go the same way; else the runs disagree."""
+    """The three-run rule (tools/readings.py, tools/confirm_abc.py): GAIN or LOSS only when every run is clear of zero the same
+    way."""
     if aim == "shown":       # declared shown only, never judged (tools/readings.py SHOWN)
         return "shown, not judged"
     if all(r["lo"] == r["hi"] == 0.0 for r in runs):
         return "EVEN, the same"
+    # as the tables read it (tools/confirm_abc.py verdict): clear runs pointing different ways disagree, whatever the
+    # others read; then any run whose interval holds zero makes the row EVEN
     if not runs:
         return "EVEN"
-    return judge_word([r["change"] for r in runs], [r["lo"] > 0 or r["hi"] < 0 for r in runs], EXPORT_AIMS.get(aim, LOWER))
+    clear = [r for r in runs if r["lo"] > 0 or r["hi"] < 0]
+    if len({r["change"] > 0 for r in clear}) > 1:
+        return "the runs disagree"
+    if len(clear) < len(runs):
+        return "EVEN"
+    up = clear[0]["change"] > 0
+    if all(abs(r["change"]) < SIZE_FLOOR for r in runs):     # the founder's floor of 20 October: every run under 0.5% reads EVEN
+        return "EVEN, under the floor"
+    if aim == "spent":
+        return "power given" if up else "GAIN"
+    if aim == "per":         # work bought with each unit of a resource (tools/readings.py WORK_PER): a fall is power given
+        return "GAIN" if up else "power given"
+    return "GAIN" if (up if aim == "up" else not up) else "LOSS"
 
 
 def paired(a, b, block):

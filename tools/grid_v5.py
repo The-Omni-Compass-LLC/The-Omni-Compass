@@ -100,27 +100,17 @@ def aim_of(k):
 
 def directions(o):
     """A square's gauges by their word against native, from its rows (never from a reading's words): ({GAIN: [...], LOSS:
-    [...], power given: [...]}, the count under the floor). A gauge counts when it is judged (not shown-only, not the same to
-    rounding) and its change is 0.5% or more (the one rule, tools/readings.py, the founder's order of 24 October 2026), named
-    "not clear of the noise" where its 95% interval crosses zero; its word is decided by what it is for, never by its sign.
-    The count returned is the gauges under the 0.5% floor (EVEN)."""
+    [...], power given: [...]}, the count inside the noise). A gauge counts when it is judged (not shown-only, not the same to
+    rounding) and its 95% interval is clear of zero; its word is decided by what it is for, never by its sign."""
     by, noise = {w: [] for w in WORDS}, 0
     for k, v in (o.get("rows") or {}).items():
         if v.get("neutral") or k in SHOWN or v.get("same"):
             continue
-        nat = v.get("native", 0.0) or 0.0
-        size = abs(v["diff"]) / abs(nat) if abs(nat) > 1e-12 else (0.0 if v["diff"] == 0 else float("inf"))
-        if size < 0.005:
+        if v.get("n", 0) > 1 and (v["lo"] > 0 or v["hi"] < 0):
+            by[word(v["diff"] < 0, aim_of(k))].append(k)
+        else:
             noise += 1
-            continue
-        by[word(v["diff"] < 0, aim_of(k))].append(k)
     return by, noise
-
-
-def unsure(o):
-    """The judged gauges of a square whose 95% interval crosses zero (named so beside their word on the square's line)."""
-    return {k for k, v in (o.get("rows") or {}).items()
-            if not (v.get("n", 0) > 1 and (v.get("lo", 0) > 0 or v.get("hi", 0) < 0))}
 
 
 def kube_verdict(o):
@@ -128,11 +118,9 @@ def kube_verdict(o):
     if o["repetitions"] < 2:
         return "ONE REPETITION"
     by, noise = directions(o)
-    un = unsure(o)
-    by = {w: [k + (", not clear of the noise" if k in un else "") for k in xs] for w, xs in by.items()}
     facts = "".join("; " + f for f in re.findall(r"; ((?:OFF THE CLOCK|INVALID)[^;]*)", o["verdict"]))   # kept as recorded
     return (", ".join(f"{w} on {len(xs)}" + (f" ({'; '.join(xs)})" if xs else "") for w, xs in by.items())
-            + f", EVEN (under the 0.5% floor) on {noise}" + facts)
+            + f", EVEN (inside the noise) on {noise}" + facts)
 
 
 def kube_cell(o):
@@ -263,8 +251,7 @@ def main(argv=None):
               + ". Every gauge of every square, with its interval: " + ", ".join(link(kub[k][2], od) for k in sorted(kub, key=lambda k: (k[0], int(k[1]))))
               + ".", "",
               "How to read a square with the cluster inside: which gauges read GAIN, LOSS or power given against native, each "
-              "whose change is 0.5% or more, named not clear of the noise where its 95% interval crosses zero (the rest are EVEN, under "
-              "the 0.5% floor: the founder's order of 24 October 2026), read from the report's own "
+              "only when its 95% interval is clear of zero (the rest are EVEN, inside the noise), read from the report's own "
               "rows (`tools/six_kube_report.py`) and judged by what each gauge is for, never by its sign: the cluster's response "
               "times, time over the response line and failed requests are time waited, missed or failed; the organism's work is "
               "work done; pods started, replicas, machines, declared energy and the organism's energy are resources spent, so a "

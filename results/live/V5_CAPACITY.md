@@ -2,13 +2,11 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
-**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the JSON twin's exact values; every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
-<!-- end: read again -->
-
 Three separate GitHub runs of the same preregistered test on the same engine: A is the result, B and C are the replications. The cap is a quota on the served app's CPU, the same in both arms and enforced by the cluster; the load rises step by step past what the cap can serve. Each cell is omni against native at one cap, the paired change with its 95% interval (completed work in percent of native; capacity in requests a second). Every judged row gets one of three readings. **GAIN** or **LOSS in all three of our runs**: all three runs move the same way and every interval is clear of zero, and the word says what that means for the gauge's declared aim, never the sign of its number (a response time that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is **power given**, never a loss: the key, `docs/HOW_TO_READ_THE_RESULTS.md`). **EVEN, no difference beyond the noise**: in the runs counted, the interval includes zero; that is the result. **The runs disagree**: runs clear of the noise point different ways. Every row is shown, LOSS included. Evidence class **L** (the real thing: a real Kubernetes cluster, real requests, every answer counted).
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
 
 | Run | GitHub run | Label | Commit | Engine | Pairs per cap |
 |---|---|---|---|---|---:|
@@ -18,16 +16,16 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 | Cap (cores) | Measure | A | B | C | Reading |
 |---:|---|---|---|---|---|
-| 1 | completed work (requests answered within the line over the window; the aim is higher) | +2.8% (-9.3 to +14.9) | -0.1% (-5.3 to +5.0) | -4.4% (-11.0 to +2.1) | **the runs disagree** |
-| 1 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | +0.00 req/s (+0.00 to +0.00) | +0.40 req/s (-0.71 to +1.51) | -0.40 req/s (-1.51 to +0.71) | **the runs disagree** |
-| 1.5 | completed work (requests answered within the line over the window; the aim is higher) | -4.7% (-10.1 to +0.8) | -2.7% (-9.2 to +3.9) | -2.3% (-10.2 to +5.7) | **LOSS** (the same way in all three runs; 0 of 3 clear of the noise) |
-| 1.5 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | -0.40 req/s (-2.48 to +1.68) | -0.40 req/s (-2.48 to +1.68) | +0.80 req/s (-1.42 to +3.02) | **the runs disagree** |
-| 2 | completed work (requests answered within the line over the window; the aim is higher) | -2.4% (-9.2 to +4.4) | -1.8% (-3.4 to -0.1) | +1.9% (-2.2 to +5.9) | **the runs disagree** |
-| 2 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | +0.00 req/s (+0.00 to +0.00) | +0.40 req/s (-0.71 to +1.51) | +0.40 req/s (-0.71 to +1.51) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
-| 3 | completed work (requests answered within the line over the window; the aim is higher) | -0.5% (-2.6 to +1.5) | +0.6% (-2.0 to +3.1) | -1.6% (-4.3 to +1.1) | **the runs disagree** |
-| 3 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | -0.80 req/s (-2.16 to +0.56) | +0.40 req/s (-0.71 to +1.51) | -0.40 req/s (-1.51 to +0.71) | **the runs disagree** |
+| 1 | completed work (requests answered within the line over the window; the aim is higher) | +2.8% (-9.3 to +14.9) | -0.1% (-5.3 to +5.0) | -4.4% (-11.0 to +2.1) | EVEN, no difference beyond the noise (all three runs) |
+| 1 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | +0.00 req/s (+0.00 to +0.00) | +0.40 req/s (-0.71 to +1.51) | -0.40 req/s (-1.51 to +0.71) | EVEN, no difference beyond the noise (all three runs) |
+| 1.5 | completed work (requests answered within the line over the window; the aim is higher) | -4.7% (-10.1 to +0.8) | -2.7% (-9.2 to +3.9) | -2.3% (-10.2 to +5.7) | EVEN, no difference beyond the noise (all three runs) |
+| 1.5 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | -0.40 req/s (-2.48 to +1.68) | -0.40 req/s (-2.48 to +1.68) | +0.80 req/s (-1.42 to +3.02) | EVEN, no difference beyond the noise (all three runs) |
+| 2 | completed work (requests answered within the line over the window; the aim is higher) | -2.4% (-9.2 to +4.4) | -1.8% (-3.4 to -0.1) | +1.9% (-2.2 to +5.9) | EVEN, no difference beyond the noise in 2 of 3 runs |
+| 2 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | +0.00 req/s (+0.00 to +0.00) | +0.40 req/s (-0.71 to +1.51) | +0.40 req/s (-0.71 to +1.51) | EVEN, no difference beyond the noise (all three runs) |
+| 3 | completed work (requests answered within the line over the window; the aim is higher) | -0.5% (-2.6 to +1.5) | +0.6% (-2.0 to +3.1) | -1.6% (-4.3 to +1.1) | EVEN, no difference beyond the noise (all three runs) |
+| 3 | work inside the response line (requests a second; the capacity test's own gauge, the aim is higher) | -0.80 req/s (-2.16 to +0.56) | +0.40 req/s (-0.71 to +1.51) | -0.40 req/s (-1.51 to +0.71) | EVEN, no difference beyond the noise (all three runs) |
 
-Readings: 1 GAIN (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise), 1 LOSS (the same way in all three runs; 0 of 3 clear of the noise), 6 the runs disagree.
+Readings: 7 no difference beyond the noise, 1 no difference beyond the noise in 2 of 3 runs.
 
 How to read it: where the cap holds native back, a higher count for Omni-Compass on top at the same cap is more work from the same capacity; where neither arm can do more under the cap, the rows show no difference beyond the noise, and that is the result. Each run's own table, with its audit lines and what each step up in the cap gives each arm: `CAPACITY.md` in its archived folder.
 

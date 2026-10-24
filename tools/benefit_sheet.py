@@ -18,16 +18,14 @@ How the number is made, the same rule as the Omni index (tools/omni_index.py):
 
   every judged gauge becomes a ratio oriented so that above 1 is a GAIN against the gauge's declared aim (native / omni for a
   gauge that aims lower or is a resource spent, omni / native for one that aims higher); a gauge counts only where its reading is
-  in all three of our runs, anything else (a word with its qualifier, moved 0.5% or more but not clear of the noise in every
-  run; EVEN, under the floor or the same; the runs disagree) counts as exactly 1; the number is the geometric mean of
+  judged across our three runs, anything else (EVEN: inside the noise or the same; the runs disagree) counts as exactly 1; the number is the geometric mean of
   those ratios, minus one, in percent. For the tests inside the index the number IS the index's own resource reading of
   that test; for a stack with several workloads the stack's number is its index category. For the simulators and the
   organisms, which the index does not score, the same arithmetic runs over every judged gauge of their tables.
 
-  "Benefit?" reads GAIN (gauges GAIN, none LOSS or power given; every word counts, with or without its qualifier, by the rule of
-  24 October 2026), GAIN, power given (a GAIN bought with a
+  "Benefit?" reads GAIN (gauges GAIN across our three runs, none LOSS or power given), GAIN, power given (a GAIN bought with a
   resource put in), GAIN AND LOSS (both; the number says which way the trade nets by this scoring), LOSS (a LOSS, no GAIN), power
-  given (a resource put in, nothing gained), or EVEN (nothing moved the same way in all three of our runs).
+  given (a resource put in, nothing gained), or EVEN (nothing moved 0.5% or more across our three runs).
 
   python3 tools/benefit_sheet.py            ->  docs/BENEFIT_SHEET.md, results/BENEFIT_SHEET.json
   python3 tools/benefit_sheet.py --check    ->  exit 1 if the committed files differ from what the tables give
@@ -45,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, receipt_key, row_gain, landed, judged, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, word_sign  # noqa: E402
+from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, word_sign  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools import wiring_verdicts as wv                            # noqa: E402
 
@@ -158,7 +156,7 @@ def verb(fell, aim):
 
 
 def in_words(items):
-    """Every change the same in all three of our runs of a benchmark in words, grouped by gauge: (name, word, range, aim) ->
+    """Every change judged across our three runs of a benchmark in words, grouped by gauge: (name, word, range, aim) ->
     'p95 cut 65% to 71% (GAIN)', 'memory ceiling held up 215% (power given)', 'work down 5% (LOSS)'."""
     groups = {}
     for name, w, rg, aim in items:
@@ -172,11 +170,11 @@ def in_words(items):
         f = (lambda x: f"{x:.0f}%") if mags[-1] >= 10 else (lambda x: f"{x:.1f}%")
         m = f(mags[0]) if f(mags[0]) == f(mags[-1]) else f"{f(mags[0])} to {f(mags[-1])}"
         out.append(f"{name} {verb(fell, aim)} {m} ({w})")
-    return "; ".join(out) if out else f"{EVEN}: nothing moved the same way in all three of our runs"
+    return "; ".join(out) if out else f"{EVEN}: nothing moved 0.5% or more across our three runs"
 
 
 def benefit_word(gain, loss, given=0):
-    """The row's word from its counts of gauges that read GAIN, LOSS and power given in all three of our runs."""
+    """The row's word from its counts of gauges that read GAIN, LOSS and power given across our three runs."""
     if gain and loss:
         return GAIN_AND_LOSS
     if gain and given:
@@ -290,13 +288,7 @@ def from_abc_table(fname, name, what):
             continue
         if c == "unjudged":
             continue
-        if c in n_ and not judged(row["reading"]):
-            # a word with its qualifier (the rule of 24 October 2026: moved 0.5% or more, not clear of the noise in every run) is
-            # counted as a word and shown, and enters the number as exactly 1, as the index reads it
-            n_[c] += 1
-            items.append((wv.K8S_GAUGE.get(key, key), WORD_OF[c], wv.pct_range(row["runs"]), aim))
-            ratios.append(1.0)
-        elif c in n_:
+        if c in n_:
             rs = []
             for r in row["runs"]:
                 n, o = r.get("native"), r.get("omni")
@@ -316,7 +308,7 @@ def from_abc_table(fname, name, what):
 
 # ------------------------------------------------------------------------------------- the simulators (markdown)
 def sim_case_ratio(rows, aims=None):
-    """One case's oriented ratio from a simulator table's rows: gauges the same in all three of our runs only, each oriented
+    """One case's oriented ratio from a simulator table's rows: gauges judged across our three runs only, each oriented
     by its aim (wv.sim_aims(): a gauge that aims higher counts omni / native, any other native / omni). Returns the ratio and
     the counts of GAIN, LOSS and power given."""
     head = rows[0]; ridx = len(head) - 1
@@ -432,7 +424,7 @@ def from_realms():
     return {"date": updated(ROOT / "results" / "realms" / "REALMS.md"), "benchmark": "The 945 modelled muscles as one tower, every muscle written at once",
             "benefit": benefit_word(g, l_), "pct": 100 * prim[0] if clear else 0.0, "gain": g, "loss": l_, "given": given,
             "words": (f"work per energy up {100 * prim[0]:.1f}% ({GAIN})" if clear and prim[0] > 0
-                      else f"work per energy down {abs(100 * prim[0]):.1f}% ({GIVEN})" if clear else f"{EVEN}: nothing moved the same way in all three of our runs"),
+                      else f"work per energy down {abs(100 * prim[0]):.1f}% ({GIVEN})" if clear else f"{EVEN}: nothing moved 0.5% or more across our three runs"),
             "what": "the tower's work per energy over ten paired seeds; a model, evidence class S", "file": "results/realms/REALMS.md"}
 
 
@@ -507,27 +499,25 @@ def main(check=False):
          "judged by what each gauge is for and never by the sign of its number (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). **On this sheet "
          "the sign is the system's own declared aims, gauge by gauge: a plus is a GAIN; a minus is a LOSS on work, speed, misses or "
          "failures, and power given on a resource spent (energy, machines, memory).** The number carries its word. Beside it every change "
-         "the same in all three of our runs is written out with which way it went and its word: \"p95 cut 65% (GAIN)\", \"memory ceiling "
+         "judged across our three runs is written out with which way it went and its word: \"p95 cut 65% (GAIN)\", \"memory ceiling "
          "held up 215% (power given)\". An operator whose aims differ reads the same numbers the other way.", "",
          "The result tables (the files in the last column) keep every change with its raw sign: a response time that fell reads \"-65%\" "
          "there, and the Reading column beside it says GAIN.", "",
          "The number is the Omni index's rule (`results/OMNI_INDEX.md`): each judged gauge becomes a ratio oriented so that above one is "
-         "a GAIN; it counts only where the reading holds in all three of our runs (every run moved 0.5% or more the same way, every "
-         "interval clear of zero), anything else counts as exactly one (a word with its qualifier among them); the number "
+         "a GAIN; it counts only where judged across our three runs, anything else counts as exactly one; the number "
          "is the geometric mean of the ratios, minus one, in percent. For the tests inside the index the number is the index's own "
          "resource reading of that test; for a stack with several workloads it is the stack's index category; for the simulators and the "
          "organisms the same arithmetic runs over every judged gauge of their tables. Built from the tables by `tools/benefit_sheet.py`, "
          "checked by `verify.py`.", "",
-         "**Benefit?** reads **GAIN** (gauges GAIN, none LOSS or power given; every word counts, with or without its qualifier, by the "
-         "founder's rule of 24 October 2026: a change of 0.5% or more is a change), **GAIN, power given** (a GAIN bought "
+         "**Benefit?** reads **GAIN** (gauges GAIN across our three runs, none LOSS or power given), **GAIN, power given** (a GAIN bought "
          "with a resource put in, named beside it), **GAIN AND LOSS** (both; the number says which way the trade nets by this scoring, and "
          "the wiring page `docs/WIRING_VERDICTS.md` says what pays for what), **LOSS** (a LOSS and no GAIN), **power given** (a resource put "
-         "in and nothing gained) or **EVEN** (nothing moved 0.5% or more). LOSS should never appear: where it "
+         "in and nothing gained) or **EVEN** (nothing moved 0.5% or more across our three runs). LOSS should never appear: where it "
          "does, the row stands and its cause is found and fixed.", "",
          "Every row names the engine its table ran on (read from the table). Results are never read across engines: a row on an "
          "older engine stands as that engine's result until the same benchmark's three runs on the engine that stands replace "
          "it here, and every benchmark is rerun on the engine that stands.", "",
-         "| Date | Benchmark | Engine | Benefit? | How much | Every change the same in all three of our runs, in words | Table |",
+         "| Date | Benchmark | Engine | Benefit? | How much | Every change judged across our three runs, in words | Table |",
          "|---|---|---|---|---:|---|---|"]
     for r in rows:
         L.append(f"| {r['date']} | {r['benchmark']} | {r['engine']} | **{r['benefit']}** | **{fmt_pct_words(r['pct'], r.get('loss', 0))}** | {r.get('words', '')} | `{r['file']}` |")

@@ -84,9 +84,9 @@ the founder overrides one in the conversation.
   LOSS in any pair. The three runs on GitHub's machines (full form, `results/orchestrator/V18_THREE_ARMS_ABC.md`): both Omni
   arms against native work GAIN and the 95th percentile GAIN in all three, machines EVEN, units power given or EVEN; Omni direct
   against Omni on native EVEN on every gauge; no LOSS. The toy gate against omni-v17 (`results/toy_gate/V18_VS_V17.md`) reads omni-v17's numbers on every toy (none
-  of its 55 files moved). Every benchmark ran again on it from 21:19 UTC on 23 October; its runs stay its own record. (Not to be
-  confused with the live engine's branch's own omni-v18 of 24 October, digest `22486290b19349eb`, 55 files, which never stood on
-  main: its change is omni-v19's.)
+  of its 55 files moved). Every benchmark runs again on it from 02:51 UTC on 24 October, when it reached main (a run counts only on a commit
+  that carries `OMNI_V18.json`; the runs started from 21:19 UTC on 23 October ran omni-v17's commits). (Not to be confused with the live engine's branch's own omni-v18 of 24 October, digest
+  `22486290b19349eb`, 55 files, which never stood on main: its change is omni-v19's.)
 - **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stood on main on 23 October, from the
   morning to the night, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
   decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and
@@ -363,6 +363,29 @@ the founder overrides one in the conversation.
 
 ## Orders of 24 October
 
+- **Every change of 0.5% or more is a change** (the founder's words: "Any gauge that gives anything over a 0.5 percent change
+  either way is a change. I don't want to see even on shit that shows a 0.5% change up or down ... Not everything can just stay
+  even ... because it's 2-3% away. That's not even"; and "You have to interpretate the muscle and what it's doing to know if a
+  gain is a benefit or a minus is a plus"). The one key (`tools/readings.py` `three_run_reading`): the change is the mean of the
+  three runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all
+  three of our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of
+  runs beyond the noise; EVEN is kept for a mean under 0.5% (EVEN, under the floor) or no change at all; runs that moved 0.5% or
+  more in opposite directions read "the runs disagree"; a count that must never rise has no floor. Each run's own number wears
+  that run's own word. Every table was read again from its own data by `tools/reread.py` (24 October: 4,037 readings in 194
+  tables; the index's headline GAIN, up 3.4%), the toy gate reads by the same floor, and the live engine's own key with it.
+- **The immune system catches a LOSS under Omni** (the founder's words: "the only way anything can show a real loss would be ...
+  Omni direct or native by itself. Everything else with Omni in it ... has Omni-Compass's mechanism of immune system and pathways
+  ... that should have pushed signals when something is in its in a negative state, and adjusted ... like any human body"). A
+  muscle whose own markers turn against native (pods waiting, a response over its line, failures) sends its signal to the muscle
+  that caused it, and that muscle backs off toward native: the next version's work, through the toy gate (first: the autoscaler
+  target never asks for more pods than the machines can place while pods wait, the pods-waiting LOSS's root cause).
+- **The live engine in the order a watcher needs it** (the founder's words of 24 October): the page, its contents and its
+  instructions laid out by importance to the operator watching the system, first to last; on every monitor of Omni on native a
+  switch that turns native off and leaves Omni direct on the organism with no other governor; live knobs, buttons and switches on
+  every muscle that can scale out, up or down, each acting on the running code; buttons that run another set of the Python's 500
+  runs (and the C++ harness's) from a new seed; and the page wired to a live governor through the control API
+  (`tools/omni_control.py`), so a system owner can hook a system up and watch and drive it from these monitors.
+
 - **Google and Amazon kept in, wired as Azure is, shown as not yet run** (the founder's words, the same morning he had ordered
   them taken out: "You leave the Google and Amazon runs in everywhere and just show it not ran yet, because someday, some way,
   I'm going to have it run and put in here ... It's got to be built everywhere as a mechanism, the code, regardless if we run it
@@ -376,21 +399,6 @@ the founder overrides one in the conversation.
   whole, Amazon once its account is on the Paid plan) and its sets start behind its own check. The engine, Python and its C++
   twin, names no cloud: the same governor runs on every one; what differs per cloud is the wire to it (the workflow, the paired
   script, the queue and the key check), and those are what stand ready.
-- **Any change of 0.5% or more is a change, and shows its word** (the founder's words: "Any gauge that gives anything over a
-  0.5 percent change either way is a change. I don't want to see even on shit that shows a 0.5% change up or down, it has to
-  show its loss or gain. Not everything can just stay even because it's 2-3% away. That's not even. In the tech world that is
-  a whole lot of value"). The rule is written once (`tools/readings.py` judge_runs over runs, judge_one for one paired
-  comparison) and every tool that decides a word calls it: EVEN only under the 0.5% floor in every run, or the same; from 0.5%
-  up the word comes from what the gauge is for (LOWER, HIGHER, SPENT, NEVER_MORE, NEVER_LESS, WORK_PER, SHOWN), never from
-  the sign, with the count of runs clear of the noise beside it whenever not all three are; runs that moved 0.5% or more
-  pointing different ways read the runs disagree; a count that must never rise keeps its strict rule. The model gates
-  (`tools/toy_gate.py` and every study that reads by it) read a paired change the same way, "(not clear of the noise)" beside
-  the word where its interval crosses zero. Every published table was read again by it from its own numbers
-  (`tools/reread_key.py`, `--check` in the same push); `results/REREAD_KEY.md` counts what moved and names every row that
-  now reads LOSS, and every LOSS that the floor now reads EVEN. The Omni index and the benefit sheet's numbers still count a
-  reading only where it holds in all three of our runs; their words count every word. The five store runners and the
-  engine harness are in the fingerprint: their own one-run words take the rule with the next engine version.
-
 ## Orders of 23 October
 
 - **Omni-Compass by itself, and on top of native: both, and both to the best** (the founder's words: "Within the native, we do
