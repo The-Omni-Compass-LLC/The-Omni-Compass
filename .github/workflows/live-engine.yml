@@ -100,15 +100,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python tools/legal.py --check > legal.txt || { tail -20 legal.txt; echo "::error::a page lacks the legal notice"; exit 1; }
-          git add docs/engine/OMNI_COMPASS_LIVE_ENGINE.html
+          # every file the rebuild writes goes in with the page (the page, its appraisal, the wall's Grafana dashboard, the GitHub
+          # ledger): on 24 October a file the rebuild had rewritten was left out, and every push attempt stopped on it ("cannot pull
+          # with rebase: You have unstaged changes", run 40074924675)
+          for f in docs/engine/OMNI_COMPASS_LIVE_ENGINE.html docs/engine/APPRAISAL.md deploy/grafana/omni-compass-wall.json docs/engine/github_ledger.json; do
+            [ -e "$f" ] && git add -- "$f"
+          done
           git commit -q -m "Live engine rebuilt from the engine that stands and the repository's own results" || echo "::notice::the page is unchanged"
+          git status --short --untracked-files=no | sed 's/^/::notice::left uncommitted by the rebuild (set aside at the push, never pushed): /'
       - name: Push, trying again if the branch moved meanwhile
         run: |
           # the page is generated: where a push that landed meanwhile touched it too (18 October: a merged pull request
           # changed it while this job pushed, and every attempt stopped on the same conflict), this rebuild's page is kept;
           # the next rebuild reads whatever landed
           for attempt in 1 2 3 4 5 6; do
-            git pull -q --rebase -X theirs && git push && exit 0
+            git pull -q --rebase --autostash -X theirs && git push && exit 0   # anything else the rebuild touched is set aside, never pushed
             git rebase --abort 2>/dev/null || true
             echo "::warning::push attempt $attempt failed (the branch moved); trying again"; sleep 15
           done
