@@ -61,7 +61,8 @@ class FakeLambda(BaseHTTPRequestHandler):
         if self.moved() or not self.authed():
             return
         if self.path == "/api/v1/ssh-keys":
-            self.reply(200, {"data": [{"id": "k1", "name": "omni-key", "public_key": PUBLIC + " made-on-a-laptop"}]})
+            self.reply(200, {"data": [{"id": "k1", "name": "omni-key", "public_key": PUBLIC + " made-on-a-laptop"}]
+                             + STATE.setdefault("added", [])})
             return
         if self.path == "/api/v1/instance-types":
             regions = [{"name": "us-east-1", "description": "Virginia"}] if STATE["capacity"] else []
@@ -85,10 +86,22 @@ class FakeLambda(BaseHTTPRequestHandler):
         else:
             self.reply(404, {"error": {"code": "not-found", "message": self.path}})
 
+    def do_DELETE(self):
+        if self.moved() or not self.authed():
+            return
+        i = self.path.rsplit("/", 1)[1]
+        STATE["added"] = [k for k in STATE.setdefault("added", []) if k["id"] != i]
+        self.reply(200, {"data": {}})
+
     def do_POST(self):
         if self.moved() or not self.authed():
             return
         body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
+        if self.path == "/api/v1/ssh-keys":                 # a run's own key, registered by its public half
+            k = {"id": f"k{len(STATE.setdefault('added', [])) + 2}", "name": body["name"], "public_key": body["public_key"]}
+            STATE["added"].append(k)
+            self.reply(200, {"data": k})
+            return
         if self.path == "/api/v1/instance-operations/launch":
             assert body["ssh_key_names"] == ["omni-key"] and body["quantity"] == 1
             i = f"inst{len(STATE['instances']) + 1}"
@@ -229,8 +242,11 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
             keys[k] = tmp_path / k; keys[k].write_text(body + "\n"); keys[k].chmod(0o600)
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["good"])]); printed += o
         assert rc == 0 and "its other half" in o, o
-        rc, o = run(["keycheck", "--name", "omni-kye", "--private-file", str(keys["good"])]); printed += o
-        assert rc == 7 and "no SSH key by that name" in o and "omni-key" in o, o
+        out = tmp_path / "resolved"
+        rc, o = run(["keycheck", "--name", "omni-key.pem", "--private-file", str(keys["good"]), "--resolved-out", str(out)]); printed += o
+        assert rc == 0 and "found by its own half" in o and out.read_text().strip() == "omni-key", o   # Lambda's name is used
+        rc, o = run(["keycheck", "--name", "omni-kye", "--private-file", str(keys["other"])]); printed += o
+        assert rc == 7 and "no SSH key by that name" in o and "omni-key" in o and "none of Lambda's keys" in o, o
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["other"])]); printed += o
         assert rc == 7 and "not the private half" in o, o
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["cut"])]); printed += o
@@ -240,6 +256,13 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["oneline"])]); printed += o
         assert rc == 0 and "its other half" in o, o                                    # line breaks lost on the way in: repaired
         assert keys["oneline"].read_text().splitlines()[1] == "GOOD-PRIVATE" and (keys["oneline"].stat().st_mode & 0o777) == 0o600
+        pub = tmp_path / "own.pub"; pub.write_text("ssh-ed25519 AAAAOWNHALF omni-gh-1\n")      # a run's own key
+        rc, o = run(["addkey", "--name", "omni-gh-1", "--public-file", str(pub)]); printed += o
+        assert rc == 0 and o.strip() and [k["name"] for k in STATE["added"]] == ["omni-gh-1"], o
+        rc, o = run(["delkey", "--name", "omni-gh-1"]); printed += o
+        assert rc == 0 and "removed from Lambda" in o and STATE["added"] == [], o              # gone at the run's end
+        rc, o = run(["delkey", "--name", "omni-gh-1"]); printed += o
+        assert rc == 0 and "nothing to remove" in o, o                                         # asking twice is fine
         assert KEY not in printed and "AAAAPUBLICHALF" not in printed and "PRIVATE" not in printed.replace("LAMBDA_SSH_PRIVATE_KEY", ""), printed
     finally:
         os.environ["PATH"] = os.pathsep.join(p for p in os.environ["PATH"].split(os.pathsep) if not p.startswith(str(tmp_path)))

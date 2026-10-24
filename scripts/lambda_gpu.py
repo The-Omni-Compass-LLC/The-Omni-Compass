@@ -274,15 +274,13 @@ def key_shape(text: str) -> str:
 
 
 def keycheck(a) -> int:
-    """The SSH key pair, checked before anything is rented: Lambda holds a key under the name, and the stored private key
-    is the other half of the public key Lambda holds (ssh-keygen derives the public half; no key material is printed).
-    A wrong pair otherwise shows only after a machine is rented and refuses the login."""
+    """The SSH key pair, checked before anything is rented: the stored private key is the other half of a public key Lambda
+    holds (ssh-keygen derives the public half; no key material is printed). The key is found by its own half, so a name
+    stored a little differently from Lambda's (Lambda keeps a generated key under its file name, "name.pem.") still finds
+    it; the name Lambda holds is written to --resolved-out for the launch. A wrong pair otherwise shows only after a machine
+    is rented and refuses the login."""
     keys = call("GET", "/ssh-keys").get("data", [])
-    held = next((k for k in keys if k.get("name") == a.name), None)
-    if held is None:
-        names = [str(k.get("name", "")) for k in keys]
-        print(f"LAMBDA_SSH_KEY_NAME: Lambda holds no SSH key by that name; it holds {len(names)}: {', '.join(names) or 'none'}")
-        return 7
+    names = [str(k.get("name", "")) for k in keys]
     raw = open(a.private_file, encoding="utf-8", errors="replace").read()
     fixed = fix_key(raw)
     if fixed != raw:              # written back in place, its mode kept: the key every later step uses is the same repair
@@ -298,11 +296,40 @@ def keycheck(a) -> int:
         print("LAMBDA_SSH_PRIVATE_KEY: not a whole private key without a passphrase (ssh-keygen could not read it): "
               f"{key_shape(fixed)}; store the whole .pem file Lambda downloaded when the key was made")
         return 7
-    if out.stdout.split()[:2] != str(held.get("public_key", "")).split()[:2]:
-        print(f"LAMBDA_SSH_PRIVATE_KEY is not the private half of the key Lambda holds as {a.name}: store the .pem file "
-              "downloaded when that key was made, or make a new key and store both again")
+    half = out.stdout.split()[:2]
+    mine = [k for k in keys if str(k.get("public_key", "")).split()[:2] == half]
+    if not mine:
+        named = a.name in names
+        print(("LAMBDA_SSH_PRIVATE_KEY is not the private half of the key Lambda holds under that name"
+               if named else f"LAMBDA_SSH_KEY_NAME: Lambda holds no SSH key by that name; it holds {len(names)}: "
+               f"{', '.join(names) or 'none'}") + ", and the stored private key is the other half of none of Lambda's keys: "
+              "store the .pem file downloaded when one of them was made, or make a new key and store both again")
         return 7
-    print(f"SSH key {a.name}: Lambda holds it, and the stored private key is its other half")
+    held = str(mine[0].get("name", ""))
+    if a.resolved_out:
+        with open(a.resolved_out, "w", encoding="utf-8") as fh:
+            fh.write(held + "\n")
+    note = "" if held == a.name else " (found by its own half; LAMBDA_SSH_KEY_NAME holds another spelling, and Lambda's is used)"
+    print(f"SSH key {held}: Lambda holds it, and the stored private key is its other half{note}")
+    return 0
+
+
+def addkey(a) -> int:
+    """Registers a public key with Lambda under a name (the run's own key, when the stored one cannot be used); prints its id."""
+    pub = open(a.public_file, encoding="utf-8").read().strip()
+    got = call("POST", "/ssh-keys", {"name": a.name, "public_key": pub}).get("data", {})
+    print(got.get("id", ""))
+    return 0
+
+
+def delkey(a) -> int:
+    """Removes every key Lambda holds under the name (the run's own key, at the run's end); a name it does not hold is fine."""
+    gone = 0
+    for k in call("GET", "/ssh-keys").get("data", []):
+        if k.get("name") == a.name and k.get("id"):
+            call("DELETE", f"/ssh-keys/{k['id']}", missing_ok=True)
+            gone += 1
+    print(f"SSH key {a.name}: {'removed from Lambda' if gone else 'not held by Lambda (nothing to remove)'}")
     return 0
 
 
@@ -320,7 +347,11 @@ def main(argv=None) -> int:
     p = sub.add_parser("terminate"); p.add_argument("ids", nargs="*"); p.add_argument("--name", default="")
     p.set_defaults(fn=terminate)
     p = sub.add_parser("keycheck"); p.add_argument("--name", required=True); p.add_argument("--private-file", required=True)
+    p.add_argument("--resolved-out", default="")
     p.set_defaults(fn=keycheck)
+    p = sub.add_parser("addkey"); p.add_argument("--name", required=True); p.add_argument("--public-file", required=True)
+    p.set_defaults(fn=addkey)
+    p = sub.add_parser("delkey"); p.add_argument("--name", required=True); p.set_defaults(fn=delkey)
     p = sub.add_parser("fixkey", help="stdin to stdout: the stored private key repaired as keycheck repairs it")
     p.set_defaults(fn=lambda a: sys.stdout.write(fix_key(sys.stdin.read())) and 0)
     a = ap.parse_args(argv)
