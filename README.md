@@ -431,9 +431,10 @@ each is read native, Omni-Compass on native, and Omni-Compass direct (each pool'
 line GAIN in all three of our runs (from +1.58% in the whole tower to +63.34% in the orchestra), its work EVEN; the orchestra's
 power is given (+52.38%) and the others' power EVEN or a cut. The whole organism, a composition of the real tables, reads
 +14.5% GAIN by the index's rule. **Direct** reads LOSS in all three of our runs on work and on muscles over the line, against
-native and against Omni-Compass on native, in seven organisms (the spine, the four realms, the four stacked, the tower), and on
-muscles over the line against Omni-Compass on native in the live engine's organism, where it reads EVEN, the same, against
-native: 29 LOSS rows, every one listed in the record. Their cause is the engine's and is on the next version's list: under
+native and against Omni-Compass on native, in eight organisms (the spine, the four realms, the four stacked, the tower and the
+live engine's organism): 32 LOSS rows, every one listed in the record. (Until 24 October the live engine's organism read direct
+EVEN, the same, against native: its harness exporter had lost the direct arm and computed native in its place; the arm is back,
+and the record now reads it.) Their cause is the engine's and is on the next version's list: under
 SOLO the twin, the brain's model of native, has its own autoscaler off too, so the floor under the max is a frozen count, not
 what native's autoscaler would run. In the orchestra direct reads its muscles over the line GAIN (+69.25%) for power given
 (+72.39%). Direct has not run in any layer of the whole organism.
