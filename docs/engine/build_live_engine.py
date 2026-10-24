@@ -884,6 +884,69 @@ def dial() -> dict:
                             for k, t in lad["toys"].items()})}   # a change against a zero (native's power cap) is NaN: null
 
 
+DIRECT_ARMS = {"yardstick": "native", "omni_native": "Omni-Compass and native", "omni": "Omni-Compass direct"}
+
+
+def direct() -> dict:
+    """Omni-Compass direct (omni_orchestrator/, docs/OMNI_ORCHESTRATOR.md): every showing GitHub ran (.github/workflows/
+    orchestrator.yml) read at the build from its own files on the branch raw: each arm's totals and the showing's readings by
+    the one key as its summary.json writes them, and each arm's series 5 s at a time from its own requests.csv (requests
+    answered, the 95th percentile) and its control plane's timeline.jsonl (the service's units; machines awake, booting or
+    draining), as tools/orchestrator_show.py per_step reads them. Class L, one run of each arm a
+    showing. Empty until a showing's files are on the branch raw. Like the ledger it is a reading of
+    what GitHub has archived, with its own read time; a check does not rebuild it (a showing archived after the build would
+    otherwise fail every check until the next build)."""
+    import csv
+    import io
+    import export_runs as XR
+    ref, pre = XR.raw_ref()
+    show = lambda p: subprocess.run(["git", "-C", str(ROOT), "show", f"{ref}:{pre}{p}"], capture_output=True).stdout.decode("utf-8", "replace")
+    dirs = [d for d in git("ls-tree", "-r", "-d", "--name-only", ref, *([pre] if pre else [])).splitlines()
+            if re.fullmatch(r"(?:" + re.escape(pre) + r")?run-\d+/orchestrator-[^/]+", d)]
+    out, BIN = [], 5.0
+    for d in sorted(dirs, key=lambda x: int(re.search(r"run-(\d+)", x).group(1))):
+        rel = d[len(pre):] if pre and d.startswith(pre) else d
+        try:
+            summ = json.loads(show(f"{rel}/summary.json"))
+        except json.JSONDecodeError:
+            continue                                    # a showing that wrote no summary is not read
+        rid = re.search(r"run-(\d+)", rel).group(1)
+        kind = rel.split("/", 1)[1][len("orchestrator-"):].rsplit("-", 1)[0]       # push-requests, A-busy, ...
+        arms = {}
+        for a, label in DIRECT_ARMS.items():
+            try:
+                meta = json.loads(show(f"{rel}/{a}/meta.json"))
+            except json.JSONDecodeError:
+                continue
+            t0, n = meta["t_load"], int(len(meta["steps"])*meta["step_s"]/BIN)
+            req, lat = [0]*n, [[] for _ in range(n)]
+            for r in csv.DictReader(io.StringIO(show(f"{rel}/{a}/requests.csv"))):
+                k = int(float(r["sent_s"])//BIN)
+                if 0 <= k < n and r["status"] == "200" and r["right"] == "1":
+                    req[k] += 1; lat[k].append(float(r["ms"]))
+            units, mach = [[] for _ in range(n)], [[] for _ in range(n)]
+            for line in show(f"{rel}/{a}/ctl/timeline.jsonl").splitlines():
+                try:
+                    x = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                k = int((x["t"] - t0)//BIN)
+                if 0 <= k < n:
+                    u, m = x.get("units") or {}, x.get("machines") or {}     # the service's units and every machine on, as the showing reads them
+                    units[k].append(u["web"] if "web" in u else sum(u.values())); mach[k].append(sum(v for q, v in m.items() if q in ("awake", "booting", "draining")))
+            p95 = lambda v: round(sorted(v)[min(len(v) - 1, int(0.95*len(v)))], 1) if v else None
+            mean = lambda v: round(sum(v)/len(v), 2) if v else None
+            arms[a] = {"label": label, "brain": meta.get("brain"), "room": meta.get("room_rule"), "steps": meta["steps"], "step_s": meta["step_s"],
+                       "totals": (summ.get("summary") or {}).get(a), "bin_s": BIN,
+                       "req": [round(c/BIN, 2) for c in req], "p95": [p95(v) for v in lat], "units": [mean(v) for v in units], "mach": [mean(v) for v in mach]}
+        if "yardstick" not in arms or len(arms) < 2:
+            continue
+        extra = {k: (summ.get("summary") or {}).get(k) for k in ("batch", "drills") if (summ.get("summary") or {}).get(k)}
+        out.append({"run": rid, "kind": kind, "folder": rel, "arms": arms, "readings": _clean(summ.get("readings") or {}), "extra": extra})
+    return {"doc": "docs/OMNI_ORCHESTRATOR.md", "grades": "docs/OMNI_ORCHESTRATOR_GRADES.md", "showings": out,
+            "read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")} if out else {}
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -934,7 +997,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial()}
+            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct()}
 
 
 def embedded(page: str, key: str):
@@ -1107,7 +1170,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial"):
+              "beatsweep", "dial", "direct"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

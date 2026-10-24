@@ -334,7 +334,8 @@ the founder overrides one in the conversation.
   gauging a couple percentage before ... there has to be a main button that puts it back"). Every monitor carries a light that reads
   the series it draws: green inside its lines, amber before the line (within 3% of it, or its own slope over the last readings crossing
   it within three readings), red over it, grey and said so where there is no line; the wall counts them and prints the engine's own
-  last act beside them, because the brain reads the same slope and acts before the line. One button, on the console, the dock, the
+  last act beside them; the projection is the light's own (the brain's law acts on the position in its band and damps on its rate of
+  change, with a fail-up at the 95% wall; it projects nothing ahead). One button, on the console, the dock, the
   wall and every monitor's knobs, returns every knob to the factory tune and says what it put back; native alone stays the kill switch.
 - **The sign explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say gain
   ... you need to now explain that wherever things are"). A number beside a word wears the word's sign (the order of 22 October), and
@@ -352,11 +353,58 @@ the founder overrides one in the conversation.
   because it would have been fixed and never gone there. The only way we're going to ever see a loss is ... when people turn knobs").
   Every LOSS row is still shown (Honesty); each one on the engine that stands is on the next version's list with its cause, and the
   live engine's knobs are where a reader may break the engine and watch it break.
+- **Red and green on every monitor; every variation a knob; the live engine the real engine** (the founder's words of 23 October,
+  night: "Every monitor is to have a red and green button as red is alert ... green has got to be good ... knobs, buttons that allow
+  you to switch amongst all the different organisms ... direct, native, Omni on native ... 1, 10, 100 ... A, B, and C runs ... 5
+  seconds ... 45 ... 120 seconds in the heartbeat ... buttons to run multiple Python hashtag jump generator run variances ... physical
+  buttons that show these reports in some form of PDF ... for CTOs ... boards and all the CFOs"). Every monitor's light is a button
+  in three colours (green working, yellow heading for its line or EVEN on a record, red an alert; the founder's word of 24 October:
+  "Yellow would mean it's even"), native's side and Omni-Compass's apart where a monitor draws both, on the page and on the Grafana wall; one switchboard sets the arm, the organism, the
+  copies, the runs, the run letter and the beat on every monitor that carries that variation and names the ones that do not; the
+  Python's runs can be run again from the page (another 500, and variants on the tuning set's knobs) and on GitHub; the reports for
+  engineers, CTOs, boards and CFOs print from the page, every reading by the one key, every number with its run's number (#run).
+  Whatever the page computes is the engine's own code and says its class; nothing on it is written as commentary.
 - **Omni-Compass at every level** (the founder's words: "OmniCompass can go in the software side, in the hardware bare metal side ...
   in the brain ... in muscles itself ... into a chip ... every level of mechanism"). Its own muscles, built from the ground up with the
   compass's mathematics inside (a pod autoscaler of its own first), beside the open-source muscles it governs, each benchmarked native,
   with Omni-Compass on top, and by itself, and all of it together: the next versions' work, each through the toy gate. A licensed
   mechanism is never copied; an interface a project publishes (the Kubernetes API) is talked to, as any client does.
+- **Omni-Compass by itself, and on top of native: both, and both to the best** (the founder's words: "Within the native, we do
+  whatever the native can be pushed to. And in our own, with no goddamn Kubernetes, we have our own Omni Compass ... We're gonna
+  push it to the best with Omni Direct. We're gonna push it to the best with Omni on a native"; "the way you're writing this
+  should be making OmniCompass better when it's on top of the native, as well as by itself on the organism as the orchestrator,
+  replacing Kubernetes and whatever other managers, orchestrators in the system that OmniCompass is able to become"). Omni's own
+  orchestrator (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`) is built from scratch, no orchestrator's code in it, and read
+  against the yardstick (Kubernetes' published autoscaling rule, written by us) by the one key; every mechanism it gains is the
+  engine's own (conveyance, the verdict, the reflex, the compass law) so the same gain goes to Omni on top of native. Every
+  level is benchmarked on its own (nothing paid for with another), then all joined and benchmarked whole.
+- **The brain finds the win; nobody turns a knob for it** (the founder's words: "the brain should have fucking wired it out";
+  "it's supposed to be built in omnicompasses mechanism, defensive system, immune system, nervous system, pathways of signals
+  moving through ... it should react with the same benefit ... Unless by taking less can show more, or vice versa"). A result
+  that reads EVEN where the organism has room is a mechanism not yet wired, found in the files and wired (23 October: the
+  response time was the unit's own paper quota, not a shortage of units; the engine's conveyance gives the unit the processor
+  its machine can spare: faster, with no unit and no machine added). The win is said only when the run's own files read it.
+- **Where a LOSS may ever be seen** (the founder's words: "Nothing should be shown as a loss because it would have been fixed
+  and never gone there. The only way we're going to ever see a loss ... is in the live engine when people turn knobs and turn
+  and tweak it to a point that fucks it up ... and that's the only benchmark proof that needs to be"). The factory tune reads
+  no LOSS anywhere; a LOSS found in our own runs is a fault, root-caused and fixed in the next version, and until it is fixed its
+  row stands with its cause (Honesty: a benchmark is never published with rows cut out; the founder may hold one back whole). The
+  live engine's knobs (the dial, the heartbeat, the sizes 1, 10, 100, more or less load) exist so a person can see the system
+  react, break it by hand and watch the brain hold or recover: that is the one place a LOSS is ever shown, as the proof that
+  the factory tune is the best state and that the mechanism can be broken only by leaving it.
+- **A reading leads with the word, never the sign** (the founder's words: "a loss can be a gain and a gain can be a loss
+  depending on ... don't because it's minus and plus"). Every reading to the founder and on every page is written as the word
+  first, then the direction in words (down 4.8%, a cut, GAIN), never a bare signed number.
+- **Every tool to strengthen the engine** (the founder's words: "all you got in access to in libraries kits formalization tools
+  all of the open source mechanisms on everything you can learn and figure and find and build and give me and strength in Omni
+  compasses engine"). Anything available that strengthens the mechanism or its proof is used and named; nothing is built from
+  another orchestrator's or governor's code.
+- **Nothing is pushed until the founder says so** (23 October: "Don't push nothing"; "I don't want you to push shit until I
+  tell you"). Work is built, run and shown here; the push waits for his word. His word came the same evening: "Native is
+  Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And then Omni direct is simply
+  Omni on top of the muscles, no Kubernetes ... they all need to be written in code ... put into the GitHub and push it all";
+  then "Update, push, push, push in the bush ... Give it to me"; "Go go". The three arms are always shown together (native, Omni on native, Omni direct;
+  `omni_orchestrator/`, brains `yardstick`, `omni_native`, `omni`), and the push hold is lifted.
 
 ## Orders of 22 October
 

@@ -2,6 +2,36 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-23 (night, the live engine): Omni-Compass direct on the page, section 5g; the orchestrator merged; the phone page fits its width
+
+- **Section 5g, Omni-Compass direct: the organism with no orchestrator, the three arms** (the founder's order of 23 October:
+  "Omnidirect is simply Omni on top of the muscles, no Kubernetes ... written in code ... put into the GitHub"). The orchestrator's
+  branch (`omni_orchestrator/`, `tools/orchestrator_show.py`, `.github/workflows/orchestrator.yml`, `docs/OMNI_ORCHESTRATOR.md`)
+  is merged into the live engine's branch, and the page plays back every showing GitHub ran from its own files on the branch
+  raw (`docs/engine/build_live_engine.py` `direct()`, the record `direct`): each arm's requests answered a second, its 95th
+  percentile, its units and its machines on, 5 s at a time, read the way the showing reads them; the arms' own totals; the
+  showing's readings by the one key, the number beside the word in the word's sign and every interval in its gauge's unit.
+  Knobs: the showing, the gauge, the arms drawn. Native is amber, Omni-Compass and native blue, Omni-Compass direct violet
+  (`--direct`), dashed. Its light reads the showing's readings (red on a LOSS, every row kept) and says it is one run of each
+  arm, class L. Monitor 39 (`dirCv`) in `docs/engine/monitors.json`, every later monitor one number up; the orchestrator
+  exports no Prometheus series yet, and its Grafana panel says so. Like the ledger, the record is a reading of what GitHub has
+  archived, with its own read time, and a check does not rebuild it. The Live Engine Manual reads it in 11.5.
+- **Every monitor's light is a button in green, yellow and red, with native's side and Omni-Compass's side apart** (the founder's
+  words: "Every monitor is to have a red and green button as red is alert ... green has got to be good"; then "they're supposed to be
+  a yellow too. Yellow would mean it's even ... all the reds are theoretically native"). Green: working inside its lines, or no line
+  to cross. Yellow: heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record. Red:
+  over its line, or a LOSS row in its record. The nineteen monitors that draw the organism's two sides carry two lights in one button,
+  native's and Omni-Compass's, each read from its own side, and between them the reading now, Omni-Compass against native on the
+  same load by the key (GAIN green, EVEN yellow, LOSS red, by whether the gauge helps or hurts, never by its sign); before, one moment
+  of the organism lit all nineteen at once from Omni-Compass's side alone. Every wall tile carries three lamps in its corner, green
+  round, yellow a diamond, red an octagon, the lit one moving with the reading; the Grafana wall's panels carry the same three colours
+  as thresholds where the line is a number on their series. A click opens each side's reason and, on a red or yellow one, the way back to the factory tune; the
+  wall's corner dots and summary line use the same colours and name the monitors whose native side is red. Read over one model day of
+  the page's organism (240 decisions, class S): native over its line in 173 decisions (350 muscle-decisions), Omni-Compass on top in
+  147 (272, 22% fewer), never over where native holds; the climb loads the fixed muscles past what they can carry.
+- **The phone page fits its width.** The lights' summary bar above the wall held a list of monitor numbers that did not wrap,
+  so at 390 px the page scrolled 513 px sideways; it wraps now, and nothing on the page is wider than the screen.
+
 ## 2026-10-23 (evening, the live engine): the sign explained where every number sits; a light on every monitor; one button back to the factory tune; the third arm named
 
 - **The sign, explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say
@@ -17,7 +47,7 @@
   replay's 95th percentile against the 200 ms line and its pods waiting, the heart's decision time against half its beat, the CPU
   host's busy share against 75%, the card's draw against its power limit, the page's own frames against 1.5 frames, a record's judged
   rows (a LOSS row lights red and stays). Above the wall one line counts the lights, names the monitors heading for a line or over
-  one, and prints the engine's own last entry on its side, because the brain reads the same slope and acts before the line.
+  one, and prints the engine's own last entry on its side; the three-reading projection is the light's own.
 - **Back to the factory tune, one button** (the founder's words: "there has to be a main button that puts it back ... once buttons
   are touched"). On the console under the kill switch, on the dock, above the wall and in every monitor's knobs: every knob of the
   page returns to the main engine as it ships (`factoryTune`): the max, Omni-Compass ON, demand ×1, noise σ 0, sense delay +0, no
@@ -38,6 +68,48 @@
   version's decision, through the toy gate (the order of 23 October).
 - The page was opened headless at 1280 and 390 px after the change: no console error; the lights, the tooltips and the factory
   button respond. The Live Engine Manual carries the lights (4.1), the button (18.1) and the sign (the key); its appendix is rebuilt.
+
+## 2026-10-23 (evening): Omni-Compass's own orchestrator with the engine's mechanisms in its brain; the three arms; the room's two walls
+
+- **Omni-Compass by itself, the organism run without Kubernetes** (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`; the
+  founder's order of 23 October: "Build it in your chat before you"). Built from scratch on Python's standard library and the
+  compass law, no orchestrator's code in it: the walls (the kernel's control groups, version 2 and 1), the machine's hand, the
+  front, the room rule, the brain, the control plane with its journal and kill switch, the checked workload, the clients.
+  The yardstick it is read against is Kubernetes' published autoscaling rule, written by us. Three arms, always together (the
+  founder's order of the same evening): **native** (the rule on the muscles), **Omni on native** (Omni on top of the rule, the
+  engine's strict form as on the kind rigs: the rule's units never fewer, Omni's reflex, conveyance, packing and machines on
+  top; brain `omni_native`) and **Omni direct** (Omni alone on the muscles; brain `omni`); every pair read by the one key,
+  paired by step (`tools/orchestrator_show.py`, `.github/workflows/orchestrator.yml`).
+- **The brain's win is the engine's own mechanisms.** The first showings read LOSS, then EVEN: Omni held the yardstick's count
+  with the same walls, and the response time was the unit's own paper quota (no request ever waited in line). Four mechanisms,
+  all the engine's, went into the brain: conveyance (each unit's CPU wall set to the room its machine can spare under 75%,
+  journaled, written to the hand, read back from `cpu.max`; omni-v7 and omni-v13's rule), the reflex (work in line adds units
+  in the beat), the yardstick twin read as Kubernetes would (busy capped at the request) and the fold under the verdict
+  (`omnicompass/verdict.py`, a unit fewer than the twin tried on the service's own response times under the same traffic, kept
+  only where it reads no LOSS within 2%; a trial whose arrivals move 15% is abandoned; work in line hands a step back). The
+  full form (18 steps of 25 s, one run of each arm, class L), Omni direct against native, by the one key: **work GAIN, up 4.7%
+  a step; the 95th percentile GAIN, down 9.9%; units GAIN, a cut, down 10.3%; machines EVEN, down 1.7%**; 0 failed, 0 wrong
+  in 20,452 requests; the batch job 16 of 16 beside the service; the drills (a unit killed, a machine lost and repaired, the
+  control plane killed and started again, the kill switch) 3,308 requests, 0 failed. One run of each arm, not yet the
+  three-run reading; the referee grades (`docs/OMNI_ORCHESTRATOR_GRADES.md`): B overall, not production.
+- **The three arms' first showing found a fault, fixed in the brain.** Quick form, one run each: Omni direct against Omni on
+  native read work LOSS (down 5.2%). Every trial the verdict began was abandoned by the traffic gate (the clients step every
+  15 s), yet each held a unit below the twin while it ran, and one trial counted its step from a twin the traffic had since
+  raised. Now a trial the traffic abandons holds the next off for 6 beats, doubled in a row up to the recheck (24 beats), cleared
+  by a trial judged to its end (`omni_orchestrator/control.py`), and a phase counts its step from the higher of the twin it found
+  and the twin now (`omni_orchestrator/brain.py`); two unit tests. After the fix, the same quick form: Omni on native against
+  native, work GAIN (up 8.3%); Omni direct against native, work GAIN (up 9.1%); Omni direct against Omni on native, the 95th
+  percentile GAIN (down 13.2%), units GAIN, a cut (down 9.5%); no LOSS in any pair; nothing failed. The workflow's room rule
+  defaults to the engine's busy rule, as the showing and the page do.
+- **The room, written** (`docs/THE_ROOM.md`, `docs/THE_ROOM_TABLE.md`, `tools/room_table.py`): the founder's law that a muscle
+  with no gain is at its limit and a LOSS is never the muscle's; the catalog read by it (527 GAIN, 421 at their limit, 159 the
+  same as native, 0 LOSS); the two walls found on 23 October (the processor core, wired by the busy rule; the unit's paper
+  quota, moved by conveyance); the unit count's own edge in mathematics (Erlang's C, the square-root law against Kubernetes'
+  2a: no room at this rig's load, near half at a company's scale).
+- **The orders of 23 October** in `CLAUDE.md` (both arms to the best; the brain finds the win; where a LOSS may ever be seen; the
+  word before the sign; every tool to strengthen the engine) and `DISCLOSURES.md` section 3 (the factory tune is published only
+  where it reads no LOSS; the live engine's knobs are where a LOSS is meant to be seen). The engine's fingerprint does not move:
+  the orchestrator is its own files beside omni-v17.
 
 ## 2026-10-23 (afternoon): omni-v17, the heartbeat a dial; the main engine at 60 s
 

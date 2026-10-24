@@ -72,6 +72,24 @@ def wiring(m: dict) -> str:
     return f" Wired: the page's {w['code']} → the Python {py} → the C++ {cpp}{proof}. Moves: {w['moves']}."
 
 
+# the live engine's light in Grafana's own thresholds, where the monitor's line is a number on its series (the founder's words of 23
+# and 24 October: green working, yellow heading for its line, red an alert): green below, yellow from 97% of the line, red at it;
+# a series whose good side is high (the master switch ON, the error budget left) reads the other way
+LIGHT = {"feed2": (0.2, False), "feed3": (0.75, False), "opsCandle": (200.0, False), "orchCv": (1.0, False), "ruStrip": (1.0, False),
+         "immCv": (1.0, False), "cStrip": (0.95, False), "band": (0.95, False), "masterCv": (1.0, True), "tSlo": (0.999, True), "tBurn": (0.1, True)}
+LIGHT_WORDS = (" Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its"
+               " slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.")
+
+
+def thresholds(mid: str) -> dict:
+    line, high_good = LIGHT.get(mid, (None, False))
+    if line is None:
+        return {"mode": "absolute", "steps": [{"color": "green", "value": None}]}
+    if high_good:
+        return {"mode": "absolute", "steps": [{"color": "red", "value": None}, {"color": "yellow", "value": round(line * 0.97, 6)}, {"color": "green", "value": line}]}
+    return {"mode": "absolute", "steps": [{"color": "green", "value": None}, {"color": "yellow", "value": round(line * 0.97, 6)}, {"color": "red", "value": line}]}
+
+
 def dashboard(reg: dict) -> dict:
     panels = []
     order = {cid: i for i, cid in enumerate(page_order())}   # every panel numbered as the page numbers its monitor, laid out left to right
@@ -89,21 +107,22 @@ def dashboard(reg: dict) -> dict:
         title = f"{n} · {m['name']}"
         base = {"id": n, "title": title, "gridPos": {"x": x, "y": y, "w": W, "h": H},
                 "description": (f"Section {sn}, {st}. " if sn else "") + f"{m['what']} Evidence class {m['cls']}; on the live engine: {m['status']}. Feed: {m['feed']['exporter']}."
-                               + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "") + wiring(m)}
+                               + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "") + wiring(m) + LIGHT_WORDS}
         col += 1
         if col == COLS:
             col, y = 0, y + H
         if m["feed"]["promql"]:
             panels.append({**base, "type": m["grafana"]["type"] if m["grafana"]["type"] in ("timeseries", "stat", "bargauge", "heatmap", "table") else "timeseries",
                            "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
-                           "fieldConfig": {"defaults": {"unit": m["grafana"].get("unit") or "short"}, "overrides": []},
+                           "fieldConfig": {"defaults": {"unit": m["grafana"].get("unit") or "short", "thresholds": thresholds(m["id"]),
+                                                        "color": {"mode": "thresholds"}, "custom": {"thresholdsStyle": {"mode": "line+area"}}}, "overrides": []},
                            "targets": [{"refId": chr(65 + j), "expr": e, "legendFormat": m["feed"]["metrics"][j] if j < len(m["feed"]["metrics"]) else e}
                                        for j, e in enumerate(m["feed"]["promql"])]})
         else:
             panels.append({**base, "type": "text", "options": {"mode": "markdown", "content":
                            f"**{m['name']}** ({reg['layers'].get(m['layer'], m['layer'])}).\n\n{m['what']}\n\nSource: {m['feed']['exporter']}. "
                            f"No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; "
-                           f"this panel marks its place on the wall (monitor {n})."}})
+                           f"this panel marks its place on the wall (monitor {n}).{LIGHT_WORDS}"}})
     return {"uid": "omni-compass-wall", "title": "Omni-Compass: the monitor wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "time": {"from": "now-6h", "to": "now"}, "refresh": "30s",
             "templating": {"list": [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "query": "prometheus", "current": {}, "hide": 0}]},

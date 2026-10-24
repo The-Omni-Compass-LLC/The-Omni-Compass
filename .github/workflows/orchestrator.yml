@@ -1,0 +1,203 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+name: orchestrator
+# Omni-Compass's own orchestrator, the organism run without Kubernetes (docs/OMNI_ORCHESTRATOR.md), shown on one of
+# GitHub's machines as a real run: the yardstick (Kubernetes' published autoscaling rule, every machine on) against Omni,
+# the same clients; a batch job beside the service; the drills (a unit killed, a machine lost, the control plane killed
+# and started again, the kill switch). Every piece a real process inside the kernel's own control groups; every answer
+# checked. One run of each arm a job (the three-run reading needs three runs: start it as A, B and C).
+on:
+  push:
+    branches: [omni-orchestrator]
+  workflow_dispatch:
+    inputs:
+      run:
+        description: "the run's letter (A, B or C), or trial"
+        default: "trial"
+      quick:
+        description: "quick form (six steps of 15 s) instead of the full showing"
+        type: boolean
+        default: false
+      room_rule:
+        description: "Omni's room rule: busy (the engine's own: also under 75% of a machine's measured busy share) or requests (Kubernetes' way)"
+        default: "busy"
+run-name: "orchestrator ${{ github.event.inputs.run || 'push' }} room=${{ github.event.inputs.room_rule || 'busy' }}${{ github.event.inputs.quick == 'true' && ' (quick)' || '' }}"
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+# the token reads the code and nothing else: this workflow pushes nothing, starts nothing and reads no other run
+# (docs/THREAT_MODEL.md, T9)
+permissions:
+  contents: read
+jobs:
+  show:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4: the code, not the archive of raw runs
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/results/live/raw/*
+      - name: Engine and source receipt
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "machine: $(nproc) processors, $(awk '/MemTotal/ {printf "%.0f", $2/1024/1024}' /proc/meminfo) GB, cgroup $(test -f /sys/fs/cgroup/cgroup.controllers && echo 2 || echo 1), $(uname -r)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Run the showing (root, for the kernel's control groups)
+        run: |
+          set +e
+          q=""; [ "${{ github.event.inputs.quick }}" = "true" ] && q="--quick"
+          rr="${{ github.event.inputs.room_rule }}"; rr="${rr:-busy}"
+          sudo -E env "PATH=$PATH" python3 tools/orchestrator_show.py --out out --room-rule "$rr" $q > run.log 2>&1
+          code=$?
+          sudo chown -R "$(id -u):$(id -g)" out 2>/dev/null || true
+          tail -5 run.log | while IFS= read -r l; do echo "::notice::$l"; done
+          [ "$code" = 0 ] || { echo "::error::the showing ended with exit $code"; mkdir -p out; cp run.log out/; cat run.log | tail -40; exit "$code"; }
+      - name: The reading, on this job's page
+        if: always()
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          p = Path("out/summary.json")
+          if not p.exists():
+              print("no summary: the showing did not finish"); raise SystemExit
+          d = json.loads(p.read_text())
+          arms = [(k, n) for k, n in (("yardstick", "native"), ("omni_native", "Omni on native"), ("omni", "Omni direct")) if k in d["summary"]]
+          print("| gauge | " + " | ".join(n for _, n in arms) + " |\n|---|" + "---:|" * len(arms))
+          for k, lab in (("answered", "requests answered"), ("failed", "failed"), ("wrong", "wrong"), ("p95_ms", "95th percentile (ms)"),
+                         ("machine_min", "machine-minutes on"), ("unit_min", "unit-minutes"), ("conveyed_core_min", "processor conveyed (core-min)"),
+                         ("cpu_s", "processor-seconds")):
+              print(f"| {lab} | " + " | ".join(f"{d['summary'][a].get(k, 0):,.1f}" for a, _ in arms) + " |")
+          print("\n| comparison and gauge | difference a step | reading |\n|---|---:|---|")
+          for g, r in d.get("readings", {}).items():
+              print(f"| {g} | {100 * float(r['rel']):+.1f}% ({float(r['lo']):+.1f} to {float(r['hi']):+.1f}) | {r['word']} |")
+          for ph in ("batch", "drills"):
+              s = d["summary"].get(ph)
+              if s:
+                  print(f"\n{ph}: {s['requests']:,} requests, {s['failed']} failed, {s['wrong']} wrong, p95 {s['p95_ms']:.0f} ms")
+          EOF
+      - name: Attach README, licenses and disclosures to this artifact
+        id: omni_legal_export_1
+        if: "always()"
+        env:
+          OMNI_EXPORT_PATHS: |
+            out
+        shell: python
+        run: |
+          #!/usr/bin/env python3
+          # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+          # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+          # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+          # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+          # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+          """Attach the exact legal bundle inside an artifact without changing its result-file layout."""
+          import glob
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import urllib.parse
+          import urllib.request
+          import uuid
+          
+          BUNDLE = ('README.md', 'LICENSE', 'NOTICE', 'DISCLOSURES.md', 'PATENTS.md', 'TRADEMARKS.md')
+          
+          
+          def search_root(pattern, workspace):
+              path = Path(os.path.expanduser(pattern))
+              if not path.is_absolute():
+                  path = workspace / path
+              prefix = Path(path.anchor)
+              for part in path.parts[1:]:
+                  if glob.has_magic(part):
+                      return prefix
+                  prefix /= part
+              return path if path.is_dir() or (not path.exists() and not path.suffix) else path.parent
+          
+          
+          def attach(paths, workspace, loader=None):
+              workspace = Path(workspace).absolute()
+              lines = [p.strip() for p in paths.splitlines() if p.strip()]
+              roots = [search_root(p, workspace) for p in lines if not p.startswith('!')]
+              if not roots:
+                  raise ValueError('artifact has no positive output path')
+              root = Path(os.path.commonpath([str(p) for p in roots]))
+              if root == Path(root.anchor):
+                  raise ValueError('refusing to write an export bundle at a filesystem root')
+              legal = root / '_omni_legal'
+              legal.mkdir(parents=True, exist_ok=True)
+              hashes = {}
+              for name in BUNDLE:
+                  source = workspace / name
+                  data = source.read_bytes() if source.is_file() else loader(name) if loader else None
+                  if data is None:
+                      raise FileNotFoundError('required export legal file is unavailable: ' + name)
+                  target = legal / name
+                  target.write_bytes(data)
+                  hashes[name] = hashlib.sha256(data).hexdigest()
+              (legal / 'SHA256SUMS.json').write_text(json.dumps(hashes, indent=2) + '\n')
+              return '\n'.join([*lines, *(str(legal / n) for n in (*BUNDLE, 'SHA256SUMS.json'))])
+          
+          
+          def main():
+              workspace = Path(os.environ.get('GITHUB_WORKSPACE', '.')).absolute()
+              def public_source(name):
+                  # Collect-only jobs may not check out source. Fetch only these public legal files, pinned to the run commit.
+                  repo, sha = os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_SHA']
+                  url = f'https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(name)}'
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      return response.read()
+              paths = attach(os.environ['OMNI_EXPORT_PATHS'], workspace, public_source)
+              delimiter = 'OMNI_LEGAL_' + uuid.uuid4().hex
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                  out.write('paths<<' + delimiter + '\n' + paths + '\n' + delimiter + '\n')
+          
+          
+          if __name__ == '__main__':
+              main()
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: orchestrator-${{ github.event.inputs.run || 'push' }}-${{ github.event.inputs.room_rule || 'requests' }}-${{ github.run_id }}
+          path: "${{ steps.omni_legal_export_1.outputs.paths }}"
+          if-no-files-found: warn
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - name: Legal files beside the files this run hands out
+        if: always()
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: _legal
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
+      - name: Legal notice handed out with this run's files
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: legal-notice
+          overwrite: true
+          path: |
+            _legal/README.md
+            _legal/LICENSE
+            _legal/NOTICE
+            _legal/DISCLOSURES.md
+            _legal/PATENTS.md
+            _legal/TRADEMARKS.md
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"

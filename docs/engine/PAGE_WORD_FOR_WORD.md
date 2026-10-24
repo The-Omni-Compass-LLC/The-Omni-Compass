@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-23 20:25 UTC on omni-v17 (digest 7c937d09e4031cc7) from commit 517bc8952c30.
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-23 21:19 UTC on omni-v17 (digest 7c937d09e4031cc7) from commit 0b7aef754ba3.
 
 
 Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
@@ -968,6 +968,30 @@ The repository's own models of one GPU card and one Linux host, native beside Om
 - **How to read it.** The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.
 - **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v17 run lands.
 
+## 5g Omni-Compass direct: the organism with no orchestrator, the three arms
+
+Omni-Compass's own orchestrator (omni_orchestrator/, docs/OMNI_ORCHESTRATOR.md) runs the organism, a checked web service and a batch job on six half-processor machines, with no Kubernetes and no other orchestrator: its own walls (the kernel's control groups), a hand on each machine, one front, the room rule, the brain and a control plane with its journal and kill switch, built from scratch with the compass law and the engine's own mechanisms inside. The three arms run the same clients on the same machines, one after another: native, Kubernetes' published autoscaling rule on the muscles, written by us (the yardstick); Omni-Compass and native, Omni-Compass on top of that rule, its units never fewer than the rule's; Omni-Compass direct, Omni-Compass alone on the muscles. Every pair is read by the one key, step by step. Each showing is one run of each arm on one GitHub machine (class L): not yet the three-run reading, and Kubernetes itself on the kind rig beside it has not run yet. Every row is shown.
+
+**Controls.** Recorded data: every showing of Omni-Compass's own orchestrator that GitHub ran, played back 5 s at a time from its own files on the branch raw (class L); pick a showing, a gauge and the arms below.
+
+**The page, in its own words.**
+
+**The showing, played back: every arm on the same clients, 5 s at a time**
+
+**Its monitors.**
+
+### Monitor 39: Omni-Compass direct: the three arms, played back
+
+Every showing of Omni-Compass's own orchestrator that GitHub ran (.github/workflows/orchestrator.yml): native (Kubernetes' published autoscaling rule on the muscles, written by us), Omni-Compass and native, and Omni-Compass direct (no orchestrator), each arm's requests answered, 95th percentile, units and machines 5 s at a time from its own files on the branch raw, with the arms' totals and the showing's readings by the one key.
+
+- **Evidence and state.** Class L (one run of each arm a showing); record.
+- **Feed.** each showing's own files on the branch raw: the control plane's timeline (omni_orchestrator/control.py) and every request's record (tools/orchestrator_show.py); the orchestrator exports no Prometheus series yet.
+- **Wired.** This page's `drawDirect, dirSetup, dirRender` → the Python `omni_orchestrator/control.py`, `omni_orchestrator/brain.py`, `tools/orchestrator_show.py`, `docs/engine/build_live_engine.py` → the C++ none: the orchestrator is live software of its own in Python; its compass law is the engine's, whose C++ twin is cpp/src/core.cpp; held equal by `tests/test_orchestrator.py`, `.github/workflows/orchestrator.yml`.
+- **Moves.** The playback cursor sweeps the showing (450 s in 30 s), each arm's line drawn up to it with its value at the head.
+- **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Arm: which arm stands on the right: Omni-Compass governing, or watching only; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
+- **How to read it.** Each scheduler, queue and multi-cluster governor four ways: the organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator.
+- **What to do with it.** Only two of the four comparisons are Omni-Compass against its native (on top of the orchestrator; on the organism alone); the others are the orchestrator's own cost and are never counted as Omni-Compass's.
+
 ## Part 6 of the page: The organism, live: native and Omni-Compass
 
 ## 6a The organism, live: native and Omni-Compass
@@ -998,7 +1022,7 @@ The body keeps itself healthy the way a human body does. Every room and every ma
 
 **Its monitors.**
 
-### Monitor 39: The organism, live: native
+### Monitor 40: The organism, live: native
 
 Sixty muscles of the stress model, each on its own native controller, at their positions in the band.
 
@@ -1010,7 +1034,7 @@ Sixty muscles of the stress model, each on its own native controller, at their p
 - **How to read it.** The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.
 - **What to do with it.** Turn the console's knobs (demand, noise, sensor delay, faults) and watch both arms take the same input; the difference between the lanes is what Omni-Compass did.
 
-### Monitor 40: The organism, live: Omni-Compass
+### Monitor 41: The organism, live: Omni-Compass
 
 The same sixty muscles with Omni-Compass on top of their native controllers, the brain's grants and pushes.
 
@@ -1022,7 +1046,7 @@ The same sixty muscles with Omni-Compass on top of their native controllers, the
 - **How to read it.** The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.
 - **What to do with it.** Turn the console's knobs (demand, noise, sensor delay, faults) and watch both arms take the same input; the difference between the lanes is what Omni-Compass did.
 
-### Monitor 41: The immune system
+### Monitor 42: The immune system
 
 Where the two sides differ, and the body's heat debt: a room warmer than its native twin, inflamed, given back.
 
@@ -1034,7 +1058,7 @@ Where the two sides differ, and the body's heat debt: a room warmer than its nat
 - **How to read it.** The organism the brain governs, muscle by muscle: positions in the compass band, the brain's grants and pushes, the immune system's heat debt; native's own controllers under every muscle.
 - **What to do with it.** Turn the console's knobs (demand, noise, sensor delay, faults) and watch both arms take the same input; the difference between the lanes is what Omni-Compass did.
 
-### Monitor 42: The body parts on the band
+### Monitor 43: The body parts on the band
 
 Each body part's muscles (the spine and the four realms) at their positions in the band, native above and Omni-Compass below, every decision.
 
@@ -1080,7 +1104,7 @@ Omni-Compass's answers are drawn from this page's records and are not reviewed b
 
 **Its monitors.**
 
-### Monitor 43: Telemetry tensor: the cube
+### Monitor 44: Telemetry tensor: the cube
 
 The engine's harness record as a tensor (decisions × sixty muscles × two arms), native and Omni-Compass as two slabs, filling in on the live engine's clock.
 
@@ -1092,7 +1116,7 @@ The engine's harness record as a tensor (decisions × sixty muscles × two arms)
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-### Monitor 44: Telemetry tensor: the difference
+### Monitor 45: Telemetry tensor: the difference
 
 The difference of the two sides' tensors, cell by cell.
 
@@ -1104,7 +1128,7 @@ The difference of the two sides' tensors, cell by cell.
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-### Monitor 45: Telemetry tensor: the modes
+### Monitor 46: Telemetry tensor: the modes
 
 The principal modes of the telemetry (its matrix decomposed).
 
@@ -1116,7 +1140,7 @@ The principal modes of the telemetry (its matrix decomposed).
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-### Monitor 46: Service level: the objective
+### Monitor 47: Service level: the objective
 
 The share of each half minute's requests answered inside the 500 ms line, native beside Omni-Compass, through the official run chosen in section 5c.
 
@@ -1128,7 +1152,7 @@ The share of each half minute's requests answered inside the 500 ms line, native
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-### Monitor 47: Service level: the error budget burn
+### Monitor 48: Service level: the error budget burn
 
 The requests over the 500 ms line counted up since the repetition began, native beside Omni-Compass: each side's error budget burned.
 
@@ -1140,7 +1164,7 @@ The requests over the 500 ms line counted up since the repetition began, native 
 - **How to read it.** The organism's telemetry as a tensor (muscle by gauge by time), its difference between the arms, its principal modes, the service level against its objective and the error budget burned, native beside Omni-Compass.
 - **What to do with it.** The service level and the budget are what an on-call engineer is paged on: watch the burn rate on both arms under the same knobs.
 
-### Monitor 48: Telemetry radar
+### Monitor 49: Telemetry radar
 
 Every gauge of the repetition replaying in section 5c against native's 0 line: GAIN to the right in green, LOSS to the left in red, its side the run's own reading.
 
@@ -1172,7 +1196,7 @@ What these controls do. Runtime parameter control and fault injection on the liv
 
 **Its monitors.**
 
-### Monitor 49: The console's response
+### Monitor 50: The console's response
 
 The last 120 decisions of the live engine: the muscles past their line and the work, native beside Omni-Compass, every knob of the console turned marked.
 
@@ -1184,7 +1208,7 @@ The last 120 decisions of the live engine: the muscles past their line and the w
 - **How to read it.** The live engine's response to every knob, native beside Omni-Compass, and the page's own frame budget.
 - **What to do with it.** Every knob acts on both arms alike; the difference between them is Omni-Compass's doing alone.
 
-### Monitor 50: The frame budget
+### Monitor 51: The frame budget
 
 The time between frames of this page against its line under the frame load knob.
 
@@ -1216,7 +1240,7 @@ Each stress lasts 40 decisions from the moment you press it. Both arms meet the 
 
 **Its monitors.**
 
-### Monitor 51: One control cycle, traced
+### Monitor 52: One control cycle, traced
 
 The compass band with its cushions, the two forces and one decision, step by step.
 
@@ -1252,7 +1276,7 @@ How each row is read: the paired change, native against Omni-Compass at the same
 
 **Its monitors.**
 
-### Monitor 52: Phase plane: native
+### Monitor 53: Phase plane: native
 
 Native's muscles in position and velocity.
 
@@ -1264,7 +1288,7 @@ Native's muscles in position and velocity.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### Monitor 53: Phase plane: Omni-Compass
+### Monitor 54: Phase plane: Omni-Compass
 
 Omni-Compass's muscles in position and velocity, the band's walls drawn.
 
@@ -1276,7 +1300,7 @@ Omni-Compass's muscles in position and velocity, the band's walls drawn.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### Monitor 54: The scoreboard strip
+### Monitor 55: The scoreboard strip
 
 The body's capacity in service and its demand (in the harness, its electrical power), the muscles past their line and the spread of positions over the day, native beside Omni-Compass.
 
@@ -1322,7 +1346,7 @@ calm = κ·h·(1 − (σ − 1)⁺)·(1 − min(ν, 1)). An organ may hand capac
 
 **Its monitors.**
 
-### Monitor 55: The brain's state: the well
+### Monitor 56: The brain's state: the well
 
 The brain's double-well potential and where its state sits.
 
@@ -1334,7 +1358,7 @@ The brain's double-well potential and where its state sits.
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### Monitor 56: The brain's state: stress S in its potential
+### Monitor 57: The brain's state: stress S in its potential
 
 Stress S on its cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS, rolling toward S*; the senses pull it back each decision (eqs. (5)–(6)).
 
@@ -1346,7 +1370,7 @@ Stress S on its cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS, rolling
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### Monitor 57: The brain's state: the bath B
+### Monitor 58: The brain's state: the bath B
 
 The bath oscillator B, the slow tide of physical load, over the last 120 decisions (eq. (7)), its spring at the latest B.
 
@@ -1358,7 +1382,7 @@ The bath oscillator B, the slow tide of physical load, over the last 120 decisio
 - **How to read it.** The brain's six state variables integrated by the fourth-order Runge–Kutta step every decision, the compass band with its cushions and its two forces, the organs' grants, native's own controller beside each grant.
 - **What to do with it.** The brain never forces: it reacts to what the body shows. A grant to expand is not a write; a write happens only where the muscle's own trial allows it.
 
-### Monitor 58: Native's own controller beside the brain
+### Monitor 59: Native's own controller beside the brain
 
 What native's controller would do at the same decision, beside the brain's grant.
 
@@ -1388,7 +1412,7 @@ How each muscle wires it. The Kubernetes controller measures 200 requests each s
 
 **Its monitors.**
 
-### Monitor 59: The verdict: one trial
+### Monitor 60: The verdict: one trial
 
 A give-back trial judged against native: its reference, its step, its interval and the word.
 
@@ -1400,7 +1424,7 @@ A give-back trial judged against native: its reference, its step, its interval a
 - **How to read it.** A give-back trial judged against native: its reference, its step, its interval, the word; then the keep ratio at every true cost.
 - **What to do with it.** A step is kept only when its interval stays inside the allowance; a refused step leaves the muscle where native had it.
 
-### Monitor 60: The verdict: every true cost
+### Monitor 61: The verdict: every true cost
 
 The keep ratio of the verdict at each true cost, from trials run in this page's idle time.
 
@@ -1490,7 +1514,7 @@ The engine that runs this page has Omni-Compass in it. Native is the browser's o
 
 **Its monitors.**
 
-### Monitor 61: Self-governed rendering
+### Monitor 62: Self-governed rendering
 
 This page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass.
 
@@ -1557,29 +1581,30 @@ This page's own render loop governed by the compass law: the frame time against 
 | 36 | The CPU host, metered: awaiting its machine | 5f Hardware | S (model) until the run | awaiting its run |
 | 37 | An 8-card node: built and awaiting its run | 5f Hardware | S (native model) until the run | awaiting its run |
 | 38 | The chip and the host, modelled | 5f Hardware | S | model |
-| 39 | The organism, live: native | 6a The organism, live | S | live |
-| 40 | The organism, live: Omni-Compass | 6a The organism, live | S | live |
-| 41 | The immune system | 6a The organism, live | S | live |
-| 42 | The body parts on the band | 6a The organism, live | S | live |
-| 43 | Telemetry tensor: the cube | 6b Telemetry analytics and Omni-Compass in its own words | S (the harness's record, realms/harness.py) | replay |
-| 44 | Telemetry tensor: the difference | 6b Telemetry analytics and Omni-Compass in its own words | S (the harness's record, realms/harness.py) | replay |
-| 45 | Telemetry tensor: the modes | 6b Telemetry analytics and Omni-Compass in its own words | S (the harness's record, realms/harness.py) | replay |
-| 46 | Service level: the objective | 6b Telemetry analytics and Omni-Compass in its own words | L (the official run's request log, SHA-256-checked) | replay |
-| 47 | Service level: the error budget burn | 6b Telemetry analytics and Omni-Compass in its own words | L (the official run's request log, SHA-256-checked) | replay |
-| 48 | Telemetry radar | 6b Telemetry analytics and Omni-Compass in its own words | L (the official run's own gauges) | replay |
-| 49 | The console's response | 7 Control console | S | live |
-| 50 | The frame budget | 7 Control console | S | live |
-| 51 | One control cycle, traced | 8a One control cycle, traced step by step | S | live |
-| 52 | Phase plane: native | 8b Phase plane and scoreboard | S | live |
-| 53 | Phase plane: Omni-Compass | 8b Phase plane and scoreboard | S | live |
-| 54 | The scoreboard strip | 8b Phase plane and scoreboard | S | live |
-| 55 | The brain's state: the well | 8c The brain's internal state | S | live |
-| 56 | The brain's state: stress S in its potential | 8c The brain's internal state | S | live |
-| 57 | The brain's state: the bath B | 8c The brain's internal state | S | live |
-| 58 | Native's own controller beside the brain | 8c The brain's internal state | S | live |
-| 59 | The verdict: one trial | 8d The verdict | S | live |
-| 60 | The verdict: every true cost | 8d The verdict | S | live |
-| 61 | Self-governed rendering | 11 Self-governed rendering | S | live |
+| 39 | Omni-Compass direct: the three arms, played back | 5g Omni-Compass direct | L (one run of each arm a showing) | record |
+| 40 | The organism, live: native | 6a The organism, live | S | live |
+| 41 | The organism, live: Omni-Compass | 6a The organism, live | S | live |
+| 42 | The immune system | 6a The organism, live | S | live |
+| 43 | The body parts on the band | 6a The organism, live | S | live |
+| 44 | Telemetry tensor: the cube | 6b Telemetry analytics and Omni-Compass in its own words | S (the harness's record, realms/harness.py) | replay |
+| 45 | Telemetry tensor: the difference | 6b Telemetry analytics and Omni-Compass in its own words | S (the harness's record, realms/harness.py) | replay |
+| 46 | Telemetry tensor: the modes | 6b Telemetry analytics and Omni-Compass in its own words | S (the harness's record, realms/harness.py) | replay |
+| 47 | Service level: the objective | 6b Telemetry analytics and Omni-Compass in its own words | L (the official run's request log, SHA-256-checked) | replay |
+| 48 | Service level: the error budget burn | 6b Telemetry analytics and Omni-Compass in its own words | L (the official run's request log, SHA-256-checked) | replay |
+| 49 | Telemetry radar | 6b Telemetry analytics and Omni-Compass in its own words | L (the official run's own gauges) | replay |
+| 50 | The console's response | 7 Control console | S | live |
+| 51 | The frame budget | 7 Control console | S | live |
+| 52 | One control cycle, traced | 8a One control cycle, traced step by step | S | live |
+| 53 | Phase plane: native | 8b Phase plane and scoreboard | S | live |
+| 54 | Phase plane: Omni-Compass | 8b Phase plane and scoreboard | S | live |
+| 55 | The scoreboard strip | 8b Phase plane and scoreboard | S | live |
+| 56 | The brain's state: the well | 8c The brain's internal state | S | live |
+| 57 | The brain's state: stress S in its potential | 8c The brain's internal state | S | live |
+| 58 | The brain's state: the bath B | 8c The brain's internal state | S | live |
+| 59 | Native's own controller beside the brain | 8c The brain's internal state | S | live |
+| 60 | The verdict: one trial | 8d The verdict | S | live |
+| 61 | The verdict: every true cost | 8d The verdict | S | live |
+| 62 | Self-governed rendering | 11 Self-governed rendering | S | live |
 
 ## Every knob
 

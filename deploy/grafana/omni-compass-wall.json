@@ -65,7 +65,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1e, The master switch's wiring: the switch above the brain, the brain above the organism, every muscle under it. The switch above the brain: ON, Omni-Compass governs every wired muscle; engaged, every setting is handed back to native's own controller at once and every Omni-Compass side on the page follows native. Evidence class S (the page's port of the master switch; the real one is omnicompass/master.py); on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawMaster, masterSet → the Python omnicompass/master.py, tools/omni_switch.py, omnicompass/nervous_system.py → the C++ cpp/src/nervous_system.cpp; held equal by tests/test_master_switch.py, tests/test_cpp_twins_parity.py. Moves: every decision: the brain's pulse and the work flowing down to every muscle; the switch acts at once.",
+   "description": "Section 1e, The master switch's wiring: the switch above the brain, the brain above the organism, every muscle under it. The switch above the brain: ON, Omni-Compass governs every wired muscle; engaged, every setting is handed back to native's own controller at once and every Omni-Compass side on the page follows native. Evidence class S (the page's port of the master switch; the real one is omnicompass/master.py); on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawMaster, masterSet → the Python omnicompass/master.py, tools/omni_switch.py, omnicompass/nervous_system.py → the C++ cpp/src/nervous_system.cpp; held equal by tests/test_master_switch.py, tests/test_cpp_twins_parity.py. Moves: every decision: the brain's pulse and the work flowing down to every muscle; the switch acts at once. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "stat",
    "datasource": {
     "type": "prometheus",
@@ -73,7 +73,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.97
+       },
+       {
+        "color": "green",
+        "value": 1.0
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -107,11 +132,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1f, The Python's runs, in this page: the jump generator's runs recomputed here, the 500 scenarios replayed. The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each. Evidence class S (the engine itself); on the live engine: live. Feed: tools/engine_runs.py (the Python) and this page. Wired: the page's drawProof, engineRuns, proofRecheck → the Python tools/engine_runs.py → the C++ cpp/tools/engine_runs.cpp, cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by verify.py, tests/test_engine_runs.py, .github/workflows/engine-runs.yml. Moves: the page recomputes one run of the Python's set from its own seed about twice a second, round after round, and holds its receipt against the Python's.",
+   "description": "Section 1f, The Python's runs, in this page: the jump generator's runs recomputed here, the 500 scenarios replayed. The engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each. Evidence class S (the engine itself); on the live engine: live. Feed: tools/engine_runs.py (the Python) and this page. Wired: the page's drawProof, engineRuns, proofRecheck → the Python tools/engine_runs.py → the C++ cpp/tools/engine_runs.cpp, cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by verify.py, tests/test_engine_runs.py, .github/workflows/engine-runs.yml. Moves: the page recomputes one run of the Python's set from its own seed about twice a second, round after round, and holds its receipt against the Python's. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The Python's runs, reproduced here** (the proof against the Python).\n\nThe engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.\n\nSource: tools/engine_runs.py (the Python) and this page. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 2)."
+    "content": "**The Python's runs, reproduced here** (the proof against the Python).\n\nThe engine's seeded runs: the Python's receipts (results/engine_runs) beside the same runs computed by this page's own engine, run by run, with one digest each.\n\nSource: tools/engine_runs.py (the Python) and this page. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 2). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -123,11 +148,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1f, The Python's runs, in this page: the jump generator's runs recomputed here, the 500 scenarios replayed. benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push. Evidence class S; on the live engine: replay. Feed: benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv). Wired: the page's drawHeld → the Python benchmarks/stack_benchmark.py, omnicompass/adapter.py, omnicompass/shield.py, omnicompass/stack_sim.py, docs/engine/export_heldout.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp; held equal by verify.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py. Moves: the 500 scenarios replayed one after another from the record, every scenario's trace hash with it.",
+   "description": "Section 1f, The Python's runs, in this page: the jump generator's runs recomputed here, the 500 scenarios replayed. benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push. Evidence class S; on the live engine: replay. Feed: benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv). Wired: the page's drawHeld → the Python benchmarks/stack_benchmark.py, omnicompass/adapter.py, omnicompass/shield.py, omnicompass/stack_sim.py, docs/engine/export_heldout.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp; held equal by verify.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py. Moves: the 500 scenarios replayed one after another from the record, every scenario's trace hash with it. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The Python's 500 scenarios, replayed** (the proof against the Python).\n\nbenchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.\n\nSource: benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 3)."
+    "content": "**The Python's 500 scenarios, replayed** (the proof against the Python).\n\nbenchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seeds), each through every arm, replayed from its record scenario by scenario with every trace hash and the file's SHA-256; verify.py replays them on every push.\n\nSource: benchmarks/stack_benchmark.py (results/heldout_seed_*/RUNS.csv). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 3). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -152,7 +177,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1h, The golden signals, the event log and the live metrics. Errors a decision on the live organism, native beside Omni-Compass (site reliability's first of four). Evidence class S; on the live engine: live. Feed: the service's own request counter (Prometheus client), kube-state-metrics for pod restarts. Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point.",
+   "description": "Section 1h, The golden signals, the event log and the live metrics. Errors a decision on the live organism, native beside Omni-Compass (site reliability's first of four). Evidence class S; on the live engine: live. Feed: the service's own request counter (Prometheus client), kube-state-metrics for pod restarts. Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -160,7 +185,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "ops"
+     "unit": "ops",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -181,7 +223,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1h, The golden signals, the event log and the live metrics. Work done a decision (traffic), native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: the service's own request counter (Prometheus client). Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point.",
+   "description": "Section 1h, The golden signals, the event log and the live metrics. Work done a decision (traffic), native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: the service's own request counter (Prometheus client). Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -189,7 +231,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "reqps"
+     "unit": "reqps",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -210,7 +269,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1h, The golden signals, the event log and the live metrics. Response time a decision, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: the service's own duration histogram. Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point.",
+   "description": "Section 1h, The golden signals, the event log and the live metrics. Response time a decision, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: the service's own duration histogram. Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -218,7 +277,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "s"
+     "unit": "s",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.194
+       },
+       {
+        "color": "red",
+        "value": 0.2
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -239,7 +323,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1h, The golden signals, the event log and the live metrics. Capacity held against capacity used, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: node_exporter. Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point.",
+   "description": "Section 1h, The golden signals, the event log and the live metrics. Capacity held against capacity used, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: node_exporter. Wired: the page's drawFeed → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine: each side's line takes a point. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -247,7 +331,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "percentunit"
+     "unit": "percentunit",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.7275
+       },
+       {
+        "color": "red",
+        "value": 0.75
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -281,7 +390,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 1i, CI pipeline: GitHub Actions runs in progress and queued. Every workflow run in progress or queued when the page was built, the Azure set's repetitions done of its cap, and the clouds' gates. Evidence class L (GitHub's own API, read at the build); on the live engine: record. Feed: GitHub Actions API (read at the build); live: github-actions-exporter. Wired: the page's drawCi → the Python docs/engine/build_live_engine.py → the C++ none: GitHub's own record of its runs, read from its API at the build; held equal by docs/engine/build_live_engine.py. Moves: the reading cursor walks the workflows, one a decision; the age of GitHub's reading counts up every second.",
+   "description": "Section 1i, CI pipeline: GitHub Actions runs in progress and queued. Every workflow run in progress or queued when the page was built, the Azure set's repetitions done of its cap, and the clouds' gates. Evidence class L (GitHub's own API, read at the build); on the live engine: record. Feed: GitHub Actions API (read at the build); live: github-actions-exporter. Wired: the page's drawCi → the Python docs/engine/build_live_engine.py → the C++ none: GitHub's own record of its runs, read from its API at the build; held equal by docs/engine/build_live_engine.py. Moves: the reading cursor walks the workflows, one a decision; the age of GitHub's reading counts up every second. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "stat",
    "datasource": {
     "type": "prometheus",
@@ -289,7 +398,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -323,11 +449,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. Every domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, native against Omni-Compass. Evidence class L/S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawBenefit, fxCursor → the Python tools/benefit_sheet.py, tools/omni_index.py, tools/readings.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_benefit_sheet.py, tests/test_readings.py. Moves: the reading cursor walks the bars, one benchmark at a time.",
+   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. Every domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, native against Omni-Compass. Evidence class L/S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawBenefit, fxCursor → the Python tools/benefit_sheet.py, tools/omni_index.py, tools/readings.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_benefit_sheet.py, tests/test_readings.py. Moves: the reading cursor walks the bars, one benchmark at a time. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The benefit board** (the whole organism).\n\nEvery domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, native against Omni-Compass.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 9)."
+    "content": "**The benefit board** (the whole organism).\n\nEvery domain's three-run table as one bar: GAIN, EVEN, LOSS and power given, native against Omni-Compass.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 9). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -339,11 +465,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. The same tables by gauge family: work, speed, misses, resources. Evidence class L/S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawFam → the Python tools/benefit_sheet.py, tools/readings.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_benefit_sheet.py, tests/test_readings.py. Moves: the reading cursor walks the families, one at a time.",
+   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. The same tables by gauge family: work, speed, misses, resources. Evidence class L/S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawFam → the Python tools/benefit_sheet.py, tools/readings.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_benefit_sheet.py, tests/test_readings.py. Moves: the reading cursor walks the families, one at a time. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**Where the benefit lives, gauge by gauge** (the whole organism).\n\nThe same tables by gauge family: work, speed, misses, resources.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 10)."
+    "content": "**Where the benefit lives, gauge by gauge** (the whole organism).\n\nThe same tables by gauge family: work, speed, misses, resources.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 10). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -355,11 +481,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. Every three-run table on the page as a tile of a squarified treemap, grouped by stack: its area the gauges it judged, its colour its reading (GAIN green, LOSS red, EVEN yellow, power given the accent, an orchestrator's own cost grey and dashed). Evidence class L/S; on the live engine: record. Feed: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). Wired: the page's drawTradeMap → the Python tools/confirm_abc.py, tools/readings.py, docs/engine/build_live_engine.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_confirm_abc.py, tests/test_readings.py, docs/engine/build_live_engine.py. Moves: the scan cursor walks every tile, one every 1.5 s.",
+   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. Every three-run table on the page as a tile of a squarified treemap, grouped by stack: its area the gauges it judged, its colour its reading (GAIN green, LOSS red, EVEN yellow, power given the accent, an orchestrator's own cost grey and dashed). Evidence class L/S; on the live engine: record. Feed: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). Wired: the page's drawTradeMap → the Python tools/confirm_abc.py, tools/readings.py, docs/engine/build_live_engine.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_confirm_abc.py, tests/test_readings.py, docs/engine/build_live_engine.py. Moves: the scan cursor walks every tile, one every 1.5 s. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The market map: every three-run table a tile** (the whole organism).\n\nEvery three-run table on the page as a tile of a squarified treemap, grouped by stack: its area the gauges it judged, its colour its reading (GAIN green, LOSS red, EVEN yellow, power given the accent, an orchestrator's own cost grey and dashed).\n\nSource: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 11)."
+    "content": "**The market map: every three-run table a tile** (the whole organism).\n\nEvery three-run table on the page as a tile of a squarified treemap, grouped by stack: its area the gauges it judged, its colour its reading (GAIN green, LOSS red, EVEN yellow, power given the accent, an orchestrator's own cost grey and dashed).\n\nSource: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 11). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -371,11 +497,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. Every three-run table as a quote: its ticker and engine, the gauge that moved most with its mean change, that gauge in runs A, B and C as a candle (the 95% interval and the value), its rows counted by word, and a tape of every headline. Evidence class L/S; on the live engine: record. Feed: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). Wired: the page's drawQuotes → the Python tools/confirm_abc.py, tools/readings.py, docs/engine/build_live_engine.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_confirm_abc.py, tests/test_readings.py, docs/engine/build_live_engine.py. Moves: the tape of the headlines runs across the top at 55 px a second.",
+   "description": "Section 2, The benefit board: every domain, native against Omni-Compass. Every three-run table as a quote: its ticker and engine, the gauge that moved most with its mean change, that gauge in runs A, B and C as a candle (the 95% interval and the value), its rows counted by word, and a tape of every headline. Evidence class L/S; on the live engine: record. Feed: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). Wired: the page's drawQuotes → the Python tools/confirm_abc.py, tools/readings.py, docs/engine/build_live_engine.py → the C++ none: the repository's measured tables, read as written; no engine runs in the page for them; held equal by tests/test_confirm_abc.py, tests/test_readings.py, docs/engine/build_live_engine.py. Moves: the tape of the headlines runs across the top at 55 px a second. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The quote board: every three-run table a quote** (the whole organism).\n\nEvery three-run table as a quote: its ticker and engine, the gauge that moved most with its mean change, that gauge in runs A, B and C as a candle (the 95% interval and the value), its rows counted by word, and a tape of every headline.\n\nSource: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 12)."
+    "content": "**The quote board: every three-run table a quote** (the whole organism).\n\nEvery three-run table as a quote: its ticker and engine, the gauge that moved most with its mean change, that gauge in runs A, B and C as a candle (the 95% interval and the value), its rows counted by word, and a tape of every headline.\n\nSource: the build (the repository's three-run tables, no live feed: a recording rule would carry each table's counts). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 12). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -400,11 +526,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 3, The whole organism, every way it is bought: on-site bare metal, through the cloud, in the device, as a service. The pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought. Evidence class S (of P and L); on the live engine: composed. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawWhole → the Python tools/whole_system.py, docs/engine/export_whole.py → the C++ none: a composition of measured tables by the product law, read as tools/whole_system.py writes it; held equal by docs/engine/build_live_engine.py. Moves: work flows down both columns; the reading cursor walks the pieces, one a decision.",
+   "description": "Section 3, The whole organism, every way it is bought: on-site bare metal, through the cloud, in the device, as a service. The pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought. Evidence class S (of P and L); on the live engine: composed. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawWhole → the Python tools/whole_system.py, docs/engine/export_whole.py → the C++ none: a composition of measured tables by the product law, read as tools/whole_system.py writes it; held equal by docs/engine/build_live_engine.py. Moves: work flows down both columns; the reading cursor walks the pieces, one a decision. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The whole organism, composed** (the whole organism).\n\nThe pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 13)."
+    "content": "**The whole organism, composed** (the whole organism).\n\nThe pieces of a stack, native beside Omni-Compass, each piece's composed factors and the whole, their product, in every way a stack is bought.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 13). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -429,11 +555,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 4, Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table. Each organism's misses against native under its own load, the climb and the line (the realms table). Evidence class S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawOrgCv → the Python tools/run_realms_v5.py, realms/harness.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by tests/test_realms.py, tests/test_cpp_governor_parity.py. Moves: the reading cursor walks every organism under every load, one a decision.",
+   "description": "Section 4, Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table. Each organism's misses against native under its own load, the climb and the line (the realms table). Evidence class S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawOrgCv → the Python tools/run_realms_v5.py, realms/harness.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by tests/test_realms.py, tests/test_cpp_governor_parity.py. Moves: the reading cursor walks every organism under every load, one a decision. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The seven organisms, three loads** (the organisms and the catalog).\n\nEach organism's misses against native under its own load, the climb and the line (the realms table).\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 14)."
+    "content": "**The seven organisms, three loads** (the organisms and the catalog).\n\nEach organism's misses against native under its own load, the climb and the line (the realms table).\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 14). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -445,11 +571,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 4, Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table. The 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle. Evidence class S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawMuscleCv → the Python tools/run_realms_v5.py, realms/harness.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by tests/test_realms.py, tests/test_cpp_governor_parity.py. Moves: the reading cursor walks the 1,107 muscles, one a decision; a click holds one.",
+   "description": "Section 4, Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table. The 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle. Evidence class S; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawMuscleCv → the Python tools/run_realms_v5.py, realms/harness.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by tests/test_realms.py, tests/test_cpp_governor_parity.py. Moves: the reading cursor walks the 1,107 muscles, one a decision; a click holds one. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**Every muscle of the catalog** (every muscle).\n\nThe 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 15)."
+    "content": "**Every muscle of the catalog** (every muscle).\n\nThe 1,107 muscles as one matrix, each cell its word against native, by family and realm; a click names the muscle.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 15). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -461,11 +587,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 4, Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table. Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside. Evidence class S/L; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawGridCv → the Python tools/grid_v5.py, scripts/dispatch_grid.py, docs/engine/build_live_engine.py → the C++ none: the grid's squares as its runs on GitHub write them; held equal by tests/test_grid_v5.py. Moves: the reading cursor walks every square with runs started, one a decision; the age of GitHub's reading counts up every second.",
+   "description": "Section 4, Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table. Seven organisms × copies × runs: every square's word, modelled and with the real cluster inside. Evidence class S/L; on the live engine: record. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawGridCv → the Python tools/grid_v5.py, scripts/dispatch_grid.py, docs/engine/build_live_engine.py → the C++ none: the grid's squares as its runs on GitHub write them; held equal by tests/test_grid_v5.py. Moves: the reading cursor walks every square with runs started, one a decision; the age of GitHub's reading counts up every second. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The scale-out grid** (the organisms and the catalog).\n\nSeven organisms × copies × runs: every square's word, modelled and with the real cluster inside.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 16)."
+    "content": "**The scale-out grid** (the organisms and the catalog).\n\nSeven organisms × copies × runs: every square's word, modelled and with the real cluster inside.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 16). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -490,7 +616,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. Machine-hours billed and the bill at list price, native against Omni-Compass, every finished Azure set with its 95% interval, and the running set's repetitions done. Evidence class L (metered by Azure); on the live engine: record. Feed: OpenCost; Azure's own billing export. Wired: the page's drawCloudBill → the Python tools/live_reps.py, tools/stop_rule.py, docs/engine/build_live_engine.py → the C++ none: the bill as Azure meters it; held equal by docs/engine/build_live_engine.py. Moves: the reading cursor walks the finished sets; the age of GitHub's reading counts up every second.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. Machine-hours billed and the bill at list price, native against Omni-Compass, every finished Azure set with its 95% interval, and the running set's repetitions done. Evidence class L (metered by Azure); on the live engine: record. Feed: OpenCost; Azure's own billing export. Wired: the page's drawCloudBill → the Python tools/live_reps.py, tools/stop_rule.py, docs/engine/build_live_engine.py → the C++ none: the bill as Azure meters it; held equal by docs/engine/build_live_engine.py. Moves: the reading cursor walks the finished sets; the age of GitHub's reading counts up every second. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -498,7 +624,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "currencyUSD"
+     "unit": "currencyUSD",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -519,7 +662,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; Google Cloud Billing export. Awaiting: the first set starts within the hour after the gate passes: the key stored whole (docs/GOOGLE_SETUP.md, section 4). Wired: the page's drawCloudBill → the Python tools/cloud_key_check.py, omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by tests/test_cloud_check.py, docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; Google Cloud Billing export. Awaiting: the first set starts within the hour after the gate passes: the key stored whole (docs/GOOGLE_SETUP.md, section 4). Wired: the page's drawCloudBill → the Python tools/cloud_key_check.py, omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by tests/test_cloud_check.py, docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -527,7 +670,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "currencyUSD"
+     "unit": "currencyUSD",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -548,7 +708,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; AWS Cost and Usage Report. Awaiting: the first set starts within the hour after the gate passes: the account on the Paid plan (docs/AMAZON_SETUP.md, section 1a). Wired: the page's drawCloudBill → the Python tools/cloud_key_check.py, omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by tests/test_cloud_check.py, docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; AWS Cost and Usage Report. Awaiting: the first set starts within the hour after the gate passes: the account on the Paid plan (docs/AMAZON_SETUP.md, section 1a). Wired: the page's drawCloudBill → the Python tools/cloud_key_check.py, omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by tests/test_cloud_check.py, docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -556,7 +716,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "currencyUSD"
+     "unit": "currencyUSD",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -577,7 +754,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The shipped controller's cloud mode on the toy cluster: the cloud's own autoscaler alone. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The shipped controller's cloud mode on the toy cluster: the cloud's own autoscaler alone. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -585,7 +762,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -606,7 +800,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same autoscaler with Omni-Compass parking a machine only after its trial, waking it on a breach. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same autoscaler with Omni-Compass parking a machine only after its trial, waking it on a breach. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -614,7 +808,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -653,11 +864,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5b, Orchestrators and governors: every scheduler, queue and multi-cluster governor, native and with Omni-Compass on top. Every scheduler, queue and multi-cluster governor on its way through trial, A, B and C, on the engine that stands. Evidence class L; on the live engine: record. Feed: GitHub Actions API (read at the build); live: github-actions-exporter. Wired: the page's drawOrchRoad → the Python tools/governors_page.py, tools/confirm_abc.py, docs/engine/build_live_engine.py → the C++ none: the governors are live software on Kubernetes, run as their projects ship them; held equal by tests/test_governors_page.py. Moves: a dot travels each governor's road, a running run pulses, and the reading cursor walks the governors, one a decision.",
+   "description": "Section 5b, Orchestrators and governors: every scheduler, queue and multi-cluster governor, native and with Omni-Compass on top. Every scheduler, queue and multi-cluster governor on its way through trial, A, B and C, on the engine that stands. Evidence class L; on the live engine: record. Feed: GitHub Actions API (read at the build); live: github-actions-exporter. Wired: the page's drawOrchRoad → the Python tools/governors_page.py, tools/confirm_abc.py, docs/engine/build_live_engine.py → the C++ none: the governors are live software on Kubernetes, run as their projects ship them; held equal by tests/test_governors_page.py. Moves: a dot travels each governor's road, a running run pulses, and the reading cursor walks the governors, one a decision. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The orchestrators' road** (the orchestrators and governors).\n\nEvery scheduler, queue and multi-cluster governor on its way through trial, A, B and C, on the engine that stands.\n\nSource: GitHub Actions API (read at the build); live: github-actions-exporter. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 22)."
+    "content": "**The orchestrators' road** (the orchestrators and governors).\n\nEvery scheduler, queue and multi-cluster governor on its way through trial, A, B and C, on the engine that stands.\n\nSource: GitHub Actions API (read at the build); live: github-actions-exporter. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 22). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -669,7 +880,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5b, Orchestrators and governors: every scheduler, queue and multi-cluster governor, native and with Omni-Compass on top. The organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator: the four arms of the chosen governor. Evidence class L; on the live engine: record. Feed: kube-state-metrics; each orchestrator's own metrics endpoint (Kueue, Volcano, KAI, Koordinator, Crane, KubeRay). Wired: the page's drawOrch → the Python tools/governors_page.py, tools/run_orchestra.py → the C++ none: the governors are live software on Kubernetes, run as their projects ship them; held equal by tests/test_governors_page.py, tests/test_orchestra.py. Moves: work flows down the stack at the live engine's demand.",
+   "description": "Section 5b, Orchestrators and governors: every scheduler, queue and multi-cluster governor, native and with Omni-Compass on top. The organism alone, the orchestrator as shipped, Omni-Compass on the organism alone, Omni-Compass on the orchestrator: the four arms of the chosen governor. Evidence class L; on the live engine: record. Feed: kube-state-metrics; each orchestrator's own metrics endpoint (Kueue, Volcano, KAI, Koordinator, Crane, KubeRay). Wired: the page's drawOrch → the Python tools/governors_page.py, tools/run_orchestra.py → the C++ none: the governors are live software on Kubernetes, run as their projects ship them; held equal by tests/test_governors_page.py, tests/test_orchestra.py. Moves: work flows down the stack at the live engine's demand. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "bargauge",
    "datasource": {
     "type": "prometheus",
@@ -677,7 +888,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "percent"
+     "unit": "percent",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.97
+       },
+       {
+        "color": "red",
+        "value": 1.0
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -711,11 +947,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5c, Kubernetes: official run playback. Every stage from the GitHub Actions run to this page: the run, the raw files archived, the SHA-256 check, the official scorer, the three-run tables, the build and the page, the stage being read lit. Evidence class L; on the live engine: replay. Feed: GitHub Actions API (read at the build); live: github-actions-exporter. Wired: the page's drawPipe → the Python scripts/raw_archive.sh, tools/live_reps.py, tools/confirm_abc.py, docs/engine/build_live_engine.py → the C++ none: the stages are GitHub's runs and the repository's own tools; held equal by docs/engine/build_live_engine.py. Moves: the stage being read lights in turn and the data moves between the stages.",
+   "description": "Section 5c, Kubernetes: official run playback. Every stage from the GitHub Actions run to this page: the run, the raw files archived, the SHA-256 check, the official scorer, the three-run tables, the build and the page, the stage being read lit. Evidence class L; on the live engine: replay. Feed: GitHub Actions API (read at the build); live: github-actions-exporter. Wired: the page's drawPipe → the Python scripts/raw_archive.sh, tools/live_reps.py, tools/confirm_abc.py, docs/engine/build_live_engine.py → the C++ none: the stages are GitHub's runs and the repository's own tools; held equal by docs/engine/build_live_engine.py. Moves: the stage being read lights in turn and the data moves between the stages. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The data pipeline, live: every stage from the GitHub Actions run to this page** (the cluster (Kubernetes)).\n\nEvery stage from the GitHub Actions run to this page: the run, the raw files archived, the SHA-256 check, the official scorer, the three-run tables, the build and the page, the stage being read lit.\n\nSource: GitHub Actions API (read at the build); live: github-actions-exporter. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 24)."
+    "content": "**The data pipeline, live: every stage from the GitHub Actions run to this page** (the cluster (Kubernetes)).\n\nEvery stage from the GitHub Actions run to this page: the run, the raw files archived, the SHA-256 check, the official scorer, the three-run tables, the build and the page, the stage being read lit.\n\nSource: GitHub Actions API (read at the build); live: github-actions-exporter. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 24). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -727,7 +963,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5c, Kubernetes: official run playback. The official run's heartbeat: native's own 15 s clock above, every beat of the governor's decision loop in the repetition below, native beside Omni-Compass. Evidence class L; on the live engine: replay. Feed: kube-state-metrics; the load generator's own histogram (the rig's loadgen). Wired: the page's drawHeart → the Python docs/engine/export_runs.py, omni_controller/controller.py → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen repetition replayed decision by decision; native's own 15 s clock beats above.",
+   "description": "Section 5c, Kubernetes: official run playback. The official run's heartbeat: native's own 15 s clock above, every beat of the governor's decision loop in the repetition below, native beside Omni-Compass. Evidence class L; on the live engine: replay. Feed: kube-state-metrics; the load generator's own histogram (the rig's loadgen). Wired: the page's drawHeart → the Python docs/engine/export_runs.py, omni_controller/controller.py → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen repetition replayed decision by decision; native's own 15 s clock beats above. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -735,7 +971,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -756,7 +1009,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5c, Kubernetes: official run playback. The governor's beat as a knob: what a decision every 5 to 120 s does against native, or against the same engine at 15 s or 60 s, on-site and in the cloud, gauge by gauge with its 95% interval, and what each beat costs the engine; our own model. Evidence class S; on the live engine: model. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBeat, beatSetup → the Python tools/heartbeat_sweep.py, tools/toy_gate.py, omni_controller/controller.py → the C++ none here: the sweep runs the shipped Python controller on the toy cluster; the C++ governor twin is held to the Python's at 60 s and at 15, 10 and 5 s (tests/test_cpp_governor_parity.py); held equal by results/toy_gate/HEARTBEAT_SWEEP.md, docs/engine/build_live_engine.py. Moves: a cursor reads the beats in turn and names the row it holds; every button redraws the chart from the record.",
+   "description": "Section 5c, Kubernetes: official run playback. The governor's beat as a knob: what a decision every 5 to 120 s does against native, or against the same engine at 15 s or 60 s, on-site and in the cloud, gauge by gauge with its 95% interval, and what each beat costs the engine; our own model. Evidence class S; on the live engine: model. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBeat, beatSetup → the Python tools/heartbeat_sweep.py, tools/toy_gate.py, omni_controller/controller.py → the C++ none here: the sweep runs the shipped Python controller on the toy cluster; the C++ governor twin is held to the Python's at 60 s and at 15, 10 and 5 s (tests/test_cpp_governor_parity.py); held equal by results/toy_gate/HEARTBEAT_SWEEP.md, docs/engine/build_live_engine.py. Moves: a cursor reads the beats in turn and names the row it holds; every button redraws the chart from the record. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -764,7 +1017,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -795,7 +1065,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5c, Kubernetes: official run playback. The response time of the chosen run as candles, one a half minute, native above and Omni-Compass below, on one logarithmic scale. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawCandle → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen run replayed half minute by half minute.",
+   "description": "Section 5c, Kubernetes: official run playback. The response time of the chosen run as candles, one a half minute, native above and Omni-Compass below, on one logarithmic scale. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawCandle → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen run replayed half minute by half minute. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -803,7 +1073,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "ms"
+     "unit": "ms",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 194.0
+       },
+       {
+        "color": "red",
+        "value": 200.0
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -824,11 +1119,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5c, Kubernetes: official run playback. The responses of each half minute counted in eight response-time buckets, native above and Omni-Compass below. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawHeat → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen run replayed half minute by half minute.",
+   "description": "Section 5c, Kubernetes: official run playback. The responses of each half minute counted in eight response-time buckets, native above and Omni-Compass below. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawHeat → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen run replayed half minute by half minute. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The official run: the heat map** (the cluster (Kubernetes)).\n\nThe responses of each half minute counted in eight response-time buckets, native above and Omni-Compass below.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 28)."
+    "content": "**The official run: the heat map** (the cluster (Kubernetes)).\n\nThe responses of each half minute counted in eight response-time buckets, native above and Omni-Compass below.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 28). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -840,11 +1135,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5c, Kubernetes: official run playback. The requests answered each half minute, native and Omni-Compass side by side, the failed requests marked. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawBars → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen run replayed half minute by half minute.",
+   "description": "Section 5c, Kubernetes: official run playback. The requests answered each half minute, native and Omni-Compass side by side, the failed requests marked. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawBars → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the chosen run replayed half minute by half minute. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The official run: paired bars** (the cluster (Kubernetes)).\n\nThe requests answered each half minute, native and Omni-Compass side by side, the failed requests marked.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 29)."
+    "content": "**The official run: paired bars** (the cluster (Kubernetes)).\n\nThe requests answered each half minute, native and Omni-Compass side by side, the failed requests marked.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 29). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -856,11 +1151,11 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5c, Kubernetes: official run playback. Each repetition's reading in the chosen gauge with its interval. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawReps → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: each repetition's reading filled in as the run replays.",
+   "description": "Section 5c, Kubernetes: official run playback. Each repetition's reading in the chosen gauge with its interval. Evidence class L; on the live engine: replay. Feed: the load generator's own histogram (the rig's loadgen). Wired: the page's drawReps → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: each repetition's reading filled in as the run replays. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The official run: the repetitions** (the cluster (Kubernetes)).\n\nEach repetition's reading in the chosen gauge with its interval.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 30)."
+    "content": "**The official run: the repetitions** (the cluster (Kubernetes)).\n\nEach repetition's reading in the chosen gauge with its interval.\n\nSource: the load generator's own histogram (the rig's loadgen). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 30). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
@@ -885,7 +1180,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5d, Kubernetes: per-repetition run telemetry. One repetition half minute by half minute from its archived capture: the 95th percentile of the response time, the replicas, the host's processor and the governor's heartbeat, native beside Omni-Compass. Evidence class L; on the live engine: replay. Feed: kube-state-metrics; metrics-server; Kepler. Wired: the page's drawRuStrip → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the archived capture replayed half minute by half minute; a ring opens at each head with its newest value.",
+   "description": "Section 5d, Kubernetes: per-repetition run telemetry. One repetition half minute by half minute from its archived capture: the 95th percentile of the response time, the replicas, the host's processor and the governor's heartbeat, native beside Omni-Compass. Evidence class L; on the live engine: replay. Feed: kube-state-metrics; metrics-server; Kepler. Wired: the page's drawRuStrip → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: the archived capture replayed half minute by half minute; a ring opens at each head with its newest value. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -893,7 +1188,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.97
+       },
+       {
+        "color": "red",
+        "value": 1.0
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -932,7 +1252,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5e, Kubernetes and cloud: the shipped controller's decision trace. The controller every Kubernetes and cloud set runs, replayed decision by decision from its own audit: native's cluster. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
+   "description": "Section 5e, Kubernetes and cloud: the shipped controller's decision trace. The controller every Kubernetes and cloud set runs, replayed decision by decision from its own audit: native's cluster. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -940,7 +1260,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -961,7 +1298,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5e, Kubernetes and cloud: the shipped controller's decision trace. The same, Omni-Compass's cluster: every write, every trial, every hold. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
+   "description": "Section 5e, Kubernetes and cloud: the shipped controller's decision trace. The same, Omni-Compass's cluster: every write, every trial, every hold. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -969,7 +1306,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -995,7 +1349,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5e, Kubernetes and cloud: the shipped controller's decision trace. The shipped controller's machines (in service, booting and parked) and the response time over the run, native beside Omni-Compass, replayed from its own audit. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCStrip → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
+   "description": "Section 5e, Kubernetes and cloud: the shipped controller's decision trace. The shipped controller's machines (in service, booting and parked) and the response time over the run, native beside Omni-Compass, replayed from its own audit. Evidence class S; on the live engine: replay. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCStrip → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1003,7 +1357,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.9215
+       },
+       {
+        "color": "red",
+        "value": 0.95
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1042,7 +1421,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5f, Hardware: the GPU card and the CPU host. The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit, clock and temperature, requests served and the 95th percentile, native beside Omni-Compass governing (or watching only), every write of the governor marked. Evidence class P; on the live engine: replay. Feed: NVIDIA DCGM exporter. Awaiting: its omni-v13 run on Lambda (lambda-gpu.yml, one exact commit): the replaced controller's run stands until then, shown as such. Wired: the page's drawGpuRun → the Python docs/engine/export_gpu_run.py → the C++ none: the 2 October run of an earlier controller, replayed from the card's own meter; today's GPU rules have their twin, cpp/src/gpu_rules.cpp, for the run on Lambda; held equal by docs/engine/build_live_engine.py. Moves: the card's own meter replayed at ten times the run's seconds.",
+   "description": "Section 5f, Hardware: the GPU card and the CPU host. The NVIDIA A10 run of 2 October replayed from the card's own meter: draw, limit, clock and temperature, requests served and the 95th percentile, native beside Omni-Compass governing (or watching only), every write of the governor marked. Evidence class P; on the live engine: replay. Feed: NVIDIA DCGM exporter. Awaiting: its omni-v13 run on Lambda (lambda-gpu.yml, one exact commit): the replaced controller's run stands until then, shown as such. Wired: the page's drawGpuRun → the Python docs/engine/export_gpu_run.py → the C++ none: the 2 October run of an earlier controller, replayed from the card's own meter; today's GPU rules have their twin, cpp/src/gpu_rules.cpp, for the run on Lambda; held equal by docs/engine/build_live_engine.py. Moves: the card's own meter replayed at ten times the run's seconds. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1050,7 +1429,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "watt"
+     "unit": "watt",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1081,7 +1477,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5f, Hardware: the GPU card and the CPU host. The CPU power harness on the host: the frequency ceiling, the clock run at, the package power and the response line, native beside Omni-Compass; today its own modelled machine (class S), the real run the day a machine with its meter runs it. Evidence class S (model) until the run; on the live engine: awaiting. Feed: node_exporter (rapl, cpufreq collectors); Kepler. Awaiting: a Linux machine whose processor exposes its energy counter (RAPL) and a writable frequency ceiling (register row 79, cpu-power.yml). Wired: the page's drawCpuHost → the Python docs/engine/export_cpu_model.py, tools/run_cpu_power.py → the C++ none: the host's model until its run lands on a machine with its meter; held equal by tests/test_run_cpu_power.py. Moves: the host's model replayed second by second until its run lands.",
+   "description": "Section 5f, Hardware: the GPU card and the CPU host. The CPU power harness on the host: the frequency ceiling, the clock run at, the package power and the response line, native beside Omni-Compass; today its own modelled machine (class S), the real run the day a machine with its meter runs it. Evidence class S (model) until the run; on the live engine: awaiting. Feed: node_exporter (rapl, cpufreq collectors); Kepler. Awaiting: a Linux machine whose processor exposes its energy counter (RAPL) and a writable frequency ceiling (register row 79, cpu-power.yml). Wired: the page's drawCpuHost → the Python docs/engine/export_cpu_model.py, tools/run_cpu_power.py → the C++ none: the host's model until its run lands on a machine with its meter; held equal by tests/test_run_cpu_power.py. Moves: the host's model replayed second by second until its run lands. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1089,7 +1485,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "watt"
+     "unit": "watt",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1115,7 +1528,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5f, Hardware: the GPU card and the CPU host. Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one-card model (class S), each Omni-Compass lane empty until the 8-card run lands, 24 paired repetitions a test pooled across the cards. Evidence class S (native model) until the run; on the live engine: awaiting. Feed: NVIDIA DCGM exporter, card by card. Awaiting: scripts/gpu_8card.sh on a rented machine with eight NVIDIA cards (docs/GPU_RUN_GUIDE.md, section D). Wired: the page's drawGpu8 → the Python realms/gpu_card.py, omni_controller/gpu_governor.py, scripts/gpu_8card.sh → the C++ cpp/src/gpu_rules.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_twins_parity.py. Moves: the one-card model's native lanes replayed second by second; the Omni-Compass lanes wait for the 8-card run.",
+   "description": "Section 5f, Hardware: the GPU card and the CPU host. Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one-card model (class S), each Omni-Compass lane empty until the 8-card run lands, 24 paired repetitions a test pooled across the cards. Evidence class S (native model) until the run; on the live engine: awaiting. Feed: NVIDIA DCGM exporter, card by card. Awaiting: scripts/gpu_8card.sh on a rented machine with eight NVIDIA cards (docs/GPU_RUN_GUIDE.md, section D). Wired: the page's drawGpu8 → the Python realms/gpu_card.py, omni_controller/gpu_governor.py, scripts/gpu_8card.sh → the C++ cpp/src/gpu_rules.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_twins_parity.py. Moves: the one-card model's native lanes replayed second by second; the Omni-Compass lanes wait for the 8-card run. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1123,7 +1536,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "watt"
+     "unit": "watt",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1144,7 +1574,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5f, Hardware: the GPU card and the CPU host. The repository's own models of one GPU card and one Linux host, native beside Omni-Compass, second by second (class S). Evidence class S; on the live engine: model. Feed: NVIDIA DCGM exporter; node_exporter. Wired: the page's drawSStrip → the Python realms/gpu_card.py, omnicompass/compass_law.py, tools/toy_gate.py, omni_controller/muscles.py, omnicompass/conveyance.py, docs/engine/export_scenarios.py → the C++ cpp/src/conveyance.cpp, cpp/tools/engine_runs.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_conveyance_parity.py, verify.py. Moves: the chip's and the host's models replayed second by second; a ring opens at each head with its newest value.",
+   "description": "Section 5f, Hardware: the GPU card and the CPU host. The repository's own models of one GPU card and one Linux host, native beside Omni-Compass, second by second (class S). Evidence class S; on the live engine: model. Feed: NVIDIA DCGM exporter; node_exporter. Wired: the page's drawSStrip → the Python realms/gpu_card.py, omnicompass/compass_law.py, tools/toy_gate.py, omni_controller/muscles.py, omnicompass/conveyance.py, docs/engine/export_scenarios.py → the C++ cpp/src/conveyance.cpp, cpp/tools/engine_runs.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_conveyance_parity.py, verify.py. Moves: the chip's and the host's models replayed second by second; a ring opens at each head with its newest value. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1152,7 +1582,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "watt"
+     "unit": "watt",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1172,7 +1619,7 @@
   {
    "id": 1013,
    "type": "row",
-   "title": "6a · The organism, live: native and Omni-Compass",
+   "title": "5g · Omni-Compass direct: the organism with no orchestrator, the three arms",
    "collapsed": false,
    "gridPos": {
     "x": 0,
@@ -1184,30 +1631,59 @@
   },
   {
    "id": 39,
-   "title": "39 · The organism, live: native",
+   "title": "39 · Omni-Compass direct: the three arms, played back",
    "gridPos": {
     "x": 0,
     "y": 198,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6a, The organism, live: native and Omni-Compass. Sixty muscles of the stress model, each on its own native controller, at their positions in the band. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format); kube-state-metrics. Wired: the page's drawRing → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle moves to its position in the band.",
+   "description": "Section 5g, Omni-Compass direct: the organism with no orchestrator, the three arms. Every showing of Omni-Compass's own orchestrator that GitHub ran (.github/workflows/orchestrator.yml): native (Kubernetes' published autoscaling rule on the muscles, written by us), Omni-Compass and native, and Omni-Compass direct (no orchestrator), each arm's requests answered, 95th percentile, units and machines 5 s at a time from its own files on the branch raw, with the arms' totals and the showing's readings by the one key. Evidence class L (one run of each arm a showing); on the live engine: record. Feed: each showing's own files on the branch raw: the control plane's timeline (omni_orchestrator/control.py) and every request's record (tools/orchestrator_show.py); the orchestrator exports no Prometheus series yet. Wired: the page's drawDirect, dirSetup, dirRender → the Python omni_orchestrator/control.py, omni_orchestrator/brain.py, tools/orchestrator_show.py, docs/engine/build_live_engine.py → the C++ none: the orchestrator is live software of its own in Python; its compass law is the engine's, whose C++ twin is cpp/src/core.cpp; held equal by tests/test_orchestrator.py, .github/workflows/orchestrator.yml. Moves: the playback cursor sweeps the showing (450 s in 30 s), each arm's line drawn up to it with its value at the head. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The organism, live: native** (the organism and its muscles).\n\nSixty muscles of the stress model, each on its own native controller, at their positions in the band.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format); kube-state-metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 39)."
+    "content": "**Omni-Compass direct: the three arms, played back** (the orchestrators and governors).\n\nEvery showing of Omni-Compass's own orchestrator that GitHub ran (.github/workflows/orchestrator.yml): native (Kubernetes' published autoscaling rule on the muscles, written by us), Omni-Compass and native, and Omni-Compass direct (no orchestrator), each arm's requests answered, 95th percentile, units and machines 5 s at a time from its own files on the branch raw, with the arms' totals and the showing's readings by the one key.\n\nSource: each showing's own files on the branch raw: the control plane's timeline (omni_orchestrator/control.py) and every request's record (tools/orchestrator_show.py); the orchestrator exports no Prometheus series yet. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 39). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
-   "id": 40,
-   "title": "40 · The organism, live: Omni-Compass",
+   "id": 1014,
+   "type": "row",
+   "title": "6a · The organism, live: native and Omni-Compass",
+   "collapsed": false,
    "gridPos": {
-    "x": 12,
-    "y": 198,
+    "x": 0,
+    "y": 206,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 40,
+   "title": "40 · The organism, live: native",
+   "gridPos": {
+    "x": 0,
+    "y": 207,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6a, The organism, live: native and Omni-Compass. The same sixty muscles with Omni-Compass on top of their native controllers, the brain's grants and pushes. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawRing → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle moves to its position, the brain's grants and pushes pulse.",
+   "description": "Section 6a, The organism, live: native and Omni-Compass. Sixty muscles of the stress model, each on its own native controller, at their positions in the band. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format); kube-state-metrics. Wired: the page's drawRing → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle moves to its position in the band. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The organism, live: native** (the organism and its muscles).\n\nSixty muscles of the stress model, each on its own native controller, at their positions in the band.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format); kube-state-metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 40). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
+   }
+  },
+  {
+   "id": 41,
+   "title": "41 · The organism, live: Omni-Compass",
+   "gridPos": {
+    "x": 12,
+    "y": 207,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Section 6a, The organism, live: native and Omni-Compass. The same sixty muscles with Omni-Compass on top of their native controllers, the brain's grants and pushes. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawRing → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle moves to its position, the brain's grants and pushes pulse. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1215,7 +1691,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1233,15 +1726,15 @@
    ]
   },
   {
-   "id": 41,
-   "title": "41 · The immune system",
+   "id": 42,
+   "title": "42 · The immune system",
    "gridPos": {
     "x": 0,
-    "y": 206,
+    "y": 215,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6a, The organism, live: native and Omni-Compass. Where the two sides differ, and the body's heat debt: a room warmer than its native twin, inflamed, given back. Evidence class S; on the live engine: live. Feed: Prometheus Alertmanager; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawImm → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py, realms/compass_arm_v5.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each side's pools, warmest room and muscles past the line take a point.",
+   "description": "Section 6a, The organism, live: native and Omni-Compass. Where the two sides differ, and the body's heat debt: a room warmer than its native twin, inflamed, given back. Evidence class S; on the live engine: live. Feed: Prometheus Alertmanager; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawImm → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py, realms/compass_arm_v5.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each side's pools, warmest room and muscles past the line take a point. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1249,7 +1742,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.97
+       },
+       {
+        "color": "red",
+        "value": 1.0
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1267,92 +1785,92 @@
    ]
   },
   {
-   "id": 42,
-   "title": "42 · The body parts on the band",
+   "id": 43,
+   "title": "43 · The body parts on the band",
    "gridPos": {
     "x": 12,
-    "y": 206,
+    "y": 215,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6a, The organism, live: native and Omni-Compass. Each body part's muscles (the spine and the four realms) at their positions in the band, native above and Omni-Compass below, every decision. Evidence class S; on the live engine: live. Feed: the realms harness's own record (realms/harness.py, each body part's muscles at their positions in the band, recorded by docs/engine/export_harness_trace.py); no Prometheus feed. Wired: the page's drawSwarm → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle's dot moves to its position in the band.",
+   "description": "Section 6a, The organism, live: native and Omni-Compass. Each body part's muscles (the spine and the four realms) at their positions in the band, native above and Omni-Compass below, every decision. Evidence class S; on the live engine: live. Feed: the realms harness's own record (realms/harness.py, each body part's muscles at their positions in the band, recorded by docs/engine/export_harness_trace.py); no Prometheus feed. Wired: the page's drawSwarm → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle's dot moves to its position in the band. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The body parts on the band** (the organism and its muscles).\n\nEach body part's muscles (the spine and the four realms) at their positions in the band, native above and Omni-Compass below, every decision.\n\nSource: the realms harness's own record (realms/harness.py, each body part's muscles at their positions in the band, recorded by docs/engine/export_harness_trace.py); no Prometheus feed. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 42)."
+    "content": "**The body parts on the band** (the organism and its muscles).\n\nEach body part's muscles (the spine and the four realms) at their positions in the band, native above and Omni-Compass below, every decision.\n\nSource: the realms harness's own record (realms/harness.py, each body part's muscles at their positions in the band, recorded by docs/engine/export_harness_trace.py); no Prometheus feed. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 43). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
-   "id": 1014,
+   "id": 1015,
    "type": "row",
    "title": "6b · Telemetry analytics and Omni-Compass in its own words",
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 214,
+    "y": 223,
     "w": 24,
     "h": 1
    },
    "panels": []
   },
   {
-   "id": 43,
-   "title": "43 · Telemetry tensor: the cube",
+   "id": 44,
+   "title": "44 · Telemetry tensor: the cube",
    "gridPos": {
     "x": 0,
-    "y": 215,
+    "y": 224,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The engine's harness record as a tensor (decisions × sixty muscles × two arms), native and Omni-Compass as two slabs, filling in on the live engine's clock. Evidence class S (the harness's record, realms/harness.py); on the live engine: replay. Feed: kube-state-metrics; the service's own metrics. Wired: the page's drawCube → the Python realms/harness.py, realms/compass_arm_v5.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_records.py. Moves: fills in decision by decision on the live engine's clock, and turns.",
+   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The engine's harness record as a tensor (decisions × sixty muscles × two arms), native and Omni-Compass as two slabs, filling in on the live engine's clock. Evidence class S (the harness's record, realms/harness.py); on the live engine: replay. Feed: kube-state-metrics; the service's own metrics. Wired: the page's drawCube → the Python realms/harness.py, realms/compass_arm_v5.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_records.py. Moves: fills in decision by decision on the live engine's clock, and turns. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**Telemetry tensor: the cube** (telemetry analytics).\n\nThe engine's harness record as a tensor (decisions × sixty muscles × two arms), native and Omni-Compass as two slabs, filling in on the live engine's clock.\n\nSource: kube-state-metrics; the service's own metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 43)."
-   }
-  },
-  {
-   "id": 44,
-   "title": "44 · Telemetry tensor: the difference",
-   "gridPos": {
-    "x": 12,
-    "y": 215,
-    "w": 12,
-    "h": 8
-   },
-   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The difference of the two sides' tensors, cell by cell. Evidence class S (the harness's record, realms/harness.py); on the live engine: replay. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawDelta → the Python realms/harness.py, realms/compass_arm_v5.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_records.py. Moves: one column a decision on the live engine's clock.",
-   "type": "text",
-   "options": {
-    "mode": "markdown",
-    "content": "**Telemetry tensor: the difference** (telemetry analytics).\n\nThe difference of the two sides' tensors, cell by cell.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 44)."
+    "content": "**Telemetry tensor: the cube** (telemetry analytics).\n\nThe engine's harness record as a tensor (decisions × sixty muscles × two arms), native and Omni-Compass as two slabs, filling in on the live engine's clock.\n\nSource: kube-state-metrics; the service's own metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 44). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
    "id": 45,
-   "title": "45 · Telemetry tensor: the modes",
+   "title": "45 · Telemetry tensor: the difference",
    "gridPos": {
-    "x": 0,
-    "y": 223,
+    "x": 12,
+    "y": 224,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The principal modes of the telemetry (its matrix decomposed). Evidence class S (the harness's record, realms/harness.py); on the live engine: replay. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawModes, tEig → the Python realms/harness.py, realms/compass_arm_v5.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_records.py. Moves: every decision: the line across each bar is that decision's own motion in the mode; the first mode's line takes a point, a ring at its head.",
+   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The difference of the two sides' tensors, cell by cell. Evidence class S (the harness's record, realms/harness.py); on the live engine: replay. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawDelta → the Python realms/harness.py, realms/compass_arm_v5.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_records.py. Moves: one column a decision on the live engine's clock. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**Telemetry tensor: the modes** (telemetry analytics).\n\nThe principal modes of the telemetry (its matrix decomposed).\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 45)."
+    "content": "**Telemetry tensor: the difference** (telemetry analytics).\n\nThe difference of the two sides' tensors, cell by cell.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 45). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
    "id": 46,
-   "title": "46 · Service level: the objective",
+   "title": "46 · Telemetry tensor: the modes",
    "gridPos": {
-    "x": 12,
-    "y": 223,
+    "x": 0,
+    "y": 232,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The share of each half minute's requests answered inside the 500 ms line, native beside Omni-Compass, through the official run chosen in section 5c. Evidence class L (the official run's request log, SHA-256-checked); on the live engine: replay. Feed: SLO recording rules (sloth, pyrra) over the service's histogram. Wired: the page's drawSankey → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: half minute by half minute through the official run; its newest value printed at the head.",
+   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The principal modes of the telemetry (its matrix decomposed). Evidence class S (the harness's record, realms/harness.py); on the live engine: replay. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawModes, tEig → the Python realms/harness.py, realms/compass_arm_v5.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_records.py. Moves: every decision: the line across each bar is that decision's own motion in the mode; the first mode's line takes a point, a ring at its head. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Telemetry tensor: the modes** (telemetry analytics).\n\nThe principal modes of the telemetry (its matrix decomposed).\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 46). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
+   }
+  },
+  {
+   "id": 47,
+   "title": "47 · Service level: the objective",
+   "gridPos": {
+    "x": 12,
+    "y": 232,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The share of each half minute's requests answered inside the 500 ms line, native beside Omni-Compass, through the official run chosen in section 5c. Evidence class L (the official run's request log, SHA-256-checked); on the live engine: replay. Feed: SLO recording rules (sloth, pyrra) over the service's histogram. Wired: the page's drawSankey → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: half minute by half minute through the official run; its newest value printed at the head. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "stat",
    "datasource": {
     "type": "prometheus",
@@ -1360,7 +1878,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "percentunit"
+     "unit": "percentunit",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.96903
+       },
+       {
+        "color": "green",
+        "value": 0.999
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1373,15 +1916,15 @@
    ]
   },
   {
-   "id": 47,
-   "title": "47 · Service level: the error budget burn",
+   "id": 48,
+   "title": "48 · Service level: the error budget burn",
    "gridPos": {
     "x": 0,
-    "y": 231,
+    "y": 240,
     "w": 12,
     "h": 8
    },
-   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The requests over the 500 ms line counted up since the repetition began, native beside Omni-Compass: each side's error budget burned. Evidence class L (the official run's request log, SHA-256-checked); on the live engine: replay. Feed: SLO recording rules (sloth, pyrra). Wired: the page's drawSankey → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: half minute by half minute through the official run; its newest value printed at the head.",
+   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. The requests over the 500 ms line counted up since the repetition began, native beside Omni-Compass: each side's error budget burned. Evidence class L (the official run's request log, SHA-256-checked); on the live engine: replay. Feed: SLO recording rules (sloth, pyrra). Wired: the page's drawSankey → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: half minute by half minute through the official run; its newest value printed at the head. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1389,7 +1932,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "percentunit"
+     "unit": "percentunit",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.097
+       },
+       {
+        "color": "green",
+        "value": 0.1
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1402,70 +1970,25 @@
    ]
   },
   {
-   "id": 48,
-   "title": "48 · Telemetry radar",
-   "gridPos": {
-    "x": 12,
-    "y": 231,
-    "w": 12,
-    "h": 8
-   },
-   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. Every gauge of the repetition replaying in section 5c against native's 0 line: GAIN to the right in green, LOSS to the left in red, its side the run's own reading. Evidence class L (the official run's own gauges); on the live engine: replay. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawRadar → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: each gauge of the repetition replaying in section 5c.",
-   "type": "text",
-   "options": {
-    "mode": "markdown",
-    "content": "**Telemetry radar** (telemetry analytics).\n\nEvery gauge of the repetition replaying in section 5c against native's 0 line: GAIN to the right in green, LOSS to the left in red, its side the run's own reading.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 48)."
-   }
-  },
-  {
-   "id": 1015,
-   "type": "row",
-   "title": "7 · Control console: every runtime control of the live engine",
-   "collapsed": false,
-   "gridPos": {
-    "x": 0,
-    "y": 239,
-    "w": 24,
-    "h": 1
-   },
-   "panels": []
-  },
-  {
    "id": 49,
-   "title": "49 · The console's response",
-   "gridPos": {
-    "x": 0,
-    "y": 240,
-    "w": 12,
-    "h": 8
-   },
-   "description": "Section 7, Control console: every runtime control of the live engine. The last 120 decisions of the live engine: the muscles past their line and the work, native beside Omni-Compass, every knob of the console turned marked. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself). Wired: the page's drawDeskCv → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: both lanes slide one decision, a ring opens at each head with its newest value; every knob turned is marked.",
-   "type": "text",
-   "options": {
-    "mode": "markdown",
-    "content": "**The console's response** (the console).\n\nThe last 120 decisions of the live engine: the muscles past their line and the work, native beside Omni-Compass, every knob of the console turned marked.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 49)."
-   }
-  },
-  {
-   "id": 50,
-   "title": "50 · The frame budget",
+   "title": "49 · Telemetry radar",
    "gridPos": {
     "x": 12,
     "y": 240,
     "w": 12,
     "h": 8
    },
-   "description": "Section 7, Control console: every runtime control of the live engine. The time between frames of this page against its line under the frame load knob. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself). Wired: the page's drawFrameCv → the Python none: the page's own frame clock, measured in the browser; there is nothing to port → the C++ none: the page's own frame clock, measured in the browser; there is nothing to port. Moves: every frame of this page.",
+   "description": "Section 6b, Telemetry analytics and Omni-Compass in its own words. Every gauge of the repetition replaying in section 5c against native's 0 line: GAIN to the right in green, LOSS to the left in red, its side the run's own reading. Evidence class L (the official run's own gauges); on the live engine: replay. Feed: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). Wired: the page's drawRadar → the Python docs/engine/export_runs.py, tools/live_reps.py, scripts/raw_archive.sh → the C++ none: the live software's own measurements, played back from their SHA-256-checked files; held equal by docs/engine/build_live_engine.py. Moves: each gauge of the repetition replaying in section 5c. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The frame budget** (the console).\n\nThe time between frames of this page against its line under the frame load knob.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 50)."
+    "content": "**Telemetry radar** (telemetry analytics).\n\nEvery gauge of the repetition replaying in section 5c against native's 0 line: GAIN to the right in green, LOSS to the left in red, its side the run's own reading.\n\nSource: the build (the repository's tables, no live feed: a recording rule would compose the layers' ratios). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 49). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
    "id": 1016,
    "type": "row",
-   "title": "8a · One control cycle, traced step by step",
+   "title": "7 · Control console: every runtime control of the live engine",
    "collapsed": false,
    "gridPos": {
     "x": 0,
@@ -1476,15 +1999,60 @@
    "panels": []
   },
   {
-   "id": 51,
-   "title": "51 · One control cycle, traced",
+   "id": 50,
+   "title": "50 · The console's response",
    "gridPos": {
     "x": 0,
     "y": 249,
     "w": 12,
     "h": 8
    },
-   "description": "Section 8a, One control cycle, traced step by step. The compass band with its cushions, the two forces and one decision, step by step. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBand → the Python omnicompass/compass_law.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py, verify.py. Moves: one control cycle traced step by step on the followed muscle, every decision.",
+   "description": "Section 7, Control console: every runtime control of the live engine. The last 120 decisions of the live engine: the muscles past their line and the work, native beside Omni-Compass, every knob of the console turned marked. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself). Wired: the page's drawDeskCv → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: both lanes slide one decision, a ring opens at each head with its newest value; every knob turned is marked. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The console's response** (the console).\n\nThe last 120 decisions of the live engine: the muscles past their line and the work, native beside Omni-Compass, every knob of the console turned marked.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 50). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
+   }
+  },
+  {
+   "id": 51,
+   "title": "51 · The frame budget",
+   "gridPos": {
+    "x": 12,
+    "y": 249,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Section 7, Control console: every runtime control of the live engine. The time between frames of this page against its line under the frame load knob. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself). Wired: the page's drawFrameCv → the Python none: the page's own frame clock, measured in the browser; there is nothing to port → the C++ none: the page's own frame clock, measured in the browser; there is nothing to port. Moves: every frame of this page. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The frame budget** (the console).\n\nThe time between frames of this page against its line under the frame load knob.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 51). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
+   }
+  },
+  {
+   "id": 1017,
+   "type": "row",
+   "title": "8a · One control cycle, traced step by step",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 257,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 52,
+   "title": "52 · One control cycle, traced",
+   "gridPos": {
+    "x": 0,
+    "y": 258,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Section 8a, One control cycle, traced step by step. The compass band with its cushions, the two forces and one decision, step by step. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBand → the Python omnicompass/compass_law.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py, verify.py. Moves: one control cycle traced step by step on the followed muscle, every decision. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1492,7 +2060,32 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.9215
+       },
+       {
+        "color": "red",
+        "value": 0.95
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1510,60 +2103,60 @@
    ]
   },
   {
-   "id": 1017,
+   "id": 1018,
    "type": "row",
    "title": "8b · Phase plane and scoreboard",
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 257,
+    "y": 266,
     "w": 24,
     "h": 1
    },
    "panels": []
   },
   {
-   "id": 52,
-   "title": "52 · Phase plane: native",
+   "id": 53,
+   "title": "53 · Phase plane: native",
    "gridPos": {
     "x": 0,
-    "y": 258,
+    "y": 267,
     "w": 12,
     "h": 8
    },
-   "description": "Section 8b, Phase plane and scoreboard. Native's muscles in position and velocity. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawPhase → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle's point moves in position and velocity.",
+   "description": "Section 8b, Phase plane and scoreboard. Native's muscles in position and velocity. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawPhase → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle's point moves in position and velocity. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**Phase plane: native** (the brain).\n\nNative's muscles in position and velocity.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 52)."
-   }
-  },
-  {
-   "id": 53,
-   "title": "53 · Phase plane: Omni-Compass",
-   "gridPos": {
-    "x": 12,
-    "y": 258,
-    "w": 12,
-    "h": 8
-   },
-   "description": "Section 8b, Phase plane and scoreboard. Omni-Compass's muscles in position and velocity, the band's walls drawn. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawPhase → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle's point moves in position and velocity.",
-   "type": "text",
-   "options": {
-    "mode": "markdown",
-    "content": "**Phase plane: Omni-Compass** (the brain).\n\nOmni-Compass's muscles in position and velocity, the band's walls drawn.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 53)."
+    "content": "**Phase plane: native** (the brain).\n\nNative's muscles in position and velocity.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 53). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
    "id": 54,
-   "title": "54 · The scoreboard strip",
+   "title": "54 · Phase plane: Omni-Compass",
    "gridPos": {
-    "x": 0,
-    "y": 266,
+    "x": 12,
+    "y": 267,
     "w": 12,
     "h": 8
    },
-   "description": "Section 8b, Phase plane and scoreboard. The body's capacity in service and its demand (in the harness, its electrical power), the muscles past their line and the spread of positions over the day, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawStrip → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine (900 ms at 1×): the line takes a point, a ring opens at its head and its newest value is printed beside it.",
+   "description": "Section 8b, Phase plane and scoreboard. Omni-Compass's muscles in position and velocity, the band's walls drawn. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawPhase → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision: each muscle's point moves in position and velocity. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Phase plane: Omni-Compass** (the brain).\n\nOmni-Compass's muscles in position and velocity, the band's walls drawn.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 54). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
+   }
+  },
+  {
+   "id": 55,
+   "title": "55 · The scoreboard strip",
+   "gridPos": {
+    "x": 0,
+    "y": 275,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Section 8b, Phase plane and scoreboard. The body's capacity in service and its demand (in the harness, its electrical power), the muscles past their line and the spread of positions over the day, native beside Omni-Compass. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawStrip → the Python omnicompass/adapter.py, omnicompass/core.py, omnicompass/nervous_system.py, omnicompass/compass_law.py, realms/harness.py, docs/engine/export_harness_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/nervous_system.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py, tests/test_cpp_twins_parity.py, docs/engine/check_records.py. Moves: every decision of the live engine (900 ms at 1×): the line takes a point, a ring opens at its head and its newest value is printed beside it. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1571,7 +2164,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1589,105 +2199,105 @@
    ]
   },
   {
-   "id": 1018,
+   "id": 1019,
    "type": "row",
    "title": "8c · The brain's internal state",
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 274,
+    "y": 283,
     "w": 24,
     "h": 1
    },
    "panels": []
   },
   {
-   "id": 55,
-   "title": "55 · The brain's state: the well",
+   "id": 56,
+   "title": "56 · The brain's state: the well",
    "gridPos": {
     "x": 0,
-    "y": 275,
+    "y": 284,
     "w": 12,
     "h": 8
    },
-   "description": "Section 8c, The brain's internal state. The brain's double-well potential and where its state sits. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBrain, drawWell → the Python omnicompass/core.py, omnicompass/adapter.py → the C++ cpp/src/core.cpp, cpp/src/governor.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py. Moves: every decision the ball rolls to the brain's state and a ring opens where it lands.",
+   "description": "Section 8c, The brain's internal state. The brain's double-well potential and where its state sits. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBrain, drawWell → the Python omnicompass/core.py, omnicompass/adapter.py → the C++ cpp/src/core.cpp, cpp/src/governor.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py. Moves: every decision the ball rolls to the brain's state and a ring opens where it lands. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The brain's state: the well** (the brain).\n\nThe brain's double-well potential and where its state sits.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 55)."
-   }
-  },
-  {
-   "id": 56,
-   "title": "56 · The brain's state: stress S in its potential",
-   "gridPos": {
-    "x": 12,
-    "y": 275,
-    "w": 12,
-    "h": 8
-   },
-   "description": "Section 8c, The brain's internal state. Stress S on its cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS, rolling toward S*; the senses pull it back each decision (eqs. (5)–(6)). Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBrain, drawWell → the Python omnicompass/core.py, omnicompass/adapter.py → the C++ cpp/src/core.cpp, cpp/src/governor.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py. Moves: every decision the ball rolls to the brain's state and a ring opens where it lands.",
-   "type": "text",
-   "options": {
-    "mode": "markdown",
-    "content": "**The brain's state: stress S in its potential** (the brain).\n\nStress S on its cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS, rolling toward S*; the senses pull it back each decision (eqs. (5)–(6)).\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 56)."
+    "content": "**The brain's state: the well** (the brain).\n\nThe brain's double-well potential and where its state sits.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 56). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
    "id": 57,
-   "title": "57 · The brain's state: the bath B",
+   "title": "57 · The brain's state: stress S in its potential",
    "gridPos": {
-    "x": 0,
-    "y": 283,
+    "x": 12,
+    "y": 284,
     "w": 12,
     "h": 8
    },
-   "description": "Section 8c, The brain's internal state. The bath oscillator B, the slow tide of physical load, over the last 120 decisions (eq. (7)), its spring at the latest B. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBrain → the Python omnicompass/core.py, omnicompass/adapter.py → the C++ cpp/src/core.cpp, cpp/src/governor.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py. Moves: every decision the bath's line takes a point and a ring opens at its head.",
+   "description": "Section 8c, The brain's internal state. Stress S on its cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS, rolling toward S*; the senses pull it back each decision (eqs. (5)–(6)). Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBrain, drawWell → the Python omnicompass/core.py, omnicompass/adapter.py → the C++ cpp/src/core.cpp, cpp/src/governor.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py. Moves: every decision the ball rolls to the brain's state and a ring opens where it lands. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The brain's state: the bath B** (the brain).\n\nThe bath oscillator B, the slow tide of physical load, over the last 120 decisions (eq. (7)), its spring at the latest B.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 57)."
+    "content": "**The brain's state: stress S in its potential** (the brain).\n\nStress S on its cubic potential Φ(S) = αₛS²/2 + βₛS³/4 − δS, rolling toward S*; the senses pull it back each decision (eqs. (5)–(6)).\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 57). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
    "id": 58,
-   "title": "58 · Native's own controller beside the brain",
-   "gridPos": {
-    "x": 12,
-    "y": 283,
-    "w": 12,
-    "h": 8
-   },
-   "description": "Section 8c, The brain's internal state. What native's controller would do at the same decision, beside the brain's grant. Evidence class S; on the live engine: live. Feed: kube-state-metrics. Wired: the page's drawNat6c → the Python realms/harness.py, docs/engine/export_harness_trace.py → the C++ none: native's own controllers, as the harness's record or the page's own model holds them; held equal by docs/engine/check_records.py. Moves: every decision of the live engine.",
-   "type": "text",
-   "options": {
-    "mode": "markdown",
-    "content": "**Native's own controller beside the brain** (the brain).\n\nWhat native's controller would do at the same decision, beside the brain's grant.\n\nSource: kube-state-metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 58)."
-   }
-  },
-  {
-   "id": 1019,
-   "type": "row",
-   "title": "8d · The verdict: change acceptance testing",
-   "collapsed": false,
-   "gridPos": {
-    "x": 0,
-    "y": 291,
-    "w": 24,
-    "h": 1
-   },
-   "panels": []
-  },
-  {
-   "id": 59,
-   "title": "59 · The verdict: one trial",
+   "title": "58 · The brain's state: the bath B",
    "gridPos": {
     "x": 0,
     "y": 292,
     "w": 12,
     "h": 8
    },
-   "description": "Section 8d, The verdict: change acceptance testing. A give-back trial judged against native: its reference, its step, its interval and the word. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawVerdict, vTick, judge → the Python omnicompass/verdict.py, omnicompass/student_t.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py, verify.py. Moves: a cost measured every 28 ms until the verdict reads; a new trial starts 2.6 s after.",
+   "description": "Section 8c, The brain's internal state. The bath oscillator B, the slow tide of physical load, over the last 120 decisions (eq. (7)), its spring at the latest B. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawBrain → the Python omnicompass/core.py, omnicompass/adapter.py → the C++ cpp/src/core.cpp, cpp/src/governor.cpp; held equal by docs/engine/check_live_engine.py, tests/test_cpp_governor_parity.py. Moves: every decision the bath's line takes a point and a ring opens at its head. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**The brain's state: the bath B** (the brain).\n\nThe bath oscillator B, the slow tide of physical load, over the last 120 decisions (eq. (7)), its spring at the latest B.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 58). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
+   }
+  },
+  {
+   "id": 59,
+   "title": "59 · Native's own controller beside the brain",
+   "gridPos": {
+    "x": 12,
+    "y": 292,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Section 8c, The brain's internal state. What native's controller would do at the same decision, beside the brain's grant. Evidence class S; on the live engine: live. Feed: kube-state-metrics. Wired: the page's drawNat6c → the Python realms/harness.py, docs/engine/export_harness_trace.py → the C++ none: native's own controllers, as the harness's record or the page's own model holds them; held equal by docs/engine/check_records.py. Moves: every decision of the live engine. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
+   "type": "text",
+   "options": {
+    "mode": "markdown",
+    "content": "**Native's own controller beside the brain** (the brain).\n\nWhat native's controller would do at the same decision, beside the brain's grant.\n\nSource: kube-state-metrics. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 59). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
+   }
+  },
+  {
+   "id": 1020,
+   "type": "row",
+   "title": "8d · The verdict: change acceptance testing",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 300,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 60,
+   "title": "60 · The verdict: one trial",
+   "gridPos": {
+    "x": 0,
+    "y": 301,
+    "w": 12,
+    "h": 8
+   },
+   "description": "Section 8d, The verdict: change acceptance testing. A give-back trial judged against native: its reference, its step, its interval and the word. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawVerdict, vTick, judge → the Python omnicompass/verdict.py, omnicompass/student_t.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py, verify.py. Moves: a cost measured every 28 ms until the verdict reads; a new trial starts 2.6 s after. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -1695,7 +2305,24 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "short"
+     "unit": "short",
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       }
+      ]
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "custom": {
+      "thresholdsStyle": {
+       "mode": "line+area"
+      }
+     }
     },
     "overrides": []
    },
@@ -1708,48 +2335,48 @@
    ]
   },
   {
-   "id": 60,
-   "title": "60 · The verdict: every true cost",
+   "id": 61,
+   "title": "61 · The verdict: every true cost",
    "gridPos": {
     "x": 12,
-    "y": 292,
+    "y": 301,
     "w": 12,
     "h": 8
    },
-   "description": "Section 8d, The verdict: change acceptance testing. The keep ratio of the verdict at each true cost, from trials run in this page's idle time. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawVerdict2, runTrialSync → the Python omnicompass/verdict.py, omnicompass/student_t.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py, verify.py. Moves: trials run in the browser's idle time; the shares fill as they run.",
+   "description": "Section 8d, The verdict: change acceptance testing. The keep ratio of the verdict at each true cost, from trials run in this page's idle time. Evidence class S; on the live engine: live. Feed: tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawVerdict2, runTrialSync → the Python omnicompass/verdict.py, omnicompass/student_t.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py, verify.py. Moves: trials run in the browser's idle time; the shares fill as they run. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**The verdict: every true cost** (the verdict).\n\nThe keep ratio of the verdict at each true cost, from trials run in this page's idle time.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 60)."
+    "content": "**The verdict: every true cost** (the verdict).\n\nThe keep ratio of the verdict at each true cost, from trials run in this page's idle time.\n\nSource: tools/omni_exporter.py (the governor's own audit, Prometheus text format). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 61). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   },
   {
-   "id": 1020,
+   "id": 1021,
    "type": "row",
    "title": "11 · Self-governed rendering: Omni-Compass inside this page",
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 300,
+    "y": 309,
     "w": 24,
     "h": 1
    },
    "panels": []
   },
   {
-   "id": 61,
-   "title": "61 · Self-governed rendering",
+   "id": 62,
+   "title": "62 · Self-governed rendering",
    "gridPos": {
     "x": 0,
-    "y": 301,
+    "y": 310,
     "w": 12,
     "h": 8
    },
-   "description": "Section 11, Self-governed rendering: Omni-Compass inside this page. This page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself). Wired: the page's drawSelf → the Python omnicompass/compass_law.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py. Moves: every frame: this page's own frame time under the compass law.",
+   "description": "Section 11, Self-governed rendering: Omni-Compass inside this page. This page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass. Evidence class S; on the live engine: live. Feed: this page's own clock (no exporter: the page measures itself). Wired: the page's drawSelf → the Python omnicompass/compass_law.py → the C++ cpp/tools/engine_runs.cpp; held equal by docs/engine/check_live_engine.py. Moves: every frame: this page's own frame time under the compass law. Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.",
    "type": "text",
    "options": {
     "mode": "markdown",
-    "content": "**Self-governed rendering** (this page).\n\nThis page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 61)."
+    "content": "**Self-governed rendering** (this page).\n\nThis page's own render loop governed by the compass law: the frame time against its line, native (no governor) beside Omni-Compass.\n\nSource: this page's own clock (no exporter: the page measures itself). No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 62). Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row."
    }
   }
  ],

@@ -450,7 +450,8 @@ monitor wall, 1c the monitor list, 1d the status board, 1e the master switch's w
 every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline, 1j the heartbeat dial); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
 measured effect in full (the organisms, every muscle, the register, the grid and every three-run table); 5 the evidence by
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
-per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
+per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host, 5g Omni-Compass direct, the
+organism with no orchestrator, the three arms); 6 the organism live (6a
 native and Omni-Compass, 6b the telemetry analytics and Omni-Compass in its own words); 7 the console; 8 the brain (8a one
 cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the components, their mathematics and their C++ twin (10a the component
 specification and mathematics, 10b the C++ twin, the Python's runs through the C++ engine); 11 the self-governed rendering.
@@ -458,7 +459,7 @@ specification and mathematics, 10b the C++ twin, the Python's runs through the C
 ### 2.3 Anchors
 
 Every section has an anchor that does not move when the page is reordered: `#s-problem`, `#s-read`, `#p-health`, `#s-health`,
-`#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-dial`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
+`#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-dial`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`, `#s-direct`,
 `#p-organism`, `#s-engines`, `#s-lab`, `#s-desk`, `#p-brain`, `#s-decision`, `#s-plane`, `#s-brain`, `#s-verdict`, `#s-fail`,
 `#s-math`, `#s-cpp`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
 contents links the same way. When this book names a section it gives its title and its anchor, so the reader finds it on a
@@ -573,20 +574,37 @@ off screen; every monitor is drawn once as the page opens, so no tile waits for 
 is in view the resting monitors are drawn in turn, one a frame, each by its own drawing code; a tile with the accent border is
 a monitor on screen now.
 
-**The light on every monitor** (the founder's order of 23 October). Each tile carries a light in its top right corner, and each
-monitor the same light beside its number on the page: green while the gauge the monitor draws is inside its lines; amber before
-the line, when the gauge is within 3% of it or when its own slope over the last readings, carried three readings ahead, crosses it;
-red when it is over; grey where the monitor has no line to watch (a bill, a count of runs), and the light says so.
+**The light on every monitor: green, yellow, red** (the founder's orders of 23 and 24 October: "Every monitor is to have a red and
+green button as red is alert ... green has got to be good"; "they're supposed to be a yellow too. Yellow would mean it's even").
+Each tile carries a light in its top right corner, and each monitor the same light, a button, beside its number on the page.
+**Green, working**: the gauge the monitor draws is inside its lines, or the monitor has no line to cross (a bill, a count of runs),
+and the button says which. **Yellow**: heading for its line (within 3% of it, or its own slope over the last readings, carried
+three readings ahead, crosses it), blinking slowly; on a record, EVEN, no difference beyond the noise (the key's yellow).
+**Red, an alert**: over its line, or a LOSS row in its record (every row stays). A monitor that draws the organism's two sides
+carries three lights in one button: native's and Omni-Compass's, each read from its own side on the same load, and between them the
+reading now, Omni-Compass against native by the key (GAIN green, EVEN yellow, LOSS red), each by whether the gauge helps or hurts the
+muscle and the organism, never by its sign: fewer muscles over their line, fewer pods waiting, a faster 95th percentile beyond 2% is
+GAIN. So the moment one side turns a colour the other does not is seen as it happens; a live light compares that moment, and the
+judged readings stay in the record's tables. On the wall every tile carries three lamps in its corner, green round, yellow a diamond
+and red an octagon like a stop sign, the lit one moving with the monitor's reading. Click the button for each side's reason; a red or yellow one
+offers the way back to the factory tune, because a light the knobs turned is a light the factory tune puts back.
+
+What the page's organism is. The sixty muscles replay the repository's own model (`realms/harness.py`, class S) under the climb,
+whose load steps past what the fixed muscles can carry; at the top of the climb both sides cross their lines, because no
+controller makes capacity that is not there and this model adds no machine. Read over one model day (240 decisions), native has a
+muscle over its line in 173 decisions (350 muscle-decisions), Omni-Compass on top in 147 (272, 22% fewer), and Omni-Compass is never
+over its line in a decision where native holds. Native in every benchmark is the system's own automatic controllers as shipped,
+with nobody turning a knob, the same as Omni-Compass; where a person would step in, the record says so and shows the crossing.
 The light reads the series the monitor draws and adds no number: on the live engine, the muscles against their lines; on a cluster
 replay, the 95th percentile against the 200 ms line and the pods waiting for a place; on the heart, the decision's own time against
 half its beat; on the CPU host, the busy share against the 75% line; on the card, the draw against its power limit; on the page's
 own governor, the time between frames against 1.5 frames; on the proof, the page's runs against the Python's (green when the
 digests match and every number is within 1e-9, red when they differ); on the governors and orchestrators, their own three-run
 tables; on a record, the judged rows of the newest tables (a LOSS row lights red and stays). A light fed by our own models says
-so (class S). Above the wall a line counts the lights and names the monitors heading for a line or over one, beside the engine's
+so (class S). Above the wall a line counts the green, yellow and red lights, names every red and yellow one, and names the two-sided monitors whose native side is red, beside the engine's
 own last entry on its side. The three-reading projection is the light's own: the brain's law acts on the position inside its
 band and damps on the position's rate of change, with a fail-up at the band's 95% wall; it projects nothing ahead. Hover a light
-for its reading.
+for its reading, or click it for the reason and the way back.
 
 ### 4.2 The order of the board
 
@@ -971,6 +989,27 @@ both lanes.
 The eighth organism: every governor's catalog muscles, each governor's a body of its own and all of
 them together one body, native and with Omni-Compass on top (modelled, class S; `tools/run_orchestra.py`,
 `results/orchestra/ORCHESTRA.md`). It is a grouping of catalog rows like the seven, never an engine file.
+
+### 11.5 Omni-Compass direct (the page's section 5g, `#s-direct`)
+
+Omni-Compass's own orchestrator (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`) runs the organism, a checked web service
+and a batch job on six half-processor machines, with no Kubernetes and no other orchestrator. Each showing GitHub runs
+(`.github/workflows/orchestrator.yml`) puts the same clients through every arm, one after another, on the same machines:
+**native**, Kubernetes' published autoscaling rule on the muscles, written by us (the yardstick, drawn amber); **Omni-Compass
+and native**, Omni-Compass on top of that rule, its units never fewer than the rule's (blue); **Omni-Compass direct**,
+Omni-Compass alone on the muscles (violet, dashed). The section plays back the showing chosen with the Showing buttons from
+its own files on the branch raw, 5 s at a time: the requests answered a second, the 95th percentile response, the units
+standing and the machines on, picked with the Gauge buttons; the Arms buttons draw or hide an arm. The steps of clients
+(1 2 3 2 3 4 …, 25 s each) are marked along the top, and the cursor sweeps the run, 450 s in 30 s, each arm's value at its
+line's head.
+
+Under the monitor, the first table gives each arm's own totals (requests answered, failed and wrong, the 50th, 95th and 99th
+percentiles, machine-minutes on and unit-minutes); the second gives the showing's readings as it wrote them, each pair by the
+one key on its own step pairs with the exact Student t interval, the number beside the word in the word's sign. The note under
+them names the run, its folder on the branch raw, its steps and its room rule, and the batch job's and the drills' counts where
+the showing ran them. The light reads the showing's readings: red where one reads LOSS (every row stays), green otherwise, and
+it says that a showing is one run of each arm (class L), not the three-run reading. Kubernetes itself on the kind rig beside
+this orchestrator has not run yet; the section says so.
 
 ## 12. Kubernetes: the Official Run Playback
 
@@ -1758,6 +1797,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 5d | `#s-runs` | Kubernetes: per-repetition run telemetry | 13 |
 | 5e | `#s-live` | Kubernetes and cloud: the shipped controller's decision trace | 14 |
 | 5f | `#s-stacks` | Hardware: the GPU card and the CPU host | 15 |
+| 5g | `#s-direct` | Omni-Compass direct: the organism with no orchestrator, the three arms | 11 |
 | 6 | `#p-organism` | The organism, live | 16, 17 |
 | 6a | `#s-engines` | The organism, live | 16 |
 | 6b | `#s-lab` | Telemetry analytics: the tensor, the modes, the service level | 17 |

@@ -94,7 +94,12 @@ Omni-Compass on top, or both side by side; what it shows at any other setting is
 on any engine, where the mixture, the intake, the exhaust, the firing or the pistons change what it delivers, **turning any knob
 of Omni-Compass can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many
 ways, for many outputs. A licensee may add on, retune, upgrade or tune down any muscle or combination (the dial, the cards, the
-bands and the service lines are exposed); a changed tune is the licensee's own, and so are its results.
+bands and the service lines are exposed); a changed tune is the licensee's own, and so are its results. The factory tune is published only where it reads no LOSS: a LOSS found
+in The Omni-Compass LLC's own runs is treated as a fault in the mechanism or its wiring, found and fixed before the result is
+published, never as a number to live with (the founder's order of 23 October 2026). The one place a LOSS is meant to be seen
+is the live engine, when a person turns its knobs away from the factory tune (the dial, the heartbeat, the sizes, the load)
+to watch the system react and the brain hold or recover: that showing is the proof that the mechanism can be broken only by
+leaving it, and a changed tune's readings are the licensee's own.
 
 ## 4. The wiring declaration
 

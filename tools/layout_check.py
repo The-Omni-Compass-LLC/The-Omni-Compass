@@ -41,7 +41,7 @@ ROOT_ALLOWED = {
     "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "OMNI_V6.json", "OMNI_V7.json", "OMNI_V8.json", "OMNI_V9.json", "OMNI_V10.json", "OMNI_V11.json", "OMNI_V12.json", "OMNI_V13.json", "OMNI_V14.json", "OMNI_V15.json", "OMNI_V16.json", "OMNI_V17.json", "codemeta.json",
     "docker-compose.yml", ".gitignore", ".gitattributes", ".dockerignore", ".github", ".fossa.yml", ".snyk",
     # code and evidence
-    "omnicompass", "omni_controller", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",
+    "omnicompass", "omni_controller", "omni_orchestrator", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",
     "k8s_controlplane", "k8s_fleet", "omnilab", "hardware", "benchmarks", "tuning", "reference", "fixtures", "sbom",
     "results", "docs", "release",
 }
