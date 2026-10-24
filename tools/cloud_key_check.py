@@ -33,6 +33,10 @@ def what_it_holds(raw: str) -> str:
     an account name, or too little to be any of these."""
     if before_brace(raw):
         return before_brace(raw)
+    if "workloadIdentityPools" in raw or "workload_identity_provider" in raw:
+        return ("it holds the settings of a GitHub link made without a key (a Workload Identity provider"
+                + (" and a service account" if "service_account" in raw or ".iam.gserviceaccount.com" in raw else "")
+                + "), not the key file")
     if any(f'"{f}"' in raw for f in FIELDS):
         return "it holds a piece from inside the file (its first line, the {, is missing): the copy started part of the way in"
     if "-----BEGIN PRIVATE KEY-----" in raw or "PRIVATE KEY-----" in raw:
