@@ -952,6 +952,21 @@ TERMS = [
     T("Return to native", D, "The control that hands governance back and restores the recorded native settings, as the adapter "
       "supports.", [(FP, "| Return to native | Hand governance back and restore the recorded native settings, as the adapter supports. |")],
       aka=["Return to native"]),
+    T("the contract, this decision", W, "The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the "
+      "settings requested u[req](k), commanded u[cmd](k) = Π[C](u[req](k)) and acknowledged u[ack](k) = R(u[cmd](k)), computed on the "
+      "live model.", [(FP, "u[cmd](k) = Π[C](u[req](k))"), (PAGE_F, "the contract, this decision")], aka=["the contract"]),
+    T("the same press on a running system", D, "The line under the main control panel's master row: after every press, the request "
+      "a running governor takes for it through its control panel (tools/omni_control.py), with its role; the page sends nothing.",
+      [(PAGE_F, "the same press on a running system")], aka=["the same press"]),
+    T("Metrics (Prometheus)", W, "The control panel's tab that prints the live model in Prometheus's text exposition format, with the "
+      "series a running system serves beside each one and the PromQL the Grafana wall draws it with.",
+      [(PAGE_F, "Metrics: this page's live model as a Prometheus endpoint")], aka=["Metrics tab", "Prometheus"]),
+    T("Commands", D, "The control panel's tab that lists every control beside the request a running governor takes for it and its "
+      "role; the mechanism's knobs and the plant's conditions have none.",
+      [(PAGE_F, "Commands: every control beside what a running system takes for it")], aka=["Commands tab"]),
+    T("the monitor wall stack", W, "deploy/wall: Prometheus, Grafana with the Omni-Compass wall loaded, Alertmanager with the "
+      "governor's alert rules, node_exporter and the governor's exporter, in one command; it reads and writes nothing.",
+      [("deploy/wall/README.md", "One command stands up the wall an operations team already knows how to read")], aka=["deploy/wall"]),
     T("actuation feedback", W, "Each decision's requested settings, those that landed as asked, those held at a muscle's limit, and "
       "those still moving toward their setting; requested, commanded and acknowledged settings are kept distinct.",
       [(FP, "so the requested, the commanded and"), (PAGE_F, "actuation, this decision")], aka=["actuation"]),

@@ -1699,27 +1699,23 @@ the benchmark runs GitHub ran. It is for the operator at the dashboard: which ti
 number comes from, and how the mechanism of action of Omni-Compass against native shows on the monitors. It explains neither how
 the engine is built (the Owner's Manual) nor how it is wired onto a stack (the Operator's Manual).
 
-The book is in eight parts, and it can be read in two ways.
+The book is in seven parts, in the page's own order (the Contents follow), and it can be read in two ways.
 
 | You are | Read |
 |---|---|
-| The operator on shift, at the wall | the Quick Reference card; Part Two (the wall and the switch); the chapter on a tile that reads LOSS in Part Seven; the troubleshooting appendix |
-| CTO, architect, head of platform | the front matter; Part Three (the whole organism and the benefit board); Part Seven (the mechanism side by side; what the page does not tell you) |
-| CEO, CFO, CIO, board member | the Problem and the Answer; the Foreword; the Disclosures; the bills and receipts in Part Three; the clouds in Part Four |
-| Site reliability engineer, on call | the Quick Reference card; Part Two; the official run playback in Part Four (the heart and the two tickers); the gauges appendix |
-| Control or plant engineer | Part Six (one cycle, the phase plane, the brain's state, the verdict, the specification); the console in Part Five |
-| Auditor, diligence team | Part One (a monitor, not a drawing); the trace from a tile to its record and the verification chapter; the page's own appraisal |
+| The operator at the wall | the Quick Reference card; Parts Two and Three; when a tile reads LOSS (Part Six) |
+| CTO, architect, head of platform | the bottom line (chapter 2); the main control panel's tabs (chapter 6); Part Five |
+| CEO, CFO, CIO, board member | the Problem and the Answer; the Disclosures; chapters 2, 12 and 20 |
+| Site reliability engineer | Part Two; the golden signals and metrics (chapter 10); the wall stack, `deploy/wall` (chapter 6) |
+| Control or plant engineer | the contract (chapter 6); the mechanism's knobs (chapter 7); chapters 16 to 19 |
+| Auditor, diligence team | Part One; Part Six; the pipeline (chapter 33); the page word for word (Appendix L) |
 | Procurement and counsel | the Disclosures and the papers bound into the back matter |
 
-**Part One** says what the page is and how it is built. **Part Two** is the wall and the switch. **Part Three** is the whole
-organism and the measured effect. **Part Four** is the evidence stack by stack, from the cloud down to the chip. **Part Five**
-is the organism live and the console. **Part Six** is the brain. **Part Seven** reads a result off the page. **Part Eight** is
-the license and how to verify a copy.
-
-**Conventions.** `Code` is a command, file, anchor or switch exactly as typed. "Native" is the system by itself, amber;
-"Omni-Compass" is Omni-Compass on top of native, blue; there is no third side. "A section" is a numbered part of the page, named
-by its anchor; "a chapter" is a chapter of this book. A knob marked **LIVE** acts on the live engine; one marked **RECORDED**
-chooses a record and modifies nothing. Every number carries its evidence class: P a physical meter, L live software, S our own
+**Conventions.** `Code` is a command, file, anchor or switch exactly as typed. "Native" is the system by itself, orange;
+"Omni-Compass" is Omni-Compass on top of native, blue; "Omni-Compass direct" is Omni-Compass alone on the muscles, violet. Red is
+never a side: it is the stop sign of a line crossed. "A section" is a numbered part of the page, named by its anchor; "a chapter"
+is a chapter of this book. A knob marked **LIVE** acts on the live engine; one marked **RECORDED** chooses a record and modifies
+nothing. Every number carries its evidence class: P a physical meter, L live software, S our own
 models (modelled); a model is never proof."""
 
 

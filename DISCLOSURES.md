@@ -199,8 +199,7 @@ nor a cloud account). A piece with no measurement enters as exactly 1 and is nam
 **The cloud's back end is not ours to meter.** Through the cloud, the bare metal belongs to the provider: no tenant can read
 its power meters or write its chips' limits, and no run here reaches it. The cloud piece's benefit is what the provider itself
 meters and bills, the machines counted every fifteen seconds and the bill at list price, read native against Omni-Compass on
-top of the cloud's own autoscaler; fewer machines held for the same work is also the provider's own benefit on its own
-hardware. The bare-metal piece is gauged on hardware we can meter (a card's own power meter; a processor's energy counter)
+top of the cloud's own autoscaler. The bare-metal piece is gauged on hardware we can meter (a card's own power meter; a processor's energy counter)
 and is carried to the provider's bare metal only as the same mechanism on the same kind of part, a modelled factor, never as a
 measurement of the provider's machines.
 
@@ -230,14 +229,12 @@ own mathematics running in the page, and the live tuning bench: a setting other 
 the mechanism, never a result. Every monitor carries its evidence class (P a physical meter, L live software, S our own models)
 and its state: live (the engine's port, proven equal to the Python and the C++ on every build by
 `docs/engine/check_live_engine.py`), a replay of a recorded run from its own files, a reading of the repository's tables, or
-built and awaiting its run, with no invented number and the run that fills it named. The page's seeded runs reproduce the
-Python's (`tools/engine_runs.py`) receipt by receipt, one SHA-256 digest on each side. The kill switch on the page acts on what
-runs in the page, and a recorded result changes its colour, never a value, a word or a row. Pointed at an owner's own
+built and awaiting its run, with no invented number and the run that fills it named. The kill switch on the page acts on
+what runs in the page, and a recorded result changes its colour, never a value, a word or a row. Pointed at an owner's own
 Prometheus, the page only reads it: it writes to no system.
 
-**The three manuals.** The Operator's Manual wires and runs Omni-Compass; the Owner's Manual holds the whole mechanism and every
-result; the Live Engine Manual reads the live engine top to bottom, monitor by monitor and knob by knob. Each carries this
-notice, the `LICENSE`, the `NOTICE` and this page, and none of them changes what a result says.
+**The three manuals.** The Operator's Manual wires and runs Omni-Compass, the Owner's holds the whole mechanism and every
+result, the Live Engine Manual reads the page; each carries this notice, the `LICENSE`, the `NOTICE` and this page.
 
 ---
 

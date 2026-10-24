@@ -112,6 +112,8 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 - **custom profile.** An identifiable configuration that differs from the released factory profile; its fingerprint names it and its results are its own. *Source: `docs/FACTORY_PROFILE.md`.*
 - **Restore factory profile.** The control that reapplies the released Omni-Compass configuration: every knob of the mechanism and the heartbeat back to the factory's, Omni-Compass still on. *Source: `docs/FACTORY_PROFILE.md`; `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **Return to native.** The control that hands governance back and restores the recorded native settings, as the adapter supports. *Source: `docs/FACTORY_PROFILE.md`.*
+- **the same press on a running system.** The line under the main control panel's master row: after every press, the request a running governor takes for it through its control panel (tools/omni_control.py), with its role; the page sends nothing. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
+- **Commands.** The control panel's tab that lists every control beside the request a running governor takes for it and its role; the mechanism's knobs and the plant's conditions have none. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 
 ### Proof and evidence
 
@@ -166,6 +168,9 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 - **AWAITING.** A dark light, never green: the run that fills this monitor has not landed yet, and the light stays dark until it does. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **native's colour.** Orange (#ff8a1f, the page's --steel): the word native and every line, bar, lane, tile and number that belongs to native's side wear it, the founder's order of 24 October. Red is only a LOSS and the alarm. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`; `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`.*
 - **live tuning bench.** The interface that operates the engine's controls and displays their effects through the connected backend: the live engine's main control panel. *Source: `docs/FACTORY_PROFILE.md`.*
+- **the contract, this decision.** The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the settings requested u[req](k), commanded u[cmd](k) = Π[C](u[req](k)) and acknowledged u[ack](k) = R(u[cmd](k)), computed on the live model. *Source: `docs/FACTORY_PROFILE.md`; `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
+- **Metrics (Prometheus).** The control panel's tab that prints the live model in Prometheus's text exposition format, with the series a running system serves beside each one and the PromQL the Grafana wall draws it with. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
+- **the monitor wall stack.** deploy/wall: Prometheus, Grafana with the Omni-Compass wall loaded, Alertmanager with the governor's alert rules, node_exporter and the governor's exporter, in one command; it reads and writes nothing. *Source: `deploy/wall/README.md`.*
 - **actuation feedback.** Each decision's requested settings, those that landed as asked, those held at a muscle's limit, and those still moving toward their setting; requested, commanded and acknowledged settings are kept distinct. *Source: `docs/FACTORY_PROFILE.md`; `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **Omni-Compass's blue.** Blue (#4e97d1, the page's --brass and --omni): Omni-Compass's side and its name; on a reading, blue always means power given. While the master switch is OFF, Omni-Compass's side follows native in a lighter tint of native's own colour. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`; `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`.*
 - **direct's violet.** Violet (#c77dff, the page's --direct): Omni-Compass direct, the third arm, Omni-Compass alone on the muscles; never a reading's colour. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
@@ -1977,6 +1982,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the 0.5% floor | term | iii (#s-bottom); 3e (#s-plane); 3l (#s-live); 4g (#s-math); 4k (#s-read) |
 | the 95% interval on Student's t | term | 2d (#s-board); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 4a (#s-whole); 4g (#s-math) |
 | A | term | 4g (#s-math) |
+| actuation feedback | term | 1a (#s-wall) |
 | alert minute | term | 4j (#s-problem); 4k (#s-read) |
 | at its limit on native | term | 3a (#s-engines); 3m (#s-stacks); 4c (#s-fleet); 4k (#s-read) |
 | the band | term | 2b (#s-feed); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3o (#s-lab); 4a (#s-whole); 4g (#s-math); 4i (#s-self); 4j (#s-problem) |
@@ -1989,6 +1995,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the centre | term | 3a (#s-engines); 3e (#s-plane); 3o (#s-lab); 4g (#s-math) |
 | the climb | term | 4c (#s-fleet); 4g (#s-math) |
 | the cloud as the wire | term | iii (#s-bottom); 2d (#s-board); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
+| Commands | term | 1a (#s-wall); 4g (#s-math); 4j (#s-problem) |
 | the compass | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4d (#s-cpp); 4g (#s-math); 4i (#s-self); v (#s-disclose) |
 | the compass law | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3l (#s-live); 3n (#s-direct); 3p (#s-proof); 4d (#s-cpp); 4g (#s-math); 4i (#s-self); v (#s-disclose) |
 | Compute / AI / Cloud | organism | 3b (#s-desk); 4j (#s-problem) |
@@ -2020,7 +2027,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | h | term | 3f (#s-brain) |
 | harness | term | 1a (#s-wall); 3a (#s-engines); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3m (#s-stacks); 3o (#s-lab); 3p (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
 | health | term | 1a (#s-wall); 3f (#s-brain); 3j (#s-ops); 4a (#s-whole) |
-| the heartbeat | term | 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3j (#s-ops); 3k (#s-runs); 4g (#s-math) |
+| the heartbeat | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3j (#s-ops); 3k (#s-runs); 4g (#s-math) |
 | the heat debt | term | 3a (#s-engines); 4g (#s-math) |
 | the immune system | term | 3a (#s-engines); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
 | the jump generator | term | 1b (#s-health); 3p (#s-proof); 4d (#s-cpp) |
@@ -2036,6 +2043,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | LOSS | term | iii (#s-bottom); 1b (#s-health); 2a (#s-status); 2c (#s-loss); 2d (#s-board); 3b (#s-desk); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the max | term | 1a (#s-wall); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4c (#s-fleet); 4g (#s-math) |
 | the mechanism panel | term | 1a (#s-wall) |
+| Metrics (Prometheus) | term | 2b (#s-feed); 3c (#s-dial); 4e (#s-github); 4l (#s-monlist) |
 | modelled | term | 2b (#s-feed); 3a (#s-engines); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3i (#s-orch); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the monitor wall | term | 1a (#s-wall); 1b (#s-health); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3h (#s-cloud); 3j (#s-ops); 3m (#s-stacks); 3p (#s-proof); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4e (#s-github); 4f (#s-master); 4g (#s-math); 4l (#s-monlist); v (#s-disclose) |
 | Monte Carlo | term | 1b (#s-health); 3p (#s-proof) |
@@ -2066,6 +2074,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the release gate | term | 3b (#s-desk); 3d (#s-decision); 3l (#s-live); 4g (#s-math) |
 | RK4 | term | 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3f (#s-brain); 3p (#s-proof); 4g (#s-math) |
 | the runs disagree | term | 2a (#s-status); 2d (#s-board); 4c (#s-fleet); 4k (#s-read) |
+| the same press on a running system | term | 1a (#s-wall) |
 | the seven organisms | term | 3a (#s-engines); 3m (#s-stacks); 4c (#s-fleet); 4d (#s-cpp) |
 | shown, not judged | term | 4c (#s-fleet); 4h (#s-fail); 4k (#s-read) |
 | the sign beside a word | term | 3j (#s-ops); 4k (#s-read) |
@@ -2098,7 +2107,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | ρ* | term | 4g (#s-math) |
 | σ | term | 3b (#s-desk); 3f (#s-brain); 3g (#s-verdict); 3p (#s-proof); 4g (#s-math) |
 
-Not printed in the page's own words at this build (defined above, not yet on the page): active profile; actuation feedback; AWAITING; candidate profile; custom profile; defensive system; factory profile; governing engine; the heartbeat's six buttons; live tuning bench; the live tuning engine; native baseline; preset; protocol 4; Restore factory profile; Return to native; the seal.
+Not printed in the page's own words at this build (defined above, not yet on the page): active profile; AWAITING; candidate profile; the contract, this decision; custom profile; defensive system; factory profile; governing engine; the heartbeat's six buttons; live tuning bench; the live tuning engine; the monitor wall stack; native baseline; preset; protocol 4; Restore factory profile; Return to native; the seal.
 
 ---
 

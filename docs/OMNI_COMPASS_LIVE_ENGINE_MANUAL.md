@@ -355,26 +355,21 @@ native's colour. "Return to native" in the main control panel is the reset, a se
 **The profile** (chapter 6). The active profile reads FACTORY, CANDIDATE or CUSTOM, with its fingerprint. The factory profile is
 the released one, omni-v19's, the heartbeat 60 s; nothing is held when the page opens. *Restore factory profile* puts the
 mechanism and the heartbeat back; *Hold the active profile* holds every knob as set; *Try the candidate* applies the sweep's best
-beat as a candidate, never a release.
-
-**The heartbeat** (chapter 6). Six buttons: 10, 15, 30, 60, 90 and 120 s. The page's live model steps every 15 s, so at 10 s two
-full decisions land in every other step.
+beat as a candidate, never a release. The heartbeat has six buttons, 10, 15, 30, 60, 90 and 120 s; the console's tabs add
+the live model as Prometheus metrics and every press as the request a running governor takes.
 
 **The status board** (chapter 9). Every reading that went against native, worst first, each with its source record and its
 root-cause document where one exists; filters: All, LOSS, the runs disagree, live now, guards and open items, GitHub.
 
-**Where a number comes from** (chapter 42). Click the tile: it opens the monitor it is a copy of. The monitor names the table,
-the run and the file; the file's SHA-256 was matched before it was drawn. Open the table in `results/live/`; open the raw
-files on the `raw` branch.
+**Where a number comes from** (chapter 42). Click the tile: its monitor names the table, the run and the file, whose SHA-256
+was matched before it was drawn (the tables in `results/live/`, the raw files on the `raw` branch).
 
 **When a tile reads LOSS** (chapter 43). The row stays. Read the three-run reading, not the one run. Open the root-cause
 document. The cause is found in this order: our wiring, native's setup, the scoring. The test runs again. Nothing is tuned
 toward GAIN; where Omni-Compass cannot bring a knob a gain, that knob stays native.
 
-**The console** (chapter 14). Every knob acts on both sides alike. Demand ×1 is the day as written; noise σ; sense delay +0 to
-+6 decisions; four faults of 40 decisions each (a surge, half the machines lost, a sense blind, a security hold); the dial (the
-max or the tune-down); the load profile; the frame load; pause, one decision, 1× to 60×; the same day again or a new day; every
-knob to its start.
+**The console** (chapter 14). Every knob acts on both sides alike: demand, noise σ, sense delay +0 to +6, four faults of 40
+decisions, the dial, the load profile, the frame load, the time, the day, every knob to its start.
 
 **The age of the page** (chapter 9). The status board's Build freshness tile. The page is rebuilt by GitHub on every change to
 the engine, a model or a result, and every three hours (chapter 33).
@@ -784,11 +779,31 @@ switch is never on one key: it is its own button, on every monitor, in the dock 
 
 ### 6.1 What it is
 
-The main control panel (`#fuseBox`, inside the page's section 1a, under the wall) switches every monitor from one box. Its top
-rows are the master switches: each acts on the whole page at once, through the same code as the console and the dock, both
-sides alike. Under them stand the heartbeat, the sweep over every beat and the profile; the profile box with the active profile,
-the backend, the actuation and each deployment route's bill; the mechanism's own knobs (chapter 7); the thirty scenarios; and the
-breakers, one for every monitor. Every switch is written to the control event log with its decision (the page's section 3b), and
+The main control panel (`#fuseBox`, inside the page's section 1a, under the wall) switches every monitor from one box, laid out
+as a console. Its first row is the master switches, always in view: each acts on the whole page at once, through the same code as
+the console and the dock, both sides alike. Under it stand seven tabs, one shown at a time:
+
+| Tab | What it holds |
+|---|---|
+| **Drive** | the plant's conditions and faults, the breakers' two buttons, the factory button, your own system, the keys; the heartbeat; the sweep over every beat and the candidate; the profile's three buttons and the profile box (the active profile, the backend, the actuation, the contract and each deployment route's bill) |
+| **The mechanism's knobs** | the engine's own constants (chapter 7), one group at a time: a row of group buttons above the knobs names the four pieces, the compass law, Omni-Compass's hand, native's controller and every muscle, with *every group* for all of them at once |
+| **The thirty scenarios** | the ten organisms, each three ways (section 6.10) |
+| **The breakers** | one for every monitor, by section (section 6.10) |
+| **Metrics (Prometheus)** | the live model printed as a Prometheus endpoint, every decision, with the series a running system serves beside each and the PromQL the Grafana wall draws it with (section 6.11) |
+| **Commands** | every control beside the request a running governor takes for it, with its role (section 6.11) |
+| **Everything** | the whole panel at once, as one long box |
+
+The tab chosen, and the group chosen among the mechanism's knobs, are kept in the viewer's own browser only, as a convenience;
+the page opens on *Drive* without them. "How to use the control panel" opens a short guide above the master row, and "What these
+knobs are, and how to read them" opens the mechanism's own guide; both are folded at first so the controls come first.
+
+Between the master row and the tabs stands one line, **the same press on a running system**. After every press it shows the
+request a running governor would take for it through its control panel (`tools/omni_control.py`), with the role the request
+needs: a heartbeat button, `POST /v1/beat {"seconds": N}`; Return to native, `POST /v1/reset`; the kill switch, `POST /v1/kill`
+(and back on, `POST /v1/arm`, two holders of the security role within ten minutes); the dial, `POST /v1/dial`; Restore factory
+profile, the dial at the max, the factory beat, every muscle driven and autopilot. A control that acts only on this page's own
+model (the plant's conditions, the faults, the time, the body, the view) says so: it has no request. The page sends nothing
+anywhere; the line is the request written out, `$OMNI_PANEL` the panel's address and `$OMNI_TOKEN` the operator's token. Every switch is written to the control event log with its decision (the page's section 3b), and
 the line at the panel's head counts the breakers by their signal word, the monitors rested, and the Omni-Compass side in view.
 The panel is the bench of `docs/FACTORY_PROFILE.md`: its controls operate the stated backend and show its response.
 
@@ -925,7 +940,7 @@ mechanism's knobs alone. *Restore factory profile* puts back the mechanism's kno
 releases a hold. *Back to the factory tune* (above the wall, on the console, in the dock and on every strip) puts back all of
 that and the page's plant at rest as well (section 14.2).
 
-### 6.8 Actuation, this decision
+### 6.8 Actuation and the contract, this decision
 
 The box's third line reads each governed arm's actuation in the decision on screen, Omni-Compass on native and Omni-Compass
 direct: how many settings it **requested** (a move of more than 2% of the setting), how many **landed as asked** (inside the
@@ -933,8 +948,24 @@ muscle's floor and ceiling), how many were **held at the muscle's limit** (clipp
 are **still moving toward their setting** (capacity in service more than 2% from its setting, following its lever with the
 muscle's own response time τ). The line adds that the model's plant refuses nothing, while a real adapter reads every write back
 and holds a refused one (omni-v12). The line follows the distinction `docs/FACTORY_PROFILE.md` draws (section 3) between the
-requested, the commanded and the acknowledged settings. While the harness plays, the line says the live model's actuation shows with
-the live model running.
+requested, the commanded and the acknowledged settings. While the harness plays, nothing is requested, commanded or read back in
+that view (the harness replays recorded settings, and section 3d traces one of its decisions), and the line carries a button, *Run
+the live model*, that moves the page to the live model, where the counts are computed.
+
+The fourth line, **the contract, this decision**, writes the same decision in the symbols of `docs/FACTORY_PROFILE.md`, section 3,
+for Omni-Compass on native:
+
+  k = the decision on screen · t[k+1] = t[k] + Δ, Δ = the heartbeat set · θ = the active profile's fingerprint and its kind
+  u[req](k): the settings changed · u[cmd](k) = Π[C](u[req](k)): how many were cut to the muscle's own limit
+  u[ack](k) = R(u[cmd](k)): how many of the sixty settings stand at their command, and how many are still moving
+
+Under it the whole contract is printed once, y(k) = h(x(t[k])) + ε(k); (u[req](k), z(k+1)) = G[θ](z(k), y(k), A(k));
+u[cmd](k) = Π[C](u[req](k)); u[ack](k) = R(u[cmd](k)); x(t[k+1]) = Φ(x(t[k]), u[ack](k), w(k)); θ(k+1) = θ(k) once released, with
+what each symbol is on this page: x the sixty muscles' settings and loads, y their readings with the sense delay and the noise σ
+set on the panel, w the demand, C each muscle's own range, A Omni-Compass's hand (the max or the tune-down). On the harness the
+line names k, Δ and θ and says the three settings are computed only on the live model; with Omni-Compass off it says nothing is
+requested and every setting is native's own. The counts are the page's own model (class S): the model's plant refuses nothing, so
+every cut is the muscle's own range, never a refused write.
 
 ### 6.9 The deployment route and its bill
 
@@ -982,6 +1013,27 @@ connected, each monitor's own query (its feed in `docs/engine/monitors.json`, th
 governor's `/metrics` expose) is asked every 15 s, and each breaker shows what that system answers. It is read only: nothing is
 written to the operator's system from the page. The Prometheus must allow the page's address (its `--web.cors.origin` flag, or
 the page served behind the same address); a page opened inside another site's sandbox may be refused by the browser, and says so.
+
+**The wall beside Omni-Compass, in one command.** `deploy/wall` (its README) stands up Prometheus, Grafana with the Omni-Compass
+wall loaded as its home dashboard (`deploy/grafana/omni-compass-wall.json`), Alertmanager with the governor's alert rules,
+node_exporter and the governor's exporter: `cp .env.example .env`, set the Grafana password, `docker compose up -d`, then Grafana at
+`http://127.0.0.1:3000` and Prometheus at `http://127.0.0.1:9090`, the address to type here. Every port is bound to the machine
+itself, every image pinned; the stack reads and writes nothing.
+
+**The Metrics tab** prints the live model in Prometheus's text exposition format, as `GET /metrics` answers on a running system:
+the decisions, the heartbeat, the master switch, the dial, the active profile (`omni_profile_info{kind, fingerprint, engine}`),
+the plant's conditions, and for each arm (`arm="native"`, `"on_native"`, `"direct"`) the work served, failed and waited, the
+muscle-decisions past their line, the writes, the cuts to a muscle's range, the setting moves and this decision's actuation
+(`omni_actuation{arm, stage}`). Under it a table sets each beside the series a running system serves (the governor's exporter,
+the service's own `http_requests_total` and `http_request_duration_seconds`, node_exporter's `node_cpu_seconds_total`, Kepler's
+joules, OpenCost's hourly cost) and the PromQL the wall draws it with. Its names are the page's own model (class S); the output
+passes `promtool check metrics`.
+
+**The Commands tab** lists every control with the request a running system takes for it, its role and its note: the kill switch
+and the arm, Return to native, the dial, the heartbeat, each muscle on or left native (`POST /v1/muscle`, the governor's muscles),
+the mode (autopilot, watch, off), Restore factory profile, the Omni-Compass side (a start setting, `--own-replicas` for direct),
+the reads (`GET /v1/status`, `/v1/presses`, `/metrics`); the mechanism's knobs have none (an engine constant changed is another
+engine, never a press), nor have the plant's conditions and the view.
 
 ### 6.12 Every control: its backend, its effects, its limits
 
