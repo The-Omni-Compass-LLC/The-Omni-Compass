@@ -139,16 +139,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-24 05:16 | kwok-scale | success | [40065363140](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065363140) |
-| 2026-10-24 05:14 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 4 | failure | [40065409505](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065409505) |
-| 2026-10-24 05:14 | cpu-power | success | [40065372794](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065372794) |
-| 2026-10-24 05:14 | six x1 line orgs 7 runs 0+10 | failure | [40065405927](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065405927) |
-| 2026-10-24 05:14 | six x1 line orgs 6 runs 0+10 | failure | [40065402197](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065402197) |
-| 2026-10-24 05:14 | six x1 line orgs 3 runs 0+10 | failure | [40065391032](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065391032) |
-| 2026-10-24 05:14 | six x1 line orgs 5 runs 0+10 | failure | [40065398573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065398573) |
-| 2026-10-24 05:14 | six x1 line orgs 4 runs 0+10 | failure | [40065394859](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065394859) |
-| 2026-10-24 05:14 | six x1 line orgs 1 runs 0+10 | failure | [40065383949](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065383949) |
-| 2026-10-24 05:13 | six x1 line orgs 2 runs 0+10 | failure | [40065387573](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40065387573) |
+| 2026-10-24 07:37 | grid | failure | [40074856495](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40074856495) |
+| 2026-10-24 07:34 | redis | success | [40068587953](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40068587953) |
+| 2026-10-24 07:23 | cloud-check google | failure | [40073897695](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40073897695) |
+| 2026-10-24 07:21 | benchmark-reps | success | [40069687931](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40069687931) |
+| 2026-10-24 07:05 | cloud-check amazon | failure | [40072742265](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40072742265) |
+| 2026-10-24 06:59 | robustness | success | [40069681296](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40069681296) |
+| 2026-10-24 06:50 | citylearn | success | [40068602268](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40068602268) |
+| 2026-10-24 06:36 | orchestrator push room=busy | success | [40068971496](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40068971496) |
+| 2026-10-24 06:26 | raw-sweep | success | [40070220670](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40070220670) |
+| 2026-10-24 06:26 | cloud-check all | failure | [40070111006](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40070111006) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
