@@ -77,8 +77,9 @@ def wiring(m: dict) -> str:
 # a series whose good side is high (the master switch ON, the error budget left) reads the other way
 LIGHT = {"feed2": (0.2, False), "feed3": (0.75, False), "opsCandle": (200.0, False), "orchCv": (1.0, False), "ruStrip": (1.0, False),
          "immCv": (1.0, False), "cStrip": (0.95, False), "band": (0.95, False), "masterCv": (1.0, True), "tSlo": (0.999, True), "tBurn": (0.1, True)}
-LIGHT_WORDS = (" Its light on the live engine: green, working inside its lines; yellow, heading for its line (within 3% of it, or its"
-               " slope crossing it within three readings), or EVEN on a record; red, an alert, over its line or a LOSS row.")
+LIGHT_WORDS = (" Its light on the live engine, a signal standing as a traffic signal does, red on top, yellow in the middle, green at the"
+               " bottom: red, an alert, over its line or a LOSS row; yellow, heading for its line (within 3% of it, or its slope crossing"
+               " it within three readings), or EVEN on a record; green, working inside its lines.")
 
 
 def thresholds(mid: str) -> dict:

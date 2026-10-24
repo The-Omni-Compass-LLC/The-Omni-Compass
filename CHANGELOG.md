@@ -37,8 +37,9 @@
   runs and through the core's Monte Carlo, each with its digest beside the Python's where the Python has run the base; OFF, the
   page's standing mode, its records played, written under the switch in plain words.
 - **The lights as a traffic signal** (the founder's order: "underneath the monitor's number on the left side ... the green, yellow,
-  red vertical stop sign order"): on every monitor's badge and every wall tile the three lamps stand under the number, green on top,
-  yellow in the middle, red at the bottom as an octagon; the signal opens the light's reason like its button.
+  red vertical stop sign order"): on every monitor's badge and every wall tile the three lamps stand under the number as a traffic
+  signal stands: red on top as an octagon, yellow in the middle, green at the bottom (the founder's correction of the same night: "The
+  red is on the top, the green is on the bottom"); the signal opens the light's reason like its button.
 
 - **The switchboard** (the founder's words: "knobs, buttons that allow you to switch amongst all the different organisms ... direct,
   native, Omni on native ... 1, 10, 100 ... A, B, and C runs ... 5 seconds ... 45 ... 120 seconds in the heartbeat"): one row of

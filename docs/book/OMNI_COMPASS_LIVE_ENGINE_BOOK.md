@@ -628,7 +628,7 @@ a monitor on screen now.
 **The light on every monitor: green, yellow, red** (the founder's orders of 23 and 24 October: "Every monitor is to have a red and
 green button as red is alert ... green has got to be good"; "they're supposed to be a yellow too. Yellow would mean it's even").
 Each tile and each monitor carries its light as a signal under its number, on the left, standing like a traffic signal (the
-founder's order of 24 October): green on top, yellow in the middle, red at the bottom, shaped as an octagon like a stop sign; one lamp
+founder's orders of 24 October): red on top, shaped as an octagon like a stop sign, yellow in the middle, green at the bottom; one lamp
 is lit, and on the page a button beside the number carries the light's words.
 **Green, working**: the gauge the monitor draws is inside its lines, or the monitor has no line to cross (a bill, a count of runs),
 and the button says which. **Yellow**: heading for its line (within 3% of it, or its own slope over the last readings, carried
@@ -638,8 +638,8 @@ carries three lights in one button: native's and Omni-Compass's, each read from 
 reading now, Omni-Compass against native by the key (GAIN green, EVEN yellow, LOSS red), each by whether the gauge helps or hurts the
 muscle and the organism, never by its sign: fewer muscles over their line, fewer pods waiting, a faster 95th percentile beyond 2% is
 GAIN. So the moment one side turns a colour the other does not is seen as it happens; a live light compares that moment, and the
-judged readings stay in the record's tables. On the wall the signal stands under each tile's number, green round, yellow a diamond
-and red an octagon, the lit one moving with the monitor's reading; a click on the signal under a monitor's number on the page opens
+judged readings stay in the record's tables. On the wall the signal stands under each tile's number, red an octagon on top, yellow a diamond
+and green round at the bottom, the lit one moving with the monitor's reading; a click on the signal under a monitor's number on the page opens
 the same reason as its button. Click the button for each side's reason; a red or yellow one
 offers the way back to the factory tune, because a light the knobs turned is a light the factory tune puts back.
 
@@ -2346,7 +2346,7 @@ reported to its own maintainers.
 
 
 
-This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-24 01:55 UTC on omni-v18 (digest 22486290b19349eb) from commit b37df99e06d7.
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-24 04:34 UTC on omni-v18 (digest 22486290b19349eb) from commit e3fdce21e807.
 
 
 Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
