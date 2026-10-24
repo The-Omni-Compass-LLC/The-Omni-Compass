@@ -61,7 +61,10 @@ class KeyShape(unittest.TestCase):
                  json.loads(whole)["private_key"]: "private key alone",
                  SECRET[:600]: "encoded string",
                  "ya29." + "a0AfB_xyZ-9q." * 45: "token",
-                 "omni-compass-github@omni-compass-123456.iam.gserviceaccount.com": "account's address"}
+                 "omni-compass-github@omni-compass-123456.iam.gserviceaccount.com": "account's address",
+                 "GCP_CREDENTIALS = " + whole: "18 characters stand before its first {",
+                 "Created key of type json for\n" + SECRET[:300] + " (see https://console.cloud.google.com)":
+                     "2 lines, with spaces, a web address in it"}
         for raw, words in cases.items():
             with self.subTest(words=words):
                 bad = cloud_key_check.problems(raw)[0]
@@ -97,6 +100,9 @@ class AzureKeyShape(unittest.TestCase):
                  "0b1c2d3e-1111-2222-3333-444455556666": "one identifier alone",
                  whole[whole.index('"clientSecret"'):]: "piece from inside the block",
                  whole[:150]: "cut short",
+                 "'" + whole + "'": "1 character stands before its first {",
+                 "Ab9+" * 21 + "Xy==": "storage account's access key",
+                 "see https://portal.azure.com for the key " + AZ_SECRET: "1 line, with spaces, a web address in it",
                  whole.replace('",', '"', 1): "not whole JSON",
                  json.dumps({"appId": "0b1c2d3e-1111-2222-3333-444455556666", "password": AZ_SECRET,
                              "tenant": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"}): "fields missing: clientId, clientSecret, subscriptionId, tenantId",

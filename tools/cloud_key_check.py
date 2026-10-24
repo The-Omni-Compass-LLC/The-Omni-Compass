@@ -31,6 +31,8 @@ def what_it_holds(raw: str) -> str:
     """What a stored text that is not a key file looks like, read from its shape alone (never a character of it), so the
     person storing it again knows what went wrong: a piece from inside the file, the private key alone, an encoded string,
     an account name, or too little to be any of these."""
+    if before_brace(raw):
+        return before_brace(raw)
     if any(f'"{f}"' in raw for f in FIELDS):
         return "it holds a piece from inside the file (its first line, the {, is missing): the copy started part of the way in"
     if "-----BEGIN PRIVATE KEY-----" in raw or "PRIVATE KEY-----" in raw:
@@ -42,11 +44,32 @@ def what_it_holds(raw: str) -> str:
     if len(raw) >= 100 and all(c.isalnum() or c in "-_.~+/=\n\r" for c in raw):
         return ("it looks like a token or a web-safe encoded string (an access token, for one, which expires within the "
                 "hour), not the key file")
-    return "it is not the key file"
+    return "it is not the key file" + shape_words(raw)
 
 
 def n_lines(raw: str) -> int:
     return raw.count("\n") + 1
+
+
+def before_brace(raw: str) -> str:
+    """Words for a text that holds a { but not at its start: something was pasted in front of the key (a name, a quote, a
+    word), counted, never shown. Empty when there is no { or it stands first."""
+    i = raw.find("{")
+    if i <= 0:
+        return ""
+    return (f"{i} character{'s stand' if i != 1 else ' stands'} before its first {{ (a name, a quotation mark or a word "
+            "pasted with it): store only from { to }")
+
+
+def shape_words(raw: str) -> str:
+    """The stored text's outline, so the person can tell which text it was: its lines, and whether it holds spaces, a web
+    address or quotation marks. Never a character of it."""
+    n = n_lines(raw)
+    bits = [f"{n} line{'s' if n != 1 else ''}"]
+    marks = [w for w, hit in (("spaces", " " in raw), ("a web address", "://" in raw), ("quotation marks", '"' in raw))
+             if hit]
+    bits.append(("with " + ", ".join(marks) + " in it") if marks else "no spaces")
+    return "; it is " + ", ".join(bits)
 
 
 def problems(raw: str | None, project: str = "") -> list[str]:
@@ -93,9 +116,15 @@ def _guid(s: str) -> bool:
 
 def azure_what_it_holds(raw: str) -> str:
     """What a stored text that is not the JSON block looks like, from its shape alone (never a character of it)."""
+    if before_brace(raw):
+        return before_brace(raw)
     if any(f'"{f}"' in raw for f in AZURE_FIELDS):
         return "it holds a piece from inside the block (its first line, the {, is missing): the copy started part of the way in"
     one = raw.strip()
+    if len(one) == 88 and one.endswith("==") and all(c.isalnum() or c in "+/=" for c in one):
+        return ("it looks like a storage account's access key (88 characters, encoded: the size Azure gives every storage "
+                "and database account key, from a storage account's Access keys page), not the block: such a key opens one "
+                "storage account, never the subscription")
     if _guid(one):
         return ("it holds one identifier alone (an application, tenant or subscription ID, a 36-character GUID), not the "
                 "whole block")
@@ -104,7 +133,7 @@ def azure_what_it_holds(raw: str) -> str:
                 "the line in section 3 prints, the secret one of its fields")
     if "=" in one and ";" in one:
         return "it looks like a connection string, not the block"
-    return "it is not the block"
+    return "it is not the block" + shape_words(one)
 
 
 def azure_problems(raw: str | None) -> list[str]:
