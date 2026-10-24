@@ -199,24 +199,15 @@ def run(setting, seed, arm):
 
 
 from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
+from tools.readings import relative_runs_reading  # noqa: E402  (the one key, written once)
 GAUGES = {"machines": ("spent", lambda t: t["nodes"] + t["boot"] + t["parked"]), "pending": ("down", lambda t: t["pending"]),
           "ms": ("down", lambda t: t["ms"]), "over": ("down", lambda t: 1.0 if t["ms"] > SLO_MS else 0.0), "kw": ("spent", lambda t: t["kw"])}
 
 
 def reading(runs, aim):
-    """The three-run rule as the tables read it (tools/confirm_abc.py verdict): clear runs pointing different ways disagree,
-    whatever the others read; then any run whose interval holds zero makes the row EVEN; else the word by the gauge's aim."""
-    if not runs:
-        return "EVEN"
-    clear = [r for r in runs if r["lo"] > 0 or r["hi"] < 0]
-    if len({r["change"] > 0 for r in clear}) > 1:
-        return "the runs disagree"
-    if len(clear) < len(runs):
-        return "EVEN"
-    up = clear[0]["change"] > 0
-    if aim == "spent":
-        return "power given" if up else "GAIN"
-    return "GAIN" if (up if aim == "up" else not up) else "LOSS"
+    """The three-run rule, the one key's (tools/readings.py, the founder's order of 24 October 2026: a change of 0.5% or more,
+    the mean of the runs, is a change, read by the gauge's aim; EVEN only under 0.5%)."""
+    return relative_runs_reading(runs, aim)
 
 
 def main(out):

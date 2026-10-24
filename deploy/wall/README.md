@@ -45,6 +45,15 @@ orphaned, hammering). No alert presses a governor button by itself: the engine's
 setting back after a crash; the watchdog runs the restore commands), and the reset and the kill switch stay a person's press.
 To page a person, add a receiver in `alertmanager.yml` (a webhook, Slack, Teams, PagerDuty).
 
+## Grafana Alloy in the collector's place
+
+`docker compose --profile alloy up -d` adds **Grafana Alloy** (`config.alloy`): an OpenTelemetry Collector distribution with
+Prometheus pipelines that collects the same targets every 5 s and writes them into the wall's Prometheus (its UI at
+http://127.0.0.1:12345). Teams that already run Alloy point it at the same endpoints: the governor's exporter is a standard
+`/metrics`. Alloy is a collector: it gathers metrics, logs, traces and profiles and forwards them; it decides nothing and writes
+no setting. It sits beside Omni-Compass, never in its place: Omni-Compass is the governor that acts on the system, Alloy one of
+the ways its readings travel to the wall.
+
 ## The live engine page on the same Prometheus
 
 The live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) reads its own model by default. On its main control panel,

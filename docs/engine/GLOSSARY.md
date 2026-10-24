@@ -119,7 +119,7 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 
 - **the verdict.** Omni-Compass moves a knob only where it measures that the muscle loses nothing by it. The trial step is read as a report reads a row: the 95% interval of its change in cost, on the logarithm of each piece of work's cost. Wholly above zero is a LOSS: refused and undone. A GAIN or an EVEN step is kept only within the 2% allowance. The 2% verdict is the engine's trigger, not a stamp on a report. *Source: `omnicompass/verdict.py`; `CLAUDE.md`.*
 - **the give-back trial.** Every give-back is tried in its own paired trial, while the service is calm: the muscle with and without it, under the same load (the knob at native first, the reference, then one step past the deepest step already allowed), and undone if the muscle loses by it. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`; `omnicompass/verdict.py`.*
-- **the toy gate.** Every change to the engine or a live controller runs first in our own models (class S), against the engine that stands, on the same seeds, before any real run is started. A change goes on to real runs only where it reads no LOSS there and shows promise; a LOSS there is root-caused and fixed in the model. *Source: `tools/toy_gate.py`.*
+- **the model gate.** Every change to the engine or a live controller runs first in our own models (class S), against the engine that stands, on the same seeds, before any real run is started. A change goes on to real runs only where it reads no LOSS there and shows promise; a LOSS there is root-caused and fixed in the model. *Source: `tools/toy_gate.py`.*
 - **the fingerprint and its digest.** Every engine version fingerprinted file by file: one SHA-256 per file and one over the sorted list, its digest. A result belongs to a version only if the commit it ran on carries exactly that version's bytes; no result is read across versions. *Source: `tools/omni_version.py`.*
 - **the seal.** Every law that exists in Python and in C++, locked together: results/SEAL.json records each twin's Python and C++ files and the parity test that proved them equal, so a change to either side breaks the seal until its parity test passes again. *Source: `tools/seal.py`.*
 - **the C++ twin.** The engine's laws written again in C++ (the core, the governor, the compass law, the verdict), each held equal to its Python by a parity test under the seal; the Python's runs fed through the C++ engine give the same digest. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`; `tools/seal.py`.*
@@ -168,6 +168,12 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 - **AWAITING.** A dark light, never green: the run that fills this monitor has not landed yet, and the light stays dark until it does. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **native's colour.** Orange (#ff8a1f, the page's --steel): the word native and every line, bar, lane, tile and number that belongs to native's side wear it, the founder's order of 24 October. Red is only a LOSS and the alarm. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`; `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`.*
 - **live tuning bench.** The interface that operates the engine's controls and displays their effects through the connected backend: the live engine's main control panel. *Source: `docs/FACTORY_PROFILE.md`.*
+- **observer.** A tool that stores readings and draws them and raises an alert when a line is crossed; a person decides. Prometheus, Grafana, Datadog and the like. Omni-Compass's exporter serves its readings to any of them. *Source: `docs/FACTORY_PROFILE.md`.*
+- **collector.** A tool that gathers metrics, logs, traces and profiles and forwards them, deciding nothing: Grafana Alloy, the OpenTelemetry Collector, node_exporter, Kepler. *Source: `docs/FACTORY_PROFILE.md`.*
+- **console.** One screen to deploy, scale, restart and set rules across clusters, where a person decides: Rancher, Portainer, Lens, the OpenShift console. The rules set there are the native Omni-Compass sits on top of. *Source: `docs/FACTORY_PROFILE.md`.*
+- **automatic optimizer.** A product that watches one layer and changes its settings itself, mostly for a cloud bill: the comparable, benchmarked as native with it and then with Omni-Compass on top. *Source: `docs/FACTORY_PROFILE.md`.*
+- **supervisory governor.** What Omni-Compass is: it reads the whole body every beat, decides with one law across every muscle, writes through a two-way plug, reads each write back, audits, hands back gradually and stops at the kill switch, on top of every native controller. *Source: `docs/FACTORY_PROFILE.md`.*
+- **the dashboards.** The page's section 1c: the live engine in nine forms an operations team reads (a board of panels, a host map, a graph, an event stream, a cluster console, a one-line diagram, a wall of numbers, the cost by body part, and Omni-Compass's own two-way pipeline), by muscle, body part or the whole organism. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **the contract, this decision.** The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the settings requested u[req](k), commanded u[cmd](k) = Π[C](u[req](k)) and acknowledged u[ack](k) = R(u[cmd](k)), computed on the live model. *Source: `docs/FACTORY_PROFILE.md`; `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **Metrics (Prometheus).** The control panel's tab that prints the live model in Prometheus's text exposition format, with the series a running system serves beside each one and the PromQL the Grafana wall draws it with. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **the monitor wall stack.** deploy/wall: Prometheus, Grafana with the Omni-Compass wall loaded, Alertmanager with the governor's alert rules, node_exporter and the governor's exporter, in one command; it reads and writes nothing. *Source: `deploy/wall/README.md`.*
@@ -1943,6 +1949,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | iii | #s-bottom | The bottom line: is Omni-Compass a benefit? One light and one number for each way to run it, against native |
 | 1a | #s-wall | The monitor wall: every monitor, numbered 1 upward in its order of appearance, read left to right |
 | 1b | #s-health | The control panel and the kill switch: one switch for the whole organism, the Python's runs, the three manuals |
+| 1c | #s-dash | The dashboards: the live engine in every form an operations team reads a system |
 | 2a | #s-status | The status board: the tiles, the alarms and the watch items |
 | 2b | #s-feed | The golden signals, the event log and the live metrics |
 | 2c | #s-loss | Every LOSS row: its cause and the knob that answers it |
@@ -1985,6 +1992,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | actuation feedback | term | 1a (#s-wall) |
 | alert minute | term | 4j (#s-problem); 4k (#s-read) |
 | at its limit on native | term | 3a (#s-engines); 3m (#s-stacks); 4c (#s-fleet); 4k (#s-read) |
+| automatic optimizer | term | 1c (#s-dash) |
 | the band | term | 2b (#s-feed); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3o (#s-lab); 4a (#s-whole); 4g (#s-math); 4i (#s-self); 4j (#s-problem) |
 | the benefit board | term | 2d (#s-board); 3b (#s-desk); 4j (#s-problem) |
 | the bill of a route | term | 2d (#s-board); 3h (#s-cloud); 4a (#s-whole); 4g (#s-math); 4j (#s-problem) |
@@ -1994,26 +2002,29 @@ Every term, organism and arm with the sections of the page that print it, by the
 | calm | term | 1a (#s-wall); 2b (#s-feed); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3o (#s-lab); 4g (#s-math); 4j (#s-problem) |
 | the centre | term | 3a (#s-engines); 3e (#s-plane); 3o (#s-lab); 4g (#s-math) |
 | the climb | term | 4c (#s-fleet); 4g (#s-math) |
-| the cloud as the wire | term | iii (#s-bottom); 2d (#s-board); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
+| the cloud as the wire | term | iii (#s-bottom); 1c (#s-dash); 2d (#s-board); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
+| collector | term | 1c (#s-dash) |
 | Commands | term | 1a (#s-wall); 4g (#s-math); 4j (#s-problem) |
 | the compass | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4d (#s-cpp); 4g (#s-math); 4i (#s-self); v (#s-disclose) |
 | the compass law | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3l (#s-live); 3n (#s-direct); 3p (#s-proof); 4d (#s-cpp); 4g (#s-math); 4i (#s-self); v (#s-disclose) |
 | Compute / AI / Cloud | organism | 3b (#s-desk); 4j (#s-problem) |
 | the conductor | term | 3b (#s-desk) |
+| console | term | 1a (#s-wall); 1c (#s-dash); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3o (#s-lab); 4c (#s-fleet); 4h (#s-fail) |
 | the conveyance | term | 3c (#s-dial); 3h (#s-cloud); 3p (#s-proof); 4g (#s-math); v (#s-disclose) |
 | the cover | term | 4g (#s-math) |
 | cruise | term | 4g (#s-math) |
 | the cushion | term | 3a (#s-engines); 3d (#s-decision); 3j (#s-ops); 4i (#s-self); 4j (#s-problem) |
+| the dashboards | term | 1c (#s-dash) |
 | the dial | term | 1a (#s-wall); 2b (#s-feed); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3j (#s-ops) |
-| direct's violet | term | 1a (#s-wall) |
+| direct's violet | term | 1a (#s-wall); 1c (#s-dash) |
 | Distribution / Specialized | organism | 4j (#s-problem) |
 | do no harm | term | 3b (#s-desk); 4j (#s-problem); v (#s-disclose) |
 | the edge | term | 2d (#s-board); 3a (#s-engines) |
 | Energy / Facility / Industrial | organism | 3b (#s-desk); 4j (#s-problem) |
 | the engine that stands | term | 3g (#s-verdict); 3i (#s-orch); 3m (#s-stacks); 3p (#s-proof); 4a (#s-whole); 4c (#s-fleet); 4e (#s-github); v (#s-disclose) |
 | EVEN | term | iii (#s-bottom); 2c (#s-loss); 2d (#s-board); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3o (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
-| evidence classes P, L, S | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
-| the factory tune | term | 1a (#s-wall); 3b (#s-desk); 4b (#s-scn); v (#s-disclose) |
+| evidence classes P, L, S | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
+| the factory tune | term | 1a (#s-wall); 3b (#s-desk); 3m (#s-stacks); 4b (#s-scn); v (#s-disclose) |
 | fail up | term | 3e (#s-plane); 4g (#s-math) |
 | family | term | 2d (#s-board); 4c (#s-fleet) |
 | the fast checks | term | 3c (#s-dial); 3j (#s-ops); 4j (#s-problem) |
@@ -2027,39 +2038,41 @@ Every term, organism and arm with the sections of the page that print it, by the
 | h | term | 3f (#s-brain) |
 | harness | term | 1a (#s-wall); 3a (#s-engines); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3m (#s-stacks); 3o (#s-lab); 3p (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
 | health | term | 1a (#s-wall); 3f (#s-brain); 3j (#s-ops); 4a (#s-whole) |
-| the heartbeat | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3j (#s-ops); 3k (#s-runs); 4g (#s-math) |
+| the heartbeat | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3j (#s-ops); 3k (#s-runs); 4g (#s-math) |
 | the heat debt | term | 3a (#s-engines); 4g (#s-math) |
 | the immune system | term | 3a (#s-engines); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
 | the jump generator | term | 1b (#s-health); 3p (#s-proof); 4d (#s-cpp) |
 | k[d] | term | 4g (#s-math) |
 | k[p] | term | 4g (#s-math) |
-| the key | term | iii (#s-bottom); 2b (#s-feed); 3c (#s-dial); 3h (#s-cloud); 3j (#s-ops); 3m (#s-stacks); 3n (#s-direct); 4a (#s-whole); 4b (#s-scn); 4j (#s-problem); 4k (#s-read) |
-| the kill switch | term | 1a (#s-wall); 1b (#s-health); 2b (#s-feed); 2d (#s-board); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3n (#s-direct); 4f (#s-master); 4g (#s-math) |
+| the key | term | iii (#s-bottom); 1c (#s-dash); 2b (#s-feed); 3c (#s-dial); 3h (#s-cloud); 3j (#s-ops); 3m (#s-stacks); 3n (#s-direct); 4a (#s-whole); 4b (#s-scn); 4j (#s-problem); 4k (#s-read) |
+| the kill switch | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2d (#s-board); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3n (#s-direct); 4f (#s-master); 4g (#s-math) |
 | knob | term | 1a (#s-wall); 1b (#s-health); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3g (#s-verdict); 3j (#s-ops); 3m (#s-stacks); 3o (#s-lab); 3p (#s-proof); 4a (#s-whole); 4c (#s-fleet); 4i (#s-self); 4k (#s-read); 4l (#s-monlist) |
-| the lease | term | 1b (#s-health); 3a (#s-engines); 3e (#s-plane); 3j (#s-ops); 4c (#s-fleet); 4g (#s-math) |
+| the lease | term | 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3e (#s-plane); 3j (#s-ops); 4c (#s-fleet); 4g (#s-math) |
 | lift-off | term | 3f (#s-brain); 4g (#s-math) |
 | the line | term | 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 3p (#s-proof); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist) |
 | The live engine's organism: sixty muscles, twelve in each of five body parts | organism | 3a (#s-engines); 3b (#s-desk); 3o (#s-lab); 4g (#s-math) |
 | LOSS | term | iii (#s-bottom); 1b (#s-health); 2a (#s-status); 2c (#s-loss); 2d (#s-board); 3b (#s-desk); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the max | term | 1a (#s-wall); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4c (#s-fleet); 4g (#s-math) |
 | the mechanism panel | term | 1a (#s-wall) |
-| Metrics (Prometheus) | term | 2b (#s-feed); 3c (#s-dial); 4e (#s-github); 4l (#s-monlist) |
-| modelled | term | 2b (#s-feed); 3a (#s-engines); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3i (#s-orch); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
+| Metrics (Prometheus) | term | 1c (#s-dash); 2b (#s-feed); 3c (#s-dial); 4e (#s-github); 4l (#s-monlist) |
+| the model gate | term | 3g (#s-verdict) |
+| modelled | term | 2b (#s-feed); 3a (#s-engines); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the monitor wall | term | 1a (#s-wall); 1b (#s-health); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3h (#s-cloud); 3j (#s-ops); 3m (#s-stacks); 3p (#s-proof); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4e (#s-github); 4f (#s-master); 4g (#s-math); 4l (#s-monlist); v (#s-disclose) |
 | Monte Carlo | term | 1b (#s-health); 3p (#s-proof) |
-| muscle | term | 1a (#s-wall); 1b (#s-health); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3i (#s-orch); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
-| native | term, arm | iii (#s-bottom); 1a (#s-wall); 1b (#s-health); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4h (#s-fail); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
-| native's colour | term | 1b (#s-health); 2b (#s-feed); 3a (#s-engines); 3e (#s-plane); 3h (#s-cloud); 4f (#s-master); 4k (#s-read) |
+| muscle | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3i (#s-orch); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
+| native | term, arm | iii (#s-bottom); 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4h (#s-fail); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
+| native's colour | term | 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 3a (#s-engines); 3e (#s-plane); 3h (#s-cloud); 4f (#s-master); 4k (#s-read) |
 | the nervous system | term | 3a (#s-engines); 3d (#s-decision); 3f (#s-brain); 3l (#s-live); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
+| observer | term | 1c (#s-dash) |
 | Omni index | term | 2d (#s-board); 4c (#s-fleet); 4k (#s-read) |
-| Omni-Compass | term | iii (#s-bottom); 1a (#s-wall); 1b (#s-health); 2a (#s-status); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4h (#s-fail); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
+| Omni-Compass | term | iii (#s-bottom); 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2a (#s-status); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 3o (#s-lab); 3p (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4h (#s-fail); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
 | Omni-Compass direct | term, arm | 1a (#s-wall); 1b (#s-health); 3n (#s-direct); 4a (#s-whole); 4b (#s-scn); 4k (#s-read) |
-| Omni-Compass on native | term, arm | 1a (#s-wall); 1b (#s-health); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
-| Omni-Compass's blue | term | 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 4a (#s-whole); 4e (#s-github); 4k (#s-read) |
+| Omni-Compass on native | term, arm | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-direct); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
+| Omni-Compass's blue | term | 1c (#s-dash); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 4a (#s-whole); 4e (#s-github); 4k (#s-read) |
 | one pedal | term | 3j (#s-ops); 4i (#s-self) |
 | the orchestra | term | 3i (#s-orch); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet) |
 | The orchestra, every governor's muscle once | organism | 3i (#s-orch); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet) |
-| the organism | term | 1b (#s-health); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3m (#s-stacks); 3n (#s-direct); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4j (#s-problem); v (#s-disclose) |
+| the organism | term | 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3m (#s-stacks); 3n (#s-direct); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4j (#s-problem); v (#s-disclose) |
 | the organs and their grants (θ) | term | 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3f (#s-brain); 3l (#s-live); 3p (#s-proof); 4g (#s-math) |
 | Physics / Robotics / Autonomous | organism | 3b (#s-desk); 4j (#s-problem) |
 | piece 1: the state (E, U, I[U], the basin) | term | 1a (#s-wall); 3a (#s-engines); 3f (#s-brain); 3p (#s-proof); 4g (#s-math) |
@@ -2084,6 +2097,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the stack | term | 4b (#s-scn); 4c (#s-fleet) |
 | STEADY | term | iii (#s-bottom); 1a (#s-wall) |
 | the stress-test model | term | 1a (#s-wall); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3o (#s-lab); 4g (#s-math) |
+| supervisory governor | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3o (#s-lab); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
 | the switchboard | term | 1b (#s-health) |
 | tanh | term | 4g (#s-math) |
 | template | term | 4c (#s-fleet) |
@@ -2091,14 +2105,13 @@ Every term, organism and arm with the sections of the page that print it, by the
 | three runs A, B and C | term | iii (#s-bottom); 2d (#s-board); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3i (#s-orch); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4h (#s-fail); 4k (#s-read) |
 | THRIVING | term | iii (#s-bottom); 1a (#s-wall) |
 | the tower | term | 1b (#s-health); 4b (#s-scn); 4c (#s-fleet) |
-| the toy gate | term | 3g (#s-verdict) |
 | the traffic signal | term | iii (#s-bottom); 1a (#s-wall) |
 | the tune-down | term | 1a (#s-wall); 3b (#s-desk); 3d (#s-decision); 3h (#s-cloud); 3l (#s-live); 4a (#s-whole); 4d (#s-cpp); 4g (#s-math); v (#s-disclose) |
 | the twin | term | 3a (#s-engines); 4g (#s-math) |
 | the two antagonist forces | term | 3a (#s-engines); 3d (#s-decision) |
-| the two-way plug | term | 3a (#s-engines); 3d (#s-decision); 3j (#s-ops); 3l (#s-live); 3p (#s-proof); 4a (#s-whole); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
+| the two-way plug | term | 1c (#s-dash); 3a (#s-engines); 3d (#s-decision); 3j (#s-ops); 3l (#s-live); 3p (#s-proof); 4a (#s-whole); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
 | the verdict | term | iii (#s-bottom); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3g (#s-verdict); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3p (#s-proof); 4d (#s-cpp); 4g (#s-math); v (#s-disclose) |
-| The whole organism, every way it is bought | organism | 1b (#s-health); 2d (#s-board); 3a (#s-engines); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
+| The whole organism, every way it is bought | organism | 1b (#s-health); 1c (#s-dash); 2d (#s-board); 3a (#s-engines); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | The whole tower, every muscle once | organism | 4b (#s-scn); 4c (#s-fleet) |
 | work waiting in line | term | 4c (#s-fleet) |
 | the yardstick | term | 3n (#s-direct) |

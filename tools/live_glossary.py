@@ -741,11 +741,11 @@ TERMS = [
       [(PAGE_F, "every give-back is tried in its own paired trial (the muscle with and without it, under the same load) and undone if the muscle loses by it"),
        ("omnicompass/verdict.py", "then at one step past the deepest step already")],
       aka=["give-back trial", "give-back", "give-backs"]),
-    T("the toy gate", P, "Every change to the engine or a live controller runs first in our own models (class S), against the "
+    T("the model gate", P, "Every change to the engine or a live controller runs first in our own models (class S), against the "
       "engine that stands, on the same seeds, before any real run is started. A change goes on to real runs only where it reads "
       "no LOSS there and shows promise; a LOSS there is root-caused and fixed in the model.",
       [("tools/toy_gate.py", "against the engine that stands, on the same seeds, before any real run is started")],
-      aka=["toy gate"]),
+      aka=["model gate"]),
     T("the fingerprint and its digest", P, "Every engine version fingerprinted file by file: one SHA-256 per file and one over the "
       "sorted list, its digest. A result belongs to a version only if the commit it ran on carries "
       "exactly that version's bytes; no result is read across versions.",
@@ -952,6 +952,26 @@ TERMS = [
     T("Return to native", D, "The control that hands governance back and restores the recorded native settings, as the adapter "
       "supports.", [(FP, "| Return to native | Hand governance back and restore the recorded native settings, as the adapter supports. |")],
       aka=["Return to native"]),
+    T("observer", W, "A tool that stores readings and draws them and raises an alert when a line is crossed; a person decides. "
+      "Prometheus, Grafana, Datadog and the like. Omni-Compass's exporter serves its readings to any of them.",
+      [(FP, "| Observer | stores readings and draws them; raises an alert when a line is crossed |")], aka=["observer", "monitoring"]),
+    T("collector", W, "A tool that gathers metrics, logs, traces and profiles and forwards them, deciding nothing: Grafana Alloy, "
+      "the OpenTelemetry Collector, node_exporter, Kepler.", [(FP, "| Collector | gathers metrics, logs, traces and profiles and forwards them |")],
+      aka=["collector", "Alloy"]),
+    T("console", W, "One screen to deploy, scale, restart and set rules across clusters, where a person decides: Rancher, Portainer, "
+      "Lens, the OpenShift console. The rules set there are the native Omni-Compass sits on top of.",
+      [(FP, "| Console | one screen to deploy, scale, restart and set rules across clusters |")], aka=["console", "cluster manager"]),
+    T("automatic optimizer", W, "A product that watches one layer and changes its settings itself, mostly for a cloud bill: the "
+      "comparable, benchmarked as native with it and then with Omni-Compass on top.",
+      [(FP, "| Automatic optimizer | watches a layer and changes its settings itself, mostly for a cloud bill |")], aka=["optimizer"]),
+    T("supervisory governor", W, "What Omni-Compass is: it reads the whole body every beat, decides with one law across every muscle, "
+      "writes through a two-way plug, reads each write back, audits, hands back gradually and stops at the kill switch, on top of "
+      "every native controller.", [(FP, "| Supervisory governor | reads the whole body every beat, decides with one law across every muscle")],
+      aka=["supervisory governor", "governor"]),
+    T("the dashboards", W, "The page's section 1c: the live engine in nine forms an operations team reads (a board of panels, a host "
+      "map, a graph, an event stream, a cluster console, a one-line diagram, a wall of numbers, the cost by body part, and "
+      "Omni-Compass's own two-way pipeline), by muscle, body part or the whole organism.",
+      [(PAGE_F, "The dashboards: the live engine in every form an operations team reads a system")], aka=["dashboards", "host map"]),
     T("the contract, this decision", W, "The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the "
       "settings requested u[req](k), commanded u[cmd](k) = Π[C](u[req](k)) and acknowledged u[ack](k) = R(u[cmd](k)), computed on the "
       "live model.", [(FP, "u[cmd](k) = Π[C](u[req](k))"), (PAGE_F, "the contract, this decision")], aka=["the contract"]),

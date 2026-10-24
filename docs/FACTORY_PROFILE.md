@@ -41,7 +41,7 @@ is verified, and no other profile is released before it.
 | Governing engine | The executable mathematical rules that turn observations and internal state into governing decisions. | `omnicompass/` (the compass law, the core, the nervous system, the verdict), `omni_controller/controller.py`, its C++ twin `cpp/src/governor.cpp` |
 | Native baseline | The system's documented configuration and behaviour with no Omni-Compass governing it: every muscle under its own native controller, as its vendor ships it. | the arm `native` in every benchmark; `realms/harness.py`, the plant and its native controller alone |
 | Factory profile | The complete, versioned set of Omni-Compass default settings shipped together. | `OMNI_V19.json` (the fingerprint), the controller's defaults, `realms/muscle_cards_v5.csv` |
-| Candidate profile | A proposed combination of settings under evaluation. | the live engine's "Try the candidate" (the best beat of a sweep); the toy gate's candidates (`tools/toy_gate.py`) |
+| Candidate profile | A proposed combination of settings under evaluation. | the live engine's "Try the candidate" (the best beat of a sweep); the model gate's candidates (`tools/toy_gate.py`) |
 | Active profile | The settings actually governing the current run. | the live engine's "active profile" line, with its fingerprint |
 | Custom profile | An identifiable configuration that differs from the released factory profile. | any knob turned on the bench; its fingerprint names it; its results are its own |
 | Live tuning bench | The interface that operates the engine's controls and displays their effects through the connected backend. | `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, the main control panel |
@@ -54,6 +54,17 @@ is verified, and no other profile is released before it.
 
 The physiological words are engineering analogies. Each points to concrete code, signals, actuators and checks, as the third column
 shows.
+
+### The tools around Omni-Compass, in plain words
+
+| The word | What it does | Who decides | Examples | Omni-Compass beside it |
+|---|---|---|---|---|
+| Observer | stores readings and draws them; raises an alert when a line is crossed | a person, after looking | Prometheus, Grafana, Datadog, New Relic, Dynatrace, Kibana, Splunk | beside it: its exporter serves Omni-Compass's readings; none of them moves a setting |
+| Collector | gathers metrics, logs, traces and profiles and forwards them | nobody: it carries | Grafana Alloy, the OpenTelemetry Collector, node_exporter, Kepler | beside it: one way the readings travel; Omni-Compass's own pipeline also writes and reads each write back |
+| Console | one screen to deploy, scale, restart and set rules across clusters | a person, by clicking or writing a rule | Rancher, Portainer, Lens, the OpenShift console | beside it: the rules set there are the native Omni-Compass sits on top of |
+| Native controller | keeps one muscle at the rule it was given | its own fixed rule, one muscle at a time | the Pod Autoscalers, the Cluster Autoscaler, Karpenter, KEDA, GPU firmware, thermostats | underneath, always running; Omni-Compass moves their settings inside each muscle's limits |
+| Automatic optimizer | watches a layer and changes its settings itself, mostly for a cloud bill | the product, within its layer | rightsizing and node optimizers for Kubernetes and the cloud | the comparable: benchmarked as native with it, then with Omni-Compass on top (`docs/THE_FIELD.md`) |
+| Supervisory governor | reads the whole body every beat, decides with one law across every muscle, writes through a two-way plug, reads each write back, audits, hands back gradually, stops at the kill switch | Omni-Compass's brain, on top of every native controller | Omni-Compass | — |
 
 ## 3. The mathematics: a fixed tune governing a changing system
 
@@ -114,7 +125,7 @@ its objective and its exact profile.
 The result is called **the best validated factory profile for the declared operating conditions**, which gives "optimal" an
 assessable meaning. Today the repository is at step 1 and step 2 for the next profile (the heartbeat sweep and the beat ladder,
 `results/toy_gate/HEARTBEAT_SWEEP.md`, `results/toy_gate/V17_LADDER.md`, class S); steps 3 to 8 come after the founder confirms the
-mechanisms. Every engine version already passes the toy gate (`tools/toy_gate.py`) and the three-run rule before its results stand.
+mechanisms. Every engine version already passes the model gate (`tools/toy_gate.py`) and the three-run rule before its results stand.
 
 ## 6. Carrying it into C++ and every other implementation
 

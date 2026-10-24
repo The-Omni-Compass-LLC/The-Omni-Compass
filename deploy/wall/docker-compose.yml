@@ -17,6 +17,8 @@ services:
       - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}
       # the live engine page may read this Prometheus from the browser ("your own system", Drive tab): only these origins
       - --web.cors.origin=${OMNI_PAGE_ORIGIN:-null|https?://(localhost|127\.0\.0\.1)(:[0-9]+)?}
+      # Grafana Alloy (the alloy profile) writes what it collects here
+      - --web.enable-remote-write-receiver
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./targets:/etc/prometheus/targets:ro
@@ -61,6 +63,18 @@ services:
     volumes:
       - ../../tools:/omni/tools:ro
       - ${OMNI_AUDIT_DIR:-/var/log/omni}:/audit:ro
+    restart: unless-stopped
+  alloy:
+    # optional (docker compose --profile alloy up -d): Grafana Alloy, an OpenTelemetry Collector distribution with Prometheus
+    # pipelines, collecting the same targets (config.alloy) and writing them into this Prometheus; it collects, it controls nothing
+    image: grafana/alloy:v1.4.2
+    profiles: [alloy]
+    command: [run, --server.http.listen-addr=0.0.0.0:12345, --storage.path=/var/lib/alloy/data, /etc/alloy/config.alloy]
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - ./targets:/etc/alloy/targets:ro
+    ports: ["127.0.0.1:12345:12345"]
+    depends_on: [prometheus]
     restart: unless-stopped
 volumes:
   prometheus-data: {}
