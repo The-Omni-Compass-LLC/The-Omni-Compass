@@ -159,6 +159,19 @@ def three_run_reading(rs, aim_, same_rel=1e-6):
     return f"**{word(fell, aim_)} {MEAN_OF_THREE}, beyond the noise in {sum(sig)} of {len(rs)}**"
 
 
+def relative_runs_reading(runs, aim):
+    """The three-run reading of runs that carry their change relative to native ("change", with its 95% interval "lo" and "hi",
+    both fractions of native), as the live page's exporters write them (docs/engine/export_scenarios.py,
+    export_controller_trace.py): the one rule above, its words without the tables' bold. aim: up, down, spent, per or shown."""
+    if aim == "shown":
+        return SHOWN
+    if not runs:
+        return EVEN
+    aim_ = {"up": HIGHER, "down": LOWER, "spent": SPENT, "per": WORK_PER}[aim]
+    rs = [{"native": 1.0, "diff": r["change"], "ci95": [r["lo"], r["hi"]]} for r in runs]
+    return three_run_reading(rs, aim_).replace("**", "")
+
+
 def reproduced_reading(changes, aim_):
     """The reading of a deterministic simulator's gauge whose three runs reproduce one another (CityLearn, pandapower, MuJoCo,
     the swarms): their changes, each in percent of native as a fraction, all one way. Under the floor (the mean under 0.5%) it

@@ -2,6 +2,35 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (late night): the live engine in the order the person watching needs it; a native switch on every monitor
+
+- **The page's order** (the founder's order of 24 October: "in its hierarchy of importance to the operator studying and watching
+  the systems ... first, second, third ... down to the most least important"): eight parts, as an operator's screens are laid out
+  (overview and alarms first, then the units side by side, then the detail and the diagnostics): 1 watch first (the control panel
+  and the kill switch, the status board, the wall, every LOSS row, the golden signals); 2 the three arms live and the knobs (Omni
+  direct, the organism live, the console, the heartbeat dial); 3 the measured effect; 4 the evidence by stack; 5 the brain; 6 the
+  failure modes; 7 the proof (the Python's runs, the C++ twin, the mathematics); 8 reference. Every section's anchor kept; every
+  citation of a section number on the page, in the registry, the manuals and the standing pages mapped to the new one; the 65
+  monitors renumbered in their new order of appearance (the golden signals 1 to 4, Omni direct's 5 to 8), the Grafana wall with
+  them. The Live Engine Manual re-sequenced to the page, ten parts and 33 chapters, every cross-reference mapped.
+- **The native switch** on every one of the 60 monitors that show Omni-Compass on top of native, and on the console: off, the live
+  model runs Omni direct's own rule (`omni_orchestrator/brain.py`, transposed to its sixty muscles, class S) with every native
+  controller on the Omni-Compass side switched off; a recorded run shows its Omni direct arm where one was run and says plainly
+  where none was. The key's paragraph that still said no third arm stood on the page now says where the three arms stand.
+- **Each muscle's own knobs** in its card: one unit down or up, to its floor, to its top, and let go; a hand holds the lever for 20
+  decisions, never past the muscle's own limits, then gives it back to the engine. The factory button takes every hand off.
+- **The one key everywhere a reading is made**: the page's two exporters (`export_scenarios.py`, `export_controller_trace.py`) read
+  through `tools/readings.py` instead of their own copy of the old rule; the GPU reader (`tools/gpu_reps.py`) reads 0.5% or more of
+  the base as a change, clear of the noise or not; every benchmark tool's page note and the three-arm writer say the rule from the
+  key; the two figures that draw the rule, their captions, the manuals' rule sections and the reading guide are drawn and written
+  to it; every toy-gate record read again from its own runs (`tools/toy_reread.py`). The realms runner's per-muscle labels are the
+  one reading not yet on it: next.
+- **The body map** (`docs/THE_BODY.md`) and **the landscape** (`docs/LANDSCAPE.md`): every part of the organism with the file that
+  is it, what Omni-Compass can and cannot help; every product in its category and the operator's screens closest to the live
+  engine, graded on seven measures written before the grades.
+- **C++ twins**: the edge, Student's t and Omni direct's brain and room rule, each proven equal to the Python to the last bit with
+  negative controls; 15 twins sealed.
+
 ## 2026-10-24 (night): every change of 0.5% or more is a change
 
 - **The key** (`tools/readings.py` `three_run_reading`, the founder's order of 24 October): the change is the mean of the three

@@ -49,10 +49,13 @@ follow it. Read the five ideas first, then go to the table you have in front of 
    4.303 at 3 pairs, 2.262 at 10, 2.093 at 20). The method that draws it covers the true difference in 95 of 100
    repetitions of the whole experiment; it is not a 95% chance about this one range.
    - If the whole range is on one side of zero, the difference is **clear of the noise** (a table's "significant"
-     column says "yes"); its word is GAIN, LOSS or power given, by the gauge's aim.
-   - If the range includes zero, the reading is **EVEN, no difference beyond the noise**: this test could not tell the
-     arms apart. It does not show that they are equal; how small a difference the test could have seen is the
-     interval's half-width, printed beside it.
+     column says "yes").
+   - If the range includes zero, the test could not tell the arms apart within its noise; how small a difference it
+     could have seen is the interval's half-width, printed beside it.
+   - The word is set by the size (the founder's order of 24 October 2026): a change of 0.5% or more either way is a
+     change and reads GAIN, LOSS or power given by the gauge's aim, with how firm it is beside it (in all three of our
+     runs when every run is clear of the noise the same way; by the mean of our three runs, with the count beyond the
+     noise, otherwise); a change under 0.5% reads **EVEN, under the floor**.
 4. **The word, not the sign.** Every judged reading is GAIN, EVEN or LOSS (the key above). For response time,
    failures and time over the line a fall is GAIN; for work and work per energy a rise is GAIN; for energy, machines
    and every other resource spent or held a fall is a cut, a GAIN, and a rise is **power given**, never a loss.

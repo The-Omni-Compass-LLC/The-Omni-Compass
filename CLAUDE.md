@@ -354,14 +354,21 @@ the founder overrides one in the conversation.
   Omni direct or native by itself. Everything else with Omni in it ... has Omni-Compass's mechanism of immune system and pathways
   ... that should have pushed signals when something is in its in a negative state, and adjusted ... like any human body"). A
   muscle whose own markers turn against native (pods waiting, a response over its line, failures) sends its signal to the muscle
-  that caused it, and that muscle backs off toward native: the next version's work, through the toy gate (first: the autoscaler
-  target never asks for more pods than the machines can place while pods wait, the pods-waiting LOSS's root cause).
+  that caused it, and that muscle backs off toward native: the next version's work, through the toy gate. Found the same night in
+  the governor's own audit (our models, class S): the pods that wait come from the fail-up, which drops the autoscaler's target
+  to its cover's floor at once (42% against the operator's 70%) and so asks for more pods than the machines can place; the floor
+  check then adds machines only after pods wait. The fix to build and gate: the machines first, the pods as the room appears. A
+  hold on the target while pods wait, tried first, changed nothing (the waiting does not come from that step).
 - **The live engine in the order a watcher needs it** (the founder's words of 24 October): the page, its contents and its
   instructions laid out by importance to the operator watching the system, first to last; on every monitor of Omni on native a
   switch that turns native off and leaves Omni direct on the organism with no other governor; live knobs, buttons and switches on
   every muscle that can scale out, up or down, each acting on the running code; buttons that run another set of the Python's 500
   runs (and the C++ harness's) from a new seed; and the page wired to a live governor through the control API
-  (`tools/omni_control.py`), so a system owner can hook a system up and watch and drive it from these monitors.
+  (`tools/omni_control.py`), so a system owner can hook a system up and watch and drive it from these monitors. Built the same
+  night: the page in eight parts by importance (1 watch first, 2 the three arms live and the knobs, 3 the measured effect, 4 the
+  evidence by stack, 5 the brain, 6 the failure modes, 7 the proof, 8 reference), the Live Engine Manual re-sequenced to it; the
+  native switch on all 60 monitors of Omni on native and on the console; each muscle's own knobs (a unit down or up, to its floor
+  or its top, let go); the run-again buttons were already there. The page driving a live governor through the control API is next.
 
 - **Google and Amazon kept in, wired as Azure is, shown as not yet run** (the founder's words, the same morning he had ordered
   them taken out: "You leave the Google and Amazon runs in everywhere and just show it not ran yet, because someday, some way,

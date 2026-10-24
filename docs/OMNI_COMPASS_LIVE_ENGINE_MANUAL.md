@@ -267,8 +267,8 @@ the compass left its center, and two machines recommended before native's autosc
 
 A tile in the alarms row turns red. It reads LOSS: the pod start wait, mean, +13% in one run. The engineer clicks it and lands
 on the three-run table it came from: run A of the Azure steady set, 33 paired repetitions, the interval −44 to +60 seconds,
-*no* in the significant column. The red is the run's own word for this run; in the three-run reading it is not yet a reading at
-all, because the interval includes zero. The row stays on the page, as every row does. The engineer opens the root-cause
+*no* in the significant column. The red is the run's own word for this run, a change past 0.5% whose interval holds zero; the
+three-run reading waits for B and C, and then reads the mean of the three. The row stays on the page, as every row does. The engineer opens the root-cause
 document the tile links to, `docs/POD_START_WAIT.md`, and reads that a pod's start on a shared host is the test machine's
 own unpacking of an image, the same on both sides at the same host load. Nothing to do tonight; the record is complete.
 
@@ -522,7 +522,7 @@ Where the two sides look the same, they are the same, and that is EVEN. Where Om
 muscle's line than native's amber one, that is the max at work: every muscle to its own limit, never past it, and the
 capacity it holds there is power given, shown beside the work and the speed it bought.
 
-![Flowchart: how a gauge's number becomes a word. The gauge's declared aim is read first: time waited, missed or failed, where a fall is GAIN; work done, where a rise is GAIN; a resource spent or held, where a fall is a cut (GAIN) and a rise is power given. Then the paired change and its 95% interval: an interval that includes zero reads EVEN; clear of zero, the word follows the aim. Three runs A, B and C: GAIN or LOSS only when all three point the same way with every interval clear of zero; EVEN when any interval includes zero; the runs disagree when clear runs point different ways. The page draws exactly this rule, as tools/readings.py writes it.](book/figures/f_reading.svg)
+![Flowchart: how a gauge's number becomes a word. The gauge's declared aim is read first: time waited, missed or failed, where a fall is GAIN; work done, where a rise is GAIN; a resource spent or held, where a fall is a cut (GAIN) and a rise is power given. Three runs A, B and C, each a paired change in percent of native with its 95% interval: runs that moved 0.5% or more in opposite directions disagree; a mean under 0.5% reads EVEN, under the floor; from 0.5% the word follows the aim, in all three of our runs when every interval is clear of zero the same way, by the mean of our three runs otherwise, with the count beyond the noise. The page draws exactly this rule, as tools/readings.py writes it.](book/figures/f_reading.svg)
 
 ### 3.4 The marks
 
@@ -727,14 +727,22 @@ direct against Omni on native) on the four gauges by the one key, each word with
 arm on one host (the quick form). The second gives each arm's totals in that run: requests answered, failed and wrong, the 95th
 and 99th percentiles, machine-minutes, unit-minutes and the processor conveyed. The third is the full form's three runs on
 GitHub's own machines, A, B and C from one commit (`results/orchestrator/V18_THREE_ARMS_ABC.md`): each pair and gauge with each
-run's word and the one rule's reading of the three, GAIN, LOSS or power given in all three when every run's interval is clear of
-zero on the same side, EVEN when any run's interval holds zero, the runs disagree when clear runs point different ways. Work aims
+run's word and the one rule's reading of the three: a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim (in all three when every run's interval is clear of zero on the same side, otherwise by the mean of the three with the count beyond the noise); under 0.5% it reads EVEN, under the floor; runs that moved 0.5% or more in opposite ways disagree. Work aims
 up; the 95th percentile aims down; units and machines are resources, so a fall is a cut, a GAIN, and a rise is power given.
 
 On a real machine each arm is the control plane started with its brain (`python3 -m omni_orchestrator.control --brain yardstick`,
 `omni_native` or `omni`), and its kill switch is the control plane's kill file: the brain off, the declared state held, every
 conveyed wall handed back.
 
+
+### 8.6 Each muscle's own knobs
+
+Pick a muscle on either ring and its card opens with its own switch (Omni-Compass on it, or handed back to native) and its own
+knobs: **− 1 unit** and **+ 1 unit** (the muscle's smallest setting), **to its floor**, **to its top**, and **let go**. A knob is a
+person's hand on that muscle's lever on the Omni-Compass side, held for 20 decisions and never past the muscle's own limits; then
+the hand lets go and the engine moves the muscle again. Turn one and watch the band, the dots and the immune system answer it:
+this is the one place the page lets a reader push a muscle away from the factory tune by hand, and see whether the body holds or
+recovers. The factory button takes every hand off at once.
 ---
 
 ## 8. The Organism, Live
@@ -836,6 +844,19 @@ while amber ones cross it. Press *A sense goes blind* and the governor's hand-ba
 hold, never a guess). Press *Security hold* and every addition stops while hand-backs go on. In every case the native side is
 put through the same fault, so the difference is Omni-Compass alone.
 
+
+### 9.5 The native switch: Omni on native, or Omni direct
+
+Beside the dial stands **Native under Omni-Compass**, and the same switch stands on every monitor that shows Omni-Compass on top
+of native. *On* is the main engine's arm: every native controller runs underneath and Omni-Compass governs on top of it. *Off*
+switches every native controller on the Omni-Compass side off and leaves Omni-Compass alone on the muscles, Omni direct, by the
+rule of Omni direct's brain (`omni_orchestrator/brain.py`, its C++ twin proven equal): work waiting adds units now, an up force
+adds units at once, a down force gives one unit back only after it has held for three decisions with nothing waiting, and no
+lever stands below its twin, native's own rule computed on the same readings. The native side, on the left, runs as it does. In
+the live model the switch runs that rule on the sixty muscles (class S); on a monitor that replays a recorded run the switch says
+whether that record holds an Omni direct arm (the three-arm runs of the page's section 2a do) or not, since a recorded run is
+never rerun in the page. The kill switch still hands everything to native at once, and the factory button puts the switch back
+on.
 ---
 
 ## 10. The Heartbeat Dial
@@ -900,7 +921,7 @@ in all three runs counts; EVEN counts as exactly 1, so nothing inside the noise 
 from its own newest three-run table, no table is pooled across engines, and every row names its table. The index is one
 number for the board; its row of factors under it is the board's own audit.
 
-![The three-run rule. A benchmark runs three times, A, B and C, on one engine version, each a paired run of native against Omni-Compass. A row reads GAIN or LOSS in all three of our runs only when the three agree in sign with every 95% interval clear of zero; EVEN, no difference beyond the noise, when an interval includes zero; the runs disagree when clear runs point different ways. The board and the index count by this rule and no other.](book/figures/readings.svg)
+![The three-run rule. A benchmark runs three times, A, B and C, on one engine version, each a paired run of native against Omni-Compass. A change of 0.5% or more, the mean of the three runs, is a change (the founder's order of 24 October 2026): GAIN or LOSS in all three of our runs when the three agree in sign with every 95% interval clear of zero, otherwise GAIN or LOSS by the mean of our three runs with the count beyond the noise; EVEN, under the floor, when the mean is under 0.5%; the runs disagree when runs that moved 0.5% or more point different ways. The board and the index count by this rule and no other.](book/figures/readings.svg)
 
 ### 11.4 Third-party software still to be benchmarked
 
@@ -1325,11 +1346,12 @@ Omni-Compass's side follows native.
 ### 20.3 How each row is read
 
 The paired change, native against Omni-Compass at the same decision, averaged over blocks of
-ten decisions so neighbouring decisions do not count twice, with its 95% interval (Student's t over the blocks). *This run*: an
-interval that includes zero reads EVEN; clear of zero, the word follows the gauge's aim (work: a rise is GAIN; misses, failed
-work, waiting: a fall is GAIN; energy or capacity held: a rise is power given, a fall a cut). *Three runs*: GAIN or LOSS only
-when all three runs point the same way with every interval clear of zero; EVEN when an interval includes zero; the runs disagree
-when clear runs point different ways. The spread of positions can widen a little under the tune-down, because the calm
+ten decisions so neighbouring decisions do not count twice, with its 95% interval (Student's t over the blocks). *This run*: a
+change of 0.5% or more reads by the gauge's aim (work: a rise is GAIN; misses, failed work, waiting: a fall is GAIN; energy or
+capacity held: a rise is power given, a fall a cut), clear of the noise or not, and a change under 0.5% reads EVEN. *Three runs*:
+a change of 0.5% or more, the mean of the three, reads GAIN, LOSS or power given, in all three of our runs when every interval is
+clear of zero the same way and by the mean of our three runs otherwise; under 0.5% EVEN, under the floor; runs that moved 0.5% or
+more in opposite directions disagree. The spread of positions can widen a little under the tune-down, because the calm
 muscles it hands back move toward their line while the busy ones stay.
 
 ## 21. The Brain's Internal State

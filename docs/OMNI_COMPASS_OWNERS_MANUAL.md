@@ -3342,16 +3342,18 @@ that runner serves, which could not have run there. Every table made by rule che
 fingerprint and heads itself with a warning if any run is not the engine it claims or if the three are not separate runs.
 
 **The three-run rule.** Every benchmark runs as **A, B and C**, three separate GitHub runs on the same frozen bytes.
-Every judged row gets one of three readings, and all three runs are shown beside it:
+Every judged row gets one of these readings, and all three runs are shown beside it:
 
-- **GAIN** or **LOSS in all three of our runs** (a resource spent that rose reads **power given**, never a loss): the same sign in all three runs, each with its 95% interval clear of
-  zero.
-- **No difference beyond the noise**: in at least one run the interval includes zero, so native and omni could not be
-  told apart on that measure. That is the result, stated as such, with the count of runs it holds in.
-- **The runs disagree**: runs clear of the noise point different ways. The test itself is then unstable on that
+- **GAIN** or **LOSS in all three of our runs** (a resource spent that rose reads **power given**, never a loss): a change of
+  0.5% or more, the mean of the three runs, the same sign in all three of our runs, each with its 95% interval clear of zero.
+- **GAIN** or **LOSS by the mean of our three runs**: a change of 0.5% or more, the mean of the three runs, where one run's
+  interval or more includes zero; the count of runs beyond the noise stands beside it (the founder's order of 24 October
+  2026: a change of 0.5% or more either way is a change, never EVEN).
+- **EVEN, under the floor**: the mean of the three runs' changes is under 0.5% either way.
+- **The runs disagree**: runs that each moved 0.5% or more point different ways. The test itself is then unstable on that
   measure, and it is looked into before anything is claimed.
 
-![The three-run rule, read from the intervals. Each row is one gauge; each bar is one run's paired change of Omni-Compass against native with its 95% interval. GAIN or LOSS in all three of our runs: the same side in all three, every interval clear of zero. EVEN: at least one interval includes zero, no difference beyond the noise. The runs disagree: clear intervals on both sides, an unstable test to be looked into. Which side reads GAIN is set by what the gauge is for: for time waited, misses and failures a fall; for work done a rise; for a resource spent a fall is a cut and a rise is power given, never a loss.](book/figures/readings.svg)
+![The three-run rule, read from the intervals (the founder's order of 24 October 2026). Each row is one gauge; each bar is one run's paired change of Omni-Compass against native with its 95% interval; the shaded band is 0.5% either way of no change. A change of 0.5% or more, the mean of the three runs, is a change: GAIN or LOSS in all three of our runs when every interval is clear of zero on the same side, GAIN or LOSS by the mean of our three runs, with the count beyond the noise, when one or more intervals hold zero. EVEN, under the floor: the mean under 0.5%. The runs disagree: runs that moved 0.5% or more in opposite directions, an unstable test to be looked into. Which side reads GAIN is set by what the gauge is for: for time waited, misses and failures a fall; for work done a rise; for a resource spent a fall is a cut and a rise is power given, never a loss.](book/figures/readings.svg)
 
 The tables are made by rule, never by hand (`tools/confirm_abc.py` for the paired
 Kubernetes and Azure tests, `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `swarm_abc.py`, `mujoco_abc.py`,
@@ -3359,16 +3361,13 @@ Kubernetes and Azure tests, `pgbench_abc.py`, `kafka_abc.py`, `redis_abc.py`, `s
 or to the declared tolerance where the simulator is not bit-reproducible across machines, and a score reads "the runs
 differ" when they do not), and `tests/test_confirm_abc.py`, run by `verify.py`, proves the rule on fixed cases.
 
-![Flowchart: the three-run reading rule, as a procedure. For one judged row: if any of the three intervals includes zero the row reads EVEN, with the count of runs it holds in; if the three clear intervals do not point the same way the runs disagree and the test is unstable there; if they point the gauge's way the row reads GAIN in all three of our runs, and the other way LOSS, except for a resource spent that rose, which is power given.](book/figures/f_reading.svg)
+![Flowchart: the three-run reading rule, as a procedure (the founder's order of 24 October 2026). For one judged row: if two runs each moved 0.5% or more in opposite directions, the runs disagree; if the mean of the three changes is under 0.5%, EVEN, under the floor; otherwise the word follows the gauge's aim, GAIN, LOSS or, for a resource spent that rose, power given, in all three of our runs when every run's interval excludes zero the same way, by the mean of our three runs otherwise.](book/figures/f_reading.svg)
 
 **Why three separate runs, and why the readings are what they are.** One run of ten paired repetitions gives one
 interval, and an interval from one run can be narrow by luck: the runner was quiet that hour, the order of arms happened
 to favour one side. A second run on another day and another machine is a replication; a third makes a coincidence
 expensive. The three runs are separate GitHub runs, which means separate machines, separate hours and separate
-installations of every dependency, so what agrees across them is not an artefact of one machine. The readings are
-designed so that there is no reading a reader could mistake for a weaker form of "yes": a row is counted only when all three runs move the same way with every interval clear of zero; a single run whose interval crosses zero makes the row
-"no difference beyond the noise", and the count says how many of the three; and two clear runs that disagree in sign are
-reported as a disagreement, which is an instability in the test to be found and fixed, not averaged away. The tables are
+installations of every dependency, so what agrees across them is not an artefact of one machine. The readings are designed so that no reading can be mistaken for something it is not: a change of 0.5% or more, the mean of the three runs, is always named by its word and its direction, and the words say how firm it is (in all three runs, every interval clear of zero; or by the mean, with the count of runs beyond the noise); a change under 0.5% is EVEN; and two runs that each moved 0.5% or more in opposite directions are reported as a disagreement, which is an instability in the test to be found and fixed, not averaged away. The tables are
 made by tools, not by hand, and the tools check each run's engine and refuse to mix engines.
 
 **The Omni index** (`tools/omni_index.py`, `results/OMNI_INDEX.md`) is the one combined number. Every measure of every

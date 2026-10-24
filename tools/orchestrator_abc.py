@@ -10,9 +10,8 @@
       --commit <sha> --out results/orchestrator/<NAME>
 
 Each run's own reading of a pair and a gauge (the mean of the step-by-step differences and its 95% interval on Student's t,
-as the showing wrote it) is combined by the repository's one rule (tools/readings.py, the stack reading): GAIN, LOSS or power
-given in all three when every run's interval is clear of zero on the same side; EVEN when any run's interval holds zero; the
-runs disagree when clear runs point different ways. Writes <NAME>.md and <NAME>.json.
+as the showing wrote it) is combined by the repository's one rule (tools/readings.py, the founder's order of 24 October
+2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim (in all three when every run's interval is clear of zero on the same side, otherwise by the mean of the three with the count beyond the noise); under 0.5% it reads EVEN, under the floor; runs that moved 0.5% or more in opposite ways disagree. Writes <NAME>.md and <NAME>.json.
 """
 from __future__ import annotations
 
