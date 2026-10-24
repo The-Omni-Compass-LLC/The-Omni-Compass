@@ -1006,6 +1006,33 @@ def three_arms() -> dict:
     return {"file": str(fs[-1].relative_to(ROOT)), **d}
 
 
+def scenarios30() -> dict:
+    """The thirty scenarios (results/scenarios/SCENARIOS_30.json, tools/scenarios_30.py, class S): ten organisms, each native, Omni-Compass
+    on native and Omni-Compass direct, every gauge's word and its three runs; the plants each reading flags stay in the record, not here."""
+    f = ROOT / "results" / "scenarios" / "SCENARIOS_30.json"
+    if not f.exists():
+        return {}
+    d = json.loads(f.read_text(encoding="utf-8"))
+    def pair(p):
+        if not isinstance(p, dict) or "gauges" not in p:
+            return p
+        return {"gauges": {k: {"word": g.get("word"), "reading": g.get("reading"), "mean": g.get("mean_change"),
+                               "runs": {r: (v or {}).get("change") for r, v in (g.get("runs") or {}).items()}} for k, g in p["gauges"].items()}}
+    orgs = []
+    for o in d.get("organisms", []):
+        x = {k: o.get(k) for k in ("no", "key", "name", "what", "class", "muscles", "direct_pools", "source")}
+        r = o.get("readings") or {}
+        on = r.get("on_native_vs_native") if isinstance(r, dict) else None
+        if isinstance(on, dict) and on.get("state") == "composed":   # the whole organism: its composition, the headline scope only
+            wh = (((on.get("composition") or {}).get("scopes") or {}).get("without") or {}).get("carried", {}).get("whole", {})
+            x["composed"] = {"index": wh.get("index"), "gauges": wh.get("gauges"), "note": "the whole organism in its three places, composed by tools/whole_system.py"}
+            x["direct"] = r.get("direct_vs_native") or {"state": "not yet run"}
+        else:
+            x["readings"] = {k: pair(v) for k, v in r.items()}
+        orgs.append(x)
+    return {"file": str(f.relative_to(ROOT)), "title": d.get("title"), "run": d.get("run"), "gauges": d.get("gauges"), "organisms": orgs}
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -1061,7 +1088,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct(), "coremc": core_mc(), "threearms": three_arms()}
+            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct(), "coremc": core_mc(), "threearms": three_arms(), "scenarios": scenarios30()}
 
 
 def embedded(page: str, key: str):
@@ -1216,7 +1243,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial", "coremc", "threearms")
+                          "beatsweep", "dial", "coremc", "threearms", "scenarios")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1234,7 +1261,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "direct", "coremc", "threearms"):
+              "beatsweep", "dial", "direct", "coremc", "threearms", "scenarios"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand
