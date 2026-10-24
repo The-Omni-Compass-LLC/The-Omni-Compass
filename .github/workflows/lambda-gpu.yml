@@ -175,10 +175,12 @@ jobs:
           git config --local --unset-all 'http.https://github.com/.extraheader' || true
           tar czf "$RUNNER_TEMP/omni.tgz" --exclude=./key --exclude=./key.pub --exclude=./keycheck.txt --exclude=./keyname.txt --exclude=./plan.txt .
           mv "$RUNNER_TEMP/omni.tgz" omni.tgz
-          scp -i key -o StrictHostKeyChecking=accept-new omni.tgz "ubuntu@$IP:omni.tgz"
-          $SSH "mkdir -p omni && tar xzf omni.tgz -C omni && echo $GITHUB_SHA > omni/COMMIT"
-          $SSH "cd omni && nohup sudo -n env $ENVS bash $SCRIPT > run.log 2>&1 < /dev/null &"
-          sleep 30; $SSH "tail -n 5 omni/run.log" | sed 's/^/  run: /'
+          # every step to the machine is bounded in time (24 October: the A100 run's start step waited 56 minutes on one
+          # connection until the job's limit cut it off); the run itself starts detached from the connection that starts it
+          timeout 900 scp -i key -o StrictHostKeyChecking=accept-new omni.tgz "ubuntu@$IP:omni.tgz"
+          timeout 300 $SSH "mkdir -p omni && tar xzf omni.tgz -C omni && echo $GITHUB_SHA > omni/COMMIT"
+          timeout 60 $SSH "cd omni && setsid nohup sudo -n env $ENVS bash $SCRIPT > run.log 2>&1 < /dev/null & disown; exit 0" || true
+          sleep 30; timeout 60 $SSH "tail -n 5 omni/run.log; pgrep -x -f 'bash $SCRIPT' > /dev/null && echo 'the run is under way' || echo 'the run is not running'" | sed 's/^/  run: /'
           echo "Started; the watch below carries on until it is over." >> "$GITHUB_STEP_SUMMARY"
           rm -f key
       - name: Give the machine back if starting failed

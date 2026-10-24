@@ -22,6 +22,13 @@
   on one connection to the card until the launch job's 60-minute limit cut it off; its watch took over with the card. Since
   then every machine carries the run's number at the end of its name (-r<run id>) and both give-backs find it by that number,
   so a launch job cut off before it hands the machine's id on still gets its machine back; the launch job's limit is 90 minutes.
+  The watch's "is the run alive?" asked pgrep for the scripts' names through ssh's own shell, whose command line holds the same
+  names, so it always read "running" and its stopped-run rule could never fire; the names are bracketed now (proved both ways),
+  every step the start makes to the machine is bounded in time, and the start says whether the run is under way. The A100 run
+  of the morning still carries the old watch: its card goes back when its run ends or at its deadline (18:12 UTC, $18 at most).
+- **main's verify on GitHub**: a cloud key test handed the program the runner's own GITHUB_ENV, so on GitHub (never on a
+  laptop) the program wrote its masked hand-off and the test failed; the tests now hand it an environment without the runner's
+  env files (proved both ways).
 
 ## 2026-10-24: the clouds' keys read to the letter of their shape
 
