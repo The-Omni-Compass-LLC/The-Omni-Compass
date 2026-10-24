@@ -142,7 +142,11 @@ jobs:
           echo "ip=$IP" >> "$GITHUB_OUTPUT"
           SSH="ssh -i key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 ubuntu@$IP"
           for i in $(seq 1 20); do $SSH true && break; sleep 15; done
-          git archive --format=tar.gz -o omni.tgz HEAD                    # the exact committed tree, nothing else
+          # the exact committed tree with its git record (the run's freeze checks read git: a plain copy stopped the run on 24
+          # October), never the checkout's token or this run's key
+          git config --local --unset-all 'http.https://github.com/.extraheader' || true
+          tar czf "$RUNNER_TEMP/omni.tgz" --exclude=./key --exclude=./key.pub --exclude=./keycheck.txt --exclude=./keyname.txt --exclude=./plan.txt .
+          mv "$RUNNER_TEMP/omni.tgz" omni.tgz
           scp -i key -o StrictHostKeyChecking=accept-new omni.tgz "ubuntu@$IP:omni.tgz"
           $SSH "mkdir -p omni && tar xzf omni.tgz -C omni && echo $GITHUB_SHA > omni/COMMIT"
           $SSH "cd omni && nohup sudo -n env $ENVS bash $SCRIPT > run.log 2>&1 < /dev/null &"
