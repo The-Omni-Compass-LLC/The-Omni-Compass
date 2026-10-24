@@ -6,9 +6,9 @@
 
 - **Google and Amazon taken out** (the founder's order: "Get it out of my repositories. Get it out of my benchmarks. Get it out of
   my engine, everything ... just Azure and anything else people could do on their own"). Removed: the workflows `gke-metered`,
-  `eks-metered` and `cloud-organism`; `scripts/gke_paired.sh`, `eks_paired.sh`, `gcp_services.sh`, `cloud_machine.py`,
-  `cloud_machine_watch.sh`, `google_queue.txt`, `amazon_queue.txt`; `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md`;
-  `tests/test_cloud_machine.py`; Google's and Amazon's $0 checks (`cloud-check` and `tools/cloud_key_check.py` read Azure alone).
+  `eks-metered` and `cloud-organism`; scripts/gke_paired.sh, `eks_paired.sh`, `gcp_services.sh`, `cloud_machine.py`,
+  `cloud_machine_watch.sh`, `google_queue.txt`, `amazon_queue.txt`; docs/GOOGLE_SETUP.md, docs/AMAZON_SETUP.md;
+  tests/test_cloud_machine.py; Google's and Amazon's $0 checks (`cloud-check` and `tools/cloud_key_check.py` read Azure alone).
   The conductor rents one cloud (`scripts/dispatch_grid.py`, `CLOUDS`, `CHECKS`, `CLOUD_FAMILIES`); `v5-all-benchmarks`,
   `archive-run`, the campaign file and the rigs no longer name them.
 - **The Operator's Manual**: chapters 16 and 17 (Google Kubernetes Engine and Amazon EKS, step by step), Appendices G and H (their
@@ -31,13 +31,21 @@
   what ran. One docstring line in a fingerprinted engine file (`omni_controller/controller.py`) still shows Amazon's command-line
   tool as an example; it goes with the next engine version. The four secrets nothing reads any more (`GCP_CREDENTIALS`,
   `GCP_PROJECT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) are the founder's to delete in the repository's settings.
+- **The GPU run on Lambda, its first card** (`lambda-gpu.yml`, `scripts/lambda_gpu.py`, `scripts/lambda_gpu_watch.sh`): the key
+  stored with its line breaks lost is mended before it is read, Lambda's key is found by its public half (not by its name), and
+  where the stored key is not whole the run makes its own key for itself and removes it after. The first real run (an A10) rented
+  and stopped at once: the code was shipped without its git record, which the run reads; the tree now goes with it, the token
+  stripped. Its watch would have kept the idle card to the deadline (a run cancelled by hand keeps watching, so no give-back is
+  lost): the watch now gives the card back as soon as the test stops before its last line, and the new test `giveback` gives back
+  every machine whose name starts as given (omni- names only, never one launched by hand), in its own queue. The A10 went back
+  after about 15 minutes; the next run rents an A100.
 
 ## 2026-10-24: the clouds' keys read to the letter of their shape
 
 - **Azure runs; Amazon off** (06:17 UTC): with the four boxes filled, Azure's check passed (the key, the login, the subscription and,
   after the allowance request of `azure-quota.yml`, the processor allowance), and the conductor started the steady set by itself.
   Amazon told the founder its Free plan cannot be raised to the Paid plan before the $100 credit is spent or the account is six
-  months old, so `scripts/amazon_queue.txt` reads `switch=off`: no hourly check fails there and nothing starts until his word.
+  months old, so scripts/amazon_queue.txt reads `switch=off`: no hourly check fails there and nothing starts until his word.
 - **Azure's login in four boxes, one value each** (the founder pasting the portal's numbers one at a time): the Azure sets and
   Azure's $0 check sign in with `AZURE_CREDENTIALS` when it holds the whole block, or else with the block built from four boxes,
   each holding one value as the portal shows it: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (the boxes the
@@ -1720,7 +1728,7 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
 - **Google's stored text, named once more.** The check of 19:12 read the 595 characters as none of the shapes known, so
   they hold characters plain base64 does not (a dot, a dash, an underscore). `tools/cloud_key_check.py` now also names a
   token or a web-safe encoded string (an access token, for one, which expires within the hour): still not the key file.
-  `docs/GOOGLE_SETUP.md` section 4 gains a new key file by clicks alone (Service Accounts, Keys, Add key, JSON), with no
+  docs/GOOGLE_SETUP.md section 4 gains a new key file by clicks alone (Service Accounts, Keys, Add key, JSON), with no
   terminal; the Operator's Manual (Appendix G) is rebuilt with it.
 - **Every workflow pinned to `ubuntu-24.04`.** GitHub announced on the runs' own pages that `ubuntu-latest` moves to
   Ubuntu 26 from 19 October. Every job (113 in 53 workflows) now names `ubuntu-24.04`, the image every run of the engine
@@ -1784,12 +1792,12 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   record. The founder's order: "fix the Google and Amazon cloud. To work".
 - **The $0 check** (`.github/workflows/cloud-check.yml`): the stored key's shape (`tools/cloud_key_check.py`: its length and
   missing parts only, never a character of it), the login, the plan, the machine type and every quota a set needs, then it
-  stops. Google's pre-flight (`scripts/gke_paired.sh`) now reads the processors in the region and in all regions (the free
+  stops. Google's pre-flight (scripts/gke_paired.sh) now reads the processors in the region and in all regions (the free
   trial's 8 is named, with the fix), the solid-state disk and the external addresses, and gives Google's own words when a
-  read is refused; Amazon's (`scripts/eks_paired.sh`) logs in first, names the Free plan when Amazon's policy denies the
+  read is refused; Amazon's (scripts/eks_paired.sh) logs in first, names the Free plan when Amazon's policy denies the
   read, and, in the check, asks Amazon for a short processor quota itself (once; never shrunk to fit). The Google workflow
   reads the key's shape before its login too. Found on the way: the Google workflow switched the project's services on with
-  a login whose roles carry no right to do so, so even a whole key would have stopped there; `scripts/gcp_services.sh` now
+  a login whose roles carry no right to do so, so even a whole key would have stopped there; scripts/gcp_services.sh now
   reads them and asks for one only when it is off, naming the fix when the login may not.
 - **The conductor waits for it** (`scripts/dispatch_grid.py`, `check_state`): a Google or Amazon set starts only after that
   cloud's newest check passed within a day; the conductor starts a check itself when there is none, the last failed an hour
@@ -1856,9 +1864,9 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
 - **Google and Amazon's first sets (18 October, 04:57)**: both clouds took their keys and spent nothing. Google's login refused
   the stored key as incomplete JSON (the key block was cut short when copied; the founder stores it again whole). Amazon's
   login worked, and its pre-flight found no machine type offered in us-east-1. That check had hidden Amazon's own reason,
-  so `scripts/eks_paired.sh` now prints AWS's error (a new account not yet verified, a region not enabled) instead of
+  so scripts/eks_paired.sh now prints AWS's error (a new account not yet verified, a region not enabled) instead of
   reading every refusal as "not offered"; the keys themselves are never printed.
-- **Google's queue paused until its key is stored whole** (`scripts/google_queue.txt`), so failed logins do not use up
+- **Google's queue paused until its key is stored whole** (scripts/google_queue.txt), so failed logins do not use up
   its A, B and C; the failed steady A is re-run in place once the key is right. Amazon stays on: its next set prints AWS's
   own reason through the repaired pre-flight.
 - **Amazon's reason, read (06:31)**: "not authorized to perform ec2:DescribeInstanceTypes with an explicit deny in a
@@ -2249,8 +2257,8 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   (`python3 tools/readings.py --fix`; `--check` fails a standing table without it).
 - **Google Cloud and Amazon on Azure's harness** (the founder's order of 16 October: the Azure run is the measure of the other
   two): `gke-metered.yml` and `eks-metered.yml` carry the replica room, the machine-family queue in their titles and
-  concurrency groups, and a secrets gate that stops a run before anything is built or billed; `scripts/google_queue.txt` and
-  `scripts/amazon_queue.txt` carry the same four sets as Azure at the same settings, behind a `switch=` line (off until the
+  concurrency groups, and a secrets gate that stops a run before anything is built or billed; scripts/google_queue.txt and
+  scripts/amazon_queue.txt carry the same four sets as Azure at the same settings, behind a `switch=` line (off until the
   secrets are in and the founder turns it on); the grid conductor (`scripts/dispatch_grid.py`) reads all three queues, one set
   at a time per machine-family queue, dispatched runs only. Nothing is rented on Google or Amazon before the switch is on.
 - **The conductor's hand-off** (`grid.yml`): when a five-hour conductor ends it starts the next unless one is already waiting;
@@ -3063,10 +3071,10 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   the founder's decision; nothing in the engine changed for it.
 - **Every cloud, the same tests**: Azure running on v5 (the 40-machine fleet, steady then burst; the whole tower and the four
   stacked at 1,000 copies on rented machines). Google and Amazon get Azure's big-machine test too: `cloud-organism`
-  (`scripts/cloud_machine.py`, `scripts/organism_detached.sh`, `scripts/cloud_machine_watch.sh`; the price and a cost
-  ceiling first, every machine labelled with its hour budget, always given back; `tests/test_cloud_machine.py`, run by
+  (scripts/cloud_machine.py, `scripts/organism_detached.sh`, scripts/cloud_machine_watch.sh; the price and a cost
+  ceiling first, every machine labelled with its hour budget, always given back; tests/test_cloud_machine.py, run by
   `verify.py`), beside their Kubernetes bill tests (`gke-metered`, `eks-metered`). Setting each cloud up, click by click:
-  `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md` (and `docs/AZURE_SETUP.md`). The Google, Amazon, Lambda and one-button
+  docs/GOOGLE_SETUP.md, docs/AMAZON_SETUP.md (and `docs/AZURE_SETUP.md`). The Google, Amazon, Lambda and one-button
   workflows now register on the branch they are pushed to, so they can be started there.
 - **The three-run words** (the founder's order of 11 October): no table or page says a result is "confirmed", because
   nobody outside The Omni-Compass LLC has reviewed or approved these results. A reading is lower or higher in all three

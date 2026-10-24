@@ -11518,7 +11518,7 @@ shows (its processor use, the requests waiting, the response times), as in every
 - **Order and dispatch.** The grid conductor starts every Azure set from `scripts/azure_queue.txt`: A of every set, then
   B, then C, one at a time in each machine family's queue, read back by its run's title, never started twice.
 - **Amendment of 16 October (the three clouds).** Google Cloud and Amazon carry the same four sets, at the same
-  settings and on the same harness, from `scripts/google_queue.txt` and `scripts/amazon_queue.txt` (the workflows
+  settings and on the same harness, from scripts/google_queue.txt and scripts/amazon_queue.txt (the workflows
   `gke-metered.yml` and `eks-metered.yml`, one set at a time per machine-family queue, read back by title as on Azure),
   each behind its own `switch=` line, off until that cloud's secrets are in the repository and the founder turns it on; a
   run without its secrets stops before anything is built or billed. The Azure run is the measure of the other two: nothing

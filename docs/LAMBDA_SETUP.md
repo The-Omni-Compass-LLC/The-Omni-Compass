@@ -81,6 +81,13 @@ end of the workflow if anything before it failed. Each give-back is acknowledged
 the run turns red and says so. Then, by hand: **cloud.lambda.ai**, **Instances**, tick the machine (its name starts
 `omni-`), **Terminate**.
 
+A run cancelled by hand keeps watching its machine (the watch jobs run on through a cancel, so a give-back is never lost),
+and a run whose test stopped early is given back at once by the watch since 24 October. For a machine still left billing
+under an older run: **Actions**, **lambda-gpu**, **Run workflow**, **test** `giveback`, **give_back** `omni-1card-` (or
+`omni-8card-`, or the machine's whole name). It gives back every machine whose name starts so, rents nothing, and never
+touches a machine launched by hand on Lambda's page; the stuck run then sees its machine gone and ends, and the next run of
+that test starts.
+
 ## 6. Afterwards
 
 The results are the run's artifacts (`lambda-gpu-watch*-<run id>`); the founder hears what they say before anything goes up.

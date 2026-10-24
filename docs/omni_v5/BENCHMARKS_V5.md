@@ -110,12 +110,12 @@ founder hears what they say before anything goes up.
 | Big organisms, Google | the same test on a rented Google machine | `cloud-organism`, cloud `gcp` | `GCP_CREDENTIALS`, `GCP_PROJECT` | about $0.27 an hour (e2-standard-8), at most about $10 for its 39-hour ceiling |
 | Big organisms, Amazon | the same test on a rented Amazon machine | `cloud-organism`, cloud `aws` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | about $0.38 an hour (m6i.2xlarge), at most about $15 for its 39-hour ceiling |
 
-The Google and Amazon runs are written to the AKS run's design (`scripts/gke_paired.sh`, `scripts/eks_paired.sh`; the big
-machine: `scripts/cloud_machine.py`, `scripts/organism_detached.sh`, the same test as Azure's) and have not yet run: their
+The Google and Amazon runs are written to the AKS run's design (scripts/gke_paired.sh, scripts/eks_paired.sh; the big
+machine: scripts/cloud_machine.py, `scripts/organism_detached.sh`, the same test as Azure's) and have not yet run: their
 first repetition is a shakedown, and any arm that fails its own checks is marked INVALID and never counted. Each cluster
 is deleted when its arm ends, and every cluster a run made is deleted at its end whatever happens; a rented machine is
 given back when its test ends, at its hour ceiling, or at the end of its workflow whatever happens. Setting up each cloud,
-click by click: `docs/AZURE_SETUP.md`, `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md`. What runs where: the managed
+click by click: `docs/AZURE_SETUP.md`, docs/GOOGLE_SETUP.md, docs/AMAZON_SETUP.md. What runs where: the managed
 Kubernetes bill and the biggest organisms need a cloud; every other benchmark (robot arms, drones, buildings, the grid, the
 databases, the messaging, the modelled realms and the grid of organisms) runs on GitHub's own machines, the same code on
 every engine, free.

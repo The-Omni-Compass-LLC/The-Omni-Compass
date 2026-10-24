@@ -604,8 +604,8 @@ the founder overrides one in the conversation.
   (`.github/workflows/cloud-check.yml`, `tools/cloud_key_check.py`): the conductor starts a cloud's set only after that
   cloud's newest check passed (the key whole, the login, the plan, the machine type, every quota; a short Amazon quota asked
   of Amazon by the check itself), starts a check itself within the hour, and so never spends a set's A, B or C on a login.
-  Google starts once the key is stored whole (downloaded as a file, `docs/GOOGLE_SETUP.md` section 4), Amazon once the
-  account is on the Paid plan (`docs/AMAZON_SETUP.md` section 1a).
+  Google starts once the key is stored whole (downloaded as a file, docs/GOOGLE_SETUP.md section 4), Amazon once the
+  account is on the Paid plan (docs/AMAZON_SETUP.md section 1a).
 
 - **Version 10: exploit all that can be, never raise the bill, hurt no one** (the founder's words: "Omni-Compass should be
   tuned to exploit all that can be and keep all healthy and never raise its bill ... whatever one can't be achieved doesn't
