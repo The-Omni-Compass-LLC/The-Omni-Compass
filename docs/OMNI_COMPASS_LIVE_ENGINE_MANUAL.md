@@ -949,7 +949,7 @@ are **still moving toward their setting** (capacity in service more than 2% from
 muscle's own response time τ). The line adds that the model's plant refuses nothing, while a real adapter reads every write back
 and holds a refused one (omni-v12). The line follows the distinction `docs/FACTORY_PROFILE.md` draws (section 3) between the
 requested, the commanded and the acknowledged settings. While the harness plays, nothing is requested, commanded or read back in
-that view (the harness replays recorded settings, and section 3d traces one of its decisions), and the line carries a button, *Run
+that view (the harness replays recorded settings, and the page's section 3d traces one of its decisions), and the line carries a button, *Run
 the live model*, that moves the page to the live model, where the counts are computed.
 
 The fourth line, **the contract, this decision**, writes the same decision in the symbols of `docs/FACTORY_PROFILE.md`, section 3,
@@ -1089,7 +1089,10 @@ The **level** gathers each form by muscle, by body part or for the whole organis
 the **series** chooses what the graph draws. Under the forms the section's table, **who does what**, gives the words for every
 tool a reader may know (an observer, a collector, a console, a native controller, an automatic optimizer, a supervisory governor),
 who decides in each, well-known examples and where Omni-Compass sits beside each; `docs/FACTORY_PROFILE.md` carries the same
-table, and `docs/THE_FIELD.md` maps the products by name.
+table, and `docs/THE_FIELD.md` maps the products by name. A second table, **the ones that compete**, names the first five
+benchmarks against products that decide and act on their own (ScaleOps, StormForge Optimize Live, IBM Turbonomic, CAST AI and
+Zeus), each with its rig and its cost as read on 24 October, and each marked not yet run.
+
 ## 7. The Mechanism's Own Knobs
 
 ### 7.1 Where it is and what it turns

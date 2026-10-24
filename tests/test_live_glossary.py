@@ -29,7 +29,7 @@ REQUIRED = ["GAIN", "EVEN", "LOSS", "power given", "the runs disagree", "do no h
             "piece 1: the state (E, U, I[U], the basin)", "piece 2: the basin's potential and flow (S, Φ(S))",
             "piece 3: the bath (B, Ḃ)", "piece 4: the governor coupling every muscle to one law", "ρ*", "κ", "h", "calm", "σ",
             "ν", "the organs and their grants (θ)", "the immune system", "the nervous system", "the heat debt", "the twin",
-            "the bone", "the edge", "the verdict", "the give-back trial", "the toy gate", "the fingerprint and its digest",
+            "the bone", "the edge", "the verdict", "the give-back trial", "the model gate", "the fingerprint and its digest",
             "the seal", "evidence classes P, L, S", "three runs A, B and C", "the 95% interval on Student's t", "the 0.5% floor",
             "the heartbeat", "the fast checks", "the conveyance", "the organism", "muscle", "realm", "family", "template",
             "knob", "the spine", "the stack", "the tower", "the orchestra", "the grid (copies × runs)", "protocol 4",

@@ -300,8 +300,20 @@ def appendix_lines() -> list[str]:
     return out
 
 
+MD_PATH = re.compile(r"(?<![\w/.`-])((?:[\w.-]+/)*[\w-]+\.md)(?![\w`])")
+
+
+def code_paths(line: str) -> str:
+    """A document's name set as code (`DISCLOSURES.md`), outside code already set, so the book reads "section 3" after it as
+    that document's own numbering, never as one of its own sections."""
+    if line.startswith("#"):
+        return line
+    parts = line.split("`")
+    return "`".join(MD_PATH.sub(r"`\1`", seg) if i % 2 == 0 else seg for i, seg in enumerate(parts))
+
+
 def main() -> int:
-    text_md, _ = normalize_markdown("\n".join(appendix_lines()))
+    text_md, _ = normalize_markdown("\n".join(code_paths(ln) for ln in appendix_lines()))
     if "--check" in sys.argv:
         same = OUT_MD.exists() and OUT_MD.read_text(encoding="utf-8") == text_md
         print("the page word for word matches the page" if same else "the page word for word differs from the page: python3 docs/book/build_live_manual.py")
