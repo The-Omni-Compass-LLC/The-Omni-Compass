@@ -1,0 +1,3490 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "ClusterQueue",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"kueue.x-k8s.io/v1beta2\",\"kind\":\"ClusterQueue\",\"metadata\":{\"annotations\":{},\"name\":\"omni-cluster-queue\"},\"spec\":{\"namespaceSelector\":{},\"resourceGroups\":[{\"coveredResources\":[\"cpu\",\"memory\"],\"flavors\":[{\"name\":\"default-flavor\",\"resources\":[{\"name\":\"cpu\",\"nominalQuota\":\"24\"},{\"name\":\"memory\",\"nominalQuota\":\"95938Mi\"}]}]}]}}\n"
+                },
+                "creationTimestamp": "2026-10-24T03:49:49Z",
+                "finalizers": [
+                    "kueue.x-k8s.io/resource-in-use"
+                ],
+                "generation": 1,
+                "name": "omni-cluster-queue",
+                "resourceVersion": "8430",
+                "uid": "045f9de7-2be6-4386-802a-602d1a9b2fab"
+            },
+            "spec": {
+                "flavorFungibility": {
+                    "whenCanBorrow": "MayStopSearch",
+                    "whenCanPreempt": "TryNextFlavor"
+                },
+                "namespaceSelector": {},
+                "preemption": {
+                    "borrowWithinCohort": {
+                        "policy": "Never"
+                    },
+                    "reclaimWithinCohort": "Never",
+                    "withinClusterQueue": "Never"
+                },
+                "queueingStrategy": "BestEffortFIFO",
+                "resourceGroups": [
+                    {
+                        "coveredResources": [
+                            "cpu",
+                            "memory"
+                        ],
+                        "flavors": [
+                            {
+                                "name": "default-flavor",
+                                "resources": [
+                                    {
+                                        "name": "cpu",
+                                        "nominalQuota": "24"
+                                    },
+                                    {
+                                        "name": "memory",
+                                        "nominalQuota": "95938Mi"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "stopPolicy": "None"
+            },
+            "status": {
+                "admittedWorkloads": 0,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:49:49Z",
+                        "message": "Can admit new workloads",
+                        "observedGeneration": 1,
+                        "reason": "Ready",
+                        "status": "True",
+                        "type": "Active"
+                    }
+                ],
+                "flavorsReservation": [
+                    {
+                        "name": "default-flavor",
+                        "resources": [
+                            {
+                                "borrowed": "0",
+                                "name": "cpu",
+                                "total": "0"
+                            },
+                            {
+                                "borrowed": "0",
+                                "name": "memory",
+                                "total": "0"
+                            }
+                        ]
+                    }
+                ],
+                "flavorsUsage": [
+                    {
+                        "name": "default-flavor",
+                        "resources": [
+                            {
+                                "borrowed": "0",
+                                "name": "cpu",
+                                "total": "0"
+                            },
+                            {
+                                "borrowed": "0",
+                                "name": "memory",
+                                "total": "0"
+                            }
+                        ]
+                    }
+                ],
+                "pendingWorkloads": 0,
+                "reservingWorkloads": 0
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "LocalQueue",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"kueue.x-k8s.io/v1beta2\",\"kind\":\"LocalQueue\",\"metadata\":{\"annotations\":{},\"name\":\"omni-queue\",\"namespace\":\"default\"},\"spec\":{\"clusterQueue\":\"omni-cluster-queue\"}}\n"
+                },
+                "creationTimestamp": "2026-10-24T03:49:43Z",
+                "generation": 1,
+                "name": "omni-queue",
+                "namespace": "default",
+                "resourceVersion": "8428",
+                "uid": "d2b72abf-0516-4d30-befa-04954fa603c4"
+            },
+            "spec": {
+                "clusterQueue": "omni-cluster-queue",
+                "stopPolicy": "None"
+            },
+            "status": {
+                "admittedWorkloads": 0,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:49:49Z",
+                        "message": "Can submit new workloads to localQueue",
+                        "observedGeneration": 1,
+                        "reason": "Ready",
+                        "status": "True",
+                        "type": "Active"
+                    }
+                ],
+                "flavorsReservation": [
+                    {
+                        "name": "default-flavor",
+                        "resources": [
+                            {
+                                "name": "cpu",
+                                "total": "0"
+                            },
+                            {
+                                "name": "memory",
+                                "total": "0"
+                            }
+                        ]
+                    }
+                ],
+                "flavorsUsage": [
+                    {
+                        "name": "default-flavor",
+                        "resources": [
+                            {
+                                "name": "cpu",
+                                "total": "0"
+                            },
+                            {
+                                "name": "memory",
+                                "total": "0"
+                            }
+                        ]
+                    }
+                ],
+                "pendingWorkloads": 0,
+                "reservingWorkloads": 0
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:51:56Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "adad2f28-3b0f-4d1d-bf8d-8c145829e7cc"
+                },
+                "name": "job-omni-batch-001-01644",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-001",
+                        "uid": "adad2f28-3b0f-4d1d-bf8d-8c145829e7cc"
+                    }
+                ],
+                "resourceVersion": "2347",
+                "uid": "03083d3c-f484-479d-8e22-c3b990f13aaa"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-001",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:51:56Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:51:56Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:52:41Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:52:15Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:52:26Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "d027f256-241a-4f72-848b-e708eddb566d"
+                },
+                "name": "job-omni-batch-002-56f2d",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-002",
+                        "uid": "d027f256-241a-4f72-848b-e708eddb566d"
+                    }
+                ],
+                "resourceVersion": "2618",
+                "uid": "e114b7fb-a13c-4c03-ae3b-8cd9ea669cad"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-002",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:52:26Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:52:26Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:17Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:52:49Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:52:56Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "569ace95-12e3-499d-91a1-19f23f4e44fe"
+                },
+                "name": "job-omni-batch-003-6e701",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-003",
+                        "uid": "569ace95-12e3-499d-91a1-19f23f4e44fe"
+                    }
+                ],
+                "resourceVersion": "2866",
+                "uid": "0b7d6b1e-f342-469e-b739-36c091ce3234"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-003",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:52:56Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:52:56Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:46Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:20Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 3,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:53:26Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "3ac24af8-c775-48a7-bdbd-5fb9f4713e66"
+                },
+                "name": "job-omni-batch-004-cd947",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-004",
+                        "uid": "3ac24af8-c775-48a7-bdbd-5fb9f4713e66"
+                    }
+                ],
+                "resourceVersion": "3127",
+                "uid": "4ebd45a7-9eb0-441e-9615-5c9be582c35f"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-004",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:26Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:26Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:21Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:53Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:53:57Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "1dacd32b-7c10-40da-83f3-fd24d0864268"
+                },
+                "name": "job-omni-batch-005-f4f42",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-005",
+                        "uid": "1dacd32b-7c10-40da-83f3-fd24d0864268"
+                    }
+                ],
+                "resourceVersion": "3458",
+                "uid": "5bf8a274-e7dd-4695-ad0e-52c5696b3b8a"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-005",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:57Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:53:57Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:58Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:25Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:54:27Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "775c56d0-901d-4304-acc7-9ce9a53401d6"
+                },
+                "name": "job-omni-batch-006-410b6",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-006",
+                        "uid": "775c56d0-901d-4304-acc7-9ce9a53401d6"
+                    }
+                ],
+                "resourceVersion": "3803",
+                "uid": "f702e619-61eb-4693-a4b1-d3fe490008e2"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-006",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:27Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:27Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:55:38Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:59Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:54:57Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "45fa348f-7a7c-4867-9e28-a494f204c89d"
+                },
+                "name": "job-omni-batch-007-c6fcc",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-007",
+                        "uid": "45fa348f-7a7c-4867-9e28-a494f204c89d"
+                    }
+                ],
+                "resourceVersion": "4031",
+                "uid": "1e208157-8102-44ad-9f13-6fec904784b1"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-007",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:57Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:54:57Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:05Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:55:24Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:55:27Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "16bf9bab-f540-448d-ac49-b7c8a31f599c"
+                },
+                "name": "job-omni-batch-008-a3b57",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-008",
+                        "uid": "16bf9bab-f540-448d-ac49-b7c8a31f599c"
+                    }
+                ],
+                "resourceVersion": "4336",
+                "uid": "d5b486ff-8423-4d24-9956-15cd255847cd"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-008",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:55:27Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:55:27Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:44Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:55:59Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:55:57Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "e81ea961-ec5c-4405-bbd7-6fd2ae8bba00"
+                },
+                "name": "job-omni-batch-009-fc9a3",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-009",
+                        "uid": "e81ea961-ec5c-4405-bbd7-6fd2ae8bba00"
+                    }
+                ],
+                "resourceVersion": "4648",
+                "uid": "738be7d7-f2f3-4c2a-9cb5-2dc4857de0ea"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-009",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:55:57Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:55:57Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:57:24Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:34Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:56:27Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "d6b3fb60-5e8d-4c67-9c06-73d2b8e40b5c"
+                },
+                "name": "job-omni-batch-010-1fdf9",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-010",
+                        "uid": "d6b3fb60-5e8d-4c67-9c06-73d2b8e40b5c"
+                    }
+                ],
+                "resourceVersion": "4886",
+                "uid": "2df4b313-3f92-42d3-99c2-0cdf2a79a189"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-010",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:27Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:27Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:57:46Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:58Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 3,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:56:58Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "26374762-36e4-4430-b891-6f749066b756"
+                },
+                "name": "job-omni-batch-011-1ee79",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-011",
+                        "uid": "26374762-36e4-4430-b891-6f749066b756"
+                    }
+                ],
+                "resourceVersion": "5316",
+                "uid": "c507f2fe-55ed-4695-9c2b-c922c09b2be5"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-011",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:58Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:56:58Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:58:39Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:57:36Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:57:28Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "cfce2655-9fe9-4999-81bf-9c2ca110a973"
+                },
+                "name": "job-omni-batch-012-58cba",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-012",
+                        "uid": "cfce2655-9fe9-4999-81bf-9c2ca110a973"
+                    }
+                ],
+                "resourceVersion": "5571",
+                "uid": "a87960be-3829-4977-b056-3f490d4eaed5"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-012",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:57:28Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:57:28Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:05Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:58:09Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:57:58Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "b740dd22-5e41-4e4d-888c-224efb45ca98"
+                },
+                "name": "job-omni-batch-013-d27d0",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-013",
+                        "uid": "b740dd22-5e41-4e4d-888c-224efb45ca98"
+                    }
+                ],
+                "resourceVersion": "5881",
+                "uid": "37b93613-d96d-4eae-8844-ae068c791132"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-013",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:57:58Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:57:58Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:47Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:58:42Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 3,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:58:28Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "b1921851-f935-4c08-95ed-2f07ade43cb2"
+                },
+                "name": "job-omni-batch-014-97a0b",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-014",
+                        "uid": "b1921851-f935-4c08-95ed-2f07ade43cb2"
+                    }
+                ],
+                "resourceVersion": "6146",
+                "uid": "cdd69949-393d-4a7b-8c15-fa6beefc17f1"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-014",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:58:28Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:58:28Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:00:18Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:05Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:58:58Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "2a9bf611-0c40-489f-b8eb-3db2e0973b27"
+                },
+                "name": "job-omni-batch-015-e4476",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-015",
+                        "uid": "2a9bf611-0c40-489f-b8eb-3db2e0973b27"
+                    }
+                ],
+                "resourceVersion": "6551",
+                "uid": "2b93e0b1-f1fd-4666-b8e7-7737c009a2eb"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-015",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:58:58Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:58:58Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:01:05Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:37Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:59:28Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "d7719ba6-7018-4211-932a-7b1713d371d7"
+                },
+                "name": "job-omni-batch-016-4e734",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-016",
+                        "uid": "d7719ba6-7018-4211-932a-7b1713d371d7"
+                    }
+                ],
+                "resourceVersion": "6710",
+                "uid": "668ccf6e-371d-4eb9-a8d0-87debf9254fb"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-016",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:28Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:28Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:01:29Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:00:17Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T03:59:59Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "6b0b17d6-26f1-43b3-a81e-ecc80cb8c63c"
+                },
+                "name": "job-omni-batch-017-c815b",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-017",
+                        "uid": "6b0b17d6-26f1-43b3-a81e-ecc80cb8c63c"
+                    }
+                ],
+                "resourceVersion": "7052",
+                "uid": "cdc083bf-206a-4ab6-90a7-bce3a3ad424f"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-017",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:59Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T03:59:59Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:02:04Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:00:50Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T04:00:29Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "3e00fe7d-217e-4461-8085-cb1eb547da9b"
+                },
+                "name": "job-omni-batch-018-ce667",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-018",
+                        "uid": "3e00fe7d-217e-4461-8085-cb1eb547da9b"
+                    }
+                ],
+                "resourceVersion": "7364",
+                "uid": "10b79c62-57cb-4715-8237-49531b570efd"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-018",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T04:00:29Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:00:29Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:02:43Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:01:11Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 3,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T04:00:59Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "74528be5-ac15-4865-a73f-511689de64e1"
+                },
+                "name": "job-omni-batch-019-6437b",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-019",
+                        "uid": "74528be5-ac15-4865-a73f-511689de64e1"
+                    }
+                ],
+                "resourceVersion": "7593",
+                "uid": "a7a85d31-e84f-4e67-9996-2c79fda6bfb6"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-019",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T04:00:59Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:00:59Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:12Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:01:56Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T04:01:30Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "6296c527-abc0-41a5-8b12-40820f9bbd35"
+                },
+                "name": "job-omni-batch-020-128dc",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-020",
+                        "uid": "6296c527-abc0-41a5-8b12-40820f9bbd35"
+                    }
+                ],
+                "resourceVersion": "7875",
+                "uid": "71919223-26b5-47ac-bea8-81ea31e162e1"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-020",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T04:01:30Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:01:30Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:46Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:02:34Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T04:02:00Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "635df889-a39b-4037-9c1d-ca0d685c0918"
+                },
+                "name": "job-omni-batch-021-c6800",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-021",
+                        "uid": "635df889-a39b-4037-9c1d-ca0d685c0918"
+                    }
+                ],
+                "resourceVersion": "8220",
+                "uid": "ae916eb2-e052-466a-aa2e-fd223ade5097"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-021",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T04:02:00Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:02:00Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:04:35Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:04Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T04:02:30Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "c2f3399b-086d-4685-9c4c-633205135403"
+                },
+                "name": "job-omni-batch-022-05076",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-022",
+                        "uid": "c2f3399b-086d-4685-9c4c-633205135403"
+                    }
+                ],
+                "resourceVersion": "8325",
+                "uid": "0f40a62e-2f6b-40f6-b295-c6230d50a148"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-022",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T04:02:31Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:02:31Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:04:48Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:30Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T04:03:01Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "c9b84c8f-44cf-4189-a2be-663ad0689aa6"
+                },
+                "name": "job-omni-batch-023-90063",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-023",
+                        "uid": "c9b84c8f-44cf-4189-a2be-663ad0689aa6"
+                    }
+                ],
+                "resourceVersion": "8389",
+                "uid": "623baac4-e46b-4a1b-b26b-1ad598007803"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-023",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:01Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:01Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:04:59Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:53Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 3,
+                        "name": "main"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "kueue.x-k8s.io/v1beta2",
+            "kind": "Workload",
+            "metadata": {
+                "creationTimestamp": "2026-10-24T04:03:31Z",
+                "generation": 1,
+                "labels": {
+                    "kueue.x-k8s.io/job-uid": "4f30e4e6-1314-4b36-8caf-6dc68731aabd"
+                },
+                "name": "job-omni-batch-024-a6cc2",
+                "namespace": "default",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "omni-batch-024",
+                        "uid": "4f30e4e6-1314-4b36-8caf-6dc68731aabd"
+                    }
+                ],
+                "resourceVersion": "8429",
+                "uid": "635e7cf7-a31a-4819-8cfe-78a836789a93"
+            },
+            "spec": {
+                "active": true,
+                "podSets": [
+                    {
+                        "count": 5,
+                        "name": "main",
+                        "template": {
+                            "metadata": {
+                                "labels": {
+                                    "app": "omni-batch-stream",
+                                    "batch.kubernetes.io/job-name": "omni-batch-024",
+                                    "omni-stream": "1"
+                                }
+                            },
+                            "spec": {
+                                "containers": [
+                                    {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-c",
+                                            "dd if=/dev/zero bs=1M count=3000 2\u003e/dev/null | sha256sum"
+                                        ],
+                                        "image": "busybox:1.36",
+                                        "imagePullPolicy": "IfNotPresent",
+                                        "name": "work",
+                                        "resources": {
+                                            "limits": {
+                                                "cpu": "1",
+                                                "memory": "64Mi"
+                                            },
+                                            "requests": {
+                                                "cpu": "500m",
+                                                "memory": "64Mi"
+                                            }
+                                        },
+                                        "terminationMessagePath": "/dev/termination-log",
+                                        "terminationMessagePolicy": "File"
+                                    }
+                                ],
+                                "dnsPolicy": "ClusterFirst",
+                                "restartPolicy": "Never",
+                                "schedulerName": "default-scheduler",
+                                "securityContext": {},
+                                "terminationGracePeriodSeconds": 30
+                            }
+                        },
+                        "topologyRequest": {
+                            "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+                        }
+                    }
+                ],
+                "priority": 0,
+                "queueName": "omni-queue"
+            },
+            "status": {
+                "admission": {
+                    "clusterQueue": "omni-cluster-queue",
+                    "podSetAssignments": [
+                        {
+                            "count": 5,
+                            "flavors": {
+                                "cpu": "default-flavor",
+                                "memory": "default-flavor"
+                            },
+                            "name": "main",
+                            "resourceUsage": {
+                                "cpu": "2500m",
+                                "memory": "320Mi"
+                            }
+                        }
+                    ]
+                },
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:31Z",
+                        "message": "Quota reserved in ClusterQueue omni-cluster-queue",
+                        "observedGeneration": 1,
+                        "reason": "QuotaReserved",
+                        "status": "True",
+                        "type": "QuotaReserved"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:03:31Z",
+                        "message": "The workload is admitted",
+                        "observedGeneration": 1,
+                        "reason": "Admitted",
+                        "status": "True",
+                        "type": "Admitted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:05:04Z",
+                        "message": "Reached expected number of succeeded pods",
+                        "observedGeneration": 1,
+                        "reason": "Succeeded",
+                        "status": "True",
+                        "type": "Finished"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-24T04:04:35Z",
+                        "message": "All pods reached readiness and the workload is running",
+                        "observedGeneration": 1,
+                        "reason": "Recovered",
+                        "status": "True",
+                        "type": "PodsReady"
+                    }
+                ],
+                "reclaimablePods": [
+                    {
+                        "count": 4,
+                        "name": "main"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
