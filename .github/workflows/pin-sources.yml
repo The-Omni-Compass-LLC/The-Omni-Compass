@@ -14,6 +14,7 @@ on:
       urls: {description: "Files to read, separated by spaces", default: ""}
       index: {description: "A Helm chart index (index.yaml) to list", default: ""}
       chart: {description: "The chart's name in that index", default: ""}
+      repos: {description: "GitHub projects (owner/name, separated by spaces) whose newest releases to list", default: ""}
 permissions:
   contents: read
 env:
@@ -50,6 +51,15 @@ jobs:
           for e in (d.get("entries", {}).get(os.environ["CHART"]) or [])[:12]:
               print(f"| {e.get('name')} | {e.get('version')} | {e.get('appVersion')} | {e.get('kubeVersion', '')} | {str(e.get('created', ''))[:10]} | {(e.get('urls') or [''])[0]} |")
           EOF
+      - name: The projects' newest releases
+        if: github.event.inputs.repos != ''
+        env: {REPOS: "${{ github.event.inputs.repos }}", GH_TOKEN: "${{ github.token }}"}
+        run: |
+          { echo; echo '| Project | Release | Published | Assets |'; echo '|---|---|---|---|'; } >> "$GITHUB_STEP_SUMMARY"
+          for r in $REPOS; do
+            gh api "repos/$r/releases?per_page=4" --jq '.[] | select(.draft == false) | "| '"$r"' | \(.tag_name)\(if .prerelease then " (pre-release)" else "" end) | \(.published_at[0:10]) | \([.assets[].name] | join(", ") | .[0:300]) |"' \
+              | tee -a "$GITHUB_STEP_SUMMARY" || echo "| $r | not read | | |" | tee -a "$GITHUB_STEP_SUMMARY"
+          done
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
