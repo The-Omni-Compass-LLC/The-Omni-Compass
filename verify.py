@@ -374,6 +374,9 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "reread.py"), "--check"], capture_output=True, text=True)
     check("every table reads by the rule that stands: a change of 0.5% or more is a change (tools/reread.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "toy_reread.py"), "--check"], capture_output=True, text=True)
+    check("every toy-gate record reads by the rule that stands, from its own runs seed by seed (tools/toy_reread.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "loss_ledger.py"), "--check"], capture_output=True, text=True)
     check("every LOSS row of every newest table on one page: docs/LOSS_LEDGER.md is rebuilt from the tables (tools/loss_ledger.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
