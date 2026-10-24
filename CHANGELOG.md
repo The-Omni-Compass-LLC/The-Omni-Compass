@@ -4,6 +4,10 @@
 
 ## 2026-10-24: the clouds' keys read to the letter of their shape
 
+- **Azure runs; Amazon off** (06:17 UTC): with the four boxes filled, Azure's check passed (the key, the login, the subscription and,
+  after the allowance request of `azure-quota.yml`, the processor allowance), and the conductor started the steady set by itself.
+  Amazon told the founder its Free plan cannot be raised to the Paid plan before the $100 credit is spent or the account is six
+  months old, so `scripts/amazon_queue.txt` reads `switch=off`: no hourly check fails there and nothing starts until his word.
 - **Azure's login in four boxes, one value each** (the founder pasting the portal's numbers one at a time): the Azure sets and
   Azure's $0 check sign in with `AZURE_CREDENTIALS` when it holds the whole block, or else with the block built from four boxes,
   each holding one value as the portal shows it: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (the boxes the
