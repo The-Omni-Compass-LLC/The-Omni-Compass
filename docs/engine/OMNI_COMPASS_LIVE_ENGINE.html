@@ -2182,7 +2182,7 @@ const WORD_SIGN = {GAIN: "+", LOSS: "−", EVEN: "=", "power given": "+"};
 const SIGN_WHY = {
   GAIN: "GAIN: against native the gauge moved toward its aim (less time waited, missed or failed; more work done; a resource cut). The number is the size of that move and wears the word's plus whichever way the raw figure ran: pods waiting that fell 29.6% are written GAIN +29.6%, because fewer waiting is the gain.",
   LOSS: "LOSS: against native the gauge moved away from its aim (more time waited, missed or failed; less work done). The number is the size of that move and wears the word's minus: alert minutes that rose 2.3% are written LOSS −2.3%.",
-  EVEN: "EVEN: native and Omni-Compass could not be told apart, in one of the key's three ways: no difference beyond the noise; a change under the 0.5% floor in every run (EVEN, under the floor, the row keeping its measured size); or a knob native already runs at the top of its range (EVEN, at its limit on native). The number wears = and claims no direction.",
+  EVEN: "EVEN: the change is under 0.5% (the mean of the runs: EVEN, under the floor, the row keeping its measured size), there is no change at all, or a knob native already runs at the top of its range (EVEN, at its limit on native). From 0.5% up every change reads GAIN, LOSS or power given (the founder's order of 24 October). The number wears = and claims no direction.",
   "power given": "power given: more of a resource put in (energy, machines, memory, processor time) or held (a peak, a swing, an unevenness of the power drawn) to buy the work and the speed shown beside it; work bought with each unit of a resource that fell is power given too. It wears the word's plus and is never a loss; where the same resource fell, the fall is a cut and reads GAIN."
 };
 const whyOf = w => SIGN_WHY[/^power given/.test(w || "") ? "power given" : /^GAIN/.test(w || "") ? "GAIN" : /^LOSS/.test(w || "") ? "LOSS" : /^EVEN/.test(w || "") ? "EVEN" : ""] || "";
@@ -2903,8 +2903,9 @@ function pairedReading(na, oa, aim, kind) {   // the paired change per decision,
   // batch means: the paired change averaged over blocks of 10 decisions, so neighbouring decisions do not count twice
   const d = []; for (let t = 0; t + 10 <= n; t += 10) { let x = 0; for (let k = t; k < t + 10; k++) x += oa[k] - na[k]; d.push(x/10); }
   if (d.length < 3) return ["EVEN", "w-even"];
-  const nb = d.length, m = d.reduce((a, b) => a + b, 0)/nb, sd = Math.sqrt(d.reduce((a, b) => a + (b - m)**2, 0)/(nb - 1)), half = tq(nb - 1)*sd/Math.sqrt(nb);
-  if (m - half <= 0 && m + half >= 0) return ["EVEN", "w-even"];
+  const nb = d.length, m = d.reduce((a, b) => a + b, 0)/nb;
+  const base = Math.abs(na.reduce((a, b) => a + b, 0)/Math.max(1, na.length)) || 1e-12;
+  if (Math.abs(m)/base < (FLOORV === null ? 0.005 : FLOORV)) return ["EVEN", "w-even"];   // under 0.5%: EVEN; from 0.5% up a change (24 October)
   const rose = m > 0;
   if (kind === "spent") return rose ? ["power given", "w-given"] : ["GAIN", "w-gain"];
   return (aim === "up" ? rose : !rose) ? ["GAIN", "w-gain"] : ["LOSS", "w-loss"];
@@ -2917,16 +2918,30 @@ function pairedInterval(na, oa) {   // the paired change over blocks of ten deci
   const nb = d.length, m = d.reduce((a, b) => a + b, 0)/nb, sd = Math.sqrt(d.reduce((a, b) => a + (b - m)**2, 0)/(nb - 1)), half = tq(nb - 1)*sd/Math.sqrt(nb);
   return {change: m/base, lo: (m - half)/base, hi: (m + half)/base};
 }
-var FLOORV = null;   // the founder's floor of 20 October (0.5%), set from the build record once it is read; null until then
-function threeRun(runs, aim) {   // as the tables read it (tools/confirm_abc.py): clear runs pointing different ways disagree; then any run holding zero is EVEN
+var FLOORV = null;   // the founder's floor (0.5%), set from the build record once it is read; null until then, read as 0.5%
+function threeRun(runs, aim) {   // as the tables read it (tools/readings.py three_run_reading, the founder's order of 24 October):
+  // a change of 0.5% or more, the mean of the runs, is a GAIN, a LOSS or power given by the gauge's aim; EVEN under 0.5%;
+  // runs that moved 0.5% or more in opposite directions disagree
   if (aim === "shown") return ["shown", "w-shown"];   // M1 fix: DO NOT fabricate EVEN when OFF. Calculate the actual recorded verdict.
   if (!runs.length) return ["EVEN", "w-even"];
-  const clear = runs.filter(r => r.lo > 0 || r.hi < 0), up = clear.map(r => r.change > 0);
-  if (up.some(x => x !== up[0])) return ["the runs disagree", "w-dis"];
-  if (clear.length < runs.length) return ["EVEN", "w-even"];
-  if (FLOORV !== null && runs.every(r => Math.abs(r.change) < FLOORV)) return ["EVEN", "w-even"];   // every run under the floor: EVEN, under the floor (20 October)
-  if (aim === "spent") return up[0] ? ["power given", "w-given"] : ["GAIN", "w-gain"];
-  return (aim === "up" ? up[0] : !up[0]) ? ["GAIN", "w-gain"] : ["LOSS", "w-loss"];
+  const F = FLOORV === null ? 0.005 : FLOORV, mean = runs.reduce((a, r) => a + r.change, 0)/runs.length;
+  const moving = runs.filter(r => Math.abs(r.change) >= F).map(r => r.change > 0);
+  if (moving.some(x => x !== moving[0])) return ["the runs disagree", "w-dis"];
+  if (Math.abs(mean) < F) return ["EVEN", "w-even"];
+  const rose = mean > 0;
+  if (aim === "spent") return rose ? ["power given", "w-given"] : ["GAIN", "w-gain"];
+  return (aim === "up" ? rose : !rose) ? ["GAIN", "w-gain"] : ["LOSS", "w-loss"];
+}
+function firmness(runs) {   // how firmly a three-run word stands: every run the same way and clear of zero, or the mean of the runs
+  const clear = runs.filter(r => (r.lo > 0 || r.hi < 0) && Math.sign(r.change) === Math.sign(runs[0].change)).length;
+  return clear === runs.length && runs.every(r => Math.sign(r.change) === Math.sign(runs[0].change)) ? "in all three of our runs"
+    : `by the mean of our three runs, beyond the noise in ${runs.filter(r => r.lo > 0 || r.hi < 0).length} of ${runs.length}`;
+}
+function runSign(r, aim) {   // one run's own sign: its own word's, EVEN (=) under the floor
+  const F = FLOORV === null ? 0.005 : FLOORV;
+  if (aim === "shown" || Math.abs(r.change) < F) return "=";
+  const rose = r.change > 0, w = aim === "spent" ? (rose ? "power given" : "GAIN") : ((aim === "up" ? rose : !rose) ? "GAIN" : "LOSS");
+  return wordSign(w) || "";
 }
 const fmtV = (v, dp) => isNaN(v) ? "—" : v.toLocaleString(undefined, {maximumFractionDigits: dp, minimumFractionDigits: dp});
 const mag = x => { const a = Math.abs(100*x); return (a >= 10 ? a.toFixed(1) : a >= 1 ? a.toFixed(1) : a >= 0.01 ? a.toFixed(2) : a >= 0.00005 ? a.toFixed(4) : "0") + "%"; };   // the size of a change, its direction carried by its word
@@ -2936,7 +2951,8 @@ function threeCell(rd, aim) {
   // Visual state (color, label) is managed via CSS and data attributes, not by falsifying data.
   if (!rd) return `<span class="note">${W.body === "model" ? "press Run A, B and C" : "—"}</span>`;
   const [wd, cl] = aim === "shown" ? ["shown", "w-shown"] : threeRun(rd, aim);
-  return `<span class="word ${cl}">${wd}</span><small class="${cl === "w-shown" ? "" : cl}">${rd.map((r, i) => "ABC"[i] + " " + (wordSign(wd) || "") + mag(r.change)).join(" · ")}</small>`;
+  const how = /^(GAIN|LOSS|power given)/.test(wd) ? ` <small class="note">${firmness(rd)}</small>` : "";
+  return `<span class="word ${cl}">${wd}</span>${how}<small class="${cl === "w-shown" ? "" : cl}">${rd.map((r, i) => "ABC"[i] + " " + runSign(r, aim) + mag(r.change)).join(" · ")}</small>`;
 }
 function lineMean(arm) {   // the share of its run each muscle with a line took to clear it, this run (each muscle alone)
   const L = TRD.alone[HS().seeds[W.run]][arm].line || []; const nat = TRD.alone[HS().seeds[W.run]].native.line || [];
