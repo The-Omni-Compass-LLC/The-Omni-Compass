@@ -33,14 +33,16 @@ echo "repetition $REP, order: ${order[*]}, work group $TYPE x up to $MAX in $REG
 # on-demand vCPU quota for standard instances (L-1216C47A) has room for the system machine and the whole work group.
 # PREFLIGHT_ONLY=1 (.github/workflows/cloud-check.yml) stops after it; QUOTA_REQUEST=1 files the quota increase with
 # Amazon when the quota is short (the founder's order of 18 October: a quota is raised with the cloud, never shrunk to fit).
+# Amazon's own words for a run's public page: the account, organization and policy numbers it quotes are masked
+aws_words() { tr '\n' ' ' < /tmp/eks-preflight.err | sed -E 's/[0-9]{12}/<account>/g; s/o-[a-z0-9]{10,32}/<organization>/g; s/p-[a-z0-9]{8,128}/<policy>/g' | cut -c1-400; }
 aws sts get-caller-identity --query Arn --output text >/dev/null 2>/tmp/eks-preflight.err \
-  || { echo "pre-flight: Amazon refused the keys (AWS said: $(tr '\n' ' ' < /tmp/eks-preflight.err | cut -c1-400)): nothing built, nothing billed"; exit 2; }
+  || { echo "pre-flight: Amazon refused the keys (AWS said: $(aws_words)): nothing built, nothing billed"; exit 2; }
 vcpu=$(aws ec2 describe-instance-types --region "$REGION" --instance-types "$TYPE" \
   --query 'InstanceTypes[0].VCpuInfo.DefaultVCpus' --output text 2>/tmp/eks-preflight.err || true)
 case "$vcpu" in ''|None)
   # Amazon's own words, so a refusal (a new account not yet verified, a region not enabled, a missing permission) is
   # never read as "not offered"; the keys are never printed, only the error AWS returns
-  why=$(tr '\n' ' ' < /tmp/eks-preflight.err | cut -c1-400)
+  why=$(aws_words)
   if grep -q "explicit deny in a service control policy" /tmp/eks-preflight.err; then
     # the limit Amazon puts on an account on its Free plan (18 October): every machine read is denied above the keys
     echo "pre-flight: the AWS account is on Amazon's Free plan, which denies every machine read; upgrade it to the Paid plan" \
