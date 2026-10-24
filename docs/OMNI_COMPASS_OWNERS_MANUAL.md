@@ -8,7 +8,7 @@
 mathematics it runs on, its mechanism, how it is built, every result with its evidence class, and how it is wired, run
 and checked. It is written for whoever owns or licenses Omni-Compass and so must know the whole mechanism. The
 Operator's Manual (`docs/OMNI_COMPASS_MANUAL.md`) is the book for the people who wire and run it; its Part VI (chapters
-13 to 28) is the implementer's whole path onto a cloud, from an empty account to a governed cluster, and is the
+13 to 30) is the implementer's whole path onto a cloud, from an empty account to a governed cluster, and is the
 reference for that work in both books. The printed
 book of this text is `docs/OMNI_COMPASS_OWNERS_MANUAL.pdf` (`python3 docs/book/build_book.py --owner`).
 
@@ -435,7 +435,7 @@ Every question has a place in this book, and the places outside it are few and n
 | The next step while wiring | the level you are at (section 9) and your stack (section 10); every step names what you should see when it is done right |
 | A reading you do not understand | the key at the front of this book; section 14 (evidence classes and how to read a result); Appendix D (metrics); section 13's reference bands |
 | A symptom | Appendix E (troubleshooting); section 11 (the three ways a governor stops); section 7.3 (blind means hold); section 8.5 (wired right or wired wrong) |
-| A setting or an audit line | the Operator's Manual, Appendices I and J (every setting and every record, field by field); the source itself in this book's Source appendix |
+| A setting or an audit line | the Operator's Manual, Appendices K and L (every setting and every record, field by field); the source itself in this book's Source appendix |
 | How the engine works | Part II (the mechanism of action), Part III (the physics), Appendix C (the equations in full), the Source appendix |
 | What a result elsewhere means | `DISCLOSURES.md`, section 4 (the front matter): the first presumption is the wiring, the settings or the reading, never the law |
 | A licensing, pilot or Enterprise License question | The Omni-Compass LLC, main office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1, landline 321-746-4411 registered in Florida; www.omni-compass.com; the chapters "Licensing: Questions and Answers" and "The Enterprise License: Standard Terms" |
@@ -2245,7 +2245,7 @@ read-back, restore, nothing left behind), and it enters service through the leve
 
 | You run | You need |
 |---|---|
-| Kubernetes (vanilla, AKS, OpenShift/OKD, Rancher, kind, or any provider's managed Kubernetes) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each governed service; a readiness probe and a short preStop pause on each service |
+| Kubernetes (vanilla, EKS, GKE, AKS, OpenShift/OKD, Rancher, kind) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each governed service; a readiness probe and a short preStop pause on each service |
 | A response-time feed (strongly recommended at every level) | a CSV per service, `elapsed_seconds,latency_ms,ok`, written continuously; `scripts/latency_probe.py` writes one against any HTTP endpoint |
 | NVIDIA GPUs | a driver with `nvidia-smi`; root (or the capability to run `nvidia-smi -pl` and `-lgc`); on a VM, full GPU passthrough |
 | CPU power control | Linux cpufreq with the schedutil governor; RAPL for package watts; usually bare metal |
@@ -2376,7 +2376,7 @@ Pass: p95, p99 and failed requests never behind native, over paired runs (sectio
 | Your platform | The park/wake command |
 |---|---|
 | any cluster, bare metal, kind | `bash scripts/kind_nodepool.sh {n}` |
-| Karpenter | the NodePool CPU limit at `{n}` times node CPU, parked nodes kept |
+| Karpenter / EKS Auto Mode | the NodePool CPU limit at `{n}` times node CPU, parked nodes kept |
 | Cluster Autoscaler node group | the group's desired size, scale-down through parking |
 | OpenShift / OKD | the worker MachineSet replicas, parked |
 
@@ -2485,8 +2485,8 @@ OFF. Native is always the stack's own controller left as shipped; omni is that c
 | Stack | Levels | Notes |
 |---|---|---|
 | Vanilla Kubernetes, kind, Rancher | 1-7 | as written |
-| Azure AKS | 1-5 | the node-pool size as the park/wake command; the managed cluster autoscaler stays native and deletes the machines Omni-Compass idles (10.1); CPU power control is not exposed on rented virtual machines; GPUs on full-GPU machines |
-| Another provider's managed Kubernetes, on the operator's own | 1-5 | the provider's node-pool size, or Karpenter's NodePool limit, as the park/wake command, set up by the operator from the provider's own documentation |
+| Amazon EKS | 1-5 | machines via Cluster Autoscaler node group or Karpenter; CPU power control is not exposed on EC2 VMs; GPUs on bare-metal or full-GPU instances |
+| Google GKE, Azure AKS | 1-5 | the provider's node-pool size as the park/wake command; on AKS the managed cluster autoscaler stays native and deletes the machines Omni-Compass idles (10.1) |
 | Red Hat OpenShift / OKD | 1-5 | the same permissions through a Role; machines via the worker MachineSet |
 | NVIDIA GPU servers without Kubernetes | 5 | the two-wire GPU governor alone |
 | Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |
@@ -3226,7 +3226,7 @@ the table reads GAIN or EVEN for the same kind of service, is read as a wiring f
 section 4): the feed's freshness and its line, the sensed autoscaler's name, the identity's permissions (section 12), the window's length against the interval widths above. **Second the direction.** Where the table reads GAIN, your receipt should read GAIN or EVEN; a smaller gain
 is your stack's, not a fault, because the gain is bounded by how far native stood from its own best. **Third the power given.** A
 resource that rose on your receipt is read beside the work and the speed it bought; a rise with nothing bought is a question for
-the audit (the Operator's Manual, Appendix J): what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the
+the audit (the Operator's Manual, Appendix L): what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the
 top of its range (the knob is at its limit on native, and the governor leaves it there by design, section 7), and a machine count
 that does not fall where no machine can be given back without a LOSS (the audit's `node_gate.reason` names the gate that held).
 What the table cannot give is your number: the same engine on another stack is another result, and it is yours (section 3.7).
@@ -3757,8 +3757,7 @@ happened to work. The numbers of earlier engines are the road, in `docs/history`
 (`scripts/dispatch_grid.py`, `scripts/reruns.txt`: A of every benchmark, then B, then C), the steady and wandering Kubernetes
 tests among them; Azure one run at a time in its region (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day;
 A, B and C); the grid with the real cluster inside on GitHub's free runners. The runs of earlier engines already started
-run to their end and stand as their own engine's record. Azure is the one cloud the benchmarks rent (the founder's order of
-24 October took Google and Amazon out; on another cloud an operator installs Omni-Compass on their own); the GPU chips wait for the founder's word; the CPU governor's measured run waits for a machine with a power meter.
+run to their end and stand as their own engine's record. Google and Amazon are not yet run: their first sets, on omni-v10 on 18 October, stopped at the login at no cost, and since 24 October both queues are switched off and kept, wired as Azure's sets run (100 paired repetitions under the stopping rule, the 60 s beat, the $0 check first), each switched on by the founder's word (Google once its key is stored whole, Amazon once its account is on its Paid plan); the GPU chips wait for the founder's word; the CPU governor's measured run waits for a machine with a power meter.
 
 ### 16.6b Wire in, or watch: the verdict per knob
 
@@ -4058,7 +4057,7 @@ any one of the three can tell whether the files in front of them are the files t
 | The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
 | Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
 | The big organisms, detached | workflow `big-organism-detached`: `mode` start / collect / survey, `test` organism / scale / robust / direct, `organisms`, `size`, `duration_s`, `commit`, `max_hours` |
-| Omni direct on a rented cloud machine | `test` = `direct` on `big-organism-detached` (Azure): the three arms' full form, `reps` runs; `dry_run` yes shows the price and rents nothing |
+| Omni direct on a rented cloud machine | `test` = `direct` on `big-organism-detached` (Azure) or `cloud-organism` (`cloud` gcp or aws): the three arms' full form, `reps` runs; `dry_run` yes shows the price and rents nothing |
 | Archive a finished run with the code | nothing to do: workflow `archive-run` takes it within the hour; to take it at once, add its id to `.github/archive_request.txt` and push |
 | Verify before a push, as GitHub runs it | `python3 tools/release_manifest.py` under Python 3.12: 0 FAIL |
 

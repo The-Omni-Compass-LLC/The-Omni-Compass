@@ -13,8 +13,8 @@ How long: about 8 hours a run (10 paired repetitions, each arm about 25 minutes)
 make the result: about a day of machine time.
 
 What it costs: the server's rent for those hours. Two kinds of offer work: a monthly dedicated server (Hetzner, OVHcloud
-and others; roughly €40 to €70 a month with a setup fee) or an hourly bare-metal instance (a cloud's bare-metal size,
-roughly $4 an hour). The order page shows today's price; these are not quotes.
+and others; roughly €40 to €70 a month with a setup fee) or an hourly bare-metal instance (for example an Amazon EC2
+`c5.metal`, roughly $4 an hour). The order page shows today's price; these are not quotes.
 
 ## Step 1. Rent the server
 

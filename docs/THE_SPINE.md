@@ -83,7 +83,7 @@ own number. Every table lists the spine first, because the other six stand on it
 |---|---|
 | `tools/run_realms_v5.py` | every muscle alone, then the seven organisms under three loads; the spine's row first in every organisms table (`results/realms_v5/REALMS_V5.md`) |
 | `tools/run_scale.py --organisms 7`, workflow `six` | the spine at 1, 10, 100 and, on GitHub's own machines, 1,000 copies, over 1 to 1,000 paired runs |
-| `tools/run_kil.py --organism spine`, workflows `six-kube`, `aks-metered` | the spine with the real Kubernetes cluster inside it as one more muscle |
+| `tools/run_kil.py --organism spine`, workflows `six-kube`, `aks-metered`, `gke-metered`, `eks-metered`, `cloud-organism` | the spine with the real Kubernetes cluster inside it as one more muscle |
 | `tools/run_hil.py` | the spine with the real card inside it (the GPU Hardware family is a spine family) |
 | `scripts/dispatch_grid.py` | the spine's squares started, read back and never started twice like every other organism's |
 | `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | the spine's 267 muscles listed first; each muscle's organisms column names the spine |

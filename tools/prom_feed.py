@@ -4,7 +4,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The governor's response-time feed from the company's own Prometheus (the Operator's Manual, section 20.7).
+"""The governor's response-time feed from the company's own Prometheus (the Operator's Manual, section 22.7).
 
 Every --interval seconds it asks Prometheus, over its HTTP query API, for the requests the service served and failed in
 the last --window, and for the served requests' response-time quantiles over the same window, and appends rows

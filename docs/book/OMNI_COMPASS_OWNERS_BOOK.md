@@ -904,7 +904,7 @@ hands every setting back to native's value when it stops, dies or is switched of
 | More work, faster, on real Kubernetes | **Shown** (L, omni-v10 and omni-v11, each test on its newest table) | See section 2.3 |
 | More work, faster, on databases and caches | **Small or EVEN** (L, omni-v11) | Redis at the operator's ceiling: 4 gauge-rows GAIN at the tune-down, 6 at the max (work inside the line and hit rate up about 1%, for about 2% memory); Kafka 1 GAIN at each objective; MongoDB 1; PostgreSQL and MySQL 0, with every other gauge EVEN; native exactly as shipped: 0 GAIN, 0 LOSS (the knob at its limit on native or untouched). MySQL's update workload reads "the runs disagree" on throughput (±0.4%, a run-level effect: `docs/LIMITATIONS.md`). The runs at the max for MySQL, MongoDB and PostgreSQL are archiving |
 | Fewer machines | **Shown in one test** (L, omni-v10) | A queue of jobs: machines in service and node-hours cut 6% to 14%, the machines after the queue finished 10% to 22%, the queue finished EVEN |
-| A smaller cloud bill | **Undetermined** | Azure, the engine of 13 October: no difference in the bill (`results/live/AKS_BILL.md`); the Azure sets run one at a time on the engine that stands; Azure is the one cloud the benchmarks rent |
+| A smaller cloud bill | **Undetermined** | Azure, the engine of 13 October: no difference in the bill (`results/live/AKS_BILL.md`); the Azure sets run one at a time on the engine that stands; Google and Amazon have not run |
 | Less energy | **Undetermined** | No physical meter yet; every energy figure in a live test is a declared model, not a measurement |
 | More work per watt on a GPU | **Undetermined** | No run on the engine that stands |
 | One governor over every muscle and organism | **Modelled** (S) | 1,107 muscles in our own models: 527 GAIN, 580 EVEN, 0 LOSS (`results/realms_v5/REALMS_V5.md`); a few dozen knobs on real systems |
@@ -935,7 +935,8 @@ rise. Where processor is billed by use, it is a cost, and the table shows it.
 
 ### 2.4 What is undetermined, and what decides it
 
-- **The cloud bill**: the Azure sets on the engine that stands (one at a time); Azure is the one cloud the benchmarks rent.
+- **The cloud bill**: the Azure sets on the engine that stands (one at a time); Google once its key is stored whole; Amazon once its account is on the
+  Paid plan.
 - **Energy**: a rented machine with the processor's own energy counters and a wall meter.
 - **The GPU**: the Lambda runs from one exact commit.
 - **Production**: a deployment on a customer's system with their sign-off.
@@ -971,7 +972,7 @@ measurement exists.
 | 5 | Method | B | **A−** | A | rules timestamped outside our repository before their runs; the pairs the power page asks for |
 | 6 | Real Kubernetes | B− | **B+** | A | every Kubernetes test's three omni-v11 runs in (seven waiting on their third run), and the cloud's multi-machine cluster |
 | 7 | Databases and caches | C | **B−** | A− | more pairs a run (`docs/POWER.md`), the max for MySQL, MongoDB and PostgreSQL (archiving), gains where the knob has room |
-| 8 | Cloud bill | Undetermined | Undetermined | graded on its result | the Azure sets at the cap (running) |
+| 8 | Cloud bill | Undetermined | Undetermined | graded on its result | the Azure sets at the cap (running), then Google and Amazon |
 | 9 | Energy | Undetermined | Undetermined | graded on its result | a physical meter: Kepler and the machine's own meter on a bare-metal machine |
 | 10 | GPU | Undetermined | Undetermined | graded on its result | the Lambda runs from one exact commit, on the founder's word |
 | 11 | Modelled muscles | C− | **C−** | B | each plant model calibrated against a measured system, with its error stated |
@@ -1040,7 +1041,7 @@ version, and every benchmark runs again on it):
 
 **What a buyer will ask for that is not here yet** (the founder's question of 19 October, answered from the repository):
 - *Proof*: a physical meter (every energy figure is a declared model; the GPU on Lambda or a metered machine closes it); a cloud
-  bill on the engine that stands (Azure running); native at its best (the cost to match,
+  bill on the engine that stands (Azure running, Google's key and Amazon's plan pending); native at its best (the cost to match,
   native tuned harder by its operator beside Omni-Compass on top, last run on 3 October on an engine long gone, runs again on
   omni-v11 from the campaign); an outside party's rerun; a real multi-machine cluster (kind puts every node on one runner);
   days to weeks on a real workload; each rule's share of the gain read on the live cluster, not only in our models.
@@ -3197,7 +3198,7 @@ at once.
 | H8 | It writes outside what the operator allows | A capability contract (minimum, maximum, resolution, step and rate limits) and a safety contract (hard bounds, forbidden contexts, fail closed) on every muscle (`omnicompass/muscle_sdk.py`: `CapabilityContract`, `SafetyContract`) | `tests/test_muscle_sdk.py` |
 | H9 | It uses more privilege than its job needs | Least-privilege service account (`deploy/kind/rbac-omni.yaml`), and every arm records what it can and cannot do (`kubectl auth can-i`, `rbac_omni.txt` in each run's folder) | The receipts in every run folder on the branch `raw` |
 | H10 | It expands while a security hold is on | The shield: no expansion during a security hold (invariant I1), with a C++ twin checked against the Python (`omnicompass/shield.py`, `cpp/`) | `tests/test_shield_properties.py`, `tests/test_cpp_shield_parity.py`, `tests/test_cpp_shield_adversarial.py` |
-| H11 | In the cloud, it raises the bill | Machines alone (`--give-back-only`): no pod autoscaler moved, no processor conveyed, no power capped. It only parks a machine the cloud already made, after its own trial, and wakes it on a breach (`scripts/kind_bench.sh`, `OMNI_MACHINES_ONLY=1`) | Azure: no difference in the bill on the engine of 13 October (`results/live/AKS_BILL.md`); the Azure sets run one at a time on the engine that stands; Azure is the one cloud the benchmarks rent. |
+| H11 | In the cloud, it raises the bill | Machines alone (`--give-back-only`): no pod autoscaler moved, no processor conveyed, no power capped. It only parks a machine the cloud already made, after its own trial, and wakes it on a breach (`scripts/kind_bench.sh`, `OMNI_MACHINES_ONLY=1`) | Azure: no difference in the bill on the engine of 13 October (`results/live/AKS_BILL.md`); the Azure sets run one at a time on the engine that stands. Google and Amazon: **undetermined**, not yet run. |
 | H12 | A test machine's limit is reported as the governor's effect | Paired arms on the same runner, rotated order, the refusal rules for an unhealthy window, and the kind rig's image pre-puller (`docs/POD_START_WAIT.md`). `tools/confirm_abc.py` marks any table whose runs differ in engine or rig | `tests/test_confirm_abc.py`, `tests/test_pod_phases.py`, `tests/test_release_campaign.py` |
 | H13 | The hand-back itself is turned against the system: a record another local user planted makes the watchdog run a command or stop a process, or a governor's pid given to another process gets that process stopped | The watchdog acts only on records of its own user that no other user can write, read without following a link; a pid counts as the governor's only while its process started before the governor registered (`tools/omni_switch.py`, 18 October). Every threat of misuse is set out in `docs/THREAT_MODEL.md` | `tests/test_switch_trust.py` (each fault reproduced on the tool as it stood, gone on the fix) |
 
@@ -3276,7 +3277,7 @@ analysis: **no outside security review or penetration test has been made**, and 
 | T7 | The engine's code is changed | The engine is fingerprinted: `OMNI_V16.json` names the digest of its 55 files, and `python3 tools/omni_version.py` names the engine a checkout carries, or what differs from every fingerprint. `python3 verify.py` holds every place that names the engine to the engine that stands (`tools/land_engine.py --check`) | `tests/` (the release manifest and the version tool); every run's receipt names the engine its commit carries | Releases are not signed artefacts, the repository's bots commit unsigned, and nothing checks the fingerprint when a governor starts |
 | T8 | A dependency is replaced (a Python package, a GitHub action) | Every package pip installs is pinned to an exact version with the SHA-256 of every file PyPI publishes for it (`requirements-lock.txt`, hash-checking mode), with a software bill of materials (`sbom/omni-compass.cdx.json`, `sbom/omni-compass.spdx.json`, written by `tools/sbom.py`); every action a workflow uses is named by its commit, its tag beside it (407 uses, 19 October); `security-scan.yml` audits every pin against the public vulnerability databases each week; Dependabot watches both the packages and the actions (`.github/dependabot.yml`) | `tests/test_supply_chain.py` fails a push with an action named by tag or a package without hashes; `tools/sbom.py --check` in `verify.py` | Closed for what Omni-Compass installs; the tools a benchmark machine installs from its own package manager (kind, kubectl, the databases) are pinned by version, not by hash |
 | T9 | A secret leaks from a workflow | Secrets reach only workflows started on this repository (a push or a dispatch); no workflow runs on `pull_request_target`, so no fork's code ever runs with them. Secrets are kept in GitHub's store only, and GitHub masks them in every log. A key stored in another form is named by its shape before any cloud's login step reads it, never a character of it printed (`tools/cloud_key_check.py`), because a login step's own refusal can quote the first characters of what it was given, and a piece of a secret is not masked (21 October: Azure's did, on a public run page) | Every workflow names its token's rights; `tests/test_cloud_check.py` fails a push that leaves any Azure login without the shape check before it; the 28 that only build, run and upload get `contents: read` and nothing else (18 October). `tests/test_workflow_permissions.py` fails a push that leaves any workflow on the repository's default, or gives a read-only token to a workflow that pushes, starts a run or reads another run's files | — |
-| T10 | A run spends money it should not | In a cloud, the governor works on the machines alone: it parks a machine the cloud already made and wakes it on a breach, and moves no pod, conveys no processor and caps no power (`OMNI_MACHINES_ONLY=1`). An Azure set starts only after Azure's $0 check passes (since 22 October: the key, the login, the subscription, the machine type, every allowance; `tools/cloud_key_check.py`); Azure is the one cloud the benchmarks rent. Nothing is rented for the grid | `results/live/AKS_BILL.md`; `tests/test_cloud_check.py` | The credentials in the secrets can create clusters; their scope is set in Azure's console |
+| T10 | A run spends money it should not | In a cloud, the governor works on the machines alone: it parks a machine the cloud already made and wakes it on a breach, and moves no pod, conveys no processor and caps no power (`OMNI_MACHINES_ONLY=1`). A cloud's set starts only after that cloud's $0 check passes (Google, Amazon and, since 22 October, Azure: the key, the login, the plan, the machine type, every quota; `tools/cloud_key_check.py`). Nothing is rented for the grid | `results/live/AKS_BILL.md`; `tests/test_cloud_check.py` | The credentials in the secrets can create clusters; their scope is set in each cloud's console |
 | T11 | The evidence is changed after the run | Every archived run is kept byte for byte on the branch `raw` with its SHA-256 sums (`scripts/raw_archive.sh`); every table names its runs and is rebuilt by its own tool from them | `tests/test_raw_archive.py` | Audit lines are not signed when written; the sums protect them from the moment they are archived |
 | T12 | The system's control plane is taken away (the API server frozen, the metrics server gone) | The governor holds on a reading it cannot make; a failed decision writes nothing; its lease runs 300 s at a 60-second decision, so a short outage does not hand back what is working | The extended fault test (queued, A, B and C: `docs/K8S_COMPASS_PREREGISTRATION.md`) | Whatever the runs read is reported |
 
@@ -3455,9 +3456,9 @@ And after it landed, the three runs on GitHub's machines (the full form, A, B an
 Every benchmark runs again on omni-v18: the conductor's campaign opened at 21:19 UTC on 23 October (`scripts/dispatch_grid.py`,
 `scripts/reruns.txt`), and the clouds' sets run on it once each cloud's own $0 check passes. In the clouds nothing changes: Omni
 on top of the cloud's Kubernetes at the tune-down, on the machines alone (the order of 14 October). Omni direct runs on GitHub's
-own machines, three runs from one commit (`orchestrator.yml`). Omni direct is ready on a rented Azure machine and runs
-there only on the founder's word: the test `direct` on the one-machine button (`big-organism-detached.yml`;
-`scripts/organism_detached.sh`) rents one 8-processor machine, ships it the exact
+own machines, three runs from one commit (`orchestrator.yml`). Omni direct is ready on a rented machine in each cloud and runs
+there only on the founder's word: the test `direct` on the one-machine buttons (`big-organism-detached.yml` on Azure,
+`cloud-organism.yml` on Google and Amazon; `scripts/organism_detached.sh`) rents one 8-processor machine, ships it the exact
 commit, runs the same full form `reps` times one after another, brings every run's files back and gives the machine back; a
 dry run (the default) shows the price and rents nothing. The GPU runs on Lambda start from `gpu-omni-v18`, one exact commit.
 
@@ -4491,7 +4492,7 @@ own number. Every table lists the spine first, because the other six stand on it
 |---|---|
 | `tools/run_realms_v5.py` | every muscle alone, then the seven organisms under three loads; the spine's row first in every organisms table (`results/realms_v5/REALMS_V5.md`) |
 | `tools/run_scale.py --organisms 7`, workflow `six` | the spine at 1, 10, 100 and, on GitHub's own machines, 1,000 copies, over 1 to 1,000 paired runs |
-| `tools/run_kil.py --organism spine`, workflows `six-kube`, `aks-metered` | the spine with the real Kubernetes cluster inside it as one more muscle |
+| `tools/run_kil.py --organism spine`, workflows `six-kube`, `aks-metered`, `gke-metered`, `eks-metered`, `cloud-organism` | the spine with the real Kubernetes cluster inside it as one more muscle |
 | `tools/run_hil.py` | the spine with the real card inside it (the GPU Hardware family is a spine family) |
 | `scripts/dispatch_grid.py` | the spine's squares started, read back and never started twice like every other organism's |
 | `docs/REALM_MUSCLES.md`, `docs/MUSCLE_CATALOG.md` | the spine's 267 muscles listed first; each muscle's organisms column names the spine |
@@ -5640,7 +5641,7 @@ A PodDisruptionBudget on each service is required, because drains go through the
 
 | You run | You need |
 |---|---|
-| Kubernetes (vanilla, AKS, OpenShift/OKD, Rancher, kind, or any provider's managed Kubernetes) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each governed service; a readiness probe and a short preStop pause on each service |
+| Kubernetes (vanilla, EKS, GKE, AKS, OpenShift/OKD, Rancher, kind) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each governed service; a readiness probe and a short preStop pause on each service |
 | A response-time feed (strongly recommended at every level) | a CSV per service, `elapsed_seconds,latency_ms,ok`, written continuously; `scripts/latency_probe.py` writes one against any HTTP endpoint |
 | NVIDIA GPUs | a driver with `nvidia-smi`; root (or the capability to run `nvidia-smi -pl` and `-lgc`); on a VM, full GPU passthrough |
 | CPU power control | Linux cpufreq with the schedutil governor; RAPL for package watts; usually bare metal |
@@ -5771,7 +5772,7 @@ Pass: p95, p99 and failed requests never behind native, over paired runs (Chapte
 | Your platform | The park/wake command |
 |---|---|
 | any cluster, bare metal, kind | `bash scripts/kind_nodepool.sh {n}` |
-| Karpenter | the NodePool CPU limit at `{n}` times node CPU, parked nodes kept |
+| Karpenter / EKS Auto Mode | the NodePool CPU limit at `{n}` times node CPU, parked nodes kept |
 | Cluster Autoscaler node group | the group's desired size, scale-down through parking |
 | OpenShift / OKD | the worker MachineSet replicas, parked |
 
@@ -5882,8 +5883,8 @@ OFF. Native is always the stack's own controller left as shipped; omni is that c
 | Stack | Levels | Notes |
 |---|---|---|
 | Vanilla Kubernetes, kind, Rancher | 1-7 | as written |
-| Azure AKS | 1-5 | the node-pool size as the park/wake command; the managed cluster autoscaler stays native and deletes the machines Omni-Compass idles (10.1); CPU power control is not exposed on rented virtual machines; GPUs on full-GPU machines |
-| Another provider's managed Kubernetes, on the operator's own | 1-5 | the provider's node-pool size, or Karpenter's NodePool limit, as the park/wake command, set up by the operator from the provider's own documentation |
+| Amazon EKS | 1-5 | machines via Cluster Autoscaler node group or Karpenter; CPU power control is not exposed on EC2 VMs; GPUs on bare-metal or full-GPU instances |
+| Google GKE, Azure AKS | 1-5 | the provider's node-pool size as the park/wake command; on AKS the managed cluster autoscaler stays native and deletes the machines Omni-Compass idles (10.1) |
 | Red Hat OpenShift / OKD | 1-5 | the same permissions through a Role; machines via the worker MachineSet |
 | NVIDIA GPU servers without Kubernetes | 5 | the two-wire GPU governor alone |
 | Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |
@@ -6416,7 +6417,7 @@ License from The Omni-Compass LLC. The copyright, patent and trademark notices, 
 
 | You run | You need |
 |---|---|
-| Kubernetes (any: vanilla, AKS, OpenShift/OKD, Rancher, kind, or any provider's managed Kubernetes) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each service to be governed; a readiness probe and a short preStop pause on each service |
+| Kubernetes (any: vanilla, EKS, GKE, AKS, OpenShift/OKD, Rancher, kind) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each service to be governed; a readiness probe and a short preStop pause on each service |
 | A response-time feed (strongly recommended at every level) | a CSV per service, `elapsed_seconds,latency_ms,ok`, written continuously; `scripts/latency_probe.py` writes one against any HTTP endpoint |
 | NVIDIA GPUs | driver with `nvidia-smi`; root (or the capability to run `nvidia-smi -pl`); on a VM, full GPU passthrough (container or "pod" GPU rentals usually block power-limit changes) |
 | CPU power control | Linux cpufreq with the schedutil governor (`/sys/devices/system/cpu/cpufreq`); RAPL for package watts (`/sys/class/powercap/intel-rapl`); usually bare metal only, since cloud VMs rarely expose these |
@@ -6480,7 +6481,7 @@ Your HPAs keep scaling as before. Omni-Compass sets their targets and raises flo
 | Your platform | The park/wake command |
 |---|---|
 | any cluster, bare metal, kind | `bash scripts/kind_nodepool.sh {n}`: close machines to new work and mark them first to go; open again, warm machines first |
-| Karpenter | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
+| Karpenter / EKS Auto Mode | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
 | Cluster Autoscaler node group | the group's desired size, scale-down through parking, not deletion |
 | OpenShift / OKD | the worker MachineSet replicas, parked, not deleted |
 
@@ -6553,8 +6554,8 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | Stack | Levels available | Notes |
 |---|---|---|
 | Vanilla Kubernetes, kind, Rancher | 1-6 | as written |
-| Azure AKS | 1-5 | the node-pool size as the park/wake command; CPU power control is not exposed on rented virtual machines; GPUs on full-GPU machines |
-| Another provider's managed Kubernetes, on the operator's own | 1-5 | the provider's node-pool size, or Karpenter's NodePool limit (level 3 table), as the park/wake command |
+| Amazon EKS | 1-5 | nodes via Cluster Autoscaler node group or Karpenter NodePool (level 3 table); CPU power control is not exposed on EC2 VMs; GPUs on bare-metal or full-GPU instances |
+| Google GKE, Azure AKS | 1-5 | as EKS, with the provider's node-pool size as the park/wake command |
 | Red Hat OpenShift / OKD | 1-5 | OpenShift is Kubernetes underneath; grant the same permissions through a Role; machines via the worker MachineSet |
 | NVIDIA GPU servers without Kubernetes | 5 | the GPU governor alone |
 | Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |
@@ -6697,8 +6698,8 @@ checks the keys first at no cost, brings the results back and always gives the m
 
 The test changes the GPU's power limit, so you need a machine where you are the full administrator of the GPU:
 
-- **Use a virtual machine (VM) or a bare-metal server.** Lambda Cloud "on-demand instances" are VMs; so are Azure's GPU
-  machines.
+- **Use a virtual machine (VM) or a bare-metal server.** Lambda Cloud "on-demand instances" are VMs; so are the GPU
+  instances on AWS, Google Cloud and Azure.
 - **Avoid "container" or "pod" rentals.** Their GPUs usually block power-limit changes. This is common on the cheapest
   per-hour marketplaces.
 - **Any single NVIDIA data-center GPU works:** A10, L4, A100, H100, L40S. One GPU is enough.
@@ -6929,6 +6930,13 @@ The machine is given back when the run prints its last line, or at the hour budg
 end of the workflow if anything before it failed. Each give-back is acknowledged by Lambda; if Lambda does not acknowledge it,
 the run turns red and says so. Then, by hand: **cloud.lambda.ai**, **Instances**, tick the machine (its name starts
 `omni-`), **Terminate**.
+
+A run cancelled by hand keeps watching its machine (the watch jobs run on through a cancel, so a give-back is never lost),
+and a run whose test stopped early is given back at once by the watch since 24 October. For a machine still left billing
+under an older run: **Actions**, **lambda-gpu**, **Run workflow**, **test** `giveback`, **give_back** `omni-1card-` (or
+`omni-8card-`, or the machine's whole name). It gives back every machine whose name starts so, rents nothing, and never
+touches a machine launched by hand on Lambda's page; the stuck run then sees its machine gone and ends, and the next run of
+that test starts.
 
 #### 48.2.6 Afterwards
 
@@ -7377,7 +7385,7 @@ Your HPAs keep scaling. My pod reflex raises floors ahead of the CPU averages.
 | Your platform | The park/wake command |
 |---|---|
 | any cluster, kind, bare metal | `bash scripts/kind_nodepool.sh {n}` (close to new work and mark first to go; open again, warm machines first) |
-| Karpenter | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
+| Karpenter / EKS Auto Mode | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
 | Cluster Autoscaler node group | the group's desired size, with scale-down through parking, not deletion |
 | OpenShift | the worker MachineSet replicas, parked, not deleted |
 
@@ -8234,7 +8242,7 @@ the table reads GAIN or EVEN for the same kind of service, is read as a wiring f
 section 4): the feed's freshness and its line, the sensed autoscaler's name, the identity's permissions (Chapter 50), the window's length against the interval widths above. **Second the direction.** Where the table reads GAIN, your receipt should read GAIN or EVEN; a smaller gain
 is your stack's, not a fault, because the gain is bounded by how far native stood from its own best. **Third the power given.** A
 resource that rose on your receipt is read beside the work and the speed it bought; a rise with nothing bought is a question for
-the audit (the Operator's Manual, Appendix J): what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the
+the audit (the Operator's Manual, Appendix L): what did the governor write, and why. Two readings are not faults: EVEN on every gauge where native already runs at the
 top of its range (the knob is at its limit on native, and the governor leaves it there by design, Chapter 32), and a machine count
 that does not fall where no machine can be given back without a LOSS (the audit's `node_gate.reason` names the gate that held).
 What the table cannot give is your number: the same engine on another stack is another result, and it is yours (section 76.7).
@@ -8771,8 +8779,7 @@ happened to work. The numbers of earlier engines are the road, in `docs/history`
 (`scripts/dispatch_grid.py`, `scripts/reruns.txt`: A of every benchmark, then B, then C), the steady and wandering Kubernetes
 tests among them; Azure one run at a time in its region (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day;
 A, B and C); the grid with the real cluster inside on GitHub's free runners. The runs of earlier engines already started
-run to their end and stand as their own engine's record. Azure is the one cloud the benchmarks rent (the founder's order of
-24 October took Google and Amazon out; on another cloud an operator installs Omni-Compass on their own); the GPU chips wait for the founder's word; the CPU governor's measured run waits for a machine with a power meter.
+run to their end and stand as their own engine's record. Google and Amazon are not yet run: their first sets, on omni-v10 on 18 October, stopped at the login at no cost, and since 24 October both queues are switched off and kept, wired as Azure's sets run (100 paired repetitions under the stopping rule, the 60 s beat, the $0 check first), each switched on by the founder's word (Google once its key is stored whole, Amazon once its account is on its Paid plan); the GPU chips wait for the founder's word; the CPU governor's measured run waits for a machine with a power meter.
 
 ### 60.9 Wire in, or watch: the verdict per knob
 
@@ -11518,16 +11525,12 @@ shows (its processor use, the requests waiting, the response times), as in every
 - **Order and dispatch.** The grid conductor starts every Azure set from `scripts/azure_queue.txt`: A of every set, then
   B, then C, one at a time in each machine family's queue, read back by its run's title, never started twice.
 - **Amendment of 16 October (the three clouds).** Google Cloud and Amazon carry the same four sets, at the same
-  settings and on the same harness, from scripts/google_queue.txt and scripts/amazon_queue.txt (the workflows
+  settings and on the same harness, from `scripts/google_queue.txt` and `scripts/amazon_queue.txt` (the workflows
   `gke-metered.yml` and `eks-metered.yml`, one set at a time per machine-family queue, read back by title as on Azure),
   each behind its own `switch=` line, off until that cloud's secrets are in the repository and the founder turns it on; a
   run without its secrets stops before anything is built or billed. The Azure run is the measure of the other two: nothing
   in a set differs between clouds but the machine type, the zone or region, and the list price. (18 October: both
   switched on by the founder, the secrets in the repository; nothing in a set changed.)
-- **Amendment of 24 October (one cloud).** The founder's order took Google Cloud and Amazon out of the repository: the amendment
-  of 16 October is withdrawn, its two queues and workflows removed. No set ran on either past its login (the omni-v10 sets
-  stopped there at no cost and stay as that engine's record), so no result is withdrawn with it. The four sets run on Azure
-  alone, unchanged; the spine's note below names workflows that no longer exist beside `six-kube` and `aks-metered`.
 - **Disclosed.** At `1 6 1 8 1 6` in October's first runs about 41% of requests failed in both arms with the
   autoscaler pinned at its cap of 10 pods; a peak of 9 asks more of the four workers than 8 did. What each arm served at
   each shape is in its table. Cost: about $4 to $6 a set of five at list price; three sets of each shape, about $30 for
@@ -11811,6 +11814,17 @@ before; every clock counts seconds since omni-v16, so a give-back trial still la
 3 minutes, and one machine is given back at most once a minute. The beats other than 60 s are read in their own runs
 (`docs/PACE_PREREGISTRATION.md`, amendment 3). Runs on omni-v16 stand at the 15 s they ran at; nothing is read across engines.
 
+### 66.53 Amendment (2026-10-24, written before any run of it): Google's and Amazon's sets to the cap under the same stopping rule
+
+On the founder's words of 24 October ("code it to wire it the same way that the Azure is running"), the Google and Amazon sets
+(`scripts/google_queue.txt`, `scripts/amazon_queue.txt`: the steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day
+on 1 to 9) run as Azure's do under the amendment of 19 October: up to 100 paired repetitions a run, the stopping rule's looks at
+10, 20, 40 and 70 (`gke-metered.yml` and `eks-metered.yml` input `stop_looks`, `tools/stop_rule.py`, the same 99% intervals, never
+stopping on a LOSS), and "to the cap, stopping rule" in each run's title so their A, B and C are counted from zero. Everything else
+is as written for them: the arms, the loads, the windows, the machine families (`e2-standard-2` in `us-central1-a`;
+`m5.large` in `us-east-1`), the tune-down on the machines alone and the 60 s beat of the amendment above. Both queues are switched
+off and neither cloud has run a set on any engine since omni-v10's logins of 18 October; this is written before the first.
+
 ## 67. The Pod Start Wait on One Shared Host
 
 
@@ -11901,7 +11915,7 @@ This section is a prediction, not a measurement. On a fleet, each node is its ow
 its own node's processor, and the processor conveyed to pods on other nodes does not touch it. A pod placed beside pods
 already serving finds the image on its node and starts in about the time this rig measures for such a pod (1.3 to 1.7 s in
 total). So the coupling in section 67.4 is a property of the single machine. It is a test machine's limit, never Omni's result,
-and the row that showed it is reported as measured. The cloud sets (Azure, the one cloud the benchmarks rent) run
+and the row that showed it is reported as measured. The cloud sets (Azure now; Google and Amazon behind their $0 check) run
 every node on its own machine, and they measure it.
 
 ### 67.6 The amendment (2026-10-18): the served image pulled onto every worker before each arm
@@ -11917,7 +11931,7 @@ and the digest each worker pulled.
 - **The operator's manifests are left as written.** `deploy/kind/demo.yaml` still names the image without a tag, so the
   kubelet still asks the registry for its digest at every start, in both arms. It then finds every layer on the node.
 - **Not the engine.** No fingerprinted file changes: the pre-puller is the rig's, and it moved no engine's digest (`python3 tools/omni_version.py`).
-- **Not the cloud.** On AKS every node is its own machine and unpacks on its own processor. Their sets keep
+- **Not the clouds.** On AKS, GKE and EKS every node is its own machine and unpacks on its own processor. Their sets keep
   `demo.yaml` and their rig as their A, B and C started.
 - **Never two rigs in one table.** A kind workflow's run on omni-v11 counts toward its three only when the run's own commit
   carries the pre-puller (`RIG_FILE` in `scripts/dispatch_grid.py`, read from GitHub at that commit). That covers the core
@@ -14095,7 +14109,7 @@ code. No outside party has reviewed or approved these results.
 - **Loads.** Open-loop load generators on synthetic schedules, one public day of demand (Google 2011) on kind, and the data
   stores' published benchmark workloads (sysbench, YCSB, pgbench). No production traffic.
 - **Size.** kind clusters of six workers on one machine; an Azure cluster of four workers. No large production fleet.
-- **Undetermined:** the cloud bill (Azure running; Azure is the one cloud the benchmarks rent), energy (no meter), the GPU
+- **Undetermined:** the cloud bill (Azure running, Google and Amazon gated by their $0 checks), energy (no meter), the GPU
   (no run on the engine that stands), production readiness (no deployment). These are written as undetermined wherever
   they appear, never as results.
 
@@ -14543,14 +14557,23 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
 on omni-v16, each only after Azure's own $0 check passed (the queue's switch was off for part of 22 October, until the founder
-confirmed that the person whose account the Azure login bills agreed to its use; a key bills only its own account) (since 22 October: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
+confirmed that the person whose account the Azure login bills agreed to its use; a key bills only its own account) (since 22 October, as Google's and
+Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
 the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
 to their end as their own record (omni-v15's campaign started none; the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
-**Google and Amazon are out** (the founder's order of 24 October): their workflows, queues, setup pages and manual chapters
-are removed. Their only sets, on omni-v10, stopped at the login at no cost (Google's stored key cut short, Amazon's account on
-its Free plan, which Amazon would not raise) and stay as that engine's record. Azure is the one cloud the benchmarks rent; on
-any other cloud an operator installs Omni-Compass on their own, from `deploy/install/` (the Operator's Manual, Part Seven).
+**Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
+`scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
+18 October (the Operator's Manual's appendices G and H, click by click). Their first sets, on omni-v10, stopped at the login at
+no cost and stay as its record: Google's stored key had been cut short when it was copied from Cloud Shell's screen, and
+Amazon's account is on its Free plan, whose policy denies every machine read. **Both are not yet run, and both queues are switched
+off** (24 October, the founder's words: "leave the Google and Amazon runs in everywhere and just show it not ran yet ... code it to
+wire it the same way that the Azure is running"): every workflow, script, queue, check and page stays, wired as Azure's sets run
+today (the same harness and the main engine's 60 s beat, 100 paired repetitions under the stopping rule, the $0 check before any
+set), and nothing starts or is checked until his word. Google needs its key stored whole (downloaded as a file, never copied from
+the screen; appendix G, its step 4); Amazon needs its account on the Paid plan (appendix H, its step 1a), which Amazon will not
+grant before the $100 credit is spent or the account is six months old. Switched on then, each cloud's sets start behind its own
+$0 check, A, B and C, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -14624,9 +14647,9 @@ way and the mathematics of the unit count's edge are on `docs/THE_ROOM.md`.
    every pace (at 60 s they read EVEN only by the seeds' spread); they are on the next version's list. Three runs of five arms
    (native, Omni-Compass at 15 s, and at 60, 10 and 5 s) on GitHub's own machines read it for real. A LOSS at 15 s there is
    root-caused and fixed in the next version.
-6. **Azure**, behind its own $0 check: its sets start as soon as its check passes (its switch on again from the founder's word
-   of 22 October that the account its login bills agreed to it); the four sets A, B and C on the engine that stands. Google and
-   Amazon are out (the founder's order of 24 October).
+6. **Azure, Google and Amazon**: Azure runs (its steady set started by the conductor on 24 October, once its check passed);
+   Google and Amazon are not yet run, their queues switched off, wired as Azure's sets are and started on the founder's word
+   (Google once its key is stored whole, Amazon once its account is on its Paid plan), each behind its own $0 check.
 7. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 8. **Linux**: a machine on the metal for `cpu-power`.
 9. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
@@ -17641,7 +17664,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | The independent simulators | `python3 tools/run_citylearn.py`, `run_pandapower.py`, `run_mujoco.py` (workflows `citylearn`, `pandapower`, `mujoco`) |
 | Azure, the bill | workflow `aks-metered`: `reps`, `arms`, `duration_s`, `load_steps`, `worker_pools`, `pool_prices`, `hpa_max` |
 | The big organisms, detached | workflow `big-organism-detached`: `mode` start / collect / survey, `test` organism / scale / robust / direct, `organisms`, `size`, `duration_s`, `commit`, `max_hours` |
-| Omni direct on a rented cloud machine | `test` = `direct` on `big-organism-detached` (Azure): the three arms' full form, `reps` runs; `dry_run` yes shows the price and rents nothing |
+| Omni direct on a rented cloud machine | `test` = `direct` on `big-organism-detached` (Azure) or `cloud-organism` (`cloud` gcp or aws): the three arms' full form, `reps` runs; `dry_run` yes shows the price and rents nothing |
 | Archive a finished run with the code | nothing to do: workflow `archive-run` takes it within the hour; to take it at once, add its id to `.github/archive_request.txt` and push |
 | Verify before a push, as GitHub runs it | `python3 tools/release_manifest.py` under Python 3.12: 0 FAIL |
 
@@ -18049,7 +18072,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 **Wire it on your stack.**
 
-- **Native controller:** the cloud's autoscaling group or scale set: Azure VMSS, or the provider's own.
+- **Native controller:** the cloud's autoscaling group or scale set: AWS Auto Scaling, Azure VMSS, GCP MIG.
 - **Wire out (read):** group size, instance states, the target-tracking metric (the cloud's API and monitoring).
 - **Wire in (write):** desired capacity, min and max, the target-tracking policy's target, through the cloud CLI or SDK.
 - **Restore:** the group's desired, min, max and policy recorded once; restored from it.
@@ -18288,7 +18311,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 - **Native controller:** the cluster's own node autoscaler: Karpenter (NodePool), the Cluster Autoscaler, a MachineSet, a cloud node pool.
 - **Wire out (read):** ready and schedulable workers, pending pods, allocatable and used CPU (Kubernetes API), the autoscaler's status ConfigMap.
-- **Wire in (write):** the pool's size through the operator's own command (--node-scale-cmd: az aks nodepool scale, or the provider's own resize command, kubectl scale machineset, a Karpenter NodePool limit); a machine parked by taint and drain, never deleted by Omni-Compass.
+- **Wire in (write):** the pool's size through the operator's own command (--node-scale-cmd: az aks nodepool scale, gcloud container clusters resize, eksctl scale nodegroup, kubectl scale machineset, a Karpenter NodePool limit); a machine parked by taint and drain, never deleted by Omni-Compass.
 - **Restore:** the pool's starting count recorded once; every parked machine untainted and the pool restored to it at the end or on the lease.
 - **Run live?** live: omni_controller nodepool mode on kind and on AKS (results/live/V1_AKS_*, the capacity and steady tables).
 
@@ -18889,7 +18912,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 **Wire it on your stack.**
 
-- **Native controller:** the function platform's concurrency settings (Knative autoscaling annotations, Azure Functions' scale limits, OpenFaaS).
+- **Native controller:** the function platform's concurrency settings (Knative autoscaling annotations, AWS Lambda concurrency, OpenFaaS).
 - **Wire out (read):** concurrency, cold starts, queue waits (the platform's metrics).
 - **Wire in (write):** provisioned and reserved concurrency, scale-to-zero windows through the platform's API or annotations.
 - **Restore:** recorded; restored.

@@ -2,35 +2,15 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-## 2026-10-24: Azure, and only Azure; Google and Amazon out
+## 2026-10-24: Google and Amazon kept in, wired as Azure is, not yet run; the GPU's first card
 
-- **Google and Amazon taken out** (the founder's order: "Get it out of my repositories. Get it out of my benchmarks. Get it out of
-  my engine, everything ... just Azure and anything else people could do on their own"). Removed: the workflows `gke-metered`,
-  `eks-metered` and `cloud-organism`; scripts/gke_paired.sh, `eks_paired.sh`, `gcp_services.sh`, `cloud_machine.py`,
-  `cloud_machine_watch.sh`, `google_queue.txt`, `amazon_queue.txt`; docs/GOOGLE_SETUP.md, docs/AMAZON_SETUP.md;
-  tests/test_cloud_machine.py; Google's and Amazon's $0 checks (`cloud-check` and `tools/cloud_key_check.py` read Azure alone).
-  The conductor rents one cloud (`scripts/dispatch_grid.py`, `CLOUDS`, `CHECKS`, `CLOUD_FAMILIES`); `v5-all-benchmarks`,
-  `archive-run`, the campaign file and the rigs no longer name them.
-- **The Operator's Manual**: chapters 16 and 17 (Google Kubernetes Engine and Amazon EKS, step by step), Appendices G and H (their
-  accounts) and the old Appendix M (the three clouds side by side) are out; the chapters after them renumbered (30 in all; Part VI is
-  chapters 13 to 28) and the appendices relettered (the paired run from GitHub is Appendix K, the license Appendix L), every
-  reference with them, in the three manuals and the pages that point into the Operator's. Wherever the manuals named the two
-  clouds' tools, they name Azure's and "the provider's own": on any other cloud an operator installs the governor on their own,
-  from `deploy/install/`.
-- **The live engine page**: section 5a is "The cloud: Azure, and any other on your own". Monitors 22 and 23 (Google's and Amazon's
-  gate and bill) are now Azure's $0 gate, check by check (`azGateCv`, `drawCloudGate`), and the cloud mode on any other cloud,
-  modelled (`ownCv`, class S, never a bill); every other monitor keeps its number. The ledger, the cards and the build read Azure
-  alone (`docs/engine/build_live_engine.py`, `docs/engine/github_ledger.json`); the Grafana wall and the page word for word
-  rebuilt from it; the Live Engine Manual's chapter 10 is "The Cloud".
-- **Standing pages** (README, `CLAUDE.md`'s Orders of 24 October, `DISCLOSURES.md`, the state of play, the register's row 38 and
-  the proof program's row 34 marked removed, the referee summary and grades, the safety case, the threat model, the limitations,
-  the coverage map, the spine, omni-v18's page, the orchestrator's page, the integration and operator manuals, the GPU and metal
-  guides, the muscle catalog's three wiring lines, the K8S preregistration's amendment of 24 October): Azure is the one cloud the
-  benchmarks rent. Kept, because they are not those clouds: the Google cluster trace of 2011 (the public dataset the Azure real
-  day replays), MuJoCo (Google DeepMind's simulator), products named as the open-source projects they are, and every record of
-  what ran. One docstring line in a fingerprinted engine file (`omni_controller/controller.py`) still shows Amazon's command-line
-  tool as an example; it goes with the next engine version. The four secrets nothing reads any more (`GCP_CREDENTIALS`,
-  `GCP_PROJECT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) are the founder's to delete in the repository's settings.
+- **Google and Amazon stay, at Azure's wiring, shown as not yet run** (the founder's words: "you leave the Google and Amazon runs
+  in everywhere and just show it not ran yet, because someday, some way, I'm going to have it run ... code it to wire it the same
+  way that the Azure is running"). Earlier the same day he had ordered both taken out; the removal was built here and never
+  pushed, and is undone whole: every workflow, script, queue, setup page, check, manual chapter, live page monitor and page
+  mention stands again. Both queues read `switch=off` (Amazon's account cannot leave its Free plan before its credit is spent or
+  it is six months old; Google's key has not been stored whole), so the conductor starts no set and no hourly check for them; every
+  page and monitor reads them "not yet run", and they start on his word once the key or the plan is in.
 - **The GPU run on Lambda, its first card** (`lambda-gpu.yml`, `scripts/lambda_gpu.py`, `scripts/lambda_gpu_watch.sh`): the key
   stored with its line breaks lost is mended before it is read, Lambda's key is found by its public half (not by its name), and
   where the stored key is not whole the run makes its own key for itself and removes it after. The first real run (an A10) rented

@@ -4,7 +4,7 @@
 
 Three components, all outside the fingerprinted engine (none moves its digest), all reading or driving the governor only
 through interfaces it already has: its audit file, its own kill file, its start-up arguments and the machine-wide master
-switch. The Operator's Manual, sections 20.2 to 20.5, is the operating reference; this page is the map.
+switch. The Operator's Manual, sections 22.2 to 22.5, is the operating reference; this page is the map.
 
 | Component | File | Interface | Writes |
 |---|---|---|---|

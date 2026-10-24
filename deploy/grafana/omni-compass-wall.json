@@ -548,7 +548,7 @@
   {
    "id": 1008,
    "type": "row",
-   "title": "5a · The cloud: Azure, and any other on your own",
+   "title": "5a · Cloud providers: Azure, Google Cloud, Amazon Web Services",
    "collapsed": false,
    "gridPos": {
     "x": 0,
@@ -567,7 +567,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, The cloud: Azure, and any other on your own. Machine-hours billed and the bill at list price, native against Omni-Compass, every finished Azure set with its 95% interval, and the running set's repetitions done. Evidence class L (metered by Azure); on the live engine: record. Feed: OpenCost; Azure's own billing export. Wired: the page's drawCloudBill → the Python tools/live_reps.py, tools/stop_rule.py, docs/engine/build_live_engine.py → the C++ none: the bill as Azure meters it; held equal by docs/engine/build_live_engine.py. Moves: the reading cursor walks the finished sets; the age of GitHub's reading counts up every second.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. Machine-hours billed and the bill at list price, native against Omni-Compass, every finished Azure set with its 95% interval, and the running set's repetitions done. Evidence class L (metered by Azure); on the live engine: record. Feed: OpenCost; Azure's own billing export. Wired: the page's drawCloudBill → the Python tools/live_reps.py, tools/stop_rule.py, docs/engine/build_live_engine.py → the C++ none: the bill as Azure meters it; held equal by docs/engine/build_live_engine.py. Moves: the reading cursor walks the finished sets; the age of GitHub's reading counts up every second.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -589,30 +589,43 @@
   },
   {
    "id": 22,
-   "title": "22 · Azure: the $0 gate, check by check",
+   "title": "22 · Google Cloud: the gate and the bill",
    "gridPos": {
     "x": 12,
     "y": 105,
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, The cloud: Azure, and any other on your own. Azure's hourly check at no cost, check by check: the key's shape (the whole block, or the four boxes), the login, the subscription, the machine and every allowance a set needs; green passed (the conductor starts the sets), red failed (nothing built, nothing billed), with the check's own reason. Azure is the one cloud the benchmarks rent (the founder's order of 24 October) Evidence class L (GitHub's own API, read at the build); on the live engine: record. Feed: GitHub Actions: the cloud-check workflow's runs, read at the build. Wired: the page's drawCloudGate → the Python tools/cloud_key_check.py, scripts/azure_capacity.py, scripts/dispatch_grid.py, docs/engine/build_live_engine.py → the C++ none: a check of the cloud account, not of the engine; held equal by tests/test_cloud_check.py. Moves: the reading cursor walks the checks, newest last; the age of GitHub's reading counts up every second.",
-   "type": "text",
-   "options": {
-    "mode": "markdown",
-    "content": "**Azure: the $0 gate, check by check** (the cloud).\n\nAzure's hourly check at no cost, check by check: the key's shape (the whole block, or the four boxes), the login, the subscription, the machine and every allowance a set needs; green passed (the conductor starts the sets), red failed (nothing built, nothing billed), with the check's own reason. Azure is the one cloud the benchmarks rent (the founder's order of 24 October)\n\nSource: GitHub Actions: the cloud-check workflow's runs, read at the build. No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; this panel marks its place on the wall (monitor 22)."
-   }
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; Google Cloud Billing export. Awaiting: not yet run: the queue is switched off (the key has not been stored whole); on the founder's word, wired as Azure's sets are (100 paired repetitions under the stopping rule, the 60 s beat, the $0 check first). Wired: the page's drawCloudBill → the Python tools/cloud_key_check.py, omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by tests/test_cloud_check.py, docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head.",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(node_total_hourly_cost)",
+     "legendFormat": "node_total_hourly_cost"
+    }
+   ]
   },
   {
    "id": 23,
-   "title": "23 · Another cloud, on your own: the cloud mode, modelled",
+   "title": "23 · Amazon: the gate and the bill",
    "gridPos": {
     "x": 0,
     "y": 113,
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, The cloud: Azure, and any other on your own. No other cloud is rented by these benchmarks (the founder's order of 24 October). On any other provider an operator installs the governor on their own, from deploy/install/ (omni-compass.yaml, rbac-machines.yaml, omni-compass-cloud.yaml); this monitor is the mechanism it runs there, the cloud mode at the tune-down on the machines alone, live on the cloud setting's model (class S, marked, never a bill), and the series OpenCost serves on the operator's own cluster Evidence class S; on the live engine: model. Feed: OpenCost, on the operator's own cluster. Wired: the page's drawCloudBill → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the modelled machines decision by decision on the live engine's clock, a ring at each head.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill) Evidence class L; on the live engine: awaiting. Feed: OpenCost; AWS Cost and Usage Report. Awaiting: not yet run: the queue is switched off (the account cannot leave Amazon's Free plan yet); on the founder's word, wired as Azure's sets are (100 paired repetitions under the stopping rule, the 60 s beat, the $0 check first). Wired: the page's drawCloudBill → the Python tools/cloud_key_check.py, omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by tests/test_cloud_check.py, docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -641,7 +654,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, The cloud: Azure, and any other on your own. The shipped controller's cloud mode on the toy cluster: the cloud's own autoscaler alone. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The shipped controller's cloud mode on the toy cluster: the cloud's own autoscaler alone. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",
@@ -670,7 +683,7 @@
     "w": 12,
     "h": 8
    },
-   "description": "Section 5a, The cloud: Azure, and any other on your own. The same autoscaler with Omni-Compass parking a machine only after its trial, waking it on a breach. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
+   "description": "Section 5a, Cloud providers: Azure, Google Cloud, Amazon Web Services. The same autoscaler with Omni-Compass parking a machine only after its trial, waking it on a breach. Evidence class S; on the live engine: replay. Feed: kube-state-metrics; tools/omni_exporter.py (the governor's own audit, Prometheus text format). Wired: the page's drawCluster → the Python omni_controller/controller.py, pilot/selfpilot.py, fleet/harness.py, tools/toy_gate.py, docs/engine/export_controller_trace.py → the C++ cpp/src/governor.cpp, cpp/src/core.cpp, cpp/src/shield.cpp, cpp/src/compass.cpp, cpp/src/hpa.cpp; held equal by docs/engine/check_records.py, tests/test_cpp_governor_parity.py, tests/test_cpp_shield_parity.py, tests/test_cpp_hpa_parity.py. Moves: the shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.",
    "type": "timeseries",
    "datasource": {
     "type": "prometheus",

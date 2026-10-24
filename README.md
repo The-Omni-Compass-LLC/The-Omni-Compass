@@ -310,12 +310,13 @@ stacked, clustered system or on any one muscle. Front matter with the card for t
 outside and its factory tune; the plug and the rules its wires obey; the wiring level by level and stack by stack
 (Kubernetes, databases, message brokers, caches, GPUs, the processor itself, the data center under the servers, robots
 and drones); operating it; checking it on your own system; **the implementer's guide for the cloud** (Part VI, chapters
-13 to 28: the path and its gates, least privilege, Azure step by step (any other cloud on your own), the response-time feed,
+13 to 30: the path and its gates, least privilege, Azure, Google Cloud and Amazon step by step, the response-time feed,
 the cloud mode, day two, the graphics processor, observability, change and risk, planning the saving before the run, own
 racks and private clouds, hardening and the supply chain, a fleet under continuous delivery, the failure drill book, and
 one installation start to finish); and back matter with every muscle, its wiring and its card, the install manifests,
 the implementer's checklists, the governor's settings (the Kubernetes governor's and the two card governors'), the audit
-record by record (every record of the governor, of the other muscles and of the card governors), every input of the paired run from GitHub, and the papers counsel asks for (the license, the licensing answers, the
+record by record (every record of the governor, of the other muscles and of the card governors), the three clouds side by
+side, every input of the paired run from GitHub, and the papers counsel asks for (the license, the licensing answers, the
 third-party notices, the Enterprise License's standard terms, the patents and trademarks, the security policy). Since 16
 October it also states the rules of the engine that stands as an operator meets them (section 6.5) and how a new muscle is
 coded on the muscle SDK (section 5.7). It is 507 pages, with 50 figures drawn from the code by two kits (`docs/book/figures.py`,

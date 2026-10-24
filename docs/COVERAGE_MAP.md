@@ -31,7 +31,7 @@ any system; it must be in one of the three lists, or it is a gap and gets a row.
 | Short | Long | Where |
 |---|---|---|
 | AKS | Azure Kubernetes Service, Microsoft's managed Kubernetes | register section 2 rows 10 to 12d: v1 done on 4 workers; the 40-worker fleet on v3 waits on Azure's allowance |
-| Another provider's managed Kubernetes | any other cloud, on the operator's own | row 38: no benchmark rents it (the founder's order of 24 October); the plain install, `deploy/install/` |
+| EKS, GKE | Amazon's and Google's managed Kubernetes | row 38, the same method as Azure's, each a credential and an allowance away |
 | HPA | the Kubernetes horizontal pod autoscaler, the native controller under every cluster test | rows 1 to 9 of section 2 (done, three runs each, rerunning today) |
 | Karpenter, Cluster Autoscaler, KEDA, VPA | the node scalers, the event-driven scaler and the vertical scaler underneath Kubernetes | row 68 (added today): Omni on top of each in turn |
 | KWOK | Kubernetes without Kubelet, simulated nodes by the thousand | row 9 (runs on every push) and row 63 |
@@ -63,7 +63,7 @@ any system; it must be in one of the three lists, or it is a gap and gets a row.
 | Domain | Real or simulator benchmarks (register rows) | Modelled muscle families (section 1) | Status today | The gap, and what was done about it |
 |---|---|---|---|---|
 | Kubernetes clusters | section 2 rows 1 to 9: seven tests, the organisms with the cluster inside, the big organisms, KWOK | 3, 4, 5, 11, 12, 13, 15, 16 | done on v3, three runs each; rerunning today | Karpenter, the Cluster Autoscaler, KEDA and VPA underneath were in the proof program (row 5) but not in the register's queue: **row 68 added** |
-| Clouds | section 2 rows 10 to 12d (Azure); row 38 (any other cloud, on the operator's own) | 3, 5 | Azure v1 done, the v3 fleet waiting on the allowance | Azure is the one cloud the benchmarks rent (the founder's order of 24 October) |
+| Clouds | section 2 rows 10 to 12d (Azure); row 38 (AWS, Google Cloud) | 3, 5 | Azure v1 done, the v3 fleet waiting on the allowance; AWS and Google queued | each further cloud is the same method, a credential and an allowance away |
 | Operating systems | row 18 (Linux: the clock, built today), row 39 (the kernel's scheduler, network and memory), row 40 (Windows power management) | 10 | built; queued | macOS exposes no writable power or scheduler knob to a program: not benchmarkable, by survey |
 | Processors and hardware | the card (section 2 rows 13 to 18), the CPU (row 18), AI serving and training on the card (rows 19, 20) | 6 (DPU), 8 (GPU fabric), 10 (host), 14 (NVIDIA hardware), 17 (quantum control) | the card pending the founder's run; the CPU waiting for a machine | DPUs, fabrics and quantum control are model only: open control toolkits exist (Qiskit Pulse, QuTiP) but no benchmark ships a controller to sit on; a real test needs the hardware |
 | Databases and caches | PostgreSQL, MySQL, MongoDB, Redis (done, section 2 row 30 and section 4 rows 24, 26, 27); Cassandra, Redis under YCSB, HammerDB (row 24); graph databases (row 44); OpenSearch (row 28) | 44, 47, 55 | done and running | distributed SQL with its own rebalancing: **row 69 added** |

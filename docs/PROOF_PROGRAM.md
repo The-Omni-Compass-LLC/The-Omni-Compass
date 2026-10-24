@@ -123,7 +123,7 @@ same rows (38 to 57) with their owners. Where no open source with a shipped cont
 
 | # | Benchmark | Native | Omni's lever | Gauges | Cost | Status |
 |---|---|---|---|---|---|---|
-| 34 | A second cloud | none rented | the same as on Azure, on an operator's own cloud | the bill, machines, p95, failed requests | nothing spent | removed by the founder's order of 24 October: Azure is the one cloud the benchmarks rent; on any other cloud an operator installs Omni-Compass on their own |
+| 34 | A second and a third cloud: AWS (EKS) and Google Cloud (GKE), Azure's method unchanged | each cloud's autoscaler and the HPA | the HPA target and the node pool, as on Azure | the bill, machines, p95, failed requests | about $12 a steady and $22 a burst run; free credits cover it where the account's allowance does | queued; each needs its own credential in a GitHub secret and about 90 cores of allowance |
 | 35 | The Linux kernel's other knobs: the CPU scheduler, the network stack, memory | the kernel's defaults | the scheduler's slice and migration cost; socket buffers and the queue's target; huge pages and swap | work inside the line, p95, CPU, energy where a meter is present | free (GitHub's machines, as root) | queued; the row-18 harness pattern |
 | 36 | Windows processor power management on the founder's own laptop | the Balanced plan | the maximum processor state | work inside the line, p95, battery discharge (a real meter), the processor's counter | free | queued; harness to build |
 | 37 | Television and streaming: adaptive bitrate (dash.js) over recorded network traces | the player's own rule | the ladder's cap and the buffer target | rebuffering, bitrate, bytes, switches | free | queued |

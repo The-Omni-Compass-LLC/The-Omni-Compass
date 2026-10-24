@@ -250,7 +250,7 @@ class Conductor(unittest.TestCase):
         self.assertEqual(g.cloud_of("aks-metered.yml"), "Azure")
         self.assertEqual(g.cloud_of("aks-metered-full.yml"), "Azure")
         self.assertEqual(g.cloud_of("big-organism.yml"), "Azure")
-        self.assertEqual(set(g.CLOUD_FAMILIES), {"Azure"})     # Azure is the one cloud the benchmarks rent (24 October)
+        self.assertEqual(g.cloud_of("gke-metered.yml"), "Google Cloud")
         self.assertIsNone(g.cloud_of("redis.yml"))
         queue = [("A", "steady", "t-steady", {"s": "1"}), ("A", "burst", "t-burst", {"b": "1"}),
                  ("B", "steady", "t-steady", {"s": "1"}), ("B", "burst", "t-burst", {"b": "1"})]

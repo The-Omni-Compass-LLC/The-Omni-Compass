@@ -71,7 +71,7 @@ License from The Omni-Compass LLC. The copyright, patent and trademark notices, 
 
 | You run | You need |
 |---|---|
-| Kubernetes (any: vanilla, AKS, OpenShift/OKD, Rancher, kind, or any provider's managed Kubernetes) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each service to be governed; a readiness probe and a short preStop pause on each service |
+| Kubernetes (any: vanilla, EKS, GKE, AKS, OpenShift/OKD, Rancher, kind) | Kubernetes 1.34 or newer (in-place pod resize); metrics-server (`kubectl top nodes` works); an HPA with a CPU target on each service to be governed; a readiness probe and a short preStop pause on each service |
 | A response-time feed (strongly recommended at every level) | a CSV per service, `elapsed_seconds,latency_ms,ok`, written continuously; `scripts/latency_probe.py` writes one against any HTTP endpoint |
 | NVIDIA GPUs | driver with `nvidia-smi`; root (or the capability to run `nvidia-smi -pl`); on a VM, full GPU passthrough (container or "pod" GPU rentals usually block power-limit changes) |
 | CPU power control | Linux cpufreq with the schedutil governor (`/sys/devices/system/cpu/cpufreq`); RAPL for package watts (`/sys/class/powercap/intel-rapl`); usually bare metal only, since cloud VMs rarely expose these |
@@ -135,7 +135,7 @@ Your HPAs keep scaling as before. Omni-Compass sets their targets and raises flo
 | Your platform | The park/wake command |
 |---|---|
 | any cluster, bare metal, kind | `bash scripts/kind_nodepool.sh {n}`: close machines to new work and mark them first to go; open again, warm machines first |
-| Karpenter | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
+| Karpenter / EKS Auto Mode | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
 | Cluster Autoscaler node group | the group's desired size, scale-down through parking, not deletion |
 | OpenShift / OKD | the worker MachineSet replicas, parked, not deleted |
 
@@ -208,8 +208,8 @@ policy's recorded maximum back exactly. GPUs can be wired the same way from the 
 | Stack | Levels available | Notes |
 |---|---|---|
 | Vanilla Kubernetes, kind, Rancher | 1-6 | as written |
-| Azure AKS | 1-5 | the node-pool size as the park/wake command; CPU power control is not exposed on rented virtual machines; GPUs on full-GPU machines |
-| Another provider's managed Kubernetes, on the operator's own | 1-5 | the provider's node-pool size, or Karpenter's NodePool limit (level 3 table), as the park/wake command |
+| Amazon EKS | 1-5 | nodes via Cluster Autoscaler node group or Karpenter NodePool (level 3 table); CPU power control is not exposed on EC2 VMs; GPUs on bare-metal or full-GPU instances |
+| Google GKE, Azure AKS | 1-5 | as EKS, with the provider's node-pool size as the park/wake command |
 | Red Hat OpenShift / OKD | 1-5 | OpenShift is Kubernetes underneath; grant the same permissions through a Role; machines via the worker MachineSet |
 | NVIDIA GPU servers without Kubernetes | 5 | the GPU governor alone |
 | Bare-metal CPU servers | 6 | cpufreq and RAPL through sysfs |

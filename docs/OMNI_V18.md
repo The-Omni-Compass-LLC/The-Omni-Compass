@@ -70,9 +70,9 @@ And after it landed, the three runs on GitHub's machines (the full form, A, B an
 Every benchmark runs again on omni-v18: the conductor's campaign opened at 21:19 UTC on 23 October (`scripts/dispatch_grid.py`,
 `scripts/reruns.txt`), and the clouds' sets run on it once each cloud's own $0 check passes. In the clouds nothing changes: Omni
 on top of the cloud's Kubernetes at the tune-down, on the machines alone (the order of 14 October). Omni direct runs on GitHub's
-own machines, three runs from one commit (`orchestrator.yml`). Omni direct is ready on a rented Azure machine and runs
-there only on the founder's word: the test `direct` on the one-machine button (`big-organism-detached.yml`;
-`scripts/organism_detached.sh`) rents one 8-processor machine, ships it the exact
+own machines, three runs from one commit (`orchestrator.yml`). Omni direct is ready on a rented machine in each cloud and runs
+there only on the founder's word: the test `direct` on the one-machine buttons (`big-organism-detached.yml` on Azure,
+`cloud-organism.yml` on Google and Amazon; `scripts/organism_detached.sh`) rents one 8-processor machine, ships it the exact
 commit, runs the same full form `reps` times one after another, brings every run's files back and gives the machine back; a
 dry run (the default) shows the price and rents nothing. The GPU runs on Lambda start from `gpu-omni-v18`, one exact commit.
 

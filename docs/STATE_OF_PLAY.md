@@ -202,14 +202,23 @@ family's wiring on a real stack from `docs/wiring_recipes.csv`).
 the same work as native for a smaller bill, at the tune-down on the machines alone (`--give-back-only`). The Azure sets (the
 steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9; A, B and C) run one at a time in their region
 on omni-v16, each only after Azure's own $0 check passed (the queue's switch was off for part of 22 October, until the founder
-confirmed that the person whose account the Azure login bills agreed to its use; a key bills only its own account) (since 22 October: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
+confirmed that the person whose account the Azure login bills agreed to its use; a key bills only its own account) (since 22 October, as Google's and
+Amazon's: for a while on the night of 21 October the stored Azure key held a text Azure's login refuses, and a set that failed at
 the login would have counted as started; the key was whole again by 00:00 UTC). The sets of earlier engines already started run
 to their end as their own record (omni-v15's campaign started none; the omni-v11 steady set at the cap, its 56th repetition running at 00:00 UTC on 22 October). The only Azure tables up so far are v1's
 4-worker fleet (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): every gauge EVEN, a fleet too small to show one machine.
-**Google and Amazon are out** (the founder's order of 24 October): their workflows, queues, setup pages and manual chapters
-are removed. Their only sets, on omni-v10, stopped at the login at no cost (Google's stored key cut short, Amazon's account on
-its Free plan, which Amazon would not raise) and stay as that engine's record. Azure is the one cloud the benchmarks rent; on
-any other cloud an operator installs Omni-Compass on their own, from `deploy/install/` (the Operator's Manual, Part VI).
+**Google (GKE) and Amazon (EKS)** carry the same four sets on the same harness (`scripts/google_queue.txt`,
+`scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
+18 October (the Operator's Manual's appendices G and H, click by click). Their first sets, on omni-v10, stopped at the login at
+no cost and stay as its record: Google's stored key had been cut short when it was copied from Cloud Shell's screen, and
+Amazon's account is on its Free plan, whose policy denies every machine read. **Both are not yet run, and both queues are switched
+off** (24 October, the founder's words: "leave the Google and Amazon runs in everywhere and just show it not ran yet ... code it to
+wire it the same way that the Azure is running"): every workflow, script, queue, check and page stays, wired as Azure's sets run
+today (the same harness and the main engine's 60 s beat, 100 paired repetitions under the stopping rule, the $0 check before any
+set), and nothing starts or is checked until his word. Google needs its key stored whole (downloaded as a file, never copied from
+the screen; appendix G, its step 4); Amazon needs its account on the Paid plan (appendix H, its step 1a), which Amazon will not
+grant before the $100 credit is spent or the account is six months old. Switched on then, each cloud's sets start behind its own
+$0 check, A, B and C, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -283,9 +292,9 @@ way and the mathematics of the unit count's edge are on `docs/THE_ROOM.md`.
    every pace (at 60 s they read EVEN only by the seeds' spread); they are on the next version's list. Three runs of five arms
    (native, Omni-Compass at 15 s, and at 60, 10 and 5 s) on GitHub's own machines read it for real. A LOSS at 15 s there is
    root-caused and fixed in the next version.
-6. **Azure**, behind its own $0 check: its sets start as soon as its check passes (its switch on again from the founder's word
-   of 22 October that the account its login bills agreed to it); the four sets A, B and C on the engine that stands. Google and
-   Amazon are out (the founder's order of 24 October).
+6. **Azure, Google and Amazon**: Azure runs (its steady set started by the conductor on 24 October, once its check passed);
+   Google and Amazon are not yet run, their queues switched off, wired as Azure's sets are and started on the founder's word
+   (Google once its key is stored whole, Amazon once its account is on its Paid plan), each behind its own $0 check.
 7. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 8. **Linux**: a machine on the metal for `cpu-power`.
 9. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October

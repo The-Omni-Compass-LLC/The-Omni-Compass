@@ -88,7 +88,7 @@ This section is a prediction, not a measurement. On a fleet, each node is its ow
 its own node's processor, and the processor conveyed to pods on other nodes does not touch it. A pod placed beside pods
 already serving finds the image on its node and starts in about the time this rig measures for such a pod (1.3 to 1.7 s in
 total). So the coupling in section 4 is a property of the single machine. It is a test machine's limit, never Omni's result,
-and the row that showed it is reported as measured. The cloud sets (Azure, the one cloud the benchmarks rent) run
+and the row that showed it is reported as measured. The cloud sets (Azure now; Google and Amazon behind their $0 check) run
 every node on its own machine, and they measure it.
 
 ## 6. The amendment (2026-10-18): the served image pulled onto every worker before each arm
@@ -104,7 +104,7 @@ and the digest each worker pulled.
 - **The operator's manifests are left as written.** `deploy/kind/demo.yaml` still names the image without a tag, so the
   kubelet still asks the registry for its digest at every start, in both arms. It then finds every layer on the node.
 - **Not the engine.** No fingerprinted file changes: the pre-puller is the rig's, and it moved no engine's digest (`python3 tools/omni_version.py`).
-- **Not the cloud.** On AKS every node is its own machine and unpacks on its own processor. Their sets keep
+- **Not the clouds.** On AKS, GKE and EKS every node is its own machine and unpacks on its own processor. Their sets keep
   `demo.yaml` and their rig as their A, B and C started.
 - **Never two rigs in one table.** A kind workflow's run on omni-v11 counts toward its three only when the run's own commit
   carries the pre-puller (`RIG_FILE` in `scripts/dispatch_grid.py`, read from GitHub at that commit). That covers the core

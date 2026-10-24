@@ -1064,16 +1064,12 @@ shows (its processor use, the requests waiting, the response times), as in every
 - **Order and dispatch.** The grid conductor starts every Azure set from `scripts/azure_queue.txt`: A of every set, then
   B, then C, one at a time in each machine family's queue, read back by its run's title, never started twice.
 - **Amendment of 16 October (the three clouds).** Google Cloud and Amazon carry the same four sets, at the same
-  settings and on the same harness, from scripts/google_queue.txt and scripts/amazon_queue.txt (the workflows
+  settings and on the same harness, from `scripts/google_queue.txt` and `scripts/amazon_queue.txt` (the workflows
   `gke-metered.yml` and `eks-metered.yml`, one set at a time per machine-family queue, read back by title as on Azure),
   each behind its own `switch=` line, off until that cloud's secrets are in the repository and the founder turns it on; a
   run without its secrets stops before anything is built or billed. The Azure run is the measure of the other two: nothing
   in a set differs between clouds but the machine type, the zone or region, and the list price. (18 October: both
   switched on by the founder, the secrets in the repository; nothing in a set changed.)
-- **Amendment of 24 October (one cloud).** The founder's order took Google Cloud and Amazon out of the repository: the amendment
-  of 16 October is withdrawn, its two queues and workflows removed. No set ran on either past its login (the omni-v10 sets
-  stopped there at no cost and stay as that engine's record), so no result is withdrawn with it. The four sets run on Azure
-  alone, unchanged; the spine's note below names workflows that no longer exist beside `six-kube` and `aks-metered`.
 - **Disclosed.** At `1 6 1 8 1 6` in October's first runs about 41% of requests failed in both arms with the
   autoscaler pinned at its cap of 10 pods; a peak of 9 asks more of the four workers than 8 did. What each arm served at
   each shape is in its table. Cost: about $4 to $6 a set of five at list price; three sets of each shape, about $30 for
@@ -1356,6 +1352,17 @@ cloud sets alike, decides every 60 s by default (`scripts/kind_bench.sh`, `OMNI_
 before; every clock counts seconds since omni-v16, so a give-back trial still lasts its 20 minutes, the wait after a breach its
 3 minutes, and one machine is given back at most once a minute. The beats other than 60 s are read in their own runs
 (`docs/PACE_PREREGISTRATION.md`, amendment 3). Runs on omni-v16 stand at the 15 s they ran at; nothing is read across engines.
+
+## Amendment (2026-10-24, written before any run of it): Google's and Amazon's sets to the cap under the same stopping rule
+
+On the founder's words of 24 October ("code it to wire it the same way that the Azure is running"), the Google and Amazon sets
+(`scripts/google_queue.txt`, `scripts/amazon_queue.txt`: the steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day
+on 1 to 9) run as Azure's do under the amendment of 19 October: up to 100 paired repetitions a run, the stopping rule's looks at
+10, 20, 40 and 70 (`gke-metered.yml` and `eks-metered.yml` input `stop_looks`, `tools/stop_rule.py`, the same 99% intervals, never
+stopping on a LOSS), and "to the cap, stopping rule" in each run's title so their A, B and C are counted from zero. Everything else
+is as written for them: the arms, the loads, the windows, the machine families (`e2-standard-2` in `us-central1-a`;
+`m5.large` in `us-east-1`), the tune-down on the machines alone and the 60 s beat of the amendment above. Both queues are switched
+off and neither cloud has run a set on any engine since omni-v10's logins of 18 October; this is written before the first.
 
 ---
 

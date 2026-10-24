@@ -78,7 +78,7 @@ SUBTITLE = ("The Master Manual: Its Philosophy, Its Mathematics, Its Mechanism, 
 SUBTITLE_HTML = ("The Master Manual:<br/>Its Philosophy, Its Mathematics, Its Mechanism, Its Results,<br/>and How to Wire It "
                  "onto Your Stack" if OWNER else "How to Read the Live Engine:<br/>Its Monitors, Gauges and Knobs,<br/>Native beside "
                  "Omni-Compass" if LIVE else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
-LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F" if LIVE else "Appendix L"
+LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F" if LIVE else "Appendix O"
 INTRO = ("Introduction: The Idea and the Promise" if OWNER else
          "Introduction: The Page, Its Monitors and What This Manual Covers" if LIVE else
          "Introduction: The Idea and What This Manual Covers")
@@ -775,8 +775,8 @@ OPERATOR_OUTLINE = [
     ("Evidence Classes and How to Read a Receipt", ("M", "Evidence Classes and How to Read a Receipt")),
     ("The Engine Version and the Three-Run Rule", ("M", "The Engine Version and the Three-Run Rule")),
     ("PART", "The Implementer's Guide: Omni-Compass on a Cloud",
-     "For the engineer who installs it on Azure (or on another cloud, on their own) and keeps it in service: the path and "
-     "its gates, the permissions, Azure step by step, the response-time feed, the cloud mode, day two, the graphics "
+     "For the engineer who installs it on Azure, Google Cloud or Amazon Web Services and keeps it in service: the path and "
+     "its gates, the permissions, each cloud step by step, the response-time feed, the cloud mode, day two, the graphics "
      "processor, observability, change and risk, planning the saving, own racks and private clouds, hardening, a fleet, "
      "the failure drills, a complete installation, and the questions implementers ask."),
     ("The Implementer's Path: From an Empty Account to a Governed Cluster",
@@ -784,6 +784,8 @@ OPERATOR_OUTLINE = [
     ("Identity, Permissions and Least Privilege on a Managed Cluster",
      ("M", "Identity, Permissions and Least Privilege on a Managed Cluster")),
     ("Azure Kubernetes Service, Step by Step", ("M", "Azure Kubernetes Service, Step by Step")),
+    ("Google Kubernetes Engine, Step by Step", ("M", "Google Kubernetes Engine, Step by Step")),
+    ("Amazon Elastic Kubernetes Service, Step by Step", ("M", "Amazon Elastic Kubernetes Service, Step by Step")),
     ("The Response-Time Feed and the Line", ("M", "The Response-Time Feed and the Line")),
     ("Running in the Cloud: the Machines Alone, the Bill and the Alarm Minutes",
      ("M", "Running in the Cloud: the Machines Alone, the Bill and the Alarm Minutes")),
@@ -817,17 +819,20 @@ OPERATOR_OUTLINE = [
     ("Appendix D. Troubleshooting", ("M", "Appendix D - Troubleshooting")),
     ("Appendix E. The Muscles: What Each Is For, and How It Is Wired", ("F", "docs/MUSCLE_CATALOG.md")),
     ("Appendix F. The Azure Account, Click by Click", ("F", "docs/AZURE_SETUP.md")),
-    ("Appendix G. The Install Manifests", ("X", "manifests")),
-    ("Appendix H. The Implementer's Checklists", ("M", "Appendix H - The Implementer's Checklists")),
-    ("Appendix I. The Kubernetes Governor's Settings", ("M", "Appendix I - The Kubernetes Governor's Settings")),
-    ("Appendix J. The Audit, Record by Record", ("M", "Appendix J - The Audit, Record by Record")),
-    ("Appendix K. The Paired Run from GitHub: Every Input", ("M", "Appendix K - The Paired Run from GitHub: Every Input")),
-    ("Appendix L. The License", ("X", "license")),
-    ("Appendix M. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
-    ("Appendix N. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
-    ("Appendix O. The Enterprise License: Standard Terms", ("F", "ENTERPRISE_LICENSE.md")),
-    ("Appendix P. Patents and Trademarks", ("FS", ["PATENTS.md", "TRADEMARKS.md"])),
-    ("Appendix Q. Security Policy", ("F", "SECURITY.md")),
+    ("Appendix G. The Google Cloud Account, Click by Click", ("F", "docs/GOOGLE_SETUP.md")),
+    ("Appendix H. The Amazon Web Services Account, Click by Click", ("F", "docs/AMAZON_SETUP.md")),
+    ("Appendix I. The Install Manifests", ("X", "manifests")),
+    ("Appendix J. The Implementer's Checklists", ("M", "Appendix J - The Implementer's Checklists")),
+    ("Appendix K. The Kubernetes Governor's Settings", ("M", "Appendix K - The Kubernetes Governor's Settings")),
+    ("Appendix L. The Audit, Record by Record", ("M", "Appendix L - The Audit, Record by Record")),
+    ("Appendix M. The Three Clouds Side by Side", ("M", "Appendix M - The Three Clouds Side by Side")),
+    ("Appendix N. The Paired Run from GitHub: Every Input", ("M", "Appendix N - The Paired Run from GitHub: Every Input")),
+    ("Appendix O. The License", ("X", "license")),
+    ("Appendix P. Licensing: Questions and Answers", ("F", "LICENSING_FAQ.md")),
+    ("Appendix Q. Third-Party Notices", ("F", "THIRD_PARTY_NOTICES.md")),
+    ("Appendix R. The Enterprise License: Standard Terms", ("F", "ENTERPRISE_LICENSE.md")),
+    ("Appendix S. Patents and Trademarks", ("FS", ["PATENTS.md", "TRADEMARKS.md"])),
+    ("Appendix T. Security Policy", ("F", "SECURITY.md")),
     ("Index", ("X", "index")),
     ("Contact", ("X", "contact")),
 ]
@@ -981,7 +986,7 @@ LIVE_OUTLINE = [
     ("PART", "Evidence by Stack",
      "From the cloud down to the chip: the clouds, the orchestrators, the official Kubernetes runs and their playback, the "
      "shipped controller's decision trace, the card and the host."),
-    ("The Cloud", ("M", "The Cloud")),
+    ("The Clouds", ("M", "The Clouds")),
     ("The Orchestrators and Governors", ("M", "The Orchestrators and Governors")),
     ("Kubernetes: the Official Run Playback", ("M", "Kubernetes: the Official Run Playback")),
     ("Kubernetes: Per-Repetition Telemetry", ("M", "Kubernetes: Per-Repetition Telemetry")),
@@ -1261,7 +1266,7 @@ def source_lines(src):
             lines += ["# " + (t or rel), ""] + body
         return lines, 0
     if kind == "X" and key == "manifests":
-        return MAN["Appendix G - The Install Manifests"], 2
+        return MAN["Appendix I - The Install Manifests"], 2
     return [], 0
 
 

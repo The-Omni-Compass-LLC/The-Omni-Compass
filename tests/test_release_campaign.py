@@ -53,10 +53,11 @@ class ReleaseCampaign(unittest.TestCase):
         workflows = {row[2] for row in queue}
         self.assertTrue({'capacity.yml', 'pandapower.yml', 'swarm.yml', 'cpu-power.yml',
                          'realms-v5.yml', 'kind-cruisekube.yml', 'aks-metered-full.yml'} <= workflows)
-        self.assertFalse({'gpu-bench.yml', 'lambda-gpu.yml'} & workflows)
+        self.assertFalse({'gke-metered.yml', 'eks-metered.yml', 'cloud-organism.yml',
+                          'gpu-bench.yml', 'lambda-gpu.yml'} & workflows)
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / 'reruns.txt'
-            p.write_text('unapproved|lambda-gpu.yml|\n')
+            p.write_text('unapproved|gke-metered.yml|\n')
             old = grid.RERUNS
             try:
                 grid.RERUNS = p

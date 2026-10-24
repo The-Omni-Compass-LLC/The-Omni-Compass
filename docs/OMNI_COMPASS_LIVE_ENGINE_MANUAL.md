@@ -348,7 +348,7 @@ the result files, the raw files and their SHA-256 lists, the manuals and `DISCLO
 
 Part I. The Page as a Monitor: 1. A Monitor, Not a Drawing; 2. The Engine Table of Contents and the Numbering; 3. The Two
 Sides and the Colours. Part II. The Wall and the Switch: 4. The Monitor Wall; 5. The Master Switch; 6. The Alarms, the Feed,
-the Event Log and the Metrics; 7. The Pipeline That Rebuilds the Page. Part III. The Measured Effect and the Whole: 8. The Benefit Board, the Grid and the Catalog; 9. The Whole Organism, Every Way It Is Bought. Part IV. Evidence by Stack: 10. The Cloud; 11. The
+the Event Log and the Metrics; 7. The Pipeline That Rebuilds the Page. Part III. The Measured Effect and the Whole: 8. The Benefit Board, the Grid and the Catalog; 9. The Whole Organism, Every Way It Is Bought. Part IV. Evidence by Stack: 10. The Clouds; 11. The
 Orchestrators and Governors; 12. Kubernetes: the Official Run Playback; 13. Kubernetes: Per-Repetition Telemetry; 14. The
 Shipped Controller's Decision Trace; 15. The Chip and the Host. Part V. The Organism Live and the Console: 16. The Organism,
 Live; 17. The Telemetry Analytics and Omni-Compass in Its Own Words; 18. The Control Console. Part VI. The Brain: 19. One
@@ -449,7 +449,7 @@ reads it. In the page's order: 1 the monitor wall and the control panel (1a the 
 monitor wall, 1c the monitor list, 1d the status board, 1e the master switch's wiring, 1f the Python's runs in the page, 1g
 every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline, 1j the heartbeat dial, 1k Omni direct: the three arms); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
 measured effect in full (the organisms, every muscle, the register, the grid and every three-run table); 5 the evidence by
-stack (5a the cloud, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
+stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
 native and Omni-Compass, 6b the telemetry analytics and Omni-Compass in its own words); 7 the console; 8 the brain (8a one
 cycle, 8b the phase plane, 8c the brain's state, 8d the verdict); 9 the failure modes; 10 the components, their mathematics and their C++ twin (10a the component
@@ -909,7 +909,7 @@ in its place.
 
 # PART IV. EVIDENCE BY STACK
 
-## 10. The Cloud
+## 10. The Clouds
 
 ### 10.1 One metric: the bill
 
@@ -917,21 +917,21 @@ In a cloud Omni-Compass shows one thing: the same work as native for a smaller b
 bigger one. Every cloud set runs Omni-Compass at the tune-down on the machines alone (`OMNI_MACHINES_ONLY=1`,
 `--give-back-only`): no pod autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's. It parks
 only a machine the cloud already made, after its own trial, and wakes it on a breach. The bill and the machines aim lower;
-work, speed and failures must read EVEN or GAIN. Azure is the one cloud the benchmarks rent (the founder's order of 24 October);
-on any other cloud an operator installs the same governor on their own, from `deploy/install/`, with the same tuning and mechanism.
+work, speed and failures must read EVEN or GAIN. Azure runs first and is the measure of the other two (Google Cloud, Amazon
+Web Services): the same tuning, mechanism and harness. Google's and Amazon's sets are not yet run: their queues are switched off
+(24 October), kept ready as Azure's sets run, and the page reads each of their rows "not yet run" until the founder switches it on.
 
 ### 10.2 The monitor (the page's section 5a, `#s-cloud`)
 
-Azure's four sets (the steady set, the bursts `1 4 1 6 1 9` and
+Each provider's four sets (the steady set, the bursts `1 4 1 6 1 9` and
 `1 6 1 8 1 6`, the real day of Google 2011 on 1 to 9) and their status: measured to the end (engine, run, started), stopped
 before a result, or now. Then every cloud run GitHub has started, set by set; the bill on Azure run by run (machine-hours
 billed native · Omni-Compass; the bill; the 95th percentile; the failed requests), each with the engine it ran on; and the
 shipped controller in the cloud setting, live: native's machines against Omni-Compass's on the repository's toy cluster (class
-S), the cloud's own autoscaler running in both arms, its run and speed following the console's clock. Three monitors sit under the
-ledger: Azure's bill, set by set (monitor 21); Azure's $0 gate, check by check, a dot each, green passed and red failed, with the
-newest failure's reason in its own job's words (monitor 22); and the cloud mode on any other cloud, set up by the operator on
-their own (monitor 23): the machines billed (in service and booting) of native and of Omni-Compass on the cloud setting's model,
-decision by decision, marked class S and never a bill.
+S), the cloud's own autoscaler running in both arms, its run and speed following the console's clock. Until a provider's
+first set lands, its bill monitor shows the same mechanism live: the machines billed (in service and booting) of native and of
+Omni-Compass on the cloud setting's model, decision by decision, marked class S and never that cloud's bill, which arrives with
+its first set; under it, the provider's newest check in its own words.
 
 ### 10.3 The stopping rule
 
@@ -950,14 +950,17 @@ requests and the alert minutes, all aiming lower and all required EVEN or GAIN; 
 settings commands the governor wrote on its own (native is 0), the share of its additions decided inside the line, Omni-Compass's
 own processor time. A bill row whose interval includes zero is EVEN so far and the run goes on to its next look.
 
-### 10.5 When Azure is not ready
+### 10.5 When a cloud is not ready
 
-The conductor starts an Azure set only after Azure's newest check passed
-(`.github/workflows/cloud-check.yml`, `tools/cloud_key_check.py`: the key whole, the login, the subscription, the machine type,
-every allowance), at no cost. The gate monitor shows a failed check in the check's own words: an Azure key stored in another
-form than the whole block from `{` to `}` (a client secret's value alone, or a storage account's access key, for two) is stored
-again: one value to each of four boxes, or the whole block under a new name, which leaves a running set's login untouched
-(`docs/AZURE_SETUP.md`, section 7). Nothing is built and nothing is billed until the check passes.
+The conductor starts a cloud's set only after that cloud's newest check passed
+(`.github/workflows/cloud-check.yml`, `tools/cloud_key_check.py`: the key whole, the login, the plan, the machine type,
+every quota), at no cost. The monitor shows a failed check as the cloud's status, in the check's own words: a Google key stored
+cut short (the stored secret shorter than a whole key file) is stored again whole (`docs/GOOGLE_SETUP.md`, section 4); an Amazon
+account on the Free plan, whose organization policy denies every machine read, is moved to the Paid plan
+(`docs/AMAZON_SETUP.md`, section 1a); an Azure key stored in another form than the whole block from `{` to `}` (a client
+secret's value alone, or a storage account's access key, for two) is stored again: one value to each of four boxes, or the
+whole block under a new name, which leaves a running set's login untouched (`docs/AZURE_SETUP.md`, section 7; Azure joined the
+check on 22 October). Nothing is built and nothing is billed until the check passes.
 
 ## 11. The Orchestrators and Governors
 
@@ -1631,7 +1634,7 @@ a live switch per muscle on the running engine, beside the kill switch, is the n
 ### 28.5 On your own system
 
 The Operator's Manual's "wired right or wired wrong" (the Operator's Manual's section 4.5) and its drill book (the
-Operator's Manual's chapter 26) are the procedure; `DISCLOSURES.md`, section 4, is the rule: where a result elsewhere differs from the published
+Operator's Manual's chapter 28) are the procedure; `DISCLOSURES.md`, section 4, is the rule: where a result elsewhere differs from the published
 record, the first presumption is the wiring, the settings or the reading, not the law.
 
 ## 29. What the Page Does Not Tell You
@@ -1649,7 +1652,7 @@ machine. A model's energy is not a meter's. The page says the class on every vie
 
 ### 29.3 Slots not yet run are empty on purpose
 
-The metered chip runs, the CPU host's meter, the cloud's sets still running
+The metered chip runs, the CPU host's meter, the clouds' sets still running
 and the register's third-party slots are written as the repository holds them and marked not yet run. An empty slot is a true
 reading of the record. Nothing is drawn in its place.
 
@@ -1779,7 +1782,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 3 | `#s-whole` | The whole organism, every way it is bought | 9 |
 | 4 | `#s-fleet` | Measured effect in full | 8 |
 | 5 | `#p-evidence` | Evidence by stack, from the cloud down to the chip | 10 to 15 |
-| 5a | `#s-cloud` | The cloud: Azure, and any other on your own | 10 |
+| 5a | `#s-cloud` | Cloud providers: Azure, Google Cloud, Amazon Web Services | 10 |
 | 5b | `#s-orch` | Orchestrators and governors | 11 |
 | 5c | `#s-ops` | Kubernetes: official run playback | 12 |
 | 5d | `#s-runs` | Kubernetes: per-repetition run telemetry | 13 |

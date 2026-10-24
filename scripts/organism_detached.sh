@@ -7,7 +7,8 @@
 # The detached big-organism test on a rented machine (any cloud): every repetition of every organism in turn, native
 # against native with Omni-Compass on top (scripts/kind_paired.sh: a fresh six-worker kind cluster per arm, the organism at
 # the asked size with the real cluster inside), each cell's files moved into cells/<cell>/ when it ends, one .exit per
-# cell, ALL_DONE at the end. big-organism-detached.yml runs it on a rented Azure machine. TEST=robust runs the robustness long scenario instead
+# cell, ALL_DONE at the end. The same test as big-organism-detached.yml's machine on Azure; .github/workflows/
+# cloud-organism.yml runs it on Google Cloud or Amazon. TEST=robust runs the robustness long scenario instead
 # (docs/ROBUSTNESS_PREREGISTRATION.md: ROBUST=long, the wandering schedule repeated to fill the window, no organism).
 # TEST=direct runs Omni direct's three arms instead (tools/orchestrator_show.py, the full form, the busy room rule: native,
 # Omni on native and Omni direct on the machine's own processors and control groups, no Kubernetes), REPS runs one after

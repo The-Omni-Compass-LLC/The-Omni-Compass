@@ -590,21 +590,21 @@ Seven organisms × copies × runs: every square's word, modelled and with the re
 
 ## Part 5 of the page: Evidence by stack, from the cloud down to the chip
 
-## 5a The cloud: Azure, and any other on your own
+## 5a Cloud providers: Azure, Google Cloud, Amazon Web Services
 
-In a cloud the one metric is the bill: whether the same workload costs less with Omni-Compass on top. Azure's four test sets and their status; Azure is the one cloud the benchmarks rent.
+In a cloud the one metric is the bill: whether the same workload costs less with Omni-Compass on top. Each provider's four test sets and their status.
 
 **Controls.** Recorded data: GitHub's own cloud runs as read at the build. The controller below plays live; its run and speed follow the console's clock.
 
 **The page, in its own words.**
 
-In a cloud, Omni-Compass shows one thing: the same work as native for a smaller bill, never a bigger one. Every cloud set runs Omni-Compass at the tune-down on the machines alone: no pod autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's. It parks only a machine the cloud already made, after its own trial, and wakes it on a breach. The bill and the machines aim lower; work, speed and failures must read EVEN or GAIN. Azure is the one cloud these benchmarks rent (the founder's order of 24 October); on any other cloud an operator installs the same governor on their own, from deploy/install/, with the same tuning and mechanism.
+In a cloud, Omni-Compass shows one thing: the same work as native for a smaller bill, never a bigger one. Every cloud set runs Omni-Compass at the tune-down on the machines alone: no pod autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's. It parks only a machine the cloud already made, after its own trial, and wakes it on a breach. The bill and the machines aim lower; work, speed and failures must read EVEN or GAIN. Azure runs first and is the measure of the other two: the same tuning, mechanism and harness.
 
 **Every cloud run GitHub has started, set by set**
 
-**The bill monitors: Azure, native against Omni-Compass; its $0 gate; and the cloud mode on any other cloud, modelled**
+**The bill monitors: Azure, Google Cloud and Amazon Web Services, native against Omni-Compass**
 
-Azure's bill: each bar pair is a finished set, native's machine-hours (amber) beside Omni-Compass's (blue), the word by the one key (the bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given), the bill at list price under it. Azure's gate: every check at no cost, a dot each, green passed and red failed, the newest failure's reason in its own job's words. The third monitor is no bill: it is the cloud mode an operator runs on any other cloud on their own, on the cloud setting's model (class S, marked), so the mechanism is seen before anyone rents a machine; nothing is drawn for a run that has not run.
+One monitor a provider, the same harness, mechanism and tuning in all three (Azure is the measure of the other two). Each bar pair is a finished set: native's machine-hours (amber) beside Omni-Compass's (blue), the word by the one key (the bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given), the bill at list price under it. A provider with no finished set shows its empty frame and the reason its hourly gate holds, in its own job's words; nothing is drawn for a run that has not run.
 
 **The bill on Azure, run by run, each with the engine it ran on**
 
@@ -632,26 +632,26 @@ Machine-hours billed and the bill at list price, native against Omni-Compass, ev
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
 
-### Monitor 22: Azure: the $0 gate, check by check
+### Monitor 22: Google Cloud: the gate and the bill
 
-Azure's hourly check at no cost, check by check: the key's shape (the whole block, or the four boxes), the login, the subscription, the machine and every allowance a set needs; green passed (the conductor starts the sets), red failed (nothing built, nothing billed), with the check's own reason. Azure is the one cloud the benchmarks rent (the founder's order of 24 October)
+The same monitor for Google Cloud: the hourly gate's reading (the key, the login, the quota) and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill)
 
-- **Evidence and state.** Class L (GitHub's own API, read at the build); record.
-- **Feed.** GitHub Actions: the cloud-check workflow's runs, read at the build.
-- **Wired.** This page's `drawCloudGate` → the Python `tools/cloud_key_check.py`, `scripts/azure_capacity.py`, `scripts/dispatch_grid.py`, `docs/engine/build_live_engine.py` → the C++ none: a check of the cloud account, not of the engine; held equal by `tests/test_cloud_check.py`.
-- **Moves.** The reading cursor walks the checks, newest last; the age of GitHub's reading counts up every second.
+- **Evidence and state.** Class L; awaiting its run: not yet run: the queue is switched off (the key has not been stored whole); on the founder's word, wired as Azure's sets are (100 paired repetitions under the stopping rule, the 60 s beat, the $0 check first).
+- **Feed.** OpenCost; Google Cloud Billing export; series `node_total_hourly_cost`; on a running system: `sum(node_total_hourly_cost)`.
+- **Wired.** This page's `drawCloudBill` → the Python `tools/cloud_key_check.py`, `omni_controller/controller.py`, `pilot/selfpilot.py`, `fleet/harness.py`, `tools/toy_gate.py`, `docs/engine/export_controller_trace.py` → the C++ `cpp/src/governor.cpp`, `cpp/src/core.cpp`, `cpp/src/shield.cpp`, `cpp/src/compass.cpp`, `cpp/src/hpa.cpp`; held equal by `tests/test_cloud_check.py`, `docs/engine/check_records.py`, `tests/test_cpp_governor_parity.py`, `tests/test_cpp_shield_parity.py`, `tests/test_cpp_hpa_parity.py`.
+- **Moves.** Until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
 
-### Monitor 23: Another cloud, on your own: the cloud mode, modelled
+### Monitor 23: Amazon: the gate and the bill
 
-No other cloud is rented by these benchmarks (the founder's order of 24 October). On any other provider an operator installs the governor on their own, from deploy/install/ (omni-compass.yaml, rbac-machines.yaml, omni-compass-cloud.yaml); this monitor is the mechanism it runs there, the cloud mode at the tune-down on the machines alone, live on the cloud setting's model (class S, marked, never a bill), and the series OpenCost serves on the operator's own cluster
+The same monitor for Amazon Web Services: the hourly gate's reading and, once a set runs, its bill native against Omni-Compass.; until its first set lands, the mechanism every cloud set runs, live on the cloud setting's model (class S, marked, never this cloud's bill)
 
-- **Evidence and state.** Class S; model.
-- **Feed.** OpenCost, on the operator's own cluster; series `node_total_hourly_cost`; on a running system: `sum(node_total_hourly_cost)`.
-- **Wired.** This page's `drawCloudBill` → the Python `omni_controller/controller.py`, `pilot/selfpilot.py`, `fleet/harness.py`, `tools/toy_gate.py`, `docs/engine/export_controller_trace.py` → the C++ `cpp/src/governor.cpp`, `cpp/src/core.cpp`, `cpp/src/shield.cpp`, `cpp/src/compass.cpp`, `cpp/src/hpa.cpp`; held equal by `docs/engine/check_records.py`, `tests/test_cpp_governor_parity.py`, `tests/test_cpp_shield_parity.py`, `tests/test_cpp_hpa_parity.py`.
-- **Moves.** The modelled machines decision by decision on the live engine's clock, a ring at each head.
+- **Evidence and state.** Class L; awaiting its run: not yet run: the queue is switched off (the account cannot leave Amazon's Free plan yet); on the founder's word, wired as Azure's sets are (100 paired repetitions under the stopping rule, the 60 s beat, the $0 check first).
+- **Feed.** OpenCost; AWS Cost and Usage Report; series `node_total_hourly_cost`; on a running system: `sum(node_total_hourly_cost)`.
+- **Wired.** This page's `drawCloudBill` → the Python `tools/cloud_key_check.py`, `omni_controller/controller.py`, `pilot/selfpilot.py`, `fleet/harness.py`, `tools/toy_gate.py`, `docs/engine/export_controller_trace.py` → the C++ `cpp/src/governor.cpp`, `cpp/src/core.cpp`, `cpp/src/shield.cpp`, `cpp/src/compass.cpp`, `cpp/src/hpa.cpp`; held equal by `tests/test_cloud_check.py`, `docs/engine/check_records.py`, `tests/test_cpp_governor_parity.py`, `tests/test_cpp_shield_parity.py`, `tests/test_cpp_hpa_parity.py`.
+- **Moves.** Until the first set lands: the modelled machines decision by decision on the live engine's clock, a ring at each head.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** The bill the cloud meters: machine-hours and the bill at list price, native's bar beside Omni-Compass's, each finished set with its word; the running set's repetitions measured so far; each provider's hourly gate with the reason its own job wrote.
 - **What to do with it.** The bill aims lower: a fall is a GAIN, inside the noise EVEN, a rise power given. A provider whose gate holds runs nothing and bills nothing; its frame stays empty until its first set lands.
@@ -1603,11 +1603,11 @@ This page's own render loop governed by the compass law: the frame time against 
 | 18 | The seven organisms, three loads | 4 Measured effect in full | S | record |
 | 19 | Every muscle of the catalog | 4 Measured effect in full | S | record |
 | 20 | The scale-out grid | 4 Measured effect in full | S/L | record |
-| 21 | Azure: the bill, run by run | 5a The cloud | L (metered by Azure) | record |
-| 22 | Azure: the $0 gate, check by check | 5a The cloud | L (GitHub's own API, read at the build) | record |
-| 23 | Another cloud, on your own: the cloud mode, modelled | 5a The cloud | S | model |
-| 24 | The cloud setting, live: native's machines | 5a The cloud | S | replay |
-| 25 | The cloud setting, live: Omni-Compass's machines | 5a The cloud | S | replay |
+| 21 | Azure: the bill, run by run | 5a Cloud providers | L (metered by Azure) | record |
+| 22 | Google Cloud: the gate and the bill | 5a Cloud providers | L | awaiting its run |
+| 23 | Amazon: the gate and the bill | 5a Cloud providers | L | awaiting its run |
+| 24 | The cloud setting, live: native's machines | 5a Cloud providers | S | replay |
+| 25 | The cloud setting, live: Omni-Compass's machines | 5a Cloud providers | S | replay |
 | 26 | The orchestrators' road | 5b Orchestrators and governors | L | record |
 | 27 | An orchestrator, four ways | 5b Orchestrators and governors | L | record |
 | 28 | The data pipeline, live: every stage from the GitHub Actions run to this page | 5c Kubernetes | L | replay |

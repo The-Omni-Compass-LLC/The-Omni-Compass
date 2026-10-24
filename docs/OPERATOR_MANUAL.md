@@ -254,7 +254,7 @@ Your HPAs keep scaling. My pod reflex raises floors ahead of the CPU averages.
 | Your platform | The park/wake command |
 |---|---|
 | any cluster, kind, bare metal | `bash scripts/kind_nodepool.sh {n}` (close to new work and mark first to go; open again, warm machines first) |
-| Karpenter | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
+| Karpenter / EKS Auto Mode | the NodePool CPU limit at `{n} × node CPU`, parked nodes kept, not consolidated away |
 | Cluster Autoscaler node group | the group's desired size, with scale-down through parking, not deletion |
 | OpenShift | the worker MachineSet replicas, parked, not deleted |
 
