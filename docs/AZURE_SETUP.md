@@ -83,6 +83,30 @@ whole:
 The conductor runs Azure's check again within the hour, and the sets start on their own once it passes. Nothing is built and
 nothing is billed while it fails.
 
+## 8. The second way in: the sign-in without a password (OIDC)
+
+Since 23 October, evening, the repository also holds a sign-in with no password at all: three IDs (`AZURE_CLIENT_ID`,
+`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`) and a rule in Azure that trusts this repository's own runs. The inventory
+(`azure-inventory.yml`) uses it. On 24 October it was refused: Azure answered that no trust rule matched the name GitHub
+presented (`AADSTS700213`), because GitHub now presents this repository by its ID numbers, and the rule in Azure names it the
+older way. One rule with the exact name makes it work:
+
+1. In the Azure portal, search **App registrations** and open the app whose **Application (client) ID** is the one stored as
+   `AZURE_CLIENT_ID`.
+2. Click **Certificates & secrets**, then the tab **Federated credentials**, then **+ Add credential**.
+3. **Federated credential scenario**: choose **Other issuer**.
+4. **Issuer**: `https://token.actions.githubusercontent.com`
+5. **Subject identifier** (type it exactly, or copy it from this page): 
+   `repo:The-Omni-Compass-LLC@334396871/The-Omni-Compass@1390458092:ref:refs/heads/main`
+6. **Name**: `github-main`. Leave **Audience** at `api://AzureADTokenExchange`. Click **Add**.
+7. The app needs a role on the subscription: **Subscriptions**, the subscription, **Access control (IAM)**, **Add role
+   assignment**, **Reader** for the inventory.
+
+The benchmark sets keep the key of section 3. A sign-in without a password holds for about an hour and cannot renew itself
+inside a job, while one Azure repetition runs about 70 minutes and must still be signed in at its end to delete what it built;
+a lapsed sign-in there could leave machines running and billing. So the sets, and Azure's $0 check that clears them, read only
+`AZURE_CREDENTIALS`, and nothing is started while that key is not whole (section 7).
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

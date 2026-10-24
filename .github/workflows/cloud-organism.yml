@@ -25,7 +25,7 @@ on:
       machine_type: {description: "Machine type (empty: e2-standard-8 on Google, m6i.2xlarge on Amazon; 8 vCPU, 32 GiB, as Azure's)", default: ""}
       where: {description: "Zone on Google (empty: us-central1-a) or region on Amazon (empty: us-east-1)", default: ""}
       max_hours: {description: "Give the machine back after this many hours, finished or not (at most 39)", default: "39"}
-      test: {description: "organism (the organisms with the cluster inside) or robust (the robustness long scenario)", default: "organism"}
+      test: {description: "organism (the organisms with the cluster inside), robust (the robustness long scenario) or direct (Omni direct's three arms, native, Omni on native and Omni direct, tools/orchestrator_show.py full form; reps runs; organisms, size and duration_s unused)", default: "organism"}
       max_cost: {description: "Ceiling in US dollars for max_hours at list price; above it nothing is rented", default: "60"}
       dry_run: {description: "Show the price and the plan, rent nothing (yes/no)", default: "yes"}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
@@ -147,7 +147,7 @@ jobs:
           scp -i key -o StrictHostKeyChecking=accept-new omni.tgz "$U@$IP:omni.tgz"
           $SSH "mkdir -p omni && tar xzf omni.tgz -C omni && echo $GITHUB_SHA > omni/COMMIT && cd omni && python3 -m venv .v && .v/bin/pip install -q -r requirements.txt"
           # started in the background with every file handle redirected, as on Azure (nothing else left holding the session)
-          $SSH "cd omni && nohup setsid sg docker -c 'ORGS=$ORGS SCALE=$SCALE REPS=$REPS DUR=$DUR TEST=$TEST bash scripts/organism_detached.sh' > detached.log 2>&1 < /dev/null & disown; sleep 90; tail -n 5 detached.log; pgrep -af kind_paired >/dev/null && echo RUNNING || { echo '::error::the test is not running'; exit 1; }"
+          $SSH "cd omni && nohup setsid sg docker -c 'ORGS=$ORGS SCALE=$SCALE REPS=$REPS DUR=$DUR TEST=$TEST bash scripts/organism_detached.sh' > detached.log 2>&1 < /dev/null & disown; sleep 90; tail -n 5 detached.log; pgrep -af "kind_paired|orchestrator_show" >/dev/null && echo RUNNING || { echo '::error::the test is not running'; exit 1; }"
           echo "Started; the watches below carry on until it is over." >> "$GITHUB_STEP_SUMMARY"
           rm -f key key.pub
       - name: Give the machine back if starting failed

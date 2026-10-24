@@ -23,6 +23,7 @@ Every record the page replays is made again here by the repository's own code on
              at the tune-down, every muscle's law, reading by reading through the C++ compass law
   dial       the heartbeat dial (omni-v17): every beat of the Kubernetes governor in our own models, from the newest
              beat ladder (results/toy_gate/V<n>_LADDER.json, tools/beat_ladder.py), beside native and the main engine's 60 s
+  direct     Omni direct's three arms (omni-v18): the showing records under results/orchestrator/, from tools/orchestrator_record.py
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
@@ -884,6 +885,16 @@ def dial() -> dict:
                             for k, t in lad["toys"].items()})}   # a change against a zero (native's power cap) is NaN: null
 
 
+def direct() -> dict:
+    """Omni direct's three arms (omni-v18): every showing record under results/orchestrator/ (tools/orchestrator_record.py),
+    newest first, as written from the showing's own files; the page replays the newest (section 1k)."""
+    recs, abc = [], []
+    for f in sorted((ROOT / "results" / "orchestrator").glob("*.json")):
+        r = json.loads(f.read_text(encoding="utf-8")); r["file"] = str(f.relative_to(ROOT))
+        (abc if f.stem.endswith("_ABC") else recs).append(r)     # a three-run table (tools/orchestrator_abc.py) or one showing
+    return {"records": sorted(recs, key=lambda r: r.get("written", ""), reverse=True), "abc": abc}
+
+
 def records(runs: bool) -> dict:
     import export_controller_trace as XC
     import export_harness_trace as XH
@@ -934,7 +945,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial()}
+            "beatsweep": beat_sweep(), "dial": dial(), "direct": direct()}
 
 
 def embedded(page: str, key: str):
@@ -1089,7 +1100,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial")
+                          "beatsweep", "dial", "direct")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1107,7 +1118,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial"):
+              "beatsweep", "dial", "direct"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

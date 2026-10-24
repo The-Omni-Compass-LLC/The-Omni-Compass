@@ -141,7 +141,7 @@ two other manuals and `DISCLOSURES.md`.
 ## Notice and Disclaimer
 
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
-(omni-v17, `OMNI_V17.json`). The page names its engine on its own `<html>` element (`data-engine`); the build stamps the engine that stands
+(omni-v18, `OMNI_V18.json`). The page names its engine on its own `<html>` element (`data-engine`); the build stamps the engine that stands
 on it and rebuilds every record, and `--check` fails a page whose engine differs; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in the
 same push. The page's own table of contents (its section v, "Engine table of contents") is the authority on the order and the
 numbering of its sections; this manual names every section by its title and its anchor (`#s-health`, `#s-ops`, and so on), which
@@ -300,7 +300,7 @@ back.
 **What this manual covers.** Every section of the page in the page's own order; every gauge, with its side, its aim and its
 word; every knob of the console, with what it acts on and what it leaves alone; the two tickers that show the mechanism of
 action; the trace from any tile to the record it came from; and what to do when a tile reads LOSS. It covers the page as
-built on omni-v17; a later engine renames itself on the page's title block and this book is realigned in the same push.
+built on omni-v18; a later engine renames itself on the page's title block and this book is realigned in the same push.
 
 **What this manual does not cover.** How the engine is built, its equations beyond the ones the page itself prints, the
 wiring of Omni-Compass onto any stack, and the benchmark results themselves as a body of evidence: those are the Owner's and
@@ -440,14 +440,14 @@ with the settings Omni-Compass wrote in that decision; and under each, that deci
 (the page's section 6a), never a number of the picture's own. The body is numbered 1 to 11; the back matter is vi
 (disclosures, governing law and contact) and vii (the closing legal notice). A section's number is printed before its title; a
 lettered section (1a, 5c) is a section inside the numbered part that holds it, and every one is lettered: part 1 runs from 1a
-to 1j, one letter for each of its panels, with no unnumbered entry in the contents.
+to 1k, one letter for each of its panels, with no unnumbered entry in the contents.
 
-### 2.2 The sections, as built on omni-v17
+### 2.2 The sections, as built on omni-v18
 
 Appendix A lists every section with its anchor and the chapter of this book that
 reads it. In the page's order: 1 the monitor wall and the control panel (1a the control panel and the kill switch, 1b the
 monitor wall, 1c the monitor list, 1d the status board, 1e the master switch's wiring, 1f the Python's runs in the page, 1g
-every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline, 1j the heartbeat dial); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
+every LOSS row, 1h the golden signals, the event log and the live metrics, 1i the pipeline, 1j the heartbeat dial, 1k Omni direct: the three arms); 2 the benefit board; 3 the whole organism, every way it is bought; 4 the
 measured effect in full (the organisms, every muscle, the register, the grid and every three-run table); 5 the evidence by
 stack (5a the clouds, 5b the orchestrators and governors, 5c Kubernetes, the official run playback, 5d Kubernetes,
 per-repetition telemetry, 5e the shipped controller's decision trace, 5f the chip and the host); 6 the organism live (6a
@@ -458,7 +458,7 @@ specification and mathematics, 10b the C++ twin, the Python's runs through the C
 ### 2.3 Anchors
 
 Every section has an anchor that does not move when the page is reordered: `#s-problem`, `#s-read`, `#p-health`, `#s-health`,
-`#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-dial`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
+`#s-wall`, `#s-monlist`, `#s-status`, `#s-master`, `#s-proof`, `#s-loss`, `#s-feed`, `#s-github`, `#s-dial`, `#s-direct`, `#s-board`, `#s-whole`, `#s-fleet`, `#p-evidence`, `#s-cloud`, `#s-orch`, `#s-ops`, `#s-runs`, `#s-live`, `#s-stacks`,
 `#p-organism`, `#s-engines`, `#s-lab`, `#s-desk`, `#p-brain`, `#s-decision`, `#s-plane`, `#s-brain`, `#s-verdict`, `#s-fail`,
 `#s-math`, `#s-cpp`, `#s-self`, `#s-disclose`. A tile on the wall links to the anchor of the monitor it copies; a row of the table of
 contents links the same way. When this book names a section it gives its title and its anchor, so the reader finds it on a
@@ -735,6 +735,33 @@ its last decision in beats of that setting; the staleness alert fires after thre
 bench's own example: the factory tune runs the main engine at 60 s, chosen and read again under the rule of `docs/THE_TUNE.md`;
 any other beat is the engine's range on the page, never a benchmark result, until its own three runs land on that beat and are
 read as that beat's. A beat set on a live system is the operator's own tune, and its results are its own.
+
+### 7.5 Omni direct: the three arms (the page's section 1k, `#s-direct`)
+
+From omni-v18 Omni-Compass's own orchestrator is part of the engine, and every organism it runs is shown three ways. **Native** is
+Kubernetes' published autoscaling rule on the muscles (written by The Omni-Compass LLC from the published rule), every machine on and
+the units spread. **Omni on native** is Omni-Compass on top of that rule: the rule's units and never fewer, with Omni-Compass's
+reflex, conveyance, room rule, packing and parked machines above them. **Omni direct** is Omni-Compass alone on the muscles, no
+Kubernetes beneath it. The section draws the three arms from the showing's own record (`results/orchestrator/`), class L.
+
+The arm buttons (**All three**, **Native**, **Omni on native**, **Omni direct**) choose the arms drawn on the four monitors: the
+work answered each step, the 95th percentile each step (with the service's line), the units serving each step (with the units'
+top) and the machines on each step (with the machines there are). Native is amber, the two Omni-Compass arms blue, Omni on native
+dashed and Omni direct solid. The step slider walks the run step by step, and every monitor's light reads the step it stands on.
+The master switch shows native alone.
+
+Under the monitors stand three tables. The first reads every pair (Omni on native against native, Omni direct against native, Omni
+direct against Omni on native) on the four gauges by the one key, each word with its direction in words, from the one run of each
+arm on one host (the quick form). The second gives each arm's totals in that run: requests answered, failed and wrong, the 95th
+and 99th percentiles, machine-minutes, unit-minutes and the processor conveyed. The third is the full form's three runs on
+GitHub's own machines, A, B and C from one commit (`results/orchestrator/V18_THREE_ARMS_ABC.md`): each pair and gauge with each
+run's word and the one rule's reading of the three, GAIN, LOSS or power given in all three when every run's interval is clear of
+zero on the same side, EVEN when any run's interval holds zero, the runs disagree when clear runs point different ways. Work aims
+up; the 95th percentile aims down; units and machines are resources, so a fall is a cut, a GAIN, and a rise is power given.
+
+On a real machine each arm is the control plane started with its brain (`python3 -m omni_orchestrator.control --brain yardstick`,
+`omni_native` or `omni`), and its kill switch is the control plane's kill file: the brain off, the declared state held, every
+conveyed wall handed back.
 
 ---
 
@@ -1557,7 +1584,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 27.2 The engine's name
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v17). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v18). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines.
 
 ## 28. When a Tile Reads LOSS
@@ -1748,6 +1775,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | 1h | `#s-feed` | The golden signals, the event log and the live metrics | 6 |
 | 1i | `#s-github` | CI pipeline: GitHub Actions | 7 |
 | 1j | `#s-dial` | The heartbeat dial: every beat beside native | 7 |
+| 1k | `#s-direct` | Omni direct: the three arms, native, Omni on native and Omni direct | 7 |
 | 2 | `#s-board` | The benefit board | 8 |
 | 3 | `#s-whole` | The whole organism, every way it is bought | 9 |
 | 4 | `#s-fleet` | Measured effect in full | 8 |

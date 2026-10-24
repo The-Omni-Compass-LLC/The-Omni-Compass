@@ -2,6 +2,41 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-23 (night): omni-v18, Omni direct in the engine; the three arms on the live engine
+
+- **omni-v18 lands** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) on the founder's orders of the
+  evening ("Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And then Omni
+  direct is simply Omni on top of the muscles, no Kubernetes"; "It should be not 17 anymore, it should be 18"): omni-v17 with
+  Omni direct taken into the engine. The seven files of Omni-Compass's own orchestrator that hold its rules (`omni_orchestrator/`:
+  the brain, the control plane, the room rule, the hand, the walls, the front, the package) are fingerprinted like every other
+  wire (`tools/omni_version.py`, `ORCHESTRATOR_WIRES`; a version declared before omni-v18 is read without them, so every earlier
+  commit keeps its version); 55 of the 62 files are omni-v17's bytes. The toy gate against omni-v17
+  (`results/toy_gate/V18_VS_V17.md`, every toy on seeds 1 to 8): every gauge identical, 95 rows, no LOSS; Omni direct's own gate
+  is its showing (no LOSS in any of the three pairs after the trial-hold fix). Landed by `tools/land_engine.py` (the campaign
+  from 21:19 UTC, the grid's manifest `results/grid_v18/`, package 0.18.0); the words on the README, CLAUDE.md, the state of play,
+  the three manuals, the appraisal and the omni-v17 page.
+- **The three arms' three runs** on GitHub's machines (runs 40023524338, 40023529155, 40023534013; `results/orchestrator/V18_THREE_ARMS_ABC.md`, `tools/orchestrator_abc.py`): Omni on native against native work GAIN in all three (up 5.2% to 7.4%) and the 95th percentile GAIN in all three (down 7.5% to 12.1%), Omni direct against native work GAIN in all three (up 5.7% to 9.4%) and the 95th percentile GAIN in all three (down 9.8% to 15.7%), machines EVEN, the units power given or EVEN, and Omni direct against Omni on native EVEN on every gauge; no LOSS in any pair in any run (`results/orchestrator/V18_THREE_ARMS_ABC.md`).
+- **The live engine shows the three arms** (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, section 1k "Omni direct: the three arms,
+  native, Omni on native and Omni direct"): four monitors (work, the 95th percentile, units, machines, each step) registered on
+  the wall with their lights (the 95th percentile against the service's line, the units against the service's most, the machines
+  against the fleet; work aims up and has no line), arm buttons, a step slider that replays the run, the readings of every pair by
+  the one key and each arm's totals. The record is the showing's own files gathered by `tools/orchestrator_record.py` into
+  `results/orchestrator/`, read by the page's builder (`docs/engine/build_live_engine.py`, the record `direct`). The page's builder
+  stamps omni-v18 and rebuilds every record on it.
+- **The three runs on the live engine** (section 1k): under the quick form's tables, the full form's A, B and C from one commit,
+  each pair and gauge with each run's word and the one rule's reading of the three (the record `results/orchestrator/V18_THREE_ARMS_ABC.json`);
+  the page's words realigned to omni-v18, and the Live Engine Manual's section 7.5 and Appendix A row for `#s-direct`.
+- **Omni direct ready on a rented cloud machine** (the founder's order: "update the new Azures ... the new direct ... everything in Azure,
+  clouds, all the clouds ... when we get ready, we're going to run that too"): the test `direct` on the one-machine buttons
+  (`big-organism-detached.yml` on Azure, `cloud-organism.yml` on Google and Amazon, `scripts/organism_detached.sh`) runs the three
+  arms' full form `reps` times on one rented 8-processor machine and brings every run's files back; a dry run (the default) shows the
+  price and rents nothing; nothing starts it but a hand on the button.
+- **Azure: the second way in written down** (`docs/AZURE_SETUP.md`, section 8): the password-free sign-in the inventory uses was refused
+  by Azure (`AADSTS700213`) because GitHub presents this repository by its ID numbers; the one trust rule that makes it work, click by
+  click. The benchmark sets keep the key of section 3 (a password-free sign-in lasts about an hour, one repetition about 70 minutes, and
+  a lapsed sign-in at the end could leave machines billing).
+- **The GPU runs on Lambda start from `gpu-omni-v18`** (`docs/LAMBDA_SETUP.md`).
+
 ## 2026-10-23 (evening): Omni-Compass's own orchestrator with the engine's mechanisms in its brain; the three arms; the room's two walls
 
 - **Omni-Compass by itself, the organism run without Kubernetes** (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`; the

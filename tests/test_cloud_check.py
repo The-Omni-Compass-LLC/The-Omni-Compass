@@ -130,13 +130,21 @@ class AzureKeyShape(unittest.TestCase):
                 steps = job.get("steps") or []
                 for k, s in enumerate(steps):
                     if str(s.get("uses", "")).startswith("azure/login@"):
+                        given = s.get("with") or {}
+                        if "creds" not in given:
+                            # the sign-in without a password (OIDC, the inventory since 23 October): no stored key text
+                            # reaches azure/login, only the three IDs, and the job asks GitHub for its token
+                            with self.subTest(workflow=f.name, job=name, login="oidc"):
+                                self.assertTrue({"client-id", "tenant-id", "subscription-id"} <= set(given))
+                                self.assertEqual((w.get("permissions") or job.get("permissions") or {}).get("id-token"), "write")
+                            continue
                         seen += 1
                         prev = steps[k - 1]
                         with self.subTest(workflow=f.name, job=name):
                             self.assertIn("cloud_key_check.py azure", str(prev.get("run", "")))
                             self.assertEqual(prev.get("env", {}).get("AZURE_CREDENTIALS"), "${{ secrets.AZURE_CREDENTIALS }}")
                             self.assertEqual(prev.get("if"), s.get("if"))       # skipped exactly when the login is
-        self.assertGreaterEqual(seen, 10)
+        self.assertGreaterEqual(seen, 9)      # the nine logins with the key (the inventory signs in without one since 23 October)
 
 
 def fake_bin(d, name, body):
@@ -257,7 +265,8 @@ class ConductorGate(unittest.TestCase):
         self.assertNotIn("az aks create", text)
         self.assertNotIn("az group create", text)
         for cloud, runs in (("google", ("google", "both", "all")), ("amazon", ("amazon", "both", "all")), ("azure", ("azure", "all"))):
-            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), github.event.inputs.cloud)")
+            # a push of this file to main runs the two free checks as "both" (23 October); a hand or conductor start names its cloud
+            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), (github.event.inputs.cloud || 'both'))")
         self.assertNotIn("eksctl create", text)
         self.assertNotIn("clusters create", text)
 

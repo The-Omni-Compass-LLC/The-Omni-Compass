@@ -11,6 +11,8 @@ This connects GitHub to a Google Cloud account so two workflows can run the same
   design as Azure's `aks-metered` (`docs/K8S_COMPASS_PREREGISTRATION.md`).
 - **`cloud-organism`** with `cloud` = `gcp`: the big organisms (the whole tower and the four stacked, the
   real cluster inside, at 100 copies) on one rented 8-processor machine, the same test Azure's `big-organism-detached` runs.
+  With `test` = `direct` the same button runs Omni direct's three arms instead (native, Omni on native and Omni direct,
+  no Kubernetes; `docs/OMNI_V18.md`), `reps` runs on the one machine; it starts only on the founder's word.
 
 About fifteen minutes, once. New accounts get **$300 of free credit for 90 days**; Google does not charge the card during the
 free trial.

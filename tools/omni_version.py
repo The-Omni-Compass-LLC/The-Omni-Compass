@@ -4,7 +4,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The engines, fingerprinted file by file: Omni v17, the engine that stands (OMNI_V17.json, docs/OMNI_V17.md), Omni v16 (OMNI_V16.json), Omni v15 (OMNI_V15.json), Omni v14 (OMNI_V14.json), Omni v13 (OMNI_V13.json), Omni v12 (OMNI_V12.json), Omni v11 (OMNI_V11.json), Omni v10 (OMNI_V10.json), Omni v9
+"""The engines, fingerprinted file by file: Omni v18, the engine that stands (OMNI_V18.json, docs/OMNI_V18.md), Omni v17 (OMNI_V17.json), Omni v16 (OMNI_V16.json), Omni v15 (OMNI_V15.json), Omni v14 (OMNI_V14.json), Omni v13 (OMNI_V13.json), Omni v12 (OMNI_V12.json), Omni v11 (OMNI_V11.json), Omni v10 (OMNI_V10.json), Omni v9
 (OMNI_V9.json), Omni v8 (OMNI_V8.json),
 Omni v7 (OMNI_V7.json),
 Omni v6 (OMNI_V6.json), Omni v5 (OMNI_V5.json,
@@ -13,7 +13,7 @@ docs/OMNI_V5.md), then the frozen v3 (OMNI_V3.json, docs/OMNI_V3.md), v2 (OMNI_V
 v5 is in active development its fingerprint is re-declared on each engine change, and no v5 result is published until the
 v5 freeze. No result is ever read across versions.
 
-  python3 tools/omni_version.py                 check this checkout: prints "omni-v17", "omni-v16", "omni-v15", "omni-v14", "omni-v13", "omni-v12", "omni-v11", "omni-v10", "omni-v9", "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
+  python3 tools/omni_version.py                 check this checkout: prints "omni-v18", "omni-v17", "omni-v16", "omni-v15", "omni-v14", "omni-v13", "omni-v12", "omni-v11", "omni-v10", "omni-v9", "omni-v8", "omni-v7", "omni-v6", "omni-v5", "omni-v3", "omni-v2" or "omni-v1", or what differs from the newest
   python3 tools/omni_version.py --commit <sha>  the same, for the engine as it stood at a git commit (any result's run)
   python3 tools/omni_version.py --write v5      write OMNI_V5.json from this checkout (only when a new version is declared or re-declared in development)
 
@@ -30,14 +30,21 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS = {"v17": ROOT / "OMNI_V17.json", "v16": ROOT / "OMNI_V16.json", "v15": ROOT / "OMNI_V15.json", "v14": ROOT / "OMNI_V14.json", "v13": ROOT / "OMNI_V13.json", "v12": ROOT / "OMNI_V12.json", "v11": ROOT / "OMNI_V11.json", "v10": ROOT / "OMNI_V10.json", "v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
+VERSIONS = {"v18": ROOT / "OMNI_V18.json", "v17": ROOT / "OMNI_V17.json", "v16": ROOT / "OMNI_V16.json", "v15": ROOT / "OMNI_V15.json", "v14": ROOT / "OMNI_V14.json", "v13": ROOT / "OMNI_V13.json", "v12": ROOT / "OMNI_V12.json", "v11": ROOT / "OMNI_V11.json", "v10": ROOT / "OMNI_V10.json", "v9": ROOT / "OMNI_V9.json", "v8": ROOT / "OMNI_V8.json", "v7": ROOT / "OMNI_V7.json", "v6": ROOT / "OMNI_V6.json", "v5": ROOT / "OMNI_V5.json", "v3": ROOT / "OMNI_V3.json", "v2": ROOT / "OMNI_V2.json",
             "v1": ROOT / "OMNI_V1.json"}     # newest first
 # omni-v15 (21 October): every wire that holds a governor's rules is in the fingerprint, so no rule can change without the
 # version changing (docs/CHANGE_CONTROL.md, "Gaps this page names"). A version declared before them never covered them
 LATE_WIRES = ("tools/run_redis.py", "tools/run_kafka.py", "tools/run_pgbench.py", "tools/run_sysbench.py", "tools/run_ycsb.py",
               "tools/run_swarm.py", "tools/run_mujoco.py", "tools/run_cpu_power.py")
+# omni-v18 (23 October): Omni direct, Omni-Compass's own orchestrator run on the muscles with no Kubernetes, is part of the
+# engine: its brain, control plane, room rule, hand, walls and front hold rules, so they are fingerprinted like every other
+# wire (its showing's workload and clients, omni_orchestrator/workload.py and load.py, are the harness and stay outside).
+# A version declared before omni-v18 never covered them
+ORCHESTRATOR_WIRES = ("omni_orchestrator/__init__.py", "omni_orchestrator/agent.py", "omni_orchestrator/brain.py",
+                      "omni_orchestrator/cgroup.py", "omni_orchestrator/control.py", "omni_orchestrator/front.py",
+                      "omni_orchestrator/scheduler.py")
 SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py",
-         *LATE_WIRES)
+         *LATE_WIRES, *ORCHESTRATOR_WIRES)
 
 
 def engine_files(commit: str | None = None) -> dict[str, str]:
@@ -65,9 +72,12 @@ def own_files(files: dict[str, str], want: dict[str, str]) -> dict[str, str]:
     into the scope (its list names none of them) is read without those eight files and only those: a tree carrying
     omni-v14's 47 files byte for byte is omni-v14 whatever the late wires hold, because its fingerprint never covered them,
     while any other file it does not list (a new rule, a new module) still makes it a different engine."""
-    if any(n in want for n in LATE_WIRES):
-        return dict(files)
-    return {n: h for n, h in files.items() if n not in LATE_WIRES}
+    out = dict(files)
+    if not any(n in want for n in LATE_WIRES):
+        out = {n: h for n, h in out.items() if n not in LATE_WIRES}
+    if not any(n in want for n in ORCHESTRATOR_WIRES):   # a version declared before omni-v18 took Omni direct in
+        out = {n: h for n, h in out.items() if n not in ORCHESTRATOR_WIRES}
+    return out
 
 
 def version_match(files: dict[str, str]) -> tuple[str, dict] | None:

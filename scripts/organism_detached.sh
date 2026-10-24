@@ -10,6 +10,9 @@
 # cell, ALL_DONE at the end. The same test as big-organism-detached.yml's machine on Azure; .github/workflows/
 # cloud-organism.yml runs it on Google Cloud or Amazon. TEST=robust runs the robustness long scenario instead
 # (docs/ROBUSTNESS_PREREGISTRATION.md: ROBUST=long, the wandering schedule repeated to fill the window, no organism).
+# TEST=direct runs Omni direct's three arms instead (tools/orchestrator_show.py, the full form, the busy room rule: native,
+# Omni on native and Omni direct on the machine's own processors and control groups, no Kubernetes), REPS runs one after
+# another, each its own cell, as orchestrator.yml runs it on GitHub's machines.
 #   ORGS=tower,stack SCALE=1000 REPS=3 DUR=10800 TEST=organism bash scripts/organism_detached.sh
 set -u
 cd "$(dirname "$0")/.."
@@ -22,7 +25,14 @@ cell_end() {   # $1 cell, $2 rep, $3 exit code
   mkdir -p "cells/$1" && mv bench-*-"$2" "cells/$1/" 2>/dev/null; mv "paired-$1.log" "cells/$1/paired.log"
   echo "$3" > "cells/$1/paired.exit"; echo "$(date -u +%FT%TZ) end $1 exit $3"
 }
-if [ "$TEST" = robust ]; then
+if [ "$TEST" = direct ]; then
+  for rep in $(seq 1 "$REPS"); do
+    cell="direct-busy-$rep"; echo "$(date -u +%FT%TZ) start $cell"
+    sudo -E env "PATH=$PATH" python3 tools/orchestrator_show.py --out "cells/$cell" --room-rule busy > "run-$cell.log" 2>&1; code=$?
+    sudo chown -R "$(id -u):$(id -g)" cells 2>/dev/null; mkdir -p "cells/$cell"
+    mv "run-$cell.log" "cells/$cell/run.log"; echo "$code" > "cells/$cell/run.exit"; echo "$(date -u +%FT%TZ) end $cell exit $code"
+  done
+elif [ "$TEST" = robust ]; then
   w="1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1"; s=""
   for i in $(seq 1 $((DUR / 900))); do s="$s $w"; done
   export ROBUST=long LOAD_STEPS_IN="${s# }"

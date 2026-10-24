@@ -209,7 +209,18 @@ Read by the one key, paired by step:
 The batch job beside the service: 746 requests, 0 failed; the drills: 1,711 requests, 0 failed. Two trials began in 90 s and
 the traffic gate abandoned both (the second held the next off for 12 beats), so no step was allowed: in the quick form Omni
 direct's edge over Omni on native is its own reflex and conveyance with fewer units, not the fold. One run of each arm on one
-host; the full form and its three runs (A, B and C on GitHub's machines, from one commit) are written here as they land.
+host.
+
+**The three runs on GitHub's machines** (the full form: 18 steps of 25 s, the busy room rule, A, B and C from one commit, `0ca2bbdac`, omni-v18's bytes; runs 40023524338, 40023529155 and 40023534013, their files on the branch `raw`; the table `results/orchestrator/V18_THREE_ARMS_ABC.md`, written by `tools/orchestrator_abc.py` from the runs' own summaries):
+
+| Pair | Work | The 95th percentile | Machines | Units |
+|---|---|---|---|---|
+| Omni on native against native | **GAIN in all three** (up 5.2%, 5.3%, 7.4%) | **GAIN in all three** (down 9.0%, 12.1%, 7.5%) | EVEN (down 2.2%, 4.6%, 2.4%) | power given in all three (up 11.0%, 8.9%, 10.8%) |
+| Omni direct against native | **GAIN in all three** (up 7.3%, 5.7%, 9.4%) | **GAIN in all three** (down 9.8%, 15.7%, 10.8%) | EVEN (down 2.2%, 3.1%, 2.2%) | EVEN (up 6.9%, down 0.3%, up 9.0%) |
+| Omni direct against Omni on native | EVEN (up 2.0%, 0.4%, 1.9%) | EVEN (down 0.9%, 4.1%, 3.6%) | EVEN | EVEN (down 3.7%, 8.5%, 1.7%) |
+
+No LOSS in any pair in any run; nothing failed and nothing wrong in any arm of any run (28,528 to 34,837 requests a run across the three arms), the batch job and the drills included. Both Omni-Compass arms do more work than native, answer faster, and pay for it in units (power given); Omni direct and Omni on native read EVEN against each other on every gauge in the three runs. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
 
 ## 3. What it covers, and what it does not yet
 
@@ -221,6 +232,10 @@ Not yet: many hosts over a network (the hands already answer over HTTP; the show
 registry (units are processes), network isolation, service names and encryption, storage that follows a unit, rolling updates
 of a new version, secrets, users and permissions. The comparison that matters, this orchestrator against Kubernetes itself on
 the same organism and load, runs on the kind rig on GitHub and has not run yet.
+
+Ready, not yet run: the same full form on a rented machine in a cloud, one machine of 8 processors, the test `direct` on the
+one-machine buttons (`big-organism-detached.yml` on Azure, `cloud-organism.yml` on Google and Amazon; `scripts/organism_detached.sh`):
+a dry run by default, shown at its price, rented only on the founder's word.
 
 ## 4. The claim, exactly
 
