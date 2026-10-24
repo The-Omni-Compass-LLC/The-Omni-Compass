@@ -62,7 +62,8 @@ the founder overrides one in the conversation.
   LOSS in any pair. The three runs on GitHub's machines (full form, `results/orchestrator/V18_THREE_ARMS_ABC.md`): both Omni
   arms against native work GAIN and the 95th percentile GAIN in all three, machines EVEN, units power given or EVEN; Omni direct
   against Omni on native EVEN on every gauge; no LOSS. The toy gate against omni-v17 (`results/toy_gate/V18_VS_V17.md`) reads omni-v17's numbers on every toy (none
-  of its 55 files moved). Every benchmark runs again on it from 21:19 UTC on 23 October.
+  of its 55 files moved). Every benchmark runs again on it from 02:51 UTC on 24 October, when it reached main (a run counts only on a commit
+  that carries `OMNI_V18.json`; the runs started from 21:19 UTC on 23 October ran omni-v17's commits).
 - **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stood on main on 23 October, from the
   morning to the night, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
   decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and

@@ -324,6 +324,9 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "levels.py"), "--check"], capture_output=True, text=True)
     check("every level on one page: docs/LEVELS.md is rebuilt from the tables it reads (tools/levels.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "loss_ledger.py"), "--check"], capture_output=True, text=True)
+    check("every LOSS row of every newest table on one page: docs/LOSS_LEDGER.md is rebuilt from the tables (tools/loss_ledger.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "power.py"), "--check"], capture_output=True, text=True)
     check("every judged row's minimum detectable effect: docs/POWER.md is rebuilt from the tables it reads (tools/power.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])

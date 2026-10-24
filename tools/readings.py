@@ -241,6 +241,10 @@ def landed(table) -> bool:
         return False
     if not isinstance(d, dict):
         return False
+    # a table whose runs ran on two engines is no three-run result of either (24 October: ten omni-v17 tables held a C run on
+    # omni-v18, and the index and the benefit sheet counted them); the benchmark stands on its newest table on one engine
+    if len({str(r.get("engine", "")).split(" ")[0] for r in d.get("runs") or [] if isinstance(r, dict) and r.get("engine")}) > 1:
+        return False
     if "rows" not in d and "workloads" not in d:
         return True                      # another table's shape (the organisms, a cloud set's repetitions): its own writer decides
     if d.get("rows"):

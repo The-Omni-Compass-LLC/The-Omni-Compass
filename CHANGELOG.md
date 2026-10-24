@@ -2,6 +2,24 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (evening): no table stands on two engines; every LOSS row on one page
+
+- **Ten three-run tables held two engines**: `V17_KAFKA`, `V17_KAFKA_SERVICE`, `V17_PGBENCH`, `V17_REDIS`, `V17_REDIS_SERVICE`,
+  `V17_REDIS_SHIPPED`, `V17_SYSBENCH`, `V17_SYSBENCH_SHIPPED`, `V17_YCSB` and `V17_YCSB_SHIPPED` carry runs A and B on omni-v17 and
+  run C on omni-v18. Each printed its own warning, and the index, the benefit sheet and every page that picks a benchmark's newest
+  table still counted it. `tools/readings.py` `landed`, the one rule those pages read, now refuses a table whose runs ran on two
+  engines; each of those benchmarks stands on its newest table on one engine (omni-v16 for most) until its three runs on the
+  engine that stands land. The index's headline moves from GAIN, up 4.6%, to GAIN, up 4.3%.
+- **The campaign counted runs of the engine before**: omni-v18's campaign was opened at 21:19 UTC on 23 October, when the engine
+  landed on its working branch; it reached main at 02:51 UTC on 24 October. The runs started between ran omni-v17's commits and
+  counted as omni-v18's. The conductor now counts a run in the campaign only when its own commit carries the standing engine's
+  fingerprint file (`scripts/dispatch_grid.py` `on_engine`), and the campaign's start reads 02:51 UTC on 24 October
+  (`tests/test_release_campaign.py`).
+- **The LOSS ledger** (`docs/LOSS_LEDGER.md`, `tools/loss_ledger.py`, checked by `verify.py`): every row that reads LOSS in all
+  three runs, in every benchmark's newest table, placed by what its two arms are. Against Omni-Compass's own native, the readings
+  do no harm is judged by: 7 rows, all on omni-v12, each with its cause where one is written. In place of an orchestrator (the four
+  ways' VS): 14. Without Omni-Compass in one arm, or two changes at once (ORCH, BOTH): 89.
+
 ## 2026-10-24 (afternoon): the conductor ticks again on omni-v18
 
 - **Why no benchmark started from 07:05 UTC**: the conductor (`grid.yml`) and the grid's own jobs (`six`, `six-kube`, both
