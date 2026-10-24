@@ -35,6 +35,18 @@ Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are
 This chapter teaches you to read every table Omni-Compass produces. You do not need to know Kubernetes or GPUs to
 follow it. Read the five ideas first, then go to the table you have in front of you.
 
+## What every result names, and how a bill is read
+
+Every result names five things, and a reading is never carried to another of any of them: **the engine** (its fingerprint,
+`python3 tools/omni_version.py`), **the profile** (the factory profile, or a custom or candidate profile and how it differs), **the
+hardware or model** (and its evidence class: P a physical meter, L live software, S our own models), **the workload** (its load, its
+service line, its seeds or runs), and **the measurement boundary** (what is counted inside it and what is not). It also names its
+**objective**: the most healthy production (work done while every health requirement holds), or the least cost per production
+completed. A **bill** is a total: each deployment route's native total cost, then Omni-Compass's, then the saving, 1 − (the
+Omni-Compass total ÷ the native total), each total the sum of its non-overlapping cost components inside the boundary, on a matched
+workload. A component's own percent (the machines, the energy) is a supporting measurement, never the bill, and a bill whose price or
+component is missing reads **unresolved** (`docs/THE_TUNE.md`, section 8; the answer at the top of the README, `tools/headline.py`).
+
 ## The five ideas behind every table
 
 1. **Native, and native with Omni-Compass on top.** Omni-Compass never runs a machine by itself. Every result compares

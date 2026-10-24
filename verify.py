@@ -380,6 +380,9 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "realms_reread.py"), "--check"], capture_output=True, text=True)
     check("every muscle of the catalog and the seven organisms read by the rule that stands, from their own seeds (tools/realms_reread.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "headline.py"), "--check"], capture_output=True, text=True)
+    check("the answer first, on the README and the live engine page, as the engine that stands's own three-run record gives it (tools/headline.py)",
+          r.returncode == 0, (r.stdout + r.stderr).strip()[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "loss_ledger.py"), "--check"], capture_output=True, text=True)
     check("every LOSS row of every newest table on one page: docs/LOSS_LEDGER.md is rebuilt from the tables (tools/loss_ledger.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])

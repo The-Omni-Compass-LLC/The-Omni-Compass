@@ -58,6 +58,9 @@ PPU = 36.0                                       # points in one drawing unit (h
 LH = 0.33                                        # one line of 9 pt type with its lead, in drawing units (11.9 pt)
 NAVY, GOLD, RULE, INK, GREY = "#0b1f3a", "#a8801f", "#c9b27a", "#1a1a1a", "#666666"
 PALE, BLUE, MIST, ROSE, RED, GREEN, AMBER = "#faf6ec", "#e8eef7", "#f3f3f1", "#f7e6e6", "#8a1f1f", "#2e6b3a", "#b8860b"
+# the key's colours on paper (the founder's order of 24 October, everywhere a reading is drawn): GAIN green, EVEN yellow, LOSS red,
+# power given blue (Omni-Compass's own colour), native orange
+YELLOW, GIVEN_BLUE, NATIVE_ORANGE = "#c9a000", "#2f6db0", "#e0740c"
 DJV = "/usr/share/fonts/truetype/dejavu/"
 
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": PT, "svg.fonttype": "none", "axes.titlesize": PT,
@@ -1151,7 +1154,7 @@ def t_lease():
     reset = [7 if k < 10 else 10 for k in t]
     death = [7 if k < 19 else 10 for k in t]
     walk = [7 if k < 10 else min(10, 7 + 3 * (k - 10) / 24) for k in t]
-    ax.plot(t, native, color=GREY, ls="--", label="native's setting")
+    ax.plot(t, native, color=NATIVE_ORANGE, ls="--", label="native's setting")
     ax.step(t, reset, where="post", color=NAVY, label="the reset, the kill switch: back at once, read back")
     ax.step(t, death, where="post", color=RED, label="a death: the watchdog's restore (kill test: 7 to 11 s, mean 9 s)")
     ax.plot(t, walk, color=GOLD, label="the modelled bodies' lease: walked back over 24 decisions")
@@ -1351,7 +1354,9 @@ def read_table(rel, head_starts):
 def reading_color(word):
     w = word.lower()
     if "power given" in w:
-        return AMBER
+        return GIVEN_BLUE
+    if w.startswith("**even") or w.startswith("even"):
+        return YELLOW
     if w.startswith("**gain") or w.startswith("gain"):
         return GREEN
     if w.startswith("**loss") or w.startswith("loss"):
@@ -1395,7 +1400,7 @@ def receipt_chart(rel, title):
     ax.axvline(0, color=NAVY, lw=1)
     ax.set_yticks(range(len(judged))); ax.set_yticklabels([wrap(j[0], 36) for j in reversed(judged)])
     ax.set_xlim(-115, 115); ax.set_xlabel("paired change against native, %\n(runs A, B, C from top; the interval is 95%)")
-    ax.set_title("the judged rows: green GAIN, amber power given,\nred LOSS, grey EVEN", loc="left")
+    ax.set_title("the judged rows: green GAIN, blue power given,\nred LOSS, yellow EVEN", loc="left")
     fig.suptitle(wrap(title, 78), x=0.01, ha="left", fontsize=PT)
     return fig_svg(fig)
 
@@ -1580,7 +1585,7 @@ def _grid_label(cell):
             return f"GAIN {g.group(1)}, LOSS {lo.group(1)}", "#f3c9c9"
         return f"GAIN on {g.group(1)}", "#cfe8cf"
     if low.startswith("even"):
-        return ("EVEN " + pp).strip(), "#e3e3e3"
+        return ("EVEN " + pp).strip(), "#f6e7a6"
     if "pending" in low:
         return "pending", "white"
     return "·", "white"
@@ -1618,7 +1623,7 @@ def grid_chart(section_start, title, key):
 
 def r_grid():
     return grid_chart("Modelled", "Modelled (class S, our own models): the seven organisms at every size and run count, the change in misses against native",
-                      "Green GAIN, grey EVEN, red LOSS, light grey one run (no label yet), white not in the receipt")
+                      "Green GAIN, yellow EVEN, red LOSS, light grey one run (no label yet), white not in the receipt")
 
 
 def r_grid_kube():

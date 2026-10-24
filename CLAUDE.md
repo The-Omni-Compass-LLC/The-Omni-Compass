@@ -340,6 +340,41 @@ the founder overrides one in the conversation.
 
 ## Orders of 24 October
 
+- **The answer first** (the founder's words: "the first thing I need to see is you telling me that it is either 2%, 3%, 10%, 1%, no
+  percent better than native ... three scenarios ... green, yellow, or red and how much"; "show those bills ... put that total out as
+  the most first thing that everybody needs to see"). The README and the live engine page open, under the notice, with the answer
+  written by `tools/headline.py` from the engine that stands's newest three-arm record (three runs, class L): native, Omni-Compass on
+  top of native and Omni-Compass direct, each with its signal and its rows quoted with their own reading, and the two bills, on-site
+  and through the cloud, each a total cost (`docs/THE_TUNE.md`, section 8) reading unresolved where a price or a part is missing (no
+  price is assumed: the founder's choice of the same night). `verify.py` fails a page whose answer differs from the files. His
+  expected sizes (the cloud route 8%, on-site 6%) are never written in: the runs say what the mechanism does.
+- **Native orange; the signals in road shapes** (the founder's words: "Everywhere the native lives ... is to be orange"; "That red
+  sign is never to be a circle. It is an eight stop sign shape octagon ... The yield is the diamond ... the circle is green only
+  everywhere it lives"). Native's colour is orange on the page (every word native marked where it lands), in the manuals and on
+  paper; every monitor's signal and every section's (the worst of its monitors): **redlining**, the red stop-sign octagon,
+  blinking; **steady**, the yellow diamond; **accelerating**, the green circle (the word chosen for him, his "no preference"); a
+  grey bar where there is no line. Red is never a circle anywhere, the canvases' markers included; EVEN is yellow and power given
+  blue in every chart, on paper too.
+- **The heartbeat's six stops** (the founder's words: "10, 15, 30, 60, 90, 120. We need that 10 because we need to show less than
+  what's already standard"). The bench's buttons, the control panel's named stops and the manuals read 10, 15, 30, 60, 90 and 120 s;
+  60 s is the factory's; any value from 5 to 120 s may still be set on the control panel, and every other beat a record holds stays
+  in its file.
+- **The common language** (the founder's master specification, pasted the same evening): the governing engine, the muscle adapters,
+  the complete configuration profile and the validation harness; the factory, candidate, active and custom profiles; fixed tuning
+  with continuously changing state; "one setting" is the whole profile vector; the eight steps to the factory baseline (not yet
+  established); the C++ contract and release record; what the bench shows (architecture, route, profile, cadence, controls,
+  actuation feedback requested / accepted / pending / refused, response, backend); **Restore factory profile** and **Return to
+  native** as two separate controls; the whole-workload bill per route. Written once in `docs/THE_TUNE.md`, sections 5 to 8, and
+  carried into the README, all three manuals and the reading guide.
+- **The cloud is only a wire** (the founder's words): in bold capitals at the head of the cloud's section in the answer, the
+  Operator's Manual (chapter 19) and the Owner's (section 10.1).
+- **The GPU, told plainly** (the founder's words, the same night: "I have it running in Lambda ... charging me almost 24 hours, and
+  I ain't got a proof"). GitHub's own logs read: one A100 run of 10 repetitions (Lambda run 40079645681, 6.7 hours at $1.29 an
+  hour) and a first try of 25 minutes, both given back; no omni- machine listed on the account after; the 8-card run never rented
+  (no 8-card machine of any kind free on Lambda). Its receipt is on main (`results/gpu/run-20261024T091235Z`): every service gauge
+  EVEN, the governor at its limit on native. A machine started by hand on Lambda's page is never used or listed by our tools; the
+  founder terminates it on cloud.lambda.ai. Nothing is rented without his word, the price told first.
+
 - **Every change of 0.5% or more is a change** (the founder's words: "Any gauge that gives anything over a 0.5 percent change
   either way is a change. I don't want to see even on shit that shows a 0.5% change up or down ... Not everything can just stay
   even ... because it's 2-3% away. That's not even"; and "You have to interpretate the muscle and what it's doing to know if a

@@ -1604,8 +1604,9 @@ P ∈ [5, 120] s, the compass's balance point c ∈ (0, 1), the dial, the verdic
 muscle's card. The factory tune is one point, θ*, fingerprinted with the engine. On an organism S under a load L, each seed
 s ∈ Ω (Ω the set of seeds) gives native's gauges g⁰(s) ∈ ℝⁿ and Omni-Compass on top of native at tune θ gives g(θ, s). The one key reads each gauge j
 from the paired differences dⱼ(θ; s) = gⱼ(θ, s) − g⁰ⱼ(s): their mean d̄ⱼ, their 95% interval [ℓⱼ, uⱼ] by Student's t on
-|Ω| − 1 degrees of freedom, the word Rⱼ(θ) (EVEN when ℓⱼ ≤ 0 ≤ uⱼ; else GAIN on the side the gauge's aim serves; else LOSS for a
-time waited, missed or failed and for work, power given for a resource) and the size rⱼ(θ) = d̄ⱼ ⁄ ḡ⁰ⱼ.
+|Ω| − 1 degrees of freedom, the size rⱼ(θ) = d̄ⱼ ⁄ ḡ⁰ⱼ, and the word Rⱼ(θ) by the founder's order of 24 October (EVEN when
+|rⱼ(θ)| < 0.005; else GAIN on the side the gauge's aim serves; else LOSS for a time waited, missed or failed and for work, power
+given for a resource), the interval printed beside it.
 
 **Admissible tunes** harm no gauge against native: A = { θ ∈ Θ : Rⱼ(θ) ≠ LOSS for every j, every muscle within its own limit },
 and in a cloud R[bill] (θ) ≠ power given as well. This is do no harm in the strict form the engine that stands keeps.
@@ -1628,6 +1629,26 @@ search never saw against the engine that stands, landed as the next version only
 times on every benchmark. The rule is code, `tools/tune_study.py`, held by `tests/test_tune_study.py`; the first search (the beat
 from 15 to 120 s and the balance point, in the kind benchmark's setting and the cloud's, seeds 101 to 108) is read on its own page in
 `results/toy_gate/` when it finishes.
+
+**The common language** (the founder's master specification of 24 October; `docs/THE_TUNE.md`, sections 5 to 8, in full). Omni-Compass
+consists of a governing engine, its muscle adapters, a complete configuration profile and a validation harness. The **factory
+profile** is the complete, versioned set of defaults shipped together, θ*; a **candidate profile** is a combination under
+evaluation; the **active profile** is the one governing the current run; a **custom profile** is any identifiable configuration
+that differs from θ*. With x the governed system's state, z the governor's internal state, y its observations and Δ ∈ {10, 15, 30, 60,
+90, 120} s the decision interval, z[k+1] = F_θ(z[k], y[k]) and u_req[k] = G_θ(z[k], y[k]), the command Π_C(u_req[k]) inside the
+operating limits C, and the system evolves on the command that actually landed, x[k+1] = Φ(x[k], u_ack[k], w[k]), w the workload
+and its disturbances. After release θ = θ* is fixed while x, z and y keep changing: one fixed factory tune governs a changing
+workload. "One setting" is the whole vector θ, evaluated jointly, against one of two explicit objectives: the most healthy
+production P(θ), or the least cost per production completed, B(θ) ⁄ P(θ). The factory baseline is established in eight steps:
+verify the mechanisms; exercise the six intervals and the knob combinations; tune on development workloads; validate on fresh
+workloads (bursts, sustained demand, declared failures); record every adverse result; freeze the profile with its engine identity
+and receipts; verify every implementation, the C++ harness included; release the identified package. That is the best validated
+factory profile for the declared operating conditions, and the final factory tune is not yet established. **Healthy production**
+is the useful output delivered while every health requirement holds (correctness, service limits, resource bounds, hardware
+limits); the **whole-workload benefit** is the bill of each deployment route, Bᵣ(a) = Σᵢ cᵣ,ᵢ(a) over the route's non-overlapping
+cost components, its saving Sᵣ(a) = 1 − Bᵣ(a) ⁄ Bᵣ(native), unresolved wherever a price or a component is missing; the **scope of
+validation** is what the receipts of the identified engine and profile demonstrated, on the systems, loads and boundaries they
+name, and nothing beyond them.
 
 ![One decision of the governor. It wakes on its period, reads every sense, and holds if any sense is blind or stale: nothing is given back, and adding capacity is still allowed. The engine blends its state toward the observations and moves one macro step; the compass law turns the reading's position into a force. A positive force adds capacity at once, gated by nothing but the security hold. A negative force must pass the release gate (calm, the line clean for three decisions, nothing pending, every sense live) and, on a slow knob, the verdict's paired trial at the 2% line. What survives is one write through the plug, read back, and one line in the audit that records every sense, the state, the force, the gate's reason and the value sent and taken, whether or not anything was written.](book/figures/loop.svg)
 
@@ -2503,6 +2524,8 @@ OFF. Native is always the stack's own controller left as shipped; omni is that c
 | A database's storage-engine cache (MongoDB under YCSB) | one knob | the WiredTiger cache size through the server's own console, grown only while the cache is full (10.8) |
 
 ### 10.1 Managed Kubernetes on Azure: the bill as the gauge
+
+**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. OMNI-COMPASS ON THE CLOUD ALONE CAN GIVE ONLY A SMALL CUT IN THE BILL, FROM THE MACHINES THE CLOUD'S OWN AUTOSCALER MADE; THE BENEFIT LIVES AT THE TWO ENDS, IN THE SOFTWARE AND IN THE BARE METAL, AND THE CLOUD CARRIES IT.**
 
 On Azure Kubernetes Service the muscle is the same as on kind (section 9, levels 1 to 3) and one thing is new: the
 bill is real. The workflow `aks-metered` builds a fresh cluster for every arm the same way: a system pool of one
@@ -3484,7 +3507,7 @@ omni-v11, the engine that stood until omni-v12 landed on 19 October (section 15)
 
 **On top of Goldilocks and the VPA's recommender** (`V11_GOLDILOCKS.md`; runs 39171064099, 39175675418, 39177950720). Native is the service rightsized by Goldilocks from the VPA recommender's figures, with the HPA under it; omni is the same with Omni-Compass on top. The response time fell at the mean 47% to 48%, at the 95th percentile 61% to 64% and at the 99th 68% to 70%; the time over the line fell 98% to 100% and the alert minutes 100%; pods started fell 53% to 61% and the total pod start wait 48% to 63%: all GAIN in all three of our runs. Failed requests were zero in both arms. Machines in service, node-hours, HPA replicas and the mean pod start wait read EVEN. The energy counted with every parked worker at idle power rose 1.7% to 2.3%, power given in all three of our runs: the governor's own settings commands (16 to 18 a run, shown and not judged) conveyed processor time to the pods, the service drew 43% to 51% more CPU and answered faster for it, and the energy per core-hour fell 28% to 31% (shown).
 
-![Receipt chart: Omni-Compass on top of Goldilocks and the VPA's recommender (omni-v11), the judged rows. Each row is one gauge; each line is one run's paired change against native with its 95% interval (runs A, B, C from top); green GAIN, amber power given, red LOSS, grey EVEN, by the reading key. The chart pictures results/live/V11_GOLDILOCKS.md and adds nothing to it.](book/figures/r_goldilocks.svg)
+![Receipt chart: Omni-Compass on top of Goldilocks and the VPA's recommender (omni-v11), the judged rows. Each row is one gauge; each line is one run's paired change against native with its 95% interval (runs A, B, C from top); green GAIN, blue power given, red LOSS, yellow EVEN, by the reading key. The chart pictures results/live/V11_GOLDILOCKS.md and adds nothing to it.](book/figures/r_goldilocks.svg)
 
 ![Receipt chart: on top of Goldilocks, the rows shown and not judged. The governor's own inputs and the mechanism's traces (the settings commands it wrote, the pods pending, the utilisation, the CPU used, its own CPU, the energy per core-hour, the host's busy share and cores), as the change in runs A, B and C. These rows explain how the judged rows came to be; they are not judged themselves.](book/figures/r_goldilocks_shown.svg)
 

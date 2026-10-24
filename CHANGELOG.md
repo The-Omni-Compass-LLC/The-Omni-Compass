@@ -2,6 +2,23 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-25 (early morning): the answer first; native orange; the signals in road shapes; the six beats; the common language; five more clouds wired
+
+- **The answer first** on the README and the live engine page (`tools/headline.py`, checked by `verify.py`): native, Omni-Compass on
+  top of native (accelerating: work up 6.0%, the 95th percentile down 9.5%, GAIN in all three runs) and Omni-Compass direct
+  (accelerating: work up 7.5%, the 95th percentile down 12.1%), from omni-v18's three runs on GitHub's machines; the two bills, on-site
+  and through the cloud, unresolved where omni-v18 has not measured them, with the measured parts beside.
+- **Native orange** everywhere on the page and in the manuals; **the signals**: redlining (red octagon, blinking), steady (yellow
+  diamond), accelerating (green circle), a grey bar for no line, on every monitor and beside every section; red never a circle; on
+  paper EVEN yellow and power given blue.
+- **The heartbeat's six stops**, 10, 15, 30, 60, 90 and 120 s, on the bench and the control panel's named stops.
+- **The common language** (`docs/THE_TUNE.md`, sections 5 to 8): profiles, the eight steps, the C++ contract, the bench's identity
+  line (architecture, active profile, backend), **Restore factory profile** and **Return to native**, the actuation words on every
+  press to a live governor, the whole-workload bill; the tune page's reading rule on the 0.5% rule.
+- **Five more clouds wired**, switched off and not yet run: Oracle, DigitalOcean, Alibaba Cloud, Linode, IBM Cloud
+  (`byoc-metered.yml`, `scripts/byoc_paired.sh`, `docs/BYOC_SETUP.md`, the kubeconfig shape check).
+- **The page never scrolls sideways on a phone**: a wide table scrolls in its own box, the wall's counts wrap.
+
 ## 2026-10-24 (night): the A100 on Lambda, omni-v18's card governor on a real card
 
 - **The receipt** (`results/gpu/run-20261024T091235Z`, Lambda workflow run 40079645681, one NVIDIA A100 SXM4 40 GB, the card's own

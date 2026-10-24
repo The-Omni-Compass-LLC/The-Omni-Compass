@@ -34,7 +34,7 @@ The buttons (each a POST carrying a bearer token; JSON body):
         governor hands every setting back and starts again with the new list
   POST /v1/beat   {"seconds": 5 to 120, "reason": ...}                  role operator
         the heartbeat, a dial (omni-v17): the governor's full decision every so many seconds (the main engine 60 s; the
-        dial's stops 5, 15, 30, 60, 75, 90 and 120 s and any value between), its fast checks every 5 s at every beat; like
+        dial's stops 10, 15, 30, 60, 90 and 120 s, and any value from 5 to 120 s), its fast checks every 5 s at every beat; like
         a dial press it passes through native, and the governor starts again with --interval set to the beat
 The reads (role viewer): GET /v1/status (the switch, the desired and the actual state, the governor's process, the
 registry and its leases, the age of the last decision), GET /v1/presses (the last presses), GET /metrics. The console

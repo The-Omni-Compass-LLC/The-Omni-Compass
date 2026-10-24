@@ -138,17 +138,20 @@ def markdown(m) -> str:
           "**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. Omni-Compass on the cloud alone can give only a "
           "small cut in the bill, from the machines the cloud's own autoscaler made; the benefit lives at the two ends, in the software "
           "and in the bare metal, and the cloud carries it.**", "",
-          "A bill is the measured change in what it is made of, in percent; no price is assumed. A part the engine that stands has not "
-          f"measured is written so.", "",
-          "| Route | Machines | Energy | The cloud's own bill |", "|---|---|---|---|"]
+          "Each route's bill is its native total cost, then Omni-Compass's, then the saving: 1 − (the Omni-Compass total ÷ the native total), "
+          "each total the sum of its non-overlapping cost components inside the declared boundary, on a matched workload "
+          "(`docs/THE_TUNE.md`, section 8). A component's own percent is a supporting measurement, never the bill. Where a price or a "
+          "component is missing the bill reads unresolved; no price is assumed.", "",
+          "| Route | The bill: native → Omni-Compass → saving | Supporting measurements |", "|---|---|---|"]
     on, di = m["scen"][0]["rows"]["machines"], m["scen"][1]["rows"]["machines"]
-    L.append(f"| **On-site**: the software on your own bare metal | Omni-Compass on top of native: {said(on, 'machines')}. "
-             f"Omni-Compass direct: {said(di, 'machines')} | not yet measured on {eng} | none: no cloud on this route |")
+    L.append(f"| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the "
+             f"energy is not yet measured on {eng} | machines, Omni-Compass on top of native: {said(on, 'machines')}. Omni-Compass direct: "
+             f"{said(di, 'machines')} |")
     cloud = (f"read in [`{m['azure'][-1].relative_to(ROOT).as_posix()}`]({m['azure'][-1].relative_to(ROOT).as_posix()})" if m["azure"]
-             else f"not yet measured on {eng}: its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon and the "
-                  "clouds a tester builds are wired and not yet run")
-    L.append(f"| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | the software end's, as on-site; "
-             f"the machines the cloud bills are its own bill, at the right | the provider's, not metered to the tenant | {cloud} |")
+             else f"**unresolved**: not yet measured on {eng}; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon "
+                  "and the clouds a tester builds are wired and not yet run")
+    L.append(f"| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | {cloud} | the software end's, as on-site; "
+             f"the provider's energy is not metered to the tenant |")
     w = m["whole"]
     if w and w["index"] is not None:
         bill = "EVEN" if abs(w["bill"]) < 100 * K.SIZE_FLOOR else f"{w['bill']:+.1f}%"
@@ -221,6 +224,16 @@ def place(text: str, block: str, anchor: str) -> str:
     return text[:i] + block + "\n\n" + text[i:]
 
 
+def place_readme(text: str, block: str) -> str:
+    """The answer in the README: straight under the notice and the one line that says what Omni-Compass is."""
+    if BEGIN in text:
+        a = text.index(BEGIN); z = text.index(END, a) + len(END)
+        return text[:a] + block + text[z:]
+    tag = "**More work, faster, on fewer machines, with less energy, on top of the stack you already run.**"
+    i = text.index(tag) + len(tag)
+    return text[:i] + "\n\n" + block + text[i:]
+
+
 def place_after_title(page: str, block: str) -> str:
     """The answer on the live engine page: its own section straight under the one line of the legal notice, the first thing on
     the page, above the title page."""
@@ -234,7 +247,7 @@ def place_after_title(page: str, block: str) -> str:
 def main(argv) -> int:
     check, m = "--check" in argv, model()
     md = markdown(m)
-    new_readme = place(README.read_text(encoding="utf-8"), md, "## The Problem and the Answer")
+    new_readme = place_readme(README.read_text(encoding="utf-8"), md)
     page = PAGE.read_text(encoding="utf-8")
     sec = page_html(m)
     blk = f"{BEGIN}\n{sec}\n{END}"
