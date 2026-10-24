@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Every file a benchmark installs is pinned by its SHA-256 before any run (docs/COMPETITORS_PREREGISTRATION.md). Some projects
+# serve their releases from hosts only GitHub's runners reach; this reads them there and prints what to pin: each file's
+# SHA-256 and size, and the newest entries of a chart index with the Kubernetes versions each supports. It installs nothing,
+# runs nothing and needs no secret.
+name: pin-sources
+on:
+  workflow_dispatch:
+    inputs:
+      urls: {description: "Files to read, separated by spaces", default: ""}
+      index: {description: "A Helm chart index (index.yaml) to list", default: ""}
+      chart: {description: "The chart's name in that index", default: ""}
+permissions:
+  contents: read
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
+jobs:
+  pin:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - name: Each file's SHA-256 and size
+        env: {URLS: "${{ github.event.inputs.urls }}"}
+        run: |
+          { echo '| File | SHA-256 | Bytes |'; echo '|---|---|---:|'; } >> "$GITHUB_STEP_SUMMARY"
+          for u in $URLS; do
+            f=$(mktemp)
+            if curl -fsSL --retry 5 --retry-all-errors --connect-timeout 20 --max-time 300 "$u" -o "$f"; then
+              echo "| $u | \`$(sha256sum "$f" | cut -d' ' -f1)\` | $(stat -c %s "$f") |" | tee -a "$GITHUB_STEP_SUMMARY"
+            else
+              echo "| $u | not read | |" | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+            rm -f "$f"
+          done
+      - name: The chart index's newest entries
+        if: github.event.inputs.index != ''
+        env: {INDEX: "${{ github.event.inputs.index }}", CHART: "${{ github.event.inputs.chart }}"}
+        run: |
+          curl -fsSL --retry 5 --retry-all-errors --connect-timeout 20 --max-time 120 "$INDEX" -o index.yaml
+          python3 - <<'EOF' | tee -a "$GITHUB_STEP_SUMMARY"
+          import os, yaml
+          d = yaml.safe_load(open("index.yaml"))
+          print("\n| Chart | Version | App version | Kubernetes | Created | URL |\n|---|---|---|---|---|---|")
+          for e in (d.get("entries", {}).get(os.environ["CHART"]) or [])[:12]:
+              print(f"| {e.get('name')} | {e.get('version')} | {e.get('appVersion')} | {e.get('kubeVersion', '')} | {str(e.get('created', ''))[:10]} | {(e.get('urls') or [''])[0]} |")
+          EOF
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
