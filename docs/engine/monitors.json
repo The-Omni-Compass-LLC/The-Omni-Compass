@@ -176,6 +176,11 @@
    "label": "Play / pause",
    "what": "the cursor's sweep of the 20 macro steps, held or running",
    "where": "the Monte Carlo monitor (section 1f)"
+  },
+  "system": {
+   "label": "Your own system",
+   "what": "your stack written as ranges of the core's six states and 22 parameters, run in the page or on GitHub through the Python and the C++ (systems/README.md)",
+   "where": "the Monte Carlo monitor's own-system panel (section 1f)"
   }
  },
  "monitors": [
@@ -314,7 +319,7 @@
    "id": "mcCv",
    "name": "The Python's Monte Carlo: 500 runs into the basin",
    "layer": "proof",
-   "what": "The engine's core (omnicompass/core.py) over 500 runs, each from step 0: the fourth-order Runge–Kutta step, 20 macro steps of 10 micro steps, native (the plant alone, u = 0) beside Omni-Compass on top (the bounded command toward the nearest basin, the far basin, or with the double well off), every run's U, the basins at ±1, and the macro step each run was conveyed (5 in a row) and certified (10 in a row); the Python's own 500 (benchmarks/core_evidence.py, seed 223387268) and every set the jump generator draws here, each held to tools/core_runs.py's digest.",
+   "what": "The engine's core (omnicompass/core.py) over 500 runs, each from step 0: the fourth-order Runge–Kutta step, 20 macro steps of 10 micro steps, native (the plant alone, u = 0) beside Omni-Compass on top (the bounded command toward the nearest basin, the far basin, or with the double well off), every run's U, the basins at ±1, and the macro step each run was conveyed (5 in a row) and certified (10 in a row); the Python's own 500 (benchmarks/core_evidence.py, seed 223387268) and every set the jump generator draws here, each held to tools/core_runs.py's digest; the linked run holds the Python's digest, the C++ twin's on the same draws and this page's beside each other, and a system of your own runs here or on GitHub.",
    "cls": "S (the engine itself)",
    "status": "live",
    "awaiting": null,
@@ -326,6 +331,7 @@
    "knobs": [
     "set",
     "way",
+    "system",
     "play",
     "runs",
     "kill"
@@ -335,18 +341,23 @@
     "unit": ""
    },
    "wire": {
-    "code": "drawMC, mcRun, coreSim, coreRk4, jgTick",
+    "code": "drawMC, mcRun, mcLinkedRun, mcSysParse, coreSim, coreRk4, jgTick",
     "python": [
      "omnicompass/core.py",
      "benchmarks/core_evidence.py",
      "tools/core_runs.py",
+     "systems/README.md",
      "docs/engine/build_live_engine.py"
     ],
     "cpp": [
+     "cpp/tools/core_runs.cpp",
      "cpp/src/core.cpp"
     ],
     "proof": [
      "tests/test_core_runs.py",
+     "tests/test_cpp_core_runs_parity.py",
+     "verify.py",
+     ".github/workflows/monte-carlo.yml",
      ".github/workflows/engine-runs.yml"
     ],
     "moves": "the cursor sweeps macro step 0 to 20 in 10 s, every run's line drawn up to it, the counters and the bars read at it; with the jump generator ON a new set of 500 arrives set after set"

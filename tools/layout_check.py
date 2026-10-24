@@ -43,10 +43,11 @@ ROOT_ALLOWED = {
     # code and evidence
     "omnicompass", "omni_controller", "omni_orchestrator", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",
     "k8s_controlplane", "k8s_fleet", "omnilab", "hardware", "benchmarks", "tuning", "reference", "fixtures", "sbom",
+    "systems",   # your own system through the core's Monte Carlo (systems/README.md; the founder's words of 24 October)
     "results", "docs", "release",
 }
 PATH_PREFIXES = ("results/", "docs/", "tools/", "scripts/", "realms/", "omnicompass/", "omni_controller/", "tests/",
-                 ".github/", "deploy/", "tuning/", "cpp/")
+                 ".github/", "deploy/", "tuning/", "cpp/", "systems/")
 LINK = re.compile(r"\]\(([^)\s#]+)(?:#[^)]*)?\)")
 TICK = re.compile(r"`([A-Za-z0-9_.\-/]+)`")
 

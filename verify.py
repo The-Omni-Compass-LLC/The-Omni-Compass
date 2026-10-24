@@ -42,7 +42,7 @@ def build_cpp(tmp):
                            ("smoke.cpp", "oc_smoke"), ("run_shield.cpp", "oc_shield"), ("run_hpa.cpp", "oc_hpa"), ("savings.cpp", "oc_savings"),
                            ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
                            ("run_compass_law.cpp", "oc_compass_law"), ("run_verdict.cpp", "oc_verdict"),
-                           ("engine_runs.cpp", "oc_engine_runs")):
+                           ("engine_runs.cpp", "oc_engine_runs"), ("core_runs.cpp", "oc_core_runs")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
 
@@ -100,6 +100,11 @@ def main():
     dg_runs = test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50 if a.quick else 500)
     check(f"the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): "
           f"every receipt identical to the last bit, one digest {dg_runs[:16]}…", True)
+    # the founder's words of 24 October: the Monte Carlo 500, the Python and the C++ linked, on the engine's ranges and on a system of one's own
+    from tests import test_cpp_core_runs_parity
+    dg_core = test_cpp_core_runs_parity.main(str(b / "oc_core_runs"), 50 if a.quick else 500)
+    check(f"the core's Monte Carlo from the jump generator through the C++ twin (cpp/tools/core_runs.cpp on cpp/src/core.cpp), the engine's own "
+          f"ranges and the example system: every U identical to the last bit, one digest {dg_core[:16]}…", True)
     from tests import test_cpp_shield_parity
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8 if a.quick else 20); check("C++ shield vs Python shield (enforce and violations)", True)
     from tests import test_cpp_shield_adversarial, test_shield_properties

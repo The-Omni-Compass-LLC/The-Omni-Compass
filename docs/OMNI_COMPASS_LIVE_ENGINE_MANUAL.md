@@ -624,7 +624,32 @@ digest must be the one `tools/core_runs.py` writes for the same base (`tools/cor
 compares; the engine-runs workflow writes the Python's record of every base it runs). The table under the monitor lists every set,
 its counts on both sides and whether its digest matches the Python's. The monitor's light reads the set shown: green when Omni-Compass
 on top certified more runs than native alone, yellow when the same, red when fewer or when the page's digest differs from the Python's
-record of the same base.
+or the C++'s record of the same base.
+
+**The two buttons: the linked run, and your own system** (the founder's words of 24 October: "The button is to have Monte Carlo 500
+Runge-Kutta, my C++ and Python linked together, ran through as a button, and then if somebody wanted to theoretically hook up their own
+system and hook this to their stack and run their own system through it, is wired into that other button, which is the simulation
+that's done within the GitHub"). **Run the Monte Carlo 500: the Python, the C++ and this page, linked** (in the control panel and on
+the monitor) stands three boxes side by side: 1, the Python, the newest set `tools/core_runs.py` ran from the jump generator, with its
+digest and its record; 2, the C++, the C++ twin of the core (`cpp/tools/core_runs.cpp` on the sealed `cpp/src/core.cpp`) on the very
+draws the Python wrote (the injection, its own SHA-256), with its digest, how many of the 2,000 run-ways agree to 1e-9 and the largest
+difference; 3, this page, its own port of the core run on the same base when the button is pressed. The line under them reads
+**ALL THREE THE SAME** when the three digests are one (every U at every macro step, four ways, to six decimals), and says so if they
+differ; the three are sealed together (`tools/seal.py`, the thirteenth twin) and `verify.py` runs the C++ against the Python on every
+push. **Run your own system through it** opens a panel: a system is your own stack written as ranges of the core, a name and, for any
+of the six starting states and the 22 parameters, a range or one number, the rest the engine's own (`systems/README.md`). It opens on
+the engine's own ranges, every one editable; **Load the example** puts in `systems/example_heavy_swing.json` (heavy outside demand,
+a strong swing, little headroom; not any real stack). **Check it** reads the block as the Python does and names anything refused;
+**Run it here** draws 500 runs in the browser through the page's port (on the base the Python ran that system on, so its digest
+compares, else on the linked run's base) and draws them in the monitor beside native; **Download it as a file** saves it for
+`systems/`; **Run it on GitHub** checks it, copies it and opens the **monte-carlo** workflow (`.github/workflows/monte-carlo.yml`):
+press **Run workflow**, paste the block into **system**, set the runs and the base, and run. On GitHub's own machine, at no cost,
+the Python draws the runs over your ranges, the C++ twin runs the same draws, the page's port is run on them in node, and the three
+digests must be one; the record, with the run's link, goes to `results/core_runs/` and joins the monitor's table at the page's next
+build. A system file committed under `systems/` runs on every push that changes it. GitHub offers **Run workflow** for a workflow on
+the repository's main branch, so the button's GitHub half works once omni-v18 reaches main; the page half works now. The block is
+read as numbers only, never run as code. Class S: the engine's own mathematics on your ranges, never a measurement of your stack;
+wiring Omni-Compass onto the stack itself is the plug of the Operator's Manual.
 
 ### 4.1 What the wall is
 

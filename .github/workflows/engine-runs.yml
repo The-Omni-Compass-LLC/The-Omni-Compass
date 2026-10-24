@@ -58,7 +58,7 @@ jobs:
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
       - name: The C++ harness built (the engine's C++ twins and the runs' driver)
-        run: cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build -j2 --target oc_engine_runs
+        run: cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build -j2 --target oc_engine_runs oc_core_runs
       - name: The Python's runs from the jump generator, and the same runs through the C++ harness
         run: |
           set -euo pipefail
@@ -73,7 +73,7 @@ jobs:
       - name: The core's Monte Carlo from the same base, and the live engine's own port of the core on the same set
         run: |
           set -euo pipefail
-          python3 tools/core_runs.py --runs "${{ github.event.inputs.runs || '500' }}" --base "$BASE" | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 tools/core_runs.py --runs "${{ github.event.inputs.runs || '500' }}" --base "$BASE" --cpp cpp/build/oc_core_runs | tee -a "$GITHUB_STEP_SUMMARY"
           python3 tools/core_runs.py --verify docs/engine/OMNI_COMPASS_LIVE_ENGINE.html --runs "${{ github.event.inputs.runs || '500' }}" --base "$BASE" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: The record committed, with this run's link
         run: |

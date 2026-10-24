@@ -587,7 +587,32 @@ digest must be the one `tools/core_runs.py` writes for the same base (`tools/cor
 compares; the engine-runs workflow writes the Python's record of every base it runs). The table under the monitor lists every set,
 its counts on both sides and whether its digest matches the Python's. The monitor's light reads the set shown: green when Omni-Compass
 on top certified more runs than native alone, yellow when the same, red when fewer or when the page's digest differs from the Python's
-record of the same base.
+or the C++'s record of the same base.
+
+**The two buttons: the linked run, and your own system** (the founder's words of 24 October: "The button is to have Monte Carlo 500
+Runge-Kutta, my C++ and Python linked together, ran through as a button, and then if somebody wanted to theoretically hook up their own
+system and hook this to their stack and run their own system through it, is wired into that other button, which is the simulation
+that's done within the GitHub"). **Run the Monte Carlo 500: the Python, the C++ and this page, linked** (in the control panel and on
+the monitor) stands three boxes side by side: 1, the Python, the newest set `tools/core_runs.py` ran from the jump generator, with its
+digest and its record; 2, the C++, the C++ twin of the core (`cpp/tools/core_runs.cpp` on the sealed `cpp/src/core.cpp`) on the very
+draws the Python wrote (the injection, its own SHA-256), with its digest, how many of the 2,000 run-ways agree to 1e-9 and the largest
+difference; 3, this page, its own port of the core run on the same base when the button is pressed. The line under them reads
+**ALL THREE THE SAME** when the three digests are one (every U at every macro step, four ways, to six decimals), and says so if they
+differ; the three are sealed together (`tools/seal.py`, the thirteenth twin) and `verify.py` runs the C++ against the Python on every
+push. **Run your own system through it** opens a panel: a system is your own stack written as ranges of the core, a name and, for any
+of the six starting states and the 22 parameters, a range or one number, the rest the engine's own (`systems/README.md`). It opens on
+the engine's own ranges, every one editable; **Load the example** puts in `systems/example_heavy_swing.json` (heavy outside demand,
+a strong swing, little headroom; not any real stack). **Check it** reads the block as the Python does and names anything refused;
+**Run it here** draws 500 runs in the browser through the page's port (on the base the Python ran that system on, so its digest
+compares, else on the linked run's base) and draws them in the monitor beside native; **Download it as a file** saves it for
+`systems/`; **Run it on GitHub** checks it, copies it and opens the **monte-carlo** workflow (`.github/workflows/monte-carlo.yml`):
+press **Run workflow**, paste the block into **system**, set the runs and the base, and run. On GitHub's own machine, at no cost,
+the Python draws the runs over your ranges, the C++ twin runs the same draws, the page's port is run on them in node, and the three
+digests must be one; the record, with the run's link, goes to `results/core_runs/` and joins the monitor's table at the page's next
+build. A system file committed under `systems/` runs on every push that changes it. GitHub offers **Run workflow** for a workflow on
+the repository's main branch, so the button's GitHub half works once omni-v18 reaches main; the page half works now. The block is
+read as numbers only, never run as code. Class S: the engine's own mathematics on your ranges, never a measurement of your stack;
+wiring Omni-Compass onto the stack itself is the plug of the Operator's Manual.
 
 ### 4.2 What the wall is
 
@@ -2515,6 +2540,14 @@ How the three prove each other. tools/engine_runs.py runs N runs from a base see
 
 **The Python's Monte Carlo: 500 runs of the engine's core, each from step 0, the fourth-order Runge–Kutta step, 20 macro steps of 10 micro steps, into the basin, held and certified**
 
+**Your own system through it: write your stack as the core's ranges, run it here, or run it on GitHub through the Python and the C++**
+
+A system is your own stack written as ranges of the engine's core: a name, and for any of the six starting states (E, energy debt; U, the order parameter, its basins at −1 and +1; I[U], the integral of need; S, stress; B, the bath; Ḃ, its rate; the block below names each by its key) and any of the 22 parameters of omnicompass/core.py a range [low, high] or one number; the rest keep the engine's own. Among the parameters: beta_int and beta_ext, the demand into E from inside and outside; E[max], the headroom; c, ω[B], Q[B] and λ₀ to λ₂, the bath's swing; mu, the depth of the double well. The draws keep their one order, so the jump generator's streams are the same; only the ranges they spread over change. The block is read as numbers only, never run as code (systems/README.md).
+
+On GitHub (the simulation done within GitHub, on its own machines, at no cost): the button checks the block, copies it and opens the monte-carlo workflow. There, press Run workflow, paste the block into system, set runs (500) and base (empty for a new one) and press Run workflow again. The Python (tools/core_runs.py) draws the runs, the C++ twin of the core (cpp/tools/core_runs.cpp on cpp/src/core.cpp) runs the same draws, this page's own port is run on them in node, and the three digests must be one; the record, with the run's link, is committed to results/core_runs/ and joins this monitor's table at the page's next build. A system file committed under systems/ runs there on every push that changes it. GitHub offers Run workflow for a workflow on the repository's main branch: this one reaches main with omni-v18.
+
+Class S: the engine's own mathematics on your ranges, never a measurement of your stack. Wiring Omni-Compass onto the stack itself is the plug of the Operator's Manual.
+
 How to read it. Every line is one run of omnicompass/core.py: six states (E, U, I[U], S, B, Ḃ), the fourth-order Runge–Kutta step 10 times a macro step (Δt 0.01 s), 20 macro steps, from the starting state and parameters the run drew; the line is its U at step 0 and at the end of every macro step. The left lane is native: the same plant with no command (u = 0), left to its own double well, μU(1 − U²). The right lane is Omni-Compass on top: the bounded feedforward-plus-proportional command (u = −f[U] + 12(σ − U), clipped to ±25 and held across the four stages) toward the nearest basin, or, by the knob, toward the far one, or with the double well switched off (μ = 0). The green bands are the basins, |U ∓ 1| ≤ 0.10. A run is conveyed when it has stayed in one basin for 5 macro steps in a row, certified at 10; the bars under each lane count the macro step each run was conveyed (its colour) and certified (green), and the counters read at the sweeping cursor. The set the page opens on is the Python's own 500 (benchmarks/core_evidence.py, numpy's generator from seed 223387268), whose counts must be its record's (results/core_evidence.json); a set run here from the jump generator is computed by this page's own port of the core, line for line, and its digest must be the one tools/core_runs.py writes for the same base. Class S: the engine's own mathematics, never a measurement.
 
 **Its monitors.**
@@ -2545,13 +2578,13 @@ benchmarks/stack_benchmark.py's 500 scenarios a seed base (the two held-out seed
 
 #### L.10.3 Monitor 4: The Python's Monte Carlo: 500 runs into the basin
 
-The engine's core (omnicompass/core.py) over 500 runs, each from step 0: the fourth-order Runge–Kutta step, 20 macro steps of 10 micro steps, native (the plant alone, u = 0) beside Omni-Compass on top (the bounded command toward the nearest basin, the far basin, or with the double well off), every run's U, the basins at ±1, and the macro step each run was conveyed (5 in a row) and certified (10 in a row); the Python's own 500 (benchmarks/core_evidence.py, seed 223387268) and every set the jump generator draws here, each held to tools/core_runs.py's digest.
+The engine's core (omnicompass/core.py) over 500 runs, each from step 0: the fourth-order Runge–Kutta step, 20 macro steps of 10 micro steps, native (the plant alone, u = 0) beside Omni-Compass on top (the bounded command toward the nearest basin, the far basin, or with the double well off), every run's U, the basins at ±1, and the macro step each run was conveyed (5 in a row) and certified (10 in a row); the Python's own 500 (benchmarks/core_evidence.py, seed 223387268) and every set the jump generator draws here, each held to tools/core_runs.py's digest; the linked run holds the Python's digest, the C++ twin's on the same draws and this page's beside each other, and a system of your own runs here or on GitHub.
 
 - **Evidence and state.** Class S (the engine itself); live.
 - **Feed.** benchmarks/core_evidence.py and tools/core_runs.py (the Python) and this page's port of the core.
-- **Wired.** This page's `drawMC, mcRun, coreSim, coreRk4, jgTick` → the Python `omnicompass/core.py`, `benchmarks/core_evidence.py`, `tools/core_runs.py`, `docs/engine/build_live_engine.py` → the C++ `cpp/src/core.cpp`; held equal by `tests/test_core_runs.py`, `.github/workflows/engine-runs.yml`.
+- **Wired.** This page's `drawMC, mcRun, mcLinkedRun, mcSysParse, coreSim, coreRk4, jgTick` → the Python `omnicompass/core.py`, `benchmarks/core_evidence.py`, `tools/core_runs.py`, `systems/README.md`, `docs/engine/build_live_engine.py` → the C++ `cpp/tools/core_runs.cpp`, `cpp/src/core.cpp`; held equal by `tests/test_core_runs.py`, `tests/test_cpp_core_runs_parity.py`, `verify.py`, `.github/workflows/monte-carlo.yml`, `.github/workflows/engine-runs.yml`.
 - **Moves.** The cursor sweeps macro step 0 to 20 in 10 s, every run's line drawn up to it, the counters and the bars read at it; with the jump generator ON a new set of 500 arrives set after set.
-- **Knobs.** Set: the Python's own 500 (numpy, seed 223387268) or a set the jump generator drew on this page; Omni-Compass side: the bounded command toward the nearest basin, toward the far basin, or with the double well off (μ = 0); native is the plant alone (u = 0); Play / pause: the cursor's sweep of the 20 macro steps, held or running; Runs: how many of the Python's runs this page computes again; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
+- **Knobs.** Set: the Python's own 500 (numpy, seed 223387268) or a set the jump generator drew on this page; Omni-Compass side: the bounded command toward the nearest basin, toward the far basin, or with the double well off (μ = 0); native is the plant alone (u = 0); Your own system: your stack written as ranges of the core's six states and 22 parameters, run in the page or on GitHub through the Python and the C++ (systems/README.md); Play / pause: the cursor's sweep of the 20 macro steps, held or running; Runs: how many of the Python's runs this page computes again; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** The Python's seeded runs beside this page's: one cell a run (green agrees to 1e-9, red differs, blue a new set), the two digests under them; and the Python's 500 scenarios a seed replayed with every trace hash.
 - **What to do with it.** Press the button to run the Python's set here; run a new base to make a new set and run the printed command in the Python to compare digests. Print or download the receipts for the file.
 
@@ -3982,6 +4015,7 @@ This page's own render loop governed by the compass law: the frame time against 
 | Set | the Python's own 500 (numpy, seed 223387268) or a set the jump generator drew on this page | the Monte Carlo monitor's set knob (section L.10) |
 | Omni-Compass side | the bounded command toward the nearest basin, toward the far basin, or with the double well off (μ = 0); native is the plant alone (u = 0) | the Monte Carlo monitor's way knob (section L.10) |
 | Play / pause | the cursor's sweep of the 20 macro steps, held or running | the Monte Carlo monitor (section L.10) |
+| Your own system | your stack written as ranges of the core's six states and 22 parameters, run in the page or on GitHub through the Python and the C++ (systems/README.md) | the Monte Carlo monitor's own-system panel (section L.10) |
 
 ### L.43 Every LOSS row, whose it is, its cause and the knob that answers it
 

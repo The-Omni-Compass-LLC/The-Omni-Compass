@@ -2,6 +2,23 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (late night, the live engine): the Monte Carlo 500, the Python and the C++ linked; your own system through it
+
+- **The linked run** (the founder's words: "Monte Carlo 500 Runge-Kutta, my C++ and Python linked together, ran through as a
+  button"): `cpp/tools/core_runs.cpp` (new, `oc_core_runs`) runs the Python's draws (`tools/core_runs.py` writes them, the injection)
+  through the sealed C++ twin of the core (`cpp/src/core.cpp`) in the Python's own loop, four ways; on 500 runs every U of every run
+  is the Python's to the last bit (2,000 of 2,000 run-ways, largest difference 0), one digest. One button in the control panel and on
+  monitor 4 stands the three side by side, the Python's, the C++'s and this page's run now, and reads ALL THREE THE SAME. The
+  thirteenth twin of the seal (`tools/seal.py`); `verify.py` runs the C++ against the Python on every push
+  (`tests/test_cpp_core_runs_parity.py`).
+- **Your own system** (the founder's words: "if somebody wanted to theoretically hook up their own system and hook this to their
+  stack and run their own system through it, is wired into that other button, which is the simulation that's done within the
+  GitHub"): a system is a stack written as ranges of the core's six states and 22 parameters (`systems/README.md`, numbers only, never
+  run as code); the panel checks it, runs it in the page, downloads it, and sends it to GitHub, where the new workflow
+  `.github/workflows/monte-carlo.yml` runs it through the Python and the C++, checks the page's port on it, and commits the record. The
+  example (`systems/example_heavy_swing.json`, not any real stack): Omni-Compass on top certified 500 of 500, native alone 237, the
+  same digest from the Python, the C++ and the page. Class S.
+
 ## 2026-10-24 (night, the live engine): the switchboard, the reports, the Python's runs again; the page on omni-v18
 
 - **The Python's Monte Carlo, a monitor** (the founder's words: "the Python's Monte Carlo, our 4K Runge-Kutta, 20-step macro, 10-step

@@ -983,12 +983,16 @@ def core_mc() -> dict:
 
 def core_sets() -> list:
     """Every set of the core's Monte Carlo that tools/core_runs.py has written from the jump generator (results/core_runs/), oldest
-    first: its base, runs, digest and counts, and the GitHub run that wrote it, so a set the page runs is checked against the Python's."""
+    first: its base, runs, digest and counts, the C++ twin's digest of the same draws, the system it ran (none: the engine's own
+    ranges) and the GitHub run that wrote it, so a set the page runs is checked against the Python's and the C++'s."""
     out = []
     for f in sorted((ROOT / "results" / "core_runs").glob("CORE_RUNS_*.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
+        c = d.get("cpp") or {}   # the C++ twin of the core on the same draws (cpp/tools/core_runs.cpp), and the system they were spread over
         out.append({"base": d.get("base"), "runs": d.get("runs"), "digest": d.get("digest"), "summary": d.get("summary"), "file": str(f.relative_to(ROOT)),
-                    "written": d.get("written", ""), "github": (d.get("github") or {}).get("url")})
+                    "written": d.get("written", ""), "github": (d.get("github") or {}).get("url"), "system": (d.get("system") or {}).get("name"),
+                    "cpp": c.get("digest"), "cpp_agree": f"{c['agree']} of {c['of']}" if "agree" in c else None, "cpp_largest": c.get("largest_difference"),
+                    "inputs": d.get("inputs_digest")})
     return sorted(out, key=lambda x: (x["written"], x["file"]))
 
 
