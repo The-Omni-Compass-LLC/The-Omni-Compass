@@ -634,7 +634,7 @@ Python's set as GitHub ran it (`tools/engine_runs.py`, its run linked), the same
 C++ twins (`cpp/tools/engine_runs.cpp`), and this page's own port, one SHA-256 digest each beside the digest of the draws
 themselves; the three must be one. Once that first check ends, the page checks the set again without end: one run at a time,
 about twice a second, each run recomputed from its own seed by the page's engine and held against the Python's receipt; the run
-being checked is boxed on all three lanes and its result printed under the digests. Appendix L lists every monitor under its number.
+being checked is boxed on all three lanes and its result printed under the digests. Appendix L lists every monitor under its number. On Grafana the wall opens with its own row of signals in the same words (the heartbeat, the senses, the master switch, the alarms firing), its knobs at the top (route, provider, machine, rate window, the control panel's address) and the panel's buttons as a link; `docs/MISSION_CONTROL.md` stands it up beside Omni-Compass in one command, with the alarms wired to the panel's operator buttons through the alert bridge.
 
 **Every monitor's wiring.** Under every monitor one line names its wiring (`docs/engine/monitors.json`): the page's own code, the
 Python it ports or reads, the C++ twin or why there is none, the checks that hold them equal, each file linked at the build's
@@ -2347,7 +2347,7 @@ reported to its own maintainers.
 
 
 
-This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-24 21:29 UTC on omni-v18 (digest 1cb92edb64c4391d) from commit 791ad0fd93b1.
+This appendix is the live engine page itself, written from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` at every build of this book (`docs/book/build_live_manual.py`): every section in the page's own order with its number, title, summary and controls line; every monitor under the number its badge carries, with its evidence class, its state, the open-source feed that would carry it on a running system and its knobs; every knob; and every LOSS row with whose it is, its cause and the knob that answers it. Nothing here is typed twice: what the page says, this appendix says, so the book and the page read each other both ways. This edition was written from the page built 2026-10-24 22:32 UTC on omni-v18 (digest 1cb92edb64c4391d) from commit d8a76f1922d4.
 
 
 Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.
