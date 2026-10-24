@@ -139,7 +139,7 @@ def three_run_reading(rs, aim_, same_rel=1e-6):
     if all(abs(r["diff"]) <= same_rel * max(abs(r["native"]), 1e-12) for r in rs):
         return EVEN_SAME
     sig = [significant(r) for r in rs]
-    signs = [(r["diff"] > 0) - (r["diff"] < 0) for r in rs]
+    signs = [int(r["diff"] > 0) - int(r["diff"] < 0) for r in rs]
     if all(r["native"] for r in rs):
         rel = [r["diff"] / abs(r["native"]) for r in rs]
         mean = sum(rel) / len(rel)
@@ -168,7 +168,7 @@ def relative_runs_reading(runs, aim):
     if not runs:
         return EVEN
     aim_ = {"up": HIGHER, "down": LOWER, "spent": SPENT, "per": WORK_PER}[aim]
-    rs = [{"native": 1.0, "diff": r["change"], "ci95": [r["lo"], r["hi"]]} for r in runs]
+    rs = [{"native": 1.0, "diff": float(r["change"]), "ci95": [float(r["lo"]), float(r["hi"])]} for r in runs]
     return three_run_reading(rs, aim_).replace("**", "")
 
 
