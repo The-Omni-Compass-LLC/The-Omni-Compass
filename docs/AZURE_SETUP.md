@@ -71,14 +71,26 @@ shape of `AZURE_CREDENTIALS` before Azure's login and says what is wrong without
 start with `{`, that it holds a client secret's value alone, that it was cut short, or which field is missing. Store it again,
 whole:
 
+A set already running keeps the key it started with: on 24 October the steady set started on 19 October was still signing in
+at every repetition while new runs read 88 characters in the box (the size of a storage account's access key, not the block).
+So make the new block under a new name, which leaves the login a running set still uses untouched; running the line of
+section 3 with its old name again can replace that login's password, and a repetition that cannot sign in at its end cannot
+delete what it built.
+
 1. In the Azure portal, click **>_** (Cloud Shell) and choose **Bash**, as in section 2.
-2. Paste the one line of section 3 again and press **Enter**. It prints a new block that starts with `{` and ends with `}`.
+2. Paste this line and press **Enter** (the line of section 3 with the name `omni-compass-github-2`). It prints a new block
+   that starts with `{` and ends with `}`:
+
+   ```bash
+   az ad sp create-for-rbac --name omni-compass-github-2 --role contributor --scopes /subscriptions/$(az account show --query id -o tsv) --sdk-auth
+   ```
 3. Select all of it, from `{` to `}`, and copy it.
 4. On GitHub, open the repository, then **Settings**, then **Secrets and variables**, then **Actions**.
 5. Beside `AZURE_CREDENTIALS`, click the pencil (**Update**).
 6. Paste the whole block as the new value and click **Update secret**.
-7. To retire every older password of the same login: in the Azure portal search **App registrations**, open
-   **omni-compass-github**, then **Certificates & secrets**, and delete every client secret but the newest.
+7. Once no Azure set is running (the **Actions** tab shows no run named `aks-metered` in progress or queued), the older
+   login may be retired: in the Azure portal search **App registrations**, open **omni-compass-github**, and click
+   **Delete**. Nothing in the repository names it.
 
 The conductor runs Azure's check again within the hour, and the sets start on their own once it passes. Nothing is built and
 nothing is billed while it fails.

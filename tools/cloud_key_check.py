@@ -172,8 +172,8 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         for b in bad:
             print(f"::error::AZURE_CREDENTIALS: {b}. Nothing built, nothing billed. Store it again, whole: docs/AZURE_SETUP.md, "
-                  "sections 3 and 4 (run the one line again in Azure's own terminal, copy everything from { to }, and paste "
-                  "it as the secret's new value).")
+                  "section 7 (make a new block under a new name in Azure's own terminal, copy everything from { to }, and "
+                  "paste it as the secret's new value).")
         return 2
     bad = problems(os.environ.get("GCP_CREDENTIALS"), os.environ.get("GCP_PROJECT", ""))
     if not bad:

@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24: the clouds' keys read to the letter of their shape
+
+- **What the Azure box holds, named** (the founder's order: "if they don't run, you better dig in ... and find out why. So I can
+  fix them"): Azure's own login still works (the steady set started on 19 October signed in at its repetition 99, 02:46 UTC on 24
+  October, and carries the key it started with), while every new run reads 88 characters in `AZURE_CREDENTIALS`, the size of a
+  storage account's access key, not the block. `tools/cloud_key_check.py` now names that form, text pasted before the `{`, and
+  the outline of any other stored text (its lines, and whether it holds spaces, a web address or quotation marks), never a
+  character of it; `docs/AZURE_SETUP.md` section 7 makes the new block under a new name (`omni-compass-github-2`), so the login a
+  running set still uses is never replaced under it, and the check's message points there. The sign-in without a password was
+  refused again at 03:27 UTC (`AADSTS700213`: no trust rule in Azure names this repository as GitHub presents it; section 8).
+
 ## 2026-10-23 (night): omni-v18, Omni direct in the engine; the three arms on the live engine
 
 - **omni-v18 lands** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) on the founder's orders of the
