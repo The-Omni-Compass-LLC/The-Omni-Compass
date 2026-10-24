@@ -10,10 +10,12 @@
 # after a day), and starts a check itself when there is none, the last one failed over an hour ago, or the last pass is a
 # day old; so once the founder's fix is stored (a whole Google key, Amazon's Paid plan), the sets start on their own within
 # the hour, and a cloud that cannot rent never uses up a set's A, B or C. On Amazon, a quota short of a set is asked of
-# Amazon here (the founder's order of 18 October: raised with the cloud, never shrunk to fit). Started by hand: cloud =
-# google, amazon, azure, both (Google and Amazon) or all.
+# Amazon here (the founder's order of 18 October: raised with the cloud, never shrunk to fit). A cluster a tester built in a
+# provider's own console (oracle, digitalocean, alibaba, linode, ibm or other; docs/BYOC_SETUP.md) is checked the same way:
+# its kubeconfig's shape, then the cluster's own shape (scripts/byoc_paired.sh, PREFLIGHT_ONLY=1), and nothing measured.
+# Started by hand: cloud = google, amazon, azure, both (Google and Amazon), all (those three), or one of the five above.
 name: cloud-check
-# the title the conductor reads a check back by: cloud-check google | cloud-check amazon | cloud-check azure
+# the title the conductor reads a check back by: cloud-check google | cloud-check amazon | cloud-check azure | cloud-check oracle ...
 run-name: cloud-check ${{ github.event.inputs.cloud || 'both' }}
 on:
   push:
@@ -21,7 +23,7 @@ on:
     paths: ['.github/workflows/cloud-check.yml']
   workflow_dispatch:
     inputs:
-      cloud: {description: "google, amazon, azure, both (google and amazon) or all", default: "both"}
+      cloud: {description: "google, amazon, azure, both (google and amazon), all (those three), or a cluster built in a provider's console: oracle, digitalocean, alibaba, linode, ibm, other", default: "both"}
 permissions:
   contents: read
 env:
@@ -148,6 +150,41 @@ jobs:
             echo "**Azure: ready.** The key is whole and logs in, the subscription is on, the machine is offered and the allowance holds the fleet: the conductor starts the sets." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "**Azure: not ready.** Nothing built, nothing billed; the failed step above says why, and docs/AZURE_SETUP.md how to fix it." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+  byoc:
+    # a cluster built in a provider's own console and handed over by its kubeconfig (docs/BYOC_SETUP.md): never in "all", since
+    # no such secret stands until a tester stores one
+    if: contains(fromJSON('["oracle", "digitalocean", "alibaba", "linode", "ibm", "other"]'), github.event.inputs.cloud || 'both')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CLOUD: ${{ github.event.inputs.cloud }}
+      KUBECONFIG_RAW: >-
+        ${{ github.event.inputs.cloud == 'oracle' && secrets.KUBECONFIG_ORACLE || github.event.inputs.cloud == 'digitalocean' && secrets.KUBECONFIG_DIGITALOCEAN
+         || github.event.inputs.cloud == 'alibaba' && secrets.KUBECONFIG_ALIBABA || github.event.inputs.cloud == 'linode' && secrets.KUBECONFIG_LINODE
+         || github.event.inputs.cloud == 'ibm' && secrets.KUBECONFIG_IBM || secrets.KUBECONFIG_OTHER }}
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: {sparse-checkout: "scripts\ntools"}
+      - name: The kubeconfig is whole (its shape only; not a character of it is printed)
+        run: |
+          umask 077
+          python3 tools/cloud_key_check.py kubeconfig
+          printf '%s' "$KUBECONFIG_RAW" | python3 -c "import base64, sys; t = sys.stdin.read(); sys.stdout.write(t if 'apiVersion' in t else base64.b64decode(t).decode())" > "$RUNNER_TEMP/kubeconfig"
+      - name: The cluster's shape, then stop (nothing measured)
+        run: KUBECONFIG="$RUNNER_TEMP/kubeconfig" PREFLIGHT_ONLY=1 REP=1 bash scripts/byoc_paired.sh
+      - name: What this check found
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = success ]; then
+            echo "**$CLOUD: ready.** The kubeconfig is whole, the cluster answers and has the shape docs/BYOC_SETUP.md sets: its sets may start once its queue's switch is on." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "**$CLOUD: not ready.** Nothing measured, nothing billed; the failed step above says why, and docs/BYOC_SETUP.md how to fix it." >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Legal notice at the end of this job's report
         if: always()
