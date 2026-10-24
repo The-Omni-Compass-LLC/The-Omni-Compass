@@ -223,7 +223,9 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
         (fake / "ssh-keygen").chmod(0o755)
         os.environ["PATH"] = f"{fake}{os.pathsep}{os.environ['PATH']}"
         keys = {}
-        for k, body in (("good", "GOOD-PRIVATE"), ("other", "OTHER-PRIVATE"), ("cut", "-----BEGIN OPENSSH")):
+        for k, body in (("good", "GOOD-PRIVATE"), ("other", "OTHER-PRIVATE"), ("cut", "-----BEGIN OPENSSH"),
+                        ("public", "ssh-ed25519 AAAAPUBLICHALF omni"),
+                        ("oneline", "-----BEGIN OPENSSH PRIVATE KEY----- GOOD-PRIVATE -----END OPENSSH PRIVATE KEY-----")):
             keys[k] = tmp_path / k; keys[k].write_text(body + "\n"); keys[k].chmod(0o600)
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["good"])]); printed += o
         assert rc == 0 and "its other half" in o, o
@@ -232,8 +234,13 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["other"])]); printed += o
         assert rc == 7 and "not the private half" in o, o
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["cut"])]); printed += o
-        assert rc == 7 and "not a whole private key" in o, o
-        assert KEY not in printed and "PRIVATE" not in printed.replace("LAMBDA_SSH_PRIVATE_KEY", ""), printed
+        assert rc == 7 and "not a whole private key" in o and "cut short" in o, o
+        rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["public"])]); printed += o
+        assert rc == 7 and "holds a public key" in o, o                                # named, never shown
+        rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["oneline"])]); printed += o
+        assert rc == 0 and "its other half" in o, o                                    # line breaks lost on the way in: repaired
+        assert keys["oneline"].read_text().splitlines()[1] == "GOOD-PRIVATE" and (keys["oneline"].stat().st_mode & 0o777) == 0o600
+        assert KEY not in printed and "AAAAPUBLICHALF" not in printed and "PRIVATE" not in printed.replace("LAMBDA_SSH_PRIVATE_KEY", ""), printed
     finally:
         os.environ["PATH"] = os.pathsep.join(p for p in os.environ["PATH"].split(os.pathsep) if not p.startswith(str(tmp_path)))
         srv.shutdown()

@@ -107,7 +107,7 @@ jobs:
           fi
           # the key pair, at no cost: Lambda holds the key named, and the stored private key is its other half (a wrong pair
           # would otherwise show only after a machine is rented and refuses the login)
-          install -m 600 /dev/null key; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > key
+          install -m 600 /dev/null key; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > key
           set +e; python3 scripts/lambda_gpu.py keycheck --name "$KEY_NAME" --private-file key 2>&1 | tee keycheck.txt; krc=${PIPESTATUS[0]}; set -e
           { echo '```'; cat keycheck.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           if [ "$krc" != 0 ]; then
@@ -163,7 +163,7 @@ jobs:
         id: w
         env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -275,7 +275,7 @@ jobs:
         id: w
         env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -387,7 +387,7 @@ jobs:
         id: w
         env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -499,7 +499,7 @@ jobs:
         id: w
         env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -611,7 +611,7 @@ jobs:
         id: w
         env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -723,7 +723,7 @@ jobs:
         id: w
         env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
