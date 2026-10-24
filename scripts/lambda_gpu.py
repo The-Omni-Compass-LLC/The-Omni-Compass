@@ -314,6 +314,25 @@ def keycheck(a) -> int:
     return 0
 
 
+def addkey(a) -> int:
+    """Registers a public key with Lambda under a name (the run's own key, when the stored one cannot be used); prints its id."""
+    pub = open(a.public_file, encoding="utf-8").read().strip()
+    got = call("POST", "/ssh-keys", {"name": a.name, "public_key": pub}).get("data", {})
+    print(got.get("id", ""))
+    return 0
+
+
+def delkey(a) -> int:
+    """Removes every key Lambda holds under the name (the run's own key, at the run's end); a name it does not hold is fine."""
+    gone = 0
+    for k in call("GET", "/ssh-keys").get("data", []):
+        if k.get("name") == a.name and k.get("id"):
+            call("DELETE", f"/ssh-keys/{k['id']}", missing_ok=True)
+            gone += 1
+    print(f"SSH key {a.name}: {'removed from Lambda' if gone else 'not held by Lambda (nothing to remove)'}")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -330,6 +349,9 @@ def main(argv=None) -> int:
     p = sub.add_parser("keycheck"); p.add_argument("--name", required=True); p.add_argument("--private-file", required=True)
     p.add_argument("--resolved-out", default="")
     p.set_defaults(fn=keycheck)
+    p = sub.add_parser("addkey"); p.add_argument("--name", required=True); p.add_argument("--public-file", required=True)
+    p.set_defaults(fn=addkey)
+    p = sub.add_parser("delkey"); p.add_argument("--name", required=True); p.set_defaults(fn=delkey)
     p = sub.add_parser("fixkey", help="stdin to stdout: the stored private key repaired as keycheck repairs it")
     p.set_defaults(fn=lambda a: sys.stdout.write(fix_key(sys.stdin.read())) and 0)
     a = ap.parse_args(argv)

@@ -41,6 +41,8 @@ jobs:
     timeout-minutes: 60
     outputs:
       launched: ${{ steps.go.outputs.launched }}
+      ownkey: ${{ steps.go.outputs.ownkey }}
+      ekey: ${{ steps.go.outputs.ekey }}
       id: ${{ steps.go.outputs.id }}
       ip: ${{ steps.go.outputs.ip }}
       deadline: ${{ steps.go.outputs.deadline }}
@@ -110,15 +112,25 @@ jobs:
           install -m 600 /dev/null key; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > key
           set +e; python3 scripts/lambda_gpu.py keycheck --name "$KEY_NAME" --private-file key --resolved-out keyname.txt 2>&1 | tee keycheck.txt; krc=${PIPESTATUS[0]}; set -e
           { echo '```'; cat keycheck.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          OWN=""
           if [ "$krc" != 0 ]; then
-            echo "::error::$(tail -n 1 keycheck.txt) Nothing rented; docs/LAMBDA_SETUP.md, steps 2 and 3."
-            echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 1
+            # the stored key cannot be used: this run makes its own pair, registers the public half with Lambda under its own
+            # name, logs in with it, hands the private half to the watch jobs encrypted with the API key, and removes it from
+            # Lambda at the end (24 October: three stores of the downloaded file in a row held the public line instead)
+            echo "::notice::The stored SSH key is not used ($(tail -n 1 keycheck.txt | cut -c1-160)); this run makes its own key."
+            rm -f key key.pub; ssh-keygen -q -t ed25519 -N "" -C "omni-gh-$GITHUB_RUN_ID" -f key
+            OWN="omni-gh-$GITHUB_RUN_ID"; KEY_NAME="$OWN"
+            python3 scripts/lambda_gpu.py delkey --name "$OWN" > /dev/null
+            python3 scripts/lambda_gpu.py addkey --name "$OWN" --public-file key.pub > /dev/null
+            echo "ownkey=$OWN" >> "$GITHUB_OUTPUT"
+            echo "ekey=$(openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:LAMBDA_API_KEY -in key | base64 -w0)" >> "$GITHUB_OUTPUT"
+            echo "The stored SSH key was not used: this run made its own key, \`$OWN\`, registered with Lambda for this run and removed at its end." >> "$GITHUB_STEP_SUMMARY"
           fi
           [ -s keyname.txt ] && KEY_NAME=$(head -n 1 keyname.txt)       # the name Lambda holds for the stored key's other half
           set +e; python3 scripts/lambda_gpu.py plan --type "$TYPE" --hours "$HOURS" --max-cost "$MAX_COST" 2>&1 | tee plan.txt; rc=${PIPESTATUS[0]}; set -e
           { echo '```'; cat plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          [ "$rc" = 0 ] || { echo "::warning::$(tail -n 1 plan.txt) Nothing rented."; echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 0; }
-          if [ "$DRY" = yes ]; then echo "Dry run: the secrets and the key pair are ready; nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 0; fi
+          [ "$rc" = 0 ] || { echo "::warning::$(tail -n 1 plan.txt) Nothing rented."; echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; [ -z "$OWN" ] || python3 scripts/lambda_gpu.py delkey --name "$OWN"; rm -f key; exit 0; }
+          if [ "$DRY" = yes ]; then echo "Dry run: the API key and an SSH key pair are ready; nothing rented." >> "$GITHUB_STEP_SUMMARY"; [ -z "$OWN" ] || python3 scripts/lambda_gpu.py delkey --name "$OWN"; rm -f key; exit 0; fi
           NAME="omni-$TEST-$(date +%s)-${BUDGET%.*}"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"      # a launch that fails after renting is still found by its name
           ID=$(python3 scripts/lambda_gpu.py launch --type "$TYPE" --name "$NAME" --ssh-key-name "$KEY_NAME" ${REGION:+--region "$REGION"})
@@ -139,7 +151,9 @@ jobs:
           rm -f key
       - name: Give the machine back if starting failed
         if: failure() && steps.go.outputs.name != ''
-        run: python3 scripts/lambda_gpu.py terminate ${{ steps.go.outputs.id }} --name "${{ steps.go.outputs.name }}"
+        run: |
+          python3 scripts/lambda_gpu.py terminate ${{ steps.go.outputs.id }} --name "${{ steps.go.outputs.name }}"
+          [ -z "${{ steps.go.outputs.ownkey }}" ] || python3 scripts/lambda_gpu.py delkey --name "${{ steps.go.outputs.ownkey }}"
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -162,9 +176,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -274,9 +290,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -386,9 +404,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -498,9 +518,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -610,9 +632,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -722,9 +746,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -863,6 +889,7 @@ jobs:
           python3 scripts/lambda_gpu.py terminate "$id" || { sleep 30; python3 scripts/lambda_gpu.py terminate "$id"; } || {
             bad=1; echo "::error::Lambda did not confirm machine $id given back: it may still be billing. Terminate it by hand: cloud.lambda.ai, Instances, tick it, Terminate."; }
           python3 scripts/lambda_gpu.py list | sed 's/^/  still listed: /' || true
+          [ -z "${{ needs.launch.outputs.ownkey }}" ] || python3 scripts/lambda_gpu.py delkey --name "${{ needs.launch.outputs.ownkey }}" || true
           exit $bad
       - name: Where the results are
         if: always()
