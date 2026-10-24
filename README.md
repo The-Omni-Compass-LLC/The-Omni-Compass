@@ -101,7 +101,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v18, fingerprint `1cb92edb64c4391d` (62 files: omni-v17's 55 and Omni direct's 7); package 0.18.0.
+- **Engine on main:** omni-v18, fingerprint `1cb92edb64c4391d` (62 files); package 0.18.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -122,10 +122,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-23 16:45 | [The engine's runs: 500 runs from the jump generator (base 1328610792), one digest](results/engine_runs/ENGINE_RUNS_500_1328610792.md) |  |
-| 2026-10-23 16:01 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V17_VS_V16.md) |  |
-| 2026-10-23 16:01 | [The heartbeat dial in our own models: every beat beside native and beside the main engine's 60 s](results/toy_gate/V17_LADDER.md) |  |
-| 2026-10-23 16:01 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-24 03:16 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-24 02:57 | [The engine's runs: 500 runs from the jump generator (base 1401172272), one digest](results/engine_runs/ENGINE_RUNS_500_1401172272.md) |  |
+| 2026-10-24 01:38 | [The toy gate: the candidate against the engine that stands, in our own models](results/toy_gate/V18_VS_V17.md) |  |
+| 2026-10-24 01:38 | [Omni direct's three arms: three runs on GitHub's machines](results/orchestrator/V18_THREE_ARMS_ABC.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -133,16 +133,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-23 19:25 | benchmark-reps | success | [39997253524](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39997253524) |
-| 2026-10-23 19:23 | swarm | success | [40010161561](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40010161561) |
-| 2026-10-23 19:23 | live-engine | success | [40008082206](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40008082206) |
-| 2026-10-23 19:16 | cloud-check amazon | failure | [40010103022](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40010103022) |
-| 2026-10-23 19:16 | cloud-check google | failure | [40010095776](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40010095776) |
-| 2026-10-23 19:16 | kind-addons | success | [39999409439](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39999409439) |
-| 2026-10-23 19:02 | mujoco | success | [40008056329](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40008056329) |
-| 2026-10-23 19:01 | raw-sweep | success | [40008082241](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40008082241) |
-| 2026-10-23 18:43 | big-organism-detached collect | failure | [40005603251](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40005603251) |
-| 2026-10-23 18:30 | kind-goldilocks | success | [39994794165](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39994794165) |
+| 2026-10-24 03:14 | orchestrators: vanilla A | success | [40049792303](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40049792303) |
+| 2026-10-24 03:10 | lambda-gpu | failure | [40056295107](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40056295107) |
+| 2026-10-24 03:09 | cloud-check all | failure | [40056161072](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40056161072) |
+| 2026-10-24 03:09 | cloud-check amazon | failure | [40055739048](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40055739048) |
+| 2026-10-24 03:09 | cloud-check google | failure | [40055734005](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40055734005) |
+| 2026-10-24 03:00 | orchestrator push room=busy | success | [40054509800](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40054509800) |
+| 2026-10-24 02:57 | live-engine | cancelled | [40055877973](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40055877973) |
+| 2026-10-24 02:57 | engine-runs | success | [40055877936](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40055877936) |
+| 2026-10-24 02:55 | security-scan | success | [40055877922](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40055877922) |
+| 2026-10-24 02:50 | benchmark-reps | success | [40048543529](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40048543529) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
