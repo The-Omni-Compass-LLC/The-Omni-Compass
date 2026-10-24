@@ -322,7 +322,9 @@ def read_organism(name, by_seed):
         per = [r["contrast"] for r in rcs]
         label = R.label_max(per, valid)
         rec["readings"][pk] = {"gauges": gauges, "runner": {
-            "label": label, "labelled": labelled(label), "valid": valid, "summary": R.summarize(per),
+            "label": label, "valid": valid, "summary": R.summarize(per),
+            # the label's words name native as the reference; against Omni-Compass on native the reference is named so
+            "labelled": labelled(label).replace("as native", "as Omni-Compass on native") if y == "on_native" else labelled(label),
             "runs": {letter: {"seed": s, **{k: v for k, v in rc.items() if k != "plants_flagged"},
                               "plants_flagged": rc["plants_flagged"]} for (letter, s), rc in zip(RUNS.items(), rcs)}}}
     return rec
