@@ -154,7 +154,8 @@ card's runs happen on v4, on one named commit, after the CPU side (`docs/OMNI_V4
 
 | # | Benchmark | Native | Omni moves | Status | Result | File |
 |---:|---|---|---|---|---|---|
-| 13 | One card (A10 on Lambda), 10 pairs, earlier card controller | the card's default power limit and clocks | power limit, clock ceiling | old (earlier card controller; new card runs replace it) | GPU energy −3.5% but 95th-percentile response +58.5% slower, both proven: a trade-off, not a win | `results/gpu/run-20261002T082232Z/` |
+| 13 | One card (A100 SXM4 40 GB on Lambda), 10 pairs, omni-v18's card governor (one run) | the card's default power limit and clocks | power limit, clock ceiling | done once on omni-v18 (24 October, Lambda run 40079645681); B and C not yet run | every service gauge EVEN (work per energy up 0.2%, the 95th percentile up 0.2%, requests served the same), the temperature up 1.4% to 1.5% (power given); the governor wrote nothing: both knobs at their top on native (at its limit on native) | `results/gpu/run-20261024T091235Z/` |
+| 13a | One card (A10 on Lambda), 10 pairs, earlier card controller | the card's default power limit and clocks | power limit, clock ceiling | old (the card controller of commit c908054, replaced since) | GPU energy down 3.5% but the 95th-percentile response up 58.5%, slower: a trade-off, not a win | `results/gpu/run-20261002T082232Z/` |
 | 14 | One card on the current card controller | as 13 | as 13 | ready (founder's go on Lambda) | | `docs/GPU_RUN_GUIDE.md` |
 | 15 | The card inside the organisms | as 13 | as 13 + the organism | done once on the earlier controller; rerun ready | | `results/hil/run-20261002T082232Z/` |
 | 16 | Eight cards | as 13 | as 13, per card and pooled | ready | | `scripts/gpu_8card.sh` |

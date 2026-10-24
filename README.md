@@ -359,7 +359,7 @@ The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for lin
 |---|---|---|
 | Real Kubernetes on GitHub | Kubernetes itself (API server, scheduler, its own autoscaler), a real web service, real requests, real response times and CPU. The machines are containers on one runner; energy there is a declared formula, not a meter | L |
 | Real cloud, Azure AKS | All of the above on real Azure machines, Azure's own autoscaler, Azure's billed machine count | L |
-| Real card, NVIDIA A10 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. The first run (2026-10-02) used a card controller since replaced (it answered slower); the current controller's run is next | P |
+| Real card, NVIDIA A100 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. omni-v18's run (2026-10-24, one run of 10 paired repetitions): every service gauge EVEN; the card's own setting already at the top of both knobs, so the governor wrote nothing (at its limit on native). The 8-card run waits for Lambda to have an 8-card machine free | P |
 | The 1,107 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
 
 ## Omni-Compass by itself: the organism run without Kubernetes (23 October)

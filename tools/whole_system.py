@@ -73,7 +73,7 @@ from omni_index import SOURCES, WORKLOAD_TABLES, newest, CAPACITY, CAPACITY_NOW,
 LIVE = ROOT / "results" / "live"
 OUT_MD = ROOT / "results" / "WHOLE_SYSTEM.md"
 OUT_JSON = ROOT / "results" / "WHOLE_SYSTEM.json"
-GPU_RUN = ROOT / "results" / "gpu" / "run-20261002T082232Z"
+GPU_RUN = ROOT / "results" / "gpu" / "run-20261024T091235Z"
 
 GAUGES = ("work", "speed", "machines", "energy", "bill")
 AIM = {"work": "higher", "speed": "lower", "machines": "spent", "energy": "spent", "bill": "spent"}
@@ -317,8 +317,9 @@ def card_tests():
     d = json.loads(p.read_text())
     paired = (d.get("paired") or {}).get("omni") or {}
     n = len([x for x in GPU_RUN.iterdir() if x.name.startswith("rep-")]) or 10
-    t = {"test": f"NVIDIA A10, the card's own meter, Omni-Compass writing the power limit, {n} paired repetitions, one run (2 October, the replaced controller)",
-         "source": "results/gpu/run-20261002T082232Z/GPU_REPS.md", "runs": [], "engine": "the card controller of commit c908054 (2 October), replaced since",
+    t = {"test": (f"NVIDIA A100 (SXM4, 40 GB) on Lambda, the card's own meter, Omni-Compass on the power limit and the clock ceiling, "
+                  f"{n} paired repetitions, one run (24 October; at its limit on native: the governor wrote nothing)"),
+         "source": str((GPU_RUN / "GPU_REPS.md").relative_to(ROOT)), "runs": [], "engine": "omni-v18 (the card governor at commit e3b05dc, the branch gpu-omni-v18)",
          "pairs": [n], "gauges": {}, "primary": None}
     for g, key in CARD_MEASURES.items():
         row = paired.get(key)
