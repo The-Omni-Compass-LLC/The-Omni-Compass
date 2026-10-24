@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (late night): every muscle of the catalog and the seven organisms read again by the 0.5% rule
+
+- **The realms read by size** (`tools/realms_reread.py`, checked by `verify.py`): the runner frozen with the results labelled a
+  muscle by its intervals over the seeds alone, so a change of a thousandth of a percent clear of the noise was a GAIN and a change
+  of several percent inside it was not counted. Every muscle and organism is read again from its own seeds: the mean change of the
+  work, of the misses (against native's own share of decisions over the line) and of the time to clear a line counts from 0.5% up,
+  clear of the noise or not; the runner, its engine and its run are untouched, and the page says it was read again.
+- **What moved**: 123 of 2,214 muscle-and-load labels. Every muscle alone: GAIN 530 (527 before), of them more work 12 (33),
+  fewer misses 445 (409), the line cleared sooner 493; EVEN, the same as native 156 (159); LOSS 0. The seven organisms read GAIN
+  for fewer misses, no longer for more work: their work moved by less than 0.5%.
+
 ## 2026-10-24 (night): every change of 0.5% or more is a change
 
 - **The key** (`tools/readings.py` `three_run_reading`, the founder's order of 24 October): the change is the mean of the three

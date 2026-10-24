@@ -246,14 +246,16 @@ that stands, the spine the seventh organism, every reading reproducing the table
 
 **Every muscle alone (1,107), under its own load and with work waiting in line:**
 
+Read again on 24 October by the one key (`tools/realms_reread.py`: a change of 0.5% or more over the seeds is a change, EVEN only under it); the column with one global setting is the reading of its own day, under the rule of then.
+
 | Reading | Muscles | With one global setting |
 |---|---:|---:|
-| **GAIN** (more work, its line cleared sooner or fewer misses, beyond the noise, and no LOSS on any of the three, under either load) | **527** | 517 |
+| **GAIN** (more work, its line cleared sooner or fewer misses, each by 0.5% or more over the seeds, and no LOSS on any of the three, under either load) | **530** | 517 |
 | of them: clear the waiting line sooner | 493 | 493 |
-| of them: over their line less often | 409 | 398 |
-| of them: more work | 33 | 32 |
+| of them: over their line less often | 445 | 398 |
+| of them: more work | 12 | 32 |
 | EVEN, at its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
-| EVEN, the same as native (no difference beyond the noise: native already did all the work that came) | 159 | 169 |
+| EVEN, the same as native (every change under 0.5%: native already did all the work that came) | 156 | 169 |
 | **LOSS, or GAIN AND LOSS** | **0** | 0 |
 
 | Kind | With work waiting in line (one global setting in brackets) | Power given | Wear |
