@@ -4,7 +4,7 @@
 
 Our own model (evidence class S), never a benchmark result. The founder's order of 23 October: beside native and Omni-Compass and native, a third arm, Omni-Compass by itself, with native's controllers switched off (`docs/SOLO_PREREGISTRATION.md`). This page reads what the engine that stands does by itself on the toy cluster: 8 seeds of a day, the same seeds in every arm, read by the toy gate's own rule (`tools/toy_gate.py`: the mean change over the seeds, its 95% interval by Student t, the word by the gauge's aim; a resource that rose is power given).
 
-Engine: differs from omni-v16: omni_controller/controller.py. Written by `python3 tools/solo_study.py`; every seed's reading of every arm is in its JSON twin (`per_seed`).
+Engine: differs from omni-v17: omni_controller/controller.py. Written by `python3 tools/solo_study.py`; every seed's reading of every arm is in its JSON twin (`per_seed`).
 
 | Arm | What governs |
 |---|---|
@@ -19,9 +19,9 @@ Engine: differs from omni-v16: omni_controller/controller.py. Written by `python
 | machine-hours | 288.000 | 288.000 | 288.000 |
 | energy per used core-hour (kWh) | 0.063 | 0.063 | 0.063 |
 | pods waiting for a place (pod-minutes an hour) | 0.000 | 0.000 | 0.000 |
-| the pod autoscaler's shortfall (minutes an hour) | 3.585 | 3.596 | 0.000 |
-| 95th percentile response (ms) | 79.955 | 76.612 | 65.545 |
-| minutes over the response line | 26.375 | 18.250 | 8.125 |
+| the pod autoscaler's shortfall (minutes an hour) | 3.585 | 3.625 | 0.000 |
+| 95th percentile response (ms) | 79.955 | 76.750 | 64.443 |
+| minutes over the response line | 26.375 | 22.000 | 9.250 |
 
 ## Omni-Compass by itself against native
 
@@ -30,9 +30,9 @@ Engine: differs from omni-v16: omni_controller/controller.py. Written by `python
 | machine-hours | =0.0% | ±0.0% to ±0.0% | **EVEN (identical)** |
 | energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **EVEN** |
 | pods waiting for a place (pod-minutes an hour) | — | — | **EVEN (identical)** |
-| the pod autoscaler's shortfall (minutes an hour) | +100.0% | +91.7% to +108.3% | **GAIN** |
-| 95th percentile response (ms) | +18.0% | +11.3% to +24.7% | **GAIN** |
-| minutes over the response line | +69.2% | +37.4% to +101.0% | **GAIN** |
+| the pod autoscaler's shortfall (minutes an hour) | — | — | not read: by itself there is no pod autoscaler to fall short |
+| 95th percentile response (ms) | +19.4% | +12.2% to +26.6% | **GAIN** |
+| minutes over the response line | +64.9% | +32.4% to +97.5% | **GAIN** |
 
 ## Omni-Compass by itself against Omni-Compass and native
 
@@ -41,9 +41,9 @@ Engine: differs from omni-v16: omni_controller/controller.py. Written by `python
 | machine-hours | =0.0% | ±0.0% to ±0.0% | **EVEN (identical)** |
 | energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **EVEN** |
 | pods waiting for a place (pod-minutes an hour) | — | — | **EVEN (identical)** |
-| the pod autoscaler's shortfall (minutes an hour) | +100.0% | +89.1% to +110.9% | **GAIN** |
-| 95th percentile response (ms) | +14.4% | +8.9% to +20.0% | **GAIN** |
-| minutes over the response line | +55.5% | +28.9% to +82.0% | **GAIN** |
+| the pod autoscaler's shortfall (minutes an hour) | — | — | not read: by itself there is no pod autoscaler to fall short |
+| 95th percentile response (ms) | +16.0% | +9.9% to +22.2% | **GAIN** |
+| minutes over the response line | +58.0% | +25.8% to +90.1% | **GAIN** |
 
 ## Omni-Compass and native against native
 
@@ -52,24 +52,15 @@ Engine: differs from omni-v16: omni_controller/controller.py. Written by `python
 | machine-hours | =0.0% | ±0.0% to ±0.0% | **EVEN (identical)** |
 | energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **EVEN** |
 | pods waiting for a place (pod-minutes an hour) | — | — | **EVEN (identical)** |
-| the pod autoscaler's shortfall (minutes an hour) | =0.3% | −3.6% to +4.2% | **EVEN** |
-| 95th percentile response (ms) | +4.2% | +2.5% to +5.9% | **GAIN** |
-| minutes over the response line | +30.8% | +14.7% to +46.9% | **GAIN** |
-
-## The candidate (differs) against the engine that stands (omni-v16), arm by arm
-
-| Gauge | native | Omni-Compass and native | Omni-Compass by itself |
-|---|---|---|---|
-| machine-hours | EVEN (identical) | EVEN (identical) | EVEN (identical) |
-| energy per used core-hour (kWh) | EVEN (identical) | EVEN (identical) | GAIN +4.2% |
-| pods waiting for a place (pod-minutes an hour) | EVEN (identical) | EVEN (identical) | EVEN (identical) |
-| the pod autoscaler's shortfall (minutes an hour) | EVEN (identical) | EVEN (identical) | EVEN (identical) |
-| 95th percentile response (ms) | EVEN (identical) | EVEN (identical) | GAIN +100.0% |
-| minutes over the response line | EVEN (identical) | EVEN (identical) | GAIN +99.4% |
+| the pod autoscaler's shortfall (minutes an hour) | =1.1% | −3.3% to +5.5% | **EVEN** |
+| 95th percentile response (ms) | +4.0% | +2.5% to +5.5% | **GAIN** |
+| minutes over the response line | +16.6% | +2.6% to +30.6% | **GAIN** |
 
 ## What it says
 
-On the engine that stands the governor moves a workload's pods only through the pod autoscaler's own object (its range and its target); with the pod autoscaler switched off it has no pod muscle of its own, so by itself it holds every workload at the operator's count and moves the machines alone. The table above is that engine by itself, read as it is; the pod muscle of its own is the next engine version's work (`docs/SOLO_PREREGISTRATION.md`), read first in this same toy, against this page, before any real run.
+On the engine that stands (differs) the governor moves a workload's pods only through the pod autoscaler's own object (its range and its target); with the pod autoscaler switched off it has no pod muscle of its own, so by itself it holds every workload at the operator's count: its 95th percentile response 64 ms and 9 minutes over the line in the day, against native's 80.0 ms and 26.4 minutes.
+
+Our own model, class S: it shows the mechanism, never a benchmark result. The real arm runs on kind (`ARM=solo`, `scripts/kind_bench.sh`) once the engine that carries the muscle stands (`docs/SOLO_PREREGISTRATION.md`).
 
 ---
 

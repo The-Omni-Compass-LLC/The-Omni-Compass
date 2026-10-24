@@ -367,6 +367,14 @@ class Controller:
         self.n_add = per(ADD_PERIOD_S)                 # decisions between two additions past the scheduling floor
         self.n_land = per(LAND_S)                      # decisions a command is watched for landing
         self.n_convey = max(1, int(round(float(getattr(a, "convey_every_s", 15.0)) / float(getattr(a, "floor_interval", 15.0) or 15.0))))
+        # omni-v18: the pod muscle of its own keeps the pace of the controller it stands in for (the pod autoscaler syncs every
+        # 15 s), whatever the decision period: a reconciliation every --own-every-s on the fast checks, its window of fewer pods
+        # counted in those reconciliations (the strict window's seconds); the compass moves its target only in a decision
+        self.n_own = max(1, int(round(float(getattr(a, "own_every_s", 15.0)) / float(getattr(a, "floor_interval", 15.0) or 15.0))))
+        sw_s = float(a.strict_window) * period if getattr(a, "strict_window", None) is not None else float(getattr(a, "strict_window_s", 300.0))
+        self.n_own_window = max(1, int(round(sw_s / max(1e-9, float(getattr(a, "own_every_s", 15.0))))))
+        self.own_checks = 0                            # fast checks taken: the pod muscle of its own's clock between decisions
+        self._own_last = None                          # (snapshot, observation, rho) of the last decision, for the checks between
         self.last_add = None                           # the decision at which the pool last added a machine
         self.cmd_at = {}                               # "nodes" or (ns, hpa) -> the decision its last command was written at
         self.checks = 0                                # checks taken, a fast check or a decision: the conveyance's clock
@@ -752,7 +760,7 @@ class Controller:
                 self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"minReplicas": want, "maxReplicas": hi0}})],
                              f"strict: replica floor {cur} -> {want} decided by Omni-Compass (utilisation {util}%, target {orig_t}%); growth stays free up to {hi0}")
 
-    def _own_pods(self, s, obs, rho):
+    def _own_pods(self, s, obs, rho, move=True):
         """The pod muscle of its own (omni-v17, the founder's order of 23 October: Omni-Compass by itself, running the muscles
         directly; docs/SOLO_PREREGISTRATION.md). For a workload the operator names (--own-replicas) and no autoscaler governs,
         Omni-Compass sets the replica count itself, through the workload's own scale, by strict C's rule: replicas =
@@ -761,9 +769,12 @@ class Controller:
         autoscaler (the decision above): the operator's own (the workload's target-utilization annotation, else
         --own-target), down to 60% of it, the most pods the cover allows past the wall. Never below the operator's own count
         at the max (the tune-down may go to the range's floor), never above the range's top, never below one pod. The count
-        it shipped is recorded once on the workload and handed back by the reset (restore)."""
+        it shipped is recorded once on the workload and handed back by the reset (restore). With move False (a fast check
+        between decisions, omni-v18) the target stays where the last decision set it and only the count is reconciled."""
         if "replicas" in self.a.native_muscles:
             return None                  # omni-v14: the replicas are left native; nothing written
+        if move:
+            self._own_last = (s, obs, rho)
         governed = {(h["metadata"]["namespace"], (h["spec"].get("scaleTargetRef") or {}).get("name")) for h in s["hpas"]}
         out = {}
         for ns, name in self.own:
@@ -798,7 +809,9 @@ class Controller:
             # the target: the compass's push and pull inside its cover, as on an autoscaler's target (the decision above)
             hi_t, lo_t = orig_t, max(10.0, 0.6 * orig_t)
             x = self.own_x.get(key, hi_t)
-            if self.compass_law is None:
+            if not move:
+                pass                                                 # between decisions: the target the last decision set
+            elif self.compass_law is None:
                 x = min(hi_t, max(lo_t, 100.0 * rho))
             else:
                 load = s["pending"] == 0 and not obs["slo_clean"]
@@ -818,7 +831,7 @@ class Controller:
             rec = cur if abs(ratio - 1.0) <= 0.1 else int(math.ceil(cur * ratio - 1e-9))
             floor_ = max(1, lo0, orig if self.dial == "max" else lo0)
             rec = max(floor_, min(hi0, rec))
-            hh = (self.own_hist.get(key, []) + [rec])[-self.n_strict_window:]; self.own_hist[key] = hh
+            hh = (self.own_hist.get(key, []) + [rec])[-self.n_own_window:]; self.own_hist[key] = hh
             want = rec if rec >= cur else max(hh)
             if obs.get("security_block", 0.0) > 0.5:
                 want = min(want, cur)                                # shield I1: no expansion during a security hold
@@ -904,9 +917,27 @@ class Controller:
             self.audit({"pod_reflex": {f"{k[0]}/{k[1]}": v for k, v in out.items()}, "busy": round(u, 3), "R_ms": round(R, 1), "S_ms": round(self.s_floor, 1)})
         return out
 
+    def _own_check(self):
+        """Between decisions, the pod muscle of its own at the pod autoscaler's pace (omni-v18): every n-th fast check
+        (--own-every-s, 15 s), the count reconciled to the busy share at the target the last decision set."""
+        if not self.own or self._own_last is None:
+            return None
+        self.own_checks += 1
+        if self.own_checks % self.n_own:
+            return None
+        s, obs, rho = self._own_last
+        try:
+            return self._own_pods(s, obs, rho, move=False)
+        except Exception as e:
+            self.audit({"error": "own pods check: " + repr(e)[:500]})
+            return None
+
     def floor_step(self):
         """Fast path between governor decisions: add the nodes that pending and running pod requests need (nodepool mode)."""
-        if self.killed() or self.a.mode != "nodepool" or not self.a.node_scale_cmd:
+        if self.killed() or self.a.mode != "nodepool":
+            return None
+        self._own_check()
+        if not self.a.node_scale_cmd:
             return None
         due = self._convey_due()
         if getattr(self, "cruise", False):
@@ -1356,6 +1387,8 @@ def parser():
     add_muscle_args(ap)
     ap.add_argument("--power-cmd", default="")
     ap.add_argument("--site-limit-w", type=float, default=0.0)
+    ap.add_argument("--own-every-s", type=float, default=15.0,
+                    help="seconds between two reconciliations of the pod muscle of its own on the fast checks (the pod autoscaler's sync)")
     ap.add_argument("--own-replicas", default=os.environ.get("OMNI_OWN_REPLICAS", ""),
                     help="ns/deployment,... no autoscaler governs, whose replica count Omni-Compass sets itself through the "
                          "workload's own scale (omni-v17, Omni-Compass by itself): its target from the workload's "

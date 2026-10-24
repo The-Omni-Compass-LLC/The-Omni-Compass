@@ -57,6 +57,28 @@ def decide(c, k, slo_clean=True):
     return c._own_pods(s, {"slo_clean": slo_clean, "security_block": 0.0}, 0.6)
 
 
+class OwnPace(unittest.TestCase):
+    """omni-v18: between decisions the pod muscle of its own keeps the pod autoscaler's pace (every 15 s on the fast checks),
+    at the target the last decision set; the compass moves the target only in a decision."""
+
+    def test_a_check_between_decisions_adds_pods_at_once(self):
+        k = Kube(replicas=2, busy=0.4); c = governor(k, "--interval", "60", "--floor-interval", "5", "--node-scale-cmd", "true")
+        self.assertEqual(decide(c, k), {})                             # 2 pods at 40% against the 50% target: nothing to do
+        x = dict(c.own_x)
+        k.busy = 1.0                                                   # the load rises between two decisions
+        c.k.get = k.get
+        for _ in range(c.n_own):                                       # 15 s of 5 s checks: one reconciliation
+            c._own_check()
+        self.assertEqual(k.replicas, 4)                                # up at once, at the decision's own target
+        self.assertEqual(c.own_x, x)                                   # the target stayed where the decision set it
+
+    def test_the_pace_is_fifteen_seconds_at_any_beat(self):
+        for beat in ("15", "60", "120"):
+            c = governor(Kube(), "--interval", beat, "--floor-interval", "5")
+            self.assertEqual(c.n_own, 3)
+            self.assertEqual(c.n_own_window * 15, 300)                 # the window of fewer pods: 300 s at any beat
+
+
 class OwnPods(unittest.TestCase):
     def test_busy_pods_get_more_at_once(self):
         k = Kube(replicas=2, busy=1.0); c = governor(k)
@@ -73,7 +95,7 @@ class OwnPods(unittest.TestCase):
         k = Kube(replicas=2, busy=1.0); c = governor(k)
         decide(c, k)                                                   # 2 -> 4, the count of 2 recorded
         k.busy = 0.05
-        for _ in range(3 * c.n_strict_window):
+        for _ in range(3 * c.n_own_window):
             decide(c, k)
         self.assertEqual(k.replicas, 2)                                # back to the operator's count, never under it
 
