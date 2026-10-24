@@ -132,9 +132,15 @@ AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
 AZURE_SINCE = "2026-10-24T02:51:00Z"   # omni-v18: every Azure set runs again on the engine that stands; the sets of earlier engines already
                                        # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v18 table
 AZURE_WF = "aks-metered.yml"
+# The clouds whose cluster a tester builds in the provider's own console and hands over by its kubeconfig (byoc-metered.yml,
+# scripts/byoc_paired.sh, docs/BYOC_SETUP.md): the same four sets on the same harness, each queue behind its own switch,
+# off until a tester has the cluster, its kubeconfig in KUBECONFIG_<CLOUD> and the founder's word (written, not yet run).
+BYOC_WF = "byoc-metered.yml"
+BYOC = {"Oracle": "oracle", "DigitalOcean": "digitalocean", "Alibaba Cloud": "alibaba", "Linode": "linode", "IBM Cloud": "ibm"}
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
           ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
-          ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"))
+          ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"),
+          *((name, BYOC_WF, ROOT / "scripts" / f"{key}_queue.txt") for name, key in BYOC.items()))
 # A cloud starts a set only after its $0 check passed (.github/workflows/cloud-check.yml: the login, the key's shape, the
 # machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's Free plan failed
 # every set started there at the login, each using up its A or B; Azure since 22 October, after its stored key held, for a
@@ -142,11 +148,11 @@ CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
 # has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder stores is
 # so taken up within the hour, and a cloud that cannot rent never uses up a set.
 CHECK_WF = "cloud-check.yml"
-CHECKS = {"Google Cloud": "google", "Amazon": "amazon", "Azure": "azure"}
+CHECKS = {"Google Cloud": "google", "Amazon": "amazon", "Azure": "azure", **BYOC}
 CHECK_FRESH_H = 24
 CHECK_RETRY_MIN = 60
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
-         "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
+         "eks-metered.yml", "byoc-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
 
 
 # ------------------------------------------------------------------------------------------------- shard shapes
@@ -630,7 +636,8 @@ def reruns_started(queue):
 # group azure-benchmark-<region>, every Google one google-benchmark-<zone>, every Amazon one amazon-benchmark-<region>; all our
 # sets use one region or zone each, so each cloud is one line: one of its runs at a time, and none started while one waits.
 CLOUD_FAMILIES = {"Azure": ("aks-metered.yml", "aks-metered-full.yml", "big-organism.yml"),
-                  "Google Cloud": ("gke-metered.yml",), "Amazon": ("eks-metered.yml",)}
+                  "Google Cloud": ("gke-metered.yml",), "Amazon": ("eks-metered.yml",),
+                  **{name: (BYOC_WF,) for name in BYOC}}     # one workflow for the five: one of their runs at a time
 ACTIVE = ("queued", "in_progress", "waiting", "pending", "requested")
 
 
@@ -675,6 +682,9 @@ def cloud_title(wf, kv):
     room = f" replica room {kv['replica_ceiling']}" if kv.get("replica_ceiling") else ""
     room += " to the cap, stopping rule" if kv.get("stop_looks") else ""   # a set run to the cap under the stopping rule counts on its own (19 October)
     dial = kv.get("dial") or "save"
+    if wf == BYOC_WF:
+        c = kv.get("cloud") or "other"
+        return f"{wf[:-4]} {c} {what}{org}{room} dial {dial} {c} {kv.get('pool') or 'work0'}"
     if wf == "gke-metered.yml":
         loc, fam = kv.get("zone") or "us-central1-a", kv.get("machine") or "e2-standard-2"
     elif wf == "eks-metered.yml":

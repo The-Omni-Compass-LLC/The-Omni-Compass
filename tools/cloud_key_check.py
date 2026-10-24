@@ -8,6 +8,8 @@
 
   python3 tools/cloud_key_check.py           Google: GCP_CREDENTIALS (and GCP_PROJECT to compare)
   python3 tools/cloud_key_check.py azure     Azure: AZURE_CREDENTIALS
+  python3 tools/cloud_key_check.py kubeconfig  a cluster built in a provider's console (Oracle, DigitalOcean, Alibaba, Linode,
+                                               IBM or any other): KUBECONFIG_RAW, the kubeconfig from KUBECONFIG_<CLOUD>
 
 On 18 October the stored GCP_CREDENTIALS ended part of the way through (it had been selected from Cloud Shell's screen),
 and every Google set failed at the login with Google's "unexpected end of JSON input". For a while on the night of
@@ -16,11 +18,15 @@ block was whole again by 00:00), and Azure's own login step quoted its first cha
 only what is wrong with its shape: how many characters were stored, which fields are missing, where the JSON stops, what
 the stored text looks like. It never prints a character of the key, and it runs before the cloud's own login step, so a
 key in the wrong form never reaches a step that would quote it.
-Exit 0: a whole key. Exit 2: what is wrong, and what to store again (docs/GOOGLE_SETUP.md, docs/AZURE_SETUP.md)."""
+Exit 0: a whole key. Exit 2: what is wrong, and what to store again (docs/GOOGLE_SETUP.md, docs/AZURE_SETUP.md,
+docs/BYOC_SETUP.md)."""
 from __future__ import annotations
 
+import base64
+import binascii
 import json
 import os
+import re
 import sys
 
 FIELDS = ("type", "project_id", "private_key_id", "private_key", "client_email", "token_uri")
@@ -221,8 +227,66 @@ def azure_login(env) -> tuple[str | None, str, list[str]]:
     return None, "", ["AZURE_CREDENTIALS: " + "; ".join(one), "the four boxes: " + "; ".join(four)]
 
 
+# the command-line tools a kubeconfig's exec credential plugin may call that GitHub's runner does not carry: such a kubeconfig
+# logs in on the tester's own computer and nowhere else (docs/BYOC_SETUP.md, section 3: a token kubeconfig instead)
+NOT_ON_RUNNER = ("oci", "doctl", "aliyun", "ibmcloud", "linode-cli", "kubelogin", "gke-gcloud-auth-plugin", "aws-iam-authenticator")
+
+
+def kubeconfig_text(raw: str) -> str | None:
+    """The kubeconfig as stored (YAML) or base64 of it; None where it is neither."""
+    s = (raw or "").strip()
+    if "apiVersion" in s:
+        return s
+    try:
+        d = base64.b64decode(re.sub(r"\s+", "", s), validate=True).decode("utf-8")
+    except (binascii.Error, ValueError, UnicodeDecodeError):
+        return None
+    return d if "apiVersion" in d else None
+
+
+def kubeconfig_problems(raw: str | None) -> tuple[list[str], str]:
+    """What is wrong with a stored kubeconfig's shape, and a line on what it holds; never a character of its values. A
+    kubeconfig is whole when it names at least one cluster with an https server, one context and one user, and the user
+    logs in by what the file carries itself (a token, or a client certificate and key) or by an exec plugin GitHub's runner
+    has; a plugin only the provider's own command line has is refused here, before anything is measured."""
+    if not (raw or "").strip():
+        return ["it is empty"], ""
+    text = kubeconfig_text(raw)
+    if text is None:
+        return [f"it is neither a kubeconfig (no apiVersion line) nor base64 of one ({len(raw.strip())} characters stored, "
+                f"{len(raw.strip().splitlines())} line(s))"], ""
+    keys = {k for k in re.findall(r"^([a-z-]+):", text, re.M)}
+    bad = [f"no top-level {k}: line" for k in ("clusters", "contexts", "users") if k not in keys]
+    servers = re.findall(r"^\s*server:\s*(\S+)", text, re.M)
+    if not servers:
+        bad.append("no cluster server: line")
+    elif not all(s.strip("'\"").startswith("https://") for s in servers):
+        bad.append("a cluster server is not an https:// address")
+    token = bool(re.search(r"^\s*token:\s*\S", text, re.M))
+    cert = bool(re.search(r"^\s*client-certificate-data:\s*\S", text, re.M)) and bool(re.search(r"^\s*client-key-data:\s*\S", text, re.M))
+    execs = re.findall(r"^\s*command:\s*['\"]?([^\s'\"]+)", text, re.M) if re.search(r"^\s*exec:\s*$", text, re.M) else []
+    off = sorted({os.path.basename(c) for c in execs if os.path.basename(c) in NOT_ON_RUNNER})
+    if off and not (token or cert):
+        bad.append(f"its user logs in through {', '.join(off)}, a provider's command line GitHub's runner does not carry: store a "
+                   "kubeconfig whose user holds a service-account token (docs/BYOC_SETUP.md, section 3)")
+    elif not (token or cert or execs):
+        bad.append("its user carries no way to log in (no token, no client certificate and key, no exec plugin)")
+    how = "a token" if token else "a client certificate and key" if cert else f"the plugin {', '.join(sorted(set(execs)))}" if execs else "nothing"
+    return bad, f"{len(servers)} cluster server(s), logging in by {how}"
+
+
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
+    if args[:1] == ["kubeconfig"]:
+        bad, holds = kubeconfig_problems(os.environ.get("KUBECONFIG_RAW"))
+        if not bad:
+            print(f"the kubeconfig: whole ({holds})")
+            return 0
+        for b in bad:
+            print(f"::error::the kubeconfig: {b}.")
+        print("::error::Nothing measured, nothing billed. Store the cluster's kubeconfig again in KUBECONFIG_<CLOUD> "
+              "(docs/BYOC_SETUP.md, section 3).")
+        return 2
     if args[:1] == ["azure"]:
         block, where, bad = azure_login(os.environ)
         if block:
