@@ -280,11 +280,8 @@ the founder overrides one in the conversation.
   started, where it would take a started run's place: 18 October). It starts every Azure set from `scripts/azure_queue.txt` (A of every set, then B, then C; one at a time in each
   machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 4 1 6 1 9`
   and `1 6 1 8 1 6`, and the real day (Google 2011) on 1 to 9, every one at the tune-down with native's cap (the founder's words of 14 October; the load generator alone
-  reads a schedule, never the governor). Google Cloud and Amazon carry the same four sets from `scripts/google_queue.txt` and
-  `scripts/amazon_queue.txt`, each behind its own `switch=` line, switched on by the founder on 18 October once their secrets were in the repository;
-  Amazon's switched off on 24 October, its account on the Free plan, which Amazon would not raise before the $100 credit is spent or
-  six months pass (on again on the founder's word)
-  (16 October: the Azure run is the measure of the other two clouds, the same tuning, mechanism and harness). Each tick runs the conductor's newest
+  reads a schedule, never the governor). Azure is the one cloud the benchmarks rent (Orders of 24 October: Google and Amazon taken
+  out of the repository, the benchmarks and the engine's pages). Each tick runs the conductor's newest
   code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
   paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
   the cluster inside only runs of protocol 4 count (12 Oct: the governor never below the organism's CPU priority, its
@@ -335,6 +332,25 @@ the founder overrides one in the conversation.
   goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
+
+## Orders of 24 October
+
+- **Azure, and only Azure; Google and Amazon out** (the founder's words, once Amazon's account could not leave its Free plan and
+  Google's key would not store: "I don't need no fucking Amazon or Google because I can't get them to run ... the one Azure run,
+  is all I got and all I can get, and that's all I need. You take that Google and that fucking Amazon shit out of there ... Get
+  it out of my repositories. Get it out of my benchmarks. Get it out of my engine, everything ... just Azure and anything else
+  people could do on their own"). Removed: the workflows `gke-metered`, `eks-metered` and `cloud-organism`, their paired scripts,
+  queues, machine tools and setup pages, Google's and Amazon's $0 checks, the conductor's two queues, the Operator's Manual's
+  chapters and appendices for them (its chapters renumbered, 30 in all), the live page's two monitors (now Azure's $0 gate and
+  the cloud mode on any other cloud, modelled), and every standing page's mention. The conductor rents one cloud, Azure
+  (`scripts/dispatch_grid.py`, `CLOUDS`); on any other cloud an operator installs Omni-Compass on their own, from
+  `deploy/install/` (the Operator's Manual, Part VI). Kept, because they are not those clouds: the Google cluster trace of 2011 (a
+  public dataset the Azure real day replays), MuJoCo (Google DeepMind's simulator), the catalog's muscles and the register's
+  rows that name a product as the open-source project it is, and every record of what ran (the omni-v10 sets that stopped at the
+  login, the changelog, `docs/history`). One line in a fingerprinted engine file (`omni_controller/controller.py`, a docstring's
+  example command) still names Amazon's command-line tool; it goes with the next engine version, never by itself. The four
+  secrets (`GCP_CREDENTIALS`, `GCP_PROJECT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) nothing reads any more; the founder
+  deletes them in the repository's settings.
 
 ## Orders of 23 October
 
@@ -504,7 +520,7 @@ the founder overrides one in the conversation.
   `docs/AZURE_SETUP.md`, section 3): the collect of 23:37 UTC failed at the login, and by 00:00 UTC the block was whole again
   (the steady set's next repetition logged in). A failed Azure set counts as started, and Azure had no check before it. The
   conductor now starts an Azure set only after `cloud-check azure` passed (the key's shape, the login, the subscription, the
-  machine and its allowance; nothing built), as Google's and Amazon's; every Azure login reads the key's shape first
+  machine and its allowance; nothing built); every Azure login reads the key's shape first
   (`tools/cloud_key_check.py azure`), because Azure's own login step quoted the stored text's first characters on a public run
   page while refusing it. Section 7 of `docs/AZURE_SETUP.md` is the founder's steps if the key is ever stored wrong again.
 
@@ -574,7 +590,7 @@ the founder overrides one in the conversation.
   runner all kind nodes share; at the same host load omni's starts were as fast or faster). Every kind arm now pulls the
   image onto every worker before it begins, the same in both arms; a kind run counts only on a commit that carries the
   pre-puller (`RIG_FILE`); the grid's runs with the cluster inside are protocol 4; and `tools/confirm_abc.py` marks a table whose runs differ in rig.
-- **Google and Amazon on** (the founder's words, once the four secrets were in: "Push the clouds, let's see. The Google
+- **Google and Amazon on** (superseded on 24 October: both taken out; the founder's words, once the four secrets were in: "Push the clouds, let's see. The Google
   AWS, I linked them up"). `GCP_CREDENTIALS`, `GCP_PROJECT`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are in the
   repository's secrets; both queues' `switch=` lines read on. The conductor starts their four sets, A, then B, then C, one
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
@@ -618,8 +634,7 @@ the founder overrides one in the conversation.
 - **Version 8 stands; push in all and update all** (the founder's words: "there's a new version 8. That means you got to
   push in all and update all ... We're going to start the GPU soon and the other two clouds"). omni-v8 is on main and on
   the branch `v8`; every page, manual, table and queue points at it; every benchmark runs again on it. The GPU runs on
-  Lambda and the Google and Amazon sets start on his word: the GPU from one exact commit given to him, the two clouds by
-  turning their `switch=` line on once their secrets are in the repository.
+  Lambda starts on his word, from one exact commit given to him (the two other clouds of that day were taken out on 24 October).
 - **The page number in both bottom corners, the running head on every page.** Every page of every manual but the title
   page carries the book's name on the left of the head and the part or chapter it belongs to on the right (openers and
   front matter included), and the page label in the left and the right bottom corner, "so that when somebody can flip
@@ -649,17 +664,16 @@ the founder overrides one in the conversation.
   found to have more room goes into the next version. Reports say native against Omni-Compass,
   gauge by gauge, never one version against another; older fingerprints are the road, in `docs/history`.
 - **Nothing is cancelled.** No run is ever cancelled; a problem found in a running benchmark is fixed and the benchmark run
-  again. Everything except the GPU chips and the Google and Amazon clouds runs, pushes and benchmarks.
-- **Azure finishes first.** The founder decides on Google and Amazon after the Azure results are where he needs them, because
-  Azure teaches what the other two will need.
+  again. Everything except the GPU chips runs, pushes and benchmarks.
+- **Azure finishes first.** (Superseded on 24 October: Azure is the one cloud; Google and Amazon taken out.)
 - **Both manuals carry every muscle with its physical wiring on any stack** (the wiring appendix, `docs/wiring_recipes.csv`),
   and the whole package is kept in line with the newest engine top to bottom, fixed and tightened as found, pushed to the real
   places: it is presented to one buyer.
 
 ## Orders of 14 October
 
-- **In the cloud, the bill** (the founder's order of 14 October, night). In a cloud (Azure now; Google and Amazon when he
-  starts them) Omni-Compass is to show one thing: the same work as native for a smaller bill, never a bigger one. Every
+- **In the cloud, the bill** (the founder's order of 14 October, night). In a cloud (Azure, the one cloud the benchmarks
+  rent since 24 October; any other on the operator's own) Omni-Compass is to show one thing: the same work as native for a smaller bill, never a bigger one. Every
   cloud set runs Omni-Compass on top at the tune-down (`dial save`) on the machines alone (`OMNI_MACHINES_ONLY=1`): no pod
   autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's; the governor only parks a
   machine the cloud already made, after its own trial, and wakes it on a breach. No more pods and no more machines than
@@ -690,8 +704,8 @@ the founder overrides one in the conversation.
     and `docs/STATE_OF_PLAY.md`). The engine is shown only as its shell and its process. Nothing in it explains or points
     to how the code is written, and nothing is disclosed or disclaimed about it. It is at least half the Owner's length
     (the founder's order of 14 October, night) and carries the implementer's whole cloud path (Part VI, chapters 13 to
-    30, with the install files in `deploy/install/` and `deploy/Dockerfile.cloud`): Google and Amazon ready the way Azure
-    is, the governor on the machines alone in every cloud.
+    28, with the install files in `deploy/install/` and `deploy/Dockerfile.cloud`): Azure step by step, any other cloud on
+    the operator's own, the governor on the machines alone in every cloud.
   - **The Owner's Manual, the master** (`docs/OMNI_COMPASS_OWNERS_MANUAL.md` and `.pdf`, `build_book.py --owner`):
     everything and all, for whoever owns or licenses Omni-Compass and so must know the whole mechanism: the philosophy and
     theory (`docs/book/THEORY.md`, `docs/book/DECLARATION.md`), the mathematics, the mechanism, how it is built, the
@@ -798,8 +812,8 @@ the founder overrides one in the conversation.
   result carries that engine's name. Nothing is shown or compared as "v3" once v5 stands: a v3 table is the road, in
   `docs/history`, never a setting to go back to by name. More versions will follow (perhaps to v10); each one reruns
   everything. Where a change made a result read LOSS, the fix is made inside the newest engine and rerun.
-- **One cloud first** (13 October, night): Kubernetes on Azure is finished first; Google (GKE), Amazon (EKS) and the GPU
-  chips (Lambda) are not run until the founder says the Azure Kubernetes results are where he needs them.
+- **One cloud first** (13 October, night): Kubernetes on Azure is finished first; the GPU chips (Lambda) are not run until the
+  founder says the Azure Kubernetes results are where he needs them (Google and Amazon taken out on 24 October).
 - **The company's telephone** (13 October, night; wording of 14 October; the landline added 16 October, night): "main
   office infrastructure, toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1", and under it the landline
   registered in Florida, 321-746-4411 (the toll-free number always on top), on every contact line where the company is

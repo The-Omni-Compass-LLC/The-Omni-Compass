@@ -1070,6 +1070,10 @@ shows (its processor use, the requests waiting, the response times), as in every
   run without its secrets stops before anything is built or billed. The Azure run is the measure of the other two: nothing
   in a set differs between clouds but the machine type, the zone or region, and the list price. (18 October: both
   switched on by the founder, the secrets in the repository; nothing in a set changed.)
+- **Amendment of 24 October (one cloud).** The founder's order took Google Cloud and Amazon out of the repository: the amendment
+  of 16 October is withdrawn, its two queues and workflows removed. No set ran on either past its login (the omni-v10 sets
+  stopped there at no cost and stay as that engine's record), so no result is withdrawn with it. The four sets run on Azure
+  alone, unchanged; the spine's note below names workflows that no longer exist beside `six-kube` and `aks-metered`.
 - **Disclosed.** At `1 6 1 8 1 6` in October's first runs about 41% of requests failed in both arms with the
   autoscaler pinned at its cap of 10 pods; a peak of 9 asks more of the four workers than 8 did. What each arm served at
   each shape is in its table. Cost: about $4 to $6 a set of five at list price; three sets of each shape, about $30 for

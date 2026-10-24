@@ -124,29 +124,26 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # October): scripts/azure_queue.txt lists every Azure set in release order, A of every line, then B, then C. A set starts
 # when its machine family's queue (its region and machine size, the workflow's own concurrency group) has no run waiting
 # or running, one a tick in each queue, and is read back by its run's title since AZURE_SINCE (a cancelled run counts for
-# nothing), so nothing is started twice and a set dispatched by hand counts as started. Google Cloud and Amazon carry the
-# same four sets at the same settings on the same harness (scripts/google_queue.txt, scripts/amazon_queue.txt; the
-# founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
-# (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
+# nothing), so nothing is started twice and a set dispatched by hand counts as started. The queue's switch line
+# (switch=on | off) holds every set while it reads off, so nothing is rented before the founder says so. Azure is the one
+# cloud the benchmarks rent (the founder's order of 24 October); any other cloud is the operator's own, on the plain install
+# of deploy/install/
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
 AZURE_SINCE = "2026-10-23T21:19:00Z"   # omni-v18: every Azure set runs again on the engine that stands; the sets of earlier engines already
                                        # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v18 table
 AZURE_WF = "aks-metered.yml"
-CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
-          ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
-          ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"))
+CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),)
 # A cloud starts a set only after its $0 check passed (.github/workflows/cloud-check.yml: the login, the key's shape, the
-# machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's Free plan failed
-# every set started there at the login, each using up its A or B; Azure since 22 October, after its stored key held, for a
-# while on 21 October, a text Azure's login refuses, and a failed set counts as started). The conductor starts a check itself when the cloud
+# machine type and every quota a set needs; Azure since 22 October, after its stored key held, for a while on 21 October,
+# a text Azure's login refuses, and a failed set counts as started). The conductor starts a check itself when the cloud
 # has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder stores is
 # so taken up within the hour, and a cloud that cannot rent never uses up a set.
 CHECK_WF = "cloud-check.yml"
-CHECKS = {"Google Cloud": "google", "Amazon": "amazon", "Azure": "azure"}
+CHECKS = {"Azure": "azure"}
 CHECK_FRESH_H = 24
 CHECK_RETRY_MIN = 60
-FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
-         "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
+FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "verify.yml", "archive-run.yml",
+         "peek.yml")
 
 
 # ------------------------------------------------------------------------------------------------- shard shapes
@@ -545,7 +542,7 @@ def rerun_blocks(path=None):
         name, wf, inputs = (ln.split("|") + ["", ""])[:3]
         kv = dict(x.split("=", 1) for x in inputs.split(";") if "=" in x)
         wf = wf.strip()
-        if wf in {"gke-metered.yml", "eks-metered.yml", "gpu-bench.yml", "lambda-gpu.yml", "cloud-organism.yml"}:
+        if wf in {"gpu-bench.yml", "lambda-gpu.yml"}:
             raise ValueError(f"{wf} is excluded from the approved non-GPU campaign")
         blocks[-1].append((name.strip(), wf, kv))
     return [b for b in blocks if b]
@@ -611,10 +608,9 @@ def reruns_started(queue):
 # GitHub holds every run of one concurrency group in one line, with ONE waiting place: a second run waiting in the group
 # cancels the first one waiting (17 October: about thirty Azure starts of 16 October, and the reruns of the Azure full-control
 # burst and of the large organisms, were cancelled that way before any machine was made). Every Azure workflow shares the
-# group azure-benchmark-<region>, every Google one google-benchmark-<zone>, every Amazon one amazon-benchmark-<region>; all our
-# sets use one region or zone each, so each cloud is one line: one of its runs at a time, and none started while one waits.
-CLOUD_FAMILIES = {"Azure": ("aks-metered.yml", "aks-metered-full.yml", "big-organism.yml"),
-                  "Google Cloud": ("gke-metered.yml",), "Amazon": ("eks-metered.yml",)}
+# group azure-benchmark-<region>; all our sets use one region, so the cloud is one line: one of its runs at a time, and none
+# started while one waits.
+CLOUD_FAMILIES = {"Azure": ("aks-metered.yml", "aks-metered-full.yml", "big-organism.yml")}
 ACTIVE = ("queued", "in_progress", "waiting", "pending", "requested")
 
 
@@ -650,8 +646,8 @@ def cloud_next(queue, started, reruns_left):
 
 def cloud_title(wf, kv):
     """The title a cloud workflow gives a run of these inputs (its run-name), so a started set is read back by it: what ran,
-    the organism, the replica room, the dial, then the machine-family queue, the last two words (Azure: the region and the
-    machine size or 'pools'; Google: the zone and the machine type; Amazon: the region and the instance type). A set run to
+    the organism, the replica room, the dial, then the machine-family queue, the last two words (the region and the machine
+    size or 'pools'). A set run to
     the paid cap under the stopping rule (stop_looks; docs/K8S_COMPASS_PREREGISTRATION.md, 19 October) carries it in its
     title, so its A, B and C are counted apart from the sets run at five repetitions before it."""
     what = f"burst {kv['load_steps']}" if kv.get("load_steps") else "steady"
@@ -659,13 +655,8 @@ def cloud_title(wf, kv):
     room = f" replica room {kv['replica_ceiling']}" if kv.get("replica_ceiling") else ""
     room += " to the cap, stopping rule" if kv.get("stop_looks") else ""   # a set run to the cap under the stopping rule counts on its own (19 October)
     dial = kv.get("dial") or "save"
-    if wf == "gke-metered.yml":
-        loc, fam = kv.get("zone") or "us-central1-a", kv.get("machine") or "e2-standard-2"
-    elif wf == "eks-metered.yml":
-        loc, fam = kv.get("region") or "us-east-1", kv.get("instance") or "m5.large"
-    else:
-        loc = kv.get("location") or "eastus"
-        fam = "pools" if kv.get("worker_pools") else (kv.get("vm_size") or "Standard_D2s_v4")
+    loc = kv.get("location") or "eastus"
+    fam = "pools" if kv.get("worker_pools") else (kv.get("vm_size") or "Standard_D2s_v4")
     return f"{wf[:-4]} {what}{org}{room} dial {dial} {loc} {fam}"
 
 
@@ -691,7 +682,7 @@ def check_state(runs, cloud, now=None):
     """Whether a cloud's sets may start, from cloud-check.yml's runs (any order): ("go" | "wait" | "check", why). "go": its
     newest check passed within CHECK_FRESH_H; "wait": a check runs, or the last failed under CHECK_RETRY_MIN ago; "check":
     start one (none yet, the last failed or was cancelled long enough ago, or the last pass is stale). Only the cloud's own
-    title counts (cloud-check google | cloud-check amazon); a check of both, started by hand, is read by neither."""
+    title counts (cloud-check azure); a check started by hand for another choice is not read."""
     title = f"{CHECK_WF[:-4]} {CHECKS[cloud]}"
     mine = sorted((r for r in runs if (r.get("display_title") or "") == title), key=lambda r: r.get("created_at") or "")
     if not mine:
@@ -761,7 +752,7 @@ def azure_to_start(queue, started, busy):
 
 def azure_runs(wf=AZURE_WF):
     """A cloud workflow's dispatched runs since AZURE_SINCE: ({title: runs not cancelled}, {queues with a run waiting or
-    running}). Only dispatched runs count: a push registers the Google and Amazon workflows and runs nothing."""
+    running}). Only dispatched runs count: a push that registers a workflow runs nothing."""
     started, busy, page = {}, set(), 1
     while page <= 5:
         d = api(f"repos/{REPO}/actions/workflows/{wf}/runs?event=workflow_dispatch&created=>={AZURE_SINCE}&per_page=100&page={page}")

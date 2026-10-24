@@ -19,7 +19,7 @@ measurement exists.
 | 5 | Method | B | **A−** | A | rules timestamped outside our repository before their runs; the pairs the power page asks for |
 | 6 | Real Kubernetes | B− | **B+** | A | every Kubernetes test's three omni-v11 runs in (seven waiting on their third run), and the cloud's multi-machine cluster |
 | 7 | Databases and caches | C | **B−** | A− | more pairs a run (`docs/POWER.md`), the max for MySQL, MongoDB and PostgreSQL (archiving), gains where the knob has room |
-| 8 | Cloud bill | Undetermined | Undetermined | graded on its result | the Azure sets at the cap (running), then Google and Amazon |
+| 8 | Cloud bill | Undetermined | Undetermined | graded on its result | the Azure sets at the cap (running) |
 | 9 | Energy | Undetermined | Undetermined | graded on its result | a physical meter: Kepler and the machine's own meter on a bare-metal machine |
 | 10 | GPU | Undetermined | Undetermined | graded on its result | the Lambda runs from one exact commit, on the founder's word |
 | 11 | Modelled muscles | C− | **C−** | B | each plant model calibrated against a measured system, with its error stated |
@@ -88,7 +88,7 @@ version, and every benchmark runs again on it):
 
 **What a buyer will ask for that is not here yet** (the founder's question of 19 October, answered from the repository):
 - *Proof*: a physical meter (every energy figure is a declared model; the GPU on Lambda or a metered machine closes it); a cloud
-  bill on the engine that stands (Azure running, Google's key and Amazon's plan pending); native at its best (the cost to match,
+  bill on the engine that stands (Azure running); native at its best (the cost to match,
   native tuned harder by its operator beside Omni-Compass on top, last run on 3 October on an engine long gone, runs again on
   omni-v11 from the campaign); an outside party's rerun; a real multi-machine cluster (kind puts every node on one runner);
   days to weeks on a real workload; each rule's share of the gain read on the live cluster, not only in our models.

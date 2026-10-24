@@ -100,7 +100,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 **Wire it on your stack.**
 
-- **Native controller:** the cloud's autoscaling group or scale set: AWS Auto Scaling, Azure VMSS, GCP MIG.
+- **Native controller:** the cloud's autoscaling group or scale set: Azure VMSS, or the provider's own.
 - **Wire out (read):** group size, instance states, the target-tracking metric (the cloud's API and monitoring).
 - **Wire in (write):** desired capacity, min and max, the target-tracking policy's target, through the cloud CLI or SDK.
 - **Restore:** the group's desired, min, max and policy recorded once; restored from it.
@@ -339,7 +339,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 - **Native controller:** the cluster's own node autoscaler: Karpenter (NodePool), the Cluster Autoscaler, a MachineSet, a cloud node pool.
 - **Wire out (read):** ready and schedulable workers, pending pods, allocatable and used CPU (Kubernetes API), the autoscaler's status ConfigMap.
-- **Wire in (write):** the pool's size through the operator's own command (--node-scale-cmd: az aks nodepool scale, gcloud container clusters resize, eksctl scale nodegroup, kubectl scale machineset, a Karpenter NodePool limit); a machine parked by taint and drain, never deleted by Omni-Compass.
+- **Wire in (write):** the pool's size through the operator's own command (--node-scale-cmd: az aks nodepool scale, or the provider's own resize command, kubectl scale machineset, a Karpenter NodePool limit); a machine parked by taint and drain, never deleted by Omni-Compass.
 - **Restore:** the pool's starting count recorded once; every parked machine untainted and the pool restored to it at the end or on the lease.
 - **Run live?** live: omni_controller nodepool mode on kind and on AKS (results/live/V1_AKS_*, the capacity and steady tables).
 
@@ -940,7 +940,7 @@ Each is a pool of servers, pods, GPUs, links or disks serving a stream of reques
 
 **Wire it on your stack.**
 
-- **Native controller:** the function platform's concurrency settings (Knative autoscaling annotations, AWS Lambda concurrency, OpenFaaS).
+- **Native controller:** the function platform's concurrency settings (Knative autoscaling annotations, Azure Functions' scale limits, OpenFaaS).
 - **Wire out (read):** concurrency, cold starts, queue waits (the platform's metrics).
 - **Wire in (write):** provisioned and reserved concurrency, scale-to-zero windows through the platform's API or annotations.
 - **Restore:** recorded; restored.

@@ -85,7 +85,7 @@ code. No outside party has reviewed or approved these results.
 - **Loads.** Open-loop load generators on synthetic schedules, one public day of demand (Google 2011) on kind, and the data
   stores' published benchmark workloads (sysbench, YCSB, pgbench). No production traffic.
 - **Size.** kind clusters of six workers on one machine; an Azure cluster of four workers. No large production fleet.
-- **Undetermined:** the cloud bill (Azure running, Google and Amazon gated by their $0 checks), energy (no meter), the GPU
+- **Undetermined:** the cloud bill (Azure running; Azure is the one cloud the benchmarks rent), energy (no meter), the GPU
   (no run on the engine that stands), production readiness (no deployment). These are written as undetermined wherever
   they appear, never as results.
 

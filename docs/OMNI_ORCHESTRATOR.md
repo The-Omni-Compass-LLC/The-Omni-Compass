@@ -233,8 +233,8 @@ registry (units are processes), network isolation, service names and encryption,
 of a new version, secrets, users and permissions. The comparison that matters, this orchestrator against Kubernetes itself on
 the same organism and load, runs on the kind rig on GitHub and has not run yet.
 
-Ready, not yet run: the same full form on a rented machine in a cloud, one machine of 8 processors, the test `direct` on the
-one-machine buttons (`big-organism-detached.yml` on Azure, `cloud-organism.yml` on Google and Amazon; `scripts/organism_detached.sh`):
+Ready, not yet run: the same full form on a rented Azure machine, one machine of 8 processors, the test `direct` on the
+one-machine button (`big-organism-detached.yml`; `scripts/organism_detached.sh`):
 a dry run by default, shown at its price, rented only on the founder's word.
 
 ## 4. The claim, exactly

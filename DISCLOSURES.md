@@ -13,7 +13,7 @@ and every report point here. Where any other page seems to say more than this pa
    claimed.
 2. The software is licensed for evaluation and simulation only (`LICENSE`). Running it in production, on any system
    beyond evaluation, or in any product or service, requires a signed, paid Omni-Compass Enterprise License.
-3. Names of other companies and products (NVIDIA, Kubernetes, Red Hat OpenShift, Amazon EKS, Google GKE, Microsoft
+3. Names of other companies and products (NVIDIA, Kubernetes, Red Hat OpenShift, Microsoft
    AKS, Karpenter, Lambda and others) are the property of their owners. They identify the systems Omni-Compass was
    tested with or connects to. No affiliation, endorsement or certification by any of them is stated or implied.
 4. All rights reserved. The Omni-Compass LLC reserves the right to change the software, the documentation, the results

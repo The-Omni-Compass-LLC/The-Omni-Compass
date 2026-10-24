@@ -15,9 +15,8 @@ on:
     inputs:
       free: {description: "Every free benchmark on GitHub's machines (yes/no)", default: "yes"}
       gpu: {description: "The GPU benchmark on the GPU runner, billed per minute (yes/no; needs the gpu-t4 runner)", default: "no"}
-      clouds: {description: "Metered Kubernetes clouds, comma-separated: aks,gke,eks (empty: none)", default: ""}
+      clouds: {description: "Metered Kubernetes on Azure: aks (empty: none)", default: ""}
       big_organisms: {description: "The big organisms on a rented Azure machine (yes/no; needs AZURE_CREDENTIALS)", default: "no"}
-      big_machines: {description: "The same big-organism test on a rented Google or Amazon machine, comma-separated: gcp,aws (empty: none; needs that cloud's secrets; starts cloud-organism for real)", default: ""}
       lambda_gpu: {description: "The GPU on a rented Lambda machine: 8card or 1card (empty: none; needs the three LAMBDA_ secrets; starts lambda-gpu for real, pooled)", default: ""}
       dry_run: {description: "List what would start, start nothing (yes/no)", default: "no"}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
@@ -35,8 +34,6 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       REF: ${{ github.ref_name }}
       HAVE_AZURE: ${{ secrets.AZURE_CREDENTIALS != '' || secrets.AZURE_CLIENT_SECRET != '' }}
-      HAVE_GCP: ${{ secrets.GCP_CREDENTIALS != '' }}
-      HAVE_AWS: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
       HAVE_LAMBDA: ${{ secrets.LAMBDA_API_KEY != '' && secrets.LAMBDA_SSH_PRIVATE_KEY != '' && secrets.LAMBDA_SSH_KEY_NAME != '' }}
     steps:
       - name: Legal notice at the top of this job's report
@@ -58,8 +55,6 @@ jobs:
           for c in $(echo "${{ github.event.inputs.clouds }}" | tr ',' ' '); do
             case "$c" in
               aks) [ "$HAVE_AZURE" = true ] && list="$list aks-metered-full" || skipped="$skipped aks-metered-full(no AZURE_CREDENTIALS)";;
-              gke) [ "$HAVE_GCP" = true ] && list="$list gke-metered" || skipped="$skipped gke-metered(no GCP_CREDENTIALS)";;
-              eks) [ "$HAVE_AWS" = true ] && list="$list eks-metered" || skipped="$skipped eks-metered(no AWS keys)";;
               *) skipped="$skipped $c(unknown cloud)";;
             esac
           done
@@ -77,17 +72,6 @@ jobs:
             else
               echo "| $w | FAILED to start |" >> "$GITHUB_STEP_SUMMARY"; failed=$((failed + 1))
             fi
-            sleep 2
-          done
-          for c in $(echo "${{ github.event.inputs.big_machines }}" | tr ',' ' '); do
-            case "$c" in
-              gcp) have="$HAVE_GCP";; aws) have="$HAVE_AWS";; *) skipped="$skipped cloud-organism-$c(unknown cloud)"; continue;;
-            esac
-            if [ "$have" != true ]; then skipped="$skipped cloud-organism-$c(no $c secrets)"
-            elif [ "${{ github.event.inputs.dry_run }}" = yes ]; then echo "| cloud-organism ($c) | would start (dry run) |" >> "$GITHUB_STEP_SUMMARY"
-            elif gh workflow run cloud-organism.yml --ref "$REF" -f cloud="$c" -f dry_run=no; then
-              echo "| cloud-organism ($c: tower and stack at 100 copies) | yes |" >> "$GITHUB_STEP_SUMMARY"; started=$((started + 1))
-            else echo "| cloud-organism ($c) | FAILED to start |" >> "$GITHUB_STEP_SUMMARY"; failed=$((failed + 1)); fi
             sleep 2
           done
           LG="${{ github.event.inputs.lambda_gpu }}"

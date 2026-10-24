@@ -54,8 +54,8 @@ checks the keys first at no cost, brings the results back and always gives the m
 
 The test changes the GPU's power limit, so you need a machine where you are the full administrator of the GPU:
 
-- **Use a virtual machine (VM) or a bare-metal server.** Lambda Cloud "on-demand instances" are VMs; so are the GPU
-  instances on AWS, Google Cloud and Azure.
+- **Use a virtual machine (VM) or a bare-metal server.** Lambda Cloud "on-demand instances" are VMs; so are Azure's GPU
+  machines.
 - **Avoid "container" or "pod" rentals.** Their GPUs usually block power-limit changes. This is common on the cheapest
   per-hour marketplaces.
 - **Any single NVIDIA data-center GPU works:** A10, L4, A100, H100, L40S. One GPU is enough.

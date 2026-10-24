@@ -104,8 +104,8 @@ def github_runs() -> list | None:
              "since": r["createdAt"], "branch": r["headBranch"]} for r in out]
 
 
-LEDGER = {"aks-metered.yml": "Azure", "gke-metered.yml": "Google Cloud", "eks-metered.yml": "Amazon Web Services",
-          "cloud-check.yml": "the $0 cloud check", "lambda-gpu.yml": "the GPU on Lambda", "cpu-power.yml": "the CPU package"}
+LEDGER = {"aks-metered.yml": "Azure", "cloud-check.yml": "Azure's $0 check",   # Azure, the one cloud the benchmarks rent (24 October)
+          "lambda-gpu.yml": "the GPU on Lambda", "cpu-power.yml": "the CPU package"}
 LEDGER_CACHE = HERE / "github_ledger.json"
 REPO = "The-Omni-Compass-LLC/The-Omni-Compass"
 LEDGER_GAUGES = ["machines billed, machine-hours", "compute bill at list price ($)", "worker nodes in service, mean", "response time (ms), 95th percentile",
@@ -149,6 +149,9 @@ def ledger(camp: dict | None = None) -> dict:
         data = json.loads(LEDGER_CACHE.read_text(encoding="utf-8"))
     if data is None:
         return {"read_at": None, "workflows": {}, "campaign": None}
+    # only the workflows the page reads, and only Azure's checks (the founder's order of 24 October took the other clouds out)
+    data["workflows"] = {wf: [r for r in rs if wf != "cloud-check.yml" or r.get("title") == "cloud-check azure"]
+                         for wf, rs in data["workflows"].items() if wf in LEDGER}
     sys.path.insert(0, str(ROOT / "scripts"))
     import dispatch_grid as D
     if (data.get("campaign") or {}).get("since") != D.RERUN_SINCE:
@@ -172,7 +175,7 @@ def ledger(camp: dict | None = None) -> dict:
                 eng[r["sha"]] = m.group(1) if m else None
             r["engine"] = eng[r["sha"]]
             r["raw"] = any(f"run-{r['id']}" in x for x in raw)
-            if wf in ("aks-metered.yml", "gke-metered.yml", "eks-metered.yml") and r["status"] != "completed" and shutil.which("gh") and not CHECKING:
+            if wf == "aks-metered.yml" and r["status"] != "completed" and shutil.which("gh") and not CHECKING:
                 # a cloud set runs its repetitions one at a time, and GitHub lists the whole run as queued while it does: its
                 # jobs say where it is (the repetitions measured to the end, the one running, how many it may take)
                 jobs, page = [], 1
@@ -248,7 +251,7 @@ def ledger(camp: dict | None = None) -> dict:
         return bool(m) and int(m.group(1)) >= 8
     data["workflows"] = {wf: [r for r in rs if recent(r)] for wf, rs in data["workflows"].items()}
     queues = {}
-    for wf, f in (("aks-metered.yml", "azure_queue.txt"), ("gke-metered.yml", "google_queue.txt"), ("eks-metered.yml", "amazon_queue.txt")):
+    for wf, f in (("aks-metered.yml", "azure_queue.txt"),):
         q = ROOT / "scripts" / f
         sets = []
         for x in (q.read_text(encoding="utf-8").splitlines() if q.exists() else []):
@@ -362,8 +365,7 @@ def board(runs: list, camp: dict | None = None) -> list:
     for t in found.values():   # a three-run table no campaign entry names: listed all the same, never left out
         out.append({"group": "every benchmark, run again on the engine that stands", "name": XS.table_title(t["stem"]), "workflow": "",
                     "tables": [{"file": f"results/live/{t['stem']}.md", "engine": f"omni-v{t['n']}"}], "now": None})
-    for cloud, f, wf in (("Azure", "azure_queue.txt", "aks-metered.yml"), ("Google Cloud", "google_queue.txt", "gke-metered.yml"),
-                         ("Amazon Web Services", "amazon_queue.txt", "eks-metered.yml")):
+    for cloud, f, wf in (("Azure", "azure_queue.txt", "aks-metered.yml"),):
         q = ROOT / "scripts" / f
         if not q.exists():
             continue

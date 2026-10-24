@@ -73,7 +73,7 @@ omni-v17, under the standing rule (tested in the toy first, told, not asked), an
 
 ## What does not change
 
-Native's own clocks, the harness, the scenario and every other rule. The cloud sets (Azure, Google, Amazon) are not part
+Native's own clocks, the harness, the scenario and every other rule. The cloud sets (Azure, the one cloud the benchmarks rent) are not part
 of this choice, because they cost money; they run at whatever default lands.
 
 ## Threats to validity

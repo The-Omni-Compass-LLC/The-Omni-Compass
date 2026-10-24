@@ -2,6 +2,36 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24: Azure, and only Azure; Google and Amazon out
+
+- **Google and Amazon taken out** (the founder's order: "Get it out of my repositories. Get it out of my benchmarks. Get it out of
+  my engine, everything ... just Azure and anything else people could do on their own"). Removed: the workflows `gke-metered`,
+  `eks-metered` and `cloud-organism`; `scripts/gke_paired.sh`, `eks_paired.sh`, `gcp_services.sh`, `cloud_machine.py`,
+  `cloud_machine_watch.sh`, `google_queue.txt`, `amazon_queue.txt`; `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md`;
+  `tests/test_cloud_machine.py`; Google's and Amazon's $0 checks (`cloud-check` and `tools/cloud_key_check.py` read Azure alone).
+  The conductor rents one cloud (`scripts/dispatch_grid.py`, `CLOUDS`, `CHECKS`, `CLOUD_FAMILIES`); `v5-all-benchmarks`,
+  `archive-run`, the campaign file and the rigs no longer name them.
+- **The Operator's Manual**: chapters 16 and 17 (Google Kubernetes Engine and Amazon EKS, step by step), Appendices G and H (their
+  accounts) and the old Appendix M (the three clouds side by side) are out; the chapters after them renumbered (30 in all; Part VI is
+  chapters 13 to 28) and the appendices relettered (the paired run from GitHub is Appendix K, the license Appendix L), every
+  reference with them, in the three manuals and the pages that point into the Operator's. Wherever the manuals named the two
+  clouds' tools, they name Azure's and "the provider's own": on any other cloud an operator installs the governor on their own,
+  from `deploy/install/`.
+- **The live engine page**: section 5a is "The cloud: Azure, and any other on your own". Monitors 22 and 23 (Google's and Amazon's
+  gate and bill) are now Azure's $0 gate, check by check (`azGateCv`, `drawCloudGate`), and the cloud mode on any other cloud,
+  modelled (`ownCv`, class S, never a bill); every other monitor keeps its number. The ledger, the cards and the build read Azure
+  alone (`docs/engine/build_live_engine.py`, `docs/engine/github_ledger.json`); the Grafana wall and the page word for word
+  rebuilt from it; the Live Engine Manual's chapter 10 is "The Cloud".
+- **Standing pages** (README, `CLAUDE.md`'s Orders of 24 October, `DISCLOSURES.md`, the state of play, the register's row 38 and
+  the proof program's row 34 marked removed, the referee summary and grades, the safety case, the threat model, the limitations,
+  the coverage map, the spine, omni-v18's page, the orchestrator's page, the integration and operator manuals, the GPU and metal
+  guides, the muscle catalog's three wiring lines, the K8S preregistration's amendment of 24 October): Azure is the one cloud the
+  benchmarks rent. Kept, because they are not those clouds: the Google cluster trace of 2011 (the public dataset the Azure real
+  day replays), MuJoCo (Google DeepMind's simulator), products named as the open-source projects they are, and every record of
+  what ran. One docstring line in a fingerprinted engine file (`omni_controller/controller.py`) still shows Amazon's command-line
+  tool as an example; it goes with the next engine version. The four secrets nothing reads any more (`GCP_CREDENTIALS`,
+  `GCP_PROJECT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) are the founder's to delete in the repository's settings.
+
 ## 2026-10-24: the clouds' keys read to the letter of their shape
 
 - **Azure runs; Amazon off** (06:17 UTC): with the four boxes filled, Azure's check passed (the key, the login, the subscription and,

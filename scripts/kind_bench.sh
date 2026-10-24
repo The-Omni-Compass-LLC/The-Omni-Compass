@@ -62,10 +62,7 @@ fi
 # which deletes a machine once it is empty, so a machine given back is a machine no longer billed; the system pool
 # carries the NoSchedule taint kind's control plane carries, so every count below is the same on both
 PLATFORM="${PLATFORM:-kind}"
-# Google (GKE) and Amazon (EKS) clusters are built to the AKS shape (a tainted system pool; work pools labelled
-# omni-role=work and agentpool=<pool>: scripts/gke_paired.sh, scripts/eks_paired.sh), so they run the same managed mode
-# (kubectl only); CLOUD keeps the provider's name
-CLOUD="$PLATFORM"; case "$PLATFORM" in gke|eks) PLATFORM=aks;; esac; export CLOUD
+CLOUD="$PLATFORM"; export CLOUD
 if [ "$PLATFORM" = aks ]; then export WORKER_SEL="${WORKER_SEL:-omni-role=work}"; else export WORKER_SEL="!node-role.kubernetes.io/control-plane"; fi   # every AKS work pool carries omni-role=work (scripts/aks_paired.sh)
 # ADDONS=keda, the add-on test: in every arm KEDA and its HTTP add-on own the service's autoscaler (scripts/kind_addons.sh;
 # ADDONS_PROFILE=both: the CPU target and the live requests in flight, the default; http: the requests in flight alone),
