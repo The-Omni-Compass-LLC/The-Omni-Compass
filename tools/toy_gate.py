@@ -811,8 +811,12 @@ def reading(gauge, diffs, base_vals, gauges=None):
 
 def render(report_path, out_md):
     """TOY_GATE.json -> a page with the notice: the toys, their gauges, the readings, the counts (class S, never a benchmark)."""
+    return render_report(json.loads(Path(report_path).read_text()), out_md)
+
+
+def render_report(r, out_md):
+    """The page of a report already in memory (tools/toy_reread.py reads a record again and renders it from here)."""
     from tools.legal import stamp
-    r = json.loads(Path(report_path).read_text())
 
     def engine(tree):
         """The engine a tree declares (tools/omni_version.py), or the tree's name where it cannot be read."""
@@ -825,8 +829,9 @@ def render(report_path, out_md):
             return out[-1].split(" (")[0] if out else Path(tree).name
         except (OSError, subprocess.SubprocessError):
             return Path(tree).name
-    base_e = engine(r["base"]) if Path(r["base"]).exists() else r["base"]
-    cand_e = engine(r["cand"]) if Path(r["cand"]).exists() else r["cand"]
+    # the engines as the page first named them, where the record keeps them (its trees are gone once the gate has run)
+    base_e = r.get("base_engine") or (engine(r["base"]) if Path(r["base"]).exists() else r["base"])
+    cand_e = r.get("cand_engine") or (engine(r["cand"]) if Path(r["cand"]).exists() else r["cand"])
     lines = ["# The toy gate: the candidate against the engine that stands, in our own models", "",
              f"Seeds {r['seeds'][0]} to {r['seeds'][-1]}, {r['days']} day each where a day is run; the standing engine "
              f"{base_e}, the candidate {cand_e}. Evidence class S, our own models: a reading here says "
@@ -886,6 +891,8 @@ def render(report_path, out_md):
                 lines.append(f"| {g} | {x['native']:.3f} | {x['base']:.3f} | {x['cand']:.3f} | {cell(x['cand_vs_base'])} | {cell(x['cand_vs_native'])} |")
             lines.append("")
     lines += ["Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.", ""]
+    if r.get("afterword"):                 # a dated correction written under the record after it ran (kept by tools/toy_reread.py)
+        lines += [r["afterword"], ""]
     Path(out_md).write_text("\n".join(stamp(lines)) + "\n")
 
 
