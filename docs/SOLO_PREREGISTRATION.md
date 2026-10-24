@@ -44,9 +44,9 @@ default brain; the dial's tune-down is the only arm that may give back below the
 
 On omni-v16 the governor moves a workload's pods only through the pod autoscaler's own object (its range and its target); with the
 autoscaler switched off it has no pod muscle of its own: by itself it holds every workload at the operator's count and moves the
-machines alone. `tools/solo_study.py` reads it on the toy cluster (class S), on the machines as the kind rig has them (every worker
+machines alone. `tools/solo_study.py` reads it on the model cluster (class S), on the machines as the kind rig has them (every worker
 made at the start, no cluster autoscaler), eight seeds of a day, the three arms on the same seeds; its page is written with the
-version it reads, in `results/toy_gate/`.
+version it reads, in `results/model_gate/`.
 
 ## The next engine version: a pod muscle of its own, and the arm in our models
 
@@ -57,9 +57,9 @@ version it reads, in `results/toy_gate/`.
    window and never below the operator's count; restored to the snapshot at the end, every write audited and read back.
 2. **The arm in our models** (`realms/`): a switch on each plant that holds its knob at the operator's setting with no native
    loop, and the arm `solo` in the harness beside `native` and `v5`, the bodies' twins static with it.
-3. **The toy gate first** (the order of 15 October), against the engine that stands, on the same seeds: every existing toy must
+3. **The model gate first** (the order of 15 October), against the engine that stands, on the same seeds: every existing model must
    read identical (the new muscle acts only where the operator names a workload, the switch only in the arm `solo`), native and
-   `v5` byte-identical on the development seeds of the realms (7100 and up), and the toy cluster read by itself against this page.
+   `v5` byte-identical on the development seeds of the realms (7100 and up), and the model cluster read by itself against this page.
    A LOSS anywhere is root-caused and fixed in the model before anything is run.
 4. **Landed** with `tools/land_engine.py` as the next version, and, by the standing rule, every benchmark run again on it.
 
@@ -82,7 +82,7 @@ Every row is reported, LOSS included; a LOSS is answered by finding where the me
 ## Threats to validity
 
 - The operator's own setting decides much of what by itself reads: a workload shipped at one replica starts far below its load.
-  The setting is the one the rig's manifest and the toy's scenario already carry, frozen here; it is never tuned to a result.
+  The setting is the one the rig's manifest and the model's scenario already carry, frozen here; it is never tuned to a result.
 - The muscle cards were found on top of native; by itself they run as they are, and a card found for by itself is its own
   version.
 - Kind has no cluster autoscaler: on kind, native's machine count is static, so the machine muscle is the same in both

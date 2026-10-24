@@ -52,12 +52,12 @@ the page carries the commit, the time and GitHub's own list of the runs running 
 | The core in C++ | the page's six-state derivative and RK4 step against the repository's C++ twin (`cpp/src/core.cpp`, compiled by the check with `docs/engine/cpp_core_probe.cpp`) | 2,000 seeded states and parameters | largest relative difference 4.4 × 10⁻¹⁶ (derivative), 2.2 × 10⁻¹⁶ (RK4 step) | `docs/engine/check_live_engine.py` |
 | Section 1, one organism | the realms harness's own organism run, native and the max, under the climb | `realms/harness.py run_organism_arm`, seeds 3000 and 3001 | decisions over the line and every plant's work identical (seed 3000: 900 native, 849 the max, both paths) | `docs/engine/check_records.py` |
 | Section 1, each muscle alone | the harness's own single-muscle runs, native and the max with its twin, under the line | `realms/harness.py run_muscle_arm`, 60 muscles × 2 arms, seeds 3000 and 3001 | 120 of 120 runs identical per seed | `docs/engine/check_records.py` |
-| Section 2, the cloud's setting | the shipped controller as `tools/toy_gate.py` wires it | `tools/toy_gate.py --worker`, seeds 3000 and 3001 | machine-hours identical (seed 3000: 27.604 both arms); verdict steps allowed and refused identical (3 and 3) | `docs/engine/check_records.py` |
+| Section 2, the cloud's setting | the shipped controller as `tools/model_gate.py` wires it | `tools/model_gate.py --worker`, seeds 3000 and 3001 | machine-hours identical (seed 3000: 27.604 both arms); verdict steps allowed and refused identical (3 and 3) | `docs/engine/check_records.py` |
 | Section 2, on top of the HPA | the shipped controller as `pilot/selfpilot.py run_day` wires it | `pilot/selfpilot.py run_day`, seeds 3000 and 3001 | machines and pods waiting identical on every one of 1,440 ticks; writes identical (25) | `docs/engine/check_records.py` |
 | Section 1, the immune system | Omni-Compass's organism reading its own immune system: every room against its twin, the heat debt, the body giving back | the same run of `realms/harness.py`'s organism with the readings taken as `max_body_step` reads them (read only: the organism's record is identical with and without them) | run A: 7 decisions with an inflamed room (`pump_speed`), heat debt 1,109 W fading to 21 W, the pools' 26 extra machines handed back; runs B and C: none | `docs/engine/export_harness_trace.py` |
 | Section 4, the official runs | each three-run table's runs A, B and C played back from their raw files (`docs/engine/export_runs.py`) | every file's SHA-256 against the run's own `SHA256SUMS_ALL.txt`; every Kubernetes repetition scored by `tools/live_reps.py arm_gauges` on its own files, the mean over repetitions against the run's own `LIVE_REPS.json` | every run's files and their match in the counts above, written at every build (on 21 October: 81 tables, 243 runs, 165,095 of 165,095 files); the scorer's means equal each run's result to 4.2 × 10⁻¹⁶ | `docs/engine/build_live_engine.py --check` |
 | Section 3, a GPU card | `realms/gpu_card.py` (inside the omni-v17 fingerprint, unchanged since omni-v8), native and Omni-Compass on top, the card as shipped and under an operator's cap, AI and compute-bound work | `realms/gpu_card.run` untouched, every arm, seeds 5100, 5101 and 5102 | the run's own result identical; every second's energy and requests add up to it | `docs/engine/check_records.py` |
-| Section 3, Linux, one host | `tools/toy_gate.py`'s conveyance model, the shipped `Muscles.convey` and `quota.py` on the CFS quota | `tools/toy_gate.py worker_convey` untouched, seeds 3000, 3001 and 3002 | its own result line identical; requests and the host's busy share add up to it | `docs/engine/check_records.py` |
+| Section 3, Linux, one host | `tools/model_gate.py`'s conveyance model, the shipped `Muscles.convey` and `quota.py` on the CFS quota | `tools/model_gate.py worker_convey` untouched, seeds 3000, 3001 and 3002 | its own result line identical; requests and the host's busy share add up to it | `docs/engine/check_records.py` |
 | Section 3, every muscle on omni-v8 | the realms runner's own table of 1,107 muscles and seven organisms, native and the max | `results/realms_v5/REALMS_V5.json` (omni-v8, commit 9819a903c, seeds 3000 to 3009), read by `docs/engine/export_scenarios.py` | 527 GAIN, 159 the same as native, 421 at their limit on native, 0 LOSS; all seven organisms GAIN under all three loads | `docs/engine/export_scenarios.py` |
 | Section 4, the receipts | every judged row of each benchmark's newest table (`results/live/V*_*.md`) | the receipts themselves, read row by row by `docs/engine/export_scenarios.py` | the counts above, written at every build: every word, Omni-Compass against its native apart from the orchestrators' own cost, every LOSS row named | `docs/engine/export_scenarios.py` |
 
@@ -67,7 +67,7 @@ the page carries the commit, the time and GitHub's own list of the runs running 
 |---|---|---|
 | Fidelity of the brain's mathematics to the code | A+ | equal to machine precision on every quantity drawn |
 | Fidelity of the harness views to the harness | A+ | every record identical to the harness's own functions on two seeds |
-| Fidelity of the live controller view to the shipped controller | A+ | identical to the toy gate's own worker and to `pilot/selfpilot.py` |
+| Fidelity of the live controller view to the shipped controller | A+ | identical to the model gate's own worker and to `pilot/selfpilot.py` |
 | Fidelity of the stacks (section 3) to their models and receipts | A+ | the GPU card and the Linux host identical to their own runs; every receipt row as written, the LOSS rows kept |
 | Native is native, Omni-Compass sits on top | A | native runs its own controllers in every view; Omni-Compass never replaces them and never goes below native's setting (the twin, the floor), proven by the identical records |
 | Every word matches what the parts do | A | the bottom line, the guide, the anatomy and the section notes say where the brain steers (the live controller) and where it reads (the harness views); three overreaching claims were found on 17 October and corrected |
@@ -82,8 +82,8 @@ the page carries the commit, the time and GitHub's own list of the runs running 
 |---|---|---|---|
 | Each muscle alone (realms harness, the line) | misses −18% to −27%; the waiting line cleared 24% to 27% sooner | work | energy +0.003% |
 | One organism (realms harness, the climb) | misses −5% to −6%; energy −0.0005% | work | none |
-| Live controller on top of the HPA (toy cluster) | none | machines (−4% to −8%), power, pods waiting, response time, time over the line | none |
-| Live controller, the cloud's tune-down (toy cluster) | none | every gauge | none |
+| Live controller on top of the HPA (model cluster) | none | machines (−4% to −8%), power, pods waiting, response time, time over the line | none |
+| Live controller, the cloud's tune-down (model cluster) | none | every gauge | none |
 | A GPU card, the card as shipped (`realms/gpu_card.py`) | none | every gauge: at the max the card's limit is its top; at the tune-down the one step tried is refused (LOSS read on its cost) | none |
 | A GPU card under an operator's 105 W cap, compute-bound | response time −8% to −11% | requests, energy, time over the line | none |
 | Linux, one host (the CFS-quota conveyance model) | requests served +64%; response time −53% mean and at the 95th percentile | alert minutes | host CPU +31%, limits +167%, pods +18%; pod start wait rose 6% to 8%, one value a run and so no interval: shown, not judged (the model's: a busier host starts pods slower; EVEN on real Kubernetes) |
@@ -96,7 +96,7 @@ the page carries the commit, the time and GitHub's own list of the runs running 
 
 1. **The models read small where the real runs read large.** In every modelled harness the two arms differ little; on
    real Kubernetes the response time falls by half or more. The real gains come through the pod CPU limits (conveyance),
-   which the realms plants and the toy cluster do not carry as real Kubernetes does. An underwriter values the class L
+   which the realms plants and the model cluster do not carry as real Kubernetes does. An underwriter values the class L
    receipts, not the models, for the size of the benefit.
 2. **The harness's native is estimated, not measured** (`realms/presets.py`: "round engineering figures"). The native
    register (`docs/engine/NATIVE_REGISTER.md`) finds the max's "native at its limit" rule right on real defaults for power
@@ -124,9 +124,9 @@ the page carries the commit, the time and GitHub's own list of the runs running 
    2023 small challenge districts, the only ones that simulate outages; the repair leaves an outage building's battery native
    (its charge is its building's reserve), reads the coming hour and glides at the speed that cuts the bill most with no LOSS
    (omni-v8 to omni-v10, `docs/OMNI_V10.md`).
-7. **The Linux model's pod start wait rises** (+6% to +8%, one value a run and so no interval, shown and not judged; +8.8% in `results/toy_gate/TOY_GATE.md` over ten seeds):
+7. **The Linux model's pod start wait rises** (+6% to +8%, one value a run and so no interval, shown and not judged; +8.8% in `results/model_gate/MODEL_GATE.md` over ten seeds):
    the raised limits keep the host busier and its start time is fitted to rise with the busy share. The two repairs
-   written for it were refused by the toy gate. On real Kubernetes it reads EVEN on KEDA on CPU and requests and LOSS on KEDA's HTTP add-on (+13% to +21%, the test machine, `docs/POD_START_WAIT.md`; the kind rig pre-pulls the image from 18 October).
+   written for it were refused by the model gate. On real Kubernetes it reads EVEN on KEDA on CPU and requests and LOSS on KEDA's HTTP add-on (+13% to +21%, the test machine, `docs/POD_START_WAIT.md`; the kind rig pre-pulls the image from 18 October).
 8. **The page replays recorded runs.** The harness and controller views are the repository's runs, recorded on seeds
    3000, 3001 and 3002 and replayed; they cannot be stressed by hand. The stress-test model can (native alone and Omni-Compass on top of the same native, side by side), and is labelled as drawn.
 

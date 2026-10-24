@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The toy gate (tools/toy_gate.py) runs on this checkout: each toy's workers run the shipped code against the toy, write
+"""The model gate (tools/model_gate.py) runs on this checkout: each model's workers run the shipped code against the model, write
 every gauge, and the reading of a candidate against the standing engine follows the words rule (a resource spent that
 rose is power given, never a LOSS; an interval across zero is EVEN)."""
 import contextlib
@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools import toy_gate as tg  # noqa: E402
+from tools import model_gate as tg  # noqa: E402
 
 
 def captured(fn, *a):
@@ -48,7 +48,7 @@ class ToyGate(unittest.TestCase):
 
     def test_convey_toy_with_the_quota_unreadable_conveys_as_with_none(self):
         """The governor's role cannot list quotas (every kind test): no budget is known and conveyance is what it is with no
-        quota at all. The first v7 trial (run 38825214203) read it as a zero budget and conveyed nothing; this toy now catches that."""
+        quota at all. The first v7 trial (run 38825214203) read it as a zero budget and conveyed nothing; this model now catches that."""
         d = tempfile.mkdtemp()
         none = captured(tg.worker_convey, "omni", 2, os.path.join(d, "a"), "none")
         unread = captured(tg.worker_convey, "omni", 2, os.path.join(d, "b"), "unreadable")

@@ -266,7 +266,7 @@ muscle past its own limit, a service over its own line, anything made to fail. W
 one muscle's strength cannot be used without straining another, the brain offsets and engages them together, and it may
 use one muscle less, or leave it native, so that another can carry more, whenever the whole organism comes out ahead and
 every muscle stays healthy. The guard above refuses every such trade, the good with the bad; the next engine version
-replaces it with that judgment of the whole organism and of every muscle's health, through the toy gate first, and every
+replaces it with that judgment of the whole organism and of every muscle's health, through the model gate first, and every
 result is run again on it.
 
 ## One trial at a time, nothing permanent, the wall belongs to the body

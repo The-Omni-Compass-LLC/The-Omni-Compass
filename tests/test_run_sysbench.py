@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The sysbench-on-MySQL runner (tools/run_sysbench.py) without a server or sysbench: the decision rule (slow statements grow the
 pool by chunks only while it is full, calm with no page read from disk gives back one chunk after the dwell, the wall adds four
-chunks, the cover holds), the plug's one-writer rule and its wait for the server's online resize against a fake console, the
+chunks, the cover holds), the plug's one-writer rule and its wait for the server's online resize against a standin console, the
 server's own reading from the performance schema, sysbench's histogram and summary parsed, quantiles from the histogram, and the
 paired reading over repetitions."""
 import sys
@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import run_sysbench as S
 
 
-class FakeCursor:
+class StandinCursor:
     def __init__(self, server):
         self.s, self.rows = server, []
 
@@ -64,14 +64,14 @@ class FakeCursor:
         return self.rows
 
 
-class FakeServer:
+class StandinServer:
     def __init__(self, mb, fill=0.5, ignore_set_while_resizing=False):
         self.mb, self.fill, self.disk_reads, self.timer_ps, self.count = mb, fill, 0, 0, 0
         self.resize_status, self.pending, self.ticks = "", None, 0
         self.ignore_set_while_resizing, self.stall_until = ignore_set_while_resizing, None
 
     def cursor(self):
-        return FakeCursor(self)
+        return StandinCursor(self)
 
 
 def main():
@@ -93,7 +93,7 @@ def main():
     assert S.decide(0.3, 0.02, misses_last_s=0.0, cur_mb=512, last_change_age=20, full=True)[0] == 512, "inside the cushion nothing moves"
     assert S.miss_share(5, 1000) == 0.005 and S.miss_share(0, 0) == 0.0 and S.miss_share(300, 1000) == 0.3
     # the plug: snapshot once, write in whole chunks and wait for the server's resize, read back, another writer stops it, restore
-    srv = FakeServer(512); plug = S.BufferPool(srv)
+    srv = StandinServer(512); plug = S.BufferPool(srv)
     assert plug.attach() == 512
     assert plug.write(700) == 640, "a write is rounded to whole chunks (700 MB asks for 5 chunks, 640 MB) and read back once the resize completes"
     assert plug.lever() == 640 and srv.pending is None
@@ -112,14 +112,14 @@ def main():
     _sleep, _wait = S.time.sleep, S.RESIZE_WAIT_S
     S.time.sleep = lambda s: None; S.RESIZE_WAIT_S = 0.6
     try:
-        srv2 = FakeServer(512, ignore_set_while_resizing=True); plug2 = S.BufferPool(srv2); plug2.attach()
+        srv2 = StandinServer(512, ignore_set_while_resizing=True); plug2 = S.BufferPool(srv2); plug2.attach()
         assert plug2.write(128) == 128
         srv2.stall_until = time.monotonic() + 0.2                    # still withdrawing blocks when the arm ends; eases inside the wait
         assert plug2.restore() and srv2.mb == 512 and plug2.restore_info["writes"] == 1 and "withdrawing" in plug2.restore_info["resize_in_flight_at_end"], plug2.restore_info
-        srv2 = FakeServer(512, ignore_set_while_resizing=True); plug2 = S.BufferPool(srv2); plug2.attach(); plug2.write(128)
+        srv2 = StandinServer(512, ignore_set_while_resizing=True); plug2 = S.BufferPool(srv2); plug2.attach(); plug2.write(128)
         srv2.stall_until = time.monotonic() + 0.9                    # eases after the first wait: the first write is ignored, the second taken
         assert plug2.restore() and srv2.mb == 512 and plug2.restore_info["writes"] == 2, plug2.restore_info
-        srv2 = FakeServer(512, ignore_set_while_resizing=True); plug2 = S.BufferPool(srv2); plug2.attach(); plug2.write(128)
+        srv2 = StandinServer(512, ignore_set_while_resizing=True); plug2 = S.BufferPool(srv2); plug2.attach(); plug2.write(128)
         srv2.stall_until = time.monotonic() + 60                     # never eases inside the budget: not handed back, and the receipt says so
         assert not plug2.restore() and plug2.restore_info["final_mb"] == 128 and plug2.restore_info["writes"] == 2 and not plug2.restore_info["ok"], plug2.restore_info
     finally:

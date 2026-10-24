@@ -21,7 +21,7 @@ class FunctionTestsTraced(unittest.TestCase):
     def test_every_function_test_runs_under_coverage_run_append(self):
         calls = []
 
-        def fake(cmd, *a, **kw):
+        def standin(cmd, *a, **kw):
             calls.append(list(cmd))
             if "--list" in cmd:
                 return subprocess.CompletedProcess(cmd, 0, "main      tests/test_one.py\nfunctions tests/test_two.py\n", "")
@@ -30,7 +30,7 @@ class FunctionTestsTraced(unittest.TestCase):
             return subprocess.CompletedProcess(cmd, 0, "", "")
 
         with mock.patch.object(EC, "engine_manifest", return_value=("omni-v12", ["omnicompass/core.py"])), \
-                mock.patch.object(EC.subprocess, "run", side_effect=fake):
+                mock.patch.object(EC.subprocess, "run", side_effect=standin):
             rec = EC.measure()
         ones = [c for c in calls if "--one" in c]
         self.assertEqual([c[c.index("--one") + 1] for c in ones], ["tests/test_one.py", "tests/test_two.py"])
@@ -39,7 +39,7 @@ class FunctionTestsTraced(unittest.TestCase):
         self.assertEqual(rec["engine"], "omni-v12")
 
     def test_a_refused_command_stops_the_measurement(self):
-        def fake(cmd, *a, **kw):
+        def standin(cmd, *a, **kw):
             if "--list" in cmd:
                 return subprocess.CompletedProcess(cmd, 0, "main      tests/test_one.py\n", "")
             if "--one" in cmd:
@@ -47,7 +47,7 @@ class FunctionTestsTraced(unittest.TestCase):
             return subprocess.CompletedProcess(cmd, 0, "", "")
 
         with mock.patch.object(EC, "engine_manifest", return_value=("omni-v12", ["omnicompass/core.py"])), \
-                mock.patch.object(EC.subprocess, "run", side_effect=fake):
+                mock.patch.object(EC.subprocess, "run", side_effect=standin):
             with self.assertRaises(SystemExit):
                 EC.measure()
 

@@ -52,10 +52,10 @@ CAUSES = {
     ("ARMADA_4W_BARE", ""): ("suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent "
                              "slower on a shared host); not yet shown on this rig", "docs/LOSS_ROWS_UNDER_INVESTIGATION.md",
                              "omni-v13, if the suspicion holds", "the benchmark's three runs on the engine that stands"),
-    ("BINPACK", "queue:"): ("suspected: the conveyance fault fixed in omni-v13; the omni-v13 toy gate's batch toy, set from the "
+    ("BINPACK", "queue:"): ("suspected: the conveyance fault fixed in omni-v13; the omni-v13 model gate's batch model, set from the "
                             "KubeRay runs' own files, read the job turnaround back at native's", "docs/OMNI_V13.md",
                             "omni-v13, if the suspicion holds", "the benchmark's three runs on the engine that stands"),
-    ("VANILLA", "queue:"): ("suspected: the conveyance fault fixed in omni-v13; the omni-v13 toy gate's batch toy read the job "
+    ("VANILLA", "queue:"): ("suspected: the conveyance fault fixed in omni-v13; the omni-v13 model gate's batch model read the job "
                             "turnaround back at native's", "docs/OMNI_V13.md", "omni-v13, if the suspicion holds",
                             "the benchmark's three runs on the engine that stands"),
     ("OCM_4W_TOP", "alert minutes"): ("under investigation: the third run's size is far from the first two",

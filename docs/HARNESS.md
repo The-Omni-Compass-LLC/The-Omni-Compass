@@ -72,7 +72,7 @@ engine's digest beside the Python's and the page's.
 ## Not in this harness
 
 Live kube-controller-manager, GPU MIG scheduler, facility cooling plant (kind runs on GitHub: `docs/K8S_COMPASS_PREREGISTRATION.md`).
-`omni_controller/` is observe-first against kubectl; tests use `tests/fake_cluster/kubectl`.
+`omni_controller/` is observe-first against kubectl; tests use `tests/standin_cluster/kubectl`.
 
 See `LIMITS.md`.
 

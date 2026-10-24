@@ -55,7 +55,7 @@ def main(argv=None):
     ap.add_argument("--gpu", type=int, default=0)
     ap.add_argument("--smi", default=os.environ.get("NVIDIA_SMI", "nvidia-smi"))
     ap.add_argument("--settle", type=float, default=float(os.environ.get("WIRE_SETTLE", 4.0)))
-    ap.add_argument("--sim", action="store_true", default=bool(os.environ.get("SIM")), help="no load is started (fake card)")
+    ap.add_argument("--sim", action="store_true", default=bool(os.environ.get("SIM")), help="no load is started (standin card)")
     a = ap.parse_args(argv)
     g, smi = a.gpu, a.smi
     start = None

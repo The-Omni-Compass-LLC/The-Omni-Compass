@@ -225,7 +225,7 @@ class AzureFourBoxes(unittest.TestCase):
             self.assertIn("docs/AZURE_SETUP.md", bad.stdout)
 
 
-def fake_bin(d, name, body):
+def standin_bin(d, name, body):
     p = Path(d) / name
     p.write_text("#!/usr/bin/env bash\n" + body)
     p.chmod(p.stat().st_mode | stat.S_IEXEC)
@@ -258,10 +258,10 @@ esac
 class PreFlight(unittest.TestCase):
     def run_script(self, script, env):
         with tempfile.TemporaryDirectory() as d:
-            fake_bin(d, "gcloud", GCLOUD)
-            fake_bin(d, "aws", AWS)
+            standin_bin(d, "gcloud", GCLOUD)
+            standin_bin(d, "aws", AWS)
             for tool in ("eksctl", "kubectl", "helm"):          # the pre-flight stops before any of them is reached
-                fake_bin(d, tool, f'echo "{tool} reached" >&2; exit 9\n')
+                standin_bin(d, tool, f'echo "{tool} reached" >&2; exit 9\n')
             e = dict(CLEAN, PATH=f"{d}:{os.environ['PATH']}", REP="1", PREFLIGHT_ONLY="1", GCP_PROJECT="p",
                      ASKED=str(Path(d) / "asked"), **env)
             out = subprocess.run(["bash", str(ROOT / "scripts" / script)], env=e, capture_output=True, text=True, cwd=d)

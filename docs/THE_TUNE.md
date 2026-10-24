@@ -8,7 +8,7 @@ benchmarks prove one engine at one tune, and every page must say that turning an
 direction. The main engine's tune is not a guess: it is the tune found, by measuring every gauge across the knobs, to serve the
 organism best, read against native and against every tune tried. This page states both and formalizes the second. Its
 rule is in code (`tools/tune_study.py`, tested by `tests/test_tune_study.py`); its first search runs in our own models
-(evidence class S) and is read on its own page in `results/toy_gate/` when it finishes. Run and scored by The Omni-Compass LLC's own code.
+(evidence class S) and is read on its own page in `results/model_gate/` when it finishes. Run and scored by The Omni-Compass LLC's own code.
 No outside party has reviewed or approved these results.
 
 ## 1. Two things, never one
@@ -85,8 +85,8 @@ LOSS on none.
 3. Power given is shown, never minimized by the max. In a cloud the bill is a service aim, so a tune that raises it is not
    admissible there.
 4. The search runs on development seeds and never on the seeds a version is judged on. A tune that dominates the factory tune is
-   only a candidate: it is read in the toy gate on the untouched seeds 1 to 8 against the engine that stands
-   (`tools/toy_gate.py`), lands as the next version only where it reads no LOSS there against that engine and against native,
+   only a candidate: it is read in the model gate on the untouched seeds 1 to 8 against the engine that stands
+   (`tools/model_gate.py`), lands as the next version only where it reads no LOSS there against that engine and against native,
    and is then run three times on every benchmark. Picking the best of many tunes on one set of seeds and reading it again on
    another is what keeps a lucky draw from being shipped.
 5. A real benchmark reads the tune that ran. A tune found best in the models is a promise to test, never a result before its
@@ -94,7 +94,7 @@ LOSS on none.
 
 ## 3. The rule in the code
 
-`tools/tune_study.py` runs every tune of a declared grid on the toy's plant that moves every 5 s (`tools/toy_gate.py`, whose
+`tools/tune_study.py` runs every tune of a declared grid on the model's plant that moves every 5 s (`tools/model_gate.py`, whose
 worker passes any of the governor's own arguments through `--ctl`), keeps every job's reading so a stopped search resumes,
 and applies the rule of section 2 in `judge()`: `admissible`, `dominates_main`, the rank by F, and `stands`. Its tests hold the
 rule on readings built for the purpose: a tune with any LOSS against native is not admissible; in a cloud a bigger bill is
@@ -110,22 +110,22 @@ preregistered seeds were never read by either search.
 
 ## 4. The first search (written before its run, 22 October, evening)
 
-- **Engine.** omni-v17 (digest `7c937d09e4031cc7`), the Kubernetes governor in the toy cluster.
+- **Engine.** omni-v17 (digest `7c937d09e4031cc7`), the Kubernetes governor in the model cluster.
 - **Settings.** The kind benchmark's (the compass law at the max, every autoscaler sensed) and the cloud's (the compass law at the
   tune-down, the machines alone), each on the plant that moves every 5 s.
 - **Knobs and values.** The beat P ∈ {15, 30, 60, 75, 90, 120} s; the compass's balance point c ∈ {0.2, 0.3, 0.4} in the kind
   setting and {0.3, 0.4, 0.5} in the cloud's: eighteen tunes in each setting, the factory tune among them (60 s; 0.3 and 0.4).
-  The beats 5 and 10 s were read in the ladder (`results/toy_gate/V17_LADDER.md`): in the kind setting they read the minutes
+  The beats 5 and 10 s were read in the ladder (`results/model_gate/V17_LADDER.md`): in the kind setting they read the minutes
   over the line 18.4% lower than 60 s and the autoscaler's shortfall 5.8% and 6.0% lower (GAIN) for 3.5 and 2.2 times its
   processor, and the pods waiting for a place LOSS against native as every beat does; in the cloud's setting no service gauge
   reads GAIN against 60 s. They are left out of this first grid for its running time (a modelled day at 5 s takes about three
   times as long as at 60 s) and join the second search.
 - **Seeds.** 101 to 108, one day each, native on the same seeds; the gate's seeds 1 to 8 are kept for the reading on untouched seeds.
-- **Gauges.** The toy's: machine-hours, energy per core-hour, the pods waiting for a place, the autoscaler's shortfall, the 95th
+- **Gauges.** The model's: machine-hours, energy per core-hour, the pods waiting for a place, the autoscaler's shortfall, the 95th
   percentile, the minutes over the line. Jₛ: the pods waiting, the 95th percentile, the minutes over the line and the
   autoscaler's shortfall; in the cloud's setting the machine-hours as well.
-- **Outcome.** Its own page in `results/toy_gate/`, written by `tools/tune_study.py --judge`: each tune admissible or not, dominating the factory tune or not, the rank,
-  and whether the factory tune stands in each setting. A dominating tune goes to the toy gate on seeds 1 to 8; a factory
+- **Outcome.** Its own page in `results/model_gate/`, written by `tools/tune_study.py --judge`: each tune admissible or not, dominating the factory tune or not, the rank,
+  and whether the factory tune stands in each setting. A dominating tune goes to the model gate on seeds 1 to 8; a factory
   tune that is not admissible is root-caused like any LOSS. The founder is told what it read either way.
 - **Next searches, in the same rule.** The cruise wait and the trial's length and allowance; the dwell and the wait after an
   addition counted in readings that agree rather than in seconds at the fast beats (the live-engine session's finding of
@@ -148,7 +148,7 @@ the engine version, configuration, hardware or model, workload and measurement b
 | Governing engine | The executable mathematical rules that transform observations and internal state into governing decisions. | the fingerprinted files of the engine that stands (`OMNI_V18.json`, `tools/omni_version.py`) |
 | Native baseline | The system's documented configuration and behavior without Omni-Compass governing it. | each benchmark's native arm, as its project ships it |
 | Factory profile | The complete, versioned set of Omni-Compass default settings shipped together. | θ*, sections 1 and 2: the engine's defaults and `realms/muscle_cards_v5.csv` |
-| Candidate profile | A proposed combination of settings undergoing evaluation. | a tune of the search grid (`tools/tune_study.py`) or a candidate engine in the toy gate (`tools/toy_gate.py`) |
+| Candidate profile | A proposed combination of settings undergoing evaluation. | a tune of the search grid (`tools/tune_study.py`) or a candidate engine in the model gate (`tools/model_gate.py`) |
 | Active profile | The settings actually governing the current run. | the governor's own audit of its arguments; the live engine's bench line (section 1 of the page's wall) |
 | Custom profile | An identifiable configuration differing from the released factory profile. | any knob turned on the bench or set on the control panel (`tools/omni_control.py`) |
 | Live tuning bench | The interface that operates the engine's controls and displays their effects through the connected backend. | `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` with `tools/omni_control.py` |

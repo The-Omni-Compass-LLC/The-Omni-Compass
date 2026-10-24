@@ -1326,7 +1326,7 @@ read as before.
 - **The governor.** The governor (`omni_controller/controller.py`, an engine file of omni-v11) counts its machines by the
   recorder's old rule. Under the add-on's mark on every worker it reads no machine in service and holds; omni-v11 makes that
   hold safe, but the governor is blind there. Counting such a worker in service in the governor changes the engine. That is
-  the next version's work, through the toy gate, after the founder is told; this amendment does not touch it.
+  the next version's work, through the model gate, after the founder is told; this amendment does not touch it.
 - **Run again.** The CruiseKube test runs again, A, B and C, on the corrected recorder (`scripts/reruns.txt`, block of
   19 October). The three-run table pools only runs of one recorder.
 

@@ -214,7 +214,7 @@ class PaceArms(unittest.TestCase):
         p95 = "response time (ms), 95th percentile"
         level = {"native": 300.0, "compass": 200.0, "compass15": 190.0, "compass10": 185.0, "compass5": 188.0}
 
-        def fake(d):
+        def standin(d):
             arm, rep = d.name.split("-")[1], int(d.name.split("-")[2])
             g = {k: 0.0 for k in LR.KEYS}
             g[p95] = level[arm] + rep
@@ -225,7 +225,7 @@ class PaceArms(unittest.TestCase):
                 d = t / f"bench-{arm}-{r}"; d.mkdir(); (d / "capture.csv").write_text("x\n")
         old = LR.arm_gauges
         try:
-            LR.arm_gauges = fake
+            LR.arm_gauges = standin
             LR.main(str(t))
         finally:
             LR.arm_gauges = old
@@ -239,7 +239,7 @@ class PaceArms(unittest.TestCase):
         for r in (1, 2, 3):                                   # the compass arm's own beat, as its runs wrote it, names its default
             (t / f"bench-compass-{r}" / "omni_interval.txt").write_text("90\n")
         try:
-            LR.arm_gauges = fake
+            LR.arm_gauges = standin
             LR.main(str(t))
         finally:
             LR.arm_gauges = old

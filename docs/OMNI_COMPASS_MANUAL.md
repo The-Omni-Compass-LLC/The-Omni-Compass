@@ -1128,7 +1128,7 @@ writes the snapshot back on stop and reads it back; a restore that does not read
 silent success. The same five lines are implemented for Kubernetes objects (annotations hold the snapshot on the object
 itself, so a watchdog can restore from the object without the governor's memory), for `nvidia-smi`, for PgBouncer's
 console, for Redis's `CONFIG SET`, for the consumer group and for the simulators' knobs. An adapter written for a new
-muscle keeps the same five lines, and is proved against a fake device of that muscle before it is pointed at a real one.
+muscle keeps the same five lines, and is proved against a stand-in device of that muscle before it is pointed at a real one.
 
 ### 4.3 Power-up order
 
@@ -1509,7 +1509,7 @@ It runs as non-root, with a read-only root filesystem and no Linux capabilities.
 
 What `verify.py` checks is worth knowing before it is run, because its last line, `VERIFICATION: PASS` or `FAIL`, is the
 only thing an installer has to read. It runs every test in the repository (the plugs, the readings rule, every stack's
-harness against a fake server), checks every fingerprinted file of the engine against its registry so that a changed file
+harness against a stand-in server), checks every fingerprinted file of the engine against its registry so that a changed file
 fails before anything is installed, compares the release's files with its manifest, and checks that every path the
 documents name exists. It takes a few minutes on a laptop and needs no network beyond the clone. GitHub runs the same
 script on every push under Python 3.12, and each run is listed under the repository's Actions tab with the commit it

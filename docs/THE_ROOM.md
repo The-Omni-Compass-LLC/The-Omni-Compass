@@ -52,7 +52,7 @@ in the gauge's own direction of aim. Two statements follow from the definitions 
 | **GAIN** | r > 0 and the law took some of its worth | holds it; the next version asks whether more of the worth is reachable |
 | **EVEN, at its limit on native** | r = 0: native is at the wall of the band | reads the knob and leaves it native; nothing can be gained here by any law |
 | **EVEN, the same as native** | r > 0 but the law took none of its worth | the room exists and is not taken: this is the room to reverse-engineer (section 5) |
-| **LOSS** | a limit was crossed or a wire is wrong | root-caused and fixed, through the toy gate, as the next version; never carried |
+| **LOSS** | a limit was crossed or a wire is wrong | root-caused and fixed, through the model gate, as the next version; never carried |
 
 ## 4. What the catalog reads today, by this law
 
@@ -95,7 +95,7 @@ first work of section 5.
      shave it.
    - **12 are batteries' power knobs**: the governor writes (27 a run) and the misses fall 0.11 points, inside the noise.
      Room taken, worth too small to read at this size; the lever itself is the question (section 5.3 for a bigger store).
-   Each answer is a change to the engine, to a muscle card or to a muscle of our own, through the toy gate, as the next
+   Each answer is a change to the engine, to a muscle card or to a muscle of our own, through the model gate, as the next
    version.
 3. **Omni-Compass's own muscles, where the wall is the design.** Where a family's wall is the vendor's design and not the
    physics, the muscle is rebuilt from its published mechanism with the wall as a dial and the compass law inside it

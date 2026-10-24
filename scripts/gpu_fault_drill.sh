@@ -12,7 +12,7 @@
 #               until the switch is on again
 #   3 blind     the response-time feed stops (the workload is paused); the governor must fail up (ceiling to the top,
 #               the lid to the start) within its next decisions
-# Usage: sudo OUT=results/gpu/drill-STAMP bash scripts/gpu_fault_drill.sh   (SIM=1 with tests/fake_gpu for a dry run)
+# Usage: sudo OUT=results/gpu/drill-STAMP bash scripts/gpu_fault_drill.sh   (SIM=1 with tests/standin_gpu for a dry run)
 set -uo pipefail
 cd "$(dirname "$0")/.."
 SMI="${NVIDIA_SMI:-nvidia-smi}"; PY="${PYTHON:-python3}"; GPU="${GPU:-0}"; OUT="${OUT:?set OUT}"

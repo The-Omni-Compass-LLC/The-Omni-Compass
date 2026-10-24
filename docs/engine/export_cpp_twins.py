@@ -12,7 +12,7 @@ rebuild of the page, on the checkout the page is built from, with the C++ compil
   twins      every twin's own parity check (the tests verify.py runs): the Python and the C++ on the same seeded inputs,
              the number of cases and the largest difference
   live       every compass law the page's own runs used while the page was built (the shipped Kubernetes controller on
-             the toy cluster, the GPU card, any other run that wires the law), each law's readings, in the order they came,
+             the model cluster, the GPU card, any other run that wires the law), each law's readings, in the order they came,
              with the band's center, cushion and push as they stood at each reading, fed through the C++ law
              (cpp/src/compass_law.cpp) and through the Python again; the force, position and velocity compared with the
              run's own, decision by decision

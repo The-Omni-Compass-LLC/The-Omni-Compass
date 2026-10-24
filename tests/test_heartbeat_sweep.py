@@ -17,8 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import heartbeat_sweep as HS  # noqa: E402
 
-RUNS = ROOT / "results" / "toy_gate" / "HEARTBEAT_SWEEP_RUNS.jsonl"
-MD = ROOT / "results" / "toy_gate" / "HEARTBEAT_SWEEP.md"
+RUNS = ROOT / "results" / "model_gate" / "HEARTBEAT_SWEEP_RUNS.jsonl"
+MD = ROOT / "results" / "model_gate" / "HEARTBEAT_SWEEP.md"
 
 
 class HeartbeatSweep(unittest.TestCase):

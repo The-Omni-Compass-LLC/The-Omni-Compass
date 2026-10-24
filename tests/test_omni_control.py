@@ -11,13 +11,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 import tools.omni_control as C
 
-FAKE = textwrap.dedent(f"""
+STANDIN = textwrap.dedent(f"""
     import json, os, sys, time
     sys.path.insert(0, {str(ROOT)!r})
     from omnicompass import master
     args = sys.argv[1:]
     kill = args[args.index("--kill-file") + 1]
-    out = os.environ["FAKE_OUT"]
+    out = os.environ["STANDIN_OUT"]
     with open(out, "a") as f:
         f.write(json.dumps({{"start": args}}) + "\\n")
     while True:
@@ -32,15 +32,15 @@ FAKE = textwrap.dedent(f"""
 class Panel(unittest.TestCase):
     def setUp(self):
         self.d = Path(tempfile.mkdtemp())
-        self.env = {k: os.environ.get(k) for k in ("OMNI_MASTER_OFF", "OMNI_REGISTRY", "FAKE_OUT")}
+        self.env = {k: os.environ.get(k) for k in ("OMNI_MASTER_OFF", "OMNI_REGISTRY", "STANDIN_OUT")}
         os.environ["OMNI_MASTER_OFF"] = str(self.d / "switch" / "OFF")
         os.environ["OMNI_REGISTRY"] = str(self.d / "switch" / "running")
-        os.environ["FAKE_OUT"] = str(self.d / "fake.jsonl")
-        (self.d / "fake.py").write_text(FAKE)
+        os.environ["STANDIN_OUT"] = str(self.d / "standin.jsonl")
+        (self.d / "standin.py").write_text(STANDIN)
         self.tokens = self.d / "tokens.json"
         self.tok = {n: C.make_token(self.tokens, n, r) for n, r in
                     (("vera", ["viewer"]), ("otto", ["operator"]), ("sam", ["security"]), ("sue", ["security"]))}
-        self.panel = C.Panel([sys.executable, str(self.d / "fake.py")], self.d / "panel.kill", self.d / "state.json",
+        self.panel = C.Panel([sys.executable, str(self.d / "standin.py")], self.d / "panel.kill", self.d / "state.json",
                              self.d / "control.jsonl", handback_s=10)
         self.srv = C.server(self.panel, self.tokens, "127.0.0.1", 0)
         threading.Thread(target=self.srv.serve_forever, daemon=True).start()
@@ -70,7 +70,7 @@ class Panel(unittest.TestCase):
             return e.code, json.loads(e.read().decode())
 
     def starts(self):
-        p = Path(os.environ["FAKE_OUT"])
+        p = Path(os.environ["STANDIN_OUT"])
         return [json.loads(x) for x in p.read_text().splitlines()] if p.exists() else []
 
     def test_reads_need_a_token_and_the_console_and_document_do_not(self):

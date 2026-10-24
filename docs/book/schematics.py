@@ -103,7 +103,7 @@ FIGURES = {
     "f_release_gate": "Flowchart: the release gate, reasons 1 to 5",
     "f_release_gate_b": "Flowchart: the release gate, reasons 6 to 9 and the release",
     "f_stops": "Flowchart: the three ways a governor stops",
-    "f_toy_gate": "Flowchart: the toy gate before any engine change runs for real",
+    "f_model_gate": "Flowchart: the model gate before any engine change runs for real",
     "f_reading": "Flowchart: the three-run reading rule, a change of 0.5% or more a change",
     "f_park": "Flowchart: parking and waking a machine in the cloud",
     "f_conductor": "Flowchart: one tick of the grid conductor",
@@ -990,9 +990,9 @@ def f_stops():
                  w=6.2, side_w=4.6)
 
 
-def f_toy_gate():
+def f_model_gate():
     return chart([("start", "a change to a rule, a gain, a guard, a preset or a muscle"),
-                  ("box", "tools/toy_gate.py: the change against the engine that stands, our own models, the same seeds, paired (class S)"),
+                  ("box", "tools/model_gate.py: the change against the engine that stands, our own models, the same seeds, paired (class S)"),
                   ("decision", "any LOSS by the gauge's aim?"),
                   ("decision", "promise shown (GAIN somewhere, EVEN elsewhere)?"),
                   ("box", "its GitHub trials: A, B and C on the real stacks"),

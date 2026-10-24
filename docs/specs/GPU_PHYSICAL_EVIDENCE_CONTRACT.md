@@ -69,7 +69,7 @@ Each repetition must contain all three arms. Each arm preserves sampled GPU tele
 `tools/validate_gpu_physical_evidence.py RUN_DIR` validates this structure and provenance after the run. It does not replace `tools/gpu_reps.py`, which applies the preregistered statistical rules.
 
 ## Claims boundary
-Before a qualifying hardware folder exists, the correct status is **PHYSICAL GPU EVIDENCE OPEN**. Harness readiness, fake-device tests, simulation, C++ parity and Kubernetes tests do not satisfy this contract.
+Before a qualifying hardware folder exists, the correct status is **PHYSICAL GPU EVIDENCE OPEN**. Harness readiness, stand-in-device tests, simulation, C++ parity and Kubernetes tests do not satisfy this contract.
 
 ---
 ## CURRENT RELEASE SYNCHRONIZATION — XPASS25

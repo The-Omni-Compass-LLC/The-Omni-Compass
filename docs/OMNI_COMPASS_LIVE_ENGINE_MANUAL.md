@@ -222,7 +222,7 @@ chooses a record is marked **RECORDED**. Every number carries its evidence class
    three-run table on it names its own engine, and a table stands on an older engine only until its runs on the engine that
    stands land.
 6. **Models are not proof.** Every view says its evidence class. The official Kubernetes and database runs are class L, played
-   from their own checked files. The harness, the shipped controller on the toy cluster, the GPU card, the Linux host, the
+   from their own checked files. The harness, the shipped controller on the model cluster, the GPU card, the Linux host, the
    realms table and the grid are class S, our own models, shown beside the real runs and never presented as proof.
 7. **Do no harm, in its one meaning.** Every knob on the console acts on both sides alike; what Omni-Compass does with it is
    held by its guards: no muscle driven below native or past its own limit, nothing taken from one muscle to give to another
@@ -288,7 +288,7 @@ record played back in motion, native beside Omni-Compass, with the governor's ow
 moves on two tickers side by side, so the mechanism is seen, not inferred.
 
 **What the page is made of.** Four exporters build its records on the engine that stands: the realms harness (one organism and
-each muscle alone; `docs/engine/export_harness_trace.py`), the shipped controller on the toy cluster (on top of the
+each muscle alone; `docs/engine/export_harness_trace.py`), the shipped controller on the model cluster (on top of the
 autoscaler at the max, and in the cloud's setting; `docs/engine/export_controller_trace.py`), the official runs read back from
 their raw files and scored again by the repository's own scorer (`docs/engine/export_runs.py`, `tools/live_reps.py`), and the
 chip and host models with every judged row of the newest receipts (`docs/engine/export_scenarios.py`). A fifth record is the
@@ -402,9 +402,9 @@ The page carries five kinds of record, and every monitor says which it plays.
 | Record | Made by | What it holds | Class |
 |---|---|---|---|
 | The harness | `docs/engine/export_harness_trace.py` | the realms harness (`realms/harness.py`, the max of `realms/compass_arm_v5.py` with the bone, the twins and the immune system): one organism of sixty muscles, and each muscle alone, native and with Omni-Compass on top, decision by decision | S |
-| The controller | `docs/engine/export_controller_trace.py` | the shipped Kubernetes governor (`omni_controller/controller.py`) on the toy cluster, on top of the autoscaler at the max and in the cloud's setting, every tick and every audited decision, runs A, B and C of six hours | S |
+| The controller | `docs/engine/export_controller_trace.py` | the shipped Kubernetes governor (`omni_controller/controller.py`) on the model cluster, on top of the autoscaler at the max and in the cloud's setting, every tick and every audited decision, runs A, B and C of six hours | S |
 | The runs | `docs/engine/export_runs.py` | the official runs as recorded: every three-run table's runs A, B and C read back from their raw files, every file's SHA-256 matched against the run's own list, every Kubernetes repetition scored by `tools/live_reps.py` and checked against the run's result | L |
-| The scenarios | `docs/engine/export_scenarios.py` | the GPU card (`realms/gpu_card.py`), the Linux host (the conveyance of `tools/toy_gate.py`), every muscle and organism of the realms table (`results/realms_v5`), and every judged row of the newest engine's receipts (`results/live/V13_*.md` as they land) | S, with the receipts' own classes |
+| The scenarios | `docs/engine/export_scenarios.py` | the GPU card (`realms/gpu_card.py`), the Linux host (the conveyance of `tools/model_gate.py`), every muscle and organism of the realms table (`results/realms_v5`), and every judged row of the newest engine's receipts (`results/live/V13_*.md` as they land) | S, with the receipts' own classes |
 | The build | `docs/engine/build_live_engine.py` | the engine, its digest and the commit; the time; GitHub's runs in progress and queued; every run started for the chips and the clouds (`docs/engine/github_ledger.json`) | the record of the build |
 
 ### 1.3 What runs live
@@ -1096,7 +1096,7 @@ Each provider's four sets (the steady set, the bursts `1 4 1 6 1 9` and
 `1 6 1 8 1 6`, the real day of Google 2011 on 1 to 9) and their status: measured to the end (engine, run, started), stopped
 before a result, or now. Then every cloud run GitHub has started, set by set; the bill on Azure run by run (machine-hours
 billed native · Omni-Compass; the bill; the 95th percentile; the failed requests), each with the engine it ran on; and the
-shipped controller in the cloud setting, live: native's machines against Omni-Compass's on the repository's toy cluster (class
+shipped controller in the cloud setting, live: native's machines against Omni-Compass's on the repository's model cluster (class
 S), the cloud's own autoscaler running in both arms, its run and speed following the console's clock. Until a provider's
 first set lands, its bill monitor shows the same mechanism live: the machines billed (in service and booting) of native and of
 Omni-Compass on the cloud setting's model, decision by decision, marked class S and never that cloud's bill, which arrives with
@@ -1238,8 +1238,8 @@ whisker the 95% interval. A fall cannot pass −100%, so an interval reaching pa
 print it whole. The beat chosen is framed, and a cursor reads the beats in turn and names the row it holds.
 
 Every number is our own model (evidence class S), never a benchmark result. The shipped controller of each engine runs on the
-toy cluster's 5-second plant, eight seeds of a day each, paired by seed and read by the toy gate's own rule
-(`tools/heartbeat_sweep.py`; the record, `results/toy_gate/HEARTBEAT_SWEEP.md`). Every beat on this monitor is read in
+model cluster's 5-second plant, eight seeds of a day each, paired by seed and read by the model gate's own rule
+(`tools/heartbeat_sweep.py`; the record, `results/model_gate/HEARTBEAT_SWEEP.md`). Every beat on this monitor is read in
 the model only: a real run reads the one beat it was started with, the governor's `--interval`, and the gauges
 `omni_decisions_total` and `omni_own_cpu_cores` of `tools/omni_exporter.py` show the beat it runs at and what it costs.
 
@@ -1297,7 +1297,7 @@ left out.
 ### 17.1 The one place the brain drives the muscles decision by decision (the page's section 4e, `#s-live`)
 
 The shipped controller,
-`omni_controller/controller.py`, on the toy cluster of `pilot/selfpilot.py`, wired as the repository wires it. Each decision
+`omni_controller/controller.py`, on the model cluster of `pilot/selfpilot.py`, wired as the repository wires it. Each decision
 runs the chain left to right: the senses, the six-state brain, the nerves and the machine organ's grant, the compass law on
 the service (the cloud setting), the verdict's trial, the release gate, the plug. Every value below the chain is the
 controller's own audit record of that decision, recorded by `docs/engine/export_controller_trace.py` on runs A, B and C (six
@@ -1469,7 +1469,7 @@ both estimates are inside the allowance).
 The Kubernetes controller measures 200 requests each side against a 2% allowance
 (`--verdict-samples 200 --allow 0.02`), the cost being each request's response time; the noise is measured at every build on
 each request of the newest tables' own runs. The GPU card measures 30 requests; in its model the card's own time per request
-carries no noise. The toy gate measures 60 (σ 0.25). Native has no trial: its knob never moves past its own setting, so there
+carries no noise. The model gate measures 60 (σ 0.25). Native has no trial: its knob never moves past its own setting, so there
 is nothing to judge; every step Omni-Compass takes past native has to pass this test first.
 
 ![Flowchart: the give-back trial. A trial starts only with the organ's grant and a clean line; it runs to its full measurement and is never ended by the calm it causes; its reading against native decides, GAIN or EVEN keeps the step, LOSS refuses it and the setting stays; the release gate then passes or holds the write. The ticker's state column reads left native until a trial starts and acting while one runs.](book/figures/f_trial.svg)
@@ -1716,7 +1716,7 @@ window and why. Three outcomes follow, and only these:
 
 | What the audit shows | What it means | What is done |
 |---|---|---|
-| a knob moved and the gauge went against its aim while the muscle stayed inside its limit | the wire or the rule is wrong for this muscle | the mechanism is corrected in the toy gate first, lands as the next engine version with no LOSS, and the benchmark runs again |
+| a knob moved and the gauge went against its aim while the muscle stayed inside its limit | the wire or the rule is wrong for this muscle | the mechanism is corrected in the model gate first, lands as the next engine version with no LOSS, and the benchmark runs again |
 | a knob moved and the muscle went past its own limit, or another muscle's room was taken | a guard did not hold | the guard is corrected (as omni-v13 did for the conveyance on a shared host) and lands the same way |
 | no knob moved, and the gauge still differs | the test machine, native's setup or the scoring | the rig or the scorer is fixed; a test machine's limit is never reported as Omni-Compass's result |
 
@@ -1741,7 +1741,7 @@ written. A reading you disagree with is taken up with the table and its runs, ne
 
 ### 31.2 Class S is not proof
 
-The harness, the shipped controller on the toy cluster, the GPU card, the Linux host, the
+The harness, the shipped controller on the model cluster, the GPU card, the Linux host, the
 realms table, the grid's modelled half and the orchestra are our own models. They show the mechanism; they do not measure a
 machine. A model's energy is not a meter's. The page says the class on every view, and the manuals say it again.
 

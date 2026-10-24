@@ -66,15 +66,15 @@ One row the table printed LOSS remains, and it is said here: in `citylearn_chall
 buildings) the monthly unevenness rose 0.11% in all three of our runs (power given by the key: a ratio of the power held), beside the bill −8.6%, the electricity bought −14.7%, carbon −11.9%, the
 daily peak −14.0% and the highest peak −2.7%, all GAIN. The score is a ratio (one minus each month's mean over its peak), and it
 rose because the energy fell faster than each month's top hours, which sit at the batteries' limit. Its repair is looked into on
-its own, in the toy gate first; v8 does not change it.
+its own, in the model gate first; v8 does not change it.
 
-## 4. The toy gate and the trial
+## 4. The model gate and the trial
 
-The change touches no Kubernetes, card or cloud controller, so the toy gate's models (`tools/toy_gate.py`) read the same on both
+The change touches no Kubernetes, card or cloud controller, so the model gate's models (`tools/model_gate.py`) read the same on both
 checkouts by construction; the gate was run all the same, omni-v8 against omni-v7 on the same seeds, and is recorded in
-`results/toy_gate/V8_VS_V7.md`: seeds 1 to 8, a day each, every gauge of every toy (the cluster at 60 s and at 15 s, conveyance
+`results/model_gate/V8_VS_V7.md`: seeds 1 to 8, a day each, every gauge of every model (the cluster at 60 s and at 15 s, conveyance
 with the quota readable and unreadable, the verdict on noisy work) identical between omni-v8 and omni-v7, to the last digit and
-in every count (steps allowed and refused, trials abandoned, machines parked, errors). The toys' readings against native are
+in every count (steps allowed and refused, trials abandoned, machines parked, errors). The models' readings against native are
 omni-v7's and stay disclosed in `docs/OMNI_V7.md`, section 6 (at a decision every 15 s the cloud setting makes pods wait longer
 than native, which is why the decision period stays 60 s). These are our own models (class S), never a benchmark result.
 

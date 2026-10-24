@@ -18,7 +18,7 @@ Kubernetes sets -998 on every pod's sandbox container.
 |---|---|
 | `CPP_BUILD.txt` | C++ engine build (Release) and CTest: 100% passed |
 | `VERIFY_FULL*.txt` | the full verification suite |
-| `NERVOUS_SYSTEM_DEMO.txt` | the live controller driven through five situations on the stand-in cluster (fake kubectl; no pods). It shows release, the latency hold, the blind-sense hold, the order-not-landed hold and the pods-first hold, each with its recorded reason. |
+| `NERVOUS_SYSTEM_DEMO.txt` | the live controller driven through five situations on the stand-in cluster (stand-in kubectl; no pods). It shows release, the latency hold, the blind-sense hold, the order-not-landed hold and the pods-first hold, each with its recorded reason. |
 
 **To run live on real Kubernetes:** `bash RUN_LIVE.sh 3` on any machine with Docker, or a `[reps]` push to GitHub.
 

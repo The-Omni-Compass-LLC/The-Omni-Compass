@@ -63,7 +63,7 @@ grades are placed here on the page's own numbering.
 **What B means here.** Every number a seat traced matches its record, and the page renders with no console error, no sideways scroll
 and no blank monitor at either width, the kill switch doing exactly what its label says: the mathematics seat recomputed seventeen, among them the Omni
 index (+4.3336% from its six category factors), the Kubernetes category (+28.65% from its nine tests), the steady test's speed ratio
-(2.8343 from the three runs' response times), the heartbeat sweep's 600 readings (0 differ from `results/toy_gate/HEARTBEAT_SWEEP.json`,
+(2.8343 from the three runs' response times), the heartbeat sweep's 600 readings (0 differ from `results/model_gate/HEARTBEAT_SWEEP.json`,
 every interval by Student t over eight seeds) and the whole organism's composition (to the last digit from `results/WHOLE_SYSTEM.json`);
 the underwriter re-tallied the executive summary's counts from the receipts with the floor as the page applies it and found them equal;
 the engine on the page is one engine (omni-v16) and its mathematics equals the Python and the C++. What held the page at B is not a
@@ -115,7 +115,7 @@ with the folds.
 | 12 | M6 | 1g | The knob column was chosen by a regular expression on the gauge's name: it contradicted the recorded cause where that cause is the rig, and asserted a knob where the cause is under investigation. | A knob is named only where the recorded cause is the governor's; the rig reads "the test machine, not the governor"; an open cause reads "no knob named: the cause is not yet established"; 1g's summary says so. |
 | 13 | M7 | 1d | A LOSS row was marked answered by another setting's tables (the vanilla scheduler by the bin-packing profile's four ways). | A row is answered only from the same setting's tables on the same gauge; otherwise its LOSS and its red stand until the engine that stands has run the benchmark three times. |
 | 14 | M8 | 5f | "The highest-value integration point", "the most valuable receipts … the same work for less power on the chip itself", before any chip has run on a fingerprinted engine. | 5f states what the chip receipts will measure, no result before its record; the superlatives are struck. |
-| 15 | M9, E1 | ii; both manuals | "found and confirmed as the best state": the word struck on 11 October, and a superlative no record carries. | "found in its own models before any real run": the toy gate reads no LOSS against the engine before; it finds no best. |
+| 15 | M9, E1 | ii; both manuals | "found and confirmed as the best state": the word struck on 11 October, and a superlative no record carries. | "found in its own models before any real run": the model gate reads no LOSS against the engine before; it finds no best. |
 | 16 | E2 | iv the key | The key gave Omni-Compass a spine, the organ every other section gives the organism. | Brain, nerves, immune system and heart; the spine stays the organism's. |
 | 17 | E4 | 2; monitor 11 | Power given "the accent" against the key's blue and the drawing's blue. | Blue, in the trading floor's text and in the registry's monitor 11. |
 | 18 | E5 | 3; 10a | Two ways a stack is bought and four ways composed in one section, with no sentence joining them. | "The composition is read four ways: the two ways a stack is bought, and two more that take its pieces alone, in the device and as a service"; 10a's item aligned. |

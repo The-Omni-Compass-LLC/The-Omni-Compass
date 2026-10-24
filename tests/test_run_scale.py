@@ -262,10 +262,10 @@ class Conductor(unittest.TestCase):
         self.assertIsNone(g.cloud_next(queue, {"t-steady": 2, "t-burst": 2}, []))
         # a run GitHub cancelled before it began is not a run: it is released again
         calls = []
-        def fake_api(path, method="GET", data=None):
+        def standin_api(path, method="GET", data=None):
             calls.append(path)
             return {"workflow_runs": [{"conclusion": "cancelled"}, {"conclusion": "success"}, {"conclusion": None}]}
-        real, g.api = g.api, fake_api
+        real, g.api = g.api, standin_api
         try:
             self.assertEqual(g.reruns_started([("A", "x", "w.yml", {})]), {"w.yml": 2})
         finally:
