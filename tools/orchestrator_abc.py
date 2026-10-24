@@ -27,12 +27,7 @@ sys.path.insert(0, str(ROOT))
 GAUGES = (("requests", "Work (requests a step)", "work"), ("p95_ms", "The 95th percentile (ms)", "wait"),
           ("machines", "Machines", "resource"), ("units", "Units", "resource"))
 PAIRS = ("Omni on native against native", "Omni direct against native", "Omni direct against Omni on native")
-NOTICE = ("© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, "
-          "commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a "
-          "signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries "
-          "this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` "
-          "All patents, copyrights and trademarks filed in the USA. "
-          "www.omni-compass.com")
+from tools.legal import NOTICE, TOP  # noqa: E402  the notice is written once, in tools/legal.py
 
 
 AIMS = {"work": "higher", "wait": "lower", "resource": "spent"}    # the key's aims (tools/readings.py)
@@ -93,7 +88,7 @@ def build(summaries: dict, run_ids: dict, commit: str) -> dict:
 
 
 def page(rec: dict) -> str:
-    out = [f"# Omni direct's three arms: three runs on GitHub's machines\n", f"> {NOTICE}\n",
+    out = [f"# Omni direct's three arms: three runs on GitHub's machines\n", f"> {TOP}\n",
            f"{rec['what']}. Commit `{rec['commit'][:12]}`, engine {rec['engine']}; runs A {rec['runs']['A']}, B {rec['runs']['B']}, "
            f"C {rec['runs']['C']} (their files on the branch `raw`, `run-<id>/`). Native is Kubernetes' published autoscaling rule on "
            "the muscles, written by us; Omni on native is Omni-Compass on top of that rule; Omni direct is Omni-Compass alone on the "

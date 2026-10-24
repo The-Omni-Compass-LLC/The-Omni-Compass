@@ -222,7 +222,7 @@ def main(argv):
                 if not check:
                     md.write_text(with_note(new_text))
     print(f"reread: {total} readings {'differ from' if check else 'read again by'} the rule that stands, in {tables} tables")
-    return 1 if check and total else 0
+    return 1 if check and (total or tables) else 0      # a page whose text would change fails too, readings or not
 
 
 if __name__ == "__main__":
