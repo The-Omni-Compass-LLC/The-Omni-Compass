@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -228,6 +229,50 @@ def terminate(a) -> int:
     return 0
 
 
+PEM = re.compile(r"(-----BEGIN ([A-Z0-9 ]+)-----)(.*?)(-----END \2-----)", re.S)
+
+
+def fix_key(text: str) -> str:
+    """The stored private key as ssh-keygen reads it: carriage returns dropped, anything pasted before its first line dropped,
+    and, where its line breaks were lost on the way in (the whole key on one line, or breaks turned into spaces), the body
+    wrapped again at the width its form uses (64 for PEM, 70 for OpenSSH). A text that is not a key is returned as it was."""
+    t = text.replace("\r", "").strip()
+    i = t.find("-----BEGIN ")
+    if i > 0:
+        t = t[i:]
+    m = PEM.match(t)
+    if not m or any(":" in ln for ln in m.group(3).splitlines()):     # not a key, or an encrypted PEM's header lines
+        return t + "\n"
+    body = re.sub(r"\s+", "", m.group(3))
+    width = 70 if "OPENSSH" in m.group(2) else 64
+    return "\n".join([m.group(1), *(body[k:k + width] for k in range(0, len(body), width)), m.group(4)]) + "\n"
+
+
+def key_shape(text: str) -> str:
+    """What a stored text that ssh-keygen cannot read looks like, from its outline alone: its size and lines, which form its
+    first line names, whether it ends, and whether it is something else (a public key, the API key, a passphrase-locked
+    key). Never a character of the key."""
+    t = text.replace("\r", "").strip()
+    lines = t.splitlines()
+    size = f"{len(t)} characters on {len(lines)} line{'s' if len(lines) != 1 else ''}"
+    if not t:
+        return "it is empty"
+    if t.startswith(("ssh-rsa ", "ssh-ed25519 ", "ecdsa-sha2-", "sk-ssh-", "sk-ecdsa-")):
+        return (f"it holds a public key ({size}), the line Lambda shows on its SSH keys page: GitHub needs the other half, the "
+                "file downloaded when the key was made")
+    if t.startswith("secret_") or (len(lines) == 1 and "-----" not in t and " " not in t):
+        return f"it holds one line with no key markers ({size}): an API key or a name, not the downloaded key file"
+    if "-----BEGIN " not in t:
+        return f"it holds no key's first line ({size}): open the downloaded .pem file and copy all of it"
+    if "ENCRYPTED" in t:
+        return f"it holds a key locked with a passphrase ({size}): make a new key in Lambda (it has none) and store that file"
+    if not PEM.search(t):
+        return f"it starts a key but has no matching last line ({size}): it was cut short when it was copied"
+    form = ("an OpenSSH key" if "OPENSSH" in t else "an RSA key in PEM form" if "RSA" in t else
+            "an EC key in PEM form" if "EC " in t else "a PKCS#8 key in PEM form")
+    return f"it is {form} ({size}), whole in its outline, that ssh-keygen still cannot read: make a new key in Lambda and store that file"
+
+
 def keycheck(a) -> int:
     """The SSH key pair, checked before anything is rented: Lambda holds a key under the name, and the stored private key
     is the other half of the public key Lambda holds (ssh-keygen derives the public half; no key material is printed).
@@ -238,6 +283,11 @@ def keycheck(a) -> int:
         names = [str(k.get("name", "")) for k in keys]
         print(f"LAMBDA_SSH_KEY_NAME: Lambda holds no SSH key by that name; it holds {len(names)}: {', '.join(names) or 'none'}")
         return 7
+    raw = open(a.private_file, encoding="utf-8", errors="replace").read()
+    fixed = fix_key(raw)
+    if fixed != raw:              # written back in place, its mode kept: the key every later step uses is the same repair
+        with open(a.private_file, "w", encoding="utf-8") as fh:
+            fh.write(fixed)
     try:
         out = subprocess.run(["ssh-keygen", "-y", "-P", "", "-f", a.private_file], capture_output=True, text=True,
                              timeout=30)
@@ -245,8 +295,8 @@ def keycheck(a) -> int:
         print("ssh-keygen is not installed here: the pair is not checked")
         return 0
     if out.returncode != 0 or not out.stdout.split():
-        print("LAMBDA_SSH_PRIVATE_KEY: not a whole private key without a passphrase (ssh-keygen could not read it): store "
-              "the whole .pem file Lambda downloaded when the key was made")
+        print("LAMBDA_SSH_PRIVATE_KEY: not a whole private key without a passphrase (ssh-keygen could not read it): "
+              f"{key_shape(fixed)}; store the whole .pem file Lambda downloaded when the key was made")
         return 7
     if out.stdout.split()[:2] != str(held.get("public_key", "")).split()[:2]:
         print(f"LAMBDA_SSH_PRIVATE_KEY is not the private half of the key Lambda holds as {a.name}: store the .pem file "
@@ -271,6 +321,8 @@ def main(argv=None) -> int:
     p.set_defaults(fn=terminate)
     p = sub.add_parser("keycheck"); p.add_argument("--name", required=True); p.add_argument("--private-file", required=True)
     p.set_defaults(fn=keycheck)
+    p = sub.add_parser("fixkey", help="stdin to stdout: the stored private key repaired as keycheck repairs it")
+    p.set_defaults(fn=lambda a: sys.stdout.write(fix_key(sys.stdin.read())) and 0)
     a = ap.parse_args(argv)
     return a.fn(a)
 
