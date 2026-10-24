@@ -24,6 +24,10 @@ from scripts import dispatch_grid as grid
 from tools import cloud_key_check
 
 ROOT = Path(__file__).resolve().parents[1]
+# the environment a test hands the program, without a runner's own GITHUB_ENV and GITHUB_OUTPUT: on GitHub's runners the
+# program's masked hand-off line (and its write to the job's env file) would otherwise run inside the test, print the test
+# block on the mask line and leave it in the job's environment (24 October: main's verify failed so, never on a laptop)
+CLEAN = {k: v for k, v in os.environ.items() if k not in ("GITHUB_ENV", "GITHUB_OUTPUT")}
 SECRET = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7" * 30
 
 
@@ -74,7 +78,7 @@ class KeyShape(unittest.TestCase):
                 self.assertNotIn(SECRET[:12], bad)
 
     def test_the_program_exits_two_and_prints_no_secret(self):
-        env = dict(os.environ, GCP_CREDENTIALS=key()[:1200], GCP_PROJECT="omni-compass-123456")
+        env = dict(CLEAN, GCP_CREDENTIALS=key()[:1200], GCP_PROJECT="omni-compass-123456")
         out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py")], env=env, capture_output=True, text=True)
         self.assertEqual(out.returncode, 2)
         self.assertNotIn(SECRET[:12], out.stdout + out.stderr)
@@ -119,12 +123,12 @@ class AzureKeyShape(unittest.TestCase):
 
     def test_the_program_exits_two_and_prints_no_secret(self):
         for raw in (AZ_SECRET, az_block()[:300]):
-            env = dict(os.environ, AZURE_CREDENTIALS=raw)
+            env = dict(CLEAN, AZURE_CREDENTIALS=raw)
             out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env, capture_output=True, text=True)
             self.assertEqual(out.returncode, 2)
             self.assertNotIn(AZ_SECRET[:10], out.stdout + out.stderr)
             self.assertIn("docs/AZURE_SETUP.md", out.stdout)
-        env = dict(os.environ, AZURE_CREDENTIALS=az_block())
+        env = dict(CLEAN, AZURE_CREDENTIALS=az_block())
         out = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env, capture_output=True, text=True)
         self.assertEqual(out.returncode, 0, out.stdout)
         self.assertNotIn(AZ_SECRET[:10], out.stdout + out.stderr)
@@ -203,7 +207,7 @@ class AzureFourBoxes(unittest.TestCase):
     def test_the_program_writes_the_masked_block_for_the_login(self):
         with tempfile.TemporaryDirectory() as d:
             out = Path(d) / "env"
-            env = dict(os.environ, GITHUB_ENV=str(out), AZURE_CREDENTIALS="", AZURE_CLIENT_SECRET=AZ_SECRET, **AZ_IDS)
+            env = dict(CLEAN, GITHUB_ENV=str(out), AZURE_CREDENTIALS="", AZURE_CLIENT_SECRET=AZ_SECRET, **AZ_IDS)
             run = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"], env=env,
                                  capture_output=True, text=True)
             self.assertEqual(run.returncode, 0, run.stdout)
@@ -214,7 +218,7 @@ class AzureFourBoxes(unittest.TestCase):
             shown = [ln for ln in run.stdout.splitlines() if AZ_SECRET in ln]
             self.assertTrue(shown and all(ln.startswith("::add-mask::") for ln in shown))
             bad = subprocess.run(["python3", str(ROOT / "tools" / "cloud_key_check.py"), "azure"],
-                                 env=dict(os.environ, AZURE_CREDENTIALS="0b1c2d3e-1111-2222-3333-444455556666"),
+                                 env=dict(CLEAN, AZURE_CREDENTIALS="0b1c2d3e-1111-2222-3333-444455556666"),
                                  capture_output=True, text=True)
             self.assertEqual(bad.returncode, 2)
             self.assertIn("AZURE_CLIENT_SECRET", bad.stdout)
@@ -258,7 +262,7 @@ class PreFlight(unittest.TestCase):
             fake_bin(d, "aws", AWS)
             for tool in ("eksctl", "kubectl", "helm"):          # the pre-flight stops before any of them is reached
                 fake_bin(d, tool, f'echo "{tool} reached" >&2; exit 9\n')
-            e = dict(os.environ, PATH=f"{d}:{os.environ['PATH']}", REP="1", PREFLIGHT_ONLY="1", GCP_PROJECT="p",
+            e = dict(CLEAN, PATH=f"{d}:{os.environ['PATH']}", REP="1", PREFLIGHT_ONLY="1", GCP_PROJECT="p",
                      ASKED=str(Path(d) / "asked"), **env)
             out = subprocess.run(["bash", str(ROOT / "scripts" / script)], env=e, capture_output=True, text=True, cwd=d)
             asked = (Path(d) / "asked").read_text() if (Path(d) / "asked").exists() else ""
@@ -364,7 +368,7 @@ class ConductorGate(unittest.TestCase):
              mock.patch.object(grid, "jobs_in_flight", return_value=(0, 0, [])), \
              mock.patch.object(grid, "cloud_switch", side_effect=lambda p: "azure" not in str(p)), \
              mock.patch.object(grid.time, "sleep"), \
-             mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": os.devnull}):
+             mock.patch.dict(CLEAN, {"GITHUB_STEP_SUMMARY": os.devnull}):
             self.assertEqual(grid.main(["tick", "--ref", "main"]), 0)
         posts = [(p, d) for m, p, d in calls if m == "POST"]
         self.assertTrue(posts)
@@ -388,7 +392,7 @@ class ConductorGate(unittest.TestCase):
              mock.patch.object(grid, "jobs_in_flight", return_value=(0, 0, [])), \
              mock.patch.object(grid, "cloud_switch", side_effect=lambda p: "azure" in str(p)), \
              mock.patch.object(grid.time, "sleep"), \
-             mock.patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": os.devnull}):
+             mock.patch.dict(CLEAN, {"GITHUB_STEP_SUMMARY": os.devnull}):
             self.assertEqual(grid.main(["tick", "--ref", "main"]), 0)
         posts = [(p, d) for m, p, d in calls if m == "POST"]
         self.assertEqual([(p.split("/")[-2], d["inputs"]) for p, d in posts], [("cloud-check.yml", {"cloud": "azure"})])
