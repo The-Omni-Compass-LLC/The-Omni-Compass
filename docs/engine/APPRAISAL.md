@@ -31,14 +31,14 @@ the page carries the commit, the time and GitHub's own list of the runs running 
 `tools/omni_version.py` reads on the page and rebuilds every record on it; `--check` fails a page whose engine differs.
 
 <!-- counts: written by docs/engine/build_live_engine.py at every build; never edited by hand -->
-**The counts of the records on the page** (omni-v17, digest `7c937d09e4031cc7`), written by the build from the records it made, so a check rebuilds them exactly:
+**The counts of the records on the page** (omni-v18, digest `1cb92edb64c4391d`), written by the build from the records it made, so a check rebuilds them exactly:
 
 | What | Count |
 |---|---|
 | Three-run tables played back from their raw files (sections 5c and 5d) | 81, with 243 runs |
 | Raw files checked against their run's own `SHA256SUMS_ALL.txt` | 165,143 of 165,143 matched; 0 unmatched |
-| Receipts (every judged row of each benchmark's newest table) | 85: omni-v16 13, omni-v12 54, omni-v11 10, omni-v10 8 |
-| Omni-Compass against its native (55 tables), as the tables wrote them | 256 GAIN, 38 power given, 1231 EVEN, 7 LOSS, 1 the runs disagree, 9 the runs differ, 478 shown, 164 tuning (the page applies the floor of 0.5% at load; after it: 239 GAIN, 33 power given, 1253 EVEN, 7 LOSS, 1 the runs disagree, 9 the runs differ, 478 shown, 164 tuning) |
+| Receipts (every judged row of each benchmark's newest table) | 85: omni-v17 10, omni-v16 3, omni-v12 54, omni-v11 10, omni-v10 8 |
+| Omni-Compass against its native (55 tables), as the tables wrote them | 255 GAIN, 40 power given, 1230 EVEN, 7 LOSS, 1 the runs disagree, 9 the runs differ, 478 shown, 164 tuning (the page applies the floor of 0.5% at load; after it: 238 GAIN, 34 power given, 1253 EVEN, 7 LOSS, 1 the runs disagree, 9 the runs differ, 478 shown, 164 tuning) |
 | The orchestrators' own cost (30 four-ways tables: the orchestrator as shipped against the organism alone, and the comparisons where Omni-Compass is on the other side), never a reading of Omni-Compass | 106 GAIN, 12 power given, 417 EVEN, 103 LOSS, 1 the runs disagree, 270 shown (the page applies the floor of 0.5% at load; after it: 106 GAIN, 12 power given, 417 EVEN, 103 LOSS, 1 the runs disagree, 270 shown) |
 | LOSS rows of Omni-Compass against its native | 7: queue: job turnaround, submitted to done, mean (s) under `V12_ARMADA_4W_BARE.md` (omni-v12: +5.1% (+1.9 to +8.3), +8.9% (+4.9 to +12.9), +9.1% (+0.9 to +17.3)); queue: job turnaround, submitted to done, mean (s) under `V12_BINPACK.md` (omni-v12: +1.4% (+0.8 to +1.9), +1.0% (+0.4 to +1.7), +1.2% (+0.7 to +1.6)); pod start wait, total (s) under `V12_CRANE_4W_TOP.md` (omni-v12: +80.9% (+37.3 to +124.5), +104.5% (+46.9 to +162.2), +54.4% (+20.0 to +88.9)); response time (ms), 99th percentile under `V12_KUBERAY_4W_BARE.md` (omni-v12: +9.8% (+1.5 to +18.0), +4.4% (+0.1 to +8.7), +13.0% (+4.7 to +21.2)); batch: queue finished (s) under `V12_KUBERAY_4W_BARE.md` (omni-v12: +0.8% (+0.1 to +1.5), +0.7% (+0.2 to +1.2), +0.6% (+0.2 to +1.1)); alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) under `V12_OCM_4W_TOP.md` (omni-v12: +5.7% (+1.4 to +10.0), +6.1% (+0.8 to +11.4), +45.5% (+5.7 to +85.2)); queue: job turnaround, submitted to done, mean (s) under `V12_VANILLA.md` (omni-v12: +0.9% (+0.2 to +1.7), +0.9% (+0.1 to +1.6), +1.2% (+0.6 to +1.8)) |
 
