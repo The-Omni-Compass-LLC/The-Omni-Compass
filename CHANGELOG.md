@@ -2,6 +2,22 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (afternoon): the conductor ticks again on omni-v18
+
+- **Why no benchmark started from 07:05 UTC**: the conductor (`grid.yml`) and the grid's own jobs (`six`, `six-kube`, both
+  pools) and the capacity test fetch only some folders, and none of their lists named `omni_orchestrator/`, which omni-v18 took
+  into the fingerprint. Their engine receipt (`tools/omni_version.py`) read every fingerprinted file from the folder, met one
+  that was not there and stopped. The conductor of 02:32 UTC had started on a commit its receipt still read whole and ticked
+  for five hours (the omni-v18 campaign's B and C reruns, Azure's steady set); every successor from 07:05 failed in seconds.
+- **The fix, in the one place every workflow shares**: the version tool reads a file a partial checkout left out from the
+  index, where git keeps it; only such a file, so a file deleted by hand from a full checkout still fails
+  (`tests/test_omni_version.py`, failing on the old tool). Not an engine change: the tool is outside the fingerprint, and
+  every version reads as before.
+- **No more chain of failed conductors**: a conductor started its successor whenever it was not cancelled, so each failed one
+  started the next, about one every 15 seconds, over 1,600 runs and none ticking. Now only a conductor that ran its whole round
+  of ticks starts the next; one that fails earlier starts none, and the three-hourly schedule restarts the chain
+  (`tests/test_release_campaign.py`).
+
 ## 2026-10-24: Google and Amazon kept in, wired as Azure is, not yet run; the GPU's first card
 
 - **Google and Amazon stay, at Azure's wiring, shown as not yet run** (the founder's words: "you leave the Google and Amazon runs

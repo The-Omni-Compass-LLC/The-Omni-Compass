@@ -201,6 +201,13 @@ class ReleaseCampaign(unittest.TestCase):
             finally:
                 grid.ROOT = old
 
+    def test_a_conductor_that_failed_before_its_ticks_starts_no_successor(self):
+        # 24 October: the receipt failed in seconds on omni-v18 and each failed conductor started the next, one every 15 s
+        steps = yaml.safe_load((ROOT / '.github/workflows/grid.yml').read_text())['jobs']['tick']['steps']
+        nxt = next(s for s in steps if s.get('name', '').startswith('The next conductor'))
+        self.assertIn('success()', nxt['if'])
+        self.assertNotIn('!cancelled()', nxt['if'])
+
     def test_six_stage_burst_is_the_workflow_and_queue_default(self):
         text = (ROOT / '.github/workflows/aks-metered-full.yml').read_text()
         w = yaml.safe_load(text)

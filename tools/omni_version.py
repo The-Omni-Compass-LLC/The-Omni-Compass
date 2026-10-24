@@ -53,12 +53,20 @@ def engine_files(commit: str | None = None) -> dict[str, str]:
     # for a new version is fingerprinted before its first commit, never after)
     cmd = ["git", "ls-tree", "-r", "--name-only", ref, "--", *SCOPE] if commit else ["git", "ls-files", "--", *SCOPE]
     names = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+    # a partial checkout (a workflow's sparse checkout) leaves some engine files out of the folder while the index still
+    # holds them: those, and only those, are read from the index, so a sparse list that misses a folder a new version
+    # took in is not a crash (24 October: omni_orchestrator/ was in no grid workflow's list, and every conductor and grid
+    # run on omni-v18 stopped here); a file deleted by hand from a full checkout is still read from the folder and fails
+    outside = set() if commit else {line[2:] for line in subprocess.run(
+        ["git", "ls-files", "-t", "--", *SCOPE], cwd=ROOT, capture_output=True, text=True, check=True).stdout.splitlines()
+        if line.startswith("S ")}
     out = {}
     for n in sorted(names):
         if not n.endswith((".py", ".csv")) or "__pycache__" in n:
             continue
-        data = (subprocess.run(["git", "show", f"{ref}:{n}"], cwd=ROOT, capture_output=True, check=True).stdout
-                if commit else (ROOT / n).read_bytes())
+        data = (subprocess.run(["git", "show", f"{ref}:{n}" if commit else f":{n}"], cwd=ROOT, capture_output=True,
+                               check=True).stdout
+                if commit or n in outside else (ROOT / n).read_bytes())
         out[n] = hashlib.sha256(data).hexdigest()
     return out
 
