@@ -15,6 +15,7 @@
 # 3. smoke: 3 repetitions x 3 arms x 180 s (about 40 minutes). It checks the wiring on real hardware. It never counts;
 # 4. if smoke is valid: the preregistered counted run, 10 repetitions x 3 arms x 600 s (about 6 hours), on the same
 #    committed code (STOP_AFTER_SMOKE=1 stops after step 3), on the pinned compute-bound workload (matrix products);
+#    SKIP_CONFIRM=1 skips it, for a run of the whole stacks alone (step 8; lambda-gpu.yml, mode stacks);
 # 5. the second preregistered counted run, the same 10 x 3 x 600 s on AI token generation (the decode workload:
 #    every weight streamed from memory once per pass, batch one), about 6 hours more (SKIP_DECODE=1 skips it). Each
 #    workload is its own result, never pooled;
@@ -82,6 +83,7 @@ if [ "$smoke_rc" != 0 ]; then
 elif [ -n "${STOP_AFTER_SMOKE:-}" ]; then
   echo "smoke valid; stopping as asked (STOP_AFTER_SMOKE)."
 else
+  if [ -z "${SKIP_CONFIRM:-}" ]; then
   echo "== confirmation (preregistered: 10 repetitions, 600 s per arm, frozen code)"
   set +e
   PHASE=confirm OUT="results/gpu/run-$STAMP" bash scripts/gpu_paired.sh
@@ -90,6 +92,7 @@ else
   PACK+=("results/gpu/run-$STAMP")
   $PY -c "import json,sys; h=json.load(open(sys.argv[1])).get('headline',{}); print('RESULT, BY RULE (compute-bound):', h.get('verdict','(no verdict)'))" \
     "results/gpu/run-$STAMP/GPU_REPS.json" 2>/dev/null || echo "no table produced (exit $confirm_rc)"
+  fi
   if [ -z "${SKIP_DECODE:-}" ]; then
     echo "== second counted run: AI token generation (preregistered: 10 repetitions, 600 s per arm, frozen code)"
     set +e

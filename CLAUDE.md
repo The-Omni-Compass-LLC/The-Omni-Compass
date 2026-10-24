@@ -62,12 +62,13 @@ the founder overrides one in the conversation.
   LOSS in any pair. The three runs on GitHub's machines (full form, `results/orchestrator/V18_THREE_ARMS_ABC.md`): both Omni
   arms against native work GAIN and the 95th percentile GAIN in all three, machines EVEN, units power given or EVEN; Omni direct
   against Omni on native EVEN on every gauge; no LOSS. The toy gate against omni-v17 (`results/toy_gate/V18_VS_V17.md`) reads omni-v17's numbers on every toy (none
-  of its 55 files moved). Every benchmark runs again on it from 21:19 UTC on 23 October.
+  of its 55 files moved). Every benchmark runs again on it from 02:51 UTC on 24 October, when it reached main (a run counts only on a commit
+  that carries `OMNI_V18.json`; the runs started from 21:19 UTC on 23 October ran omni-v17's commits).
 - **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stood on main on 23 October, from the
   morning to the night, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
   decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and
   cloud run), any beat from 5 to 120 s can be set, and every beat is shown beside native with what it buys and what it costs
-  (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 1j; the real runs,
+  (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 2d; the real runs,
   `docs/PACE_PREREGISTRATION.md`, amendment 3, eight arms). The monitors scale with the beat (`omni_heartbeat_seconds`, the
   staleness alert at three beats, the control panel's `POST /v1/beat`). One fault the dial's ladder found before it landed is
   fixed in it: at 90 and 120 s the cruise wait (120 s) rounded to one decision, so one reading with a pod waiting put every
@@ -281,7 +282,10 @@ the founder overrides one in the conversation.
   machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 4 1 6 1 9`
   and `1 6 1 8 1 6`, and the real day (Google 2011) on 1 to 9, every one at the tune-down with native's cap (the founder's words of 14 October; the load generator alone
   reads a schedule, never the governor). Google Cloud and Amazon carry the same four sets from `scripts/google_queue.txt` and
-  `scripts/amazon_queue.txt`, each behind its own `switch=` line, switched on by the founder on 18 October once their secrets were in the repository
+  `scripts/amazon_queue.txt`, each behind its own `switch=` line, switched on by the founder on 18 October once their secrets were in the repository;
+  both switched off on 24 October and kept, wired as Azure's sets run, shown everywhere as not yet run (Orders of 24 October; Amazon's
+  account on the Free plan, which Amazon would not raise before the $100 credit is spent or six months pass; Google's key not yet
+  stored whole), each on again on the founder's word
   (16 October: the Azure run is the measure of the other two clouds, the same tuning, mechanism and harness). Each tick runs the conductor's newest
   code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
   paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
@@ -333,6 +337,54 @@ the founder overrides one in the conversation.
   goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in
   `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
+
+## Orders of 24 October
+
+- **Every change of 0.5% or more is a change** (the founder's words: "Any gauge that gives anything over a 0.5 percent change
+  either way is a change. I don't want to see even on shit that shows a 0.5% change up or down ... Not everything can just stay
+  even ... because it's 2-3% away. That's not even"; and "You have to interpretate the muscle and what it's doing to know if a
+  gain is a benefit or a minus is a plus"). The one key (`tools/readings.py` `three_run_reading`): the change is the mean of the
+  three runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all
+  three of our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of
+  runs beyond the noise; EVEN is kept for a mean under 0.5% (EVEN, under the floor) or no change at all; runs that moved 0.5% or
+  more in opposite directions read "the runs disagree"; a count that must never rise has no floor. Each run's own number wears
+  that run's own word. Every table was read again from its own data by `tools/reread.py` (24 October: 4,037 readings in 194
+  tables; the index's headline GAIN, up 3.4%), the toy gate reads by the same floor, and the live engine's own key with it; every toy-gate
+  record from its own seeds (`tools/toy_reread.py`), and every muscle of the catalog and the seven organisms from theirs
+  (`tools/realms_reread.py`: 123 of 2,214 labels moved; GAIN 530 muscles, more work 12, fewer misses 445, LOSS 0).
+- **The immune system catches a LOSS under Omni** (the founder's words: "the only way anything can show a real loss would be ...
+  Omni direct or native by itself. Everything else with Omni in it ... has Omni-Compass's mechanism of immune system and pathways
+  ... that should have pushed signals when something is in its in a negative state, and adjusted ... like any human body"). A
+  muscle whose own markers turn against native (pods waiting, a response over its line, failures) sends its signal to the muscle
+  that caused it, and that muscle backs off toward native: the next version's work, through the toy gate. Found the same night in
+  the governor's own audit (our models, class S): the pods that wait come from the fail-up, which drops the autoscaler's target
+  to its cover's floor at once (42% against the operator's 70%) and so asks for more pods than the machines can place; the floor
+  check then adds machines only after pods wait. The fix to build and gate: the machines first, the pods as the room appears. A
+  hold on the target while pods wait, tried first, changed nothing (the waiting does not come from that step).
+- **The live engine in the order a watcher needs it** (the founder's words of 24 October): the page, its contents and its
+  instructions laid out by importance to the operator watching the system, first to last; on every monitor of Omni on native a
+  switch that turns native off and leaves Omni direct on the organism with no other governor; live knobs, buttons and switches on
+  every muscle that can scale out, up or down, each acting on the running code; buttons that run another set of the Python's 500
+  runs (and the C++ harness's) from a new seed; and the page wired to a live governor through the control API
+  (`tools/omni_control.py`), so a system owner can hook a system up and watch and drive it from these monitors. Built the same
+  night: the page in eight parts by importance (1 watch first, 2 the three arms live and the knobs, 3 the measured effect, 4 the
+  evidence by stack, 5 the brain, 6 the failure modes, 7 the proof, 8 reference), the Live Engine Manual re-sequenced to it; the
+  native switch on all 60 monitors of Omni on native and on the console; each muscle's own knobs (a unit down or up, to its floor
+  or its top, let go); the run-again buttons were already there. The page driving a live governor through the control API is next.
+
+- **Google and Amazon kept in, wired as Azure is, shown as not yet run** (the founder's words, the same morning he had ordered
+  them taken out: "You leave the Google and Amazon runs in everywhere and just show it not ran yet, because someday, some way,
+  I'm going to have it run and put in here ... It's got to be built everywhere as a mechanism, the code, regardless if we run it
+  or not, and code it to wire it the same way that the Azure is running"). The removal of that morning was built here and never
+  pushed; it is undone whole. Every Google and Amazon workflow (`gke-metered`, `eks-metered`, `cloud-organism`), paired script,
+  queue, machine tool, setup page, $0 check, manual chapter, live page monitor and page mention stands, wired as Azure's sets run
+  today: the same harness (`scripts/kind_bench.sh` in its managed-cluster mode, the main engine's 60 s beat), the tune-down on the
+  machines alone, 100 paired repetitions a set under the preregistered stopping rule (`stop_looks`, `tools/stop_rule.py`), the $0
+  check before any set. Both queues read `switch=off`, so the conductor neither checks nor starts anything for them; every page,
+  board row and monitor reads them "not yet run". On the founder's word a queue's switch goes on (Google once its key is stored
+  whole, Amazon once its account is on the Paid plan) and its sets start behind its own check. The engine, Python and its C++
+  twin, names no cloud: the same governor runs on every one; what differs per cloud is the wire to it (the workflow, the paired
+  script, the queue and the key check), and those are what stand ready.
 
 ## Orders of 23 October
 
@@ -435,7 +487,7 @@ the founder overrides one in the conversation.
   be able to show the same 15 second beats"). omni-v17 (`docs/OMNI_V17.md`): the main engine takes its full decision every 60 s; any beat can be set
   (`--interval`, 5 to 120 s and every value between); every beat is shown beside native with what it buys (its reads of the
   cluster) and what it costs (its own processor, and every service row against native and against 60 s), in our models
-  (`results/toy_gate/V17_LADDER.md`), on the live engine page (section 1j, "The heartbeat dial") and in its real runs
+  (`results/toy_gate/V17_LADDER.md`), on the live engine page (section 2d, "The heartbeat dial") and in its real runs
   (`docs/PACE_PREREGISTRATION.md`, amendment 3: eight arms, native and 5, 15, 30, 60, 75, 90 and 120 s). The monitors scale with
   the beat: the exporter serves the beat the governor runs at (`omni_heartbeat_seconds`), the governor's Grafana screen counts the
   time since its last decision in beats, and the staleness alert fires after three beats at any setting. The engine "can always be
@@ -456,7 +508,7 @@ the founder overrides one in the conversation.
   (`tools/heartbeat_sweep.py`, our own model, class S; the record `results/toy_gate/HEARTBEAT_SWEEP.md`, written again from its
   runs by `tests/test_heartbeat_sweep.py`) reads the engine that stands and the one before it at every beat from 5 to 120 s,
   on-site and in the cloud. Each beat is read against native and against the same engine at 15 s and 60 s, with the engine's own
-  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 5c,
+  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 4c,
   after the heart) has a button for each beat, setting, engine, zero line and gauge. The factory's beat is the main engine's 60 s since omni-v17
   (the dial above); another beat is a changed tune, its receipts its own. On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in
   pods waiting (GAIN +83.5% at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power

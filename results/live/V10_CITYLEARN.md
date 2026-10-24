@@ -4,6 +4,8 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 CityLearn (University of Texas at Austin) is an independent, deterministic simulator of real buildings with its own controller (BasicRBC) and its own scores; every score is one CityLearn itself aims lower. Native is that controller; omni is the same controller with the compass law on top of its electric battery commands only (`tools/run_citylearn.py`). The same districts ran three times as separate GitHub runs on the same frozen engine. Because the simulator is deterministic, the runs must reproduce each other: a score reads **GAIN** or **LOSS in all three of our runs** when all three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill, the carbon, the peaks, the swings and the unevenness are the power the district draws and holds and the wear of moving it, so a fall is a cut, a GAIN, and a rise is **power given**; a rise in the energy not served or the time uncomfortable (the occupants' misses) is a LOSS. **EVEN, the same** when the change is under one part in a million, and **the runs differ** when they do not reproduce, which is a finding about the simulator or the harness and is said so. A district with no electric battery gets nothing from Omni (a water tank stays native), so any native/omni difference in it is CityLearn's own run-to-run variation, never an Omni result. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Districts in the run |
@@ -26,7 +28,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | ramping (swings hour to hour) (`ramping_average`) | -10.13% | -10.13% | -10.13% | **GAIN in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -2.11% | -2.11% | -2.11% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -1.32% | -1.32% | -1.32% | **GAIN in all three of our runs** |
-| distance from zero net energy (`zero_net_energy`) | +0.02% | +0.02% | +0.02% | **power given in all three of our runs** |
+| distance from zero net energy (`zero_net_energy`) | +0.02% | +0.02% | +0.02% | EVEN, under the floor (the three runs' mean 0.02%) |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
 
@@ -168,7 +170,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | ramping (swings hour to hour) (`ramping_average`) | -8.65% | -8.65% | -8.65% | **GAIN in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -3.32% | -3.32% | -3.32% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -2.30% | -2.30% | -2.30% | **GAIN in all three of our runs** |
-| distance from zero net energy (`zero_net_energy`) | -0.15% | -0.15% | -0.15% | **GAIN in all three of our runs** |
+| distance from zero net energy (`zero_net_energy`) | -0.15% | -0.15% | -0.15% | EVEN, under the floor (the three runs' mean 0.15%) |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
 
@@ -184,7 +186,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | ramping (swings hour to hour) (`ramping_average`) | -3.40% | -3.40% | -3.40% | **GAIN in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -0.88% | -0.88% | -0.88% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -0.77% | -0.77% | -0.77% | **GAIN in all three of our runs** |
-| distance from zero net energy (`zero_net_energy`) | -0.44% | -0.44% | -0.44% | **GAIN in all three of our runs** |
+| distance from zero net energy (`zero_net_energy`) | -0.44% | -0.44% | -0.44% | EVEN, under the floor (the three runs' mean 0.44%) |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
 

@@ -45,7 +45,7 @@ LIVE = ROOT / "results" / "live"
 # its reading by rule. (category, test, file, {measure: row key}, work). work: "equal" (the same fixed-rate work was sent
 # to both arms and none failed: ratio 1), "capacity" (the capacity row of that table), or None (not taken). A measure
 # counts only as its reading allows: GAIN, LOSS or power given in all three of our runs gives the geometric mean of
-# the three runs' ratios; EVEN (no difference beyond the noise, or the same) or the runs disagree gives exactly 1 (nothing
+# the three runs' ratios; EVEN (under 0.5%, or the same) or the runs disagree gives exactly 1 (nothing
 # is claimed either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
 P95 = "response time (ms), 95th percentile"
 MEAN = "response time (ms), mean"
@@ -112,7 +112,7 @@ def gmean(xs):
 
 
 def measure(row, m):
-    """One measure's ratio over the three runs, as its reading allows: the same in all three of our runs gives the geometric mean
+    """One measure's ratio over the three runs, as its reading allows: judged across our three runs (a change of 0.5% or more) gives the geometric mean
     of the runs' ratios (a LOSS, or power given, in all three of our runs counts below 1); anything else is exactly 1, nothing claimed."""
     reading = row["reading"]
     rs = [ratio(m, r["native"], r["omni"]) for r in row["runs"]]
@@ -278,11 +278,11 @@ def main():
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
          "Every number is read from the test's own newest three-run table (`results/live/V<n>_*.json`, the newest engine with all three runs, made by "
          "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
-         f"## Headline: Omni-Compass on top of native, real machines, the same in all three of our runs: **{pw(head, index_word(head, head_s))}, "
+         f"## Headline: Omni-Compass on top of native, real machines, judged across our three runs (a change of 0.5% or more): **{pw(head, index_word(head, head_s))}, "
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
-         "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
-         "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
-         "nothing inside the noise is claimed either way. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
+         "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`; the founder's order of 24 October 2026): a change "
+         "of 0.5% or more, GAIN, LOSS or power given in all three of our runs or by the mean of our three runs, counts as the "
+         "geometric mean of the runs' ratios; EVEN (under 0.5%, or the same) and runs that disagree count as exactly 1. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
          "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v18 runs land, Azure and the card as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. Each table names the engine it ran on.", "",

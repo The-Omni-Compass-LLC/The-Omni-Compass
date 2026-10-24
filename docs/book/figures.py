@@ -62,7 +62,7 @@ FIGURES = {
     "levels": "The eight levels of an installation",
     "pedal": "One pedal, no brake: the modes and the two switches",
     "organisms": "The seven organisms on the spine",
-    "readings": "The three-run rule: GAIN, EVEN, LOSS, and the runs that disagree",
+    "readings": "The three-run rule: a change of 0.5% or more is a change, EVEN under it, and the runs that disagree",
     "engine": "The engine's six states, their couplings and the control law",
     "potential": "The double well of the alignment and the cubic potential of the stress",
 }
@@ -337,16 +337,19 @@ def fig_organisms():
 
 
 def fig_readings():
-    """The three readings of tools/readings.py and the fourth case, as intervals beside the zero line."""
-    d = Drawing(W, 324)
-    z = 300.0
-    d.add(Line(z, 34, z, 292, strokeColor=NAVY, strokeWidth=1.0))
-    text(d, z, 296, "0: no change", color=NAVY, anchor="middle")
-    text(d, z - 8, 310, "the side the gauge's aim calls GAIN", color=GREEN, anchor="end")
-    text(d, z + 8, 310, "the side it calls LOSS", color=RED, anchor="start")
+    """The readings of tools/readings.py (the founder's order of 24 October 2026: a change of 0.5% or more, the mean of the
+    three runs, is a change), as three runs' intervals beside the zero line and the floor band of 0.5% either way."""
+    d = Drawing(W, 384)
+    z, fl = 300.0, 12.0                      # the zero line, and the floor's half width on this scale
+    d.add(Rect(z - fl, 34, 2 * fl, 318, fillColor=colors.Color(0.85, 0.87, 0.9), strokeColor=None))
+    d.add(Line(z, 34, z, 352, strokeColor=NAVY, strokeWidth=1.0))
+    text(d, z, 356, "0: no change; the band: under 0.5% either way", color=NAVY, anchor="middle")
+    text(d, z - 8, 370, "the side the gauge's aim calls GAIN", color=GREEN, anchor="end")
+    text(d, z + 8, 370, "the side it calls LOSS", color=RED, anchor="start")
     rows = [
-        ("GAIN in all three of our runs", [(-80, -30), (-95, -40), (-70, -20)], 254),
-        ("EVEN: no difference beyond the noise", [(-50, 15), (-70, -20), (-30, 25)], 194),
+        ("GAIN in all three of our runs", [(-80, -30), (-95, -40), (-70, -20)], 314),
+        ("GAIN by the mean: beyond the noise in 2 of 3", [(-80, -30), (-60, 20), (-75, -25)], 254),
+        ("EVEN, under the floor: the mean under 0.5%", [(-9, 7), (-6, 10), (-10, 5)], 194),
         ("LOSS in all three of our runs", [(30, 80), (45, 95), (20, 70)], 134),
         ("the runs disagree: look into the test", [(-90, -40), (30, 80), (-60, -15)], 74),
     ]

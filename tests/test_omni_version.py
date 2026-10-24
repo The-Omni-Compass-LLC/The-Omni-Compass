@@ -64,6 +64,32 @@ class Fingerprints(unittest.TestCase):
         self.assertIsNone(ov.version_of(files))
         self.assertEqual(ov.version_before(files), (None, []))
 
+    def test_a_partial_checkout_reads_the_files_it_left_out_from_git(self):
+        """A workflow's sparse checkout that leaves an engine folder out (omni_orchestrator/ in the grid's lists on omni-v18,
+        24 October) reads the same version, the left-out files from the index; a file deleted by hand from a full checkout
+        still fails, never read from git in its place."""
+        import os, shutil, subprocess, tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t")
+            for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"):
+                env.pop(k, None)
+            git = lambda *a: subprocess.run(["git", *a], cwd=repo, env=env, capture_output=True, text=True, check=True)
+            tool = lambda: subprocess.run([sys.executable, "tools/omni_version.py"], cwd=repo, env=env, capture_output=True, text=True)
+            (repo / "tools").mkdir(); shutil.copy(ROOT / "tools" / "omni_version.py", repo / "tools")
+            for n, body in (("omnicompass/law.py", "law"), ("omni_orchestrator/__init__.py", "init"), ("omni_orchestrator/brain.py", "brain")):
+                (repo / n).parent.mkdir(exist_ok=True); (repo / n).write_text(body + "\n")
+            git("init", "-q"); git("add", "-A")
+            self.assertIn("written: 3 files", subprocess.run([sys.executable, "tools/omni_version.py", "--write", "v18"], cwd=repo,
+                                                            env=env, capture_output=True, text=True, check=True).stdout)
+            git("add", "-A"); git("commit", "-q", "-m", "engine")
+            git("sparse-checkout", "set", "--no-cone", "/tools/", "/omnicompass/", "/OMNI_V18.json")
+            self.assertFalse((repo / "omni_orchestrator").exists(), "the sparse checkout leaves the folder out")
+            r = tool()
+            self.assertEqual((r.returncode, r.stdout.split()[0] if r.stdout else r.stderr), (0, "omni-v18"))
+            git("sparse-checkout", "disable"); (repo / "omni_orchestrator" / "brain.py").unlink()
+            self.assertNotEqual(tool().returncode, 0, "a file deleted from a full checkout is not read from git")
+
 
 def main():
     r = unittest.TextTestRunner(verbosity=0, stream=open("/dev/null", "w")).run(unittest.defaultTestLoader.loadTestsFromTestCase(Fingerprints))

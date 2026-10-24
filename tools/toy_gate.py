@@ -41,7 +41,8 @@ the cloud setting). The card toys read the requests served and not served, the 9
 energy and peak temperature, and the power limit's writes, moves, reversals and travel in watts.
 The candidate is read against the standing engine paired by seed: the mean change, its 95% interval over the seeds
 (Student's t), and the word by the gauge's aim (tools/readings.py): a fall in time waited, missed or over the line is a
-GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; an interval across zero is EVEN.
+GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; a mean change under 0.5% is EVEN, and
+from 0.5% up every change reads by its aim, with whether it stands beyond the seeds' noise beside it (24 October 2026).
 """
 from __future__ import annotations
 
@@ -793,22 +794,29 @@ def reading(gauge, diffs, base_vals, gauges=None):
     t = T95.get(n - 1, 2.0); lo, hi = m - t * sd / math.sqrt(n), m + t * sd / math.sqrt(n)
     if sd == 0.0:
         lo = hi = m
-    if lo <= 0.0 <= hi and not (lo == hi == 0.0):
-        word = "EVEN"
-    elif lo == hi == 0.0:
+    b = sum(base_vals) / n
+    rel = m / b if b else float("nan")
+    # the founder's order of 24 October 2026: a change of 0.5% or more (the seeds' mean) is a change, read by the gauge's aim;
+    # EVEN is kept for a change under 0.5%; whether the change stands beyond the seeds' noise is kept beside the word
+    if lo == hi == 0.0:
         word = "EVEN (identical)"
-    elif (hi < 0) == (aim == "lower"):
+    elif (b and abs(rel) < 0.005) or m == 0.0:
+        word = "EVEN"
+    elif (m < 0) == (aim == "lower"):
         word = "GAIN"
     else:
         word = "power given" if spent else "LOSS"
-    b = sum(base_vals) / n
-    return {"mean_change": m, "ci95": [lo, hi], "relative": m / b if b else float("nan"), "word": word}
+    return {"mean_change": m, "ci95": [lo, hi], "relative": rel, "word": word, "beyond_noise": not (lo <= 0.0 <= hi)}
 
 
 def render(report_path, out_md):
     """TOY_GATE.json -> a page with the notice: the toys, their gauges, the readings, the counts (class S, never a benchmark)."""
+    return render_report(json.loads(Path(report_path).read_text()), out_md)
+
+
+def render_report(r, out_md):
+    """The page of a report already in memory (tools/toy_reread.py reads a record again and renders it from here)."""
     from tools.legal import stamp
-    r = json.loads(Path(report_path).read_text())
 
     def engine(tree):
         """The engine a tree declares (tools/omni_version.py), or the tree's name where it cannot be read."""
@@ -821,8 +829,9 @@ def render(report_path, out_md):
             return out[-1].split(" (")[0] if out else Path(tree).name
         except (OSError, subprocess.SubprocessError):
             return Path(tree).name
-    base_e = engine(r["base"]) if Path(r["base"]).exists() else r["base"]
-    cand_e = engine(r["cand"]) if Path(r["cand"]).exists() else r["cand"]
+    # the engines as the page first named them, where the record keeps them (its trees are gone once the gate has run)
+    base_e = r.get("base_engine") or (engine(r["base"]) if Path(r["base"]).exists() else r["base"])
+    cand_e = r.get("cand_engine") or (engine(r["cand"]) if Path(r["cand"]).exists() else r["cand"])
     lines = ["# The toy gate: the candidate against the engine that stands, in our own models", "",
              f"Seeds {r['seeds'][0]} to {r['seeds'][-1]}, {r['days']} day each where a day is run; the standing engine "
              f"{base_e}, the candidate {cand_e}. Evidence class S, our own models: a reading here says "
@@ -882,6 +891,8 @@ def render(report_path, out_md):
                 lines.append(f"| {g} | {x['native']:.3f} | {x['base']:.3f} | {x['cand']:.3f} | {cell(x['cand_vs_base'])} | {cell(x['cand_vs_native'])} |")
             lines.append("")
     lines += ["Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.", ""]
+    if r.get("afterword"):                 # a dated correction written under the record after it ran (kept by tools/toy_reread.py)
+        lines += [r["afterword"], ""]
     Path(out_md).write_text("\n".join(stamp(lines)) + "\n")
 
 

@@ -101,7 +101,7 @@ FIGURES = {
     "f_release_gate_b": "Flowchart: the release gate, reasons 6 to 9 and the release",
     "f_stops": "Flowchart: the three ways a governor stops",
     "f_toy_gate": "Flowchart: the toy gate before any engine change runs for real",
-    "f_reading": "Flowchart: the three-run reading rule",
+    "f_reading": "Flowchart: the three-run reading rule, a change of 0.5% or more a change",
     "f_park": "Flowchart: parking and waking a machine in the cloud",
     "f_conductor": "Flowchart: one tick of the grid conductor",
     "f_trial": "Flowchart: the verdict's trial on one step, from the reference to the reading",
@@ -1001,14 +1001,16 @@ def f_toy_gate():
 
 
 def f_reading():
-    return chart([("start", "one judged row: three runs, three intervals"),
-                  ("decision", "does every interval exclude zero?"),
-                  ("decision", "do all three point the same way?"),
+    return chart([("start", "one judged row: three runs, each a change in percent of native with its 95% interval"),
+                  ("decision", "did two runs each move 0.5% or more, in opposite directions?"),
+                  ("decision", "is the mean of the three changes 0.5% or more, either way?"),
                   ("decision", "is that way the gauge's aim? (time, misses, failures: a fall; work: a rise; a resource spent: a fall is a cut)"),
+                  ("decision", "does every run's interval exclude zero, all three the same way?"),
                   ("end", "GAIN in all three of our runs")],
-                 decisions={1: ("no", "EVEN: no difference beyond the noise (with the count of runs it holds in)"),
-                            2: ("no", "the runs disagree: the test is unstable there; look into it"),
-                            3: ("no", "LOSS in all three of our runs; for a resource spent that rose, power given")},
+                 decisions={1: ("yes", "the runs disagree: the test is unstable there; look into it"),
+                            2: ("no", "EVEN, under the floor"),
+                            3: ("no", "LOSS; for a resource spent that rose, power given (in all three, or by the mean, by the next question)"),
+                            4: ("no", "GAIN by the mean of our three runs, with the count of runs beyond the noise")},
                  w=6.4, side_w=4.4)
 
 

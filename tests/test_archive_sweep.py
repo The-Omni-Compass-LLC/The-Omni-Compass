@@ -42,7 +42,8 @@ class ArchiveSweep(unittest.TestCase):
         d = yaml.safe_load(ARCHIVE.read_text())
         self.assertIn("schedule", d[True])                       # PyYAML reads the key `on` as True
         body = ARCHIVE.read_text()
-        self.assertIn('select(.conclusion != "cancelled" and .conclusion != "skipped")', body)
+        self.assertIn('select(.conclusion != "skipped")', body)       # a cancelled run with files is taken (24 October)
+        self.assertNotIn('.conclusion != "cancelled"', body)
         self.assertRegex(body, r'ARCHIVE_SINCE: "2026-10-18T16:06:00Z"')
 
     def test_a_pass_frees_the_disk_after_each_run(self):

@@ -2,6 +2,166 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-24 (night): the A100 on Lambda, omni-v18's card governor on a real card
+
+- **The receipt** (`results/gpu/run-20261024T091235Z`, Lambda workflow run 40079645681, one NVIDIA A100 SXM4 40 GB, the card's own
+  meter, ten paired repetitions of 600 s an arm, native, Omni-Compass watching only and Omni-Compass governing): every service gauge
+  EVEN (work per energy up 0.2%, the 95th percentile up 0.2%, requests served the same, none lost), the card's temperature up 1.4% to
+  1.5% (power given); wire check 7 of 7, fault drill 5 of 5. The card's own setting already holds both knobs at their top (400 W of
+  400 W, the clock unlocked to 1,410 MHz), so the factory tune's governor asked for exactly that in its 3,050 decisions and wrote
+  nothing: at its limit on native. One run; B and C, and the 8-card pooled run with its organisms at 1, 10 and 100, not yet run (no
+  8-card machine of any kind free on Lambda on 24 October).
+- **What it cost**: 6.7 hours of the one card at $1.29 an hour, and 25 minutes of a first try whose start stopped on a fault of the
+  rig (the shipped tree had no git history), given back at once.
+- **The archive bot** takes a cancelled run that handed in files (the run's start step was cancelled at its time limit while its
+  watch finished every repetition); the live engine's card monitor, the whole-system table, the register, the evidence ledger and the
+  README read the A100 run; the A10 run of 2 October stays as its own record. The whole-system table's words follow the one key that
+  stands (0.5% either way).
+
+## 2026-10-24 (late night): every muscle of the catalog and the seven organisms read again by the 0.5% rule
+
+- **The realms read by size** (`tools/realms_reread.py`, checked by `verify.py`): the runner frozen with the results labelled a
+  muscle by its intervals over the seeds alone, so a change of a thousandth of a percent clear of the noise was a GAIN and a change
+  of several percent inside it was not counted. Every muscle and organism is read again from its own seeds: the mean change of the
+  work, of the misses (against native's own share of decisions over the line) and of the time to clear a line counts from 0.5% up,
+  clear of the noise or not; the runner, its engine and its run are untouched, and the page says it was read again.
+- **What moved**: 123 of 2,214 muscle-and-load labels. Every muscle alone: GAIN 530 (527 before), of them more work 12 (33),
+  fewer misses 445 (409), the line cleared sooner 493; EVEN, the same as native 156 (159); LOSS 0. The seven organisms read GAIN
+  for fewer misses, no longer for more work: their work moved by less than 0.5%.
+## 2026-10-24 (late night): the live engine in the order the person watching needs it; a native switch on every monitor
+
+- **The page's order** (the founder's order of 24 October: "in its hierarchy of importance to the operator studying and watching
+  the systems ... first, second, third ... down to the most least important"): eight parts, as an operator's screens are laid out
+  (overview and alarms first, then the units side by side, then the detail and the diagnostics): 1 watch first (the control panel
+  and the kill switch, the status board, the wall, every LOSS row, the golden signals); 2 the three arms live and the knobs (Omni
+  direct, the organism live, the console, the heartbeat dial); 3 the measured effect; 4 the evidence by stack; 5 the brain; 6 the
+  failure modes; 7 the proof (the Python's runs, the C++ twin, the mathematics); 8 reference. Every section's anchor kept; every
+  citation of a section number on the page, in the registry, the manuals and the standing pages mapped to the new one; the 65
+  monitors renumbered in their new order of appearance (the golden signals 1 to 4, Omni direct's 5 to 8), the Grafana wall with
+  them. The Live Engine Manual re-sequenced to the page, ten parts and 33 chapters, every cross-reference mapped.
+- **The native switch** on every one of the 60 monitors that show Omni-Compass on top of native, and on the console: off, the live
+  model runs Omni direct's own rule (`omni_orchestrator/brain.py`, transposed to its sixty muscles, class S) with every native
+  controller on the Omni-Compass side switched off; a recorded run shows its Omni direct arm where one was run and says plainly
+  where none was. The key's paragraph that still said no third arm stood on the page now says where the three arms stand.
+- **Each muscle's own knobs** in its card: one unit down or up, to its floor, to its top, and let go; a hand holds the lever for 20
+  decisions, never past the muscle's own limits, then gives it back to the engine. The factory button takes every hand off.
+- **The one key everywhere a reading is made**: the page's two exporters (`export_scenarios.py`, `export_controller_trace.py`) read
+  through `tools/readings.py` instead of their own copy of the old rule; the GPU reader (`tools/gpu_reps.py`) reads 0.5% or more of
+  the base as a change, clear of the noise or not; every benchmark tool's page note and the three-arm writer say the rule from the
+  key; the two figures that draw the rule, their captions, the manuals' rule sections and the reading guide are drawn and written
+  to it; every toy-gate record read again from its own runs (`tools/toy_reread.py`); the realms runner's per-muscle labels read again
+  from their own seeds (`tools/realms_reread.py`, below).
+- **The body map** (`docs/THE_BODY.md`) and **the landscape** (`docs/LANDSCAPE.md`): every part of the organism with the file that
+  is it, what Omni-Compass can and cannot help; every product in its category and the operator's screens closest to the live
+  engine, graded on seven measures written before the grades.
+- **C++ twins**: the edge, Student's t and Omni direct's brain and room rule, each proven equal to the Python to the last bit with
+  negative controls; 15 twins sealed.
+
+## 2026-10-24 (night): every change of 0.5% or more is a change
+
+- **The key** (`tools/readings.py` `three_run_reading`, the founder's order of 24 October): the change is the mean of the three
+  runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all three of
+  our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of runs
+  beyond the noise. EVEN is kept for a mean under 0.5% or no change at all; runs that moved 0.5% or more in opposite directions
+  disagree; a count that must never rise has no floor. Each run's own number in a kind table wears that run's own word, and an
+  interval turns with its number where the word turns the number's sign.
+- **Every table read again from its own data** (`tools/reread.py`, idempotent, checked by `verify.py`): 4,037 readings in 194
+  tables; the numbers are the runs' own, only the words were read again, and each table says so under its title. The kind,
+  stack and three-arm writers read by the same rule from now on; the deterministic simulators (CityLearn, pandapower, MuJoCo, the
+  swarms) put a mean under 0.5% at EVEN, under the floor.
+- **What moved**: the index's headline reads GAIN, up 3.4% (up 4.3% before); the LOSS ledger holds 331 rows read LOSS across their
+  three runs (160 against Omni-Compass's own native, 284 of all of them on omni-v12, none on omni-v18, whose three runs have not
+  landed); the real knobs' verdicts read 4 write, 21 the operator's choice, 1 watch (9, 5 and 12 before).
+- **The toy gate and the live engine read by the same floor**: the gate's mean change across its seeds from 0.5% up reads by its
+  aim, with whether it stands beyond the seeds' noise beside it; the live engine's own key (`threeRun`, `pairedReading`) the same,
+  each run's number wearing its own word, and how firmly a word stands printed beside it.
+
+## 2026-10-24 (evening): no table stands on two engines; every LOSS row on one page
+
+- **Ten three-run tables held two engines**: `V17_KAFKA`, `V17_KAFKA_SERVICE`, `V17_PGBENCH`, `V17_REDIS`, `V17_REDIS_SERVICE`,
+  `V17_REDIS_SHIPPED`, `V17_SYSBENCH`, `V17_SYSBENCH_SHIPPED`, `V17_YCSB` and `V17_YCSB_SHIPPED` carry runs A and B on omni-v17 and
+  run C on omni-v18. Each printed its own warning, and the index, the benefit sheet and every page that picks a benchmark's newest
+  table still counted it. `tools/readings.py` `landed`, the one rule those pages read, now refuses a table whose runs ran on two
+  engines; each of those benchmarks stands on its newest table on one engine (omni-v16 for most) until its three runs on the
+  engine that stands land. The index's headline moves from GAIN, up 4.6%, to GAIN, up 4.3%.
+- **The campaign counted runs of the engine before**: omni-v18's campaign was opened at 21:19 UTC on 23 October, when the engine
+  landed on its working branch; it reached main at 02:51 UTC on 24 October. The runs started between ran omni-v17's commits and
+  counted as omni-v18's. The conductor now counts a run in the campaign only when its own commit carries the standing engine's
+  fingerprint file (`scripts/dispatch_grid.py` `on_engine`), and the campaign's start reads 02:51 UTC on 24 October
+  (`tests/test_release_campaign.py`).
+- **The LOSS ledger** (`docs/LOSS_LEDGER.md`, `tools/loss_ledger.py`, checked by `verify.py`): every row that reads LOSS in all
+  three runs, in every benchmark's newest table, placed by what its two arms are. Against Omni-Compass's own native, the readings
+  do no harm is judged by: 7 rows, all on omni-v12, each with its cause where one is written. In place of an orchestrator (the four
+  ways' VS): 14. Without Omni-Compass in one arm, or two changes at once (ORCH, BOTH): 89.
+
+## 2026-10-24 (afternoon): the conductor ticks again on omni-v18
+
+- **Why no benchmark started from 07:05 UTC**: the conductor (`grid.yml`) and the grid's own jobs (`six`, `six-kube`, both
+  pools) and the capacity test fetch only some folders, and none of their lists named `omni_orchestrator/`, which omni-v18 took
+  into the fingerprint. Their engine receipt (`tools/omni_version.py`) read every fingerprinted file from the folder, met one
+  that was not there and stopped. The conductor of 02:32 UTC had started on a commit its receipt still read whole and ticked
+  for five hours (the omni-v18 campaign's B and C reruns, Azure's steady set); every successor from 07:05 failed in seconds.
+- **The fix, in the one place every workflow shares**: the version tool reads a file a partial checkout left out from the
+  index, where git keeps it; only such a file, so a file deleted by hand from a full checkout still fails
+  (`tests/test_omni_version.py`, failing on the old tool). Not an engine change: the tool is outside the fingerprint, and
+  every version reads as before.
+- **No more chain of failed conductors**: a conductor started its successor whenever it was not cancelled, so each failed one
+  started the next, about one every 15 seconds, over 1,600 runs and none ticking. Now only a conductor that ran its whole round
+  of ticks starts the next; one that fails earlier starts none, and the three-hourly schedule restarts the chain
+  (`tests/test_release_campaign.py`).
+
+## 2026-10-24: Google and Amazon kept in, wired as Azure is, not yet run; the GPU's first card
+
+- **Google and Amazon stay, at Azure's wiring, shown as not yet run** (the founder's words: "you leave the Google and Amazon runs
+  in everywhere and just show it not ran yet, because someday, some way, I'm going to have it run ... code it to wire it the same
+  way that the Azure is running"). Earlier the same day he had ordered both taken out; the removal was built here and never
+  pushed, and is undone whole: every workflow, script, queue, setup page, check, manual chapter, live page monitor and page
+  mention stands again. Both queues read `switch=off` (Amazon's account cannot leave its Free plan before its credit is spent or
+  it is six months old; Google's key has not been stored whole), so the conductor starts no set and no hourly check for them; every
+  page and monitor reads them "not yet run", and they start on his word once the key or the plan is in.
+- **The GPU run on Lambda, its first card** (`lambda-gpu.yml`, `scripts/lambda_gpu.py`, `scripts/lambda_gpu_watch.sh`): the key
+  stored with its line breaks lost is mended before it is read, Lambda's key is found by its public half (not by its name), and
+  where the stored key is not whole the run makes its own key for itself and removes it after. The first real run (an A10) rented
+  and stopped at once: the code was shipped without its git record, which the run reads; the tree now goes with it, the token
+  stripped. Its watch would have kept the idle card to the deadline (a run cancelled by hand keeps watching, so no give-back is
+  lost): the watch now gives the card back as soon as the test stops before its last line, and the new test `giveback` gives back
+  every machine whose name starts as given (omni- names only, never one launched by hand), in its own queue. The A10 went back
+  after about 15 minutes. The A100 run that followed (40079645681) had its card up in four minutes, then its start step waited
+  on one connection to the card until the launch job's 60-minute limit cut it off; its watch took over with the card. Since
+  then every machine carries the run's number at the end of its name (-r<run id>) and both give-backs find it by that number,
+  so a launch job cut off before it hands the machine's id on still gets its machine back; the launch job's limit is 90 minutes.
+  The watch's "is the run alive?" asked pgrep for the scripts' names through ssh's own shell, whose command line holds the same
+  names, so it always read "running" and its stopped-run rule could never fire; the names are bracketed now (proved both ways),
+  every step the start makes to the machine is bounded in time, and the start says whether the run is under way. The A100 run
+  of the morning still carries the old watch: its card goes back when its run ends or at its deadline (18:12 UTC, $18 at most).
+- **main's verify on GitHub**: a cloud key test handed the program the runner's own GITHUB_ENV, so on GitHub (never on a
+  laptop) the program wrote its masked hand-off and the test failed; the tests now hand it an environment without the runner's
+  env files (proved both ways).
+
+## 2026-10-24: the clouds' keys read to the letter of their shape
+
+- **Azure runs; Amazon off** (06:17 UTC): with the four boxes filled, Azure's check passed (the key, the login, the subscription and,
+  after the allowance request of `azure-quota.yml`, the processor allowance), and the conductor started the steady set by itself.
+  Amazon told the founder its Free plan cannot be raised to the Paid plan before the $100 credit is spent or the account is six
+  months old, so scripts/amazon_queue.txt reads `switch=off`: no hourly check fails there and nothing starts until his word.
+- **Azure's login in four boxes, one value each** (the founder pasting the portal's numbers one at a time): the Azure sets and
+  Azure's $0 check sign in with `AZURE_CREDENTIALS` when it holds the whole block, or else with the block built from four boxes,
+  each holding one value as the portal shows it: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (the boxes the
+  sign-in without a password already reads) and `AZURE_CLIENT_SECRET` (or the password's value alone in `AZURE_CREDENTIALS`).
+  `tools/cloud_key_check.py azure` builds it, masks it and hands it to the login as `env.AZ_CREDS`; every failure names the box
+  and what is wrong with its shape (an empty box, an ID where the password goes, the Secret ID copied for the Value), never a
+  character of it. All nine logins with a password read it (`tests/test_cloud_check.py`); `docs/AZURE_SETUP.md` section 7a
+  gives the clicks.
+
+- **What the Azure box holds, named** (the founder's order: "if they don't run, you better dig in ... and find out why. So I can
+  fix them"): Azure's own login still works (the steady set started on 19 October signed in at its repetition 99, 02:46 UTC on 24
+  October, and carries the key it started with), while every new run reads 88 characters in `AZURE_CREDENTIALS`, the size of a
+  storage account's access key, not the block. `tools/cloud_key_check.py` now names that form, text pasted before the `{`, and
+  the outline of any other stored text (its lines, and whether it holds spaces, a web address or quotation marks), never a
+  character of it; `docs/AZURE_SETUP.md` section 7 makes the new block under a new name (`omni-compass-github-2`), so the login a
+  running set still uses is never replaced under it, and the check's message points there. The sign-in without a password was
+  refused again at 03:27 UTC (`AADSTS700213`: no trust rule in Azure names this repository as GitHub presents it; section 8).
+
 ## 2026-10-23 (night): omni-v18, Omni direct in the engine; the three arms on the live engine
 
 - **omni-v18 lands** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) on the founder's orders of the
@@ -1666,7 +1826,7 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
 - **Google's stored text, named once more.** The check of 19:12 read the 595 characters as none of the shapes known, so
   they hold characters plain base64 does not (a dot, a dash, an underscore). `tools/cloud_key_check.py` now also names a
   token or a web-safe encoded string (an access token, for one, which expires within the hour): still not the key file.
-  `docs/GOOGLE_SETUP.md` section 4 gains a new key file by clicks alone (Service Accounts, Keys, Add key, JSON), with no
+  docs/GOOGLE_SETUP.md section 4 gains a new key file by clicks alone (Service Accounts, Keys, Add key, JSON), with no
   terminal; the Operator's Manual (Appendix G) is rebuilt with it.
 - **Every workflow pinned to `ubuntu-24.04`.** GitHub announced on the runs' own pages that `ubuntu-latest` moves to
   Ubuntu 26 from 19 October. Every job (113 in 53 workflows) now names `ubuntu-24.04`, the image every run of the engine
@@ -1730,12 +1890,12 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   record. The founder's order: "fix the Google and Amazon cloud. To work".
 - **The $0 check** (`.github/workflows/cloud-check.yml`): the stored key's shape (`tools/cloud_key_check.py`: its length and
   missing parts only, never a character of it), the login, the plan, the machine type and every quota a set needs, then it
-  stops. Google's pre-flight (`scripts/gke_paired.sh`) now reads the processors in the region and in all regions (the free
+  stops. Google's pre-flight (scripts/gke_paired.sh) now reads the processors in the region and in all regions (the free
   trial's 8 is named, with the fix), the solid-state disk and the external addresses, and gives Google's own words when a
-  read is refused; Amazon's (`scripts/eks_paired.sh`) logs in first, names the Free plan when Amazon's policy denies the
+  read is refused; Amazon's (scripts/eks_paired.sh) logs in first, names the Free plan when Amazon's policy denies the
   read, and, in the check, asks Amazon for a short processor quota itself (once; never shrunk to fit). The Google workflow
   reads the key's shape before its login too. Found on the way: the Google workflow switched the project's services on with
-  a login whose roles carry no right to do so, so even a whole key would have stopped there; `scripts/gcp_services.sh` now
+  a login whose roles carry no right to do so, so even a whole key would have stopped there; scripts/gcp_services.sh now
   reads them and asks for one only when it is off, naming the fix when the login may not.
 - **The conductor waits for it** (`scripts/dispatch_grid.py`, `check_state`): a Google or Amazon set starts only after that
   cloud's newest check passed within a day; the conductor starts a check itself when there is none, the last failed an hour
@@ -1802,9 +1962,9 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
 - **Google and Amazon's first sets (18 October, 04:57)**: both clouds took their keys and spent nothing. Google's login refused
   the stored key as incomplete JSON (the key block was cut short when copied; the founder stores it again whole). Amazon's
   login worked, and its pre-flight found no machine type offered in us-east-1. That check had hidden Amazon's own reason,
-  so `scripts/eks_paired.sh` now prints AWS's error (a new account not yet verified, a region not enabled) instead of
+  so scripts/eks_paired.sh now prints AWS's error (a new account not yet verified, a region not enabled) instead of
   reading every refusal as "not offered"; the keys themselves are never printed.
-- **Google's queue paused until its key is stored whole** (`scripts/google_queue.txt`), so failed logins do not use up
+- **Google's queue paused until its key is stored whole** (scripts/google_queue.txt), so failed logins do not use up
   its A, B and C; the failed steady A is re-run in place once the key is right. Amazon stays on: its next set prints AWS's
   own reason through the repaired pre-flight.
 - **Amazon's reason, read (06:31)**: "not authorized to perform ec2:DescribeInstanceTypes with an explicit deny in a
@@ -2195,8 +2355,8 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   (`python3 tools/readings.py --fix`; `--check` fails a standing table without it).
 - **Google Cloud and Amazon on Azure's harness** (the founder's order of 16 October: the Azure run is the measure of the other
   two): `gke-metered.yml` and `eks-metered.yml` carry the replica room, the machine-family queue in their titles and
-  concurrency groups, and a secrets gate that stops a run before anything is built or billed; `scripts/google_queue.txt` and
-  `scripts/amazon_queue.txt` carry the same four sets as Azure at the same settings, behind a `switch=` line (off until the
+  concurrency groups, and a secrets gate that stops a run before anything is built or billed; scripts/google_queue.txt and
+  scripts/amazon_queue.txt carry the same four sets as Azure at the same settings, behind a `switch=` line (off until the
   secrets are in and the founder turns it on); the grid conductor (`scripts/dispatch_grid.py`) reads all three queues, one set
   at a time per machine-family queue, dispatched runs only. Nothing is rented on Google or Amazon before the switch is on.
 - **The conductor's hand-off** (`grid.yml`): when a five-hour conductor ends it starts the next unless one is already waiting;
@@ -3009,10 +3169,10 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   the founder's decision; nothing in the engine changed for it.
 - **Every cloud, the same tests**: Azure running on v5 (the 40-machine fleet, steady then burst; the whole tower and the four
   stacked at 1,000 copies on rented machines). Google and Amazon get Azure's big-machine test too: `cloud-organism`
-  (`scripts/cloud_machine.py`, `scripts/organism_detached.sh`, `scripts/cloud_machine_watch.sh`; the price and a cost
-  ceiling first, every machine labelled with its hour budget, always given back; `tests/test_cloud_machine.py`, run by
+  (scripts/cloud_machine.py, `scripts/organism_detached.sh`, scripts/cloud_machine_watch.sh; the price and a cost
+  ceiling first, every machine labelled with its hour budget, always given back; tests/test_cloud_machine.py, run by
   `verify.py`), beside their Kubernetes bill tests (`gke-metered`, `eks-metered`). Setting each cloud up, click by click:
-  `docs/GOOGLE_SETUP.md`, `docs/AMAZON_SETUP.md` (and `docs/AZURE_SETUP.md`). The Google, Amazon, Lambda and one-button
+  docs/GOOGLE_SETUP.md, docs/AMAZON_SETUP.md (and `docs/AZURE_SETUP.md`). The Google, Amazon, Lambda and one-button
   workflows now register on the branch they are pushed to, so they can be started there.
 - **The three-run words** (the founder's order of 11 October): no table or page says a result is "confirmed", because
   nobody outside The Omni-Compass LLC has reviewed or approved these results. A reading is lower or higher in all three

@@ -34,33 +34,13 @@ from omnicompass.verdict import Verdict                                  # noqa:
 
 GPU_SEEDS = (5100, 5101, 5102)
 from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
-from tools.readings import SIZE_FLOOR  # noqa: E402  (the one floor, written once)
+from tools.readings import relative_runs_reading  # noqa: E402  (the one key, written once)
 
 
 def reading(runs, aim):
-    """The three-run rule (tools/readings.py, tools/confirm_abc.py): GAIN or LOSS only when every run is clear of zero the same
-    way."""
-    if aim == "shown":       # declared shown only, never judged (tools/readings.py SHOWN)
-        return "shown, not judged"
-    if all(r["lo"] == r["hi"] == 0.0 for r in runs):
-        return "EVEN, the same"
-    # as the tables read it (tools/confirm_abc.py verdict): clear runs pointing different ways disagree, whatever the
-    # others read; then any run whose interval holds zero makes the row EVEN
-    if not runs:
-        return "EVEN"
-    clear = [r for r in runs if r["lo"] > 0 or r["hi"] < 0]
-    if len({r["change"] > 0 for r in clear}) > 1:
-        return "the runs disagree"
-    if len(clear) < len(runs):
-        return "EVEN"
-    up = clear[0]["change"] > 0
-    if all(abs(r["change"]) < SIZE_FLOOR for r in runs):     # the founder's floor of 20 October: every run under 0.5% reads EVEN
-        return "EVEN, under the floor"
-    if aim == "spent":
-        return "power given" if up else "GAIN"
-    if aim == "per":         # work bought with each unit of a resource (tools/readings.py WORK_PER): a fall is power given
-        return "GAIN" if up else "power given"
-    return "GAIN" if (up if aim == "up" else not up) else "LOSS"
+    """The three-run rule, the one key's (tools/readings.py, the founder's order of 24 October 2026: a change of 0.5% or more,
+    the mean of the runs, is a change, read by the gauge's aim; EVEN only under 0.5%)."""
+    return relative_runs_reading(runs, aim)
 
 
 def paired(a, b, block):

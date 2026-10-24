@@ -971,16 +971,21 @@ LIVE_OUTLINE = [
     ("A Monitor, Not a Drawing", ("M", "A Monitor, Not a Drawing")),
     ("The Engine Table of Contents and the Numbering", ("M", "The Engine Table of Contents and the Numbering")),
     ("The Two Sides and the Colours", ("M", "The Two Sides and the Colours")),
-    ("PART", "The Wall and the Switch",
-     "The status board, the master switch and its three states, the alarms, the golden-signal feed, the event log, the metrics "
-     "exposition, and the pipeline that rebuilds the page."),
-    ("The Monitor Wall", ("M", "The Monitor Wall")),
+    ("PART", "Watch First: the Switch, the Alarms, the Wall and Every LOSS",
+     "What the person watching needs first, in the page's order (the founder's order of 24 October): the master switch and the "
+     "kill switch, the alarms, the golden-signal feed, the event log and the metrics exposition, and the monitor wall."),
     ("The Master Switch", ("M", "The Master Switch")),
     ("The Alarms, the Feed, the Event Log and the Metrics", ("M", "The Alarms, the Feed, the Event Log and the Metrics")),
-    ("The Pipeline That Rebuilds the Page", ("M", "The Pipeline That Rebuilds the Page")),
+    ("The Monitor Wall", ("M", "The Monitor Wall")),
+    ("PART", "The Three Arms, Live, and the Knobs That Turn Them",
+     "Native, Omni-Compass on native and Omni direct side by side; the organism live with each muscle's own knobs; the console "
+     "with the native switch; and the heartbeat dial."),
+    ("Omni Direct: the Three Arms", ("M", "Omni Direct: the Three Arms")),
+    ("The Organism, Live", ("M", "The Organism, Live")),
+    ("The Control Console", ("M", "The Control Console")),
+    ("The Heartbeat Dial", ("M", "The Heartbeat Dial")),
     ("PART", "The Measured Effect and the Whole",
-     "In the page's order (the founder's order of 20 October): the benefit board, the grid and the catalog, then the whole "
-     "organism every way it is bought, its bills and receipts."),
+     "The benefit board, the grid and the catalog, then the whole organism every way it is bought, its bills and receipts."),
     ("The Benefit Board, the Grid and the Catalog", ("M", "The Benefit Board, the Grid and the Catalog")),
     ("The Whole Organism, Every Way It Is Bought", ("M", "The Whole Organism, Every Way It Is Bought")),
     ("PART", "Evidence by Stack",
@@ -992,21 +997,21 @@ LIVE_OUTLINE = [
     ("Kubernetes: Per-Repetition Telemetry", ("M", "Kubernetes: Per-Repetition Telemetry")),
     ("The Shipped Controller's Decision Trace", ("M", "The Shipped Controller's Decision Trace")),
     ("The Chip and the Host", ("M", "The Chip and the Host")),
-    ("PART", "The Organism Live and the Console",
-     "The organism rendered live, native beside Omni-Compass, its body scan and immune system; the telemetry analytics; and every "
-     "knob of the console."),
-    ("The Organism, Live", ("M", "The Organism, Live")),
-    ("The Telemetry Analytics and Omni-Compass in Its Own Words", ("M", "The Telemetry Analytics and Omni-Compass in Its Own Words")),
-    ("The Control Console", ("M", "The Control Console")),
     ("PART", "The Brain",
-     "One control cycle traced, the phase plane and the scoreboard, the brain's state, the verdict, the failure modes, the "
-     "component specification, and the page that governs its own drawing."),
+     "One control cycle traced, the phase plane and the scoreboard, the brain's state, the verdict, the telemetry analytics, "
+     "and the failure modes."),
     ("One Control Cycle, Traced", ("M", "One Control Cycle, Traced")),
     ("The Phase Plane and the Scoreboard", ("M", "The Phase Plane and the Scoreboard")),
     ("The Brain's Internal State", ("M", "The Brain's Internal State")),
     ("The Verdict", ("M", "The Verdict")),
+    ("The Telemetry Analytics and Omni-Compass in Its Own Words", ("M", "The Telemetry Analytics and Omni-Compass in Its Own Words")),
     ("Failure Modes, Controls and Residual Risk", ("M", "Failure Modes, Controls and Residual Risk")),
+    ("PART", "The Proof: the C++ Twin and the Mathematics",
+     "Every component of the engine, its equation and its module, and the same engine in C++, fed the Python's own runs."),
     ("The Component Specification", ("M", "The Component Specification")),
+    ("PART", "Reference: the Pipeline and the Page's Own Drawing",
+     "The pipeline that rebuilds the page, and the page's own render loop governed by the compass law."),
+    ("The Pipeline That Rebuilds the Page", ("M", "The Pipeline That Rebuilds the Page")),
     ("The Page Governs Its Own Drawing", ("M", "The Page Governs Its Own Drawing")),
     ("PART", "Reading a Result off the Page",
      "The mechanism of action side by side, the trace from a tile to its record, what to do when a tile reads LOSS, and what the "
@@ -1109,11 +1114,12 @@ def special(name, nb=None):
 # ("section 16.4b", "chapter 6", "Appendix E", "Part VI") is rewritten to the book's numbers from the map the
 # headings make, and a reference that resolves to nothing is listed at the end of the build.
 LABEL_RE = re.compile(r"^(?:(\d+(?:\.\d+)*[a-z]?)\.?|([A-Z])\.(\d+)?|([IVX]+)\.)\s+(?=\S)")
-PART_WORDS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+PART_WORDS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"]
 # the manual's own grouping of its chapters into parts (its preface) against the book's parts: the Operator's
 # manual and its book share one grouping; the Owner's manual groups its 18 chapters in seven, the book in eight
 PART_MAP = ({"II": "Two", "III": "Five", "IV": "Five", "V": "Six", "VI": "Seven", "VII": "Eight"} if OWNER
-            else {"I": "One", "II": "Two", "III": "Three", "IV": "Four", "V": "Five", "VI": "Six", "VII": "Seven", "VIII": "Eight"})
+            else {"I": "One", "II": "Two", "III": "Three", "IV": "Four", "V": "Five", "VI": "Six", "VII": "Seven", "VIII": "Eight",
+                  "IX": "Nine", "X": "Ten"})
 SEC_REF = re.compile(r"\b([Ss]ections?)\s+(\d+(?:\.\d+)?[a-z]?(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+(?:\.\d+)?[a-z]?)*)(?![\w.]\w)")
 CHAP_REF = re.compile(r"\b([Cc]hapters?)\s+(\d+(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+)*)\b")
 APPX_REF = re.compile(r"\bAppendi(x|ces) ([A-Z])\b")
@@ -1121,7 +1127,10 @@ PART_REF = re.compile(r"\bPart ([IVX]+)\b")
 # a reference that follows another document's name (`DISCLOSURES.md`, section 4; `LICENSE`, section 10; the Operator's
 # Manual, Appendix L; the founder's manuscript) carries that document's numbering and is left as written; the book's own
 # manual, named in full, is not another document
-EXTERNAL = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual|the page['’]s)\W*$")   # the page's section 4c: the live engine's own numbering
+# (in the Live Engine Manual's book "the manual's section 4.5", written in a bound page, names the Operator's Manual: another
+# document there, while the Operator's and the Owner's books read it as their own)
+EXTERNAL = re.compile(r"(\.md|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual|[Tt]he page['’]s"
+                      + (r"|manual['’]s" if LIVE else "") + r")\W*$")   # the page's section 4c: the live engine's own numbering
 MANUSCRIPT = re.compile(r"[Mm]anuscript")
 OWN_NAME = (re.compile(r"Owner's Manual|OWNERS_MANUAL\.md") if OWNER else re.compile(r"Live Engine Manual|LIVE_ENGINE_MANUAL\.md") if LIVE
             else re.compile(r"Operator's Manual|OMNI_COMPASS_MANUAL\.md"))
@@ -1774,7 +1783,7 @@ def build():
         md_parts += [f"## {sec}", ""] + front_lines(MAN[sec]) + [""]
 
     part_no = 0
-    words = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+    words = PART_WORDS                              # the book's part words, written once above
     first, after_part = True, False
     for item in OUTLINE:
         if item[0] == "PART":

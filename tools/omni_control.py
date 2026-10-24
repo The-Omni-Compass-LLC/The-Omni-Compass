@@ -429,11 +429,39 @@ function show(s,j){document.getElementById('o').textContent=s+'\\n'+JSON.stringi
 </script></body></html>"""
 
 
-def server(panel: Panel, tokens_path: Path, bind: str, port: int, cert=None, key=None) -> ThreadingHTTPServer:
+def server(panel: Panel, tokens_path: Path, bind: str, port: int, cert=None, key=None, allow_origins=()) -> ThreadingHTTPServer:
+    allowed = {o.rstrip("/") for o in allow_origins if o}
+
     class H(BaseHTTPRequestHandler):
+        def _origin(self):
+            """The page that called, where the operator named it (--allow-origin): the live engine page served from its own
+            address may then read the status and press the buttons, each call still carrying its bearer token; any other
+            origin gets no cross-origin header and its browser refuses the answer."""
+            o = (self.headers.get("Origin") or "").rstrip("/")
+            return o if o and o in allowed else None
+
+        def _cors(self):
+            o = self._origin()
+            if o:
+                self.send_header("Access-Control-Allow-Origin", o)
+                self.send_header("Vary", "Origin")
+
+        def do_OPTIONS(self):
+            """The browser's preflight before a cross-origin call with a token: answered only for an origin the operator named."""
+            if not self._origin():
+                return self._send(403, {"error": "this origin is not allowed (serve --allow-origin)"})
+            self.send_response(204)
+            self._cors()
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
+            self.send_header("Access-Control-Max-Age", "600")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
         def _send(self, code, obj, ctype="application/json"):
             data = (obj if isinstance(obj, str) else json.dumps(obj, indent=1)).encode()
             self.send_response(code)
+            self._cors()
             self.send_header("Content-Type", ctype + "; charset=utf-8")
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
@@ -513,6 +541,9 @@ def main(argv=None):
     ap.add_argument("--bind", default=os.environ.get("OMNI_CONTROL_BIND", "127.0.0.1"))
     ap.add_argument("--port", type=int, default=int(os.environ.get("OMNI_CONTROL_PORT", "9465")))
     ap.add_argument("--cert"); ap.add_argument("--key")
+    ap.add_argument("--allow-origin", action="append", default=[o for o in os.environ.get("OMNI_CONTROL_ALLOW_ORIGIN", "").split(",") if o],
+                    help="a page allowed to call the panel from another address (the live engine page's origin, e.g. "
+                         "https://the-omni-compass-llc.github.io); repeat for more; none by default")
     a = ap.parse_args(argv)
     if a.cmd == "token":
         if not a.name:
@@ -524,7 +555,7 @@ def main(argv=None):
         raise SystemExit("--governor is required")
     panel = Panel(shlex.split(a.governor), a.kill_file, a.state, a.log, a.audit,
                   {"kill": a.kill_flag, "dial": a.dial_flag, "watch": a.watch_flag}, a.handback)
-    srv = server(panel, a.tokens, a.bind, a.port, a.cert, a.key)
+    srv = server(panel, a.tokens, a.bind, a.port, a.cert, a.key, a.allow_origin)
     scheme = "https" if a.cert else "http"
     print(f"{PLAIN}\nomni control panel: {scheme}://{a.bind}:{a.port}/ (mode off until a press starts the governor)", flush=True)
     try:

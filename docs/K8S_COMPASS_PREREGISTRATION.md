@@ -1353,6 +1353,17 @@ before; every clock counts seconds since omni-v16, so a give-back trial still la
 3 minutes, and one machine is given back at most once a minute. The beats other than 60 s are read in their own runs
 (`docs/PACE_PREREGISTRATION.md`, amendment 3). Runs on omni-v16 stand at the 15 s they ran at; nothing is read across engines.
 
+## Amendment (2026-10-24, written before any run of it): Google's and Amazon's sets to the cap under the same stopping rule
+
+On the founder's words of 24 October ("code it to wire it the same way that the Azure is running"), the Google and Amazon sets
+(`scripts/google_queue.txt`, `scripts/amazon_queue.txt`: the steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day
+on 1 to 9) run as Azure's do under the amendment of 19 October: up to 100 paired repetitions a run, the stopping rule's looks at
+10, 20, 40 and 70 (`gke-metered.yml` and `eks-metered.yml` input `stop_looks`, `tools/stop_rule.py`, the same 99% intervals, never
+stopping on a LOSS), and "to the cap, stopping rule" in each run's title so their A, B and C are counted from zero. Everything else
+is as written for them: the arms, the loads, the windows, the machine families (`e2-standard-2` in `us-central1-a`;
+`m5.large` in `us-east-1`), the tune-down on the machines alone and the 60 s beat of the amendment above. Both queues are switched
+off and neither cloud has run a set on any engine since omni-v10's logins of 18 October; this is written before the first.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

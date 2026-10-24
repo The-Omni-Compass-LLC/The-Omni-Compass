@@ -69,7 +69,18 @@ for arm in "${order[@]}"; do
   client_checks=()
   [ "${OMNI_MACHINES_ONLY:-0}" != 1 ] || client_checks+=(--machines-only)
   python3 scripts/aks_kubectl.py check "${client_checks[@]}"
-  kubectl wait --for=condition=Ready nodes --all --timeout=600s
+  # 24 October: in 3 of the steady set's first 9 repetitions the work machines did not read Ready within 600 s and the
+  # repetition ended before any measurement. The nodes' own conditions and the pools' states are kept in the repetition's
+  # files whenever the wait runs out, so the cause is read from the run, and the wait is given once more before it fails
+  if ! kubectl wait --for=condition=Ready nodes --all --timeout=900s; then
+    mkdir -p "bench-$arm-$REP"
+    kubectl get nodes -o wide > "bench-$arm-$REP/nodes_not_ready.txt" 2>&1 || true
+    kubectl describe nodes > "bench-$arm-$REP/nodes_describe.txt" 2>&1 || true
+    kubectl get events -A --sort-by=.lastTimestamp > "bench-$arm-$REP/events.txt" 2>&1 || true
+    az aks nodepool list -g "$RG" --cluster-name "$name" -o json > "bench-$arm-$REP/nodepools.json" 2>&1 || true
+    echo "######## $name: a node not Ready after 900 s (its conditions kept in bench-$arm-$REP); one more wait of 600 s"
+    kubectl wait --for=condition=Ready nodes --all --timeout=600s
+  fi
   az aks show -g "$RG" -n "$name" -o json > "/tmp/aks-$name.json"
   echo "######## ARM $arm (repetition $REP)"
   mkdir -p "bench-$arm-$REP"; cp "/tmp/aks-$name.json" "bench-$arm-$REP/aks_cluster.json"

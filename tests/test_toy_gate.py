@@ -61,7 +61,11 @@ class ToyGate(unittest.TestCase):
         self.assertEqual(tg.reading("machine_hours", [1.0, 1.1, 0.9, 1.2], [10.0] * 4)["word"], "power given")
         self.assertEqual(tg.reading("p95_ms", [1.0, 1.1, 0.9, 1.2], [10.0] * 4)["word"], "LOSS")
         self.assertEqual(tg.reading("p95_ms", [-1.0, -1.1, -0.9, -1.2], [10.0] * 4)["word"], "GAIN")
-        self.assertEqual(tg.reading("p95_ms", [-1.0, 1.1, -0.9, 1.2], [10.0] * 4)["word"], "EVEN")
+        # the founder's order of 24 October 2026: a mean change of 0.5% or more is a change, read by the aim, with whether it
+        # stands beyond the seeds' noise beside it; EVEN only under 0.5%
+        swing = tg.reading("p95_ms", [-1.0, 1.1, -0.9, 1.2], [10.0] * 4)
+        self.assertEqual((swing["word"], swing["beyond_noise"]), ("LOSS", False))
+        self.assertEqual(tg.reading("p95_ms", [-0.05, 0.06, -0.04, 0.05], [10.0] * 4)["word"], "EVEN")
         self.assertEqual(tg.reading("requests_served", [1.0, 1.1, 0.9, 1.2], [10.0] * 4, tg.CONVEY_GAUGES)["word"], "GAIN")
 
 

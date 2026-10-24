@@ -10,9 +10,8 @@
       --commit <sha> --out results/orchestrator/<NAME>
 
 Each run's own reading of a pair and a gauge (the mean of the step-by-step differences and its 95% interval on Student's t,
-as the showing wrote it) is combined by the repository's one rule (tools/readings.py, the stack reading): GAIN, LOSS or power
-given in all three when every run's interval is clear of zero on the same side; EVEN when any run's interval holds zero; the
-runs disagree when clear runs point different ways. Writes <NAME>.md and <NAME>.json.
+as the showing wrote it) is combined by the repository's one rule (tools/readings.py, the founder's order of 24 October
+2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim (in all three when every run's interval is clear of zero on the same side, otherwise by the mean of the three with the count beyond the noise); under 0.5% it reads EVEN, under the floor; runs that moved 0.5% or more in opposite ways disagree. Writes <NAME>.md and <NAME>.json.
 """
 from __future__ import annotations
 
@@ -27,26 +26,39 @@ sys.path.insert(0, str(ROOT))
 GAUGES = (("requests", "Work (requests a step)", "work"), ("p95_ms", "The 95th percentile (ms)", "wait"),
           ("machines", "Machines", "resource"), ("units", "Units", "resource"))
 PAIRS = ("Omni on native against native", "Omni direct against native", "Omni direct against Omni on native")
-NOTICE = ("© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, "
-          "commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a "
-          "signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries "
-          "this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. "
-          "www.omni-compass.com")
+from tools.legal import NOTICE, TOP  # noqa: E402  the notice is written once, in tools/legal.py
+
+
+AIMS = {"work": "higher", "wait": "lower", "resource": "spent"}    # the key's aims (tools/readings.py)
 
 
 def combine(runs: list[dict], aim: str) -> str:
-    clear = [r for r in runs if not (r["lo"] <= 0 <= r["hi"])]
-    signs = {(r["mean"] > 0) - (r["mean"] < 0) for r in clear}
-    if len(signs) > 1:
-        return "the runs disagree"
-    if len(clear) < len(runs):
-        return f"EVEN ({len(runs) - len(clear)} of {len(runs)} runs within the noise)"
-    up = runs[0]["mean"] > 0
-    if aim == "work":
-        return "GAIN in all three" if up else "LOSS in all three"
-    if aim == "wait":
-        return "LOSS in all three" if up else "GAIN in all three"
-    return "power given in all three" if up else "GAIN, a cut, in all three"
+    """The three runs read by the rule that stands (tools/readings.py three_run_reading, the founder's order of 24 October 2026:
+    a change of 0.5% or more, the mean of the three runs, is a GAIN, a LOSS or power given by the gauge's aim; EVEN under it)."""
+    from tools.readings import three_run_reading
+    rs = [{"native": 1.0, "diff": r["rel"], "ci95": [r["lo"], r["hi"]]} for r in runs]
+    return three_run_reading(rs, AIMS[aim]).replace("**", "")
+
+
+def run_word_of(rel: float, aim: str) -> str:
+    """One run's own word: its change of 0.5% or more read by the gauge's aim, EVEN under it."""
+    from tools.readings import run_word
+    return run_word({"native": 1.0, "diff": rel}, AIMS[aim])
+
+
+def reread(path: Path) -> int:
+    """The table read again from its own JSON by the rule that stands; returns how many readings changed."""
+    rec = json.loads(path.read_text())
+    aims, n = {g: a for g, _, a in GAUGES}, 0
+    for r in rec["rows"]:
+        new = combine(list(r["runs"].values()), aims[r["gauge"]])
+        n += new != r["reading"]
+        r["reading"] = new
+        for v in r["runs"].values():
+            v["word"] = run_word_of(v["rel"], aims[r["gauge"]])
+    path.write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+    path.with_suffix(".md").write_text(page(rec))
+    return n
 
 
 def words(rel: float) -> str:
@@ -75,13 +87,15 @@ def build(summaries: dict, run_ids: dict, commit: str) -> dict:
 
 
 def page(rec: dict) -> str:
-    out = [f"# Omni direct's three arms: three runs on GitHub's machines\n", f"> {NOTICE}\n",
+    out = [f"# Omni direct's three arms: three runs on GitHub's machines\n", f"> {TOP}\n",
            f"{rec['what']}. Commit `{rec['commit'][:12]}`, engine {rec['engine']}; runs A {rec['runs']['A']}, B {rec['runs']['B']}, "
            f"C {rec['runs']['C']} (their files on the branch `raw`, `run-<id>/`). Native is Kubernetes' published autoscaling rule on "
            "the muscles, written by us; Omni on native is Omni-Compass on top of that rule; Omni direct is Omni-Compass alone on the "
            "muscles, no Kubernetes. Each run reads every pair by the one key, paired by step; the three runs are combined by the one "
-           "rule (tools/readings.py): GAIN, LOSS or power given in all three when every run's interval is clear of zero on the same "
-           "side, EVEN when any run's interval holds zero, the runs disagree when clear runs point different ways.\n",
+           "rule (tools/readings.py, the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, "
+           "reads GAIN, LOSS or power given by the gauge's aim, in all three of our runs where every run moved the same way clear of "
+           "zero, otherwise by the mean of our three runs with the count of runs beyond the noise; EVEN under 0.5%; the runs disagree "
+           "when runs moved 0.5% or more in opposite directions. Each run's own word stands beside its number by the same floor.\n",
            "| Pair | Gauge | Three runs | A | B | C |", "|---|---|---|---|---|---|"]
     for r in rec["rows"]:
         cells = [f"{v['word']}, {words(v['rel'])}" for v in r["runs"].values()]

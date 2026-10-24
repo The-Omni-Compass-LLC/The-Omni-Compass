@@ -376,7 +376,7 @@ def board(runs: list, camp: dict | None = None) -> list:
             label = x.split("|")[0]
             out.append({"group": f"the cloud: {cloud}, at the tune-down on the machines alone (the bill)", "name": label, "workflow": wf,
                         "tables": [], "now": ("running now" if label.split()[0] in running_titles else "in the queue") if on else
-                        "switched off until the founder turns it on"})
+                        "not yet run: switched off until the founder turns it on"})
     gp = ROOT / "scripts" / "gpu_campaign_profiles.json"
     if gp.exists():
         g = json.loads(gp.read_text(encoding="utf-8"))
@@ -887,7 +887,7 @@ def dial() -> dict:
 
 def direct() -> dict:
     """Omni direct's three arms (omni-v18): every showing record under results/orchestrator/ (tools/orchestrator_record.py),
-    newest first, as written from the showing's own files; the page replays the newest (section 1k)."""
+    newest first, as written from the showing's own files; the page replays the newest (section 2a)."""
     recs, abc = [], []
     for f in sorted((ROOT / "results" / "orchestrator").glob("*.json")):
         r = json.loads(f.read_text(encoding="utf-8")); r["file"] = str(f.relative_to(ROOT))
@@ -1044,7 +1044,7 @@ def appraisal_counts(rec) -> str:
     lines = [COUNTS_BEGIN,
              f"**The counts of the records on the page** ({b['engine']}, digest `{b['digest']}`), written by the build from the records it made, so a check rebuilds them exactly:",
              "", "| What | Count |", "|---|---|",
-             f"| Three-run tables played back from their raw files (sections 5c and 5d) | {len(R['benchmarks'])}, with {len(runs)} runs |",
+             f"| Three-run tables played back from their raw files (sections 4c and 4d) | {len(R['benchmarks'])}, with {len(runs)} runs |",
              f"| Raw files checked against their run's own `SHA256SUMS_ALL.txt` | {ok:,} of {files:,} matched; {unmatched} unmatched |",
              f"| Receipts (every judged row of each benchmark's newest table) | {len(recs)}: " + ", ".join(f"{e} {n}" for e, n in sorted(by_eng.items(), key=lambda kv: -int(re.sub(r'\D', '', kv[0]) or 0))) + " |",
              f"| Omni-Compass against its native ({len(omni)} tables), as the tables wrote them | {words(tally(omni, False))}{fl}{words(tally(omni, True)) + ')' if floor is not None else ''} |",
