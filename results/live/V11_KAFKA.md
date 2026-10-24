@@ -2,6 +2,10 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
+**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the JSON twin's exact values; every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
+<!-- end: read again -->
+
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
 Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's count is native; omni is the compass law on the consumer count inside [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms line (`docs/KAFKA_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its sign; a resource spent that rose reads **power given**) a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The tuning workload is shown and not counted. Every row is shown, LOSS included. The host's CPU-seconds are measured on GitHub's shared runner, the compass's own cost included; no energy is claimed beyond them.
@@ -18,20 +22,20 @@ Native capacity with the operator's 2 consumers, per run: 972, 976, 981 messages
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (messages a second handled within the line) | 366.6 | 365.9 | -0.2% (-0.7 to +0.3) | -0.4% (-1.1 to +0.3) | -0.1% (-0.3 to +0.2) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| throughput (messages a second consumed) | 427.7 | 427.7 | -0.0% (-0.0 to +0.0) | -0.0% (-0.2 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 95th percentile (ms) | 2,178 | 2,249 | +3.3% (-11.0 to +17.6) | +1.0% (-7.0 to +9.0) | -0.9% (-13.2 to +11.3) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 99th percentile (ms) | 3,424 | 3,465 | +1.2% (-6.6 to +9.0) | +2.6% (-0.5 to +5.8) | -3.1% (-17.8 to +11.5) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, median (ms) | 8.2 | 8.19 | -0.2% (-2.9 to +2.5) | -0.1% (-1.1 to +1.0) | -0.5% (-2.9 to +1.9) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, mean (ms) | 284.7 | 292.4 | +2.7% (-10.9 to +16.4) | +3.2% (-5.9 to +12.2) | -1.1% (-15.6 to +13.4) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, most messages waiting at once | 1,588 | 1,588 | +0.0% (-2.8 to +2.8) | +1.1% (-7.3 to +9.4) | -0.4% (-13.0 to +12.2) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, mean messages waiting | 125.7 | 128.7 | +2.4% (-10.4 to +15.2) | +2.7% (-6.4 to +11.8) | -1.7% (-15.1 to +11.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (messages a second handled within the line) | 366.6 | 365.9 | -0.2% (-0.7 to +0.3) | -0.4% (-1.1 to +0.3) | -0.1% (-0.3 to +0.2) | EVEN, under the floor (every run under 0.5%; the largest 0.40%) |
+| throughput (messages a second consumed) | 427.7 | 427.7 | -0.0% (-0.0 to +0.0) | -0.0% (-0.2 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, under the floor (every run under 0.5%; the largest 0.04%) |
+| end-to-end latency, 95th percentile (ms) | 2,178 | 2,249 | +3.3% (-11.0 to +17.6) | +1.0% (-7.0 to +9.0) | -0.9% (-13.2 to +11.3) | **the runs disagree** |
+| end-to-end latency, 99th percentile (ms) | 3,424 | 3,465 | +1.2% (-6.6 to +9.0) | +2.6% (-0.5 to +5.8) | -3.1% (-17.8 to +11.5) | **the runs disagree** |
+| end-to-end latency, median (ms) | 8.2 | 8.19 | -0.2% (-2.9 to +2.5) | -0.1% (-1.1 to +1.0) | -0.5% (-2.9 to +1.9) | EVEN, under the floor (every run under 0.5%; the largest 0.49%) |
+| end-to-end latency, mean (ms) | 284.7 | 292.4 | +2.7% (-10.9 to +16.4) | +3.2% (-5.9 to +12.2) | -1.1% (-15.6 to +13.4) | **the runs disagree** |
+| consumer lag, most messages waiting at once | 1,588 | 1,588 | +0.0% (-2.8 to +2.8) | +1.1% (-7.3 to +9.4) | -0.4% (-13.0 to +12.2) | **LOSS** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| consumer lag, mean messages waiting | 125.7 | 128.7 | +2.4% (-10.4 to +15.2) | +2.7% (-6.4 to +11.8) | -1.7% (-15.1 to +11.6) | **the runs disagree** |
 | messages produced and never consumed | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| consumers running, mean (the resources held) | 2 | 2.01 | +0.7% (-3.9 to +5.4) | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | EVEN, no difference beyond the noise (1 of 3 runs) |
-| consumers running, most at once | 2 | 2.33 | +16.7% (-55.1 to +88.4) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU busy (share of the run) | 0.297 | 0.296 | -0.2% (-2.7 to +2.3) | -0.4% (-4.2 to +3.5) | -1.2% (-3.7 to +1.3) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 529.7 | 529.1 | -0.1% (-2.2 to +2.0) | -0.1% (-3.8 to +3.7) | -1.1% (-3.5 to +1.2) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 messages inside the line | 3.21 | 3.21 | +0.1% (-1.6 to +1.9) | +0.3% (-3.5 to +4.0) | -1.1% (-3.6 to +1.4) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| consumers running, mean (the resources held) | 2 | 2.01 | +0.7% (-3.9 to +5.4) | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | **power given** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| consumers running, most at once | 2 | 2.33 | +16.7% (-55.1 to +88.4) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | **power given** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| host CPU busy (share of the run) | 0.297 | 0.296 | -0.2% (-2.7 to +2.3) | -0.4% (-4.2 to +3.5) | -1.2% (-3.7 to +1.3) | **GAIN** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| host CPU-seconds | 529.7 | 529.1 | -0.1% (-2.2 to +2.0) | -0.1% (-3.8 to +3.7) | -1.1% (-3.5 to +1.2) | **GAIN** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| host CPU-seconds per 1,000 messages inside the line | 3.21 | 3.21 | +0.1% (-1.6 to +1.9) | +0.3% (-3.5 to +4.0) | -1.1% (-3.6 to +1.4) | **GAIN** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
 | consumer changes written (the knob's moves) | 2 | 4.67 | +133.3% (-10.1 to +276.8) | +100.0% (+100.0 to +100.0) | +100.0% (+100.0 to +100.0) | shown, not judged |
 
 The consumer count handed back to the operator's and read back at the end of every omni arm in every run: yes.
@@ -44,20 +48,20 @@ Native capacity with the operator's 2 consumers, per run: 976, 976, 979 messages
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (messages a second handled within the line) | 340.9 | 340.8 | -0.0% (-0.1 to +0.1) | -0.3% (-0.3 to -0.3) | -0.3% (-0.8 to +0.3) | EVEN, no difference beyond the noise (2 of 3 runs) |
-| throughput (messages a second consumed) | 419.1 | 419.1 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.1% (-0.5 to +0.3) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 95th percentile (ms) | 2,515 | 2,536 | +0.9% (-7.1 to +8.8) | -1.8% (-7.3 to +3.7) | +0.5% (-3.3 to +4.3) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 99th percentile (ms) | 3,874 | 3,727 | -3.8% (-18.0 to +10.4) | +1.7% (-8.0 to +11.4) | +2.4% (-11.1 to +16.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, median (ms) | 8.96 | 8.77 | -2.2% (-7.5 to +3.2) | -0.8% (-1.4 to -0.1) | +1.0% (-5.4 to +7.5) | EVEN, no difference beyond the noise (2 of 3 runs) |
-| end-to-end latency, mean (ms) | 379.0 | 382.1 | +0.8% (-1.2 to +2.8) | +0.6% (-1.2 to +2.3) | +0.6% (-0.7 to +2.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, most messages waiting at once | 1,664 | 1,661 | -0.2% (-4.4 to +4.1) | -0.8% (-3.2 to +1.6) | +0.3% (-3.5 to +4.1) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, mean messages waiting | 163.5 | 164.8 | +0.8% (-1.0 to +2.5) | -0.1% (-3.2 to +3.1) | +1.3% (-1.6 to +4.3) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (messages a second handled within the line) | 340.9 | 340.8 | -0.0% (-0.1 to +0.1) | -0.3% (-0.3 to -0.3) | -0.3% (-0.8 to +0.3) | EVEN, under the floor (every run under 0.5%; the largest 0.29%) |
+| throughput (messages a second consumed) | 419.1 | 419.1 | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.1% (-0.5 to +0.3) | EVEN, under the floor (every run under 0.5%; the largest 0.09%) |
+| end-to-end latency, 95th percentile (ms) | 2,515 | 2,536 | +0.9% (-7.1 to +8.8) | -1.8% (-7.3 to +3.7) | +0.5% (-3.3 to +4.3) | **the runs disagree** |
+| end-to-end latency, 99th percentile (ms) | 3,874 | 3,727 | -3.8% (-18.0 to +10.4) | +1.7% (-8.0 to +11.4) | +2.4% (-11.1 to +16.0) | **the runs disagree** |
+| end-to-end latency, median (ms) | 8.96 | 8.77 | -2.2% (-7.5 to +3.2) | -0.8% (-1.4 to -0.1) | +1.0% (-5.4 to +7.5) | **the runs disagree** |
+| end-to-end latency, mean (ms) | 379.0 | 382.1 | +0.8% (-1.2 to +2.8) | +0.6% (-1.2 to +2.3) | +0.6% (-0.7 to +2.0) | **LOSS** (the same way in all three runs; 0 of 3 clear of the noise) |
+| consumer lag, most messages waiting at once | 1,664 | 1,661 | -0.2% (-4.4 to +4.1) | -0.8% (-3.2 to +1.6) | +0.3% (-3.5 to +4.1) | **GAIN** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| consumer lag, mean messages waiting | 163.5 | 164.8 | +0.8% (-1.0 to +2.5) | -0.1% (-3.2 to +3.1) | +1.3% (-1.6 to +4.3) | **LOSS** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
 | messages produced and never consumed | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
 | consumers running, mean (the resources held) | 2 | 1.98 | -0.8% (-0.8 to -0.8) | -0.8% (-0.8 to -0.8) | -0.8% (-0.8 to -0.8) | **GAIN in all three of our runs** |
 | consumers running, most at once | 2 | 2 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, the same |
-| host CPU busy (share of the run) | 0.308 | 0.304 | -1.1% (-7.9 to +5.6) | -0.9% (-4.6 to +2.8) | -0.4% (-4.5 to +3.7) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 220.9 | 218.4 | -1.1% (-7.8 to +5.6) | -0.9% (-4.6 to +2.8) | -0.3% (-4.1 to +3.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 messages inside the line | 3.59 | 3.55 | -1.1% (-7.7 to +5.5) | -0.6% (-4.2 to +3.1) | -0.1% (-4.3 to +4.2) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| host CPU busy (share of the run) | 0.308 | 0.304 | -1.1% (-7.9 to +5.6) | -0.9% (-4.6 to +2.8) | -0.4% (-4.5 to +3.7) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| host CPU-seconds | 220.9 | 218.4 | -1.1% (-7.8 to +5.6) | -0.9% (-4.6 to +2.8) | -0.3% (-4.1 to +3.6) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| host CPU-seconds per 1,000 messages inside the line | 3.59 | 3.55 | -1.1% (-7.7 to +5.5) | -0.6% (-4.2 to +3.1) | -0.1% (-4.3 to +4.2) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
 | consumer changes written (the knob's moves) | 2 | 4 | +100.0% (+100.0 to +100.0) | +100.0% (+100.0 to +100.0) | +100.0% (+100.0 to +100.0) | shown, not judged |
 
 The consumer count handed back to the operator's and read back at the end of every omni arm in every run: yes.
@@ -70,20 +74,20 @@ Native capacity with the operator's 2 consumers, per run: 392, 394, 393 messages
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (messages a second handled within the line) | 147.2 | 149.7 | +1.8% (-5.9 to +9.4) | +0.2% (-0.5 to +0.9) | -0.0% (-0.1 to +0.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| throughput (messages a second consumed) | 172.6 | 172.6 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 95th percentile (ms) | 2,374 | 2,430 | +2.4% (-13.7 to +18.4) | -1.8% (-6.9 to +3.3) | +1.9% (-2.7 to +6.5) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 99th percentile (ms) | 3,663 | 3,843 | +4.9% (-21.6 to +31.5) | -5.1% (-12.9 to +2.7) | -3.3% (-9.5 to +2.9) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, median (ms) | 11.5 | 11.5 | +0.0% (-1.1 to +1.1) | -0.1% (-1.0 to +0.9) | -0.2% (-0.3 to -0.2) | EVEN, no difference beyond the noise (2 of 3 runs) |
-| end-to-end latency, mean (ms) | 319.1 | 308.2 | -3.4% (-16.5 to +9.6) | -3.0% (-10.6 to +4.5) | -0.2% (-1.9 to +1.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, most messages waiting at once | 698.0 | 729.0 | +4.4% (-11.9 to +20.8) | -2.4% (-7.9 to +3.0) | +1.9% (-4.4 to +8.1) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, mean messages waiting | 59.0 | 56.2 | -4.7% (-21.8 to +12.5) | -2.8% (-9.5 to +3.9) | -0.0% (-0.4 to +0.3) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (messages a second handled within the line) | 147.2 | 149.7 | +1.8% (-5.9 to +9.4) | +0.2% (-0.5 to +0.9) | -0.0% (-0.1 to +0.0) | **GAIN** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| throughput (messages a second consumed) | 172.6 | 172.6 | +0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.00%) |
+| end-to-end latency, 95th percentile (ms) | 2,374 | 2,430 | +2.4% (-13.7 to +18.4) | -1.8% (-6.9 to +3.3) | +1.9% (-2.7 to +6.5) | **the runs disagree** |
+| end-to-end latency, 99th percentile (ms) | 3,663 | 3,843 | +4.9% (-21.6 to +31.5) | -5.1% (-12.9 to +2.7) | -3.3% (-9.5 to +2.9) | **the runs disagree** |
+| end-to-end latency, median (ms) | 11.5 | 11.5 | +0.0% (-1.1 to +1.1) | -0.1% (-1.0 to +0.9) | -0.2% (-0.3 to -0.2) | EVEN, under the floor (every run under 0.5%; the largest 0.22%) |
+| end-to-end latency, mean (ms) | 319.1 | 308.2 | -3.4% (-16.5 to +9.6) | -3.0% (-10.6 to +4.5) | -0.2% (-1.9 to +1.6) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| consumer lag, most messages waiting at once | 698.0 | 729.0 | +4.4% (-11.9 to +20.8) | -2.4% (-7.9 to +3.0) | +1.9% (-4.4 to +8.1) | **the runs disagree** |
+| consumer lag, mean messages waiting | 59.0 | 56.2 | -4.7% (-21.8 to +12.5) | -2.8% (-9.5 to +3.9) | -0.0% (-0.4 to +0.3) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
 | messages produced and never consumed | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| consumers running, mean (the resources held) | 2 | 2.01 | +0.7% (-3.9 to +5.4) | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | EVEN, no difference beyond the noise (1 of 3 runs) |
-| consumers running, most at once | 2 | 2.33 | +16.7% (-55.1 to +88.4) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU busy (share of the run) | 0.279 | 0.28 | +0.2% (-2.1 to +2.5) | -0.8% (-4.0 to +2.5) | -0.6% (-2.8 to +1.5) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 491.2 | 492.7 | +0.3% (-2.1 to +2.7) | -0.8% (-4.0 to +2.5) | -0.7% (-2.9 to +1.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 messages inside the line | 7.41 | 7.31 | -1.4% (-10.1 to +7.3) | -1.0% (-4.0 to +2.1) | -0.6% (-2.9 to +1.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| consumers running, mean (the resources held) | 2 | 2.01 | +0.7% (-3.9 to +5.4) | -0.3% (-0.3 to -0.3) | -0.3% (-0.3 to -0.3) | **power given** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| consumers running, most at once | 2 | 2.33 | +16.7% (-55.1 to +88.4) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | **power given** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| host CPU busy (share of the run) | 0.279 | 0.28 | +0.2% (-2.1 to +2.5) | -0.8% (-4.0 to +2.5) | -0.6% (-2.8 to +1.5) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| host CPU-seconds | 491.2 | 492.7 | +0.3% (-2.1 to +2.7) | -0.8% (-4.0 to +2.5) | -0.7% (-2.9 to +1.6) | **GAIN** (2 of 3 runs moved 0.5% or more, the same way, 1 under the floor; 0 of 3 clear of the noise) |
+| host CPU-seconds per 1,000 messages inside the line | 7.41 | 7.31 | -1.4% (-10.1 to +7.3) | -1.0% (-4.0 to +2.1) | -0.6% (-2.9 to +1.6) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
 | consumer changes written (the knob's moves) | 2 | 4.67 | +133.3% (-10.1 to +276.8) | +100.0% (+100.0 to +100.0) | +100.0% (+100.0 to +100.0) | shown, not judged |
 
 The consumer count handed back to the operator's and read back at the end of every omni arm in every run: yes.
@@ -96,27 +100,27 @@ Native capacity with the operator's 2 consumers, per run: 1,930, 1,935, 1,933 me
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (messages a second handled within the line) | 725.5 | 725.0 | -0.1% (-1.0 to +0.9) | -0.3% (-1.0 to +0.4) | +0.0% (-0.2 to +0.2) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| throughput (messages a second consumed) | 848.7 | 848.7 | -0.0% (-0.0 to +0.0) | -0.0% (-0.2 to +0.1) | +0.0% (-0.0 to +0.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 95th percentile (ms) | 2,250 | 2,242 | -0.4% (-14.1 to +13.4) | +2.9% (-4.3 to +10.2) | +0.0% (-1.9 to +1.9) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, 99th percentile (ms) | 3,564 | 3,544 | -0.6% (-6.4 to +5.2) | -0.9% (-7.7 to +5.9) | -2.2% (-13.0 to +8.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, median (ms) | 8.38 | 7.86 | -6.2% (-15.3 to +2.9) | -3.9% (-11.1 to +3.3) | -2.3% (-13.5 to +8.8) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| end-to-end latency, mean (ms) | 304.4 | 302.8 | -0.5% (-10.7 to +9.6) | +2.0% (-9.8 to +13.9) | -0.5% (-1.9 to +1.0) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, most messages waiting at once | 3,212 | 3,206 | -0.2% (-5.9 to +5.5) | +1.7% (-6.2 to +9.6) | -1.0% (-4.5 to +2.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumer lag, mean messages waiting | 264.6 | 262.8 | -0.7% (-10.7 to +9.3) | +1.1% (-10.6 to +12.8) | -0.5% (-1.5 to +0.5) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (messages a second handled within the line) | 725.5 | 725.0 | -0.1% (-1.0 to +0.9) | -0.3% (-1.0 to +0.4) | +0.0% (-0.2 to +0.2) | EVEN, under the floor (every run under 0.5%; the largest 0.27%) |
+| throughput (messages a second consumed) | 848.7 | 848.7 | -0.0% (-0.0 to +0.0) | -0.0% (-0.2 to +0.1) | +0.0% (-0.0 to +0.0) | EVEN, under the floor (every run under 0.5%; the largest 0.04%) |
+| end-to-end latency, 95th percentile (ms) | 2,250 | 2,242 | -0.4% (-14.1 to +13.4) | +2.9% (-4.3 to +10.2) | +0.0% (-1.9 to +1.9) | **LOSS** (1 of 3 runs moved 0.5% or more, 2 under the floor; 0 of 3 clear of the noise) |
+| end-to-end latency, 99th percentile (ms) | 3,564 | 3,544 | -0.6% (-6.4 to +5.2) | -0.9% (-7.7 to +5.9) | -2.2% (-13.0 to +8.6) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
+| end-to-end latency, median (ms) | 8.38 | 7.86 | -6.2% (-15.3 to +2.9) | -3.9% (-11.1 to +3.3) | -2.3% (-13.5 to +8.8) | **GAIN** (the same way in all three runs; 0 of 3 clear of the noise) |
+| end-to-end latency, mean (ms) | 304.4 | 302.8 | -0.5% (-10.7 to +9.6) | +2.0% (-9.8 to +13.9) | -0.5% (-1.9 to +1.0) | **the runs disagree** |
+| consumer lag, most messages waiting at once | 3,212 | 3,206 | -0.2% (-5.9 to +5.5) | +1.7% (-6.2 to +9.6) | -1.0% (-4.5 to +2.6) | **the runs disagree** |
+| consumer lag, mean messages waiting | 264.6 | 262.8 | -0.7% (-10.7 to +9.3) | +1.1% (-10.6 to +12.8) | -0.5% (-1.5 to +0.5) | **the runs disagree** |
 | messages produced and never consumed | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| consumers running, mean (the resources held) | 2 | 2.25 | +12.3% (-14.9 to +39.5) | +6.0% (-21.3 to +33.3) | +5.9% (-21.0 to +32.9) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| consumers running, most at once | 2 | 2.67 | +33.3% (-38.4 to +105.0) | +16.7% (-55.1 to +88.4) | +16.7% (-55.1 to +88.4) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU busy (share of the run) | 0.325 | 0.327 | +0.6% (-4.0 to +5.3) | +1.8% (-1.0 to +4.6) | -1.3% (-8.8 to +6.2) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 557.0 | 561.9 | +0.9% (-4.6 to +6.4) | +2.1% (-0.9 to +5.2) | -1.2% (-9.8 to +7.4) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 messages inside the line | 1.71 | 1.72 | +1.0% (-4.6 to +6.5) | +2.4% (-0.5 to +5.2) | -1.2% (-9.9 to +7.6) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| consumers running, mean (the resources held) | 2 | 2.25 | +12.3% (-14.9 to +39.5) | +6.0% (-21.3 to +33.3) | +5.9% (-21.0 to +32.9) | **power given** (the same way in all three runs; 0 of 3 clear of the noise) |
+| consumers running, most at once | 2 | 2.67 | +33.3% (-38.4 to +105.0) | +16.7% (-55.1 to +88.4) | +16.7% (-55.1 to +88.4) | **power given** (the same way in all three runs; 0 of 3 clear of the noise) |
+| host CPU busy (share of the run) | 0.325 | 0.327 | +0.6% (-4.0 to +5.3) | +1.8% (-1.0 to +4.6) | -1.3% (-8.8 to +6.2) | **the runs disagree** |
+| host CPU-seconds | 557.0 | 561.9 | +0.9% (-4.6 to +6.4) | +2.1% (-0.9 to +5.2) | -1.2% (-9.8 to +7.4) | **the runs disagree** |
+| host CPU-seconds per 1,000 messages inside the line | 1.71 | 1.72 | +1.0% (-4.6 to +6.5) | +2.4% (-0.5 to +5.2) | -1.2% (-9.9 to +7.6) | **the runs disagree** |
 | consumer changes written (the knob's moves) | 2 | 5.33 | +166.7% (+23.2 to +310.1) | +133.3% (-10.1 to +276.8) | +133.3% (-10.1 to +276.8) | shown, not judged |
 
 The consumer count handed back to the operator's and read back at the end of every omni arm in every run: yes.
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 2 to 3 (3 trials, 1 allowed, 0 refused); left native (2 trials, 0 allowed, 0 refused); acting: 2 to 3 (3 trials, 1 allowed, 0 refused); run B: left native (2 trials, 0 allowed, 0 refused); acting: 2 to 3 (3 trials, 1 allowed, 0 refused); left native (2 trials, 0 allowed, 0 refused); run C: left native (2 trials, 0 allowed, 0 refused); acting: 2 to 3 (3 trials, 1 allowed, 0 refused); left native (2 trials, 0 allowed, 0 refused).
 
-**Across 3 untouched workloads: 1 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 41 EVEN, 0 where the runs disagree.**
+**Across 3 untouched workloads: 13 gauge-rows GAIN (1 in all three of our runs), 3 LOSS (0 in all three of our runs), 4 power given (0 in all three of our runs), 10 EVEN, 12 where the runs disagree.**
 
 ---
 

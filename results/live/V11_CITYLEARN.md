@@ -2,6 +2,10 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+<!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
+**Read again by the founder's rule of 24 October 2026** (`tools/reread_key.py`; the one rule, `tools/readings.py` judge_runs): a change of 0.5% or more either way is a change and never reads EVEN. It reads its word by what the gauge is for, written "in all three of our runs" when all three runs moved 0.5% or more the same way with every interval clear of zero, and otherwise with its qualifier beside it in the same cell (how many runs moved 0.5% or more, and how many of the three were clear of the noise); under 0.5% in every run it reads EVEN, under the floor. Only the Reading cells and the counts under them were rewritten, from the values the table prints (it keeps no JSON twin; a printed size of exactly 0.50% counts as at the floor); every row, run and number is as first written. Where a paragraph below states the rule this table was first written by (a run whose interval included zero read EVEN whatever its size), this rule replaces it.
+<!-- end: read again -->
+
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
 CityLearn (University of Texas at Austin) is an independent, deterministic simulator of real buildings with its own controller (BasicRBC) and its own scores; every score is one CityLearn itself aims lower. Native is that controller; omni is the same controller with the compass law on top of its electric battery commands only (`tools/run_citylearn.py`). The same districts ran three times as separate GitHub runs on the same frozen engine. Because the simulator is deterministic, the runs must reproduce each other: a score reads **GAIN** or **LOSS in all three of our runs** when all three runs give the same sign, judged by what the score is for and never by its sign: the electricity bought, the bill, the carbon, the peaks, the swings and the unevenness are the power the district draws and holds and the wear of moving it, so a fall is a cut, a GAIN, and a rise is **power given**; a rise in the energy not served or the time uncomfortable (the occupants' misses) is a LOSS. **EVEN, the same** when the change is under one part in a million, and **the runs differ** when they do not reproduce, which is a finding about the simulator or the harness and is said so. A district with no electric battery gets nothing from Omni (a water tank stays native), so any native/omni difference in it is CityLearn's own run-to-run variation, never an Omni result. Every row is shown, LOSS included.
@@ -26,7 +30,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | ramping (swings hour to hour) (`ramping_average`) | -10.13% | -10.13% | -10.13% | **GAIN in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -2.11% | -2.11% | -2.11% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -1.32% | -1.32% | -1.32% | **GAIN in all three of our runs** |
-| distance from zero net energy (`zero_net_energy`) | +0.02% | +0.02% | +0.02% | **power given in all three of our runs** |
+| distance from zero net energy (`zero_net_energy`) | +0.02% | +0.02% | +0.02% | EVEN, under the floor (every run under 0.5%; the largest 0.02%) |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
 
@@ -168,7 +172,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | ramping (swings hour to hour) (`ramping_average`) | -8.65% | -8.65% | -8.65% | **GAIN in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -3.32% | -3.32% | -3.32% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -2.30% | -2.30% | -2.30% | **GAIN in all three of our runs** |
-| distance from zero net energy (`zero_net_energy`) | -0.15% | -0.15% | -0.15% | **GAIN in all three of our runs** |
+| distance from zero net energy (`zero_net_energy`) | -0.15% | -0.15% | -0.15% | EVEN, under the floor (every run under 0.5%; the largest 0.15%) |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | **the runs differ** |
 
@@ -184,7 +188,7 @@ CityLearn (University of Texas at Austin) is an independent, deterministic simul
 | ramping (swings hour to hour) (`ramping_average`) | -3.40% | -3.40% | -3.40% | **GAIN in all three of our runs** |
 | daily load unevenness (`daily_one_minus_load_factor_average`) | -0.88% | -0.88% | -0.88% | **GAIN in all three of our runs** |
 | monthly load unevenness (`monthly_one_minus_load_factor_average`) | -0.77% | -0.77% | -0.77% | **GAIN in all three of our runs** |
-| distance from zero net energy (`zero_net_energy`) | -0.44% | -0.44% | -0.44% | **GAIN in all three of our runs** |
+| distance from zero net energy (`zero_net_energy`) | -0.44% | -0.44% | -0.44% | EVEN, under the floor (every run under 0.5%; the largest 0.44%) |
 | energy not served (`annual_normalized_unserved_energy_total`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
 | time uncomfortable (`discomfort_proportion`) | +0.00% | +0.00% | +0.00% | EVEN, the same |
 
@@ -202,7 +206,7 @@ A district counts only when all three runs agree.
 | ramping (swings hour to hour) | 4 | 0 | 0 | 7 | 0 |
 | daily load unevenness | 4 | 0 | 0 | 7 | 0 |
 | monthly load unevenness | 4 | 0 | 0 | 7 | 0 |
-| distance from zero net energy | 3 | 0 | 1 (ca_alameda_county_neighborhood) | 7 | 0 |
+| distance from zero net energy | 1 | 0 | 0 | 10 | 0 |
 | energy not served | 0 | 0 | 0 | 10 | 0 |
 | time uncomfortable | 0 | 0 | 0 | 8 | 2 |
 
