@@ -4,6 +4,37 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
+<!-- headline: written by tools/headline.py from the result files; never edited by hand -->
+
+## The answer first: is Omni-Compass a benefit against native?
+
+**Yes, on omni-v18, the newest engine with its three runs in (the engine that stands, omni-v20, runs them again), measured on real machines (class L), three runs (A, B and C).** Omni-Compass on top of native did 6.0% more work than native and answered 9.5% faster at the 95th percentile; Omni-Compass direct did 7.5% more work and answered 12.1% faster.
+
+| Scenario | Signal | Work | Response (95th percentile) | Machines | Units |
+|---|---|---|---|---|---|
+| **Native**: Kubernetes' own autoscaling rule on the muscles | <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> the baseline | the baseline | the baseline | the baseline | the baseline |
+| **Omni-Compass on top of native**: Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 6.0%; the runs 5.2%, 5.3%, 7.4% | GAIN in all three of our runs: down 9.5% (faster); the runs 9.0%, 12.1%, 7.5% | GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% | power given in all three of our runs: up 10.2%; the runs 11.0%, 8.9%, 10.8% |
+| **Omni-Compass direct**: Omni-Compass alone on the muscles: no Kubernetes autoscaler under it, Omni-Compass the only controller moving the knob | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 7.5%; the runs 7.3%, 5.7%, 9.4% | GAIN in all three of our runs: down 12.1% (faster); the runs 9.8%, 15.7%, 10.8% | GAIN by the mean of our three runs, beyond the noise in 0 of 3: down 2.5% (fewer); the runs 2.2%, 3.1%, 2.2% | power given by the mean of our three runs, beyond the noise in 2 of 3: up 5.2%; the runs 6.9%, 0.3%, 9.0% |
+
+The signals: <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> accelerating, a GAIN and no LOSS; <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> steady, every row EVEN; <img src="docs/engine/signals/redlining.svg" alt="the red stop-sign octagon" height="14"> redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, never a LOSS. Source: [`results/orchestrator/V18_THREE_ARMS_ABC.json`](results/orchestrator/V18_THREE_ARMS_ABC.json), Omni direct's three arms, three runs on GitHub's own machines (A, B and C from one commit), the full form: 18 steps of 25 s, clients 1 2 3 2 3 4 ..., the busy room rule; runs A 40023524338, B 40023529155, C 40023534013; commit `0ca2bbdac97f`.
+
+### The two bills
+
+**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. Omni-Compass on the cloud alone can give only a small cut in the bill, from the machines the cloud's own autoscaler made; the benefit lives at the two ends, in the software and in the bare metal, and the cloud carries it.**
+
+Each route's bill is its native total cost, then Omni-Compass's, then the saving: 1 − (the Omni-Compass total ÷ the native total), each total the sum of its non-overlapping cost components inside the declared boundary, on a matched workload (`docs/THE_TUNE.md`, section 8). A component's own percent is a supporting measurement, never the bill. Where a price or a component is missing the bill reads unresolved; no price is assumed.
+
+| Route | The bill: native → Omni-Compass → saving | Supporting measurements |
+|---|---|---|
+| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v18 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4%. Omni-Compass direct: GAIN by the mean of our three runs, beyond the noise in 0 of 3: down 2.5% (fewer); the runs 2.2%, 3.1%, 2.2% |
+| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v18; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
+
+Beside it, and never read as omni-v18: the totals composed from earlier engines' tables (`tools/whole_system.py`, omni-v1, omni-v10, omni-v11, omni-v12, omni-v16, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 24.6%, the 95th percentile 43.0% faster, machines 8.7% fewer, energy 3.3% less, the cloud's bill EVEN; the index over the gauges +14.9%. Each benchmark runs again on omni-v18, and each total follows its own engine's tables.
+
+Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
+<!-- end headline -->
+
 ## The bottom line: is Omni-Compass a benefit?
 
 The founder's order of 24 October 2026: the first thing anyone sees says whether Omni-Compass is a benefit, for each way to
