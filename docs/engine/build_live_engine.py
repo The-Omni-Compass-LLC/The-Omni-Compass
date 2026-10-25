@@ -453,7 +453,12 @@ def fleet() -> dict:
         out["index"] = {"headline": m.group(1).strip() if m else None, "service": m2.group(1).strip() if m2 else None, "file": "results/OMNI_INDEX.md"}
         oj = ROOT / "results" / "OMNI_INDEX.json"
         if oj.exists():   # each category's own reading, so the page can say what carries the headline
-            out["index"]["categories"] = json.loads(oj.read_text(encoding="utf-8")).get("categories") or {}
+            oij = json.loads(oj.read_text(encoding="utf-8"))
+            out["index"]["categories"] = oij.get("categories") or {}
+            # the figure of record as the index's own record holds it, never read back out of a sentence (the mathematics seat of
+            # 24 October: the headline's first percent is the 0.5% floor it names, not the index)
+            out["index"]["headline_pct"] = oij.get("headline_pct")
+            out["index"]["service_pct"] = oij.get("service_headline_pct")
     # the grid: the engine that stands's own when its squares have landed, else the newest grid with squares, named by its
     # own engine (never read as the engine that stands's), with the dispatches of the engine that stands beside it
     stand_n = engine()[0].rsplit("v", 1)[-1]
@@ -882,8 +887,9 @@ def dial() -> dict:
     return {"file": str(lads[-1].relative_to(ROOT)), "seeds": lad["seeds"], "days": lad["days"], "main_s": lad["main_s"],
             "real": ("three-run tables in " + ", ".join(f"results/live/{f.name}" for f in pace)) if pace else
                     "not yet run (docs/PACE_PREREGISTRATION.md, amendment 3: eight arms in every repetition, three runs)",
-            "toys": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
-                            for k, t in lad["toys"].items()})}   # a change against a zero (native's power cap) is NaN: null
+            # the page's key is "models" (the editing seat of 24 October: the retired word is printed nowhere); the ladder file keeps its own
+            "models": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
+                              for k, t in (lad.get("models") or lad.get("toys") or {}).items()})}   # a change against a zero (native's power cap) is NaN: null
 
 
 def core_mc() -> dict:

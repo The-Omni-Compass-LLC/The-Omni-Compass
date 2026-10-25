@@ -73,13 +73,20 @@ def layer_no(name: str) -> int | None:
 
 
 def word_of(gauge: str, mu: float, sigma: float) -> str:
-    """The word of a composed factor from its 95% interval, by the gauge's aim (the file's own convention for a carried reading)."""
-    lo, hi = mu - Z95 * sigma, mu + Z95 * sigma
-    if lo > 0:
+    """The word of a composed factor by the key's floor (tools/readings.py, the founder's order of 24 October 2026; the mathematics
+    seat of 24 October): a change of 0.5% or more reads by the gauge's aim, whatever its interval, EVEN only under 0.5%. Whether
+    its 95% interval stands clear of no change is carried beside it (clear_of), never as the word."""
+    from tools.readings import SIZE_FLOOR
+    if abs(math.exp(mu) - 1) < SIZE_FLOOR:
+        return EVEN
+    if mu > 0:
         return GAIN
-    if hi < 0:
-        return GIVEN if gauge in SPENT else LOSS
-    return EVEN
+    return GIVEN if gauge in SPENT else LOSS
+
+
+def clear_of(mu: float, sigma: float) -> bool:
+    """True when the composed factor's 95% interval stands clear of no change (a ratio of 1)."""
+    return mu - Z95 * sigma > 0 or mu + Z95 * sigma < 0
 
 
 def factor(mu: float | None, sigma: float | None, gauge: str) -> dict | None:
@@ -87,7 +94,8 @@ def factor(mu: float | None, sigma: float | None, gauge: str) -> dict | None:
         return None
     sigma = sigma or 0.0
     return {"mu": mu, "sigma": sigma, "ratio": math.exp(mu), "pct": 100 * (math.exp(mu) - 1),
-            "lo_pct": 100 * (math.exp(mu - Z95 * sigma) - 1), "hi_pct": 100 * (math.exp(mu + Z95 * sigma) - 1), "word": word_of(gauge, mu, sigma)}
+            "lo_pct": 100 * (math.exp(mu - Z95 * sigma) - 1), "hi_pct": 100 * (math.exp(mu + Z95 * sigma) - 1), "word": word_of(gauge, mu, sigma),
+            "clear": clear_of(mu, sigma)}
 
 
 def compose(parts: list[dict]) -> dict:
@@ -109,7 +117,7 @@ def compose(parts: list[dict]) -> dict:
         out["index"] = {"mu": mu, "ratio": math.exp(mu), "pct": 100 * (math.exp(mu) - 1), "gauges": k,
                         "independent": [100 * (math.exp(mu - Z95 * s_ind) - 1), 100 * (math.exp(mu + Z95 * s_ind) - 1)],
                         "correlated": [100 * (math.exp(mu - Z95 * s_cor) - 1), 100 * (math.exp(mu + Z95 * s_cor) - 1)],
-                        "word": word_of("index", mu, s_cor)}
+                        "word": word_of("index", mu, s_cor), "clear": clear_of(mu, s_cor)}
     return out
 
 
@@ -175,7 +183,8 @@ def main(out):
             "results": results, "separability": {"pairs": sep, "n": len(sep), "agree": sum(1 for s in sep if s.get("agree"))}, "beside": d.get("beside") or {},
             "rule": "R(g) = ∏ℓ Rℓ(g), log R = Σℓ log Rℓ, the variances added; a scenario sums the layers it stacks; the index is the mean of the gauge logarithms, "
                     "its 95% interval under two bounds (the gauges independent; perfectly correlated); by the index's rule only what held the same way in all three "
-                    "of our runs enters, with every interval carried everything measured enters with its interval"}
+                    "of our runs enters, with every interval carried everything measured enters with its interval; each composed factor's word by the key's "
+                    "floor (0.5% or more by the gauge's aim, EVEN under it), whether its interval stands clear of no change said beside it"}
     Path(out).write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False), encoding="utf-8")
     for sk, R in results.items():
         for rd in readings:

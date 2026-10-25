@@ -70,6 +70,7 @@ def load_system(arg: str) -> dict:
     d = json.loads(text)
     if not isinstance(d, dict):
         raise ValueError("a system is a JSON object: {\"name\": ..., \"state\": {...}, \"params\": {...}}")
+    d = {k: v for k, v in d.items() if k not in ("notice", "notice_end")}    # the legal notice a saved system carries at its top and end
     extra = set(d) - {"name", "about", "state", "params"}
     if extra:
         raise ValueError(f"unknown keys: {sorted(extra)} (a system holds name, about, state and params)")

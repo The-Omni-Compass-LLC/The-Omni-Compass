@@ -28,6 +28,8 @@ REG = HERE / "monitors.json"
 PAGE = HERE / "OMNI_COMPASS_LIVE_ENGINE.html"
 OUT = ROOT / "deploy" / "grafana" / "omni-compass-wall.json"
 W, H, COLS = 12, 8, 2
+sys.path.insert(0, str(HERE.parents[1]))
+from tools.legal import PLAIN as NOTICE   # noqa: E402  (the notice, written once in tools/legal.py, without its Markdown)
 
 
 def page_order() -> list:
@@ -129,8 +131,16 @@ def dashboard(reg: dict) -> dict:
             "templating": {"list": [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "query": "prometheus", "current": {}, "hide": 0}]},
             "links": [{"title": "The governor's own screen", "type": "dashboards", "tags": ["omni-compass"], "asDropdown": False},
                       {"title": "The live engine", "type": "link", "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
-            "panels": panels,
-            "__notice": "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com"}
+            "description": NOTICE,
+            # the notice at the top and the end of the wall, where Grafana shows it (the underwriting seat of 24 October)
+            "panels": [notice_panel(-1)] + panels + [notice_panel(max([p["gridPos"]["y"] + p["gridPos"]["h"] for p in panels] or [0]))],
+            "__notice": NOTICE}
+
+
+def notice_panel(y: int) -> dict:
+    """A text panel carrying the legal notice, the full width of the wall: at its top (y below every other panel's 0) and its end."""
+    return {"id": 9000 + (0 if y < 0 else 1), "type": "text", "title": "", "gridPos": {"x": 0, "y": max(y, 0) if y >= 0 else 0, "w": COLS * W, "h": 2},
+            "transparent": True, "options": {"mode": "markdown", "content": NOTICE}}
 
 
 def main(out: str | None = None) -> dict:
@@ -144,5 +154,5 @@ def main(out: str | None = None) -> dict:
 
 if __name__ == "__main__":
     d = main(sys.argv[1] if len(sys.argv) > 1 else None)
-    mons = [p for p in d["panels"] if p["type"] != "row"]
+    mons = [p for p in d["panels"] if p["type"] != "row" and p.get("id", 0) < 9000]
     print(f"{len(mons)} panels under {len(d['panels']) - len(mons)} section rows, {sum(1 for p in mons if p['type'] != 'text')} on Prometheus series")

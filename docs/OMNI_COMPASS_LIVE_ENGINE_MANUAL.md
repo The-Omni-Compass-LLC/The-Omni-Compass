@@ -61,7 +61,7 @@ Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** o
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is EVEN, at its limit on native |
 | **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
 
 How the sign of a number becomes a word:
@@ -72,7 +72,7 @@ How the sign of a number becomes a word:
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
 - **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; EVEN is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the 0.5% floor reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -2348,12 +2348,12 @@ Under the twenty scenarios the section carries the injection grid (`#s-inj`; the
 `results/injection_grid/INJECTION_GRID_<base>.json` and its `.md`, written by `tools/injection_grid.py`; class S). Its line
 under the heading, **The batch**, names the batch it stands on: its base, its 500 injections and the jump generator's rule (seed_k =
 base + k·0x9E3779B9 mod 2³²), the digest of the Python's runs of that batch and its file, and the C++ engine's digest of the same
-seeds ("the same", with the count of runs that agree). The same batch drives the Python's runs in section 3o. An injection is one
+seeds ("identical", with the count of runs that agree). The same batch drives the Python's runs in section 3o. An injection is one
 seed: every plant of every organism draws its demand, its weather and its disturbances from it, under the climb, for 240 decisions
 of 15 s, and the same injection reaches every organism and every way.
 
 The same line prints two checks the page makes as it opens. First it re-hashes the record's cells the way the Python hashed them
-and prints "the same as the Python's" or "not the Python's". Then it recomputes every cell's mean from the runs' means, joined and
+and prints "identical digest to the Python's" or "not identical to the Python's". Then it recomputes every cell's mean from the runs' means, joined and
 stacked as the Python joins and stacks them, and prints the number of cell gauges checked. It reports "every one agrees" with the
 largest difference, or the count that differ by more than 0.001 points and where the largest one is. The engine, the commit, when
 it ran and on how many processes close the line.
@@ -2369,9 +2369,11 @@ it ran and on how many processes close the line.
   so on it only Omni-Compass on native is offered.
 - **Against**: native, and, for Omni-Compass on top of a governor, the governor on the organism too, so Omni-Compass's own
   effect on that governed stack is read alone.
-- **Runs**: 1, 10, 100 or 500. **Organisms stacked**: 1, 10, 100 or 500. Run k of a cell stacks M copies of the organism, copy
-  c on injection k + c (mod 500), so every cell comes out of the one batch; a cell whose runs × organisms pass 500 uses an
-  injection more than once, and its readout says so.
+- **Runs**: 1, 10, 100 or 500. **Organisms stacked**: 1, 10, 100 or 500. Every cell is the one batch cut down: 100 runs are
+  the first 100 of the batch's 500, 10 the first 10, 1 the first; and each run carries a stack of 500 organisms, of which 100
+  organisms are the first 100 copies, 10 the first 10, 1 the first (copy c of run k on injection k + c, mod 500). A click on
+  100 shows those 100 and no others. A cell whose runs × organisms pass 500 uses an injection more than once, and its readout
+  says so.
 - **Gauge**: work, the share of muscles over the line, or the power per muscle. Every gauge is read per muscle. Two ways on the
   same muscles read the same either way, and a governor's way, which carries its own body's muscles beside the organism's, is
   read like for like.

@@ -60,8 +60,10 @@ The live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) reads its own
 **Drive → your own system**, type `http://127.0.0.1:9090` and press **Connect**: each monitor asks this Prometheus its own
 query every 15 s and its breaker shows the answer (read only). The page's **Metrics (Prometheus)** tab prints its own model in
 the same text format, with the series a running system serves beside each one and the PromQL the wall draws it with. This
-Prometheus answers a browser only from the origins in `OMNI_PAGE_ORIGIN` (by default a page opened from a file or from this
-machine).
+Prometheus answers a browser only from the origins in `OMNI_PAGE_ORIGIN`: by default a page served from this machine
+(`python3 -m http.server` in `docs/engine`, then open `http://127.0.0.1:8000/OMNI_COMPASS_LIVE_ENGINE.html`). A page opened
+straight from a file carries the origin `null`, which every sandboxed frame on any website also carries, so it is not answered
+by default; set `OMNI_PAGE_ORIGIN` yourself only if you accept that exposure.
 
 ---
 

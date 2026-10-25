@@ -155,15 +155,35 @@ def verb(fell, aim):
     return "up"
 
 
+def fell_of(w, aim):
+    """Which way a gauge read GAIN, LOSS or power given went, from its word and its aim (tools/readings.py word, read backward):
+    True where it fell, False where it rose, None where the word does not settle it."""
+    a = str(aim or "")
+    if a not in ("higher", "lower", "spent", "never more", "never less", "work per resource"):
+        return None                               # no declared aim: the table's own cells carry the gauge's direction
+    if w == GAIN:
+        return a not in ("higher", "never less", "work per resource")
+    if w == LOSS:
+        return a in ("higher", "never less")
+    if w == GIVEN:
+        return a == "work per resource"
+    return None
+
+
 def in_words(items):
     """Every change judged across our three runs of a benchmark in words, grouped by gauge: (name, word, range, aim) ->
     'p95 cut 65% to 71% (GAIN)', 'memory ceiling held up 215% (power given)', 'work down 5% (LOSS)'."""
     groups = {}
     for name, w, rg, aim in items:
-        nums = re.findall(r"[-+]?\d+(?:\.\d+)?%", rg or "")
+        nums = re.findall(r"[-+\u2212]?\d+(?:\.\d+)?%", rg or "")
         if not nums:
             continue
-        groups.setdefault((name, w, nums[0].startswith("-"), aim), []).extend(abs(float(n.rstrip("%"))) for n in nums)
+        # which way the gauge went is read from its word and its aim, never from the first printed number's sign (the mathematics
+        # seat of 24 October: a range "-0% to +430%" on a 95th percentile read LOSS had printed "cut")
+        fell = fell_of(w, aim)
+        if fell is None:
+            fell = nums[0].startswith(("-", "\u2212"))
+        groups.setdefault((name, w, fell, aim), []).extend(abs(float(n.rstrip("%").replace("\u2212", "-"))) for n in nums)
     out = []
     for (name, w, fell, aim), mags in groups.items():
         mags = sorted(mags)
