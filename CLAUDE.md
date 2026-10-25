@@ -43,9 +43,24 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v18 stands (v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v19 stands (v18, v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v18** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) stands on main since 23 October, night,
+- **Omni v19** (`OMNI_V19.json`, digest `9a72693d49b18b9b`, 62 files; `docs/OMNI_V19.md`) stands on main from 25 October, on the
+  founder's orders of 24 and 25 October ("if OmniCompass can't beat the native, the native stays. Even in the cloud"; "let the math do
+  what it's coded to do"): omni-v18 with the immune system in the Kubernetes governor (`omni_controller/controller.py`): the immune
+  hand-back (a pod waits while the pod target stands below the operator's: the operator's target back at once, from the fast check,
+  held 10 minutes, doubled in a row up to two hours, halved after a quiet hold); the immune memory (the largest rise in requests and
+  in each service's demand inside two decisions: a machine given back only when the rest hold the requests and a reserve of the
+  larger of one machine and that rise; extra pods only as far as the machines can place that rise times themselves); native's line
+  (never thinner than native's own autoscaler's scale-down threshold, `--native-release-util`, 0.5; a machine back the moment the
+  line or the reserve is crossed); immune maturity (no give-back trial before one recheck period); and the step back (a pod that
+  waited between decisions steps an allowed depth back, Omni direct's own reaction). The model gate (`results/model_gate/V19_VS_V18.md`,
+  `V19_PACE.md`, class S): no LOSS against omni-v18 in any model; on-site every service gauge GAIN against native (pods waiting
+  down 5.2%, the 95th percentile down 6.9%, alert minutes down 27.3%), machines power given; in the cloud the same as native on
+  every gauge. The trade: against omni-v18 the on-site 95th percentile and alert minutes give back part of their GAIN (bought with
+  pods that waited). Still LOSS against native in the models, as on omni-v18: the conveyance's pod start wait, the card's 95th and
+  99th percentiles, the batch's requests served: the next version's list. Every benchmark runs again on it.
+- **Omni v18** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) stood on main from 23 October, night, to 25 October,
   on the founder's orders of that evening ("Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on
   top of the muscles. And then Omni direct is simply Omni on top of the muscles, no Kubernetes ... they all need to be written in
   code"; "It should be not 17 anymore, it should be 18"): omni-v17 with Omni direct taken into the engine. The seven files of

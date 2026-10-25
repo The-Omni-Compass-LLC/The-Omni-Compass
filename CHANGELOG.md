@@ -2,6 +2,17 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-25 (morning): omni-v19 stands: the immune system, native stays wherever Omni-Compass cannot beat it
+
+- **omni-v19** (`OMNI_V19.json`, fingerprint `9a72693d49b18b9b`, `docs/OMNI_V19.md`): omni-v18 with the immune system in the
+  Kubernetes governor: the immune hand-back, the immune memory, native's line, immune maturity and the step back
+  (`tests/test_immune_system.py`). The model gate against omni-v18 (`results/model_gate/V19_VS_V18.md`, `V19_PACE.md`, class S):
+  no LOSS against omni-v18 in any model; on-site every service gauge GAIN against native, in the cloud the same as native.
+  Every benchmark runs again on it.
+- **The ladder is 1, 10, 100 and 500 everywhere** (the founder's order of 25 October): the grid's copies and runs, and the
+  Monte Carlo's rungs, each with its own digest in the Python, the C++ harness and the live engine (`tools/engine_runs.py`'s
+  ladder; the page's ladder buttons and table); the 1,000 tier retired.
+
 ## 2026-10-25 (night): Omni-Compass never by itself; our models are models; every competitor preregistered; the GPU stacks on a card
 
 - **Omni-Compass is never by itself** (the founder's order of 25 October): the by-itself arm of 23 October (each muscle's own native

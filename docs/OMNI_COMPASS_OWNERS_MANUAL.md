@@ -691,7 +691,7 @@ installed is a quarter off the bill.
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v18, fingerprint 1cb92edb64c4391d (62 files).
+- **The engine on this checkout:** omni-v19, fingerprint 9a72693d49b18b9b (62 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 577, GAIN 530
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses down 0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.118 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses down 0.092 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
@@ -706,15 +706,14 @@ installed is a quarter off the bill.
   - Real messaging (Apache Kafka, GitHub): −1.9% LOSS
   - Real database (PostgreSQL behind PgBouncer, GitHub): −4.9% LOSS
 
-**On the engine that stands (omni-v18): 2 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v19): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Redis, the cache's memory ceiling | omni-v18 | +0.2% | GAIN, power given | L |
-| Kafka, the consumer group's size | omni-v18 | −1.9% | GAIN AND LOSS | L |
 | Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 and omni-v18 | +3.1% | GAIN AND LOSS | L |
 | Robustness: the two-hour run | omni-v11 | −4.2% | GAIN AND LOSS | L |
 | Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
+| Redis, the cache's memory ceiling | omni-v18 | +0.2% | GAIN, power given | L |
 | Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
 | Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
 | Real Kubernetes, demand that wanders | omni-v10 | +36.5% | GAIN AND LOSS | L |
@@ -730,6 +729,7 @@ installed is a quarter off the bill.
 | PostgreSQL, the pooler's pool size | omni-v16 | −4.9% | GAIN AND LOSS | L |
 | MySQL, the buffer pool's size | omni-v16 | +1.6% | GAIN AND LOSS | L |
 | MongoDB, the storage engine's cache size | omni-v16 | −1.4% | GAIN AND LOSS | L |
+| Kafka, the consumer group's size | omni-v18 | −1.9% | GAIN AND LOSS | L |
 | Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN | S |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
