@@ -1,0 +1,184 @@
+date_utc=2026-10-25T03:16:22Z
+arm=compass
+git_commit=7815b0003729278dd1f6adc8cde0149921003fd0
+docker=Docker version 28.0.4, build b8034c0
+kind=kind v0.31.0 go1.25.5 linux/amd64
+kubectl=v1.35.0
+server=v1.35.0
+python=Python 3.12.15
+metrics_server=v0.9.0 sha256=1cec29a5267809306a2c6ec74a3e449abbb705b4a8beed0c8a1963910f72c79b
+workers=6
+serviceaccount/metrics-server created
+clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
+clusterrole.rbac.authorization.k8s.io/system:metrics-server created
+rolebinding.rbac.authorization.k8s.io/metrics-server-auth-reader created
+clusterrolebinding.rbac.authorization.k8s.io/metrics-server:system:auth-delegator created
+clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
+service/metrics-server created
+deployment.apps/metrics-server created
+apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
+deployment.apps/coredns patched
+Waiting for deployment "metrics-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "metrics-server" successfully rolled out
+deployment "coredns" successfully rolled out
+busybox: loaded into every node from the runner's own copy (kind load)
+Waiting for daemon set "rig-prepull" rollout to finish: 0 of 6 updated pods are available...
+Waiting for daemon set "rig-prepull" rollout to finish: 1 of 6 updated pods are available...
+Waiting for daemon set "rig-prepull" rollout to finish: 2 of 6 updated pods are available...
+Waiting for daemon set "rig-prepull" rollout to finish: 3 of 6 updated pods are available...
+Waiting for daemon set "rig-prepull" rollout to finish: 4 of 6 updated pods are available...
+Waiting for daemon set "rig-prepull" rollout to finish: 5 of 6 updated pods are available...
+daemon set "rig-prepull" successfully rolled out
+images=pre-pulled on every worker before the arm (deploy/kind/prepull.yaml)
+image_ids= 6 registry.k8s.io/hpa-example@sha256:581697a37f0e136db86d6b30392f0db40ce99c8248a7044c770012f4e8491544 
+deployment.apps/php-apache created
+service/php-apache created
+horizontalpodautoscaler.autoscaling/php-apache created
+cores: the 7 kind nodes on cores 0-2, the governor alone on core 3 (of 4), in every arm
+service/php-apache-edge created
+poddisruptionbudget.policy/php-apache created
+Waiting for deployment "php-apache" rollout to finish: 0 of 1 updated replicas are available...
+deployment "php-apache" successfully rolled out
+group: a member of a group of clusters omni-m1; the stream sent by the group, this member's scheduler as shipped (registry.k8s.io/kube-scheduler:v1.35.0)
+busybox:1.36 pre-pulled on every worker
+coredns=registry.k8s.io/coredns/coredns:v1.13.1
+metrics-server=registry.k8s.io/metrics-server/metrics-server:v0.9.0
+batch queue: group: a member of a group of clusters omni-m1; the stream sent by the group, this member's scheduler as shipped (registry.k8s.io/kube-scheduler:v1.35.0) (batch_queue.txt)
+probe_url=http://172.18.0.3:30080/ (Service via kube-proxy on the control plane)
+configmap/omni-security created
+deployment.apps/load-generator created
+loadgen=closed
+Waiting for deployment "load-generator" rollout to finish: 0 out of 1 new replicas have been updated...
+Waiting for deployment "load-generator" rollout to finish: 0 of 1 updated replicas are available...
+deployment "load-generator" successfully rolled out
+namespace/omni-compass created
+serviceaccount/omni-compass created
+clusterrole.rbac.authorization.k8s.io/omni-compass-sense created
+clusterrole.rbac.authorization.k8s.io/omni-compass-nodes created
+clusterrolebinding.rbac.authorization.k8s.io/omni-compass-sense created
+clusterrolebinding.rbac.authorization.k8s.io/omni-compass-nodes created
+role.rbac.authorization.k8s.io/omni-compass-app created
+rolebinding.rbac.authorization.k8s.io/omni-compass-app created
+== can (each muscle's push)
+patch hpa/php-apache (hpa): yes
+Warning: resource 'nodes' is not namespace scoped
+
+patch nodes (node pool: idle mark): yes
+create pods/eviction (node pool: drain): yes
+patch pods/resize (power cap, in place): yes
+patch pods (make before break: which pods leave first): yes
+get pods/resize (power cap reads before it writes): yes
+patch deployment/php-apache (rollout guard, cap record): yes
+get configmap/omni-security (security afferent): yes
+== cannot
+Warning: resource 'nodes' is not namespace scoped
+
+delete nodes: no
+create pods: no
+delete pods: no
+delete deployments: no
+patch deployment/load-generator: no
+patch deployments in kube-system: no
+patch hpa in kube-system: no
+get secrets (any namespace): no
+Warning: resource 'namespaces' is not namespace scoped
+
+create namespaces: no
+patch configmap/omni-security: no
+== warm-up 120s (both arms)
+group: member omni-m1 of 2, the windows opened together at 1792898434
+batch: 24 jobs of 10 pods, 5 at a time, one every 30 s, 3000 MB hashed each, through group
+== ARM compass: Omni-Compass driving HPA target + node pool + power sensing
+== reset
+omni writes during the run: 22
+wake omni-m1-worker: open to work
+open workers: 6 (wanted 6)
+pod CPU limits after kill: 500m
+HPA replica range after kill: 1,10
+restored target: 50
+workers in service: 6 of 6
+Omni records left after kill: none
+rows captured: 91
+== controller: decisions inside the window 25 of 25 (one every 60.0 s; 25 in all), failed decisions or checks 0
+-- controller's own cost (CPU of the process and every command it ran): {"time": 1792899875.863507, "overhead": {"cpu_s": 19.54, "wall_s": 1440.6, "cores_mean": 0.0136}}
+-- my writes by muscle (count, first words of why)
+      5 convey: the shared host
+      2 record original target: 
+      2 convey: omni-m1-worker2 idle CPU
+      2 convey: omni-m1-worker idle CPU
+      1 rollout: resume (change permitted)
+      1 rollout: record pause
+      1 rollout: pause (change not
+      1 rollout: clear pause record
+      1 node pool size: 
+      1 convey: record original CPU
+      1 convey: omni-m1-worker6 idle CPU
+      1 convey: omni-m1-worker5 idle CPU
+      1 convey: omni-m1-worker4 idle CPU
+      1 HPA target to rho* = 55%: 
+      1 HPA target to rho* = 30% (SLO reflex: not tighter than
+-- conveyed CPU limits (last 8)
+convey: omni-m1-worker4 idle CPU to its 1 serving pod(s), limit 3700m in place
+convey: the shared host at its top (busy 0.83) beside another workload's room, operator's limit 500m in place
+convey: the shared host at its top (busy 0.83) beside another workload's room, operator's limit 500m in place
+convey: the shared host at its top (busy 0.83) beside another workload's room, operator's limit 500m in place
+convey: the shared host at its top (busy 0.83) beside another workload's room, operator's limit 500m in place
+convey: the shared host at its top (busy 0.83) beside another workload's room, operator's limit 500m in place
+convey: omni-m1-worker idle CPU to its 1 serving pod(s), limit 3700m in place
+convey: omni-m1-worker2 idle CPU to its 1 serving pod(s), limit 3700m in place
+-- pod reflex (last 8)
+-- controller.log (last 40 lines)
+idle omni-m1-worker: prefer-not, 0 pod(s) marked first to go; it idles when its work is gone (no pod moved, no pod waits)
+open workers: 5 (wanted 5)
+-- audit errors (last 10)
+-- decision trail (nodes seen -> recommended | p95 ms | SLO clean | calm | node-view calm | node gate)
+  compass: Β >  90.0° Dispersion: peak extension, the turn | Ω held | G·n≤0 yes | L 878.0138 | axle S 0.1383 (rest 2.3686) | circles 0
+  6 -> 6 | p95 None | clean False | calm 0.153 | node calm 0.341 | gate pods waiting; latency breached now; node organ has no contraction authority; a sense is blind | queue 0.4 | U 0.876 | blind ['latency'] | latency age 1.5 s | proprioception {}
+  compass: Ε +   7.6° Expansion: rising through rest | Ω held | G·n≤0 yes | L 847.6592 -30.3546 | axle S 0.1838 (rest 2.3686) | circles 0
+  6 -> 6 | p95 916.1 | clean False | calm 0.063 | node calm 0.251 | gate pods waiting; latency breached now; node organ has no contraction authority | queue 1.0 | U 0.866 | blind [] | latency age 2.9 s | proprioception {}
+  compass: Ε +  12.6° Expansion: rising through rest | Ω held | G·n≤0 yes | L 834.4572 -13.2020 | axle S 0.2038 (rest 2.3686) | circles 0
+  6 -> 6 | p95 844.0 | clean False | calm 0.005 | node calm 0.141 | gate pods waiting; latency breached now; node organ has no contraction authority | queue 1.2 | U 0.852 | blind [] | latency age 5.0 s | proprioception {}
+  compass: Ζ ⇄  35.7° Expansion: expansion, exchange under way | Ω held | G·n≤0 yes | L 818.1167 -16.3406 | axle S 0.2287 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1036.3 | clean False | calm 0.016 | node calm 0.138 | gate pods waiting; latency breached now; node organ has no contraction authority | queue 1.073 | U 0.858 | blind [] | latency age 2.8 s | proprioception {}
+  compass: Ε +  21.3° Expansion: rising through rest | Ω held | G·n≤0 yes | L 818.6010 +0.4844 (forced) | axle S 0.2281 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1182.8 | clean False | calm 0.0 | node calm 0.402 | gate pods waiting; latency breached now; node organ has no contraction authority | queue 1.366 | U 0.841 | blind [] | latency age 6.0 s | proprioception {}
+  compass: Ζ ⇄  29.6° Expansion: expansion, exchange under way | Ω held | G·n≤0 yes | L 821.4906 +2.8895 (forced) | axle S 0.2239 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1232.2 | clean False | calm 0.0 | node calm 0.652 | gate latency breached now; node organ has no contraction authority | queue 1.464 | U 0.828 | blind [] | latency age 1.9 s | proprioception {}
+  compass: Ζ ⇄  23.6° Expansion: expansion, exchange under way | Ω held | G·n≤0 yes | L 834.8186 +13.3280 (forced) | axle S 0.2039 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1376.4 | clean False | calm 0.0 | node calm 0.778 | gate latency breached now; node organ has no contraction authority | queue 1.753 | U 0.803 | blind [] | latency age 4.7 s | proprioception {}
+  compass: Ι > 110.1° Dispersion: peak extension, the turn | Ω held | G·n≤0 yes | L 831.1846 -3.6340 | axle S 0.2095 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1252.1 | clean False | calm 0.0 | node calm 0.845 | gate latency breached now; node organ has no contraction authority | queue 1.504 | U 0.812 | blind [] | latency age 4.6 s | proprioception {'hpa default/php-apache': 0.0}
+  compass: Μ ⊤ 142.6° Dispersion: dispersion, the ceiling holds | Ω held | G·n≤0 yes | L 819.7602 -11.4244 | axle S 0.2268 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1160.4 | clean False | calm 0.0 | node calm 0.884 | gate latency breached now; node organ has no contraction authority | queue 1.321 | U 0.829 | blind [] | latency age 3.0 s | proprioception {}
+  compass: Ζ ⇄  23.8° Expansion: expansion, exchange under way | Ω held | G·n≤0 yes | L 831.4602 +11.7001 (forced) | axle S 0.2092 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1386.9 | clean False | calm 0.0 | node calm 0.909 | gate latency breached now; node organ has no contraction authority | queue 1.774 | U 0.802 | blind [] | latency age 2.4 s | proprioception {}
+  compass: Μ ⊤ 155.3° Dispersion: dispersion, the ceiling holds | Ω held | G·n≤0 yes | L 817.3272 -14.1331 | axle S 0.2307 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1149.4 | clean False | calm 0.0 | node calm 0.925 | gate latency breached now; node organ has no contraction authority | queue 1.299 | U 0.826 | blind [] | latency age 7.2 s | proprioception {}
+  compass: Ζ ⇄  22.5° Expansion: expansion, exchange under way | Ω held | G·n≤0 yes | L 830.3961 +13.0689 (forced) | axle S 0.211 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1408.0 | clean False | calm 0.0 | node calm 0.926 | gate latency breached now; node organ has no contraction authority | queue 1.816 | U 0.798 | blind [] | latency age 3.7 s | proprioception {}
+  compass: Ν − 158.8° Dispersion: falling through rest | Ω held | G·n≤0 yes | L 815.3216 -15.0745 | axle S 0.2338 (rest 2.3686) | circles 0
+  6 -> 6 | p95 1147.4 | clean False | calm 0.0 | node calm 0.928 | gate latency breached now; node organ has no contraction authority | queue 1.295 | U 0.825 | blind [] | latency age 1.6 s | proprioception {}
+  compass: Ω − 174.4° Dispersion: falling through rest | Ω: machine_fill below the floor, held | G·n≤0 yes | L 768.4452 -46.8764 | axle S 0.3057 (rest 2.3686) | circles 0
+  6 -> 6 | p95 682.1 | clean False | calm 0.056 | node calm 0.93 | gate latency breached now; node organ has no contraction authority | queue 0.364 | U 0.901 | blind [] | latency age 0.4 s | proprioception {}
+  compass: Ω − 174.4° Dispersion: falling through rest | Ω: machine_fill below the floor, held | G·n≤0 yes | L 723.0556 -45.3897 | axle S 0.3768 (rest 2.3686) | circles 0
+  6 -> 6 | p95 82.8 | clean False | calm 0.319 | node calm 0.933 | gate release permitted | queue 0.0 | U 0.943 | blind [] | latency age 1.4 s | proprioception {}
+  compass: Ν − 169.7° Dispersion: falling through rest | Ω: machine_fill below the floor, held | G·n≤0 yes | L 694.0576 -28.9979 | axle S 0.4231 (rest 2.3686) | circles 0
+  6 -> 6 | p95 76.1 | clean False | calm 0.498 | node calm 0.937 | gate release permitted | queue 0.0 | U 0.953 | blind [] | latency age 2.7 s | proprioception {}
+  compass: Ν − 161.8° Dispersion: falling through rest | Ω: machine_fill below the floor, held | G·n≤0 yes | L 675.4761 -18.5816 | axle S 0.4532 (rest 2.3686) | circles 0
+  6 -> 6 | p95 83.7 | clean True | calm 0.596 | node calm 0.94 | gate release permitted | queue 0.0 | U 0.954 | blind [] | latency age 4.1 s | proprioception {}
+  compass: Μ ⊤ 151.2° Dispersion: dispersion, the ceiling holds | Ω: machine_fill below the floor, held | G·n≤0 yes | L 663.4734 -12.0027 | axle S 0.4728 (rest 2.3686) | circles 0
+  6 -> 6 | p95 84.0 | clean True | calm 0.651 | node calm 0.943 | gate release permitted | queue 0.0 | U 0.953 | blind [] | latency age 0.2 s | proprioception {}
+  compass: Λ ⊤ 141.7° Dispersion: dispersion, the ceiling holds | Ω: machine_fill below the floor, held | G·n≤0 yes | L 655.6266 -7.8468 | axle S 0.4856 (rest 2.3686) | circles 0
+  6 -> 6 | p95 91.4 | clean True | calm 0.685 | node calm 0.947 | gate release permitted | queue 0.0 | U 0.953 | blind [] | latency age 1.1 s | proprioception {'hpa default/php-apache': 0.0}
+  compass: Λ ⊤ 137.4° Dispersion: dispersion, the ceiling holds | Ω: machine_fill below the floor, held | G·n≤0 yes | L 650.5168 -5.1099 | axle S 0.494 (rest 2.3686) | circles 0
+  6 -> 6 | p95 89.5 | clean True | calm 0.688 | node calm 0.951 | gate release permitted | queue 0.0 | U 0.953 | blind [] | latency age 2.4 s | proprioception {}
+  compass: Λ ⊤ 137.2° Dispersion: dispersion, the ceiling holds | Ω: machine_fill below the floor, held | G·n≤0 yes | L 647.1777 -3.3391 | axle S 0.4995 (rest 2.3686) | circles 0
+  6 -> 6 | p95 72.9 | clean True | calm 0.691 | node calm 0.955 | gate release permitted | queue 0.0 | U 0.954 | blind [] | latency age 3.5 s | proprioception {}
+  compass: Λ ⊤ 139.1° Dispersion: dispersion, the ceiling holds | Ω: machine_fill below the floor, held | G·n≤0 yes | L 644.9877 -2.1900 | axle S 0.5032 (rest 2.3686) | circles 0
+  6 -> 6 | p95 75.0 | clean True | calm 0.696 | node calm 0.959 | gate release permitted | queue 0.0 | U 0.954 | blind [] | latency age 4.9 s | proprioception {}
+  compass: Λ ⊤ 142.4° Dispersion: dispersion, the ceiling holds | Ω: machine_fill below the floor, returning | G·n≤0 yes | L 643.6085 -1.3792 | axle S 0.5054 (rest 2.3686) | circles 0
+  6 -> 2 | p95 93.7 | clean True | calm 0.702 | node calm 0.963 | gate release permitted | queue 0.0 | U 0.955 | blind [] | latency age 0.6 s | proprioception {}
+  compass: Ν − 158.8° Dispersion: falling through rest | Ω: machine_fill below the floor, held | G·n≤0 yes | L 645.8070 +2.1986 | axle S 0.5019 (rest 2.3686) | circles 0
+  5 -> 5 | p95 93.8 | clean True | calm 0.721 | node calm 0.967 | gate release permitted | queue 0.0 | U 0.958 | blind [] | latency age 1.8 s | proprioception {'nodes': 0.0}
+  compass: Μ ⊤ 156.9° Dispersion: dispersion, the ceiling holds | Ω: machine_fill below the floor, held | G·n≤0 yes | L 647.5503 +1.7433 | axle S 0.499 (rest 2.3686) | circles 0
+  5 -> 5 | p95 77.1 | clean True | calm 0.732 | node calm 0.972 | gate release permitted | queue 0.0 | U 0.960 | blind [] | latency age 2.9 s | proprioception {}
