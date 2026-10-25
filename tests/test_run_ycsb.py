@@ -18,10 +18,11 @@ from tools import run_ycsb as Y
 
 class FakeAdmin:
     def __init__(self, mb):
-        self.mb = mb; self.reads = (0, 0)
+        self.mb = mb; self.reads = (0, 0); self.calls = []
 
     def command(self, cmd):
-        if cmd == "serverStatus":
+        if cmd == "serverStatus" or (isinstance(cmd, dict) and "serverStatus" in cmd):   # in full, or with sections asked away (25 October)
+            self.calls.append(cmd)
             return {"wiredTiger": {"cache": {"maximum bytes configured": self.mb * Y.MB, "bytes currently in the cache": self.mb * Y.MB // 2,
                                              "pages read into cache": 100, "unmodified pages evicted": 5, "modified pages evicted": 1,
                                              "pages evicted by application threads": 0, "pages requested from the cache": 10000}},

@@ -69,7 +69,9 @@ COVER_MB = (256, 2048)    # never under 256 MB (the server's own floor), never o
 STEP_MB = 64              # one notch of the knob
 FAILUP_MB = 448           # past the wall: a quarter of the cover at once, and again the next second if still past it
 DWELL_S = 5.0             # after growing, no taking back within five seconds; giving back is a notch a second
-FULL = 0.9                # the cache counts as full when the bytes in it are 90% of its size or more
+FULL = 0.8                # the cache counts as full when the bytes in it are 80% of its size or more (WiredTiger's own eviction_target, which
+                          # its eviction workers hold the cache at), or when it evicted a page in the last second (store fix of 25 October:
+                          # at 0.9 the cache read full in only 2 to 61 of about 460 seconds of every omni-v16 arm, so the grow path never opened)
 RATE = 3000               # operations a second offered by YCSB (-target), the same in both arms
 THREADS = 32              # YCSB's client threads
 STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
@@ -107,7 +109,41 @@ GAUGES = [  # key, label, direction
     ("cpu_seconds", "host CPU-seconds", "spent"),
     ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 operations inside the line", "spent"),
     ("writes", "cache size changes written (the knob's moves)", "shown"),
+    # store fix of 25 October: the CPU apart, beside the host figure (old runs lack these rows; the readers prefer process_cpu_seconds)
+    ("process_cpu_seconds", "the store's and the harness's own CPU-seconds (mongod plus the compass and its sampler; steal excluded)", "spent"),
+    ("server_cpu_seconds", "the server's own CPU-seconds (mongod)", "shown"),
+    ("harness_cpu_seconds", "the harness's own CPU-seconds (the compass's brain in the omni arm, the sampler in both)", "shown"),
+    ("host_cpu_seconds_no_steal", "host CPU-seconds without steal (the load generator included)", "shown"),
+    ("steal_seconds", "CPU-seconds the hypervisor took (steal), host-wide", "shown"),
 ]
+OPTIONAL_GAUGES = ("process_cpu_seconds", "server_cpu_seconds", "harness_cpu_seconds", "host_cpu_seconds_no_steal", "steal_seconds")  # absent from runs before 25 October
+# the serverStatus sections the brain and the sampler read (store fix of 25 October: every other section is asked away, so the
+# one-a-second reading no longer has the server build, and Python decode, the whole document)
+STATUS_SECTIONS = ("wiredTiger", "opLatencies")
+
+
+def lean_status_command(full_doc, keep=STATUS_SECTIONS):
+    """The serverStatus command that asks only for the sections kept: every other section the server reported in a full
+    document (a sub-document at the top level) is asked away with 0, so only names the server itself gave are sent."""
+    cmd = {"serverStatus": 1}
+    for k, v in full_doc.items():
+        if isinstance(v, dict) and k not in keep:
+            cmd[k] = 0
+    return cmd
+
+
+class LeanStatus:
+    """serverStatus once in full, then only the sections the brain reads (STATUS_SECTIONS)."""
+
+    def __init__(self, client):
+        self.c, self.cmd = client, None
+
+    def __call__(self):
+        if self.cmd is None:
+            full = self.c.admin.command("serverStatus")
+            self.cmd = lean_status_command(full)
+            return full
+        return self.c.admin.command(dict(self.cmd))
 
 
 class CacheSize:
@@ -116,9 +152,10 @@ class CacheSize:
 
     def __init__(self, client):
         self.c, self.snapshot, self.last_written = client, None, None
+        self.status = LeanStatus(client)
 
     def _status(self):
-        return self.c.admin.command("serverStatus")
+        return self.status()
 
     def configured_mb(self, st=None):
         st = st or self._status()
@@ -173,12 +210,32 @@ GIVEBACK_MISS_SHARE = 0.01  # amendment 1: a notch is given back only while the 
 GROW_MISS_SHARE = GIVEBACK_MISS_SHARE  # and the cache grows only while missing (1% or more): a full cache that holds its working set cannot mend a slow read
 
 
-def decide(p, force, miss_share_last_s, cur_mb, last_change_age, full, wall=0.95, reads=True):
+def cache_full(used_mb, cur_mb, evicted_last_s=0):
+    """The cache is full when the bytes in it reach WiredTiger's own eviction target (FULL of its size) or it evicted a page in
+    the last second (store fix of 25 October)."""
+    return used_mb >= FULL * cur_mb or (evicted_last_s or 0) > 0
+
+
+def decide(p, force, miss_share_last_s, cur_mb, last_change_age, full, wall=0.95, reads=True, native_mb=None):
     """The knob's move this second, in MB: slow reads (the service slow) grow the cache by ceil(force / 0.1) notches, but only
     while the cache is full (a slow read with room to spare is not the cache's to mend) and missing (amendment 1: misses at one
     percent of its requests or more); calm with the cache's misses under one percent of its requests (it holds the working set)
     gives back one notch after the dwell, and only in a second that requested pages (a second with none says nothing about the
-    working set); past the wall, with the cache full, a quarter of the cover at once."""
+    working set); past the wall, with the cache full, a quarter of the cover at once.
+    Store fix of 25 October, the queue line of the database wire (docs/POSTGRES_PREREGISTRATION.md, amendment 2) for the cache:
+    below the operator's own size (native_mb), a second that requested pages with misses at one percent of its requests or more
+    adds one notch back, up to the operator's size, with no slow or full condition (a size below native's that misses no longer
+    holds the working set; the omni-v16 runs held the cache at 448 MB to the end of two arms with misses at 9 to 13%)."""
+    target, why = _decide(p, force, miss_share_last_s, cur_mb, last_change_age, full, wall, reads)
+    if native_mb is not None and cur_mb < native_mb and reads and miss_share_last_s >= GROW_MISS_SHARE:
+        back = min(native_mb, cur_mb + STEP_MB)
+        if back > target:
+            return back, f"missing below the operator's size ({100 * miss_share_last_s:.1f}% of requests): a notch added back, up to the operator's own size"
+    return target, why
+
+
+def _decide(p, force, miss_share_last_s, cur_mb, last_change_age, full, wall=0.95, reads=True):
+    """The rule before the store fix (the slow, calm and wall moves); decide() adds the hand-back below native."""
     lo, hi = COVER_MB
     if p is not None and p >= wall and full:
         return min(hi, cur_mb + FAILUP_MB), "fail up: the line is at hand and the cache is full, a quarter of the cover at once"
@@ -236,16 +293,18 @@ class Omni(threading.Thread):
                     cur, used, rd, ev, rq = cache_stats(st); ev_last = ev - ev0; ev0 = ev
                     rd_last = rd - rd0; rd0 = rd; rq_last = rq - rq0; rq0 = rq
                     share = miss_share(rd_last, rq_last)
-                    cur = self.plug.lever(st); full = used >= FULL * cur
+                    cur = self.plug.lever(st); full = cache_full(used, cur, ev_last)
                     cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
                     cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
                     cost = sample_cost(self.objective, do, reading if do > 0 else None, cur, cpu_share)
                     self.verdict.observe(cost, tick - t0)                                   # measured under the cache of the last second
-                    target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high, reads=rq_last > 0)
+                    target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high, reads=rq_last > 0,
+                                         native_mb=native)
+                    missing_below = cur < native and rq_last > 0 and share >= GROW_MISS_SHARE     # the size below native no longer holds the working set
                     target, why, vinfo = self.verdict.decide(
                         target, spend_ok=(f > 0.05 and full and share >= GROW_MISS_SHARE),
                         give_ok=(f < -0.05 and rq_last > 0 and share < GIVEBACK_MISS_SHARE),
-                        t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=why.startswith("fail up"))
+                        t=tick - t0, why=why, stress=(f > 0.05 or missing_below), calm=f < -0.05, fail_up=why.startswith("fail up"))
                     wrote = None
                     if target != cur:
                         wrote = self.plug.write(target); self.writes += 1
@@ -272,11 +331,12 @@ class Sampler(threading.Thread):
     def __init__(self, client):
         super().__init__(daemon=True)
         self.c, self.stop_flag, self.rows = client, threading.Event(), []
+        self.status = LeanStatus(client)
 
     def run(self):
         while not self.stop_flag.is_set():
             try:
-                self.rows.append(cache_stats(self.c.admin.command("serverStatus")))
+                self.rows.append(cache_stats(self.status()))
             except Exception:
                 pass
             time.sleep(DT)
@@ -287,6 +347,71 @@ def cpu_times():
         f = fh.readline().split()
     vals = list(map(int, f[1:]))
     return sum(vals), vals[3] + vals[4]
+
+
+# --- the CPU apart (store fix of 25 October) -------------------------------------------------------------------------
+# The host figure above (kept, so every older table reads the same) counts every field but idle and iowait as busy: steal (the
+# hypervisor's), and guest twice. Beside it: the host's busy time without steal, the steal itself, the server's own CPU from
+# its /proc/<pid>/stat and the harness's own from getrusage, so the store's work and the compass's cost are read apart from
+# the load generator, the runner's own processes and the machine's neighbours.
+def host_cpu_split(line=None):
+    """(busy jiffies without steal or guest, steal jiffies) from /proc/stat's cpu line (or the line given)."""
+    if line is None:
+        with open("/proc/stat") as fh:
+            line = fh.readline()
+    v = [int(x) for x in line.split()[1:]] + [0] * 10
+    user, nice, system, idle, iowait, irq, softirq, steal = v[:8]
+    return user + nice + system + irq + softirq, steal        # guest and guest_nice are already inside user and nice
+
+
+def pid_of(name):
+    """The oldest process whose command name is `name` (its /proc/<pid>/comm), or None."""
+    best = None
+    for d in Path("/proc").iterdir():
+        if d.name.isdigit():
+            try:
+                if (d / "comm").read_text().strip() == name:
+                    pid = int(d.name)
+                    best = pid if best is None or pid < best else best
+            except OSError:
+                continue
+    return best
+
+
+def proc_cpu_jiffies(pid, stat_text=None):
+    """utime + stime (jiffies) of one process from /proc/<pid>/stat (or the text given); None when it is gone."""
+    try:
+        txt = stat_text if stat_text is not None else Path(f"/proc/{pid}/stat").read_text()
+    except (OSError, TypeError):
+        return None
+    rest = txt[txt.rindex(")") + 2:].split()                    # after the command name, which may hold spaces
+    return int(rest[11]) + int(rest[12])                        # fields 14 and 15 of the stat line
+
+
+class CpuApart:
+    """The CPU of one arm apart: start() before the load, stop() after; figures in seconds."""
+
+    def __init__(self, server_name):
+        self.server_name = server_name
+
+    def _read(self):
+        import resource
+        pid = pid_of(self.server_name)
+        own = resource.getrusage(resource.RUSAGE_SELF)
+        busy, steal = host_cpu_split()
+        return {"pid": pid, "server": proc_cpu_jiffies(pid) if pid else None, "harness": own.ru_utime + own.ru_stime, "busy": busy, "steal": steal}
+
+    def start(self):
+        self.a = self._read()
+        return self
+
+    def stop(self):
+        b, a, tck = self._read(), self.a, os.sysconf("SC_CLK_TCK")
+        server = (b["server"] - a["server"]) / tck if (a["server"] is not None and b["server"] is not None and a["pid"] == b["pid"]) else None
+        harness = b["harness"] - a["harness"]
+        return {"server_cpu_seconds": server, "harness_cpu_seconds": harness,
+                "process_cpu_seconds": (server + harness) if server is not None else None,
+                "host_cpu_seconds_no_steal": (b["busy"] - a["busy"]) / tck, "steal_seconds": (b["steal"] - a["steal"]) / tck}
 
 
 def parse_raw(path: Path):
@@ -382,6 +507,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
     if arm == "omni":
         omni = Omni(CacheSize(pymongo.MongoClient(URL)), d / "audit.jsonl", line_ms, objective); omni.start()
     records, failed, summaries = [], 0, []
+    apart = CpuApart("mongod").start()
     cpu0 = cpu_times(); t0 = time.time()
     for i, notch in enumerate(int(s) for s in steps.split()):
         raw = d / f"notch-{i + 1}.raw"
@@ -395,7 +521,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
         lat = sorted(l for _, l in got); row = sampler.rows[-1] if sampler.rows else (native_now, 0.0, 0, 0, 0)
         print(f"   {arm} rep {rep} notch {notch}: {len(lat)} ops, mean {sum(lat) / max(1, len(lat)):.3f} ms, p95 {(lat[int(0.95 * len(lat))] if lat else float('nan')):.3f} ms, "
               f"inside the line {100 * sum(1 for l in lat if l <= line_ms) / max(1, len(lat)):.1f}%, cache {row[0]:.0f} MB, in cache {row[1]:.0f} MB", flush=True)
-    t1 = time.time(); cpu1 = cpu_times()
+    t1 = time.time(); cpu1 = cpu_times(); cpu_apart = apart.stop()
     if omni:
         omni.stop_flag.set(); omni.join(timeout=30)
     sampler.stop_flag.set(); sampler.join(timeout=5)
@@ -415,6 +541,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
          "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
          "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
          "controller_error": (omni.error if omni else None),
+         **cpu_apart,
          "verdict": (omni.verdict.record() if omni and omni.verdict else None)}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     print(f"   {arm} rep {rep}: {n} operations, inside the line {g['work_inside_line_ops']:.0f}/s, p95 {g['p95_ms']:.2f} ms, cache {g['cache_mb_mean']:.0f} MB, "

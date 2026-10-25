@@ -88,9 +88,9 @@ WORKLOAD_TABLES = [
     ("Real messaging (Apache Kafka, GitHub)", "V7_KAFKA.json", "Kafka `{wl}`: the consumer group's size, three paired repetitions, three runs",
      {"work": "work_inside_line_mps", "speed": "p95_ms", "machines": "consumers_mean", "energy": "cpu_seconds"}),
     ("Real cache (Redis, GitHub)", "V7_REDIS.json", "Redis `{wl}`: the cache's memory ceiling, three paired repetitions, three runs",
-     {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": "cpu_seconds"}),
+     {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": ("process_cpu_seconds", "cpu_seconds")}),
     ("Real database cache (MongoDB under YCSB, GitHub)", "V7_YCSB.json", "YCSB `{wl}`: the storage engine's cache size, three paired repetitions, three runs",
-     {"work": "work_inside_line_ops", "speed": "p95_ms", "machines": "cache_mb_mean", "energy": "cpu_seconds"}),
+     {"work": "work_inside_line_ops", "speed": "p95_ms", "machines": "cache_mb_mean", "energy": ("process_cpu_seconds", "cpu_seconds")}),
     ("Real database buffer pool (MySQL under sysbench, GitHub)", "V7_SYSBENCH.json", "sysbench `{wl}`: the buffer pool's size, three paired repetitions, three runs",
      {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "pool_mb_mean", "energy": "cpu_seconds"}),
 ]
@@ -140,6 +140,17 @@ def newest(fname):
     return found[-1][1] if found else fname
 
 
+def workload_gauge(gauges, key):
+    """One measure's gauge from a workload table: key, or a tuple of keys read in order, the first whose three runs all hold a
+    value (store fix of 25 October: a table written from runs that record the CPU apart reads the stack's own CPU-seconds,
+    process_cpu_seconds; an older table reads the host's, cpu_seconds, as before)."""
+    for k in (key if isinstance(key, tuple) else (key,)):
+        g = gauges.get(k)
+        if g and g.get("runs") and not any(x is None for x in g["runs"]):
+            return g
+    return None
+
+
 def tests():
     out = []
     for cat, name, f, measures, work in SOURCES:
@@ -168,7 +179,7 @@ def tests():
                 continue                                        # the tuning workload is shown in its table, never counted
             r = {}
             for m, key in measures_.items():
-                g = gauges.get(key)
+                g = workload_gauge(gauges, key)
                 if not g or any(x is None for x in g["runs"]):
                     continue
                 reading = g["reading"]

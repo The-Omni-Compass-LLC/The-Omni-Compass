@@ -71,7 +71,9 @@ SMOOTH = 0.5
 DEAD = 0.05               # a force inside the cushion moves nothing
 UP = 0.10                 # adding: ceil(force / UP) slots a second (full force adds ten); taking back: one idle server a second
 PEAK = 0.9                # the peak notch offers nine tenths of native's unlimited capacity: native at its knee, not past it
-DWELL_S = 5.0             # after adding, no taking back within five seconds (no hunting); adding is never held (amendment 1)
+DWELL_S = 30.0            # after adding, no taking back within thirty seconds (no hunting); adding is never held (amendment 1). Store fix of 25
+                          # October: five seconds before; near saturation the brain gave a server back on a calm second and added it back 1 to
+                          # 10 seconds later, 21 to 39 writes an arm in the omni-v16 tpcb_hot runs, each closing a server and opening a new one
 FLOOR, CEILING = 2, 90    # the cover: never under two server connections; never within ten of PostgreSQL's 100 connections
 NATIVE_POOL = 20          # PgBouncer's shipped default_pool_size: native's setting and Omni's snapshot
 WAIT_SHARE = 0.5          # where the time goes decides the direction: waiting for a server (add one) or inside it (take one)
@@ -145,7 +147,7 @@ def decide(p, force, wait_share, idle, cur, snapshot, last_dir, since_change_s, 
         return cur, 0, "inside the cushion"
     sign = 1 if d > 0 else -1
     if sign < 0 and last_dir > 0 and since_change_s < DWELL_S:
-        return cur, 0, "dwell: no taking back within five seconds of adding"   # gas is never held; only the brake dwells (amendment 1)
+        return cur, 0, f"dwell: no taking back within {DWELL_S:.0f} seconds of adding"   # gas is never held; only the brake dwells (amendment 1)
     target = int(clamp(cur + d, FLOOR, CEILING))
     if target == cur:
         return cur, 0, "at the cover"
@@ -165,6 +167,39 @@ def parse_latencies(files):
                     except ValueError:
                         continue
     return out
+
+
+def parse_log_rows(files):
+    """(epoch seconds, latency us, schedule lag us) of every transaction in pgbench's per-transaction log files (-l, with -R):
+    client transaction time script epoch us [lag]."""
+    out = []
+    for f in files:
+        with open(f) as fh:
+            for line in fh:
+                parts = line.split()
+                if len(parts) >= 6:
+                    try:
+                        out.append((int(parts[4]) + int(parts[5]) / 1e6, int(parts[2]), int(parts[6]) if len(parts) >= 7 else 0))
+                    except ValueError:
+                        continue
+    return out
+
+
+def aggregate_per_second(rows, interval=1):
+    """pgbench's own --aggregate-interval columns, one line a second, from the per-transaction rows (store fix of 25 October):
+    interval_start num_transactions sum_latency sum_latency_2 min_latency max_latency sum_lag sum_lag_2 min_lag max_lag. pgbench
+    writes either this or the per-transaction log, never both, and the gauges are read from the per-transaction log; so the runner
+    writes the same aggregate from it before the raw log is removed, and every second of a stall stays in the run's files."""
+    agg = {}
+    for t, lat, lag in rows:
+        k = int(t // interval) * interval
+        a = agg.get(k)
+        if a is None:
+            agg[k] = [1, lat, lat * lat, lat, lat, lag, lag * lag, lag, lag]
+        else:
+            a[0] += 1; a[1] += lat; a[2] += lat * lat; a[3] = min(a[3], lat); a[4] = max(a[4], lat)
+            a[5] += lag; a[6] += lag * lag; a[7] = min(a[7], lag); a[8] = max(a[8], lag)
+    return [f"{k} " + " ".join(str(x) for x in agg[k]) for k in sorted(agg)]
 
 
 def latency_gauges(lat_us, seconds, line_ms=LINE_MS):
@@ -592,12 +627,13 @@ def parse_summary(text):
 
 
 # --- one workload --------------------------------------------------------------------------------------------------
-def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms, objective=DEFAULT_OBJECTIVE):
+def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms, objective=DEFAULT_OBJECTIVE, prepare=None):
     d = wl_dir / f"rep-{rep}" / arm
     d.mkdir(parents=True, exist_ok=True)
     env = {**os.environ, "PGPASSWORD": "x"}
     conn = ["-h", "127.0.0.1", "-p", str(port), "-U", user]
     assert b.pool_size() == NATIVE_POOL, "every arm starts from the pooler's own setting"
+    prep = prepare(d) if prepare is not None else None             # store fix of 25 October: the tables re-initialised and a CHECKPOINT, both arms alike
     # an uncounted warm-up at the base rate, both arms alike
     pgbench(conn + ["-c", str(clients), "-j", str(jobs), "-T", "5", "-R", f"{base:.1f}", "-n"] + script + [dbname], env)
     sampler = Sampler(b, dbname); sampler.start()
@@ -615,6 +651,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
         s = parse_summary(r.stdout)
         files = sorted(d.glob(f"step-{k:02d}.*[0-9]"))
         l = parse_latencies(files)
+        (d / f"step-{k:02d}.agg").write_text("\n".join(aggregate_per_second(parse_log_rows(files))) + "\n")   # every second of the step kept
         g = latency_gauges(l, step_s, line_ms)
         per_step.append({"step": k, "notch": notch, "offered_tps": rate, **g, "failed": s["failed"], "exit": r.returncode})
         lat += l; failed += s["failed"]
@@ -625,7 +662,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
     own1 = resource.getrusage(resource.RUSAGE_SELF)
     sampler.stop_flag.set(); sampler.join(timeout=5)
     g = latency_gauges(lat, step_s * len(steps), line_ms)
-    g.update({"failed": failed, "seconds": seconds,
+    g.update({"failed": failed, "seconds": seconds, "prepared": prep,
               "harness_cpu_seconds": (own1.ru_utime + own1.ru_stime) - (own0.ru_utime + own0.ru_stime),
               "console_logins": b.console.logins,
               "servers_alive_mean": sum(sampler.alive) / len(sampler.alive) if sampler.alive else float("nan"),
@@ -676,11 +713,12 @@ def run_workload(name, out, pg, dbname, user, password, port, reps, steps, step_
         rec = {"workload": name, "script": script_flag or "tpcb (default)", "scale": scale, "line_ms": line_ms, "steps": steps,
                "step_s": step_s, "clients": clients, "jobs": jobs, "native_capacity_tps": cap, "base_tps": base,
                "snapshot_pool": snapshot, "cover": [FLOOR, CEILING], "center": CENTER, "objective": objective, "engine": engine(), "reps": []}
+        prepare = lambda d: reset_tables(pg, dbname, user, password, scale, d)   # noqa: E731  (the same state before every arm)
         for rep in range(1, reps + 1):
             order = ["native", "omni"] if rep % 2 else ["omni", "native"]
             one = {"rep": rep, "order": order}
             for arm in order:
-                one[arm] = run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms, objective)
+                one[arm] = run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base, clients, jobs, line_ms, objective, prepare=prepare)
                 print(f"== {name} rep {rep} {arm}: inside the line {one[arm]['work_inside_line_tps']:.0f} tps, p95 {one[arm]['p95_ms']:.1f} ms, "
                       f"servers {one[arm]['servers_alive_mean']:.1f}, pool {one[arm]['pool_mean']:.1f}, CPU {100 * one[arm]['cpu_busy_share']:.0f}%", flush=True)
             rec["reps"].append(one)
@@ -690,6 +728,26 @@ def run_workload(name, out, pg, dbname, user, password, port, reps, steps, step_
         return rec
     finally:
         b.stop()
+
+
+def checkpoint_command(dbname):
+    """CHECKPOINT as the postgres superuser (the bench role holds no right to it), the way --setup reaches the server."""
+    pre = ["runuser", "-u", "postgres", "--"] if os.geteuid() == 0 else ["sudo", "-n", "-u", "postgres"]
+    return pre + ["psql", "-qX", "-d", dbname, "-c", "CHECKPOINT"]
+
+
+def reset_tables(pg, dbname, user, password, scale, d, run=subprocess.run):
+    """Before every arm, both arms alike (store fix of 25 October): pgbench's tables re-initialised at the workload's scale and
+    a CHECKPOINT, so each arm starts from the same tables and the same point in the checkpoint cycle (the omni-v16 runs
+    initialised once a workload and ran six arms, about 45 minutes, on the growing tables, the checkpoints falling wherever
+    they fell). Returns what was done, for the arm's record."""
+    env = {**os.environ, "PGPASSWORD": password}
+    direct = ["-h", pg_host(pg), "-p", pg_port(pg), "-U", user]
+    t0 = time.monotonic()
+    r = run(["pgbench"] + direct + ["-i", "-s", str(scale), "-q", dbname], capture_output=True, text=True, env=env)
+    c = run(checkpoint_command(dbname), capture_output=True, text=True)
+    (Path(d) / "prepare.txt").write_text((r.stdout or "") + (r.stderr or "") + "\n" + (c.stdout or "") + (c.stderr or ""))
+    return {"reinit_exit": r.returncode, "checkpoint_exit": c.returncode, "seconds": round(time.monotonic() - t0, 2)}
 
 
 def pg_host(pg):

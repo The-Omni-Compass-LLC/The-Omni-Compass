@@ -24,7 +24,7 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.readings import with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
-from tools.run_redis import GAUGES, SAME_REL, paired  # noqa: E402
+from tools.run_redis import GAUGES, OPTIONAL_GAUGES, SAME_REL, paired  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 
 
@@ -122,6 +122,8 @@ def main(argv=None):
         out["workloads"][wl] = {}
         for k, label, dr in GAUGES:
             rs = [r["paired"].get(k) for r in recs]
+            if k in OPTIONAL_GAUGES and all(r is None for r in rs):
+                continue                                       # a gauge the runs before 25 October did not record: no row, as before
             v = verdict(rs, dr, k)
             if not tuning:
                 tally.add(v, dr, k)
