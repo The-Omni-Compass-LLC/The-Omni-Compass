@@ -101,6 +101,11 @@ def main():
     dg_runs = test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50 if a.quick else 500)
     check(f"the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): "
           f"every receipt identical to the last bit, one digest {dg_runs[:16]}…", True)
+    # the core's Monte Carlo through its C++ twin, the engine's own ranges and a person's own system (systems/), four ways
+    from tests import test_cpp_core_runs_parity
+    dg_core = test_cpp_core_runs_parity.main(str(b / "oc_core_runs"), 50 if a.quick else 500)
+    check(f"the core's Monte Carlo from the jump generator through its C++ twin (cpp/tools/core_runs.cpp): every U identical, "
+          f"one digest {dg_core[:16]}…", True)
     from tests import test_cpp_shield_parity
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8 if a.quick else 20); check("C++ shield vs Python shield (enforce and violations)", True)
     from tests import test_cpp_shield_adversarial, test_shield_properties

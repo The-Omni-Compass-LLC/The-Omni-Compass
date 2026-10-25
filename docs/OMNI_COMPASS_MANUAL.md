@@ -991,7 +991,7 @@ the engine's own setting for every other muscle. The whole tune is fixed and fin
 (`python3 tools/omni_version.py`), so an installation can always tell whether it is running the factory tune or a tune of
 its own. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands.
 In the words of `docs/FACTORY_PROFILE.md`, the factory tune is the **factory profile**: the complete, versioned set of
-Omni-Compass default settings shipped together. The released one is the engine that stands, omni-v20's. The best validated
+Omni-Compass default settings shipped together. The released one is the engine that stands, omni-v21's. The best validated
 factory profile for the declared operating conditions has not yet been established: it is chosen only after every mechanism
 is verified and the settings are tuned and validated together (`docs/FACTORY_PROFILE.md`, section 5), and until then the
 released profile stands and no other is locked as the baseline.
@@ -1467,7 +1467,7 @@ respect a limit the wires do not carry.
 
 ### 5.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v20** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
+The engine that stands in this edition is **omni-v21** (`python3 tools/omni_version.py` prints it; chapter 12); the receipts
 quoted here ran on omni-v7, whose rules omni-v19 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
@@ -1638,7 +1638,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v20 (digest 1df07f8e36a97985, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v21 (digest b658f05d43c1e602, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 32.
 
 **Level 1 - Watch (read-only).**
 

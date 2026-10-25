@@ -803,7 +803,7 @@ Every stage from the GitHub Actions run to this page: the run, the raw files arc
 - **Moves.** The stage being read lights in turn and the data moves between the stages.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Gauge: which gauge of the run is shown.
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 33: The official run's heartbeat
 
@@ -815,7 +815,7 @@ The official run's heartbeat: native's own 15 s clock above, every beat of the g
 - **Moves.** The chosen repetition replayed decision by decision; native's own 15 s clock beats above.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 34: The heartbeat sweep: every beat the governor can run at
 
@@ -827,7 +827,7 @@ The governor's beat as a knob: what a decision every 5 to 120 s does against nat
 - **Moves.** A cursor reads the beats in turn and names the row it holds; every button redraws the chart from the record.
 - **Knobs.** Beat: the governor's full read of the state and its decision: every 5, 10, 15, 20, 30, 60, 75, 90 or 120 s in the heartbeat sweep's record; on a real governor its --interval (60 s at the factory since omni-v17, 15 s on omni-v16); Scenario: on-site bare metal, through the cloud, in the device, as a service; Engine: which engine's record the monitor reads: the engine that stands or the one before it; Against: what each reading is set against: native, or the same engine at another setting; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 35: The official run: response time candles
 
@@ -839,7 +839,7 @@ The response time of the chosen run as candles, one a half minute, native above 
 - **Moves.** The chosen run replayed half minute by half minute.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 36: The official run: the heat map
 
@@ -851,7 +851,7 @@ The responses of each half minute counted in eight response-time buckets, native
 - **Moves.** The chosen run replayed half minute by half minute.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 37: The official run: paired bars
 
@@ -863,7 +863,7 @@ The requests answered each half minute, native and Omni-Compass side by side, th
 - **Moves.** The chosen run replayed half minute by half minute.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 38: The official run: the repetitions
 
@@ -875,7 +875,7 @@ Each repetition's reading in the chosen gauge with its interval.
 - **Moves.** Each repetition's reading filled in as the run replays.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ## 3k Kubernetes: per-repetition run telemetry
 
@@ -907,7 +907,7 @@ One repetition half minute by half minute from its archived capture: the 95th pe
 - **Moves.** The archived capture replayed half minute by half minute; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Repetition: which repetition of the run is replayed; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ## 3l Kubernetes and cloud: the shipped controller's decision trace
 
@@ -945,7 +945,7 @@ The controller every Kubernetes and cloud set runs, replayed decision by decisio
 - **Moves.** The shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 41: The shipped controller's trace: Omni-Compass
 
@@ -957,7 +957,7 @@ The same, Omni-Compass's cluster: every write, every trial, every hold.
 - **Moves.** The shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ### Monitor 42: The shipped controller's trace: the strip
 
@@ -969,7 +969,7 @@ The shipped controller's machines (in service, booting and parked) and the respo
 - **Moves.** The shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white).
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v20; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v21; an older engine's run is its own record.
 
 ## 3m Hardware: the GPU card and the CPU host
 

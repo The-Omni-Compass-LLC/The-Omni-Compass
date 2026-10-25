@@ -2,6 +2,16 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-25 (evening): omni-v21 stands: the immune system knows itself, knob by knob
+
+- **omni-v21** (`OMNI_V21.json`, fingerprint `b658f05d43c1e602`, `docs/OMNI_V21.md`): omni-v20 with the immune system's
+  self-knowledge, the founder's order of 25 October: a knob redlining past its line that Omni-Compass cannot bring back goes to
+  native where native's twin reads it lower, and stays where native is not stronger. In the Python (`omnicompass/immune.py`) and
+  its C++ twin (`cpp/src/immune.cpp`, sealed), carried through the nervous system in both (`native_hold`), wired into the
+  Kubernetes governor; omni-v19's immune rules carried onto omni-v20. The model gate against omni-v20: no LOSS in any model.
+- **The live-engine chat's work on main** (omni-v20, the data stores' wires, the twenty scenarios, the live engine and manuals),
+  merged on the founder's order, its own branch's faults fixed on the way; main's verify brought back to green.
+
 ## 2026-10-25: omni-v20, the data stores' wires fixed at their causes
 
 - **omni-v20** (`OMNI_V20.json`, digest `1df07f8e36a97985`, 62 files; `docs/OMNI_V20.md`), landed under the founder's words of 25

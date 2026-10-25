@@ -921,7 +921,7 @@ the engine's own setting for every other muscle. The whole tune is fixed and fin
 (`python3 tools/omni_version.py`), so an installation can always tell whether it is running the factory tune or a tune of
 its own. Every published result is the factory tune of the engine its table names (`python3 tools/omni_version.py`), and is run again on each engine that stands.
 In the words of `docs/FACTORY_PROFILE.md`, the factory tune is the **factory profile**: the complete, versioned set of
-Omni-Compass default settings shipped together. The released one is the engine that stands, omni-v20's. The best validated
+Omni-Compass default settings shipped together. The released one is the engine that stands, omni-v21's. The best validated
 factory profile for the declared operating conditions has not yet been established: it is chosen only after every mechanism
 is verified and the settings are tuned and validated together (`docs/FACTORY_PROFILE.md`, section 5), and until then the
 released profile stands and no other is locked as the baseline.

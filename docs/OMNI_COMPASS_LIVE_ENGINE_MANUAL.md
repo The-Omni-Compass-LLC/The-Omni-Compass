@@ -426,7 +426,7 @@ under the same rule, the engine's setting for the rest (`realms/muscle_cards_v5.
 
 In the words of `docs/FACTORY_PROFILE.md`, the page is the **live tuning bench**: the interface that operates the engine's
 controls and displays their effects through the connected backend. The **factory profile** is the complete, versioned set of
-Omni-Compass default settings shipped together; on the engine that stands it is omni-v20's (`OMNI_V20.json`): the governor's
+Omni-Compass default settings shipped together; on the engine that stands it is omni-v21's (`OMNI_V20.json`): the governor's
 full decision every 60 s, the fast checks every 5 s, every muscle on the card found for it and on the engine's own setting
 otherwise. The **active profile** is the settings actually governing the current run. An adjustment on the bench produces an
 identifiable active configuration, a **custom profile**; it becomes a new factory profile only after validation and a new
