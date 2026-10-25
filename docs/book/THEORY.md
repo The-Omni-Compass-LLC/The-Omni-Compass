@@ -369,8 +369,8 @@ realm's trade adds to the base it stands on; the spine read alone shows whether 
 stack runs on before any trade is put on them.
 
 **The grid.** Each organism runs at 1, 10 and 100 copies of itself on one clock and at 1, 10 and 100 paired runs, modelled
-and with the real cluster inside, both arms shown in every square; on GitHub's own machines the 1,000 tier runs too (the
-founder's distinction of 15 October), a cell beyond a free runner's memory or time listed as pending runner capacity and
+and with the real cluster inside, both arms shown in every square; on GitHub's own machines the 500 tier runs too (the
+ladder of the Python's 500-run Monte Carlo, the founder's order of 25 October), a cell beyond a free runner's memory or time listed as pending runner capacity and
 never rented, while paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100 repetitions. The two axes answer
 two questions. Copies is the size of the body one brain governs: at 100 copies of the four stacked the law computes a force
 for about 190,000 muscles from one reading of one clock, and the question is whether it stays coherent, whether the decision

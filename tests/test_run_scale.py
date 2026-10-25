@@ -124,7 +124,7 @@ class PoolScale(unittest.TestCase):
 
 
 class Conductor(unittest.TestCase):
-    """scripts/dispatch_grid.py: every supported free square planned once to 1,000 runs at 1/10/100/1000 copies, nothing started twice, every shard inside a runner's six hours and memory, and the started runs
+    """scripts/dispatch_grid.py: every supported free square planned once to 500 runs at 1/10/100/500 copies, nothing started twice, every shard inside a runner's six hours and memory, and the started runs
     read back from their own names."""
 
     @classmethod
@@ -135,7 +135,7 @@ class Conductor(unittest.TestCase):
 
     def test_every_square_once_to_100(self):
         g = self.g
-        self.assertEqual((g.SIZES, g.RUNS), ((1, 10, 100, 1000), 1000))
+        self.assertEqual((g.SIZES, g.RUNS), ((1, 10, 100, 500), 500))
         plan = g.next_dispatches({})
         seen = {}
         for d in plan:
@@ -156,7 +156,7 @@ class Conductor(unittest.TestCase):
                 self.assertEqual(seen.get(("six", size, o)), expected, (size, o))
                 expected = set(range(1, g.RUNS + 1)) if g.kube_fits(size, k) else None
                 self.assertEqual(seen.get(("kube", size, k)), expected, (size, k))
-        self.assertTrue([d for d in plan if d["size"] == 1000])
+        self.assertTrue([d for d in plan if d["size"] == 500])
         self.assertTrue(g.free_runner_refusals())
 
     def test_shards_fit_a_runner(self):
@@ -172,7 +172,7 @@ class Conductor(unittest.TestCase):
         for size in g.SIZES:
             for k in g.KUBE:
                 if g.kube_fits(size, k):
-                    self.assertLess(g.kube_minutes(size, k, size >= 1000), 330, (size, k))
+                    self.assertLess(g.kube_minutes(size, k, size >= g.SIZES[-1]), 330, (size, k))
 
     def test_azure_and_reports_go_before_the_grid(self):
         g = self.g
@@ -334,8 +334,8 @@ class Conductor(unittest.TestCase):
         g = self.g
         m = g.JOB_NAME.match("run (stack, 1, 56, 960, native compass)")
         self.assertEqual((m.group(1), int(m.group(2)), int(m.group(3))), ("stack", 1, 56))
-        m = g.JOB_NAME.match("run (compute_ai_cloud, 1000, 7, 7200, compass, -compass)")
-        self.assertEqual((m.group(1), int(m.group(2)), int(m.group(3))), ("compute_ai_cloud", 1000, 7))
+        m = g.JOB_NAME.match("run (compute_ai_cloud, 500, 7, 7200, compass, -compass)")
+        self.assertEqual((m.group(1), int(m.group(2)), int(m.group(3))), ("compute_ai_cloud", 500, 7))
         self.assertIsNone(g.JOB_NAME.match("report"))
 
     def test_matrix_cuts_the_runs_asked(self):

@@ -986,9 +986,9 @@ register's own words, what is measured (the lines of its preregistration) and th
 
 ### 11.5 The scale-out grid
 
-Seven organisms × 1, 10, 100 and 1,000 copies × 1, 10, 100 and 1,000 runs: modelled (the misses)
-and with the real cluster inside (the 95th percentile), both values shown in every square. The 1,000 tier runs on GitHub's free
-runners only; paid machines stay at 100. Two buttons choose *the engine that stands: its runs as they land* or *the road: the
+Seven organisms × 1, 10, 100 and 500 copies × 1, 10, 100 and 500 runs: modelled (the misses)
+and with the real cluster inside (the 95th percentile), both values shown in every square. The ladder is the Python's 500-run
+Monte Carlo's (the founder's order of 25 October); the 500 tier runs on GitHub's free runners only; paid machines stay at 100. Two buttons choose *the engine that stands: its runs as they land* or *the road: the
 newest grid with its squares landed*. A square not yet landed says so; a square beyond a free runner's memory or time is listed
 as pending runner capacity, never rented. The grid's monitor draws the engine that stands' own campaign as GitHub runs it: each
 square filled by its runs started (pale) and measured (solid), as GitHub was read at the build, with the age of that reading in

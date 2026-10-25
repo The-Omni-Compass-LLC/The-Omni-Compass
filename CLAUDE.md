@@ -264,11 +264,13 @@ the founder overrides one in the conversation.
   Omni-Compass on top (`kind-orchestrators.yml`, `results/live/GOVERNORS.md`).
 - The organisms are named `tower`, `stack` and `spine` in code and workflows (never by a count); the old names `organism_656`
   and `stack_1226` are read as aliases.
-- The grid: each organism runs native and omni at clustered copies × runs: 63 squares (seven organisms) at 1, 10 and 100 copies × 1, 10
-  and 100 runs, modelled and with the real cluster inside, with both values shown in every square. **On GitHub's own
-  machines only, the 1,000 tier stands again** (the founder's distinction of 15 October, `scripts/dispatch_grid.py`,
-  `docs/OMNI_V6.md`): the seven organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and
-  1,000 copies and nested 1, 10, 100 and 1,000 runs on free runners, and a cell beyond a free runner's memory or time is
+- The grid: each organism runs native and omni at clustered copies × runs, modelled and with the real cluster inside, with
+  both values shown in every square. **The ladder is 1, 10, 100 and 500, for copies and for runs alike, everywhere** (the
+  founder's order of 25 October: "it gotta be 1, 10, 100, and the last one has to be 500, and the organism has to be 500 as
+  well, to be in line with the Python": the Python's Monte Carlo is 500 runs, `tools/engine_runs.py`, read at its first 1, 10,
+  100 and 500 in the Python, the C++ harness and the live engine alike; `scripts/dispatch_grid.py`): on GitHub's own machines the
+  seven organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and 500 copies and nested 1, 10,
+  100 and 500 runs on free runners (the 1,000 tier of 15 October is retired), and a cell beyond a free runner's memory or time is
   listed as pending runner capacity, never rented; **paid cloud and GPU runs stay at 1, 10 and 100 copies with at most
   100 repetitions** (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the
   grid. Every grid button starts all its sizes × all its run counts and uses every runner GitHub gives. The conductor

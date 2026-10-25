@@ -126,7 +126,7 @@ token generation (memory-bound work).
 ## The card inside the seven organisms (`results/hil/run-<stamp>/HIL.md`)
 
 The real card is wired into each of the seven organisms (the spine, the four realms, the four stacked, the whole tower) at four
-sizes (1, 10, 100 and 1,000 copies). Each row is one size, one organism and one part:
+sizes (1, 10, 100 and 500 copies; paid card runs stop at 100). Each row is one size, one organism and one part:
 - **stacks (model)**: the modelled machines (evidence S);
 - **card (meter)**: the real card, its own meter (evidence P);
 - **both**: the two added together.

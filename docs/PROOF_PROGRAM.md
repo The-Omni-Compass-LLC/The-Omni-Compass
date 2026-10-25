@@ -34,7 +34,7 @@ register (`docs/REGISTER.md`) and a chapter in the manual (`docs/OMNI_COMPASS_MA
 |---|---|---|---|
 | Kubernetes, real cluster (kind) | 6 workers, 10 pairs × 3 runs; the seven organisms at 1, 10 and 100 copies | the organisms at 1,000 copies on a rented machine, the window set to keep the clock | `six-kube`, `benchmark-reps`, `big-organism-detached` |
 | Kubernetes, simulated nodes (KWOK) | 50, 500 and 1,000 nodes | | `kwok-scale` |
-| The modelled organisms | 1, 10, 100 and 1,000 copies × 1 to 1,000 runs (the grid) | | `six` |
+| The modelled organisms | 1, 10, 100 and 500 copies × 1 to 500 runs (the grid) | | `six` |
 | Azure's managed Kubernetes | | the largest fleet the allowance gives: 15 workers today (32 cores), 96 at 200 cores once a machine family is granted; the app's ceiling 9 pods a worker | `aks-metered` (`max_workers`, `hpa_max`), `azure-quota` |
 | GPU | | one card; one card inside 1,000 copies; eight cards; vLLM serving (Lambda) | `scripts/gpu_*.sh`, `tools/run_hil.py` |
 | CPU power, a real meter | | one rented bare-metal machine, RAPL energy counters | to build |

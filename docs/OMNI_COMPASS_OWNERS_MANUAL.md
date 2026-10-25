@@ -1160,8 +1160,8 @@ place on real software.
 Every organism runs at **1, 10 and 100 copies** (that many instances of the organism on one clock, so the four stacked
 at 100 copies is about 190,000 modelled muscles) and at **1, 10 and 100 paired runs** (that many native-and-omni pairs,
 each from its own seed): the seven organisms × three sizes × three run counts are 63 squares, run modelled and with the
-real cluster inside, both arms shown in every square. On GitHub's own machines the grid also runs the 1,000 tier, 1,000
-copies and nested 1,000 runs (the founder's distinction of 15 October), a cell beyond a free runner's memory or time listed
+real cluster inside, both arms shown in every square. On GitHub's own machines the grid also runs the 500 tier, 500
+copies and nested 500 runs (the ladder of the Python's 500-run Monte Carlo, the founder's order of 25 October), a cell beyond a free runner's memory or time listed
 as pending runner capacity and never rented; paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100
 repetitions (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the grid
 (`scripts/dispatch_grid.py`, `results/grid_v5/`).
@@ -3178,7 +3178,7 @@ less work was done. The steps below are the whole method.
    is claimed while the time outside the service line is above native's.
 
 **At scale (modelled).** The seven organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
-(`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of each
+(`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 500 paired runs and at 1, 10, 100 and 500 copies of each
 organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the seven organisms with
 a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on GitHub) and `big-organism` and
 `big-organism-detached` (1,000 copies on a rented machine).

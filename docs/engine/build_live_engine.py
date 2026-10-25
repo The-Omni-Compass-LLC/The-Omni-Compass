@@ -625,7 +625,7 @@ def grid_reading() -> dict | None:
         for size in D.SIZES:
             for o in (D.ORGS if key == "six" else D.KUBE):
                 org = name[o] if key == "six" else o
-                for n in (1, 10, 100, 1000):
+                for n in (1, 10, 100, D.RUNS):
                     want = range(0, n) if key == "six" else range(1, n + 1)
                     st = len(cov_all.get((key, size, o), set()) & set(want)); dn = len(cov_done.get((key, size, o), set()) & set(want))
                     if st:

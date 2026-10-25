@@ -1364,6 +1364,14 @@ is as written for them: the arms, the loads, the windows, the machine families (
 `m5.large` in `us-east-1`), the tune-down on the machines alone and the 60 s beat of the amendment above. Both queues are switched
 off and neither cloud has run a set on any engine since omni-v10's logins of 18 October; this is written before the first.
 
+
+## Amendment (25 October 2026): the ladder is 1, 10, 100 and 500
+
+The founder's order of 25 October: the grid's top rung is 500 copies and 500 runs, in line with the Python's 500-run Monte
+Carlo (`tools/engine_runs.py`), replacing the 1,000 tier of 15 October. Every grid run started from this amendment on runs the
+ladder 1, 10, 100 and 500 (`scripts/dispatch_grid.py`); runs started before it stay as their own record. Paid cloud and GPU runs
+stay at 1, 10 and 100 copies with at most 100 repetitions.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
