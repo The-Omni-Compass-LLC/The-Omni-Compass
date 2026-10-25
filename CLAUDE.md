@@ -43,9 +43,21 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v19 stands (v18, v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v20 stands (v19, v18, v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v19** (`OMNI_V19.json`, digest `36ee67284c035235`, 62 files; `docs/OMNI_V19.md`) stands on main since 24 October, 16:54
+- **Omni v20** (`OMNI_V20.json`, digest `1df07f8e36a97985`, 62 files; `docs/OMNI_V20.md`) stands on the branch since 25 October,
+  13:24 UTC, under the founder's words of 25 October ("Fix, fix, fix ... it can be fixed") and the standing order that every fault
+  found is fixed and lands as the next version, told, not asked: omni-v19 with the five data stores' wires fixed at their causes,
+  found by tracing why the Omni index fell from +4.32% to +3.397% under the 0.5% key (`docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md`).
+  sysbench's brain reads sysbench's own statements, prepared ones included, as its own account (`tools/run_sysbench.py`; it read 4.1
+  a second, the harness's own queries, against sysbench's 999 to 4,198); above the operator's count Kafka hands a consumer back on
+  calm within one poll round, 30 s after the last change, with no double rebalance at the start (`tools/run_kafka.py`); below native
+  YCSB grows its cache back 64 MB a second while it misses, full at WiredTiger's own 80% or evicting (`tools/run_ycsb.py`); YCSB and
+  Redis record the stack's CPU apart from the host's; pgbench starts every arm from the same state and the workflow logs the
+  runner's stalls. The store gate (`tools/store_gate.py`, `results/toy_gate/STORE_GATE.md`, open-loop, class S) replayed every
+  archived arm through both wires: no LOSS (the YCSB cache rise, +5.2%, power given). Every benchmark runs again on it, sysbench's
+  rows first (its old reading was blind). 57 of its 62 files are omni-v19's bytes.
+- **Omni v19** (`OMNI_V19.json`, digest `36ee67284c035235`, 62 files; `docs/OMNI_V19.md`) stood from 24 October, 16:54
   UTC, under the founder's order of 23 October (Orders of 23 October, the third arm, Omni-Compass by itself) and the standing order
   that every change lands as the next version, told, not asked: omni-v18 with a pod muscle of its own (`--own-replicas`,
   `omni_controller/controller.py` `_own_pods`): for a workload the operator names and no autoscaler governs, the governor sets the

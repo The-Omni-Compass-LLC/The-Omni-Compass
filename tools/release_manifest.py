@@ -27,6 +27,7 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v20": ["OMNI_V20.json", "tools/omni_version.py", "docs/OMNI_V20.md", "tools/run_sysbench.py", "tools/run_kafka.py", "tools/run_ycsb.py", "tools/run_redis.py", "tools/run_pgbench.py", ".github/workflows/pgbench.yml", "tools/store_gate.py", "results/toy_gate/STORE_GATE.md", "results/toy_gate/STORE_GATE.json", "tests/test_store_wires.py", "tests/test_store_gate.py", "docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md"],
     "engine_v19": ["OMNI_V19.json", "tools/omni_version.py", "docs/OMNI_V19.md", "omni_controller/controller.py", "realms/harness.py",
                    "realms/plants.py", "tests/test_own_replicas.py", "results/toy_gate/V19_VS_V18.md", "results/toy_gate/V19_VS_V18.json",
                    "results/toy_gate/SOLO_V19.md", "results/toy_gate/SOLO_V19.json", "results/toy_gate/SOLO_V19_VS_V18.md",

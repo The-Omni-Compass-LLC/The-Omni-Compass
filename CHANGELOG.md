@@ -2,6 +2,21 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-25: omni-v20, the data stores' wires fixed at their causes
+
+- **omni-v20** (`OMNI_V20.json`, digest `1df07f8e36a97985`, 62 files; `docs/OMNI_V20.md`), landed under the founder's words of 25
+  October ("Fix, fix, fix") and the standing order that every fault found is fixed and lands as the next version. omni-v19 with five
+  wires changed: sysbench reads its own workload (prepared statements counted, as its own account); Kafka hands a consumer back above
+  the operator's count on calm and starts with no double rebalance; YCSB grows its cache back below native while it misses, full at
+  80% or evicting, `serverStatus` read lean; YCSB and Redis record the stack's CPU apart; pgbench resets and checkpoints every arm and
+  logs the runner's stalls. The store gate (`results/toy_gate/STORE_GATE.md`) read no LOSS. The causes:
+  `docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md`. Every benchmark runs again on it.
+- **The injection grid** (`tools/injection_grid.py`, `results/injection_grid/`): the Python's batch of 500 injections through every
+  organism and the fourteen governors, 1 to 500 runs by 1 to 500 organisms stacked, read per muscle; on the live engine in section 4b.
+  Omni-Compass's LOSS cells: none; the governors' own LOSS cells against native: 37, shown as theirs.
+- **The consensus audit of 24 October** (`docs/engine/CONSENSUS_AUDIT_2026-10-24.md`): five seats, overall B; the first round of the
+  majors fixed on the live engine.
+
 ## 2026-10-24 (late afternoon): omni-v19, Omni-Compass by itself, a pod muscle of its own; the two engines named omni-v18 reconciled
 
 - **omni-v19** (`OMNI_V19.json`, digest `36ee67284c035235`, 62 files; `docs/OMNI_V19.md`), landed under the founder's order of 23

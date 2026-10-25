@@ -757,7 +757,7 @@ installed is a quarter off the bill.
   - Real database cache (MongoDB under YCSB, GitHub): −1.4% LOSS
   - Real database (PostgreSQL behind PgBouncer, GitHub): −4.9% LOSS
 
-**On the engine that stands (omni-v19): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v20): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
@@ -3731,7 +3731,7 @@ three runs, which the bottom line carries: Omni-Compass on native against native
 machines +3.1% fewer, serving units +10.2% more; Omni-Compass direct against native, work +7.5%, the 95th percentile +12.1%
 faster, machines +2.5% fewer, serving units +5.2% more; Omni-Compass direct against Omni-Compass on native, work +1.4%, the 95th
 percentile +2.9% faster, machines +0.6% more, serving units +4.6% fewer. No pair reads LOSS on any gauge. The test runs again on
-omni-v19, the engine that stands. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved
+omni-v20, the engine that stands. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved
 these results.
 
 ### 16.2 The organisms with the real cluster inside, and the big organisms
@@ -4046,7 +4046,7 @@ happened to work. The numbers of earlier engines are the road, in `docs/history`
 | Drone swarms (omni-v11) | S | energy a mission −7% to −20%, missions a charge +8% to +25%, GAIN; the closest approach spent to about 0.16 m (shown); collisions on a mission draw outside the counted cells, a fault in the wire fixed in omni-v12, its runs under way (section 16.5) | `results/live/V11_SWARM.md` |
 | Buildings with batteries (omni-v11) | S | 27 score-rows GAIN, 1 power given, no LOSS; the batteries of the outage districts native | `results/live/V11_CITYLEARN.md` |
 
-**Running now and next.** Every benchmark runs again on omni-v19, the engine that stands, released by the conductor
+**Running now and next.** Every benchmark runs again on omni-v20, the engine that stands, released by the conductor
 (`scripts/dispatch_grid.py`, `scripts/reruns.txt`: A of every benchmark, then B, then C), the steady and wandering Kubernetes
 tests among them; Azure one run at a time in its region (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day;
 A, B and C); the grid with the real cluster inside on GitHub's free runners. The runs of earlier engines already started

@@ -425,6 +425,17 @@ dispatched with `workloads=untouched`, `reps=3`, `step_s=30`, the resource objec
 (`tools/pgbench_abc.py`), the index, the wiring page and the benefit sheet are read again, and the set this one supersedes goes whole to
 `docs/history`.
 
+
+## Proposed amendment (25 October 2026, not yet in force): a fourth paired repetition
+
+Proposed with omni-v20, to be declared before the next counted set and not applied to any run until then: each pgbench workload
+runs four paired repetitions a run instead of three, in the order native/omni, omni/native, native/omni, omni/native. With three,
+Omni-Compass always takes arm positions 2, 3 and 6 and native 1, 4 and 5, so a drift of the runner across the arm sequence is not
+balanced; the omni-v16 `tpcb_hot` runs showed write stalls of 1 to 6 s landing in either arm by position
+(`docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md`). A fourth pair balances the order and narrows the interval of a stall-driven gauge.
+Each run takes about a third longer per workload (eight arms of about 7.5 minutes instead of six). The rules, the gauges, the line,
+the notches and the three-run reading are unchanged.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

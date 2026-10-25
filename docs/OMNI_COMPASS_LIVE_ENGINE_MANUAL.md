@@ -426,7 +426,7 @@ under the same rule, the engine's setting for the rest (`realms/muscle_cards_v5.
 
 In the words of `docs/FACTORY_PROFILE.md`, the page is the **live tuning bench**: the interface that operates the engine's
 controls and displays their effects through the connected backend. The **factory profile** is the complete, versioned set of
-Omni-Compass default settings shipped together; on the engine that stands it is omni-v19's (`OMNI_V19.json`): the governor's
+Omni-Compass default settings shipped together; on the engine that stands it is omni-v20's (`OMNI_V20.json`): the governor's
 full decision every 60 s, the fast checks every 5 s, every muscle on the card found for it and on the engine's own setting
 otherwise. The **active profile** is the settings actually governing the current run. An adjustment on the bench produces an
 identifiable active configuration, a **custom profile**; it becomes a new factory profile only after validation and a new
@@ -2740,7 +2740,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 41.2 The engine's name and the profile
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v19). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v20). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines. Every result the page plays ran the factory profile of the engine its
 table names; the main control panel names the profile governing the live model now, with its fingerprint (section 6.5), and a
 candidate or custom profile there is never a result of record.
@@ -2917,7 +2917,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **Engine that stands.** The engine version on main, named on the page's title block and in `python3 tools/omni_version.py`;
   omni-v19 for this edition.
 - **Factory profile.** The complete, versioned set of Omni-Compass default settings shipped together; on the engine that
-  stands, omni-v19's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
+  stands, omni-v20's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
 - **Fingerprint (of a profile).** The page's FNV-1a hash of every setting of the mechanism, the heartbeat and every muscle's body
   included: one identity for one set of settings.
 - **Golden signals.** Latency, traffic, errors and saturation: on the page, the golden-signal feed of the page's section 2b.
