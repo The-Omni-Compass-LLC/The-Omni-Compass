@@ -3,10 +3,13 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The thirty scenarios (the founder's words of 24 October: "We have 4 realms ... the 4 realms stacked ... the spine of the 4
-realms ... Then we have the whole thing native. And with OmniCompass on native and then OmniCompass direct to all those same
-muscles in every piece ... 9 to 10 different organisms ... in all 3 is 30 different scenarios that would have to be
-benchmarked out, monitored, tabulated, calculated"): ten organisms, each in three arms, read by the one key.
+"""The twenty scenarios: ten organisms, each native and with Omni-Compass on top of native, read by the one key.
+
+The founder's words of 24 October set the organisms ("We have 4 realms ... the 4 realms stacked ... the spine of the 4 realms
+... Then we have the whole thing native. And with OmniCompass on native ... 9 to 10 different organisms"); his order of 25
+October took the third way out ("we don't need an omnicompass by itself ... Never is going to omnicompass be by itself. It
+needs muscles somewhere, somehow"): Omni-Compass always sits on top of a native controller, so every organism runs two
+ways, ten organisms by two, twenty scenarios.
 
 The ten organisms, in this order:
   1  the spine                    every muscle in all four realms (tools/run_realms_v5.py spine_rows)
@@ -18,16 +21,12 @@ The ten organisms, in this order:
   9  the live engine's organism   the sixty muscles the live engine page draws (docs/engine/export_harness_trace.py)
   10 the whole organism           three sectors (the software, the cloud as the wire, the bare metal / the data center),
                                   a composition of the real tables (results/WHOLE_SYSTEM.json, regrouped by
-                                  docs/engine/export_whole.py); no direct arm has run in any of its layers
+                                  docs/engine/export_whole.py)
 
-The three arms, on the same seeds (the same demand, weather and disturbances in every arm):
+The two arms, on the same seeds (the same demand, weather and disturbances in both):
   native     Omni-Compass off: every plant under its own native controller (realms/harness.py run_bodies, arm native)
   on_native  Omni-Compass on native: the max (realms/compass_arm_v5.py, V5CFG), the factory tune, on top of every native
              controller (arm v5, as tools/run_realms_v5.py runs it)
-  direct     Omni-Compass direct (realms/harness.py SOLO, "by itself"): the max, with every pool whose own count is its knob
-             run with its own autoscaler switched off, in the plant and in its twin (native_off_pool: a compute pool whose
-             knob is anything but a power cap or an admission limit); every other muscle's native is a setting native holds
-             still or the actuator of native's own loop, so direct is the same arm as on native there
 
 Organisms 1-8 run here, under the climb (realms/harness.py CLIMB: the load stepping by one, 1 2 3 2 3 4 ..., level 4 the
 organism's own load, 8 twice it), on run_bodies exactly as tools/run_realms_v5.py runs its organisms, for the full 240
@@ -37,16 +36,16 @@ functions (docs/engine/export_harness_trace.py run, gauges and interval), and ch
 organism run here. Runs A, B and C are seeds 3000, 3001 and 3002 (the harness record's runs: the first three of the realms'
 preregistered seeds 3000-3009).
 
-The reading, gauge by gauge, for each pair (on native against native, direct against native, direct against on native): the
-harness record's own measurement (export_harness_trace.gauges: the work index against the reference arm's own rate, the
-muscles over their line, the body's power, and the spread of the service positions, shown), the paired change per decision
-averaged over blocks of ten decisions with its 95% interval by Student t over the blocks (export_harness_trace.interval), in
-each run; the word by the key (tools/readings.py stack_reading, the founder's half-percent floor by in_all_three): GAIN, LOSS
-or power given in all three of our runs, EVEN (the same, no difference beyond the noise, or under the floor), the runs
-disagree. The realms runner's own contrasts (tools/run_realms_v5.py: paired_organism, plant_harms, the wear) and its label
-over the three seeds (label_max, 95% intervals over the seeds) stand beside them. Evidence class S (our own models).
+The reading, gauge by gauge, of Omni-Compass on native against native: the harness record's own measurement
+(export_harness_trace.gauges: the work index against native's own rate, the muscles over their line, the body's power, and
+the spread of the service positions, shown), the paired change per decision averaged over blocks of ten decisions with its
+95% interval by Student t over the blocks (export_harness_trace.interval), in each run; the word by the key (tools/readings.py
+stack_reading, the founder's half-percent floor by in_all_three): GAIN, LOSS or power given in all three of our runs, EVEN (the
+same, no difference beyond the noise, or under the floor), the runs disagree. The realms runner's own contrasts
+(tools/run_realms_v5.py: paired_organism, plant_harms, the wear) and its label over the three seeds (label_max, 95% intervals
+over the seeds) stand beside them. Evidence class S (our own models).
 
-  python3 tools/scenarios_30.py [--out results/scenarios] [--workers N]
+  python3 tools/scenarios_20.py [--out results/scenarios] [--workers N]
 """
 from __future__ import annotations
 
@@ -73,7 +72,7 @@ from tools.readings import (GAIN, EVEN, LOSS, GIVEN, DISAGREE, SHOWN, IN_ALL_THR
                             stack_reading, with_own_runs)
 import tools.run_realms_v5 as R  # noqa: E402
 from tools.run_orchestra import bodies as orchestra_bodies  # noqa: E402
-from realms.harness import (Body, SOLO, STACK, TOWER, KILL_AT, WALK, CLIMB, native_off_pool, paired_organism,  # noqa: E402
+from realms.harness import (Body, STACK, TOWER, KILL_AT, WALK, CLIMB, paired_organism,  # noqa: E402
                             run_bodies, scale_load)
 from realms.compass_arm_v5 import machines, v5_position  # noqa: E402
 from realms.presets import ORGANISM_STEPS  # noqa: E402
@@ -96,15 +95,19 @@ LOAD = "climb"
 DECISION_S = 15
 SAME_REL = 1e-6                                     # under one part in a million of the value: EVEN, the same (amendment 11)
 ORCHESTRA, LIVE, WHOLE = "orchestra", "live_engine", "whole"
-ARMS = ("native", "on_native", "direct")
-ARM_NAMES = {"native": "Native (Omni-Compass off)", "on_native": "Omni-Compass on native", "direct": "Omni-Compass direct"}
-HARNESS_ARM = {"native": "native", "on_native": "v5", "direct": SOLO}        # realms/harness.py run_bodies
-EXPORT_ARM = {"native": "native", "on_native": "omni", "direct": "solo"}     # docs/engine/export_harness_trace.py run
-PAIRS = (("on_native", "native"), ("direct", "native"), ("direct", "on_native"))
+ARMS = ("native", "on_native")
+ARM_NAMES = {"native": "Native (Omni-Compass off)", "on_native": "Omni-Compass on native"}
+HARNESS_ARM = {"native": "native", "on_native": "v5"}        # realms/harness.py run_bodies
+EXPORT_ARM = {"native": "native", "on_native": "omni"}       # docs/engine/export_harness_trace.py run
+PAIRS = (("on_native", "native"),)
 PAIR_KEY = {p: f"{p[0]}_vs_{p[1]}" for p in PAIRS}
-PAIR_NAMES = {"on_native_vs_native": "Omni-Compass on native against native",
-              "direct_vs_native": "Omni-Compass direct against native",
-              "direct_vs_on_native": "Omni-Compass direct against Omni-Compass on native"}
+PAIR_NAMES = {"on_native_vs_native": "Omni-Compass on native against native"}
+
+
+def pool(template, knob):
+    """A compute pool whose count is its knob (capacity or the autoscaler's target; not a power cap or an admission limit): the
+    pools whose machines the record counts, as the harness export counts them."""
+    return template == "compute_pool" and knob not in ("power", "admission")
 AIMS = {"up": HIGHER, "down": LOWER, "spent": SPENT, "shown": SHOWN_AIM}  # the harness record's aims in the key's words
 GAUGES = {
     "work": ("work", HIGHER, "the work index: each decision, the mean over the muscles of the work each did against the reference "
@@ -158,7 +161,7 @@ def recorded_run(name, rs, seed, arm, load=LOAD):
     """One organism, one arm, on realms/harness.py run_bodies exactly as tools/run_realms_v5.py organism_run runs it (the four
     stacked: each realm's own body on one clock), every decision recorded as the live engine's harness record records it:
     the service position the law reads, the decisions over the line and the work of every plant, the body's power, and the
-    machines in service and starting over every pool whose own count is its knob (the pools direct switches off). The
+    machines in service and starting over every pool whose own count is its knob. The
     record is read after each body's step and changes nothing in it. Returns (record, run_bodies' own result)."""
     bodies = [Body(x, seed) for x in rs] if name == STACK else [Body(rs, seed)]
     if load != "normal":
@@ -168,7 +171,7 @@ def recorded_run(name, rs, seed, arm, load=LOAD):
     for b in bodies:
         rec = {"p": [], "over": [], "work": [], "w": [], "mach": []}
         pv, pw = [0] * len(b.plants), [0.0] * len(b.plants)
-        pools = [i for i, (p, r) in enumerate(zip(b.plants, b.rows)) if native_off_pool(p.template, r["knob"])]
+        pools = [i for i, (p, r) in enumerate(zip(b.plants, b.rows)) if pool(p.template, r["knob"])]
 
         def step(b=b, orig=b.step, rec=rec, pv=pv, pw=pw, pools=pools):
             orig()
@@ -204,18 +207,16 @@ def runner_contrast(arm_out, ref_out, ids, kinds):
     """The realms runner's own contrasts of one pair on one seed (tools/run_realms_v5.py): work, energy (a battery's charge
     left below where it started bought back at its round trip), the change in the share of decisions over the line
     (points), work per energy; the plants that did less work or spent more decisions over their line, and what kind of
-    plant and knob each is (kinds: id -> (template, knob, whether direct switches its own native controller off)); the
-    wear, shown."""
+    plant and knob each is (kinds: id -> (template, knob)); the wear, shown."""
     wear = [a["wear"] / n["wear"] - 1.0 for a, n in zip(arm_out["plants"], ref_out["plants"]) if n["wear"] > 0]
     harms = R.plant_harms(arm_out, ref_out, ids)
     by_kind = {}
     for mid, _, _ in harms:
-        t, k, off = kinds[mid]
-        key = f"{t} {k}{' (its own autoscaler off under direct)' if off else ''}"
+        t, k = kinds[mid]
+        key = f"{t} {k}"
         by_kind[key] = by_kind.get(key, 0) + 1
     return {"contrast": paired_organism(arm_out, ref_out), "wear": sum(wear) / len(wear) if wear else 0.0,
             "plants_less_work": sum(1 for _, dw, _ in harms if dw < -1e-9), "plants_more_misses": sum(1 for _, _, dv in harms if dv > 0),
-            "plants_flagged_in_switched_off_pools": sum(1 for mid, _, _ in harms if kinds[mid][2]),
             "plants_flagged_by_kind": dict(sorted(by_kind.items(), key=lambda kv: -kv[1])),
             "plants_flagged": [[mid, dw, dv] for mid, dw, dv in harms]}
 
@@ -231,11 +232,11 @@ def arm_totals(out, rec):
 
 
 def organism_job(args):
-    """One organism on one seed: the three arms, every pair's gauges and the runner's contrasts."""
+    """One organism on one seed: the two arms, the pair's gauges and the runner's contrasts."""
     name, rs, seed = args
     ids = ([f"{r['muscle_id']}@{realm}" for realm, x in zip(R.REALMS, rs) for r in x] if name == STACK
            else [r["muscle_id"] for r in rs])
-    kinds = {i: (r["template"], r["knob"], native_off_pool(r["template"], r["knob"])) for i, r in zip(ids, flat(name, rs))}
+    kinds = {i: (r["template"], r["knob"]) for i, r in zip(ids, flat(name, rs))}
     runs = {arm: recorded_run(name, rs, seed, HARNESS_ARM[arm]) for arm in ARMS}
     recs = {arm: runs[arm][0] for arm in ARMS}
     check = None
@@ -338,7 +339,7 @@ SECTORS = (("software", "the software"), ("cloud", "the cloud as the wire"), ("h
 def whole_record():
     """Organism 10 from results/WHOLE_SYSTEM.json, regrouped into its three sectors by docs/engine/export_whole.py (its own
     run, written to a temporary file): the on-native factors as the composition carries them; native the reference of
-    every factor; direct not yet run in any layer."""
+    every factor."""
     with tempfile.TemporaryDirectory() as td:
         f = Path(td) / "whole.json"
         with contextlib.redirect_stdout(io.StringIO()):
@@ -382,16 +383,12 @@ def whole_record():
 
 def whole_organism(no, key, name, what):
     w = whole_record()
-    direct = {"state": NOT_RUN, "note": "no layer of the composition has run Omni-Compass direct (the cluster's, the services', "
-                                        "the cloud's and the card's tests are native against Omni-Compass on native); the real "
-                                        "arm is preregistered in `docs/SOLO_PREREGISTRATION.md`"}
     return {"no": no, "key": key, "name": name, "what": what, "class": "S (a composition of class P and class L measurements)",
             "muscles": None, "source": "results/WHOLE_SYSTEM.json, regrouped by docs/engine/export_whole.py",
             "arms": {"native": {"state": "the reference", "note": "every factor is a ratio against native, each layer measured with its "
                                                                   "own native as its own test ran it; native carries no number of its own"},
-                     "on_native": {"state": w.get("state"), "composition": w}, "direct": direct},
-            "readings": {"on_native_vs_native": {"state": w.get("state"), "composition": w},
-                         "direct_vs_native": dict(direct), "direct_vs_on_native": dict(direct)}}
+                     "on_native": {"state": w.get("state"), "composition": w}},
+            "readings": {"on_native_vs_native": {"state": w.get("state"), "composition": w}}}
 
 
 # ------------------------------------------------------------------------------------------------------------------- the page
@@ -410,13 +407,13 @@ def summary_cell(rd):
 
 def write_md(out, rec):
     run = rec["run"]
-    L = ["# The thirty scenarios: ten organisms, each native, Omni-Compass on native and Omni-Compass direct (modelled)", ""]
+    L = ["# The twenty scenarios: ten organisms, each native and with Omni-Compass on native (modelled)", ""]
     L += receipt_key() + [""]
-    L += ["The founder's words of 24 October: \"We have 4 realms ... the 4 realms stacked ... the spine of the 4 realms ... Then we "
-          "have the whole thing native. And with OmniCompass on native and then OmniCompass direct to all those same muscles in "
-          "every piece ... 9 to 10 different organisms ... in all 3 is 30 different scenarios that would have to be benchmarked "
-          "out, monitored, tabulated, calculated.\" Ten organisms, each in three arms: thirty scenarios, every one tabulated "
-          "below, every row reported, LOSS included.", "",
+    L += ["The founder's words of 24 October set the organisms: \"We have 4 realms ... the 4 realms stacked ... the spine of the 4 "
+          "realms ... Then we have the whole thing native. And with OmniCompass on native ... 9 to 10 different organisms.\" His "
+          "order of 25 October took the third way out: \"we don't need an omnicompass by itself ... Never is going to omnicompass be "
+          "by itself. It needs muscles somewhere, somehow.\" Omni-Compass always sits on top of a native controller. Ten organisms, "
+          "each two ways: twenty scenarios, every one tabulated below, every row reported, LOSS included.", "",
           f"Evidence class **S** (our own models): a model's energy is not a meter's, and a plant written by the people who wrote "
           f"the law is not an independent test. Engine **{run['engine']}** (`tools/omni_version.py`, digest {run['engine_digest'][:16]}), "
           f"commit `{run['commit'][:12]}`{' (uncommitted changes in the files it stands on)' if run['dirty'] else ''}, run "
@@ -426,20 +423,15 @@ def write_md(out, rec):
           f"{' '.join(str(x) for x in CLIMB[:8])} ..., level 4 the organism's own load, 8 twice it), for {run['steps']} decisions "
           f"of {DECISION_S} s (an hour, every organism at full length); at {int(KILL_AT * 100)}% of every run the brain goes "
           f"silent and the lease walks every setting back to native over {WALK} decisions. Written by "
-          "`python3 tools/scenarios_30.py`; every run's every gauge is in `results/scenarios/SCENARIOS_30.json`.", "",
-          "## The three arms", "",
+          "`python3 tools/scenarios_20.py`; every run's every gauge is in `results/scenarios/SCENARIOS_20.json`.", "",
+          "## The two arms", "",
           "| Arm | What runs |", "|---|---|",
           "| Native (Omni-Compass off) | every plant under its own native controller alone (`realms/harness.py` `run_bodies`, arm native) |",
           "| Omni-Compass on native | the max (`realms/compass_arm_v5.py`, `V5CFG`), the factory tune, on top of every native controller: "
           "every muscle to its own limit, never past it and never below native, the bone granting only the power the body's lines "
-          "and rooms have room for (arm v5, as `tools/run_realms_v5.py` runs it) |",
-          "| Omni-Compass direct | the same max with every pool whose own count is its knob run with its own autoscaler switched off, "
-          "in the plant and in its twin, the brain's model of native (`realms/harness.py` `SOLO` and `native_off_pool`: a compute "
-          "pool whose knob is anything but a power cap or an admission limit). Every other muscle's native is a setting native "
-          "holds still, or the actuator of native's own loop, so direct is the same arm as on native there; the pools switched "
-          "off are counted for each organism below |", "",
+          "and rooms have room for (arm v5, as `tools/run_realms_v5.py` runs it) |", "",
           "## How each scenario is read", "",
-          "Each pair (on native against native, direct against native, direct against on native) is read gauge by gauge as the live "
+          "Omni-Compass on native is read against native gauge by gauge as the live "
           "engine's harness record reads it (`docs/engine/export_harness_trace.py` `gauges` and `interval`): in each run the paired "
           "change per decision, averaged over blocks of ten decisions, with its 95% interval by Student t over the 24 blocks. The "
           "word is the key's (`tools/readings.py` `stack_reading`, with the founder's half-percent floor through `in_all_three`): "
@@ -457,12 +449,11 @@ def write_md(out, rec):
           "label over the three seeds (`label_max`: 95% intervals over the seeds, Student t with two degrees of freedom), in the "
           "words of the key.", ""]
     orgs = rec["organisms"]
-    # the thirty
-    L += ["## The thirty scenarios", "",
-          "Native's own gauges (the mean of runs A, B and C), then each Omni-Compass arm read against its reference (the word, and "
-          "the mean of the three runs' changes). The per-run numbers and intervals follow.", "",
-          "| # | Organism | Muscles | Native (Omni-Compass off) | Omni-Compass on native, against native | Omni-Compass direct, against "
-          "native | Omni-Compass direct, against on native |", "|---:|---|---:|---|---|---|---|"]
+    # the twenty
+    L += ["## The twenty scenarios", "",
+          "Native's own gauges (the mean of runs A, B and C), then Omni-Compass on native read against native (the word, and the "
+          "mean of the three runs' changes). The per-run numbers and intervals follow.", "",
+          "| # | Organism | Muscles | Native (Omni-Compass off) | Omni-Compass on native, against native |", "|---:|---|---:|---|---|"]
     for o in orgs:
         if o["key"] == WHOLE:
             comp = o["readings"]["on_native_vs_native"]["composition"]
@@ -475,7 +466,7 @@ def write_md(out, rec):
                       "(the composition, by the index's rule, without the card)")
             else:
                 c = "the composition is not in this checkout"
-            L.append(f"| {o['no']} | {o['name']} | layers | the reference of every factor | {c} | {NOT_RUN} | {NOT_RUN} |")
+            L.append(f"| {o['no']} | {o['name']} | layers | the reference of every factor | {c} |")
             continue
         nat = o["arms"]["native"]["runs"]
         ng = lambda k: sum(nat[x]["gauges"][k] for x in RUNS) / 3
@@ -513,8 +504,8 @@ def write_md(out, rec):
           "the hour); muscles over the line is the mean count each decision; power is the organism's mean electrical power; energy "
           "is the runner's total (a battery's charge left below its start bought back at its round trip); writes are the settings "
           "Omni-Compass changed before the brain went silent; the lease is every setting back at the operator's before the run "
-          "ended; the pools' machines are the machines in service and starting over every pool whose own count is its knob (the "
-          "pools direct switches off), at the first decision, their mean over the hour and their peak (shown, never judged).", "",
+          "ended; the pools' machines are the machines in service and starting over every pool whose own count is its knob, at "
+          "the first decision, their mean over the hour and their peak (shown, never judged).", "",
           "| # | Organism | Arm | Work index | Muscles over the line a decision | Power (kW) | Energy (MJ) | Muscle-decisions over the line "
           "| Writes | Lease handed back | The pools' machines: first, mean, peak |", "|---:|---|---|---|---|---|---|---|---|---|---|"]
     for o in orgs:
@@ -554,7 +545,7 @@ def write_md(out, rec):
     w = next(o for o in orgs if o["key"] == WHOLE)
     comp = w["readings"]["on_native_vs_native"].get("composition") or {}
     L += [f"## Organism 10, {w['name'].lower()}", "", f"{w['what'][0].upper()}{w['what'][1:]}. {w['arms']['native']['note'][0].upper()}"
-          f"{w['arms']['native']['note'][1:]}. Omni-Compass direct: {NOT_RUN} ({w['arms']['direct']['note']}).", ""]
+          f"{w['arms']['native']['note'][1:]}.", ""]
     if comp.get("state") == "composed":
         L += [f"The composition's rule: {comp['rule']}. The tests' engines: {'; '.join(comp['engines'])}. Separability (a layer's "
               f"ratio unchanged when the layer under it carries Omni-Compass), tested on the governors' four ways: "
@@ -577,61 +568,19 @@ def write_md(out, rec):
                                              for g in comp["layers"].values() for lay in g) + ".", ""]
     else:
         L += ["`results/WHOLE_SYSTEM.json` is not in this checkout: the composition cannot be read.", ""]
-    # where direct's LOSS lives, from the runs' own files
-    L += ["## Where Omni-Compass direct's LOSS lives", "",
-          "Measured in these runs, against native, run by run (A / B / C): the plants that did less work or spent more decisions "
-          "over their line, how many of them are pools whose own autoscaler direct switches off, and the machines in those pools "
-          "(the mean over the hour; native's, then direct's).", "",
-          "| # | Organism | Plants flagged | Of them in the pools switched off | By kind (run A) | The pools' machines, mean: native → direct |",
-          "|---:|---|---|---|---|---|"]
-    for o in orgs:
-        if o["key"] == WHOLE:
-            continue
-        rr = o["readings"]["direct_vs_native"]["runner"]["runs"]
-        na, da = o["arms"]["native"]["runs"], o["arms"]["direct"]["runs"]
-        kinds = "; ".join(f"{k}: {v}" for k, v in rr["A"]["plants_flagged_by_kind"].items()) or "none"
-        L.append(f"| {o['no']} | {o['name']} | {' / '.join(str(len(rr[x]['plants_flagged'])) for x in RUNS)} | "
-                 f"{' / '.join(str(rr[x]['plants_flagged_in_switched_off_pools']) for x in RUNS)} | {kinds} | "
-                 + " / ".join(f"{na[x]['totals']['pool_machines_mean']:,.0f} → {da[x]['totals']['pool_machines_mean']:,.0f}" for x in RUNS) + " |")
-    lost = [o for o in orgs if o["key"] != WHOLE and o["readings"]["direct_vs_native"]["gauges"]["work"]["word"] == LOSS]
-    kept = [o for o in orgs if o["key"] != WHOLE and o not in lost]
-    ratio = lambda o, arm: [o["arms"][arm]["runs"][x]["totals"]["pool_machines_peak"] / max(1, o["arms"][arm]["runs"][x]["totals"]["pool_machines_first"])
-                            for x in RUNS]
-    if lost:
-        all_off = all(o["readings"]["direct_vs_native"]["runner"]["runs"][x]["plants_flagged_in_switched_off_pools"]
-                      == len(o["readings"]["direct_vs_native"]["runner"]["runs"][x]["plants_flagged"]) for o in lost for x in RUNS)
-        d_up = max(r for o in lost for r in ratio(o, "direct"))
-        n_lo, n_hi = min(r for o in lost for r in ratio(o, "native")), max(r for o in lost for r in ratio(o, "native"))
-        L += ["", f"In the organisms where direct reads LOSS on work ({', '.join(o['name'] for o in lost)}), "
-              + ("every plant flagged in every run is a pool whose own autoscaler direct switches off" if all_off else
-                 "not every plant flagged is a pool whose own autoscaler direct switches off (the table names them)")
-              + f"; direct's machines in those pools peaked at most {100 * (d_up - 1):.1f}% above their first count in any run, "
-              f"while native's own autoscalers took them to {n_lo:.1f} to {n_hi:.1f} times their first count at the climb's top."
-              + (" " + "; ".join(f"In {o['name'].lower()} direct's peak was {min(ratio(o, 'direct')):.1f} to {max(ratio(o, 'direct')):.1f} "
-                                 f"times its first count (native's {min(ratio(o, 'native')):.1f} to {max(ratio(o, 'native')):.1f})"
-                                 for o in kept) + "." if kept else "")]
-    L += ["", "How the harness runs it (the code, read): under direct a pool's own autoscaler is off, so its count holds where it "
-          "stands unless the max sets a floor or a ceiling (`realms/plants.py`, `ComputePool.step`, `native_off`); inside an organism "
-          "the max adds machines only out of the room the bone finds on the body's lines, never below the pool's twin "
-          "(`realms/compass_arm_v5.py`, `max_body_step`, `Bone`); and under direct the twin, the brain's model of native, has its own "
-          "autoscaler switched off too (`realms/harness.py`, `run_bodies`, `SOLO`), so the floor under the max is the twin's held "
-          "count, not what native's autoscaler would run. That is the engine's, on the next version's list, through the toy gate; "
-          "nothing here changes it.", ""]
-    # organism 9's check, direct's reach
+    # organism 9's check
     live = next(o for o in orgs if o["key"] == LIVE)
     L += ["## What stands behind the numbers", "",
           f"- Organism 9 is read from the harness export's own functions (`docs/engine/export_harness_trace.py` `run`, `gauges`, "
           f"`interval`); the same sixty muscles run here on `run_bodies` gave, decision by decision in every arm and run, "
           f"{'the same record' if live.get('export_check') else 'a different record (named, not hidden: the export reads its own)'}.",
-          "- Omni-Compass direct differs from Omni-Compass on native only on the pools whose own count is the knob. Pools switched "
-          "off, by organism: " + "; ".join(f"{o['name']} {o['direct_pools']} of {o['muscles']:,}" for o in orgs if o.get("direct_pools") is not None) + ".",
           "- Every LOSS row stands where it reads; a LOSS on the factory tune is a fault to be root-caused and fixed in the next "
           "version, never a number to accept.", ""]
     losses = [(o["name"], PAIR_NAMES[pk], g["name"], g["reading"]) for o in orgs if o["key"] != WHOLE
               for pk in PAIR_KEY.values() for g in o["readings"][pk]["gauges"].values() if g["word"] == LOSS]
     L += [f"## Every LOSS row ({len(losses)})", ""]
     L += [f"- {n}, {p}: {g}, {r}" for n, p, g, r in losses] or ["- none"]
-    (out / "SCENARIOS_30.md").write_text("\n".join(stamp(with_own_runs(L))) + "\n", encoding="utf-8")
+    (out / "SCENARIOS_20.md").write_text("\n".join(stamp(with_own_runs(L))) + "\n", encoding="utf-8")
 
 
 # --------------------------------------------------------------------------------------------------------------------- main
@@ -639,7 +588,7 @@ def git(*a):
     return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True).stdout.strip()
 
 
-FROZEN = R.FROZEN + ["tools/scenarios_30.py", "tools/run_orchestra.py", "tools/governors_page.py",
+FROZEN = R.FROZEN + ["tools/scenarios_20.py", "tools/run_orchestra.py", "tools/governors_page.py",
                      "docs/engine/export_harness_trace.py", "docs/engine/export_whole.py", "results/WHOLE_SYSTEM.json"]
 
 
@@ -673,14 +622,13 @@ def build(workers=None, organisms=None):
             continue
         rs = flat(key, groups[key])
         o = {"no": no, "key": key, "name": name, "what": what, "class": "S", "muscles": len(rs),
-             "direct_pools": sum(1 for r in rs if native_off_pool(r["template"], r["knob"])),
              "source": ("docs/engine/export_harness_trace.py (run, gauges, interval)" if key == LIVE
-                        else "realms/harness.py run_bodies, recorded by tools/scenarios_30.py")}
+                        else "realms/harness.py run_bodies, recorded by tools/scenarios_20.py")}
         o.update(read_organism(key, raw[key]))
         if key == LIVE:
             o["export_check"] = all(raw[key][s]["export_check"] for s in RUNS.values())
         orgs.append(o)
-    return {"title": "The thirty scenarios: ten organisms, each native, Omni-Compass on native and Omni-Compass direct",
+    return {"title": "The twenty scenarios: ten organisms, each native and with Omni-Compass on native",
             "class": "S", "own_runs": OWN_RUNS, "run": run, "arms": ARM_NAMES, "pairs": PAIR_NAMES,
             "gauges": {k: {"name": n, "aim": a, "how": h} for k, (n, a, h) in GAUGES.items()},
             "organisms": orgs}
@@ -694,7 +642,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     rec = build(a.workers, [x for x in a.organisms.split(",") if x])
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
-    (out / "SCENARIOS_30.json").write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    (out / "SCENARIOS_20.json").write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     if len(rec["organisms"]) == len(ORGANISMS):
         write_md(out, rec)
     print(f"scenarios: {len(rec['organisms'])} organisms in {rec['run']['elapsed_s']} s -> {out}")

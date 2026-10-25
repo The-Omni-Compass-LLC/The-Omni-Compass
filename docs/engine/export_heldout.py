@@ -25,7 +25,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-ARMS = ["native", "omni_k8s_protect", "omni_k8s_throughput", "omni_direct", "k8s_ref_70", "omni_k8s_observe"]
+# Omni-Compass always on top of native (the founder's order of 25 October: never by itself): the record's own arm that runs
+# Omni-Compass alone, omni_direct, stays in its file and is not drawn
+ARMS = ["native", "omni_k8s_protect", "omni_k8s_throughput", "k8s_ref_70", "omni_k8s_observe"]
 GAUGES = [("time_healthy", "time healthy (share of the 72 steps)", "higher"), ("sla_violation_physical", "service-level violations, physical (share of steps)", "lower"),
           ("recovery_minutes", "recovery after the event (minutes)", "lower"), ("energy_kwh", "energy (kWh)", "spent"), ("node_hours", "machine-hours", "spent")]
 

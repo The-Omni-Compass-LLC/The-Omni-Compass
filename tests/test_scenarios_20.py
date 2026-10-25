@@ -3,18 +3,17 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The thirty scenarios (tools/scenarios_30.py, results/scenarios/SCENARIOS_30.json): ten organisms in the founder's order, each
-in three arms; every judged cell carries a word of the key; the whole organism's direct arm reads "not yet run" and carries no
-number; the record was run on committed code; and a small organism run twice gives the same record, its recording changing
-nothing in the harness's own run."""
+"""The twenty scenarios (tools/scenarios_20.py, results/scenarios/SCENARIOS_20.json): ten organisms in the founder's order, each
+native and with Omni-Compass on native, and no third way (the founder's order of 25 October: Omni-Compass is never by
+itself); every judged cell carries a word of the key; the record was run on committed code; and a small organism run twice
+gives the same record, its recording changing nothing in the harness's own run."""
 import json
-import re
 import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-import tools.scenarios_30 as S  # noqa: E402
+import tools.scenarios_20 as S  # noqa: E402
 from tools.readings import GAIN, EVEN, LOSS, GIVEN, DISAGREE, SHOWN, SHOWN_AIM, HIGHER, LOWER, SPENT, OWN_RUNS, classify, aim  # noqa: E402
 
 RESULT = ROOT / "results" / "scenarios"
@@ -22,15 +21,17 @@ WORDS = {GAIN, EVEN, LOSS, GIVEN, DISAGREE}
 
 
 def record():
-    return json.loads((RESULT / "SCENARIOS_30.json").read_text(encoding="utf-8"))
+    return json.loads((RESULT / "SCENARIOS_20.json").read_text(encoding="utf-8"))
 
 
 class Shape(unittest.TestCase):
-    def test_ten_organisms_three_arms_in_the_founders_order(self):
+    def test_ten_organisms_two_arms_in_the_founders_order(self):
         d = record()
         self.assertEqual([o["key"] for o in d["organisms"]], [k for k, *_ in S.ORGANISMS])
         self.assertEqual([o["no"] for o in d["organisms"]], list(range(1, 11)))
-        self.assertEqual(len(d["organisms"]) * len(S.ARMS), 30)
+        self.assertEqual(S.ARMS, ("native", "on_native"))
+        self.assertEqual(len(d["organisms"]) * len(S.ARMS), 20)
+        self.assertNotIn("direct", json.dumps(d["arms"]) + json.dumps(d["pairs"]))
         for o in d["organisms"]:
             self.assertEqual(set(o["arms"]), set(S.ARMS), o["key"])
             self.assertEqual(set(o["readings"]), set(S.PAIR_KEY.values()), o["key"])
@@ -55,12 +56,10 @@ class Shape(unittest.TestCase):
                         self.assertRegex(g["runs"][x]["cell"], r"^[+−=±]\d")
                 self.assertIn(rd["runner"]["labelled"].split(" ")[0].strip(","), {GAIN, EVEN, LOSS, "INVALID"}, (o["key"], pk))
 
-    def test_the_whole_organisms_direct_arm_is_not_yet_run(self):
+    def test_the_whole_organism_is_the_composition_of_the_real_tables(self):
         w = record()["organisms"][9]
         self.assertEqual(w["key"], S.WHOLE)
-        for cell in (w["arms"]["direct"], w["readings"]["direct_vs_native"], w["readings"]["direct_vs_on_native"]):
-            self.assertEqual(cell["state"], S.NOT_RUN)
-            self.assertFalse(re.search(r"\d+\.\d|%", json.dumps(cell)), cell)       # no number written for a run that never ran
+        self.assertEqual(set(w["arms"]), set(S.ARMS))
         comp = w["readings"]["on_native_vs_native"]["composition"]
         self.assertEqual(comp["state"], "composed")
         for sc in comp["scopes"].values():
@@ -81,14 +80,14 @@ class Shape(unittest.TestCase):
         self.assertTrue(live["export_check"])          # the harness export's own run and the run here agree decision by decision
 
     def test_the_page_carries_the_notice_and_every_organism(self):
-        text = (RESULT / "SCENARIOS_30.md").read_text(encoding="utf-8")
+        text = (RESULT / "SCENARIOS_20.md").read_text(encoding="utf-8")
         lines = text.rstrip().splitlines()
         self.assertIn("www.omni-compass.com", lines[2])
         self.assertIn("www.omni-compass.com", lines[-1])
         self.assertIn(OWN_RUNS, text)
         for _, name, _ in S.ORGANISMS:
             self.assertIn(name, text)
-        self.assertIn(S.NOT_RUN, text)
+        self.assertNotRegex(text, r"Omni-Compass direct|by itself, the|SOLO")
 
 
 class Reading(unittest.TestCase):
