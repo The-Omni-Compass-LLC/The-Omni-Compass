@@ -336,7 +336,7 @@ class ConductorGate(unittest.TestCase):
 
     def test_the_workflow_titles_match_the_conductor(self):
         w = yaml.safe_load((ROOT / ".github" / "workflows" / "cloud-check.yml").read_text())
-        self.assertEqual(w["run-name"], "cloud-check ${{ github.event.inputs.cloud || 'both' }}")
+        self.assertEqual(w["run-name"], "cloud-check ${{ github.event.inputs.cloud || 'azure' }}")
         byoc = {"oracle", "digitalocean", "alibaba", "linode", "ibm"}
         self.assertEqual(set(grid.CHECKS.values()), {"google", "amazon", "azure"} | byoc)
         # one job a cloud, its title the conductor's; the clusters built in a provider's console share one job, by its input
@@ -350,7 +350,7 @@ class ConductorGate(unittest.TestCase):
         self.assertNotIn("az group create", text)
         for cloud, runs in (("google", ("google", "both", "all")), ("amazon", ("amazon", "both", "all")), ("azure", ("azure", "all"))):
             # a push of this file to main runs the two free checks as "both" (23 October); a hand or conductor start names its cloud
-            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), (github.event.inputs.cloud || 'both'))")
+            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), (github.event.inputs.cloud || 'azure'))")
         self.assertNotIn("eksctl create", text)
         self.assertNotIn("clusters create", text)
 
