@@ -41,7 +41,7 @@ on:
       vm_size: {description: "Azure machine size (start); Standard_D8as_v4 is the size eastus granted on 2026-10-05", default: "Standard_D8as_v4"}
       location: {description: "Azure region (start). Survey of 2026-10-06: eastus allows 32 vCPUs and the v4 sizes; every other region allows 10 vCPUs and only the v5 to v7 sizes (the sizes tried fall back to v7)", default: "eastus"}
       max_hours: {description: "Collect and delete a machine older than this, finished or not (start: stored on the machine's group; collect: the default for machines without one)", default: "40"}
-      test: {description: "organism (the organisms with the cluster inside, above), scale (the modelled organisms, tools/run_scale.py, on the max with work waiting in line: organisms is a number 1-7 (7 the spine), reps the runs, rep_first the first run, 0-based; for the grid's squares too big for a GitHub machine) or robust (the robustness long scenario, docs/ROBUSTNESS_PREREGISTRATION.md: the governor's memory and decisions over duration_s an arm, the wandering schedule repeated; the 24-hour run)", default: "organism"}
+      test: {description: "organism (the organisms with the cluster inside, above), scale (the modelled organisms, tools/run_scale.py, on the max with work waiting in line: organisms is a number 1-7 (7 the spine), reps the runs, rep_first the first run, 0-based; for the grid's squares too big for a GitHub machine) or robust (the robustness long scenario, docs/ROBUSTNESS_PREREGISTRATION.md: the governor's memory and decisions over duration_s an arm, the wandering schedule repeated; the 24-hour run) or direct (Omni direct's three arms, native, Omni on native and Omni direct, tools/orchestrator_show.py full form with the busy room rule, no Kubernetes: reps runs from rep_first; organisms, size and duration_s unused)", default: "organism"}
       rep_first: {description: "The first repetition on this machine (1-based; scale: the first run, 0-based), so many machines fill one square without two running the same repetition", default: "1"}
       group: {description: "collect: look at this resource group only (omni-detached-<run id>); empty = every tagged machine", default: ""}
   schedule:
@@ -78,9 +78,13 @@ jobs:
       - name: The Azure key is whole (its shape only; not a character of it is printed; a key in another form never reaches the login, which would quote it)
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         run: python3 _keycheck/tools/cloud_key_check.py azure
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
-        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+        with: {creds: "${{ env.AZ_CREDS }}"}
       - name: Which sizes may this subscription rent, where
         run: |
           # the 8-vCPU sizes the start job tries, in the regions it could use: unrestricted sizes and the regional quota
@@ -173,9 +177,13 @@ jobs:
       - name: The Azure key is whole (its shape only; not a character of it is printed; a key in another form never reaches the login, which would quote it)
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         run: python3 tools/cloud_key_check.py azure
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
-        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+        with: {creds: "${{ env.AZ_CREDS }}"}
       - name: Rent the machine
         run: |
           az group create -n "$RG" -l "$LOC" -o none \
@@ -247,6 +255,14 @@ jobs:
             python3 tools/run_scale.py --runs $REPS --first $R0 --scale $SCALE --organisms $ORGS --out "cells/\$cell" --workers "\$w" \
               --arm v5 --load line > "run-\$cell.log" 2>&1; code=\$?
             mv "run-\$cell.log" "cells/\$cell/run.log"; echo "\$code" > "cells/\$cell/run.exit"; echo "\$(date -u +%FT%TZ) end \$cell exit \$code"
+          elif [ "$TEST" = direct ]; then
+            # Omni direct's three arms (tools/orchestrator_show.py, the full form, the busy room rule), one run a cell, as on GitHub
+            for rep in \$(seq $R0 $((R0 + REPS - 1))); do
+              cell="direct-busy-\$rep"; echo "\$(date -u +%FT%TZ) start \$cell"
+              sudo -E env "PATH=\$PATH" python3 tools/orchestrator_show.py --out "cells/\$cell" --room-rule busy > "run-\$cell.log" 2>&1; code=\$?
+              sudo chown -R "\$(id -u):\$(id -g)" cells 2>/dev/null; mkdir -p "cells/\$cell"
+              mv "run-\$cell.log" "cells/\$cell/run.log"; echo "\$code" > "cells/\$cell/run.exit"; echo "\$(date -u +%FT%TZ) end \$cell exit \$code"
+            done
           elif [ "$TEST" = robust ]; then
             w="1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1"; s=""
             for i in \$(seq 1 $((DUR / 900))); do s="\$s \$w"; done
@@ -270,7 +286,7 @@ jobs:
           scp -o StrictHostKeyChecking=no run_all.sh omni@$IP:omni/run_all.sh
           # the test is started in the background with every file handle redirected, and nothing else is put in the
           # background with it (an "a && b &" list would leave a shell holding this ssh session open until the test ends)
-          ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log run-*.log 2>/dev/null; pgrep -af "kind_paired|run_scale" >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
+          ssh -o StrictHostKeyChecking=no omni@$IP 'cd omni; nohup setsid sg docker -c "bash run_all.sh" > detached.log 2>&1 < /dev/null & disown; sleep 90; echo "--- detached.log"; cat detached.log; echo "--- paired log"; tail -5 paired-*.log run-*.log 2>/dev/null; pgrep -af "kind_paired|run_scale|orchestrator_show" >/dev/null && echo RUNNING || { echo "::error::the test is not running"; exit 1; }'
           echo "::notice::$RG in $LOC: test $TEST, $ORGS at $SCALE copies, $REPS repetitions from $R0 (of $DUR s an arm with the cluster inside), commit $SHA, collected and deleted after $MAXH h at the latest; collect looks at it every two hours"
       - name: A start that failed after renting deletes its machine (nothing bills for a test that is not running)
         if: failure()
@@ -303,9 +319,13 @@ jobs:
       - name: The Azure key is whole (its shape only; not a character of it is printed; a key in another form never reaches the login, which would quote it)
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         run: python3 _keycheck/tools/cloud_key_check.py azure
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
-        with: {creds: "${{ secrets.AZURE_CREDENTIALS }}"}
+        with: {creds: "${{ env.AZ_CREDS }}"}
       - name: Look at every running machine
         id: look
         run: |
@@ -345,7 +365,7 @@ jobs:
             scp -i k -o StrictHostKeyChecking=no -r "omni@$ip:omni/cells/*" out/ || true
             scp -i k -o StrictHostKeyChecking=no "omni@$ip:omni/detached.log" "out/detached-$RG.log" || true
             { $S 'free -g; df -h /'; echo "$tags"; } > "out/machine-$RG.txt" 2>&1 || true
-            for c in out/six-* out/robust-* out/part-*; do [ -d "$c" ] && echo "::notice::$(basename "$c"): exit $(cat "$c/paired.exit" "$c/run.exit" 2>/dev/null || echo missing), $(find "$c" -type f | wc -l) files"; done
+            for c in out/six-* out/robust-* out/part-* out/direct-*; do [ -d "$c" ] && echo "::notice::$(basename "$c"): exit $(cat "$c/paired.exit" "$c/run.exit" 2>/dev/null || echo missing), $(find "$c" -type f | wc -l) files"; done
             az group delete -n "$RG" --yes --no-wait || true; any=1
           done
           echo "any=$any" >> "$GITHUB_OUTPUT"
@@ -354,7 +374,7 @@ jobs:
         id: cells
         if: steps.look.outputs.any == '1'
         run: |
-          i=0; for c in out/six-* out/robust-* out/part-*; do [ -d "$c" ] || continue; i=$((i + 1)); echo "c$i=$(basename "$c")" >> "$GITHUB_OUTPUT"; done
+          i=0; for c in out/six-* out/robust-* out/part-* out/direct-*; do [ -d "$c" ] || continue; i=$((i + 1)); echo "c$i=$(basename "$c")" >> "$GITHUB_OUTPUT"; done
           [ "$i" -le 6 ] || echo "::notice::$i cells collected: the first six are also published one by one; every cell is in detached-cells"
       - name: Attach README, licenses and disclosures to this artifact
         id: omni_legal_export_1

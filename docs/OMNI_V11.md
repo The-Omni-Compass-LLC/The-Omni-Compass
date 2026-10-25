@@ -11,7 +11,7 @@ reading that had machines. Every setting, gain, preset and muscle is omni-v10's,
 
 Its fingerprint is `OMNI_V11.json` (digest `745aa53ec8eeb67b`, 47 files). Forty-six files are omni-v10's bytes; one differs, the
 Kubernetes governor (`omni_controller/controller.py`). The change was proven in a unit test that reproduces the fault and in the
-toy gate before it was pushed. Every benchmark runs again on it. Every earlier table stands as its own engine's result until its
+model gate before it was pushed. Every benchmark runs again on it. Every earlier table stands as its own engine's result until its
 three runs on v11 land, and results from two versions are never pooled. Run and scored by The Omni-Compass LLC's own code. No
 outside party has reviewed or approved these results.
 
@@ -42,15 +42,15 @@ The rig was repaired beside it (no engine file; `docs/K8S_COMPASS_PREREGISTRATIO
 capture shows no machine in service is refused in either arm, because its machine count is wrong. A failed decision is named by
 its error. The capture records each node's taints and conditions at the moment it sees no machine in service.
 
-## 2. The toy gate
+## 2. The model gate
 
-The candidate was run against omni-v10 on seeds 1 to 8 in our own models (`tools/toy_gate.py`; `results/toy_gate/V11_VS_V10.md`),
-on every toy: the cluster at a decision every 60 s and every 15 s, the new blink toy, conveyance with the quota readable and
+The candidate was run against omni-v10 on seeds 1 to 8 in our own models (`tools/model_gate.py`; `results/model_gate/V11_VS_V10.md`),
+on every model: the cluster at a decision every 60 s and every 15 s, the new blink model, conveyance with the quota readable and
 unreadable, and the verdict on noisy work. This is the first gate in which each arm is proven to import its own checkout's
 engine. From omni-v9's gate on, the gate had put its own tree first, so both arms ran the candidate; omni-v9 and omni-v10
-changed no file a toy runs, so their readings hold by construction, and each page carries the correction.
+changed no file a model runs, so their readings hold by construction, and each page carries the correction.
 
-| Toy | Gauges identical to omni-v10 | Decisions that failed (omni-v10 / omni-v11) | Decisions held (omni-v10 / omni-v11) |
+| Model | Gauges identical to omni-v10 | Decisions that failed (omni-v10 / omni-v11) | Decisions held (omni-v10 / omni-v11) |
 |---|---:|---:|---:|
 | the cluster, a decision every 60 s | 6 of 6 | 0 / 0 | 0 / 0 |
 | the cluster, a decision every 15 s | 6 of 6 | 0 / 0 | 0 / 0 |
@@ -59,12 +59,12 @@ changed no file a toy runs, so their readings hold by construction, and each pag
 | conveyance, the quota unreadable | 8 of 8 | (no decision of the governor) | |
 | the verdict on noisy work | 5 of 5 | (no decision of the governor) | |
 
-Every gauge and every count is identical. A decision that failed and one that held both write nothing, so nothing the toys
+Every gauge and every count is identical. A decision that failed and one that held both write nothing, so nothing the models
 measure moves; what moves is the record (a reason where there was an error) and the engine's own state, which a blind reading
 no longer reaches. Against native, the two engines read the same, and four rows read LOSS in both: the pod start wait under
 conveyance (+9.0% mean, +10.0% at the 95th percentile), the pending-pod minutes and the response time at a decision every 15 s
-(+111.7%, +0.33%; no run decides that often), and the alert minutes in the blink toy (+2.35%). They are not this change's; they
-are the next version's work, in the gate first. The first is the test machine, not the governor: the toy's pod start time was
+(+111.7%, +0.33%; no run decides that often), and the alert minutes in the blink model (+2.35%). They are not this change's; they
+are the next version's work, in the gate first. The first is the test machine, not the governor: the model's pod start time was
 fitted to the empty-node image unpacking of the single kind host (`docs/POD_START_WAIT.md`, section 8), and the kind rig now
 pre-pulls the image. These are our own models (class S), never a benchmark result.
 

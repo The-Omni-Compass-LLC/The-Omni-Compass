@@ -139,10 +139,14 @@ jobs:
     - name: The Azure key is whole (its shape only; not a character of it is printed; a key in another form never reaches the login, which would quote it)
       env:
         AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       run: python3 tools/cloud_key_check.py azure
     - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        creds: ${{ env.AZ_CREDS }}
     - run: az provider register --namespace Microsoft.ContainerService --wait
     - name: Run the paired repetition (full controls)
       run: |

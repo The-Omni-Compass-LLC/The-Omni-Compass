@@ -121,7 +121,7 @@ undone. The card's own energy counter (NVML) and its ECC and retired-page counte
 
 ## Testing the bench without a GPU
 
-`python tests/test_gpu_bench.py` runs the whole script against a stand-in `nvidia-smi` (`tests/fake_gpu/`), with the
+`python tests/test_gpu_bench.py` runs the whole script against a stand-in `nvidia-smi` (`tests/standin_gpu/`), with the
 workload's `--sim` mode. The stand-in has no real power physics, so its numbers mean nothing; it proves the script,
 the controls and the validity checks work.
 

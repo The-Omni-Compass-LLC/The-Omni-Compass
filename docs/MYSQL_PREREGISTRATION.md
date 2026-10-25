@@ -221,7 +221,7 @@ any resize the server is still carrying out (the load has stopped by then, so a 
 snapshot, and if the server did not take it, waits once more and writes once more; its receipt (what was in flight when the arm
 ended, the seconds waited, the writes, the final read-back) is written into every omni arm's record, and the table reports how
 many arms were not handed back and in how many the server was mid-resize. `tests/test_run_sysbench.py` proves the three cases
-against the fake console (a withdrawal that eases inside the wait; one that eases after the first write is ignored; one that
+against the stand-in console (a withdrawal that eases inside the wait; one that eases after the first write is ignored; one that
 never eases, which still reads NO). Nothing in the law, the gates, the line, the cover, the chunk, the dwell or the gauges
 changes; `tools/omni_version.py` still prints omni-v3. **The second counted set (A2, B2, C2) runs on this plug; its table
 replaces the first in `results/live/V3_SYSBENCH.md`, and the first set's table moves to `docs/history` with this note, every

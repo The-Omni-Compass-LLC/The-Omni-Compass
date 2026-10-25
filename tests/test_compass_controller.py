@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The compass law in the live Kubernetes controller (--law compass), against the fake kubectl (tests/fake_cluster/kubectl).
+"""The compass law in the live Kubernetes controller (--law compass), against the standin kubectl (tests/standin_cluster/kubectl).
 
   calm      p95 far under the SLO: the compass pulls down, the HPA target never rises above the operator's (never tighter
             than native), and the node pool gives one machine back per decision through the release gate
@@ -23,7 +23,7 @@ import json, os, sys, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Controller, parser, ANNOTATION, UNBOUNDED
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def cluster(tmp, target=50):
@@ -35,7 +35,7 @@ def cluster(tmp, target=50):
     hpas = [{"metadata": {"name": "web", "namespace": "default"}, "spec": {"minReplicas": 1, "maxReplicas": 10, "metrics": [cpu]},
              "status": {"currentReplicas": 3, "desiredReplicas": 3, "currentMetrics": cur}}]
     st = Path(tmp) / "state.json"; st.write_text(json.dumps({"nodes": nodes, "pods": pods, "hpas": hpas, "used_per_node": "300m"}))
-    os.environ["FAKE_KUBE_STATE"] = str(st); os.environ["FAKE_KUBE_LOG"] = str(Path(tmp) / "writes.log")
+    os.environ["STANDIN_KUBE_STATE"] = str(st); os.environ["STANDIN_KUBE_LOG"] = str(Path(tmp) / "writes.log")
     return st
 
 
@@ -49,7 +49,7 @@ def probe(tmp, ms, n=40):
 def controller(tmp, lat, *extra):
     marker = Path(tmp) / "scaled"
     cmd = f"python3 -c \"open('{marker}', 'a').write('{{n}}\\\\n')\""
-    a = parser().parse_args(["--kubectl", FAKE, "--interval", "60", "--audit", str(Path(tmp) / "audit.jsonl"),
+    a = parser().parse_args(["--kubectl", STANDIN, "--interval", "60", "--audit", str(Path(tmp) / "audit.jsonl"),
                              "--kill-file", str(Path(tmp) / "kill"), "--mode", "nodepool", "--law", "compass",
                              "--node-scale-cmd", cmd, "--max-node-step", "1", "--latency-file", str(lat), "--slo-ms", "500",
                              "--latency-window-s", "30", *extra])

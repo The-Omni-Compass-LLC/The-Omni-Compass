@@ -20,13 +20,13 @@ machines added or removed a minute), the compass's damping and smoothing, the ed
 raise, the additions past the scheduling floor (a step a minute), a command's minute to land, the host's busy share
 over a minute, the heat law's minute, one batch job a minute, the conveyance every 15 s whichever check falls due, and
 the loop that keeps its own schedule (`tests/test_pace_clocks.py`, `tests/test_loop_schedule.py`). At 60 s it makes
-exactly omni-v15's decisions (the toy cluster, 4,578 records, none different); the conveyance's 15 s and the loop's
+exactly omni-v15's decisions (the model cluster, 4,578 records, none different); the conveyance's 15 s and the loop's
 schedule are the only changes a run at 60 s can see.
 
 ## What was read first, in our own models (class S)
 
-The toy gate, before any run (`results/toy_gate/V16_VS_V15.md`, `results/toy_gate/V16_PACE.md`): omni-v16 against omni-v15
-on every toy, and omni-v16 alone at 60, 15, 10 and 5 s on a plant that moves every 5 s, in the cloud's
+The model gate, before any run (`results/model_gate/V16_VS_V15.md`, `results/model_gate/V16_PACE.md`): omni-v16 against omni-v15
+on every model, and omni-v16 alone at 60, 15, 10 and 5 s on a plant that moves every 5 s, in the cloud's
 setting and in this benchmark's. A pace that reads a LOSS there is not run here.
 
 ## What is run
@@ -62,14 +62,14 @@ commands, the governor's own processor) is power given, never a LOSS; it is show
 
 The default becomes the fastest pace that meets all four:
 
-1. In the toy gate, no LOSS at that pace.
+1. In the model gate, no LOSS at that pace.
 2. Against native: no row reads LOSS.
 3. Against the 60 s arm: no row of work done, time waited, missed or failed reads LOSS or "the runs disagree".
 4. Omni-Compass's own processor at that pace (the receipt's "Omni's own CPU (cores)", from the overhead record every
    Omni arm writes) stays under 0.1 of one core, a fortieth of the runner's four.
 
 If no faster pace meets all four, the default stays 60 s, as omni-v16 landed it. A faster default is the next version,
-omni-v17, under the standing rule (tested in the toy first, told, not asked), and every benchmark runs again on it.
+omni-v17, under the standing rule (tested in the model first, told, not asked), and every benchmark runs again on it.
 
 ## What does not change
 
@@ -85,21 +85,21 @@ of this choice, because they cost money; they run at whatever default lands.
 - The runs share GitHub's runners with the campaign; each repetition pairs its five arms on one runner at one time, so
   the queue changes no comparison.
 
-## Amendment 1 (22 October, written before any run): how rule 1 reads the toy
+## Amendment 1 (22 October, written before any run): how rule 1 reads the model
 
-Rule 1 reads each pace as every toy gate reads a candidate: against the engine that stands at its default, here omni-v16
-deciding every 60 s, paired by seed (`results/toy_gate/`); the paired reading is what says whether a pace adds anything. The
-toy's rows against native are printed beside them in full (`results/toy_gate/V16_PACE.md`), and a row there that reads LOSS
+Rule 1 reads each pace as every model gate reads a candidate: against the engine that stands at its default, here omni-v16
+deciding every 60 s, paired by seed (`results/model_gate/`); the paired reading is what says whether a pace adds anything. The
+model's rows against native are printed beside them in full (`results/model_gate/V16_PACE.md`), and a row there that reads LOSS
 goes to the next version's list (`docs/CHANGE_CONTROL.md`) to be root-caused as the engine's: it is the engine's trade at
-every pace, the default included. Written once the toy had read, before the first run, because "no LOSS at that pace" could
+every pace, the default included. Written once the model had read, before the first run, because "no LOSS at that pace" could
 be read either way: in the cloud's setting the pods wait for a machine longer than native's at every pace, the default
 included (pending pod minutes an hour: native 8.2, every 60 s 20.9, every 15, 10 and 5 s 18.4, 15.9 and 16.5), a reading of
 EVEN at 60 and 10 s and of LOSS at 15 and 5 s only because the seeds' spread differs, while against the 60 s default each
-faster pace reads EVEN. The reading kept is the toy gate's own, the one every version since 15 October was landed by.
+faster pace reads EVEN. The reading kept is the model gate's own, the one every version since 15 October was landed by.
 
 ## Amendment 2 (22 October, written before any run): the founder sets the heartbeat at 15 s
 
-Once the toy had read (`results/toy_gate/V16_PACE.md`: against 60 s, no LOSS at any pace in either setting; at 15 s the alert
+Once the model had read (`results/model_gate/V16_PACE.md`: against 60 s, no LOSS at any pace in either setting; at 15 s the alert
 minutes 14.7% fewer in this benchmark's setting and energy per core 2.6% less in the cloud's), the founder's word was "15 sec
 all over heart beat fix update code". The default is therefore 15 s from omni-v16 on, set by him and not by this rule, and the
 rule above no longer picks it: omni-v16 lands with its full decision every 15 s, not at the 60 s the rule above first left it. The runs stay as written, with the arms around the default: native, the compass arm at 15 s,
@@ -128,8 +128,8 @@ Everything else stands as written above: the fast checks every 5 s in every Omni
 Each beat is read against native and against the compass arm at 60 s, paired within the repetition, by the one key, three
 runs of 10 repetitions; a repetition's job may run four hours (`.github/workflows/benchmark-reps.yml`). A row that reads LOSS
 at any beat against native is the engine's at that beat: it is named on the dial's page (the live engine page, "The heartbeat
-dial") and root-caused like any other, in the toy first. The seven beats were read first in our own models
-(`results/toy_gate/V17_LADDER.md`), and that reading found one fault before the version landed: at 90 and 120 s the cruise
+dial") and root-caused like any other, in the model first. The seven beats were read first in our own models
+(`results/model_gate/V17_LADDER.md`), and that reading found one fault before the version landed: at 90 and 120 s the cruise
 wait (120 s) had rounded to one decision, so one reading with a pod waiting put every machine in service. omni-v17 carries the
 fix (the cruise wait never fewer than two readings; `docs/OMNI_V17.md`, section 3), so the compass90 and compass120 arms run
 the corrected rule; every other arm's counts are unchanged by it.

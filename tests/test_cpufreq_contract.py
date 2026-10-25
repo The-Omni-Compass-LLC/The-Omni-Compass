@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """CPU-frequency lever through the kernel's policy files (hardware/cpufreq.py, contract adopted from the ChatGPT
-release, wired here under the nervous system). On a fake sysfs tree:
+release, wired here under the nervous system). On a standin sysfs tree:
   C1 schedutil map: request = min(1, 1.25 u), tipping at u = 0.8
   C2 a ceiling never exceeds the operator's pre-Omni ceiling and never crosses scaling_min_freq
   C3 exact restore of every policy's pre-Omni ceiling (not the silicon maximum)

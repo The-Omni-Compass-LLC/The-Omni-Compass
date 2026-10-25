@@ -4,6 +4,8 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 MySQL as Ubuntu ships it with the operator's InnoDB buffer pool (512 MB) is native; omni is the compass law on the pool size through the server's own console inside [128, 2,048] MB in chunks of 128 MB, holding the server's own mean statement latency at 40% of the 0.6 ms statement line (`docs/MYSQL_PREREGISTRATION.md`). sysbench's published OLTP workloads ask for rows from a set of tables that steps through the pool and past it, the same transactions in both arms. Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number (a resource spent that rose reads **power given**, never a loss; the key: `docs/HOW_TO_READ_THE_RESULTS.md`)); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Errors: any increase in any run is marked. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Workloads |
@@ -137,7 +139,7 @@ The buffer pool handed back to the operator's and read back at the end of every 
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 128 to 512 (11 trials, 3 allowed, 4 refused); acting: 256 to 512 (12 trials, 2 allowed, 4 refused); acting: 128 to 512 (13 trials, 3 allowed, 5 refused); run B: left native (20 trials, 0 allowed, 4 refused); acting: 128 to 512 (13 trials, 3 allowed, 4 refused); acting: 512 to 640 (19 trials, 1 allowed, 3 refused); run C: acting: 128 to 512 (6 trials, 3 allowed, 2 refused); acting: 128 to 512 (8 trials, 3 allowed, 3 refused); acting: 256 to 512 (12 trials, 2 allowed, 4 refused).
 
-**Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS or power given, 0 where the runs disagree.**
+**Across 4 untouched workloads: 0 gauge-rows GAIN, 0 LOSS, 0 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 48 EVEN, 0 where the runs disagree.**
 
 ---
 

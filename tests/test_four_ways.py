@@ -24,7 +24,7 @@ NODES = "worker nodes in service, mean"
 G = {"nativebare": (40.0, 6.0), "native": (30.0, 6.0), "compassbare": (36.0, 4.5), "compass": (27.0, 4.2)}
 
 
-def fake(d):
+def standin(d):
     arm, rep = d.name.split("-")[1], int(d.name.split("-")[2])
     wait, nodes = G[arm]
     g = {k: 0.0 for k in LR.KEYS}
@@ -40,7 +40,7 @@ class FourWays(unittest.TestCase):
                 d = t / f"bench-{arm}-{r}"; d.mkdir(); (d / "capture.csv").write_text("x\n")
         old = LR.arm_gauges
         try:
-            LR.arm_gauges = fake
+            LR.arm_gauges = standin
             LR.main(str(t))
         finally:
             LR.arm_gauges = old

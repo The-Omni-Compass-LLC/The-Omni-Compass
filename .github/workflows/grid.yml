@@ -96,7 +96,7 @@ jobs:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with: {sparse-checkout: "scripts\nresults/grid_v17\ntools\nrealms\nomnicompass\nomni_controller"}
+        with: {sparse-checkout: "scripts\nresults/grid_v19\ntools\nrealms\nomnicompass\nomni_controller"}
       - name: Engine and source receipt
         run: |
           set -euo pipefail
@@ -115,7 +115,10 @@ jobs:
             if [ "$i" -lt "$rounds" ]; then sleep 900; fi
           done
       - name: The next conductor (one at a time; it waits for this one to end)
-        if: ${{ !cancelled() && env.DRY != 'yes' }}
+        # only after a whole round of ticks: a conductor that failed before its ticks starts none, so a fault in its first
+        # steps cannot chain (24 October: the receipt failed in seconds on omni-v18 and each failed conductor started the
+        # next, about one every 15 s from 07:05 UTC on 24 October, none ticking); the schedule restarts the chain once fixed
+        if: ${{ success() && env.DRY != 'yes' }}
         run: |
           # another conductor already waiting its turn (its tick job not yet run, whatever started it) carries on instead; a
           # cancelled conductor starts none (to stop the grid, disable this workflow). Only a run whose tick job is waiting
