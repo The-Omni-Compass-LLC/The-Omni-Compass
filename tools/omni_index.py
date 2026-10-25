@@ -45,7 +45,7 @@ LIVE = ROOT / "results" / "live"
 # its reading by rule. (category, test, file, {measure: row key}, work). work: "equal" (the same fixed-rate work was sent
 # to both arms and none failed: ratio 1), "capacity" (the capacity row of that table), or None (not taken). A measure
 # counts only as its reading allows: GAIN, LOSS or power given in all three of our runs gives the geometric mean of
-# the three runs' ratios; EVEN (under 0.5%, or the same) or the runs disagree gives exactly 1 (nothing
+# the three runs' ratios; EVEN (no difference beyond the noise, or the same) or the runs disagree gives exactly 1 (nothing
 # is claimed either way). Azure's billed runs and the six organisms join the index when their v1 tables land.
 P95 = "response time (ms), 95th percentile"
 MEAN = "response time (ms), mean"
@@ -88,15 +88,15 @@ WORKLOAD_TABLES = [
     ("Real messaging (Apache Kafka, GitHub)", "V7_KAFKA.json", "Kafka `{wl}`: the consumer group's size, three paired repetitions, three runs",
      {"work": "work_inside_line_mps", "speed": "p95_ms", "machines": "consumers_mean", "energy": "cpu_seconds"}),
     ("Real cache (Redis, GitHub)", "V7_REDIS.json", "Redis `{wl}`: the cache's memory ceiling, three paired repetitions, three runs",
-     {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": "cpu_seconds"}),
+     {"work": "work_inside_line_rps", "speed": "p95_ms", "machines": "maxmemory_mb_mean", "energy": ("process_cpu_seconds", "cpu_seconds")}),
     ("Real database cache (MongoDB under YCSB, GitHub)", "V7_YCSB.json", "YCSB `{wl}`: the storage engine's cache size, three paired repetitions, three runs",
-     {"work": "work_inside_line_ops", "speed": "p95_ms", "machines": "cache_mb_mean", "energy": "cpu_seconds"}),
+     {"work": "work_inside_line_ops", "speed": "p95_ms", "machines": "cache_mb_mean", "energy": ("process_cpu_seconds", "cpu_seconds")}),
     ("Real database buffer pool (MySQL under sysbench, GitHub)", "V7_SYSBENCH.json", "sysbench `{wl}`: the buffer pool's size, three paired repetitions, three runs",
      {"work": "work_inside_line_tps", "speed": "p95_ms", "machines": "pool_mb_mean", "energy": "cpu_seconds"}),
 ]
 DB_FILE = WORKLOAD_TABLES[0][1]
 AIM_LOWER = {"speed", "machines", "energy"}   # the measures whose declared aim is lower (work aims higher)
-PENDING = {"Real cloud (Azure AKS, billed)": "the omni-v19 Azure sets run one at a time at the tune-down with native's cap (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day of Google 2011; A, B and C, `scripts/azure_queue.txt`); the category joins as their three-run tables land",
+PENDING = {"Real cloud (Azure AKS, billed)": "the omni-v20 Azure sets run one at a time at the tune-down with native's cap (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day of Google 2011; A, B and C, `scripts/azure_queue.txt`); the category joins as their three-run tables land",
            "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
 
 
@@ -140,6 +140,17 @@ def newest(fname):
     return found[-1][1] if found else fname
 
 
+def workload_gauge(gauges, key):
+    """One measure's gauge from a workload table: key, or a tuple of keys read in order, the first whose three runs all hold a
+    value (store fix of 25 October: a table written from runs that record the CPU apart reads the stack's own CPU-seconds,
+    process_cpu_seconds; an older table reads the host's, cpu_seconds, as before)."""
+    for k in (key if isinstance(key, tuple) else (key,)):
+        g = gauges.get(k)
+        if g and g.get("runs") and not any(x is None for x in g["runs"]):
+            return g
+    return None
+
+
 def tests():
     out = []
     for cat, name, f, measures, work in SOURCES:
@@ -168,7 +179,7 @@ def tests():
                 continue                                        # the tuning workload is shown in its table, never counted
             r = {}
             for m, key in measures_.items():
-                g = gauges.get(key)
+                g = workload_gauge(gauges, key)
                 if not g or any(x is None for x in g["runs"]):
                     continue
                 reading = g["reading"]
@@ -280,10 +291,10 @@ def main():
          "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
          f"## Headline: Omni-Compass on top of native, real machines, judged across our three runs (a change of 0.5% or more): **{pw(head, index_word(head, head_s))}, "
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
-         "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`; the founder's order of 24 October 2026): a change "
-         "of 0.5% or more, GAIN, LOSS or power given in all three of our runs or by the mean of our three runs, counts as the "
-         "geometric mean of the runs' ratios; EVEN (under 0.5%, or the same) and runs that disagree count as exactly 1. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
-         "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v19 runs land, Azure and the card as their three-run tables land. A category's "
+         "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
+         "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
+         "nothing inside the noise is claimed either way. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
+         "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v20 runs land, Azure and the card as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. Each table names the engine it ran on.", "",
          "| Category | Index (work, speed, machines, energy) | Service reading (work and speed only) | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |",

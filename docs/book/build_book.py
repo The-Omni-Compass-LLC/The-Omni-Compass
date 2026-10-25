@@ -965,57 +965,57 @@ OWNER_OUTLINE = [
 ]
 
 LIVE_OUTLINE = [
-    ("PART", "The Page as a Monitor",
-     "What the live engine page is: a monitor of the engine and of the runs GitHub ran, never a drawing; how it is built, its "
-     "table of contents, and its two sides and three words."),
+    ("PART", "The Front of the Page",
+     "The title page and the records the page carries, the bottom line, the engine table of contents and its numbering, and the sides, colours and signal words."),
     ("A Monitor, Not a Drawing", ("M", "A Monitor, Not a Drawing")),
+    ("The Bottom Line", ("M", "The Bottom Line")),
     ("The Engine Table of Contents and the Numbering", ("M", "The Engine Table of Contents and the Numbering")),
-    ("The Two Sides and the Colours", ("M", "The Two Sides and the Colours")),
-    ("PART", "Watch First: the Switch, the Alarms, the Wall and Every LOSS",
-     "What the person watching needs first, in the page's order (the founder's order of 24 October): the master switch and the "
-     "kill switch, the alarms, the golden-signal feed, the event log and the metrics exposition, and the monitor wall."),
-    ("The Master Switch", ("M", "The Master Switch")),
-    ("The Alarms, the Feed, the Event Log and the Metrics", ("M", "The Alarms, the Feed, the Event Log and the Metrics")),
+    ("The Sides, the Colours and the Signal Words", ("M", "The Sides, the Colours and the Signal Words")),
+    ("PART", "The Monitors and the Main Control Panel",
+     "The monitor wall, the main control panel with its heartbeat, its profile, its actuation and each route's bill, the mechanism's own knobs, and the control panel with the kill switch."),
     ("The Monitor Wall", ("M", "The Monitor Wall")),
-    ("PART", "The Three Arms, Live, and the Knobs That Turn Them",
-     "Native, Omni-Compass on native and Omni direct side by side; the organism live with each muscle's own knobs; the console "
-     "with the native switch; and the heartbeat dial."),
-    ("Omni Direct: the Three Arms", ("M", "Omni Direct: the Three Arms")),
+    ("The Main Control Panel", ("M", "The Main Control Panel")),
+    ("The Mechanism's Own Knobs", ("M", "The Mechanism's Own Knobs")),
+    ("The Control Panel and the Kill Switch", ("M", "The Control Panel and the Kill Switch")),
+    ("PART", "What the Monitors Say: the Synopses",
+     "The status board, the golden signals and the event log, every LOSS row with its cause and its knob, and the benefit board."),
+    ("The Status Board: Tiles, Alarms and Watch Items", ("M", "The Status Board: Tiles, Alarms and Watch Items")),
+    ("The Golden Signals, the Event Log and the Metrics", ("M", "The Golden Signals, the Event Log and the Metrics")),
+    ("Every LOSS Row: Its Cause and Its Knob", ("M", "Every LOSS Row: Its Cause and Its Knob")),
+    ("The Benefit Board", ("M", "The Benefit Board")),
+    ("PART", "Every Monitor, Spread Out",
+     "In the page's order: the organism live, the console, the heartbeat dial, one control cycle, the phase plane, the brain, the verdict, the clouds, the orchestrators, the official Kubernetes runs, the decision trace, the chip and the host, the telemetry analytics and the Python's runs."),
     ("The Organism, Live", ("M", "The Organism, Live")),
     ("The Control Console", ("M", "The Control Console")),
     ("The Heartbeat Dial", ("M", "The Heartbeat Dial")),
-    ("PART", "The Measured Effect and the Whole",
-     "The benefit board, the grid and the catalog, then the whole organism every way it is bought, its bills and receipts."),
-    ("The Benefit Board, the Grid and the Catalog", ("M", "The Benefit Board, the Grid and the Catalog")),
-    ("The Whole Organism, Every Way It Is Bought", ("M", "The Whole Organism, Every Way It Is Bought")),
-    ("PART", "Evidence by Stack",
-     "From the cloud down to the chip: the clouds, the orchestrators, the official Kubernetes runs and their playback, the "
-     "shipped controller's decision trace, the card and the host."),
+    ("One Control Cycle, Traced", ("M", "One Control Cycle, Traced")),
+    ("The Phase Plane and the Scoreboard", ("M", "The Phase Plane and the Scoreboard")),
+    ("The Brain's Internal State", ("M", "The Brain's Internal State")),
+    ("The Verdict", ("M", "The Verdict")),
     ("The Clouds", ("M", "The Clouds")),
     ("The Orchestrators and Governors", ("M", "The Orchestrators and Governors")),
     ("Kubernetes: the Official Run Playback", ("M", "Kubernetes: the Official Run Playback")),
     ("Kubernetes: Per-Repetition Telemetry", ("M", "Kubernetes: Per-Repetition Telemetry")),
     ("The Shipped Controller's Decision Trace", ("M", "The Shipped Controller's Decision Trace")),
     ("The Chip and the Host", ("M", "The Chip and the Host")),
-    ("PART", "The Brain",
-     "One control cycle traced, the phase plane and the scoreboard, the brain's state, the verdict, the telemetry analytics, "
-     "and the failure modes."),
-    ("One Control Cycle, Traced", ("M", "One Control Cycle, Traced")),
-    ("The Phase Plane and the Scoreboard", ("M", "The Phase Plane and the Scoreboard")),
-    ("The Brain's Internal State", ("M", "The Brain's Internal State")),
-    ("The Verdict", ("M", "The Verdict")),
     ("The Telemetry Analytics and Omni-Compass in Its Own Words", ("M", "The Telemetry Analytics and Omni-Compass in Its Own Words")),
-    ("Failure Modes, Controls and Residual Risk", ("M", "Failure Modes, Controls and Residual Risk")),
-    ("PART", "The Proof: the C++ Twin and the Mathematics",
-     "Every component of the engine, its equation and its module, and the same engine in C++, fed the Python's own runs."),
-    ("The Component Specification", ("M", "The Component Specification")),
-    ("PART", "Reference: the Pipeline and the Page's Own Drawing",
-     "The pipeline that rebuilds the page, and the page's own render loop governed by the compass law."),
+    ("The Python's Runs in the Page and the Core's Monte Carlo", ("M", "The Python's Runs in the Page and the Core's Monte Carlo")),
+    ("PART", "The Organisms and Everything Else",
+     "The whole organism, the twenty scenarios and the injection grid, the measured effect in full, the C++ twin, the pipeline, the master switch's wiring, the component specification, the failure modes, the page's own rendering, the problem and the summary as the page prints them, the monitor list, and the glossary and index."),
+    ("The Whole Organism, Every Way It Is Bought", ("M", "The Whole Organism, Every Way It Is Bought")),
+    ("The Twenty Scenarios and the Injection Grid", ("M", "The Twenty Scenarios and the Injection Grid")),
+    ("Measured Effect in Full: the Organisms, the Register, the Grid and Every Table", ("M", "Measured Effect in Full: the Organisms, the Register, the Grid and Every Table")),
+    ("The C++ Twin", ("M", "The C++ Twin")),
     ("The Pipeline That Rebuilds the Page", ("M", "The Pipeline That Rebuilds the Page")),
+    ("The Master Switch's Wiring", ("M", "The Master Switch's Wiring")),
+    ("The Component Specification", ("M", "The Component Specification")),
+    ("Failure Modes, Controls and Residual Risk", ("M", "Failure Modes, Controls and Residual Risk")),
     ("The Page Governs Its Own Drawing", ("M", "The Page Governs Its Own Drawing")),
+    ("The Problem, the Summary and the Key on the Page", ("M", "The Problem, the Summary and the Key on the Page")),
+    ("The Monitor List", ("M", "The Monitor List")),
+    ("The Glossary and Index", ("M", "The Glossary and Index")),
     ("PART", "Reading a Result off the Page",
-     "The mechanism of action side by side, the trace from a tile to its record, what to do when a tile reads LOSS, and what the "
-     "page does not tell you."),
+     "The mechanism of action side by side, the trace from a tile to its record, what to do when a tile reads LOSS, and what the page does not tell you."),
     ("The Mechanism of Action, Side by Side", ("M", "The Mechanism of Action, Side by Side")),
     ("From a Tile to Its Record", ("M", "From a Tile to Its Record")),
     ("When a Tile Reads LOSS", ("M", "When a Tile Reads LOSS")),
@@ -1027,7 +1027,7 @@ LIVE_OUTLINE = [
     ("BACK", None),
     ("Glossary", ("M", "Glossary")),
     ("Appendix A. The Page, Section by Section", ("M", "Appendix A - The Page, Section by Section")),
-    ("Appendix B. Every Control of the Console", ("M", "Appendix B - Every Control of the Console")),
+    ("Appendix B. Every Control", ("M", "Appendix B - Every Control")),
     ("Appendix C. The Gauges on the Wall", ("M", "Appendix C - The Gauges on the Wall")),
     ("Appendix D. The Colours and the Marks", ("M", "Appendix D - The Colours and the Marks")),
     ("Appendix E. Troubleshooting the Page", ("M", "Appendix E - Troubleshooting the Page")),
@@ -1114,12 +1114,11 @@ def special(name, nb=None):
 # ("section 16.4b", "chapter 6", "Appendix E", "Part VI") is rewritten to the book's numbers from the map the
 # headings make, and a reference that resolves to nothing is listed at the end of the build.
 LABEL_RE = re.compile(r"^(?:(\d+(?:\.\d+)*[a-z]?)\.?|([A-Z])\.(\d+)?|([IVX]+)\.)\s+(?=\S)")
-PART_WORDS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"]
+PART_WORDS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
 # the manual's own grouping of its chapters into parts (its preface) against the book's parts: the Operator's
 # manual and its book share one grouping; the Owner's manual groups its 18 chapters in seven, the book in eight
 PART_MAP = ({"II": "Two", "III": "Five", "IV": "Five", "V": "Six", "VI": "Seven", "VII": "Eight"} if OWNER
-            else {"I": "One", "II": "Two", "III": "Three", "IV": "Four", "V": "Five", "VI": "Six", "VII": "Seven", "VIII": "Eight",
-                  "IX": "Nine", "X": "Ten"})
+            else {"I": "One", "II": "Two", "III": "Three", "IV": "Four", "V": "Five", "VI": "Six", "VII": "Seven", "VIII": "Eight"})
 SEC_REF = re.compile(r"\b([Ss]ections?)\s+(\d+(?:\.\d+)?[a-z]?(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+(?:\.\d+)?[a-z]?)*)(?![\w.]\w)")
 CHAP_REF = re.compile(r"\b([Cc]hapters?)\s+(\d+(?:(?:,\s*|\s+and\s+|\s+or\s+|\s+to\s+)\d+)*)\b")
 APPX_REF = re.compile(r"\bAppendi(x|ces) ([A-Z])\b")
@@ -1127,10 +1126,7 @@ PART_REF = re.compile(r"\bPart ([IVX]+)\b")
 # a reference that follows another document's name (`DISCLOSURES.md`, section 4; `LICENSE`, section 10; the Operator's
 # Manual, Appendix L; the founder's manuscript) carries that document's numbering and is left as written; the book's own
 # manual, named in full, is not another document
-# (in the Live Engine Manual's book "the manual's section 4.5", written in a bound page, names the Operator's Manual: another
-# document there, while the Operator's and the Owner's books read it as their own)
-EXTERNAL = re.compile(r"(\.md|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual|[Tt]he page['’]s"
-                      + (r"|manual['’]s" if LIVE else "") + r")\W*$")   # the page's section 4c: the live engine's own numbering
+EXTERNAL = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual|the page['’]s)\W*$")   # the page's section 4c: the live engine's own numbering
 MANUSCRIPT = re.compile(r"[Mm]anuscript")
 OWN_NAME = (re.compile(r"Owner's Manual|OWNERS_MANUAL\.md") if OWNER else re.compile(r"Live Engine Manual|LIVE_ENGINE_MANUAL\.md") if LIVE
             else re.compile(r"Operator's Manual|OMNI_COMPASS_MANUAL\.md"))
@@ -1702,27 +1698,24 @@ the benchmark runs GitHub ran. It is for the operator at the dashboard: which ti
 number comes from, and how the mechanism of action of Omni-Compass against native shows on the monitors. It explains neither how
 the engine is built (the Owner's Manual) nor how it is wired onto a stack (the Operator's Manual).
 
-The book is in eight parts, and it can be read in two ways.
+The book is in seven parts, in the page's own order (the Contents follow), and it can be read in two ways.
 
 | You are | Read |
 |---|---|
-| The operator on shift, at the wall | the Quick Reference card; Part Two (the wall and the switch); the chapter on a tile that reads LOSS in Part Seven; the troubleshooting appendix |
-| CTO, architect, head of platform | the front matter; Part Three (the whole organism and the benefit board); Part Seven (the mechanism side by side; what the page does not tell you) |
-| CEO, CFO, CIO, board member | the Problem and the Answer; the Foreword; the Disclosures; the bills and receipts in Part Three; the clouds in Part Four |
-| Site reliability engineer, on call | the Quick Reference card; Part Two; the official run playback in Part Four (the heart and the two tickers); the gauges appendix |
-| Control or plant engineer | Part Six (one cycle, the phase plane, the brain's state, the verdict, the specification); the console in Part Five |
-| Auditor, diligence team | Part One (a monitor, not a drawing); the trace from a tile to its record and the verification chapter; the page's own appraisal |
+| The operator at the wall | the Quick Reference card; Parts Two and Three; when a tile reads LOSS (Part Six) |
+| CTO, architect, head of platform | the bottom line (chapter 2); the main control panel's tabs (chapter 6); Part Five |
+| CEO, CFO, CIO, board member | the Problem and the Answer; the Disclosures; chapters 2, 12 and 20 |
+| Site reliability engineer | Part Two; the golden signals and metrics (chapter 10); the wall stack, `deploy/wall` (chapter 6) |
+| Control or plant engineer | the contract (chapter 6); the mechanism's knobs (chapter 7); chapters 16 to 19 |
+| Auditor, diligence team | Part One; Part Six; the pipeline (chapter 32); the page word for word (Appendix L) |
 | Procurement and counsel | the Disclosures and the papers bound into the back matter |
 
-**Part One** says what the page is and how it is built. **Part Two** is the wall and the switch. **Part Three** is the whole
-organism and the measured effect. **Part Four** is the evidence stack by stack, from the cloud down to the chip. **Part Five**
-is the organism live and the console. **Part Six** is the brain. **Part Seven** reads a result off the page. **Part Eight** is
-the license and how to verify a copy.
-
-**Conventions.** `Code` is a command, file, anchor or switch exactly as typed. "Native" is the system by itself, amber;
-"Omni-Compass" is Omni-Compass on top of native, blue; there is no third side. "A section" is a numbered part of the page, named
-by its anchor; "a chapter" is a chapter of this book. A knob marked **LIVE** acts on the live engine; one marked **RECORDED**
-chooses a record and modifies nothing. Every number carries its evidence class: P a physical meter, L live software, S our own
+**Conventions.** `Code` is a command, file, anchor or switch exactly as typed. "Native" is the system by itself, orange;
+"Omni-Compass" is Omni-Compass on top of native, blue. Those are the two sides, and the only two: Omni-Compass is never by itself
+(the founder's order of 25 October). Violet marks only a knob or profile turned from the factory tune. Red is never a side: it is
+the stop sign of a line crossed. "A section" is a numbered part of the page, named by its anchor; "a chapter"
+is a chapter of this book. A knob marked **LIVE** acts on the live engine; one marked **RECORDED** chooses a record and modifies
+nothing. Every number carries its evidence class: P a physical meter, L live software, S our own
 models (modelled); a model is never proof."""
 
 
@@ -1783,7 +1776,7 @@ def build():
         md_parts += [f"## {sec}", ""] + front_lines(MAN[sec]) + [""]
 
     part_no = 0
-    words = PART_WORDS                              # the book's part words, written once above
+    words = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
     first, after_part = True, False
     for item in OUTLINE:
         if item[0] == "PART":

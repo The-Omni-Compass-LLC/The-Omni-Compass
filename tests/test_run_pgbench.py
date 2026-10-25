@@ -77,12 +77,13 @@ def main():
     # the cushion
     assert R.decide(0.4, 0.03, 0.9, 5, 10, snap, 0, 99)[:2] == (10, 0)
     assert R.decide(0.4, -0.03, 0.9, 5, 10, snap, 0, 99)[:2] == (10, 0)
-    # the dwell (amendment 1): adding is never held, even two seconds after taking back; taking back waits five seconds
-    # after adding, then goes
+    # the dwell (amendment 1): adding is never held, even two seconds after taking back; taking back waits DWELL_S after adding
+    # (thirty seconds since the store fix of 25 October, five before), then goes
     assert R.decide(0.5, 0.3, 0.9, 0, 10, snap, -1, 2.0)[:2] == (13, 1), "gas is never held"
     assert R.decide(0.5, 0.3, 0.9, 0, 10, snap, 1, 2.0)[:2] == (13, 1), "the same direction is never held"
     assert R.decide(0.1, -0.3, 0.0, 3, 10, snap, 1, 2.0)[:2] == (10, 0), "the brake dwells after the gas"
-    assert R.decide(0.1, -0.3, 0.0, 3, 10, snap, 1, 6.0)[:2] == (9, -1)
+    assert R.decide(0.1, -0.3, 0.0, 3, 10, snap, 1, R.DWELL_S - 1.0)[:2] == (10, 0), "still inside the dwell"
+    assert R.decide(0.1, -0.3, 0.0, 3, 10, snap, 1, R.DWELL_S + 1.0)[:2] == (9, -1)
     # the cover
     assert R.decide(0.1, -0.3, 0.0, 1, R.FLOOR, snap, 0, 99)[:2] == (R.FLOOR, 0)
     assert R.decide(0.6, 1.0, 0.9, 0, R.CEILING - 3, snap, 0, 99)[:2] == (R.CEILING, 1)

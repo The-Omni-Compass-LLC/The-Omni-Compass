@@ -11,22 +11,26 @@
 #   the run stopped without its last line (it refused to start, or died): fetch what exists, give the machine back;
 #   the machine is already gone: nothing to do.
 # Writes the state (done, deadline, gone or watching) to OUT/state. The key never leaves the environment.
-# Usage: bash scripts/lambda_gpu_watch.sh ID IP DEADLINE_EPOCH MINUTES OUT     (SSH_KEY: the private key file)
+# Usage: bash scripts/lambda_gpu_watch.sh ID IP DEADLINE_EPOCH MINUTES OUT     (SSH_KEY: the private key file; LOGIN: the
+# machine's login user, ubuntu by default; GIVE_BACK=no keeps a machine launched by hand on Lambda's page after the run,
+# .github/workflows/lambda-attach.yml)
 set -uo pipefail
 echo "Omni-Compass: evaluation and Simulation use only. Commercial use requires a signed, paid Omni-Compass Enterprise License (LICENSE, NOTICE)."
 ID="$1"; IP="$2"; DEADLINE="$3"; MINUTES="$4"; OUT="$5"
 EVERY="${EVERY:-600}"
 mkdir -p "$OUT"
-SSH=(ssh -i "${SSH_KEY:?set SSH_KEY}" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -o ServerAliveInterval=30 "ubuntu@$IP")
+LOGIN="${LOGIN:-ubuntu}"
+SSH=(ssh -i "${SSH_KEY:?set SSH_KEY}" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -o ServerAliveInterval=30 "$LOGIN@$IP")
 SCP=(scp -i "$SSH_KEY" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20)
-give_back() { python3 scripts/lambda_gpu.py terminate "$ID" || python3 scripts/lambda_gpu.py terminate "$ID"; }
+give_back() { if [ "${GIVE_BACK:-yes}" = no ]; then echo "the machine is kept (GIVE_BACK=no): it bills until its owner gives it back"; return 0; fi
+  python3 scripts/lambda_gpu.py terminate "$ID" || python3 scripts/lambda_gpu.py terminate "$ID"; }
 fetch() {   # every result file the run packed, its log, and the machine's own card list; partial if the run was cut
-  "${SCP[@]}" "ubuntu@$IP:omni/results/gpu/omni-*.tar.gz" "$OUT/" 2>/dev/null || true
-  "${SCP[@]}" "ubuntu@$IP:omni/run.log" "$OUT/run.log" 2>/dev/null || true
+  "${SCP[@]}" "$LOGIN@$IP:omni/results/gpu/omni-*.tar.gz" "$OUT/" 2>/dev/null || true
+  "${SCP[@]}" "$LOGIN@$IP:omni/run.log" "$OUT/run.log" 2>/dev/null || true
   "${SSH[@]}" "nvidia-smi --query-gpu=index,name,power.limit,power.default_limit --format=csv" > "$OUT/cards.csv" 2>/dev/null || true
   if ! ls "$OUT"/omni-*.tar.gz >/dev/null 2>&1; then
     "${SSH[@]}" "cd omni && tar czf /tmp/omni-partial.tar.gz results/gpu run.log 2>/dev/null; true" || true
-    "${SCP[@]}" "ubuntu@$IP:/tmp/omni-partial.tar.gz" "$OUT/omni-partial.tar.gz" 2>/dev/null || true
+    "${SCP[@]}" "$LOGIN@$IP:/tmp/omni-partial.tar.gz" "$OUT/omni-partial.tar.gz" 2>/dev/null || true
   fi
   ( cd "$OUT" && sha256sum ./* > SHA256SUMS.txt 2>/dev/null ) || true
 }

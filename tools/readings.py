@@ -105,7 +105,7 @@ def word(fell: bool, aim_: str) -> str:
     return GAIN if fell else LOSS                     # lower, never more
 
 
-SIZE_FLOOR = 0.005           # the founder's floor of 20 October 2026: a change under half of one percent either way, in every run, reads EVEN
+SIZE_FLOOR = 0.005           # the founder's floor of 20 October 2026 (and 24 October): a mean change under half of one percent either way reads EVEN
 EVEN_FLOOR = f"{EVEN}, under the floor"              # held the same way in all three runs, every run's change under SIZE_FLOOR
 SIGN_OF = {GAIN: "+", LOSS: "−", EVEN: "="}          # the number beside a word carries the word's sign, never the gauge's raw direction (20 October)
 
@@ -544,8 +544,8 @@ LETTERS = (
      "resource cut"),
     (EVEN, "the break-even baseline: equilibrium", (("E", "Equalized", "zero variance"), ("V", "Verified baseline", "expected norm"),
                                                     ("E", "Equilibrium", "balanced risk"), ("N", "Neutral", "no net change")),
-     "native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at "
-     "the top of its range is EVEN, at its limit on native"),
+     "native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no "
+     "change at all; a knob native already runs at the top of its range is EVEN, at its limit on native"),
     (LOSS, "actuarial deficit and exposure", (("L", "Leakage", "capital drain"), ("O", "Off-track", "adverse selection"),
                                               ("S", "Setback", "claim liability"), ("S", "Subpar", "negative variance")),
      "the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures"),
@@ -582,7 +582,7 @@ def key_lines():
           "**the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.",
           "- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw "
           "direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads "
-          "GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.", "",
+          "GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the 0.5% floor reads EVEN =0.3%.", "",
           "Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN "
           "GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: "
           + "; ".join(f"{k} reads {v}" for k, v in LABEL_SHOWN.items() if k not in ("WORSE", "MIXED", "AWAY FROM ITS AIM", "INVALID"))
@@ -640,15 +640,18 @@ def receipt_key_lines():
     return [
         "**How to read this receipt.** Every judged row reads one of three words, decided by what its gauge is for and never by "
         "the plus or minus sign of its number. **GAIN**: the gauge moved toward its declared aim against native (more work done, "
-        "a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass could not be told apart "
-        "(the 95% interval includes zero: no difference beyond the noise), or the knob is at its limit on native. **LOSS**: the "
+        "a shorter wait, fewer misses or failures, or a resource cut). **EVEN**: native and Omni-Compass within 0.5% of each other "
+        "(the mean of the three runs' changes under the 0.5% floor, or no change at all), or the knob is at its limit on native. "
+        "**LOSS**: the "
         "gauge moved away from its aim (less work done, a longer wait, more misses or failures). A resource spent or held (energy, "
         "the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear) that fell is a cut, a GAIN; one "
         "that rose is **power given**, what Omni-Compass put in to buy the work and the speed shown beside it, always shown and "
         "never called a loss; work bought with each unit of a resource (work per energy) that fell is power given too. So a minus "
         "can read GAIN (a "
-        "response time cut) and a plus can read LOSS (failed requests up). A reading counts when it holds the same way in all three "
-        "of our runs, A, B and C, with every interval clear of zero; **the runs disagree** names a test unstable there; **shown, not "
+        "response time cut) and a plus can read LOSS (failed requests up). A change of 0.5% or more, the mean of the three runs' "
+        "changes, reads GAIN, LOSS or power given: **in all three of our runs** where A, B and C moved the same way with every "
+        "interval clear of zero, otherwise **by the mean of our three runs**, with the count of runs beyond the noise beside it; "
+        "**the runs disagree** names runs that moved 0.5% or more in opposite directions, a test unstable there; **shown, not "
         "judged** is a gauge declared shown only. The output follows the input: every reading is the result of the tune, the wiring "
         "and the load it names, and where a reading elsewhere differs the first presumption is the wiring (`DISCLOSURES.md`, "
         "section 4). The full key, letter by letter: `docs/HOW_TO_READ_THE_RESULTS.md`. " + OWN_RUNS,

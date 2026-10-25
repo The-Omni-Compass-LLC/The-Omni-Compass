@@ -35,9 +35,10 @@
 # and made no write is valid: it stayed native, and the table counts such windows); SHA256SUMS.txt fingerprints every
 # output file.
 set -euo pipefail
-ARM="${ARM:?set ARM=native, ARM=watch (Omni watches, writes nothing), ARM=omni (B: Omni on top), ARM=compass (B with the compass law) or ARM=strict (C: Omni decides replicas and nodes)}"
+ARM="${ARM:?set ARM=native, ARM=watch (Omni watches, writes nothing), ARM=omni (B: Omni on top), ARM=compass (B with the compass law), ARM=strict (C: Omni decides replicas and nodes) or ARM=solo (Omni-Compass by itself: the pod autoscaler removed, the pod muscle of Omni-Compass on the workload)}"
 STRICT=""; [ "$ARM" = "strict" ] && STRICT="--strict-replicas"
-LAW=""; [ "$ARM" = "compass" ] && LAW="--law compass"
+LAW=""; { [ "$ARM" = "compass" ] || [ "$ARM" = "solo" ]; } && LAW="--law compass"
+OWN=""   # ARM=solo: the workload Omni-Compass scales itself (omni-v19's pod muscle of its own; docs/SOLO_PREREGISTRATION.md)
 DRY=""; [ "$ARM" = "watch" ] && DRY="--dry-run"
 # native tuned harder (the cost-to-match test): ARM=native40, native30, native20 is Kubernetes alone with its HPA target
 # lowered to that value by the operator, no Omni-Compass; it shows what native needs to reach Omni-Compass's response times
@@ -419,6 +420,19 @@ fi
 hpa_count=$(kubectl get hpa -A -o json | jq '.items | length')
 want_hpa=1; [ -z "${TWO_APP:-}" ] || want_hpa=2
 [ "$hpa_count" = "$want_hpa" ] || { echo "expected exactly $want_hpa HPA, found $hpa_count"; exit 1; }
+SOLO_RANGE=""
+if [ "$ARM" = "solo" ]; then
+  # Omni-Compass by itself (docs/SOLO_PREREGISTRATION.md): the plain serving rig only; the pod autoscaler is removed after the
+  # deploy, its own target and range written on the workload as the operator's (they are the operator's settings, not Omni's
+  # records), the workload at the range's floor, the count its manifest ships; Kubernetes' own scheduler and kubelet stay
+  [ -z "$KEDA$CRANE$CRUISEKUBE${TWO_APP:-}${BATCH_QUEUE:-}" ] || { echo "ARM=solo runs on the plain serving rig only"; exit 1; }
+  SOLO_TARGET=$(hpa_cpu_target "$HPA_NAME"); SOLO_RANGE=$(kubectl get hpa "$HPA_NAME" -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
+  kubectl delete hpa "$HPA_NAME" >/dev/null
+  kubectl annotate deployment php-apache --overwrite "omnicompass.io/target-utilization=$SOLO_TARGET" "omnicompass.io/replica-range=$SOLO_RANGE" >/dev/null
+  kubectl scale deployment php-apache --replicas="${SOLO_RANGE%%,*}" >/dev/null
+  OWN="--own-replicas default/php-apache"; export OWN_WORKLOADS="default/php-apache"
+  echo "solo: the pod autoscaler removed; the operator's target ${SOLO_TARGET}% and range $SOLO_RANGE written on the workload, $((${SOLO_RANGE%%,*})) replica(s) to start" | tee -a "$OUT_DIR/preflight.txt"
+fi
 if [ -n "$KEDA" ]; then   # the add-on's own pods, all on the control plane (scripts/kind_addons.sh checks where); with
   # CruiseKube beside it, CruiseKube's, its PostgreSQL's and its metrics' too (scripts/kind_addons_cruisekube.sh checks where)
   ck=false; [ -z "$CRUISEKUBE" ] || ck=true
@@ -649,7 +663,7 @@ start_controller() {   # $1 decisions to make, $2 log file
     ${OMNI_POWER_CMD:+--power-cmd "$OMNI_POWER_CMD"} --site-limit-w "$SITE_LIMIT_W" \
     $CAP_ARGS --thermal-model --security-configmap default/omni-security \
     --rollout-guard default/php-apache --sensed "$OMNI_SENSED" --latency-file "$OUT_DIR/latency.csv" --slo-ms "${SLO_MS:-500}" \
-    --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $GIVE_BACK_ONLY $STRICT $LAW ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} ${OMNI_DIAL:+--dial "$OMNI_DIAL"} > "$2" 2>&1 &
+    --audit "$OUT_DIR/audit.jsonl" --kill-file "$OUT_DIR/kill" $GIVE_BACK_ONLY $STRICT $LAW $OWN ${CLOSURE:+--closure "$CLOSURE"} ${REPLICA_CEILING:+--replica-ceiling "$REPLICA_CEILING"} ${OMNI_DIAL:+--dial "$OMNI_DIAL"} > "$2" 2>&1 &
   echo $!
 }
 # the window's governor is not a child of this shell (start_controller runs in a subshell), so `wait` cannot see it (12
@@ -695,8 +709,9 @@ if [ -n "${ROBUST:-}" ]; then
     export -f start_controller
     # (17 Oct: GIVE_BACK_ONLY, added on 15 October, was missing here, so the second governor stopped on an unbound variable
     # before it began and every kill run of omni-v7 was marked invalid; tests/test_robust_restart.py now checks the list,
-    # and caught GOV_PIN, the governor's own core, on 20 October before any run)
-    export CAP_ARGS DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD GIVE_BACK_ONLY GOV_PIN
+    # and caught GOV_PIN, the governor's own core, on 20 October before any run, and OWN, omni-v19's pod muscle of its own, on
+    # 24 October before any run of ARM=solo)
+    export CAP_ARGS DRY KUBECTL WORKERS SITE_LIMIT_W OUT_DIR STRICT LAW CLOSURE REPLICA_CEILING OMNI_DIAL MIN_NODES NODE_CUSHION SLO_MS OMNI_NICE OMNI_SENSED OMNI_POWER_CMD GIVE_BACK_ONLY GOV_PIN OWN
   fi
   OUT_DIR="$OUT_DIR" DURATION="$DURATION" ROBUST="$ROBUST" OMNI_PID="$omni_pid" WORKERS="$WORKERS" HPA_RANGE="$HPA_RANGE" \
     WORKER_SEL="$WORKER_SEL" NATIVE="$NATIVE" bash scripts/kind_robust.sh > "$OUT_DIR/robust.out" 2>&1 &
@@ -806,7 +821,7 @@ elif [ -z "$NATIVE" ]; then
   fi
   stop_governors        # no write of the window's governor can land after the reset is checked
   python -m omni_controller.controller --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --iterations 1 \
-    $CAP_ARGS --rollout-guard default/php-apache \
+    $CAP_ARGS --rollout-guard default/php-apache $OWN \
     --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"
   cpu_limit=$(limits_now)
   if [ -n "$CAP_ARGS" ]; then echo "pod CPU limits after kill: $cpu_limit" | tee -a "$OUT_DIR/kill_switch.txt"
@@ -819,13 +834,26 @@ elif [ -z "$NATIVE" ]; then
       sleep 2
     done
   fi
+  if [ "$ARM" = "solo" ]; then
+    # by itself: no autoscaler; the workload back at the count it started at and no record of Omni's left on it (the
+    # operator's own target and range stay, written before the window)
+    restored="$EXPECT_TARGET"; range_now="$HPA_RANGE"
+    rep_now=$(kubectl get deployment php-apache -o jsonpath='{.spec.replicas}')
+    echo "the workload's replicas after kill: $rep_now (the count it started at: ${SOLO_RANGE%%,*})" | tee -a "$OUT_DIR/kill_switch.txt"
+    test "$rep_now" = "${SOLO_RANGE%%,*}"
+  else
   restored=$(hpa_cpu_target "$HPA_NAME")
   range_now=$(kubectl get hpa "$HPA_NAME" -o jsonpath='{.spec.minReplicas},{.spec.maxReplicas}')
   echo "HPA replica range after kill: $range_now" | tee -a "$OUT_DIR/kill_switch.txt"
   test "$range_now" = "$HPA_RANGE"
+  fi
   back=$(kubectl get nodes -l "$WORKER_SEL" -o json | jq '[.items[] | select(.spec.unschedulable != true and (any(.spec.taints[]?; .key == "omnicompass.io/idle") | not))] | length')
   { echo "restored target: $restored"; echo "workers in service: $back of $WORKERS"; } | tee "$OUT_DIR/kill_switch.txt"
+  if [ "$ARM" = "solo" ]; then   # no autoscaler to read; the operator's own target and range on the workload are not Omni's records
+    leftover=$(kubectl get deployment php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/")) | select(. != "omnicompass.io/target-utilization" and . != "omnicompass.io/replica-range")')
+  else
   leftover=$(kubectl get hpa "$HPA_NAME" -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))'; kubectl get deployment php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')
+  fi
   if [ -n "$KEDA" ]; then   # the add-on's ScaledObject: the operator's own settings back, and no record left on it either
     leftover="$leftover$(kubectl get scaledobject php-apache -o json | jq -r '.metadata.annotations // {} | keys[] | select(startswith("omnicompass.io/"))')"
     so_now=$(kubectl get scaledobject php-apache -o json | jq -c '{min: .spec.minReplicaCount, max: .spec.maxReplicaCount, cpu: ([.spec.triggers[] | select(.type == "cpu") | .metadata.value][0] // "")}')

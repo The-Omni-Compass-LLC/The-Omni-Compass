@@ -7,7 +7,9 @@
 """The A/B/C table for the Redis benchmark (docs/OMNI_V1.md's readings, docs/REDIS_PREREGISTRATION.md): the untouched
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_redis.py), each run holding three
 paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a
-95% interval; across the three runs a gauge reads by the one key (tools/readings.py, the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim, in all three of our runs when every run is clear of zero the same way and otherwise by the mean of our three runs with the count beyond the noise; under 0.5% EVEN, under the floor; runs that moved 0.5% or more in opposite ways disagree. Failed requests: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
+95% interval; across the three runs a gauge reads GAIN or LOSS in all three of our runs (by what it is for, never by its sign; a resource spent that rose reads power given) when all three move the same way with
+every interval clear of zero, EVEN, no difference beyond the noise, when a run's interval includes zero (with the count of such
+runs), and the runs disagree when runs clear of the noise point different ways. Failed requests: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
 LOSS included; no energy is claimed beyond the host's CPU seconds.
 Usage: python tools/redis_abc.py A_DIR B_DIR C_DIR --out results/live/V3_REDIS.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding redis-<workload>/.../<workload>.json"""
@@ -21,8 +23,8 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, stack_reading, aim_of, Tally, STACK_RULE  # noqa: E402  (every table says whose runs these are)
-from tools.run_redis import GAUGES, SAME_REL, paired  # noqa: E402
+from tools.readings import with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
+from tools.run_redis import GAUGES, OPTIONAL_GAUGES, SAME_REL, paired  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 
 
@@ -84,7 +86,10 @@ def main(argv=None):
           "Redis as shipped with the operator's memory ceiling (64 MB, allkeys-lru) is native; omni is the compass law on the ceiling ")
          + 
          "through Redis's own console inside [16, 512] MB, holding the application's own request latency at 40% of the 2 ms line, a hit "
-         "inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). " + STACK_RULE + " Failed requests: any "
+         "inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). Each run holds three paired repetitions; the "
+         "paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make "
+         "a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **EVEN, no difference beyond the "
+         "noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed requests: any "
          "rise in any run reads **LOSS in at least one of our runs**. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are "
          "measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every "
          "row is shown, LOSS included.", "",
@@ -117,6 +122,8 @@ def main(argv=None):
         out["workloads"][wl] = {}
         for k, label, dr in GAUGES:
             rs = [r["paired"].get(k) for r in recs]
+            if k in OPTIONAL_GAUGES and all(r is None for r in rs):
+                continue                                       # a gauge the runs before 25 October did not record: no row, as before
             v = verdict(rs, dr, k)
             if not tuning:
                 tally.add(v, dr, k)

@@ -60,6 +60,9 @@ TWINS = {
     "the engine's seeded runs (the Python's 500 from the jump generator, its draws the input, every twin above the mechanism)": {
         "python": ["tools/engine_runs.py"], "cpp": ["cpp/tools/engine_runs.cpp"],
         "proof": "tests/test_cpp_engine_runs_parity.py"},
+    "the core's Monte Carlo (the Python's 500 RK4 runs from the jump generator, its draws the input, the core's twin the mechanism, four ways)": {
+        "python": ["tools/core_runs.py"], "cpp": ["cpp/tools/core_runs.cpp"],
+        "proof": "tests/test_cpp_core_runs_parity.py"},
 }
 PYTHON_ONLY = {
     "omni_controller/gpu_governor.py (device I/O)": "reading nvidia-smi and writing power limits; its decision rules are twinned above",
@@ -106,6 +109,8 @@ def prove():
     from tests import test_cpp_orchestrator_brain_parity
     test_cpp_orchestrator_brain_parity.main(str(b / "oc_orchestrator_brain"), 300)
     test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 100)
+    from tests import test_cpp_core_runs_parity
+    test_cpp_core_runs_parity.main(str(b / "oc_core_runs"), 100)
 
 
 def check():

@@ -474,7 +474,7 @@ class Muscles:
         first half minute stayed through the saturated queue: the batch pods hashed 7.6% slower, the queue finished
         0.7% later and the web served no faster (20 October, docs/OMNI_V13.md). A host with no such workload keeps the
         v7 rule: what the serving pods use there at the top is the host's own idle, and no other muscle's room.
-        Two other designs were tried in the model gate (tools/model_gate.py,
+        Two other designs were tried in the toy gate (tools/toy_gate.py,
         docs/OMNI_V7.md) and refused by it: the host's CPU counted once and shared by every serving pod (at the v6 KEDA
         runs' nine replicas, 3,500m / 9 is under the operator's 500m, so nothing is ever conveyed and the +64% work and
         -53% response time of conveyance are lost whole), and a hold while a pod starts on the host (a start wait 1%

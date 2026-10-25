@@ -29,6 +29,8 @@ REG = HERE / "monitors.json"
 PAGE = HERE / "OMNI_COMPASS_LIVE_ENGINE.html"
 OUT = ROOT / "deploy" / "grafana" / "omni-compass-wall.json"
 W, H, COLS = 12, 8, 2
+sys.path.insert(0, str(HERE.parents[1]))
+from tools.legal import PLAIN as NOTICE   # noqa: E402  (the notice, written once in tools/legal.py, without its Markdown)
 
 
 def page_order() -> list:
@@ -132,6 +134,25 @@ def signals_row() -> list:
                  [(0, 0.5, "accelerating"), (0.5, 1.5, "steady"), (1.5, 1e9, "redlining")], "Alerts firing now across the wall (Prometheus's ALERTS series).")]
 
 
+# the live engine's light in Grafana's own thresholds, where the monitor's line is a number on its series (the founder's words of 23
+# and 24 October: green working, yellow heading for its line, red an alert): green below, yellow from 97% of the line, red at it;
+# a series whose good side is high (the master switch ON, the error budget left) reads the other way
+LIGHT = {"feed2": (0.2, False), "feed3": (0.75, False), "opsCandle": (200.0, False), "orchCv": (1.0, False), "ruStrip": (1.0, False),
+         "immCv": (1.0, False), "cStrip": (0.95, False), "band": (0.95, False), "masterCv": (1.0, True), "tSlo": (0.999, True), "tBurn": (0.1, True)}
+LIGHT_WORDS = (" Its light on the live engine, a signal standing as a traffic signal does, red on top, yellow in the middle, green at the"
+               " bottom: red, an alert, over its line or a LOSS row; yellow, heading for its line (within 3% of it, or its slope crossing"
+               " it within three readings), or EVEN on a record; green, working inside its lines.")
+
+
+def thresholds(mid: str) -> dict:
+    line, high_good = LIGHT.get(mid, (None, False))
+    if line is None:
+        return {"mode": "absolute", "steps": [{"color": "green", "value": None}]}
+    if high_good:
+        return {"mode": "absolute", "steps": [{"color": "red", "value": None}, {"color": "yellow", "value": round(line * 0.97, 6)}, {"color": "green", "value": line}]}
+    return {"mode": "absolute", "steps": [{"color": "green", "value": None}, {"color": "yellow", "value": round(line * 0.97, 6)}, {"color": "red", "value": line}]}
+
+
 def dashboard(reg: dict) -> dict:
     panels = []
     order = {cid: i for i, cid in enumerate(page_order())}   # every panel numbered as the page numbers its monitor, laid out left to right
@@ -149,21 +170,22 @@ def dashboard(reg: dict) -> dict:
         title = f"{n} · {m['name']}"
         base = {"id": n, "title": title, "gridPos": {"x": x, "y": y, "w": W, "h": H},
                 "description": (f"Section {sn}, {st}. " if sn else "") + f"{m['what']} Evidence class {m['cls']}; on the live engine: {m['status']}. Feed: {m['feed']['exporter']}."
-                               + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "") + wiring(m)}
+                               + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "") + wiring(m) + LIGHT_WORDS}
         col += 1
         if col == COLS:
             col, y = 0, y + H
         if m["feed"]["promql"]:
             panels.append({**base, "type": m["grafana"]["type"] if m["grafana"]["type"] in ("timeseries", "stat", "bargauge", "heatmap", "table") else "timeseries",
                            "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
-                           "fieldConfig": {"defaults": {"unit": m["grafana"].get("unit") or "short"}, "overrides": SIDES},
+                           "fieldConfig": {"defaults": {"unit": m["grafana"].get("unit") or "short", "thresholds": thresholds(m["id"]),
+                                                        "color": {"mode": "thresholds"}, "custom": {"thresholdsStyle": {"mode": "line+area"}}}, "overrides": SIDES},
                            "targets": [{"refId": chr(65 + j), "expr": scoped(e), "legendFormat": m["feed"]["metrics"][j] if j < len(m["feed"]["metrics"]) else e}
                                        for j, e in enumerate(m["feed"]["promql"])]})
         else:
             panels.append({**base, "type": "text", "options": {"mode": "markdown", "content":
                            f"**{m['name']}** ({reg['layers'].get(m['layer'], m['layer'])}).\n\n{m['what']}\n\nSource: {m['feed']['exporter']}. "
                            f"No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; "
-                           f"this panel marks its place on the wall (monitor {n})."}})
+                           f"this panel marks its place on the wall (monitor {n}).{LIGHT_WORDS}"}})
     return {"uid": "omni-compass-wall", "title": "Omni-Compass: the monitor wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "time": {"from": "now-6h", "to": "now"}, "refresh": "30s",
             "templating": {"list": knobs()},
@@ -172,8 +194,16 @@ def dashboard(reg: dict) -> dict:
                        "url": "${control}/", "targetBlank": True, "icon": "bolt"},
                       {"title": "Alertmanager: the alarms and their silences", "type": "link", "url": "http://localhost:9093", "targetBlank": True},
                       {"title": "The live engine", "type": "link", "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
-            "panels": signals_row() + panels,
-            "__notice": "© 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com"}
+            "description": NOTICE,
+            # the notice at the top and the end of the wall, where Grafana shows it (the underwriting seat of 24 October)
+            "panels": [notice_panel(-1)] + signals_row() + panels + [notice_panel(max([p["gridPos"]["y"] + p["gridPos"]["h"] for p in panels] or [0]))],
+            "__notice": NOTICE}
+
+
+def notice_panel(y: int) -> dict:
+    """A text panel carrying the legal notice, the full width of the wall: at its top (y below every other panel's 0) and its end."""
+    return {"id": 9000 + (0 if y < 0 else 1), "type": "text", "title": "", "gridPos": {"x": 0, "y": max(y, 0) if y >= 0 else 0, "w": COLS * W, "h": 2},
+            "transparent": True, "options": {"mode": "markdown", "content": NOTICE}}
 
 
 def main(out: str | None = None) -> dict:
@@ -187,5 +217,5 @@ def main(out: str | None = None) -> dict:
 
 if __name__ == "__main__":
     d = main(sys.argv[1] if len(sys.argv) > 1 else None)
-    mons = [p for p in d["panels"] if p["type"] != "row"]
+    mons = [p for p in d["panels"] if p["type"] != "row" and p.get("id", 0) < 9000]
     print(f"{len(mons)} panels under {len(d['panels']) - len(mons)} section rows, {sum(1 for p in mons if p['type'] != 'text')} on Prometheus series")

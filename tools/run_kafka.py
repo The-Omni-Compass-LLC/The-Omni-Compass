@@ -15,7 +15,9 @@ latency, produce to consume. An operator sets the consumer count once; that fixe
   omni    the same group, with the compass law (omnicompass/compass_law.py) on one knob, the consumer count, inside the
           cover [1, 8] (never under one consumer, never more consumers than partitions): the compass reads the group's own
           end-to-end latency on a band from 0 to the response line and holds it at 40% of the line; the service slow and
-          messages waiting add consumers; calm gives back one idle consumer a second; at 95% of the line every consumer the
+          messages waiting add consumers; calm gives back one idle consumer a second (above the operator's count, calm with
+          nothing waiting gives one back with no idle test; idle is a full second with no message: store fix of 25 October);
+          at 95% of the line every consumer the
           topic can use is started at once (fail up); the count is handed back to the operator's at the end and read back
 
 Gauges from the consumers' own records (every message's latency), the group's lag (produced minus consumed) and the
@@ -60,6 +62,13 @@ SMOOTH = 0.5
 NATIVE_CONSUMERS = 2      # the operator's count
 COVER = (1, PARTITIONS)   # never under one consumer, never more than partitions
 DWELL_S = 5.0             # no taking back within five seconds of a change
+POLL_RECORDS = 50         # the most messages a consumer takes in one poll (KafkaConsumer max_poll_records)
+HANDBACK_DWELL_S = 30.0   # store fix of 25 October: a consumer above the operator's count is handed back only 30 s after the last change (each
+                          # change rebalances the whole group, and a hand-back that is undone at once is two pauses for nothing)
+IDLE_S = 1.0              # store fix of 25 October: a consumer is idle only after a full second with no message (a sustained state, never one
+                          # empty 200 ms poll), and a consumer starts busy: the omni-v16 runs read a momentary empty poll as idle, which made a
+                          # 2 -> 1 -> 2 give-back trial and its fail-up (two rebalances) in the first 11 seconds of every omni arm, and with 8
+                          # partitions keyed round-robin no consumer above the operator's count was ever idle, so none was ever given back
 STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
 BURST = "1 6 1 8 1 6"
 PEAK_SHARE = 0.9          # the peak notch offers nine tenths of native's measured capacity
@@ -133,8 +142,9 @@ def consumer_proc(topic, group, service_ms, consumed, stop_evt, rec_path, idle_f
     """One consumer of the group: poll, spend the service time per message, record (consume time, latency ms)."""
     from kafka import KafkaConsumer
     c = KafkaConsumer(topic, bootstrap_servers=BOOTSTRAP, group_id=group, auto_offset_reset="earliest",
-                      enable_auto_commit=True, max_poll_records=50, session_timeout_ms=10000, heartbeat_interval_ms=3000)
+                      enable_auto_commit=True, max_poll_records=POLL_RECORDS, session_timeout_ms=10000, heartbeat_interval_ms=3000)
     n = 0
+    last_msg = time.monotonic()                                 # a consumer starts busy: idle only after IDLE_S with no message
     with open(rec_path, "a") as rec:
         while not stop_evt.is_set():
             batch = c.poll(timeout_ms=200)
@@ -150,8 +160,15 @@ def consumer_proc(topic, group, service_ms, consumed, stop_evt, rec_path, idle_f
                 n += got; rec.flush()
                 with consumed.get_lock():
                     consumed.value += got
-            idle_flag.value = 0 if got else 1
+            if got:
+                last_msg = time.monotonic()
+            idle_flag.value = 1 if is_idle(last_msg, time.monotonic()) else 0
     c.close()
+
+
+def is_idle(last_msg_t, now, idle_s=IDLE_S):
+    """A consumer is idle when no message has reached it for idle_s seconds or more (a sustained state, store fix of 25 October)."""
+    return now - last_msg_t >= idle_s
 
 
 class Group:
@@ -162,7 +179,7 @@ class Group:
         self.consumed = mp.Value("l", 0); self.procs = []; self.k = 0; self.changes = 0
 
     def start_one(self):
-        stop = mp.Event(); idle = mp.Value("i", 1)
+        stop = mp.Event(); idle = mp.Value("i", 0)                 # a consumer starts busy (store fix of 25 October)
         self.k += 1
         p = mp.Process(target=consumer_proc, args=(self.topic, self.group, self.service_ms, self.consumed, stop, str(self.out / f"consumer-{self.k}.log"), idle), daemon=True)
         p.start(); self.procs.append((p, stop, idle)); self.changes += 1
@@ -215,17 +232,29 @@ def service_reading(rec_files, since_s):
     return service_sample(rec_files, since_s)[0]
 
 
-def decide(p, force, lag, idle, cur, last_change_age, wall=0.95):
+def decide(p, force, lag, idle, cur, last_change_age, wall=0.95, snapshot=None, consumed=None):
     """The knob's move this second: (target, direction, why). The service slow with messages waiting adds consumers,
     ceil(force / 0.1) at a time; calm gives back one idle consumer a second, after the dwell; past the wall, every
-    consumer the topic can use at once."""
+    consumer the topic can use at once.
+    Store fix of 25 October: above the operator's own count (snapshot), calm with no more waiting than the group takes in one
+    poll round (POLL_RECORDS a consumer: the messages in flight between the producer and the consumers, which keep the lag
+    above zero in 388 of 389 calm seconds of an omni-v16 arm) gives one consumer back, HANDBACK_DWELL_S after the last change,
+    with no idle test (every consumer of a topic keyed round-robin has work, so the idle test held a consumer added above
+    native to the end of the arm). Below the operator's count the idle test and an empty backlog stay. A second in which the
+    group consumed nothing (consumed 0: before the producer starts, or a rebalance) says nothing about the demand: nothing
+    is given back in it."""
     lo, hi = COVER
     if p is not None and p >= wall:
         return hi, 0, "fail up: the line is at hand, every consumer at once"
     if force > 0.05 and lag > 0:
         want = min(hi, cur + max(1, math.ceil(force / 0.1)))
         return want, (1 if want != cur else 0), f"slow with {lag} waiting: add {want - cur}"
-    if force < -0.05 and idle > 0 and cur > lo and last_change_age >= DWELL_S and lag == 0:
+    if consumed is not None and consumed <= 0:
+        return cur, 0, "nothing consumed in the last second: nothing known, nothing taken"
+    if (snapshot is not None and cur > snapshot and force < -0.05 and lag <= cur * POLL_RECORDS
+            and last_change_age >= HANDBACK_DWELL_S):
+        return cur - 1, -1, "calm, nothing waiting beyond one poll round, above the operator's count: one consumer given back"
+    if force < -0.05 and idle > 0 and cur > lo and last_change_age >= DWELL_S and lag == 0 and (snapshot is None or cur <= snapshot):
         return cur - 1, -1, "calm, an idle consumer given back"
     return cur, 0, "hold"
 
@@ -260,9 +289,12 @@ class Omni(threading.Thread):
                 cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
                 cost = sample_cost(self.objective, inside, reading if n_msg else None, cur, cpu_share)
                 self.verdict.observe(cost, tick - t0)                                    # measured under the count of the last second
-                target, d, why = decide(self.law.p, f, lag, idle, cur, tick - self.last_change, wall=self.law.band.wall_high)
+                target, d, why = decide(self.law.p, f, lag, idle, cur, tick - self.last_change, wall=self.law.band.wall_high, snapshot=snapshot,
+                                        consumed=n_msg)
                 fail_up = why.startswith("fail up")
-                target, why, vinfo = self.verdict.decide(target, spend_ok=(f > 0.05 and lag > 0), give_ok=(f < -0.05 and idle > 0 and lag == 0),
+                # a give-back above the operator's count is the hand-back of a spend, inside the allowance: no give-back trial (whose
+                # steps run below native) is started for it
+                target, why, vinfo = self.verdict.decide(target, spend_ok=(f > 0.05 and lag > 0), give_ok=(f < -0.05 and idle > 0 and lag == 0 and cur <= snapshot and n_msg > 0),
                                                          t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=fail_up)
                 if target > cur:
                     for _ in range(target - cur):

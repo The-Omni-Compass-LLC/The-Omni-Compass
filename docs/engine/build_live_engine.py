@@ -23,7 +23,6 @@ Every record the page replays is made again here by the repository's own code on
              at the tune-down, every muscle's law, reading by reading through the C++ compass law
   dial       the heartbeat dial (omni-v17): every beat of the Kubernetes governor in our own models, from the newest
              beat ladder (results/model_gate/V<n>_LADDER.json, tools/beat_ladder.py), beside native and the main engine's 60 s
-  direct     Omni direct's three arms (omni-v18): the showing records under results/orchestrator/, from tools/orchestrator_record.py
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
@@ -334,6 +333,8 @@ def board(runs: list, camp: dict | None = None) -> list:
         if not ln.strip() or ln.startswith("#") or "|" not in ln:
             continue
         name, wf = ln.split("|")[:2]
+        if "by itself" in name or re.search(r"\barms=[^;]*\bsolo\b", ln):   # Omni-Compass is never by itself (the founder's order of 25 October): not on this page
+            continue
         tables = []
         for stem in TABLE_OF.get(name, []):
             t = found.pop(stem, None)
@@ -452,7 +453,12 @@ def fleet() -> dict:
         out["index"] = {"headline": m.group(1).strip() if m else None, "service": m2.group(1).strip() if m2 else None, "file": "results/OMNI_INDEX.md"}
         oj = ROOT / "results" / "OMNI_INDEX.json"
         if oj.exists():   # each category's own reading, so the page can say what carries the headline
-            out["index"]["categories"] = json.loads(oj.read_text(encoding="utf-8")).get("categories") or {}
+            oij = json.loads(oj.read_text(encoding="utf-8"))
+            out["index"]["categories"] = oij.get("categories") or {}
+            # the figure of record as the index's own record holds it, never read back out of a sentence (the mathematics seat of
+            # 24 October: the headline's first percent is the 0.5% floor it names, not the index)
+            out["index"]["headline_pct"] = oij.get("headline_pct")
+            out["index"]["service_pct"] = oij.get("service_headline_pct")
     # the grid: the engine that stands's own when its squares have landed, else the newest grid with squares, named by its
     # own engine (never read as the engine that stands's), with the dispatches of the engine that stands beside it
     stand_n = engine()[0].rsplit("v", 1)[-1]
@@ -625,7 +631,7 @@ def grid_reading() -> dict | None:
         for size in D.SIZES:
             for o in (D.ORGS if key == "six" else D.KUBE):
                 org = name[o] if key == "six" else o
-                for n in (1, 10, 100, D.RUNS):
+                for n in (1, 10, 100, 1000):
                     want = range(0, n) if key == "six" else range(1, n + 1)
                     st = len(cov_all.get((key, size, o), set()) & set(want)); dn = len(cov_done.get((key, size, o), set()) & set(want))
                     if st:
@@ -881,18 +887,126 @@ def dial() -> dict:
     return {"file": str(lads[-1].relative_to(ROOT)), "seeds": lad["seeds"], "days": lad["days"], "main_s": lad["main_s"],
             "real": ("three-run tables in " + ", ".join(f"results/live/{f.name}" for f in pace)) if pace else
                     "not yet run (docs/PACE_PREREGISTRATION.md, amendment 3: eight arms in every repetition, three runs)",
+            # the page's key is "models" (the editing seat of 24 October: the retired word is printed nowhere); the ladder file keeps its own
             "models": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
-                            for k, t in lad["models"].items()})}   # a change against a zero (native's power cap) is NaN: null
+                              for k, t in (lad.get("models") or lad.get("models") or {}).items()})}   # a change against a zero (native's power cap) is NaN: null
 
 
-def direct() -> dict:
-    """Omni direct's three arms (omni-v18): every showing record under results/orchestrator/ (tools/orchestrator_record.py),
-    newest first, as written from the showing's own files; the page replays the newest (section 2a)."""
-    recs, abc = [], []
-    for f in sorted((ROOT / "results" / "orchestrator").glob("*.json")):
-        r = json.loads(f.read_text(encoding="utf-8")); r["file"] = str(f.relative_to(ROOT))
-        (abc if f.stem.endswith("_ABC") else recs).append(r)     # a three-run table (tools/orchestrator_abc.py) or one showing
-    return {"records": sorted(recs, key=lambda r: r.get("written", ""), reverse=True), "abc": abc}
+def core_mc() -> dict:
+    """The Python's Monte Carlo (benchmarks/core_evidence.py, the founder's words of 24 October: "the Python's Monte Carlo, our 4K
+    Runge-Kutta, 20-step macro, 10-step micro in each macro ... how each Python run comes out and starts at zero, and how long in
+    steps OmniCompass gets it into the basin and holds it there and certifies the count"): the canonical 500-run population
+    (numpy's generator from seed 223387268, the record's own), each run through omnicompass/core.simulate, 20 macro steps of
+    10 RK4 micro steps, in four variants (controlled; uncontrolled, u = 0; aimed at the wrong basin; the double well's mu at 0).
+    Kept per run: U at every macro step (three decimals), the macro step its five-in-a-row in the basin completes (convey) and
+    its ten-in-a-row (cert), and its basin; the counts beside the record's (results/core_evidence.json), one SHA-256 digest of
+    the paths. Class S, the engine's own mathematics."""
+    import hashlib
+    from dataclasses import replace
+    import numpy as np
+    from omnicompass import core as C
+    seed, runs = 223387268, 500
+    rng = np.random.default_rng(seed)
+    pop = [(C.sample_state(rng), C.sample_params(rng)) for _ in range(runs)]
+    rec = json.loads((ROOT / "results" / "core_evidence.json").read_text(encoding="utf-8"))
+    out = {}
+    for name in ("controlled", "uncontrolled", "wrong_target", "controlled_mu0"):
+        U, cv, ce, tg = [], [], [], []
+        for x0, p in pop:
+            pp = replace(p, mu=0.0) if name == "controlled_mu0" else p
+            tgt = -C.nearest_basin_sign(x0.U) if name == "wrong_target" else None
+            r = C.simulate(x0, pp, target=tgt, controlled=(name != "uncontrolled"))
+            U.append([round(float(u), 3) for u in r.U_hist]); cv.append(int(r.convey_confirm) if r.convey else 0)
+            ce.append(int(r.cert_complete) if r.cert else 0); tg.append(int(r.target_sign))
+        out[name] = {"U": U, "convey": cv, "cert": ce, "target": tg, "n_convey": sum(1 for c in cv if c), "n_cert": sum(1 for c in ce if c),
+                     "record": {"convey5": (rec.get(name) or {}).get("convey5"), "cert10": (rec.get(name) or {}).get("cert10")},
+                     "digest": hashlib.sha256(json.dumps(U, separators=(",", ":")).encode()).hexdigest()}
+    return {"seed": seed, "runs": runs, "macro": C.MACRO_STEPS, "micro": C.MICRO_STEPS, "dt": C.MACRO_DT, "tol": C.BASIN_TOL,
+            "convey_window": C.CONVEY_WINDOW, "cert_window": C.CERT_WINDOW, "kp": C.KP, "file": "results/core_evidence.json",
+            "tool": "benchmarks/core_evidence.py", "variants": out, "sets": core_sets()}
+
+
+def core_sets() -> list:
+    """Every set of the core's Monte Carlo that tools/core_runs.py has written from the jump generator (results/core_runs/), oldest
+    first: its base, runs, digest and counts, the C++ twin's digest of the same draws, the system it ran (none: the engine's own
+    ranges) and the GitHub run that wrote it, so a set the page runs is checked against the Python's and the C++'s."""
+    out = []
+    for f in sorted((ROOT / "results" / "core_runs").glob("CORE_RUNS_*.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        c = d.get("cpp") or {}   # the C++ twin of the core on the same draws (cpp/tools/core_runs.cpp), and the system they were spread over
+        out.append({"base": d.get("base"), "runs": d.get("runs"), "digest": d.get("digest"), "summary": d.get("summary"), "file": str(f.relative_to(ROOT)),
+                    "written": d.get("written", ""), "github": (d.get("github") or {}).get("url"), "system": (d.get("system") or {}).get("name"),
+                    "cpp": c.get("digest"), "cpp_agree": f"{c['agree']} of {c['of']}" if "agree" in c else None, "cpp_largest": c.get("largest_difference"),
+                    "inputs": d.get("inputs_digest")})
+    return sorted(out, key=lambda x: (x["written"], x["file"]))
+
+
+ON_NATIVE_PAIR = "Omni on native against native"
+
+
+def on_native_abc() -> dict:
+    """The newest real three-run test on GitHub's own machines of Omni-Compass on native against native, the page's bottom line
+    (results/orchestrator/*_THREE_ARMS_ABC.json, tools/orchestrator_abc.py, class L): native is Kubernetes' published autoscaling
+    rule on the muscles, Omni-Compass on native is Omni-Compass on top of that rule. Only that pair and those two arms are carried:
+    Omni-Compass is never by itself (the founder's order of 25 October), so the file's other arm stays in its file."""
+    fs = sorted(ROOT.glob("results/orchestrator/*_THREE_ARMS_ABC.json"), key=lambda f: (int(re.search(r"V(\d+)_", f.name).group(1)) if re.search(r"V(\d+)_", f.name) else 0, f.name))
+    if not fs:
+        return {}
+    d = json.loads(fs[-1].read_text(encoding="utf-8"))
+    return {"file": str(fs[-1].relative_to(ROOT)), "class": d.get("class"), "commit": d.get("commit"), "engine": d.get("engine"),
+            "runs": d.get("runs"),
+            "what": "Omni-Compass on native against native, three runs on GitHub's own machines (A, B and C from one commit), the full "
+                    "form: 18 steps of 25 s, clients 1 2 3 2 3 4 ...; native is Kubernetes' published autoscaling rule on the muscles, "
+                    "written by us, and Omni-Compass sits on top of it.",
+            "rows": [r for r in d.get("rows", []) if r.get("pair") == ON_NATIVE_PAIR],
+            "totals": {k: {a: v.get(a) for a in ("yardstick", "omni_native") if a in v} for k, v in (d.get("totals") or {}).items()}}
+
+
+def scenarios20() -> dict:
+    """The twenty scenarios (results/scenarios/SCENARIOS_20.json, tools/scenarios_20.py, class S): ten organisms, each native and with
+    Omni-Compass on native, every gauge's word and its three runs; the plants each reading flags stay in the record, not here."""
+    f = ROOT / "results" / "scenarios" / "SCENARIOS_20.json"
+    if not f.exists():
+        return {}
+    d = json.loads(f.read_text(encoding="utf-8"))
+    def pair(p):
+        if not isinstance(p, dict) or "gauges" not in p:
+            return p
+        return {"gauges": {k: {"word": g.get("word"), "reading": g.get("reading"), "mean": g.get("mean_change"),
+                               "runs": {r: (v or {}).get("change") for r, v in (g.get("runs") or {}).items()}} for k, g in p["gauges"].items()}}
+    orgs = []
+    for o in d.get("organisms", []):
+        x = {k: o.get(k) for k in ("no", "key", "name", "what", "class", "muscles", "source")}
+        r = o.get("readings") or {}
+        on = r.get("on_native_vs_native") if isinstance(r, dict) else None
+        if isinstance(on, dict) and on.get("state") == "composed":   # the whole organism: its composition, the headline scope only
+            wh = (((on.get("composition") or {}).get("scopes") or {}).get("without") or {}).get("carried", {}).get("whole", {})
+            x["composed"] = {"index": wh.get("index"), "gauges": wh.get("gauges"), "note": "the whole organism in its three places, composed by tools/whole_system.py"}
+        else:
+            x["readings"] = {k: pair(v) for k, v in r.items()}
+        orgs.append(x)
+    return {"file": str(f.relative_to(ROOT)), "title": d.get("title"), "run": d.get("run"), "gauges": d.get("gauges"), "organisms": orgs}
+
+
+def injection_grid() -> dict:
+    """The injection grid (results/injection_grid/INJECTION_GRID_<base>.json, tools/injection_grid.py, class S): the Python's
+    newest 500 injections through every organism, native and with Omni-Compass on native, and through every governor on each
+    organism, at 1, 10, 100 and 500 runs and organisms stacked. The page carries every cell, every run's means (from which it
+    recomputes every cell's mean and checks the Python's) and the batch's Python and C++ digests; the ranking it computes."""
+    fs = [f for f in (ROOT / "results" / "injection_grid").glob("INJECTION_GRID_*.json") if "_look_" not in f.name]
+    if not fs:
+        return {}
+    f = max(fs, key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("run", {}).get("started", ""), f.name))
+    d = json.loads(f.read_text(encoding="utf-8"))
+    d.pop("best", None)
+    return {"file": str(f.relative_to(ROOT)), **d}
+
+
+def glossary() -> dict:
+    """The glossary and index at the back of the page (tools/live_glossary.py, docs/engine/glossary.json): every term in the words of
+    the file it names, the ten organisms, the two arms and their twenty scenarios, every muscle of the catalog, and the index."""
+    f = ROOT / "docs" / "engine" / "glossary.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
 
 
 def records(runs: bool) -> dict:
@@ -927,6 +1041,11 @@ def records(runs: bool) -> dict:
         eruns = json.loads(er_files[-1].read_text(encoding="utf-8")) if er_files else {"missing": "results/engine_runs"}
         if er_files:
             eruns["file"] = str(er_files[-1].relative_to(ROOT))
+            # every set the Python has run (the founder's words of 23 October: "running it again runs another 500 and again another
+            # 500"): its base, its runs and its digest, so a set run again on the page is checked against the Python's own record
+            eruns["sets"] = sorted(({"base": d.get("base"), "runs": d.get("runs"), "digest": d.get("digest"), "file": str(f.relative_to(ROOT)),
+                                     "written": d.get("written", "")} for f in er_files for d in [json.loads(f.read_text(encoding="utf-8"))]),
+                                   key=lambda x: (x["written"], x["file"]))
         # the same record's set through the C++ engine at this build (cpp/tools/engine_runs.cpp), receipt by receipt
         XT.main(str(t / "x.json"), live_laws=laws.laws, engine_runs=eruns if er_files else None)
         h, c, s, rr, wh, gpu, cpu, ho, x = (json.loads((t / f).read_text(encoding="utf-8")) for f in
@@ -945,7 +1064,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "direct": direct()}
+            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "injgrid": injection_grid(), "glossary": glossary()}
 
 
 def embedded(page: str, key: str):
@@ -1044,7 +1163,7 @@ def appraisal_counts(rec) -> str:
     lines = [COUNTS_BEGIN,
              f"**The counts of the records on the page** ({b['engine']}, digest `{b['digest']}`), written by the build from the records it made, so a check rebuilds them exactly:",
              "", "| What | Count |", "|---|---|",
-             f"| Three-run tables played back from their raw files (sections 4c and 4d) | {len(R['benchmarks'])}, with {len(runs)} runs |",
+             f"| Three-run tables played back from their raw files (sections 5c and 5d) | {len(R['benchmarks'])}, with {len(runs)} runs |",
              f"| Raw files checked against their run's own `SHA256SUMS_ALL.txt` | {ok:,} of {files:,} matched; {unmatched} unmatched |",
              f"| Receipts (every judged row of each benchmark's newest table) | {len(recs)}: " + ", ".join(f"{e} {n}" for e, n in sorted(by_eng.items(), key=lambda kv: -int(re.sub(r'\D', '', kv[0]) or 0))) + " |",
              f"| Omni-Compass against its native ({len(omni)} tables), as the tables wrote them | {words(tally(omni, False))}{fl}{words(tally(omni, True)) + ')' if floor is not None else ''} |",
@@ -1100,7 +1219,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial", "direct")
+                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "glossary")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1113,12 +1232,14 @@ def main() -> int:
             bad.append("the appraisal's counts (docs/engine/APPRAISAL.md)")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         for k in bad:
+            if k not in rec:          # the appraisal's counts are a file, not a record: named above, no record to compare
+                continue
             where = first_difference(embedded(page, k), rec[k])
             if where:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "direct"):
+              "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "glossary"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

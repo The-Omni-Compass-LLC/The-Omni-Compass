@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/archive-run.yml"
 # the runners write these files and read them back inside the same run, before the archive exists
 WRITERS = {"run_ycsb.py", "run_redis.py", "run_kafka.py", "run_cpu_power.py", "run_sysbench.py"}
+# a reader that reads a gzipped file in its stored form too (it names the .gz form and opens it with gzip)
+GZ_AWARE = {"store_gate.py"}
 
 
 def gzipped_names():
@@ -30,7 +32,7 @@ class ArchiveGzip(unittest.TestCase):
     def test_no_archive_reader_names_a_gzipped_file(self):
         pats = {"*.raw": r"\.raw\b|notch-", "requests.log": r"requests\.log", "consumer-*.log": r"consumer-"}
         readers = [p for p in sorted((ROOT / "tools").glob("*.py")) + sorted((ROOT / "scripts").glob("*.py"))
-                   if p.name not in WRITERS]
+                   if p.name not in WRITERS and not (p.name in GZ_AWARE and "gzip.decompress" in p.read_text())]
         readers += [ROOT / ".github/workflows/reaggregate.yml"]
         for name in gzipped_names():
             for p in readers:

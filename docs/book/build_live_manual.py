@@ -110,7 +110,7 @@ READ = {   # how to read a monitor of each layer, and what the engineer in charg
                "Press the kill switch only for security: it is instant, every setting goes back to native and is read back. Watch the governors' table beside it: every governor on the page says OFF and what it handed back."),
     "whole": ("Bars and tiles in the traffic light of the one key: GAIN green to one side, LOSS red to the other, EVEN yellow on zero, power given blue. A figure is a composition or a table's own word, never a single run's number.",
               "Read the word before the size, and the interval before the word: an interval across zero is EVEN whatever its centre. A LOSS on the board is answered on the status board, with its cause and its knob."),
-    "service": ("The four golden signals of a service, one point a decision of the live engine: native in amber, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.",
+    "service": ("The four golden signals of a service, one point a decision of the live engine: native in orange, Omni-Compass in blue, the same demand on both. A red band is a kill-switch window.",
                 "Watch latency and errors first: a rise there is the only thing that can read LOSS. Saturation and throughput are the work and the capacity held: capacity is power given when it rises."),
     "cluster": ("A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.",
                 "Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries {engine}; an older engine's run is its own record."),
@@ -300,8 +300,20 @@ def appendix_lines() -> list[str]:
     return out
 
 
+MD_PATH = re.compile(r"(?<![\w/.`-])((?:[\w.-]+/)*[\w-]+\.md)(?![\w`])")
+
+
+def code_paths(line: str) -> str:
+    """A document's name set as code (`DISCLOSURES.md`), outside code already set, so the book reads "section 3" after it as
+    that document's own numbering, never as one of its own sections."""
+    if line.startswith("#"):
+        return line
+    parts = line.split("`")
+    return "`".join(MD_PATH.sub(r"`\1`", seg) if i % 2 == 0 else seg for i, seg in enumerate(parts))
+
+
 def main() -> int:
-    text_md, _ = normalize_markdown("\n".join(appendix_lines()))
+    text_md, _ = normalize_markdown("\n".join(code_paths(ln) for ln in appendix_lines()))
     if "--check" in sys.argv:
         same = OUT_MD.exists() and OUT_MD.read_text(encoding="utf-8") == text_md
         print("the page word for word matches the page" if same else "the page word for word differs from the page: python3 docs/book/build_live_manual.py")

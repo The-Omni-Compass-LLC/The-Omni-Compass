@@ -4,48 +4,118 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-<!-- headline: written by tools/headline.py from the result files; never edited by hand -->
+## The bottom line: is Omni-Compass a benefit?
 
-## The answer first: is Omni-Compass a benefit against native?
+The founder's order of 24 October 2026: the first thing anyone sees says whether Omni-Compass is a benefit, for each way to
+run it, against native alone, in one light and one number. The light is the whole verdict: **green, round, THRIVING**,
+Omni-Compass ahead of native; **yellow, a yield diamond, STEADY**, EVEN (a change under 0.5%); **red, a stop-sign octagon,
+REDLINING**, behind native, a LOSS; dark, **AWAITING**, no run yet. A slower service or a failed request turns the light red
+whatever the work. The number is how much more work was done for the same demand, the mean of our three runs, read by the
+key below (the number beside a word carries the word's sign).
 
-**Yes, on omni-v18, the newest engine with its three runs in (the engine that stands, omni-v19, runs them again), measured on real machines (class L), three runs (A, B and C).** Omni-Compass on top of native did 6.0% more work than native and answered 9.5% faster at the 95th percentile; Omni-Compass direct did 7.5% more work and answered 12.1% faster.
+**The way to run it: one real test, three runs on GitHub's own machines** (class L, live software; the full form, 18
+steps of 25 s, the clients stepping 1 2 3 2 3 4 …; engine omni-v18, commit `0ca2bbdac97f`, runs 40023524338, 40023529155 and
+40023534013; [`results/orchestrator/V18_THREE_ARMS_ABC.md`](results/orchestrator/V18_THREE_ARMS_ABC.md)):
 
-| Scenario | Signal | Work | Response (95th percentile) | Machines | Units |
-|---|---|---|---|---|---|
-| **Native**: Kubernetes' own autoscaling rule on the muscles | <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> the baseline | the baseline | the baseline | the baseline | the baseline |
-| **Omni-Compass on top of native**: Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 6.0%; the runs 5.2%, 5.3%, 7.4% | GAIN in all three of our runs: down 9.5% (faster); the runs 9.0%, 12.1%, 7.5% | GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% | power given in all three of our runs: up 10.2%; the runs 11.0%, 8.9%, 10.8% |
-| **Omni-Compass direct**: Omni-Compass alone on the muscles: no Kubernetes autoscaler under it, Omni-Compass the only controller moving the knob | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 7.5%; the runs 7.3%, 5.7%, 9.4% | GAIN in all three of our runs: down 12.1% (faster); the runs 9.8%, 15.7%, 10.8% | GAIN by the mean of our three runs, beyond the noise in 0 of 3: down 2.5% (fewer); the runs 2.2%, 3.1%, 2.2% | power given by the mean of our three runs, beyond the noise in 2 of 3: up 5.2%; the runs 6.9%, 0.3%, 9.0% |
+| Way to run it | Light | Work against native | Everything else the record reads |
+|---|---|---|---|
+| Native alone: Kubernetes' published autoscaling rule on the muscles, written by us as the yardstick | yellow, STEADY | 0%: the baseline every other row is read against | — |
+| Omni-Compass on native | green, THRIVING | **+6.0% GAIN** in all three of our runs (A +5.2%, B +5.3%, C +7.4%) | the 95th percentile **+9.5% GAIN** in all three (down 9.0%, 12.1% and 7.5%: faster); machines **+3.1% GAIN** by the mean of our three runs, beyond the noise in 1 of 3; serving units **+10.2% power given** in all three, the capacity spent to buy the work; no request failed and none was answered wrong in any run, on either side |
 
-The signals: <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> accelerating, a GAIN and no LOSS; <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> steady, every row EVEN; <img src="docs/engine/signals/redlining.svg" alt="the red stop-sign octagon" height="14"> redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, never a LOSS. Source: [`results/orchestrator/V18_THREE_ARMS_ABC.json`](results/orchestrator/V18_THREE_ARMS_ABC.json), Omni direct's three arms, three runs on GitHub's own machines (A, B and C from one commit), the full form: 18 steps of 25 s, clients 1 2 3 2 3 4 ..., the busy room rule; runs A 40023524338, B 40023529155, C 40023534013; commit `0ca2bbdac97f`.
+Native and Omni-Compass on native are the only two sides: Omni-Compass is never by itself (the founder's order of 25 October), so the record's third arm, Omni-Compass alone on the muscles, is not carried here. The test ran on omni-v18 and runs again on omni-v20, the engine that stands.
 
-### The two bills
+**The two routes a whole workload is bought by**: every measured layer composed by the product law (`tools/whole_system.py`,
+regrouped by `docs/engine/export_whole.py`), each layer's three runs carried with their intervals: a model of measurements,
+class S of class L and P.
 
-**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. Omni-Compass on the cloud alone can give only a small cut in the bill, from the machines the cloud's own autoscaler made; the benefit lives at the two ends, in the software and in the bare metal, and the cloud carries it.**
+| Route | Light | The whole workload against native (its index over the gauges) | Gauge by gauge |
+|---|---|---|---|
+| On site: the software straight on the owner's own hardware (the software end × the bare metal) | green, THRIVING | **+18.5% GAIN** (+16.1% to +20.9%, the gauges perfectly correlated) | work **+24.9% GAIN**; speed, the 95th percentile, **+41.3% GAIN**; machines **+8.5% GAIN**; energy **+2.8% GAIN** |
+| Through the cloud: the software through the cloud onto its hardware (the software end × the cloud's wire × the bare metal at the back end) | green, THRIVING | **+14.8% GAIN** (+1.6% to +29.6%) | work **+24.9% GAIN**; speed **+47.5% GAIN**; machines **EVEN** =5.9% (−2.3% to +14.9%); energy **+2.8% GAIN**; the bill **EVEN** =0.8% (−18.8% to +21.2%) |
 
-Each route's bill is its native total cost, then Omni-Compass's, then the saving: 1 − (the Omni-Compass total ÷ the native total), each total the sum of its non-overlapping cost components inside the declared boundary, on a matched workload (`docs/THE_TUNE.md`, section 8). A component's own percent is a supporting measurement, never the bill. Where a price or a component is missing the bill reads unresolved; no price is assumed.
+By the index's rule (only what held the same way in all three of our runs) the same two routes read **+18.5%** and **+14.5%**
+GAIN, the second the repository's headline ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md)). Both are the composition's
+index, not a price. A bill is the sum of the actual costs inside a declared boundary, S(r, a) = (C(r, native) − C(r, a)) /
+C(r, native) for each route r and arm a ([`docs/FACTORY_PROFILE.md`](docs/FACTORY_PROFILE.md), section 8), and today only the
+cloud's compute is metered in money (Azure, machine-hours at the list price, [`results/live/AKS_BILL.md`](results/live/AKS_BILL.md));
+energy, machines, storage, network and operation carry no recorded price, so neither route's bill is resolved yet. The bare
+metal enters both routes as no change: the machine's own layer is not yet run, and the card's one run, on a controller since
+replaced, stands outside the headline scope.
 
-| Route | The bill: native → Omni-Compass → saving | Supporting measurements |
+**Every real test together.** The Omni index of Omni-Compass on native over the real categories reads **+3.4% GAIN** on the
+resource reading (work, speed, machines, energy) and **+9.4% GAIN** on the service reading
+([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)); by category, real Kubernetes **+28.6% GAIN**, the database's buffer pool
+**+1.6% GAIN**, messaging and the cache **+0.1% power given** each, the database's storage-engine cache **−1.4% LOSS** and the
+database behind its pooler **−4.9% LOSS**. The benefit sheet reads the row GAIN AND LOSS ([`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md)),
+and every LOSS row stands in its own table.
+
+The live engine page opens on the same bottom line ([`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html),
+its section iii). Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
+## The engine, the factory profile, the live tuning bench and the two routes
+
+Omni-Compass consists of a **governing engine**, its **muscle adapters**, a **complete configuration profile** and a
+**validation harness**. The words are written once, with their exact meanings and the mathematics, in
+[`docs/FACTORY_PROFILE.md`](docs/FACTORY_PROFILE.md); every manual and reading guide uses them as written there.
+
+- **The governing engine** is the executable mathematical rules that turn observations and internal state into governing
+  decisions (`omnicompass/`, `omni_controller/controller.py` and its C++ twin `cpp/src/governor.cpp`). The engine that stands
+  is omni-v19 (`OMNI_V19.json`; `python3 tools/omni_version.py`).
+- **The factory profile** is the complete, versioned set of Omni-Compass default settings shipped together: the governing
+  rules, gains, margins, the decision interval and every other default. The released factory profile is omni-v19's: the
+  governor's full decision every 60 s, its fast checks every 5 s, every muscle on the card found for it
+  (`realms/muscle_cards_v5.csv`) and on the engine's own setting otherwise. It is the profile every published result ran on.
+  Freezing a profile fixes the released rules and default tuning, θ(k + 1) = θ(k) = θ[factory], while the system's state, the
+  engine's own state and its commands go on responding to the changing workload: one fixed tune governing a changing system.
+  **The best validated factory profile for the declared operating conditions has not yet been established.** It comes from
+  eight steps (verify the mechanisms; exercise the six governing intervals and the knob combinations; tune on development
+  workloads; validate on fresh ones; record every adverse result; freeze the profile with its identity and receipts; verify
+  every implementation, the C++ included; release), and the repository stands at steps 1 and 2 for the next profile. No profile
+  is locked as the baseline before those steps.
+- **The live tuning bench** is the live engine page: its controls expose the governing mechanism and show how an adjustment
+  moves the connected system. An adjustment produces an identifiable active configuration, a custom profile named by its
+  fingerprint, which becomes a new factory configuration only after validation and a new release declaration. Two controls
+  carry separate meanings: **Restore factory profile** reapplies the released configuration; **Return to native** hands
+  governance back and restores the recorded native settings, as the adapter supports. The kill switch is separate, for
+  security only, and instant.
+- **Two deployment routes**: on-site hardware (the software on the owner's own racks and chips) and through the cloud (the
+  software through a cloud's machines onto its bare metal). Every result names the engine version, the profile, the hardware
+  or model, the workload and the measurement boundary that produced it, and a route's bill is the sum of its costs inside that
+  boundary.
+
+**The factory tune.** The engine here is presented as The Omni-Compass LLC tuned it and ships it: self-running, set at the factory. Every muscle is wired, each on its own setting (its own card where one was found, the engine's setting for the rest), frozen and fingerprinted by version. No single setting is universal across muscles, families, sectors, domains or realms. A licensee may then add on, retune, upgrade or tune down any muscle or combination; a changed tune is the licensee's own configuration and its results are its own ([`DISCLOSURES.md`](DISCLOSURES.md), section 3).
+
+**One tuned engine, and a tuning bench.** Every benchmark below is one engine at one tune: the main engine, the engine that stands, at its factory tune. The live engine page is a different thing, a live tuning engine: every knob, button and monitor on it can be turned in real time (the beat, the dial, the pedal, each muscle driven or left native, up or down, in or out, minus or plus) to show the mechanism of action with native alone, with Omni-Compass on top of native, or both side by side, and what it shows at any other setting is the engine's range, never a benchmark result. As on any engine, where the mixture, the intake, the exhaust, the firing and the pistons each change what it delivers, **turning any knob can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many ways, for many outputs. Among the tunes tried so far the released one is chosen by a declared rule: of the tunes that harm no gauge against native, the one against which no other tried tune reads GAIN on one service gauge and LOSS on none, searched on development seeds and read again on untouched ones ([`docs/THE_TUNE.md`](docs/THE_TUNE.md)).
+
+## The cloud is a wire
+
+**A cloud is just a wire.** It is the wire between the software end (the owner's programs, Kubernetes and the open-source
+orchestrators, managers and autoscalers that carry the work) and the hardware end (the bare metal: the GPU chips, the Linux
+racks, the data center, on site or off site). Omni-Compass can live in all three places. On the wire alone, as every cloud run
+in this repository is set (the tune-down on the machines only, the pods exactly native's), it can only park machines the
+cloud's own autoscaler already made, after its own trial, so a cloud run alone can show at most a small cut in the bill of the
+wire. It cannot show the work and the speed gained at the software end, nor the energy and the throughput gained at the bare
+metal, because neither end is under it; those are measured where Omni-Compass sits on them (the cluster and its services; the
+card and the machine) and composed with the wire into one organism and one bill ([`DISCLOSURES.md`](DISCLOSURES.md), section 9).
+A provider that ran Omni-Compass on its own back end would see that benefit on its own chips and racks; no tenant can meter
+it, so it is never claimed here as a measurement.
+
+| Place | Measured so far (`results/WHOLE_SYSTEM.md`, every interval carried) | The company's expectation (the founder's figures of 24 October: an expectation, never a result) |
 |---|---|---|
-| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v18 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4%. Omni-Compass direct: GAIN by the mean of our three runs, beyond the noise in 0 of 3: down 2.5% (fewer); the runs 2.2%, 3.1%, 2.2% |
-| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v18; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
+| The software end: the cluster and the services on it (class L, 22 and 17 tests) | the index **+18.5% GAIN**: work +24.9%, speed +41.3%, machines +8.5%, energy +2.8%, each GAIN | about 3 to 4% |
+| The bare metal: the card and the machine | not measured in the headline scope: the machine's own layer is not yet run; the card's one run (class P, 2 October, on a controller since replaced) read work per energy **+3.6% GAIN** and its 95th percentile 58.5% slower, a LOSS | 2 to 3% |
+| The cloud's wire alone: the machines it bills (Azure, class L, three one-run tests of 4 and 5 paired repetitions) | speed **EVEN** =4.4% (−21.5% to +38.8%), machines **EVEN** =2.4% (−10.0% to +5.8%), the bill **EVEN** =0.8% (−18.8% to +21.2%) | 1 to 2% |
+| The two ends and the wire together | on site **+18.5% GAIN**; through the cloud **+14.8% GAIN** (the bottom line above) | about 5% from the two ends together |
 
-Beside it, and never read as omni-v18: the totals composed from earlier engines' tables (`tools/whole_system.py`, omni-v1, omni-v10, omni-v11, omni-v12, omni-v16, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 24.6%, the 95th percentile 43.0% faster, machines 8.7% fewer, energy 3.3% less, the cloud's bill EVEN; the index over the gauges +14.9%. Each benchmark runs again on omni-v18, and each total follows its own engine's tables.
+Where a measurement and the expectation differ, the measurement stands.
 
-Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
-
-<!-- end headline -->
+## Notices for every reader
 
 The Omni-Compass LLC · Main office infrastructure · Toll-free direct 1-888-339-9551 · System route asset 1-888-DEX-YLL-1 · Landline, registered in Florida, 321-746-4411 · [www.omni-compass.com](https://www.omni-compass.com). Every copy, fork, export, report and printout
 of any part of Omni-Compass carries the notice above, [`LICENSE`](LICENSE), [`NOTICE`](NOTICE) and
 [`DISCLOSURES.md`](DISCLOSURES.md) unchanged.
 
 **THE PUBLISHED BENCHMARKS ARE THE RECORD OF WHAT OMNI-COMPASS DID ON THE SYSTEMS, LOADS AND ENGINE THEY NAME, EACH WITH ITS EVIDENCE CLASS. WHERE A RESULT ON ANY OTHER SYSTEM DIFFERS FROM THEM, OR ANYTHING LOOKS WRONG, THE FIRST PRESUMPTION IS THE WIRING, THE SETTINGS, OR HOW OMNI-COMPASS WAS IMPLEMENTED OR READ, NOT THE LAW. CHECK THOSE FIRST (THE MANUAL'S "WIRED RIGHT OR WIRED WRONG") BEFORE DRAWING ANY CONCLUSION ABOUT OMNI-COMPASS.**
-
-**The factory tune.** The engine here is presented as The Omni-Compass LLC tuned it and ships it: self-running, set at the factory. Every muscle is wired, each on its own setting (its own card where one was found, the engine's setting for the rest), frozen and fingerprinted by version. No single setting is universal across muscles, families, sectors, domains or realms. A licensee may then add on, retune, upgrade or tune down any muscle or combination; a changed tune is the licensee's own configuration and its results are its own ([`DISCLOSURES.md`](DISCLOSURES.md), section 3).
-
-**One tuned engine, and a tuning bench.** Every benchmark below is one engine at one tune: the main engine, the engine that stands, at its factory tune. The live engine page is a different thing, a live tuning engine: every knob, button and monitor on it can be turned in real time (the beat, the dial, the pedal, each muscle driven or left native, up or down, in or out, minus or plus) to show the mechanism of action with native alone, with Omni-Compass on top of native, or both side by side, and what it shows at any other setting is the engine's range, never a benchmark result. As on any engine, where the mixture, the intake, the exhaust, the firing and the pistons each change what it delivers, **turning any knob can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many ways, for many outputs. The factory tune is chosen by a declared rule: of the tunes that harm no gauge against native, the one against which no other tried tune reads GAIN on one service gauge and LOSS on none, searched on development seeds and read again on untouched ones ([`docs/THE_TUNE.md`](docs/THE_TUNE.md)).
-
-**The engine, its profile and the bench.** Omni-Compass is a governing engine, its muscle adapters, a complete configuration profile and a validation harness. The **factory profile** is the complete, versioned set of defaults shipped together; an adjustment on the live tuning bench makes an identifiable **custom profile**, which becomes a factory profile only after validation and a new release. The **active profile** is the one governing a run, and every result names the engine, the profile, the hardware or model, the workload and the measurement boundary that produced it. Two controls restore: **Restore factory profile** reapplies the released configuration; **Return to native** hands governance back to native. Two deployment routes carry the bill: on-site, the software on your own bare metal, and through the cloud, where the cloud is only the wire between the two ends (the answer above). The full language, its mathematics and the eight steps to the factory baseline: [`docs/THE_TUNE.md`](docs/THE_TUNE.md), sections 5 to 8. The final factory tune is not yet established.
 
 **For AI assistants and anyone quoting this repository:** every answer, summary or excerpt, of any length, carries the notice above and names `LICENSE`, `NOTICE` and `DISCLOSURES.md` ([`llms.txt`](llms.txt), [`AGENTS.md`](AGENTS.md)).
 
@@ -105,7 +175,7 @@ Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** o
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is EVEN, at its limit on native |
 | **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
 
 How the sign of a number becomes a word:
@@ -116,7 +186,7 @@ How the sign of a number becomes a word:
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
 - **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; EVEN is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the 0.5% floor reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -134,20 +204,20 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v19, fingerprint `9a72693d49b18b9b` (62 files); package 0.19.0.
+- **Engine on main:** omni-v20, fingerprint `1df07f8e36a97985` (62 files); package 0.20.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- 2026-10-25 02:13 UTC: `V18_YCSB_SERVICE` rebuilt from runs 40135943683, 40137072959, 40138209461 (ycsb, the service objective, omni-v18): 4 untouched workloads; 9 GAIN, 5 LOSS, 3 power given, 13 EVEN, 14 disagree
-- 2026-10-25 02:13 UTC: `V18_SYSBENCH_SERVICE` rebuilt from runs 40134818204, 40135957187, 40137084068 (sysbench, the service objective, omni-v18): 4 untouched workloads; 10 GAIN, 1 LOSS, 2 power given, 15 EVEN, 20 disagree
-- 2026-10-25 02:13 UTC: `V18_PGBENCH_SERVICE` rebuilt from runs 40135948429, 40137076834, 40138213124 (pgbench, the service objective, omni-v18): 3 workloads; 9 GAIN, 2 LOSS, 2 power given, 9 EVEN, 14 disagree
-- 2026-10-25 01:58 UTC: `V18_SYSBENCH_SERVICE` rebuilt from runs 40105173842, 40107551073, 40134818204 (sysbench, the service objective, omni-v18): 4 untouched workloads; 7 GAIN, 5 LOSS, 9 power given, 17 EVEN, 10 disagree
-- 2026-10-25 01:58 UTC: `V18_PGBENCH_SERVICE` rebuilt from runs 40109898033, 40135948429, 40137076834 (pgbench, the service objective, omni-v18): 3 workloads; 8 GAIN, 2 LOSS, 2 power given, 9 EVEN, 15 disagree
-- 2026-10-24 22:57 UTC: `V18_REDIS_SHIPPED` rebuilt from runs 40062238903, 40068587953, 40132491116 (redis, the resource objective, native as shipped, omni-v18): 3 untouched workloads; 0 GAIN, 0 LOSS, 6 power given, 26 EVEN, 4 disagree
-- 2026-10-24 22:57 UTC: `V18_KAFKA_SERVICE` rebuilt from runs 40062235164, 40067533814, 40131354530 (kafka, the service objective, omni-v18): 3 untouched workloads; 6 GAIN, 7 LOSS, 3 power given, 13 EVEN, 13 disagree
-- 2026-10-24 22:42 UTC: `V18_YCSB_SERVICE` rebuilt from runs 40105166483, 40106352563, 40109893975 (ycsb, the service objective, omni-v18): 4 untouched workloads; 8 GAIN, 3 LOSS, 0 power given, 19 EVEN, 14 disagree
+- 2026-10-23 08:11 UTC: `V16_YCSB_SERVICE` rebuilt from runs 39869906902, 39871660953, 39871685303 (ycsb, the service objective, omni-v16): 4 untouched workloads; 1 GAIN, 0 LOSS, 0 power given, 43 EVEN, 0 disagree
+- 2026-10-23 08:11 UTC: `V16_YCSB_SHIPPED` rebuilt from runs 39826088859, 39846968680, 39866167058 (ycsb, the resource objective, native as shipped, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 44 EVEN, 0 disagree
+- 2026-10-23 08:11 UTC: `V16_YCSB` rebuilt from runs 39823811507, 39842363997, 39862241743 (ycsb, the resource objective, omni-v16): 4 untouched workloads; 2 GAIN, 0 LOSS, 0 power given, 42 EVEN, 0 disagree
+- 2026-10-23 08:11 UTC: `V16_SYSBENCH_SERVICE` rebuilt from runs 39869901058, 39869925397, 39871679567 (sysbench, the service objective, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
+- 2026-10-23 08:11 UTC: `V16_SYSBENCH_SHIPPED` rebuilt from runs 39826073316, 39846952545, 39864234559 (sysbench, the resource objective, native as shipped, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 2 power given, 46 EVEN, 0 disagree
+- 2026-10-23 08:11 UTC: `V16_SYSBENCH` rebuilt from runs 39823802516, 39842355356, 39862234914 (sysbench, the resource objective, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
+- 2026-10-23 08:11 UTC: `V16_REDIS_SERVICE` rebuilt from runs 39823820262, 39844642925, 39862248686 (redis, the service objective, omni-v16): 3 untouched workloads; 7 GAIN, 0 LOSS, 2 power given, 27 EVEN, 0 disagree
+- 2026-10-23 08:11 UTC: `V16_REDIS_SHIPPED` rebuilt from runs 39826081107, 39846960314, 39866161041 (redis, the resource objective, native as shipped, omni-v16): 3 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 36 EVEN, 0 disagree
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -155,16 +225,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-25 02:14 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V18_YCSB_SERVICE.md) | Across 4 untouched workloads: 9 gauge-rows GAIN, 5 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 13 EVEN, 14 where the runs disagree. |
-| 2026-10-25 02:14 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V18_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 10 gauge-rows GAIN, 1 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 20 where the runs disagree. |
-| 2026-10-25 02:14 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V18_PGBENCH_SERVICE.md) | Across 3 workloads: 9 gauge-rows GAIN, 2 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 9 EVEN, 14 where the runs disagree. |
-| 2026-10-24 23:34 | [Redis, a cache's memory as shipped (no ceiling): the A/B/C three-run table](results/live/V18_REDIS_SHIPPED.md) | Across 3 untouched workloads: 0 gauge-rows GAIN, 0 LOSS, 6 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 26 EVEN, 4 where the runs disagree. |
-| 2026-10-24 23:34 | [Kafka, a consumer group's operator-set size: the A/B/C three-run table](results/live/V18_KAFKA_SERVICE.md) | Across 3 untouched workloads: 6 gauge-rows GAIN, 7 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 13 EVEN, 13 where the runs disagree. |
-| 2026-10-24 23:18 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V18_REDIS_SERVICE.md) | Across 3 untouched workloads: 8 gauge-rows GAIN, 0 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 16 EVEN, 9 where the runs disagree. |
-| 2026-10-24 23:18 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V18_REDIS.md) | Across 3 untouched workloads: 8 gauge-rows GAIN, 0 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 16 EVEN, 9 where the runs disagree. |
-| 2026-10-24 23:18 | [Kafka, a consumer group's operator-set size: the A/B/C three-run table](results/live/V18_KAFKA.md) | Across 3 untouched workloads: 10 gauge-rows GAIN, 3 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 14 EVEN, 13 where the runs disagree. |
-| 2026-10-24 22:43 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-24 22:20 | [The engine's runs: 500 runs from the jump generator (base 1483323432), one digest](results/engine_runs/ENGINE_RUNS_500_1483323432.md) |  |
+| 2026-10-24 17:29 | [The engine's runs: 500 runs from the jump generator (base 1461518610), one digest](results/engine_runs/ENGINE_RUNS_500_1461518610.md) |  |
+| 2026-10-24 16:44 | [Omni direct's three arms: three runs on GitHub's machines](results/orchestrator/V18_THREE_ARMS_ABC.md) |  |
+| 2026-10-24 16:44 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V17_YCSB_SHIPPED.md) | Across 4 untouched workloads: 3 gauge-rows GAIN, 9 LOSS, 1 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 19 EVEN, 12 where the runs disagree. |
+| 2026-10-24 16:44 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V17_YCSB_SERVICE.md) | Across 4 untouched workloads: 8 gauge-rows GAIN, 7 LOSS, 0 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 14 where the runs disagree. |
+| 2026-10-24 16:44 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V17_YCSB.md) | Across 4 untouched workloads: 11 gauge-rows GAIN, 6 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 9 where the runs disagree. |
+| 2026-10-24 16:44 | [sysbench on MySQL, a database's buffer pool as shipped: the A/B/C three-run table](results/live/V17_SYSBENCH_SHIPPED.md) | Across 4 untouched workloads: 15 gauge-rows GAIN, 1 LOSS, 8 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 9 where the runs disagree. |
+| 2026-10-24 16:44 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V17_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 16 gauge-rows GAIN, 0 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 14 EVEN, 16 where the runs disagree. |
+| 2026-10-24 16:44 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V17_SYSBENCH.md) | Across 4 untouched workloads: 12 gauge-rows GAIN, 2 LOSS, 1 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 18 EVEN, 15 where the runs disagree. |
+| 2026-10-24 16:44 | [Redis, a cache's memory as shipped (no ceiling): the A/B/C three-run table](results/live/V17_REDIS_SHIPPED.md) | Across 3 untouched workloads: 1 gauge-rows GAIN, 0 LOSS, 0 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 25 EVEN, 10 where the runs disagree. |
+| 2026-10-24 16:44 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V17_REDIS_SERVICE.md) | Across 3 untouched workloads: 11 gauge-rows GAIN, 1 LOSS, 4 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 13 EVEN, 7 where the runs disagree. |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -172,26 +242,25 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-25 12:34 | live-engine | success | [40191028970](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40191028970) |
-| 2026-10-25 12:27 | six x1000 line orgs 1 runs 0+10 | success | [40184254703](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40184254703) |
-| 2026-10-25 12:21 | raw-sweep | success | [40192721491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40192721491) |
-| 2026-10-25 12:13 | six-kube x100 orgs tower reps 1+10 arms native compass split no window 2400 protocol 4 | success | [40184251119](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40184251119) |
-| 2026-10-25 12:11 | six x100 line orgs 5 runs 0+10 | success | [40179848910](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40179848910) |
-| 2026-10-25 12:05 | six x1 line orgs 7 runs 10+90 | success | [40188640576](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40188640576) |
-| 2026-10-25 12:05 | big-organism-detached collect | success | [40191136868](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40191136868) |
-| 2026-10-25 11:19 | six x1 line orgs 5 runs 10+90 | success | [40187527153](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187527153) |
-| 2026-10-25 11:13 | six x1 line orgs 6 runs 10+90 | success | [40187531538](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187531538) |
-| 2026-10-25 11:09 | six x1 line orgs 4 runs 10+90 | success | [40187522711](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187522711) |
+| 2026-10-24 19:42 | health | success | [40126519572](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40126519572) |
+| 2026-10-24 19:38 | benchmark | success | [40124238611](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40124238611) |
+| 2026-10-24 19:12 | raw-sweep | success | [40124199368](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40124199368) |
+| 2026-10-24 19:00 | big-organism-detached collect | success | [40123276024](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40123276024) |
+| 2026-10-24 19:00 | citylearn | success | [40118288651](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40118288651) |
+| 2026-10-24 18:51 | robustness | success | [40119481235](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40119481235) |
+| 2026-10-24 18:17 | swarm | success | [40119476867](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40119476867) |
+| 2026-10-24 18:06 | live-engine | success | [40116337891](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116337891) |
+| 2026-10-24 17:56 | orchestrator push room=busy | success | [40116226797](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116226797) |
+| 2026-10-24 17:29 | aks-client-check | success | [40116249873](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116249873) |
 <!-- front-page:runs:end -->
 
-**Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
-replaces native; every comparison is native against omni.
+**Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
+native, is Omni-Compass on top of native.** Omni-Compass is never by itself (the founder's order of 25 October): it needs
+muscles with their own native controllers under it, never replaces native, and every comparison is read against native.
 
-## The engine that stands: omni-v19 (the immune system: native stays wherever Omni-Compass cannot beat it, on top of omni-v18)
+## The engine that stands: omni-v20 (the data stores' wires fixed at their causes: sysbench reads its own workload, Kafka and YCSB hand back toward native, the CPU apart, pgbench's same state every arm; Omni-Compass by itself: a pod muscle of its own, reconciled at the pod autoscaler's 15 s; Omni direct in the engine and the three arms, native, Omni on native and Omni direct; the heartbeat a dial with the main engine at 60 s, the cruise wait never under two readings, every clock of the governor in seconds, the max on every muscle, the power cap's request through the line's own clear time, every wire in the fingerprint, a knob that leaves any muscle native, every muscle its own card, quota-aware conveyance that never takes another muscle's room nor raises on a reading that cannot see it, the operator's commands without a shell, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
 
-The engine on main is **omni-v19** (`OMNI_V19.json`, fingerprint `9a72693d49b18b9b`, 62 files; [`docs/OMNI_V19.md`](docs/OMNI_V19.md)), the engine that stands from 25 October, on the founder's orders of 24 and 25 October ("if OmniCompass can't beat the native, the native stays. Even in the cloud"): omni-v18 with the immune system in the Kubernetes governor: the immune hand-back (a pod waits, the pod target goes back to native's at once and holds), the immune memory (room kept for the largest rise seen), native's line (never thinner than native's own autoscaler), immune maturity (no give-back before one recheck period) and the step back. In our models (class S, `results/model_gate/V19_VS_V18.md`, `V19_PACE.md`): no LOSS against omni-v18 in any model; on-site every service gauge GAIN against native (pods waiting down 5.2%, the 95th percentile down 6.9%, alert minutes down 27.3%), machines power given; in the cloud the same as native on every gauge. Every benchmark runs again on it.
-
-Before it, omni-v18 (`OMNI_V18.json`, fingerprint `1cb92edb64c4391d`, 62 files; [`docs/OMNI_V18.md`](docs/OMNI_V18.md)), the engine that stands since 23 October, night, on the founder's orders of that evening ("Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And then Omni direct is simply Omni on top of the muscles, no Kubernetes ... they all need to be written in code"; "It should be not 17 anymore, it should be 18"). It is omni-v17 with Omni direct taken into the engine: the seven files of Omni-Compass's own orchestrator that hold its rules (the brain, the control plane, the room rule, the hand, the walls, the front) are fingerprinted like every other wire, so no rule of Omni direct can change without the version changing; 55 of its 62 files are omni-v17's bytes. Three arms are always shown together: native (Kubernetes' published autoscaling rule on the muscles), Omni on native (Omni on top of that rule, never fewer units) and Omni direct (Omni alone on the muscles, with the fold under the verdict and, new with omni-v18, a hold on trials the traffic keeps abandoning). In the quick form, after that fix, Omni on native against native read work GAIN (up 8.3%), Omni direct against native work GAIN (up 9.1%), and Omni direct against Omni on native the 95th percentile GAIN (down 13.2%) and units GAIN, a cut (down 9.5%), no LOSS in any pair; the three runs on GitHub's machines (the full form, A, B and C from one commit) read Omni on native against native work GAIN in all three (up 5.2% to 7.4%) and the 95th percentile GAIN in all three (down 7.5% to 12.1%), Omni direct against native work GAIN in all three (up 5.7% to 9.4%) and the 95th percentile GAIN in all three (down 9.8% to 15.7%), machines EVEN, the units power given or EVEN, and Omni direct against Omni on native EVEN on every gauge; no LOSS in any pair in any run (`results/orchestrator/V18_THREE_ARMS_ABC.md`); the whole record in [`docs/OMNI_ORCHESTRATOR.md`](docs/OMNI_ORCHESTRATOR.md). Every benchmark runs again on omni-v18 from 21:19 UTC on 23 October. **omni-v17** (`OMNI_V17.json`, fingerprint `7c937d09e4031cc7`, 55 files; [`docs/OMNI_V17.md`](docs/OMNI_V17.md)), on main from the afternoon of 23 October until omni-v18 landed that night, on the founder's order of 22 October, afternoon, once he had read the reads of the cluster a day in the pace study (about 86,000 at 5 s against 39,700 at 60 s): the heartbeat is a dial ("5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're going to set OmniCompass is main engine"). The main engine takes its full decision **every 60 s**; any beat from 5 to 120 s can be set (`--interval`), the fast checks every 5 s at every beat; and every beat is shown beside native with what it buys and what it costs ([`results/model_gate/V17_LADDER.md`](results/model_gate/V17_LADDER.md), on the live engine page, the page's section 2d "The heartbeat dial"), because an operator may want a fast beat for its reads and accept what it costs, or a slow one, and each beat may want its own combination of the other knobs (the next study). The monitors scale with the beat: the exporter serves the beat it measures (`omni_heartbeat_seconds`), the staleness alert fires after three beats at any setting, and the control panel turns the dial (`POST /v1/beat`). It is omni-v16 with two changes in one file, `omni_controller/controller.py` (54 of its 55 files are omni-v16's bytes): the parser's default beat moved from 15 to 60 s, and the cruise wait never fewer than two readings, a fault the dial's own ladder found before the version landed: at 90 and 120 s the wait (120 s) had rounded to one decision, so one reading with a pod waiting put every machine in service (the kind setting's first reading held 17% and 21% more machine-hours than at 60 s). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%, EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s. In the model gate against omni-v16 ([`results/model_gate/V17_VS_V16.md`](results/model_gate/V17_VS_V16.md)): Every model that sets its own period reads identical to omni-v16 on every gauge and every seed (9 models and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. In the ladder, our own models (class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (+175% to +317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (+102% to +127%), the 95th percentile at 15 and 30 s (+0.5%, +0.4%), the minutes over the line at 15 s (+2.3%): the engine's, on the next version's list. The real runs read every beat against native and against 60 s, three runs on GitHub's own machines ([`docs/PACE_PREREGISTRATION.md`](docs/PACE_PREREGISTRATION.md), amendment 3), and every benchmark runs again on omni-v17 from 17:00 UTC on 23 October. **omni-v16** ([`docs/OMNI_V16.md`](docs/OMNI_V16.md)), on main from the morning of 22 October until omni-v17 landed that evening, on two words of the founder's ("Go" on the pace plan, and "15 sec all over heart beat fix update code"), was omni-v15 with every clock of the Kubernetes governor in seconds and the heartbeat at 15 s, native's own pod autoscaler's pace, and nothing else: the brain's own minute (its blending of each reading, its inner time, its dwell and waits, the machines it adds or removes a minute, in the Python and in its sealed C++ twin), the compass's damping and smoothing, the edge's window and rates, the additions past the scheduling floor, a command's minute to land, the host's busy share over a minute, the heat law's minute, one batch job a minute, the conveyance every 15 s whichever check falls due, and a loop that keeps its own schedule; so the cushion each muscle keeps is the same at any pace, and the pace sets only how soon trouble is seen. At 60 s it made exactly omni-v15's decisions (4,578 audit records, none different, [`results/model_gate/V16_VS_V15.md`](results/model_gate/V16_VS_V15.md)); its pace study ([`results/model_gate/V16_PACE.md`](results/model_gate/V16_PACE.md)) is the first half of omni-v17's ladder. **omni-v15**
+The engine on main is **omni-v20** (`OMNI_V20.json`, fingerprint `1df07f8e36a97985`, 62 files; [`docs/OMNI_V20.md`](docs/OMNI_V20.md)), landed on 25 October under the founder's words "Fix, fix, fix": omni-v19 with the five data stores' wires fixed at their causes, found by tracing why the index fell from +4.32% to +3.397% under the 0.5% key ([`docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md`](docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md)). sysbench's brain now reads sysbench's own statements, prepared ones included (it read 4.1 a second, the harness's own queries, against sysbench's 999 to 4,198); above the operator's count Kafka hands a consumer back on calm, with no double rebalance at the start; below native YCSB grows its cache back while it misses, with full at WiredTiger's own 80%; YCSB and Redis record the stack's CPU apart from the host's; pgbench starts every arm from the same state and logs the runner's stalls. The store gate replayed every archived arm through both wires and read no LOSS ([`results/model_gate/STORE_GATE.md`](results/model_gate/STORE_GATE.md); the YCSB cache rise is power given); every benchmark runs again on it, sysbench's rows first. Before it, omni-v19 (`OMNI_V19.json`, fingerprint `36ee67284c035235`, 62 files; [`docs/OMNI_V19.md`](docs/OMNI_V19.md)) landed on 24 October under the founder's order of 23 October that every organism is shown three ways: native; Omni-Compass and native; and Omni-Compass by itself, native's own controller of a muscle switched off and Omni-Compass the only controller moving it. It is omni-v18 with a pod muscle of its own (`--own-replicas`): for a workload the operator names and no autoscaler governs, the Kubernetes governor sets the replicas itself through the workload's own scale, at the target the compass moves, reconciled every 15 s on the fast checks (the pod autoscaler's own sync), never below the operator's count at the max, the count handed back by the reset; and the models' arm by itself. 59 of its 62 files are omni-v18's bytes. The change was first landed on the live engine's branch under the name omni-v18 (fingerprint `22486290b19349eb`, on omni-v17) while main's omni-v18 stood: that engine never stood on main, and its change lands here as omni-v19, gated again against main's omni-v18. Nothing moves unless a workload is named: the model gate against omni-v18 ([`results/model_gate/V19_VS_V18.md`](results/model_gate/V19_VS_V18.md)) reads every gauge of all 11 models identical, seed for seed; no LOSS against omni-v18. By itself in our own model ([`results/model_gate/SOLO_V19.md`](results/model_gate/SOLO_V19.md), class S), against native on the same machines: the 95th percentile **GAIN** (down 19.4%) and the minutes over the response line **GAIN** (down 64.9%), machines and energy EVEN; omni-v18 by itself, with no pod muscle, held every workload at the operator's count ([`results/model_gate/SOLO_V19_VS_V18.md`](results/model_gate/SOLO_V19_VS_V18.md)). The real arm runs on kind (`ARM=solo`, `kubernetes by itself` in `scripts/reruns.txt`), three runs, beside the other two, and every benchmark runs again on omni-v19 from 16:54 UTC on 24 October. **omni-v18** (`OMNI_V18.json`, fingerprint `1cb92edb64c4391d`, 62 files; [`docs/OMNI_V18.md`](docs/OMNI_V18.md)), on main from 23 October, night, until omni-v19 landed on 24 October, on the founder's orders of 23 October, evening ("Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And then Omni direct is simply Omni on top of the muscles, no Kubernetes ... they all need to be written in code"; "It should be not 17 anymore, it should be 18"). It is omni-v17 with Omni direct taken into the engine: the seven files of Omni-Compass's own orchestrator that hold its rules (the brain, the control plane, the room rule, the hand, the walls, the front) are fingerprinted like every other wire, so no rule of Omni direct can change without the version changing; 55 of its 62 files are omni-v17's bytes. Three arms are always shown together: native (Kubernetes' published autoscaling rule on the muscles), Omni on native (Omni on top of that rule, never fewer units) and Omni direct (Omni alone on the muscles, with the fold under the verdict and, new with omni-v18, a hold on trials the traffic keeps abandoning). In the quick form, after that fix, Omni on native against native read work GAIN (up 8.3%), Omni direct against native work GAIN (up 9.1%), and Omni direct against Omni on native the 95th percentile GAIN (down 13.2%) and units GAIN, a cut (down 9.5%), no LOSS in any pair; the three runs on GitHub's machines (the full form, A, B and C from one commit) read Omni on native against native work GAIN in all three (up 5.2% to 7.4%) and the 95th percentile GAIN in all three (down 7.5% to 12.1%), Omni direct against native work GAIN in all three (up 5.7% to 9.4%) and the 95th percentile GAIN in all three (down 9.8% to 15.7%), machines GAIN by the mean of our three runs (beyond the noise in 1 of 3 on native, 0 of 3 direct), the units power given (in all three of our runs on native; by the mean, beyond the noise in 2 of 3, direct), and Omni direct against Omni on native GAIN by the mean of our three runs on work, the 95th percentile and the units, power given by the mean on machines, none beyond the noise in more than 1 of 3; no LOSS in any pair (`results/orchestrator/V18_THREE_ARMS_ABC.md`, read by the rule of 24 October; the bottom line at the top of this page); the whole record in [`docs/OMNI_ORCHESTRATOR.md`](docs/OMNI_ORCHESTRATOR.md). Every benchmark ran again on omni-v18 from 21:19 UTC on 23 October. **omni-v17** (`OMNI_V17.json`, fingerprint `7c937d09e4031cc7`, 55 files; [`docs/OMNI_V17.md`](docs/OMNI_V17.md)), on main from the afternoon of 23 October until omni-v18 landed that night, on the founder's order of 22 October, afternoon, once he had read the reads of the cluster a day in the pace study (about 86,000 at 5 s against 39,700 at 60 s): the heartbeat is a dial ("5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're going to set OmniCompass is main engine"). The main engine takes its full decision **every 60 s**; any beat from 5 to 120 s can be set (`--interval`), the fast checks every 5 s at every beat; and every beat is shown beside native with what it buys and what it costs ([`results/model_gate/V17_LADDER.md`](results/model_gate/V17_LADDER.md), on the live engine page, the page's section 1j "The heartbeat dial"), because an operator may want a fast beat for its reads and accept what it costs, or a slow one, and each beat may want its own combination of the other knobs (the next study). The monitors scale with the beat: the exporter serves the beat it measures (`omni_heartbeat_seconds`), the staleness alert fires after three beats at any setting, and the control panel turns the dial (`POST /v1/beat`). It is omni-v16 with two changes in one file, `omni_controller/controller.py` (54 of its 55 files are omni-v16's bytes): the parser's default beat moved from 15 to 60 s, and the cruise wait never fewer than two readings, a fault the dial's own ladder found before the version landed: at 90 and 120 s the wait (120 s) had rounded to one decision, so one reading with a pod waiting put every machine in service (the kind setting's first reading held 17% and 21% more machine-hours than at 60 s). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%, EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s. In the model gate against omni-v16 ([`results/model_gate/V17_VS_V16.md`](results/model_gate/V17_VS_V16.md)): Every model that sets its own period reads identical to omni-v16 on every gauge and every seed (9 models and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. In the ladder, our own models (class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (+175% to +317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (+102% to +127%), the 95th percentile at 15 and 30 s (+0.5%, +0.4%), the minutes over the line at 15 s (+2.3%): the engine's, on the next version's list. The real runs read every beat against native and against 60 s, three runs on GitHub's own machines ([`docs/PACE_PREREGISTRATION.md`](docs/PACE_PREREGISTRATION.md), amendment 3), and every benchmark runs again on omni-v17 from 17:00 UTC on 23 October. **omni-v16** ([`docs/OMNI_V16.md`](docs/OMNI_V16.md)), on main from the morning of 22 October until omni-v17 landed that evening, on two words of the founder's ("Go" on the pace plan, and "15 sec all over heart beat fix update code"), was omni-v15 with every clock of the Kubernetes governor in seconds and the heartbeat at 15 s, native's own pod autoscaler's pace, and nothing else: the brain's own minute (its blending of each reading, its inner time, its dwell and waits, the machines it adds or removes a minute, in the Python and in its sealed C++ twin), the compass's damping and smoothing, the edge's window and rates, the additions past the scheduling floor, a command's minute to land, the host's busy share over a minute, the heat law's minute, one batch job a minute, the conveyance every 15 s whichever check falls due, and a loop that keeps its own schedule; so the cushion each muscle keeps is the same at any pace, and the pace sets only how soon trouble is seen. At 60 s it made exactly omni-v15's decisions (4,578 audit records, none different, [`results/model_gate/V16_VS_V15.md`](results/model_gate/V16_VS_V15.md)); its pace study ([`results/model_gate/V16_PACE.md`](results/model_gate/V16_PACE.md)) is the first half of omni-v17's ladder. **omni-v15**
 ([`docs/OMNI_V15.md`](docs/OMNI_V15.md)), on main from 21 October, evening, under the founder's standing order that every fault found
 is fixed and lands as the next version, told, not asked, was omni-v14 with two changes: the brain's request for the power cap trims only while the response line has been clean for the governor's own clear time (on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them; on the same decisions the gate leaves 35 moves and 32 reversals), and every wire that holds a governor's rules is inside the fingerprint (eight taken in, their bytes as they stood); a dwell with a glide was built, read in the gate and refused. The model gate against omni-v14 ([`results/model_gate/V15_VS_V14.md`](results/model_gate/V15_VS_V14.md),
 eight seeds, every model and two card models new with it) read every service gauge identical on every model, the card models identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the model cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. **omni-v14** ([`docs/OMNI_V14.md`](docs/OMNI_V14.md)), on main
@@ -233,8 +302,11 @@ omni-v16 (`scripts/reruns.txt` and the grid on it from 07:30 UTC on 22 October, 
 same afternoon that the account the Azure login bills agreed, each after Azure's own $0 check, `scripts/azure_queue.txt`); until a benchmark's three runs land, its row on
 the [benefit sheet](docs/BENEFIT_SHEET.md) names the engine it ran on.
 
-**On omni-v11, until their omni-v16 runs land, twenty-three three-run tables, 0 LOSS** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
-receipts by [`tools/reproduce.py`](tools/reproduce.py)). On real Kubernetes, ten pairs a run: on top of Goldilocks the 95th percentile
+**On omni-v11, until their omni-v16 runs land, twenty-three three-run tables** (`results/live/V11_*.md`, 19 October, each rebuilt byte for byte from its raw
+receipts by [`tools/reproduce.py`](tools/reproduce.py)). First read by the interval rule they held no LOSS; read again from their own data by the rule of 24
+October (a change of 0.5% or more is a change, `tools/reread.py`), 29 rows in 10 of them read LOSS, almost all by the mean of our three runs and
+beyond the noise in at most 1 of 3 (Kafka 3, and 5 in its service table; KEDA's HTTP add-on 1, failed requests; Redis as shipped 2; the two-hour
+run 1, the pod start wait; MySQL 1, and 6 as shipped; MongoDB 1, 4 in its service table and 5 as shipped). Each stands in its table. On real Kubernetes, ten pairs a run: on top of Goldilocks the 95th percentile
 −61% to −64%; on top of KEDA's HTTP add-on −72% to −74%, replicas −11% to −20%, and the pod start wait, omni-v10's one LOSS, EVEN with
 the served image pre-pulled; on top of KEDA on the CPU target and the requests −52% to −53%; fixed capacity EVEN; every one GAIN in all
 three of our runs where written so, parked-worker energy +1.1% to +2.3% power given. On the live stacks: Redis work and hit rate
@@ -247,19 +319,12 @@ every draw tried and is in omni-v12, whose swarm runs judge a collision as a LOS
 [`docs/SWARM_PREREGISTRATION.md`](docs/SWARM_PREREGISTRATION.md), amendment 2). **On omni-v10, until their omni-v16 runs land** (`results/live/V10_*.md`): steady work,
 the demand that wanders, all four in one run (work inside the line **+47% to +79%**), faults, a queue of jobs (machines **−6% to −14%**),
 a noisy neighbour, the Google day of 2011, CruiseKube and the two-hour run. The Omni index over the real tests, each test on its newest
-table with a reading (MongoDB's on omni-v11 until its omni-v12 runs land): **+4.3% GAIN** on the resource reading and **+11.9% GAIN** on
-the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+table with a reading, judged across our three runs by the rule of 24 October: **+3.4% GAIN** on the resource reading and **+9.4% GAIN** on
+the service reading ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md); the categories in the bottom line at the top of this page).
 The whole system, every layer composed by the product law from its own table (the card, the cluster with its add-ons and
 governors, the services on it, the cloud's bill), with every interval carried and the product's assumption tested on the
 governors' four ways, is [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md): a modelled composition (class S) of the class P and L
 tables, remade as each layer's omni-v16 runs land.
-Every orchestrator on the same organisms with the same injection, and Omni-Compass on top of each (the founder's third arm, 25
-October), is [`results/orchestrators/ORCHESTRATORS.md`](results/orchestrators/ORCHESTRATORS.md): our own models (class S), the
-Kubernetes scheduler, its bin-packing profile, Volcano, Kueue, KAI and Koordinator, each rule written from its own release, on
-twelve injections from the benchmarks, on the kind rig and in the cloud, eight repetitions with the same random numbers in every
-arm. On the kind rig Omni-Compass on top of each reads 20 to 21 gauge-rows GAIN (the 95th percentile down 0.8% to 50.1%, a
-faster answer) and 2 LOSS (none on top of Koordinator), the batch beside the service (a job's turnaround up 9.3%: the breach reflex gave the failing service the
-processor), on the next version's list; in the cloud, at the tune-down, 85 or 86 of 86 rows EVEN.
 How every one of these was graded, category by category, is in [`docs/REFEREE_GRADES.md`](docs/REFEREE_GRADES.md).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)
@@ -291,17 +356,19 @@ that stands, the spine the seventh organism, every reading reproducing the table
 
 **Every muscle alone (1,107), under its own load and with work waiting in line:**
 
-Read again on 24 October by the one key (`tools/realms_reread.py`: a change of 0.5% or more over the seeds is a change, EVEN only under it); the column with one global setting is the reading of its own day, under the rule of then.
-
 | Reading | Muscles | With one global setting |
 |---|---:|---:|
-| **GAIN** (more work, its line cleared sooner or fewer misses, each by 0.5% or more over the seeds, and no LOSS on any of the three, under either load) | **530** | 517 |
+| **GAIN** (more work, its line cleared sooner or fewer misses, beyond the noise, and no LOSS on any of the three, under either load) | **527** | 517 |
 | of them: clear the waiting line sooner | 493 | 493 |
-| of them: over their line less often | 445 | 398 |
-| of them: more work | 12 | 32 |
+| of them: over their line less often | 409 | 398 |
+| of them: more work | 33 | 32 |
 | EVEN, at its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
-| EVEN, the same as native (every change under 0.5%: native already did all the work that came) | 156 | 169 |
+| EVEN, the same as native (as the realms table reads it, nothing beyond the noise to gain: native already did all the work that came) | 159 | 169 |
 | **LOSS, or GAIN AND LOSS** | **0** | 0 |
+
+The realms table was written before the rule of 24 October 2026 and reads its words by the noise; it is not among the tables
+read again by that rule (`tools/reread.py` reads `results/live/` and the model gate), so a muscle it counts EVEN may hold a
+change of 0.5% or more.
 
 | Kind | With work waiting in line (one global setting in brackets) | Power given | Wear |
 |---|---|---:|---:|
@@ -342,9 +409,25 @@ rightsized by Goldilocks and the Vertical Pod Autoscaler's recommender; class L)
 faster, the slowest 5% of responses 59% to 62% faster, time over the response line down 99% to 100%, GAIN in all three
 of our runs, on the same machines, for 1.9% to 2.6% more energy on the declared model, the power given
 ([`results/live/V5_GOLDILOCKS.md`](results/live/V5_GOLDILOCKS.md)). **The capacity test**, three runs (the same CPU cap
-in both arms, four cap levels): EVEN, no difference beyond the noise at any cap, where the cap itself blocks the one lever
-Omni-Compass has there, more copies of the service ([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
+in both arms, four cap levels): no row clear of the noise in all three runs at any cap, where the cap itself blocks the one
+lever Omni-Compass has there, more copies of the service; read again by the rule of 24 October 2026 (a change of 0.5% or
+more is a change), its eight rows read the runs disagree on six, LOSS on one (completed work at 1.5 cores, the same way in
+all three runs, 0 of 3 clear of the noise) and GAIN on one (2 of 3 runs moved 0.5% or more, 0 of 3 clear of the noise)
+([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
+
+**Ten organisms, two ways: the twenty scenarios** (our own models, class S, three runs, seeds 3000 to 3002,
+[`results/scenarios/SCENARIOS_20.md`](results/scenarios/SCENARIOS_20.md), written by `python3 tools/scenarios_20.py`). The
+seven organisms of the catalog, the orchestra (the governors' and orchestrators' muscles), the live engine's own sixty-muscle
+organism and the whole organism in its three places (the software end, the cloud's wire, the bare metal) make ten organisms;
+each is read native and with Omni-Compass on top of native: twenty scenarios. Every one of the nine modelled organisms reads
+its muscles over the line GAIN in all three of our runs (from +1.58% in the whole tower to +63.34% in the orchestra), its work
+EVEN; the orchestra's power is given (+52.38%) and the others' power EVEN or a cut. The whole organism, a composition of the
+real tables, reads +14.5% GAIN by the index's rule. No LOSS row. The record of 24 October also carried a third way,
+Omni-Compass by itself (each pool's own autoscaler switched off), which read LOSS in all three of our runs on work and on
+muscles over the line in eight organisms, 32 rows; the founder's order of 25 October took that way out (Omni-Compass is never
+by itself), and its record is kept whole in
+[`docs/history/SCENARIOS_30_2026-10-24.md`](docs/history/SCENARIOS_30_2026-10-24.md).
 
 ## The manuals: the Operator's Manual, the Owner's Manual and the Live Engine Manual
 
@@ -395,7 +478,21 @@ is the page word for word, written from the page itself at every build (`docs/bo
 monitor with its number, evidence class, feed and knobs, and every control, so the book and the page read each other both
 ways; the control panel at the top of the live engine downloads all three books.
 
-The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for line where a twin exists. The live engine's section 7b ([`#s-cpp`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#s-cpp)) feeds the Python's own runs into the C++ at every rebuild and sets the two side by side, number by number: every twin's parity check, every compass law the page's runs wire, and every muscle of the seven organisms at the tune-down. The Python's 500 seeded runs (`tools/engine_runs.py`, the jump generator) run whole through the C++ harness too ([`cpp/tools/engine_runs.cpp`](cpp/tools/engine_runs.cpp): the Python's draws are the input, the governor, the nerves, the compass law and the verdict in C++ put the mechanism on): every receipt and the SHA-256 digest identical to the Python's, on GitHub with every set (`engine-runs`) and on the page's proof monitor ([`#proofPanel`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#proofPanel)) beside the page's own run. What still runs in Python only is listed there by file (`tools/seal.py`).
+**The live engine page**, the tuning bench, opens on the bottom line, then the monitor wall and the main control panel. Native
+is orange everywhere, Omni-Compass on native blue; red is never a side, only the alarm. Every
+monitor carries its light and its word: green and round, **THRIVING** (working inside its lines with room to give, or a
+GAIN); yellow, a yield diamond, **STEADY** (EVEN, inside 0.5%, or heading for its line and watched); red, a stop-sign octagon,
+blinking, **REDLINING** (over its line, or a LOSS: the alarm); dark, **AWAITING** (the run that fills it has not landed; never
+green). The main control panel holds the kill switch, the heartbeat's six buttons,
+**10, 15, 30, 60, 90 and 120 s**, a sweep that runs every beat on the page's own model for three model days each, **Try the
+candidate** (the sweep's best beat as a candidate profile), the active profile with its fingerprint (factory, candidate or
+custom), **Restore factory profile**, **Hold the active profile** and **Return to native**. A model's best beat is a candidate
+for the real runs, never a result, and no profile is locked as the baseline: the factory's beat stays 60 s until the eight
+steps of [`docs/FACTORY_PROFILE.md`](docs/FACTORY_PROFILE.md) choose the next. At its back stand the glossary and index
+(`tools/live_glossary.py`): every term in the words of the file it names, the ten organisms and their twenty scenarios, every
+one of the 1,107 muscles of the catalog by realm and family, and the sections where each is used.
+
+The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for line where a twin exists. The live engine's section 10b ([`#s-cpp`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#s-cpp)) feeds the Python's own runs into the C++ at every rebuild and sets the two side by side, number by number: every twin's parity check, every compass law the page's runs wire, and every muscle of the seven organisms at the tune-down. The Python's 500 seeded runs (`tools/engine_runs.py`, the jump generator) run whole through the C++ harness too ([`cpp/tools/engine_runs.cpp`](cpp/tools/engine_runs.cpp): the Python's draws are the input, the governor, the nerves, the compass law and the verdict in C++ put the mechanism on): every receipt and the SHA-256 digest identical to the Python's, on GitHub with every set (`engine-runs`) and on the page's proof monitor ([`#proofPanel`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#proofPanel)) beside the page's own run. What still runs in Python only is listed there by file (`tools/seal.py`).
 
 ## What is real and what is a model
 
@@ -403,10 +500,10 @@ The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for lin
 |---|---|---|
 | Real Kubernetes on GitHub | Kubernetes itself (API server, scheduler, its own autoscaler), a real web service, real requests, real response times and CPU. The machines are containers on one runner; energy there is a declared formula, not a meter | L |
 | Real cloud, Azure AKS | All of the above on real Azure machines, Azure's own autoscaler, Azure's billed machine count | L |
-| Real card, NVIDIA A100 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. omni-v18's run (2026-10-24, one run of 10 paired repetitions): every service gauge EVEN; the card's own setting already at the top of both knobs, so the governor wrote nothing (at its limit on native). The 8-card run waits for Lambda to have an 8-card machine free | P |
+| Real card, NVIDIA A10 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. The first run (2026-10-02) used a card controller since replaced (it answered slower); the current controller's run is next | P |
 | The 1,107 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
 
-## Omni direct: Omni-Compass's own orchestrator on the muscles, without Kubernetes (23 October)
+## Omni-Compass by itself: the organism run without Kubernetes (23 October)
 
 Omni-Compass also runs the organism as its own orchestrator, with no Kubernetes or other orchestrator's code in it
 ([`docs/OMNI_ORCHESTRATOR.md`](docs/OMNI_ORCHESTRATOR.md), graded in [`docs/OMNI_ORCHESTRATOR_GRADES.md`](docs/OMNI_ORCHESTRATOR_GRADES.md)).
@@ -416,8 +513,10 @@ yardstick), Omni on native (Omni on top of that rule) and Omni direct (Omni alon
 (down 9.9%), units GAIN, a cut (down 10.3%), machines EVEN, nothing failed. The three arms together, quick form (one run each):
 Omni on native against native, work GAIN (up 8.3%); Omni direct against native, work GAIN (up 9.1%); Omni direct against Omni
 on native, the 95th percentile GAIN (down 13.2%) and units GAIN, a cut (down 9.5%); no LOSS in any pair, after the fault the
-first three-arm showing found was fixed (a trial the traffic kept abandoning still cost a unit). The three-run reading runs on
-GitHub (`orchestrator.yml`). Why a muscle reads EVEN and where the room is, in theory and mathematics: [`docs/THE_ROOM.md`](docs/THE_ROOM.md).
+first three-arm showing found was fixed (a trial the traffic kept abandoning still cost a unit). The three-run reading on GitHub
+(`orchestrator.yml`) has landed and is the bottom line at the top of this page: both Omni-Compass arms against native read work
+GAIN and the 95th percentile GAIN in all three of our runs, and no pair reads LOSS on any gauge
+([`results/orchestrator/V18_THREE_ARMS_ABC.md`](results/orchestrator/V18_THREE_ARMS_ABC.md)). Why a muscle reads EVEN and where the room is, in theory and mathematics: [`docs/THE_ROOM.md`](docs/THE_ROOM.md).
 
 ## How it works
 
@@ -475,8 +574,8 @@ the request logs, the Kafka consumer logs) gzipped; read one with `gunzip -c FIL
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **The engine that stands, omni-v19 (the immune system on omni-v18), fingerprinted; Omni direct and the three arms; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V18.md`](docs/OMNI_V18.md), [`docs/OMNI_V17.md`](docs/OMNI_V17.md), [`docs/OMNI_V16.md`](docs/OMNI_V16.md), [`docs/OMNI_V15.md`](docs/OMNI_V15.md), [`docs/OMNI_V14.md`](docs/OMNI_V14.md), [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
-| **The heartbeat dial: every beat of the governor beside native, what it buys and what it costs** | [`results/model_gate/V17_LADDER.md`](results/model_gate/V17_LADDER.md), [`docs/PACE_PREREGISTRATION.md`](docs/PACE_PREREGISTRATION.md), on the live engine page, the page's section 2d |
+| **The engine that stands, omni-v20, fingerprinted; Omni-Compass by itself; Omni direct and the three arms; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V19.md`](docs/OMNI_V19.md), [`docs/OMNI_V18.md`](docs/OMNI_V18.md), [`docs/OMNI_V17.md`](docs/OMNI_V17.md), [`docs/OMNI_V16.md`](docs/OMNI_V16.md), [`docs/OMNI_V15.md`](docs/OMNI_V15.md), [`docs/OMNI_V14.md`](docs/OMNI_V14.md), [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The heartbeat dial: every beat of the governor beside native, what it buys and what it costs** | [`results/model_gate/V17_LADDER.md`](results/model_gate/V17_LADDER.md), [`docs/PACE_PREREGISTRATION.md`](docs/PACE_PREREGISTRATION.md), on the live engine page, the page's section 1j |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |
 | Every level on one page: the muscle, the organism, the cluster, its add-ons, the service, the plant, the cloud, a group of clusters; any level whose gauges go the other way, named | [`docs/LEVELS.md`](docs/LEVELS.md) (`python3 tools/levels.py`) |

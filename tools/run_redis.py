@@ -50,6 +50,7 @@ sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 2: the brain's own verdict)
 from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, EVEN_NOISE, SHOWN  # noqa: E402  (the words every table uses)
+from tools.run_ycsb import host_cpu_split, pid_of, proc_cpu_jiffies  # noqa: E402  (the CPU apart, the same reading as the other stores)
 
 HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
 PORT = int(os.environ.get("REDIS_PORT", "6390"))
@@ -99,7 +100,17 @@ GAUGES = [  # key, label, direction
     ("cpu_seconds", "host CPU-seconds", "spent"),
     ("cpu_s_per_1k_inside", "host CPU-seconds per 1,000 requests inside the line", "spent"),
     ("writes", "ceiling changes written (the knob's moves)", "shown"),
+    # store fix of 25 October: the CPU apart, beside the host figure (old runs lack these rows; the readers prefer process_cpu_seconds)
+    ("process_cpu_seconds", "the stack's own CPU-seconds (redis-server, the application, the compass and its sampler; steal and the runner's other processes excluded)", "spent"),
+    ("server_cpu_seconds", "the server's own CPU-seconds (redis-server)", "shown"),
+    ("app_cpu_seconds", "the application's own CPU-seconds (its request threads)", "shown"),
+    ("brain_cpu_seconds", "the compass's own CPU-seconds (the brain's thread; none in the native arm)", "shown"),
+    ("sampler_cpu_seconds", "the sampler's own CPU-seconds (both arms)", "shown"),
+    ("host_cpu_seconds_no_steal", "host CPU-seconds without steal", "shown"),
+    ("steal_seconds", "CPU-seconds the hypervisor took (steal), host-wide", "shown"),
 ]
+OPTIONAL_GAUGES = ("process_cpu_seconds", "server_cpu_seconds", "app_cpu_seconds", "brain_cpu_seconds", "sampler_cpu_seconds",
+                   "host_cpu_seconds_no_steal", "steal_seconds")      # absent from runs before 25 October
 
 
 def zipf_sampler(rng, n, s=ZIPF_S):
@@ -253,8 +264,10 @@ class Omni(threading.Thread):
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event(); self.last_change = -1e9; self.writes = 0; self.failups = 0
         self.foreign = False; self.handed_back = False; self.verdict = None
+        self.cpu_s = 0.0                                             # the brain thread's own CPU-seconds so far (store fix of 25 October)
 
     def run(self):
+        c0 = time.thread_time()
         native_mb = self.plug.attach() // MB; ev0 = self.plug.evicted(); t0 = time.monotonic(); cpu_prev = cpu_times()
         if native_mb == 0:
             # Redis as shipped holds every key it is given (no ceiling): the knob is at its limit on native, and any ceiling
@@ -297,6 +310,7 @@ class Omni(threading.Thread):
                     fh.write(json.dumps({"t": round(tick - t0, 2), "error": repr(e)}) + "\n")
                     self.foreign = True
                     break
+                self.cpu_s = time.thread_time() - c0
                 time.sleep(max(0.0, DT - (time.monotonic() - tick)))
         self.handed_back = self.plug.restore()
 
@@ -307,15 +321,29 @@ class Sampler(threading.Thread):
     def __init__(self, r):
         super().__init__(daemon=True)
         self.r, self.stop_flag, self.rows = r, threading.Event(), []
+        self.cpu_s = 0.0                                             # the sampler thread's own CPU-seconds so far
 
     def run(self):
+        c0 = time.thread_time()
         while not self.stop_flag.is_set():
             try:
                 m = self.r.info("memory"); s = self.r.info("stats")
                 self.rows.append((int(m["maxmemory"]) / MB, int(m["used_memory"]) / MB, int(s.get("evicted_keys", 0))))
             except Exception:
                 pass
+            self.cpu_s = time.thread_time() - c0
             time.sleep(DT)
+
+
+def cpu_apart(server_s, process_s, brain_s, sampler_s, busy_s, steal_s):
+    """The arm's CPU apart (store fix of 25 October), all in seconds over the arm: the server's from its /proc/<pid>/stat, the
+    harness process's from getrusage, the brain's and the sampler's from their own threads' clocks; the application is the
+    harness process less the two threads. process_cpu_seconds, the stack's own (server, application, compass, sampler), is
+    what the readers prefer to the host figure, which also counts steal and every other process on the runner."""
+    app = max(0.0, process_s - brain_s - sampler_s)
+    return {"server_cpu_seconds": server_s, "app_cpu_seconds": app, "brain_cpu_seconds": brain_s, "sampler_cpu_seconds": sampler_s,
+            "process_cpu_seconds": (server_s + process_s) if server_s is not None else None,
+            "host_cpu_seconds_no_steal": busy_s, "steal_seconds": steal_s}
 
 
 def cpu_times():
@@ -343,9 +371,17 @@ def run_arm(arm, wl_dir: Path, rep, value_bytes, base_keys, steps, step_s, line_
     omni = None
     if arm == "omni":
         omni = Omni(Ceiling(redis.Redis(host=HOST, port=PORT, socket_timeout=5)), app, d / "audit.jsonl", line_ms, objective); omni.start()
+    import resource
+    tck = os.sysconf("SC_CLK_TCK"); pid = pid_of("redis-server")
+    srv0 = proc_cpu_jiffies(pid) if pid else None; own0 = resource.getrusage(resource.RUSAGE_SELF); busy0, steal0 = host_cpu_split()
+    brain0 = omni.cpu_s if omni else 0.0; samp0 = sampler.cpu_s
     cpu0 = cpu_times(); t0 = time.time()
     app.start(); app.join()
     t1 = time.time(); cpu1 = cpu_times()
+    srv1 = proc_cpu_jiffies(pid) if pid else None; own1 = resource.getrusage(resource.RUSAGE_SELF); busy1, steal1 = host_cpu_split()
+    apart = cpu_apart(None if srv0 is None or srv1 is None else (srv1 - srv0) / tck,
+                      (own1.ru_utime + own1.ru_stime) - (own0.ru_utime + own0.ru_stime),
+                      (omni.cpu_s - brain0) if omni else 0.0, sampler.cpu_s - samp0, (busy1 - busy0) / tck, (steal1 - steal0) / tck)
     if omni:
         omni.stop_flag.set(); omni.join(timeout=30)
     sampler.stop_flag.set(); sampler.join(timeout=5)
@@ -364,7 +400,7 @@ def run_arm(arm, wl_dir: Path, rep, value_bytes, base_keys, steps, step_s, line_
          "p95_ms": q(0.95), "p99_ms": q(0.99), "mean_ms": (sum(lat_sorted) / n) if n else float("nan"), "failed": app.failed,
          "maxmemory_mb_mean": sum(x[0] for x in rows) / len(rows), "used_mb_mean": sum(x[1] for x in rows) / len(rows),
          "evictions": rows[-1][2], "cpu_busy_share": (total - idle) / max(1, total), "cpu_seconds": cpu_s,
-         "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0),
+         "cpu_s_per_1k_inside": 1000.0 * cpu_s / max(1, inside), "writes": (omni.writes if omni else 0), **apart,
          "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
          "verdict": (omni.verdict.record() if omni and omni.verdict else None)}
     (d / "arm.json").write_text(json.dumps(g, indent=1))

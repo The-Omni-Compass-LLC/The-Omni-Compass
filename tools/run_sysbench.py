@@ -14,7 +14,8 @@ and past it. The operator's fixed pool is the native controller here.
   native  MySQL at the operator's pool (512 MB) for the whole run
   omni    the same MySQL, with the compass law (omnicompass/compass_law.py) on one knob, the buffer pool size, through the
           server's own console (SET GLOBAL innodb_buffer_pool_size), inside the cover [128 MB, 2,048 MB]: the compass reads the
-          server's own mean statement latency over the last second (performance_schema) on a band from 0 to the statement
+          workload's own mean statement latency over the last second (performance_schema, sysbench's account only, its prepared
+          statements counted; store fix of 25 October) on a band from 0 to the statement
           line and holds it at 40% of the line; slow statements with the pool full push the pool up a chunk or more (slow
           statements with room to spare are not the pool's to mend), calm with the pool's misses under one percent of its read requests gives a chunk back
           (amendment 2: the pool grows only while it is missing, one percent or more, the same line the other way; a second
@@ -58,6 +59,15 @@ from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as
 HOST = os.environ.get("MYSQL_HOST", "127.0.0.1")
 USER = os.environ.get("MYSQL_USER", "omni")
 PASSWORD = os.environ.get("MYSQL_PWD", "omni-bench")       # a local benchmark user on a throwaway runner, created by --setup
+LOAD_USER = os.environ.get("SYSBENCH_USER", "omni_load")   # the account sysbench connects as, apart from the harness's (store fix of 25 October):
+                                                           # the brain reads the statements of this account only, never its own monitoring queries
+# The statements the brain reads (store fix of 25 October): sysbench 1.0.20 runs its OLTP scripts as server-side prepared
+# statements, which the performance schema counts as statement/com/Execute (the binary protocol's execute) or
+# statement/sql/execute_sql (an SQL-level EXECUTE), not as statement/sql/select and the other three. The omni-v16 runs read
+# only those four, so the brain counted 4.1 statements a second in every arm (its own and the sampler's monitoring SELECTs)
+# while sysbench sent 994 to 4,839 queries a second: its force and the verdict's work sample never saw the workload.
+WORKLOAD_EVENTS = ("statement/sql/select", "statement/sql/update", "statement/sql/insert", "statement/sql/delete",
+                   "statement/com/Execute", "statement/sql/execute", "statement/sql/execute_sql")
 DB = "sbtest"
 MB = 1024 * 1024
 PAGE = 16 * 1024          # InnoDB's page
@@ -136,10 +146,18 @@ def status(conn):
                        "'Innodb_buffer_pool_pages_free', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests', 'Innodb_buffer_pool_resize_status')")
     st = {k: v for k, v in rows}
     st["pool_bytes"] = int(query(conn, "SELECT @@innodb_buffer_pool_size")[0][0])
-    t = query(conn, "SELECT COALESCE(SUM(SUM_TIMER_WAIT), 0), COALESCE(SUM(COUNT_STAR), 0) FROM performance_schema.events_statements_summary_global_by_event_name "
-                    "WHERE EVENT_NAME IN ('statement/sql/select', 'statement/sql/update', 'statement/sql/insert', 'statement/sql/delete')")[0]
+    t = query(conn, workload_statements_sql())[0]
     st["stmt_timer_ps"], st["stmt_count"] = int(t[0]), int(t[1])
     return st
+
+
+def workload_statements_sql(user=None):
+    """The workload's statement timer and count: sysbench's own account only (the harness's monitoring queries run as another
+    account and are never read), its plain and prepared statements alike (WORKLOAD_EVENTS)."""
+    user = LOAD_USER if user is None else user
+    events = ", ".join(f"'{e}'" for e in WORKLOAD_EVENTS)
+    return ("SELECT COALESCE(SUM(SUM_TIMER_WAIT), 0), COALESCE(SUM(COUNT_STAR), 0) FROM performance_schema.events_statements_summary_by_user_by_event_name "
+            f"WHERE USER = '{user}' AND EVENT_NAME IN ({events})")
 
 
 def pool_stats(st):
@@ -389,7 +407,7 @@ def quantile(hist, q):
 
 
 def sysbench(script, cmd, tables, rate, seconds, out_file: Path | None, extra=()):
-    args = ["sysbench", str(LUA / f"{script}.lua"), f"--mysql-host={HOST}", f"--mysql-user={USER}", f"--mysql-password={PASSWORD}", f"--mysql-db={DB}",
+    args = ["sysbench", str(LUA / f"{script}.lua"), f"--mysql-host={HOST}", f"--mysql-user={LOAD_USER}", f"--mysql-password={PASSWORD}", f"--mysql-db={DB}",
             f"--tables={tables}", f"--table-size={TABLE_ROWS}", f"--threads={THREADS}", *extra]
     if cmd == "run":
         args += [f"--rate={rate}", f"--time={int(seconds)}", f"--rand-type={RAND_TYPE}", "--histogram=on", "--report-interval=0", "--percentile=95"]
@@ -556,7 +574,8 @@ def setup():
     """The benchmark user on the local server, the operator's pool and chunk in the server's own configuration file, the
     performance schema on; the server restarted. MySQL and sysbench themselves are installed by the workflow from Ubuntu's own
     packages."""
-    sql = (f"CREATE USER IF NOT EXISTS '{USER}'@'%' IDENTIFIED BY '{PASSWORD}'; GRANT ALL PRIVILEGES ON *.* TO '{USER}'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;")
+    sql = (f"CREATE USER IF NOT EXISTS '{USER}'@'%' IDENTIFIED BY '{PASSWORD}'; GRANT ALL PRIVILEGES ON *.* TO '{USER}'@'%' WITH GRANT OPTION; "
+           f"CREATE USER IF NOT EXISTS '{LOAD_USER}'@'%' IDENTIFIED BY '{PASSWORD}'; GRANT ALL PRIVILEGES ON {DB}.* TO '{LOAD_USER}'@'%'; FLUSH PRIVILEGES;")
     ok = False
     for cmd in (["sudo", "mysql", "-e", sql], ["mysql", "-uroot", "-proot", "-h", HOST, "-e", sql]):
         r = subprocess.run(cmd, capture_output=True, text=True)
@@ -570,7 +589,7 @@ def setup():
     subprocess.run(["sudo", "tee", str(conf)], input=txt, text=True, check=True, capture_output=True)
     subprocess.run(["sudo", "systemctl", "restart", "mysql"], check=True)
     c = fresh_server(NATIVE_MB)
-    print(f"MySQL {server_version()} at native's {NATIVE_MB} MB pool ({NATIVE}) (chunk {CHUNK_MB} MB); {sysbench_version()}; user {USER}; pool reads {status(c)['pool_bytes'] // MB} MB")
+    print(f"MySQL {server_version()} at native's {NATIVE_MB} MB pool ({NATIVE}) (chunk {CHUNK_MB} MB); {sysbench_version()}; user {USER}, load user {LOAD_USER}; pool reads {status(c)['pool_bytes'] // MB} MB")
     return 0
 
 

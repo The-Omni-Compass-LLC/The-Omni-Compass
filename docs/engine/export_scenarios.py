@@ -301,6 +301,55 @@ def even_reason(abc):
     return {"kind": "changes", "bound": max(abs(ch) for ch, _, _ in runs), "pct": pct}
 
 
+AIM_CODE = {"higher": "up", "lower": "down", "spent": "spent", "work per resource": "per", "never more": "never", "never less": "up"}
+
+
+def runs_of(src, rows):
+    """Each judged row's aim and each run's own word and raw change, from the table's JSON twin (the mathematics seat of 24
+    October): since tools/reread.py rewrote the kind tables, each run's printed number wears that run's word's sign, so a page
+    that read the cell's sign as the gauge's direction printed the opposite word. The JSON holds every run's native, difference
+    and interval; each row is matched to its gauge in order by its reading, as tools/reread.py patch_md matches them. A row of a
+    table with no JSON twin (an outside simulator's) is left as printed: its cells carry the gauge's own direction.
+      aim  up, down, spent, per or never (tools/readings.py HIGHER, LOWER, SPENT, WORK_PER, NEVER_MORE)
+      rw   each run's own word (tools/readings.py run_word: 0.5% or more read by the aim, EVEN under it; None for never more)
+      rv   each run's raw change as [change, low, high, in percent of native]: percent where native is not zero, else the
+           gauge's own unit"""
+    j = Path(src).with_suffix(".json")
+    if not j.exists():
+        return
+    from tools.reread import gauges, bare
+    from tools.readings import aim as aim_of, run_word
+    try:
+        data = json.loads(j.read_text(encoding="utf-8"))
+    except ValueError:
+        return
+    if not isinstance(data, dict):
+        return
+    i = 0
+    for _, g in gauges(data):
+        rd, aim_raw, rs = bare(g.get("reading")), g.get("aim"), g.get("runs")
+        while i < len(rows):
+            row = rows[i]; i += 1
+            if bare(row["r"].split("shown and not counted: ")[-1]) == rd:
+                a = aim_of(aim_raw) if aim_raw else None
+                if a in AIM_CODE and isinstance(rs, list) and len(rs) == 3 and all(isinstance(r, dict) and r.get("diff") is not None
+                                                                                  and r.get("native") is not None for r in rs):
+                    row["aim"] = AIM_CODE[a]
+                    row["rw"] = [run_word(r, a) for r in rs]
+                    rv = []
+                    for r in rs:
+                        nat, d = r["native"], r["diff"]
+                        lo, hi = (list(r.get("ci95") or []) + [None, None])[:2]
+                        ok = lambda v: isinstance(v, (int, float)) and v == v
+                        if nat:
+                            rv.append([round(100 * d / abs(nat), 4), round(100 * lo / abs(nat), 4) if ok(lo) else None,
+                                       round(100 * hi / abs(nat), 4) if ok(hi) else None, True])
+                        else:
+                            rv.append([round(d, 6), round(lo, 6) if ok(lo) else None, round(hi, 6) if ok(hi) else None, False])
+                    row["rv"] = rv
+                break
+
+
 def receipt(name, path=None):
     """Every judged row of results/live/<name>.md as written (or of the table at path, written by the same tool): its table's
     heading, the gauge, runs A, B and C, the reading."""
@@ -331,8 +380,10 @@ def receipt(name, path=None):
     count = {}
     for r in rows:
         count[r["w"]] = count.get(r["w"], 0) + 1
+    runs_of(src, rows)
     title = table_title(name) if not path else title
-    even = [{"s": r["s"], "g": r["g"], "abc": r["abc"], **even_reason(r["abc"])} for r in rows if r["w"] == "EVEN"]
+    even = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **{k: r[k] for k in ("aim", "rw", "rv") if k in r}, **even_reason(r["abc"])}
+            for r in rows if r["w"] == "EVEN"]
     # the rows a table shows and does not judge (its preregistration's own rule), kept so their sizes are seen: a resource a
     # table only shows, CPU used beside a response time, is the price of the work
     shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **({"tuning": True} if r["w"] == "tuning" else {})}

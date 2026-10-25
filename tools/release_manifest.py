@@ -27,7 +27,12 @@ RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
-    "engine_v19": ["OMNI_V19.json", "tools/omni_version.py", "docs/OMNI_V19.md"],   # extend with the files omni-v19 changed
+    "engine_v20": ["OMNI_V20.json", "tools/omni_version.py", "docs/OMNI_V20.md", "tools/run_sysbench.py", "tools/run_kafka.py", "tools/run_ycsb.py", "tools/run_redis.py", "tools/run_pgbench.py", ".github/workflows/pgbench.yml", "tools/store_gate.py", "results/model_gate/STORE_GATE.md", "results/model_gate/STORE_GATE.json", "tests/test_store_wires.py", "tests/test_store_gate.py", "docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md"],
+    "engine_v19": ["OMNI_V19.json", "tools/omni_version.py", "docs/OMNI_V19.md", "omni_controller/controller.py", "realms/harness.py",
+                   "realms/plants.py", "tests/test_own_replicas.py", "results/model_gate/V19_VS_V18.md", "results/model_gate/V19_VS_V18.json",
+                   "results/model_gate/SOLO_V19.md", "results/model_gate/SOLO_V19.json", "results/model_gate/SOLO_V19_VS_V18.md",
+                   "results/model_gate/SOLO_V19_VS_V18.json", "docs/SOLO_PREREGISTRATION.md", "tools/solo_study.py", "scripts/kind_bench.sh",
+                   "fleet/capture/kube_capture.sh", "tools/confirm_abc.py", "tools/live_reps.py", "tools/run_realms_v5.py"],
     "engine_v18": ["OMNI_V18.json", "tools/omni_version.py", "docs/OMNI_V18.md"],   # extend with the files omni-v18 changed
     "engine_v17": ["OMNI_V17.json", "tools/omni_version.py", "docs/OMNI_V17.md", "omni_controller/controller.py",
                    "tests/test_pace_clocks.py", "tests/test_time_correct.py", "tools/beat_ladder.py", "tests/test_beat_ladder.py",

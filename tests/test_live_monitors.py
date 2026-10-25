@@ -16,18 +16,6 @@ PAGE = ROOT / "docs" / "engine" / "OMNI_COMPASS_LIVE_ENGINE.html"
 REG = ROOT / "docs" / "engine" / "monitors.json"
 
 
-
-def monitor_panels(d):
-    """The wall's panels that stand for the page's monitors: every row and panel after the signals row, which reads the
-    governor's own alarms in the road's words and stands for no monitor of the page (docs/engine/export_grafana.py, signals_row)."""
-    out, skip = [], False
-    for p in d["panels"]:
-        if p["type"] == "row":
-            skip = p["title"].startswith("The signals")
-        if not skip:
-            out.append(p)
-    return out
-
 class LiveMonitors(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -55,8 +43,12 @@ class LiveMonitors(unittest.TestCase):
 
     def test_the_grafana_wall_has_a_panel_a_monitor(self):
         d = json.loads((ROOT / "deploy" / "grafana" / "omni-compass-wall.json").read_text(encoding="utf-8"))
-        mons = [p for p in monitor_panels(d) if p["type"] != "row"]
+        # 9000 and 9001: the legal notice at the wall's top and end; 899 to 904: the signals row (export_grafana.signals_row)
+        mons = [p for p in d["panels"] if p["type"] != "row" and p.get("id", 0) < 9000 and not 899 <= p.get("id", 0) <= 904]
         self.assertEqual(len(mons), len(self.reg["monitors"]))
+        notes = [p for p in d["panels"] if p.get("id", 0) >= 9000]
+        self.assertEqual([p["id"] for p in notes], [9000, 9001])
+        self.assertTrue(all("www.omni-compass.com" in p["options"]["content"] for p in notes))
         for p in mons:
             if p["type"] != "text":
                 self.assertTrue(p["targets"] and all(t["expr"] for t in p["targets"]), p["title"])
@@ -71,9 +63,13 @@ class LiveMonitors(unittest.TestCase):
         order = {c: i for i, c in enumerate(XGF.page_order())}
         ids = [m["id"] for m in sorted(self.reg["monitors"], key=lambda m: order.get(m["id"], len(order)))]
         row, n = None, 0
-        for p in monitor_panels(d):
+        for p in d["panels"]:
             if p["type"] == "row":
                 row = p["title"]
+                continue
+            if 899 <= p.get("id", 0) <= 904:  # the signals row, the governor's own state, under its own row before the sections
+                continue
+            if p.get("id", 0) >= 9000:      # the legal notice's two panels, at the wall's top and end
                 continue
             n += 1
             cid = ids[n - 1]
