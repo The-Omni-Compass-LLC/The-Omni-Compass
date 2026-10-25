@@ -264,16 +264,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-25 21:28 | benchmark-reps | success | [40230821800](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40230821800) |
+| 2026-10-25 21:25 | kind-addons | success | [40232040937](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40232040937) |
+| 2026-10-25 21:14 | big-organism-detached collect | success | [40234541006](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40234541006) |
+| 2026-10-25 20:41 | grid | success | [40231957782](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40231957782) |
+| 2026-10-25 20:34 | live-engine | success | [40228284242](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40228284242) |
+| 2026-10-25 19:56 | raw-sweep | success | [40228366167](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40228366167) |
 | 2026-10-25 19:51 | health | success | [40227992652](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40227992652) |
 | 2026-10-25 19:40 | kind-goldilocks | success | [40222183655](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40222183655) |
-| 2026-10-25 19:34 | benchmark-reps | success | [40223431219](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40223431219) |
 | 2026-10-25 19:30 | capacity A: caps [1000,1500,2000,3000] reps [1,2,3,4,5] rates 4 6 8 10 12 14 16 20 | success | [40222187614](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40222187614) |
 | 2026-10-25 18:57 | realms-v5 | success | [40222199178](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40222199178) |
-| 2026-10-25 18:55 | cpu-power | success | [40223427197](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40223427197) |
-| 2026-10-25 18:50 | live-engine | success | [40218616847](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40218616847) |
-| 2026-10-25 18:50 | realms | success | [40222195191](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40222195191) |
-| 2026-10-25 18:50 | kwok-scale | failure | [40222191485](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40222191485) |
-| 2026-10-25 18:35 | live-shadow | success | [40220951717](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40220951717) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
