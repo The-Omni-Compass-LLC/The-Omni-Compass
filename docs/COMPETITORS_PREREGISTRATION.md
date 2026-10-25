@@ -11,7 +11,7 @@ decide, what a cluster runs on.
 
 ## The question
 
-For each product: does Omni-Compass by itself do more for the organism than the product does, and does Omni-Compass on top of
+For each product: does Omni-Compass on the organism alone (on native, the product absent) do more for the organism than the product does, and does Omni-Compass on top of
 the product do more than the product alone? Each is answered by the one key (`tools/readings.py`), gauge by gauge, with
 every row shown, LOSS rows included.
 
@@ -24,11 +24,10 @@ rotated by repetition, the governor on its own core (the rig of `docs/BATCH_QUEU
 |---|---|---|
 | the organism alone | Kubernetes with its own autoscalers (the HPA, the node pool's own autoscaler), nothing added | `nativebare` |
 | the product as it ships | the organism with the product installed and set as its own documentation sets it | `native` |
-| Omni-Compass by itself | the organism with Omni-Compass on top, the product absent | `compassbare` |
+| Omni-Compass on the organism alone | the organism with Omni-Compass on top of its own autoscalers, the product absent | `compassbare` |
 | Omni-Compass on top of the product | the product as it ships, with Omni-Compass on top | `compass` |
 
-Four comparisons are read in every run: the product against the organism alone (what the product does); Omni-Compass by
-itself against the product (which is stronger alone); Omni-Compass on top of the product against the product (what
+Four comparisons are read in every run: the product against the organism alone (what the product does); Omni-Compass on the organism alone against the product (which does more on the same native); Omni-Compass on top of the product against the product (what
 Omni-Compass adds); and Omni-Compass on top of the product against the organism alone. Omni-Compass never replaces the
 product: on top, it writes only its own muscles, and every reset check reads the product's own settings back after the run.
 

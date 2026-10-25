@@ -397,7 +397,7 @@ The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for lin
 | Real card, NVIDIA A100 on Lambda | The card's power limit and clocks, its own power meter, real GPU work. omni-v18's run (2026-10-24, one run of 10 paired repetitions): every service gauge EVEN; the card's own setting already at the top of both knobs, so the governor wrote nothing (at its limit on native). The 8-card run waits for Lambda to have an 8-card machine free | P |
 | The 1,107 muscles | Software models of real control systems (AI serving, cooling, batteries, robot joints, grids), each from its maker's specification. They show the mechanism; they are labelled as models wherever they appear | S |
 
-## Omni-Compass by itself: the organism run without Kubernetes (23 October)
+## Omni direct: Omni-Compass's own orchestrator on the muscles, without Kubernetes (23 October)
 
 Omni-Compass also runs the organism as its own orchestrator, with no Kubernetes or other orchestrator's code in it
 ([`docs/OMNI_ORCHESTRATOR.md`](docs/OMNI_ORCHESTRATOR.md), graded in [`docs/OMNI_ORCHESTRATOR_GRADES.md`](docs/OMNI_ORCHESTRATOR_GRADES.md)).

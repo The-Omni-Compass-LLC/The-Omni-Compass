@@ -245,7 +245,7 @@ repetitions). The composition is class S over class P and L tables and across en
 run (Omni-Compass at every layer at once) is the measurement that would replace it, and the page is remade as each layer's
 omni-v16 runs land. The numbers stand on that page, never copied here.
 
-## Omni-Compass by itself: the organism run without Kubernetes (23 October)
+## Omni direct: Omni-Compass's own orchestrator on the muscles, without Kubernetes (23 October)
 
 The founder's order of 23 October: build Omni-Compass's own orchestrator, no Kubernetes or other orchestrator's code in it,
 and show the three arms together: native (Kubernetes' published autoscaling rule on the muscles, written by us as the

@@ -27,8 +27,8 @@ def captured(fn, *a):
     return json.loads(buf.getvalue().strip().splitlines()[-1])
 
 
-class ToyGate(unittest.TestCase):
-    def test_cluster_toy_runs_both_arms(self):
+class ModelGate(unittest.TestCase):
+    def test_cluster_model_runs_both_arms(self):
         d = tempfile.mkdtemp()
         for arm in ("native", "omni"):
             r = captured(tg.worker, arm, 3, 0.1, 60.0, os.path.join(d, arm))
@@ -38,7 +38,7 @@ class ToyGate(unittest.TestCase):
         self.assertIn("steps_allowed", r)
         self.assertEqual(r["errors"], 0)
 
-    def test_convey_toy_runs_both_arms(self):
+    def test_convey_model_runs_both_arms(self):
         d = tempfile.mkdtemp()
         nat = captured(tg.worker_convey, "native", 2, os.path.join(d, "n"))
         omni = captured(tg.worker_convey, "omni", 2, os.path.join(d, "o"))
@@ -46,7 +46,7 @@ class ToyGate(unittest.TestCase):
             self.assertIn(g, nat); self.assertIn(g, omni)
         self.assertGreaterEqual(omni["limit_given_m"], nat["limit_given_m"])    # conveyance never lowers under native
 
-    def test_convey_toy_with_the_quota_unreadable_conveys_as_with_none(self):
+    def test_convey_model_with_the_quota_unreadable_conveys_as_with_none(self):
         """The governor's role cannot list quotas (every kind test): no budget is known and conveyance is what it is with no
         quota at all. The first v7 trial (run 38825214203) read it as a zero budget and conveyed nothing; this model now catches that."""
         d = tempfile.mkdtemp()

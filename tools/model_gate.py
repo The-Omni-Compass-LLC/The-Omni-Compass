@@ -196,27 +196,8 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
             elif n > p.nodes:
                 k = min(n - p.nodes, len(self.parked)); p.nodes += k; self.parked = self.parked[k:]
 
-    class SoloSim(StaticSim):
-        """Omni-Compass by itself (the founder's order of 23 October, docs/SOLO_PREREGISTRATION.md): on kind's static pool, the
-        pod autoscaler switched off as well. Every workload's pods stay at the operator's own count unless the governor writes
-        it through the workload's own scale (omni-v17's pod muscle of its own); Kubernetes' own scheduler stays: a pod that
-        does not fit waits."""
-
-        def tick(self):
-            import pilot.selfpilot as _sp
-            real = _sp.hpa_step
-            _sp.hpa_step = lambda w, target: None             # no pod autoscaler: the count stays where it stands
-            try:
-                super().tick()
-            finally:
-                _sp.hpa_step = real
-
-    solo = setting == "solo"; static = setting in ("static", "solo")
-    sim = (SoloSim if solo else StaticSim if static else FineSim if fine else CloudSim)(seed, days, autoscaler="none" if static else "ca")
-    if solo:                                                   # the operator's own target and range, written on each workload
-        for w in sim.c.workloads:
-            w.ann = {"omnicompass.io/target-utilization": str(int(round(w.target * 100))),
-                     "omnicompass.io/replica-range": f"{int(w.min_rep)},{int(w.max_rep)}"}
+    static = setting == "static"
+    sim = (StaticSim if static else FineSim if fine else CloudSim)(seed, days, autoscaler="none" if static else "ca")
     billed = []
     lat_path = out / "latency.csv"
     lat_rows, minute_ms, p95s = [], {}, []
@@ -278,8 +259,6 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
                 pend = sum(w.replicas - int(w.replicas * frac) for w in c.workloads)
                 return "\n".join(f"pod/p{i}" for i in range(pend))
             if args[:2] == ("get", "hpa"):                      # the HPA as Kubernetes shows it: its range and target
-                if solo:
-                    return {"items": []}                       # by itself: no pod autoscaler on any workload
                 hp = super().get(*args)
                 for h, w in zip(hp["items"], self.sim.c.workloads):
                     h["spec"].update({"minReplicas": int(w.min_rep), "maxReplicas": int(w.max_rep),
@@ -298,7 +277,7 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
             if args[:2] == ("get", "deployment"):
                 w = next(x for x in self.sim.c.workloads if x.name == args[2])
                 cpu = f"{int(w.request * 1000)}m"
-                return {"metadata": {"name": w.name, "namespace": "default", "annotations": dict(getattr(w, "ann", {}) or {}) if solo else {}},
+                return {"metadata": {"name": w.name, "namespace": "default", "annotations": {}},
                         "spec": {"replicas": int(w.replicas), "selector": {"matchLabels": {"app": w.name}},
                                  "template": {"metadata": {"labels": {"app": w.name}}, "spec": {"containers": [
                                      {"name": "app", "resources": {"requests": {"cpu": cpu}, "limits": {"cpu": cpu}}}]}}},
@@ -308,16 +287,6 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
             except ValueError:
                 raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the model cluster")
 
-    if solo:
-        _write = Kube.write
-
-        def write(self, args, why):
-            if args and args[0] == "scale":                      # the workload's own scale (the pod muscle of its own)
-                self.audit({"write": list(args), "why": why, "dry_run": False})
-                w = next(x for x in self.sim.c.workloads if x.name == args[2])
-                w.replicas = int(next(a_ for a_ in args if a_.startswith("--replicas="))[len("--replicas="):]); return None
-            return _write(self, args, why)
-        Kube.write = write
     if arm != "native":
         from omni_controller.controller import Controller, parser
         # the cloud's setting (the compass law at the tune-down, machines alone), or the kind benchmark's (omni-v16's pace
@@ -325,9 +294,6 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
         law = ["--law", "compass", "--dial", "save", "--sensed", "none/none"] if setting == "cloud" else \
             ["--law", "compass", "--dial", "max"]
         p0 = parser()
-        if solo and any("--own-replicas" in getattr(x, "option_strings", []) for x in p0._actions):
-            # by itself, every workload is the operator's to name to the pod muscle of its own (an engine before omni-v17 has none)
-            law += ["--own-replicas", ",".join(f"default/{w.name}" for w in sim.c.workloads)]
         # a period of 0 is the checkout's own default (the shipped model); the fast checks come once a plant step, as
         # every model has run them (15 s on the cluster's plant, 5 s on the fine one)
         argv = ["--mode", "nodepool", *law, *(["--interval", str(period)] if period > 0 else []),
@@ -404,7 +370,7 @@ def worker(arm, seed, days, period, out, blink=False, fine=False, setting="cloud
 # the model host's calibration, set so the native arm sits where the v6 KEDA run's native arm did (results/live/raw/addons-run-
 # 38725705826: host busy mean 0.27 and p95 0.42, response p50 91 ms and p95 248 ms, the HPA's replicas), see docs/OMNI_V7.md
 CAL = {"cost_s": 0.06, "clients": 1.0, "think_s": 0.05, "other_cores": 0.55, "loadgen_s": 0.004}
-CAL.update(json.loads(os.environ.get("TOY_CAL", "{}")))        # a heavier or lighter load for one run, without a code change
+CAL.update(json.loads(os.environ.get("MODEL_CAL", "{}")))        # a heavier or lighter load for one run, without a code change
 CONVEY_GAUGES = {"requests_served": ("higher", False), "start_wait_s": ("lower", False), "start_wait_p95_s": ("lower", False), "p95_ms": ("lower", False),
                  "alert_minutes": ("lower", False), "host_busy": ("lower", True), "limit_given_m": ("lower", True),
                  "pod_seconds": ("lower", True), "writes": ("lower", True)}
@@ -422,7 +388,7 @@ BATCH = {"jobs": 24, "every_s": 30, "completions": 10, "parallel": 5, "req_m": 5
 # own processor 0.017 cores, the table's "Omni's own CPU"); a batch pod running 2.66 s after it was made (the saturated
 # repetitions' mean, rounded up to whole seconds); and the governor's reading as its sampler takes it (capacity.py): the
 # host's busy share over the whole time since its previous reading, none at the first
-BATCH.update(json.loads(os.environ.get("TOY_BATCH", "{}")))
+BATCH.update(json.loads(os.environ.get("MODEL_BATCH", "{}")))
 CONVEY_BATCH_GAUGES = {**CONVEY_GAUGES, "batch_queue_s": ("lower", False), "batch_turnaround_s": ("lower", False),
                        "batch_work_core_s": ("higher", False)}
 
@@ -948,7 +914,7 @@ def main(argv=None):
     lo_s, _, hi_s = a.seeds.partition("-")
     seeds = list(range(int(lo_s), int(hi_s or lo_s) + 1))
     base, cand = Path(a.base).resolve(), Path(a.cand).resolve()
-    work = Path(a.out or tempfile.mkdtemp(prefix="toy_gate_"))
+    work = Path(a.out or tempfile.mkdtemp(prefix="model_gate_"))
     from concurrent.futures import ThreadPoolExecutor
     report = {"seeds": seeds, "days": a.days, "base": str(base), "cand": str(cand), "models": {}}
     models = a.models.split(",")

@@ -146,7 +146,7 @@ run of each arm, class L, every number from the run's own files):
 (+14.8 to +37.4 requests a step, the interval clear of zero); the 95th percentile **GAIN**, down 9.9% a step (−31.3 to −4.9 ms,
 clear of zero); units standing **GAIN, a cut**, down 10.3% a step (−1.5 to −0.2 units, clear of zero); machines on **EVEN**,
 down 1.7% (−0.2 to +0.0). No row reads LOSS. More work, faster, on fewer units, on the same machines, nothing failed: the
-first reading of Omni-Compass by itself against Kubernetes' own rule that the key calls GAIN, and still one run of each arm,
+first reading of Omni direct against Kubernetes' own rule that the key calls GAIN, and still one run of each arm,
 not the three-run reading.
 
 Where it came from, in the files. Conveyance stood a mean of 160 m above the requests across the run (18 walls raised, 2 handed

@@ -338,6 +338,29 @@ the founder overrides one in the conversation.
   `results/model_gate/` and never presented as a benchmark result. The model's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 25 October
+
+- **Omni-Compass is never by itself** (the founder's words: "The pod scalers part, we don't need an omnicompass by itself. Take that
+  out there. Never is going to omnicompass be by itself. It needs muscles somewhere, somehow. Get that running organism out of there
+  completely"). The by-itself arm of 23 October (each muscle's own native controller switched off and a pod scaler of Omni-Compass's
+  own in its place: its preregistration, its study tool and the model gate's setting for it) is removed whole, and nothing is built
+  for it again. Every page shows two sides, native and Omni-Compass on top of native. Omni direct (the engine's own orchestrator on
+  the machines' muscles, omni-v18) stands as the engine carries it until the founder says otherwise.
+- **Our models are models, a test's stand-in is a stand-in** (the founder's order of 24 October, night: no page, file or program
+  may call our own models or a test's stand-in by the two words he struck, anywhere). Our own models are models (evidence class S):
+  the model gate (`tools/model_gate.py`, `results/model_gate/`); a test's stand-in for a real program is a stand-in
+  (`tests/standin_*`). The raw records on the branch `raw` stay as recorded; the engine's own files take the change with the next
+  engine version.
+- **Every product Omni-Compass competes with is run against it** (the founder's words: "benchmark all this ... defensibly ... to see
+  if it's better than OmniCompass or not, and OmniCompass has to sit on it if it's in the world"). Four ways each
+  (`docs/COMPETITORS_PREREGISTRATION.md`, the register's rows 99 to 106): the organism alone, the product as it ships, Omni-Compass
+  on the organism alone, Omni-Compass on top of the product. The commercial services run only on an account the founder opens and
+  only where their terms allow a published benchmark.
+- **Alloy, a sense and a muscle** (the founder's words: "Compass would use ... Alloy as its telemetry ... and go beyond it"; "We can
+  use Alloy as a muscle and put it in our stacks"). Grafana Alloy (Apache-2.0) runs unchanged as a separate service: its readings
+  are a wire into Omni-Compass, and its own knobs (how often it reads, batches and samples) are a muscle Omni-Compass governs, a
+  catalog row with its own benchmark.
+
 ## Orders of 24 October
 
 - **The answer first** (the founder's words: "the first thing I need to see is you telling me that it is either 2%, 3%, 10%, 1%, no
@@ -423,7 +446,7 @@ the founder overrides one in the conversation.
 
 ## Orders of 23 October
 
-- **Omni-Compass by itself, and on top of native: both, and both to the best** (the founder's words: "Within the native, we do
+- **Omni direct and Omni on native: both, and both to the best** (the founder's words: "Within the native, we do
   whatever the native can be pushed to. And in our own, with no goddamn Kubernetes, we have our own Omni Compass ... We're gonna
   push it to the best with Omni Direct. We're gonna push it to the best with Omni on a native"; "the way you're writing this
   should be making OmniCompass better when it's on top of the native, as well as by itself on the organism as the orchestrator,
@@ -458,17 +481,6 @@ the founder overrides one in the conversation.
   Omni on top of the muscles, no Kubernetes ... they all need to be written in code ... put into the GitHub and push it all";
   then "Update, push, push, push in the bush". The three arms are always shown together (native, Omni on native, Omni direct;
   `omni_orchestrator/`, brains `yardstick`, `omni_native`, `omni`), and the push hold is lifted.
-- **Omni-Compass by itself, the third arm** (the founder's words: "we're going to be expanding out a whole nother omni-compass by
-  itself without any Kubernetes or any schedulers or any governors running direct muscles ... there's native, there's Omni and
-  native, and then there's Omni by itself ... the one that said Omni before is going to have to add the word and native"). Every
-  organism is shown three ways: native; Omni-Compass and native (the arm every table carried as "omni", its machine key unchanged);
-  Omni-Compass by itself, each muscle's own native controller switched off and Omni-Compass the only controller moving that knob (on
-  Kubernetes no pod autoscaler and no cluster autoscaler; Kubernetes' own scheduler and kubelet stay; where native is a setting rather
-  than a controller the two Omni-Compass arms are one arm). Preregistered before any run (`docs/SOLO_PREREGISTRATION.md`); the engine
-  that carries it (a pod muscle of its own, the models' arm with the pool's autoscaler off) lands as the next version through the model
-  gate, and its runs go to GitHub's machines, three runs, read beside the other two. No cloud by itself without the founder's word
-  (the order of 14 October: nothing in a cloud adds a machine). The pages and the words say the three arms; the third's column appears
-  from its first run, nothing written for it before.
 - **The live engine is the operating control panel** (the founder's words: "build a live engine's mechanism, interpreting what it
   sees, as well as giving it knobs and buttons ... in every canvas section block ... every monitor needs to have a light in it ...
   gauging a couple percentage before ... there has to be a main button that puts it back"). Every monitor carries a light that reads
@@ -494,8 +506,8 @@ the founder overrides one in the conversation.
   live engine's knobs are where a reader may break the engine and watch it break.
 - **Omni-Compass at every level** (the founder's words: "OmniCompass can go in the software side, in the hardware bare metal side ...
   in the brain ... in muscles itself ... into a chip ... every level of mechanism"). Its own muscles, built from the ground up with the
-  compass's mathematics inside (a pod autoscaler of its own first), beside the open-source muscles it governs, each benchmarked native,
-  with Omni-Compass on top, and by itself, and all of it together: the next versions' work, each through the model gate. A licensed
+  compass's mathematics inside, beside the open-source muscles it governs, each benchmarked native,
+  with Omni-Compass on top of native, and all of it together: the next versions' work, each through the model gate. A licensed
   mechanism is never copied; an interface a project publishes (the Kubernetes API) is talked to, as any client does.
 
 ## Orders of 22 October

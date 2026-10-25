@@ -112,7 +112,8 @@ wired and moving by its own machinery. *Omni-Compass* always means Omni-Compass 
 all of that still running underneath, and the governor on top of all of it, wired in through the two-way plug. No third side
 exists anywhere on the page. Native is drawn in orange, Omni-Compass in blue, in every chart, table, tile and number.
 
-**The third arm, Omni-Compass by itself** (the founder's order of 23 October, `docs/SOLO_PREREGISTRATION.md`). The same system with each muscle's own native controller switched off and Omni-Compass the only controller moving that knob: on Kubernetes no pod autoscaler and no cluster autoscaler, while Kubernetes' own scheduler and kubelet stay. Where native is a setting rather than a controller (a cache's memory ceiling, a pool's size) the two Omni-Compass arms are one and the same arm. On the page the arm that was called Omni-Compass is now called Omni-Compass and native wherever an arm is named (the chips, the table heads, the lanes), and the third arm's column appears in every table from its first run on GitHub's machines, once the engine that carries it lands; nothing is written for it before. Until then every two-arm reading on the page is native against Omni-Compass and native.
+**Omni-Compass is never by itself** (the founder's order of 25 October): it always sits on native's own muscles and controllers, so every
+monitor shows two sides, native and Omni-Compass on top of native.
 
 **What a monitor is.** The page is laid out as an operations monitor is: a wall of tiles at the top (the status board), each
 tile a small copy of a monitor further down the page; then the monitors themselves, section by section, each with its own

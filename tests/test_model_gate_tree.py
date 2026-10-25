@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 from tools import model_gate  # noqa: E402
 
 
-class ToyGateTree(unittest.TestCase):
+class ModelGateTree(unittest.TestCase):
     def test_the_gate_never_puts_its_own_tree_ahead_of_the_checkout(self):
         s = (ROOT / "tools" / "model_gate.py").read_text()
         self.assertNotIn("sys.path.insert(0, str(ROOT))", s)

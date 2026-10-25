@@ -2,6 +2,24 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-25 (night): Omni-Compass never by itself; our models are models; every competitor preregistered; the GPU stacks on a card
+
+- **Omni-Compass is never by itself** (the founder's order of 25 October): the by-itself arm of 23 October (each muscle's own native
+  controller switched off and a pod scaler of Omni-Compass's own in its place) is removed whole: its preregistration, its study
+  tool, the model gate's setting for it and every page's third column; every page shows native and Omni-Compass on top of native.
+- **Our models are models, a test's stand-in is a stand-in**: the model gate (`tools/model_gate.py`, `results/model_gate/`,
+  `MODEL_GATE.json`), `tests/standin_*`; the three manuals rebuilt. The engine's own files take the change with the next version.
+- **Every product Omni-Compass competes with, preregistered before any run** (`docs/COMPETITORS_PREREGISTRATION.md`; the register's
+  rows 99 to 106): Rancher, Portainer, the Vertical Pod Autoscaler in place, the Descheduler, KRR, Knative Serving, kube-green, four
+  ways each; the commercial services named and why none runs before an account and its terms are read. The first rig is built:
+  the VPA 1.7.1 in place on the service's memory beside the HPA on its processor (`kind-vpa.yml`, `scripts/kind_addons_vpa.sh`).
+  `pin-sources.yml` fingerprints the files a new rig installs where only GitHub's runners reach the project's host.
+- **The GPU stacks with the card inside** (`lambda-gpu.yml` mode `stacks`, tag A, B or C): the one-card fast run skipped the stacks
+  and the full run asked 100 repetitions a size, past what one card finishes; the stacks mode runs the seven organisms at 1, 10 and
+  100 copies at the preregistered 5, 3 and 2 repetitions on its own A10, three runs side by side.
+- **The page bot rebuilds the pages read from every table** (the re-read, the levels, the loss ledger, the state of play) whenever
+  it adds a table, so main never stands behind its own tables.
+
 ## 2026-10-25 (early morning): the answer first; native orange; the signals in road shapes; the six beats; the common language; five more clouds wired
 
 - **The answer first** on the README and the live engine page (`tools/headline.py`, checked by `verify.py`): native, Omni-Compass on
@@ -1947,7 +1965,7 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   of the checkout under test, so both arms imported the candidate's engine. omni-v9 and omni-v10 changed no file any model runs,
   so their "identical" readings hold by construction (a correction stands on each page). The gate now places the checkout
   first, every worker names the tree its engine came from, and a reading taken on the wrong tree is refused
-  (`tests/test_toy_gate_tree.py`). It also gains the blink model: the cluster model with every machine out of service in the
+  (`tests/test_model_gate_tree.py`). It also gains the blink model: the cluster model with every machine out of service in the
   governor's reading for two minutes every six hours, the failure the real run met.
 - **Version after version, nothing left behind** (the founder's order of 18 October: "version 10, 20, 30, 40 ... keep updating
   and moving and tightening ... leaving everything intact, only upgrading what keeps moving"): `tools/land_engine.py vN --since
