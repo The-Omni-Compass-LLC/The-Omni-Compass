@@ -1,0 +1,33 @@
+addons=crane
+crane=0.11.0 sha256=1f3f163abc17c373e27380be42cf39d5041090ccad3c7af1597390550a8f7fe9 (its chart; images docker.io/gocrane/*:v0.11.0)
+prometheus_chart=25.8.0 sha256=9f4fa3cc4e0f9e18b38fd8e754ad9bca36e021e8508b1169d5c6ad849ea37756; Crane's override values sha256=3fffcad0f166f4fae6f6d1444b65263f553dba4e7a169c692c69f59cf7f39452
+autoscaler: EHPA php-apache owns HPA ehpa-php-apache; ehpa spec: {"maxReplicas":10,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":50,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"prediction":{"predictionAlgorithm":{"algorithmType":"dsp","dsp":{"historyLength":"7d","sampleInterval":"60s"}},"predictionWindowSeconds":3600},"scaleStrategy":"Auto","scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"php-apache"}}
+hpa metrics: [{"resource":{"name":"cpu","target":{"averageUtilization":50,"type":"Utilization"}},"type":"Resource"}]
+hpa range: 1,10
+crane pods (namespace crane-system):
+  crane-agent-2mfqs Running node=omni-bench-worker4
+  crane-agent-9j6pw Running node=omni-bench-worker5
+  crane-agent-b5lps Running node=omni-bench-worker2
+  crane-agent-dfjkg Running node=omni-bench-worker3
+  crane-agent-mkn4z Running node=omni-bench-worker
+  crane-agent-t84n6 Running node=omni-bench-worker6
+  craned-7778ff7898-grfvx Running node=omni-bench-control-plane
+  metric-adapter-77c6d7b66b-v7v24 Running node=omni-bench-control-plane
+  prometheus-kube-state-metrics-84b6859cb8-8vdqf Running node=omni-bench-control-plane
+  prometheus-prometheus-node-exporter-87lgn Running node=omni-bench-worker4
+  prometheus-prometheus-node-exporter-hs56p Running node=omni-bench-worker5
+  prometheus-prometheus-node-exporter-jth5k Running node=omni-bench-worker2
+  prometheus-prometheus-node-exporter-kpq8g Running node=omni-bench-worker6
+  prometheus-prometheus-node-exporter-kx46q Running node=omni-bench-worker3
+  prometheus-prometheus-node-exporter-tlnxb Running node=omni-bench-control-plane
+  prometheus-prometheus-node-exporter-xtpgh Running node=omni-bench-worker
+  prometheus-server-7bcdd5749f-x7gx2 Running node=omni-bench-control-plane
+images, with the digest each resolved to:
+  docker.io/gocrane/crane-agent:v0.11.0 docker.io/gocrane/crane-agent@sha256:898bcd46148ab8d06bd2302c77cb8dd2705e8c869f3b4fbd4b42e8c79a877e57
+  docker.io/gocrane/craned:v0.11.0 docker.io/gocrane/craned@sha256:38f320daaf3775f3e4d071134982504ec460eb0def31489c1b52dbdf036c34ad
+  docker.io/gocrane/dashboard:v0.11.0 docker.io/gocrane/dashboard@sha256:9116b988276d7d336b74e755ae6b8e2b6eb66cc404970004c77425d118ba9aff
+  docker.io/gocrane/metric-adapter:v0.11.0 docker.io/gocrane/metric-adapter@sha256:8a22b2b611deecf84d52b1542727197fd3ff38649cecae5da8b4c8aeeec9d0f3
+  quay.io/prometheus-operator/prometheus-config-reloader:v0.67.0 quay.io/prometheus-operator/prometheus-config-reloader@sha256:14feefde1b8015de2cbdee008a19891c2af09f91b650af854e584feda9869a39
+  quay.io/prometheus/node-exporter:v1.7.0 quay.io/prometheus/node-exporter@sha256:4cb2b9019f1757be8482419002cb7afe028fdba35d47958829e4cfeaf6246d80
+  quay.io/prometheus/prometheus:v2.48.0 quay.io/prometheus/prometheus@sha256:b440bc0e8aa5bab44a782952c09516b6a50f9d7b2325c1ffafac7bc833298e2e
+  registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.1 registry.k8s.io/kube-state-metrics/kube-state-metrics@sha256:af8220f534938de121a694cb7314313a6195c9d494fc30bfa6885b08a276bb82
