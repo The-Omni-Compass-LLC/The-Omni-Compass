@@ -166,9 +166,11 @@ column.
 observations, θ the complete configuration profile and Δ the full governing decision interval, Δ ∈ {10, 15, 30, 60, 90, 120} s on
 the bench's six buttons (60 s the factory's). At decision k:
 
-  y[k] = h(x[k]),   z[k+1] = F[θ](z[k], y[k]),   u[req][k] = G[θ](z[k], y[k]),   u[cmd][k] = Π[C](u[req][k]),
+```
+y[k] = h(x[k]),   z[k+1] = F[θ](z[k], y[k]),   u[req][k] = G[θ](z[k], y[k]),   u[cmd][k] = Π[C](u[req][k]),
 
-  x[k+1] = Φ(x[k], u[ack][k], w[k]),
+x[k+1] = Φ(x[k], u[ack][k], w[k]),
+```
 
 where G[θ] supplies the governing authority, Π[C] enforces the applicable constraints (C holds the operating limits: each muscle's own
 range, the do-no-harm floor at native, the operator's caps), u[ack] is the command the system acknowledged (read back), and w is the

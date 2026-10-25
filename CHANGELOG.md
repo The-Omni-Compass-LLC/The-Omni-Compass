@@ -305,7 +305,7 @@
   back. Native alone stays the kill switch.
 - **The three arms, named** (the founder's order: "the one that said Omni before is going to have to add the word and native"). The
   title chips, every table head and every lane on the page read native, Omni-Compass and native, and Omni-Compass by itself; the key
-  and the whole organism (section 3) say what the third arm is (`docs/SOLO_PREREGISTRATION.md`) and that its column appears from its
+  and the whole organism (section 3) say what the third arm is (its preregistration, removed on 25 October) and that its column appears from its
   first run on GitHub's machines, nothing written for it before.
 - **The beats the ladder had not read, 20, 40, 45 and 50 s, read on the side** (the founder's words: "I think 45 you didn't try"),
   in our own models on omni-v17, eight seeds, both settings, and folded into the ladder's record (`results/model_gate/V17_LADDER.md`,
@@ -386,12 +386,12 @@
   a worker meant for the engine that stands imported the candidate's engine; the gate's own check refused it at once (the engine
   imported from the wrong checkout). The gate's checkout is last on the path again, as it was, and only the gate's own process
   formats a reading.
-- **Omni-Compass by itself, preregistered** (the founder's order of 23 October; `docs/SOLO_PREREGISTRATION.md`): a third arm beside
+- **Omni-Compass by itself, preregistered** (the founder's order of 23 October; its preregistration removed on 25 October, the founder's order that Omni-Compass is never by itself): a third arm beside
   native and Omni-Compass and native, with each muscle's own native controller switched off and Omni-Compass the only controller
   moving the knob. The page says what it switches off and what stays (Kubernetes' scheduler and kubelet), where it is the same arm
   (every service whose native is a setting; every actuator native's own loop drives), that the cloud waits for the founder's word,
   and what is run once the next engine version carries a pod muscle of its own. The model gate takes two settings for it (kind's
-  static pool, and by itself on it), read by `tools/solo_study.py`.
+  static pool, and by itself on it), read by its study tool (removed on 25 October).
 - **The sign rule on the benefit sheet and the state of play.** Their one number now wears its own word's sign, as every three-run
   table does: GAIN '+', LOSS '−', EVEN '=', power given '+'. The Redis row's one number read '-0.1% power given'; it reads '+0.1%
   power given'. The modelled organisms' line says each change in its verb ('misses down 0.145 pp', 'power given +0.011%', or
