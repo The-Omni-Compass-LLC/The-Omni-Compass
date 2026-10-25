@@ -337,6 +337,7 @@ def build(base=None, workers=None, organisms=None, n_inj=BATCH, cache=CACHE):
         rec["cells"][key] = cells
         print(f"  cells {key}: {len(cells)} pairs × {len(RUNS) * len(COPIES)} cells", flush=True)
     rec["best"] = best_ways(rec)
+    rec["loss_cells"] = loss_counts(rec)
     return rec
 
 
@@ -399,11 +400,36 @@ def write_md(out: Path, rec):
                                                  for i, r in enumerate(rows[:6])) + (f"; {len(rows) - 6} more in the record" if len(rows) > 6 else ""), ""]
     losses = [(o["name"], p, nm, g, rec["cells"][o["key"]][p][nm][g]["reading"]) for o in rec["organisms"] for p in rec["cells"][o["key"]]
               for nm in rec["cells"][o["key"]][p] for g, *_ in GAUGES if rec["cells"][o["key"]][p][nm][g]["word"] == LOSS]
-    L += [f"## Every LOSS cell ({len(losses)})", ""]
-    L += [f"- {n}, {pair_name(p)}, {nm.replace('x', ' runs × ')} organisms: {g}, {r}" for n, p, nm, g, r in losses[:400]] or ["- none"]
-    if len(losses) > 400:
-        L.append(f"- and {len(losses) - 400} more, every one in the record")
+    mine = [x for x in losses if is_omni(x[1])]
+    theirs = [x for x in losses if not is_omni(x[1])]
+    L += [f"## Every LOSS cell of Omni-Compass ({len(mine)})", "",
+          "A LOSS counts against Omni-Compass only where the way read is Omni-Compass's: on native against native, on top of a "
+          "governor against that governor, or on top of a governor against native.", ""]
+    L += [f"- {n}, {pair_name(p)}, {nm.replace('x', ' runs × ')} organisms: {g}, {r}" for n, p, nm, g, r in mine[:400]] or ["- none"]
+    if len(mine) > 400:
+        L.append(f"- and {len(mine) - 400} more, every one in the record")
+    L += ["", f"## The governors' own LOSS cells against native ({len(theirs)})", "",
+          "Each governor on the organism, read against native: the governor's own reading, shown as the governor's, never counted "
+          "as Omni-Compass's.", ""]
+    L += [f"- {n}, {pair_name(p)}, {nm.replace('x', ' runs × ')} organisms: {g}, {r}" for n, p, nm, g, r in theirs[:400]] or ["- none"]
+    if len(theirs) > 400:
+        L.append(f"- and {len(theirs) - 400} more, every one in the record")
     (out / f"INJECTION_GRID_{b['base']}.md").write_text("\n".join(stamp(L + ["", OWN_RUNS])) + "\n", encoding="utf-8")
+
+
+def is_omni(pair):
+    """A pair whose way is Omni-Compass's (its LOSS is Omni-Compass's); a governor's way against native is the governor's own."""
+    return pair.split("|")[0] == "on_native" or pair.startswith("omni_gov:")
+
+
+def loss_counts(rec):
+    """Every LOSS cell, Omni-Compass's and the governors' own, counted apart."""
+    out = {"omni": 0, "governors": 0}
+    for key, pairs in rec["cells"].items():
+        for p, cells in pairs.items():
+            n = sum(c[g]["word"] == LOSS for c in cells.values() for g, *_ in GAUGES)
+            out["omni" if is_omni(p) else "governors"] += n
+    return out
 
 
 def way_name(w):
