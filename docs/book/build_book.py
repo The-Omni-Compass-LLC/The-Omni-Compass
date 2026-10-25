@@ -984,7 +984,7 @@ LIVE_OUTLINE = [
     ("Every LOSS Row: Its Cause and Its Knob", ("M", "Every LOSS Row: Its Cause and Its Knob")),
     ("The Benefit Board", ("M", "The Benefit Board")),
     ("PART", "Every Monitor, Spread Out",
-     "In the page's order: the organism live, the console, the heartbeat dial, one control cycle, the phase plane, the brain, the verdict, the clouds, the orchestrators, the official Kubernetes runs, the decision trace, the chip and the host, Omni-Compass direct, the telemetry analytics and the Python's runs."),
+     "In the page's order: the organism live, the console, the heartbeat dial, one control cycle, the phase plane, the brain, the verdict, the clouds, the orchestrators, the official Kubernetes runs, the decision trace, the chip and the host, the telemetry analytics and the Python's runs."),
     ("The Organism, Live", ("M", "The Organism, Live")),
     ("The Control Console", ("M", "The Control Console")),
     ("The Heartbeat Dial", ("M", "The Heartbeat Dial")),
@@ -998,13 +998,12 @@ LIVE_OUTLINE = [
     ("Kubernetes: Per-Repetition Telemetry", ("M", "Kubernetes: Per-Repetition Telemetry")),
     ("The Shipped Controller's Decision Trace", ("M", "The Shipped Controller's Decision Trace")),
     ("The Chip and the Host", ("M", "The Chip and the Host")),
-    ("Omni-Compass Direct: the Organism with No Orchestrator", ("M", "Omni-Compass Direct: the Organism with No Orchestrator")),
     ("The Telemetry Analytics and Omni-Compass in Its Own Words", ("M", "The Telemetry Analytics and Omni-Compass in Its Own Words")),
     ("The Python's Runs in the Page and the Core's Monte Carlo", ("M", "The Python's Runs in the Page and the Core's Monte Carlo")),
     ("PART", "The Organisms and Everything Else",
-     "The whole organism, the thirty scenarios, the measured effect in full, the C++ twin, the pipeline, the master switch's wiring, the component specification, the failure modes, the page's own rendering, the problem and the summary as the page prints them, the monitor list, and the glossary and index."),
+     "The whole organism, the twenty scenarios, the measured effect in full, the C++ twin, the pipeline, the master switch's wiring, the component specification, the failure modes, the page's own rendering, the problem and the summary as the page prints them, the monitor list, and the glossary and index."),
     ("The Whole Organism, Every Way It Is Bought", ("M", "The Whole Organism, Every Way It Is Bought")),
-    ("The Thirty Scenarios", ("M", "The Thirty Scenarios")),
+    ("The Twenty Scenarios", ("M", "The Twenty Scenarios")),
     ("Measured Effect in Full: the Organisms, the Register, the Grid and Every Table", ("M", "Measured Effect in Full: the Organisms, the Register, the Grid and Every Table")),
     ("The C++ Twin", ("M", "The C++ Twin")),
     ("The Pipeline That Rebuilds the Page", ("M", "The Pipeline That Rebuilds the Page")),
@@ -1708,12 +1707,13 @@ The book is in seven parts, in the page's own order (the Contents follow), and i
 | CEO, CFO, CIO, board member | the Problem and the Answer; the Disclosures; chapters 2, 12 and 20 |
 | Site reliability engineer | Part Two; the golden signals and metrics (chapter 10); the wall stack, `deploy/wall` (chapter 6) |
 | Control or plant engineer | the contract (chapter 6); the mechanism's knobs (chapter 7); chapters 16 to 19 |
-| Auditor, diligence team | Part One; Part Six; the pipeline (chapter 33); the page word for word (Appendix L) |
+| Auditor, diligence team | Part One; Part Six; the pipeline (chapter 32); the page word for word (Appendix L) |
 | Procurement and counsel | the Disclosures and the papers bound into the back matter |
 
 **Conventions.** `Code` is a command, file, anchor or switch exactly as typed. "Native" is the system by itself, orange;
-"Omni-Compass" is Omni-Compass on top of native, blue; "Omni-Compass direct" is Omni-Compass alone on the muscles, violet. Red is
-never a side: it is the stop sign of a line crossed. "A section" is a numbered part of the page, named by its anchor; "a chapter"
+"Omni-Compass" is Omni-Compass on top of native, blue. Those are the two sides, and the only two: Omni-Compass is never by itself
+(the founder's order of 25 October). Violet marks only a knob or profile turned from the factory tune. Red is never a side: it is
+the stop sign of a line crossed. "A section" is a numbered part of the page, named by its anchor; "a chapter"
 is a chapter of this book. A knob marked **LIVE** acts on the live engine; one marked **RECORDED** chooses a record and modifies
 nothing. Every number carries its evidence class: P a physical meter, L live software, S our own
 models (modelled); a model is never proof."""
