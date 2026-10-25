@@ -155,16 +155,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-25 02:14 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V18_YCSB_SERVICE.md) | Across 4 untouched workloads: 9 gauge-rows GAIN, 5 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 13 EVEN, 14 where the runs disagree. |
-| 2026-10-25 02:14 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V18_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 10 gauge-rows GAIN, 1 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 20 where the runs disagree. |
-| 2026-10-25 02:14 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V18_PGBENCH_SERVICE.md) | Across 3 workloads: 9 gauge-rows GAIN, 2 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 9 EVEN, 14 where the runs disagree. |
-| 2026-10-24 23:34 | [Redis, a cache's memory as shipped (no ceiling): the A/B/C three-run table](results/live/V18_REDIS_SHIPPED.md) | Across 3 untouched workloads: 0 gauge-rows GAIN, 0 LOSS, 6 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 26 EVEN, 4 where the runs disagree. |
-| 2026-10-24 23:34 | [Kafka, a consumer group's operator-set size: the A/B/C three-run table](results/live/V18_KAFKA_SERVICE.md) | Across 3 untouched workloads: 6 gauge-rows GAIN, 7 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 13 EVEN, 13 where the runs disagree. |
-| 2026-10-24 23:18 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V18_REDIS_SERVICE.md) | Across 3 untouched workloads: 8 gauge-rows GAIN, 0 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 16 EVEN, 9 where the runs disagree. |
-| 2026-10-24 23:18 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V18_REDIS.md) | Across 3 untouched workloads: 8 gauge-rows GAIN, 0 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 16 EVEN, 9 where the runs disagree. |
-| 2026-10-24 23:18 | [Kafka, a consumer group's operator-set size: the A/B/C three-run table](results/live/V18_KAFKA.md) | Across 3 untouched workloads: 10 gauge-rows GAIN, 3 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 14 EVEN, 13 where the runs disagree. |
-| 2026-10-24 22:43 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-24 22:20 | [The engine's runs: 500 runs from the jump generator (base 1483323432), one digest](results/engine_runs/ENGINE_RUNS_500_1483323432.md) |  |
+| 2026-10-25 16:11 | [The engine's runs: 500 runs from the jump generator (base 1555621548), one digest](results/engine_runs/ENGINE_RUNS_500_1555621548.md) |  |
+| 2026-10-25 04:02 | [The orchestrators on the same organisms, with the same injection](results/orchestrators/ORCHESTRATORS.md) |  |
+| 2026-10-25 03:31 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -172,16 +165,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-25 12:34 | live-engine | success | [40191028970](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40191028970) |
-| 2026-10-25 12:27 | six x1000 line orgs 1 runs 0+10 | success | [40184254703](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40184254703) |
-| 2026-10-25 12:21 | raw-sweep | success | [40192721491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40192721491) |
-| 2026-10-25 12:13 | six-kube x100 orgs tower reps 1+10 arms native compass split no window 2400 protocol 4 | success | [40184251119](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40184251119) |
-| 2026-10-25 12:11 | six x100 line orgs 5 runs 0+10 | success | [40179848910](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40179848910) |
-| 2026-10-25 12:05 | six x1 line orgs 7 runs 10+90 | success | [40188640576](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40188640576) |
-| 2026-10-25 12:05 | big-organism-detached collect | success | [40191136868](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40191136868) |
-| 2026-10-25 11:19 | six x1 line orgs 5 runs 10+90 | success | [40187527153](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187527153) |
-| 2026-10-25 11:13 | six x1 line orgs 6 runs 10+90 | success | [40187531538](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187531538) |
-| 2026-10-25 11:09 | six x1 line orgs 4 runs 10+90 | success | [40187522711](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187522711) |
+| 2026-10-25 16:39 | orchestrator push room=busy | success | [40210395422](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210395422) |
+| 2026-10-25 16:31 | six x10 line orgs 6 runs 10+90 | success | [40206042697](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40206042697) |
+| 2026-10-25 16:29 | raw-sweep | success | [40211868681](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40211868681) |
+| 2026-10-25 16:25 | engine-runs | success | [40211463569](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40211463569) |
+| 2026-10-25 16:21 | cloud-check all | failure | [40208875547](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40208875547) |
+| 2026-10-25 16:20 | monte-carlo | success | [40211051993](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40211051993) |
+| 2026-10-25 16:13 | cloud-check both | failure | [40210327278](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210327278) |
+| 2026-10-25 16:12 | aks-client-check | success | [40210436312](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210436312) |
+| 2026-10-25 16:11 | grid | success | [40210444923](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210444923) |
+| 2026-10-25 16:09 | security-scan | success | [40210327295](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210327295) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
