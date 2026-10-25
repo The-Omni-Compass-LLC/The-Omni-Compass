@@ -149,6 +149,7 @@ def job(args):
 
 
 ORG_ROWS, GOV_ROWS = {}, {}
+CACHED = []       # the cached bodies' own record of when they were computed (a run that reads a cache says so)
 
 
 def setup(organisms=None):
@@ -193,6 +194,9 @@ def run_all(base, workers, n_inj, cache: Path, shard=None):
         if f.exists():
             z = np.load(f)
             data[(kind, key)] = (z["native"], z["on_native"])
+            side = f.with_suffix(".json")
+            if side.exists():
+                CACHED.append(json.loads(side.read_text(encoding="utf-8")))
         else:
             data[(kind, key)] = (np.zeros((n_inj, 3, STEPS), np.float32), np.zeros((n_inj, 3, STEPS), np.float32))
             todo.append((kind, key))
@@ -206,6 +210,9 @@ def run_all(base, workers, n_inj, cache: Path, shard=None):
                 left[(kind, key)] -= 1
                 if not left[(kind, key)]:
                     np.savez_compressed(cache / f"{base}_{kind}_{key}_{n_inj}.npz", native=data[(kind, key)][0], on_native=data[(kind, key)][1])
+                    (cache / f"{base}_{kind}_{key}_{n_inj}.json").write_text(json.dumps(
+                        {"body": f"{kind}:{key}", "computed": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+                         "after_s": round(time.time() - t0)}), encoding="utf-8")
                     print(f"  {kind} {key}: {n_inj} injections done ({time.time() - t0:.0f} s)", flush=True)
     return data, round(time.time() - t0)
 
@@ -298,6 +305,9 @@ def build(base=None, workers=None, organisms=None, n_inj=BATCH, cache=CACHE):
            "engine_digest": digest(snap), "class": "S", "load": "climb", "steps": STEPS, "decision_s": S.DECISION_S,
            "workers": workers or os.cpu_count() or 2, "injections": n_inj}
     data, run["elapsed_s"] = run_all(batch["base"], run["workers"], n_inj, Path(cache))
+    if CACHED:
+        run["cached"] = {"bodies": len(CACHED), "first": min(c["computed"] for c in CACHED), "last": max(c["computed"] for c in CACHED),
+                         "note": "these bodies' runs were read from the cache their own run wrote (on GitHub, the shards); elapsed_s is this read"}
     rec = {"title": "The injection grid: the Python's 500 injections through every organism, native and with Omni-Compass on native, "
                     "and through every governor on each organism, at 1, 10, 100 and 500 runs and 1, 10, 100 and 500 organisms",
            "class": "S", "own_runs": OWN_RUNS, "batch": batch, "run": run, "tiers": {"runs": list(RUNS), "copies": list(COPIES)},
