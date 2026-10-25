@@ -97,6 +97,26 @@ eight repetitions (Student's t), the word by the gauge's aim, and under 0.5% EVE
 orchestrator against native; Omni-Compass on top of each orchestrator against that orchestrator alone; and Omni-Compass on top of
 each against native. Every row is shown, LOSS included; a run that fails is listed with its error.
 
+## Amendment 1: the response time and the pods waiting, corrected in the model (written before the second run, 25 October 2026)
+
+The first recorded run (kept whole: `docs/history/ORCHESTRATORS_FIRST_RUN_2026-10-25.json` and `.md`) read Omni-Compass on top LOSS
+in 26 rows on-site, on every orchestrator alike: the 95th percentile, the minutes over the line and the pods waiting rose wherever
+the governor raised the service's pod ceiling (10 to 19) on a host already full. The fault was in the model, in two places, the
+same in every arm:
+
+- **The response time.** Each serving pod was read as a queue of its own on a fixed slice of the host, so on a full host every pod
+  added made every answer slower. The kernel shares the processor without leaving any of it idle (work-conserving): a request
+  alone runs at its pod's limit, or at what the host leaves, and never faster than one core (php-apache answers a request on one
+  thread); the queue is the whole service's, on all the processor its pods can get together, however many pods it is split into:
+  T = S/r₁ + (S/Cₛ)·ρ/(1 − ρ) + the backlog's wait, with S the 60 ms a request, r₁ = min(the pod's limit, Cₛ, one core), Cₛ the
+  processor the service's pods can get together and ρ = λS/Cₛ. On a full host more pods neither speed an answer nor slow it, as
+  the kind rig's own replica-room run found (`results/live/REPLICA_ROOM.md`: the cap raised to 30 served no more requests).
+- **The pods waiting.** Every new pod was counted as waiting for its first 5 s step, because the HPA made it after the scheduler's
+  pass. A pod waiting for a place is one the scheduler could not place, with no machine that has room: the HPA now acts before
+  the scheduler's pass in each step, and a pod is counted only while it stays unplaced after it.
+
+Nothing else changes: the organisms, the orchestrators' rules, the injection, the gauges and the reading stand as written above.
+
 ## 7. Where it lives
 
 `tools/orchestrators_arm.py` (the model), `tools/orchestrators_report.py` (the record and its page), `results/orchestrators/`

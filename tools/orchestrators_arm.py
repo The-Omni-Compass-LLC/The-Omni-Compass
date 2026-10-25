@@ -487,10 +487,14 @@ class Organism:
             self.served += done
             if arrive <= 0:
                 continue
-            per = [p.get("capm", 0.0) / 1000.0 for p in ready]
-            mean_c = sum(per) / len(per) if per else 0.0
-            rho = min(0.98, (load[i] * COST_S) / max(1e-9, sum(per))) if per else 0.98
-            base = (COST_S / max(1e-3, mean_c)) / (1.0 - rho) + (sv["backlog"] / cap_rps if cap_rps > 0 else TIMEOUT_S)
+            # the kernel shares the processor without leaving any idle (work-conserving): a request alone runs at its pod's
+            # limit (or what the host leaves, one core at most: a request runs on one thread), and the queue is the whole service's, C_s the processor all its pods can
+            # get together, however many pods it is split into (amendment 1): T = S/r1 + (S/C_s)·ρ/(1 − ρ) + backlog
+            c_s = sum(p.get("capm", 0.0) for p in ready) / 1000.0
+            r1 = min(max((p["lim"] for p in ready), default=0) / 1000.0, c_s, 1.0)   # one request, one thread: a core at most
+            rho = min(0.98, (load[i] * COST_S) / max(1e-9, c_s)) if ready else 0.98
+            base = (COST_S / max(1e-3, r1) + (COST_S / max(1e-3, c_s)) * rho / (1.0 - rho)
+                    + (sv["backlog"] / cap_rps if cap_rps > 0 else TIMEOUT_S))
             row = self.inj["spread"][self.t % len(self.inj["spread"])]
             for z in row:
                 ms = min(TIMEOUT_S, base * z) * 1000.0
@@ -524,16 +528,18 @@ class Organism:
     def step(self):
         self.fault_machine()
         self.submit()
-        if self.orch == "koordinator":
-            self.koordinator_batch()
-        self.schedule()
-        load = self.share_cpu()
-        self.serve(load)
-        self.progress()
-        if self.t % 3 == 0:
+        if self.t % 3 == 0:                                        # the HPA every 15 s, its new pods placed in this step
             self.hpa()
         if self.setting["ca"] and self.t % 2 == 0:
             self.cluster_autoscaler()
+        if self.orch == "koordinator":
+            self.koordinator_batch()
+        self.schedule()
+        # a pod waiting for a place: one the scheduler could not place (no machine with room), counted after its pass
+        self.pending_s += sum(1 for p in self.pods if p["node"] is None) * DT
+        load = self.share_cpu()
+        self.serve(load)
+        self.progress()
         live = self.live_nodes()
         in_service = len(live) + len(self.booting) if self.setting["ca"] else sum(1 for n in live if not n["idle"])
         self.mach_s += in_service * DT
@@ -542,7 +548,6 @@ class Organism:
             self.energy_j += (self.setting["idle_w"] + self.setting["core_w"] * busy * self.setting["host"] / 1000.0) * DT
         else:
             self.energy_j += sum(self.setting["idle_w"] + self.setting["core_w"] * busy * 2.0 for _ in range(in_service)) * DT
-        self.pending_s += sum(1 for p in self.pods if p["node"] is None) * DT
         self.t += 1
 
     def finished(self):
