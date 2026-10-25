@@ -189,7 +189,7 @@ Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** o
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni could not be told apart: the same, or no difference beyond the noise; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is EVEN, at its limit on native |
 | **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
 
 How the sign of a number becomes a word:
@@ -200,7 +200,7 @@ How the sign of a number becomes a word:
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
 - **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; EVEN is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change inside the noise reads EVEN =0.3%.
+- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the 0.5% floor reads EVEN =0.3%.
 
 Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
@@ -362,7 +362,7 @@ under the same rule, the engine's setting for the rest (`realms/muscle_cards_v5.
 
 In the words of `docs/FACTORY_PROFILE.md`, the page is the **live tuning bench**: the interface that operates the engine's
 controls and displays their effects through the connected backend. The **factory profile** is the complete, versioned set of
-Omni-Compass default settings shipped together; on the engine that stands it is omni-v19's (`OMNI_V19.json`): the governor's
+Omni-Compass default settings shipped together; on the engine that stands it is omni-v20's (`OMNI_V20.json`): the governor's
 full decision every 60 s, the fast checks every 5 s, every muscle on the card found for it and on the engine's own setting
 otherwise. The **active profile** is the settings actually governing the current run. An adjustment on the bench produces an
 identifiable active configuration, a **custom profile**; it becomes a new factory profile only after validation and a new
@@ -524,8 +524,8 @@ Appendix A lists every section with its anchor and the chapter of this book that
   orchestrators and governors; 3j Kubernetes, the official run playback; 3k Kubernetes, per-repetition run telemetry; 3l
   Kubernetes and cloud, the shipped controller's decision trace; 3m hardware, the GPU card and the CPU host; 3n telemetry
   analytics and Omni-Compass in its own words; 3o the Python's runs in the page and the core's Monte Carlo.
-- **Part 4, the organisms and everything else:** 4a the whole organism, every way it is bought; 4b the twenty scenarios, ten
-  organisms, each native and with Omni-Compass on native; 4c the
+- **Part 4, the organisms and everything else:** 4a the whole organism, every way it is bought; 4b the twenty scenarios and the
+  injection grid, ten organisms native and with Omni-Compass on native and every governor on the Python's 500 injections; 4c the
   measured effect in full; 4d the C++ twin; 4e the CI pipeline; 4f the master switch's wiring; 4g the component specification
   and mathematics; 4h failure modes, controls and residual risk; 4i self-governed rendering; 4j the problem and the answer; 4k
   the executive summary and reading key; 4l the monitor list; 4m the glossary and index.
@@ -738,7 +738,7 @@ the console and the dock, both sides alike. Under it stand seven tabs, one shown
 |---|---|
 | **Drive** | the plant's conditions and faults, the breakers' two buttons, the factory button, your own system, the keys; the heartbeat; the sweep over every beat and the candidate; the profile's three buttons and the profile box (the active profile, the backend, the actuation, the contract and each deployment route's bill) |
 | **The mechanism's knobs** | the engine's own constants (chapter 7), one group at a time: a row of group buttons above the knobs names the four pieces, the compass law, Omni-Compass's hand, native's controller and every muscle, with *every group* for all of them at once |
-| **The twenty scenarios** | the ten organisms, each native and with Omni-Compass on native (section 6.9) |
+| **The twenty scenarios and the injection grid** | the ten organisms, each native and with Omni-Compass on native, and the injection grid: every governor, 1 to 500 runs × 1 to 500 organisms on the Python's batch (section 6.9) |
 | **The breakers** | one for every monitor, by section (section 6.9) |
 | **Metrics (Prometheus)** | the live model printed as a Prometheus endpoint, every decision, with the series a running system serves beside each and the PromQL the Grafana wall draws it with (section 6.10) |
 | **Commands** | every control beside the request a running governor takes for it, with its role (section 6.10) |
@@ -918,11 +918,13 @@ defined for a positive native cost and the same workload in both arms. A compone
 unresolved, and the saving with it. The whole-workload index in the bottom line is the composition's one number, not a price
 (chapter 2). The measured changes follow the whole organism's reading and chip knobs (the page's section 4a).
 
-### 6.9 The twenty scenarios and the breakers
+### 6.9 The twenty scenarios, the injection grid and the breakers
 
 Under the mechanism's knobs the panel carries the twenty scenarios in a compact grid (ten organisms, each native alone and with
 Omni-Compass on native, each cell one signal word and one number against native); a click on a cell prints its gauges and three
-runs under the grid, and the full grid stands in the page's section 4b (chapter 29). A click on the live engine's own organism in
+runs under the grid, and the full grid stands in the page's section 4b (chapter 29). Under it the injection grid stands compact:
+the organism, the way, what it is read against, the runs, the organisms stacked and the gauge, the cell's readout and its matrix
+(chapter 29.4 to 29.8). A click on the live engine's own organism in
 the Omni-Compass on native column also moves the live engine to the harness's one organism.
 
 The breakers are the monitors, one for every monitor, grouped by section in the page's order, each section with its own signal.
@@ -1274,7 +1276,9 @@ under it names the monitors that moved, or says that no monitor carries the vari
   side follows native; *Omni-Compass and native* releases it, and every monitor shows Omni-Compass on top of native again.
 - **Organism**: the spine, the four realms, the four stacked or the tower: the grid's row is marked, and for the spine and the
   realms the console's fault body part follows.
-- **Copies** and **runs** (1, 10, 100, 1,000): the grid's square is marked for the organism chosen.
+- **Organisms** and **runs** (1, 10, 100, 500, in line with the Python's batch of 500): the injection grid of section 4b moves
+  to that many runs × organisms stacked (chapter 29), and the scale grid's square is marked where GitHub's grid carries that
+  tier (it runs 1, 10, 100 and 1,000). The organism row sets the injection grid's organism too.
 - **Run**: A, B or C on every replay that holds three runs and on the live organism's record.
 - **Beat**: 10, 15, 30, 60, 90 or 120 s: the heartbeat sweep monitor moves to that beat, or to the
   sweep record's nearest one and says which, and, unless the active profile is held, the live model's heartbeat is set to it.
@@ -2242,7 +2246,7 @@ wiring Omni-Compass onto the stack itself is the plug of the Operator's Manual.
 
 # Part Five. The Organisms and Everything Else
 
-*The whole organism, the twenty scenarios, the measured effect in full, the C++ twin, the pipeline, the master switch's wiring, the component specification, the failure modes, the page's own rendering, the problem and the summary as the page prints them, the monitor list, and the glossary and index.*
+*The whole organism, the twenty scenarios and the injection grid, the measured effect in full, the C++ twin, the pipeline, the master switch's wiring, the component specification, the failure modes, the page's own rendering, the problem and the summary as the page prints them, the monitor list, and the glossary and index.*
 
 
 ## 28. The Whole Organism, Every Way It Is Bought
@@ -2308,7 +2312,7 @@ where the missing pieces are: every slot not yet measured is named, and the whol
 in its place.
 
 
-## 29. The Twenty Scenarios
+## 29. The Twenty Scenarios and the Injection Grid
 
 
 ### 29.1 The grid
@@ -2339,6 +2343,94 @@ Omni-Compass on native against native, on work, the time over the line and the p
 the change of each run A, B and C. Every run under 0.5% reads EVEN; from 0.5% up the word by what the gauge is for; runs pointing
 different ways, the runs disagree. The note names the record's file, its engine and its commit. A click on the live engine's
 organism in the Omni-Compass on native column also puts the live engine on that body, the harness's one organism.
+
+### 29.4 The injection grid: one batch of the Python's 500 injections
+
+Under the twenty scenarios the section carries the injection grid (`#s-inj`; the record
+`results/injection_grid/INJECTION_GRID_<base>.json` and its `.md`, written by `tools/injection_grid.py`; class S). Its line
+under the heading, **The batch**, names the batch it stands on: its base, its 500 injections and the jump generator's rule (seed_k =
+base + k·0x9E3779B9 mod 2³²), the digest of the Python's runs of that batch and its file, and the C++ engine's digest of the same
+seeds ("identical", with the count of runs that agree). The same batch drives the Python's runs in section 3o. An injection is one
+seed: every plant of every organism draws its demand, its weather and its disturbances from it, under the climb, for 240 decisions
+of 15 s, and the same injection reaches every organism and every way.
+
+The same line prints two checks the page makes as it opens. First it re-hashes the record's cells the way the Python hashed them
+and prints "identical digest to the Python's" or "not identical to the Python's". Then it recomputes every cell's mean from the runs' means, joined and
+stacked as the Python joins and stacks them, and prints the number of cell gauges checked. It reports "every one agrees" with the
+largest difference, or the count that differ by more than 0.001 points and where the largest one is. The engine, the commit, when
+it ran and on how many processes close the line.
+
+### 29.5 The knobs
+
+- **Organism**: the nine organisms with a plant, by their scenario number (the spine 1 to the live engine's own organism 9), each
+  with its muscles. The whole organism (10) is a composition of measured tables and takes no injection; its reading stands in
+  the twenty scenarios above.
+- **Way**: *Omni-Compass on native*; *a governor on the organism* (each of the fourteen: the Kubernetes scheduler with its
+  bin-packing profile, Kueue, Volcano, KAI, Koordinator, CruiseKube, Crane, KubeRay, Gödel, Armada, Karmada, Open Cluster
+  Management, KubeEdge and Nephio); *Omni-Compass on top of a governor*. The orchestra already holds every governor's muscles,
+  so on it only Omni-Compass on native is offered.
+- **Against**: native, and, for Omni-Compass on top of a governor, the governor on the organism too, so Omni-Compass's own
+  effect on that governed stack is read alone.
+- **Runs**: 1, 10, 100 or 500. **Organisms stacked**: 1, 10, 100 or 500. Every cell is the one batch cut down: 100 runs are
+  the first 100 of the batch's 500, 10 the first 10, 1 the first; and each run carries a stack of 500 organisms, of which 100
+  organisms are the first 100 copies, 10 the first 10, 1 the first (copy c of run k on injection k + c, mod 500). A click on
+  100 shows those 100 and no others. A cell whose runs × organisms pass 500 uses an injection more than once, and its readout
+  says so.
+- **Gauge**: work, the share of muscles over the line, or the power per muscle. Every gauge is read per muscle. Two ways on the
+  same muscles read the same either way, and a governor's way, which carries its own body's muscles beside the organism's, is
+  read like for like.
+
+The switchboard's *Organisms* and *Runs* (section 8.5) and its organism row set the same knobs.
+
+### 29.6 What a cell shows
+
+The readout on the left prints the cell's word and its number with the word's sign, the gauge, the way and what it is read
+against. Under it come the reading in the key's words for its run count ("in all 500 of our runs", "by the mean of our 10
+runs", "in our one run") and how many runs are beyond the noise. It then gives the range the runs moved over in plain directions
+("from up 2.6% to up 3.4%") and the mean as this page recomputes it. The scenario number, the organism, the cell's tier, the
+injections it draws on and its reference follow. The cell's three gauges stand at the end, each with its word.
+
+Under the readout, the strip draws each run's change against its reference as a dot. The band is the 0.5% floor. A dot is green
+toward the gauge's aim, red away from it and amber for power given, by the floor alone; the dashed line is the mean. The cell's
+word adds the noise: each run's 95% interval over its 24 blocks of ten decisions (Student's t), read by the key. Hover a dot for
+its run, its injections and its seed.
+
+On the right, the matrix shows every runs × organisms cell of the chosen way and gauge, each with its signal, its number and its
+word. A click on a cell selects it.
+
+### 29.7 The ranking, every organism, one injection
+
+- **Every way on this organism in this cell, ranked** against native by work, then by the share over the line, with power
+  beside. Its line names the first way, the rank of Omni-Compass on native, and the ranks held by the ways with Omni-Compass on
+  top; the rows with Omni-Compass are drawn in its colour. A click on a way selects it. In our models a governor's knobs run
+  under their own native controllers, so a governor's way reads native's work index by construction. What it moves is the share
+  over the line and the power of its knobs, and its rank says so. The governors as their projects ship them, governing real
+  workloads, are read on real Kubernetes in section 3i (class L): fourteen named, twelve with a rig built, eleven run the four
+  ways.
+- **Every organism on the same injections**: the chosen way and cell on every organism, so each organism's reaction to the same
+  injections is read side by side. A click on an organism selects it.
+- **One injection through every organism**: pick k (0 to 499) with the arrows or the box. The line prints its seed and the rule
+  that made it. The table gives each organism's mean over that run's 240 decisions per muscle, the reference to the way, with
+  the change in plain directions.
+
+### 29.8 Exports, import and the reference
+
+- **This cell, every run (CSV)**: each run k, its first and last injection, its first seed and its change on the three gauges.
+- **This organism, every way and cell (CSV)**: every pair, tier and gauge with its mean, word, reading, runs beyond the noise,
+  smallest and largest run.
+- **The batch's 500 injections (CSV)**: k and its seed.
+- **The whole record (JSON)**: the record as the page holds it.
+
+Each file opens with the notice and the batch's line (its base, the Python's and the C++ engine's digests, the engine, the
+commit). **Import** reads another record of `tools/injection_grid.py` (another batch). Every view and both checks follow it,
+the batch line says it is imported and not this build's record, and *Back to this build's record* returns. Every cell has a
+**reference**, `IG/base/organism/way|against/NxM/gauge` (for example `IG/1488855732/tower/on_native|native/500x1/work`).
+*Copy this cell's reference* copies it, and typing it in the box and pressing *Go* reaches that cell on any copy of the page that
+holds the batch. Another batch is run with `python3 tools/engine_runs.py --runs 500 --base B` (the Python, then the C++ engine
+on the same seeds) and `python3 tools/injection_grid.py --base B`. On GitHub, every set the engine-runs workflow commits on main
+starts the injection-grid workflow (eight shards, then the record and the page's rebuild), and a dispatch runs any base.
+
+One batch is one run in the key's sense; three batches make a three-run reading. Class S, our own models.
 
 
 ## 30. Measured Effect in Full: the Organisms, the Register, the Grid and Every Table
@@ -2677,7 +2769,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 41.2 The engine's name and the profile
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v19). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v20). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines. Every result the page plays ran the factory profile of the engine its
 table names; the main control panel names the profile governing the live model now, with its fingerprint (section 6.5), and a
 candidate or custom profile there is never a result of record.
@@ -2868,7 +2960,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **Engine that stands.** The engine version on main, named on the page's title block and in `python3 tools/omni_version.py`;
   omni-v19 for this edition.
 - **Factory profile.** The complete, versioned set of Omni-Compass default settings shipped together; on the engine that
-  stands, omni-v19's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
+  stands, omni-v20's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
 - **Fingerprint (of a profile).** The page's FNV-1a hash of every setting of the mechanism, the heartbeat and every muscle's body
   included: one identity for one set of settings.
 - **Golden signals.** Latency, traffic, errors and saturation: on the page, the golden-signal feed of the page's section 2b.
@@ -2991,7 +3083,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | The same day again / A new day | the console; the page's section 3d | the seed replayed or redrawn, with the knobs as set | the knobs |
 | Every knob to its start | the console | demand, noise and delay, back to the day as written | the dial and the switch |
 | Back to the factory tune | above the wall; the main control panel; the console; the dock; every monitor's strip; the key `f` | the factory profile and the plant at rest (section 14.2) | the records |
-| Arm, Organism, Copies, Runs, Run, Beat (the switchboard) | the page's section 1b | every monitor that carries the variation (section 8.5) | every monitor that does not |
+| Arm, Organism, Organisms, Runs, Run, Beat (the switchboard) | the page's section 1b | every monitor that carries the variation (section 8.5) | every monitor that does not |
 | A / B / C | the page's sections 3j, 3k, 3l, 3m | which run is played | the other runs |
 | Benchmark, run, repetition | the page's sections 3j, 3k | which record is played | the record itself |
 | This muscle; Every muscle back under Omni-Compass | the page's section 3d, on the muscle's card; the mechanism panel's last group | one muscle of the stress-test model run by native's own controller alone, or in a replay shown by native's own record, while every other muscle stays governed | the body's recorded totals in a replay; the kill switch, which hands every muscle back at once |
