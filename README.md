@@ -139,16 +139,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-25 06:18 | godel: B (nativebare native compassbare compass) | success | [40161074996](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40161074996) |
-| 2026-10-25 06:16 | orchestrators: kuberay B | success | [40160106691](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40160106691) |
-| 2026-10-25 05:51 | live-engine | success | [40164777258](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40164777258) |
-| 2026-10-25 05:43 | group: ocm A (nativebare native compassbare compass) | success | [40158184424](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40158184424) |
-| 2026-10-25 05:34 | raw-sweep | success | [40165986937](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40165986937) |
-| 2026-10-25 05:25 | group: karmada A (nativebare native compassbare compass) | success | [40157220855](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40157220855) |
-| 2026-10-25 05:20 | crane: B (nativebare native compassbare compass) | success | [40160109718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40160109718) |
-| 2026-10-25 05:18 | big-organism-detached collect | success | [40165054860](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40165054860) |
-| 2026-10-25 05:14 | godel: A (nativebare native compassbare compass) | success | [40157217643](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40157217643) |
-| 2026-10-25 04:40 | health | success | [40162726001](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40162726001) |
+| 2026-10-25 12:17 | raw-sweep | success | [40192461591](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40192461591) |
+| 2026-10-25 12:13 | six-kube x100 orgs tower reps 1+10 arms native compass split no window 2400 protocol 4 | success | [40184251119](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40184251119) |
+| 2026-10-25 12:11 | six x100 line orgs 5 runs 0+10 | success | [40179848910](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40179848910) |
+| 2026-10-25 12:05 | six x1 line orgs 7 runs 10+90 | success | [40188640576](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40188640576) |
+| 2026-10-25 12:05 | big-organism-detached collect | success | [40191136868](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40191136868) |
+| 2026-10-25 11:19 | six x1 line orgs 5 runs 10+90 | success | [40187527153](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187527153) |
+| 2026-10-25 11:13 | six x1 line orgs 6 runs 10+90 | success | [40187531538](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187531538) |
+| 2026-10-25 11:09 | six x1 line orgs 4 runs 10+90 | success | [40187522711](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187522711) |
+| 2026-10-25 11:08 | grid | success | [40187638889](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40187638889) |
+| 2026-10-25 10:55 | six x100 line orgs 6 runs 0+10 | success | [40179852924](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40179852924) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
