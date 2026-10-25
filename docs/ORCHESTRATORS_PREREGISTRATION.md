@@ -99,7 +99,7 @@ each against native. Every row is shown, LOSS included; a run that fails is list
 
 ## Amendment 1: the response time and the pods waiting, corrected in the model (written before the second run, 25 October 2026)
 
-The first recorded run (kept whole: `docs/history/ORCHESTRATORS_FIRST_RUN_2026-10-25.json` and `.md`) read Omni-Compass on top LOSS
+The first recorded run (kept whole: `docs/history/ORCHESTRATORS_FIRST_RUN_2026-10-25.json.gz` and `.md`) read Omni-Compass on top LOSS
 in 26 rows on-site, on every orchestrator alike: the 95th percentile, the minutes over the line and the pods waiting rose wherever
 the governor raised the service's pod ceiling (10 to 19) on a host already full. The fault was in the model, in two places, the
 same in every arm:
@@ -116,6 +116,15 @@ same in every arm:
   the scheduler's pass in each step, and a pod is counted only while it stays unplaced after it.
 
 Nothing else changes: the organisms, the orchestrators' rules, the injection, the gauges and the reading stand as written above.
+
+## Amendment 2: the Cluster Autoscaler acts after the scheduler's pass (written before the third run, 25 October 2026)
+
+The second recorded run (kept whole: `docs/history/ORCHESTRATORS_SECOND_RUN_2026-10-25.json.gz` and `.md`) read Kueue in the cloud
+using 11% to 35% fewer machine-hours than Kubernetes alone on organisms where nothing else differed. The fault was in the model:
+amendment 1 moved the HPA before the scheduler's pass, and the Cluster Autoscaler, run between them, read every pod the HPA had
+just made as one that could not be placed and added a machine for it, in every arm but Kueue's (whose new pods were not yet
+admitted). The Cluster Autoscaler acts only on pods the scheduler has tried and could not place: it now runs after the
+scheduler's pass. Nothing else changes.
 
 ## 7. Where it lives
 

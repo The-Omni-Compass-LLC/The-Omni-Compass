@@ -530,13 +530,13 @@ class Organism:
         self.submit()
         if self.t % 3 == 0:                                        # the HPA every 15 s, its new pods placed in this step
             self.hpa()
-        if self.setting["ca"] and self.t % 2 == 0:
-            self.cluster_autoscaler()
         if self.orch == "koordinator":
             self.koordinator_batch()
         self.schedule()
         # a pod waiting for a place: one the scheduler could not place (no machine with room), counted after its pass
         self.pending_s += sum(1 for p in self.pods if p["node"] is None) * DT
+        if self.setting["ca"] and self.t % 2 == 0:                 # the Cluster Autoscaler acts on pods the scheduler could
+            self.cluster_autoscaler()                              # not place, never on pods not yet tried (amendment 2)
         load = self.share_cpu()
         self.serve(load)
         self.progress()
