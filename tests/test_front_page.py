@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import front_page as fp  # noqa: E402
 
 
-def fake_run(raw: Path, rid: int, product: str, workloads, objective="resource", engine="omni-v3", report=True):
+def standin_run(raw: Path, rid: int, product: str, workloads, objective="resource", engine="omni-v3", report=True):
     d = raw / f"run-{rid}"
     if report:
         (d / f"{product}-report").mkdir(parents=True, exist_ok=True)
@@ -35,12 +35,12 @@ class TestFrontPage(unittest.TestCase):
             root = Path(t)
             raw = root / "results" / "live" / "raw"
             for rid in (101, 102, 103, 104):                       # four resource runs: the newest three are the set
-                fake_run(raw, rid, "redis", ["tuning", "small", "large", "burst"])
-            fake_run(raw, 201, "redis", ["tuning", "small", "large", "burst"], objective="service")   # one service run: no set
-            fake_run(raw, 202, "redis", ["tuning", "small", "large", "burst"], objective="service")   # two: still no set
-            fake_run(raw, 301, "kafka", ["light"], report=False)   # no report directory: not complete, not counted
-            fake_run(raw, 401, "ycsb", ["a", "b"]); fake_run(raw, 402, "ycsb", ["a", "b"]); fake_run(raw, 403, "ycsb", ["a", "b"])
-            fake_run(raw, 404, "ycsb", ["a", "b"], engine="omni-v4")                                  # another engine: another kind
+                standin_run(raw, rid, "redis", ["tuning", "small", "large", "burst"])
+            standin_run(raw, 201, "redis", ["tuning", "small", "large", "burst"], objective="service")   # one service run: no set
+            standin_run(raw, 202, "redis", ["tuning", "small", "large", "burst"], objective="service")   # two: still no set
+            standin_run(raw, 301, "kafka", ["light"], report=False)   # no report directory: not complete, not counted
+            standin_run(raw, 401, "ycsb", ["a", "b"]); standin_run(raw, 402, "ycsb", ["a", "b"]); standin_run(raw, 403, "ycsb", ["a", "b"])
+            standin_run(raw, 404, "ycsb", ["a", "b"], engine="omni-v4")                                  # another engine: another kind
             items = fp.plan(root)
             by = {it["table"]: it for it in items}
             self.assertEqual(sorted(by), ["V3_REDIS", "V3_YCSB"])
@@ -90,12 +90,12 @@ class TestFrontPage(unittest.TestCase):
             root = Path(t)
             raw = root / "results" / "live" / "raw"
             for rid in (11, 12, 13):
-                fake_run(raw, rid, "kafka", ["tuning", "light", "heavy", "burst"])
+                standin_run(raw, rid, "kafka", ["tuning", "light", "heavy", "burst"])
             live = root / "results" / "live"
             (live / "V3_KAFKA.md").write_text("built\n")
             (live / "FRONT_PAGE_STATE.json").write_text(json.dumps({"V3_KAFKA": {"runs": [11, 12, 13]}}))
             self.assertEqual(fp.plan(root), [])
-            fake_run(raw, 14, "kafka", ["tuning", "light", "heavy", "burst"])    # a fourth run: the set moves and the table is stale
+            standin_run(raw, 14, "kafka", ["tuning", "light", "heavy", "burst"])    # a fourth run: the set moves and the table is stale
             items = fp.plan(root)
             self.assertEqual([it["runs"] for it in items], [[12, 13, 14]])
             self.assertEqual(items[0]["previous"], [11, 12, 13])

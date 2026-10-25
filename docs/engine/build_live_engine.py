@@ -10,25 +10,27 @@ Every record the page replays is made again here by the repository's own code on
 
   harness    docs/engine/export_harness_trace.py: the realms harness (realms/harness.py, the max of
              realms/compass_arm_v5.py with the bone, the twins and the immune system), one organism and each muscle alone
-  ctlrec     docs/engine/export_controller_trace.py: the shipped controller (omni_controller/controller.py) on the toy
+  ctlrec     docs/engine/export_controller_trace.py: the shipped controller (omni_controller/controller.py) on the model
              cluster, on top of the HPA (the max) and in the cloud's setting, every tick and every audited decision
   runs       docs/engine/export_runs.py: the official runs as recorded, every three-run table's runs A, B and C read
              back from their raw files, every file's SHA-256 matched against the run's own list, every Kubernetes
              repetition scored by the repository's own scorer (tools/live_reps.py) and checked against the run's result
-  scen       docs/engine/export_scenarios.py: the GPU card (realms/gpu_card.py), the Linux host (tools/toy_gate.py's
+  scen       docs/engine/export_scenarios.py: the GPU card (realms/gpu_card.py), the Linux host (tools/model_gate.py's
              conveyance), every muscle and organism of the realms table (results/realms_v5) and every judged row of the
              newest engine's receipts (results/live/V<n>_*.md)
   cpptwin    docs/engine/export_cpp_twins.py: the Python's own runs fed through the C++ engine (cpp/): every Python/C++
              twin's parity check, every compass law the runs above wired (recorded as they ran), and the seven organisms
              at the tune-down, every muscle's law, reading by reading through the C++ compass law
   dial       the heartbeat dial (omni-v17): every beat of the Kubernetes governor in our own models, from the newest
-             beat ladder (results/toy_gate/V<n>_LADDER.json, tools/beat_ladder.py), beside native and the main engine's 60 s
+             beat ladder (results/model_gate/V<n>_LADDER.json, tools/beat_ladder.py), beside native and the main engine's 60 s
+  direct     Omni direct's three arms (omni-v18): the showing records under results/orchestrator/, from tools/orchestrator_record.py
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
 
-The page names the engine it stands on (data-engine on its <html>); the build refuses to write a page whose engine is not
-the one tools/omni_version.py reads, so a new engine version is always written into the page's words by a person first.
+The page names the engine it stands on (data-engine on its <html>); the build stamps the engine tools/omni_version.py reads on
+the page and rebuilds every record on it, and when that engine is newer than the one the page's prose was written for, the page
+says so in a banner until the prose is realigned; --check fails a page whose engine differs from the one that stands.
 Usage: python3 docs/engine/build_live_engine.py [--check] [--no-runs]. --check rebuilds in memory and exits 1 if any record
 differs from the page (nothing written). Evidence class S for the models; the receipts keep their own classes.
 """
@@ -64,7 +66,7 @@ def pack_controller(data: dict) -> dict:
         val = {**d, "kappa": sc.get("kappa"), "h": sc.get("h"), "sigma": sc.get("sigma"), "nu": sc.get("nu"),
                "gate_ok": int(bool(d.get("gate_ok"))), "nodes_ok": int(bool(ct.get("nodes"))), "verdict": d.get("verdict", "")}
         return [val.get(k) for k in CDEC]
-    out = {"slo": data["slo_ms"], "seeds": data["seeds"], "settings": {}}
+    out = {"slo": data["slo_ms"], "seeds": data["seeds"], "interval_s": data.get("interval_s", 60.0), "settings": {}}
     for name, sec in data["settings"].items():
         runs = {sd: {arm: {k: [t[k] for t in r[arm]] for k in TICK} for arm in ("native", "omni")} for sd, r in sec["runs"].items()}
         for sd, r in sec["runs"].items():
@@ -374,7 +376,7 @@ def board(runs: list, camp: dict | None = None) -> list:
             label = x.split("|")[0]
             out.append({"group": f"the cloud: {cloud}, at the tune-down on the machines alone (the bill)", "name": label, "workflow": wf,
                         "tables": [], "now": ("running now" if label.split()[0] in running_titles else "in the queue") if on else
-                        "switched off until the founder turns it on"})
+                        "not yet run: switched off until the founder turns it on"})
     gp = ROOT / "scripts" / "gpu_campaign_profiles.json"
     if gp.exists():
         g = json.loads(gp.read_text(encoding="utf-8"))
@@ -395,6 +397,43 @@ def _clean(v):
     if isinstance(v, list):
         return [_clean(x) for x in v]
     return v
+
+
+def beat_sweep() -> dict:
+    """The heartbeat sweep's record (tools/heartbeat_sweep.py --table, results/model_gate/HEARTBEAT_SWEEP.json) as the page's
+    heartbeat monitor reads it: every beat of each engine in each setting, each gauge's change in percent against native and
+    against the same engine at 15 s and at 60 s, with its 95% interval and its word, and the engine's own cost a day."""
+    f = ROOT / "results" / "model_gate" / "HEARTBEAT_SWEEP.json"
+    if not f.exists():
+        return {"missing": str(f.relative_to(ROOT)), "periods": [], "rows": {}}
+    rec = json.loads(f.read_text(encoding="utf-8"))
+    fin = lambda v: v if isinstance(v, (int, float)) and math.isfinite(v) else None
+
+    def pct(x, base):
+        # the gate's reading (tools/model_gate.py reading) in percent of the zero line's mean over the same seeds: the change is
+        # mean_change/relative's base; where the change is nought, the zero line's mean as recorded
+        m, (lo, hi), rel = x["mean_change"], x["ci95"], x["relative"]
+        b = m / rel if fin(rel) and rel and m else base
+        out = {"word": x["word"], "pct": fin(100 * rel) if fin(rel) is not None else None,
+               "lo": fin(100 * lo / b) if b else None, "hi": fin(100 * hi / b) if b else None}
+        return {k: (round(v, 3) if isinstance(v, float) else v) for k, v in out.items()}
+    rows, periods, seeds = {}, set(), 0
+    for key, v in rec.items():
+        parts = key.split("|")
+        if len(parts) != 3:
+            continue
+        setting, eng, p = parts
+        nat = rec.get(f"{setting}|native", {})
+        mean_at = lambda q: (rec.get(f"{setting}|{eng}|{q}") or {}).get("mean", {})
+        rows.setdefault(setting, {}).setdefault(eng, {})[p] = {
+            "vs": {g: pct(x, nat.get(g)) for g, x in v["vs_native"].items()},
+            "vs15": {g: pct(x, mean_at(15).get(g)) for g, x in (v.get("vs_15") or {}).items()} or None,
+            "vs60": {g: pct(x, mean_at(60).get(g)) for g, x in (v.get("vs_60") or {}).items()} or None,
+            "cost": {c: round(x, 3) for c, x in v["cost"].items()}}
+        periods.add(float(p))
+        seeds = max(seeds, len(v["seeds"]))
+    return {"file": str(f.relative_to(ROOT)), "seeds": seeds, "rows": rows,
+            "periods": [int(p) if p == int(p) else p for p in sorted(periods)]}
 
 
 def fleet() -> dict:
@@ -586,7 +625,7 @@ def grid_reading() -> dict | None:
         for size in D.SIZES:
             for o in (D.ORGS if key == "six" else D.KUBE):
                 org = name[o] if key == "six" else o
-                for n in (1, 10, 100, 1000):
+                for n in (1, 10, 100, D.RUNS):
                     want = range(0, n) if key == "six" else range(1, n + 1)
                     st = len(cov_all.get((key, size, o), set()) & set(want)); dn = len(cov_done.get((key, size, o), set()) & set(want))
                     if st:
@@ -832,9 +871,9 @@ def register_places(limit: bool = True) -> list:
 
 def dial() -> dict:
     """The heartbeat dial (omni-v17): every beat of the Kubernetes governor read in our own models, from the newest ladder
-    tools/beat_ladder.py wrote (results/toy_gate/V<n>_LADDER.json), without its per-seed records; the real runs' place from
+    tools/beat_ladder.py wrote (results/model_gate/V<n>_LADDER.json), without its per-seed records; the real runs' place from
     the pace entry's three-run tables once they exist (results/live/V<n>_PACE*.md). Empty until a ladder exists."""
-    lads = sorted((ROOT / "results" / "toy_gate").glob("V*_LADDER.json"), key=lambda f: int(re.sub(r"\D", "", f.stem) or 0))
+    lads = sorted((ROOT / "results" / "model_gate").glob("V*_LADDER.json"), key=lambda f: int(re.sub(r"\D", "", f.stem) or 0))
     if not lads:
         return {}
     lad = json.loads(lads[-1].read_text(encoding="utf-8"))
@@ -842,8 +881,18 @@ def dial() -> dict:
     return {"file": str(lads[-1].relative_to(ROOT)), "seeds": lad["seeds"], "days": lad["days"], "main_s": lad["main_s"],
             "real": ("three-run tables in " + ", ".join(f"results/live/{f.name}" for f in pace)) if pace else
                     "not yet run (docs/PACE_PREREGISTRATION.md, amendment 3: eight arms in every repetition, three runs)",
-            "toys": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
-                            for k, t in lad["toys"].items()})}   # a change against a zero (native's power cap) is NaN: null
+            "models": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
+                            for k, t in lad["models"].items()})}   # a change against a zero (native's power cap) is NaN: null
+
+
+def direct() -> dict:
+    """Omni direct's three arms (omni-v18): every showing record under results/orchestrator/ (tools/orchestrator_record.py),
+    newest first, as written from the showing's own files; the page replays the newest (section 2a)."""
+    recs, abc = [], []
+    for f in sorted((ROOT / "results" / "orchestrator").glob("*.json")):
+        r = json.loads(f.read_text(encoding="utf-8")); r["file"] = str(f.relative_to(ROOT))
+        (abc if f.stem.endswith("_ABC") else recs).append(r)     # a three-run table (tools/orchestrator_abc.py) or one showing
+    return {"records": sorted(recs, key=lambda r: r.get("written", ""), reverse=True), "abc": abc}
 
 
 def records(runs: bool) -> dict:
@@ -895,7 +944,8 @@ def records(runs: bool) -> dict:
     build["board"] = board(build["runs"], camp)
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
-            "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x, "dial": dial()}
+            "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
+            "beatsweep": beat_sweep(), "dial": dial(), "direct": direct()}
 
 
 def embedded(page: str, key: str):
@@ -939,6 +989,88 @@ def inject(page: str, key: str, value) -> str:
     return page.replace(anchor, f"{tag}{text}</script>\n{anchor}", 1)
 
 
+APPRAISAL = ROOT / "docs" / "engine" / "APPRAISAL.md"
+COUNTS_BEGIN = "<!-- counts: written by docs/engine/build_live_engine.py at every build; never edited by hand -->"
+COUNTS_END = "<!-- end counts -->"
+WORDS = ("GAIN", "power given", "EVEN", "LOSS", "the runs disagree", "the runs differ", "shown", "tuning")
+
+
+def table_way(file: str):
+    """As the page reads it (tableWay): a four-ways table's tag, and whether Omni-Compass is read against its own native in it."""
+    m = re.search(r"_4W_(TOP|ORCH|BARE|VS|BOTH)\.md$", file or "")
+    return (m.group(1) if m else None), (not m or m.group(1) in ("TOP", "BARE"))
+
+
+def _size(abc):
+    """The largest size among a row's three runs, in percent, or None where a run is not a percentage."""
+    out = []
+    for c in abc or []:
+        m = re.search(r"[-+\u2212]?\d[\d,]*(?:\.\d+)?", str(c or ""))
+        if not m or "%" not in str(c):
+            return None
+        out.append(abs(float(m.group(0).replace(",", "").replace("\u2212", "-"))))
+    return max(out) if out else None
+
+
+def appraisal_counts(rec) -> str:
+    """The appraisal's counts, from the records this build made: the runs and their files, the receipts by engine and by word
+    (Omni-Compass against its native apart from the orchestrators' own cost, before and after the page's floor), and every LOSS
+    row of Omni-Compass against its native. Written between COUNTS_BEGIN and COUNTS_END in docs/engine/APPRAISAL.md."""
+    from collections import Counter
+    b, R, S = rec["build"], rec["runs"], rec["scen"]
+    runs = [r for bm in R["benchmarks"] for r in bm["runs"]]
+    files, ok, unmatched = sum(r["checked"] for r in runs), sum(r["ok"] for r in runs), sum(len(r.get("unmatched") or []) for r in runs)
+    recs = S["receipts"]; floor = rec["build"].get("floor")
+    by_eng = Counter(r["engine"] for r in recs)
+
+    def tally(rs, floored):
+        c = Counter()
+        for r in rs:
+            cnt = dict(r.get("count") or {})
+            if floored and floor is not None:
+                for x in r["rows"]:
+                    sz = _size(x.get("abc"))
+                    if x["w"] in ("GAIN", "LOSS", "power given") and sz is not None and sz < 100 * floor:
+                        cnt[x["w"]] = cnt.get(x["w"], 0) - 1; cnt["EVEN"] = cnt.get("EVEN", 0) + 1
+            c.update({w: cnt.get(w, 0) for w in WORDS})
+        return c
+
+    def words(c):
+        return ", ".join(f"{c[w]} {w}" for w in WORDS if c[w])
+    omni = [r for r in recs if table_way(r["file"])[1]]; orch = [r for r in recs if not table_way(r["file"])[1]]
+    losses = [f"{x['g']} under `{Path(r['file']).name}` ({r['engine']}: {', '.join(str(a) for a in (x.get('abc') or []))})"
+              for r in omni for x in r["rows"] if x["w"] == "LOSS"]
+    fl = f" (the page applies the floor of {100 * floor:g}% at load; after it: " if floor is not None else ""
+    lines = [COUNTS_BEGIN,
+             f"**The counts of the records on the page** ({b['engine']}, digest `{b['digest']}`), written by the build from the records it made, so a check rebuilds them exactly:",
+             "", "| What | Count |", "|---|---|",
+             f"| Three-run tables played back from their raw files (sections 4c and 4d) | {len(R['benchmarks'])}, with {len(runs)} runs |",
+             f"| Raw files checked against their run's own `SHA256SUMS_ALL.txt` | {ok:,} of {files:,} matched; {unmatched} unmatched |",
+             f"| Receipts (every judged row of each benchmark's newest table) | {len(recs)}: " + ", ".join(f"{e} {n}" for e, n in sorted(by_eng.items(), key=lambda kv: -int(re.sub(r'\D', '', kv[0]) or 0))) + " |",
+             f"| Omni-Compass against its native ({len(omni)} tables), as the tables wrote them | {words(tally(omni, False))}{fl}{words(tally(omni, True)) + ')' if floor is not None else ''} |",
+             f"| The orchestrators' own cost ({len(orch)} four-ways tables: the orchestrator as shipped against the organism alone, and the comparisons where Omni-Compass is on the other side), never a reading of Omni-Compass | {words(tally(orch, False))}{fl}{words(tally(orch, True)) + ')' if floor is not None else ''} |",
+             f"| LOSS rows of Omni-Compass against its native | {len(losses)}: " + ("; ".join(losses) if losses else "none") + " |",
+             "", COUNTS_END]
+    return "\n".join(lines)
+
+
+def write_appraisal(rec, check: bool = False) -> bool:
+    """Rewrites the counts block of the appraisal (or, under --check, says whether it is current). True when current or written."""
+    if not APPRAISAL.exists():
+        return True
+    t = APPRAISAL.read_text(encoding="utf-8")
+    a, z = t.find(COUNTS_BEGIN), t.find(COUNTS_END)
+    if a < 0 or z < 0:
+        return True
+    new = t[:a] + appraisal_counts(rec) + t[z + len(COUNTS_END):]
+    if new == t:
+        return True
+    if check:
+        return False
+    APPRAISAL.write_text(new, encoding="utf-8")
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true", help="rebuild in memory; exit 1 if any record differs from the page")
@@ -967,7 +1099,8 @@ def main() -> int:
         print(f"the engine that stands is now {rec['build']['engine']} (the page was built on {old}): records rebuilt on it; "
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
-        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin", "dial")
+        bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
+                          "beatsweep", "dial", "direct")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -976,15 +1109,19 @@ def main() -> int:
         strip = lambda bd: [{k: v for k, v in x.items() if k not in ("now", "abc")} for x in (bd or [])]
         if any(pb.get(k) != rec["build"][k] for k in keep) or strip(pb.get("board")) != strip(rec["build"]["board"]):
             bad.append("build")
+        if not write_appraisal(rec, check=True):
+            bad.append("the appraisal's counts (docs/engine/APPRAISAL.md)")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         for k in bad:
             where = first_difference(embedded(page, k), rec[k])
             if where:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
-    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin", "dial"):
+    for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
+              "beatsweep", "dial", "direct"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
+    write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand
     b = rec["build"]
     print(f"live engine rebuilt on {b['engine']} ({b['digest']}) at {b['commit'][:12]}, {b['built_at']}; "
           f"{len(b['runs'])} GitHub runs running or queued")

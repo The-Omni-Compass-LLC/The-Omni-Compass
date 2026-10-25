@@ -25,7 +25,7 @@ def main():
     assert P.verdict([r(10, 5, 15)] * 3, "spent") == "**power given in all three of our runs**", "a resource spent that rose is power given, never a LOSS"
     assert P.verdict([r(10, 5, 15)] * 3, "lower", "cpu_seconds") == "**power given in all three of our runs**", "a resource declared lower before the word spent"
     assert P.verdict([r(-10, -15, -5)] * 3, "spent") == "**GAIN in all three of our runs**", "a cut is a GAIN"
-    assert P.verdict([r(10, 5, 15), r(10, -2, 22), r(10, 5, 15)], "higher") == "EVEN, no difference beyond the noise (1 of 3 runs)"
+    assert P.verdict([r(10, 5, 15), r(10, -2, 22), r(10, 5, 15)], "higher") == "**GAIN by the mean of our three runs, beyond the noise in 2 of 3**"
     assert P.verdict([r(10, 5, 15), r(-10, -15, -5), r(10, 5, 15)], "higher") == "**the runs disagree**"
     assert P.verdict([r(0.0, -1e-9, 1e-9)] * 3, "higher") == "EVEN, the same"
     assert P.verdict([r(0, 0, 0, nat=0), r(1, 1, 1, nat=0), r(0, 0, 0, nat=0)], "never more") == "**LOSS in at least one of our runs**", "one more failed transaction in one run is marked"

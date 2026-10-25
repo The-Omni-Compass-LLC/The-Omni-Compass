@@ -10,11 +10,11 @@ The founder's list of 19 October, night: every governor and orchestrator he name
 
 | Governor | What it governs | Register row | Where it stands | Readings (A, B and C) |
 |---|---|---:|---|---|
-| The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: three runs in; bin-packing profile: three runs in | as shipped: 5 GAIN, 1 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_VANILLA.md)); bin-packing profile: 5 GAIN, 1 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_BINPACK.md)) |
+| The Kubernetes scheduler (vanilla, and its bin-packing profile) | pod placement | 88 | as shipped: three runs in; bin-packing profile: three runs in | as shipped: 5 GAIN, 4 LOSS, 1 power given, 7 EVEN, 5 where the runs disagree ([table](V12_VANILLA.md)); bin-packing profile: 6 GAIN, 7 LOSS, 1 power given, 6 EVEN, 2 where the runs disagree ([table](V12_BINPACK.md)) |
 | Kueue | batch admission (a job at a time, by queue quota) | 63 | running four ways (below) | runs not yet finished |
 | Volcano | batch scheduling (queues, gangs) | 63 | running four ways (below) | runs not yet finished |
-| KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | three runs in | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_KAI.md)) |
-| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | three runs in | 3 GAIN, 0 LOSS, 0 power given, 19 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR.md)) |
+| KAI scheduler | AI workload scheduling (queues, fair share, gangs) | 91 | three runs in | 5 GAIN, 5 LOSS, 0 power given, 6 EVEN, 6 where the runs disagree ([table](V12_KAI.md)) |
+| Koordinator | QoS colocation (batch work on what latency-sensitive pods leave unused) | 89 | three runs in | 7 GAIN, 2 LOSS, 2 power given, 7 EVEN, 4 where the runs disagree ([table](V12_KOORDINATOR.md)) |
 | CruiseKube | rightsizing (requests and limits, in place) | 81 | built; its runs come in the campaign | not yet run |
 | Crane | predictive autoscaling and resource governance | 90 | running four ways (below) | runs not yet finished |
 | KubeRay | Ray clusters (the Ray autoscaler) | 92 | running four ways (below) | runs not yet finished |
@@ -31,17 +31,17 @@ Each system runs four ways in every repetition, each way on a fresh cluster of t
 
 | System | Runs (A, B and C) | Omni-Compass on top of it, against it as shipped | it as shipped, against the organism alone | Omni-Compass on the organism alone, against the organism alone | Omni-Compass on the organism alone, against it as shipped | Omni-Compass on top of it, against the organism alone |
 |---|---|---|---|---|---|---|
-| The KAI scheduler | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368344021) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368351097) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368358521) | 2 GAIN, 0 LOSS, 0 power given, 20 EVEN, 0 where the runs disagree ([table](V12_KAI_4W_TOP.md)) | 0 GAIN, 7 LOSS, 0 power given, 15 EVEN, 0 where the runs disagree ([table](V12_KAI_4W_ORCH.md)) | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_KAI_4W_BARE.md)) | 11 GAIN, 0 LOSS, 0 power given, 11 EVEN, 0 where the runs disagree ([table](V12_KAI_4W_VS.md)) | 1 GAIN, 6 LOSS, 0 power given, 15 EVEN, 0 where the runs disagree ([table](V12_KAI_4W_BOTH.md)) |
-| Koordinator | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368366066) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368373713) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368380786) | 1 GAIN, 0 LOSS, 0 power given, 21 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR_4W_TOP.md)) | 4 GAIN, 4 LOSS, 0 power given, 14 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR_4W_ORCH.md)) | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR_4W_BARE.md)) | 8 GAIN, 3 LOSS, 0 power given, 11 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR_4W_VS.md)) | 4 GAIN, 4 LOSS, 0 power given, 14 EVEN, 0 where the runs disagree ([table](V12_KOORDINATOR_4W_BOTH.md)) |
-| Kueue | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368387821) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368394823) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368401852) | 6 GAIN, 0 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_TOP.md)) | 0 GAIN, 4 LOSS, 0 power given, 18 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_ORCH.md)) | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_BARE.md)) | 8 GAIN, 0 LOSS, 0 power given, 14 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_VS.md)) | 4 GAIN, 3 LOSS, 0 power given, 15 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_BOTH.md)) |
-| Volcano | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368409208) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368415819) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368422189) | 4 GAIN, 0 LOSS, 0 power given, 18 EVEN, 0 where the runs disagree ([table](V12_VOLCANO_4W_TOP.md)) | 3 GAIN, 4 LOSS, 0 power given, 15 EVEN, 0 where the runs disagree ([table](V12_VOLCANO_4W_ORCH.md)) | 2 GAIN, 0 LOSS, 0 power given, 20 EVEN, 0 where the runs disagree ([table](V12_VOLCANO_4W_BARE.md)) | 5 GAIN, 2 LOSS, 0 power given, 15 EVEN, 0 where the runs disagree ([table](V12_VOLCANO_4W_VS.md)) | 5 GAIN, 4 LOSS, 0 power given, 13 EVEN, 0 where the runs disagree ([table](V12_VOLCANO_4W_BOTH.md)) |
-| The scheduler's bin-packing profile | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368428763) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368435483) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368442002) | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_BINPACK_4W_TOP.md)) | 1 GAIN, 0 LOSS, 0 power given, 21 EVEN, 0 where the runs disagree ([table](V12_BINPACK_4W_ORCH.md)) | 5 GAIN, 0 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_BINPACK_4W_BARE.md)) | 4 GAIN, 1 LOSS, 0 power given, 17 EVEN, 0 where the runs disagree ([table](V12_BINPACK_4W_VS.md)) | 6 GAIN, 0 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_BINPACK_4W_BOTH.md)) |
-| KubeRay | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438462925) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438478652) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438494234) | 0 GAIN, 0 LOSS, 0 power given, 22 EVEN, 0 where the runs disagree ([table](V12_KUBERAY_4W_TOP.md)) | 0 GAIN, 8 LOSS, 2 power given, 12 EVEN, 0 where the runs disagree ([table](V12_KUBERAY_4W_ORCH.md)) | 5 GAIN, 2 LOSS, 0 power given, 15 EVEN, 0 where the runs disagree ([table](V12_KUBERAY_4W_BARE.md)) | 12 GAIN, 0 LOSS, 0 power given, 10 EVEN, 0 where the runs disagree ([table](V12_KUBERAY_4W_VS.md)) | 0 GAIN, 8 LOSS, 2 power given, 12 EVEN, 0 where the runs disagree ([table](V12_KUBERAY_4W_BOTH.md)) |
-| Crane | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438326588) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438344234) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438362894) | 0 GAIN, 1 LOSS, 2 power given, 13 EVEN, 0 where the runs disagree ([table](V12_CRANE_4W_TOP.md)) | 0 GAIN, 1 LOSS, 0 power given, 14 EVEN, 1 where the runs disagree ([table](V12_CRANE_4W_ORCH.md)) | 0 GAIN, 0 LOSS, 1 power given, 14 EVEN, 1 where the runs disagree ([table](V12_CRANE_4W_BARE.md)) | 1 GAIN, 1 LOSS, 1 power given, 13 EVEN, 0 where the runs disagree ([table](V12_CRANE_4W_VS.md)) | 0 GAIN, 1 LOSS, 4 power given, 11 EVEN, 0 where the runs disagree ([table](V12_CRANE_4W_BOTH.md)) |
+| The KAI scheduler | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368344021) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368351097) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368358521) | 6 GAIN, 6 LOSS, 2 power given, 5 EVEN, 3 where the runs disagree ([table](V12_KAI_4W_TOP.md)) | 1 GAIN, 8 LOSS, 1 power given, 9 EVEN, 3 where the runs disagree ([table](V12_KAI_4W_ORCH.md)) | 7 GAIN, 3 LOSS, 0 power given, 5 EVEN, 7 where the runs disagree ([table](V12_KAI_4W_BARE.md)) | 14 GAIN, 1 LOSS, 0 power given, 5 EVEN, 2 where the runs disagree ([table](V12_KAI_4W_VS.md)) | 5 GAIN, 10 LOSS, 2 power given, 5 EVEN, 0 where the runs disagree ([table](V12_KAI_4W_BOTH.md)) |
+| Koordinator | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368366066) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368373713) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368380786) | 7 GAIN, 3 LOSS, 0 power given, 4 EVEN, 8 where the runs disagree ([table](V12_KOORDINATOR_4W_TOP.md)) | 5 GAIN, 5 LOSS, 0 power given, 8 EVEN, 4 where the runs disagree ([table](V12_KOORDINATOR_4W_ORCH.md)) | 6 GAIN, 3 LOSS, 0 power given, 6 EVEN, 7 where the runs disagree ([table](V12_KOORDINATOR_4W_BARE.md)) | 9 GAIN, 5 LOSS, 0 power given, 4 EVEN, 4 where the runs disagree ([table](V12_KOORDINATOR_4W_VS.md)) | 10 GAIN, 6 LOSS, 1 power given, 4 EVEN, 1 where the runs disagree ([table](V12_KOORDINATOR_4W_BOTH.md)) |
+| Kueue | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368387821) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368394823) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368401852) | 6 GAIN, 4 LOSS, 1 power given, 5 EVEN, 6 where the runs disagree ([table](V12_KUEUE_4W_TOP.md)) | 0 GAIN, 11 LOSS, 2 power given, 9 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_ORCH.md)) | 8 GAIN, 4 LOSS, 1 power given, 6 EVEN, 3 where the runs disagree ([table](V12_KUEUE_4W_BARE.md)) | 17 GAIN, 0 LOSS, 0 power given, 5 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_VS.md)) | 6 GAIN, 10 LOSS, 2 power given, 4 EVEN, 0 where the runs disagree ([table](V12_KUEUE_4W_BOTH.md)) |
+| Volcano | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368409208) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368415819) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368422189) | 6 GAIN, 4 LOSS, 1 power given, 6 EVEN, 5 where the runs disagree ([table](V12_VOLCANO_4W_TOP.md)) | 8 GAIN, 4 LOSS, 0 power given, 9 EVEN, 1 where the runs disagree ([table](V12_VOLCANO_4W_ORCH.md)) | 9 GAIN, 4 LOSS, 1 power given, 6 EVEN, 2 where the runs disagree ([table](V12_VOLCANO_4W_BARE.md)) | 8 GAIN, 5 LOSS, 0 power given, 5 EVEN, 4 where the runs disagree ([table](V12_VOLCANO_4W_VS.md)) | 9 GAIN, 6 LOSS, 1 power given, 5 EVEN, 1 where the runs disagree ([table](V12_VOLCANO_4W_BOTH.md)) |
+| The scheduler's bin-packing profile | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368428763) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368435483) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39368442002) | 6 GAIN, 3 LOSS, 2 power given, 6 EVEN, 5 where the runs disagree ([table](V12_BINPACK_4W_TOP.md)) | 3 GAIN, 1 LOSS, 1 power given, 10 EVEN, 7 where the runs disagree ([table](V12_BINPACK_4W_ORCH.md)) | 6 GAIN, 4 LOSS, 1 power given, 6 EVEN, 5 where the runs disagree ([table](V12_BINPACK_4W_BARE.md)) | 8 GAIN, 4 LOSS, 0 power given, 5 EVEN, 5 where the runs disagree ([table](V12_BINPACK_4W_VS.md)) | 6 GAIN, 3 LOSS, 2 power given, 6 EVEN, 5 where the runs disagree ([table](V12_BINPACK_4W_BOTH.md)) |
+| KubeRay | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438462925) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438478652) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438494234) | 7 GAIN, 2 LOSS, 0 power given, 7 EVEN, 6 where the runs disagree ([table](V12_KUBERAY_4W_TOP.md)) | 0 GAIN, 10 LOSS, 4 power given, 6 EVEN, 2 where the runs disagree ([table](V12_KUBERAY_4W_ORCH.md)) | 6 GAIN, 8 LOSS, 2 power given, 5 EVEN, 1 where the runs disagree ([table](V12_KUBERAY_4W_BARE.md)) | 12 GAIN, 0 LOSS, 1 power given, 4 EVEN, 5 where the runs disagree ([table](V12_KUBERAY_4W_VS.md)) | 3 GAIN, 10 LOSS, 4 power given, 3 EVEN, 2 where the runs disagree ([table](V12_KUBERAY_4W_BOTH.md)) |
+| Crane | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438326588) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438344234) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438362894) | 1 GAIN, 2 LOSS, 2 power given, 7 EVEN, 4 where the runs disagree ([table](V12_CRANE_4W_TOP.md)) | 2 GAIN, 1 LOSS, 1 power given, 7 EVEN, 5 where the runs disagree ([table](V12_CRANE_4W_ORCH.md)) | 4 GAIN, 1 LOSS, 2 power given, 7 EVEN, 2 where the runs disagree ([table](V12_CRANE_4W_BARE.md)) | 4 GAIN, 2 LOSS, 2 power given, 7 EVEN, 1 where the runs disagree ([table](V12_CRANE_4W_VS.md)) | 0 GAIN, 2 LOSS, 4 power given, 5 EVEN, 5 where the runs disagree ([table](V12_CRANE_4W_BOTH.md)) |
 | The Gödel scheduler | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39530159191) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39530162328) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39530165147) | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished | runs not yet finished |
-| Karmada | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438525862) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438541616) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438559009) | 0 GAIN, 0 LOSS, 0 power given, 22 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_TOP.md)) | 0 GAIN, 6 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_ORCH.md)) | 0 GAIN, 0 LOSS, 1 power given, 21 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_BARE.md)) | 6 GAIN, 0 LOSS, 0 power given, 16 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_VS.md)) | 0 GAIN, 8 LOSS, 1 power given, 13 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_BOTH.md)) |
-| Open Cluster Management | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479807336) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479824367) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479840381) | 0 GAIN, 1 LOSS, 1 power given, 20 EVEN, 0 where the runs disagree ([table](V12_OCM_4W_TOP.md)) | 0 GAIN, 2 LOSS, 0 power given, 20 EVEN, 0 where the runs disagree ([table](V12_OCM_4W_ORCH.md)) | 0 GAIN, 0 LOSS, 0 power given, 22 EVEN, 0 where the runs disagree ([table](V12_OCM_4W_BARE.md)) | 2 GAIN, 2 LOSS, 1 power given, 17 EVEN, 0 where the runs disagree ([table](V12_OCM_4W_VS.md)) | 0 GAIN, 9 LOSS, 0 power given, 13 EVEN, 0 where the runs disagree ([table](V12_OCM_4W_BOTH.md)) |
-| Armada | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39482335827) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39482351075) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39482365814) | 6 GAIN, 0 LOSS, 0 power given, 15 EVEN, 0 where the runs disagree ([table](V12_ARMADA_4W_TOP.md)) | 7 GAIN, 5 LOSS, 0 power given, 9 EVEN, 0 where the runs disagree ([table](V12_ARMADA_4W_ORCH.md)) | 0 GAIN, 1 LOSS, 0 power given, 21 EVEN, 0 where the runs disagree ([table](V12_ARMADA_4W_BARE.md)) | 5 GAIN, 5 LOSS, 1 power given, 10 EVEN, 0 where the runs disagree ([table](V12_ARMADA_4W_VS.md)) | 9 GAIN, 5 LOSS, 0 power given, 7 EVEN, 0 where the runs disagree ([table](V12_ARMADA_4W_BOTH.md)) |
+| Karmada | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438525862) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438541616) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39438559009) | 4 GAIN, 9 LOSS, 2 power given, 4 EVEN, 3 where the runs disagree ([table](V12_KARMADA_4W_TOP.md)) | 0 GAIN, 12 LOSS, 2 power given, 8 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_ORCH.md)) | 4 GAIN, 9 LOSS, 2 power given, 4 EVEN, 3 where the runs disagree ([table](V12_KARMADA_4W_BARE.md)) | 14 GAIN, 2 LOSS, 2 power given, 4 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_VS.md)) | 4 GAIN, 12 LOSS, 2 power given, 4 EVEN, 0 where the runs disagree ([table](V12_KARMADA_4W_BOTH.md)) |
+| Open Cluster Management | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479807336) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479824367) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39479840381) | 4 GAIN, 10 LOSS, 2 power given, 4 EVEN, 2 where the runs disagree ([table](V12_OCM_4W_TOP.md)) | 4 GAIN, 9 LOSS, 0 power given, 8 EVEN, 1 where the runs disagree ([table](V12_OCM_4W_ORCH.md)) | 7 GAIN, 7 LOSS, 2 power given, 4 EVEN, 2 where the runs disagree ([table](V12_OCM_4W_BARE.md)) | 14 GAIN, 2 LOSS, 2 power given, 4 EVEN, 0 where the runs disagree ([table](V12_OCM_4W_VS.md)) | 4 GAIN, 12 LOSS, 2 power given, 4 EVEN, 0 where the runs disagree ([table](V12_OCM_4W_BOTH.md)) |
+| Armada | [A](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39482335827) [B](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39482351075) [C](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/39482365814) | 6 GAIN, 1 LOSS, 2 power given, 10 EVEN, 2 where the runs disagree ([table](V12_ARMADA_4W_TOP.md)) | 8 GAIN, 5 LOSS, 1 power given, 4 EVEN, 3 where the runs disagree ([table](V12_ARMADA_4W_ORCH.md)) | 5 GAIN, 8 LOSS, 2 power given, 4 EVEN, 3 where the runs disagree ([table](V12_ARMADA_4W_BARE.md)) | 8 GAIN, 6 LOSS, 2 power given, 2 EVEN, 3 where the runs disagree ([table](V12_ARMADA_4W_VS.md)) | 10 GAIN, 7 LOSS, 2 power given, 2 EVEN, 0 where the runs disagree ([table](V12_ARMADA_4W_BOTH.md)) |
 
 ## The orchestra, the eighth organism (modelled, class S)
 
@@ -65,6 +65,25 @@ The founder's word of 19 October, night: the governors in a catalog group, an or
 | Nephio | 4 | GAIN (fewer misses) | GAIN (more work + fewer misses) | GAIN (fewer misses) |
 | **The orchestra, every governor's muscle once** | 55 | **GAIN (more work + fewer misses)** | **GAIN (more work + fewer misses)** | **GAIN (more work + fewer misses)** |
 
+## The orchestrators on the same organisms, with the same injection (modelled, class S): the third arm
+
+The founder's order of 25 October: every orchestrator on the same organisms with the same injection, and Omni-Compass on top of each. 12 injections in two settings (the kind rig and the cloud), 8 repetitions, every arm of a repetition meeting the same random numbers; each orchestrator's rule written from its own release; Omni-Compass the shipped governor of omni-v19. A model, never a measurement of the orchestrator itself; every organism and gauge: [`results/orchestrators/ORCHESTRATORS.md`](../orchestrators/ORCHESTRATORS.md).
+
+| Orchestrator | Setting | Against Kubernetes alone | Omni-Compass on top of it, against it |
+|---|---|---|---|
+| the Kubernetes scheduler as shipped (the organism alone) | on-site | it is native | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| the Kubernetes scheduler as shipped (the organism alone) | cloud | it is native | 0 GAIN, 0 LOSS, 1 power given, 85 EVEN |
+| the Kubernetes scheduler's bin-packing profile | on-site | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| the Kubernetes scheduler's bin-packing profile | cloud | 1 GAIN, 2 LOSS, 3 power given, 80 EVEN | 0 GAIN, 0 LOSS, 1 power given, 85 EVEN |
+| Volcano v1.16.0 | on-site | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| Volcano v1.16.0 | cloud | 6 GAIN, 20 LOSS, 2 power given, 58 EVEN | 0 GAIN, 1 LOSS, 0 power given, 85 EVEN |
+| Kueue v0.20.2 | on-site | 0 GAIN, 5 LOSS, 0 power given, 81 EVEN | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| Kueue v0.20.2 | cloud | 2 GAIN, 6 LOSS, 0 power given, 78 EVEN | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN |
+| the KAI scheduler v0.18.6 | on-site | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN | 20 GAIN, 2 LOSS, 0 power given, 64 EVEN |
+| the KAI scheduler v0.18.6 | cloud | 4 GAIN, 37 LOSS, 7 power given, 38 EVEN | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN |
+| Koordinator 1.8.0 | on-site | 4 GAIN, 3 LOSS, 1 power given, 78 EVEN | 20 GAIN, 0 LOSS, 0 power given, 66 EVEN |
+| Koordinator 1.8.0 | cloud | 0 GAIN, 7 LOSS, 6 power given, 73 EVEN | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN |
+
 ## The Kubernetes scheduler (vanilla, and its bin-packing profile)
 
 - **Native**: the default scheduler of Kubernetes 1.35 as shipped, which places every pod of every Kubernetes set; and the same release's scheduler with the operator's bin-packing profile (NodeResourcesFit, MostAllocated).
@@ -75,19 +94,19 @@ The founder's word of 19 October, night: the governors in a catalog group, an or
 
 | Gauge | Reading |
 |---|---|
-| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job wait, submitted to its first pod running, mean (s) | the runs disagree |
 | queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, the same |
 | queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs |
 | queue: jobs unfinished at the window's end | EVEN, the same |
-| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) |
+| batch: queue finished (s) | EVEN, under the floor (the three runs' mean 0.12%) |
 | batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs |
 | worker nodes in service, mean | GAIN in all three of our runs |
 | node-hours | GAIN in all three of our runs |
-| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy, parked workers still on at idle power (Wh) | EVEN, under the floor (the three runs' mean 0.15%) |
 | energy (Wh) | GAIN in all three of our runs |
 | energy per core-hour (Wh) | shown, not judged |
 | response time (ms), mean | GAIN in all three of our runs |
-| response time (ms), 95th percentile | EVEN, no difference beyond the noise (2 of 3 runs) |
+| response time (ms), 95th percentile | LOSS by the mean of our three runs, beyond the noise in 1 of 3 |
 | failed requests (%) | EVEN, the same |
 
 Every row of the run: [`results/live/V12_VANILLA.md`](V12_VANILLA.md).
@@ -96,19 +115,19 @@ Every row of the run: [`results/live/V12_VANILLA.md`](V12_VANILLA.md).
 
 | Gauge | Reading |
 |---|---|
-| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
-| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job wait, submitted to its first pod running, mean (s) | the runs disagree |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS by the mean of our three runs, beyond the noise in 0 of 3 |
 | queue: job turnaround, submitted to done, mean (s) | LOSS in all three of our runs |
 | queue: jobs unfinished at the window's end | EVEN, the same |
-| batch: queue finished (s) | EVEN, no difference beyond the noise (2 of 3 runs) |
+| batch: queue finished (s) | EVEN, under the floor (the three runs' mean 0.01%) |
 | batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs |
 | worker nodes in service, mean | GAIN in all three of our runs |
 | node-hours | GAIN in all three of our runs |
-| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy, parked workers still on at idle power (Wh) | EVEN, under the floor (the three runs' mean 0.05%) |
 | energy (Wh) | GAIN in all three of our runs |
 | energy per core-hour (Wh) | shown, not judged |
 | response time (ms), mean | GAIN in all three of our runs |
-| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) |
+| response time (ms), 95th percentile | GAIN by the mean of our three runs, beyond the noise in 0 of 3 |
 | failed requests (%) | EVEN, the same |
 
 Every row of the run: [`results/live/V12_BINPACK.md`](V12_BINPACK.md).
@@ -140,19 +159,19 @@ Every row of the run: [`results/live/V12_BINPACK.md`](V12_BINPACK.md).
 
 | Gauge | Reading |
 |---|---|
-| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
-| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) |
-| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (2 of 3 runs) |
+| queue: job wait, submitted to its first pod running, mean (s) | the runs disagree |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | LOSS by the mean of our three runs, beyond the noise in 0 of 3 |
+| queue: job turnaround, submitted to done, mean (s) | LOSS by the mean of our three runs, beyond the noise in 1 of 3 |
 | queue: jobs unfinished at the window's end | EVEN, the same |
-| batch: queue finished (s) | EVEN, no difference beyond the noise (1 of 3 runs) |
+| batch: queue finished (s) | EVEN, under the floor (the three runs' mean 0.34%) |
 | batch: worker machines in service after the queue finished, mean | GAIN in all three of our runs |
 | worker nodes in service, mean | GAIN in all three of our runs |
 | node-hours | GAIN in all three of our runs |
-| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| energy, parked workers still on at idle power (Wh) | EVEN, under the floor (the three runs' mean 0.01%) |
 | energy (Wh) | GAIN in all three of our runs |
 | energy per core-hour (Wh) | shown, not judged |
 | response time (ms), mean | GAIN in all three of our runs |
-| response time (ms), 95th percentile | EVEN, no difference beyond the noise (all three runs) |
+| response time (ms), 95th percentile | the runs disagree |
 | failed requests (%) | EVEN, the same |
 
 Every row of the run: [`results/live/V12_KAI.md`](V12_KAI.md).
@@ -168,16 +187,16 @@ Every row of the run: [`results/live/V12_KAI.md`](V12_KAI.md).
 
 | Gauge | Reading |
 |---|---|
-| queue: job wait, submitted to its first pod running, mean (s) | EVEN, no difference beyond the noise (all three runs) |
-| queue: job wait, submitted to its first pod running, 95th percentile (s) | EVEN, no difference beyond the noise (all three runs) |
-| queue: job turnaround, submitted to done, mean (s) | EVEN, no difference beyond the noise (all three runs) |
-| queue: jobs unfinished at the window's end | EVEN, no difference beyond the noise (all three runs) |
-| batch: queue finished (s) | EVEN, no difference beyond the noise (all three runs) |
-| batch: worker machines in service after the queue finished, mean | EVEN, no difference beyond the noise (all three runs) |
-| worker nodes in service, mean | EVEN, no difference beyond the noise (all three runs) |
-| node-hours | EVEN, no difference beyond the noise (all three runs) |
-| energy, parked workers still on at idle power (Wh) | EVEN, no difference beyond the noise (all three runs) |
-| energy (Wh) | EVEN, no difference beyond the noise (all three runs) |
+| queue: job wait, submitted to its first pod running, mean (s) | GAIN by the mean of our three runs, beyond the noise in 0 of 3 |
+| queue: job wait, submitted to its first pod running, 95th percentile (s) | the runs disagree |
+| queue: job turnaround, submitted to done, mean (s) | the runs disagree |
+| queue: jobs unfinished at the window's end | the runs disagree |
+| batch: queue finished (s) | GAIN by the mean of our three runs, beyond the noise in 0 of 3 |
+| batch: worker machines in service after the queue finished, mean | GAIN by the mean of our three runs, beyond the noise in 0 of 3 |
+| worker nodes in service, mean | EVEN, under the floor (the three runs' mean 0.44%) |
+| node-hours | GAIN by the mean of our three runs, beyond the noise in 0 of 3 |
+| energy, parked workers still on at idle power (Wh) | EVEN, under the floor (the three runs' mean 0.14%) |
+| energy (Wh) | EVEN, under the floor (the three runs' mean 0.45%) |
 | energy per core-hour (Wh) | shown, not judged |
 | response time (ms), mean | GAIN in all three of our runs |
 | response time (ms), 95th percentile | GAIN in all three of our runs |

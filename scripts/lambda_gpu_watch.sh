@@ -8,6 +8,7 @@
 # MINUTES, and give it back the moment the run is over:
 #   the run printed its last line ("send this one file back"): fetch every result file, give the machine back;
 #   the hour budget plus one hour has passed (the deadline): fetch whatever results exist, give the machine back;
+#   the run stopped without its last line (it refused to start, or died): fetch what exists, give the machine back;
 #   the machine is already gone: nothing to do.
 # Writes the state (done, deadline, gone or watching) to OUT/state. The key never leaves the environment.
 # Usage: bash scripts/lambda_gpu_watch.sh ID IP DEADLINE_EPOCH MINUTES OUT     (SSH_KEY: the private key file)
@@ -35,6 +36,16 @@ while :; do
   if [ "$st" = terminated ]; then echo gone > "$OUT/state"; echo "machine $ID is already given back"; exit 0; fi
   if "${SSH[@]}" "grep -q 'send this one file back' omni/run.log" 2>/dev/null; then
     echo "the run is over: fetching the results"; fetch; give_back; echo done > "$OUT/state"; exit 0
+  fi
+  # the run stopped without its last line (it refused to start, or died): nothing more will come, so the card goes back now
+  # instead of billing to the deadline; only a clear answer counts (a lost connection is not a stopped run)
+  # the brackets keep the pattern from matching the shell that runs this very check (its own command line holds the
+  # names; unbracketed, every check read "running" and a stopped run kept its card to the deadline: 24 October)
+  alive=$("${SSH[@]}" "pgrep -f '[g]pu_rented_run.sh|[g]pu_8card.sh' > /dev/null && echo running || echo stopped" 2>/dev/null)
+  if [ "$alive" = stopped ] && ! "${SSH[@]}" "grep -q 'send this one file back' omni/run.log" 2>/dev/null; then
+    echo "the run stopped before its last line: fetching what exists and giving the machine back"
+    "${SSH[@]}" "tail -n 5 omni/run.log" 2>/dev/null | sed 's/^/  run: /'
+    fetch; give_back; echo done > "$OUT/state"; exit 0
   fi
   if [ "$(date +%s)" -ge "$DEADLINE" ]; then
     echo "the deadline has passed: fetching what exists and giving the machine back"; fetch; give_back

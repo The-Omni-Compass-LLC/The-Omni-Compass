@@ -20,9 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import cloud_machine as CM  # noqa: E402
 
-FAKE = r'''#!/usr/bin/env python3
+STANDIN = r'''#!/usr/bin/env python3
 import json, os, sys
-log = os.environ["FAKE_LOG"]; state = os.environ["FAKE_STATE"]
+log = os.environ["STANDIN_LOG"]; state = os.environ["STANDIN_STATE"]
 a = sys.argv[1:]
 open(log, "a").write(os.path.basename(sys.argv[0]) + " " + " ".join(a) + "\n")
 s = json.load(open(state)) if os.path.exists(state) else {}
@@ -49,10 +49,10 @@ else:
 def _setup(tmp):
     for name in ("gcloud", "aws"):
         p = Path(tmp) / name
-        p.write_text(FAKE)
+        p.write_text(STANDIN)
         p.chmod(p.stat().st_mode | stat.S_IEXEC)
     os.environ.update(CLOUD_GCLOUD=str(Path(tmp) / "gcloud"), CLOUD_AWS=str(Path(tmp) / "aws"),
-                      FAKE_LOG=str(Path(tmp) / "calls.log"), FAKE_STATE=str(Path(tmp) / "state.json"), CLOUD_POLL_S="0")
+                      STANDIN_LOG=str(Path(tmp) / "calls.log"), STANDIN_STATE=str(Path(tmp) / "state.json"), CLOUD_POLL_S="0")
     (Path(tmp) / "k.pub").write_text("ssh-ed25519 AAAATEST omni\n")
     return Path(tmp) / "calls.log"
 

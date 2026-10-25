@@ -7,6 +7,7 @@
 October: every monitor numbered, on the wall, with its own knobs and its open-source feed)."""
 import json
 import re
+import sys
 import unittest
 from pathlib import Path
 
@@ -14,6 +15,18 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "docs" / "engine" / "OMNI_COMPASS_LIVE_ENGINE.html"
 REG = ROOT / "docs" / "engine" / "monitors.json"
 
+
+
+def monitor_panels(d):
+    """The wall's panels that stand for the page's monitors: every row and panel after the signals row, which reads the
+    governor's own alarms in the road's words and stands for no monitor of the page (docs/engine/export_grafana.py, signals_row)."""
+    out, skip = [], False
+    for p in d["panels"]:
+        if p["type"] == "row":
+            skip = p["title"].startswith("The signals")
+        if not skip:
+            out.append(p)
+    return out
 
 class LiveMonitors(unittest.TestCase):
     @classmethod
@@ -42,10 +55,67 @@ class LiveMonitors(unittest.TestCase):
 
     def test_the_grafana_wall_has_a_panel_a_monitor(self):
         d = json.loads((ROOT / "deploy" / "grafana" / "omni-compass-wall.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(d["panels"]), len(self.reg["monitors"]))
-        for p in d["panels"]:
+        mons = [p for p in monitor_panels(d) if p["type"] != "row"]
+        self.assertEqual(len(mons), len(self.reg["monitors"]))
+        for p in mons:
             if p["type"] != "text":
                 self.assertTrue(p["targets"] and all(t["expr"] for t in p["targets"]), p["title"])
+
+    def test_every_grafana_panel_sits_under_its_section(self):
+        """The founder's order of 21 October: every dashboard wired to its section. Each panel lies under the row of the page's
+        section that holds its monitor, numbered as the page numbers it."""
+        sys.path.insert(0, str(ROOT / "docs" / "engine"))
+        import export_grafana as XGF
+        sec = XGF.page_sections()
+        d = json.loads((ROOT / "deploy" / "grafana" / "omni-compass-wall.json").read_text(encoding="utf-8"))
+        order = {c: i for i, c in enumerate(XGF.page_order())}
+        ids = [m["id"] for m in sorted(self.reg["monitors"], key=lambda m: order.get(m["id"], len(order)))]
+        row, n = None, 0
+        for p in monitor_panels(d):
+            if p["type"] == "row":
+                row = p["title"]
+                continue
+            n += 1
+            cid = ids[n - 1]
+            self.assertTrue(p["title"].startswith(f"{n} · "), p["title"])
+            self.assertEqual(row, f"{sec[cid][0]} · {sec[cid][1]}", (cid, row))
+
+    def test_every_monitor_is_in_a_numbered_section(self):
+        sys.path.insert(0, str(ROOT / "docs" / "engine"))
+        import export_grafana as XGF
+        sec = XGF.page_sections()
+        self.assertEqual([c for c in self.canvases if not sec.get(c, ("", ""))[0]], [], "a monitor outside every numbered section")
+
+    def test_every_section_closes_what_it_opens(self):
+        """A closing tag too many once ended section 4 early and left the scale-out grid and every section after it outside the
+        page's frame (found 21 October): inside each section the divs open and close in balance, and none closes what it did not open."""
+        body = re.sub(r"<!--.*?-->", "", re.sub(r"<script[^>]*>.*?</script>", "", PAGE.read_text(encoding="utf-8"), flags=re.S), flags=re.S)
+        depth, opened = 0, []
+        for t in re.finditer(r"<(/?)(div|section)\b[^>]*>", body):
+            close, tag = t.group(1) == "/", t.group(2)
+            if tag == "section":
+                if close:
+                    self.assertEqual(depth, opened.pop(), "a section closed with a div still open inside it")
+                else:
+                    opened.append(depth)
+            else:
+                depth += -1 if close else 1
+                self.assertGreaterEqual(depth, opened[-1] if opened else 0, f"a closing div with no div open in its section, near offset {t.start()}")
+        self.assertEqual((depth, opened), (0, []))
+
+    def test_every_monitor_names_its_wiring(self):
+        """The founder's order of 21 October: every monitor confirmed, its code to its Python to its C++, lined up. Each monitor names
+        the page's own code (every function present in the page's script), the Python it ports or reads, the C++ twin or why there is
+        none, the checks that hold them equal and how it moves; every file named is in the repository."""
+        for m in self.reg["monitors"]:
+            w = m.get("wire") or {}
+            self.assertTrue(w.get("code") and w.get("moves"), m["id"])
+            for fn in (f.strip() for f in w["code"].split(",")):
+                self.assertRegex(self.body, rf"(function {fn}\(|const {fn} = )", (m["id"], fn))
+            self.assertTrue(w.get("cpp") or w.get("cpp_none"), (m["id"], "a C++ twin, or why there is none"))
+            for k in ("python", "cpp", "proof"):
+                for p in w.get(k, []):
+                    self.assertTrue((ROOT / p).exists(), (m["id"], k, p))
 
     def test_the_kill_switch_words(self):
         self.assertIn('class="onword">ON</span>', self.body)

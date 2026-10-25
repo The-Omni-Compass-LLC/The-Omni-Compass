@@ -42,6 +42,10 @@ NOISE_N = 200   # requests in the verdict's own window (omni_controller/controll
 # each in its own sub-folder (.github/workflows/kind-addons.yml): the HTTP add-on in http/, the CPU target with the requests in
 # flight in both/; every other run holds its arms at its own root.
 ADDON_SETUP = {"KEDA_REQUESTS": "http/", "KEDA_CPU_REQUESTS": "both/"}
+# the four ways (docs/BATCH_QUEUE_PREREGISTRATION.md, amendment 6): each table's own two arms, (its reference, its candidate), so a
+# table's replay plays the arms the table compares and never another table's of the same run
+FOUR_WAYS = {"TOP": ("native", "compass"), "ORCH": ("nativebare", "native"), "BARE": ("nativebare", "compassbare"),
+             "VS": ("native", "compassbare"), "BOTH": ("nativebare", "compass")}
 DB_GAUGES = ["work_inside_line_rps", "rps", "p95_ms", "p99_ms", "mean_ms", "failed", "hit_rate", "cpu_busy_share", "writes"]
 
 
@@ -203,8 +207,10 @@ def official(s: Sums, rel: str, slo: float) -> dict:
                 s.stale.add(x[len(s.d) + 1:])                           # not the run's own file: left out, and said
                 continue
             data = s.read(x[len(s.d) + 1:])
-            if data is not None:
-                (d / x.rsplit("/", 1)[-1]).write_bytes(data)
+            if data is not None:   # every file at its own place in the folder: a group's member clusters (m1/, m2/) never overwrite the group's own files
+                f = d / x[len(s.d) + len(rel) + 2:]
+                f.parent.mkdir(parents=True, exist_ok=True)
+                f.write_bytes(data)
         old = os.environ.get("SLO_MS"); os.environ["SLO_MS"] = str(slo)
         try:
             import contextlib, io as _io
@@ -321,7 +327,7 @@ def arm_k8s(s: Sums, rel: str, omni: bool, slo: float = 500.0) -> dict:
     return out
 
 
-def k8s_run(g: Git, run: dict, sub: str):
+def k8s_run(g: Git, run: dict, sub: str, pair: tuple = ("native", "compass")):
     d = run_dir(g, str(run["run"]), run.get("paired_repetitions"))
     if not d:
         return None
@@ -333,15 +339,16 @@ def k8s_run(g: Git, run: dict, sub: str):
                        and re.match(rf"([^/]*-)?{re.escape(stem)}-\d+/", x[len(d) + 1:])})
     reps = {}
     for rel in arms:
-        m = re.search(r"bench-(native|compass)-(\d+)$", rel)
-        if not m or s.listed(f"{rel}/INVALID"):        # a repetition the run itself marked invalid is left out, as live_reps does
+        m = re.search(r"bench-(nativebare|compassbare|native|compass)-(\d+)$", rel)
+        if not m or m.group(1) not in pair or s.listed(f"{rel}/INVALID"):   # a repetition the run itself marked invalid is left out, as live_reps does
             continue
         group = rel[:m.start()].strip("/")
-        reps.setdefault((group, int(m.group(2))), {})["omni" if m.group(1) == "compass" else "native"] = rel
+        reps.setdefault((group, int(m.group(2))), {})["native" if m.group(1) == pair[0] else "omni"] = rel
     out = []
     for (group, n), pr in sorted(reps.items()):
         if "native" in pr and "omni" in pr:
-            out.append({"group": group, "n": n, "native": arm_k8s(s, pr["native"], False), "omni": arm_k8s(s, pr["omni"], True)})
+            out.append({"group": group, "n": n, "native": arm_k8s(s, pr["native"], pair[0].startswith("compass")),
+                        "omni": arm_k8s(s, pr["omni"], pair[1].startswith("compass"))})
     # the run's own scored result, and the page's per-repetition scoring checked against it: the mean over repetitions of
     # the scorer's gauges must equal the run's LIVE_REPS.json means (the table's own numbers)
     lr = None
@@ -358,7 +365,7 @@ def k8s_run(g: Git, run: dict, sub: str):
     agree = None
     if lr and out:
         worst = 0.0
-        for arm, key in (("native", "native"), ("omni", "compass")):
+        for arm, key in (("native", pair[0]), ("omni", pair[1])):
             for k in OFFICIAL:
                 vals = [r[arm]["official"].get(k) for r in out if isinstance(r[arm]["official"].get(k), (int, float))]
                 ref = (lr.get("means", {}).get(key) or {}).get(k)
@@ -366,7 +373,8 @@ def k8s_run(g: Git, run: dict, sub: str):
                     m = sum(vals) / len(vals)
                     worst = max(worst, abs(m - ref) / max(1.0, abs(ref)))
         agree = worst
-    paired = {k: v for k, v in ((lr or {}).get("paired", {}).get("compass") or {}).items() if k in OFFICIAL}
+    pk = "compass" if pair == ("native", "compass") else f"{pair[1]}|{pair[0]}"   # the run's own paired reading of this table's two arms
+    paired = {k: v for k, v in ((lr or {}).get("paired", {}).get(pk) or {}).items() if k in OFFICIAL}
     return {"dir": d, "sums_sha256": s.sha_of_list, "checked": s.checked, "ok": s.ok, "unmatched": s.missing[:5],
             "outside_list": sorted(s.stale)[:5], "outside_list_n": len(s.stale),
             "official_paired": paired, "official_agree": agree, "reps": out}
@@ -434,6 +442,8 @@ def main(out_path):
         if not t["kind"]:
             continue
         base, kind, n, stem = t["base"], t["kind"], t["n"], t["stem"]
+        way = re.search(r"_4W_(TOP|ORCH|BARE|VS|BOTH)$", stem)
+        pair = FOUR_WAYS[way.group(1)] if way else ("native", "compass")
         meta = json.loads((ROOT / "results" / "live" / f"{stem}.json").read_text(encoding="utf-8"))
         runs, raw_runs = [], meta.get("runs", [])
         if raw_runs and not isinstance(raw_runs[0], dict):            # a table that lists its runs by id alone
@@ -442,7 +452,7 @@ def main(out_path):
                         for i, x in enumerate(raw_runs)]
         sds = []
         for r in raw_runs:
-            rec = k8s_run(g, r, ADDON_SETUP.get(base, "")) if kind == "k8s" else db_run(g, r)
+            rec = k8s_run(g, r, ADDON_SETUP.get(base, ""), pair) if kind == "k8s" else db_run(g, r)
             if rec:
                 for rep in rec.get("reps") or []:
                     for arm in ("native", "omni"):
@@ -454,7 +464,13 @@ def main(out_path):
                         r = dict(r, commit=c or m.group(1).decode())
                 runs.append({"tag": r.get("tag"), "id": str(r.get("run")), "commit": r.get("commit"), "engine": r.get("engine"), **serial(r), **rec})
         title = XS.table_title(stem)
-        benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs,
+        arms = None
+        if way:   # the table's own words for its two arms, from its title: "the four ways: <candidate> against <reference> (register row N)"
+            m = re.search(r"the four ways: (.+?) against (.+?) \(register", title)
+            if m:
+                arms = {"native": m.group(2)[:1].upper() + m.group(2)[1:], "omni": m.group(1)[:1].upper() + m.group(1)[1:],
+                        "omniOn": pair[1].startswith("compass"), "way": way.group(1)}
+        benches.append({"key": base, "kind": kind, "file": f"results/live/{stem}.md", "engine": f"omni-v{n}", "title": title, "runs": runs, "arms": arms,
                         # the noise measured on this table's own requests, both arms, runs A, B and C: the median over every window
                         "noise": {"sigma": round(statistics.median(sds), 3), "windows": len(sds), "window": NOISE_N} if sds else None})
         ck, okk = sum(r["checked"] for r in runs), sum(r["ok"] for r in runs)

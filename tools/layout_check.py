@@ -16,7 +16,8 @@ Checks:
             uses falls off instead of piling up.
   engine    every page of the newest material that names the engine that stands names the newest one in
             tools/omni_version.py (VERSIONS, newest first), so no page is left calling an older engine the one that
-            stands; the history, the receipts, the change log and each older engine's own page keep the words of their day.
+            stands; the history, the receipts, the change log, each older engine's own page and the referees' reports (which quote
+            the page they read, docs/engine/audit_*/) keep the words of their day.
 
   python3 tools/layout_check.py        (exit 0: lined up; exit 1: what is out of line, one line each)
 """
@@ -37,10 +38,10 @@ ROOT_ALLOWED = {
     # the same rules for every AI assistant that reads this repository (Codex, Copilot, Gemini, Cursor)
     "AGENTS.md", "GEMINI.md", ".cursorrules", "llms.txt",   # llms.txt: read by AI crawlers at the root, the notice in it
     # build, verification and metadata
-    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "OMNI_V6.json", "OMNI_V7.json", "OMNI_V8.json", "OMNI_V9.json", "OMNI_V10.json", "OMNI_V11.json", "OMNI_V12.json", "OMNI_V13.json", "OMNI_V14.json", "OMNI_V15.json", "OMNI_V16.json", "OMNI_V17.json", "codemeta.json",
+    "pyproject.toml", "requirements.txt", "requirements-lock.txt", "verify.py", "RELEASE_MANIFEST.json", "OMNI_V1.json", "OMNI_V2.json", "OMNI_V3.json", "OMNI_V5.json", "OMNI_V6.json", "OMNI_V7.json", "OMNI_V8.json", "OMNI_V9.json", "OMNI_V10.json", "OMNI_V11.json", "OMNI_V12.json", "OMNI_V13.json", "OMNI_V14.json", "OMNI_V15.json", "OMNI_V16.json", "OMNI_V17.json", "OMNI_V18.json", "OMNI_V19.json", "codemeta.json",
     "docker-compose.yml", ".gitignore", ".gitattributes", ".dockerignore", ".github", ".fossa.yml", ".snyk",
     # code and evidence
-    "omnicompass", "omni_controller", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",
+    "omnicompass", "omni_controller", "omni_orchestrator", "realms", "cpp", "tools", "scripts", "tests", "deploy", "fleet", "pilot",
     "k8s_controlplane", "k8s_fleet", "omnilab", "hardware", "benchmarks", "tuning", "reference", "fixtures", "sbom",
     "results", "docs", "release",
 }
@@ -78,7 +79,7 @@ def stale_engine(files):
     own_page = f"docs/OMNI_V{newest}.md"
     out = []
     for p in files:
-        if p.startswith(("results/", "release/", "docs/history/", "archive/", "OMNI_V")) or p in ("CHANGELOG.md", "RELEASE_MANIFEST.json") \
+        if p.startswith(("results/", "release/", "docs/history/", "archive/", "OMNI_V", "docs/engine/audit_")) or p in ("CHANGELOG.md", "RELEASE_MANIFEST.json") \
                 or not p.endswith((".md", ".py", ".txt", ".yml", ".yaml", ".cff", ".toml")) \
                 or (re.match(r"docs/OMNI_V\d+(_PLAN)?\.md$", p) and p != own_page):
             continue

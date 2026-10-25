@@ -4,6 +4,8 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 PostgreSQL as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on the pool size through PgBouncer's own console (`docs/POSTGRES_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number (a resource spent that rose reads **power given**, never a loss; the key: `docs/HOW_TO_READ_THE_RESULTS.md`)); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed transactions: any increase in any run is marked. Every row is shown, LOSS included. The host's CPU-seconds are measured on GitHub's shared runner; no energy is claimed.
 
 | Run | GitHub run | Commit | Engine | Workloads |
@@ -87,7 +89,7 @@ The knob handed back and read back at the end of every omni arm in every run: ye
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: resource): run A: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 9 to 20 (14 trials, 11 allowed, 3 refused); acting: 10 to 20 (14 trials, 10 allowed, 3 refused); run B: acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); acting: 19 to 20 (7 trials, 1 allowed, 6 refused); run C: acting: 14 to 20 (11 trials, 6 allowed, 4 refused); acting: 18 to 20 (11 trials, 2 allowed, 7 refused); acting: 17 to 20 (9 trials, 3 allowed, 5 refused).
 
-**Across 3 workloads: 1 gauge-rows GAIN in all three of our runs, 1 LOSS or power given, 1 where the runs disagree.**
+**Across 3 workloads: 1 gauge-rows GAIN, 0 LOSS, 1 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 33 EVEN, 1 where the runs disagree.**
 
 ---
 

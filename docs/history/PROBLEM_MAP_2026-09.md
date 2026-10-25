@@ -59,7 +59,7 @@ equation alone setting the draw) cut ramps 63% but did not hold the grid limit: 
 
 1. Request right-sizing muscle (VPA role) under the same engine, benchmarked against HPA + VPA "in conflict".
 2. Training power-smoothing muscle (GPU power-cap ramp limits) with a synthetic synchronized-training power trace.
-3. GPU packing / fragmentation muscle (with fake-gpu-operator or KWOK on the live cluster).
+3. GPU packing / fragmentation muscle (with stand-in-gpu-operator or KWOK on the live cluster).
 4. Live Karpenter opponent (kwok provider) to test problem 3 head to head.
 5. Inference muscle (KV-cache and queue driven), then hardware-health (straggler drain), then agent containment.
 

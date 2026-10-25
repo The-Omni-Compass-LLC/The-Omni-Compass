@@ -4,6 +4,8 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 Redis as shipped with the operator's memory ceiling (64 MB, allkeys-lru) is native; omni is the compass law on the ceiling through Redis's own console inside [16, 512] MB, holding the application's own request latency at 40% of the 2 ms line, a hit inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number (a resource spent that rose reads **power given**, never a loss; the key: `docs/HOW_TO_READ_THE_RESULTS.md`)); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed requests: any increase in any run is marked. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Workloads |
@@ -112,7 +114,7 @@ The ceiling handed back to the operator's and read back at the end of every omni
 
 The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: service): run A: acting: 56 to 96 (17 trials, 5 allowed, 0 refused); acting: 56 to 96 (16 trials, 5 allowed, 0 refused); acting: 56 to 80 (16 trials, 3 allowed, 1 refused); run B: acting: 56 to 80 (14 trials, 3 allowed, 0 refused); acting: 56 to 80 (12 trials, 3 allowed, 0 refused); acting: 56 to 80 (13 trials, 3 allowed, 0 refused); run C: acting: 64 to 88 (13 trials, 3 allowed, 1 refused); acting: 56 to 80 (12 trials, 3 allowed, 0 refused); acting: 56 to 80 (13 trials, 3 allowed, 0 refused).
 
-**Across 3 untouched workloads: 5 gauge-rows GAIN in all three of our runs, 2 LOSS or power given, 0 where the runs disagree.**
+**Across 3 untouched workloads: 5 gauge-rows GAIN, 0 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 29 EVEN, 0 where the runs disagree.**
 
 ---
 

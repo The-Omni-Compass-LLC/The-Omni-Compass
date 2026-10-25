@@ -46,6 +46,17 @@ TWINS = {
     "verdict (the give-back trial, its interval reading and the steps it allows)": {
         "python": ["omnicompass/verdict.py"], "cpp": ["cpp/src/verdict.cpp", "cpp/include/omnicompass/verdict.hpp"],
         "proof": "tests/test_cpp_verdict_parity.py"},
+    "Student's t (the exact two-sided 95% point every interval reads, CPython's own log-gamma)": {
+        "python": ["omnicompass/student_t.py"], "cpp": ["cpp/src/student_t.cpp", "cpp/include/omnicompass/student_t.hpp"],
+        "proof": "tests/test_cpp_student_t_parity.py"},
+    "the edge (each muscle's balance point and wall, the cushion widened at once and narrowed slowly)": {
+        "python": ["omnicompass/edge.py"], "cpp": ["cpp/src/edge.cpp", "cpp/include/omnicompass/edge.hpp"],
+        "proof": "tests/test_cpp_edge_parity.py"},
+    "Omni direct's brain and room rule (the yardstick, the reflex, the compass, the twin, the verdict's depth, the conveyed walls, "
+    "the machines, pack and spread)": {
+        "python": ["omni_orchestrator/brain.py", "omni_orchestrator/scheduler.py"],
+        "cpp": ["cpp/src/orchestrator_brain.cpp", "cpp/include/omnicompass/orchestrator_brain.hpp"],
+        "proof": "tests/test_cpp_orchestrator_brain_parity.py"},
     "the engine's seeded runs (the Python's 500 from the jump generator, its draws the input, every twin above the mechanism)": {
         "python": ["tools/engine_runs.py"], "cpp": ["cpp/tools/engine_runs.cpp"],
         "proof": "tests/test_cpp_engine_runs_parity.py"},
@@ -58,9 +69,8 @@ PYTHON_ONLY = {
     "realms/compass_arm_v5.py": "the max, the default brain of every organism (max_apply, max_body_step, the Bone, the twins, the "
                                 "heat debt); its tune-down runs the compass law, twinned above",
     "realms/harness.py, realms/plants.py": "the organisms' body and its plants (the modelled muscles the harness drives)",
-    "omnicompass/edge.py": "the edge every muscle's balance point and wall move by (realms/compass_arm_v5.py Edge)",
-    "omnicompass/student_t.py": "the exact 95% point of Student's t the reports read (the verdict itself is twinned above and "
-                                "reads the fixed 1.96)",
+    "omni_orchestrator/control.py, agent.py, cgroup.py, front.py": "Omni direct's control plane, hand, walls and front (I/O: "
+                                "the machines' processes, cgroups and HTTP); its brain and room rule are twinned above",
 }
 
 
@@ -88,8 +98,13 @@ def prove():
     test_cpp_twins_parity.main(str(b / "oc_twins"), 2000)
     from tests import test_cpp_compass_law_parity
     test_cpp_compass_law_parity.main(str(b / "oc_compass_law"), 300)
-    from tests import test_cpp_verdict_parity, test_cpp_engine_runs_parity
+    from tests import test_cpp_verdict_parity, test_cpp_engine_runs_parity, test_cpp_edge_parity
     test_cpp_verdict_parity.main(str(b / "oc_verdict"), 300)
+    test_cpp_edge_parity.main(str(b / "oc_edge"), 400)
+    from tests import test_cpp_student_t_parity
+    test_cpp_student_t_parity.main(str(b / "oc_student_t"), 2000)
+    from tests import test_cpp_orchestrator_brain_parity
+    test_cpp_orchestrator_brain_parity.main(str(b / "oc_orchestrator_brain"), 300)
     test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 100)
 
 

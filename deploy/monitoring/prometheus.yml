@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+#
+# Prometheus for the mission-control wall (docker-compose.yml). Each target list is a file in targets/, read again by
+# Prometheus whenever it changes, so a machine or a cloud is added without a restart. The labels route (onsite | cloud)
+# and provider (bare-metal, azure, google, amazon, oracle, ...) ride on every series of a target, and the wall's knobs
+# filter by them.
+global:
+  # the governor's fastest check runs every 5 s and its audit, which the exporter reads, changes no faster: 5 s reads
+  # every change. The bare-metal machines are read every second (the job below), the founder's choice for the hardware.
+  scrape_interval: 5s
+  evaluation_interval: 5s
+  external_labels: {wall: omni-compass}
+
+rule_files:
+  - /etc/prometheus/rules/omni-compass-rules.yaml
+
+# the alarms go to Alertmanager, and from it to the alert bridge's buttons (alertmanager.yml, actions.json)
+alerting:
+  alertmanagers: [{static_configs: [{targets: ["alertmanager:9093"]}]}]
+
+scrape_configs:
+  # the governors' own gauges (tools/omni_exporter.py): on site and in every cloud, one line each in targets/omni.yml
+  - job_name: omni-exporter
+    file_sd_configs: [{files: [/etc/prometheus/targets/omni.yml]}]
+
+  # the control panel's counters (tools/omni_control.py, GET /metrics, the viewer role): its token in targets/control.token
+  - job_name: omni-control
+    authorization: {type: Bearer, credentials_file: /etc/prometheus/targets/control.token}
+    file_sd_configs: [{files: [/etc/prometheus/targets/control.yml]}]
+
+  # every bare-metal machine (node_exporter): this machine and every other one listed in targets/nodes.yml
+  - job_name: bare-metal
+    scrape_interval: 1s
+    scrape_timeout: 1s
+    file_sd_configs: [{files: [/etc/prometheus/targets/nodes.yml]}]
+
+  # the alert bridge's own counters: what it pressed, what it only wrote, what the panel refused
+  - job_name: omni-bridge
+    static_configs: [{targets: ["omni-bridge:9466"], labels: {route: onsite, provider: bare-metal}}]
+
+  - job_name: prometheus
+    static_configs: [{targets: ["localhost:9090"], labels: {route: onsite, provider: bare-metal}}]
+
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

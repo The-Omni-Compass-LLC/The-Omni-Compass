@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Walk the live controller (omni_controller/controller.py, nodepool mode, closure law, two-way nervous system) through
-five situations on the repository's stand-in cluster (tests/fake_cluster/kubectl: answers like the Kubernetes API from a
+five situations on the repository's stand-in cluster (tests/standin_cluster/kubectl: answers like the Kubernetes API from a
 JSON state file; no pods run). Prints the decision trail each decision writes to its audit:
   1 calm, machines idle            -> releases one machine per decision down to the floor (3 here)
   2 latency breached now           -> holds ("latency breached now")
@@ -16,7 +16,7 @@ import csv, json, os, sys, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Controller, parser
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
            "spec": {"minReplicas": 1, "maxReplicas": 10, "metrics": [{"type": "Resource", "resource": {"name": "cpu", "target": {"type": "Utilization", "averageUtilization": 50}}}]},
            "status": {"currentReplicas": 2, "desiredReplicas": 2, "currentMetrics": [{"type": "Resource", "resource": {"name": "cpu", "current": {"averageUtilization": 30}}}]}}
     p.write_text(json.dumps({"nodes": nodes, "pods": [], "used_per_node": "300m", "deployments": [], "configmaps": [], "jobs": [], "hpas": [hpa]}))
-    os.environ["FAKE_KUBE_STATE"] = str(p); os.environ["FAKE_KUBE_LOG"] = str(t / "w.log")
+    os.environ["STANDIN_KUBE_STATE"] = str(p); os.environ["STANDIN_KUBE_LOG"] = str(t / "w.log")
     scale = t / "scale.py"   # node-pool actuator: cordon down to n (refuses when REFUSE_DRAIN exists)
     scale.write_text(f'''import json, os, sys
 n = int(sys.argv[1]); s = json.load(open({str(p)!r}))
@@ -42,7 +42,7 @@ json.dump(s, open({str(p)!r}, "w"))''')
             old = time.time() - 900; os.utime(lat, (old, old))
 
     probe(200)
-    a = parser().parse_args(["--kubectl", FAKE, "--mode", "nodepool", "--active-nodes-only", "--interval", "0", "--min-nodes", "3",
+    a = parser().parse_args(["--kubectl", STANDIN, "--mode", "nodepool", "--active-nodes-only", "--interval", "0", "--min-nodes", "3",
                              "--max-nodes", "6", "--node-scale-cmd", f"{sys.executable} {scale} {{n}}", "--latency-file", str(lat),
                              "--slo-ms", "500", "--slo-clear", "1", "--audit", str(t / "a.jsonl"), "--kill-file", str(t / "kill"),
                              "--closure", str(ROOT / "tuning/GLOBAL_LEAGUE_PREREGISTRATION.json")])
@@ -72,7 +72,7 @@ json.dump(s, open({str(p)!r}, "w"))''')
     step("5 pods scaling up (HPA 2 -> 5)")
     Path(ROOT / "results/local_run").mkdir(parents=True, exist_ok=True)
     (ROOT / "results/local_run/NERVOUS_SYSTEM_DEMO.txt").write_text(
-        "Live controller on the stand-in cluster (fake kubectl; no pods run). Decision trail as written to the audit.\n\n" + "\n".join(out) + "\n")
+        "Live controller on the stand-in cluster (standin kubectl; no pods run). Decision trail as written to the audit.\n\n" + "\n".join(out) + "\n")
 
 
 if __name__ == "__main__":

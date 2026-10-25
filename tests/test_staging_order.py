@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-FAKE = r'''#!/usr/bin/env python3
+STANDIN = r'''#!/usr/bin/env python3
 import json, os, sys
 p = os.environ["STAGE_STATE"]; st = json.load(open(p)); a = sys.argv[1:]
 def save(): json.dump(st, open(p, "w"))
@@ -88,7 +88,7 @@ class StagingOrder(unittest.TestCase):
     def test_order_down_and_up(self):
         with tempfile.TemporaryDirectory() as t:
             d = Path(t)
-            (d / "kubectl").write_text(FAKE); (d / "kubectl").chmod(0o755)
+            (d / "kubectl").write_text(STANDIN); (d / "kubectl").chmod(0o755)
             st = {"nodes": [node(n) for n in ("w1", "w2", "w3", "w4")],
                   "pods": [pod("a1", "w1"), pod("a2", "w1"), pod("a3", "w1"), pod("b1", "w2"), pod("d1", "w4"), pod("d2", "w4"),
                            pod("x1", "w4", serving=False)],
@@ -121,7 +121,7 @@ class StagingOrder(unittest.TestCase):
         # governor's own idle mark on it comes off; waking every machine (the OFF switch's reset) leaves it cordoned
         with tempfile.TemporaryDirectory() as t:
             d = Path(t)
-            (d / "kubectl").write_text(FAKE); (d / "kubectl").chmod(0o755)
+            (d / "kubectl").write_text(STANDIN); (d / "kubectl").chmod(0o755)
             nodes = [node(n) for n in ("w1", "w2", "w3", "w4", "w5")]
             nodes[3]["spec"] = {"unschedulable": True}                                          # w4: cordoned, no mark
             nodes[4]["spec"] = {"unschedulable": True, "taints": [{"key": "omnicompass.io/idle", "effect": "PreferNoSchedule"}]}

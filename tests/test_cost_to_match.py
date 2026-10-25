@@ -16,7 +16,7 @@ G = {  # arm -> (p95, p99, replicas, cpu incl. Omni's own, machines)
     "native20": (120, 190, 17.0, 1.60, 6.0), "compass": (132, 186, 8.4, 1.02, 5.7)}
 
 
-def fake(d):
+def standin(d):
     arm = d.name.split("-", 2)[1]
     p95, p99, rep, cpu, nodes = G[arm]
     rep_n = int(d.name.split("-", 2)[2])
@@ -33,7 +33,7 @@ def main():
     for arm in G:
         for r in (1, 2, 3):
             d = t / f"bench-{arm}-{r}"; d.mkdir(); (d / "capture.csv").write_text("x\n")
-    LR.arm_gauges = fake
+    LR.arm_gauges = standin
     LR.main(str(t))
     md = (t / "LIVE_REPS.md").read_text()
     assert "The cost to match" in md and "Native tuned, HPA target 20" in md

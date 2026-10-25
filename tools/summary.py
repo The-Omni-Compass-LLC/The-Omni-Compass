@@ -27,7 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import NOTICE                                       # noqa: E402  (the notice, written once)
-from tools.readings import (OWN_RUNS, GAIN, EVEN, LOSS, GIVEN, key_lines, key_text, gel_of_label, labelled)  # noqa: E402
+from tools.readings import (OWN_RUNS, GAIN, EVEN, LOSS, GIVEN, key_lines, key_text, gel_of_label, labelled, by_word)  # noqa: E402
 
 WHAT = ("Omni-Compass is a supervisory governor. It always sits on top of a system's own native controller (the Kubernetes "
         "autoscaler, a database's pool, a GPU's firmware, a building's battery controller, a robot's servo) and is never "
@@ -80,6 +80,30 @@ def word_of_pct(x, loss=False):
     return GAIN if x > 0 else (LOSS if loss else GIVEN)
 
 
+def moved(what, x, unit, nd=3):
+    """A measured change in its verb, never a bare sign beside a word: 'misses down 0.145 pp', 'misses up 0.020 pp'."""
+    return f"{what} the same" if abs(x) < 0.5 * 10 ** -nd else f"{what} {'down' if x < 0 else 'up'} {abs(x):.{nd}f}{unit}"
+
+
+def energy_moved(e, nd=3):
+    """The energy beside its word: a rise is power given and wears its '+', a fall is a cut."""
+    x = 100 * e
+    if abs(x) < 0.5 * 10 ** -nd:
+        return "energy the same"
+    return f"power given +{x:.{nd}f}%" if x > 0 else f"energy cut {abs(x):.{nd}f}%"
+
+
+def num(x, loss=False, nd=1):
+    """The one number wearing its own word's sign (the founder's sign rule, tools/readings.py): GAIN '+', LOSS '−', EVEN '=',
+    power given '+'; the raw value stays in the result files."""
+    return "no number" if x is None else by_word(x, word_of_pct(x, loss), digits=nd)
+
+
+def num_word(x, loss=False, nd=1):
+    """The number and its word: '+4.3% GAIN', '+0.1% power given', '−2.0% LOSS'."""
+    return "no number" if x is None else f"{num(x, loss, nd)} {word_of_pct(x, loss)}"
+
+
 def evidence(bench: str) -> str:
     """The evidence class of a benefit-sheet row, by what the benchmark is."""
     b = bench.lower()
@@ -106,13 +130,13 @@ def index_part():
     h, s = d.get("headline_pct"), d.get("service_headline_pct")
     sheet = load("results/BENEFIT_SHEET.json") or {}
     eng = next((r.get("engine") for r in sheet.get("rows", []) if r.get("file") == "results/OMNI_INDEX.md"), None) or "the engines named in its tables"
-    out = [f"The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run "
-           f"tables of {eng}, each named in its table): {pct(h)} {word_of_pct(h, s is not None and s < -0.05)} on the "
-           f"resource reading (work, speed, machines, energy), {pct(s)} {word_of_pct(s, True)} on the service reading (work and "
+    out = [f"The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run "
+           f"tables of {eng}, each named in its table): {num_word(h, s is not None and s < -0.05)} on the "
+           f"resource reading (work, speed, machines, energy), {num_word(s, True)} on the service reading (work and "
            "speed alone). Source: results/OMNI_INDEX.md."]
     for c, v in sorted((d.get("categories") or {}).items(), key=lambda kv: -(kv[1] or 0)):
         sv = (d.get("service_categories") or {}).get(c)
-        out.append(f"  {c}: {pct(v)} {word_of_pct(v, sv is not None and sv < -0.05)}")
+        out.append(f"  {c}: {num_word(v, sv is not None and sv < -0.05)}")
     return out
 
 
@@ -123,7 +147,7 @@ def benefit_part():
     out = ["Every benchmark, one number and its word (source: docs/BENEFIT_SHEET.md; class in brackets):"]
     for r in by_engine(d.get("rows", [])):
         n = r.get("pct")
-        out.append(f"  {r.get('benefit', '?'):<18} {pct(n):>9}  {r['benchmark']} [{evidence(r['benchmark'])}; {r.get('engine', 'engine not named')}]")
+        out.append(f"  {r.get('benefit', '?'):<18} {num(n, bool(r.get('loss'))):>9}  {r['benchmark']} [{evidence(r['benchmark'])}; {r.get('engine', 'engine not named')}]")
     return out
 
 
@@ -177,7 +201,7 @@ def realms_part():
             sm = o.get("summary", {})
             v = sm.get("viol_pp", [None])[0]; e = sm.get("energy", [None])[0]
             nm = NAMES.get(name, name)
-            parts.append(f"{nm}: {labelled(o.get('label'))}, misses {v:+.3f} pp, power given {100 * e:+.3f}%"
+            parts.append(f"{nm}: {labelled(o.get('label'))}, {moved('misses', v, ' pp')}, {energy_moved(e)}"
                          if v is not None and e is not None else f"{nm}: {labelled(o.get('label'))}")
         out.append(f"  the organisms under the {load_} load: " + "; ".join(parts))
     return out
@@ -244,7 +268,7 @@ def standing_block():
               "(`scripts/reruns.txt`); results are never read across engines.",
               "", "| Benchmark | Engine | Its one number | Its word | Class |", "|---|---|---:|---|---|"]
         for r in by_engine(d["rows"]):
-            L.append(f"| {r['benchmark']} | {r.get('engine', 'not named')} | {pct(r.get('pct'))} | {r.get('benefit', '')} | {evidence(r['benchmark'])} |")
+            L.append(f"| {r['benchmark']} | {r.get('engine', 'not named')} | {num(r.get('pct'), bool(r.get('loss')))} | {r.get('benefit', '')} | {evidence(r['benchmark'])} |")
     L += ["", OWN_RUNS, "", BLOCK_END]
     return "\n".join(L)
 

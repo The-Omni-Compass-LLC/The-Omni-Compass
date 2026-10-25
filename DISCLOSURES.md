@@ -76,15 +76,16 @@ wear it bought, never called a loss. Where no move passes that test, Omni-Compas
 alone. It takes nothing from one muscle to give to another: that form never harms the organism, but it leaves
 unused any gain that needs one muscle to give way to another. Letting one muscle give way so that the organism's whole
 output comes out ahead, judged on the organism and on every muscle's health, is the next engine version's work. It is
-built and proven in our own models first (the toy gate), every benchmark is run again on it, and no result claims it
+built and proven in our own models first (the model gate), every benchmark is run again on it, and no result claims it
 before its runs exist.
 
 **The factory tune: one tuned engine, and a tuning bench.** The engine in this repository is presented as The Omni-Compass LLC
 tuned and ships it: self-running, set at the factory. Every muscle in the catalog is wired and runs on the setting found for it
 (its own card where one was found on development seeds and kept under the strict rule, 364 muscles in
 `realms/muscle_cards_v5.csv`; the engine's own setting for every other), frozen and fingerprinted by version (`python3
-tools/omni_version.py`); no setting is presented as universal. **Every published benchmark result is this one engine at this one
-tune**, chosen by a declared rule (`docs/THE_TUNE.md`, `tools/tune_study.py`): of the tunes that harm no gauge against native, the
+tools/omni_version.py`); no setting is presented as universal. **Every published benchmark result is one engine at its one
+factory tune**: the engine its table names (`python3 tools/omni_version.py`), run again on each engine that stands. From
+omni-v17 that tune is held to a declared rule (`docs/THE_TUNE.md`, `tools/tune_study.py`): of the tunes that harm no gauge against native, the
 one against which no other tune tried reads GAIN on one service gauge and LOSS on none, searched on development seeds and read
 again on untouched ones; the claim is non-dominance among the tunes searched, never a global optimum. The live engine page and the
 control panel are a live tuning engine: every knob, button and monitor turns in real time (the beat, the dial, the pedal, each
@@ -93,7 +94,12 @@ Omni-Compass on top, or both side by side; what it shows at any other setting is
 on any engine, where the mixture, the intake, the exhaust, the firing or the pistons change what it delivers, **turning any knob
 of Omni-Compass can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many
 ways, for many outputs. A licensee may add on, retune, upgrade or tune down any muscle or combination (the dial, the cards, the
-bands and the service lines are exposed); a changed tune is the licensee's own, and so are its results.
+bands and the service lines are exposed); a changed tune is the licensee's own, and so are its results. The factory tune is published only where it reads no LOSS: a LOSS found
+in The Omni-Compass LLC's own runs is treated as a fault in the mechanism or its wiring, found and fixed before the result is
+published, never as a number to live with (the founder's order of 23 October 2026). The one place a LOSS is meant to be seen
+is the live engine, when a person turns its knobs away from the factory tune (the dial, the heartbeat, the sizes, the load)
+to watch the system react and the brain hold or recover: that showing is the proof that the mechanism can be broken only by
+leaving it, and a changed tune's readings are the licensee's own.
 
 ## 4. The wiring declaration
 

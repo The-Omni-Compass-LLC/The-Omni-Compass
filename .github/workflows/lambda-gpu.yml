@@ -4,12 +4,14 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: lambda-gpu
+run-name: lambda-gpu ${{ github.event.inputs.test || '' }} ${{ github.event.inputs.mode || '' }} ${{ github.event.inputs.tag || '' }}
 # The GPU benchmark on a rented Lambda Cloud machine, one button (Actions -> lambda-gpu -> Run workflow): the 8-GPU result
 # (scripts/gpu_8card.sh) or the one-card test (scripts/gpu_rented_run.sh), at the exact commit the button is pressed on.
 # It shows the price first and rents nothing on a dry run (the default). Otherwise it rents one machine, ships the
 # committed tree to it, starts the run, watches it from GitHub, brings every result file back as this run's artifact,
 # and always gives the machine back: when the run prints its last line, or at the hour budget plus one hour whatever
-# happens, or at the very end of this workflow if anything before failed. Needs three repository secrets:
+# happens, or at the very end of this workflow if anything before failed; the test giveback gives back a stuck run's machine
+# by its name and rents nothing. Needs three repository secrets:
 # LAMBDA_API_KEY, LAMBDA_SSH_PRIVATE_KEY and LAMBDA_SSH_KEY_NAME (docs/LAMBDA_SETUP.md, click by click). Before anything
 # is rented, on a dry run too, it checks at no cost that the key logs in to Lambda, that Lambda holds the SSH key named, and
 # that the stored private key is its other half; a missing secret or a wrong pair turns the run red and rents nothing.
@@ -17,30 +19,60 @@ name: lambda-gpu
 on:
   workflow_dispatch:
     inputs:
-      test: {description: "8card (the 8-GPU result) or 1card (the one-card test)", default: "8card"}
-      mode: {description: "pooled, fast or full (8card: about 10, 3.5 or 18 hours; 1card: fast about 7, full about 30)", default: "pooled"}
+      test: {description: "8card (the 8-GPU result), 1card (the one-card test), or giveback (give back a stuck run's machine: no test, nothing rented)", default: "8card"}
+      mode: {description: "pooled, fast or full (8card: about 10, 3.5 or 18 hours; 1card: fast about 7, full about 30), or stacks (1card: the whole stacks with the card inside at 1, 10 and 100 copies, about 22 hours)", default: "pooled"}
+      tag: {description: "A, B or C: which of the three runs this is (each its own machine, side by side; empty for one run)", default: ""}
       instance_type: {description: "Lambda machine type (empty: gpu_8x_a100_80gb_sxm4 for 8card, gpu_1x_a10 for 1card)", default: ""}
       region: {description: "Lambda region (empty: the first with a machine free)", default: ""}
       max_cost: {description: "Ceiling in US dollars for the hour budget plus one hour; above it nothing is rented", default: "400"}
       dry_run: {description: "Show the price and the plan, rent nothing (yes/no)", default: "yes"}
       hil_profile: {description: "Prepared organism scales: standard or 1-10-100", default: "1-10-100"}
+      give_back: {description: "giveback only: the name, or the start of the name, of the machines to give back (omni-1card-, omni-8card-, or a whole name)", default: ""}
   push:          # registers this workflow on the branch it is pushed to; a push runs nothing (every job asks for a dispatch)
     branches-ignore: [main, raw, "v[0-9]*", "gpu-omni-*", "archive/**"]   # a push to main or a level branch never starts it (20 October: every bot commit started 25 skipped runs and a cascade of cancelled page rebuilds)
 permissions:
   contents: read
 # one run at a time per test: the one-card and the eight-card tests may rent at once (the same money, half the wait), a
 # second dispatch of the same test waits for the first; a push (which runs nothing) never takes a dispatch's place
-concurrency: {group: "lambda-gpu-${{ github.event_name }}-${{ github.event.inputs.test || 'none' }}", cancel-in-progress: false}
+concurrency: {group: "lambda-gpu-${{ github.event_name }}-${{ github.event.inputs.test || 'none' }}${{ github.event.inputs.tag || '' }}", cancel-in-progress: false}
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
   LAMBDA_API_KEY: ${{ secrets.LAMBDA_API_KEY }}
 jobs:
-  launch:
-    if: github.event_name == 'workflow_dispatch'
+  giveback:
+    # a run whose watch can no longer end it (a card idle under a run cancelled by hand: the watch jobs run on through a
+    # cancel so a give-back is never lost, and wait for the deadline): the machines named are given back at once, from
+    # here, and that run's watch sees its machine gone and ends; only omni- names, so a machine launched by hand on
+    # Lambda's page is never touched. Its own queue (the test's name), so it never waits behind the run it frees.
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test == 'giveback'
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 10
+    steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: {sparse-checkout: "scripts"}
+      - name: Give the machines back
+        env:
+          WHICH: ${{ github.event.inputs.give_back }}
+        run: |
+          [ -n "$LAMBDA_API_KEY" ] || { echo "::error::LAMBDA_API_KEY is not in this repository's secrets."; exit 2; }
+          case "$WHICH" in omni-?*) ;; *) echo "::error::give_back must start with omni- (omni-1card-, omni-8card-, or a whole name)."; exit 2;; esac
+          python3 scripts/lambda_gpu.py list | sed 's/^/  listed before: /' || true
+          python3 scripts/lambda_gpu.py terminate --prefix "$WHICH" | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 scripts/lambda_gpu.py list | sed 's/^/  still listed: /' || true
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
+
+  launch:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test != 'giveback'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90                # Lambda allows a machine 30 minutes to boot; the wait, the login and the shipping fit
     outputs:
       launched: ${{ steps.go.outputs.launched }}
+      ownkey: ${{ steps.go.outputs.ownkey }}
+      ekey: ${{ steps.go.outputs.ekey }}
       id: ${{ steps.go.outputs.id }}
       ip: ${{ steps.go.outputs.ip }}
       deadline: ${{ steps.go.outputs.deadline }}
@@ -82,6 +114,9 @@ jobs:
             8card:full)   SCRIPT=scripts/gpu_8card.sh; ENVS="";         BUDGET=26;;
             1card:fast)   SCRIPT=scripts/gpu_rented_run.sh; ENVS="SKIP_DECODE=1 SKIP_CAP=1 SKIP_HIL=1 SKIP_LLM=1"; BUDGET=8;;
             1card:full)   SCRIPT=scripts/gpu_rented_run.sh; ENVS="";    BUDGET=32;;
+            # the whole stacks with the card inside, nothing else: the wire check and the smoke on the real card first, then the
+            # seven organisms at 1, 10 and 100 copies (tools/run_hil.py, the preregistered repetitions 5, 3 and 2 by size)
+            1card:stacks) SCRIPT=scripts/gpu_rented_run.sh; ENVS="SKIP_CONFIRM=1 SKIP_DECODE=1 SKIP_CAP=1 SKIP_DRILL=1 SKIP_LLM=1"; BUDGET=24;;
             *) echo "unknown test/mode $TEST/$MODE" | tee -a "$GITHUB_STEP_SUMMARY"; exit 1;;
           esac
           case "$HIL_PROFILE" in
@@ -107,18 +142,29 @@ jobs:
           fi
           # the key pair, at no cost: Lambda holds the key named, and the stored private key is its other half (a wrong pair
           # would otherwise show only after a machine is rented and refuses the login)
-          install -m 600 /dev/null key; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > key
-          set +e; python3 scripts/lambda_gpu.py keycheck --name "$KEY_NAME" --private-file key 2>&1 | tee keycheck.txt; krc=${PIPESTATUS[0]}; set -e
+          install -m 600 /dev/null key; printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > key
+          set +e; python3 scripts/lambda_gpu.py keycheck --name "$KEY_NAME" --private-file key --resolved-out keyname.txt 2>&1 | tee keycheck.txt; krc=${PIPESTATUS[0]}; set -e
           { echo '```'; cat keycheck.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          OWN=""
           if [ "$krc" != 0 ]; then
-            echo "::error::$(tail -n 1 keycheck.txt) Nothing rented; docs/LAMBDA_SETUP.md, steps 2 and 3."
-            echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 1
+            # the stored key cannot be used: this run makes its own pair, registers the public half with Lambda under its own
+            # name, logs in with it, hands the private half to the watch jobs encrypted with the API key, and removes it from
+            # Lambda at the end (24 October: three stores of the downloaded file in a row held the public line instead)
+            echo "::notice::The stored SSH key is not used ($(tail -n 1 keycheck.txt | cut -c1-160)); this run makes its own key."
+            rm -f key key.pub; ssh-keygen -q -t ed25519 -N "" -C "omni-gh-$GITHUB_RUN_ID" -f key
+            OWN="omni-gh-$GITHUB_RUN_ID"; KEY_NAME="$OWN"
+            python3 scripts/lambda_gpu.py delkey --name "$OWN" > /dev/null
+            python3 scripts/lambda_gpu.py addkey --name "$OWN" --public-file key.pub > /dev/null
+            echo "ownkey=$OWN" >> "$GITHUB_OUTPUT"
+            echo "ekey=$(openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:LAMBDA_API_KEY -in key | base64 -w0)" >> "$GITHUB_OUTPUT"
+            echo "The stored SSH key was not used: this run made its own key, \`$OWN\`, registered with Lambda for this run and removed at its end." >> "$GITHUB_STEP_SUMMARY"
           fi
+          [ -s keyname.txt ] && KEY_NAME=$(head -n 1 keyname.txt)       # the name Lambda holds for the stored key's other half
           set +e; python3 scripts/lambda_gpu.py plan --type "$TYPE" --hours "$HOURS" --max-cost "$MAX_COST" 2>&1 | tee plan.txt; rc=${PIPESTATUS[0]}; set -e
           { echo '```'; cat plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          [ "$rc" = 0 ] || { echo "::warning::$(tail -n 1 plan.txt) Nothing rented."; echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 0; }
-          if [ "$DRY" = yes ]; then echo "Dry run: the secrets and the key pair are ready; nothing rented." >> "$GITHUB_STEP_SUMMARY"; rm -f key; exit 0; fi
-          NAME="omni-$TEST-$(date +%s)-${BUDGET%.*}"
+          [ "$rc" = 0 ] || { echo "::warning::$(tail -n 1 plan.txt) Nothing rented."; echo "Nothing rented." >> "$GITHUB_STEP_SUMMARY"; [ -z "$OWN" ] || python3 scripts/lambda_gpu.py delkey --name "$OWN"; rm -f key; exit 0; }
+          if [ "$DRY" = yes ]; then echo "Dry run: the API key and an SSH key pair are ready; nothing rented." >> "$GITHUB_STEP_SUMMARY"; [ -z "$OWN" ] || python3 scripts/lambda_gpu.py delkey --name "$OWN"; rm -f key; exit 0; fi
+          NAME="omni-$TEST-$(date +%s)-${BUDGET%.*}-r$GITHUB_RUN_ID"   # the run number last: its machines are found by it alone
           echo "name=$NAME" >> "$GITHUB_OUTPUT"      # a launch that fails after renting is still found by its name
           ID=$(python3 scripts/lambda_gpu.py launch --type "$TYPE" --name "$NAME" --ssh-key-name "$KEY_NAME" ${REGION:+--region "$REGION"})
           echo "id=$ID" >> "$GITHUB_OUTPUT"; echo "launched=true" >> "$GITHUB_OUTPUT"
@@ -129,16 +175,26 @@ jobs:
           echo "ip=$IP" >> "$GITHUB_OUTPUT"
           SSH="ssh -i key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 ubuntu@$IP"
           for i in $(seq 1 20); do $SSH true && break; sleep 15; done
-          git archive --format=tar.gz -o omni.tgz HEAD                    # the exact committed tree, nothing else
-          scp -i key -o StrictHostKeyChecking=accept-new omni.tgz "ubuntu@$IP:omni.tgz"
-          $SSH "mkdir -p omni && tar xzf omni.tgz -C omni && echo $GITHUB_SHA > omni/COMMIT"
-          $SSH "cd omni && nohup sudo -n env $ENVS bash $SCRIPT > run.log 2>&1 < /dev/null &"
-          sleep 30; $SSH "tail -n 5 omni/run.log" | sed 's/^/  run: /'
+          # the exact committed tree with its git record (the run's freeze checks read git: a plain copy stopped the run on 24
+          # October), never the checkout's token or this run's key
+          git config --local --unset-all 'http.https://github.com/.extraheader' || true
+          tar czf "$RUNNER_TEMP/omni.tgz" --exclude=./key --exclude=./key.pub --exclude=./keycheck.txt --exclude=./keyname.txt --exclude=./plan.txt .
+          mv "$RUNNER_TEMP/omni.tgz" omni.tgz
+          # every step to the machine is bounded in time (24 October: the A100 run's start step waited 56 minutes on one
+          # connection until the job's limit cut it off); the run itself starts detached from the connection that starts it
+          timeout 900 scp -i key -o StrictHostKeyChecking=accept-new omni.tgz "ubuntu@$IP:omni.tgz"
+          timeout 300 $SSH "mkdir -p omni && tar xzf omni.tgz -C omni && echo $GITHUB_SHA > omni/COMMIT"
+          timeout 60 $SSH "cd omni && setsid nohup sudo -n env $ENVS bash $SCRIPT > run.log 2>&1 < /dev/null & disown; exit 0" || true
+          sleep 30; timeout 60 $SSH "tail -n 5 omni/run.log; pgrep -x -f 'bash $SCRIPT' > /dev/null && echo 'the run is under way' || echo 'the run is not running'" | sed 's/^/  run: /'
           echo "Started; the watch below carries on until it is over." >> "$GITHUB_STEP_SUMMARY"
           rm -f key
       - name: Give the machine back if starting failed
-        if: failure() && steps.go.outputs.name != ''
-        run: python3 scripts/lambda_gpu.py terminate ${{ steps.go.outputs.id }} --name "${{ steps.go.outputs.name }}"
+        # a failed start, and a start cut off by the job's time limit or a cancel (whose outputs may never be handed on): every
+        # machine of this run is found by the run number its name ends with
+        if: failure() || cancelled()
+        run: |
+          python3 scripts/lambda_gpu.py terminate ${{ steps.go.outputs.id }} --run "$GITHUB_RUN_ID"
+          python3 scripts/lambda_gpu.py delkey --name "omni-gh-$GITHUB_RUN_ID"
       - name: Legal notice at the end of this job's report
         if: always()
         run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
@@ -161,9 +217,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -273,9 +331,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -385,9 +445,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -497,9 +559,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -609,9 +673,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -721,9 +787,11 @@ jobs:
             !/results/live/raw/*
       - name: Watch, fetch, give back
         id: w
-        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}"}
+        env: {SSH_PRIVATE: "${{ secrets.LAMBDA_SSH_PRIVATE_KEY }}", EKEY: "${{ needs.launch.outputs.ekey }}"}
         run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/key"; printf '%s\n' "$SSH_PRIVATE" | tr -d '\r' > "$RUNNER_TEMP/key"
+          install -m 600 /dev/null "$RUNNER_TEMP/key"
+          if [ -n "$EKEY" ]; then printf '%s' "$EKEY" | base64 -d | openssl enc -d -aes-256-cbc -pbkdf2 -pass env:LAMBDA_API_KEY > "$RUNNER_TEMP/key"
+          else printf '%s\n' "$SSH_PRIVATE" | python3 scripts/lambda_gpu.py fixkey > "$RUNNER_TEMP/key"; fi
           SSH_KEY="$RUNNER_TEMP/key" bash scripts/lambda_gpu_watch.sh "${{ needs.launch.outputs.id }}" \
             "${{ needs.launch.outputs.ip }}" "${{ needs.launch.outputs.deadline }}" 340 out
           echo "state=$(cat out/state 2>/dev/null || echo watching)" >> "$GITHUB_OUTPUT"
@@ -844,7 +912,9 @@ jobs:
   give-back:
     # whatever happened above, the machine goes back (asking twice; an already given-back machine is fine)
     needs: [launch, watch1, watch2, watch3, watch4, watch5, watch6]
-    if: always() && needs.launch.outputs.launched == 'true'
+    # whenever the launch job ran at all: a launch cut off by its time limit may never hand on "launched", and its machine is
+    # still found by this run's number
+    if: always() && needs.launch.result != 'skipped'
     runs-on: ubuntu-24.04
     steps:
       - name: Legal notice at the top of this job's report
@@ -859,9 +929,10 @@ jobs:
         run: |
           # terminate confirms each machine given back (exit 2 otherwise); asked twice, then a red run that says so
           id="${{ needs.launch.outputs.id }}"; bad=0
-          python3 scripts/lambda_gpu.py terminate "$id" || { sleep 30; python3 scripts/lambda_gpu.py terminate "$id"; } || {
-            bad=1; echo "::error::Lambda did not confirm machine $id given back: it may still be billing. Terminate it by hand: cloud.lambda.ai, Instances, tick it, Terminate."; }
+          python3 scripts/lambda_gpu.py terminate $id --run "$GITHUB_RUN_ID" || { sleep 30; python3 scripts/lambda_gpu.py terminate $id --run "$GITHUB_RUN_ID"; } || {
+            bad=1; echo "::error::Lambda did not confirm this run's machine given back: it may still be billing. Terminate it by hand: cloud.lambda.ai, Instances, tick it, Terminate."; }
           python3 scripts/lambda_gpu.py list | sed 's/^/  still listed: /' || true
+          python3 scripts/lambda_gpu.py delkey --name "omni-gh-$GITHUB_RUN_ID" || true
           exit $bad
       - name: Where the results are
         if: always()

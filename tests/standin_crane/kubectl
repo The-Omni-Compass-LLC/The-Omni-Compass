@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""Stand-in kubectl for tests/test_kubectl_crane.py: a cluster where Crane owns an HPA, as Crane 0.11.0 does
+(pkg/controller/ehpa/hpa.go): on every change of the EHPA, and of the HPA it owns, the HPA is rebuilt from the EHPA, its
+replica range and metrics the EHPA's (its forecast's external metric after them), its annotations exactly the EHPA's that
+carry a propagated prefix (the operator's --ehpa-propagation-annotation-prefixes=omnicompass.io/), every other annotation
+gone. State in $STANDIN_STATE."""
+import copy, json, os, sys
+S = os.environ["STANDIN_STATE"]
+st = json.load(open(S))
+args = sys.argv[1:]
+PREFIX = "omnicompass.io/"
+def save():
+    tmp = S + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(st, f)
+    os.replace(tmp, S)
+def rebuild():
+    e, h = st["ehpa"], st["hpa"]
+    h["spec"]["minReplicas"] = e["spec"].get("minReplicas", 1)
+    h["spec"]["maxReplicas"] = e["spec"]["maxReplicas"]
+    h["spec"]["metrics"] = copy.deepcopy(e["spec"]["metrics"]) + [
+        {"type": "External", "external": {"metric": {"name": "crane_pod_cpu_usage"}, "target": {"type": "AverageValue", "averageValue": "250m"}}}]
+    ann = {k: v for k, v in (e["metadata"].get("annotations") or {}).items() if k.startswith(PREFIX)}
+    h["metadata"]["annotations"] = ann or None
+def annotate(obj, toks):
+    ann = dict(obj["metadata"].get("annotations") or {})
+    for t in toks:
+        if t.startswith("-"): continue
+        if "=" in t:
+            k, v = t.split("=", 1); ann[k] = v
+        elif t.endswith("-"):
+            ann.pop(t[:-1], None)
+    obj["metadata"]["annotations"] = ann
+def jsonpatch(obj, ops):
+    for op in ops:
+        parts = op["path"].strip("/").split("/")
+        cur = obj
+        for p in parts[:-1]:
+            cur = cur[int(p)] if isinstance(cur, list) else cur[p]
+        last = parts[-1]
+        if isinstance(cur, list): cur[int(last)] = op["value"]
+        else: cur[last] = op["value"]
+def payload(a):
+    for i, t in enumerate(a):
+        if t == "-p": return json.loads(a[i + 1])
+    raise SystemExit("no payload")
+def ptype(a):
+    for t in a:
+        if t.startswith("--type="): return t.split("=", 1)[1]
+    return "strategic"
+verb = args[0]
+if verb == "get":
+    kind = args[1]
+    if kind == "hpa" and "-A" in args:
+        print(json.dumps({"items": [st["hpa"]]})); sys.exit(0)
+    if kind == "hpa": print(json.dumps(st["hpa"])); sys.exit(0)
+    if kind.startswith("effectivehorizontalpodautoscaler"): print(json.dumps(st["ehpa"])); sys.exit(0)
+    if kind == "deployment": print(json.dumps({"metadata": {"annotations": {}}, "spec": {"template": {"spec": {"containers": [{"resources": {"requests": {"cpu": "200m"}, "limits": {"cpu": "500m"}}}]}}}})); sys.exit(0)
+    print(json.dumps({"items": []})); sys.exit(0)
+if verb == "patch":
+    kind = args[1]
+    obj = st["ehpa"] if kind.startswith("effectivehorizontalpodautoscaler") else st["hpa"] if kind == "hpa" else None
+    if obj is None:
+        print("standin: unsupported", args, file=sys.stderr); sys.exit(3)
+    if ptype(args) == "json": jsonpatch(obj, payload(args))
+    else:
+        for k, v in payload(args)["spec"].items(): obj["spec"][k] = v
+    rebuild(); save(); sys.exit(0)   # a write to the HPA itself: Crane undoes it
+if verb == "annotate":
+    kind = args[1]
+    toks = [t for t in args[3:] if t not in ("-n", "default")]
+    if kind.startswith("effectivehorizontalpodautoscaler"):
+        annotate(st["ehpa"], toks); rebuild(); save(); sys.exit(0)
+    if kind == "hpa":
+        annotate(st["hpa"], toks); rebuild(); save(); sys.exit(0)   # Crane puts back exactly the propagated ones
+print("standin: unsupported", args, file=sys.stderr); sys.exit(3)

@@ -25,7 +25,7 @@ STATE = {"instances": {}, "polls": 0, "capacity": True, "auth_ok": True, "seen":
 PUBLIC = "ssh-ed25519 AAAAPUBLICHALF"
 
 
-class FakeLambda(BaseHTTPRequestHandler):
+class StandinLambda(BaseHTTPRequestHandler):
     def log_message(self, *a):                       # quiet
         pass
 
@@ -61,7 +61,8 @@ class FakeLambda(BaseHTTPRequestHandler):
         if self.moved() or not self.authed():
             return
         if self.path == "/api/v1/ssh-keys":
-            self.reply(200, {"data": [{"id": "k1", "name": "omni-key", "public_key": PUBLIC + " made-on-a-laptop"}]})
+            self.reply(200, {"data": [{"id": "k1", "name": "omni-key", "public_key": PUBLIC + " made-on-a-laptop"}]
+                             + STATE.setdefault("added", [])})
             return
         if self.path == "/api/v1/instance-types":
             regions = [{"name": "us-east-1", "description": "Virginia"}] if STATE["capacity"] else []
@@ -85,10 +86,22 @@ class FakeLambda(BaseHTTPRequestHandler):
         else:
             self.reply(404, {"error": {"code": "not-found", "message": self.path}})
 
+    def do_DELETE(self):
+        if self.moved() or not self.authed():
+            return
+        i = self.path.rsplit("/", 1)[1]
+        STATE["added"] = [k for k in STATE.setdefault("added", []) if k["id"] != i]
+        self.reply(200, {"data": {}})
+
     def do_POST(self):
         if self.moved() or not self.authed():
             return
         body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
+        if self.path == "/api/v1/ssh-keys":                 # a run's own key, registered by its public half
+            k = {"id": f"k{len(STATE.setdefault('added', [])) + 2}", "name": body["name"], "public_key": body["public_key"]}
+            STATE["added"].append(k)
+            self.reply(200, {"data": k})
+            return
         if self.path == "/api/v1/instance-operations/launch":
             assert body["ssh_key_names"] == ["omni-key"] and body["quantity"] == 1
             i = f"inst{len(STATE['instances']) + 1}"
@@ -118,7 +131,7 @@ def run(argv):
 
 
 def test_lambda_launcher_end_to_end():
-    srv = HTTPServer(("127.0.0.1", 0), FakeLambda)
+    srv = HTTPServer(("127.0.0.1", 0), StandinLambda)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     os.environ["LAMBDA_API"] = f"http://127.0.0.1:{srv.server_address[1]}/api/v1"
     for v in ("NO_PROXY", "no_proxy"):                # the stand-in is on this machine: never through a proxy
@@ -154,6 +167,27 @@ def test_lambda_launcher_end_to_end():
         assert rc == 0 and "inst1" in o and STATE["instances"]["inst1"]["status"] == "terminated", o
         rc, o = run(["wait", "inst1", "--timeout", "1", "--every", "0.01"]); printed += o
         assert rc == 5, o                                                             # a given-back machine never runs
+        rc, o = run(["launch", "--type", "gpu_1x_a10", "--name", f"omni-1card-{int(time.time())}-9",
+                     "--ssh-key-name", "omni-key"]); printed += o
+        stuck = o.strip()
+        STATE["instances"]["hand"] = {"id": "hand", "name": "my-a100", "status": "active", "ip": None,
+                                      "region": {"name": "us-east-1"}}            # one launched by hand on Lambda's page
+        rc, o = run(["terminate", "--prefix", "my-"]); printed += o
+        assert rc == 2 and STATE["instances"]["hand"]["status"] == "active", o        # only names this workflow gives
+        rc, o = run(["terminate", "--prefix", "omni-1card-"]); printed += o
+        assert rc == 0 and STATE["instances"][stuck]["status"] == "terminated", o     # a stuck run's card, by its name
+        assert STATE["instances"]["hand"]["status"] == "active", o                    # the hand-launched one untouched
+        rc, o = run(["launch", "--type", "gpu_1x_a10", "--name", f"omni-1card-{int(time.time())}-9-r4242",
+                     "--ssh-key-name", "omni-key"]); printed += o
+        cut = o.strip()
+        rc, o = run(["terminate", "--run", "424"]); printed += o
+        assert rc == 0 and STATE["instances"][cut]["status"] != "terminated", o     # another run's number never matches
+        rc, o = run(["terminate", "--run", "4242"]); printed += o
+        assert rc == 0 and STATE["instances"][cut]["status"] == "terminated", o     # a launch cut off: found by its run
+        assert STATE["instances"]["hand"]["status"] == "active", o
+        rc, o = run(["list"]); printed += o
+        assert rc == 0 and " 0.00h" in o, o                                           # its age still read from its name
+        del STATE["instances"]["hand"]
         os.environ["LAMBDA_API_KEY"] = "wrong"
         rc, o = run(["list"]); printed += o
         assert rc == 2 and "HTTP 401" in o, o                                         # a refused key is reported
@@ -175,7 +209,7 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
     """A moved address keeps a launch and a give-back what they are (urllib alone resends a POST as a GET without its
     body, so the machine would stay rented and the give-back would look done); a move to a host that is not Lambda's is
     refused; a give-back Lambda does not confirm is exit 2 with the id; the SSH pair is checked before anything is rented."""
-    srv = HTTPServer(("127.0.0.1", 0), FakeLambda)
+    srv = HTTPServer(("127.0.0.1", 0), StandinLambda)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     here = f"http://127.0.0.1:{srv.server_address[1]}"
     for v in ("NO_PROXY", "no_proxy"):
@@ -215,25 +249,42 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
         rc, o = run(["status", "no-such-machine"]); printed += o
         assert rc == 0 and o.split()[2] == "terminated", o                            # the watch reads field 3
 
-        fake = tmp_path / "bin"; fake.mkdir()                 # ssh-keygen -y: the public half of a private key file
-        (fake / "ssh-keygen").write_text("#!/bin/sh\nf=''; while [ $# -gt 0 ]; do [ \"$1\" = -f ] && f=\"$2\"; shift; done\n"
+        standin = tmp_path / "bin"; standin.mkdir()                 # ssh-keygen -y: the public half of a private key file
+        (standin / "ssh-keygen").write_text("#!/bin/sh\nf=''; while [ $# -gt 0 ]; do [ \"$1\" = -f ] && f=\"$2\"; shift; done\n"
                                          f"grep -q GOOD-PRIVATE \"$f\" && {{ echo '{PUBLIC} omni'; exit 0; }}\n"
                                          "grep -q OTHER-PRIVATE \"$f\" && { echo 'ssh-ed25519 AAAAOTHER omni'; exit 0; }\n"
                                          "echo 'Load key: invalid format' >&2; exit 1\n")
-        (fake / "ssh-keygen").chmod(0o755)
-        os.environ["PATH"] = f"{fake}{os.pathsep}{os.environ['PATH']}"
+        (standin / "ssh-keygen").chmod(0o755)
+        os.environ["PATH"] = f"{standin}{os.pathsep}{os.environ['PATH']}"
         keys = {}
-        for k, body in (("good", "GOOD-PRIVATE"), ("other", "OTHER-PRIVATE"), ("cut", "-----BEGIN OPENSSH")):
+        for k, body in (("good", "GOOD-PRIVATE"), ("other", "OTHER-PRIVATE"), ("cut", "-----BEGIN OPENSSH"),
+                        ("public", "ssh-ed25519 AAAAPUBLICHALF omni"),
+                        ("oneline", "-----BEGIN OPENSSH PRIVATE KEY----- GOOD-PRIVATE -----END OPENSSH PRIVATE KEY-----")):
             keys[k] = tmp_path / k; keys[k].write_text(body + "\n"); keys[k].chmod(0o600)
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["good"])]); printed += o
         assert rc == 0 and "its other half" in o, o
-        rc, o = run(["keycheck", "--name", "omni-kye", "--private-file", str(keys["good"])]); printed += o
-        assert rc == 7 and "no SSH key by that name" in o and "omni-key" in o, o
+        out = tmp_path / "resolved"
+        rc, o = run(["keycheck", "--name", "omni-key.pem", "--private-file", str(keys["good"]), "--resolved-out", str(out)]); printed += o
+        assert rc == 0 and "found by its own half" in o and out.read_text().strip() == "omni-key", o   # Lambda's name is used
+        rc, o = run(["keycheck", "--name", "omni-kye", "--private-file", str(keys["other"])]); printed += o
+        assert rc == 7 and "no SSH key by that name" in o and "omni-key" in o and "none of Lambda's keys" in o, o
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["other"])]); printed += o
         assert rc == 7 and "not the private half" in o, o
         rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["cut"])]); printed += o
-        assert rc == 7 and "not a whole private key" in o, o
-        assert KEY not in printed and "PRIVATE" not in printed.replace("LAMBDA_SSH_PRIVATE_KEY", ""), printed
+        assert rc == 7 and "not a whole private key" in o and "cut short" in o, o
+        rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["public"])]); printed += o
+        assert rc == 7 and "holds a public key" in o, o                                # named, never shown
+        rc, o = run(["keycheck", "--name", "omni-key", "--private-file", str(keys["oneline"])]); printed += o
+        assert rc == 0 and "its other half" in o, o                                    # line breaks lost on the way in: repaired
+        assert keys["oneline"].read_text().splitlines()[1] == "GOOD-PRIVATE" and (keys["oneline"].stat().st_mode & 0o777) == 0o600
+        pub = tmp_path / "own.pub"; pub.write_text("ssh-ed25519 AAAAOWNHALF omni-gh-1\n")      # a run's own key
+        rc, o = run(["addkey", "--name", "omni-gh-1", "--public-file", str(pub)]); printed += o
+        assert rc == 0 and o.strip() and [k["name"] for k in STATE["added"]] == ["omni-gh-1"], o
+        rc, o = run(["delkey", "--name", "omni-gh-1"]); printed += o
+        assert rc == 0 and "removed from Lambda" in o and STATE["added"] == [], o              # gone at the run's end
+        rc, o = run(["delkey", "--name", "omni-gh-1"]); printed += o
+        assert rc == 0 and "nothing to remove" in o, o                                         # asking twice is fine
+        assert KEY not in printed and "AAAAPUBLICHALF" not in printed and "PRIVATE" not in printed.replace("LAMBDA_SSH_PRIVATE_KEY", ""), printed
     finally:
         os.environ["PATH"] = os.pathsep.join(p for p in os.environ["PATH"].split(os.pathsep) if not p.startswith(str(tmp_path)))
         srv.shutdown()

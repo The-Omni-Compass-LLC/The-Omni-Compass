@@ -16,51 +16,51 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v17, fingerprint 7c937d09e4031cc7 (55 files).
+- **The engine on this checkout:** omni-v19, fingerprint 9a72693d49b18b9b (62 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
-  - every muscle alone, over its loads: EVEN 580, GAIN 527
-  - the organisms under the normal load: the spine: GAIN (fewer misses), misses -0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.118 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses -0.092 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
-  - the organisms under the climb load: the spine: GAIN (more work + fewer misses), misses -0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (more work + fewer misses), misses -0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (more work + fewer misses), misses -0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.217 pp, power given +0.000%; Distribution / Specialized: GAIN (more work + fewer misses), misses -0.460 pp, power given +0.026%; the four stacked: GAIN (more work + fewer misses), misses -0.349 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.094 pp, power given +0.000%
-  - the organisms under the line load: the spine: GAIN (fewer misses), misses -0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses -0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses -0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses -0.117 pp, power given +0.000%; Distribution / Specialized: GAIN (fewer misses), misses -0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses -0.176 pp, power given +0.000%; the whole tower: GAIN (fewer misses), misses -0.051 pp, power given +0.000%
+  - every muscle alone, over its loads: EVEN 577, GAIN 530
+  - the organisms under the normal load: the spine: GAIN (fewer misses), misses down 0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.118 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses down 0.092 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
+  - the organisms under the climb load: the spine: GAIN (fewer misses), misses down 0.632 pp, power given +0.039%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.390 pp, power given +0.046%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.317 pp, power given +0.021%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.217 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.460 pp, power given +0.026%; the four stacked: GAIN (fewer misses), misses down 0.349 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.094 pp, energy the same
+  - the organisms under the line load: the spine: GAIN (fewer misses), misses down 0.371 pp, power given +0.038%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.205 pp, power given +0.045%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.250 pp, power given +0.030%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.117 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.142 pp, power given +0.006%; the four stacked: GAIN (fewer misses), misses down 0.176 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
 - The grid (source: results/grid_v5/GRID.md): Across the grid: modelled, 36 of 36 squares of 10 and 100 runs GAIN (fewer misses); the 18 single runs: 18 with fewer misses; work +0.000%; power given +0.000% to +0.065%; with the cluster inside, 54 squares: 18 single repetitions (no reading); of the 36 of 10 and 100 repetitions, by gauge: "organism time over the line (% of steps)" GAIN in 36, LOSS in 0, "time over the response line (% of samples)" GAIN in 36, LOSS in 0, "response time (ms), 95th percentile" GAIN in 26, LOSS in 2, "energy (Wh)" GAIN in 26, power given in 0, "energy, parked workers still on at idle power (Wh)" GAIN in 26, power given in 0, "organism energy (J)" GAIN in 0, power given in 22, "organism work per energy" GAIN in 0, power given in 22, "failed requests (%)" GAIN in 18, LOSS in 0, "response time (ms), 99th percentile" GAIN in 12, LOSS in 2, "HPA replicas, mean" GAIN in 4, power given in 5, "pods started" GAIN in 3, power given in 0; off the clock in 3; invalid in 0.
-- The Omni index (evidence class L, real machines, every measure the same in all three of our runs; the three-run tables of omni-v10 and omni-v11 and omni-v16, each named in its table): +4.3% GAIN on the resource reading (work, speed, machines, energy), +11.9% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
+- The Omni index (evidence class L, real machines, every measure judged across our three runs; the three-run tables of omni-v10 and omni-v11 and omni-v16 and omni-v18, each named in its table): +3.1% GAIN on the resource reading (work, speed, machines, energy), +8.8% GAIN on the service reading (work and speed alone). Source: results/OMNI_INDEX.md.
   - Real Kubernetes (GitHub): +28.6% GAIN
-  - Real database cache (MongoDB under YCSB, GitHub): +0.2% GAIN
-  - Real messaging (Apache Kafka, GitHub): +0.1% GAIN
-  - Real database (PostgreSQL behind PgBouncer, GitHub): +0.0% EVEN
-  - Real database buffer pool (MySQL under sysbench, GitHub): +0.0% EVEN
-  - Real cache (Redis, GitHub): -0.1% power given
+  - Real database buffer pool (MySQL under sysbench, GitHub): +1.6% GAIN
+  - Real cache (Redis, GitHub): +0.2% GAIN
+  - Real database cache (MongoDB under YCSB, GitHub): −1.4% LOSS
+  - Real messaging (Apache Kafka, GitHub): −1.9% LOSS
+  - Real database (PostgreSQL behind PgBouncer, GitHub): −4.9% LOSS
 
-**On the engine that stands (omni-v17): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v19): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 | +4.3% | GAIN, power given | L |
-| Redis, the cache's memory ceiling | omni-v16 | -0.1% | GAIN, power given | L |
-| PostgreSQL, the pooler's pool size | omni-v16 | +0.0% | power given | L |
-| MySQL, the buffer pool's size | omni-v16 | +0.0% | EVEN | L |
-| MongoDB, the storage engine's cache size | omni-v16 | +0.2% | GAIN | L |
-| Kafka, the consumer group's size | omni-v16 | +0.1% | GAIN | L |
+| Every real test together: the Omni index | omni-v10 and omni-v11 and omni-v16 and omni-v18 | +3.1% | GAIN AND LOSS | L |
+| Robustness: the two-hour run | omni-v11 | −4.2% | GAIN AND LOSS | L |
+| Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
+| Redis, the cache's memory ceiling | omni-v18 | +0.2% | GAIN, power given | L |
+| Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
+| Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
+| Real Kubernetes, demand that wanders | omni-v10 | +36.5% | GAIN AND LOSS | L |
+| Real Kubernetes, all four at once | omni-v10 | +39.7% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | +76.6% | GAIN, power given | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | −0.4% | LOSS | L |
+| Real Kubernetes, a queue of jobs | omni-v10 | +10.2% | GAIN AND LOSS | L |
+| Real Kubernetes, a public day of demand (Google 2011) | omni-v10 | +35.2% | GAIN AND LOSS | L |
+| Real Kubernetes, a noisy neighbour | omni-v10 | =0.0% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +63.3% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +41.0% | GAIN, power given | L |
+| Power grids (SimBench), both load models | omni-v11 | +5.8% | GAIN, power given | S |
+| PostgreSQL, the pooler's pool size | omni-v16 | −4.9% | GAIN AND LOSS | L |
+| MySQL, the buffer pool's size | omni-v16 | +1.6% | GAIN AND LOSS | L |
+| MongoDB, the storage engine's cache size | omni-v16 | −1.4% | GAIN AND LOSS | L |
+| Kafka, the consumer group's size | omni-v18 | −1.9% | GAIN AND LOSS | L |
+| Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN | S |
 | The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
 | The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
 | The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
-| Robustness: the two-hour run | omni-v11 | +3.8% | GAIN, power given | L |
-| Robustness: the governor killed outright mid-run | omni-v11 | +10.7% | GAIN, power given | L |
 | Robot arms (MuJoCo), the three untouched robots | omni-v11 | +3.8% | GAIN | S |
-| Real Kubernetes, steady work | omni-v10 | +29.8% | GAIN | L |
-| Real Kubernetes, faults | omni-v10 | +33.6% | GAIN, power given | L |
-| Real Kubernetes, demand that wanders | omni-v10 | +36.7% | GAIN | L |
-| Real Kubernetes, all four at once | omni-v10 | +39.7% | GAIN | L |
-| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v11 | +72.9% | GAIN, power given | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v10 | +0.0% | EVEN | L |
-| Real Kubernetes, a queue of jobs | omni-v10 | +10.2% | GAIN | L |
-| Real Kubernetes, a public day of demand (Google 2011) | omni-v10 | +35.4% | GAIN, power given | L |
-| Real Kubernetes, a noisy neighbour | omni-v10 | +0.0% | GAIN | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +59.7% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v11 | +41.0% | GAIN, power given | L |
-| Power grids (SimBench), both load models | omni-v11 | +5.8% | GAIN, power given | S |
 | Drone swarms, the three untouched cells | omni-v11 | +5.9% | GAIN | S |
-| Buildings and batteries (CityLearn), the districts with batteries | omni-v11 | +1.5% | GAIN, power given | S |
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
@@ -98,34 +98,34 @@ with inputs, times and ids, is `docs/RERUN_2026-10-10.md`. Not restarted, and wh
 waits on the family allowance those machines hold.
 
 
-## In one paragraph (2026-10-22, the engine that stands is omni-v17)
+## In one paragraph (2026-10-25, the engine that stands is omni-v19)
 
-**The engine that stands is omni-v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`), on main since 23 October, afternoon, on the founder's order of 22 October, afternoon: the heartbeat is a dial ("5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're going to set OmniCompass is main engine"). The main engine takes its full decision every 60 s; any beat from 5 to 120 s can be set, the fast checks every 5 s at every beat; every beat is shown beside native with what it buys and what it costs (`results/toy_gate/V17_LADDER.md`; on the live engine page, the page's section 1j); the monitors scale with the beat (`omni_heartbeat_seconds`, the staleness alert at three beats, the control panel's `/v1/beat`). It is omni-v16 with two changes in `omni_controller/controller.py` (54 of 55 files are omni-v16's bytes): the default beat moved from 15 to 60 s, and the cruise wait never fewer than two readings, a fault the ladder found at 90 and 120 s before the version landed (the wait's 120 s had rounded to one decision there, and one reading with a pod waiting put every machine in service). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours −1.7% EVEN, the minutes over the line −4.7% EVEN, the pods waiting −12.1% EVEN, the 95th percentile −0.2% EVEN; at 120 s the machine-hours −2.1% EVEN, the minutes over the line −3.7% EVEN, the pods waiting −29.6% GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s. The toy gate against omni-v16 (`results/toy_gate/V17_VS_V16.md`): Every toy that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. The ladder (class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (+175% to +317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (+102% to +127%), the 95th percentile at 15 and 30 s (+0.5%, +0.4%), the minutes over the line at 15 s (+2.3%): the engine's, on the next version's list. The real runs read every beat against native and against 60 s (`docs/PACE_PREREGISTRATION.md`, amendment 3), and every benchmark runs again on omni-v17 from 17:00 UTC on 23 October. **omni-v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`), on main from the morning of 22 October to that evening, was omni-v15 with every clock of the Kubernetes governor in seconds and the heartbeat at 15 s, and nothing else; at 60 s it made exactly omni-v15's decisions (4,578 audit records, none different; `results/toy_gate/V16_VS_V15.md`), and its pace study (`results/toy_gate/V16_PACE.md`) is the first half of omni-v17's ladder. **omni-v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), on main from
+**The engine that stands is **omni-v18** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`), on main since 23 October, night: omni-v17 with Omni direct, Omni-Compass's own orchestrator run on the muscles with no Kubernetes, taken into the engine (its seven rule-holding files fingerprinted like every other wire, 55 of the 62 files omni-v17's bytes), so the three arms, native, Omni on native and Omni direct, run from one fingerprint; every benchmark runs again on it from 21:19 UTC. Before it, **omni-v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`), on main from 23 October, afternoon, on the founder's order of 22 October, afternoon: the heartbeat is a dial ("5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're going to set OmniCompass is main engine"). The main engine takes its full decision every 60 s; any beat from 5 to 120 s can be set, the fast checks every 5 s at every beat; every beat is shown beside native with what it buys and what it costs (`results/model_gate/V17_LADDER.md`; on the live engine page, the page's section 2d); the monitors scale with the beat (`omni_heartbeat_seconds`, the staleness alert at three beats, the control panel's `/v1/beat`). It is omni-v16 with two changes in `omni_controller/controller.py` (54 of 55 files are omni-v16's bytes): the default beat moved from 15 to 60 s, and the cruise wait never fewer than two readings, a fault the ladder found at 90 and 120 s before the version landed (the wait's 120 s had rounded to one decision there, and one reading with a pod waiting put every machine in service). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%, EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s. The model gate against omni-v16 (`results/model_gate/V17_VS_V16.md`): Every model that sets its own period reads identical to omni-v16 on every gauge and every seed (9 models and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. The ladder (class S): Every beat reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native (−12.0% at the main engine's 60 s, −28.2% at its most), for machine-hours and energy given; the rows that read LOSS against native are in the kind setting pods waiting for a place at 5, 10, 15, 30, 60, 75, 90 and 120 s (+175% to +317%); and in the cloud's pods waiting for a place at 5, 15 and 30 s (+102% to +127%), the 95th percentile at 15 and 30 s (+0.5%, +0.4%), the minutes over the line at 15 s (+2.3%): the engine's, on the next version's list. The real runs read every beat against native and against 60 s (`docs/PACE_PREREGISTRATION.md`, amendment 3), and every benchmark runs again on omni-v17 from 17:00 UTC on 23 October. **omni-v16** (`OMNI_V16.json`, digest `5c5502f12b1c0ce4`, 55 files; `docs/OMNI_V16.md`), on main from the morning of 22 October to that evening, was omni-v15 with every clock of the Kubernetes governor in seconds and the heartbeat at 15 s, and nothing else; at 60 s it made exactly omni-v15's decisions (4,578 audit records, none different; `results/model_gate/V16_VS_V15.md`), and its pace study (`results/model_gate/V16_PACE.md`) is the first half of omni-v17's ladder. **omni-v15** (`OMNI_V15.json`, digest `0a53cdd7a558f803`, 55 files; `docs/OMNI_V15.md`), on main from
 21 October, evening, under the founder's standing order that every fault found is fixed and lands as the next version, was
-omni-v14 with two changes: the brain's request for the power cap trims only while the response line has been clean for the governor's own clear time (on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them; on the same decisions the gate leaves 35 moves and 32 reversals), and every wire that holds a governor's rules is inside the fingerprint (eight taken in, their bytes as they stood); a dwell with a glide was built, read in the gate and refused (`docs/OMNI_V15.md`). The toy gate against omni-v14 (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two
-card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`), on main
+omni-v14 with two changes: the brain's request for the power cap trims only while the response line has been clean for the governor's own clear time (on the omni-v11 long run the request switched between the start limit and the trim at 126 of 350 decisions and turned back at 123 of them; on the same decisions the gate leaves 35 moves and 32 reversals), and every wire that holds a governor's rules is inside the fingerprint (eight taken in, their bytes as they stood); a dwell with a glide was built, read in the gate and refused (`docs/OMNI_V15.md`). The model gate against omni-v14 (`results/model_gate/V15_VS_V14.md`, eight seeds, every model and two
+card models new with it) read every service gauge identical on every model, the card models identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the model cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. **omni-v14** (`OMNI_V14.json`, digest `7afba44615fcff8f`, 47 files; `docs/OMNI_V14.md`), on main
 from 04:47 UTC on 21 October by the founder's orders: a knob on every monitor for every muscle, and "tune the engine". It was omni-v13 with two
 changes in the Kubernetes governor: `--native` leaves any muscle where native runs it (the control panel's muscle button); and the
 operator's own commands run without a shell unless they hold a pipe, a redirect or a variable. A third, no conveyance raise on a
-reading that leaves out another workload's starting pods, was refused by the toy gate (the web's 95th percentile 6.4% higher than
-omni-v13's) and is kept on a study branch (`docs/OMNI_V14.md`, section 3). The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. **omni-v13** (`docs/OMNI_V13.md`), on main from 20 October, was omni-v12 with one fault fixed in the Kubernetes
+reading that leaves out another workload's starting pods, was refused by the model gate (the web's 95th percentile 6.4% higher than
+omni-v13's) and is kept on a study branch (`docs/OMNI_V14.md`, section 3). The model gate against omni-v13 (`results/model_gate/V14_VS_V13.md`, eight seeds, every model, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict model identical: no LOSS. **omni-v13** (`docs/OMNI_V13.md`), on main from 20 October, was omni-v12 with one fault fixed in the Kubernetes
 governor's conveyance, found on KubeRay's rig with the organism alone (the queue 0.6% to 0.8% later and the web's 99th
 percentile 4% to 13% higher, LOSS in all three runs): the web pods' CPU limits, raised in the queue's first half minute, stayed
 through the saturated queue, so the batch pods hashed 7.6% slower while the web served no faster; no machine was parked during a
 saturated queue (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11). On a shared host at its top beside another workload's room
-every limit given now goes back to the operator's, and every other pod is counted by its own limit. In its toy gate
-(`results/toy_gate/V13_VS_V12.md`) omni-v13 read no LOSS against omni-v12 in any toy, identical on the web-only toys, and in a
-batch toy set from the KubeRay runs' own files brings the queue and the job turnaround back to native's. **omni-v12**
+every limit given now goes back to the operator's, and every other pod is counted by its own limit. In its model gate
+(`results/model_gate/V13_VS_V12.md`) omni-v13 read no LOSS against omni-v12 in any model, identical on the web-only models, and in a
+batch model set from the KubeRay runs' own files brings the queue and the job turnaround back to native's. **omni-v12**
 (`docs/OMNI_V12.md`), on main from 19 October, was omni-v11 with two faults fixed, both found on the
 omni-v11 runs: a CPU-limit raise the cluster's admission refuses is held instead of being written again at every fast check (in
 the omni-v11 capacity test the governor asked again about 9 times a minute, 970 to 1,000 refused writes an hour, though nothing
 wrong was ever set), and the swarm's proximity reflex hands back the planner's cruise in the tick it is triggered (the omni-v11
-reflex slowed over a second, and on a mission draw outside the counted cells two drones collided). In the toy gate
-(`results/toy_gate/V12_VS_V11.md`) omni-v12 reads identical to omni-v11 on every gauge of every toy but the one whose every raise
+reflex slowed over a second, and on a mission draw outside the counted cells two drones collided). In the model gate
+(`results/model_gate/V12_VS_V11.md`) omni-v12 reads identical to omni-v11 on every gauge of every model but the one whose every raise
 is refused, where it writes 97.5% fewer commands, GAIN. **omni-v11** (`docs/OMNI_V11.md`) is omni-v10 with one guard in the
 Kubernetes governor: a reading with no machine in service is blind, so the governor holds, says why, decides nothing from it and
-writes nothing (found in the omni-v10 CruiseKube test, where every kind worker left service for two minutes; the toy gate in
-`results/toy_gate/V11_VS_V10.md`). **omni-v10** (`docs/OMNI_V10.md`) is omni-v9 with the CityLearn battery wire's glide at 0.0875 of its range an hour (omni-v9:
+writes nothing (found in the omni-v10 CruiseKube test, where every kind worker left service for two minutes; the model gate in
+`results/model_gate/V11_VS_V10.md`). **omni-v10** (`docs/OMNI_V10.md`) is omni-v9 with the CityLearn battery wire's glide at 0.0875 of its range an hour (omni-v9:
 0.0625), the speed that cuts the bill most with no LOSS: omni-v9 had stopped at the fastest glide where no score rose, and by the
 one key (the founder's correction of 17 October) a rise in the ramping or in the distance from net zero is power held, power
 given, never a LOSS. Read on CityLearn before it was pushed, it cuts the bill 8.4% to 20.1% in every district with a price, a
@@ -171,7 +171,7 @@ October; 1,039 judged rows, **0 LOSS**), each rebuilt byte for byte from its raw
   missions a charge +8% to +25%, GAIN, no near miss in the counted cells; **a fault found beyond them**: the wire spent the
   closest-approach margin (to about 0.16 m, shown) and, on a mission draw outside the preregistered seeds, let drones collide
   where native did not, because its proximity reflex slowed over a second instead of at once. The fix held every drone outside
-  the keep-out on every draw tried (`results/toy_gate/V12_SWARM_REFLEX.md`) and landed in omni-v12, whose swarm runs judge a
+  the keep-out on every draw tried (`results/model_gate/V12_SWARM_REFLEX.md`) and landed in omni-v12, whose swarm runs judge a
   collision as a LOSS and fly three mission draws never flown (`docs/SWARM_PREREGISTRATION.md`, amendment 2).
 
 **On omni-v10, until their omni-v11 runs land** (`results/live/V10_*.md`, 18 October, ten pairs a run): steady work in steps,
@@ -211,12 +211,14 @@ to their end as their own record (omni-v15's campaign started none; the omni-v11
 `scripts/amazon_queue.txt`), each behind its own `switch=` line; the founder put their secrets in and switched both on on
 18 October (the Operator's Manual's appendices G and H, click by click). Their first sets, on omni-v10, stopped at the login at
 no cost and stay as its record: Google's stored key had been cut short when it was copied from Cloud Shell's screen, and
-Amazon's account is on its Free plan, whose policy denies every machine read. Both queues are on again behind a $0 check
-(`cloud-check`): the conductor starts a cloud's set only after that cloud's check passed (the key whole, the login, the plan,
-the machine type and every quota; a short Amazon quota is asked of Amazon by the check itself), so nothing more is spent on a
-login. Google waits for its key stored whole (downloaded as a file, never copied from the screen; appendix G, its step 4);
-Amazon waits for its account on the Paid plan (appendix H, its step 1a). Then the sets start on their own, A, B and C on
-omni-v16, one at a time in each machine-family queue.
+Amazon's account is on its Free plan, whose policy denies every machine read. **Both are not yet run, and both queues are switched
+off** (24 October, the founder's words: "leave the Google and Amazon runs in everywhere and just show it not ran yet ... code it to
+wire it the same way that the Azure is running"): every workflow, script, queue, check and page stays, wired as Azure's sets run
+today (the same harness and the main engine's 60 s beat, 100 paired repetitions under the stopping rule, the $0 check before any
+set), and nothing starts or is checked until his word. Google needs its key stored whole (downloaded as a file, never copied from
+the screen; appendix G, its step 4); Amazon needs its account on the Paid plan (appendix H, its step 1a), which Amazon will not
+grant before the $100 credit is spent or the account is six months old. Switched on then, each cloud's sets start behind its own
+$0 check, A, B and C, one at a time in each machine-family queue.
 
 **The card (evidence class P)**: every earlier card result is obsolete; the founder's runs on rented cards (Lambda) come at one
 exact commit of the engine that stands, on his word. **Linux's own CPU governor and meter** (`cpu-power`): built and
@@ -243,6 +245,22 @@ repetitions). The composition is class S over class P and L tables and across en
 run (Omni-Compass at every layer at once) is the measurement that would replace it, and the page is remade as each layer's
 omni-v16 runs land. The numbers stand on that page, never copied here.
 
+## Omni direct: Omni-Compass's own orchestrator on the muscles, without Kubernetes (23 October)
+
+The founder's order of 23 October: build Omni-Compass's own orchestrator, no Kubernetes or other orchestrator's code in it,
+and show the three arms together: native (Kubernetes' published autoscaling rule on the muscles, written by us as the
+yardstick), Omni on native (Omni on top of that rule, the engine's strict form) and Omni direct (Omni alone on the muscles).
+`omni_orchestrator/` and `docs/OMNI_ORCHESTRATOR.md` are what was built; `docs/OMNI_ORCHESTRATOR_GRADES.md` grades it sector
+by sector (B overall, not production). Its brain carries the engine's own mechanisms (conveyance, the reflex, the twin read as
+Kubernetes would, the fold under the verdict), and in the full form on one host (18 steps of 25 s, one run of each arm, class
+L) Omni direct read against native by the one key: work GAIN (up 4.7%), the 95th percentile GAIN (down 9.9%), units GAIN, a cut
+(down 10.3%), machines EVEN, nothing failed. The three arms together in the quick form (one run each, after a fault the first
+three-arm showing found was fixed: a trial the traffic kept abandoning still held a unit below the twin): Omni on native against
+native, work GAIN (up 8.3%); Omni direct against native, work GAIN (up 9.1%); Omni direct against Omni on native, the 95th
+percentile GAIN (down 13.2%) and units GAIN, a cut (down 9.5%); no LOSS in any pair. And the three runs on GitHub's machines (the full form, A, B and C from one commit) read Omni on native against native work GAIN in all three (up 5.2% to 7.4%) and the 95th percentile GAIN in all three (down 7.5% to 12.1%), Omni direct against native work GAIN in all three (up 5.7% to 9.4%) and the 95th percentile GAIN in all three (down 9.8% to 15.7%), machines EVEN, the units power given or EVEN, and Omni direct against Omni on native EVEN on every gauge; no LOSS in any pair in any run (`results/orchestrator/V18_THREE_ARMS_ABC.md`). Still to come: the comparison against Kubernetes itself on the kind
+rig, and Omni direct on a cloud's machines on the founder's word. The two walls found on the
+way and the mathematics of the unit count's edge are on `docs/THE_ROOM.md`.
+
 ## Open
 
 1. **Every benchmark on omni-v11**: released A, then B, then C by the conductor from `scripts/reruns.txt` (the steady and
@@ -268,21 +286,21 @@ omni-v16 runs land. The numbers stand on that page, never copied here.
    cancelled. The first omni-v16 starts came at 13:50 UTC; of them the levers check (A) failed three of its 19 checks on a rig
    omni-v16 had left at decisions of 5 s, too short for the brain's own minute (rightsize and coldstart wait for its calm); the
    rig now runs the minutes its checks were written for, and the levers check runs again, A, B and C (`docs/OMNI_V16.md`).
-5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the toy read no LOSS at 15 s against 60 s
-   (`results/toy_gate/V16_PACE.md`, `results/toy_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a
+5a. **The heartbeat at 15 s** (`docs/PACE_PREREGISTRATION.md`, amendment 2): the model read no LOSS at 15 s against 60 s
+   (`results/model_gate/V16_PACE.md`, `results/model_gate/V16_VS_V15.md`); against native it read LOSS on the pods waiting for a
    place (both settings) and, in the cloud's setting, on the 95th percentile and the alert minutes, rows the engine carries at
    every pace (at 60 s they read EVEN only by the seeds' spread); they are on the next version's list. Three runs of five arms
    (native, Omni-Compass at 15 s, and at 60, 10 and 5 s) on GitHub's own machines read it for real. A LOSS at 15 s there is
    root-caused and fixed in the next version.
-6. **Google, Amazon and Azure**: each behind its own $0 check; Google starts once its key is stored whole, Amazon once its
-   account is on its Paid plan, Azure as soon as its check passes (its switch on again from the founder's word of 22 October
-   that the account its login bills agreed to it); the four sets A, B and C on omni-v16.
+6. **Azure, Google and Amazon**: Azure runs (its steady set started by the conductor on 24 October, once its check passed);
+   Google and Amazon are not yet run, their queues switched off, wired as Azure's sets are and started on the founder's word
+   (Google once its key is stored whole, Amazon once its account is on its Paid plan), each behind its own $0 check.
 7. **The card**: the founder's runs on Lambda, one exact commit of omni-v11.
 8. **Linux**: a machine on the metal for `cpu-power`.
 9. **More room**: of the 159 muscles that read EVEN (the same as native) on the realms table, the room search of 16 October
    (`docs/OMNI_V7.md`) found none under the max's gauges within each muscle's own knob; six process loops miss at most 0.56% of
    decisions, a card candidate for a later version. The 14 of 26 knob-cases on the real stacks that read watch stay the next
-   engine's question, in the toy gate first.
+   engine's question, in the model gate first.
 10. **Omni-Compass 1.0**: when the founder declares the engine final, the engine that stands then is published as 1.0 and
    the older fingerprints go to `docs/history` as the road to it.
 
