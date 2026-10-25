@@ -253,6 +253,13 @@ The whole system, every layer composed by the product law from its own table (th
 governors, the services on it, the cloud's bill), with every interval carried and the product's assumption tested on the
 governors' four ways, is [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md): a modelled composition (class S) of the class P and L
 tables, remade as each layer's omni-v16 runs land.
+Every orchestrator on the same organisms with the same injection, and Omni-Compass on top of each (the founder's third arm, 25
+October), is [`results/orchestrators/ORCHESTRATORS.md`](results/orchestrators/ORCHESTRATORS.md): our own models (class S), the
+Kubernetes scheduler, its bin-packing profile, Volcano, Kueue, KAI and Koordinator, each rule written from its own release, on
+twelve injections from the benchmarks, on the kind rig and in the cloud, eight repetitions with the same random numbers in every
+arm. On the kind rig Omni-Compass on top of each reads 20 to 21 gauge-rows GAIN (the 95th percentile down 0.8% to 50.1%, a
+faster answer) and 2 LOSS (none on top of Koordinator), the batch beside the service (a job's turnaround up 9.3%: the breach reflex gave the failing service the
+processor), on the next version's list; in the cloud, at the tune-down, 85 or 86 of 86 rows EVEN.
 How every one of these was graded, category by category, is in [`docs/REFEREE_GRADES.md`](docs/REFEREE_GRADES.md).
 
 ## The engine's law: every muscle from 1 up to one click under its own capacity, read live (13 October, night)

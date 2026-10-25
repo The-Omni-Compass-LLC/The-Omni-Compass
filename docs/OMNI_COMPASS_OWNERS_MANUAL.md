@@ -3738,6 +3738,21 @@ or approved these results.
   change is exactly zero in every run: CityLearn's own value moved by at most 3.6 × 10⁻⁵ between runs, in both arms alike.
   In all, 27 score-rows GAIN, 1 power given and no LOSS. The wire's road since then: omni-v9 reads the coming hour, and omni-v10
   glides at 0.0875 an hour (`docs/OMNI_V8.md` to `docs/OMNI_V10.md`); omni-v11 to omni-v19, the engine that stands, carry it unchanged.
+- **The orchestrators on the same organisms, the third arm** (`results/orchestrators/ORCHESTRATORS.md`; preregistered in
+  `docs/ORCHESTRATORS_PREREGISTRATION.md`; the founder's order of 25 October): the Kubernetes scheduler as shipped, its
+  bin-packing profile, Volcano v1.16.0, Kueue v0.20.2, the KAI scheduler v0.18.6 and Koordinator 1.8.0, each rule written from its
+  own release files, on twelve injections from the benchmarks that carry them, on the kind rig (six workers on one runner) and in
+  the cloud (machines of their own under the Cluster Autoscaler), eight repetitions, every arm of a repetition meeting the same
+  random numbers, and the shipped governor of omni-v19 on top of each. On the kind rig, where every worker shares one host, where
+  a pod lands changes nothing: the orchestrators read EVEN against Kubernetes alone but Kueue, whose admission makes work wait (5
+  LOSS), and Koordinator, whose best-effort batch yields the processor to the service (4 GAIN, 3 LOSS, 1 power given); Omni-Compass
+  on top of each reads 20 to 21 GAIN (the 95th percentile down 0.8% to 50.1%, its conveyance giving the serving pods the host's
+  idle processor) and 2 LOSS where the batch stream runs beside a failing service (a job's turnaround up 9.3%: the breach reflex
+  gives the service the processor), none on top of Koordinator. In the cloud, where machines are their own, packing matters: the
+  KAI scheduler, packing the service by its requests, reads 37 LOSS (the 95th percentile up 6.9% to 4,700.0%: its answers time out), Volcano 20,
+  Koordinator 7, Kueue 6 and the bin-packing profile 2; Omni-Compass on top, at the tune-down on the machines alone, reads 85 or 86
+  of 86 rows EVEN, since omni-v19 gives nothing back before it has watched its organism for two hours. Two faults of the model
+  were found in its own first runs and corrected before the third (amendments 1 and 2), each run kept whole in `docs/history`.
 
 ### 16.6 The one number, and the table
 

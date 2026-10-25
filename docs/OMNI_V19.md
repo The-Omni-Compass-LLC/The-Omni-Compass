@@ -60,6 +60,12 @@ machines left as a whole, where the Cluster Autoscaler reads each machine's own 
 more machines than native would: power given, never a LOSS by the one key. Reading the line machine by machine, as the
 Cluster Autoscaler does, is on the next version's list, through the model gate.
 
+The orchestrators on the same organisms (`results/orchestrators/ORCHESTRATORS.md`, our own models) read two more for that list,
+the same on top of every orchestrator but Koordinator: where the batch stream runs beside the service on the kind rig's one host,
+the service fails requests in every arm and the breach reflex lowers its autoscaler's target, so more serving pods take the
+processor from the batch (requests failed down 6.5%, GAIN; a job's turnaround up 9.3% and the stream's makespan up 2.0%, LOSS); and
+in the cloud, beside Volcano, a job's turnaround up 0.7% with a machine marked idle.
+
 ## Every benchmark runs again
 
 Every benchmark runs again on omni-v19 from the moment it reached main; nothing is read across engines.

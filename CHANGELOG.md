@@ -2,6 +2,22 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-25 (day): the orchestrators, the third arm, on the same organisms with the same injection
+
+- **Every orchestrator on the same organisms** (the founder's order of 25 October; `docs/ORCHESTRATORS_PREREGISTRATION.md`, written
+  before the recorded run): the Kubernetes scheduler as shipped, its bin-packing profile, Volcano v1.16.0, Kueue v0.20.2, the KAI
+  scheduler v0.18.6 and Koordinator 1.8.0, each rule written from its own release files, on twelve injections from the benchmarks
+  that carry them, on the kind rig and in the cloud, eight repetitions, every arm of a repetition meeting the same random numbers;
+  Omni-Compass's shipped governor on top of each (`tools/orchestrators_arm.py`, `results/orchestrators/ORCHESTRATORS.md`, class S).
+  On the kind rig the orchestrators read EVEN against Kubernetes alone but Kueue (5 LOSS) and Koordinator (4 GAIN, 3 LOSS), and
+  Omni-Compass on top of each 20 to 21 GAIN and 2 LOSS (none on Koordinator); in the cloud KAI reads 37 LOSS, Volcano 20,
+  Koordinator 7, Kueue 6 and the bin-packing profile 2 against Kubernetes alone, and Omni-Compass on top 85 or 86 of 86 rows EVEN.
+  Two model faults found and corrected before the third run, each run kept in `docs/history` (amendments 1 and 2).
+  The governors' page reads it (`results/live/GOVERNORS.md`); `verify.py` checks the page against its record.
+- **omni-v19's records** brought up to the version: the mechanism identity, the model-gate pages, the coverage page, the bill of
+  materials and the benefit sheet. The self-pilot reads omni-v19's trade by the one key (pods waiting down 100%, GAIN; machine-hours
+  up 18.3%, power given; `tests/test_selfpilot.py`); native's line read machine by machine is on the next version's list.
+
 ## 2026-10-25 (morning): omni-v19 stands: the immune system, native stays wherever Omni-Compass cannot beat it
 
 - **omni-v19** (`OMNI_V19.json`, fingerprint `9a72693d49b18b9b`, `docs/OMNI_V19.md`): omni-v18 with the immune system in the

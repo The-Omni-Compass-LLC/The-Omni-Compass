@@ -374,6 +374,19 @@ the founder overrides one in the conversation.
   (`docs/COMPETITORS_PREREGISTRATION.md`, the register's rows 99 to 106): the organism alone, the product as it ships, Omni-Compass
   on the organism alone, Omni-Compass on top of the product. The commercial services run only on an account the founder opens and
   only where their terms allow a published benchmark.
+- **The orchestrators, the third arm, on the same organisms with the same injection** (the founder's words: "all the orchestrators
+  to have the same injection ran through. Those orchestrators sit on the same organism. And there lies the third arm ... the
+  Kubernetes bin pack, Volcano, Kueue, Koordinator, KAI ... and of course then OmniCompass on top of that same stack"). Three arms
+  on every organism: native (Kubernetes alone), the orchestrator (every pod of the same work sent to it as its project documents,
+  its shipped rule written by us from its release files), and Omni-Compass's shipped governor on top of it. Every arm of a
+  repetition meets the same random numbers (the engine's jump generator, drawn before any arm runs). Modelled first, class S
+  (`tools/orchestrators_arm.py`, `docs/ORCHESTRATORS_PREREGISTRATION.md`, `results/orchestrators/ORCHESTRATORS.md`): twelve
+  injections from the benchmarks that carry them, each on the kind rig and in the cloud, eight repetitions; the live four ways on
+  GitHub's machines (`kind-orchestrators.yml`) send the batch stream through each orchestrator on the same kind rig. Gödel, KubeRay,
+  Crane and the multi-cluster orchestrators join the model once each one's shipped default is read from its release. The
+  orchestrators place pods on machines and admit jobs, so they run on the organisms that hold a cluster; in the ten modelled
+  organisms of the twenty scenarios their knobs are catalog rows (the orchestra, `tools/run_orchestra.py`), and their rules are
+  never written into a muscle that has no pods, machines or jobs.
 - **Alloy, a sense and a muscle** (the founder's words: "Compass would use ... Alloy as its telemetry ... and go beyond it"; "We can
   use Alloy as a muscle and put it in our stacks"). Grafana Alloy (Apache-2.0) runs unchanged as a separate service: its readings
   are a wire into Omni-Compass, and its own knobs (how often it reads, batches and samples) are a muscle Omni-Compass governs, a

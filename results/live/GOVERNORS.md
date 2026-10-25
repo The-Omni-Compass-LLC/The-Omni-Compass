@@ -65,6 +65,25 @@ The founder's word of 19 October, night: the governors in a catalog group, an or
 | Nephio | 4 | GAIN (fewer misses) | GAIN (more work + fewer misses) | GAIN (fewer misses) |
 | **The orchestra, every governor's muscle once** | 55 | **GAIN (more work + fewer misses)** | **GAIN (more work + fewer misses)** | **GAIN (more work + fewer misses)** |
 
+## The orchestrators on the same organisms, with the same injection (modelled, class S): the third arm
+
+The founder's order of 25 October: every orchestrator on the same organisms with the same injection, and Omni-Compass on top of each. 12 injections in two settings (the kind rig and the cloud), 8 repetitions, every arm of a repetition meeting the same random numbers; each orchestrator's rule written from its own release; Omni-Compass the shipped governor of omni-v19. A model, never a measurement of the orchestrator itself; every organism and gauge: [`results/orchestrators/ORCHESTRATORS.md`](../orchestrators/ORCHESTRATORS.md).
+
+| Orchestrator | Setting | Against Kubernetes alone | Omni-Compass on top of it, against it |
+|---|---|---|---|
+| the Kubernetes scheduler as shipped (the organism alone) | on-site | it is native | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| the Kubernetes scheduler as shipped (the organism alone) | cloud | it is native | 0 GAIN, 0 LOSS, 1 power given, 85 EVEN |
+| the Kubernetes scheduler's bin-packing profile | on-site | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| the Kubernetes scheduler's bin-packing profile | cloud | 1 GAIN, 2 LOSS, 3 power given, 80 EVEN | 0 GAIN, 0 LOSS, 1 power given, 85 EVEN |
+| Volcano v1.16.0 | on-site | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| Volcano v1.16.0 | cloud | 6 GAIN, 20 LOSS, 2 power given, 58 EVEN | 0 GAIN, 1 LOSS, 0 power given, 85 EVEN |
+| Kueue v0.20.2 | on-site | 0 GAIN, 5 LOSS, 0 power given, 81 EVEN | 21 GAIN, 2 LOSS, 0 power given, 63 EVEN |
+| Kueue v0.20.2 | cloud | 2 GAIN, 6 LOSS, 0 power given, 78 EVEN | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN |
+| the KAI scheduler v0.18.6 | on-site | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN | 20 GAIN, 2 LOSS, 0 power given, 64 EVEN |
+| the KAI scheduler v0.18.6 | cloud | 4 GAIN, 37 LOSS, 7 power given, 38 EVEN | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN |
+| Koordinator 1.8.0 | on-site | 4 GAIN, 3 LOSS, 1 power given, 78 EVEN | 20 GAIN, 0 LOSS, 0 power given, 66 EVEN |
+| Koordinator 1.8.0 | cloud | 0 GAIN, 7 LOSS, 6 power given, 73 EVEN | 0 GAIN, 0 LOSS, 0 power given, 86 EVEN |
+
 ## The Kubernetes scheduler (vanilla, and its bin-packing profile)
 
 - **Native**: the default scheduler of Kubernetes 1.35 as shipped, which places every pod of every Kubernetes set; and the same release's scheduler with the operator's bin-packing profile (NodeResourcesFit, MostAllocated).
