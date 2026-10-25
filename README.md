@@ -139,16 +139,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-25 06:18 | godel: B (nativebare native compassbare compass) | success | [40161074996](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40161074996) |
+| 2026-10-25 06:16 | orchestrators: kuberay B | success | [40160106691](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40160106691) |
+| 2026-10-25 05:51 | live-engine | success | [40164777258](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40164777258) |
+| 2026-10-25 05:43 | group: ocm A (nativebare native compassbare compass) | success | [40158184424](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40158184424) |
+| 2026-10-25 05:34 | raw-sweep | success | [40165986937](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40165986937) |
 | 2026-10-25 05:25 | group: karmada A (nativebare native compassbare compass) | success | [40157220855](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40157220855) |
 | 2026-10-25 05:20 | crane: B (nativebare native compassbare compass) | success | [40160109718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40160109718) |
 | 2026-10-25 05:18 | big-organism-detached collect | success | [40165054860](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40165054860) |
 | 2026-10-25 05:14 | godel: A (nativebare native compassbare compass) | success | [40157217643](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40157217643) |
 | 2026-10-25 04:40 | health | success | [40162726001](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40162726001) |
-| 2026-10-25 04:18 | grid | success | [40161419034](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40161419034) |
-| 2026-10-25 04:14 | orchestrators: kuberay A | success | [40149198786](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40149198786) |
-| 2026-10-25 03:54 | orchestrators: binpack C | success | [40149195417](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40149195417) |
-| 2026-10-25 03:53 | orchestrators: volcano C | success | [40148147684](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40148147684) |
-| 2026-10-25 03:13 | orchestrators: kueue C | success | [40147126017](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40147126017) |
 <!-- front-page:runs:end -->
 
 **Two names only: native is the system as it runs on its own; omni is Omni-Compass on top of native.** Omni-Compass never
