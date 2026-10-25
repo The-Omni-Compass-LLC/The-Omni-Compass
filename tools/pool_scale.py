@@ -71,7 +71,7 @@ def main(out, *paths):
     if not any(per.values()):
         raise ValueError("shards contain no completed runs")
     total = max(len(v) for v in per.values())
-    ladder = (1, 10, 100, 1000)
+    ladder = (1, 10, 100, 500)      # the ladder of the Python's 500-run Monte Carlo (the founder's order of 25 October)
     ceiling = next((n for n in ladder if n >= extent), extent)
     prefixes = [n for n in ladder if n <= ceiling]
     if ceiling not in prefixes:
@@ -83,7 +83,7 @@ def main(out, *paths):
     L = [f"# The organisms at {scale}x size, {LOADS[load]}, up to {total} completed runs; seed coverage through {extent} (pooled from {len(files)} shards)", "",
          f"Evidence class **S** (models). Engine {', '.join(known) or 'not recorded'}, commit(s) {', '.join(sorted(commits))}. "
          f"Native: each organism's own controllers. Omni: {law}. Each block is the first N runs (seeds {SEED0} on), so 1, 10, "
-         "100 and 1,000 are nested; a block short of a run says so (Runs column: finished of the block). Band first: no win "
+         "100 and 500 are nested; a block short of a run says so (Runs column: finished of the block). Band first: no win "
          "unless the time over the service line is no higher than native's. Labels describe only available observations; "
          "an incomplete block is not evidence of completing its requested prefix."
          + (f" The four stacked: {n_joined} of its runs are the four realms' runs on the same seeds joined plant for plant "

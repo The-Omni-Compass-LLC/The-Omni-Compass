@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""scripts/cpufreq_ceiling.sh against a fake sysfs: sets scaling_max_freq on every policy, clamps to cpuinfo limits,
+"""scripts/cpufreq_ceiling.sh against a standin sysfs: sets scaling_max_freq on every policy, clamps to cpuinfo limits,
 restore puts cpuinfo_max_freq back, and fails loudly when there is no cpufreq."""
 import os, subprocess, sys, tempfile
 from pathlib import Path

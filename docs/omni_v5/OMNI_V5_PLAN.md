@@ -339,7 +339,7 @@ So the wire must already be there, watching, the instant that muscle is hit.
 
 ## 22. What is really open to benchmark ON TOP OF (honest source map — so we never claim a closed scalp we didn't take)
 The whole method needs the REAL native underneath, not our model of it. Here is what is actually gettable and what is not.
-- **Truly open, real code on GitHub — build Omni on top and benchmark for real (no toy):**
+- **Truly open, real code on GitHub — build Omni on top and benchmark for real (no model):**
   Kubernetes HPA / VPA / Cluster Autoscaler / **Karpenter** / **KEDA** (Apache-2.0); GPU serving **vLLM / Triton /
   TensorRT-LLM**; databases **PostgreSQL / MySQL / MongoDB / Redis**; data/stream **Spark / Kafka / OpenSearch / Nginx /
   fio**; observability & immune stand-ins **Prometheus / Alertmanager / Grafana / OpenTelemetry**; cooling/building

@@ -34,30 +34,13 @@ from omnicompass.verdict import Verdict                                  # noqa:
 
 GPU_SEEDS = (5100, 5101, 5102)
 from omnicompass.student_t import t95 as _t95    # noqa: E402  (the exact two-sided 95% point of Student's t, omni-v9)
+from tools.readings import relative_runs_reading  # noqa: E402  (the one key, written once)
 
 
 def reading(runs, aim):
-    """The three-run rule (tools/readings.py, tools/confirm_abc.py): GAIN or LOSS only when every run is clear of zero the same
-    way."""
-    if aim == "shown":       # declared shown only, never judged (tools/readings.py SHOWN)
-        return "shown, not judged"
-    if all(r["lo"] == r["hi"] == 0.0 for r in runs):
-        return "EVEN, the same"
-    # as the tables read it (tools/confirm_abc.py verdict): clear runs pointing different ways disagree, whatever the
-    # others read; then any run whose interval holds zero makes the row EVEN
-    if not runs:
-        return "EVEN"
-    clear = [r for r in runs if r["lo"] > 0 or r["hi"] < 0]
-    if len({r["change"] > 0 for r in clear}) > 1:
-        return "the runs disagree"
-    if len(clear) < len(runs):
-        return "EVEN"
-    up = clear[0]["change"] > 0
-    if aim == "spent":
-        return "power given" if up else "GAIN"
-    if aim == "per":         # work bought with each unit of a resource (tools/readings.py WORK_PER): a fall is power given
-        return "GAIN" if up else "power given"
-    return "GAIN" if (up if aim == "up" else not up) else "LOSS"
+    """The three-run rule, the one key's (tools/readings.py, the founder's order of 24 October 2026: a change of 0.5% or more,
+    the mean of the runs, is a change, read by the gauge's aim; EVEN only under 0.5%)."""
+    return relative_runs_reading(runs, aim)
 
 
 def paired(a, b, block):
@@ -159,13 +142,13 @@ LINUX_GAUGES = {   # name: (aim, per-second series)
 
 
 def linux_run(seed, arm):
-    """One run of tools/toy_gate.py worker_convey, unchanged: its own locals read at the end of every one-second tick
+    """One run of tools/model_gate.py worker_convey, unchanged: its own locals read at the end of every one-second tick
     (sys.settrace on the line that adds up the tick), and its own result line."""
     import contextlib
     import inspect
     import io
     import tempfile
-    from tools import toy_gate as TG
+    from tools import model_gate as TG
     src, first = inspect.getsourcelines(TG.worker_convey)
     mark = first + next(i for i, s in enumerate(src) if s.strip().startswith("busy_sum += busy"))
     code = TG.worker_convey.__code__
@@ -189,7 +172,7 @@ def linux_run(seed, arm):
         finally:
             sys.settrace(None)
     sec["summary"] = json.loads(buf.getvalue().strip().splitlines()[-1])
-    # the checkout the engine was imported from, as tools/toy_gate.py checks it: this one, checked here and never recorded (a
+    # the checkout the engine was imported from, as tools/model_gate.py checks it: this one, checked here and never recorded (a
     # machine's own path would make the record differ from one machine to the next)
     got = sec["summary"].pop("engine_tree", None)
     if got is not None and Path(got).resolve() != ROOT.resolve():
@@ -210,7 +193,9 @@ def linux():
             out["readings"].setdefault(g, {"aim": aim, "runs": [], "single": True})["runs"].append(
                 {"native": a, "omni": b, "change": c, "lo": c, "hi": c})
     for g, v in out["readings"].items():
-        v["reading"] = reading(v["runs"], v["aim"])
+        # one value a run is no interval: three single values that agree cannot be judged (tools/confirm_abc.py verdict), so
+        # the gauge is shown, never GAIN or LOSS
+        v["reading"] = "shown, not judged (one value a run, no interval)" if v.get("single") else reading(v["runs"], v["aim"])
         print(f"linux {g:14s} {v['reading']:16s} " + "  ".join(f"{r['change']*100:+.2f}%" for r in v["runs"]))
     for sd in map(str, LINUX_SEEDS):                                   # the page draws every fifth second
         for arm in ("native", "omni"):
@@ -283,7 +268,7 @@ def receipt_word(rd):
     return "shown"
 
 
-NUM = r"[-+\u2212]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"
+NUM = r"[-+\u2212=]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"   # a cell beside EVEN carries "=" (the key's sign rule, 20 October)
 
 
 def even_reason(abc):
@@ -293,7 +278,7 @@ def even_reason(abc):
     still allows: 'tight' within 2%, 'within' within 10%, 'wide' past 10% (too noisy to tell at these repetitions); a table
     that prints no interval: 'changes', the largest change read."""
     import re
-    f = lambda x: float(x.replace(",", "").replace("\u2212", "-"))
+    f = lambda x: float(x.replace(",", "").replace("\u2212", "-").lstrip("="))
     runs, pct = [], False
     for c in abc:
         if not c:

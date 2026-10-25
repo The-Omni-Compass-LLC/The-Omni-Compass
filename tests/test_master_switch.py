@@ -5,8 +5,8 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The master switch (omnicompass/master.py, tools/omni_switch.py): one OFF for the whole harness.
 
-Two governors run at once as their own processes, against the stand-in hardware: the two-wire GPU governor on the fake
-nvidia-smi, and the Kubernetes controller (compass law, HPA target mode) on the fake kubectl. Then:
+Two governors run at once as their own processes, against the stand-in hardware: the two-wire GPU governor on the standin
+nvidia-smi, and the Kubernetes controller (compass law, HPA target mode) on the standin kubectl. Then:
 
   running   both register themselves; status lists both
   off       one command turns the whole harness off: both governors put every setting back (the card's start limit and
@@ -20,8 +20,8 @@ nvidia-smi, and the Kubernetes controller (compass law, HPA target mode) on the 
 import json, os, subprocess, sys, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-SMI = str(ROOT / "tests" / "fake_gpu" / "nvidia-smi")
-KUBECTL = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+SMI = str(ROOT / "tests" / "standin_gpu" / "nvidia-smi")
+KUBECTL = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def main():
@@ -44,7 +44,7 @@ def main():
                   "status": {"currentReplicas": 3, "desiredReplicas": 3,
                              "currentMetrics": [{"type": "Resource", "resource": {"name": "cpu", "current": {"averageUtilization": 40}}}]}}],
         "used_per_node": "300m"}))
-    env.update(FAKE_SMI_STATE=str(smi), FAKE_KUBE_STATE=str(kube), FAKE_KUBE_LOG=str(t / "kube_writes.log"))
+    env.update(STANDIN_SMI_STATE=str(smi), STANDIN_KUBE_STATE=str(kube), STANDIN_KUBE_LOG=str(t / "kube_writes.log"))
     hot = t / "hot.csv"
     hot.write_text("elapsed_seconds,latency_ms,ok\n" + "".join(f"{i * 0.5},900,1\n" for i in range(40)))
     gpu_cmd = [sys.executable, "-m", "omni_controller.gpu_compass", "--mode", "cap", "--smi", SMI, "--interval", "0.5",

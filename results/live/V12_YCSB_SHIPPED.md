@@ -4,6 +4,8 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 MongoDB exactly as shipped, its WiredTiger cache at the server's own default, is native: above the cover the knob is at its limit on native, and omni reads and writes nothing (`docs/YCSB_PREREGISTRATION.md`, amendment 4); otherwise omni is the compass law on the cache size through the server's own console inside [256, 2,048] MB, holding the server's own mean read latency at 40% of the 1 ms line(`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads ask for records from a key space that steps through the cache and past it, the same operations in both arms. Each run holds three paired repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its sign; a resource spent that rose reads **power given**) a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed operations: any rise in any run reads **LOSS in at least one of our runs**. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Workloads |
@@ -22,18 +24,18 @@ MongoDB 8.0.34, YCSB 0.17.0; 3,000 operations a second offered from 32 threads; 
 
 | Gauge | native (A) | omni (A) | A | B | C | Reading |
 |---|---:|---:|---:|---:|---:|---|
-| work inside the response line (operations a second answered within the line) | 2,929 | 2,928 | -0.1% (-0.1 to -0.0) | +0.0% (-0.1 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, no difference beyond the noise (2 of 3 runs) |
-| throughput (operations a second) | 2,931 | 2,930 | -0.0% (-0.1 to -0.0) | +0.0% (-0.1 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, no difference beyond the noise (2 of 3 runs) |
-| latency, 95th percentile (ms) | 0.245 | 0.25 | +1.9% (+0.7 to +3.1) | +2.3% (-5.0 to +9.6) | -0.4% (-2.6 to +1.7) | EVEN, no difference beyond the noise (2 of 3 runs) |
-| latency, 99th percentile (ms) | 0.391 | 0.396 | +1.3% (-1.5 to +4.0) | -0.2% (-0.7 to +0.3) | -0.2% (-4.8 to +4.4) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| latency, mean (ms) | 0.0854 | 0.0878 | +2.8% (-0.9 to +6.5) | +0.3% (-1.3 to +1.8) | -0.8% (-2.6 to +1.1) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| work inside the response line (operations a second answered within the line) | 2,929 | 2,928 | -0.1% (-0.1 to -0.0) | +0.0% (-0.1 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, under the floor (the three runs' mean 0.02%) |
+| throughput (operations a second) | 2,931 | 2,930 | -0.0% (-0.1 to -0.0) | +0.0% (-0.1 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, under the floor (the three runs' mean 0.01%) |
+| latency, 95th percentile (ms) | 0.245 | 0.25 | +1.9% (+0.7 to +3.1) | +2.3% (-5.0 to +9.6) | -0.4% (-2.6 to +1.7) | **LOSS by the mean of our three runs, beyond the noise in 1 of 3** |
+| latency, 99th percentile (ms) | 0.391 | 0.396 | +1.3% (-1.5 to +4.0) | -0.2% (-0.7 to +0.3) | -0.2% (-4.8 to +4.4) | EVEN, under the floor (the three runs' mean 0.30%) |
+| latency, mean (ms) | 0.0854 | 0.0878 | +2.8% (-0.9 to +6.5) | +0.3% (-1.3 to +1.8) | -0.8% (-2.6 to +1.1) | **the runs disagree** |
 | failed operations | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
 | cache size held, mean (MB; the knob, the resource) | 7,482 | 7,482 | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | EVEN, the same |
-| bytes in the cache, mean (MB) | 1,366 | 1,367 | +0.1% (-0.1 to +0.2) | +0.0% (-0.0 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| bytes in the cache, mean (MB) | 1,366 | 1,367 | +0.1% (-0.1 to +0.2) | +0.0% (-0.0 to +0.1) | -0.0% (-0.2 to +0.1) | EVEN, under the floor (the three runs' mean 0.02%) |
 | pages read into the cache (misses) | 61,784 | 61,887 | +0.2% (-0.2 to +0.5) | +0.1% (-0.3 to +0.5) | +0.1% (-0.6 to +0.7) | shown, not judged |
-| host CPU busy (share of the run) | 0.101 | 0.0988 | -2.2% (-15.2 to +10.9) | -12.7% (-25.4 to +0.0) | -16.1% (-54.1 to +21.8) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds | 182.5 | 177.5 | -2.7% (-17.6 to +12.1) | -14.8% (-30.0 to +0.5) | -17.7% (-58.5 to +23.2) | EVEN, no difference beyond the noise (3 of 3 runs) |
-| host CPU-seconds per 1,000 operations inside the line | 0.136 | 0.133 | -2.7% (-17.6 to +12.2) | -14.8% (-30.0 to +0.5) | -17.6% (-58.6 to +23.3) | EVEN, no difference beyond the noise (3 of 3 runs) |
+| host CPU busy (share of the run) | 0.101 | 0.0988 | -2.2% (-15.2 to +10.9) | -12.7% (-25.4 to +0.0) | -16.1% (-54.1 to +21.8) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| host CPU-seconds | 182.5 | 177.5 | -2.7% (-17.6 to +12.1) | -14.8% (-30.0 to +0.5) | -17.7% (-58.5 to +23.2) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| host CPU-seconds per 1,000 operations inside the line | 0.136 | 0.133 | -2.7% (-17.6 to +12.2) | -14.8% (-30.0 to +0.5) | -17.6% (-58.6 to +23.3) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | cache size changes written (the knob's moves) | 0 | 0 | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | shown, not judged |
 
 The cache size handed back to native's and read back at the end of every omni arm in every run: yes.
@@ -50,7 +52,7 @@ The cache size handed back to native's and read back at the end of every omni ar
 
 > not in every run: B, C lack it.
 
-**Across 4 untouched workloads: 0 gauge-rows GAIN in all three of our runs, 0 LOSS, 0 power given, 11 EVEN, 0 where the runs disagree.**
+**Across 1 untouched workloads: 3 gauge-rows GAIN, 1 LOSS, 0 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 6 EVEN, 1 where the runs disagree.**
 
 ---
 

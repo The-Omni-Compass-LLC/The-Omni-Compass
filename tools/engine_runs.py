@@ -16,6 +16,11 @@ and its last, the trial's answer and how many samples it took. The digest is the
 rounded to six decimals; the page computes the same runs with its own ported engine (proven equal to this Python to 1e-12 by
 docs/engine/check_live_engine.py) and compares receipt by receipt.
 
+The ladder (the founder's order of 25 October): every set is read at its first 1, 10, 100 and 500 runs. With S_N = {0, …, N−1}
+the first N runs and r_k run k's receipt, S_1 ⊂ S_10 ⊂ S_100 ⊂ S_500 (the rungs nest), and each rung has its own digest
+D_N = SHA-256(canon(r_0) ‖ "\n" ‖ … ‖ canon(r_{N−1})); the record holds D_N for N in {1, 10, 100, 500}, the Python's and the C++
+harness's, and the page computes its own D_N from the same runs: the three agree at every rung or the rung reads "differs".
+
   python3 tools/engine_runs.py --runs 500 --base 20261020           write results/engine_runs/ENGINE_RUNS_500_20261020.json and .md
   python3 tools/engine_runs.py --verify PAGE                        run the page's own loop in node on 20 runs and compare to the Python
   python3 tools/engine_runs.py --verify PAGE --all --runs 500 --base B   the same on every one of the 500
@@ -55,6 +60,7 @@ ORGANS = ("pods", "nodes", "cpufreq", "gpu", "power", "routing")   # the organs 
 DECISIONS = 288
 LAW_STEPS = 80
 DEFAULT_RUNS = 500
+LADDER = (1, 10, 100, 500)          # the rungs read at every set: the first 1, 10, 100 and 500 runs (the founder's order of 25 October)
 DEFAULT_BASE = 20261020
 OUT_DIR = ROOT / "results" / "engine_runs"
 
@@ -340,6 +346,15 @@ def main() -> int:
                                 "omnicompass::CompassLaw and omnicompass::Verdict (cpp/src/compass_law.cpp, cpp/src/verdict.cpp), sealed twins of their Python"}
         if not data["cpp"]["same"]:
             print(f"the C++ harness DIFFERS from the Python: digest {c['digest'][:16]}… against {dg[:16]}…, largest difference {data['cpp']['largest_difference']:.1e}")
+    # the ladder: the first 1, 10, 100 and 500 runs of the same set, each with its own digest, the Python's and the C++ harness's
+    # (the C++ writes one canonical line a run, the Python's own form, so each rung's digest is its first N lines)
+    cpp_lines = c["canon"].split("\n") if "cpp" in data else None
+    data["ladder"] = [{"runs": n, "digest": digest(runs[:n]), "allowed": sum(r["allowed"] for r in runs[:n]),
+                       **({"cpp_digest": hashlib.sha256("\n".join(cpp_lines[:n]).encode("utf-8")).hexdigest()} if cpp_lines else {})}
+                      for n in LADDER if n <= len(runs)]
+    for rung in data["ladder"]:
+        if "cpp_digest" in rung:
+            rung["same"] = rung["cpp_digest"] == rung["digest"]
     if os.environ.get("GITHUB_RUN_ID"):   # made on GitHub: the run that made it, so the page links the record to it
         data["github"] = {"run_id": os.environ["GITHUB_RUN_ID"], "workflow": os.environ.get("GITHUB_WORKFLOW", ""),
                           "commit": os.environ.get("GITHUB_SHA", ""), "ref": os.environ.get("GITHUB_REF_NAME", ""),
@@ -355,6 +370,11 @@ def main() -> int:
           *([f"**The C++ harness** (`cpp/tools/engine_runs.cpp`, the C++ twins of the engine) on the same draws: digest {data['cpp']['digest']}, "
              f"{'the same' if data['cpp']['same'] else 'DIFFERENT'}; {data['cpp']['agree']} of {a.runs} runs agree to 1e-9, largest difference "
              f"{data['cpp']['largest_difference']:.1e}. The draws themselves, the injection: SHA-256 {data['inputs_digest']}.", ""] if "cpp" in data else []),
+          "**The ladder**: the first 1, 10, 100 and 500 runs of the same set, each its own digest, so a rung read by the page or the C++ "
+          "is checked against the Python's rung.", "",
+          "| Rung | Runs | Trials allowed | The Python's digest | The C++ harness's digest | The same |", "|---:|---:|---:|---|---|---|",
+          *[f"| {i + 1} | {g['runs']} | {g['allowed']} | `{g['digest'][:16]}…` | " + (f"`{g['cpp_digest'][:16]}…` | {'yes' if g['same'] else 'NO'} |" if "cpp_digest" in g else "not run | |")
+            for i, g in enumerate(data["ladder"])], "",
           f"Trials allowed {allowed} of {a.runs}; the brain's pushes summed over all runs {sum(r['push'] for r in runs):.3f}; grants to expand {sum(r['expand'] for r in runs)}, to contract {sum(r['contract'] for r in runs)}.", "",
           "| run | seed | final state E U I S B C | pushes | expand | contract | calm | τ | mean force | last force | trial | samples |", "|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|---:|"]
     for r in runs:

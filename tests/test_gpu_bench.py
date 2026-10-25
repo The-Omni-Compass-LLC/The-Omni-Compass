@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The GPU bench (scripts/gpu_paired.sh, omni_controller/gpu_governor.py, tools/gpu_reps.py) against a stand-in nvidia-smi
-(tests/fake_gpu/nvidia-smi): the governor's contract and the bench's validity checks, without a GPU.
+(tests/standin_gpu/nvidia-smi): the governor's contract and the bench's validity checks, without a GPU.
 
 Governor contract: the start limit is read and recorded before any write; watch computes and records but executes no
 write; a written limit is never below draw x 1.3 nor the device minimum, never above the start limit; no second write
@@ -16,12 +16,12 @@ import json, os, subprocess, sys, tempfile, time
 from pathlib import Path
 from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-SMI = str(ROOT / "tests" / "fake_gpu" / "nvidia-smi")
+SMI = str(ROOT / "tests" / "standin_gpu" / "nvidia-smi")
 
 
 def state(d, **kw):
     s = {"limit": {"0": 300.0}, "default": 300, "min": 100, "max": 350, "draw_w": 180.0, "util": 40, "temp": 60}
-    s.update(kw); p = d / "state.json"; p.write_text(json.dumps(s)); os.environ["FAKE_SMI_STATE"] = str(p)
+    s.update(kw); p = d / "state.json"; p.write_text(json.dumps(s)); os.environ["STANDIN_SMI_STATE"] = str(p)
     if Path(str(p) + ".writes").exists():
         Path(str(p) + ".writes").unlink()
     return p
@@ -68,11 +68,11 @@ def governor():
     assert last["decision"]["0"]["hold"] == "last write not read back", last
     g.written.pop(0)
     # blind: the start limit at once
-    os.environ["FAKE_SMI_BLIND"] = "1"
+    os.environ["STANDIN_SMI_BLIND"] = "1"
     try:
         g.cap[0] = 0.78; g.step()
     finally:
-        del os.environ["FAKE_SMI_BLIND"]
+        del os.environ["STANDIN_SMI_BLIND"]
     assert json.load(open(p))["limit"]["0"] == 300.0, "blind sense did not return the start limit"
     # response-time breach: the start limit
     p = state(d)
@@ -165,7 +165,7 @@ def bench_compass():
                for x in open(d / "run" / "rep-1" / "watch" / "audit.jsonl") if x.strip())
     rest = [x for x in recs if "restored" in x][-1]
     assert rest["ok"] and any(x.get("clock_write") == ["-i", "0", "-rgc"] and x.get("why") == "restore" for x in recs)
-    st = json.loads(Path(os.environ["FAKE_SMI_STATE"]).read_text())
+    st = json.loads(Path(os.environ["STANDIN_SMI_STATE"]).read_text())
     assert not st.get("clock_lock", {}).get("0"), "clocks left locked after the run"
     assert out["headline"]["valid"]
 
@@ -342,7 +342,7 @@ def enforced():
         GpuGovernor(args(d, "cap", audit=str(d / "a3.jsonl"))); raise AssertionError("cap mode ran without power management")
     except SystemExit as e:
         assert "power management" in str(e)
-    assert "refused" in recs(d / "a3.jsonl")[-1] and not Path(os.environ["FAKE_SMI_STATE"] + ".writes").exists()
+    assert "refused" in recs(d / "a3.jsonl")[-1] and not Path(os.environ["STANDIN_SMI_STATE"] + ".writes").exists()
     GpuGovernor(args(d, "watch", audit=str(d / "a3w.jsonl")))
     # a refused write ends the arm: recorded, restored, exit 4
     p = state(d, refuse_pl=True)
@@ -371,6 +371,9 @@ def enforced():
     assert verdict("energy, GPU (J)", -5.0, 1.0, 10) == "GAIN, clear of the noise", "energy cut is a GAIN"
     assert verdict("response time, 95th percentile (ms)", 5.0, 9.0, 10) == "EVEN, no difference beyond the noise"
     assert verdict("work per energy (served requests per kJ)", 5.0, 1.0, 10) == "GAIN, clear of the noise"
+    # the founder's order of 24 October 2026: 0.5% or more of the base is a change, beyond the noise or not; under it, EVEN
+    assert verdict("response time, 95th percentile (ms)", 5.0, 9.0, 10, 100.0) == "LOSS, not beyond the noise"
+    assert verdict("energy, GPU (J)", 0.2, 0.1, 10, 100.0) == "EVEN, under the floor"
 
 
 def one_writer():

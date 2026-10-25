@@ -10,6 +10,8 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 **The comparison.** In this table "omni" stands for Omni-Compass on the organism alone and "native" for the orchestrator as shipped: each cell is the first against the second, paired within one repetition (the four ways, `docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 6), and each word is read by the gauge's aim for the first.
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
@@ -20,19 +22,19 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | -0.0% (-0.0 to +0.0) | +0.0% (-0.0 to +0.0) | -0.0% (-0.0 to +0.0) | EVEN, the same |
-| node-hours | +0.0% (-0.6 to +0.6) | +0.5% (-0.2 to +1.1) | +0.4% (-0.1 to +1.0) | EVEN, no difference beyond the noise (all three runs) |
-| energy, parked workers still on at idle power (Wh, declared model) | -0.6% (-1.2 to +0.1) | -0.1% (-0.8 to +0.6) | -0.1% (-0.7 to +0.4) | EVEN, no difference beyond the noise (all three runs) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | -0.6% (-1.2 to +0.1) | -0.1% (-0.8 to +0.6) | -0.1% (-0.7 to +0.4) | EVEN, no difference beyond the noise (all three runs) |
-| response time (ms), mean | -4.6% (-6.7 to -2.4) | -3.1% (-5.7 to -0.6) | -4.6% (-6.6 to -2.5) | **GAIN in all three of our runs** |
-| response time (ms), 95th percentile | -6.4% (-9.9 to -2.8) | -3.0% (-5.7 to -0.3) | -2.7% (-5.4 to +0.0) | EVEN, no difference beyond the noise (1 of 3 runs) |
-| response time (ms), 99th percentile | +0.0% (-4.0 to +4.0) | -3.1% (-9.4 to +3.3) | -2.8% (-5.8 to +0.2) | EVEN, no difference beyond the noise (all three runs) |
-| time over the response line (% of samples) | +6.2% (-41.2 to +53.5) | -29.7% (-72.7 to +13.4) | -3.8% (-38.4 to +30.9) | EVEN, no difference beyond the noise (all three runs) |
-| failed requests (%) | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | +0.0% (-238.4 to +238.4) | -100.0% (-326.2 to +126.2) | +0 (+0 to +0) | EVEN, no difference beyond the noise (all three runs) |
+| worker nodes in service, mean | =0.0% (−0.0 to +0.0) | =0.0% (−0.0 to +0.0) | =0.0% (−0.0 to +0.0) | EVEN, the same |
+| node-hours | =0.0% (−0.6 to +0.6) | =0.5% (−0.2 to +1.1) | =0.4% (−0.1 to +1.0) | EVEN, under the floor (the three runs' mean 0.31%) |
+| energy, parked workers still on at idle power (Wh, declared model) | +0.6% (−0.1 to +1.2) | =0.1% (−0.8 to +0.6) | =0.1% (−0.7 to +0.4) | EVEN, under the floor (the three runs' mean 0.28%) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | +0.6% (−0.1 to +1.2) | =0.1% (−0.8 to +0.6) | =0.1% (−0.7 to +0.4) | EVEN, under the floor (the three runs' mean 0.28%) |
+| response time (ms), mean | +4.6% (+2.4 to +6.7) | +3.1% (+0.6 to +5.7) | +4.6% (+2.5 to +6.6) | **GAIN in all three of our runs** |
+| response time (ms), 95th percentile | +6.4% (+2.8 to +9.9) | +3.0% (+0.3 to +5.7) | +2.7% (−0.0 to +5.4) | **GAIN by the mean of our three runs, beyond the noise in 2 of 3** |
+| response time (ms), 99th percentile | =0.0% (−4.0 to +4.0) | +3.1% (−3.3 to +9.4) | +2.8% (−0.2 to +5.8) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| time over the response line (% of samples) | −6.2% (−53.5 to +41.2) | +29.7% (−13.4 to +72.7) | +3.8% (−30.9 to +38.4) | **the runs disagree** |
+| failed requests (%) | =0.0000 (±0.0000 to ±0.0000) | =0.0000 (±0.0000 to ±0.0000) | =0.0000 (±0.0000 to ±0.0000) | EVEN, the same |
+| alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | =0.0% (−238.4 to +238.4) | +100.0% (−126.2 to +326.2) | =0.0000 (±0.0000 to ±0.0000) | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | settings commands the governor wrote on its own (no person touched either arm) | +2.6 (+0.8414 to +4.359) | +1.2 (+0.2583 to +2.142) | +1.5 (+0.5315 to +2.469) | shown, not judged |
-| pods with no machine to take them (unschedulable) | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
-| time pods had no machine to take them, pod-minutes | +0 (+0 to +0) | +0 (+0 to +0) | +0 (+0 to +0) | EVEN, the same |
+| pods with no machine to take them (unschedulable) | =0.0000 (±0.0000 to ±0.0000) | =0.0000 (±0.0000 to ±0.0000) | =0.0000 (±0.0000 to ±0.0000) | EVEN, the same |
+| time pods had no machine to take them, pod-minutes | =0.0000 (±0.0000 to ±0.0000) | =0.0000 (±0.0000 to ±0.0000) | =0.0000 (±0.0000 to ±0.0000) | EVEN, the same |
 | pending pods in a 15 s snapshot, pod-minutes (a pod being started counts too: shown, not judged) | +175.0% (-6.6 to +356.6) | +246.2% (+43.8 to +448.5) | +152.2% (-3.4 to +307.8) | shown, not judged |
 | utilisation (used / allocatable) | -10.0% (-11.5 to -8.5) | -9.8% (-11.7 to -7.9) | -9.2% (-10.4 to -8.1) | shown, not judged |
 | CPU used (cores), mean | -10.0% (-11.5 to -8.5) | -9.8% (-11.7 to -7.9) | -9.2% (-10.4 to -8.1) | shown, not judged |
@@ -40,13 +42,13 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | CPU used with Omni's own (cores), mean | -9.4% (-10.9 to -7.9) | -9.2% (-11.2 to -7.3) | -8.7% (-9.8 to -7.5) | shown, not judged |
 | energy per core-hour (Wh, the 25 W standby model; a ratio over CPU used: shown, not judged) | +10.6% (+8.6 to +12.6) | +10.3% (+8.2 to +12.3) | +9.5% (+8.4 to +10.7) | shown, not judged |
 | HPA replicas, mean | +17.6% (+9.5 to +25.7) | +9.8% (+2.5 to +17.1) | +12.1% (+4.8 to +19.4) | **power given in all three of our runs** |
-| pods started | +58.7% (+21.3 to +96.1) | +34.7% (-4.9 to +74.3) | +42.0% (+10.8 to +73.2) | EVEN, no difference beyond the noise (1 of 3 runs) |
-| pod start wait, total (s) | +60.3% (+28.4 to +92.2) | +56.1% (+0.6 to +111.6) | +51.9% (+20.4 to +83.4) | **LOSS in all three of our runs** |
-| pod start wait, mean (s) | +1.6% (-21.9 to +25.0) | +16.8% (-11.2 to +44.7) | +7.8% (-8.6 to +24.3) | EVEN, no difference beyond the noise (all three runs) |
+| pods started | +58.7% (+21.3 to +96.1) | +34.7% (−4.9 to +74.3) | +42.0% (+10.8 to +73.2) | **power given by the mean of our three runs, beyond the noise in 2 of 3** |
+| pod start wait, total (s) | −60.3% (−28.4 to −92.2) | −56.1% (−0.6 to −111.6) | −51.9% (−20.4 to −83.4) | **LOSS in all three of our runs** |
+| pod start wait, mean (s) | −1.6% (−25.0 to +21.9) | −16.8% (−44.7 to +11.2) | −7.8% (−24.3 to +8.6) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** |
 | host CPU busy, the real machine under kind (%) | -11.1% (-12.3 to -9.8) | -10.7% (-12.3 to -9.2) | -10.6% (-11.7 to -9.4) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 
-Readings: 1 GAIN in all three of our runs, 1 LOSS in all three of our runs, 1 power given in all three of our runs, 2 EVEN, no difference beyond the noise (1 of 3 runs), 7 EVEN, no difference beyond the noise (all three runs), 4 EVEN, the same, 9 shown, not judged.
+Readings: 4 EVEN, the same, 3 EVEN, under the floor, 3 GAIN by the mean of our three runs, 1 GAIN in all three of our runs, 1 LOSS by the mean of our three runs, 1 LOSS in all three of our runs, 1 power given by the mean of our three runs, 1 power given in all three of our runs, 9 shown, not judged, 1 the runs disagree.
 
 ---
 

@@ -12,13 +12,13 @@ import unittest
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 import tools.tune_study as TS
-from tools.toy_gate import PACE_GAUGES
+from tools.model_gate import PACE_GAUGES
 
 SEEDS = [101, 102, 103, 104]
 
 
 def gauges(**over):
-    """One seed's gauges of the toy, each 10 unless set; a small seed-dependent wobble so an interval has width."""
+    """One seed's gauges of the model, each 10 unless set; a small seed-dependent wobble so an interval has width."""
     return {g: over.get(g, 10.0) for g in PACE_GAUGES}
 
 

@@ -32,6 +32,11 @@ jobs:
       # the exact versions verify.py passed with before the push (requirements-lock.txt), so this check runs the same
       # environment; requirements.txt gives the supported ranges
       - run: pip install -r requirements-lock.txt
+      # the workflow checker (rhysd/actionlint), one pinned release, its checksum the one the release publishes (24 October)
+      - run: |
+          curl -sSL -o /tmp/actionlint.tgz https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  /tmp/actionlint.tgz" | sha256sum -c -
+          sudo tar -xzf /tmp/actionlint.tgz -C /usr/local/bin actionlint
       - run: cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build cpp/build -j2
       - run: python verify.py --quick
       - name: Legal notice at the end of this job's report

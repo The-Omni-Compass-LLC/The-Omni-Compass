@@ -5,12 +5,14 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The one metered chip run, second by second, for the live engine's GPU card monitor (class P: the card's own meter).
 
-results/gpu/run-20261002T082232Z is the NVIDIA A10 run of 2 October (10 paired repetitions, 600 s an arm, the card controller
-of commit c908054, replaced since): the only run in the repository where a real card's own meter recorded native beside
-Omni-Compass. The monitor replays it as it was recorded: every arm's power draw, enforced power limit, clock and temperature
-from nvidia-smi (200 ms samples, binned to 2 s), its requests served and 95th-percentile response in 10 s windows, and the
-governor's decisions from its own audit. Nothing is modelled; a lane with no file stays empty. The run's total table is carried
-as GPU_REPS.md prints it, each row re-read by the one key (tools/readings.py), so the words follow the gauge's aim.
+results/gpu/run-20261024T091235Z is the NVIDIA A100 (SXM4, 40 GB) run of 24 October on Lambda (workflow run 40079645681: 10
+paired repetitions, 600 s an arm, the card governor of omni-v18 at commit e3b05dc on the branch gpu-omni-v18): the engine that
+stands on a real card, its own meter recording native beside Omni-Compass. The monitor replays it as it was recorded: every
+arm's power draw, enforced power limit, clock and temperature from nvidia-smi (200 ms samples, binned to 2 s), its requests
+served and 95th-percentile response in 10 s windows, and the governor's decisions from its own audit. Nothing is modelled; a
+lane with no file stays empty. The run's total table is carried as GPU_REPS.md prints it, each row re-read by the one key that
+stands (a change of 0.5% or more either way is a change, EVEN only under it; tools/readings.py), so the words follow the gauge's
+aim. The A10 run of 2 October (results/gpu/run-20261002T082232Z, the card controller of commit c908054) stays as its own record.
 
   python3 docs/engine/export_gpu_run.py OUT.json
 """
@@ -26,8 +28,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
+from tools.readings import SIZE_FLOOR  # noqa: E402  (the one floor, written once)
 
-RUN = ROOT / "results" / "gpu" / "run-20261002T082232Z"
+RUN = ROOT / "results" / "gpu" / "run-20261024T091235Z"
 ARMS = ("native", "watch", "omni")
 BIN_S = 2.0
 REQ_BIN_S = 10.0
@@ -38,23 +41,32 @@ AIMS = {"work per energy": "WORK_PER", "work per wall energy": "WORK_PER", "ener
 
 def _aim(gauge: str) -> str:
     g = gauge.lower().strip("* ")
-    for k, v in AIMS.items():
+    for k, v in sorted(AIMS.items(), key=lambda kv: -len(kv[0])):     # the longest name first: "power-capped share" before "power"
         if g.startswith(k):
             return v
     return "SHOWN"
 
 
 def _word(aim: str, change: str, interval: str) -> str:
-    """The word by the gauge's aim from the row's own interval (clear of zero or not) and the sign of its change."""
+    """The word by the gauge's aim and the one key that stands: the row's change in percent of native, 0.5% or more either way
+    a change by its sign (SIZE_FLOOR), EVEN only under it; a row printed with no percent (a count from zero) is read by its own
+    interval, clear of zero or not."""
     if aim == "SHOWN":
         return "shown, not judged"
-    m = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?", interval.replace("−", "-"))
-    if len(m) < 2:
-        return "unread"
-    lo, hi = float(m[0].replace(",", "")), float(m[1].replace(",", ""))
-    if lo <= 0 <= hi:
-        return "EVEN"
-    up = hi > 0
+    pct = re.fullmatch(r"\s*([-+]?\d+(?:\.\d+)?)%\s*", change.replace("−", "-"))
+    if pct:
+        rel = float(pct.group(1)) / 100.0
+        if abs(rel) < SIZE_FLOOR:
+            return "EVEN"
+        up = rel > 0
+    else:
+        m = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?", interval.replace("−", "-"))
+        if len(m) < 2:
+            return "unread"
+        lo, hi = float(m[0].replace(",", "")), float(m[1].replace(",", ""))
+        if lo <= 0 <= hi:
+            return "EVEN"
+        up = hi > 0
     if aim == "HIGHER":
         return "GAIN" if up else "LOSS"
     if aim == "LOWER":
@@ -200,9 +212,12 @@ def main(out: str) -> None:
                 a["audit"] = audit(ad / "audit.jsonl", ws)
             rep["arms"][arm] = a
         reps.append(rep)
-    data = {"source": str(RUN.relative_to(ROOT)), "table": "results/gpu/run-20261002T082232Z/GPU_REPS.md",
+    data = {"source": str(RUN.relative_to(ROOT)), "table": str((RUN / "GPU_REPS.md").relative_to(ROOT)),
             "card": receipt.get("gpu_name"), "driver": receipt.get("driver"), "engine_commit": receipt.get("git"),
-            "engine_note": "the card controller of commit c908054 (2 October), replaced since; its omni-v12 run on Lambda is the next receipt",
+            "engine_note": ("omni-v18's card governor (commit e3b05dc, the branch gpu-omni-v18) at the factory tune, the max: on this "
+                            "card native already runs both knobs at their top (the power limit 400 W of 400 W, the clock unlocked to "
+                            "1,410 MHz), so in its 3,050 decisions the governor asked for exactly that and wrote nothing: at its limit "
+                            "on native. Lambda workflow run 40079645681, 24 October"),
             "reps_n": receipt.get("reps"), "duration_s": receipt.get("duration_s"), "sample_ms": receipt.get("sample_ms"),
             "limit_default_w": receipt.get("power_limit_default_w"), "limit_min_w": receipt.get("power_limit_min_w"), "envelope": receipt.get("envelope"),
             "workload": receipt.get("workload"), "bin_s": BIN_S, "req_bin_s": REQ_BIN_S, "arms": list(ARMS),

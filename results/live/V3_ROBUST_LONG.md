@@ -4,6 +4,8 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **GAIN** or **LOSS in all three of our runs**: all three runs move the same way and every interval is clear of zero, and the word says what that means for the gauge's declared aim, never the sign of its number (a response time that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is **power given**, never a loss: the key, `docs/HOW_TO_READ_THE_RESULTS.md`). **EVEN, no difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
@@ -43,7 +45,7 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 | robust: the governor's decision time, mean of the last hour over the first (the gap between decisions less the configured interval), the most over the repetitions | 1.15 | 1.27 | 1.30 | no growth beyond the limit (every repetition under 1.5) |
 | robust: every setting handed back at the end and read back at the operator's, no record left, every repetition | yes | yes | yes | **every setting handed back at the end of every repetition, in all three of our runs** |
 
-Readings: 1 every setting handed back at the end of every repetition, in all three of our runs, 8 EVEN, no difference beyond the noise (all three runs), 5 EVEN, no difference beyond the noise in 2 of 3 runs, 2 EVEN, the same, 1 no growth beyond the limit (every repetition under 1.5), 1 no leak (every repetition under 1.25), 8 shown, not judged, 1 shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed, 1 valid (every repetition at 95% of the expected or more).
+Readings: 1 every setting handed back at the end of every repetition, in all three of our runs, 8 no difference beyond the noise, 5 no difference beyond the noise in 2 of 3 runs, 1 no growth beyond the limit, 1 no leak, 2 same, 8 shown, not judged, 1 shown, not judged: API 500 for apis/autoscaling/v2/horizontalpodautoscalers; the governor held and resumed, 1 valid.
 
 ---
 

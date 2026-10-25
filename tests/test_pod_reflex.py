@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Fast pod reflex on the fake cluster: calm queue -> no read, no write; a queue building up -> the HPA's replica floor
+"""Fast pod reflex on the standin cluster: calm queue -> no read, no write; a queue building up -> the HPA's replica floor
 rises to exactly the HPA's own rule (current x busy / target) with busy read from queueing (u = 1 - S/R) and the target
 in queue terms (target x request / limit); the queue drained -> the floor is handed back; the reset restores the
 range and leaves no record."""
@@ -11,7 +11,7 @@ import json, os, sys, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Controller, parser, RANGE_ANN
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def probe(path, ms):
@@ -31,9 +31,9 @@ def main():
                     "metrics": [{"type": "Resource", "resource": {"name": "cpu", "target": {"type": "Utilization", "averageUtilization": 50}}}]},
            "status": {"currentReplicas": 2, "desiredReplicas": 2}}
     st = {"nodes": [], "pods": [], "deployments": [dep], "hpas": [hpa], "configmaps": [], "jobs": []}
-    p = t / "state.json"; p.write_text(json.dumps(st)); os.environ["FAKE_KUBE_STATE"] = str(p); os.environ["FAKE_KUBE_LOG"] = str(t / "w.log")
+    p = t / "state.json"; p.write_text(json.dumps(st)); os.environ["STANDIN_KUBE_STATE"] = str(p); os.environ["STANDIN_KUBE_LOG"] = str(t / "w.log")
     lat = t / "latency.csv"
-    a = parser().parse_args(["--kubectl", FAKE, "--mode", "target", "--interval", "0", "--audit", str(t / "a.jsonl"),
+    a = parser().parse_args(["--kubectl", STANDIN, "--mode", "target", "--interval", "0", "--audit", str(t / "a.jsonl"),
                              "--kill-file", str(t / "kill"), "--latency-file", str(lat), "--slo-ms", "500"])
     c = Controller(a); a.pod_reflex_writes = True   # the writing reflex; by default it gauges only (tested below)
     H = lambda: json.loads(p.read_text())["hpas"][0]
@@ -56,9 +56,9 @@ def main():
     (t / "kill").touch(); c.step()
     assert (H()["spec"]["minReplicas"], H()["spec"]["maxReplicas"]) == (1, 10) and RANGE_ANN not in H()["metadata"].get("annotations", {})
     # by default the reflex gauges only: the autoscaler makes and removes pods, I write nothing
-    t2 = Path(tempfile.mkdtemp()); p2 = t2 / "state.json"; p2.write_text(json.dumps(st)); os.environ["FAKE_KUBE_STATE"] = str(p2)
-    os.environ["FAKE_KUBE_LOG"] = str(t2 / "w.log"); lat2 = t2 / "latency.csv"
-    a2 = parser().parse_args(["--kubectl", FAKE, "--mode", "target", "--interval", "0", "--audit", str(t2 / "a.jsonl"),
+    t2 = Path(tempfile.mkdtemp()); p2 = t2 / "state.json"; p2.write_text(json.dumps(st)); os.environ["STANDIN_KUBE_STATE"] = str(p2)
+    os.environ["STANDIN_KUBE_LOG"] = str(t2 / "w.log"); lat2 = t2 / "latency.csv"
+    a2 = parser().parse_args(["--kubectl", STANDIN, "--mode", "target", "--interval", "0", "--audit", str(t2 / "a.jsonl"),
                               "--kill-file", str(t2 / "kill"), "--latency-file", str(lat2), "--slo-ms", "500"])
     c2 = Controller(a2); probe(lat2, [100.0] * 5 + [250.0] * 35); c2.pod_reflex()
     assert not (t2 / "w.log").exists(), "the gauging reflex must write nothing"

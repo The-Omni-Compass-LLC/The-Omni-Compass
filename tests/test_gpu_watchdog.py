@@ -3,16 +3,16 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""External GPU actuator watchdog against the fake nvidia-smi."""
+"""External GPU actuator watchdog against the standin nvidia-smi."""
 import json, os, subprocess, sys, tempfile, time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-SMI=str(ROOT/'tests/fake_gpu/nvidia-smi')
+SMI=str(ROOT/'tests/standin_gpu/nvidia-smi')
 
 def main():
     d=Path(tempfile.mkdtemp()); state=d/'state.json'
     state.write_text(json.dumps({"limit":{"0":220.0},"default":300,"min":100,"max":350,"draw_w":180.0,"util":40,"temp":60}))
-    env=dict(os.environ, FAKE_SMI_STATE=str(state))
+    env=dict(os.environ, STANDIN_SMI_STATE=str(state))
     sleeper=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)'])
     receipt=d/'watchdog.jsonl'
     w=subprocess.Popen([sys.executable,str(ROOT/'tools/gpu_actuator_watchdog.py'),'--pid',str(sleeper.pid),'--gpu','0','--start-w','300','--smi',SMI,'--receipt',str(receipt),'--poll','0.05'],cwd=ROOT,env=env)

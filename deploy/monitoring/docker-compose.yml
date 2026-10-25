@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+#
+# The mission-control wall beside Omni-Compass, on one machine: Prometheus gathers the governor's own gauges
+# (tools/omni_exporter.py), the control panel's counters (tools/omni_control.py) and each bare-metal machine's
+# (node_exporter); Grafana shows the two Omni-Compass boards already loaded, the monitor wall and the governor's own
+# screen (deploy/grafana/), with the Prometheus data source set. Every image is pinned to one release, never "latest".
+# Grafana's administrator password is read from your own .env file (copy .env.example): it is never written here.
+#
+#   cp .env.example .env    # then set GRAFANA_ADMIN_PASSWORD and OMNI_AUDIT_DIR
+#   docker compose up -d    # Grafana on http://localhost:3000, Prometheus on http://localhost:9090
+#
+# The scrape targets are lists you keep in targets/: your bare-metal machines, the governors on site and in each cloud,
+# the control panel. docs/MISSION_CONTROL.md says every step.
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.1
+    container_name: omni_prometheus
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=30d", "--web.enable-lifecycle"]
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./targets:/etc/prometheus/targets:ro
+      - ../prometheus/omni-compass-rules.yaml:/etc/prometheus/rules/omni-compass-rules.yaml:ro
+      - prometheus-data:/prometheus
+    ports: ["9090:9090"]
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: omni_grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in deploy/monitoring/.env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/omni/omni-compass-wall.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../grafana:/var/lib/grafana/dashboards/omni:ro
+      - grafana-data:/var/lib/grafana
+    ports: ["3000:3000"]
+    depends_on: [prometheus]
+    restart: unless-stopped
+  node-exporter:
+    # this machine's own processor, memory, disk and network, the bare metal under the governor
+    image: prom/node-exporter:v1.8.2
+    container_name: omni_node_exporter
+    command: ["--path.rootfs=/host"]
+    pid: host
+    volumes: ["/:/host:ro,rslave"]
+    ports: ["9100:9100"]
+    restart: unless-stopped
+  omni-exporter:
+    # the governor's own gauges, read from its audit (read-only; it has no button)
+    image: python:3.12.4-slim
+    container_name: omni_exporter
+    command: ["python3", "/omni/tools/omni_exporter.py", "serve", "--audit", "/audit/audit.jsonl", "--port", "9464", "--bind", "0.0.0.0"]
+    volumes:
+      - ../../tools:/omni/tools:ro
+      - ${OMNI_AUDIT_DIR:?set OMNI_AUDIT_DIR in deploy/monitoring/.env}:/audit:ro
+    ports: ["9464:9464"]
+    restart: unless-stopped
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: omni_alertmanager
+    volumes: ["./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro"]
+    ports: ["9093:9093"]
+    restart: unless-stopped
+  omni-bridge:
+    # the wire from the alarms to the control panel's buttons (tools/omni_alert_bridge.py): it writes what it would press
+    # until OMNI_BRIDGE_PRESS=1 is set in .env, and then presses with the operator token in targets/bridge.token
+    image: python:3.12.4-slim
+    container_name: omni_bridge
+    entrypoint: ["sh", "-c", "exec python3 /omni/tools/omni_alert_bridge.py serve --actions /etc/omni/actions.json --panel \"$${OMNI_PANEL_URL:-http://host.docker.internal:9465}\" --bind 0.0.0.0 --log /var/log/omni-bridge/bridge.jsonl $${OMNI_BRIDGE_PRESS:+--press --token-file /etc/omni/targets/bridge.token}"]
+    environment:
+      OMNI_PANEL_URL: ${OMNI_PANEL_URL:-http://host.docker.internal:9465}
+      OMNI_BRIDGE_PRESS: ${OMNI_BRIDGE_PRESS:-}
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes:
+      - ../../tools:/omni/tools:ro
+      - ./actions.json:/etc/omni/actions.json:ro
+      - ./targets:/etc/omni/targets:ro
+      - bridge-log:/var/log/omni-bridge
+    ports: ["9466:9466"]
+    restart: unless-stopped
+volumes:
+  prometheus-data:
+  grafana-data:
+  bridge-log:
+
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

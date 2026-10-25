@@ -24,7 +24,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, in_all_three, EVEN_SAME, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, in_all_three, EVEN_SAME, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts, reproduced_reading  # noqa: E402  (every table says whose runs these are)
 from tools.run_citylearn import KPIS, WORDS as KPI_NAMES
 
 # What each CityLearn score is for (tools/readings.py, one key for every gauge). CityLearn aims every score lower. The
@@ -84,7 +84,7 @@ def verdict(recs, k):
     signs = {(c > 0) - (c < 0) for c in ch}
     if len(signs) > 1:
         return "**the runs differ**"
-    return in_all_three(signs == {-1}, aim_of(k))
+    return reproduced_reading(ch, aim_of(k))
 
 
 def engine(run):

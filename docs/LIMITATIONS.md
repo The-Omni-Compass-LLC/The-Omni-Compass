@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-What the newest three-run tables (omni-v11's; omni-v17, the engine that stands since 23 October, runs every benchmark again)
+What the newest three-run tables (omni-v11's; omni-v19, the engine that stands from 25 October, runs every benchmark again)
 can and cannot support, written the way a referee reads a
 study: who ran it, what could bias a comparison, what a gauge really measures, how often the reading rule could be fooled,
 and how far a result travels. Each limitation names what would remove it. Run and scored by The Omni-Compass LLC's own
@@ -51,7 +51,7 @@ code. No outside party has reviewed or approved these results.
   about 0.30 m to as low as 0.156 m (run C, the short cell). There was no near miss and no collision in any counted run, but
   the margin native keeps was spent to fly faster. On mission draws outside the preregistered seeds it read LOSS: on the mixed
   cell with draw 214, the omni-v11 wire let two drones come within 0.083 m, with 5 near-miss ticks and 3 collision ticks, where
-  native flew the same draw with none (`results/toy_gate/V12_SWARM_REFLEX.md`). A preregistered set of seeds could not show
+  native flew the same draw with none (`results/model_gate/V12_SWARM_REFLEX.md`). A preregistered set of seeds could not show
   it, and only flying draws the wire was never tuned on did.
 - **The cause is in the wire, not the brain.** The proximity reflex is written to return the planner's cruise at once. The
   code lowered the speed by 0.01 a tick instead, so a drone that saw a neighbour within 0.5 m flew fast for about a second more.

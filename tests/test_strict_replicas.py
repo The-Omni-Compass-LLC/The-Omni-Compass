@@ -3,14 +3,14 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Strict C on the fake cluster: Omni-Compass sets the replica count from measured utilisation (up at once, down only to
+"""Strict C on the standin cluster: Omni-Compass sets the replica count from measured utilisation (up at once, down only to
 the highest recent recommendation), sets it as the HPA's floor within the HPA's own range (growth stays free up to the
 operator's maximum), and the reset restores the range and leaves no record."""
 import json, os, sys, tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Controller, parser, RANGE_ANN
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def main():
@@ -20,8 +20,8 @@ def main():
           "hpas": [{"metadata": {"name": "web", "namespace": "default"},
                     "spec": {"minReplicas": 1, "maxReplicas": 10, "metrics": [{"type": "Resource", "resource": {"name": "cpu", "target": {"type": "Utilization", "averageUtilization": 50}}}]},
                     "status": {"currentReplicas": 2, "currentMetrics": [{"type": "Resource", "resource": {"name": "cpu", "current": {"averageUtilization": 150}}}]}}]}
-    p = t / "state.json"; p.write_text(json.dumps(st)); os.environ["FAKE_KUBE_STATE"] = str(p); os.environ["FAKE_KUBE_LOG"] = str(t / "w.log")
-    a = parser().parse_args(["--kubectl", FAKE, "--mode", "target", "--strict-replicas", "--interval", "0", "--audit", str(t / "a.jsonl"), "--kill-file", str(t / "kill")])
+    p = t / "state.json"; p.write_text(json.dumps(st)); os.environ["STANDIN_KUBE_STATE"] = str(p); os.environ["STANDIN_KUBE_LOG"] = str(t / "w.log")
+    a = parser().parse_args(["--kubectl", STANDIN, "--mode", "target", "--strict-replicas", "--interval", "0", "--audit", str(t / "a.jsonl"), "--kill-file", str(t / "kill")])
     c = Controller(a)
     hpa = lambda: json.loads(p.read_text())["hpas"][0]
     c.step(); assert (hpa()["spec"]["minReplicas"], hpa()["spec"]["maxReplicas"]) == (6, 10), hpa()["spec"]   # 2 x 150/50; the max stays free

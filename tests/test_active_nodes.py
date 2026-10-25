@@ -3,14 +3,14 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Full-engine controller options against the fake kubectl: --active-nodes-only ignores cordoned and NoSchedule-tainted
+"""Full-engine controller options against the standin kubectl: --active-nodes-only ignores cordoned and NoSchedule-tainted
 nodes (and the pods and usage on them); without it every Ready node counts; the reset runs --node-restore-cmd
 exactly once and writes nothing else to the node pool."""
 import json, os, sys, tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Controller, Kube, parser, snapshot
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def cluster(tmp):
@@ -23,17 +23,17 @@ def cluster(tmp):
     cpu = {"type": "Resource", "resource": {"name": "cpu", "target": {"type": "Utilization", "averageUtilization": 50}}}
     hpas = [{"metadata": {"name": "php-apache", "namespace": "default"}, "spec": {"metrics": [cpu]}, "status": {"currentReplicas": 2}}]
     st = Path(tmp) / "state.json"; st.write_text(json.dumps({"nodes": nodes, "pods": pods, "hpas": hpas, "used_per_node": "1000m"}))
-    os.environ["FAKE_KUBE_STATE"] = str(st); os.environ["FAKE_KUBE_LOG"] = str(Path(tmp) / "writes.log")
+    os.environ["STANDIN_KUBE_STATE"] = str(st); os.environ["STANDIN_KUBE_LOG"] = str(Path(tmp) / "writes.log")
 
 
 def main():
     t = tempfile.mkdtemp(); cluster(t)
-    k = Kube(FAKE, audit=lambda r: r)
+    k = Kube(STANDIN, audit=lambda r: r)
     s = snapshot(k, active_only=True)
     assert s["nodes"] == 2 and s["alloc_m"] == 8000, s
     assert s["req_m"] == 1200 and s["used_m"] == 2000 and s["pending"] == 1, s
     # a cordoned worker still carrying work is in service until its work is gone; a DaemonSet pod is not work
-    st = Path(os.environ["FAKE_KUBE_STATE"]); S = json.loads(st.read_text())
+    st = Path(os.environ["STANDIN_KUBE_STATE"]); S = json.loads(st.read_text())
     S["pods"].append({"metadata": {"ownerReferences": [{"kind": "DaemonSet"}]}, "status": {"phase": "Running"},
                       "spec": {"nodeName": "w3", "containers": [{"resources": {"requests": {"cpu": "100m"}}}]}})
     st.write_text(json.dumps(S)); assert snapshot(k, active_only=True)["nodes"] == 2, "a DaemonSet pod keeps no worker in service"
@@ -46,7 +46,7 @@ def main():
     assert s_all["nodes"] == 4 and s_all["req_m"] == 2150 and s_all["used_m"] == 4000, s_all
 
     marker = Path(t) / "restored"
-    a = parser().parse_args(["--kubectl", FAKE, "--mode", "nodepool", "--active-nodes-only", "--interval", "0",
+    a = parser().parse_args(["--kubectl", STANDIN, "--mode", "nodepool", "--active-nodes-only", "--interval", "0",
                              "--audit", str(Path(t) / "audit.jsonl"), "--kill-file", str(Path(t) / "kill"),
                              "--node-restore-cmd", f"sh -c 'echo x >> {marker}'"])
     c = Controller(a)

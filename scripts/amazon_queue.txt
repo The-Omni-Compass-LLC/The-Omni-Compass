@@ -23,8 +23,14 @@
 # plan, the instance type and the processor quota, a short quota asked of Amazon by the check itself), so the Free plan
 # uses up no set's A, B or C, and once the account is on the Paid plan (docs/AMAZON_SETUP.md, section 1a; the credits still
 # pay first) the sets start on their own within the hour.
-switch=on
-steady|dial=save;replica_ceiling=0
-burst 1 4 1 6 1 9|load_steps=1 4 1 6 1 9;duration_s=1800;reps=5;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0
-burst 1 6 1 8 1 6|load_steps=1 6 1 8 1 6;duration_s=1800;reps=5;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0
-the real day on 1 to 9|load_steps=2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5;duration_s=2592;reps=5;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0
+# Off again on 24 October, morning, the founder's account still on the Free plan: Amazon told him the plan cannot be raised
+# until the $100 credit is spent or the account is six months old, so every hourly check read the same refusal. Off, the
+# conductor neither checks nor starts anything here; on again on the founder's word, once an account can run machines.
+# Kept and wired as Azure is (the founder's words of 24 October: "you leave the Google and Amazon runs in everywhere and
+# just show it not ran yet"): every page reads it "not yet run". Every set runs as Azure's do: to the paid cap of 100
+# paired repetitions under the preregistered stopping rule (stop_looks; tools/stop_rule.py).
+switch=off
+steady|dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70
+burst 1 4 1 6 1 9|load_steps=1 4 1 6 1 9;duration_s=1800;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70
+burst 1 6 1 8 1 6|load_steps=1 6 1 8 1 6;duration_s=1800;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70
+the real day on 1 to 9|load_steps=2 3 3 4 3 4 4 3 2 2 2 2 2 3 2 3 4 5 4 5 6 7 6 5;duration_s=2592;max_workers=4;region=us-east-1;instance=m5.large;dial=save;replica_ceiling=0;reps=100;stop_looks=10,20,40,70

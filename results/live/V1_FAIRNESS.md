@@ -4,6 +4,8 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 Three separate GitHub runs of the same preregistered test on the same frozen engine: A is the result, B and C are the replications. Each cell is omni against native, the paired change in percent of native with its 95% interval. Every judged row gets one of three readings. **GAIN** or **LOSS in all three of our runs**: all three runs move the same way and every interval is clear of zero, and the word says what that means for the gauge's declared aim, never the sign of its number (a response time that fell is GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is **power given**, never a loss: the key, `docs/HOW_TO_READ_THE_RESULTS.md`). **EVEN, no difference beyond the noise**: in the runs counted, the interval includes zero, so native and omni could not be told apart on that measure; that is the result. **The runs disagree**: runs clear of the noise point different ways, so the test itself is unstable there. Every row is shown, LOSS included.
 
 | Run | GitHub run | Commit | Engine | Paired repetitions |
@@ -42,7 +44,7 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 | second app: time over the response line (% of samples) | +1.7% (-1.3 to +4.6) | +0.6% (-5.8 to +7.0) | -3.7% (-6.9 to -0.5) | EVEN, no difference beyond the noise in 2 of 3 runs |
 | second app: failed requests (%) | +2.7% (-0.4 to +5.9) | +0.2% (-4.3 to +4.7) | -1.2% (-4.8 to +2.4) | EVEN, no difference beyond the noise (all three runs) |
 
-Readings: 13 EVEN, no difference beyond the noise (all three runs), 3 EVEN, no difference beyond the noise in 2 of 3 runs, 3 EVEN, the same, 8 shown, not judged.
+Readings: 13 no difference beyond the noise, 3 no difference beyond the noise in 2 of 3 runs, 3 same, 8 shown, not judged.
 
 ---
 

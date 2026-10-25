@@ -25,7 +25,7 @@ class Clock:
         self.t += max(0.0, s)
 
 
-class FakeController:
+class StandinController:
     """Records when each decision and each fast check began; each takes the time it is given."""
     def __init__(self, clock, step_s, check_s):
         self.clock, self.step_s, self.check_s, self.events, self.audits = clock, step_s, check_s, [], []
@@ -45,11 +45,11 @@ class FakeController:
 
 def run(interval, floor, iterations, step_s, check_s):
     clock = Clock()
-    ctl = FakeController(clock, step_s, check_s)
+    ctl = StandinController(clock, step_s, check_s)
     argv = ["--mode", "nodepool", "--interval", str(interval), "--floor-interval", str(floor), "--iterations", str(iterations),
             "--audit", ""]
-    fake_time = SimpleNamespace(time=clock.time, sleep=clock.sleep)
-    with mock.patch.object(C, "time", fake_time), mock.patch.object(C, "Controller", lambda a: ctl), \
+    standin_time = SimpleNamespace(time=clock.time, sleep=clock.sleep)
+    with mock.patch.object(C, "time", standin_time), mock.patch.object(C, "Controller", lambda a: ctl), \
             mock.patch.object(C.master, "refuse_if_off", lambda *a, **k: None), \
             mock.patch.object(C.master, "register", lambda *a, **k: None), \
             mock.patch.object(C.master, "heartbeat", lambda *a, **k: None), \

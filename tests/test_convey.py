@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Energy to where the work is, against the fake kubectl: each machine's idle CPU (inside the living band, less the
+"""Energy to where the work is, against the standin kubectl: each machine's idle CPU (inside the living band, less the
 limits of every other pod on it: omni-v13 counts another workload by what it may take, where omni-v12 counted its
 requests) is conveyed to the serving pods on it as their CPU limit, resized in place with no
 restart and never below the operator's limit; requests are untouched; a security hold blocks expansion; a machine
@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Controller, Kube, parser, snapshot
 from omni_controller.muscles import CPU_ANN
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def pod(name, node, app, req="200m", lim="500m", phase="Running"):
@@ -36,7 +36,7 @@ def state(tmp, hold="false"):
     st = {"nodes": nodes, "pods": pods, "deployments": [dep], "hpas": [], "used_per_node": "400m",
           "configmaps": [{"metadata": {"name": "omni-security"}, "data": {"hold": hold}}], "jobs": []}
     p = Path(tmp) / "state.json"; p.write_text(json.dumps(st))
-    os.environ["FAKE_KUBE_STATE"] = str(p); os.environ["FAKE_KUBE_LOG"] = str(Path(tmp) / "writes.log")
+    os.environ["STANDIN_KUBE_STATE"] = str(p); os.environ["STANDIN_KUBE_LOG"] = str(Path(tmp) / "writes.log")
     return p
 
 
@@ -49,7 +49,7 @@ def limits(p):
 def args(tmp):
     # a decision a minute and a check every 15 s, the defaults this test was written against before omni-v16 set 15 s and 5 s
     a = parser().parse_args(["--interval", "60", "--floor-interval", "15",
-                             "--kubectl", FAKE, "--audit", str(Path(tmp) / "audit.jsonl"), "--kill-file", str(Path(tmp) / "kill"),
+                             "--kubectl", STANDIN, "--audit", str(Path(tmp) / "audit.jsonl"), "--kill-file", str(Path(tmp) / "kill"),
                              "--cap-deployments", "default/web", "--security-configmap", "default/omni-security",
                              "--latency-file", str(Path(tmp) / "latency.csv"), "--mode", "target"])
     return a
@@ -71,7 +71,7 @@ def main():
     S = json.loads(Path(p).read_text())
     assert S["deployments"][0]["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["cpu"] == "500m", "no rollout"
     assert S["deployments"][0]["metadata"]["annotations"][CPU_ANN] == "500m"
-    writes = [json.loads(l) for l in Path(os.environ["FAKE_KUBE_LOG"]).read_text().splitlines()]
+    writes = [json.loads(l) for l in Path(os.environ["STANDIN_KUBE_LOG"]).read_text().splitlines()]
     assert all(w[:2] != ["patch", "pod"] or "--subresource" in w for w in writes), "in place only"
     # the replica organ reads the gain: mean conveyed limit / operator's limit = (1900 + 1900 + 1800 + 500) / 4 / 500
     g = c.m.gain[("default", "web")]
@@ -89,16 +89,16 @@ def main():
     assert all(v[0] == "500m" for n, v in limits(p2).items() if n.startswith("web")), "no expansion during a hold"
 
     # a closed machine still carrying work: in service, not open
-    os.environ["FAKE_KUBE_STATE"] = str(p)
+    os.environ["STANDIN_KUBE_STATE"] = str(p)
     S = json.loads(Path(p).read_text()); S["nodes"][2]["spec"]["unschedulable"] = True; Path(p).write_text(json.dumps(S))
-    s = snapshot(Kube(FAKE, audit=lambda r: r), active_only=True)
+    s = snapshot(Kube(STANDIN, audit=lambda r: r), active_only=True)
     assert s["nodes"] == 3 and s["open"] == 2, s
     # closed by the prefer-not idle mark instead of a cordon: the same accounting; empty, it idles
     S["nodes"][2]["spec"].pop("unschedulable"); S["nodes"][2]["spec"]["taints"] = [{"key": "omnicompass.io/idle", "value": "true", "effect": "PreferNoSchedule"}]
-    Path(p).write_text(json.dumps(S)); s = snapshot(Kube(FAKE, audit=lambda r: r), active_only=True)
+    Path(p).write_text(json.dumps(S)); s = snapshot(Kube(STANDIN, audit=lambda r: r), active_only=True)
     assert s["nodes"] == 3 and s["open"] == 2, s
     S["pods"] = [q for q in S["pods"] if q["spec"]["nodeName"] != "w2"]; Path(p).write_text(json.dumps(S))
-    s = snapshot(Kube(FAKE, audit=lambda r: r), active_only=True)
+    s = snapshot(Kube(STANDIN, audit=lambda r: r), active_only=True)
     assert s["nodes"] == 2 and s["open"] == 2, s
     # on top, with response time clean: the HPA target keeps the operator's promise in queue terms at the CPU each pod
     # is guaranteed: the autoscaler's largest count (10) over the 3 machines in service is 4 pods a machine, 0.95 x 4000m
@@ -124,7 +124,7 @@ def main():
     seen.append(json.loads(Path(p3).read_text())["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"])
     assert seen[-1] == 95, seen
     # coasting (rule 6): the same raise with coast_step 25 eases 50 -> 75 in one window, never 50 -> 95 at once
-    save = (os.environ["FAKE_KUBE_STATE"], os.environ["FAKE_KUBE_LOG"])
+    save = (os.environ["STANDIN_KUBE_STATE"], os.environ["STANDIN_KUBE_LOG"])
     t5 = tempfile.mkdtemp(); p5 = state(t5); S5 = json.loads(Path(p5).read_text())
     S5["hpas"] = [{"metadata": {"name": "web", "namespace": "default"}, "spec": {"minReplicas": 1, "maxReplicas": 10,
                    "scaleTargetRef": {"kind": "Deployment", "name": "web"}, "metrics": [{"type": "Resource", "resource": {
@@ -140,7 +140,7 @@ def main():
     os.utime(lf5); c5.step()
     eased = json.loads(Path(p5).read_text())["hpas"][0]["spec"]["metrics"][0]["resource"]["target"]["averageUtilization"]
     assert eased == 75, eased
-    os.environ["FAKE_KUBE_STATE"], os.environ["FAKE_KUBE_LOG"] = save
+    os.environ["STANDIN_KUBE_STATE"], os.environ["STANDIN_KUBE_LOG"] = save
     # a machine leaving service changes the guaranteed share (10 over 2 machines: 5 a machine, 760m, g 1.52 -> 76%): a
     # lower target, more pods, so it is written at once, inside the autoscaler's window
     S3 = json.loads(Path(p3).read_text()); S3["nodes"] = S3["nodes"][:2]

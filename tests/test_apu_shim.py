@@ -12,10 +12,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SHIM = ROOT / "scripts" / "apu" / "nvidia-smi"
 
-FAKE = r'''#!/usr/bin/env python3
+STANDIN = r'''#!/usr/bin/env python3
 import json, os, sys
 a = sys.argv[1:]
-open(os.environ["FAKE_AMD_LOG"], "a").write(" ".join(a) + "\n")
+open(os.environ["STANDIN_AMD_LOG"], "a").write(" ".join(a) + "\n")
 if a[:1] == ["version"]:
     print("AMDSMI Tool: 24.6.2"); sys.exit(0)
 if a[:1] == ["list"]:
@@ -29,7 +29,7 @@ if a[:1] == ["static"]:
     print(json.dumps([{"gpu": 0, "asic": {"market_name": "AMD Instinct MI300A"},
           "limit": {"max_power_limit": {"value": 550, "unit": "W"}, "min_power_limit": {"value": 100, "unit": "W"},
                     "default_power_cap": {"value": 550, "unit": "W"}}}])); sys.exit(0)
-if a[:1] == ["set"] and "--clk-limit" in a and os.environ.get("FAKE_AMD_REFUSE_CLK"):
+if a[:1] == ["set"] and "--clk-limit" in a and os.environ.get("STANDIN_AMD_REFUSE_CLK"):
     print("not supported", file=sys.stderr); sys.exit(4)
 if a[:1] in (["set"], ["reset"], ["process"]):
     print(json.dumps({"process_list": []}) if a[:1] == ["process"] else "ok"); sys.exit(0)
@@ -40,10 +40,10 @@ sys.exit(1)
 class ApuShim(unittest.TestCase):
     def setUp(self):
         self.d = Path(tempfile.mkdtemp())
-        fake = self.d / "amd-smi"
-        fake.write_text(FAKE); fake.chmod(0o755)
+        standin = self.d / "amd-smi"
+        standin.write_text(STANDIN); standin.chmod(0o755)
         self.log = self.d / "log.txt"
-        self.env = dict(os.environ, AMD_SMI=str(fake), FAKE_AMD_LOG=str(self.log))
+        self.env = dict(os.environ, AMD_SMI=str(standin), STANDIN_AMD_LOG=str(self.log))
 
     def run_shim(self, *args, env=None):
         return subprocess.run([sys.executable, str(SHIM), *args], capture_output=True, text=True, env=env or self.env)
@@ -66,7 +66,7 @@ class ApuShim(unittest.TestCase):
         self.assertEqual(len(r.stdout.strip().splitlines()), 2)
 
     def test_clock_wire_refused_cleanly(self):
-        r = self.run_shim("-i", "0", "-lgc", "800,1800", env=dict(self.env, FAKE_AMD_REFUSE_CLK="1"))
+        r = self.run_shim("-i", "0", "-lgc", "800,1800", env=dict(self.env, STANDIN_AMD_REFUSE_CLK="1"))
         self.assertEqual(r.returncode, 3)
         self.assertIn("not supported", r.stderr)
 
