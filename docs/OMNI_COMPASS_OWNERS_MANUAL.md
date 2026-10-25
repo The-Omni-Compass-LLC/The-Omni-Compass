@@ -1635,8 +1635,8 @@ consists of a governing engine, its muscle adapters, a complete configuration pr
 profile** is the complete, versioned set of defaults shipped together, θ*; a **candidate profile** is a combination under
 evaluation; the **active profile** is the one governing the current run; a **custom profile** is any identifiable configuration
 that differs from θ*. With x the governed system's state, z the governor's internal state, y its observations and Δ ∈ {10, 15, 30, 60,
-90, 120} s the decision interval, z[k+1] = F[θ](z[k], y[k]) and u[req][k] = G[θ](z[k], y[k]), the command Π[C](u[req][k]) inside the
-operating limits C, and the system evolves on the command that actually landed, x[k+1] = Φ(x[k], u[ack][k], w[k]), w the workload
+90, 120} s the decision interval, `z[k+1] = F[θ](z[k], y[k])` and `u[req][k] = G[θ](z[k], y[k])`, the command `Π[C](u[req][k])` inside the
+operating limits C, and the system evolves on the command that actually landed, `x[k+1] = Φ(x[k], u[ack][k], w[k])`, w the workload
 and its disturbances. After release θ = θ* is fixed while x, z and y keep changing: one fixed factory tune governs a changing
 workload. "One setting" is the whole vector θ, evaluated jointly, against one of two explicit objectives: the most healthy
 production P(θ), or the least cost per production completed, B(θ) ⁄ P(θ). The factory baseline is established in eight steps:
