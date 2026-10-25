@@ -141,7 +141,7 @@ identified implementation demonstrated.
 
 ## 7. What the live engine shows
 
-- **Architecture:** native, Omni-Compass on native, or Omni-Compass direct.
+- **Architecture:** native, or Omni-Compass on native; Omni-Compass is never by itself (the founder's order of 25 October).
 - **Deployment route:** on-site hardware, or through the cloud.
 - **Engine and profile identity:** factory, candidate or custom, with the profile's fingerprint.
 - **Cadence:** the six buttons, 10, 15, 30, 60, 90 and 120 s.
@@ -173,7 +173,7 @@ For each deployment route r, add its cost components inside the declared boundar
 
   C(r, a) = Σₖ c(r, a, k),
 
-where a names the arm: native, Omni-Compass on native, or Omni-Compass direct. Then
+where a names the arm: native, or Omni-Compass on native. Then
 
   S(r, a) = (C(r, native) − C(r, a)) / C(r, native),
 

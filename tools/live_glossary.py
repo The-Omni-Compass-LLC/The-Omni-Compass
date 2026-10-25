@@ -17,8 +17,8 @@ docs/MUSCLE_CATALOG.md); what the native controller under each plant is, is real
 family natively and how it is wired is docs/wiring_recipes.csv. The organisms are made by the runners' own rules, imported, not
 copied: the spine, the four realms, the four stacked and the tower by tools/run_realms_v5.py, the orchestra by
 tools/run_orchestra.py (the governors' mapping of tools/governors_page.py), the live engine's sixty muscles by
-docs/engine/export_harness_trace.py, the whole organism by docs/engine/export_whole.py and results/WHOLE_SYSTEM.json. The third
-arm is realms/harness.py's SOLO, read through native_off_pool. Every term carries its definition, drawn from the file it names,
+docs/engine/export_harness_trace.py, the whole organism by docs/engine/export_whole.py and results/WHOLE_SYSTEM.json. Two arms,
+native and Omni-Compass on native: Omni-Compass is never by itself (the founder's order of 25 October). Every term carries its definition, drawn from the file it names,
 and a short quote from that file that this tool finds there before it writes anything: a term whose source no longer says what
 it is cited for stops the build. The index reads docs/engine/OMNI_COMPASS_LIVE_ENGINE.html section by section (each
 <section id="s-...">, its heading, its visible words and its monitors' own names) and keeps, for every term, organism and arm,
@@ -47,7 +47,7 @@ sys.path.insert(0, str(ROOT))
 from tools.legal import PLAIN, stamp  # noqa: E402
 from tools.muscle_catalog import TEMPLATE, KNOB, PRESET, does, card_text, nice  # noqa: E402
 from realms.compass_arm_v5 import load_cards  # noqa: E402
-from realms.harness import native_off_pool, SOLO, TOWER, STACK  # noqa: E402
+from realms.harness import TOWER, STACK  # noqa: E402
 import realms.plants as plants  # noqa: E402
 import tools.run_realms_v5 as RR  # noqa: E402
 from tools.run_orchestra import bodies, ORCHESTRA  # noqa: E402
@@ -201,10 +201,8 @@ def organisms(rows) -> list[dict]:
     spine = [r for r in rows if is_spine(r)]
     orch = bodies(rows)
     six = sixty_rows()
-    off = lambda rs: sum(1 for r in rs if native_off_pool(r["template"], r["knob"]))
     out = [{
         "key": RR.SPINE, "name": RR.NAMES[RR.SPINE], "class": "S", "muscles": len(spine), "families": family_list(spine),
-        "direct_off": off(spine),
         "meaning": (f"The {len(spine)} muscles every real stack runs on, every one in all four realms: the computers' scheduling, "
                     f"placement, processors and memory, network, storage, observability, security, power and cooling, "
                     f"{len(family_list(spine))} families. An organism in its own right since 16 October, the seventh, run "
@@ -223,7 +221,6 @@ def organisms(rows) -> list[dict]:
         fam_own = family_list(own)
         out.append({
             "key": k, "name": REALM_NAMES[k], "class": "S", "muscles": len(by[k]), "own": len(own), "families": family_list(by[k]),
-            "direct_off": off(by[k]),
             "meaning": (f"Every muscle whose realm list includes {REALM_NAMES[k]}, the spine among them: its own {len(own)} "
                         f"muscles in {len(fam_own)} families of its trade (the largest: "
                         + ", ".join(f["name"] for f in fam_own[:4]) +
@@ -236,7 +233,6 @@ def organisms(rows) -> list[dict]:
     out.append({
         "key": STACK, "name": RR.NAMES[STACK], "class": "S", "muscles": stack_n, "distinct": len(rows),
         "families": family_list(rows, weight=lambda r: len(r["realms"].split(";"))),
-        "direct_off": sum(len(r["realms"].split(";")) for r in rows if native_off_pool(r["template"], r["knob"])),
         "meaning": (f"The four realms stacked on one clock with every duplicate of the spine kept ({stack_n:,} muscles: the "
                     f"spine once in each realm's body). Each realm keeps its own body, so every muscle in the stack runs exactly "
                     "the native it runs in its own realm, plant by plant."),
@@ -245,7 +241,6 @@ def organisms(rows) -> list[dict]:
         "aka": ["the four stacked", "four stacked"]})
     out.append({
         "key": TOWER, "name": RR.NAMES[TOWER], "class": "S", "muscles": len(rows), "families": family_list(rows),
-        "direct_off": off(rows),
         "meaning": (f"The whole catalog as one body, every muscle once: {len(rows):,} distinct muscles in "
                     f"{len(family_list(rows))} families, the founder's nine open-source pieces among them (Kepler, Climatik, "
                     "EAR, CruiseKube, Goldilocks, the Kubernetes Power Manager, PEAKS, Adaptive GPU Power Capping, NVIDIA's "
@@ -256,7 +251,7 @@ def organisms(rows) -> list[dict]:
     govs = [{"slug": slug, "name": name, "muscles": len(orch[slug])} for slug, name, *_ in GOVERNORS]
     out.append({
         "key": ORCHESTRA, "name": "The orchestra, every governor's muscle once", "class": "S", "muscles": len(orch[ORCHESTRA]),
-        "families": family_list(orch[ORCHESTRA]), "governors": govs, "direct_off": off(orch[ORCHESTRA]),
+        "families": family_list(orch[ORCHESTRA]), "governors": govs,
         "meaning": (f"The eighth organism (the founder's word of 19 October, night): every catalog muscle that stands for a knob "
                     f"of a governor or orchestrator he named ({len(govs)}: " + ", ".join(g["name"] for g in govs) +
                     f"), each governor's muscles a body of its own and all of them together one body, {len(orch[ORCHESTRA])} "
@@ -271,7 +266,7 @@ def organisms(rows) -> list[dict]:
     dup = sorted(n for n, c in Counter(r["muscle"] for r in rows).items() if c > 1)
     out.append({
         "key": SIXTY, "name": "The live engine's organism: sixty muscles, twelve in each of five body parts", "class": "S",
-        "muscles": len(six), "families": family_list(six), "direct_off": off(six),
+        "muscles": len(six), "families": family_list(six),
         "parts": [{"part": p, "muscles": ids, "organ": PART_ORGAN[p][0], "theta": PART_ORGAN[p][1]} for p, ids in parts.items()],
         "meaning": ("The sixty muscles the page draws, twelve from the spine and twelve from each realm, put in one organism of "
                     "the realms harness (the plants of realms/plants.py coupled through their heat and their power) under the "
@@ -312,8 +307,8 @@ def whole_organism() -> dict:
                     "software at one end (the cluster, its add-ons, its governors and the services on it), the bare metal at "
                     "the other (the card and the machine), and the cloud as the wire between them (the machines it bills, "
                     "metered). No run has stacked the layers yet: the composition is class S of class P and L measurements. "
-                    "It is the tenth of the ten organisms, read like each of the others native, with Omni-Compass on top of "
-                    "native and with Omni-Compass direct. It has layers, not catalog muscles."),
+                    "It is the tenth of the ten organisms, read like each of the others native and with Omni-Compass on top of "
+                    "native. It has layers, not catalog muscles."),
         "sources": [{"file": "DISCLOSURES.md", "quote": "composes each layer's own measured ratio, native against Omni-Compass on top of native, into one benefit for a whole stack"},
                     {"file": "tools/whole_system.py", "quote": "the cloud is the wire between the chip at one end and the software at the other"},
                     {"file": "DISCLOSURES.md", "quote": "and the whole organism in its three places (the software end, the cloud's wire, the bare metal) composed above: ten organisms"}],
@@ -336,22 +331,11 @@ def arms() -> list[dict]:
                  "Kubernetes on top of the muscles. The arm every table carried as \"omni\", its machine key unchanged."),
          "sources": [{"file": "CLAUDE.md", "quote": "Omni on native is Omni on top of Kubernetes on top of the muscles"},
                      {"file": "CLAUDE.md", "quote": "Omni-Compass and native (the arm every table carried as \"omni\", its machine key unchanged)"}]},
-        {"key": SOLO, "name": "Omni-Compass direct", "colour": "violet", "hex": "#c77dff",
-         "aka": ["Omni-Compass direct", "Omni-Compass by itself", "Omni direct"],
-         "def": ("Omni-Compass alone on the muscles, no orchestrator: each muscle's own native controller switched off and "
-                 "Omni-Compass the only controller moving that knob (on Kubernetes no pod autoscaler and no cluster autoscaler; "
-                 "Kubernetes' own scheduler and kubelet stay). In the models, every pool whose own count is its knob runs with "
-                 "its own autoscaler switched off; a power cap, an admission limit and every other plant's knob are a setting "
-                 "native holds still or run through native's own loop as its actuator, and there the two Omni-Compass arms "
-                 "are one arm. No cloud runs by itself without the founder's word."),
-         "sources": [{"file": "CLAUDE.md", "quote": "Omni-Compass by itself, each muscle's own native controller switched off and Omni-Compass the only controller moving that knob"},
-                     {"file": "realms/harness.py", "quote": "a setting native already holds still, or run through native's own loop as their actuator: by itself is the same arm"},
-                     {"file": "CLAUDE.md", "quote": "No cloud by itself without the founder's word"}]},
     ]
 
 
 def scenarios(orgs, arm_list) -> list[dict]:
-    """Every organism under every arm: 10 × 3, named."""
+    """Every organism under both arms: 10 × 2, named."""
     out = []
     for o in orgs:
         for a in arm_list:
@@ -362,18 +346,9 @@ def scenarios(orgs, arm_list) -> list[dict]:
                     s["what"] = f"{n:,} muscles, each under its own native controller alone."
                 elif a["key"] == "omni":
                     s["what"] = f"the same {n:,} muscles, every native controller running, Omni-Compass on top of all of them."
-                else:
-                    k = o["direct_off"]
-                    s["what"] = (f"{k:,} of the {n:,} muscles are pools whose knob is their count or their autoscaler's target: "
-                                 "their own autoscaler switched off and Omni-Compass the only controller on them; on the other "
-                                 f"{n - k:,} the arm is the same as Omni-Compass on native.")
-                    s["native_off"] = k
             else:
                 s["what"] = {"native": "every layer as native runs it.",
-                             "omni": "Omni-Compass on top of every piece, composed layer by layer.",
-                             SOLO: ("by itself where native is a controller that can be switched off (on Kubernetes and in our "
-                                    "models); where native is a setting the two Omni-Compass arms are one; the cloud runs "
-                                    "nothing by itself without the founder's word.")}[a["key"]]
+                             "omni": "Omni-Compass on top of every piece, composed layer by layer."}[a["key"]]
             out.append(s)
     return out
 
@@ -469,21 +444,9 @@ TERMS = [
       "\"omni\", its machine key unchanged. Blue on the page.",
       [(CL, "Omni on native is Omni on top of Kubernetes on top of the muscles")],
       aka=["Omni-Compass on native", "Omni-Compass and native", "Omni on native", "on top of native"]),
-    T("Omni-Compass direct", A, "Omni-Compass alone on the muscles, no orchestrator: each muscle's own native controller "
-      "switched off and Omni-Compass the only controller moving that knob. Omni-Compass's own orchestrator (omni_orchestrator/) "
-      "runs the organism this way, with no Kubernetes, read against Kubernetes' published autoscaling rule written by us (the "
-      "yardstick). Violet on the page.",
-      [(CL, "Omni direct is simply Omni on top of the muscles, no Kubernetes"),
-       (PAGE_F, "Omni-Compass alone on the muscles, no orchestrator")], aka=["Omni-Compass direct", "Omni direct"]),
-    T("by itself", A, "The third arm as our models run it (realms/harness.py, SOLO): the max, with every pool whose own count is "
-      "its knob run with its own autoscaler switched off, and its twin (the brain's sense of native) too. A power cap, an "
-      "admission limit and every other plant's knob are a setting native already holds still, or run through native's own loop "
-      "as their actuator: there by itself is the same arm as Omni-Compass on native.",
-      [("realms/harness.py", "the max, with every pool whose own count is"),
-       ("realms/harness.py", "a setting native already holds still, or run through native's own loop as their actuator")],
-      aka=["by itself", "Omni-Compass by itself"]),
     T("the yardstick", A, "Kubernetes' published autoscaling rule, written by us from its documentation (a description of a rule, "
-      "not Kubernetes' code), as the native Omni-Compass direct is read against.",
+      "not Kubernetes' code): the native that Omni-Compass on native is read against in the real three-run test of the page's "
+      "bottom line.",
       [("docs/OMNI_ORCHESTRATOR.md", "as the yardstick Omni is read against")], aka=["yardstick"]),
     T("the three places Omni-Compass lives", A, "Omni-Compass sits at both ends of the cloud's wire and at every layer between: "
       "the software end (the cluster, Kubernetes, its add-ons, its governors and the services on it), the cloud between them (the "
@@ -999,9 +962,9 @@ TERMS = [
       [(PAGE_F, "the sides: --brass is Omni-Compass (blue)"), (MAN, "| Blue | Omni-Compass; on a reading, power given |"),
        (PAGE_F, "OFF at the master switch: every Omni-Compass side is drawn in native's own colour, a lighter tint of it")],
       aka=["blue"]),
-    T("direct's violet", W, "Violet (#c77dff, the page's --direct): Omni-Compass direct, the third arm, Omni-Compass alone on the "
-      "muscles; never a reading's colour.",
-      [(PAGE_F, "Omni-Compass direct, the third arm (Omni-Compass alone on the muscles): violet, never a reading's colour")],
+    T("a changed tune's violet", W, "Violet (#c77dff, the page's --tuned): a knob or a profile turned from the factory tune; never "
+      "a side and never a reading's colour.",
+      [(PAGE_F, "a knob or profile turned from the factory tune: violet, never a side and never a reading's colour")],
       aka=["violet"]),
     T("the mechanism panel", W, "The engine's own knobs, live: the four pieces of the brain, the compass law, Omni-Compass's hand on "
       "each muscle (the max's push and lift-off, the tune-down's floor, step and dwell), native's own controller (its target, "
@@ -1183,7 +1146,6 @@ MUSCLE_KEYS = {   # what each field of a muscle's record holds: the record is sh
     "meaning": "the muscle in one line, in the catalog's words",
     "does": "what the max does with it: an index into does[] (tools/muscle_catalog.py does())",
     "card": "its own card, or global (realms/muscle_cards_v5.csv)",
-    "direct_off": "true where Omni-Compass direct switches its own native controller off (a pool whose count is its knob); false where the two Omni-Compass arms are one (realms/harness.py native_off_pool)",
     "organisms": "every organism it belongs to, by the runners' own rules (spine, the realms, stack, tower, orchestra, sixty)",
     "governors": "the governors whose knob it stands for in the orchestra (tools/governors_page.py CATALOG)",
     "part": "its body part in the live engine's sixty (docs/engine/export_harness_trace.py)",
@@ -1222,7 +1184,7 @@ def build_core() -> dict:
         rec = {"id": r["muscle_id"], "name": r["muscle"], "family": r["family_id"], "realms": r["realms"].split(";"),
                "template": t, "preset": p, "knob": k, "meaning": f"The {nice(r['muscle'])} setting of {pw[0]}, a {k} knob.",
                "does": does_list.index(dz), "card": card_text(cards.get(r["muscle_id"])),
-               "direct_off": native_off_pool(t, k), "organisms": m["organisms"]}
+               "organisms": m["organisms"]}
         if m["governors"]:
             rec["governors"] = m["governors"]
         if m["part"]:

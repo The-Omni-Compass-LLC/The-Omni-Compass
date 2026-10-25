@@ -13,7 +13,7 @@ REDLINING**, behind native, a LOSS; dark, **AWAITING**, no run yet. A slower ser
 whatever the work. The number is how much more work was done for the same demand, the mean of our three runs, read by the
 key below (the number beside a word carries the word's sign).
 
-**The three ways to run it: one real test, three runs on GitHub's own machines** (class L, live software; the full form, 18
+**The way to run it: one real test, three runs on GitHub's own machines** (class L, live software; the full form, 18
 steps of 25 s, the clients stepping 1 2 3 2 3 4 …; engine omni-v18, commit `0ca2bbdac97f`, runs 40023524338, 40023529155 and
 40023534013; [`results/orchestrator/V18_THREE_ARMS_ABC.md`](results/orchestrator/V18_THREE_ARMS_ABC.md)):
 
@@ -21,12 +21,8 @@ steps of 25 s, the clients stepping 1 2 3 2 3 4 …; engine omni-v18, commit `0c
 |---|---|---|---|
 | Native alone: Kubernetes' published autoscaling rule on the muscles, written by us as the yardstick | yellow, STEADY | 0%: the baseline every other row is read against | — |
 | Omni-Compass on native | green, THRIVING | **+6.0% GAIN** in all three of our runs (A +5.2%, B +5.3%, C +7.4%) | the 95th percentile **+9.5% GAIN** in all three (down 9.0%, 12.1% and 7.5%: faster); machines **+3.1% GAIN** by the mean of our three runs, beyond the noise in 1 of 3; serving units **+10.2% power given** in all three, the capacity spent to buy the work; no request failed and none was answered wrong in any run, on either side |
-| Omni-Compass direct: Omni-Compass alone on the muscles, no Kubernetes | green, THRIVING | **+7.5% GAIN** in all three of our runs (A +7.3%, B +5.7%, C +9.4%) | the 95th percentile **+12.1% GAIN** in all three (down 9.8%, 15.7% and 10.8%); machines **+2.5% GAIN** by the mean of our three runs, beyond the noise in 0 of 3; serving units **+5.2% power given** by the mean of our three runs, beyond the noise in 2 of 3; no request failed and none was answered wrong |
 
-Omni-Compass direct against Omni-Compass on native, in the same runs, each by the mean of our three runs: work **+1.4% GAIN**
-(beyond the noise in 1 of 3), the 95th percentile **+2.9% GAIN** (0 of 3), machines **+0.6% power given** (0 of 3), serving
-units **+4.6% GAIN**, a cut (1 of 3). No pair reads LOSS on any gauge. The test ran on omni-v18 and runs again on omni-v19, the
-engine that stands.
+Native and Omni-Compass on native are the only two sides: Omni-Compass is never by itself (the founder's order of 25 October), so the record's third arm, Omni-Compass alone on the muscles, is not carried here. The test ran on omni-v18 and runs again on omni-v19, the engine that stands.
 
 **The two routes a whole workload is bought by**: every measured layer composed by the product law (`tools/whole_system.py`,
 regrouped by `docs/engine/export_whole.py`), each layer's three runs carried with their intervals: a model of measurements,
@@ -258,11 +254,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-24 17:29 | aks-client-check | success | [40116249873](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116249873) |
 <!-- front-page:runs:end -->
 
-**Three arms, always shown together: native is the system as it runs on its own; omni, Omni-Compass on native, is
-Omni-Compass on top of native; Omni-Compass direct is Omni-Compass alone on the muscles, each muscle's own native controller
-switched off** (the founder's order of 23 October; where native is a setting rather than a controller the two Omni-Compass arms
-are one arm, and no cloud runs direct without the founder's word). Omni-Compass on native never replaces native; every
-comparison is read against native, pair by pair.
+**Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
+native, is Omni-Compass on top of native.** Omni-Compass is never by itself (the founder's order of 25 October): it needs
+muscles with their own native controllers under it, never replaces native, and every comparison is read against native.
 
 ## The engine that stands: omni-v19 (Omni-Compass by itself: a pod muscle of its own, reconciled at the pod autoscaler's 15 s; Omni direct in the engine and the three arms, native, Omni on native and Omni direct; the heartbeat a dial with the main engine at 60 s, the cruise wait never under two readings, every clock of the governor in seconds, the max on every muscle, the power cap's request through the line's own clear time, every wire in the fingerprint, a knob that leaves any muscle native, every muscle its own card, quota-aware conveyance that never takes another muscle's room nor raises on a reading that cannot see it, the operator's commands without a shell, a refused raise held, every rule in seconds, the outage battery left native, the battery reading the coming hour at the glide that cuts the bill most, a blind reading held, the swarm's reflex at once)
 
@@ -422,22 +416,18 @@ all three runs, 0 of 3 clear of the noise) and GAIN on one (2 of 3 runs moved 0.
 ([`results/live/V5_CAPACITY.md`](results/live/V5_CAPACITY.md)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-**Ten organisms, three arms: the thirty scenarios** (24 October; our own models, class S, three runs, seeds 3000 to 3002,
-[`results/scenarios/SCENARIOS_30.md`](results/scenarios/SCENARIOS_30.md), written by `python3 tools/scenarios_30.py`). The
+**Ten organisms, two ways: the twenty scenarios** (our own models, class S, three runs, seeds 3000 to 3002,
+[`results/scenarios/SCENARIOS_20.md`](results/scenarios/SCENARIOS_20.md), written by `python3 tools/scenarios_20.py`). The
 seven organisms of the catalog, the orchestra (the governors' and orchestrators' muscles), the live engine's own sixty-muscle
 organism and the whole organism in its three places (the software end, the cloud's wire, the bare metal) make ten organisms;
-each is read native, Omni-Compass on native, and Omni-Compass direct (each pool's own autoscaler switched off,
-`realms/harness.py` SOLO): thirty scenarios. **On native**, every one of the nine modelled organisms reads its muscles over the
-line GAIN in all three of our runs (from +1.58% in the whole tower to +63.34% in the orchestra), its work EVEN; the orchestra's
-power is given (+52.38%) and the others' power EVEN or a cut. The whole organism, a composition of the real tables, reads
-+14.5% GAIN by the index's rule. **Direct** reads LOSS in all three of our runs on work and on muscles over the line, against
-native and against Omni-Compass on native, in eight organisms (the spine, the four realms, the four stacked, the tower and the
-live engine's organism): 32 LOSS rows, every one listed in the record. (Until 24 October the live engine's organism read direct
-EVEN, the same, against native: its harness exporter had lost the direct arm and computed native in its place; the arm is back,
-and the record now reads it.) Their cause is the engine's and is on the next version's list: under
-SOLO the twin, the brain's model of native, has its own autoscaler off too, so the floor under the max is a frozen count, not
-what native's autoscaler would run. In the orchestra direct reads its muscles over the line GAIN (+69.25%) for power given
-(+72.39%). Direct has not run in any layer of the whole organism.
+each is read native and with Omni-Compass on top of native: twenty scenarios. Every one of the nine modelled organisms reads
+its muscles over the line GAIN in all three of our runs (from +1.58% in the whole tower to +63.34% in the orchestra), its work
+EVEN; the orchestra's power is given (+52.38%) and the others' power EVEN or a cut. The whole organism, a composition of the
+real tables, reads +14.5% GAIN by the index's rule. No LOSS row. The record of 24 October also carried a third way,
+Omni-Compass by itself (each pool's own autoscaler switched off), which read LOSS in all three of our runs on work and on
+muscles over the line in eight organisms, 32 rows; the founder's order of 25 October took that way out (Omni-Compass is never
+by itself), and its record is kept whole in
+[`docs/history/SCENARIOS_30_2026-10-24.md`](docs/history/SCENARIOS_30_2026-10-24.md).
 
 ## The manuals: the Operator's Manual, the Owner's Manual and the Live Engine Manual
 
@@ -489,17 +479,17 @@ monitor with its number, evidence class, feed and knobs, and every control, so t
 ways; the control panel at the top of the live engine downloads all three books.
 
 **The live engine page**, the tuning bench, opens on the bottom line, then the monitor wall and the main control panel. Native
-is orange everywhere, Omni-Compass on native blue, Omni-Compass direct violet; red is never a side, only the alarm. Every
+is orange everywhere, Omni-Compass on native blue; red is never a side, only the alarm. Every
 monitor carries its light and its word: green and round, **THRIVING** (working inside its lines with room to give, or a
 GAIN); yellow, a yield diamond, **STEADY** (EVEN, inside 0.5%, or heading for its line and watched); red, a stop-sign octagon,
 blinking, **REDLINING** (over its line, or a LOSS: the alarm); dark, **AWAITING** (the run that fills it has not landed; never
-green). The main control panel holds the kill switch, the arm (Omni-Compass on native or direct), the heartbeat's six buttons,
+green). The main control panel holds the kill switch, the heartbeat's six buttons,
 **10, 15, 30, 60, 90 and 120 s**, a sweep that runs every beat on the page's own model for three model days each, **Try the
 candidate** (the sweep's best beat as a candidate profile), the active profile with its fingerprint (factory, candidate or
 custom), **Restore factory profile**, **Hold the active profile** and **Return to native**. A model's best beat is a candidate
 for the real runs, never a result, and no profile is locked as the baseline: the factory's beat stays 60 s until the eight
 steps of [`docs/FACTORY_PROFILE.md`](docs/FACTORY_PROFILE.md) choose the next. At its back stand the glossary and index
-(`tools/live_glossary.py`): every term in the words of the file it names, the ten organisms and their thirty scenarios, every
+(`tools/live_glossary.py`): every term in the words of the file it names, the ten organisms and their twenty scenarios, every
 one of the 1,107 muscles of the catalog by realm and family, and the sections where each is used.
 
 The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for line where a twin exists. The live engine's section 10b ([`#s-cpp`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#s-cpp)) feeds the Python's own runs into the C++ at every rebuild and sets the two side by side, number by number: every twin's parity check, every compass law the page's runs wire, and every muscle of the seven organisms at the tune-down. The Python's 500 seeded runs (`tools/engine_runs.py`, the jump generator) run whole through the C++ harness too ([`cpp/tools/engine_runs.cpp`](cpp/tools/engine_runs.cpp): the Python's draws are the input, the governor, the nerves, the compass law and the verdict in C++ put the mechanism on): every receipt and the SHA-256 digest identical to the Python's, on GitHub with every set (`engine-runs`) and on the page's proof monitor ([`#proofPanel`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#proofPanel)) beside the page's own run. What still runs in Python only is listed there by file (`tools/seal.py`).

@@ -23,7 +23,7 @@ PAGE = ROOT / "docs" / "engine" / "OMNI_COMPASS_LIVE_ENGINE.html"
 CATALOG = ROOT / "realms" / "catalog_v5.csv"
 REALMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized"]
 REQUIRED = ["GAIN", "EVEN", "LOSS", "power given", "the runs disagree", "do no harm", "native", "Omni-Compass on native",
-            "Omni-Compass direct", "by itself", "the compass", "the compass law", "the band", "the cushion", "the centre",
+            "the compass", "the compass law", "the band", "the cushion", "the centre",
             "the two antagonist forces", "k[p]", "k[d]", "A", "tanh", "the max", "the tune-down", "the dial", "one pedal",
             "lift-off", "cruise", "the lease", "the kill switch", "the snapshot", "the two-way plug", "the four pieces",
             "piece 1: the state (E, U, I[U], the basin)", "piece 2: the basin's potential and flow (S, Φ(S))",
@@ -34,7 +34,7 @@ REQUIRED = ["GAIN", "EVEN", "LOSS", "power given", "the runs disagree", "do no h
             "the heartbeat", "the fast checks", "the conveyance", "the organism", "muscle", "realm", "family", "template",
             "knob", "the spine", "the stack", "the tower", "the orchestra", "the grid (copies × runs)", "protocol 4",
             "the conductor", "Omni index", "the benefit board", "the traffic signal", "REDLINING", "STEADY", "THRIVING",
-            "native's colour", "Omni-Compass's blue", "direct's violet", "the cloud as the wire",
+            "native's colour", "Omni-Compass's blue", "a changed tune's violet", "the cloud as the wire",
             "the three places Omni-Compass lives", "Monte Carlo", "RK4", "the jump generator", "the C++ twin",
             "the mechanism panel"]
 
@@ -101,7 +101,7 @@ class LiveGlossary(unittest.TestCase):
         member = Counter(k for m in self.d["muscles"] for k in m["organisms"])
         for k in ["spine"] + REALMS + ["tower", "orchestra", "sixty"]:
             self.assertEqual(member[k], orgs[k]["muscles"], f"the muscles marked {k} are not the organism's count")
-        self.assertEqual([a["key"] for a in self.d["arms"]], ["native", "omni", "solo"])
+        self.assertEqual([a["key"] for a in self.d["arms"]], ["native", "omni"])
         self.assertEqual(len({s["key"] for s in self.d["scenarios"]}), len(self.d["scenarios"]))
 
     def test_every_term_has_a_definition_and_a_source_that_still_says_it(self):

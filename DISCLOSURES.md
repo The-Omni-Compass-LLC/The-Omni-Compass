@@ -219,9 +219,9 @@ differ the measurement stands.
 
 **The organisms.** The seven organisms of the catalog (the spine, the four realms, the four stacked, the tower), the orchestra
 beside them, the live engine's own sixty-muscle organism, and the whole organism in its three places (the software end, the
-cloud's wire, the bare metal) composed above: ten organisms. Each is read three ways, native, Omni-Compass on top of native,
-and Omni-Compass direct (native's own pool autoscalers off, `realms/harness.py` SOLO): thirty scenarios, recorded in
-`results/scenarios/SCENARIOS_30.json` (class S, our own models, three runs), every cell with no run reading "not yet run".
+cloud's wire, the bare metal) composed above: ten organisms. Each is read two ways, native and Omni-Compass on top of native
+(Omni-Compass is never by itself, the founder's order of 25 October): twenty scenarios, recorded in
+`results/scenarios/SCENARIOS_20.json` (class S, our own models, three runs), every cell with no run reading "not yet run".
 None is a product.
 
 **The live engine.** `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` is a monitor of the repository's records and of the engine's

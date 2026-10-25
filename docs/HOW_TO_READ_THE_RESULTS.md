@@ -261,17 +261,17 @@ categories, each weighted the same. A measure enters only as its three-run readi
 all three of our runs enters as the geometric mean of the runs' ratios; anything else (EVEN, the runs disagree, a word read by
 the mean of our three runs) enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
 
-## The three arms, the thirty scenarios and the whole organism
+## The real test, the twenty scenarios and the whole organism
 
-- **The three arms** (`results/orchestrator/V18_THREE_ARMS_ABC.md`): one row per pair and gauge, the pairs Omni-Compass on
-  native against native, Omni-Compass direct against native, and Omni-Compass direct against Omni-Compass on native; each run's
-  own word beside its number, the three-run reading in bold; below, each arm's totals in each run (requests answered, failed,
-  wrong). The bottom line on the README and the live engine page takes the work row's mean of the three runs as its number
-  and turns its light red on any slower service or failed request.
-- **The thirty scenarios** (`results/scenarios/SCENARIOS_30.md`, class S): ten organisms, each native, Omni-Compass on native
-  and Omni-Compass direct. The first table gives native's own gauges and each Omni-Compass arm's word and mean change against
-  its reference; the sections after it give every run's change with its interval and the reading, every arm's own gauges, the
-  realms runner's contrasts, where direct's LOSS lives and why, and every LOSS row by name.
+- **The real test** (`results/orchestrator/V18_THREE_ARMS_ABC.md`): one row per pair and gauge, each run's own word beside its
+  number, the three-run reading in bold; below, each arm's totals in each run (requests answered, failed, wrong). The bottom line
+  on the README and the live engine page reads its pair Omni-Compass on native against native, takes the work row's mean of the
+  three runs as its number and turns its light red on any slower service or failed request. The record's third arm, Omni-Compass
+  alone on the muscles, is not carried there: Omni-Compass is never by itself (the founder's order of 25 October).
+- **The twenty scenarios** (`results/scenarios/SCENARIOS_20.md`, class S): ten organisms, each native and with Omni-Compass on
+  native. The first table gives native's own gauges and Omni-Compass on native's word and mean change against native; the
+  sections after it give every run's change with its interval and the reading, each arm's own gauges, the realms runner's
+  contrasts, and every LOSS row by name.
 - **The whole organism** (`results/WHOLE_SYSTEM.md`): each layer's ratio oriented so that above 1 is a GAIN, composed by the
   product law R(g) = ∏ℓ Rℓ(g); read the scope (with or without the card's old run) and the reading (by the index's rule, or
   every interval carried) before the number. It is a model of measurements, class S of class L and P, and its index is not a

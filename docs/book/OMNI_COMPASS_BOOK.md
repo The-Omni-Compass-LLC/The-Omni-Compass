@@ -792,9 +792,9 @@ governors and orchestrators (the Kubernetes scheduler, Kueue, Volcano, the KAI s
 KubeRay, Gödel, Armada, Karmada, Open Cluster Management, KubeEdge, Nephio; `tools/run_orchestra.py`); the **live engine's own
 organism** of sixty muscles, the one the live engine page draws (`docs/engine/export_harness_trace.py`); and the **whole
 organism** in its three places, the software end, the cloud's wire and the bare metal, composed from the real tables
-(`tools/whole_system.py`). Each of the ten is read three ways, native, Omni-Compass on native and Omni-Compass direct (each
-pool's own autoscaler switched off, `realms/harness.py` SOLO): thirty scenarios, written by `python3 tools/scenarios_30.py`
-into `results/scenarios/SCENARIOS_30.md` (our own models, class S). Their readings are in the Owner's Manual; your own
+(`tools/whole_system.py`). Each of the ten is read two ways, native and Omni-Compass on native (Omni-Compass is never by
+itself, the founder's order of 25 October): twenty scenarios, written by `python3 tools/scenarios_20.py` into
+`results/scenarios/SCENARIOS_20.md` (our own models, class S). Their readings are in the Owner's Manual; your own
 organism is the one this chapter builds.
 
 **Building your own organism.** A real installation is rarely a whole realm. It is the muscles one company runs, wired in
@@ -2272,7 +2272,7 @@ same key.
 | Kubernetes on the kind rig (`scripts/kind_bench.sh`) | `ARM=native` | `ARM=omni`, or `ARM=compass` with the compass law | `ARM=solo`: the pod autoscaler removed after the deploy, the workload at its manifest's count, the governor's own pod muscle on it |
 | Paired repetitions on GitHub (`benchmark-reps`) | `native` among the arms | `compass` among the arms | `solo` among the arms; `tools/live_reps.py` reads Omni-Compass by itself against native and against Omni-Compass and native |
 | Omni-Compass's own orchestrator, the three arms in one showing (`python3 tools/orchestrator_show.py --out DIR [--quick]`, run as root; on GitHub `orchestrator.yml`) | Kubernetes' published autoscaling rule, written as the yardstick | Omni-Compass on top of that rule | Omni-Compass alone on the muscles |
-| Our own models, the ten organisms (`python3 tools/scenarios_30.py`) | every plant under its own native controller | the max on top of every native controller | the max with every pool's own autoscaler switched off |
+| Our own models, the ten organisms (`python3 tools/scenarios_20.py`) | every plant under its own native controller | the max on top of every native controller | not run: Omni-Compass is never by itself (the founder's order of 25 October) |
 
 A cloud has no direct arm without the owner's word (chapter 20), and a muscle whose native is a setting has one Omni-Compass
 arm, not two (section 1.1).

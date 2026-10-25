@@ -333,6 +333,8 @@ def board(runs: list, camp: dict | None = None) -> list:
         if not ln.strip() or ln.startswith("#") or "|" not in ln:
             continue
         name, wf = ln.split("|")[:2]
+        if "by itself" in name or re.search(r"\barms=[^;]*\bsolo\b", ln):   # Omni-Compass is never by itself (the founder's order of 25 October): not on this page
+            continue
         tables = []
         for stem in TABLE_OF.get(name, []):
             t = found.pop(stem, None)
@@ -884,69 +886,6 @@ def dial() -> dict:
                             for k, t in lad["toys"].items()})}   # a change against a zero (native's power cap) is NaN: null
 
 
-DIRECT_ARMS = {"yardstick": "native", "omni_native": "Omni-Compass and native", "omni": "Omni-Compass direct"}
-
-
-def direct() -> dict:
-    """Omni-Compass direct (omni_orchestrator/, docs/OMNI_ORCHESTRATOR.md): every showing GitHub ran (.github/workflows/
-    orchestrator.yml) read at the build from its own files on the branch raw: each arm's totals and the showing's readings by
-    the one key as its summary.json writes them, and each arm's series 5 s at a time from its own requests.csv (requests
-    answered, the 95th percentile) and its control plane's timeline.jsonl (the service's units; machines awake, booting or
-    draining), as tools/orchestrator_show.py per_step reads them. Class L, one run of each arm a
-    showing. Empty until a showing's files are on the branch raw. Like the ledger it is a reading of
-    what GitHub has archived, with its own read time; a check does not rebuild it (a showing archived after the build would
-    otherwise fail every check until the next build)."""
-    import csv
-    import io
-    import export_runs as XR
-    ref, pre = XR.raw_ref()
-    show = lambda p: subprocess.run(["git", "-C", str(ROOT), "show", f"{ref}:{pre}{p}"], capture_output=True).stdout.decode("utf-8", "replace")
-    dirs = [d for d in git("ls-tree", "-r", "-d", "--name-only", ref, *([pre] if pre else [])).splitlines()
-            if re.fullmatch(r"(?:" + re.escape(pre) + r")?run-\d+/orchestrator-[^/]+", d)]
-    out, BIN = [], 5.0
-    for d in sorted(dirs, key=lambda x: int(re.search(r"run-(\d+)", x).group(1))):
-        rel = d[len(pre):] if pre and d.startswith(pre) else d
-        try:
-            summ = json.loads(show(f"{rel}/summary.json"))
-        except json.JSONDecodeError:
-            continue                                    # a showing that wrote no summary is not read
-        rid = re.search(r"run-(\d+)", rel).group(1)
-        kind = rel.split("/", 1)[1][len("orchestrator-"):].rsplit("-", 1)[0]       # push-requests, A-busy, ...
-        arms = {}
-        for a, label in DIRECT_ARMS.items():
-            try:
-                meta = json.loads(show(f"{rel}/{a}/meta.json"))
-            except json.JSONDecodeError:
-                continue
-            t0, n = meta["t_load"], int(len(meta["steps"])*meta["step_s"]/BIN)
-            req, lat = [0]*n, [[] for _ in range(n)]
-            for r in csv.DictReader(io.StringIO(show(f"{rel}/{a}/requests.csv"))):
-                k = int(float(r["sent_s"])//BIN)
-                if 0 <= k < n and r["status"] == "200" and r["right"] == "1":
-                    req[k] += 1; lat[k].append(float(r["ms"]))
-            units, mach = [[] for _ in range(n)], [[] for _ in range(n)]
-            for line in show(f"{rel}/{a}/ctl/timeline.jsonl").splitlines():
-                try:
-                    x = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                k = int((x["t"] - t0)//BIN)
-                if 0 <= k < n:
-                    u, m = x.get("units") or {}, x.get("machines") or {}     # the service's units and every machine on, as the showing reads them
-                    units[k].append(u["web"] if "web" in u else sum(u.values())); mach[k].append(sum(v for q, v in m.items() if q in ("awake", "booting", "draining")))
-            p95 = lambda v: round(sorted(v)[min(len(v) - 1, int(0.95*len(v)))], 1) if v else None
-            mean = lambda v: round(sum(v)/len(v), 2) if v else None
-            arms[a] = {"label": label, "brain": meta.get("brain"), "room": meta.get("room_rule"), "steps": meta["steps"], "step_s": meta["step_s"],
-                       "totals": (summ.get("summary") or {}).get(a), "bin_s": BIN,
-                       "req": [round(c/BIN, 2) for c in req], "p95": [p95(v) for v in lat], "units": [mean(v) for v in units], "mach": [mean(v) for v in mach]}
-        if "yardstick" not in arms or len(arms) < 2:
-            continue
-        extra = {k: (summ.get("summary") or {}).get(k) for k in ("batch", "drills") if (summ.get("summary") or {}).get(k)}
-        out.append({"run": rid, "kind": kind, "folder": rel, "arms": arms, "readings": _clean(summ.get("readings") or {}), "extra": extra})
-    return {"doc": "docs/OMNI_ORCHESTRATOR.md", "grades": "docs/OMNI_ORCHESTRATOR_GRADES.md", "showings": out,
-            "read_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")} if out else {}
-
-
 def core_mc() -> dict:
     """The Python's Monte Carlo (benchmarks/core_evidence.py, the founder's words of 24 October: "the Python's Monte Carlo, our 4K
     Runge-Kutta, 20-step macro, 10-step micro in each macro ... how each Python run comes out and starts at zero, and how long in
@@ -996,20 +935,31 @@ def core_sets() -> list:
     return sorted(out, key=lambda x: (x["written"], x["file"]))
 
 
-def three_arms() -> dict:
-    """The newest three-run test of the three ways to run (native, Omni-Compass on native, Omni-Compass direct) on GitHub's own
-    machines (results/orchestrator/*_THREE_ARMS_ABC.json, tools/orchestrator_abc.py, class L): the page's bottom line reads it."""
+ON_NATIVE_PAIR = "Omni on native against native"
+
+
+def on_native_abc() -> dict:
+    """The newest real three-run test on GitHub's own machines of Omni-Compass on native against native, the page's bottom line
+    (results/orchestrator/*_THREE_ARMS_ABC.json, tools/orchestrator_abc.py, class L): native is Kubernetes' published autoscaling
+    rule on the muscles, Omni-Compass on native is Omni-Compass on top of that rule. Only that pair and those two arms are carried:
+    Omni-Compass is never by itself (the founder's order of 25 October), so the file's other arm stays in its file."""
     fs = sorted(ROOT.glob("results/orchestrator/*_THREE_ARMS_ABC.json"), key=lambda f: (int(re.search(r"V(\d+)_", f.name).group(1)) if re.search(r"V(\d+)_", f.name) else 0, f.name))
     if not fs:
         return {}
     d = json.loads(fs[-1].read_text(encoding="utf-8"))
-    return {"file": str(fs[-1].relative_to(ROOT)), **d}
+    return {"file": str(fs[-1].relative_to(ROOT)), "class": d.get("class"), "commit": d.get("commit"), "engine": d.get("engine"),
+            "runs": d.get("runs"),
+            "what": "Omni-Compass on native against native, three runs on GitHub's own machines (A, B and C from one commit), the full "
+                    "form: 18 steps of 25 s, clients 1 2 3 2 3 4 ...; native is Kubernetes' published autoscaling rule on the muscles, "
+                    "written by us, and Omni-Compass sits on top of it.",
+            "rows": [r for r in d.get("rows", []) if r.get("pair") == ON_NATIVE_PAIR],
+            "totals": {k: {a: v.get(a) for a in ("yardstick", "omni_native") if a in v} for k, v in (d.get("totals") or {}).items()}}
 
 
-def scenarios30() -> dict:
-    """The thirty scenarios (results/scenarios/SCENARIOS_30.json, tools/scenarios_30.py, class S): ten organisms, each native, Omni-Compass
-    on native and Omni-Compass direct, every gauge's word and its three runs; the plants each reading flags stay in the record, not here."""
-    f = ROOT / "results" / "scenarios" / "SCENARIOS_30.json"
+def scenarios20() -> dict:
+    """The twenty scenarios (results/scenarios/SCENARIOS_20.json, tools/scenarios_20.py, class S): ten organisms, each native and with
+    Omni-Compass on native, every gauge's word and its three runs; the plants each reading flags stay in the record, not here."""
+    f = ROOT / "results" / "scenarios" / "SCENARIOS_20.json"
     if not f.exists():
         return {}
     d = json.loads(f.read_text(encoding="utf-8"))
@@ -1020,13 +970,12 @@ def scenarios30() -> dict:
                                "runs": {r: (v or {}).get("change") for r, v in (g.get("runs") or {}).items()}} for k, g in p["gauges"].items()}}
     orgs = []
     for o in d.get("organisms", []):
-        x = {k: o.get(k) for k in ("no", "key", "name", "what", "class", "muscles", "direct_pools", "source")}
+        x = {k: o.get(k) for k in ("no", "key", "name", "what", "class", "muscles", "source")}
         r = o.get("readings") or {}
         on = r.get("on_native_vs_native") if isinstance(r, dict) else None
         if isinstance(on, dict) and on.get("state") == "composed":   # the whole organism: its composition, the headline scope only
             wh = (((on.get("composition") or {}).get("scopes") or {}).get("without") or {}).get("carried", {}).get("whole", {})
             x["composed"] = {"index": wh.get("index"), "gauges": wh.get("gauges"), "note": "the whole organism in its three places, composed by tools/whole_system.py"}
-            x["direct"] = r.get("direct_vs_native") or {"state": "not yet run"}
         else:
             x["readings"] = {k: pair(v) for k, v in r.items()}
         orgs.append(x)
@@ -1035,7 +984,7 @@ def scenarios30() -> dict:
 
 def glossary() -> dict:
     """The glossary and index at the back of the page (tools/live_glossary.py, docs/engine/glossary.json): every term in the words of
-    the file it names, the ten organisms, the three arms and their thirty scenarios, every muscle of the catalog, and the index."""
+    the file it names, the ten organisms, the two arms and their twenty scenarios, every muscle of the catalog, and the index."""
     f = ROOT / "docs" / "engine" / "glossary.json"
     return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
 
@@ -1095,7 +1044,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "direct": {} if CHECKING else direct(), "coremc": core_mc(), "threearms": three_arms(), "scenarios": scenarios30(), "glossary": glossary()}
+            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "glossary": glossary()}
 
 
 def embedded(page: str, key: str):
@@ -1250,7 +1199,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial", "coremc", "threearms", "scenarios", "glossary")
+                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "glossary")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1270,7 +1219,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "direct", "coremc", "threearms", "scenarios", "glossary"):
+              "beatsweep", "dial", "coremc", "onnative", "scenarios", "glossary"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand

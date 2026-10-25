@@ -2008,7 +2008,7 @@ profile with its fingerprint (factory, candidate or custom) and its backend, **R
 profile** and **Return to native**. A model's best beat is a candidate for the real runs, never a result; no profile is locked
 as the baseline, and the factory's beat stays 60 s until the eight steps of section 76.8 choose the next. At the page's back
 stand the glossary and index (`tools/live_glossary.py`): every term in the words of the file it names, the ten organisms with
-their thirty scenarios, every one of the 1,107 muscles of the catalog by realm and family, and the sections where each is used.
+their twenty scenarios, every one of the 1,107 muscles of the catalog by realm and family, and the sections where each is used.
 
 ![One decision of the governor. It wakes on its period, reads every sense, and holds if any sense is blind or stale: nothing is given back, and adding capacity is still allowed. The engine blends its state toward the observations and moves one macro step; the compass law turns the reading's position into a force. A positive force adds capacity at once, gated by nothing but the security hold. A negative force must pass the release gate (calm, the line clean for three decisions, nothing pending, every sense live) and, on a slow knob, the verdict's paired trial at the 2% line. What survives is one write through the plug, read back, and one line in the audit that records every sense, the state, the force, the gate's reason and the value sent and taken, whether or not anything was written.](figures/loop.svg)
 
@@ -4529,20 +4529,19 @@ next is opened, so that no result is ever waiting on a harness that was half bui
 ordered by what each benchmark adds to the index that the ones before it did not: a new resource traded (memory after
 machines, a buffer pool after a cache), a new native controller, a new class of evidence.
 
-### 34.7 Ten organisms, three arms: the thirty scenarios
+### 34.7 Ten organisms, two ways: the twenty scenarios
 
 Beside the seven organisms of the catalog the repository reads three more, each a grouping of catalog rows or of real tables
 and none a product (`DISCLOSURES.md`, section 9): **the orchestra**, the muscles that stand for the knobs of the governors and
 orchestrators the founder named (55 muscles, `tools/run_orchestra.py`, the mapping in `tools/governors_page.py`); **the live
 engine's own organism**, the sixty muscles the live engine page draws (`docs/engine/export_harness_trace.py`); and **the whole
 organism** in its three places, the software end, the cloud's wire and the bare metal, composed from the real tables by the
-product law (`tools/whole_system.py`, section 60.6). Each of the ten is read three ways on the same seeds: native (every plant
-under its own native controller), Omni-Compass on native (the max, the factory tune, on top of every native controller) and
-Omni-Compass direct (the same max with every pool whose own count is its knob run with its own autoscaler switched off, in the
-plant and in its twin, `realms/harness.py` SOLO; every other muscle's native is a setting native holds still or the actuator of
-native's own loop, so direct is the same arm as on native there). Ten organisms in three arms are the thirty scenarios, written
-by `python3 tools/scenarios_30.py` into `results/scenarios/SCENARIOS_30.md`, class S, three runs (seeds 3000 to 3002), under the
-climb for the full hour of 240 decisions of 15 s; their readings are in section 60.10.
+product law (`tools/whole_system.py`, section 60.6). Each of the ten is read two ways on the same seeds: native (every plant
+under its own native controller) and Omni-Compass on native (the max, the factory tune, on top of every native controller).
+Omni-Compass is never by itself (the founder's order of 25 October): it always sits on top of a native controller. Ten
+organisms by two ways are the twenty scenarios, written by `python3 tools/scenarios_20.py` into
+`results/scenarios/SCENARIOS_20.md`, class S, three runs (seeds 3000 to 3002), under the climb for the full hour of 240
+decisions of 15 s; their readings are in section 60.10.
 
 
 ## 35. The Spine: the Base Every Stack Runs On
@@ -7970,17 +7969,17 @@ categories, each weighted the same. A measure enters only as its three-run readi
 all three of our runs enters as the geometric mean of the runs' ratios; anything else (EVEN, the runs disagree, a word read by
 the mean of our three runs) enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
 
-### 53.13 The three arms, the thirty scenarios and the whole organism
+### 53.13 The real test, the twenty scenarios and the whole organism
 
-- **The three arms** (`results/orchestrator/V18_THREE_ARMS_ABC.md`): one row per pair and gauge, the pairs Omni-Compass on
-  native against native, Omni-Compass direct against native, and Omni-Compass direct against Omni-Compass on native; each run's
-  own word beside its number, the three-run reading in bold; below, each arm's totals in each run (requests answered, failed,
-  wrong). The bottom line on the README and the live engine page takes the work row's mean of the three runs as its number
-  and turns its light red on any slower service or failed request.
-- **The thirty scenarios** (`results/scenarios/SCENARIOS_30.md`, class S): ten organisms, each native, Omni-Compass on native
-  and Omni-Compass direct. The first table gives native's own gauges and each Omni-Compass arm's word and mean change against
-  its reference; the sections after it give every run's change with its interval and the reading, every arm's own gauges, the
-  realms runner's contrasts, where direct's LOSS lives and why, and every LOSS row by name.
+- **The real test** (`results/orchestrator/V18_THREE_ARMS_ABC.md`): one row per pair and gauge, each run's own word beside its
+  number, the three-run reading in bold; below, each arm's totals in each run (requests answered, failed, wrong). The bottom line
+  on the README and the live engine page reads its pair Omni-Compass on native against native, takes the work row's mean of the
+  three runs as its number and turns its light red on any slower service or failed request. The record's third arm, Omni-Compass
+  alone on the muscles, is not carried there: Omni-Compass is never by itself (the founder's order of 25 October).
+- **The twenty scenarios** (`results/scenarios/SCENARIOS_20.md`, class S): ten organisms, each native and with Omni-Compass on
+  native. The first table gives native's own gauges and Omni-Compass on native's word and mean change against native; the
+  sections after it give every run's change with its interval and the reading, each arm's own gauges, the realms runner's
+  contrasts, and every LOSS row by name.
 - **The whole organism** (`results/WHOLE_SYSTEM.md`): each layer's ratio oriented so that above 1 is a GAIN, composed by the
   product law R(g) = ∏ℓ Rℓ(g); read the scope (with or without the card's old run) and the reading (by the index's rule, or
   every interval carried) before the number. It is a model of measurements, class S of class L and P, and its index is not a
@@ -9198,52 +9197,37 @@ or approved these results.
   In all, 27 score-rows GAIN, 1 power given and no LOSS. The wire's road since then: omni-v9 reads the coming hour, and omni-v10
   glides at 0.0875 an hour (`docs/OMNI_V8.md` to `docs/OMNI_V10.md`); omni-v11 to omni-v19, the engine that stands, carry it unchanged.
 
-### 60.10 The ten organisms in three arms: the thirty scenarios (modelled, class S)
+### 60.10 The ten organisms two ways: the twenty scenarios (modelled, class S)
 
-The ten organisms of section 34.7, each native, Omni-Compass on native and Omni-Compass direct, on engine omni-v19, three runs
-(seeds 3000, 3001 and 3002, the same seed in every arm), under the climb for 240 decisions of 15 s, the brain going silent at
-80% of every run and the lease walking every setting back to native (`results/scenarios/SCENARIOS_30.md`, every run's every
-gauge in `results/scenarios/SCENARIOS_30.json`; `python3 tools/scenarios_30.py`). Evidence class S: a model's energy is not a
-meter's, and a plant written by the people who wrote the law is not an independent test. Each pair is read gauge by gauge as
-the live engine's harness record reads it, the change per decision averaged over blocks of ten decisions with its 95% interval
-over the 24 blocks, by the key. The gauges: work (the work index, 1.0 the reference's own work; a rise is GAIN), muscles over
-the line (counted each decision; a fall is GAIN; the change is a share of the reference's own count), power (the organism's
-electrical draw; a fall is a cut, a rise power given). The record's table, every row (native's own gauges, the mean of runs A,
-B and C, then each Omni-Compass arm against its reference, the word and the mean of the three runs' changes):
+The ten organisms of section 34.7, each native and with Omni-Compass on native, on engine omni-v19, three runs (seeds 3000,
+3001 and 3002, the same seed in both arms), under the climb for 240 decisions of 15 s, the brain going silent at 80% of every
+run and the lease walking every setting back to native (`results/scenarios/SCENARIOS_20.md`, every run's every gauge in
+`results/scenarios/SCENARIOS_20.json`; `python3 tools/scenarios_20.py`). Evidence class S: a model's energy is not a meter's,
+and a plant written by the people who wrote the law is not an independent test. Each organism is read gauge by gauge as the
+live engine's harness record reads it, the change per decision averaged over blocks of ten decisions with its 95% interval over
+the 24 blocks, by the key. The gauges: work (the work index, 1.0 native's own work; a rise is GAIN), muscles over the line
+(counted each decision; a fall is GAIN; the change is a share of native's own count), power (the organism's electrical draw; a
+fall is a cut, a rise power given). The record's table, every row (native's own gauges, the mean of runs A, B and C, then
+Omni-Compass on native against native, the word and the mean of the three runs' changes):
 
-| # | Organism | Muscles | Native (Omni-Compass off) | Omni-Compass on native, against native | Omni-Compass direct, against native | Omni-Compass direct, against on native |
-|---:|---|---:|---|---|---|---|
-| 1 | The spine | 267 | work index 1.000; 21.38 muscles over the line a decision (8.01% of muscle-decisions); 3,418.4 kW (13,262.9 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +8.36% · power **EVEN** =0.49% | work **LOSS** −4.08% · muscles over the line **LOSS** −184.57% · power **GAIN** +2.33% | work **LOSS** −4.08% · muscles over the line **LOSS** −210.50% · power **GAIN** +1.85% |
-| 2 | Compute / AI / Cloud | 540 | work index 1.000; 29.80 muscles over the line a decision (5.52% of muscle-decisions); 3,890.7 kW (14,962.9 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +7.41% · power **GAIN** +0.59% | work **LOSS** −4.62% · muscles over the line **LOSS** −267.22% · power **GAIN** +3.79% | work **LOSS** −4.63% · muscles over the line **LOSS** −296.60% · power **GAIN** +3.22% |
-| 3 | Physics / Robotics / Autonomous | 404 | work index 1.000; 38.22 muscles over the line a decision (9.46% of muscle-decisions); 4,811.8 kW (19,023.4 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +3.89% · power **EVEN** =0.26% | work **LOSS** −5.03% · muscles over the line **LOSS** −137.65% · power **GAIN** +2.84% | work **LOSS** −5.03% · muscles over the line **LOSS** −147.25% · power **GAIN** +2.58% |
-| 4 | Energy / Facility / Industrial | 480 | work index 1.000; 39.22 muscles over the line a decision (8.17% of muscle-decisions); 2,953,821.5 kW (10,659,898.0 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +3.02% · power **EVEN** =0.00% | work **LOSS** −3.01% · muscles over the line **LOSS** −107.55% · power **EVEN** =0.00% | work **LOSS** −3.01% · muscles over the line **LOSS** −114.00% · power **EVEN** =0.00% |
-| 5 | Distribution / Specialized | 484 | work index 1.000; 29.72 muscles over the line a decision (6.14% of muscle-decisions); 15,072.9 kW (55,218.8 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +7.22% · power **EVEN** =0.17% | work **LOSS** −5.75% · muscles over the line **LOSS** −260.47% · power **GAIN** +2.56% | work **LOSS** −5.75% · muscles over the line **LOSS** −288.52% · power **GAIN** +2.40% |
-| 6 | The four stacked | 1,908 | work index 1.000; 136.97 muscles over the line a decision (7.18% of muscle-decisions); 2,977,596.8 kW (10,749,103.1 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +5.13% · power **EVEN** =0.00% | work **LOSS** −4.59% · muscles over the line **LOSS** −183.66% · power **EVEN** =0.02% | work **LOSS** −4.59% · muscles over the line **LOSS** −198.99% · power **EVEN** =0.02% |
-| 7 | The whole tower | 1,107 | work index 1.000; 75.27 muscles over the line a decision (6.80% of muscle-decisions); 2,967,368.7 kW (10,709,412.1 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +1.58% · power **EVEN** =0.00% | work **LOSS** −4.57% · muscles over the line **LOSS** −174.30% · power **EVEN** =0.02% | work **LOSS** −4.57% · muscles over the line **LOSS** −178.69% · power **EVEN** =0.02% |
-| 8 | The orchestra | 55 | work index 1.000; 1.72 muscles over the line a decision (3.13% of muscle-decisions); 91.5 kW (329.4 MJ) | work **EVEN** =0.19% · muscles over the line **GAIN** +63.34% · power **power given** +52.38% | work **EVEN** =0.19% · muscles over the line **GAIN** +69.25% · power **power given** +72.39% | work **EVEN** =0.00% · muscles over the line **GAIN** +16.53% · power **power given** +13.13% |
-| 9 | The live engine's organism | 60 | work index 1.000; 3.73 muscles over the line a decision (6.21% of muscle-decisions); 408,580.7 kW (1,471,946.9 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +5.61% · power **EVEN** =0.00% | work **LOSS** −4.47% · muscles over the line **LOSS** −186.47% · power **EVEN** =0.00% | work **LOSS** −4.47% · muscles over the line **LOSS** −203.52% · power **EVEN** =0.00% |
-| 10 | The whole organism, three sectors | layers | the reference of every factor | work **GAIN** +24.6% · speed **GAIN** +45.3% · machines **GAIN** +5.7% · energy **GAIN** +3.1% · bill **EVEN** =0.0%; the index **GAIN** +14.5% (+13.3% to +15.8%, the gauges perfectly correlated) (the composition, by the index's rule, without the card) | not yet run | not yet run |
+| # | Organism | Muscles | Native (Omni-Compass off) | Omni-Compass on native, against native |
+|---:|---|---:|---|---|
+| 1 | The spine | 267 | work index 1.000; 21.38 muscles over the line a decision (8.01% of muscle-decisions); 3,418.4 kW (13,262.9 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +8.36% · power **EVEN** =0.49% |
+| 2 | Compute / AI / Cloud | 540 | work index 1.000; 29.80 muscles over the line a decision (5.52% of muscle-decisions); 3,890.7 kW (14,962.9 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +7.41% · power **GAIN** +0.59% |
+| 3 | Physics / Robotics / Autonomous | 404 | work index 1.000; 38.22 muscles over the line a decision (9.46% of muscle-decisions); 4,811.8 kW (19,023.4 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +3.89% · power **EVEN** =0.26% |
+| 4 | Energy / Facility / Industrial | 480 | work index 1.000; 39.22 muscles over the line a decision (8.17% of muscle-decisions); 2,953,821.5 kW (10,659,898.0 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +3.02% · power **EVEN** =0.00% |
+| 5 | Distribution / Specialized | 484 | work index 1.000; 29.72 muscles over the line a decision (6.14% of muscle-decisions); 15,072.9 kW (55,218.8 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +7.22% · power **EVEN** =0.17% |
+| 6 | The four stacked | 1,908 | work index 1.000; 136.97 muscles over the line a decision (7.18% of muscle-decisions); 2,977,596.8 kW (10,749,103.1 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +5.13% · power **EVEN** =0.00% |
+| 7 | The whole tower | 1,107 | work index 1.000; 75.27 muscles over the line a decision (6.80% of muscle-decisions); 2,967,368.7 kW (10,709,412.1 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +1.58% · power **EVEN** =0.00% |
+| 8 | The orchestra | 55 | work index 1.000; 1.72 muscles over the line a decision (3.13% of muscle-decisions); 91.5 kW (329.4 MJ) | work **EVEN** =0.19% · muscles over the line **GAIN** +63.34% · power **power given** +52.38% |
+| 9 | The live engine's organism | 60 | work index 1.000; 3.73 muscles over the line a decision (6.21% of muscle-decisions); 408,580.7 kW (1,471,946.9 MJ) | work **EVEN** =0.00% · muscles over the line **GAIN** +5.61% · power **EVEN** =0.00% |
+| 10 | The whole organism, three sectors | layers | the reference of every factor | work **GAIN** +24.6% · speed **GAIN** +45.3% · machines **GAIN** +5.7% · energy **GAIN** +3.1% · bill **EVEN** =0.0%; the index **GAIN** +14.5% (+13.3% to +15.8%, the gauges perfectly correlated) (the composition, by the index's rule, without the card) |
 
-The table's words carry their three-run readings in the record's per-gauge sections: every GAIN, LOSS and power given above
-holds in all three of our runs except three, read by the mean of our three runs (Omni-Compass direct against native, the
-power of Distribution / Specialized, beyond the noise in 1 of 3; Omni-Compass direct against Omni-Compass on native, the same
-power, 0 of 3, and the orchestra's muscles over the line, 0 of 3); every EVEN is under the floor or the same.
-
-**Every LOSS row, and its cause.** Thirty-two rows read LOSS, all of Omni-Compass direct and all in all three of our runs:
-work and muscles over the line, against native and against Omni-Compass on native, in the spine, the four realms, the four
-stacked, the whole tower and the live engine's organism. (Until 24 October the live engine's organism read direct EVEN, the
-same, against native: its harness exporter had lost the direct arm and computed native in its place; with the arm back, direct
-reads there work 4.1% to 5.1% under native and about three times native's muscle-decisions over the line, in all three runs.) The record finds the cause in the runs: in every organism where direct reads LOSS
-on work, every plant flagged in every run is a pool whose own autoscaler direct switches off; direct's machines in those pools
-peaked at most 6.4% above their first count in any run, while native's own autoscalers took them to 4.9 to 5.9 times their
-first count at the climb's top. The code, read: under direct a pool's count holds where it stands unless the max sets a floor
-or a ceiling (`realms/plants.py`, `ComputePool.step`, `native_off`); inside an organism the max adds machines only out of the
-room the bone finds, never below the pool's twin (`realms/compass_arm_v5.py`, `max_body_step`, `Bone`); and under direct the
-twin, the brain's model of native, has its own autoscaler switched off too (`realms/harness.py`, `run_bodies`, `SOLO`), so the
-floor under the max is a frozen count, not what native's autoscaler would run. That is the engine's, on the next version's
-list, through the model gate. In the orchestra direct's peak reached 6.6 to 7.5 times its first count (native's 4.5 to 5.4), and
-there direct reads its muscles over the line GAIN (+69.25%) for power given (+72.39%). Omni-Compass direct has not run in any
-layer of the whole organism; its cells read "not yet run". Run and scored by The Omni-Compass LLC's own code. No outside party
+Every GAIN and power given above holds in all three of our runs; every EVEN is under the floor or the same. **No row reads
+LOSS.** The record of 24 October also carried a third way, Omni-Compass by itself (each pool's own autoscaler switched off,
+`realms/harness.py` SOLO), which read LOSS in all three of our runs on work and on muscles over the line in eight organisms,
+32 rows; the founder's order of 25 October took that way out, and its record, with every one of those rows and their cause, is
+kept whole in `docs/history/SCENARIOS_30_2026-10-24.md`. Run and scored by The Omni-Compass LLC's own code. No outside party
 has reviewed or approved these results.
 
 ### 60.11 The one number, and the table
@@ -18298,7 +18282,7 @@ against 861-889 MHz on its own. Corrected (amendments 6 and 7); the corrected go
 | Candidate, active and custom profile | a proposed combination under evaluation; the settings actually governing the current run; an identifiable configuration that differs from the released factory profile (section 76.8) |
 | The best validated factory profile for the declared operating conditions | the profile the eight steps of section 76.8 establish; the meaning "optimal" has here, and the only one |
 | Restore factory profile; Return to native | the two restoring controls: reapply the released configuration; hand governance back and restore the recorded native settings (the reset) |
-| The ten organisms; the thirty scenarios | the seven of the catalog, the orchestra, the live engine's organism and the whole organism, each read native, on native and direct (sections 34.7 and 60.10) |
+| The ten organisms; the twenty scenarios | the seven of the catalog, the orchestra, the live engine's organism and the whole organism, each read native and on native (sections 34.7 and 60.10) |
 | The cloud is a wire | a cloud is the wire between the software end and the bare metal; Omni-Compass can live in all three places (section 60.6) |
 | Beyond the noise | a run whose 95% interval excludes zero; a three-run reading carries the count of its runs beyond the noise (Chapter 59) |
 | Off the clock | a repetition in which either arm ended more than 5% of its window late; marked, the pairing stands |
