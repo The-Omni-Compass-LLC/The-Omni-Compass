@@ -128,6 +128,34 @@ def joined(parts):
     return c
 
 
+LADDER = (1, 10, 100, 500)   # the ladder (the founder's order of 25 October): copies and runs alike
+
+
+def cut_plants(key, scale, cat, stack_mode, m):
+    """The plants of the stack's first m copies, in the run's plant order: every body lists its rows copy by copy (rows_for:
+    copy 0's muscles, then copy 1's, ...), and the bodies one after another, so the first m copies of a body are its first
+    m times its muscles. The stack of 500 copies cut down to its first 100, 10 or 1 is the first part of the same stack."""
+    bases = ([len(rows_for(r, 1, cat)) for r in REALMS] if organism_name(key) == STACK and stack_mode == "realms"
+             else [len(rows_for(key, 1, cat))])
+    idx, off = [], 0
+    for nb in bases:
+        idx += list(range(off, off + nb * m))
+        off += nb * scale
+    return idx
+
+
+def cuts_of(key, scale, cat, stack_mode, om, nat):
+    """The run read at the first 1, 10 and 100 copies of its stack (each rung under the run's own size): the same run, cut."""
+    out = {}
+    for m in LADDER:
+        if m >= scale:
+            continue
+        idx = cut_plants(key, scale, cat, stack_mode, m)
+        part = lambda r: {"plants": [r["plants"][i] for i in idx]}
+        out[str(m)] = contrast(sums_of(part(om), part(nat)), om["restore_ok"])
+    return out
+
+
 def job(args):
     key, scale, seed, arm, cat, stack_mode, load = args
     t = time.time()
@@ -143,6 +171,8 @@ def job(args):
     wear = [a["wear"] / n["wear"] - 1.0 for a, n in zip(om["plants"], nat["plants"]) if n.get("wear", 0) > 0]
     c["wear"] = sum(wear) / len(wear) if wear else 0.0
     c["sums"] = sums_of(om, nat)
+    if scale > 1:                                              # the stack cut down: its first 1, 10 and 100 copies, the same run
+        c["cuts"] = cuts_of(key, scale, cat, stack_mode, om, nat)
     c["wall_s"] = round(time.time() - t, 1)                    # the run's own time and the worker's peak memory, for planning
     c["rss_gb"] = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6, 2)
     return key, seed, c
@@ -257,6 +287,20 @@ def main(argv=None):
         summary[k]["band_first"] = band
         L.append(f"| {num} | {nm} | {sum(len(rows_for(r, a.scale, cat)) for r in REALMS) if organism_name(k) == STACK else len(rows_for(k, a.scale, cat))} | **{lab}** | {band} | {f('work')} | "
                  f"{f('viol_pp', 1.0, '')} | {f('energy')} | {f('primary')} | {all(c['restore_ok'] for c in per)} |")
+    cut_rows = []
+    for num, (k, nm) in ORGS.items():
+        per = [res[k][s] for s in sorted(res.get(k, {}))]
+        rungs = sorted({m for c in per for m in c.get("cuts", {})}, key=int)
+        for m in rungs:
+            sm = summarize([c["cuts"][m] for c in per if m in c.get("cuts", {})])
+            summary.setdefault(k, {}).setdefault("cuts", {})[m] = {q: list(v) for q, v in sm.items()}
+            f = lambda q, s=100.0, u="%": f"{s * sm[q][0]:+.3f}{u} ({s * sm[q][1]:+.3f} to {s * sm[q][2]:+.3f})"
+            cut_rows.append(f"| {num} | {nm} | the first {m} of {a.scale} | {f('work')} | {f('viol_pp', 1.0, '')} | {f('energy')} | {f('primary')} |")
+    if cut_rows:
+        L += ["", f"## The stack cut down: the same {a.scale}-copy runs read at their first 1, 10 and 100 copies", "",
+              "The stack of copies is one organism; the first m copies of it are read from the same run, plant for plant, so a "
+              "rung holds those copies and no others (the founder's order of 25 October).", "",
+              "| # | Organism | Copies | Work | Misses (pp) | Power given | Work per energy |", "|---|---|---|---:|---:|---:|---:|", *cut_rows]
     (out / "SCALE.md").write_text("\n".join(_legal_stamp(L)) + "\n")
     save(not stopped)
     print("\n".join(L))

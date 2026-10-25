@@ -798,7 +798,7 @@ Every stage from the GitHub Actions run to this page: the run, the raw files arc
 - **Moves.** The stage being read lights in turn and the data moves between the stages.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Gauge: which gauge of the run is shown; Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 31: The official run's heartbeat
 
@@ -810,7 +810,7 @@ The official run's heartbeat: native's own 15 s clock above, every beat of the g
 - **Moves.** The chosen repetition replayed decision by decision; native's own 15 s clock beats above.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 32: The heartbeat sweep: every beat the governor can run at
 
@@ -822,7 +822,7 @@ The governor's beat as a knob: what a decision every 5 to 120 s does against nat
 - **Moves.** A cursor reads the beats in turn and names the row it holds; every button redraws the chart from the record.
 - **Knobs.** Beat: the governor's full read of the state and its decision: at the bench's six stops, 10, 15, 30, 60, 90 or 120 s (the heartbeat sweep's record holds 5, 20 and 75 s too, read in its file); on a real governor its --interval (60 s at the factory since omni-v17, 15 s on omni-v16); Scenario: on-site bare metal, through the cloud, in the device, as a service; Engine: which engine's record the monitor reads: the engine that stands or the one before it; Against: what each reading is set against: native, or the same engine at another setting; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 33: The official run: response time candles
 
@@ -834,7 +834,7 @@ The response time of the chosen run as candles, one a half minute, native above 
 - **Moves.** The chosen run replayed half minute by half minute.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 34: The official run: the heat map
 
@@ -846,7 +846,7 @@ The responses of each half minute counted in eight response-time buckets, native
 - **Moves.** The chosen run replayed half minute by half minute.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 35: The official run: paired bars
 
@@ -858,7 +858,7 @@ The requests answered each half minute, native and Omni-Compass side by side, th
 - **Moves.** The chosen run replayed half minute by half minute.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 36: The official run: the repetitions
 
@@ -870,7 +870,7 @@ Each repetition's reading in the chosen gauge with its interval.
 - **Moves.** Each repetition's reading filled in as the run replays.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Gauge: which gauge of the run is shown; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ## 4d Kubernetes: per-repetition run telemetry
 
@@ -902,7 +902,7 @@ One repetition half minute by half minute from its archived capture: the 95th pe
 - **Moves.** The archived capture replayed half minute by half minute; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Repetition: which repetition of the run is replayed; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ## 4e Kubernetes and cloud: the shipped controller's decision trace
 
@@ -940,7 +940,7 @@ The controller every Kubernetes and cloud set runs, replayed decision by decisio
 - **Moves.** The shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 39: The shipped controller's trace: Omni-Compass
 
@@ -952,7 +952,7 @@ The same, Omni-Compass's cluster: every write, every trial, every hold.
 - **Moves.** The shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ### Monitor 40: The shipped controller's trace: the strip
 
@@ -964,7 +964,7 @@ The shipped controller's machines (in service, booting and parked) and the respo
 - **Moves.** The shipped controller's record played decision by decision on the live engine's clock; a ring opens at each head with its newest value.
 - **Knobs.** Run: A, B or C (or the archived run) the monitor plays; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** A Kubernetes run played back from its own archived files, or the shipped controller replayed decision by decision from its own audit: the machines, the replicas, the response line, native beside Omni-Compass.
-- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v18; an older engine's run is its own record.
+- **What to do with it.** Pick the run (A, B or C) and the gauge; read the paired difference in each repetition before the table's word. A run of the engine that stands carries omni-v19; an older engine's run is its own record.
 
 ## 4f Hardware: the GPU card and the CPU host
 
@@ -1018,7 +1018,7 @@ The NVIDIA A100 run of 24 October on Lambda (omni-v18's card governor) replayed 
 - **Moves.** The card's own meter replayed at ten times the run's seconds.
 - **Knobs.** Repetition: which repetition of the run is replayed; Arm: which arm stands on the right: Omni-Compass governing, or watching only; Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.
-- **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v18 run lands.
+- **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v19 run lands.
 
 ### Monitor 42: The CPU host, metered: awaiting its machine
 
@@ -1042,7 +1042,7 @@ Eight card slots for scripts/gpu_8card.sh: each native lane the repository's one
 - **Moves.** The one-card model's native lanes replayed second by second; the Omni-Compass lanes wait for the 8-card run.
 - **Knobs.** Speed: 1×, 4×, 16× or 60× of the engine's clock; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.
-- **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v18 run lands.
+- **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v19 run lands.
 
 ### Monitor 44: The chip and the host, modelled
 
@@ -1054,7 +1054,7 @@ The repository's own models of one GPU card and one Linux host, native beside Om
 - **Moves.** The chip's and the host's models replayed second by second; a ring opens at each head with its newest value.
 - **Knobs.** Stack: the GPU card, the Linux host, Kubernetes or the cloud; Run: A, B or C (or the archived run) the monitor plays; Kill switch: Omni-Compass ON (green) or engaged (red): every setting handed back to native at once; every Omni-Compass side follows native (white); Native under Omni-Compass: On: Omni-Compass on top of native, every native controller running underneath (the main engine's arm). Off: every native controller on the Omni-Compass side switched off, Omni-Compass alone on the muscles (Omni direct). In the live model it runs Omni direct's own rule (omni_orchestrator/brain.py); a recorded run shows its Omni direct arm where one was run (section 2a) and says where none was..
 - **How to read it.** The card's own meter, second by second: its draw, the power limit Omni-Compass wrote (dashed), its clock, the 95th percentile against the response line, its temperature; every write of the governor a red tick.
-- **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v18 run lands.
+- **What to do with it.** Power on a card is a resource: a fall is a cut, a rise power given; the response time is the judge. The one real run on the page is the replaced controller's record and is shown as such until its omni-v19 run lands.
 
 ## Part 5 of the page: Control architecture: the brain
 

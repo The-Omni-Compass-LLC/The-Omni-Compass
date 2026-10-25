@@ -605,7 +605,7 @@ ENGINE_FILE = f"OMNI_V{ENGINE.rsplit('v', 1)[1]}.json"   # the standing engine's
 
 def on_engine(sha, seen):
     """True when the commit carries the standing engine's fingerprint file, so a run counts in this campaign only where it ran
-    the engine that stands (24 October: omni-v18's campaign opened at 21:19 UTC on 23 October, the engine reached main at 02:51
+    the standing engine (a fault found on 24 October: omni-v18's campaign opened at 21:19 UTC on 23 October, it reached main at 02:51
     UTC on 24 October, and the runs started between counted as omni-v18's while they ran omni-v17's commits; the tables they
     made held two engines)."""
     return carries(sha, ENGINE_FILE, seen)

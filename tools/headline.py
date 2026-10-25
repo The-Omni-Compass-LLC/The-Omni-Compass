@@ -120,7 +120,10 @@ def markdown(m) -> str:
     img = lambda lv: f'<img src="{SIGNAL[lv][1]}" alt="{SIGNAL[lv][2]}" height="14">'
     L = [BEGIN, "", "## The answer first: is Omni-Compass a benefit against native?", ""]
     yes = all(s["signal"] == "ok" for s in m["scen"])
-    L.append(f"**{'Yes' if yes else 'Not in every way'}, on the engine that stands ({eng}), measured on real machines (class L), "
+    stands = "omni-v" + re.search(r'VERSIONS = \{"v(\d+)"', (ROOT / "tools" / "omni_version.py").read_text()).group(1)
+    where = (f"on the engine that stands ({eng})" if eng.startswith(stands + " ") or eng == stands else
+             f"on {eng.split(' (')[0]}, the newest engine with its three runs in (the engine that stands, {stands}, runs them again)")
+    L.append(f"**{'Yes' if yes else 'Not in every way'}, {where}, measured on real machines (class L), "
              f"three runs (A, B and C).** Omni-Compass on top of native did {100 * m['scen'][0]['work']:.1f}% more work than native "
              f"and answered {100 * abs(m['scen'][0]['p95']):.1f}% faster at the 95th percentile; Omni-Compass direct did "
              f"{100 * m['scen'][1]['work']:.1f}% more work and answered {100 * abs(m['scen'][1]['p95']):.1f}% faster.")

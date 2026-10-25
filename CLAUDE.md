@@ -283,7 +283,8 @@ the founder overrides one in the conversation.
   both values shown in every square. **The ladder is 1, 10, 100 and 500, for copies and for runs alike, everywhere** (the
   founder's order of 25 October: "it gotta be 1, 10, 100, and the last one has to be 500, and the organism has to be 500 as
   well, to be in line with the Python": the Python's Monte Carlo is 500 runs, `tools/engine_runs.py`, read at its first 1, 10,
-  100 and 500 in the Python, the C++ harness and the live engine alike; `scripts/dispatch_grid.py`): on GitHub's own machines the
+  100 and 500 in the Python, the C++ harness and the live engine alike; one set and one stack cut down, never separate sets,
+  `docs/THE_LADDER.md`; `scripts/dispatch_grid.py`): on GitHub's own machines the
   seven organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and 500 copies and nested 1, 10,
   100 and 500 runs on free runners (the 1,000 tier of 15 October is retired), and a cell beyond a free runner's memory or time is
   listed as pending runner capacity, never rented; **paid cloud and GPU runs stay at 1, 10 and 100 copies with at most
@@ -694,7 +695,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v18` since 23 October, night), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v19` from 25 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its

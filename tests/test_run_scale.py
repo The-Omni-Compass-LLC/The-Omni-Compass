@@ -57,6 +57,26 @@ def _run(work, viol_omni):
     return c
 
 
+class TheStackCutDown(unittest.TestCase):
+    """The ladder of copies (the founder's order of 25 October): the stack of 500 copies cut down to its first 100, 10 and 1 is
+    the first part of the same stack, copy for copy, and a run's cut reads exactly those copies' plants."""
+
+    def test_every_size_is_the_first_part_of_the_500_stack(self):
+        for key in ("spine", "compute_ai_cloud"):
+            stack = run_scale.rows_for(key, 500)
+            n = len(run_scale.rows_for(key, 1))
+            for m in (1, 10, 100):
+                with self.subTest(organism=key, copies=m):
+                    self.assertEqual(run_scale.rows_for(key, m), stack[:n * m])   # the same copies, the same muscles, in order
+
+    def test_a_cut_reads_the_first_copies_of_every_body(self):
+        n = [len(run_scale.rows_for(r, 1)) for r in REALMS]
+        idx = run_scale.cut_plants(STACK, 10, None, "realms", 2)
+        offs = [sum(x * 10 for x in n[:i]) for i in range(len(n))]
+        self.assertEqual(idx, [o + j for o, nb in zip(offs, n) for j in range(nb * 2)])   # each realm's own first 2 copies
+        self.assertEqual(run_scale.cut_plants("spine", 500, None, "body", 100), list(range(len(run_scale.rows_for("spine", 1)) * 100)))
+
+
 class PoolScale(unittest.TestCase):
     def test_joined_stack_and_short_block(self):
         with tempfile.TemporaryDirectory() as t:
