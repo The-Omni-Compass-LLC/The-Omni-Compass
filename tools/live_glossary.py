@@ -888,7 +888,10 @@ TERMS = [
       "band with room to climb; yellow STEADY, inside its band; red REDLINING, at the top of its band and holding there, blinking red "
       "and black; red OVER THE LINE, past its band, blinking red and white; grey, and said so, where there is no line. On a record "
       "the colour is the reading's word: GAIN green, STEADY yellow, LOSS red. A needle that falls is not a LOSS and one that rises is "
-      "not a GAIN: each light reads what its gauge is for. The light moves with its monitor: it reads the series the monitor draws.",
+      "not a GAIN: each light reads what its gauge is for. The light moves with its monitor: it reads the series the monitor draws. "
+      "Every signal shows all four live words, the lit one bright and the rest dim, on native's side and on Omni-Compass's side "
+      "alike: Omni-Compass's redline reflex is built never to let a muscle redline, and the red is still wired, so that if one does "
+      "(a fault, a bug) it is seen at once, and the kill switch hands everything back to native in the same instant.",
       [(PAGE_F, "GAINING: low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN)"),
        (PAGE_F, "STEADY: inside its band, or level with native (STEADY, a change under 0.5%)"),
        (MAN, "| Yellow | STEADY |")], aka=["traffic signal", "traffic light", "light", "lights"]),

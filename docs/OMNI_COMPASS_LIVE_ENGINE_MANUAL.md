@@ -53,6 +53,22 @@ run on. It does not make a system immune to failure, delay or drift: it keeps ea
 by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
 differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
 
+## What This Is: a Benchmark Engine
+
+The Omni-Compass Live Benchmark Engine is a benchmark, analysis and audit engine. It runs Omni-Compass on top of native across the
+organisms, clusters, software, chips, clouds and muscles of the technical world, and shows every benchmark: native against
+Omni-Compass on top of native, on the same work. **Native** is the stack as it runs today, by itself: its fragmented organisms of
+muscles (processors, memory, machines, pods, caches, queues, power) run by Kubernetes and the open-source orchestrators,
+schedulers, autoscalers, governors and managers the industry runs them with. **Omni-Compass** is the supervisory governor placed on
+top of that native stack; it never replaces it. Every number on the page traces to its run's own files and the code that scored
+it, so anyone can rerun and audit it: real, open-source software on real machines (class L), a physical meter (class P), or our
+own models, marked as such (class S).
+
+Only what could be run and proven was benchmarked. Where a system could not be seen, run or measured, it is not shown, and nothing
+is claimed for it. The rest of the story is written when others benchmark Omni-Compass, critique it and analyse it on their own
+systems; that work needs to be done and will be, and its results are theirs to publish. No outside party has reviewed or approved
+the results in this manual or on the page.
+
 <!-- the key: GAIN, STEADY and LOSS (tools/readings.py) -->
 ## The key: GAIN, STEADY and LOSS
 
@@ -649,14 +665,32 @@ difference of one is a change. Two values that print the same are never told apa
 
 Every monitor, every section heading and part title whose section holds a monitor, every breaker of the main control panel, the
 wall's tiles, the bottom line's rows, the twenty scenarios' cells and the dock carry a signal and its word (the founder's order
-of 24 October):
+of 24 October, read on the band by the founder's words of 25 October):
 
 | Signal | Shape | Word | What it means on the page |
 |---|---|---|---|
 | green | round | GAINING | low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN) |
-| yellow | a yield diamond | STEADY | no difference beyond the noise (STEADY, inside 0.5%), or heading for its line and watched before it gets there |
-| red | an octagon, a stop sign, blinking | REDLINING | over its line, or Omni-Compass behind native now (a LOSS): the alarm |
+| yellow | a yield diamond | STEADY | inside its band, or level with native (a change under 0.5%) |
+| red | an octagon, a stop sign, blinking red and black | REDLINING | at the top of its band and holding there, or Omni-Compass behind native now (a LOSS) |
+| red | an octagon, blinking red and white | OVER THE LINE | past the top of its band: the alarm |
 | dark | no lamp lit | AWAITING | the run that fills this monitor has not landed yet; its light stays dark until it does, never green |
+
+These four live words belong to the moving monitors. A result fixed after the fact, in a table, reads GAIN, STEADY or LOSS (with
+power given for a resource spent that rose): GAINING and GAIN go together, STEADY and STEADY, REDLINING and LOSS.
+
+Every signal shows all four live words at once, the lit one bright and the rest dim, on native's side and on Omni-Compass's side
+alike; a monitor that draws both sides carries a full signal for each, with the result now against native (GAIN, STEADY, LOSS)
+beside them. Omni-Compass's redline reflex is built never to let a muscle redline: at the top of a muscle's band it pushes at once,
+before the line; where it cannot move the muscle and native's own twin carries it better, it hands the muscle back to native; where
+native is no better it stays, because redlining less than native is still a benefit against native. The red is still wired on its
+side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill switch's purpose: when something
+redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the same instant.
+
+Each light reads what its gauge is for, never the direction of its needle: a wait that falls is GAINING, work that falls is not.
+
+The number of every monitor carries the colour key: Omni-Compass blue behind the number of a monitor that shows Omni-Compass on top
+of native, native orange behind one that shows native alone, both (orange first) behind one that shows the two side by side, with
+black type. The key is fixed: no switch recolours it.
 
 The signal stands as a traffic signal does, red on top, yellow in the middle, green at the bottom, one lamp lit. Red appears only
 in a stop sign's shape: a red light is an octagon, a red word (REDLINING, LOSS) is a stop sign's shape printed white on red, and
