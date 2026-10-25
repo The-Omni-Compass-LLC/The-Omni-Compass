@@ -18,7 +18,7 @@ the knob elsewhere is read on a world that did not answer it. It says what each 
 a store would then have done.
 
 Gauges, each arm one pair (the standing wire against the candidate on the same seconds), read by the gauge's aim
-(tools/readings.py through tools/toy_gate.reading: a change under 0.5% is EVEN; from 0.5% a resource spent that fell is a
+(tools/readings.py through tools/toy_gate.reading: a change under 0.5% is STEADY; from 0.5% a resource spent that fell is a
 cut, a GAIN, and one that rose is power given; time waited or missed that rose is a LOSS):
   setting, mean            the knob held (pool size, consumers, cache MB): a resource
   writes                   the knob's moves (a resize, a rebalance, a server closed and opened): wear, a resource
@@ -302,7 +302,7 @@ def fmt_word(r):
     if r.get("word") in (None, "shown"):
         return "shown"
     rel, w = r.get("relative"), r["word"]
-    noise = "" if r.get("beyond_noise") or w.startswith("EVEN") else ", inside the arms' noise"
+    noise = "" if r.get("beyond_noise") or w.startswith("STEADY") else ", inside the arms' noise"
     if rel is not None and rel == rel:
         return f"{by_word(100 * rel, w)} {w}{noise}"
     return f"{by_word(r['mean_change'], w, unit=' a arm', digits=2)} {w}{noise} (the standing wire's mean is 0)"
@@ -311,7 +311,7 @@ def fmt_word(r):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base", default=BASE, help="the standing runners' git revision")
-    ap.add_argument("--raw", default=str(LIVE / "raw"), help="the archived runs' folder (scripts/raw_archive.sh open places them here)")
+    ap.add_argument("--raw", dest="raw_dir", default=str(LIVE / "raw"), help="the archived runs' folder (scripts/raw_archive.sh open places them here)")
     ap.add_argument("--engine", default="V16", help="the three-run tables whose runs are replayed")
     ap.add_argument("--out", default=str(OUT))
     a = ap.parse_args(argv)
@@ -321,7 +321,7 @@ def main(argv=None):
         all_pairs, per_wl, matches, unread = [], {}, [], []
         for wl in wls:
             pairs = []
-            for tag, rep, rows in audits(a.raw, a.engine, table, prefix, wl):
+            for tag, rep, rows in audits(a.raw_dir, a.engine, table, prefix, wl):
                 b = gauges_of(replay(base_mod, rows, native), native, key, rows); c = gauges_of(replay(cand_mod, rows, native), native)
                 matches.append(b["matches_record"])
                 if b["matches_record"] < MATCH_MIN:
@@ -334,8 +334,8 @@ def main(argv=None):
         if all_pairs:
             report["wires"][wire] = {"arms": len(all_pairs), "runs": run_ids(a.engine, table), "unread": unread, "standing_replay_matches_record": sum(matches) / len(matches),
                                      "standing_replay_matches_record_min": min(matches), "reading": read_pairs(wire, all_pairs), "workloads": per_wl}
-    report["sysbench"] = sysbench_counters(a.raw, a.engine)
-    report["redis"] = redis_identity(a.raw, a.engine, load_wire("run_redis", a.base), load_wire("run_redis"))
+    report["sysbench"] = sysbench_counters(a.raw_dir, a.engine)
+    report["redis"] = redis_identity(a.raw_dir, a.engine, load_wire("run_redis", a.base), load_wire("run_redis"))
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     (out / "STORE_GATE.json").write_text(json.dumps(report, indent=1) + "\n")
     (out / "STORE_GATE.md").write_text("\n".join(render(report)) + "\n")

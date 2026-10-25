@@ -6,7 +6,7 @@ The founder's words of 24 October: "if somebody wanted to theoretically hook up 
 their own system through it, is wired into that other button, which is the simulation that's done within the GitHub."
 
 A system file is a JSON object that writes your own stack as ranges of the engine's core (`omnicompass/core.py`): the same Monte
-Carlo the live engine's monitor 4 draws (500 runs from the jump generator, the fourth-order Runge–Kutta step, 20 macro steps of 10
+Carlo the live benchmark engine's monitor 4 draws (500 runs from the jump generator, the fourth-order Runge–Kutta step, 20 macro steps of 10
 micro steps, native beside Omni-Compass on top), spread over your ranges instead of the engine's own. It is read as numbers only and
 never run as code. Class S: the engine's own mathematics on draws, never a measurement of your stack. Wiring Omni-Compass onto the
 stack itself is the plug of the Operator's Manual.
@@ -33,7 +33,7 @@ stack itself is the plug of the Operator's Manual.
 
 Run it three ways:
 
-1. **In the live engine**: the Monte Carlo monitor's "Your own system" panel (section 1f): paste or edit the block, "Run it here"
+1. **In the live benchmark engine**: the Monte Carlo monitor's "Your own system" panel (section 1f): paste or edit the block, "Run it here"
    draws the runs in your browser through the page's own port of the core.
 2. **On GitHub**: the same panel's "Run it on GitHub" copies the block and opens the **monte-carlo** workflow; press **Run workflow**,
    paste the block into **system**, choose the runs and the base, and run. The Python and the C++ twin of the core

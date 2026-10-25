@@ -8,7 +8,7 @@
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_kafka.py), each run holding three
 paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a
 95% interval; across the three runs a gauge reads GAIN or LOSS in all three of our runs (by what it is for, never by its sign; a resource spent that rose reads power given) when all three move the same way with
-every interval clear of zero, EVEN, no difference beyond the noise, when a run's interval includes zero (with the count of such
+every interval clear of zero, STEADY, no difference beyond the noise, when a run's interval includes zero (with the count of such
 runs), and the runs disagree when runs clear of the noise point different ways. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
 LOSS included; no energy is claimed beyond the host's CPU seconds.
 Usage: python tools/kafka_abc.py A_DIR B_DIR C_DIR --out results/live/V3_KAFKA.md
@@ -55,7 +55,7 @@ def engine(run_dir):
 
 def verdict(rs, direction, key=None):
     """The three-run reading of one gauge, by rule, from its three within-run paired results: GAIN, LOSS, power given,
-    EVEN or the runs disagree, by what the gauge is for (tools/readings.py)."""
+    STEADY or the runs disagree, by what the gauge is for (tools/readings.py)."""
     return stack_reading(rs, direction, SAME_REL, key)
 
 
@@ -84,7 +84,7 @@ def main(argv=None):
          "omni is the compass law on the consumer count inside [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms "
          "line (`docs/KAFKA_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a "
          "run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its sign; a resource spent that rose reads **power given**) "
-         "a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); "
+         "a run whose interval includes zero reads **STEADY, no difference beyond the noise** (with the count of such runs); "
          "clear runs pointing different ways read **the runs disagree**. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The tuning "
          "workload is shown and not counted. Every row is shown, LOSS included. The host's CPU-seconds are measured on GitHub's shared "
          "runner, the compass's own cost included; no energy is claimed beyond them.", "",

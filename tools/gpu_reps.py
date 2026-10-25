@@ -12,7 +12,7 @@ energy counters when the machine has them. Nothing here is a model.
 Per repetition, per arm: energy, joules per served request, mean power, peak and mean temperature, served and not
 served requests, response time (mean, 95th, 99th percentile), power-limit writes. Across repetitions: for watch and omni
 against native, the paired mean difference with a t-based 95% interval. A difference is clear of the noise when that
-interval excludes zero; otherwise it reads EVEN, no difference beyond the noise (the words of the GPU preregistration's
+interval excludes zero; otherwise it reads STEADY, no difference beyond the noise (the words of the GPU preregistration's
 amendment of 17 October; before it, "proven" and "not proven", the same rule).
 
 Three contrasts, each paired by repetition: observation = watch − native (does Omni's presence alone move the plant),
@@ -36,7 +36,7 @@ try:                                                       # the legal notice ev
     from tools.legal import stamp as _legal_stamp
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
-from tools.readings import word as gel_word, labelled, GAIN, EVEN, LOSS, GIVEN, WORK_PER  # noqa: E402  (the words every table uses)
+from tools.readings import word as gel_word, labelled, GAIN, STEADY, LOSS, GIVEN, WORK_PER  # noqa: E402  (the words every table uses)
 CLEAR = "clear of the noise"   # the 95% interval excludes zero (the GPU preregistration, amendment of 17 October)
 from pathlib import Path
 
@@ -370,16 +370,16 @@ def label(prim, g_served, g_p95, g_lost, valid, observation=None):
 
 def verdict(k, mean, half, n):
     """A gauge's word against the base, by what it is for (GAIN, LOSS, or power given for a resource spent that rose), and
-    when its 95% interval clears zero; EVEN, no difference beyond the noise, when the interval includes zero; EVEN, the same,
+    when its 95% interval clears zero; STEADY, no difference beyond the noise, when the interval includes zero; STEADY, the same,
     when it did not move."""
     if n < 2 or math.isnan(half):
         return "no interval (too few repetitions)"
     if abs(mean) < 1e-12 and half < 1e-12:
-        return f"{EVEN}, the same"
+        return f"{STEADY}, the same"
     aim = "spent" if k in SPENT else "lower" if k in LOWER else WORK_PER if k in (PRIMARY, WALL) else "higher"
     if mean - half > 0 or mean + half < 0:
         return f"{gel_word(mean < 0, aim)}, {CLEAR}"
-    return f"{EVEN}, no difference beyond the noise"
+    return f"{STEADY}, no difference beyond the noise"
 
 
 def main(root):

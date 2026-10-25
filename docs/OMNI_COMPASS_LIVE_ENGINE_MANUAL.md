@@ -1,8 +1,8 @@
-# THE OMNI-COMPASS LIVE ENGINE MANUAL
+# THE OMNI-COMPASS LIVE BENCHMARK ENGINE MANUAL
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-## How to Read the Live Engine: Its Monitors, Gauges and Knobs, Native beside Omni-Compass
+## How to Read the Live Benchmark Engine: Its Monitors, Gauges and Knobs, Native beside Omni-Compass
 
 **October 2026**
 **The Omni-Compass LLC**
@@ -43,7 +43,7 @@ organism: never less work or health than native (`DISCLOSURES.md`, section 3). T
 faster, on fewer machines, with less energy, from the hardware and the controllers already in place; in a cloud, the same
 work for a smaller bill.
 
-**Where the page shows it.** The live engine page plays every benchmark back from its own SHA-256-checked files, native
+**Where the page shows it.** The live benchmark engine page plays every benchmark back from its own SHA-256-checked files, native
 beside Omni-Compass on top of native, lane by lane, and runs the engine's own runs in the page: the Python's seeded runs, and
 the same runs through the engine's C++ twin, side by side (the page's section 4d). This book reads that page; the mechanism and every
 result are in the Owner's Manual.
@@ -53,15 +53,15 @@ run on. It does not make a system immune to failure, delay or drift: it keeps ea
 by row, what it did against native. A result on another system is that system's own, from its own paired runs; where it
 differs, the first presumption is the wiring (`DISCLOSURES.md`, section 4).
 
-<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
-## The key: GAIN, EVEN and LOSS
+<!-- the key: GAIN, STEADY and LOSS (tools/readings.py) -->
+## The key: GAIN, STEADY and LOSS
 
-Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
+Every judged reading in Omni-Compass is one of three words: **GAIN**, **STEADY** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
 
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **STEADY** | **S** Stable (zero variance); **T** True to baseline (expected norm); **E** Equilibrium (balanced risk); **A** At par (no net change); **D** Drift-free (within the 0.5% floor); **Y** Yield held (nothing lost) | the par baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is STEADY, at its limit on native |
 | **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
 
 How the sign of a number becomes a word:
@@ -71,22 +71,22 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
-- **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; EVEN is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the 0.5% floor reads EVEN =0.3%.
+- **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; STEADY is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **STEADY, under the floor**, with its size.
+- **Two numbers, never mixed** (the referee's work order of 25 October): every row shows native's value and Omni-Compass's, the **raw change** (Omni-Compass − native) / native with its true sign, + for a rise and − for a fall whatever the gauge is for, labelled raw, and apart from it the word with its size and no sign. A bill cut 3% reads raw −3.0%, GAIN 3.0%; failed requests up 2% read raw +2.0%, LOSS 2.0%; a pod start wait from 0.22 s to 0.83 s reads raw +275.0%, LOSS 275.0%; a change under the 0.5% floor reads STEADY 0.3%. No raw sign is ever turned to match a word.
 
-Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
+Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads STEADY (the same as native); AT ITS LIMIT ON NATIVE reads STEADY (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads STEADY (inside the noise, within the guardrails); NOT ESTABLISHED reads STEADY (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
-Every reading is one of these. **GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, every 95% interval clear of zero. **GAIN, LOSS or power given by the mean of our three runs**: the runs' mean moved 0.5% or more, with the count of runs that stood beyond the noise beside it. **EVEN, under the floor**: the mean moved less than 0.5%. **EVEN, the same**: no change at all. **The runs disagree**: runs moved 0.5% or more in opposite directions, so the test is unstable there and is looked into. **Shown, not judged**: a gauge declared in advance as shown only, such as the knob's own setting.
+Every reading is one of these. **GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, every 95% interval clear of zero. **GAIN, LOSS or power given by the mean of our three runs**: the runs' mean moved 0.5% or more, with the count of runs that stood beyond the noise beside it. **STEADY, under the floor**: the mean moved less than 0.5%. **STEADY, the same**: no change at all. **The runs disagree**: runs moved 0.5% or more in opposite directions, so the test is unstable there and is looked into. **Shown, not judged**: a gauge declared in advance as shown only, such as the knob's own setting.
 
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, par or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (STEADY). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
-Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+Disclosure and disclaimer: GAIN, STEADY and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
 
 **How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
 the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
 in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
-minutes means 2.3% more minutes over the line; EVEN =0.3% means a change under the 0.5% floor; power given +3.1% means 3.1% more
+minutes means 2.3% more minutes over the line; STEADY =0.3% means a change under the 0.5% floor; power given +3.1% means 3.1% more
 of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
 coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
 or fell against native (the page's section 4k, "How to read a number beside a word"; the founder's order of 23 October).
@@ -100,11 +100,11 @@ one profile, the **factory profile**; any other setting shows the engine's range
 `#tuningBench`; chapter 1). The words used here for the engine, its profiles and its bench are written once, in
 `docs/FACTORY_PROFILE.md`, and this book uses them exactly.
 
-**What the live engine is.** The live engine is one web page, `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, built by the
+**What the live benchmark engine is.** The live benchmark engine is one web page, `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, built by the
 repository's own code (`docs/engine/build_live_engine.py`) from the engine that stands and from the repository's own
 results. It is a monitor of the engine and of the benchmark runs GitHub ran: every number on it is read from a record the
 repository holds (a three-run table, a run's raw files, the engine's own audit, the realms table, the models' own readings),
-and every word on it (GAIN, EVEN, LOSS, power given) is that record's own reading under `tools/readings.py`. The page decides
+and every word on it (GAIN, STEADY, LOSS, power given) is that record's own reading under `tools/readings.py`. The page decides
 nothing about any result and types nothing in. Where it plays the repository's own models (evidence class S) it says so, and
 a model is never proof.
 
@@ -120,7 +120,7 @@ alarm.
 **What a monitor is.** The page is laid out as an operations monitor is: the bottom line first; then a wall of tiles (the
 monitor wall), each tile a small copy of a monitor further down the page, with the main control panel under it; then the
 synopses of what the monitors say; then the monitors themselves, section by section, each with its own knobs in a bar at its
-head ("Controls") and a strip under it. A knob marked *Live* acts on the live engine, the engine's own mathematics running in
+head ("Controls") and a strip under it. A knob marked *Live* acts on the live benchmark engine, the engine's own mathematics running in
 the page; a knob marked *Recorded data* only chooses which record is shown and never modifies it. Every monitor shows native
 beside Omni-Compass on the same demand, the same seconds, so the one difference left between the two sides is Omni-Compass.
 
@@ -147,7 +147,7 @@ files, the raw files GitHub archived with their SHA-256 lists, the two other man
 
 ## Notice and Disclaimer
 
-This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
+This manual describes the live benchmark engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
 (omni-v19, `OMNI_V19.json`). The page names its engine on its own `<html>` element (`data-engine`), and the engine its words
 were written for (`data-prose`); where the records stand on a newer engine than the words, a banner under the notice says so
 (`#engBanner`). The build stamps the engine that stands on the page and rebuilds every record, and `--check` fails a page whose
@@ -165,7 +165,7 @@ first presumption is the wiring, the settings, or how Omni-Compass was implement
 A governor that cannot be watched cannot be trusted. Every controller a stack already runs has a dashboard somewhere: the
 autoscaler's replica count, the card's clock and power, the building's setpoints. What none of them had was one wall where the
 whole body is seen at once, native beside the same body governed, decision by decision, with the record each number came
-from one click away. The live engine is that wall, and this book is how to read it.
+from one click away. The live benchmark engine is that wall, and this book is how to read it.
 
 I asked for it to be a monitor and not a drawing: every record on it made again by the repository's own code, every raw file
 checked against its own SHA-256 list before a byte of it is drawn, every word on it the run's own reading and never one drawn
@@ -177,7 +177,7 @@ next, and every reading that went against native is raised before anything that 
 tells you where its record is and what to do: the row stays, its cause is found (our wiring first, native's setup second, the
 scoring third), and the test runs again. Nothing on the page is pushed toward GAIN; the only thing forced is the mechanism.
 
-## The Three Manuals: the Operator's, the Owner's and the Live Engine's
+## The Three Manuals: the Operator's, the Owner's and the Live Benchmark Engine's
 
 Three books stand in the repository, each for a different reader, and each says what it leaves out.
 
@@ -185,7 +185,7 @@ Three books stand in the repository, each for a different reader, and each says 
 |---|---|---|---|
 | The Operator's Manual (`docs/OMNI_COMPASS_MANUAL.pdf`) | the engineering team that embeds, wires, tunes, runs and checks Omni-Compass on a stack | the plug, the wire check, the eight levels, every stack, the switches and the lease, the implementer's guide for the cloud, every muscle's wiring and card | nothing on how the engine is built; no benchmark results |
 | The Owner's Manual, the master (`docs/OMNI_COMPASS_OWNERS_MANUAL.pdf`) | whoever owns or licenses Omni-Compass and must know the whole mechanism | the philosophy, the mathematics, the mechanism, the engine's source, every result, the wiring | nothing: it is the master |
-| The Live Engine Manual (this book, `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`) | the operator at the dashboard | how to follow the live engine page: its monitors, gauges and knobs; every control, its backend, its effects, its limits, and the factory against the active settings; and the mechanism of action native beside Omni-Compass as the monitors show it | how the engine is built (the Owner's); how to wire it (the Operator's) |
+| The Live Benchmark Engine Manual (this book, `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`) | the operator at the dashboard | how to follow the live benchmark engine page: its monitors, gauges and knobs; every control, its backend, its effects, its limits, and the factory against the active settings; and the mechanism of action native beside Omni-Compass as the monitors show it | how the engine is built (the Owner's); how to wire it (the Operator's) |
 
 A reading on the page and a reading in a receipt are the same reading: the page draws the receipt. Where this book and a
 receipt seem to differ, the receipt governs, and the page is rebuilt.
@@ -211,7 +211,7 @@ control panel, and the text says which is meant. "The band" is a reading's safe 
 (p = 0.5) to its line (p = 1). "A decision" is one turn of the governor's loop. "A tile" is one small monitor on the wall. "A
 section" is one numbered part of the page, named by its anchor. "The factory profile", "the active profile", "a candidate
 profile" and "a custom profile" carry the meanings of `docs/FACTORY_PROFILE.md` (section 6.6). Every step that acts on the
-live engine is marked **LIVE**; a step that only chooses a record is marked **RECORDED**. Every number carries its evidence
+live benchmark engine is marked **LIVE**; a step that only chooses a record is marked **RECORDED**. Every number carries its evidence
 class: **P** a physical meter, **L** live software, **S** our own models (modelled). A number from a model is never written as
 if it came from hardware.
 
@@ -272,7 +272,7 @@ counsel asks for.
 
 It is a quarter past two. The on-call engineer has the wall open on one screen and the cluster's own console on the other.
 In the main control panel under the wall the kill switch reads Omni-Compass ON, and the active profile reads FACTORY. On the
-wall every tile carries its signal: green, THRIVING, on nearly all of them. Native in orange on the left of each pair,
+wall every tile carries its signal: green, GAINING, on nearly all of them. Native in orange on the left of each pair,
 Omni-Compass in blue on the right, both moving on the same demand. The orange line of the work waiting climbs as the night's
 batch starts; the blue line climbs too, then bends sooner, because the governor's ticker (the page's section 3j) shows the pedal
 pushed at the first decision the compass left its center, and two machines recommended before native's autoscaler had seen its
@@ -333,11 +333,11 @@ Keep this card beside the screen that shows the wall. Every line is explained in
 two: Omni-Compass is never by itself. Violet is a knob or a profile turned from the factory tune, never a side. Red is never a
 side.
 
-**The three words** (the key). Green GAIN, yellow EVEN, red LOSS (the word itself shaped as a stop sign, white on red). A
+**The three words** (the key). Green GAIN, yellow STEADY, red LOSS (the word itself shaped as a stop sign, white on red). A
 resource that rose is *power given*, blue. White with a dashed edge is *the runs disagree* or *the runs differ*; grey is
-*shown, not judged*; neither is a reading. A change of 0.5% or more is a change and carries its word; under 0.5% it reads EVEN.
+*shown, not judged*; neither is a reading. A change of 0.5% or more is a change and carries its word; under 0.5% it reads STEADY.
 
-**The signal words** (chapter 4). On every monitor, section, part, breaker and in the dock: green THRIVING (round), yellow
+**The signal words** (chapter 4). On every monitor, section, part, breaker and in the dock: green GAINING (round), yellow
 STEADY (a yield diamond), red REDLINING (an octagon, a stop sign, blinking), and a dark AWAITING where a monitor's run has not
 landed, never green.
 
@@ -402,7 +402,7 @@ Glossary; Appendices A to L; Index; Contact.
 
 ### 1.1 What the page is
 
-The live engine is a monitor of the Omni-Compass engine and of the benchmark runs GitHub ran. A
+The live benchmark engine is a monitor of the Omni-Compass engine and of the benchmark runs GitHub ran. A
 monitor shows what its instrument reads; a drawing shows what its author believes. The page is the former by construction:
 every record it replays is made again by the repository's own code on the checkout it is built from, and `--check` fails a
 page whose engine is not the one `python3 tools/omni_version.py` reads. So the page never runs ahead of the repository: when
@@ -450,7 +450,7 @@ Beside the title, on a desktop, stand the owner's two illustrations, one above t
 title): the stacks Omni-Compass sits on top of as he pictures them, and under it the Omni-Compass as the unified control
 authority. Each says under it that it is an illustration, not a result, and the first says that the product names and marks in
 it belong to their owners, with no partnership, sponsorship or endorsement stated or implied. The engine draws over them: a
-ring at every decision of the live engine; on the rose two hands, native's (orange, the longer) and Omni-Compass's (blue), each
+ring at every decision of the live benchmark engine; on the rose two hands, native's (orange, the longer) and Omni-Compass's (blue), each
 at the mean place of that side's muscles in their bands, calm at north and the line at south; on the control core a glow that
 grows with the settings Omni-Compass wrote in that decision; and under each, that decision's counts. The marks are the engine's
 state (the page's section 3a), never a number of the picture's own.
@@ -508,7 +508,7 @@ the screen ("vs native, more work (3 real runs): on native").
 
 ### 2.2 How to read it
 
-Each row is one way to run a workload, against native alone on the same work. The light is the whole verdict: green THRIVING,
+Each row is one way to run a workload, against native alone on the same work. The light is the whole verdict: green GAINING,
 Omni-Compass ahead of native; yellow STEADY, no difference beyond 0.5% or the noise; red REDLINING, behind native; dark
 AWAITING, no test of that way in this build. The big number is how much: more work done for the same demand, read by the key.
 A slower service or a failed request turns the light red whatever the work.
@@ -527,7 +527,7 @@ are the way to run it, the light, the change against native and what else moved.
   more or fewer; a rise is power given, the capacity spent to buy the work, never a loss) and the failed or wrong answers over
   the runs, Omni-Compass against native.
 - **The light** is red, REDLINING, when the work's reading or the 95th percentile's is LOSS or the runs disagree, or when
-  Omni-Compass's arm gave more failed or wrong answers than native in any run; green, THRIVING, when the work reads GAIN; yellow,
+  Omni-Compass's arm gave more failed or wrong answers than native in any run; green, GAINING, when the work reads GAIN; yellow,
   STEADY, otherwise. A way with no three-run test in the build reads AWAITING, "not yet run".
 
 The note under the table names the record (on this build `results/orchestrator/V18_THREE_ARMS_ABC.json`, of which the page
@@ -547,7 +547,7 @@ The note under it names its source: `tools/whole_system.py` composes every measu
 whole workload (a model of measurements, class S of class L and P; chapter 28). It says what enters today: the bare metal enters
 as no change, because the machine's own layer is not yet run and the card's one run, made on a controller since replaced,
 stands outside the headline scope; so both bills are the software end's and, through the cloud, the wire's, and the cloud's own
-bill line reads EVEN, as the cloud-is-a-wire box explains (the page's section 3h, chapter 20). The two bills follow the whole
+bill line reads STEADY, as the cloud-is-a-wire box explains (the page's section 3h, chapter 20). The two bills follow the whole
 organism's two knobs in the page's section 4a, the reading and the chip's one run in or out. The index here is a composition's
 one number, not a price; each route's bill as a sum of costs is the main control panel's (section 6.8).
 
@@ -567,7 +567,7 @@ matter, Parts 1 to 3, and, under the page's back matter, Part 4 with the disclos
 row carries its number, its title and one line on what it holds. The contents say the order in their own words: "in the order the
 people who watch and study it need it (the founder's order of 24 October, night)", and say the colours and the signals: native
 orange everywhere, Omni-Compass blue, and on every monitor, section and part its signal and its word, red REDLINING, yellow
-STEADY, green THRIVING. A section's number is printed before its title; a lettered section (1a, 3h) is a section inside the
+STEADY, green GAINING. A section's number is printed before its title; a lettered section (1a, 3h) is a section inside the
 numbered part that holds it.
 
 ### 3.2 The sections, as built on omni-v19
@@ -626,11 +626,11 @@ colour, dashed, so both stay in view.
 
 ### 4.2 The words
 
-GAIN is green, EVEN is yellow, LOSS is red. Every reading, in every table, chart, bar and tile, wears one of those three
+GAIN is green, STEADY is yellow, LOSS is red. Every reading, in every table, chart, bar and tile, wears one of those three
 colours, or blue for power given, and no other. Power given wears blue, Omni-Compass's own colour, because it is what
 Omni-Compass put in. A LOSS word is printed white on red in the shape of a stop sign. *The runs disagree* and *the runs differ*
 are white with a dashed edge, and *shown, not judged* is grey, because none of them is a reading. The size printed beside a word
-is how far the gauge moved from native and carries the word's own sign (GAIN +, LOSS −, EVEN =), never the gauge's raw
+is how far the gauge moved from native and carries the word's own sign (GAIN +, LOSS −, STEADY =), never the gauge's raw
 direction.
 
 ### 4.3 The 0.5% rule
@@ -638,12 +638,12 @@ direction.
 The page reads every change by the key's one floor, half of one percent (`tools/readings.py`). A three-run reading follows
 `three_run_reading`: the change is the mean of the three runs' changes, each in percent of native; a mean of 0.5% or more reads
 GAIN, LOSS or power given by the gauge's aim, "in all three of our runs" when every run moved the same way clear of zero, and
-otherwise "by the mean of our three runs" with the count of runs beyond the noise; a mean under 0.5% reads EVEN, under the floor;
+otherwise "by the mean of our three runs" with the count of runs beyond the noise; a mean under 0.5% reads STEADY, under the floor;
 runs that moved 0.5% or more in opposite directions disagree. The same rule reads the sweep's three model days (section 6.4) and
 the three-run column of the page's scoreboards. One run's reading, on the scoreboard and on the control-loop table, is under
-0.5% either way EVEN and from 0.5% up the word, whatever the interval says. The lights that compare the two sides at one moment
-read EVEN only inside ±0.5% of native's value; where a light counts (the muscles over their line, the pods waiting), a
-difference of one is a change. Two values that print the same are never told apart: they read EVEN.
+0.5% either way STEADY and from 0.5% up the word, whatever the interval says. The lights that compare the two sides at one moment
+read STEADY only inside ±0.5% of native's value; where a light counts (the muscles over their line, the pods waiting), a
+difference of one is a change. Two values that print the same are never told apart: they read STEADY.
 
 ### 4.4 The signal words and their shapes
 
@@ -653,8 +653,8 @@ of 24 October):
 
 | Signal | Shape | Word | What it means on the page |
 |---|---|---|---|
-| green | round | THRIVING | working inside its lines with room to give, or Omni-Compass ahead of native now (a GAIN) |
-| yellow | a yield diamond | STEADY | no difference beyond the noise (EVEN, inside 0.5%), or heading for its line and watched before it gets there |
+| green | round | GAINING | low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN) |
+| yellow | a yield diamond | STEADY | no difference beyond the noise (STEADY, inside 0.5%), or heading for its line and watched before it gets there |
 | red | an octagon, a stop sign, blinking | REDLINING | over its line, or Omni-Compass behind native now (a LOSS): the alarm |
 | dark | no lamp lit | AWAITING | the run that fills this monitor has not landed yet; its light stays dark until it does, never green |
 
@@ -666,7 +666,7 @@ monitors' lights (red over yellow over green; AWAITING only where every monitor 
 ### 4.5 The sides are never a reading
 
 Blue does not mean good and orange does not mean bad: they name who is being read.
-Where the two sides look the same, they are the same, and that is EVEN. Where Omni-Compass's blue line sits closer to a
+Where the two sides look the same, they are the same, and that is STEADY. Where Omni-Compass's blue line sits closer to a
 muscle's line than native's orange one, that is the max at work: every muscle to its own limit, never past it, and the
 capacity it holds there is power given, shown beside the work and the speed it bought.
 
@@ -677,7 +677,7 @@ border on its tile. A tile with no reading says what it shows (a count, a state,
 row shown and not judged (the knob's own setting, the governor's own commands, Omni-Compass's own processor time) is grey and
 counted in no total. A ring that opens and fades at the head of a line is the decision that has just landed on it, and the small
 box beside the head prints that line's newest value, as a quote board prints the last price. A box drawn round a row, a cell or a
-bar of a record monitor is its reading cursor: it walks the record one row for each decision of the live engine, and the row it
+bar of a record monitor is its reading cursor: it walks the record one row for each decision of the live benchmark engine, and the row it
 holds is named under the monitor; the record itself changes only when GitHub's next run rebuilds the page. An age printed
 beside a reading of GitHub ("read 06:16 UTC, 41 min 07 s ago") counts up every second.
 
@@ -718,28 +718,28 @@ tune: it is the kill switch. Under the wall stands the main control panel (chapt
 
 Each tile and each monitor carries its light as a signal under its number, on the left, standing like a traffic signal: red on
 top, an octagon like a stop sign, yellow in the middle, a yield diamond, green at the bottom, round; one lamp is lit, and on the
-page the word beside the number (THRIVING, STEADY, REDLINING or AWAITING, section 4.4) says which. **Green, THRIVING**: the
+page the word beside the number (GAINING, STEADY, REDLINING or AWAITING, section 4.4) says which. **Green, GAINING**: the
 gauge the monitor draws is inside its lines, or the monitor has no line to cross (a bill, a count of runs), and the light's
 button says which. **Yellow, STEADY**: heading for its line (within 3% of it, or its own slope over the last readings, carried
-three readings ahead, crosses it), its lamp pulsing slowly; on a record, EVEN, no difference beyond the noise. **Red,
+three readings ahead, crosses it), its lamp pulsing slowly; on a record, STEADY, no difference beyond the noise. **Red,
 REDLINING**, blinking: over its line, or a LOSS row in its record (every row stays). **Dark, AWAITING**: the monitor's run has
 not landed. A monitor that draws the organism's two sides carries three lights in one button: native's and Omni-Compass's, each
 read from its own side on the same load, and between them the reading now, Omni-Compass against native by the key (GAIN green,
-EVEN yellow, LOSS red), each by whether the gauge helps or hurts the muscle and the organism, never by its sign: fewer muscles
+STEADY yellow, LOSS red), each by whether the gauge helps or hurts the muscle and the organism, never by its sign: fewer muscles
 over their line, fewer pods waiting, or a 95th percentile faster by 0.5% or more is GAIN, and a 95th percentile within 0.5% of
-native's reads EVEN. So the moment one side turns a colour the other does not is seen as it happens; a live light compares that
+native's reads STEADY. So the moment one side turns a colour the other does not is seen as it happens; a live light compares that
 moment, and the judged readings stay in the record's tables. Click the button for each side's reason; a red or yellow one offers
 the way back to the factory tune, because a light the knobs turned is a light the factory tune puts back. A line is a health
 requirement in the words of `docs/FACTORY_PROFILE.md`: a service limit, a resource bound or a hardware limit.
 
-The light reads the series the monitor draws and adds no number: on the live engine, the muscles against their lines; on a
+The light reads the series the monitor draws and adds no number: on the live benchmark engine, the muscles against their lines; on a
 cluster replay, the pods waiting for a place and the 95th percentile against native's at the same moment; on the heart, the
 decision's own time against half its beat; on the CPU host, the busy share against the 75% line; on the card, the draw against
 its power limit; on the page's own governor, the time between frames; on the proof, the page's runs against the Python's (green
 when the digests match, red when they differ); on the governors and orchestrators, their own three-run tables; on a record, the
 judged rows of the newest tables (a LOSS row lights red and stays). A light fed by our own models says so (class S). Above the
 wall a line counts the green, yellow and red lights, names every red and yellow one, names the two-sided monitors whose native
-side is red, and gives the count of GAIN, EVEN and LOSS now on the two-sided monitors, beside the engine's own last entry on its
+side is red, and gives the count of GAIN, STEADY and LOSS now on the two-sided monitors, beside the engine's own last entry on its
 side. The three-reading projection is the light's own: the brain's law acts on the position inside its band and damps on the
 position's rate of change, with a fail-up at the band's 95% wall; it projects nothing ahead.
 
@@ -821,14 +821,14 @@ decisions**: *Surge ×2*, *Lose half*, *A sense blind*, *Security hold*; **break
 screen*; **factory**: *Back to the factory tune*; **your own system** (section 6.10); **keys**: *Keyboard keys* and *Kiosk*.
 
 The dial, the demand, the noise, the sense delay and the faults act on the live stress-test model; turning any of them while the
-harness plays moves the live engine to the model, and the control event log says so.
+harness plays moves the live benchmark engine to the model, and the control event log says so.
 
 ### 6.3 The heartbeat: six buttons
 
 The third row is the heartbeat, the governor's full decision: six buttons, **10, 15, 30, 60, 90 and 120 s**, and nothing else
 (`BEATS`). The factory profile's beat is 60 s; 15 s is the standard of native's own pod autoscaler, which checks every 15 s; the
 10 s button shows a beat below that standard. Pressed, a button sets the beat of Omni-Compass on the live stress-test model
-(moving the live engine to the model if the harness plays), moves the heartbeat sweep monitor (the page's section 3j) to the same
+(moving the live benchmark engine to the model if the harness plays), moves the heartbeat sweep monitor (the page's section 3j) to the same
 beat, and is logged with its decision.
 
 The live model steps every 15 s of the plant (`STEP_S`), native's own autoscaler check. At a beat of 15 s one full decision lands
@@ -855,7 +855,7 @@ ends, the model starts the day in hand again from its seed. Nothing runs until t
 Under the profile box a table gives each beat, Omni-Compass on native against native, the one pair: a light, the change in work
 with its word and its sign, the muscle-decisions past the line, the failed work and the capacity held, each with its word. Each
 day is paired with native's on the same seed and read by `three_run_reading` (section 4.3): the change is the mean of the three
-days' changes; under 0.5% EVEN; from 0.5% up the word by the gauge's aim; days that moved 0.5% or more in opposite directions
+days' changes; under 0.5% STEADY; from 0.5% up the word by the gauge's aim; days that moved 0.5% or more in opposite directions
 disagree. Capacity held that rose is power given. The light is red where work, the muscle-decisions past the line or the failed
 work reads LOSS, green where work reads GAIN, yellow otherwise. The best beat is the one with the most work for Omni-Compass on
 native and no LOSS; it is outlined and marked "the best", and 60 s is marked "the factory's". Under the table the page reads the
@@ -975,8 +975,8 @@ Under the mechanism's knobs the panel carries the twenty scenarios in a compact 
 Omni-Compass on native, each cell one signal word and one number against native); a click on a cell prints its gauges and three
 runs under the grid, and the full grid stands in the page's section 4b (chapter 29). Under it the injection grid stands compact:
 the organism, the way, what it is read against, the runs, the organisms stacked and the gauge, the cell's readout and its matrix
-(chapter 29.4 to 29.8). A click on the live engine's own organism in
-the Omni-Compass on native column also moves the live engine to the harness's one organism.
+(chapter 29.4 to 29.8). A click on the live benchmark engine's own organism in
+the Omni-Compass on native column also moves the live benchmark engine to the harness's one organism.
 
 The breakers are the monitors, one for every monitor, grouped by section in the page's order, each section with its own signal.
 Each breaker carries its signal and its word, its number and name, its switch (**ON** draws it live; **REST** stops its drawing,
@@ -1038,13 +1038,13 @@ view.
 
 The engine runs itself: its own mathematics decides every beat, and the knobs show the mechanism; they never have to drive it
 (the page's own words under Part 1). The page opens on the factory profile, with Omni-Compass on, the heartbeat at 60 s, every
-muscle driven and nothing held, and the live engine governs from the first decision. Every knob turned is a variation of the
+muscle driven and nothing held, and the live benchmark engine governs from the first decision. Every knob turned is a variation of the
 mechanism on the live tuning bench (class S); the benchmarks prove the factory profile only, and a changed profile's results are
 its own.
 
 ### 6.13 The dashboards (the page's section 1c)
 
-Under the control panel the page's section 1c draws the same live engine in nine forms an operations team already reads, each
+Under the control panel the page's section 1c draws the same live benchmark engine in nine forms an operations team already reads, each
 fed by the page's own model as it runs (class S), native in orange beside Omni-Compass in blue, each
 change with its word by the key. The forms are the industry's; the numbers are this engine's; no vendor's product is drawn or
 implied.
@@ -1091,7 +1091,7 @@ as it ships" or how many knobs are turned, "a variation of the mechanism (class 
 then reads CUSTOM with a new fingerprint. Every turn is written to the control event log with its decision. Each group prints a
 live reading of the quantities its knobs act on, every decision, and the line at the top of the panel prints the live model's
 decision with the muscles past the line, the work served, the work failed and the work waiting this day, native beside
-Omni-Compass on native. The harness replays recorded positions, so turning any knob moves the live engine to the stress-test model
+Omni-Compass on native. The harness replays recorded positions, so turning any knob moves the live benchmark engine to the stress-test model
 (the log says so); the knobs act on that model only. While the active profile is held, the panel's knobs are disabled.
 
 ### 7.3 Where each group acts
@@ -1261,7 +1261,7 @@ Python, the C++ and this page, linked*; *Run your own system through it (here or
 jump generator, the switchboard, the four reports, the three manuals and the wall as a Grafana dashboard. The monitors it
 drives follow: the wall (the page's section 1a), the monitor list (4l), the status board (2a), the master switch's wiring (4f),
 the Python's runs in the page (3o), every LOSS row (2c), the golden signals (2b) and GitHub's pipeline (4e). No value here is
-typed in: each is computed at runtime from the live engine or from the repository's records embedded at build time.
+typed in: each is computed at runtime from the live benchmark engine or from the repository's records embedded at build time.
 
 ### 8.2 The kill switch and its three states
 
@@ -1357,7 +1357,7 @@ series (chapter 38).
 
 The status board (the page's section 2a, `#s-status`) says whether Omni-Compass is engaged, which signals are out of tolerance
 and where, and raises every LOSS row as an alarm with its source record; each tile and each alarm is computed at runtime from the
-live engine or from the repository's records. The board is laid out the way an operations monitor is. The switch and the engine
+live benchmark engine or from the repository's records. The board is laid out the way an operations monitor is. The switch and the engine
 come first. Next come the live organism's signals, native beside Omni-Compass, in the terms of site-reliability practice
 (latency, traffic, errors and saturation). Then every reading of the real and modelled runs that went against native, worst
 first. Last come GitHub and the age of the page. A tile's word is its reading against native by the key; a tile with no reading
@@ -1371,11 +1371,11 @@ Each tile carries its title, its state, a line of detail and its buttons; every 
 |---|---|---|
 | Omni-Compass, engagement | ON on top of native, or OFF, native alone; the dial | the kill switch; the max or the tune-down |
 | The engine that stands | the engine and its digest; its brain, compass law and verdict run in the page, checked against the Python and the C++ before the page is committed | the mathematics |
-| Errors: threshold breaches | the muscle-decisions over their line this day, Omni-Compass against native, read beyond the counts' noise (two standard deviations of their difference): GAIN, EVEN or LOSS; "too early to read" in the day's first 20 decisions | Surge ×2; Lose machines |
+| Errors: threshold breaches | the muscle-decisions over their line this day, Omni-Compass against native, read beyond the counts' noise (two standard deviations of their difference): GAIN, STEADY or LOSS; "too early to read" in the day's first 20 decisions | Surge ×2; Lose machines |
 | Throughput | the work done (on the live model, the requests served), the same demand on both sides, with the paired reading over the day's decisions | Demand ×1.6; Every knob to its start |
 | Latency or saturation | on the live model the queue depth now, on the harness the organism's electrical power now (a rise to do more is power given) | Pause |
 | Injected faults | the faults active and the decisions each has left | Blind a sense; Security hold |
-| Three-run tables | their LOSS rows (and how many were answered: the rig corrected, run again EVEN) and the rows where the runs disagree | Show the LOSS rows; Show where they disagree |
+| Three-run tables | their LOSS rows (and how many were answered: the rig corrected, run again STEADY) and the rows where the runs disagree | Show the LOSS rows; Show where they disagree |
 | Verdict guard (do no harm) | how often the engine that stands keeps a step that truly costs 3% more, at the noise the real runs measured (class S): open, the next engine version's work | the verdict; where it can fail |
 | CI pipeline: GitHub Actions | the runs running and queued when the page was built | every run |
 | Cloud runs | the Azure sets running and their repetitions | the clouds |
@@ -1389,7 +1389,7 @@ the repository's record and a way to it:
 1. the live organism, when it has more muscle-decisions past their line than native this day, beyond the noise of the counts
    (LOSS);
 2. every LOSS row of Omni-Compass's own three-run tables, with the root-cause document where the repository has one, and "run
-   again: EVEN" where the row was answered by its own rerun on the corrected rig;
+   again: STEADY" where the row was answered by its own rerun on the corrected rig;
 3. every square of the scale-out grid that reads LOSS with the real cluster inside;
 4. every LOSS row of an orchestrator's own cost, where Omni-Compass is in neither arm: not a reading of Omni-Compass, standing as
    its table writes it;
@@ -1420,14 +1420,14 @@ the build they name.
 ### 10.1 The golden-signal feed
 
 The golden-signal feed of the page's section 2b, `#s-feed`, streams the live organism's four golden signals, native beside Omni-Compass: errors (muscles
-over the line), throughput (work served), latency and saturation. One point per decision streamed from the live engine, gapless,
+over the line), throughput (work served), latency and saturation. One point per decision streamed from the live benchmark engine, gapless,
 the last 240 decisions, each signal on its own axis, with each side's last, mean and maximum as a time-series dashboard reports
 them; a kill-switch window shaded red; native in orange, Omni-Compass in blue, the same demand on both. The feed is the status
 board's signals at full size and full history.
 
 ### 10.2 The event log
 
-The live engine's own events as it emits them, newest first, with the wall-clock time and the
+The live benchmark engine's own events as it emits them, newest first, with the wall-clock time and the
 decision: a threshold breach and its clearing on either side, every injected fault and its end, the kill switch, the dial, a
 new day, and the brain's calm crossing the grant threshold. The log is what an operator reads to answer "what happened at
 02:14": the decision number ties it to every other monitor.
@@ -1436,7 +1436,7 @@ Its buttons filter it by grade: *All*, *ALERT*, *WARN*, *INFO*, as an operations
 
 ### 10.3 The OpenMetrics exposition
 
-The live engine's metrics in the OpenMetrics text format, the exposition format
+The live benchmark engine's metrics in the OpenMetrics text format, the exposition format
 Prometheus scrapes and Grafana charts, refreshed every two seconds. They are: engagement (the switch), the decision index,
 breaches, work, band time, actuator moves and reversals per side, and frame time; then the verdict's keep ratio at each true
 cost (chapter 19), the three-run tables' rows by class and reading, and the build's engine, digest and commit. *Copy the
@@ -1449,7 +1449,7 @@ the stack's.
 
 The table of the page's section 2c, `#s-loss`, lists every LOSS row of every three-run table on the page, Omni-Compass's own first and then
 the orchestrators' own cost, each with the cause the repository records and, where that cause is the governor's, the knob that
-brings it EVEN or leaves the muscle native. Where the cause is the test machine, or not yet established, the row says so and
+brings it STEADY or leaves the muscle native. Where the cause is the test machine, or not yet established, the row says so and
 asserts no knob. No row is cut and no number is tuned. It is recorded data: every row is read from the three-run tables on the
 page.
 
@@ -1460,7 +1460,7 @@ own cost), the table with its engine and file, the gauge with its runs A, B and 
 knob and what is done where no setting answers it. Where no cause is recorded yet, an Omni-Compass row reads "under
 investigation: the mechanism and its wiring first (the founder's rule), never the number", and an orchestrator's own row reads
 "none of Omni-Compass's". The note above the table counts both kinds and states the rule on every one: find where the mechanism
-or its wiring is wrong and correct that in the model gate; a knob with no setting that brings the row EVEN stays native on that
+or its wiring is wrong and correct that in the model gate; a knob with no setting that brings the row STEADY stays native on that
 stack, so Omni-Compass hurts nothing (do no harm, `DISCLOSURES.md`, section 3); no number is tuned to make a row read well.
 Chapter 42 is the procedure.
 
@@ -1470,10 +1470,10 @@ Chapter 42 is the procedure.
 
 Every domain, native against Omni-Compass, as the repository's benefit sheet
 holds it (`results/BENEFIT_SHEET.json`, `docs/BENEFIT_SHEET.md`): the domain, the benchmark, its evidence class, its engine,
-its benefit (one number and one word), its GAIN rows, power given, EVEN and LOSS counts, and where it stands (landed, running,
+its benefit (one number and one word), its GAIN rows, power given, STEADY and LOSS counts, and where it stands (landed, running,
 queued, not yet run). It is the first thing after the wall: every benchmark's measured effect in one board, by domain and by
-gauge family, with the Omni index that weighs them together at its head. Each bar carries its table's own word (GAIN green, EVEN
-yellow, LOSS red, power given blue), and the size beside the word carries the word's sign (GAIN +, LOSS −, EVEN =, power given +).
+gauge family, with the Omni index that weighs them together at its head. Each bar carries its table's own word (GAIN green, STEADY
+yellow, LOSS red, power given blue), and the size beside the word carries the word's sign (GAIN +, LOSS −, STEADY =, power given +).
 The axis reads 10, 25, 50 and 100% each way on a square-root scale, so a small bar is seen; a bar past 100% runs to the edge and is
 marked. Every LOSS row stands on the board, is raised on the status board and is answered, with its cause and its knob, in
 the page's section 2c.
@@ -1491,7 +1491,7 @@ counted beside them, and the runs that disagree or differ are listed, not counte
 Every three-run table on the page, read the way a trading floor reads its market (the founder's order of 21 October). The
 market map is a squarified treemap: one tile a table, grouped by stack, its area the number of gauges the table judged and its
 colour its reading: green GAIN, deeper the larger the share of its rows that read GAIN; red wherever any row reads LOSS; yellow
-EVEN; blue where it gave power; grey with a dashed edge a table of an orchestrator's own cost, with no Omni-Compass in
+STEADY; blue where it gave power; grey with a dashed edge a table of an orchestrator's own cost, with no Omni-Compass in
 either arm. A reading cursor walks the map one table every one and a half seconds and names it under the map. The quote board
 gives every table a quote: its ticker (the table's file) and engine, the gauge that moved most with its mean change across
 the three runs, and that gauge in runs A, B and C as a candle: the vertical bar is the run's 95% interval, the tick its value,
@@ -1503,7 +1503,7 @@ run and the file. Every figure is the table's own; nothing is typed in.
 
 The Omni index (`results/OMNI_INDEX.md`): the geometric mean of the
 ratios of every measure that enters, where a measure enters only as its three-run reading allows (GAIN, LOSS or power given
-in all three runs counts; EVEN counts as exactly 1, so nothing inside the noise is claimed either way). Each test is read
+in all three runs counts; STEADY counts as exactly 1, so nothing inside the noise is claimed either way). Each test is read
 from its own newest three-run table, no table is pooled across engines, and every row names its table. The index is one
 number for the board; its row of factors under it is the board's own audit.
 
@@ -1563,12 +1563,12 @@ organism, each with what native has, what Omni-Compass and native has, and where
 
 ### 14.1 What the console is
 
-Runtime parameter control and fault injection on the live engine: load
+Runtime parameter control and fault injection on the live benchmark engine: load
 scaling, noise injection, sensor latency, capacity loss, a demand surge, a sensor blackout, a security hold, the dial, and
 the kill switch. Every control is applied to both sides identically; the response is plotted per decision, native beside
 Omni-Compass. The engine these knobs turn is the engine's own mathematics running in the page: the brain, the compass law and
 the verdict, proven equal to the Python and the C++ on every build. It governs the stress-test model's sixty muscles, each on
-top of its own native controller. The knobs move the live engine in the page's sections 3a and 3d to 3f, and the kill switch and the
+top of its own native controller. The knobs move the live benchmark engine in the page's sections 3a and 3d to 3f, and the kill switch and the
 frame load also move the page's own render governor (the page's section 4i).
 
 ### 14.2 Back to the factory tune
@@ -1660,7 +1660,7 @@ key reads a resource spent: power given.
 
 ### 15.3 Reading a row
 
-Read a row across: a beat whose service words read GAIN or EVEN against native and whose cost columns the operator accepts is a
+Read a row across: a beat whose service words read GAIN or STEADY against native and whose cost columns the operator accepts is a
 beat that can be set. A word of LOSS against native is the engine's at that beat and is listed with every other LOSS row
 (the page's section 2c, chapter 11). The values are our own models (class S, `results/toy_gate/V17_LADDER.json`, `tools/beat_ladder.py`),
 each beat's mean over seeded days on a plant that moves every 5 s, paired by seed; the real runs at every beat
@@ -1732,9 +1732,9 @@ Omni-Compass's side follows native.
 
 Each row of the table is the paired change, native against Omni-Compass at the same decision, averaged over blocks of ten
 decisions so neighbouring decisions do not count twice, with its 95% interval (Student's t over the blocks). *This run*: a change
-under 0.5% of native either way reads EVEN, and from 0.5% up the word follows the gauge's aim, whatever the interval says (work: a
+under 0.5% of native either way reads STEADY, and from 0.5% up the word follows the gauge's aim, whatever the interval says (work: a
 rise is GAIN; misses, failed work, waiting: a fall is GAIN; energy or capacity held: a rise is power given, a fall a cut). *Three
-runs*: the change is the mean of runs A, B and C; a mean under 0.5% reads EVEN; from 0.5% up the word by the gauge's aim; runs
+runs*: the change is the mean of runs A, B and C; a mean under 0.5% reads STEADY; from 0.5% up the word by the gauge's aim; runs
 that moved 0.5% or more in opposite directions disagree (section 4.3). The spread of positions and the settings are shown, never
 judged: no rule of the engine aims at them. The spread can widen a little under the tune-down, because the calm muscles it hands
 back move toward their line while the busy ones stay.
@@ -1784,10 +1784,10 @@ grants or refuses a controller, and a blind sense or a security hold changes not
 Before a knob moves one step past native, the step runs as a
 trial: costs at native first, then at the step. The engine reads the change exactly as a report reads a row, on the log of
 each cost, with its 95% interval. Each step is kept unless the measurement reads LOSS or its estimated cost exceeds the 2%
-allowance; an EVEN result (no difference resolvable from the noise) is accepted, so on a high-variance workload a step with a
+allowance; an STEADY result (no difference resolvable from the noise) is accepted, so on a high-variance workload a step with a
 small true cost can pass, and the lab under the monitor measures that false-acceptance rate.
 
-![Block diagram: the verdict's paired trial around a slow knob, read GAIN, EVEN or LOSS. The reference is the cost of n pieces of work at the deepest step already allowed; the trial is the cost of n pieces at the step. Both on the log of the cost, with the 95% interval of their difference: an interval wholly above zero refuses the step; one inside the allowance keeps it; one wider than the allowance measures on, up to three times n each side. The verdict monitor runs this rule live at any true cost the viewer sets.](book/figures/c_verdict.svg)
+![Block diagram: the verdict's paired trial around a slow knob, read GAIN, STEADY or LOSS. The reference is the cost of n pieces of work at the deepest step already allowed; the trial is the cost of n pieces at the step. Both on the log of the cost, with the 95% interval of their difference: an interval wholly above zero refuses the step; one inside the allowance keeps it; one wider than the allowance measures on, up to three times n each side. The verdict monitor runs this rule live at any true cost the viewer sets.](book/figures/c_verdict.svg)
 
 ### 19.2 The lab
 
@@ -1810,7 +1810,7 @@ each request of the newest tables' own runs. The GPU card measures 30 requests; 
 carries no noise. The model gate measures 60 (σ 0.25). Native has no trial: its knob never moves past its own setting, so there
 is nothing to judge; every step Omni-Compass takes past native has to pass this test first.
 
-![Flowchart: the give-back trial. A trial starts only with the organ's grant and a clean line; it runs to its full measurement and is never ended by the calm it causes; its reading against native decides, GAIN or EVEN keeps the step, LOSS refuses it and the setting stays; the release gate then passes or holds the write. The ticker's state column reads left native until a trial starts and acting while one runs.](book/figures/f_trial.svg)
+![Flowchart: the give-back trial. A trial starts only with the organ's grant and a clean line; it runs to its full measurement and is never ended by the calm it causes; its reading against native decides, GAIN or STEADY keeps the step, LOSS refuses it and the setting stays; the release gate then passes or holds the write. The ticker's state column reads left native until a trial starts and acting while one runs.](book/figures/f_trial.svg)
 
 ## 20. The Clouds
 
@@ -1841,7 +1841,7 @@ In a cloud Omni-Compass shows one thing: the same work as native for a smaller b
 bigger one. Every cloud set runs Omni-Compass at the tune-down on the machines alone (`OMNI_MACHINES_ONLY=1`,
 `--give-back-only`): no pod autoscaler moved, no processor conveyed, no power capped, so the pods are exactly native's. It parks
 only a machine the cloud already made, after its own trial, and wakes it on a breach. The bill and the machines aim lower;
-work, speed and failures must read EVEN or GAIN. Azure runs first and is the measure of the other two (Google Cloud, Amazon
+work, speed and failures must read STEADY or GAIN. Azure runs first and is the measure of the other two (Google Cloud, Amazon
 Web Services): the same tuning, mechanism and harness. Google's and Amazon's sets are not yet run: their queues are switched off
 (24 October), kept ready as Azure's sets run, and the page reads each of their rows "not yet run" until the founder switches it on.
 
@@ -1861,7 +1861,7 @@ its first set; under it, the provider's newest check in its own words.
 
 From 19 October every Azure set runs up to 100 paired repetitions a run, the paid cap, under the
 preregistered stopping rule (`tools/stop_rule.py`). After 10, 20, 40 and 70 repetitions the bill's change is read with its
-99% interval. The run stops once the bill is read (GAIN, power given, or EVEN within ±2% of native's bill), and never while the
+99% interval. The run stops once the bill is read (GAIN, power given, or STEADY within ±2% of native's bill), and never while the
 speed or the failed requests read a LOSS. Those runs carry "to the cap, stopping rule" in their title and count as their own
 A, B and C. So a cloud set that has run for a day and a half and shows no result on the board is not a fault: its bill has not
 yet been read at a look, and `peek` (`.github/workflows/peek.yml`) prints its finished repetitions, paired, while it runs.
@@ -1870,9 +1870,9 @@ yet been read at a look, and `peek` (`.github/workflows/peek.yml`) prints its fi
 
 The rows an operator reads first: machines billed (machine-hours) and the compute bill at
 list price, both aiming lower; then the response time's mean, 95th and 99th percentiles, the time over the line, the failed
-requests and the alert minutes, all aiming lower and all required EVEN or GAIN; then the rows shown and not judged: the
+requests and the alert minutes, all aiming lower and all required STEADY or GAIN; then the rows shown and not judged: the
 settings commands the governor wrote on its own (native is 0), the share of its additions decided inside the line, Omni-Compass's
-own processor time. A bill not yet read at a look (GAIN, power given, or EVEN within ±2% of native's bill, by the stopping rule)
+own processor time. A bill not yet read at a look (GAIN, power given, or STEADY within ±2% of native's bill, by the stopping rule)
 runs on to its next look.
 
 ### 20.6 When a cloud is not ready
@@ -1985,7 +1985,7 @@ choice does. Its five rows of buttons pick the record to read:
   the fast check's rescues, the machines its 5-second check added only after a pod already waited.
 
 The tiles give the chosen beat whole. They show what it is read against and every gauge's mean change with its 95% interval
-and its word (GAIN, EVEN, LOSS or power given, by the one key); the number carries the word's sign (GAIN +, LOSS −, EVEN =),
+and its word (GAIN, STEADY, LOSS or power given, by the one key); the number carries the word's sign (GAIN +, LOSS −, STEADY =),
 never the gauge's raw direction. The last tiles give the engine's own cost a day; native,
 which runs no governor, costs nothing there. The rescues tile says why a slow beat waits more: the full decision sizes the
 pool ahead of the load, and read less often, the load outruns it between decisions, so the 5-second check adds the machine
@@ -2083,7 +2083,7 @@ numbers are the model's.
 
 Beside the model's three runs the section sets what the real thing reads (class L: real Kubernetes, three runs each): every
 Kubernetes three-run table on the page, each on its newest engine, with its rows that read GAIN in all three of our runs, power
-given, LOSS in all three and EVEN. Under them a table reads how steadily the governor steered on real Kubernetes: its own moves on
+given, LOSS in all three and STEADY. Under them a table reads how steadily the governor steered on real Kubernetes: its own moves on
 every table `results/STEERING.json` holds, each on its own engine, beside native's own controllers.
 
 ## 25. The Chip and the Host
@@ -2104,7 +2104,7 @@ of 600 s an arm, native (the card as shipped), Omni-Compass watching only (the s
 Omni-Compass governing the power limit and the clock ceiling, every `nvidia-smi` sample and every decision of the governor's own
 audit (`results/gpu/run-20261024T091235Z`, `docs/engine/export_gpu_run.py`). On this card native already runs both knobs at their
 top (the power limit 400 W of 400 W, the clock unlocked), so the governor asked for exactly that and wrote nothing: at its limit on
-native, every service gauge EVEN. One run; B, C and the 8-card run are not yet run. The A10 run of 2 October (the card controller
+native, every service gauge STEADY. One run; B, C and the 8-card run are not yet run. The A10 run of 2 October (the card controller
 of commit c908054, replaced since) stays as its own record. Its table is re-read by the one key. The CPU host is built and waits for its machine: the CPU
 power harness (`tools/run_cpu_power.py`) puts Omni-Compass on top of the Linux kernel's own frequency governor and meters the
 processor's package energy (RAPL); no GitHub runner exposes that counter or a writable ceiling, so until a Linux machine that
@@ -2141,7 +2141,7 @@ in, played back from their raw files like every Kubernetes run, the moment their
 The engine's own record is a tensor: two sides × every decision × sixty muscles,
 each entry a muscle's compass position (0 calm, 0.5 the center of its band, 1 its line), recorded from `realms/harness.py`
 (class S). It fills in decision by decision as the page's section 3a plays: the tensor, the difference matrix and the principal
-motions replay that record on the live engine's clock, and no knob of the console changes them. Read it as a sheet of heat: a column (one decision) that is
+motions replay that record on the live benchmark engine's clock, and no knob of the console changes them. Read it as a sheet of heat: a column (one decision) that is
 light on the blue side and dark on the orange side is a body Omni-Compass held nearer calm at that moment.
 
 ### 26.2 The difference matrix and the principal motions
@@ -2287,14 +2287,14 @@ The benefits, gauge by gauge, added together over every measured piece: work (mo
 shorter 95th percentile), machines (fewer), energy (less), the bill (smaller), and the one number, the index over the gauges.
 Two readings are offered by the buttons: *every measured piece, every interval carried* (every factor with its own 95%
 interval, the whole their product) and *the strict reading: the index's rule* (only a factor that reads GAIN or power given in
-all three of its runs counts; EVEN counts as exactly 1). A third pair of buttons says what to do with a governor that replaces
+all three of its runs counts; STEADY counts as exactly 1). A third pair of buttons says what to do with a governor that replaces
 a native controller: *its one run beside the count* or *its one run in the count*.
 
 ### 28.4 The composition
 
 Piece by piece and layer by layer: each factor with its 95% interval, the whole their product. Read
 the table left to right: the piece and its layer, the five gauges, the index, and the receipt (the table's own row) each factor
-is read from. A factor's interval that includes 1 is EVEN and multiplies the whole by exactly 1 in the strict reading.
+is read from. A factor's interval that includes 1 is STEADY and multiplies the whole by exactly 1 in the strict reading.
 
 ### 28.5 Bills and receipts
 
@@ -2317,7 +2317,7 @@ in its place.
 
 The grid of the page's section 4b, `#s-scn`, reads ten organisms two ways each: the spine; the four realms (Compute/AI/Cloud,
 Physics/Robotics/Autonomous, Energy/Facility/Industrial, Distribution/Specialized); the four stacked; the whole tower; the
-orchestra; the live engine's own organism of sixty muscles; and the whole organism in its three places. Each runs **native
+orchestra; the live benchmark engine's own organism of sixty muscles; and the whole organism in its three places. Each runs **native
 alone** and **Omni-Compass on native** (the factory profile, on top of every native controller), on the same seeds, so the same
 demand meets both. Omni-Compass is never by itself (the founder's order of 25 October), so there is no third way. That makes
 twenty cells, each read by the key against native, from the record `results/scenarios/SCENARIOS_20.json` (written out as
@@ -2329,8 +2329,8 @@ record of thirty scenarios is kept as history in `docs/history/SCENARIOS_30_2026
 
 Each cell carries one signal word and one number against native. The native column reads STEADY and 0%, the yardstick. In the
 Omni-Compass on native column the organism's gauges are work, the time over the line and the power drawn: a cell is red,
-REDLINING, when any of them reads LOSS, green, THRIVING, when any reads GAIN and none LOSS, and yellow, STEADY, otherwise; its
-number is the gauge that decided the light (work, where work decides it), with the word's sign (+ a GAIN, − a LOSS, = EVEN). The
+REDLINING, when any of them reads LOSS, green, GAINING, when any reads GAIN and none LOSS, and yellow, STEADY, otherwise; its
+number is the gauge that decided the light (work, where work decides it), with the word's sign (+ a GAIN, − a LOSS, = STEADY). The
 whole organism's cell reads its composition's index over the gauges (chapter 28). Hover a cell for each gauge's reading and each
 run's change.
 
@@ -2338,9 +2338,9 @@ run's change.
 
 Click a cell for its detail under the grid: the organism, what it is, its muscles and its class, then a table of its one pair,
 Omni-Compass on native against native, on work, the time over the line and the power drawn, each with its word, its reading and
-the change of each run A, B and C. Every run under 0.5% reads EVEN; from 0.5% up the word by what the gauge is for; runs pointing
-different ways, the runs disagree. The note names the record's file, its engine and its commit. A click on the live engine's
-organism in the Omni-Compass on native column also puts the live engine on that body, the harness's one organism.
+the change of each run A, B and C. Every run under 0.5% reads STEADY; from 0.5% up the word by what the gauge is for; runs pointing
+different ways, the runs disagree. The note names the record's file, its engine and its commit. A click on the live benchmark engine's
+organism in the Omni-Compass on native column also puts the live benchmark engine on that body, the harness's one organism.
 
 ### 29.4 The injection grid: one batch of the Python's 500 injections
 
@@ -2360,7 +2360,7 @@ it ran and on how many processes close the line.
 
 ### 29.5 The knobs
 
-- **Organism**: the nine organisms with a plant, by their scenario number (the spine 1 to the live engine's own organism 9), each
+- **Organism**: the nine organisms with a plant, by their scenario number (the spine 1 to the live benchmark engine's own organism 9), each
   with its muscles. The whole organism (10) is a composition of measured tables and takes no injection; its reading stands in
   the twenty scenarios above.
 - **Way**: *Omni-Compass on native*; *a governor on the organism* (each of the fourteen: the Kubernetes scheduler with its
@@ -2464,7 +2464,7 @@ square takes its word. The road draws the newest grid with its squares landed, u
 ### 30.4 Every three-run table
 
 Every three-run table in the repository, native against Omni-Compass, every row as written,
-each benchmark's newest engine's table; open a row to read every judged row that is not EVEN. The table's own rule is printed
+each benchmark's newest engine's table; open a row to read every judged row that is not STEADY. The table's own rule is printed
 with it; rows shown and not judged are left out of the counts; a tuning case is shown and never counted.
 
 ### 30.5 Every muscle and the seven organisms
@@ -2473,7 +2473,7 @@ From `results/realms_v5/REALMS_V5.json`, the realms runner at the max, its
 engine and commit named above it (`tools/run_realms_v5.py`, catalog `realms/catalog_v5.csv`), ten paired seeds per muscle and
 per organism, the lease after 80% of every run. Misses: the plant decisions over their line, summed over the ten seeds. A
 muscle reads GAIN when one of its aims (more work, faster, fewer misses) moved beyond the noise under some load with none
-moving the other way; EVEN at its limit on native when its knob already sits at the top of its range; EVEN, the same as
+moving the other way; STEADY at its limit on native when its knob already sits at the top of its range; STEADY, the same as
 native, when it wrote and nothing moved beyond the noise. Energy is power given where it rose. The seven organisms are listed
 spine first, then the four realms, the four stacked and the whole tower, each under its own load, the climb and the work
 waiting in line (the three buttons). Evidence class S: a model's energy is not a meter's.
@@ -2482,7 +2482,7 @@ waiting in line (the three buttons). Evidence class S: a model's energy is not a
 
 Each muscle alone, native and then with Omni-Compass on top, grouped by the family of its
 knob and the stack it lives on; *Find a muscle* searches the 1,107 by name. A family reads GAIN when more of its rows read
-GAIN than LOSS; the row of a muscle at its limit on native is counted as EVEN.
+GAIN than LOSS; the row of a muscle at its limit on native is counted as STEADY.
 
 ## 31. The C++ Twin
 
@@ -2592,7 +2592,7 @@ the Python and the C++ on every build) and the two bodies, the realms harness an
 
 Every known way Omni-Compass can fall short, the control that mitigates it,
 that control's coverage and the residual risk where it does not reach, and its implementation in the code; every failure mode
-the live engine can be put through has a fault-injection control on the console, named in the row. The register is
+the live benchmark engine can be put through has a fault-injection control on the console, named in the row. The register is
 `docs/SAFETY_CASE.md` and `docs/THREAT_MODEL.md` read as a table.
 
 ### 35.2 The resource costs shown, not judged
@@ -2633,7 +2633,7 @@ book carries the same matter in its front matter, "The Problem and the Answer".
 
 The executive summary and reading key (the page's section 4k, `#s-read`) opens with the Omni index, every real test weighed together, and one paragraph on the two
 sides, the three words and the three classes of evidence, and unfolds into the executive summary (every number read from the
-records on the page when it opens), the key (GAIN, EVEN, LOSS and power given, the colours, how to read a number beside a word,
+records on the page when it opens), the key (GAIN, STEADY, LOSS and power given, the colours, how to read a number beside a word,
 why a minus can be a GAIN and a plus a LOSS) and the terms the page uses, each defined once and shown when pointed at. This book
 carries the key in its front matter, word for word as `tools/readings.py` writes it.
 
@@ -2718,7 +2718,7 @@ calm falling under a surge and the grant refused until the line is clean again, 
 
 It is not a competitor's dashboard. Omni-Compass never replaces the controller it sits
 on; every move native makes is still made. A monitor where the two sides are identical is a muscle Omni-Compass left native,
-at its limit or with nothing to add, and that reading is EVEN and correct.
+at its limit or with nothing to add, and that reading is STEADY and correct.
 
 ## 41. From a Tile to Its Record
 
@@ -2841,7 +2841,7 @@ changed profile would do on a real system until that profile is validated and re
 
 ## 44. License and Commercial Terms
 
-The live engine page, this manual and every part of the repository are the property of The Omni-Compass LLC; all rights
+The live benchmark engine page, this manual and every part of the repository are the property of The Omni-Compass LLC; all rights
 reserved; all patents, copyrights and trademarks filed in the USA. Use is evaluation and simulation only under `LICENSE`
 (`LicenseRef-OmniCompass-Evaluation-1.0`); any commercial use, commercialization, monetization, production use,
 redistribution or hosted service requires a signed, paid Omni-Compass Enterprise License (`ENTERPRISE_LICENSE.md`). The
@@ -2907,7 +2907,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
   the candidate*, never a release.
 - **Class (P, L, S).** The evidence class of a number: a physical meter, live software, our own models.
 - **Compass position (p).** Where a reading sits in its band; 0 calm, 1 at the line.
-- **Console.** The controls of the page's section 3b: every runtime control of the live engine, acting on both sides alike.
+- **Console.** The controls of the page's section 3b: every runtime control of the live benchmark engine, acting on both sides alike.
 - **Custom profile.** An identifiable configuration that differs from the released factory profile; its fingerprint names it,
   and its results are its own.
 - **Decision.** One turn of the governor; the unit of time on every live monitor.
@@ -2930,13 +2930,13 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **Immune system.** Omni-Compass's: native twins, the heat debt, the cure on the spot, the pools' give-back, the bone's grant.
 - **Kill switch.** The instant hand-back of every lever to native, for security; red on the switch and on every time axis.
 - **Lease.** The governor's proof of life; when it ages past its limit the watchdog walks every setting back to native.
-- **Live / Recorded.** A knob marked Live acts on the live engine; one marked Recorded data chooses a record and modifies nothing.
+- **Live / Recorded.** A knob marked Live acts on the live benchmark engine; one marked Recorded data chooses a record and modifies nothing.
 - **Live tuning bench.** The interface that operates the engine's controls and displays their effects through the connected
-  backend: the live engine page and its main control panel.
+  backend: the live benchmark engine page and its main control panel.
 - **Main control panel.** The box under the wall (`#fuseBox`) that switches every monitor from one place: the master rows, the
   heartbeat, the sweep, the profile, each route's bill, the mechanism's own knobs, the twenty scenarios and the breakers.
 - **Master switch.** The one switch at the top of the organism: ON (green), the kill switch engaged (red), OFF (white).
-- **Monitor.** One canvas of the page that draws a record or the live engine; its small copy on the wall is a tile.
+- **Monitor.** One canvas of the page that draws a record or the live benchmark engine; its small copy on the wall is a tile.
 - **Muscle.** A specific controllable mechanism, with its own actuator, observations, limits and read-back.
 - **Native.** The whole system by itself with everything it ships with: the native baseline; orange.
 - **Native baseline.** The system's documented configuration and behaviour with no Omni-Compass governing it: every muscle under
@@ -2949,9 +2949,9 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **Power given.** A resource spent or held that rose: what Omni-Compass put in to buy the work and speed beside it; blue.
 - **REDLINING.** The red signal word, an octagon, blinking: over its line, or Omni-Compass behind native now (a LOSS).
 - **Shown, not judged.** A gauge declared in advance as shown only; grey; counted in no total.
-- **STEADY.** The yellow signal word, a yield diamond: EVEN inside 0.5%, or heading for its line and watched.
+- **STEADY.** The yellow signal word, a yield diamond: STEADY inside 0.5%, or heading for its line and watched.
 - **Stopping rule.** The cloud sets' preregistered looks at 10, 20, 40 and 70 repetitions with 99% intervals (`tools/stop_rule.py`).
-- **THRIVING.** The green signal word, round: inside its lines with room to give, or Omni-Compass ahead of native now (a GAIN).
+- **GAINING.** The green signal word, round: inside its lines with room to give, or Omni-Compass ahead of native now (a GAIN).
 - **Ticker.** The governor's decisions (first ticker) and native's own controllers' moves (second ticker), newest first.
 - **Tile.** One small monitor on the wall; click it to go to the monitor it copies.
 - **Twenty scenarios.** Ten organisms, each native and with Omni-Compass on native, each read against native.
@@ -3015,7 +3015,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | Kill switch | the main control panel; the head of the page's section 1b; every section's controls; every monitor's strip; the console; the dock | every lever of every governor on the page, to native at once; shades every time axis red; a second press releases it | the records: nothing recorded is modified |
 | Return to native (the reset) | the main control panel's profile row; the switchboard's native arm | the same hand-back, named the reset; the switch reads "OFF by the reset" | the records: nothing recorded is modified |
 | Turn Omni-Compass OFF / ON | the console | the brain's outputs: OFF, read in shadow, nothing leaves; ON, outputs reach the muscles | the native side, which never stops |
-| The max / Tune-down | the main control panel; the console; the page's section 3d | the dial of the live engine's governor | the records; the official runs' own dial, named in each |
+| The max / Tune-down | the main control panel; the console; the page's section 3d | the dial of the live benchmark engine's governor | the records; the official runs' own dial, named in each |
 | The body | the main control panel; the page's section 3d | which body the live monitors draw | the records |
 | Heartbeat: 10, 15, 30, 60, 90, 120 s | the main control panel | the live model's full decision period | the dial's tables (the page's section 3c), which are records |
 | Run every beat (10 to 120 s), three days each | the main control panel | three model days at each beat on the live model; the sweep's table | the live day in hand, restored after |
@@ -3055,7 +3055,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 
 | Gauge | Side | Aim | GAIN reads | Power given reads | Where it comes from |
 |---|---|---|---|---|---|
-| The work waiting | both | time waited: lower | the blue line under the orange | — | the live engine; on the official runs, pending pods and the queue |
+| The work waiting | both | time waited: lower | the blue line under the orange | — | the live benchmark engine; on the official runs, pending pods and the queue |
 | The work done | both | work done: higher | the blue line over the orange | — | requests served, jobs finished, work inside the line |
 | The decisions past their line | both | missed: lower | fewer blue past the line | — | the compass positions over 1 |
 | The capacity held | both | a resource held | a fall (a cut) | a rise | machines, replicas, clock in service |
@@ -3078,11 +3078,11 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | Blue | Omni-Compass; on a reading, power given |
 | Violet | a knob or a profile turned from the factory tune (the mechanism panel's knobs, a CUSTOM profile); never a side |
 | Green | GAIN |
-| Yellow | EVEN |
+| Yellow | STEADY |
 | Red | LOSS; the kill switch and its window; the master switch engaged; only ever in a stop sign's shape |
 | White, dashed edge | the runs disagree; the runs differ; not a reading |
 | Grey | shown, not judged; a monitor with no record yet |
-| Green, round | THRIVING |
+| Green, round | GAINING |
 | Yellow, a yield diamond | STEADY |
 | Red octagon, blinking | REDLINING |
 | Dark, dashed word | AWAITING |
@@ -3100,7 +3100,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | A monitor says "stopped before a result" | a cloud or chip run ended without a measurement | the status board carries it; the run's own log says why (a key cut short, a plan, a quota); fix at the cloud, never on the page |
 | The age of the page is over three hours | the rebuild did not run or did not land | `.github/workflows/live-engine.yml` on GitHub; `python3 docs/engine/build_live_engine.py` locally |
 | A number on the page differs from a table | the page was built before the table changed | the Build freshness tile; the table governs; the next build carries it |
-| The two sides are identical on a monitor | the muscle is at its limit on native, or Omni-Compass left it native | EVEN, correct; section 40.4 |
+| The two sides are identical on a monitor | the muscle is at its limit on native, or Omni-Compass left it native | STEADY, correct; section 40.4 |
 | The first ticker is empty | the switch is OFF or the kill switch engaged | nothing decides on top of native while it is; turn it ON |
 | The heartbeat, the sweep or the mechanism's knobs do nothing | the active profile is held | *Restore factory profile* in the main control panel |
 | The active profile reads CUSTOM | a knob of the mechanism or the heartbeat was turned | *Restore factory profile*, or *Back to the factory tune* for the whole page |

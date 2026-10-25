@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-The founder's order of 22 October, evening: the live engine and the main benchmark engine are two different things. The live
+The founder's order of 22 October, evening: the live benchmark engine and the main benchmark engine are two different things. The live
 engine gives the buttons, knobs and monitors that turn every muscle and mechanism up or down, in or out, on or off; the real
 benchmarks prove one engine at one tune, and every page must say that turning any knob can change every metric in any
 direction. The main engine's tune is not a guess: it is the tune found, by measuring every gauge across the knobs, to serve the
@@ -21,7 +21,7 @@ give-back trial of 20 minutes; the cruise wait of 120 s, never under two reading
 found (`realms/muscle_cards_v5.csv`) and the engine's setting for the rest. **Every published benchmark result is this one
 engine at this one tune**, on the systems, loads and harness that benchmark names, native against Omni-Compass on top of native.
 
-**The tuning bench** is the live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, read by the Live Engine Manual) with
+**The tuning bench** is the live benchmark engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, read by the Live Benchmark Engine Manual) with
 the control panel's buttons (`tools/omni_control.py`): a live tuning engine. Every knob, button and monitor there can be turned
 in real time: the heartbeat from 5 to 120 s, the dial between the max and the tune-down, the pedal, each muscle driven or left
 native, up or down, in or out, minus or plus. The bench shows the mechanism of action at each setting with native alone, with
@@ -48,7 +48,7 @@ g⁰(s) ∈ ℝⁿ, and Omni-Compass on top of native at tune θ gives g(θ, s) 
 **The one key.** Each gauge j has an aim aⱼ (`tools/readings.py`): time waited, missed or failed, where lower serves; work,
 where higher serves; a resource spent or held, which is power. The paired difference dⱼ(θ; s) = gⱼ(θ, s) − g⁰ⱼ(s) has a mean
 d̄ⱼ over the seeds and a 95% interval [ℓⱼ, uⱼ] by Student's t on |Ω| − 1 degrees of freedom (`omnicompass/student_t.py`). The
-reading Rⱼ(θ) is EVEN when ℓⱼ ≤ 0 ≤ uⱼ; otherwise GAIN when the whole interval lies on the side the aim serves; otherwise LOSS
+reading Rⱼ(θ) is STEADY when ℓⱼ ≤ 0 ≤ uⱼ; otherwise GAIN when the whole interval lies on the side the aim serves; otherwise LOSS
 for a time waited, missed or failed or for work, and power given for a resource. The size is rⱼ(θ) = d̄ⱼ ⁄ ḡ⁰ⱼ. The same key
 reads one tune against another, θ′ against θ, with g(θ, s) in the place of g⁰(s).
 
@@ -133,8 +133,8 @@ preregistered seeds were never read by either search.
 ## 5. Where it is written
 
 The disclosure of section 1 stands in `DISCLOSURES.md` section 3 (the factory tune), near the top of the README and of the
-live engine page, and in all three manuals: the Operator's Manual (section 3.1, the factory tune and the bench, without the engine's internals), the Owner's Manual
-(the tune and its mathematics, this page's sections 1 and 2) and the Live Engine Manual (its opening: the page is a tuning bench).
+live benchmark engine page, and in all three manuals: the Operator's Manual (section 3.1, the factory tune and the bench, without the engine's internals), the Owner's Manual
+(the tune and its mathematics, this page's sections 1 and 2) and the Live Benchmark Engine Manual (its opening: the page is a tuning bench).
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 

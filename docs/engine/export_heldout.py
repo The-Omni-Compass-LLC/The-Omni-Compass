@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The Python's 500 scenarios a seed (the held-out seeds), for the live engine's replay monitor.
+"""The Python's 500 scenarios a seed (the held-out seeds), for the live benchmark engine's replay monitor.
 
 benchmarks/stack_benchmark.py runs 500 scenarios of 72 steps from one seed base (each scenario's own stream drawn from it,
 omnicompass/stack_sim.py), every scenario through every arm, and writes one row a scenario and arm with the run's trace hash

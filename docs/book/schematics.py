@@ -88,7 +88,7 @@ FIGURES = {
     # control-loop block diagrams
     "c_compass_loop": "Block diagram: the compass law as a closed loop on one muscle",
     "c_engine_loop": "Block diagram: from the observations through the engine to the authority",
-    "c_verdict": "Block diagram: the verdict's paired trial around a slow knob, read GAIN, EVEN or LOSS",
+    "c_verdict": "Block diagram: the verdict's paired trial around a slow knob, read GAIN, STEADY or LOSS",
     "c_gpu_pair": "Block diagram: the two wires of a card as an antagonist pair",
     "c_authority": "Logic diagram: the nervous system's authority to add and to give back",
     # flowcharts
@@ -737,7 +737,7 @@ def c_engine_loop():
 
 def c_verdict():
     """The verdict as the engine that stands reads it (omnicompass/verdict.py, judge="interval"): the trial step's cost
-    against the reference's as a 95% interval on the logarithm of each piece of work's cost, read GAIN, EVEN or LOSS
+    against the reference's as a 95% interval on the logarithm of each piece of work's cost, read GAIN, STEADY or LOSS
     exactly as a report reads a row; the medians kept as the second guard. Every number is the controllers' own
     (omni_controller/controller.py: n = 200, a = 0.02, R = 7,200 s, 120 decisions at 60 s; omni_controller/gpu_compass.py:
     n = 30, a = 0.02, R = 900 decisions of 2 s)."""
@@ -991,7 +991,7 @@ def f_toy_gate():
     return chart([("start", "a change to a rule, a gain, a guard, a preset or a muscle"),
                   ("box", "tools/toy_gate.py: the change against the engine that stands, our own models, the same seeds, paired (class S)"),
                   ("decision", "any LOSS by the gauge's aim?"),
-                  ("decision", "promise shown (GAIN somewhere, EVEN elsewhere)?"),
+                  ("decision", "promise shown (GAIN somewhere, STEADY elsewhere)?"),
                   ("box", "its GitHub trials: A, B and C on the real stacks"),
                   ("decision", "no LOSS, nothing behind the engine that stands?"),
                   ("end", "the next engine version: fingerprinted, every benchmark run again on it")],
@@ -1006,7 +1006,7 @@ def f_reading():
                   ("decision", "do all three point the same way?"),
                   ("decision", "is that way the gauge's aim? (time, misses, failures: a fall; work: a rise; a resource spent: a fall is a cut)"),
                   ("end", "GAIN in all three of our runs")],
-                 decisions={1: ("no", "EVEN: no difference beyond the noise (with the count of runs it holds in)"),
+                 decisions={1: ("no", "STEADY: no difference beyond the noise (with the count of runs it holds in)"),
                             2: ("no", "the runs disagree: the test is unstable there; look into it"),
                             3: ("no", "LOSS in all three of our runs; for a resource spent that rose, power given")},
                  w=6.4, side_w=4.4)
@@ -1244,7 +1244,7 @@ def t_trial():
         ax.add_patch(patches.Rectangle((a, 0.7), b - a, 1.3, color=col, ec=GREY))
         if lab:
             ax.text((a + b) / 2, 1.35, wrap(lab, n), ha="center", va="center", fontsize=PT)
-    ax.annotate("the verdict (one decision): the 95% interval of the change in log cost,\nGAIN, EVEN or LOSS; allowed, the deepest step moves one deeper; the\n"
+    ax.annotate("the verdict (one decision): the 95% interval of the change in log cost,\nGAIN, STEADY or LOSS; allowed, the deepest step moves one deeper; the\n"
                 "next trial no sooner than P after this one began (Kubernetes 600 s; a card 8 decisions)", xy=(16.5, 2.0), xytext=(0.5, 2.55),
                 arrowprops=dict(arrowstyle="->", color=GREEN), color=GREEN, ha="left")
     ax.text(18, 0.3, wrap("a phase past its limit (Kubernetes 1,200 s; a card 30 decisions), or out of calm, is abandoned: the knob goes back, "
@@ -1393,7 +1393,7 @@ def receipt_chart(rel, title):
     ax.axvline(0, color=NAVY, lw=1)
     ax.set_yticks(range(len(judged))); ax.set_yticklabels([wrap(j[0], 36) for j in reversed(judged)])
     ax.set_xlim(-115, 115); ax.set_xlabel("paired change against native, %\n(runs A, B, C from top; the interval is 95%)")
-    ax.set_title("the judged rows: green GAIN, amber power given,\nred LOSS, grey EVEN", loc="left")
+    ax.set_title("the judged rows: green GAIN, amber power given,\nred LOSS, grey STEADY", loc="left")
     fig.suptitle(wrap(title, 78), x=0.01, ha="left", fontsize=PT)
     return fig_svg(fig)
 
@@ -1467,7 +1467,7 @@ def r_capacity():
             ax.plot([lo, hi], [y, y], color=col, lw=1.6); ax.plot([m], [y], "o", color=col, ms=3.5)
     ax.axvline(0, color=NAVY, lw=1)
     ax.set_yticks(range(len(data))); ax.set_yticklabels([f"cap {cap} cores:\n" + ("completed work, %" if "completed" in name else "work inside the line, req/s") for cap, name, _, _ in reversed(data)])
-    ax.set_xlabel("paired change (percent, or requests a second),\nruns A, B, C from top; every row EVEN")
+    ax.set_xlabel("paired change (percent, or requests a second),\nruns A, B, C from top; every row STEADY")
     fig.suptitle("The capacity test: four caps, five pairs a cap, three runs (omni-v11)", x=0.01, ha="left", fontsize=PT)
     return fig_svg(fig)
 
@@ -1577,8 +1577,8 @@ def _grid_label(cell):
         if lo and int(lo.group(1)) > 0:
             return f"GAIN {g.group(1)}, LOSS {lo.group(1)}", "#f3c9c9"
         return f"GAIN on {g.group(1)}", "#cfe8cf"
-    if low.startswith("even"):
-        return ("EVEN " + pp).strip(), "#e3e3e3"
+    if low.startswith(("steady", "even")):
+        return ("STEADY " + pp).strip(), "#e3e3e3"
     if "pending" in low:
         return "pending", "white"
     return "·", "white"
@@ -1616,7 +1616,7 @@ def grid_chart(section_start, title, key):
 
 def r_grid():
     return grid_chart("Modelled", "Modelled (class S, our own models): the seven organisms at every size and run count, the change in misses against native",
-                      "Green GAIN, grey EVEN, red LOSS, light grey one run (no label yet), white not in the receipt")
+                      "Green GAIN, grey STEADY, red LOSS, light grey one run (no label yet), white not in the receipt")
 
 
 def r_grid_kube():
@@ -1740,7 +1740,7 @@ def g_pipeline():
     stages = [("audit.jsonl: one record a decision: senses, state, force, gate, write, read-back", BLUE),
               ("tools/live_reps.py: the paired receipt of one run: every gauge, native, omni, the change, its 95% interval", MIST),
               ("tools/confirm_abc.py: runs A, B, C → the three-run table; the engine of every run checked against the fingerprint", MIST),
-              ("tools/readings.py: GAIN, EVEN, LOSS by the gauge's aim; the reading key on top of every table", PALE),
+              ("tools/readings.py: GAIN, STEADY, LOSS by the gauge's aim; the reading key on top of every table", PALE),
               ("docs/BENEFIT_SHEET.md, results/OMNI_INDEX.md: one number per benchmark, its word; the index over all", BLUE)]
     bw, bh = 4.0, 2.2
     boxes = []

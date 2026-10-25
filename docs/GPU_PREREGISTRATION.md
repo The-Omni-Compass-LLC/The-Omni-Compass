@@ -422,7 +422,7 @@ From this amendment the card harness measures what it never counted:
 - the card's time over the line (requests slower than the line, ten bare service times, percent of requests) and its
   95th percentile, each paired against native;
 - each row keeps its preregistered label and names, beside it, every measure that came out behind native by any
-  amount, so what Omni costs is read beside what it gains; every change is read in words (GAIN, EVEN or LOSS, and what it means); no new line is drawn. The 2% bound stays where the founder set it: inside the engine, as the trigger of the
+  amount, so what Omni costs is read beside what it gains; every change is read in words (GAIN, STEADY or LOSS, and what it means); no new line is drawn. The 2% bound stays where the founder set it: inside the engine, as the trigger of the
   verdict (`omnicompass/verdict.py`: a knob moves only where a paired trial shows the muscle at most a 2% LOSS);
 - the stacks' own label (`realms/harness.py label`) puts the band first: its guardrail is the mean time over the line
   at or under native's, where it was the upper end of the interval under +1 point;
@@ -438,7 +438,7 @@ operator's. A machine went back with no headroom (the next burst waits for a boo
 covers the recent peak at 0.6 of the release level. Each alone leaves the stacks late more often; together they are late
 less often. The headroom is the least that keeps every seed un-late (`results/realms/RELEASE_MARGIN_SWEEP.md`).
 
-Every report reads each change in words (GAIN, EVEN or LOSS, and what it means), so a sign is never read alone.
+Every report reads each change in words (GAIN, STEADY or LOSS, and what it means), so a sign is never read alone.
 
 ## Amendment 12 (2026-10-05, before any trial on this code)
 
@@ -471,15 +471,15 @@ be longer is measured on the machine and stated in the receipt), where it took a
 ## Amendment 14 (2026-10-17, wording only, before any trial on this code)
 
 The rule of the analysis and of amendment 1 is unchanged; only its words change, so a reading never claims more than a
-95% interval can carry and every word matches the house key (GAIN, EVEN, LOSS; `docs/HOW_TO_READ_THE_RESULTS.md`):
+95% interval can carry and every word matches the house key (GAIN, STEADY, LOSS; `docs/HOW_TO_READ_THE_RESULTS.md`):
 
 - "a proven GAIN" and "a proven LOSS" (the interval wholly on one side of zero) are written **GAIN, clear of the noise**
   and **LOSS, clear of the noise** (a card's energy that rose: **power given, clear of the noise**);
-- "not proven" (the interval includes zero) is written **EVEN, no difference beyond the noise**;
+- "not proven" (the interval includes zero) is written **STEADY, no difference beyond the noise**;
 - a contrast with fewer than two repetitions has no interval and says so.
 
 The labels of amendment 1 read the same way: primary GAIN clear of the noise, all three guardrails held: SUPERIOR WITHIN
-GUARDRAILS; a guardrail failed: ENERGY IMPROVEMENT WITH SERVICE TRADEOFF; primary EVEN, guardrails held: NONINFERIOR /
+GUARDRAILS; a guardrail failed: ENERGY IMPROVEMENT WITH SERVICE TRADEOFF; primary STEADY, guardrails held: NONINFERIOR /
 INCONCLUSIVE; a guardrail failed: NOT ESTABLISHED; primary LOSS or power given clear of the noise: AWAY FROM ITS AIM; the
 observation contrast clear of the noise: NOT ATTRIBUTABLE. The intervals use the two-sided 95% point of Student's t
 computed for the run's own degrees of freedom (`omnicompass/student_t.py`); the table it replaces held the same values to

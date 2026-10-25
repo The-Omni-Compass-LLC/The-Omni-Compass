@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The line-up: every monitor of the live engine held against the Python and the C++ that feed it, check by check.
+"""The line-up: every monitor of the live benchmark engine held against the Python and the C++ that feed it, check by check.
 
 The founder's order of 25 October: everything on the page "100% in line with ... the numbers that come out of the Python and
 the C++ harness attached to the visual Grafana monitor style ... control panels". Each monitor in the registry
@@ -151,7 +151,7 @@ def main(argv=None):
                        "checks_passed": sum(r.get("ok") is True for r in results.values())}}
     OUT_JSON.write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     s = rec["summary"]
-    L = ["# The line-up: every monitor of the live engine held against the Python and the C++", "",
+    L = ["# The line-up: every monitor of the live benchmark engine held against the Python and the C++", "",
          f"Written {rec['written']} from commit `{rec['commit'][:12]}`{' (uncommitted changes)' if rec['dirty'] else ''} by "
          "`python3 docs/engine/lineup.py`. Each monitor names the proofs that tie what it draws to the repository's own Python and, "
          "where it has one, its C++ twin (`docs/engine/monitors.json`, wire.proof); each proof ran once here.", "",

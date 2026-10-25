@@ -54,7 +54,7 @@ native with no record left (`scripts/kind_bench.sh`).
 
 By the one key (`tools/readings.py`), from the three runs' receipts (`tools/live_reps.py`, `tools/confirm_abc.py`): each
 pace against native, and each other pace against the compass arm at its default of 15 s, paired within the repetition. A row reads GAIN or LOSS
-only when all three runs agree in sign with every 95% interval clear of zero; EVEN when an interval includes zero; and
+only when all three runs agree in sign with every 95% interval clear of zero; STEADY when an interval includes zero; and
 "the runs disagree" when clear runs point different ways. A resource that rises (pods, machines, energy, the settings
 commands, the governor's own processor) is power given, never a LOSS; it is shown and named.
 
@@ -94,8 +94,8 @@ goes to the next version's list (`docs/CHANGE_CONTROL.md`) to be root-caused as 
 every pace, the default included. Written once the toy had read, before the first run, because "no LOSS at that pace" could
 be read either way: in the cloud's setting the pods wait for a machine longer than native's at every pace, the default
 included (pending pod minutes an hour: native 8.2, every 60 s 20.9, every 15, 10 and 5 s 18.4, 15.9 and 16.5), a reading of
-EVEN at 60 and 10 s and of LOSS at 15 and 5 s only because the seeds' spread differs, while against the 60 s default each
-faster pace reads EVEN. The reading kept is the toy gate's own, the one every version since 15 October was landed by.
+STEADY at 60 and 10 s and of LOSS at 15 and 5 s only because the seeds' spread differs, while against the 60 s default each
+faster pace reads STEADY. The reading kept is the toy gate's own, the one every version since 15 October was landed by.
 
 ## Amendment 2 (22 October, written before any run): the founder sets the heartbeat at 15 s
 
@@ -127,7 +127,7 @@ The runs on omni-v17 carry eight arms in every repetition, in an order rotated b
 Everything else stands as written above: the fast checks every 5 s in every Omni arm, the steady load, the line, the reset.
 Each beat is read against native and against the compass arm at 60 s, paired within the repetition, by the one key, three
 runs of 10 repetitions; a repetition's job may run four hours (`.github/workflows/benchmark-reps.yml`). A row that reads LOSS
-at any beat against native is the engine's at that beat: it is named on the dial's page (the live engine page, "The heartbeat
+at any beat against native is the engine's at that beat: it is named on the dial's page (the live benchmark engine page, "The heartbeat
 dial") and root-caused like any other, in the toy first. The seven beats were read first in our own models
 (`results/toy_gate/V17_LADDER.md`), and that reading found one fault before the version landed: at 90 and 120 s the cruise
 wait (120 s) had rounded to one decision, so one reading with a pod waiting put every machine in service. omni-v17 carries the

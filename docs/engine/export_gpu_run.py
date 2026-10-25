@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The one metered chip run, second by second, for the live engine's GPU card monitor (class P: the card's own meter).
+"""The one metered chip run, second by second, for the live benchmark engine's GPU card monitor (class P: the card's own meter).
 
 results/gpu/run-20261024T091235Z is the NVIDIA A100 (SXM4, 40 GB) run of 24 October on Lambda (workflow run 40079645681: 10
 paired repetitions, 600 s an arm, the card governor of omni-v18 at commit e3b05dc on the branch gpu-omni-v18): the engine that
@@ -11,7 +11,7 @@ stands on a real card, its own meter recording native beside Omni-Compass. The m
 arm's power draw, enforced power limit, clock and temperature from nvidia-smi (200 ms samples, binned to 2 s), its requests
 served and 95th-percentile response in 10 s windows, and the governor's decisions from its own audit. Nothing is modelled; a
 lane with no file stays empty. The run's total table is carried as GPU_REPS.md prints it, each row re-read by the one key that
-stands (a change of 0.5% or more either way is a change, EVEN only under it; tools/readings.py), so the words follow the gauge's
+stands (a change of 0.5% or more either way is a change, STEADY only under it; tools/readings.py), so the words follow the gauge's
 aim. The A10 run of 2 October (results/gpu/run-20261002T082232Z, the card controller of commit c908054) stays as its own record.
 
   python3 docs/engine/export_gpu_run.py OUT.json
@@ -49,7 +49,7 @@ def _aim(gauge: str) -> str:
 
 def _word(aim: str, change: str, interval: str) -> str:
     """The word by the gauge's aim and the one key that stands: the row's change in percent of native, 0.5% or more either way
-    a change by its sign (SIZE_FLOOR), EVEN only under it; a row printed with no percent (a count from zero) is read by its own
+    a change by its sign (SIZE_FLOOR), STEADY only under it; a row printed with no percent (a count from zero) is read by its own
     interval, clear of zero or not."""
     if aim == "SHOWN":
         return "shown, not judged"
@@ -57,7 +57,7 @@ def _word(aim: str, change: str, interval: str) -> str:
     if pct:
         rel = float(pct.group(1)) / 100.0
         if abs(rel) < SIZE_FLOOR:
-            return "EVEN"
+            return "STEADY"
         up = rel > 0
     else:
         m = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?", interval.replace("−", "-"))
@@ -65,7 +65,7 @@ def _word(aim: str, change: str, interval: str) -> str:
             return "unread"
         lo, hi = float(m[0].replace(",", "")), float(m[1].replace(",", ""))
         if lo <= 0 <= hi:
-            return "EVEN"
+            return "STEADY"
         up = hi > 0
     if aim == "HIGHER":
         return "GAIN" if up else "LOSS"

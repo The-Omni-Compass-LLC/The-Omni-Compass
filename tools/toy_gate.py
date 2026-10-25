@@ -41,7 +41,7 @@ the cloud setting). The card toys read the requests served and not served, the 9
 energy and peak temperature, and the power limit's writes, moves, reversals and travel in watts.
 The candidate is read against the standing engine paired by seed: the mean change, its 95% interval over the seeds
 (Student's t), and the word by the gauge's aim (tools/readings.py): a fall in time waited, missed or over the line is a
-GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; a mean change under 0.5% is EVEN, and
+GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; a mean change under 0.5% is STEADY, and
 from 0.5% up every change reads by its aim, with whether it stands beyond the seeds' noise beside it (24 October 2026).
 """
 from __future__ import annotations
@@ -797,11 +797,11 @@ def reading(gauge, diffs, base_vals, gauges=None):
     b = sum(base_vals) / n
     rel = m / b if b else float("nan")
     # the founder's order of 24 October 2026: a change of 0.5% or more (the seeds' mean) is a change, read by the gauge's aim;
-    # EVEN is kept for a change under 0.5%; whether the change stands beyond the seeds' noise is kept beside the word
+    # STEADY is kept for a change under 0.5%; whether the change stands beyond the seeds' noise is kept beside the word
     if lo == hi == 0.0:
-        word = "EVEN (identical)"
+        word = "STEADY (identical)"
     elif (b and abs(rel) < 0.005) or m == 0.0:
-        word = "EVEN"
+        word = "STEADY"
     elif (m < 0) == (aim == "lower"):
         word = "GAIN"
     else:

@@ -69,7 +69,7 @@ def main(argv=None):
          f"statement latency at 40% of the {r00['line_stmt_ms']:g} ms statement line (`docs/MYSQL_PREREGISTRATION.md`). sysbench's published OLTP workloads "
          "ask for rows from a set of tables that steps through the pool and past it, the same transactions in both arms. Each run holds three paired "
          "repetitions; the paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a "
-         "reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of "
+         "reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **STEADY, no difference beyond the noise** (with the count of "
          "such runs); clear runs pointing different ways read **the runs disagree**. Errors: any rise in any run reads **LOSS in at least one of our runs**. Memory held is the resource; the "
          "host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning "
          "workload is shown and not counted. Every row is shown, LOSS included.", "",

@@ -11,7 +11,7 @@
 
 Each run's own reading of a pair and a gauge (the mean of the step-by-step differences and its 95% interval on Student's t,
 as the showing wrote it) is combined by the repository's one rule (tools/readings.py, the stack reading): GAIN, LOSS or power
-given in all three when every run's interval is clear of zero on the same side; EVEN when any run's interval holds zero; the
+given in all three when every run's interval is clear of zero on the same side; STEADY when any run's interval holds zero; the
 runs disagree when clear runs point different ways. Writes <NAME>.md and <NAME>.json.
 """
 from __future__ import annotations
@@ -35,14 +35,14 @@ AIMS = {"work": "higher", "wait": "lower", "resource": "spent"}    # the key's a
 
 def combine(runs: list[dict], aim: str) -> str:
     """The three runs read by the rule that stands (tools/readings.py three_run_reading, the founder's order of 24 October 2026:
-    a change of 0.5% or more, the mean of the three runs, is a GAIN, a LOSS or power given by the gauge's aim; EVEN under it)."""
+    a change of 0.5% or more, the mean of the three runs, is a GAIN, a LOSS or power given by the gauge's aim; STEADY under it)."""
     from tools.readings import three_run_reading
     rs = [{"native": 1.0, "diff": r["rel"], "ci95": [r["lo"], r["hi"]]} for r in runs]
     return three_run_reading(rs, AIMS[aim]).replace("**", "")
 
 
 def run_word_of(rel: float, aim: str) -> str:
-    """One run's own word: its change of 0.5% or more read by the gauge's aim, EVEN under it."""
+    """One run's own word: its change of 0.5% or more read by the gauge's aim, STEADY under it."""
     from tools.readings import run_word
     return run_word({"native": 1.0, "diff": rel}, AIMS[aim])
 
@@ -95,7 +95,7 @@ def page(rec: dict) -> str:
            "muscles, no Kubernetes. Each run reads every pair by the one key, paired by step; the three runs are combined by the one "
            "rule (tools/readings.py, the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, "
            "reads GAIN, LOSS or power given by the gauge's aim, in all three of our runs where every run moved the same way clear of "
-           "zero, otherwise by the mean of our three runs with the count of runs beyond the noise; EVEN under 0.5%; the runs disagree "
+           "zero, otherwise by the mean of our three runs with the count of runs beyond the noise; STEADY under 0.5%; the runs disagree "
            "when runs moved 0.5% or more in opposite directions. Each run's own word stands beside its number by the same floor.\n",
            "| Pair | Gauge | Three runs | A | B | C |", "|---|---|---|---|---|---|"]
     for r in rec["rows"]:

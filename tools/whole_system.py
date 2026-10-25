@@ -36,7 +36,7 @@ of the total is exp(μ ± 1.96 σ). The index over the gauges is the mean of the
 two bounds, the gauges independent (Var = Σσ²/k²) and the gauges perfectly correlated inside a run (σ = Σσ/k).
 
 Two readings of the same numbers. By the index's rule a gauge of a test enters only when its three-run reading is GAIN,
-LOSS or power given in all three of our runs; an EVEN gauge, a disagreement, or a table of one run enters as exactly 1 with
+LOSS or power given in all three of our runs; an STEADY gauge, a disagreement, or a table of one run enters as exactly 1 with
 no variance (nothing inside the noise is claimed either way). With every interval carried, every measured gauge enters with
 its pooled estimate and its variance whatever its reading, and the total's interval says what the noise allows.
 
@@ -153,7 +153,7 @@ def interval(est):
 
 def word_for(gauge, est):
     """The word for a composed ratio: GAIN when its whole interval is above 1; below 1 a LOSS for work and speed and power given
-    for a resource or the bill; EVEN when the interval includes 1."""
+    for a resource or the bill; STEADY when the interval includes 1."""
     if est is None:
         return "not measured"
     r, lo, hi = interval(est)
@@ -161,7 +161,7 @@ def word_for(gauge, est):
         return readings.GAIN
     if hi < 1.0:
         return readings.LOSS if AIM[gauge] in ("higher", "lower") else readings.GIVEN
-    return readings.EVEN
+    return readings.STEADY
 
 
 def pct(r):
@@ -491,7 +491,7 @@ def main(argv=None):
              "its interval is given under two bounds, the gauges independent (Var = Σσ² / k²) and the gauges perfectly correlated inside a run (σ = Σσ / k).")
     L.append("")
     L.append("Two readings of the same numbers. **By the index's rule** a gauge of a test enters only when its three-run reading is GAIN, LOSS or power "
-             "given in all three of our runs; an EVEN gauge, a disagreement, or a table of one run enters as exactly 1 with no variance (nothing inside the "
+             "given in all three of our runs; an STEADY gauge, a disagreement, or a table of one run enters as exactly 1 with no variance (nothing inside the "
              "noise is claimed either way). **With every interval carried**, every measured gauge enters with its pooled estimate and its variance whatever "
              "its reading, and the total's interval says what the noise allows.")
     L.append("")
@@ -572,8 +572,8 @@ def main(argv=None):
              "wide one-run intervals (4 and 5 paired repetitions) are what widen it. With the card's one old run carried the chip's speed LOSS of that "
              f"run pulls the index to **{pct(math.exp(idx_a[0]))}** and its energy GAIN adds to the energy row; the card's omni-v12 run replaces that row.")
     L.append("")
-    L.append("The cloud is the wire, and it has its own factor: the bill. On Azure's own autoscaler the bill read EVEN (×1.000 inside the noise, four "
-             "paired repetitions on the compass law; the v1 fleet's steady set and burst EVEN too), so the cloud layer multiplies the total by 1 so far: "
+    L.append("The cloud is the wire, and it has its own factor: the bill. On Azure's own autoscaler the bill read STEADY (×1.000 inside the noise, four "
+             "paired repetitions on the compass law; the v1 fleet's steady set and burst STEADY too), so the cloud layer multiplies the total by 1 so far: "
              "the benefit measured is at the two ends and the layers between, and the cloud carries it without adding or taking. The omni-v12 Azure "
              "sets at the tune-down (the bill at native's work, `scripts/azure_queue.txt`) are the measurement of that factor; the bill row here changes "
              "the day their three-run tables land.")

@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Every monitor of the live engine is registered, on the wall, knobbed and in the Grafana dashboard (the founder's order of 20
+"""Every monitor of the live benchmark engine is registered, on the wall, knobbed and in the Grafana dashboard (the founder's order of 20
 October: every monitor numbered, on the wall, with its own knobs and its open-source feed)."""
 import json
 import re

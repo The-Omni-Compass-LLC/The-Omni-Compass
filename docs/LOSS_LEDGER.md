@@ -6,7 +6,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Every row of every three-run table stands where its table stands, LOSS included; this page gathers the LOSS rows so none of them is found only by reading every table. A LOSS row is a gauge that moved away from its declared aim by 0.5% or more across the benchmark's three runs, A, B and C (the founder's order of 24 October 2026, `tools/readings.py`): in all three, every run's 95% interval clear of zero, or by the mean of the three, with the count of runs beyond the noise. Each benchmark is read from its newest whole table; an older engine's table stands only until the engine that stands has run that benchmark three times, and the engine each row ran on is printed beside it.
 
-Rows that read LOSS across their three runs: **331**. Against my own native, the readings do no harm is judged by: **160**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v17: 9, omni-v16: 28, omni-v12: 284, omni-v11: 2, omni-v10: 8.
+Rows that read LOSS across their three runs: **335**. Against my own native, the readings do no harm is judged by: **164**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v17: 9, omni-v16: 28, omni-v12: 284, omni-v11: 6, omni-v10: 8.
 
 ## Against my own native
 
@@ -40,6 +40,10 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v12 | `results/live/V12_BINPACK_4W_TOP.json` | pod start wait, total (s) | 80.0%, 100.0%, 0 to 0.6 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_BINPACK_4W_TOP.json` | pod start wait, mean (s) | 260.0%, 62.5%, 0 to 0.6 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_BINPACK_4W_TOP.json` | queue: job turnaround, submitted to done, mean (s) | 2.2%, 2.4%, 5.2% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v11 | `results/live/V11_CAPACITY.json` | 1000:work | 6.8%, 1.6%, 2.0% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v11 | `results/live/V11_CAPACITY.json` | 2000:capacity | 0.0%, 0.0%, 6.5% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v11 | `results/live/V11_CAPACITY.json` | 3000:work | 1.7%, 0.3%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v11 | `results/live/V11_CAPACITY.json` | 3000:capacity | 2.7%, 5.4%, 2.6% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_CRANE_4W_BARE.json` | pod start wait, total (s) | 60.3%, 28.8%, 69.0% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_CRANE_4W_TOP.json` | pod start wait, total (s) | 80.9%, 104.5%, 54.4% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_CRANE_4W_TOP.json` | pod start wait, mean (s) | 8.6%, 21.3%, 0.9% | not yet written | — | the benchmark's three runs on the engine that stands |

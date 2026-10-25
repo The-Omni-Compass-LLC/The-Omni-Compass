@@ -62,7 +62,7 @@ FIGURES = {
     "levels": "The eight levels of an installation",
     "pedal": "One pedal, no brake: the modes and the two switches",
     "organisms": "The seven organisms on the spine",
-    "readings": "The three-run rule: GAIN, EVEN, LOSS, and the runs that disagree",
+    "readings": "The three-run rule: GAIN, STEADY, LOSS, and the runs that disagree",
     "engine": "The engine's six states, their couplings and the control law",
     "potential": "The double well of the alignment and the cubic potential of the stress",
 }
@@ -346,7 +346,7 @@ def fig_readings():
     text(d, z + 8, 310, "the side it calls LOSS", color=RED, anchor="start")
     rows = [
         ("GAIN in all three of our runs", [(-80, -30), (-95, -40), (-70, -20)], 254),
-        ("EVEN: no difference beyond the noise", [(-50, 15), (-70, -20), (-30, 25)], 194),
+        ("STEADY: no difference beyond the noise", [(-50, 15), (-70, -20), (-30, 25)], 194),
         ("LOSS in all three of our runs", [(30, 80), (45, 95), (20, 70)], 134),
         ("the runs disagree: look into the test", [(-90, -40), (30, 80), (-60, -15)], 74),
     ]

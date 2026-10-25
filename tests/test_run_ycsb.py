@@ -84,7 +84,7 @@ def main():
             {"native": {"ops": 2890.0, "cache_mb_mean": 512.0, "failed": 0}, "omni": {"ops": 2945.0, "cache_mb_mean": 920.0, "failed": 0}}]
     assert Y.paired(reps, "ops", "higher")["reading"] == "GAIN"
     assert Y.paired(reps, "cache_mb_mean", "spent")["reading"] == "power given", "more cache held is power given"
-    assert Y.paired(reps, "failed", "never more")["reading"] == "EVEN, the same"
+    assert Y.paired(reps, "failed", "never more")["reading"] == "STEADY, the same"
     reps[1]["omni"]["failed"] = 1
     assert Y.paired(reps, "failed", "never more")["reading"] == "**LOSS in a repetition**"
     assert Y.COVER_MB == (256, 2048) and Y.NATIVE_MB == 512 and lo <= Y.NATIVE_MB <= hi and len(Y.YCSB_SHA256) == 64

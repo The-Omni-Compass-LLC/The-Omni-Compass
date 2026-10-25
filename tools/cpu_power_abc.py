@@ -52,7 +52,7 @@ def engine(run_dir):
 
 def verdict(rs, direction, key=None):
     """The three-run reading of one gauge, by rule, from its three within-run paired results: GAIN, LOSS, power given,
-    EVEN or the runs disagree, by what the gauge is for (tools/readings.py)."""
+    STEADY or the runs disagree, by what the gauge is for (tools/readings.py)."""
     return stack_reading(rs, direction, SAME_REL, key)
 
 
@@ -82,7 +82,7 @@ def main(argv=None):
          "latency at 40% of the 20 ms line, every notch down allowed only by a paired trial on the machine itself under the declared objective "
          "(`docs/CPU_POWER_PREREGISTRATION.md`). Each run holds its paired repetitions; the paired difference's 95% interval within a run, and "
          "the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a "
-         "run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); clear runs pointing different "
+         "run whose interval includes zero reads **STEADY, no difference beyond the noise** (with the count of such runs); clear runs pointing different "
          "ways read **the runs disagree**. Failed requests: any rise in any run reads **LOSS in at least one of our runs**. Energy is the processor's own meter (RAPL, class P, "
          "the processor's calibrated counter); the whole machine at the wall where a plug was fitted. The tuning workload is shown and not "
          "counted. Every row is shown, LOSS included.", "",

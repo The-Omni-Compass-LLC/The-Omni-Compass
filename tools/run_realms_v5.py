@@ -64,7 +64,7 @@ NAMES = {SPINE: "The spine, the muscles every stack runs on",
          TOWER: "The whole tower, every muscle once"}
 GAINS = ["MORE WORK", "FASTER", "FEWER MISSES"]
 # The kinds, by the muscle's three aims (more work, faster, fewer misses), in the words every table uses (tools/readings.py):
-# GAIN (some aim toward and none away), EVEN (the same as native, or at its limit on native), GAIN AND LOSS, LOSS
+# GAIN (some aim toward and none away), STEADY (the same as native, or at its limit on native), GAIN AND LOSS, LOSS
 TOWARD, BOTH, AWAY = GAIN, GAIN_AND_LOSS, LOSS
 SAME, AT_LIMIT = "SAME AS NATIVE", "AT ITS LIMIT ON NATIVE"
 KINDS = [TOWARD, SAME, AT_LIMIT, BOTH, AWAY, "INVALID"]
@@ -112,9 +112,9 @@ def label_max(per_seed, valid=True, at_limit=False):
     """The max's label by rule, against the muscle's three aims (more work, its line cleared sooner, fewer misses):
       the gains, joined (MORE WORK + FASTER + FEWER MISSES, or any of them)   at least one toward its aim and none away:
                                kind GAIN
-      SAME AS NATIVE           no difference beyond the noise: EVEN
+      SAME AS NATIVE           no difference beyond the noise: STEADY
       AT ITS LIMIT ON NATIVE   no difference, and native already runs the knob at the top of its range (the max wrote
-                               nothing: there is nothing above native to give it): EVEN
+                               nothing: there is nothing above native to give it): STEADY
       GAIN AND LOSS            one toward its aim and one away (less work, slower or more misses)
       LOSS                     one away and none toward
       INVALID                  a knob not handed back to native by the lease"""
@@ -392,14 +392,14 @@ def write_md(out, res, orgs, run):
       + ". Each muscle's word is judged by its three aims, never by the sign of a number (the key: "
       "`docs/HOW_TO_READ_THE_RESULTS.md`). **GAIN**: at least one of its three aims moved beyond the noise under some load "
       "(more work, faster: the line cleared sooner, fewer misses) and none the other way under any. **GAIN AND LOSS**: one "
-      "toward its aim and one away (less work, slower or more misses). **LOSS**: one away and none toward. **EVEN, at its "
+      "toward its aim and one away (less work, slower or more misses). **LOSS**: one away and none toward. **STEADY, at its "
       "limit on native**: native already runs the knob at the top of its range (full clock, full speed, full torque, full "
       "battery power, nothing paced or turned away), so the max has nothing above native to give it and writes nothing. "
-      "**EVEN, the same as native**: the max acted or could, and the result is no different beyond the noise (native "
+      "**STEADY, the same as native**: the max acted or could, and the result is no different beyond the noise (native "
       "already did all the work that came and was almost never over its line). The energy the max takes is power given, "
       "shown beside the work, never judged.")
     w("")
-    w("| Realm | Muscles | GAIN | of them: more work | faster | fewer misses | EVEN, the same as native | EVEN, at its limit on native | GAIN AND LOSS | LOSS | Invalid |")
+    w("| Realm | Muscles | GAIN | of them: more work | faster | fewer misses | STEADY, the same as native | STEADY, at its limit on native | GAIN AND LOSS | LOSS | Invalid |")
     w("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
 
     def count_row(rs):
@@ -417,8 +417,8 @@ def write_md(out, res, orgs, run):
           "brain the only controller. Every other muscle's native is a setting native holds still or its own actuator, so "
           "by itself is the same arm there, and is counted so.")
         w("")
-        w("| Realm | Muscles | The same arm | By itself | GAIN | EVEN, the same as native | GAIN AND LOSS | LOSS | Invalid | "
-          "Against Omni-Compass and native: GAIN | EVEN | GAIN AND LOSS or LOSS |")
+        w("| Realm | Muscles | The same arm | By itself | GAIN | STEADY, the same as native | GAIN AND LOSS | LOSS | Invalid | "
+          "Against Omni-Compass and native: GAIN | STEADY | GAIN AND LOSS or LOSS |")
         w("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
 
         def solo_row(rs):
@@ -439,7 +439,7 @@ def write_md(out, res, orgs, run):
           "start, native → Omni-Compass and native (and the share still waiting at the end, where it did not clear). Power given: energy "
           "against native's.")
         w("")
-        w("| Plant | Knob | Muscles | Omni-Compass acts on | GAIN | EVEN, at its limit on native | Misses, native → Omni-Compass and native | Work | Line, native → Omni-Compass and native | Power given | Wear |")
+        w("| Plant | Knob | Muscles | Omni-Compass acts on | GAIN | STEADY, at its limit on native | Misses, native → Omni-Compass and native | Work | Line, native → Omni-Compass and native | Power given | Wear |")
         w("|---|---|---:|---:|---:|---:|---|---:|---|---:|---:|")
         groups = defaultdict(list)
         for r in res:
@@ -469,7 +469,7 @@ def write_md(out, res, orgs, run):
     acted = sum(1 for r in res if r["writes"] > 0)
     lim = sum(1 for r in res if r["label"] == AT_LIMIT)
     w(f"- Omni acts on **{acted}** of {len(res)} muscles alone. **{lim}** are at their limit on native (the knob is "
-      "already at the top of its range: EVEN); the rest it could act on show nothing beyond the noise to gain.")
+      "already at the top of its range: STEADY); the rest it could act on show nothing beyond the noise to gain.")
     w(f"- Muscles alone that read **LOSS** or **GAIN AND LOSS** under any load: **{len(away)}**"
       + ("." if not away else ": " + ", ".join(f"{r['row']['muscle']} ({r['row']['knob']}, {kind_of(r['label'])})" for r in away) + "."))
     s_away = [r for r in res if r.get("solo") and kind_of(r["solo"]["label"]) in (AWAY, BOTH)]

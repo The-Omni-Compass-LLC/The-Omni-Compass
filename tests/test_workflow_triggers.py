@@ -3,14 +3,14 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""No workflow is started by every push to main, and the live engine never starts itself (20 October).
+"""No workflow is started by every push to main, and the live benchmark engine never starts itself (20 October).
 
-The live engine committed its rebuilt page to main, and its own push filter matched that page, so it rebuilt itself every
+The live benchmark engine committed its rebuilt page to main, and its own push filter matched that page, so it rebuilt itself every
 seven minutes; each of those commits also started 21 workflows that only skip on a push (they run when started by hand),
-each skipped run started the front page, and each front page started the live engine and the raw sweep, which cancelled
+each skipped run started the front page, and each front page started the live benchmark engine and the raw sweep, which cancelled
 one another: 320 cancelled runs and 300 skipped ones in an hour and a half, no benchmark among them. A push trigger here
 is filtered by its paths or its branches, main and the level branches are ignored by every workflow that runs only when
-started, and the live engine's own page is outside its filter."""
+started, and the live benchmark engine's own page is outside its filter."""
 import unittest
 from pathlib import Path
 

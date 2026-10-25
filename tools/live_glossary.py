@@ -4,10 +4,10 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The live engine's glossary and index: every muscle of the catalog, every organism, every arm and every term a reader of
-the live engine meets, each in the repository's own words, and where on the page each one appears.
+"""The live benchmark engine's glossary and index: every muscle of the catalog, every organism, every arm and every term a reader of
+the live benchmark engine meets, each in the repository's own words, and where on the page each one appears.
 
-The founder's words of 24 October: "That live engine better have at the back of it a glossary and index and what that means.
+The founder's words of 24 October: "That live benchmark engine better have at the back of it a glossary and index and what that means.
 And that simply will have all 1,000 muscles and every other thing that should be in this so people know what it is. You can
 bulk in the glossary the organisms by their realms ... I have the catalog."
 
@@ -16,7 +16,7 @@ knob is, and what the max does with each muscle, are tools/muscle_catalog.py's w
 docs/MUSCLE_CATALOG.md); what the native controller under each plant is, is realms/plants.py's own docstring; who runs each
 family natively and how it is wired is docs/wiring_recipes.csv. The organisms are made by the runners' own rules, imported, not
 copied: the spine, the four realms, the four stacked and the tower by tools/run_realms_v5.py, the orchestra by
-tools/run_orchestra.py (the governors' mapping of tools/governors_page.py), the live engine's sixty muscles by
+tools/run_orchestra.py (the governors' mapping of tools/governors_page.py), the live benchmark engine's sixty muscles by
 docs/engine/export_harness_trace.py, the whole organism by docs/engine/export_whole.py and results/WHOLE_SYSTEM.json. Two arms,
 native and Omni-Compass on native: Omni-Compass is never by itself (the founder's order of 25 October). Every term carries its definition, drawn from the file it names,
 and a short quote from that file that this tool finds there before it writes anything: a term whose source no longer says what
@@ -160,7 +160,7 @@ def groups(rows) -> list[dict]:
 
 # --------------------------------------------------------------------------------------------------------- the organisms
 def sixty_rows() -> list[dict]:
-    """The live engine's sixty muscles, exactly as its recorder takes them from the catalog (docs/engine/export_harness_trace.py
+    """The live benchmark engine's sixty muscles, exactly as its recorder takes them from the catalog (docs/engine/export_harness_trace.py
     rows(): by name, the catalog's last row of a name winning), each with its body part."""
     return HARNESS_TRACE.rows()
 
@@ -265,7 +265,7 @@ def organisms(rows) -> list[dict]:
         parts.setdefault(r["part"], []).append(r["muscle_id"])
     dup = sorted(n for n, c in Counter(r["muscle"] for r in rows).items() if c > 1)
     out.append({
-        "key": SIXTY, "name": "The live engine's organism: sixty muscles, twelve in each of five body parts", "class": "S",
+        "key": SIXTY, "name": "The live benchmark engine's organism: sixty muscles, twelve in each of five body parts", "class": "S",
         "muscles": len(six), "families": family_list(six),
         "parts": [{"part": p, "muscles": ids, "organ": PART_ORGAN[p][0], "theta": PART_ORGAN[p][1]} for p, ids in parts.items()],
         "meaning": ("The sixty muscles the page draws, twelve from the spine and twelve from each realm, put in one organism of "
@@ -376,10 +376,12 @@ TERMS = [
       "failures, or a resource cut. Decided by what the gauge is for, never by the plus or minus sign of its number; the number "
       "beside it wears a plus (+73.0% GAIN). G.A.I.N.: Growth, Advantage, Improvement, Net-positive. Green.",
       [(RD, "the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures")]),
-    T("EVEN", R, "A change under 0.5% (the mean of the three runs' changes under the floor), no change at all, or a knob native "
-      "already runs at the top of its range (at its limit on native). A change of 0.5% or more is never EVEN. The number beside "
-      "it wears = (=0.3% EVEN). E.V.E.N.: Equalized, Verified baseline, Equilibrium, Neutral. Yellow.",
-      [(RD, "EVEN is kept for a change under 0.5%"), (RD, "the top of its range is EVEN, at its limit on native")]),
+    T("STEADY", R, "A change under 0.5% (the mean of the three runs' changes under the floor), no change at all, or a knob native "
+      "already runs at the top of its range (at its limit on native). A change of 0.5% or more is never STEADY. Of three kinds: "
+      "exactly the same (to nine decimal places), under the floor (a measured change under 0.5%), and, in a table read by an older "
+      "key, no difference beyond the noise. Its size is printed without a sign (STEADY 0.3%), the raw change apart. S.T.E.A.D.Y.: Stable, True to baseline, Equilibrium, At par, Drift-free, Yield held. Yellow, and the yellow of the traffic signal on every "
+      "monitor carries the same word.",
+      [(RD, "STEADY is kept for a change under 0.5%"), (RD, "the top of its range is STEADY, at its limit on native")]),
     T("LOSS", R, "The gauge moved away from its declared aim against native: less work done, a longer wait, more misses or "
       "failures. A LOSS row is never cut: its cause is found and fixed (our own wiring first, then native's setup, then the "
       "scoring) and the test is run again. The number beside it wears − (−16.8% LOSS). L.O.S.S.: Leakage, Off-track, Setback, "
@@ -399,16 +401,17 @@ TERMS = [
       "Grey.", [(RD, "SHOWN = \"shown, not judged\"                 # declared in advance as shown only")], aka=["shown, not judged"]),
     T("the 0.5% floor", R, "A change of half of one percent (0.5%) or more either way is a change: GAIN, LOSS or power given by "
       "what the gauge is for. The change is the mean of the three runs' changes, each in percent of native; a mean under 0.5% "
-      "reads EVEN, under the floor, with its size. The floor is the founder's order of 20 October 2026; that every change of "
+      "reads STEADY, under the floor, with its size. The floor is the founder's order of 20 October 2026; that every change of "
       "0.5% or more shows its word, his order of 24 October.",
       [(RD, "percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge "),
-       (RD, "A mean under 0.5% reads **EVEN, under the floor**, with its size.")],
+       (RD, "A mean under 0.5% reads **STEADY, under the floor**, with its size.")],
       aka=["the floor", "under the floor", "0.5%"]),
-    T("the sign beside a word", R, "The number next to a word carries the word's sign, never the gauge's raw direction: GAIN +, "
-      "LOSS −, EVEN =, power given +. A bill cut 3% reads GAIN +3%; failed requests up 2% read LOSS −2%.",
-      [(RD, "the number next to a word carries the word's sign, never the gauge's raw")],
-      aka=["sign beside a word", "number beside a word"]),
-    T("the key", R, "GAIN, EVEN and LOSS, with power given and the letters behind each word: The Omni-Compass LLC's own convention "
+    T("the raw change and the word", R, "Two numbers, never mixed (the referee's work order of 25 October): every row shows native's "
+      "value, Omni-Compass's value and the raw change, (Omni-Compass − native) / native, with its true sign; the word beside it is "
+      "judged by what the gauge is for, and the size printed beside a word carries no sign. A wait that fell 3% prints raw −3.0% and "
+      "GAIN 3.0%; failed requests that rose 2% print raw +2.0% and LOSS 2.0%.",
+      [(RD, "Two numbers, never mixed")], aka=["sign beside a word", "number beside a word", "raw change"]),
+    T("the key", R, "GAIN, STEADY and LOSS, with power given and the letters behind each word: The Omni-Compass LLC's own convention "
       "for reading its own results, in the words of underwriting and actuarial work, where every outcome is graded as surplus, "
       "break-even or deficit. Not an actuarial, financial or insurance opinion; no outside body defined, reviewed or approved it.",
       [(RD, "they are the words of underwriting and actuarial work"),
@@ -421,7 +424,7 @@ TERMS = [
       [(DIS, "Omni-Compass has one goal: to strengthen the organism it governs and keep it healthy"),
        (DIS, "Harm is judged at the organism.")], aka=["do no harm"]),
     T("at its limit on native", R, "A knob native already runs at the top of its range: the max has nothing above native to "
-      "give it, so Omni-Compass reads it and leaves it native. It reads EVEN.",
+      "give it, so Omni-Compass reads it and leaves it native. It reads STEADY.",
       [(CL, "A knob native already runs at the top of its range is \"at its limit on native\"."),
        (ARM5, "Whether native already runs this kind of knob at the top of its range, so the max has nothing above native to")],
       aka=["at its limit on native"]),
@@ -688,14 +691,14 @@ TERMS = [
       "its one factory tune; a changed tune's results are the tuner's own. One button returns every knob to it.",
       [(DIS, "Every published benchmark result is one engine at its one factory tune"),
        (PAGE_F, "Every knob back to the factory tune")], aka=["factory tune"]),
-    T("the live tuning engine", D, "The live engine page and its control panel: every knob, button and monitor turns in real time "
+    T("the live tuning engine", D, "The live benchmark engine page and its control panel: every knob, button and monitor turns in real time "
       "to show the mechanism of action with native alone, with Omni-Compass on top, or both; what it shows at any other setting "
       "is the engine's range, never a benchmark result.",
-      [(DIS, "The live engine page and the control panel are a live tuning engine")], aka=["live tuning engine"]),
+      [(DIS, "The live benchmark engine page and the control panel are a live tuning engine")], aka=["live tuning engine"]),
     # ------------------------------------------------------------------------------------------------ proof and evidence
     T("the verdict", P, "Omni-Compass moves a knob only where it measures that the muscle loses nothing by it. The trial step is "
       "read as a report reads a row: the 95% interval of its change in cost, on the logarithm of each piece of work's cost. "
-      "Wholly above zero is a LOSS: refused and undone. A GAIN or an EVEN step is kept only within the 2% allowance. The 2% "
+      "Wholly above zero is a LOSS: refused and undone. A GAIN or an STEADY step is kept only within the 2% allowance. The 2% "
       "verdict is the engine's trigger, not a stamp on a report.",
       [("omnicompass/verdict.py", "The verdict: Omni-Compass moves a knob only where it measures that the muscle loses nothing by it."),
        (CL, "is the engine's trigger, not a stamp on a report")], aka=["verdict", "2% allowance"]),
@@ -745,8 +748,8 @@ TERMS = [
     T("Monte Carlo", P, "The Python's Monte Carlo of the engine's core: N runs from the jump generator, each through the six "
       "states and the RK4 step, controlled, uncontrolled (native), aimed at the wrong basin and with the double well's μ at 0; a "
       "run is conveyed when its U has stayed in one basin for 5 macro steps in a row and certified at 10. One digest, and the "
-      "live engine's own port and the C++ twin held to it. Class S.",
-      [("tools/core_runs.py", "The Python's Monte Carlo of the engine's core from the jump generator: N runs, one digest, the live engine's own port held to it.")],
+      "live benchmark engine's own port and the C++ twin held to it. Class S.",
+      [("tools/core_runs.py", "The Python's Monte Carlo of the engine's core from the jump generator: N runs, one digest, the live benchmark engine's own port held to it.")],
       aka=["Monte Carlo"]),
     T("the jump generator", P, "The seed of run k: seed_k = base + k·0x9E3779B9, mod 2³², feeding a mulberry32 stream (the page's "
       "own generator), so the Python, the C++ and the page draw the same runs and prove each other receipt by receipt.",
@@ -879,27 +882,26 @@ TERMS = [
     # ------------------------------------------------------------------------------------------------------------ the page
     T("the benefit board", W, "Every benchmark's measured effect in one board, native against Omni-Compass on top of native, by "
       "domain and by gauge family, with the Omni index that weighs them together; every bar is its table's own word (GAIN green, "
-      "EVEN yellow, LOSS red, power given blue) beside its size.",
+      "STEADY yellow, LOSS red, power given blue) beside its size.",
       [(PAGE_F, "every benchmark's measured effect in one board")], aka=["benefit board"]),
-    T("the traffic signal", W, "Every monitor's light, a button in three colours: green inside its lines (working), yellow before "
-      "its line (within 3% of it, or its own slope crossing it within three readings) or EVEN on a record, red over its line (an "
-      "alert); grey, and said so, where there is no line. On a record the colour is the reading's word: GAIN green, EVEN yellow, "
-      "LOSS red.",
-      [(CL, "green inside its lines, amber before the line (within 3% of it, or its own slope over the last readings crossing it within three readings), red over it"),
-       (CL, "green working, yellow heading for its line or EVEN on a record, red an alert"),
-       (MAN, "| Yellow | EVEN |")], aka=["traffic signal", "traffic light", "light", "lights"]),
-    T("REDLINING", W, "Red on the traffic signal, blinking: a monitor over its line, or Omni-Compass behind native now (a LOSS): "
-      "the alarm. Red means LOSS and the alarm only, never native.",
-      [(PAGE_F, "REDLINING: over its line, or Omni-Compass behind native now (a LOSS): the alarm"), (CL, "red an alert")],
+    T("the traffic signal", W, "Every monitor's light, read on its band (the founder's words of 25 October): green GAINING, low in its "
+      "band with room to climb; yellow STEADY, inside its band; red REDLINING, at the top of its band and holding there, blinking red "
+      "and black; red OVER THE LINE, past its band, blinking red and white; grey, and said so, where there is no line. On a record "
+      "the colour is the reading's word: GAIN green, STEADY yellow, LOSS red. A needle that falls is not a LOSS and one that rises is "
+      "not a GAIN: each light reads what its gauge is for. The light moves with its monitor: it reads the series the monitor draws.",
+      [(PAGE_F, "GAINING: low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN)"),
+       (PAGE_F, "STEADY: inside its band, or level with native (STEADY, a change under 0.5%)"),
+       (MAN, "| Yellow | STEADY |")], aka=["traffic signal", "traffic light", "light", "lights"]),
+    T("GAINING", W, "Green on the traffic signal: low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN).",
+      [(PAGE_F, "GAINING: low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN)")], aka=["GAINING"]),
+    T("REDLINING", W, "Red on the traffic signal, blinking red and black: at the top of its band and holding there, or Omni-Compass "
+      "behind native now (a LOSS). Red means LOSS and the alarm only, never native.",
+      [(PAGE_F, "REDLINING: at the top of its band and holding there, blinking red and black, or Omni-Compass behind native now (a LOSS)")],
       aka=["REDLINING"]),
-    T("STEADY", W, "Yellow on the traffic signal: no difference beyond the noise (EVEN, inside 0.5%), or a monitor heading for its "
-      "line and watched before it gets there.",
-      [(PAGE_F, "STEADY: no difference beyond the noise (EVEN, inside 0.5%), or heading for its line and watched before it gets there")],
-      aka=["STEADY"]),
-    T("THRIVING", W, "Green on the traffic signal: a monitor working inside its lines with room to give, or Omni-Compass ahead of "
-      "native now (a GAIN).",
-      [(PAGE_F, "THRIVING: working inside its lines with room to give, or Omni-Compass ahead of native now (a GAIN)")],
-      aka=["THRIVING"]),
+    T("OVER THE LINE", W, "Red on the traffic signal, blinking red and white: past the top of its band, the alarm. Omni-Compass's own "
+      "law hands a muscle back toward native before its line (the fail-up at the band's 95% wall), so this light is what a line "
+      "crossed looks like, on whichever side crossed it.",
+      [(PAGE_F, "OVER THE LINE: past the top of its band, blinking red and white: the alarm")], aka=["OVER THE LINE", "over the line"]),
     T("AWAITING", W, "A dark light, never green: the run that fills this monitor has not landed yet, and the light stays dark until "
       "it does.", [(PAGE_F, "AWAITING: the run that fills this monitor has not landed yet; its light stays dark until it does, never green")],
       aka=["AWAITING"]),
@@ -933,7 +935,7 @@ TERMS = [
       "and its results are its own.", [(FP, "An identifiable configuration that differs from the released factory profile.")],
       aka=["custom profile"]),
     T("live tuning bench", W, "The interface that operates the engine's controls and displays their effects through the connected "
-      "backend: the live engine's main control panel.",
+      "backend: the live benchmark engine's main control panel.",
       [(FP, "The interface that operates the engine's controls and displays their effects through the connected backend.")],
       aka=["tuning bench", "the bench"]),
     T("harness", P, "The machinery that supplies workloads, executes comparisons, checks requirements and records results.",
@@ -967,10 +969,10 @@ TERMS = [
       "writes through a two-way plug, reads each write back, audits, hands back gradually and stops at the kill switch, on top of "
       "every native controller.", [(FP, "| Supervisory governor | reads the whole body every beat, decides with one law across every muscle")],
       aka=["supervisory governor", "governor"]),
-    T("the dashboards", W, "The page's section 1c: the live engine in nine forms an operations team reads (a board of panels, a host "
+    T("the dashboards", W, "The page's section 1c: the live benchmark engine in nine forms an operations team reads (a board of panels, a host "
       "map, a graph, an event stream, a cluster console, a one-line diagram, a wall of numbers, the cost by body part, and "
       "Omni-Compass's own two-way pipeline), by muscle, body part or the whole organism.",
-      [(PAGE_F, "The dashboards: the live engine in every form an operations team reads a system")], aka=["dashboards", "host map"]),
+      [(PAGE_F, "The dashboards: the live benchmark engine in every form an operations team reads a system")], aka=["dashboards", "host map"]),
     T("the contract, this decision", W, "The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the "
       "settings requested u[req](k), commanded u[cmd](k) = Π[C](u[req](k)) and acknowledged u[ack](k) = R(u[cmd](k)), computed on the "
       "live model.", [(FP, "u[cmd](k) = Π[C](u[req](k))"), (PAGE_F, "the contract, this decision")], aka=["the contract"]),
@@ -1116,7 +1118,7 @@ def page_sections(page: str) -> list[dict]:
 
 
 def _pattern(alias: str) -> re.Pattern:
-    """An alias as the page would print it: whole words at its word ends; case kept for a word in capitals (GAIN, EVEN,
+    """An alias as the page would print it: whole words at its word ends; case kept for a word in capitals (GAIN, STEADY,
     LOSS, the light's labels, A), folded otherwise."""
     core = re.escape(alias)
     lead = r"(?<![\w-])" if re.match(r"\w", alias) else ""        # a hyphen joins a word: Omni-Compass is not the compass
@@ -1184,7 +1186,7 @@ MUSCLE_KEYS = {   # what each field of a muscle's record holds: the record is sh
     "card": "its own card, or global (realms/muscle_cards_v5.csv)",
     "organisms": "every organism it belongs to, by the runners' own rules (spine, the realms, stack, tower, orchestra, sixty)",
     "governors": "the governors whose knob it stands for in the orchestra (tools/governors_page.py CATALOG)",
-    "part": "its body part in the live engine's sixty (docs/engine/export_harness_trace.py)",
+    "part": "its body part in the live benchmark engine's sixty (docs/engine/export_harness_trace.py)",
 }
 
 
@@ -1244,7 +1246,7 @@ def build() -> dict:
     rows = core.pop("rows")
     out = OrderedDict()
     out["notice"] = PLAIN
-    out["title"] = "The live engine's glossary and index"
+    out["title"] = "The live benchmark engine's glossary and index"
     out["source"] = "tools/live_glossary.py"
     out["engine"] = engine()
     out["rule"] = ("Every muscle of realms/catalog_v5.csv once; every organism, arm and term in the repository's own words, each "
@@ -1279,8 +1281,8 @@ def to_md(d: dict) -> str:
     sec = {s["id"]: s for s in d["sections"]}
     anchor = lambda a: f"{sec[a]['n']} (#{a})" if sec[a]["n"] else f"#{a}"
     c = d["counts"]
-    L = ["# The Live Engine's Glossary and Index", "",
-         "This is the back of the live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): every term a reader of the page "
+    L = ["# The Live Benchmark Engine's Glossary and Index", "",
+         "This is the back of the live benchmark engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): every term a reader of the page "
          f"meets, the {c['organisms']} organisms it shows, its {c['arms']} arms and their {c['scenarios']} combinations, every one of "
          f"the catalog's {c['muscles']:,} muscles bulked by its realms, and an index of where each term stands on the page. Every "
          "definition is drawn from the file it names, and the file still carries the words quoted from it; nothing here is typed "
@@ -1331,7 +1333,7 @@ def to_md(d: dict) -> str:
           "Every muscle of `realms/catalog_v5.csv` once: the spine's families first, then each realm's own. Each family names its "
           "plant, its class of machine, the native controller that runs it and how it is reached; each muscle its knob, what "
           "Omni-Compass does with it (the max, the default) and the organisms it belongs to (spine; the realms; stack; tower; "
-          "orchestra, with its governors; the live engine's sixty, with its body part).", "",
+          "orchestra, with its governors; the live benchmark engine's sixty, with its body part).", "",
           "**The four kinds of knob.** " + " ".join(f"**{k}**: {v['full']}" for k, v in d["knobs"].items()), "",
           "**The five plants.** " + " ".join(f"`{k}`: {v['what']}; native: {v['native']}." for k, v in d["templates"].items()), ""]
     mus = {m["id"]: m for m in d["muscles"]}

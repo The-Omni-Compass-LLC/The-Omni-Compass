@@ -39,7 +39,7 @@ only costs.
 
 The wall reads; it writes nothing. The governor is the autopilot: it acts before a line is crossed, and its settings change only
 by the governor itself, by its control panel (`tools/omni_control.py`: an authenticated API, every press audited with its
-reason; the live engine page's **Commands** tab lists every press and its request) and by the kill switch
+reason; the live benchmark engine page's **Commands** tab lists every press and its request) and by the kill switch
 (`tools/omni_switch.py`, security, instant). An alert wakes a person only when the governor itself is in trouble (stale,
 orphaned, hammering). No alert presses a governor button by itself: the engine's own safety acts first (the lease walks every
 setting back after a crash; the watchdog runs the restore commands), and the reset and the kill switch stay a person's press.
@@ -54,9 +54,9 @@ http://127.0.0.1:12345). Teams that already run Alloy point it at the same endpo
 no setting. It sits beside Omni-Compass, never in its place: Omni-Compass is the governor that acts on the system, Alloy one of
 the ways its readings travel to the wall.
 
-## The live engine page on the same Prometheus
+## The live benchmark engine page on the same Prometheus
 
-The live engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) reads its own model by default. On its main control panel,
+The live benchmark engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) reads its own model by default. On its main control panel,
 **Drive → your own system**, type `http://127.0.0.1:9090` and press **Connect**: each monitor asks this Prometheus its own
 query every 15 s and its breaker shows the answer (read only). The page's **Metrics (Prometheus)** tab prints its own model in
 the same text format, with the series a running system serves beside each one and the PromQL the wall draws it with. This

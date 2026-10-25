@@ -7,7 +7,7 @@
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_pgbench.py), each run holding
 three paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions
 gives a 95% interval; across the three runs a gauge reads GAIN or LOSS in all three of our runs (by what it is for, never by its sign; a resource
-spent that rose reads power given) when all three move the same way with every interval clear of zero, EVEN, no difference beyond the noise, when a run's interval includes zero (with the count
+spent that rose reads power given) when all three move the same way with every interval clear of zero, STEADY, no difference beyond the noise, when a run's interval includes zero (with the count
 of such runs), and the runs disagree when runs clear of the noise point different ways. Failed transactions: any rise
 in any run is marked. The pool size is shown, never judged. Every row is reported, LOSS included; no energy is claimed.
 Usage: python tools/pgbench_abc.py A_DIR B_DIR C_DIR --out results/live/V3_PGBENCH.md
@@ -55,7 +55,7 @@ def engine(run_dir):
 
 def verdict(rs, direction, key=None):
     """The three-run reading of one gauge, by rule, from its three within-run paired results: GAIN, LOSS, power given,
-    EVEN or the runs disagree, by what the gauge is for (tools/readings.py)."""
+    STEADY or the runs disagree, by what the gauge is for (tools/readings.py)."""
     return stack_reading(rs, direction, SAME_REL, key)
 
 
@@ -83,7 +83,7 @@ def main(argv=None):
          "PostgreSQL as shipped behind PgBouncer's shipped pool of 20 is native; omni is the compass law on the pool size through "
          "PgBouncer's own console (`docs/POSTGRES_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired "
          "difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make a "
-         "reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **EVEN, no difference beyond the "
+         "reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **STEADY, no difference beyond the "
          "noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed transactions: "
          "any rise in any run reads **LOSS in at least one of our runs**. Every row is shown, LOSS included. The host's CPU-seconds are measured on GitHub's "
          "shared runner; no energy is claimed.", "",

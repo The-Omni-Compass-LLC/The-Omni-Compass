@@ -4,7 +4,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The whole organism, two ways, for the live engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html, section 11).
+"""The whole organism, two ways, for the live benchmark engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html, section 11).
 
 The repository composes the layers of the whole system by the product law in one place, tools/whole_system.py, which writes
 results/WHOLE_SYSTEM.json and results/WHOLE_SYSTEM.md: for every gauge g and layer ℓ an oriented ratio Rℓ(g) (above 1 is
@@ -40,7 +40,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tools.readings import GAIN, EVEN, LOSS, GIVEN  # noqa: E402
+from tools.readings import GAIN, STEADY, LOSS, GIVEN  # noqa: E402
 
 WS = ROOT / "results" / "WHOLE_SYSTEM.json"
 GAUGES = ("work", "speed", "machines", "energy", "bill")
@@ -74,11 +74,11 @@ def layer_no(name: str) -> int | None:
 
 def word_of(gauge: str, mu: float, sigma: float) -> str:
     """The word of a composed factor by the key's floor (tools/readings.py, the founder's order of 24 October 2026; the mathematics
-    seat of 24 October): a change of 0.5% or more reads by the gauge's aim, whatever its interval, EVEN only under 0.5%. Whether
+    seat of 24 October): a change of 0.5% or more reads by the gauge's aim, whatever its interval, STEADY only under 0.5%. Whether
     its 95% interval stands clear of no change is carried beside it (clear_of), never as the word."""
     from tools.readings import SIZE_FLOOR
     if abs(math.exp(mu) - 1) < SIZE_FLOOR:
-        return EVEN
+        return STEADY
     if mu > 0:
         return GAIN
     return GIVEN if gauge in SPENT else LOSS
@@ -184,7 +184,7 @@ def main(out):
             "rule": "R(g) = ∏ℓ Rℓ(g), log R = Σℓ log Rℓ, the variances added; a scenario sums the layers it stacks; the index is the mean of the gauge logarithms, "
                     "its 95% interval under two bounds (the gauges independent; perfectly correlated); by the index's rule only what held the same way in all three "
                     "of our runs enters, with every interval carried everything measured enters with its interval; each composed factor's word by the key's "
-                    "floor (0.5% or more by the gauge's aim, EVEN under it), whether its interval stands clear of no change said beside it"}
+                    "floor (0.5% or more by the gauge's aim, STEADY under it), whether its interval stands clear of no change said beside it"}
     Path(out).write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False), encoding="utf-8")
     for sk, R in results.items():
         for rd in readings:

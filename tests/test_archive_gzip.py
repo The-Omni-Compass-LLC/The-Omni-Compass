@@ -28,7 +28,7 @@ class ArchiveGzip(unittest.TestCase):
         self.assertEqual(sorted(gzipped_names()), ["*.raw", "consumer-*.log", "requests.log"])
 
     def test_no_archive_reader_names_a_gzipped_file(self):
-        pats = {"*.raw": r"\.raw\b|notch-", "requests.log": r"requests\.log", "consumer-*.log": r"consumer-"}
+        pats = {"*.raw": r"\.raw\b|notch-(?![^\"']*\.log)", "requests.log": r"requests\.log", "consumer-*.log": r"consumer-"}
         readers = [p for p in sorted((ROOT / "tools").glob("*.py")) + sorted((ROOT / "scripts").glob("*.py"))
                    if p.name not in WRITERS]
         readers += [ROOT / ".github/workflows/reaggregate.yml"]

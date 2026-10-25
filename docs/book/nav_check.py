@@ -198,7 +198,7 @@ def main(pdf, md_path):
     # a reference that follows another document's name (`DISCLOSURES.md`, section 4; `LICENSE`, section 10; the other
     # manual; the founder's manuscript) carries that document's numbering: not this book's to check
     external = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual)\W*$")
-    own_name = ("Owner's Manual" if "OWNERS" in md_path.upper() else "Live Engine Manual" if "LIVE_ENGINE" in md_path.upper()
+    own_name = ("Owner's Manual" if "OWNERS" in md_path.upper() else "Live Benchmark Engine Manual" if "LIVE_ENGINE" in md_path.upper()
                 else "Operator's Manual")
 
     def foreign(prev, ln, start):

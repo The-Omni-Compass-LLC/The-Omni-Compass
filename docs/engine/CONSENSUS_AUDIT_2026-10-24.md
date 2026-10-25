@@ -24,7 +24,7 @@ All five seats are in. Majors as counted: the mathematics 11 (S1–S11), the str
 less U10), the editing 17 (E1–E17) and the visual 11 (V1–V11): 59. The underwriting seat's U10 (the GPU run's engine and class
 stated three ways) is carried as a minor on the founder's word of 25 October ("drop the smallest one"). The editing seat's E14
 carries the same fault as a major, so nothing is lost. Several are one fault seen by two or three seats: the dial's record and
-its doubled id (S11 = ST5 = V1), the reading key's EVEN defined by the noise (S6 = U12 = E12), the broken section pointers
+its doubled id (S11 = ST5 = V1), the reading key's STEADY defined by the noise (S6 = U12 = E12), the broken section pointers
 (ST1 = E13), the page's described order (ST2 = E4), the LOSS count typed as 7 where 2c lists 160 (S8 = U4), and the heartbeat
 stated as 15 s where the engine decides every 60 s (S8 = E11). The fixes are in hand. This section is written again, finding by
 finding, when they land.
@@ -92,7 +92,7 @@ Each is set out in full in its seat's report, with the line, the evidence and th
   - S3 the benefit board's verbs against their words;
   - S4 seconds printed as percent;
   - S5 "in all three runs" counts overstated;
-  - S6 the retired EVEN rule;
+  - S6 the retired STEADY rule;
   - S7 the whole-workload words and the cloud layer beyond its record;
   - S8 two stale typed numbers;
   - S9 a green light beside "GAIN AND LOSS";
@@ -131,7 +131,7 @@ Each is set out in full in its seat's report, with the line, the evidence and th
   - E9 the glossary's beats;
   - E10 the kill switch called native alone;
   - E11 15 s against 60 s;
-  - E12 EVEN two ways;
+  - E12 STEADY two ways;
   - E13 nine cross-references to missing sections;
   - E14 the GPU run named four ways;
   - E15 ten organisms against seven;

@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The monitor wall as a Grafana dashboard: one panel a monitor, each on the open-source feed that carries it live.
 
-The live engine's monitors (docs/engine/monitors.json) are, in the founder's words, nothing more than a Grafana-type dashboard
+The live benchmark engine's monitors (docs/engine/monitors.json) are, in the founder's words, nothing more than a Grafana-type dashboard
 wired to the organism. This writes that dashboard (deploy/grafana/omni-compass-wall.json, Grafana's dashboard model, schema 39):
 a monitor with a Prometheus expression becomes a panel on that expression (the datasource a variable, ${DS_PROMETHEUS}); a
 monitor the page computes from the repository's tables, or from its own clock, becomes a text panel saying so and where the
@@ -74,14 +74,14 @@ def wiring(m: dict) -> str:
     return f" Wired: the page's {w['code']} → the Python {py} → the C++ {cpp}{proof}. Moves: {w['moves']}."
 
 
-# the live engine's light in Grafana's own thresholds, where the monitor's line is a number on its series (the founder's words of 23
+# the live benchmark engine's light in Grafana's own thresholds, where the monitor's line is a number on its series (the founder's words of 23
 # and 24 October: green working, yellow heading for its line, red an alert): green below, yellow from 97% of the line, red at it;
 # a series whose good side is high (the master switch ON, the error budget left) reads the other way
 LIGHT = {"feed2": (0.2, False), "feed3": (0.75, False), "opsCandle": (200.0, False), "orchCv": (1.0, False), "ruStrip": (1.0, False),
          "immCv": (1.0, False), "cStrip": (0.95, False), "band": (0.95, False), "masterCv": (1.0, True), "tSlo": (0.999, True), "tBurn": (0.1, True)}
-LIGHT_WORDS = (" Its light on the live engine, a signal standing as a traffic signal does, red on top, yellow in the middle, green at the"
+LIGHT_WORDS = (" Its light on the live benchmark engine, a signal standing as a traffic signal does, red on top, yellow in the middle, green at the"
                " bottom: red, an alert, over its line or a LOSS row; yellow, heading for its line (within 3% of it, or its slope crossing"
-               " it within three readings), or EVEN on a record; green, working inside its lines.")
+               " it within three readings), or STEADY on a record; green, working inside its lines.")
 
 
 def thresholds(mid: str) -> dict:
@@ -109,7 +109,7 @@ def dashboard(reg: dict) -> dict:
         x = col * W
         title = f"{n} · {m['name']}"
         base = {"id": n, "title": title, "gridPos": {"x": x, "y": y, "w": W, "h": H},
-                "description": (f"Section {sn}, {st}. " if sn else "") + f"{m['what']} Evidence class {m['cls']}; on the live engine: {m['status']}. Feed: {m['feed']['exporter']}."
+                "description": (f"Section {sn}, {st}. " if sn else "") + f"{m['what']} Evidence class {m['cls']}; on the live benchmark engine: {m['status']}. Feed: {m['feed']['exporter']}."
                                + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "") + wiring(m) + LIGHT_WORDS}
         col += 1
         if col == COLS:
@@ -124,13 +124,13 @@ def dashboard(reg: dict) -> dict:
         else:
             panels.append({**base, "type": "text", "options": {"mode": "markdown", "content":
                            f"**{m['name']}** ({reg['layers'].get(m['layer'], m['layer'])}).\n\n{m['what']}\n\nSource: {m['feed']['exporter']}. "
-                           f"No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; "
+                           f"No Prometheus series carries this panel: the live benchmark engine draws it from the repository's own records or from its own clock; "
                            f"this panel marks its place on the wall (monitor {n}).{LIGHT_WORDS}"}})
     return {"uid": "omni-compass-wall", "title": "Omni-Compass: the monitor wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "time": {"from": "now-6h", "to": "now"}, "refresh": "30s",
             "templating": {"list": [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "query": "prometheus", "current": {}, "hide": 0}]},
             "links": [{"title": "The governor's own screen", "type": "dashboards", "tags": ["omni-compass"], "asDropdown": False},
-                      {"title": "The live engine", "type": "link", "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
+                      {"title": "The live benchmark engine", "type": "link", "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
             "description": NOTICE,
             # the notice at the top and the end of the wall, where Grafana shows it (the underwriting seat of 24 October)
             "panels": [notice_panel(-1)] + panels + [notice_panel(max([p["gridPos"]["y"] + p["gridPos"]["h"] for p in panels] or [0]))],

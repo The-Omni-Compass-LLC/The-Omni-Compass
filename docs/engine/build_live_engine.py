@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Rebuilds the live engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html) from the engine that stands and the
+"""Rebuilds the live benchmark engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html) from the engine that stands and the
 repository's own results: the page is a monitor of the engine, never a drawing of it.
 
 Every record the page replays is made again here by the repository's own code on the checkout it runs in:
@@ -729,10 +729,10 @@ def orchestrators() -> list:
         if cands:
             n, _, _, st = max(cands)
             rc = XS.receipt(f"V{n}_{st}")
-            # every row as written: the judged ones that moved, the EVEN ones (no difference beyond the noise) and the rows shown unjudged
+            # every row as written: the judged ones that moved, the STEADY ones (no difference beyond the noise) and the rows shown unjudged
             table = {"file": rc["file"], "title": rc["title"], "engine": f"omni-v{n}", "count": rc["count"],
                      "rows": ([{"g": x["g"], "abc": x["abc"], "w": x["w"], "r": x["r"]} for x in rc["rows"]]
-                              + [{"g": x["g"], "abc": x["abc"], "w": "EVEN", "r": x.get("kind")} for x in rc["even"]]
+                              + [{"g": x["g"], "abc": x["abc"], "w": "STEADY", "r": x.get("kind")} for x in rc["even"]]
                               + [{"g": x["g"], "abc": x["abc"], "w": "shown", "r": x["r"]} for x in rc["shown"]])[:60]}
         named = re.findall(r"docs/[A-Z0-9_]+_PREREGISTRATION\.md", test + " " + (r0["status"] if r0 else ""))
         pp = [ROOT / x for x in named if (ROOT / x).exists()]
@@ -1002,6 +1002,43 @@ def injection_grid() -> dict:
     return {"file": str(f.relative_to(ROOT)), **d}
 
 
+def verdict_audit() -> dict:
+    """The verdict audit (tools/verdict_audit.py; the referee's work order of 25 October): every row of every three-run table
+    recomputed from its stored native and Omni-Compass values, every count from one selection, and the discrepancy report
+    against the tables as they were (results/verdict_audit/DISCREPANCIES.json)."""
+    import sys as _s
+    _s.path.insert(0, str(ROOT))
+    from tools.verdict_audit import build as audit_build, digest as audit_digest, loss_rows
+    rec = audit_build()
+    by_t = {t["stem"]: t for t in rec["tables"]}
+    r4 = lambda x: None if x is None else round(x, 4)
+
+    def row(r):
+        t = by_t[r["table"]]
+        return {"t": r["table"], "f": t["file"], "e": t["engine"], "c": t["class"], "s": r["section"], "g": r["gauge"],
+                "d": r["direction"], "w": r["word"], "rd": r["stored"],
+                "runs": [[r4(x.get("native")), r4(x.get("omni")), r4(x.get("raw_pct")), r4(x.get("raw_unit")), bool(x.get("clear"))]
+                         for x in r["runs"]], "ev": r.get("evidence")}
+    disc = ROOT / "results" / "verdict_audit" / "DISCREPANCIES.json"
+    dd = json.loads(disc.read_text(encoding="utf-8")) if disc.exists() else {"rows": []}
+    kinds = {}
+    for d in dd["rows"]:
+        for k in d["kinds"]:
+            kinds.setdefault(k, {"standing": 0, "all": 0})
+            kinds[k]["all"] += 1
+            kinds[k]["standing"] += d["status"] == "standing"
+    return {"file": "results/verdict_audit/VERDICT_AUDIT.md", "digest": audit_digest(rec), "engine_standing": rec["engine_standing"],
+            "rule": rec["rule"], "exact_rel": rec["exact_rel"], "floor": rec["floor"], "counts": rec["counts"],
+            "tables": [{k: t[k] for k in ("stem", "file", "engine", "status", "comparison", "stack", "class", "on_the_engine_that_stands")}
+                       | {"runs": [[x.get("tag"), x.get("run"), x.get("paired_repetitions"), str(x.get("commit") or "")[:12]] for x in t["runs"]]}
+                       for t in rec["tables"]],
+            "losses": [row(r) for r in loss_rows(rec)],
+            "armada": [row(r) for r in rec["rows"] if r["table"] == "V12_ARMADA_4W_BARE" and r["word"] in ("LOSS", "GAIN", "power given")],
+            "discrepancies": {"base": dd.get("base"), "kinds": kinds, "rows": len(dd["rows"]),
+                              "words": [{k: (re.sub(r"\bEVEN\b", "STEADY", d[k]) if k == "old_reading" else d[k]) for k in ("table", "status", "gauge", "old_reading", "new_reading")}
+                                        for d in dd["rows"] if d["word_changed"]]}}   # the old word EVEN is shown as STEADY, its name now (counted apart as "renamed")
+
+
 def glossary() -> dict:
     """The glossary and index at the back of the page (tools/live_glossary.py, docs/engine/glossary.json): every term in the words of
     the file it names, the ten organisms, the two arms and their twenty scenarios, every muscle of the catalog, and the index."""
@@ -1064,7 +1101,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "injgrid": injection_grid(), "glossary": glossary()}
+            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "injgrid": injection_grid(), "audit": verdict_audit(), "glossary": glossary()}
 
 
 def embedded(page: str, key: str):
@@ -1111,7 +1148,7 @@ def inject(page: str, key: str, value) -> str:
 APPRAISAL = ROOT / "docs" / "engine" / "APPRAISAL.md"
 COUNTS_BEGIN = "<!-- counts: written by docs/engine/build_live_engine.py at every build; never edited by hand -->"
 COUNTS_END = "<!-- end counts -->"
-WORDS = ("GAIN", "power given", "EVEN", "LOSS", "the runs disagree", "the runs differ", "shown", "tuning")
+WORDS = ("GAIN", "power given", "STEADY", "LOSS", "the runs disagree", "the runs differ", "shown", "tuning")
 
 
 def table_way(file: str):
@@ -1150,7 +1187,7 @@ def appraisal_counts(rec) -> str:
                 for x in r["rows"]:
                     sz = _size(x.get("abc"))
                     if x["w"] in ("GAIN", "LOSS", "power given") and sz is not None and sz < 100 * floor:
-                        cnt[x["w"]] = cnt.get(x["w"], 0) - 1; cnt["EVEN"] = cnt.get("EVEN", 0) + 1
+                        cnt[x["w"]] = cnt.get(x["w"], 0) - 1; cnt["STEADY"] = cnt.get("STEADY", 0) + 1
             c.update({w: cnt.get(w, 0) for w in WORDS})
         return c
 
@@ -1159,6 +1196,14 @@ def appraisal_counts(rec) -> str:
     omni = [r for r in recs if table_way(r["file"])[1]]; orch = [r for r in recs if not table_way(r["file"])[1]]
     losses = [f"{x['g']} under `{Path(r['file']).name}` ({r['engine']}: {', '.join(str(a) for a in (x.get('abc') or []))})"
               for r in omni for x in r["rows"] if x["w"] == "LOSS"]
+    # the one count (the referee's work order of 25 October, item 4): the verdict audit's selection, which the LOSS ledger reads
+    # too; the page's receipts are counted beside it and any difference is named, never hidden
+    from tools.verdict_audit import build as audit_build, loss_rows as audit_losses
+    au = audit_build(); ac = au["counts"]
+    by_t = {t["stem"]: t for t in au["tables"]}
+    a_nat = Counter(r["word"] for r in au["rows"] if by_t[r["table"]]["status"] == "standing" and by_t[r["table"]]["comparison"] == "against its native")
+    page_nat = tally(omni, False)
+    diff = {w: (page_nat[w], a_nat.get(w, 0)) for w in WORDS if page_nat[w] != a_nat.get(w, 0)}
     fl = f" (the page applies the floor of {100 * floor:g}% at load; after it: " if floor is not None else ""
     lines = [COUNTS_BEGIN,
              f"**The counts of the records on the page** ({b['engine']}, digest `{b['digest']}`), written by the build from the records it made, so a check rebuilds them exactly:",
@@ -1168,7 +1213,9 @@ def appraisal_counts(rec) -> str:
              f"| Receipts (every judged row of each benchmark's newest table) | {len(recs)}: " + ", ".join(f"{e} {n}" for e, n in sorted(by_eng.items(), key=lambda kv: -int(re.sub(r'\D', '', kv[0]) or 0))) + " |",
              f"| Omni-Compass against its native ({len(omni)} tables), as the tables wrote them | {words(tally(omni, False))}{fl}{words(tally(omni, True)) + ')' if floor is not None else ''} |",
              f"| The orchestrators' own cost ({len(orch)} four-ways tables: the orchestrator as shipped against the organism alone, and the comparisons where Omni-Compass is on the other side), never a reading of Omni-Compass | {words(tally(orch, False))}{fl}{words(tally(orch, True)) + ')' if floor is not None else ''} |",
-             f"| LOSS rows of Omni-Compass against its native | {len(losses)}: " + ("; ".join(losses) if losses else "none") + " |",
+             f"| The verdict audit (`results/verdict_audit/VERDICT_AUDIT.md`, the one selection the LOSS ledger reads): standing tables, Omni-Compass against its native | {words(Counter(a_nat))}; {ac['standing_tables_on_the_engine_that_stands']} of {sum(1 for t in au['tables'] if t['status'] == 'standing')} standing tables on the engine that stands ({au['engine_standing']}) |",
+             f"| The page's receipts against the audit | " + ("the same, word by word" if not diff else "differ: " + "; ".join(f"{w} {a} on the page, {b} in the audit" for w, (a, b) in diff.items())) + " |",
+             f"| LOSS rows of Omni-Compass against its native | {len(audit_losses(au))} in the audit; on the page {len(losses)}: " + ("; ".join(losses) if losses else "none") + " |",
              "", COUNTS_END]
     return "\n".join(lines)
 
@@ -1199,8 +1246,8 @@ def main() -> int:
     CHECKING = a.check
     page = PAGE.read_text(encoding="utf-8")
     if re.search(r'prefers-color-scheme:\s*light|data-theme="light"\]', page):
-        # the founder's orders of 17 and 20 October: the live engine is black on every viewer's theme, never white
-        print("the page carries a light palette: the live engine renders dark on every viewer's theme")
+        # the founder's orders of 17 and 20 October: the live benchmark engine is black on every viewer's theme, never white
+        print("the page carries a light palette: the live benchmark engine renders dark on every viewer's theme")
         return 1
     named = re.search(r'<html[^>]*data-engine="(omni-v\d+)"', page)
     rec = records(not a.no_runs and not a.check)
@@ -1219,7 +1266,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "glossary")
+                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "audit", "glossary")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1239,12 +1286,12 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "glossary"):
+              "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "audit", "glossary"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand
     b = rec["build"]
-    print(f"live engine rebuilt on {b['engine']} ({b['digest']}) at {b['commit'][:12]}, {b['built_at']}; "
+    print(f"live benchmark engine rebuilt on {b['engine']} ({b['digest']}) at {b['commit'][:12]}, {b['built_at']}; "
           f"{len(b['runs'])} GitHub runs running or queued")
     return 0
 

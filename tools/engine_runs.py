@@ -3,9 +3,9 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The engine's runs, seeded, with one receipt and one digest: the Python here, the same runs in the live engine's page.
+"""The engine's runs, seeded, with one receipt and one digest: the Python here, the same runs in the live benchmark engine's page.
 
-The founder's order of 20 October: whenever the Python runs its runs (500 by default), the live engine must be able to run the
+The founder's order of 20 October: whenever the Python runs its runs (500 by default), the live benchmark engine must be able to run the
 same runs, from the same jump generator, and show the same receipts, so that a run of the Python and a run of the page prove
 each other. One run k draws its seed from the jump generator (seed_k = base + k·0x9E3779B9, mod 2³²), feeds a mulberry32
 stream (the page's own generator, written here in 32-bit arithmetic) through the engine that stands: the brain's state
@@ -23,7 +23,7 @@ docs/engine/check_live_engine.py) and compares receipt by receipt.
   python3 tools/engine_runs.py --verify-cpp cpp/build/oc_engine_runs  the Python's first 20 runs (or --all) through the C++ harness
 
 On GitHub (.github/workflows/engine-runs.yml, the founder's order of 21 October: every set the jump generator runs is linked to
-the live engine) every push that changes the page or this file, and every dispatch, runs another set from a new base, checks the
+the live benchmark engine) every push that changes the page or this file, and every dispatch, runs another set from a new base, checks the
 page's own code on every run of it, and commits the record with the run that made it (its id, address and commit); the page
 shows the newest record and the GitHub run beside it.
 """
@@ -60,7 +60,7 @@ OUT_DIR = ROOT / "results" / "engine_runs"
 
 
 def mulberry32(a: int):
-    """The page's generator (function mulberry32 in the live engine), bit for bit, in unsigned 32-bit arithmetic."""
+    """The page's generator (function mulberry32 in the live benchmark engine), bit for bit, in unsigned 32-bit arithmetic."""
     a &= M32
 
     def rnd() -> float:
@@ -312,7 +312,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--runs", type=int, default=DEFAULT_RUNS)
     ap.add_argument("--base", type=int, default=DEFAULT_BASE, help="the jump generator's base seed")
-    ap.add_argument("--verify", default="", help="the live engine page: run its loop in node and compare")
+    ap.add_argument("--verify", default="", help="the live benchmark engine page: run its loop in node and compare")
     ap.add_argument("--out", default="", help="where to write (default results/engine_runs/)")
     ap.add_argument("--all", action="store_true", help="with --verify or --verify-cpp: every run of the set, not the first 20")
     ap.add_argument("--cpp", default="", help="the C++ harness (cpp/build/oc_engine_runs): run the same set through it and record its digest")
@@ -350,7 +350,7 @@ def main() -> int:
     allowed = sum(r["allowed"] for r in runs)
     md = [f"# The engine's runs: {a.runs} runs from the jump generator (base {a.base}), one digest", "", f"> {TOP}", "",
           f"Engine {eng}. Written {data['written']}. Each run: {DECISIONS} decisions of the brain (RK4), {LAW_STEPS} steps of the compass law, one give-back",
-          "trial judged by the verdict; the seed of run k is base + k·0x9E3779B9 mod 2³², the stream mulberry32, the same in the live engine's page.", "",
+          "trial judged by the verdict; the seed of run k is base + k·0x9E3779B9 mod 2³², the stream mulberry32, the same in the live benchmark engine's page.", "",
           f"**Digest {dg}** (SHA-256 of the receipts, six decimals). The page runs the same {a.runs} and shows its own digest beside this one.", "",
           *([f"**The C++ harness** (`cpp/tools/engine_runs.cpp`, the C++ twins of the engine) on the same draws: digest {data['cpp']['digest']}, "
              f"{'the same' if data['cpp']['same'] else 'DIFFERENT'}; {data['cpp']['agree']} of {a.runs} runs agree to 1e-9, largest difference "

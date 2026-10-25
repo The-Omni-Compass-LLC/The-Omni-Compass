@@ -38,7 +38,7 @@ implied, a security exposure or a legal-notice fault.
 | 3e Phase plane and scoreboard | A+ | Class S; the only place on the page that states the reading rule of 24 October correctly. |
 | 3f The brain's internal state | A+ | Class S, native's absence of a brain drawn honestly. |
 | 3g The verdict | A+ | The false-acceptance rate of the 2% allowance is computed and shown, and the withdrawn σ values are named as withdrawn. |
-| 3h Cloud providers | A | Every Azure run read EVEN on the bill and shown so, but the box publishes the company's expected gains and says a provider "would see that benefit" with no record behind either (U11). |
+| 3h Cloud providers | A | Every Azure run read STEADY on the bill and shown so, but the box publishes the company's expected gains and says a provider "would see that benefit" with no record behind either (U11). |
 | 3i Orchestrators and governors | A+ | The four ways disclosed, the orchestrators' own cost kept out of Omni-Compass's readings, the orchestra class S on omni-v12. |
 | 3j Official run playback | A+ | 165,143 of 165,143 files SHA-matched in the record; the heart's text still describes omni-v16 as current. |
 | 3k Per-repetition telemetry | A+ | Class L stated, scored by the repository's own scorer. |
@@ -88,7 +88,7 @@ three-run table on kind, whose native is the shipped autoscaler.
 **U2. The bottom line's other lights are greener than their records** (iii, lines 674, 680–690; `bottomRender`).
 (a) The two bills ("On site" +18.5%, "Through the cloud" +14.8%, green THRIVING) are compositions, class S of L and P, across
 omni-v10 to omni-v17 tables; the class is in the note only, and "through the cloud" is carried by work +25.0% and speed +47.5%
-measured on kind, while every cloud run on the page reads the bill EVEN (the composition's own bill gauge EVEN −0.8%). (b) The
+measured on kind, while every cloud run on the page reads the bill STEADY (the composition's own bill gauge STEADY −0.8%). (b) The
 index row is green THRIVING beside "GAIN AND LOSS ... 24 LOSS", four of its six categories read below native (PostgreSQL −4.9%,
 with work inside the response line and latency LOSS; MongoDB −1.4%; Kafka −0.1%; Redis −0.1%), and without Kubernetes it reads
 −1.0%; the section's own rule (line 674) is "A slower service or a failed request turns the light red whatever the work". Its
@@ -157,21 +157,21 @@ rows on the status board and in 2c, marked class S, or correct both pointers.
 governor at commit `e3b05dc`, whose fingerprint is omni-v18 `1cb92edb`, not omni-v19. The section's summary says "No GPU card ... has
 been measured on the engine that stands". The disclosures say the GPU card is class S and "The GPU, CPU and cloud places are written
 and marked not yet run", while a class P A100 run and four Azure runs are on the page; the board reads the Lambda places "not yet
-launched"; monitor 43 awaits "its omni-v13 run". **Fix:** "omni-v18's card governor on one A100, class P, one run, every gauge EVEN
+launched"; monitor 43 awaits "its omni-v13 run". **Fix:** "omni-v18's card governor on one A100, class P, one run, every gauge STEADY
 (at its limit on native); omni-v19's run pending", and the same words in v, on the board and in the registry.
 
 **U11. Expected gains and an unmeasured benefit published beside the results** (3h lines 1161–1162; 4a lines 1622–1623). "The
 company's own expectation, not a measured result: about 3 to 4% from the front end, 2 to 3% from the back end, about 5% from the two
 ends together, and 1 to 2% from the wire alone", and "A cloud provider that runs Omni-Compass on its own back end would see that
-benefit". The label is honest, but the figures have no stated basis, the only metered hardware run reads EVEN on every gauge (the
-card at its limit on native, nothing written), the CPU host is a model, and every Azure run reads the bill EVEN; 4j says the product
+benefit". The label is honest, but the figures have no stated basis, the only metered hardware run reads STEADY on every gauge (the
+card at its limit on native, nothing written), the CPU host is a model, and every Azure run reads the bill STEADY; 4j says the product
 "promises no number on a system it has not run on". To an insurer or a licensee this is a performance representation. **Fix:** take
 the figures off the live page (keep them, with their basis, in `DISCLOSURES.md` as management's expectation), and write "a provider
 would measure that benefit on its own hardware; no such measurement exists".
 
-**U12. The key on the page is not the key the tables are read by** (4k lines 1932–1939). The page's key says EVEN is "no difference
-beyond the noise", "EVEN =0.9% means a 0.9% difference the noise covers", "the runs disagree: the three runs pointed different ways,
-each clear of the noise", and "a change under half of one percent either way, in every run, reads EVEN". Every table on the page,
+**U12. The key on the page is not the key the tables are read by** (4k lines 1932–1939). The page's key says STEADY is "no difference
+beyond the noise", "STEADY =0.9% means a 0.9% difference the noise covers", "the runs disagree: the three runs pointed different ways,
+each clear of the noise", and "a change under half of one percent either way, in every run, reads STEADY". Every table on the page,
 and `tools/readings.py` (`three_run_reading`, `KEY`), read by the rule of 24 October: a mean change of 0.5% or more reads GAIN, LOSS
 or power given "by the mean of our three runs" even where no run clears the noise (the bottom line's own machines row: "GAIN by the
 mean of our three runs, beyond the noise in 1 of 3"), and the runs disagree only when runs moved 0.5% or more in opposite
@@ -206,7 +206,7 @@ receiver only under the `alloy` profile; say the exposure in the README if `null
   verified"), ScaleOps on kind (the field: "install on kind not verified"), CAST AI's tier (the field: "may have changed").
 - **1c** No line beside the two tables says the product names are their owners' marks, used only to identify, with no affiliation,
   sponsorship or endorsement (the plates' caption has one; the tables do not).
-- **2a** A LOSS row answered by its own setting's four ways keeps its word but is coloured yellow EVEN ("run again: EVEN"); keep its
+- **2a** A LOSS row answered by its own setting's four ways keeps its word but is coloured yellow STEADY ("run again: STEADY"); keep its
   red until the engine that stands has rerun the same benchmark three times.
 - **3a, 3j** The heart is described as omni-v16's 15 s (lines 928, 1262); the factory beat has been 60 s since omni-v17, and "the
   runs replayed here ran before omni-v16" is not so for the omni-v16 and omni-v17 service tables played back.
@@ -215,7 +215,7 @@ receiver only under the `alloy` profile; say the exposure in the README if `null
 - **4b** The scenario detail's source note runs "...disagree.results/scenarios/..." with its "Source:" word lost.
 - **4c** "From each benchmark's newest engine's table (results/live/V10_*.md today)" (line 1709): the tables are omni-v10 to omni-v17.
 - **4h** The KEDA row says the start-wait rerun "is queued" (line 7121) while `V11_KEDA_REQUESTS.md` ran pre-pulled and reads the
-  start wait EVEN; no row names the by-itself start flag still in the engine as a residual risk.
+  start wait STEADY; no row names the by-itself start flag still in the engine as a residual risk.
 - **4i, v** The page's own renderer is called class L, a class the page defines as live software of the product.
 - **4k** "The headline: the Omni index ... (class L)" (line 6950) names no engine; "Not shown yet: ... a group of clusters" (line 6949)
   while Open Cluster Management, Karmada and Armada ran on a group of two clusters.

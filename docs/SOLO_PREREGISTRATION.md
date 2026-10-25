@@ -75,7 +75,7 @@ version it reads, in `results/toy_gate/`.
 ## How it is read
 
 Every comparison is paired within its repetition and read by the one key (`tools/readings.py`): Omni-Compass by itself against
-native, Omni-Compass by itself against Omni-Compass and native, and Omni-Compass and native against native as before. GAIN, EVEN
+native, Omni-Compass by itself against Omni-Compass and native, and Omni-Compass and native against native as before. GAIN, STEADY
 or LOSS by the gauge's aim, power given for a resource spent that rose, the floor of half of one percent, the three-run rule.
 Every row is reported, LOSS included; a LOSS is answered by finding where the mechanism or its wiring is wrong.
 

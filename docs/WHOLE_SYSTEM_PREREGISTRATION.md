@@ -13,7 +13,7 @@ tables). The stacked run is the measurement that replaces the composition: Omni-
 every layer native in the other, paired, the same gauges. The question it answers is the one the composition assumes:
 does a layer's factor stand when the layers around it also carry Omni-Compass? The stacked table and the composed total
 are printed side by side, per gauge, as TOP ÷ composed with its 95% interval (`tools/whole_system.py`, section 3), read by
-the one key: GAIN, EVEN or LOSS by the gauge's aim, never by the sign of the number.
+the one key: GAIN, STEADY or LOSS by the gauge's aim, never by the sign of the number.
 
 ## 2. The arms
 
@@ -47,7 +47,7 @@ has run; until then it enters the composition as exactly 1 and the stacked run d
 
 ## 4. The reading
 
-Every judged row gets GAIN, EVEN or LOSS by the three-run rule (`tools/readings.py`). The composition test: for each gauge
+Every judged row gets GAIN, STEADY or LOSS by the three-run rule (`tools/readings.py`). The composition test: for each gauge
 present in both, log(R_stacked) − Σℓ log(Rℓ) with its interval (the stacked estimate's variance plus the composed sum's);
 agree within the noise when the interval includes zero. A disagreement is reported as what it is: the layers interact
 there, and the stacked number is the one that stands for that gauge. Nothing is re-aimed after a reading; a LOSS row stays

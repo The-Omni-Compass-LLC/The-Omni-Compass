@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Records the stacks the live engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html) replays one at a time beside the
+"""Records the stacks the live benchmark engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html) replays one at a time beside the
 live controller: each stack's own model in the repository, run as the repository runs it, native first and then
 Omni-Compass on top of native, the same load on the same seed, second by second.
 
@@ -39,7 +39,7 @@ from tools.readings import relative_runs_reading  # noqa: E402  (the one key, wr
 
 def reading(runs, aim):
     """The three-run rule, the one key's (tools/readings.py, the founder's order of 24 October 2026: a change of 0.5% or more,
-    the mean of the runs, is a change, read by the gauge's aim; EVEN only under 0.5%)."""
+    the mean of the runs, is a change, read by the gauge's aim; STEADY only under 0.5%)."""
     return relative_runs_reading(runs, aim)
 
 
@@ -257,24 +257,18 @@ def table_title(stem):
 
 
 def receipt_word(rd):
-    r = rd.replace("**", "").strip().lower()
-    for w, key in (("gain", "GAIN"), ("loss", "LOSS"), ("power given", "power given"), ("even", "EVEN")):
-        if r.startswith(w):
-            return key
-    if "disagree" in r:
-        return "the runs disagree"     # clear runs pointing different ways: the test is unstable there
-    if "runs differ" in r:
-        return "the runs differ"       # a deterministic simulator's runs did not reproduce (tools/readings.py DIFFER)
-    return "shown"
+    """A reading's word, from the key's one reader (tools/readings.py word_of); a row shown and not judged reads "shown"."""
+    from tools.readings import word_of
+    return word_of(rd) or "shown"
 
 
-NUM = r"[-+\u2212=]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"   # a cell beside EVEN carries "=" (the key's sign rule, 20 October)
+NUM = r"[-+\u2212=]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"   # a cell beside STEADY carries "=" (the key's sign rule, 20 October)
 
 
 def even_reason(abc):
-    """Why an EVEN row is EVEN, read from its three runs' own cells (each 'change (low to high)', or a change alone): the
+    """Why an STEADY row is STEADY, read from its three runs' own cells (each 'change (low to high)', or a change alone): the
     kind and the bound. 'same': every run reads zero with a zero-wide interval (Omni-Compass held it native); 'split': a run
-    is clear of zero but not all three the same way (EVEN by the three-run rule); else the largest change any run's interval
+    is clear of zero but not all three the same way (STEADY by the three-run rule); else the largest change any run's interval
     still allows: 'tight' within 2%, 'within' within 10%, 'wide' past 10% (too noisy to tell at these repetitions); a table
     that prints no interval: 'changes', the largest change read."""
     import re
@@ -311,7 +305,7 @@ def runs_of(src, rows):
     and interval; each row is matched to its gauge in order by its reading, as tools/reread.py patch_md matches them. A row of a
     table with no JSON twin (an outside simulator's) is left as printed: its cells carry the gauge's own direction.
       aim  up, down, spent, per or never (tools/readings.py HIGHER, LOWER, SPENT, WORK_PER, NEVER_MORE)
-      rw   each run's own word (tools/readings.py run_word: 0.5% or more read by the aim, EVEN under it; None for never more)
+      rw   each run's own word (tools/readings.py run_word: 0.5% or more read by the aim, STEADY under it; None for never more)
       rv   each run's raw change as [change, low, high, in percent of native]: percent where native is not zero, else the
            gauge's own unit"""
     j = Path(src).with_suffix(".json")
@@ -347,6 +341,11 @@ def runs_of(src, rows):
                         else:
                             rv.append([round(d, 6), round(lo, 6) if ok(lo) else None, round(hi, 6) if ok(hi) else None, False])
                     row["rv"] = rv
+                    from tools.readings import evidence
+                    ev = evidence(rs, a)        # the evidence apart from the word (the referee's work order of 25 October)
+                    row["ev"] = {k: (round(v, 4) if isinstance(v, float) else [round(x, 4) for x in v] if k == "mean_ci95_pct" else v)
+                                 for k, v in ev.items() if k in ("strength", "steady", "disagree", "runs", "clear", "clear_with_mean",
+                                                                 "with_mean", "mean_pct", "mean_ci95_pct") and v is not None}
                 break
 
 
@@ -383,12 +382,12 @@ def receipt(name, path=None):
     runs_of(src, rows)
     title = table_title(name) if not path else title
     even = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **{k: r[k] for k in ("aim", "rw", "rv") if k in r}, **even_reason(r["abc"])}
-            for r in rows if r["w"] == "EVEN"]
+            for r in rows if r["w"] == "STEADY"]
     # the rows a table shows and does not judge (its preregistration's own rule), kept so their sizes are seen: a resource a
     # table only shows, CPU used beside a response time, is the price of the work
     shown = [{"s": r["s"], "g": r["g"], "abc": r["abc"], "r": r["r"], **({"tuning": True} if r["w"] == "tuning" else {})}
              for r in rows if r["w"] in ("shown", "tuning")]
-    return {"file": f"results/live/{name}.md" if not path else None, "title": title, "rows": [r for r in rows if r["w"] not in ("EVEN", "shown", "tuning")],
+    return {"file": f"results/live/{name}.md" if not path else None, "title": title, "rows": [r for r in rows if r["w"] not in ("STEADY", "shown", "tuning")],
             "count": count, "even": even, "shown": shown}
 
 
