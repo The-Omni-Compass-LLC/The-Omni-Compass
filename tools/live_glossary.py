@@ -364,6 +364,7 @@ def T(term, group, d, sources, aka=(), note=None):
 R, A, L, B, D, P, C, G, W = ("Reading a result", "The arms and where Omni-Compass sits", "The law and the plug", "The brain and its nerves",
                              "Driving it", "Proof and evidence", "The catalog and the organisms", "The runs and the grid",
                              "The page")
+IGT = "tools/injection_grid.py"   # the injection grid (25 October)
 FP = "docs/FACTORY_PROFILE.md"    # the common language of the factory profile, the tuning bench and the bill (24 October)
 PAGE_F, CL, DIS, RD, MAN = ("docs/engine/OMNI_COMPASS_LIVE_ENGINE.html", "CLAUDE.md", "DISCLOSURES.md", "tools/readings.py",
                             "docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md")
@@ -751,6 +752,41 @@ TERMS = [
       "own generator), so the Python, the C++ and the page draw the same runs and prove each other receipt by receipt.",
       [("tools/engine_runs.py", "One run k draws its seed from the jump generator (seed_k = base + k·0x9E3779B9, mod 2³²)")],
       aka=["jump generator"]),
+    T("the injection", G, "One seed of the Python's batch, seed_k = base + k·0x9E3779B9 mod 2³² (the jump generator): every plant of "
+      "every organism draws its demand noise, its weather and its disturbances from it, under the climb, for 240 decisions of 15 s. "
+      "The same injection reaches every organism and every way, native, Omni-Compass on native, each governor on the organism and "
+      "Omni-Compass on top of each governor, so each one's reaction to the same thing is read side by side.",
+      [(IGT, "one seed: every plant of every organism draws its demand noise, its weather and its disturbances from it"),
+       (IGT, "The same injection reaches every organism and every arm.")], aka=["injection", "injections"]),
+    T("the injection batch", G, "One set of the Python's 500 injections, named by its base and by the SHA-256 digest of the Python's "
+      "runs of it; the C++ engine runs the same seeds and must give the same digest (section 3o). Every cell of the injection grid is "
+      "drawn from one batch; another batch is another run in the key's sense, and three batches make a three-run reading.",
+      [(IGT, "The batch. One set of the Python's jump generator (tools/engine_runs.py): base B, 500 injections, injection k drawing its")],
+      aka=["injection batch", "batch of 500"]),
+    T("the injection grid", G, "Every organism with a plant, each native and with Omni-Compass on native, and each of the fourteen "
+      "governors sitting on it, on one injection batch, at 1, 10, 100 and 500 runs × 1, 10, 100 and 500 organisms stacked (section "
+      "4b). Run k of a cell stacks M copies, copy c on injection k + c (mod 500); each cell is read by the key over its N runs. The "
+      "page re-hashes the record and recomputes every cell's mean from the runs' means. Class S.",
+      [(IGT, "The grid. Runs N in 1, 10, 100, 500 and organisms stacked M in 1, 10, 100, 500.")],
+      aka=["injection grid"]),
+    T("organisms stacked", G, "In the injection grid, M copies of one organism run side by side on one clock, each on its own "
+      "injection: separate clusters sharing no power line or room, every gauge the mean of the copies' per muscle. The scale grid "
+      "of section 4c stacks its copies in one body instead.",
+      [(IGT, "copies are separate clusters on one clock: they share no power line or room, so a stacked run's every gauge is the mean of its")],
+      aka=["stacked organisms"]),
+    T("a governor's way", A, "The third arm in our models: a governor or orchestrator (the Kubernetes scheduler and its bin-packing "
+      "profile, Kueue, Volcano, KAI, Koordinator, CruiseKube, Crane, KubeRay, Gödel, Armada, Karmada, Open Cluster Management, "
+      "KubeEdge, Nephio) as the body of the catalog muscles that stand for its knobs, sitting on the organism's clock on the same "
+      "injections; Omni-Compass on top of the governor governs both bodies. Read per muscle, like for like. Its knobs run under "
+      "their own native controllers, so it reads native's work index by construction; the governors as their projects ship them "
+      "run on real Kubernetes in section 3i (class L).",
+      [(IGT, "The governors, the third arm. Each of the fourteen governors and orchestrators the founder named is its own body of the"),
+       (IGT, "Per muscle. Every gauge is read per muscle")], aka=["third arm", "governor's way"]),
+    T("a cell's reference", G, "IG/base/organism/way|against/NxM/gauge: the name of one cell of the injection grid (for example "
+      "IG/1488855732/tower/on_native|native/500x1/work), printed under the cell, copied by its button and typed back into the "
+      "reference box to reach the same cell on any copy of the page that holds that batch.",
+      [(IGT, "python3 tools/injection_grid.py [--base B] [--workers N] [--organisms a,b] [--runs 500] [--cache DIR]")],
+      aka=["cell reference"]),
     T("the engine that stands", P, "The engine version on main, named on the page's title block and printed by python3 "
       "tools/omni_version.py (this glossary's engine field names it); every benchmark runs again on it.",
       [(MAN, "The engine version on main, named on the page's title block")], aka=["engine that stands"]),

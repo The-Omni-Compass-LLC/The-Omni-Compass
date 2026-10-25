@@ -40,9 +40,15 @@ governors' own muscles, every governor already inside it, so no governor is adde
 The grid. Runs N in 1, 10, 100, 500 and organisms stacked M in 1, 10, 100, 500. Run k of a cell (k = 0 to N−1) stacks M
 copies of the organism, copy c receiving injection k + c (mod 500): every cell is drawn from the one batch of 500, so a cell
 whose N × M passes 500 reuses injections across its runs (with 500 organisms stacked, every run holds the whole batch). The
-copies are separate clusters on one clock: they share no power line or room, so a stacked run's work index is the mean of its
-copies' and its muscles over the line and its power are their sums, decision by decision. (The scale grid of the page's
-section 4c stacks its copies in one body instead.)
+copies are separate clusters on one clock: they share no power line or room, so a stacked run's every gauge is the mean of its
+copies', decision by decision. (The scale grid of the page's section 4c stacks its copies in one body instead.)
+
+Per muscle. Every gauge is read per muscle: the work index (already the mean over the muscles of each one's work against native's
+own mean rate), the share of the muscles over their line, and the power per muscle. Two ways on the same muscles read the same
+change either way; a governor's way carries its own body's muscles beside the organism's, and per muscle it is read against the
+organism alone like for like, never counted worse for having more muscles. A governor's knobs run under their own native
+controllers in our models, so its way reads native's work index by construction (each native body's index averages 1 over a
+run); what it moves is the share over the line and the power of its knobs.
 
 The reading. For each pair (Omni-Compass on native against native; the governor on the organism against native; Omni-Compass
 on top of the governor against the governor, and against native) and each gauge (work, up; muscles over the line, down; power,
@@ -55,6 +61,8 @@ or more in opposite directions disagree. One batch is one run in the sense of th
 is three batches (three bases). Evidence class S (our own models).
 
   python3 tools/injection_grid.py [--base B] [--workers N] [--organisms a,b] [--runs 500] [--cache DIR]
+  python3 tools/injection_grid.py --shard I/N --cache-only   (one of N shards of the bodies, cached for the run that reads them;
+                                                              .github/workflows/injection-grid.yml)
 """
 from __future__ import annotations
 
@@ -91,7 +99,7 @@ RUNS = (1, 10, 100, 500)
 COPIES = (1, 10, 100, 500)
 STEPS = S.ORGANISM_STEPS
 BLOCK = 10
-GAUGES = (("work", "work", "up", HIGHER), ("over", "muscles over the line", "down", LOWER), ("power", "power", "spent", SPENT))
+GAUGES = (("work", "work", "up", HIGHER), ("over", "share of muscles over the line", "down", LOWER), ("power", "power per muscle", "spent", SPENT))
 ARMS = ("native", "on_native")
 HARNESS_ARM = {"native": "native", "on_native": "v5"}
 GOV_NAMES = {k: name for k, name, *_ in GOVERNORS}
@@ -160,12 +168,26 @@ def muscles(kind, key):
     return len(S.flat(key, rs)) if kind == "org" else len(rs)
 
 
-def run_all(base, workers, n_inj, cache: Path):
+def shard_of(bodies, shard):
+    """Shard I of N (1-based): the bodies dealt out heaviest first, each to the shard with the fewest muscles so far."""
+    if not shard:
+        return bodies
+    i, n = shard
+    load, mine = [0] * n, []
+    for b in sorted(bodies, key=lambda b: (-muscles(*b), b)):
+        j = load.index(min(load))
+        load[j] += muscles(*b)
+        if j == i - 1:
+            mine.append(b)
+    return mine
+
+
+def run_all(base, workers, n_inj, cache: Path, shard=None):
     """Every organism and every governor's body on every injection of the batch, cached per body so a cut run resumes."""
     cache.mkdir(parents=True, exist_ok=True)
     data = {}
     todo = []
-    bodies = [("org", k) for k in ORG_ROWS] + [("gov", k) for k in GOV_ROWS]
+    bodies = shard_of([("org", k) for k in ORG_ROWS] + [("gov", k) for k in GOV_ROWS], shard)
     for kind, key in bodies:
         f = cache / f"{base}_{kind}_{key}_{n_inj}.npz"
         if f.exists():
@@ -189,21 +211,27 @@ def run_all(base, workers, n_inj, cache: Path):
 
 
 # --------------------------------------------------------------------------------------------------------- the reading
-def stacked(a, m, w_weight=None):
-    """The batch's runs stacked m at a time: run k = copies on injections k ... k+m−1 (mod the batch). a: (n, 3, steps).
-    Work is the mean of the copies' work indices, over and power their sums."""
+def stacked(a, m):
+    """The batch's runs stacked m at a time: run k = copies on injections k ... k+m−1 (mod the batch). a: (n, 3, steps), per
+    muscle; every gauge the mean of the copies'."""
     n = a.shape[0]
     reps = -(-(n + m - 1) // n)                            # the batch wrapped as often as m copies need (copy c: injection k + c mod n)
     ext = np.concatenate([a] * reps, axis=0)[:n + m - 1]
     cs = np.concatenate([np.zeros((1,) + a.shape[1:]), np.cumsum(ext.astype(np.float64), axis=0)], axis=0)
-    s = cs[m:m + n] - cs[0:n]
-    s[:, 0, :] /= m
-    return s
+    return (cs[m:m + n] - cs[0:n]) / m
+
+
+def per_muscle(a, n):
+    """One body's gauges per muscle: the work index as it is (a mean over the muscles already), over and power divided by n."""
+    out = a.copy()
+    out[:, 1:, :] /= n
+    return out
 
 
 def joined(org, gov, n_org, n_gov):
-    """The organism and a governor's body on one clock: work the mean over every muscle of both, over and power their sums."""
-    out = org + gov
+    """The organism and a governor's body on one clock, per muscle of both: the work index the mean over every muscle, the share
+    over the line and the power per muscle their sums over every muscle."""
+    out = (org + gov) / (n_org + n_gov)
     out[:, 0, :] = (n_org * org[:, 0, :] + n_gov * gov[:, 0, :]) / (n_org + n_gov)
     return out
 
@@ -274,7 +302,9 @@ def build(base=None, workers=None, organisms=None, n_inj=BATCH, cache=CACHE):
                     "and through every governor on each organism, at 1, 10, 100 and 500 runs and 1, 10, 100 and 500 organisms",
            "class": "S", "own_runs": OWN_RUNS, "batch": batch, "run": run, "tiers": {"runs": list(RUNS), "copies": list(COPIES)},
            "rule": ("run k of a cell stacks M copies, copy c on injection k + c (mod 500); the copies are separate clusters on one "
-                    "clock (work the mean of the copies' work indices, over and power their sums); each run's change per decision "
+                    "clock; every gauge per muscle (the work index, the share of muscles over the line, the power per muscle; a "
+                    "governor's way per muscle of the organism and the governor's body together) and the mean of the copies'; "
+                    "each run's change per decision "
                     "against its reference over 24 blocks of ten decisions with its 95% interval (Student t); the cell's word by the "
                     "founder's rule of 24 October over its N runs (tools/readings.py three_run_reading)"),
            "gauges": [{"key": k, "name": n, "aim": a} for k, n, a, _ in GAUGES],
@@ -282,21 +312,25 @@ def build(base=None, workers=None, organisms=None, n_inj=BATCH, cache=CACHE):
            "governors": [{"key": k, "name": GOV_NAMES.get(k, k), "muscles": muscles("gov", k)} for k in GOV_ROWS],
            "whole": "the whole organism is a composition of real measured tables (tools/whole_system.py) and takes no injection; "
                     "tools/scenarios_20.py reads it, native and with Omni-Compass on native",
+           "means_note": "each run's mean over its decisions, per body as the harness counts it (work index, muscles over the line, "
+                         "power in kW), native and with Omni-Compass on native; the cells read them per muscle (over and power divided "
+                         "by the body's muscles, a governor's way by the organism's and the body's together)",
            "cells": {}, "runs_m1": {}, "means": {"org": {}, "gov": {}}}
     for (kind, key), (nat, arm) in data.items():
         rec["means"][kind][key] = {"native": np.round(nat.mean(axis=2).astype(np.float64), 6).tolist(),
                                    "on_native": np.round(arm.mean(axis=2).astype(np.float64), 6).tolist()}
     for key in ORG_ROWS:
-        nat, arm = (a.astype(np.float64) for a in data[("org", key)])
+        nat_raw, arm_raw = (a.astype(np.float64) for a in data[("org", key)])
+        n_org = muscles("org", key)
+        nat, arm = per_muscle(nat_raw, n_org), per_muscle(arm_raw, n_org)
         cells = {"on_native|native": pair_cells(nat, arm)}
         rel, _, _, _, _ = run_changes(nat, arm)
         rec["runs_m1"][key] = {"on_native|native": np.round(rel, 6).tolist()}
         if key != S.ORCHESTRA:
-            n_org = muscles("org", key)
             for g in GOV_ROWS:
                 gn, ga = (a.astype(np.float64) for a in data[("gov", g)])
                 n_gov = muscles("gov", g)
-                gov_nat, gov_omni = joined(nat, gn, n_org, n_gov), joined(arm, ga, n_org, n_gov)
+                gov_nat, gov_omni = joined(nat_raw, gn, n_org, n_gov), joined(arm_raw, ga, n_org, n_gov)
                 cells[f"gov:{g}|native"] = pair_cells(nat, gov_nat)
                 cells[f"omni_gov:{g}|gov:{g}"] = pair_cells(gov_nat, gov_omni)
                 cells[f"omni_gov:{g}|native"] = pair_cells(nat, gov_omni)
@@ -395,7 +429,19 @@ def main(argv=None):
     ap.add_argument("--runs", type=int, default=BATCH, help="injections to run (a look below 500; the record holds 500)")
     ap.add_argument("--cache", default=str(CACHE))
     ap.add_argument("--out", default=str(OUT))
+    ap.add_argument("--shard", default="", help="I/N: run only shard I of N of the bodies (with --cache-only)")
+    ap.add_argument("--cache-only", action="store_true", help="run the bodies into the cache and write no record")
     a = ap.parse_args(argv)
+    if a.cache_only:
+        shard = tuple(int(x) for x in a.shard.split("/")) if a.shard else None
+        batch = newest_batch(a.base)
+        setup([x for x in a.organisms.split(",") if x])
+        mine = shard_of([("org", k) for k in ORG_ROWS] + [("gov", k) for k in GOV_ROWS], shard)
+        print(f"injection grid, batch {batch['base']}{f', shard {a.shard}' if shard else ''}: {', '.join(f'{k} {b}' for k, b in mine)} "
+              f"({sum(muscles(*b) for b in mine):,} muscles)", flush=True)
+        _, el = run_all(batch["base"], a.workers, a.runs, Path(a.cache), shard)
+        print(f"cached in {a.cache} ({el} s)")
+        return 0
     rec = build(a.base, a.workers, [x for x in a.organisms.split(",") if x], a.runs, a.cache)
     rec["cells_digest"] = digest_of(rec)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)

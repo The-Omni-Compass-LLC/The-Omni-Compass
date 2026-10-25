@@ -42,6 +42,7 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 - **the yardstick.** Kubernetes' published autoscaling rule, written by us from its documentation (a description of a rule, not Kubernetes' code): the native that Omni-Compass on native is read against in the real three-run test of the page's bottom line. *Source: `docs/OMNI_ORCHESTRATOR.md`.*
 - **the three places Omni-Compass lives.** Omni-Compass sits at both ends of the cloud's wire and at every layer between: the software end (the cluster, Kubernetes, its add-ons, its governors and the services on it), the cloud between them (the machines it bills, metered) and the bare metal (the card, the chip, and the machine: the kernel, bare metal, Kepler). *Source: `tools/whole_system.py`; `docs/engine/export_whole.py`.*
 - **the cloud as the wire.** The cloud is the wire between the chip at one end and the software at the other. A cloud run can show only the bill of the machines it parks: through the cloud the bare metal belongs to the provider (no tenant can read its meters or write its chips' limits), so the cloud's benefit is what the provider itself meters and bills, the machines counted every fifteen seconds and the bill at list price. Every cloud set runs Omni-Compass at the tune-down on the machines alone: the same work as native for a smaller bill, never a bigger one. The work and the speed live on the software end and the bare-metal end. *Source: `tools/whole_system.py`; `DISCLOSURES.md`; `CLAUDE.md`.*
+- **a governor's way.** The third arm in our models: a governor or orchestrator (the Kubernetes scheduler and its bin-packing profile, Kueue, Volcano, KAI, Koordinator, CruiseKube, Crane, KubeRay, Gödel, Armada, Karmada, Open Cluster Management, KubeEdge, Nephio) as the body of the catalog muscles that stand for its knobs, sitting on the organism's clock on the same injections; Omni-Compass on top of the governor governs both bodies. Read per muscle, like for like. Its knobs run under their own native controllers, so it reads native's work index by construction; the governors as their projects ship them run on real Kubernetes in section 3i (class L). *Source: `tools/injection_grid.py`.*
 - **governing engine.** The executable mathematical rules that turn observations and internal state into governing decisions. *Source: `docs/FACTORY_PROFILE.md`.*
 - **native baseline.** The system's documented configuration and behaviour with no Omni-Compass governing it: every muscle under its own native controller, as its vendor ships it. *Source: `docs/FACTORY_PROFILE.md`.*
 
@@ -130,6 +131,21 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 - **the engine that stands.** The engine version on main, named on the page's title block and printed by python3 tools/omni_version.py (this glossary's engine field names it); every benchmark runs again on it. *Source: `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`.*
 - **harness.** The machinery that supplies workloads, executes comparisons, checks requirements and records results. *Source: `docs/FACTORY_PROFILE.md`.*
 
+### The runs and the grid
+
+- **the injection.** One seed of the Python's batch, seed_k = base + k·0x9E3779B9 mod 2³² (the jump generator): every plant of every organism draws its demand noise, its weather and its disturbances from it, under the climb, for 240 decisions of 15 s. The same injection reaches every organism and every way, native, Omni-Compass on native, each governor on the organism and Omni-Compass on top of each governor, so each one's reaction to the same thing is read side by side. *Source: `tools/injection_grid.py`.*
+- **the injection batch.** One set of the Python's 500 injections, named by its base and by the SHA-256 digest of the Python's runs of it; the C++ engine runs the same seeds and must give the same digest (section 3o). Every cell of the injection grid is drawn from one batch; another batch is another run in the key's sense, and three batches make a three-run reading. *Source: `tools/injection_grid.py`.*
+- **the injection grid.** Every organism with a plant, each native and with Omni-Compass on native, and each of the fourteen governors sitting on it, on one injection batch, at 1, 10, 100 and 500 runs × 1, 10, 100 and 500 organisms stacked (section 4b). Run k of a cell stacks M copies, copy c on injection k + c (mod 500); each cell is read by the key over its N runs. The page re-hashes the record and recomputes every cell's mean from the runs' means. Class S. *Source: `tools/injection_grid.py`.*
+- **organisms stacked.** In the injection grid, M copies of one organism run side by side on one clock, each on its own injection: separate clusters sharing no power line or room, every gauge the mean of the copies' per muscle. The scale grid of section 4c stacks its copies in one body instead. *Source: `tools/injection_grid.py`.*
+- **a cell's reference.** IG/base/organism/way|against/NxM/gauge: the name of one cell of the injection grid (for example IG/1488855732/tower/on_native|native/500x1/work), printed under the cell, copied by its button and typed back into the reference box to reach the same cell on any copy of the page that holds that batch. *Source: `tools/injection_grid.py`.*
+- **the line.** The limit a reading must not cross: a response time, a temperature, a feed's rating. Over the line, work is waiting or failing. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
+- **the climb.** A load stepping by one, up and down (1 2 3 2 3 4 …): level 4 is the organism's own load and level 8 twice it, so the organism is pushed past what native can carry and the most each arm can do shows. *Source: `realms/harness.py`.*
+- **work waiting in line.** The third load: work already waiting when the run starts, a quarter of the work the run itself brings, so the arm that clears it sooner is faster. *Source: `realms/harness.py`; `tools/run_realms_v5.py`.*
+- **the grid (copies × runs).** Each organism native and with Omni-Compass at 1, 10 and 100 copies × 1, 10 and 100 paired runs, modelled and with the real cluster inside, both values in every square; the 1,000 tier on GitHub's own machines only; paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100 repetitions. Copies is the size of the body one brain governs; runs is the number of independent paired trials. *Source: `CLAUDE.md`; `docs/book/THEORY.md`.*
+- **protocol 4.** With the cluster inside, only runs of protocol 4 count: the governor never below the organism's CPU priority, its decisions counted inside the window; the model of the organism on the runner's last core and the kind nodes on the others, the same in both arms; the served image pulled onto every worker before each arm. *Source: `CLAUDE.md`.*
+- **the conductor.** The program that starts the runs (scripts/dispatch_grid.py, every 15 minutes): it starts every run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what GitHub runs plus a margin; it also releases every benchmark's reruns on the engine that stands and the cloud sets. *Source: `CLAUDE.md`.*
+- **Omni index.** One number for more for the same, or the same for less: every measure of every test turned into a ratio oriented so that above 1 is a GAIN (work, speed, machines, energy or the bill); a test's index is the geometric mean of its ratios, minus one, in percent; the headline is the geometric mean of the real categories, each weighted the same. The modelled muscles are shown beside it, never inside it. *Source: `tools/omni_index.py`.*
+
 ### The catalog and the organisms
 
 - **the organism.** A set of muscles stepped together on one clock, each muscle from its own plant model with its own native controller, the whole fed one demand from one seed, so that the heat the machines make is load on the rooms, the body's power swing is load on every site's line, and one brain judges every step against every other muscle's cushion. *Source: `docs/book/THEORY.md`.*
@@ -145,16 +161,6 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 - **the orchestra.** The eighth organism: every catalog muscle that stands for a knob of the governors and orchestrators the founder named (the Kubernetes scheduler, Kueue, Volcano, the KAI scheduler, Koordinator, CruiseKube, Crane, KubeRay, Gödel, Armada, Karmada, Open Cluster Management, KubeEdge, Nephio), each governor's muscles a body of its own and all together one body, native and with Omni-Compass on top, modelled. *Source: `tools/run_orchestra.py`.*
 - **the seven organisms.** The spine, the four realms, the four stacked and the whole tower: each run native and with Omni-Compass on top of native on the same seed, the same load and the same clock. *Source: `docs/book/THEORY.md`.*
 - **the stress-test model.** A model drawn for the page so the body can be stressed by hand (a surge, a blind sense, a security hold, the kill switch), class S: sixty muscles named from the catalog, each a capacity lever with its own response time and sensing delay under an HPA-style native controller, run native and Omni-Compass side by side on the same demand. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
-
-### The runs and the grid
-
-- **the line.** The limit a reading must not cross: a response time, a temperature, a feed's rating. Over the line, work is waiting or failing. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
-- **the climb.** A load stepping by one, up and down (1 2 3 2 3 4 …): level 4 is the organism's own load and level 8 twice it, so the organism is pushed past what native can carry and the most each arm can do shows. *Source: `realms/harness.py`.*
-- **work waiting in line.** The third load: work already waiting when the run starts, a quarter of the work the run itself brings, so the arm that clears it sooner is faster. *Source: `realms/harness.py`; `tools/run_realms_v5.py`.*
-- **the grid (copies × runs).** Each organism native and with Omni-Compass at 1, 10 and 100 copies × 1, 10 and 100 paired runs, modelled and with the real cluster inside, both values in every square; the 1,000 tier on GitHub's own machines only; paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100 repetitions. Copies is the size of the body one brain governs; runs is the number of independent paired trials. *Source: `CLAUDE.md`; `docs/book/THEORY.md`.*
-- **protocol 4.** With the cluster inside, only runs of protocol 4 count: the governor never below the organism's CPU priority, its decisions counted inside the window; the model of the organism on the runner's last core and the kind nodes on the others, the same in both arms; the served image pulled onto every worker before each arm. *Source: `CLAUDE.md`.*
-- **the conductor.** The program that starts the runs (scripts/dispatch_grid.py, every 15 minutes): it starts every run not yet started, reads started runs back from their names, never starts one twice, and keeps the queue at what GitHub runs plus a margin; it also releases every benchmark's reruns on the engine that stands and the cloud sets. *Source: `CLAUDE.md`.*
-- **Omni index.** One number for more for the same, or the same for less: every measure of every test turned into a ratio oriented so that above 1 is a GAIN (work, speed, machines, energy or the bill); a test's index is the geometric mean of its ratios, minus one, in percent; the headline is the geometric mean of the real categories, each weighted the same. The modelled muscles are shown beside it, never inside it. *Source: `tools/omni_index.py`.*
 
 ### The page
 
@@ -1957,7 +1963,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | 3n | #s-lab | Telemetry analytics and Omni-Compass in its own words |
 | 3o | #s-proof | The Python's runs, in this page: the jump generator's runs recomputed here, the 500 scenarios replayed, the core's Monte Carlo |
 | 4a | #s-whole | The whole organism, every way it is bought: on-site bare metal, through the cloud, in the device, as a service |
-| 4b | #s-scn | The twenty scenarios: ten organisms, each native and with Omni-Compass on native |
+| 4b | #s-scn | The twenty scenarios and the injection grid: ten organisms native and with Omni-Compass on native, every governor, on the Python's 500 injections |
 | 4c | #s-fleet | Measured effect in full: the organisms, every muscle, the register, the grid and every three-run table |
 | 4d | #s-cpp | The C++ twin: the Python's runs through the C++ engine |
 | 4e | #s-github | CI pipeline: GitHub Actions runs in progress and queued |
@@ -1972,10 +1978,11 @@ Every term, organism and arm with the sections of the page that print it, by the
 
 | Term | Kind | Where on the page |
 |---|---|---|
-| the 0.5% floor | term | iii (#s-bottom); 3e (#s-plane); 3l (#s-live); 4g (#s-math); 4k (#s-read) |
+| the 0.5% floor | term | iii (#s-bottom); 3e (#s-plane); 3l (#s-live); 4b (#s-scn); 4g (#s-math); 4k (#s-read) |
 | the 95% interval on Student's t | term | 2d (#s-board); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4g (#s-math) |
 | A | term | 4g (#s-math) |
 | a changed tune's violet | term | 1a (#s-wall) |
+| a governor's way | term | 4b (#s-scn) |
 | actuation feedback | term | 1a (#s-wall) |
 | alert minute | term | 4j (#s-problem); 4k (#s-read) |
 | at its limit on native | term | 3a (#s-engines); 3m (#s-stacks); 4c (#s-fleet); 4k (#s-read) |
@@ -1984,7 +1991,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the benefit board | term | 2d (#s-board); 3b (#s-desk); 4j (#s-problem) |
 | the bill of a route | term | 2d (#s-board); 3h (#s-cloud); 4a (#s-whole); 4g (#s-math); 4j (#s-problem) |
 | the bone | term | 3a (#s-engines); 4g (#s-math) |
-| the C++ twin | term | 1b (#s-health); 3b (#s-desk); 3o (#s-proof); 4d (#s-cpp); 4e (#s-github); 4g (#s-math); 4l (#s-monlist); v (#s-disclose) |
+| the C++ twin | term | 1b (#s-health); 3b (#s-desk); 3o (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4e (#s-github); 4g (#s-math); 4l (#s-monlist); v (#s-disclose) |
 | calm | term | 1a (#s-wall); 2b (#s-feed); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3n (#s-lab); 4g (#s-math); 4j (#s-problem) |
 | the centre | term | 3a (#s-engines); 3e (#s-plane); 3n (#s-lab); 4g (#s-math) |
 | the climb | term | 4c (#s-fleet); 4g (#s-math) |
@@ -2013,25 +2020,27 @@ Every term, organism and arm with the sections of the page that print it, by the
 | fail up | term | 3e (#s-plane); 4g (#s-math) |
 | family | term | 2d (#s-board); 4c (#s-fleet) |
 | the fast checks | term | 3c (#s-dial); 3j (#s-ops); 4j (#s-problem) |
-| the fingerprint and its digest | term | 1b (#s-health); 2b (#s-feed); 3o (#s-proof); 4d (#s-cpp); 4g (#s-math); v (#s-disclose) |
+| the fingerprint and its digest | term | 1b (#s-health); 2b (#s-feed); 3o (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4g (#s-math); v (#s-disclose) |
 | the four pieces | term | 1a (#s-wall) |
 | The four stacked, every shared muscle in each | organism | 4b (#s-scn); 4c (#s-fleet) |
 | GAIN | term | iii (#s-bottom); 2d (#s-board); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3n (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the give-back trial | term | 1a (#s-wall); 1b (#s-health); 3b (#s-desk); 3g (#s-verdict); 3j (#s-ops); 3o (#s-proof); 4d (#s-cpp); 4j (#s-problem) |
 | golden signals | term | 1b (#s-health); 2b (#s-feed); 4j (#s-problem) |
-| the grid (copies × runs) | term | 1b (#s-health); 2d (#s-board); 3o (#s-proof); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); v (#s-disclose) |
+| the grid (copies × runs) | term | 2d (#s-board); 3o (#s-proof); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); v (#s-disclose) |
 | h | term | 3f (#s-brain) |
-| harness | term | 1a (#s-wall); 3a (#s-engines); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
+| harness | term | 1a (#s-wall); 3a (#s-engines); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
 | health | term | 1a (#s-wall); 3f (#s-brain); 3j (#s-ops); 4a (#s-whole) |
 | the heartbeat | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3j (#s-ops); 3k (#s-runs); 4g (#s-math) |
 | the heat debt | term | 3a (#s-engines); 4g (#s-math) |
 | the immune system | term | 3a (#s-engines); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
+| the injection | term | 3b (#s-desk); 3o (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4h (#s-fail) |
+| the injection grid | term | 4b (#s-scn) |
 | the jump generator | term | 1b (#s-health); 3o (#s-proof); 4d (#s-cpp) |
 | k[d] | term | 4g (#s-math) |
 | k[p] | term | 4g (#s-math) |
 | the key | term | iii (#s-bottom); 1c (#s-dash); 2b (#s-feed); 3c (#s-dial); 3h (#s-cloud); 3j (#s-ops); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4j (#s-problem); 4k (#s-read) |
 | the kill switch | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2d (#s-board); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 4f (#s-master); 4g (#s-math) |
-| knob | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3g (#s-verdict); 3j (#s-ops); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4a (#s-whole); 4c (#s-fleet); 4i (#s-self); 4k (#s-read); 4l (#s-monlist) |
+| knob | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3g (#s-verdict); 3j (#s-ops); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4i (#s-self); 4k (#s-read); 4l (#s-monlist) |
 | the lease | term | 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3e (#s-plane); 3j (#s-ops); 4c (#s-fleet); 4g (#s-math) |
 | lift-off | term | 3f (#s-brain); 4g (#s-math) |
 | the line | term | 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist) |
@@ -2043,8 +2052,8 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the model gate | term | 3g (#s-verdict) |
 | modelled | term | 2b (#s-feed); 3a (#s-engines); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the monitor wall | term | 1a (#s-wall); 1b (#s-health); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3h (#s-cloud); 3j (#s-ops); 3m (#s-stacks); 3o (#s-proof); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4e (#s-github); 4f (#s-master); 4g (#s-math); 4l (#s-monlist); v (#s-disclose) |
-| Monte Carlo | term | 1b (#s-health); 3o (#s-proof) |
-| muscle | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3i (#s-orch); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
+| Monte Carlo | term | 1b (#s-health); 3o (#s-proof); 4b (#s-scn) |
+| muscle | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3i (#s-orch); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | native | term, arm | iii (#s-bottom); 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4h (#s-fail); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | native's colour | term | 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 3a (#s-engines); 3e (#s-plane); 3h (#s-cloud); 4f (#s-master); 4k (#s-read) |
 | the nervous system | term | 3a (#s-engines); 3d (#s-decision); 3f (#s-brain); 3l (#s-live); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
@@ -2057,6 +2066,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the orchestra | term | 3i (#s-orch); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet) |
 | The orchestra, every governor's muscle once | organism | 3i (#s-orch); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet) |
 | the organism | term | 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4j (#s-problem); v (#s-disclose) |
+| organisms stacked | term | 4b (#s-scn) |
 | the organs and their grants (θ) | term | 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3f (#s-brain); 3l (#s-live); 3o (#s-proof); 4g (#s-math) |
 | Physics / Robotics / Autonomous | organism | 3b (#s-desk); 4j (#s-problem) |
 | piece 1: the state (E, U, I[U], the basin) | term | 1a (#s-wall); 3a (#s-engines); 3f (#s-brain); 3o (#s-proof); 4g (#s-math) |
@@ -2081,8 +2091,8 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the stack | term | 4b (#s-scn); 4c (#s-fleet) |
 | STEADY | term | iii (#s-bottom); 1a (#s-wall) |
 | the stress-test model | term | 1a (#s-wall); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3n (#s-lab); 4g (#s-math) |
-| supervisory governor | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
-| the switchboard | term | 1b (#s-health) |
+| supervisory governor | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
+| the switchboard | term | 1b (#s-health); 4b (#s-scn) |
 | tanh | term | 4g (#s-math) |
 | template | term | 4c (#s-fleet) |
 | the three places Omni-Compass lives | term | 3h (#s-cloud); 4a (#s-whole); 4g (#s-math) |
@@ -2103,7 +2113,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | ρ* | term | 4g (#s-math) |
 | σ | term | 3b (#s-desk); 3f (#s-brain); 3g (#s-verdict); 3o (#s-proof); 4g (#s-math) |
 
-Not printed in the page's own words at this build (defined above, not yet on the page): active profile; AWAITING; candidate profile; the contract, this decision; custom profile; defensive system; factory profile; governing engine; the heartbeat's six buttons; live tuning bench; the live tuning engine; the monitor wall stack; native baseline; preset; protocol 4; Restore factory profile; Return to native; the seal; the yardstick.
+Not printed in the page's own words at this build (defined above, not yet on the page): a cell's reference; active profile; AWAITING; candidate profile; the contract, this decision; custom profile; defensive system; factory profile; governing engine; the heartbeat's six buttons; the injection batch; live tuning bench; the live tuning engine; the monitor wall stack; native baseline; preset; protocol 4; Restore factory profile; Return to native; the seal; the yardstick.
 
 ---
 

@@ -982,6 +982,20 @@ def scenarios20() -> dict:
     return {"file": str(f.relative_to(ROOT)), "title": d.get("title"), "run": d.get("run"), "gauges": d.get("gauges"), "organisms": orgs}
 
 
+def injection_grid() -> dict:
+    """The injection grid (results/injection_grid/INJECTION_GRID_<base>.json, tools/injection_grid.py, class S): the Python's
+    newest 500 injections through every organism, native and with Omni-Compass on native, and through every governor on each
+    organism, at 1, 10, 100 and 500 runs and organisms stacked. The page carries every cell, every run's means (from which it
+    recomputes every cell's mean and checks the Python's) and the batch's Python and C++ digests; the ranking it computes."""
+    fs = [f for f in (ROOT / "results" / "injection_grid").glob("INJECTION_GRID_*.json") if "_look_" not in f.name]
+    if not fs:
+        return {}
+    f = max(fs, key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("run", {}).get("started", ""), f.name))
+    d = json.loads(f.read_text(encoding="utf-8"))
+    d.pop("best", None)
+    return {"file": str(f.relative_to(ROOT)), **d}
+
+
 def glossary() -> dict:
     """The glossary and index at the back of the page (tools/live_glossary.py, docs/engine/glossary.json): every term in the words of
     the file it names, the ten organisms, the two arms and their twenty scenarios, every muscle of the catalog, and the index."""
@@ -1044,7 +1058,7 @@ def records(runs: bool) -> dict:
     build["ledger"] = led
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
-            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "glossary": glossary()}
+            "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "injgrid": injection_grid(), "glossary": glossary()}
 
 
 def embedded(page: str, key: str):
@@ -1199,7 +1213,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "glossary")
+                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "glossary")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1219,7 +1233,7 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "coremc", "onnative", "scenarios", "glossary"):
+              "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "glossary"):
         page = inject(page, k, rec[k])
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand
