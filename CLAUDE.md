@@ -22,7 +22,7 @@ the founder overrides one in the conversation.
   live decision. Reactive and proactive, like an immune system. Every row is still shown. The engine that stands keeps
   the strictest form: every muscle judged on itself, never below native, nothing traded between muscles; where it can't
   bring a knob a GAIN, that knob stays native. The 2% verdict (`omnicompass/verdict.py`) is the engine's trigger, not a
-  stamp on a report. The trade between muscles, judged on the organism, is the next version's work (the toy gate first).
+  stamp on a report. The trade between muscles, judged on the organism, is the next version's work (the model gate first).
   Gains are uncapped.
 - Headline: more work, faster, on fewer machines, with less energy. One combined number: the Omni index.
 - **The max is the default brain** (12 October): every muscle runs at its own limit, never past it and never below
@@ -43,23 +43,57 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v17 stands (v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v19 stands (v18, v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stands on main since 23 October,
-  morning, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
+- **Omni v19** (`OMNI_V19.json`, digest `9a72693d49b18b9b`, 62 files; `docs/OMNI_V19.md`) stands on main from 25 October, on the
+  founder's orders of 24 and 25 October ("if OmniCompass can't beat the native, the native stays. Even in the cloud"; "let the math do
+  what it's coded to do"): omni-v18 with the immune system in the Kubernetes governor (`omni_controller/controller.py`): the immune
+  hand-back (a pod waits while the pod target stands below the operator's: the operator's target back at once, from the fast check,
+  held 10 minutes, doubled in a row up to two hours, halved after a quiet hold); the immune memory (the largest rise in requests and
+  in each service's demand inside two decisions: a machine given back only when the rest hold the requests and a reserve of the
+  larger of one machine and that rise; extra pods only as far as the machines can place that rise times themselves); native's line
+  (never thinner than native's own autoscaler's scale-down threshold, `--native-release-util`, 0.5; a machine back the moment the
+  line or the reserve is crossed); immune maturity (no give-back trial before one recheck period); and the step back (a pod that
+  waited between decisions steps an allowed depth back, Omni direct's own reaction). The model gate (`results/model_gate/V19_VS_V18.md`,
+  `V19_PACE.md`, class S): no LOSS against omni-v18 in any model; on-site every service gauge GAIN against native (pods waiting
+  down 5.2%, the 95th percentile down 6.9%, alert minutes down 27.3%), machines power given; in the cloud the same as native on
+  every gauge. The trade: against omni-v18 the on-site 95th percentile and alert minutes give back part of their GAIN (bought with
+  pods that waited). Still LOSS against native in the models, as on omni-v18: the conveyance's pod start wait, the card's 95th and
+  99th percentiles, the batch's requests served: the next version's list. Every benchmark runs again on it.
+- **Omni v18** (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files; `docs/OMNI_V18.md`) stood on main from 23 October, night, to 25 October,
+  on the founder's orders of that evening ("Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on
+  top of the muscles. And then Omni direct is simply Omni on top of the muscles, no Kubernetes ... they all need to be written in
+  code"; "It should be not 17 anymore, it should be 18"): omni-v17 with Omni direct taken into the engine. The seven files of
+  Omni-Compass's own orchestrator that hold its rules (`omni_orchestrator/`: the brain, the control plane, the room rule, the
+  hand, the walls, the front, the package; not the showing's workload and clients) are fingerprinted like every other wire
+  (`tools/omni_version.py`, `ORCHESTRATOR_WIRES`; a version declared before omni-v18 is read without them), so no rule of Omni
+  direct changes without the version changing; 55 of its 62 files are omni-v17's bytes. The three arms are always shown together:
+  native (Kubernetes' published autoscaling rule on the muscles, brain `yardstick`), Omni on native (Omni on top of the rule, never
+  fewer units, no fold, brain `omni_native`) and Omni direct (Omni alone on the muscles, brain `omni`). Its brain carries the
+  engine's conveyance, reflex, twin, busy room rule and the fold under the verdict, and a hold on trials the traffic keeps
+  abandoning (6 beats, doubled in a row to the recheck), found on the first three-arm showing and fixed before it landed. Quick
+  form after the fix, one run each, class L: Omni on native against native work GAIN (up 8.3%); Omni direct against native work
+  GAIN (up 9.1%); Omni direct against Omni on native the 95th percentile GAIN (down 13.2%), units GAIN, a cut (down 9.5%); no
+  LOSS in any pair. The three runs on GitHub's machines (full form, `results/orchestrator/V18_THREE_ARMS_ABC.md`): both Omni
+  arms against native work GAIN and the 95th percentile GAIN in all three, machines EVEN, units power given or EVEN; Omni direct
+  against Omni on native EVEN on every gauge; no LOSS. The model gate against omni-v17 (`results/model_gate/V18_VS_V17.md`) reads omni-v17's numbers on every model (none
+  of its 55 files moved). Every benchmark runs again on it from 02:51 UTC on 24 October, when it reached main (a run counts only on a commit
+  that carries `OMNI_V18.json`; the runs started from 21:19 UTC on 23 October ran omni-v17's commits).
+- **Omni v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files; `docs/OMNI_V17.md`) stood on main on 23 October, from the
+  morning to the night, on the founder's order of 22 October, afternoon (Orders of 22 October, the heartbeat a dial): the main engine takes its full
   decision every 60 s (`--interval 60`, the parser's default in `omni_controller/controller.py`, in every rig, install file and
   cloud run), any beat from 5 to 120 s can be set, and every beat is shown beside native with what it buys and what it costs
-  (`results/toy_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 1j; the real runs,
+  (`results/model_gate/V17_LADDER.md`, `tools/beat_ladder.py`; on the live engine page, the page's section 2d; the real runs,
   `docs/PACE_PREREGISTRATION.md`, amendment 3, eight arms). The monitors scale with the beat (`omni_heartbeat_seconds`, the
   staleness alert at three beats, the control panel's `POST /v1/beat`). One fault the dial's ladder found before it landed is
   fixed in it: at 90 and 120 s the cruise wait (120 s) rounded to one decision, so one reading with a pod waiting put every
   machine in service (the kind setting's first reading: machine-hours +17% and +21% against 60 s, the minutes over the line −72%);
   the cruise wait is now never fewer than two readings (`tests/test_pace_clocks.py`, failing on the unfixed rule), and nothing at
   80 s or faster moves. 54 of its 55 files are omni-v16's bytes. Corrected, the kind benchmark's setting reads at 90 s, against 60
-  s, the machine-hours −1.7% EVEN, the minutes over the line −4.7% EVEN, the pods waiting −12.1% EVEN, the 95th percentile −0.2%
-  EVEN; at 120 s the machine-hours −2.1% EVEN, the minutes over the line −3.7% EVEN, the pods waiting −29.6% GAIN; machines parked
-  over the eight days 190 and 119 against 329 at 60 s. The toy gate against omni-v16 (`results/toy_gate/V17_VS_V16.md`): Every toy
-  that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped,
+  s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%,
+  EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked
+  over the eight days 190 and 119 against 329 at 60 s. The model gate against omni-v16 (`results/model_gate/V17_VS_V16.md`): Every model
+  that sets its own period reads identical to omni-v16 on every gauge and every seed (9 models and the verdict); as shipped,
   omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16. The ladder: Every beat
   reads the cluster from about 86,400 times a day at 5 s to 37,400 at 120 s (39,700 at the main engine's 60 s), for 5.5 to 1.6 s
   of Omni's own processor an hour. In the kind benchmark's setting every beat reads the minutes over the line GAIN against native
@@ -85,8 +119,8 @@ the founder overrides one in the conversation.
   (`omni_controller/muscles.py`), the coast per raise, the conveyance every 15 s whichever check falls due, and a loop that keeps
   its own schedule (`tests/test_pace_clocks.py`, `tests/test_loop_schedule.py`). The cushion each muscle keeps is the same at any
   pace; the pace sets only how soon trouble is seen, and a longer one would only blind the governor longer (the founder's question
-  of 22 October, answered so). At 60 s it makes exactly omni-v15's decisions (the toy gate, `results/toy_gate/V16_VS_V15.md`: 4,578
-  audit records, none different). The pace study (`results/toy_gate/V16_PACE.md`, a plant that moves every 5 s): 15 s against 60 s,
+  of 22 October, answered so). At 60 s it makes exactly omni-v15's decisions (the model gate, `results/model_gate/V16_VS_V15.md`: 4,578
+  audit records, none different). The pace study (`results/model_gate/V16_PACE.md`, a plant that moves every 5 s): 15 s against 60 s,
   alert minutes −14.7% in the kind setting and energy per core −2.6% in the cloud's (GAIN), every other reading EVEN, no LOSS at
   any pace; as shipped (the gate's `cluster_shipped`, omni-v16 at 15 s against omni-v15 at 60 s) every gauge EVEN. Against native
   the pods waiting for a place read LOSS at every pace, the old 60 s default included, and in the cloud's setting at 15 s the 95th
@@ -105,11 +139,11 @@ the founder overrides one in the conversation.
   audit, the gate leaves 35 moves and 32 reversals (`tests/test_cap_band.py`, the fixture
   `tests/fixtures/robust_long_39173420146_decisions.json`). On Kubernetes the cap wire is off, so no table moves for it; the card
   governor had applied the same gate outside the brain. A dwell with a glide was built first and refused by the gate (seven small
-  moves for one on the toy cluster, 25 limit writes for 16 on the toy card). And every wire that holds a governor's rules is in the
+  moves for one on the model cluster, 25 limit writes for 16 on the model card). And every wire that holds a governor's rules is in the
   fingerprint (`tools/omni_version.py`: the data stores' five runners, the swarm, MuJoCo and the CPU power runner, their bytes as
   they stood; a version declared before them is read without those eight and only those). Declared with it, not an engine change: the kill test reads the
-  300 s after the kill (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v15"). The toy gate against omni-v14
-  (`results/toy_gate/V15_VS_V14.md`, eight seeds, every toy and two card toys new with it) read every service gauge identical on every toy, the card toys identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the toy cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Its campaign opened at
+  300 s after the kill (`docs/ROBUSTNESS_PREREGISTRATION.md`, "On omni-v15"). The model gate against omni-v14
+  (`results/model_gate/V15_VS_V14.md`, eight seeds, every model and two card models new with it) read every service gauge identical on every model, the card models identical (the card governor already applied the gate outside the brain), the verdict identical, and the request's own moves, reversals and travel EVEN on the model cluster (+3.7% at 60 s, −1.4% at 15 s, where breaches are rare and short; the fault's regime, the long run's clustered breaches, reads −72% on the run's own decisions): no LOSS. Its campaign opened at
   02:30 UTC on 22 October and started no run: the conductor read every commit from omni-v15's push on as no engine (Orders of 22
   October); the last runs it started, at 00:31 UTC, were omni-v14's.
 
@@ -119,9 +153,9 @@ the founder overrides one in the conversation.
   (or `OMNI_NATIVE`, the control panel's muscle button) leaves any muscle where native runs it, never written, an unknown name
   refused; and the operator's own commands run without a shell unless they hold a pipe, a redirect or a variable (the static
   scan's high findings 3 to 2). A third, no conveyance raise on a reading that leaves out another workload's starting pods (the
-  raise omni-v13 makes once early in the batch toy's queue), was refused by the toy gate: the batch back at native's, but the
-  web's 95th percentile 6.4% higher than omni-v13's; it is kept on the branch `v14-convey-study` until the toy's web model is set
-  from a real run's files. The toy gate against omni-v13 (`results/toy_gate/V14_VS_V13.md`, eight seeds, every toy, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict toy identical: no LOSS. Every benchmark runs again on it.
+  raise omni-v13 makes once early in the batch model's queue), was refused by the model gate: the batch back at native's, but the
+  web's 95th percentile 6.4% higher than omni-v13's; it is kept on the branch `v14-convey-study` until the model's web model is set
+  from a real run's files. The model gate against omni-v13 (`results/model_gate/V14_VS_V13.md`, eight seeds, every model, the batch pods listed as a cluster lists them) read every gauge identical, and the verdict model identical: no LOSS. Every benchmark runs again on it.
 - **Omni v13** (`OMNI_V13.json`, digest `0088837333c6f0fc`, 47 files; `docs/OMNI_V13.md`) stood on main 20 to 21 October, landed 20 October, evening, the
   founder's order that every fault found be fixed and every fix land as the next version, told, not asked: omni-v12 with one fault
   fixed in the Kubernetes governor's conveyance (`omni_controller/muscles.py`), found on KubeRay's rig with the organism alone (the
@@ -131,8 +165,8 @@ the founder overrides one in the conversation.
   parked during a saturated queue (`docs/BATCH_QUEUE_PREREGISTRATION.md`, amendment 11). Now, on a shared host at its top (busy at or
   over 75%) beside another workload's room (a pod whose limit is above its request), every limit given goes back to the operator's,
   conveyed again only under 70%; and every other pod on a machine is counted by its own limit, where omni-v12 counted requests. The
-  toy gate (`results/toy_gate/V13_VS_V12.md`, with a batch toy set from the KubeRay runs' own files): no LOSS against omni-v12 in
-  any toy, the web-only toys identical; in the batch toy the queue and the job turnaround back at native's. Every benchmark runs
+  model gate (`results/model_gate/V13_VS_V12.md`, with a batch model set from the KubeRay runs' own files): no LOSS against omni-v12 in
+  any model, the web-only models identical; in the batch model the queue and the job turnaround back at native's. Every benchmark runs
   again on it.
 - **Omni v12** (`OMNI_V12.json`, digest `d38b58fbe28939b8`, 47 files; `docs/OMNI_V12.md`) stood on main 19 to 20 October, landed the night of 19 October,
   the founder's order ("Of course I want you to land version 12 ... every time you do that ... it becomes a new version"):
@@ -141,9 +175,9 @@ the founder overrides one in the conversation.
   `omni_controller/muscles.py`), where omni-v11 wrote it again at every fast check (the capacity test, about 970 to 1,000
   refused writes an hour); and the swarm's proximity reflex hands back the planner's cruise in the tick it is triggered, its
   reach growing with the square of the speed (`tools/run_swarm.py`, outside the fingerprint's scope, declared with v12). The
-  toy gate (`results/toy_gate/V12_VS_V11.md`): identical to omni-v11 on every gauge of every toy but the refused writes,
+  model gate (`results/model_gate/V12_VS_V11.md`): identical to omni-v11 on every gauge of every model but the refused writes,
   −97.5%, GAIN; no LOSS. The stricter verdict built with it (a step kept only when its whole 95% interval is inside the
-  allowance) was refused by the same gate (no give-back trial could start in the cloud toy) and is kept on the branch
+  allowance) was refused by the same gate (no give-back trial could start in the cloud model) and is kept on the branch
   `v12-verdict-study`. The swarm's preregistration takes amendment 2 with it (a collision with Omni-Compass on top is a judged
   LOSS row, a cell void only when native collides, three mission draws never flown). Every benchmark runs again on it from
   00:30 UTC on 20 October; earlier tables stand as their own engine's until each benchmark's three runs on v12 land.
@@ -153,8 +187,8 @@ the founder overrides one in the conversation.
   says why, nothing is decided from it or written, the floor check returns, and the last reading with machines stays the
   conveyance's bound. Found in the omni-v10 CruiseKube test (run 39120444653, repetition 8: every kind worker out of service
   for two minutes while the service answered every probe; omni-v10 fed the engine the highest overload, then divided by the
-  empty capacity). `tests/test_blind_reading.py` reproduces the fault on omni-v10 and passes on omni-v11; the toy gate
-  (`results/toy_gate/V11_VS_V10.md`, with a blink toy) before it was pushed. Every benchmark runs again on it; earlier tables
+  empty capacity). `tests/test_blind_reading.py` reproduces the fault on omni-v10 and passes on omni-v11; the model gate
+  (`results/model_gate/V11_VS_V10.md`, with a blink model) before it was pushed. Every benchmark runs again on it; earlier tables
   stood as their own engine's until each benchmark's three runs on v11 landed (its 23 tables are its own). Its bookkeeping
   was landed by `tools/land_engine.py`, the one command for every version from now on.
 - **Omni v10** (`OMNI_V10.json`, digest `4bf39b0d707784de`, 47 files; `docs/OMNI_V10.md`) stood on main on 18 October, the
@@ -165,11 +199,11 @@ the founder overrides one in the conversation.
   −8.4% to −20.1% in every district with a price (1.1 to 2.4 points beyond omni-v9), no LOSS against native in any district read before the push;
   the electricity bought, the carbon and the peaks fall a little less than on omni-v9, still GAIN, and two rows of the 2022
   phase 3 are power given (the ramping +6.18%, the net-zero shortfall +0.25%). Refused before it: steering the outage
-  buildings' batteries outside the outage hours (energy not served +0.69% in one 2023 district, a LOSS). The toy gate
-  (`results/toy_gate/V10_VS_V9.md`) before it was pushed. Every benchmark runs again on it; earlier tables stand as their own
+  buildings' batteries outside the outage hours (energy not served +0.69% in one 2023 district, a LOSS). The model gate
+  (`results/model_gate/V10_VS_V9.md`) before it was pushed. Every benchmark runs again on it; earlier tables stand as their own
   engine's until each benchmark's three runs on v10 land.
 - **Omni v9** (`OMNI_V9.json`, digest `7379f3a79ff2c475`, 47 files; `docs/OMNI_V9.md`) stood on main 17 to 18 October,
-  the founder's order ("we're going into another version of Engine ... Apply the fix, run it, and see in the toy sim that
+  the founder's order ("we're going into another version of Engine ... Apply the fix, run it, and see in the model sim that
   it works"; then "go go go"): omni-v8 with the CityLearn battery wire reading the coming hour (the mean of the same hour
   over the past seven days, only hours already seen) and gliding at up to 0.0625 an hour (0.05 before; the fastest glide that read no LOSS on any score
   in any district: 0.075 and faster raised the ramping in one district), because the reading of
@@ -177,7 +211,7 @@ the founder overrides one in the conversation.
   robustness district's monthly unevenness +0.11%, power given: a peak, a swing and an unevenness are power held, the
   founder's correction of 17 October); and every 95% interval on the exact Student t quantile
   (`omnicompass/student_t.py`; every tabled value unchanged, no published reading moves). Proven locally on CityLearn
-  3.0.2 and in the toy gate (`results/toy_gate/V9_VS_V8.md`, identical to v8 on every toy) before it was pushed. 44 of its
+  3.0.2 and in the model gate (`results/model_gate/V9_VS_V8.md`, identical to v8 on every model) before it was pushed. 44 of its
   47 files are omni-v8's bytes. Its reruns started on 17 October and run to their end as its own record.
 - **Omni v8** (`OMNI_V8.json`, digest `f93d233136a1f902`, 46 files; `docs/OMNI_V8.md`) stood on main on 17 October,
   the founder's order ("there's a new version 8 ... push in all and update all"): omni-v7 with one wire changed, the
@@ -194,7 +228,7 @@ the founder overrides one in the conversation.
   namespace's CPU quota (`omni_controller/quota.py`; an unreadable quota is no budget known, Kubernetes admission is the
   authority), on a shared host no limit raised while the machine is 75% busy or unread, the verdict reading a trial in
   the reports' words (GAIN, EVEN, LOSS: a clear rise refused), every rule in seconds, the cloud's one flag
-  `--give-back-only`. Two repairs first written for the KEDA pod start wait were refused by the toy gate and are not in
+  `--give-back-only`. Two repairs first written for the KEDA pod start wait were refused by the model gate and are not in
   it. Its seventeen three-run tables of 17 October (`results/live/V7_*.md`) and its twelve trial runs of 16 October
   (Goldilocks, KEDA's add-ons, fixed capacity, CruiseKube; A, B and C) are its own. **Omni v6** (`OMNI_V6.json`, `docs/OMNI_V6.md`) stood one day, 15 to 16 October; its four
   three-run tables are its own.
@@ -205,14 +239,14 @@ the founder overrides one in the conversation.
   it wins twice and never falls behind native on any seed; inside a body a battery wired by its power keeps the body's
   margins, V14; `docs/FORMAL_V5.md` section 5), the lease's walk back, the tune-down on the dial. v5 is re-declared on
   every engine change while in development. `OMNI_V3.json` (`docs/OMNI_V3.md`), `OMNI_V2.json` and `OMNI_V1.json` stay for their results,
-  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v16, omni-v15, omni-v14, omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
+  never up front. Check with `python3 tools/omni_version.py [--commit <sha>]`: it prints omni-v18, omni-v17, omni-v16, omni-v15, omni-v14, omni-v13, omni-v12, omni-v11, omni-v10, omni-v9, omni-v8, omni-v7, omni-v6,
   omni-v5, omni-v3, omni-v2, omni-v1, or what differs.
 - The version numbers are bookkeeping so no result is read across engines. When the founder says the engine is final, the
   engine that stands then is published as **Omni-Compass 1.0**; the older fingerprints go to `docs/history` as the road to
   1.0, never as a second product.
 - Any change to a rule, gain, guard, preset or muscle makes **the next version**, and every result is run again on it. Never read a result across
   versions. Never change the engine without telling the founder first; telling is not asking (19 October, night): a version
-  that passes the toy gate with no LOSS lands, and he hears what it changed.
+  that passes the model gate with no LOSS lands, and he hears what it changed.
 - Three runs: each benchmark runs as A, B and C (`tools/confirm_abc.py`). Every judged row gets one of three
   readings: GAIN or LOSS in all three of our runs (the same sign in all three, every 95% interval clear of zero, the word
   set by the gauge's aim; a resource spent that rose is power given); EVEN, no difference beyond the noise (an interval includes zero: that is the result, say so); the runs disagree (clear runs
@@ -245,11 +279,14 @@ the founder overrides one in the conversation.
   Omni-Compass on top (`kind-orchestrators.yml`, `results/live/GOVERNORS.md`).
 - The organisms are named `tower`, `stack` and `spine` in code and workflows (never by a count); the old names `organism_656`
   and `stack_1226` are read as aliases.
-- The grid: each organism runs native and omni at clustered copies × runs: 63 squares (seven organisms) at 1, 10 and 100 copies × 1, 10
-  and 100 runs, modelled and with the real cluster inside, with both values shown in every square. **On GitHub's own
-  machines only, the 1,000 tier stands again** (the founder's distinction of 15 October, `scripts/dispatch_grid.py`,
-  `docs/OMNI_V6.md`): the seven organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and
-  1,000 copies and nested 1, 10, 100 and 1,000 runs on free runners, and a cell beyond a free runner's memory or time is
+- The grid: each organism runs native and omni at clustered copies × runs, modelled and with the real cluster inside, with
+  both values shown in every square. **The ladder is 1, 10, 100 and 500, for copies and for runs alike, everywhere** (the
+  founder's order of 25 October: "it gotta be 1, 10, 100, and the last one has to be 500, and the organism has to be 500 as
+  well, to be in line with the Python": the Python's Monte Carlo is 500 runs, `tools/engine_runs.py`, read at its first 1, 10,
+  100 and 500 in the Python, the C++ harness and the live engine alike; one set and one stack cut down, never separate sets,
+  `docs/THE_LADDER.md`; `scripts/dispatch_grid.py`): on GitHub's own machines the
+  seven organisms and their modelled, Kubernetes, Linux and swarm workloads run at 1, 10, 100 and 500 copies and nested 1, 10,
+  100 and 500 runs on free runners (the 1,000 tier of 15 October is retired), and a cell beyond a free runner's memory or time is
   listed as pending runner capacity, never rented; **paid cloud and GPU runs stay at 1, 10 and 100 copies with at most
   100 repetitions** (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the
   grid. Every grid button starts all its sizes × all its run counts and uses every runner GitHub gives. The conductor
@@ -263,7 +300,10 @@ the founder overrides one in the conversation.
   machine family's queue; read back by its run's title, never started twice): the steady set, the bursts `1 4 1 6 1 9`
   and `1 6 1 8 1 6`, and the real day (Google 2011) on 1 to 9, every one at the tune-down with native's cap (the founder's words of 14 October; the load generator alone
   reads a schedule, never the governor). Google Cloud and Amazon carry the same four sets from `scripts/google_queue.txt` and
-  `scripts/amazon_queue.txt`, each behind its own `switch=` line, switched on by the founder on 18 October once their secrets were in the repository
+  `scripts/amazon_queue.txt`, each behind its own `switch=` line, switched on by the founder on 18 October once their secrets were in the repository;
+  both switched off on 24 October and kept, wired as Azure's sets run, shown everywhere as not yet run (Orders of 24 October; Amazon's
+  account on the Free plan, which Amazon would not raise before the $100 credit is spent or six months pass; Google's key not yet
+  stored whole), each on again on the founder's word
   (16 October: the Azure run is the measure of the other two clouds, the same tuning, mechanism and harness). Each tick runs the conductor's newest
   code (fetched from the branch). `peek` (`.github/workflows/peek.yml`) prints a running run's finished repetitions,
   paired, so a benchmark is looked at while it runs and a problem fixed before it ends. Shards are cut from measured run times; each stops at its deadline and hands in every run it finished. With
@@ -306,15 +346,200 @@ the founder overrides one in the conversation.
 
 ## Orders of 15 October
 
-- **The toy gate first** (the founder's order of 15 October, night: every fix, knob and rule is tried in a toy model
+- **The model gate first** (the founder's order of 15 October, night: every fix, knob and rule is tried in a model
   before it is pushed, and goes to a real run only where it shows promise there). Every change to the engine or to a
-  live controller runs in our own models (`tools/toy_gate.py`: the shipped controller on the toy cluster in the cloud
+  live controller runs in our own models (`tools/model_gate.py`: the shipped controller on the model cluster in the cloud
   setting at 60 and 15 s, conveyance on one kind host set to the v6 KEDA run's own regime, the verdict on noisy work)
   against the engine that stands, on the same seeds, paired, read GAIN, EVEN or LOSS by the gauge's aim. A LOSS there
   is root-caused and fixed in the model, never carried into a real run; a change that reads no LOSS and shows promise
   goes to its GitHub trials; nothing is dispatched before. The gate's readings are models (class S), recorded in
-  `results/toy_gate/` and never presented as a benchmark result. The toy's regime is set from a real run's own files
+  `results/model_gate/` and never presented as a benchmark result. The model's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
+
+## Orders of 25 October
+
+- **Omni-Compass is never by itself** (the founder's words: "The pod scalers part, we don't need an omnicompass by itself. Take that
+  out there. Never is going to omnicompass be by itself. It needs muscles somewhere, somehow. Get that running organism out of there
+  completely"). The by-itself arm of 23 October (each muscle's own native controller switched off and a pod scaler of Omni-Compass's
+  own in its place: its preregistration, its study tool and the model gate's setting for it) is removed whole, and nothing is built
+  for it again. Every page shows two sides, native and Omni-Compass on top of native. Omni direct (the engine's own orchestrator on
+  the machines' muscles, omni-v18) stands as the engine carries it until the founder says otherwise.
+- **Our models are models, a test's stand-in is a stand-in** (the founder's order of 24 October, night: no page, file or program
+  may call our own models or a test's stand-in by the two words he struck, anywhere). Our own models are models (evidence class S):
+  the model gate (`tools/model_gate.py`, `results/model_gate/`); a test's stand-in for a real program is a stand-in
+  (`tests/standin_*`). The raw records on the branch `raw` stay as recorded; the engine's own files take the change with the next
+  engine version.
+- **Every product Omni-Compass competes with is run against it** (the founder's words: "benchmark all this ... defensibly ... to see
+  if it's better than OmniCompass or not, and OmniCompass has to sit on it if it's in the world"). Four ways each
+  (`docs/COMPETITORS_PREREGISTRATION.md`, the register's rows 99 to 106): the organism alone, the product as it ships, Omni-Compass
+  on the organism alone, Omni-Compass on top of the product. The commercial services run only on an account the founder opens and
+  only where their terms allow a published benchmark.
+- **The orchestrators, the third arm, on the same organisms with the same injection** (the founder's words: "all the orchestrators
+  to have the same injection ran through. Those orchestrators sit on the same organism. And there lies the third arm ... the
+  Kubernetes bin pack, Volcano, Kueue, Koordinator, KAI ... and of course then OmniCompass on top of that same stack"). Three arms
+  on every organism: native (Kubernetes alone), the orchestrator (every pod of the same work sent to it as its project documents,
+  its shipped rule written by us from its release files), and Omni-Compass's shipped governor on top of it. Every arm of a
+  repetition meets the same random numbers (the engine's jump generator, drawn before any arm runs). Modelled first, class S
+  (`tools/orchestrators_arm.py`, `docs/ORCHESTRATORS_PREREGISTRATION.md`, `results/orchestrators/ORCHESTRATORS.md`): twelve
+  injections from the benchmarks that carry them, each on the kind rig and in the cloud, eight repetitions; the live four ways on
+  GitHub's machines (`kind-orchestrators.yml`) send the batch stream through each orchestrator on the same kind rig. Gödel, KubeRay,
+  Crane and the multi-cluster orchestrators join the model once each one's shipped default is read from its release. The
+  orchestrators place pods on machines and admit jobs, so they run on the organisms that hold a cluster; in the ten modelled
+  organisms of the twenty scenarios their knobs are catalog rows (the orchestra, `tools/run_orchestra.py`), and their rules are
+  never written into a muscle that has no pods, machines or jobs.
+- **Alloy, a sense and a muscle** (the founder's words: "Compass would use ... Alloy as its telemetry ... and go beyond it"; "We can
+  use Alloy as a muscle and put it in our stacks"). Grafana Alloy (Apache-2.0) runs unchanged as a separate service: its readings
+  are a wire into Omni-Compass, and its own knobs (how often it reads, batches and samples) are a muscle Omni-Compass governs, a
+  catalog row with its own benchmark.
+
+## Orders of 24 October
+
+- **The answer first** (the founder's words: "the first thing I need to see is you telling me that it is either 2%, 3%, 10%, 1%, no
+  percent better than native ... three scenarios ... green, yellow, or red and how much"; "show those bills ... put that total out as
+  the most first thing that everybody needs to see"). The README and the live engine page open, under the notice, with the answer
+  written by `tools/headline.py` from the engine that stands's newest three-arm record (three runs, class L): native, Omni-Compass on
+  top of native and Omni-Compass direct, each with its signal and its rows quoted with their own reading, and the two bills, on-site
+  and through the cloud, each a total cost (`docs/THE_TUNE.md`, section 8) reading unresolved where a price or a part is missing (no
+  price is assumed: the founder's choice of the same night). `verify.py` fails a page whose answer differs from the files. His
+  expected sizes (the cloud route 8%, on-site 6%) are never written in: the runs say what the mechanism does.
+- **Native orange; the signals in road shapes** (the founder's words: "Everywhere the native lives ... is to be orange"; "That red
+  sign is never to be a circle. It is an eight stop sign shape octagon ... The yield is the diamond ... the circle is green only
+  everywhere it lives"). Native's colour is orange on the page (every word native marked where it lands), in the manuals and on
+  paper; every monitor's signal and every section's (the worst of its monitors): **redlining**, the red stop-sign octagon,
+  blinking; **steady**, the yellow diamond; **accelerating**, the green circle (the word chosen for him, his "no preference"); a
+  grey bar where there is no line. Red is never a circle anywhere, the canvases' markers included; EVEN is yellow and power given
+  blue in every chart, on paper too.
+- **The heartbeat's six stops** (the founder's words: "10, 15, 30, 60, 90, 120. We need that 10 because we need to show less than
+  what's already standard"). The bench's buttons, the control panel's named stops and the manuals read 10, 15, 30, 60, 90 and 120 s;
+  60 s is the factory's; any value from 5 to 120 s may still be set on the control panel, and every other beat a record holds stays
+  in its file.
+- **The common language** (the founder's master specification, pasted the same evening): the governing engine, the muscle adapters,
+  the complete configuration profile and the validation harness; the factory, candidate, active and custom profiles; fixed tuning
+  with continuously changing state; "one setting" is the whole profile vector; the eight steps to the factory baseline (not yet
+  established); the C++ contract and release record; what the bench shows (architecture, route, profile, cadence, controls,
+  actuation feedback requested / accepted / pending / refused, response, backend); **Restore factory profile** and **Return to
+  native** as two separate controls; the whole-workload bill per route. Written once in `docs/THE_TUNE.md`, sections 5 to 8, and
+  carried into the README, all three manuals and the reading guide.
+- **The cloud is only a wire** (the founder's words): in bold capitals at the head of the cloud's section in the answer, the
+  Operator's Manual (chapter 19) and the Owner's (section 10.1).
+- **The GPU, told plainly** (the founder's words, the same night: "I have it running in Lambda ... charging me almost 24 hours, and
+  I ain't got a proof"). GitHub's own logs read: one A100 run of 10 repetitions (Lambda run 40079645681, 6.7 hours at $1.29 an
+  hour) and a first try of 25 minutes, both given back; no omni- machine listed on the account after; the 8-card run never rented
+  (no 8-card machine of any kind free on Lambda). Its receipt is on main (`results/gpu/run-20261024T091235Z`): every service gauge
+  EVEN, the governor at its limit on native. A machine started by hand on Lambda's page is never used or listed by our tools; the
+  founder terminates it on cloud.lambda.ai. Nothing is rented without his word, the price told first.
+
+- **Every change of 0.5% or more is a change** (the founder's words: "Any gauge that gives anything over a 0.5 percent change
+  either way is a change. I don't want to see even on shit that shows a 0.5% change up or down ... Not everything can just stay
+  even ... because it's 2-3% away. That's not even"; and "You have to interpretate the muscle and what it's doing to know if a
+  gain is a benefit or a minus is a plus"). The one key (`tools/readings.py` `three_run_reading`): the change is the mean of the
+  three runs' changes in percent of native; from 0.5% up it reads GAIN, LOSS or power given by what the gauge is for, "in all
+  three of our runs" where every run moved the same way clear of zero, otherwise "by the mean of our three runs" with the count of
+  runs beyond the noise; EVEN is kept for a mean under 0.5% (EVEN, under the floor) or no change at all; runs that moved 0.5% or
+  more in opposite directions read "the runs disagree"; a count that must never rise has no floor. Each run's own number wears
+  that run's own word. Every table was read again from its own data by `tools/reread.py` (24 October: 4,037 readings in 194
+  tables; the index's headline GAIN, up 3.4%), the model gate reads by the same floor, and the live engine's own key with it; every model-gate
+  record from its own seeds (`tools/model_reread.py`), and every muscle of the catalog and the seven organisms from theirs
+  (`tools/realms_reread.py`: 123 of 2,214 labels moved; GAIN 530 muscles, more work 12, fewer misses 445, LOSS 0).
+- **The immune system catches a LOSS under Omni** (the founder's words: "the only way anything can show a real loss would be ...
+  Omni direct or native by itself. Everything else with Omni in it ... has Omni-Compass's mechanism of immune system and pathways
+  ... that should have pushed signals when something is in its in a negative state, and adjusted ... like any human body"). A
+  muscle whose own markers turn against native (pods waiting, a response over its line, failures) sends its signal to the muscle
+  that caused it, and that muscle backs off toward native: the next version's work, through the model gate. Found the same night in
+  the governor's own audit (our models, class S): the pods that wait come from the fail-up, which drops the autoscaler's target
+  to its cover's floor at once (42% against the operator's 70%) and so asks for more pods than the machines can place; the floor
+  check then adds machines only after pods wait. The fix to build and gate: the machines first, the pods as the room appears. A
+  hold on the target while pods wait, tried first, changed nothing (the waiting does not come from that step).
+- **The live engine in the order a watcher needs it** (the founder's words of 24 October): the page, its contents and its
+  instructions laid out by importance to the operator watching the system, first to last; on every monitor of Omni on native a
+  switch that turns native off and leaves Omni direct on the organism with no other governor; live knobs, buttons and switches on
+  every muscle that can scale out, up or down, each acting on the running code; buttons that run another set of the Python's 500
+  runs (and the C++ harness's) from a new seed; and the page wired to a live governor through the control API
+  (`tools/omni_control.py`), so a system owner can hook a system up and watch and drive it from these monitors. Built the same
+  night: the page in eight parts by importance (1 watch first, 2 the three arms live and the knobs, 3 the measured effect, 4 the
+  evidence by stack, 5 the brain, 6 the failure modes, 7 the proof, 8 reference), the Live Engine Manual re-sequenced to it; the
+  native switch on all 60 monitors of Omni on native and on the console; each muscle's own knobs (a unit down or up, to its floor
+  or its top, let go); the run-again buttons were already there. The page driving a live governor through the control API is next.
+
+- **Google and Amazon kept in, wired as Azure is, shown as not yet run** (the founder's words, the same morning he had ordered
+  them taken out: "You leave the Google and Amazon runs in everywhere and just show it not ran yet, because someday, some way,
+  I'm going to have it run and put in here ... It's got to be built everywhere as a mechanism, the code, regardless if we run it
+  or not, and code it to wire it the same way that the Azure is running"). The removal of that morning was built here and never
+  pushed; it is undone whole. Every Google and Amazon workflow (`gke-metered`, `eks-metered`, `cloud-organism`), paired script,
+  queue, machine tool, setup page, $0 check, manual chapter, live page monitor and page mention stands, wired as Azure's sets run
+  today: the same harness (`scripts/kind_bench.sh` in its managed-cluster mode, the main engine's 60 s beat), the tune-down on the
+  machines alone, 100 paired repetitions a set under the preregistered stopping rule (`stop_looks`, `tools/stop_rule.py`), the $0
+  check before any set. Both queues read `switch=off`, so the conductor neither checks nor starts anything for them; every page,
+  board row and monitor reads them "not yet run". On the founder's word a queue's switch goes on (Google once its key is stored
+  whole, Amazon once its account is on the Paid plan) and its sets start behind its own check. The engine, Python and its C++
+  twin, names no cloud: the same governor runs on every one; what differs per cloud is the wire to it (the workflow, the paired
+  script, the queue and the key check), and those are what stand ready.
+
+## Orders of 23 October
+
+- **Omni direct and Omni on native: both, and both to the best** (the founder's words: "Within the native, we do
+  whatever the native can be pushed to. And in our own, with no goddamn Kubernetes, we have our own Omni Compass ... We're gonna
+  push it to the best with Omni Direct. We're gonna push it to the best with Omni on a native"; "the way you're writing this
+  should be making OmniCompass better when it's on top of the native, as well as by itself on the organism as the orchestrator,
+  replacing Kubernetes and whatever other managers, orchestrators in the system that OmniCompass is able to become"). Omni's own
+  orchestrator (`omni_orchestrator/`, `docs/OMNI_ORCHESTRATOR.md`) is built from scratch, no orchestrator's code in it, and read
+  against the yardstick (Kubernetes' published autoscaling rule, written by us) by the one key; every mechanism it gains is the
+  engine's own (conveyance, the verdict, the reflex, the compass law) so the same gain goes to Omni on top of native. Every
+  level is benchmarked on its own (nothing paid for with another), then all joined and benchmarked whole.
+- **The brain finds the win; nobody turns a knob for it** (the founder's words: "the brain should have fucking wired it out";
+  "it's supposed to be built in omnicompasses mechanism, defensive system, immune system, nervous system, pathways of signals
+  moving through ... it should react with the same benefit ... Unless by taking less can show more, or vice versa"). A result
+  that reads EVEN where the organism has room is a mechanism not yet wired, found in the files and wired (23 October: the
+  response time was the unit's own paper quota, not a shortage of units; the engine's conveyance gives the unit the processor
+  its machine can spare: faster, with no unit and no machine added). The win is said only when the run's own files read it.
+- **Where a LOSS may ever be seen** (the founder's words: "Nothing should be shown as a loss because it would have been fixed
+  and never gone there. The only way we're going to ever see a loss ... is in the live engine when people turn knobs and turn
+  and tweak it to a point that fucks it up ... and that's the only benchmark proof that needs to be"). The factory tune reads
+  no LOSS anywhere; a LOSS found in our own runs is a fault, fixed before anything is published, never shown as a result. The
+  live engine's knobs (the dial, the heartbeat, the sizes 1, 10, 100, more or less load) exist so a person can see the system
+  react, break it by hand and watch the brain hold or recover: that is the one place a LOSS is ever shown, as the proof that
+  the factory tune is the best state and that the mechanism can be broken only by leaving it.
+- **A reading leads with the word, never the sign** (the founder's words: "a loss can be a gain and a gain can be a loss
+  depending on ... don't because it's minus and plus"). Every reading to the founder and on every page is written as the word
+  first, then the direction in words (down 4.8%, a cut, GAIN), never a bare signed number.
+- **Every tool to strengthen the engine** (the founder's words: "all you got in access to in libraries kits formalization tools
+  all of the open source mechanisms on everything you can learn and figure and find and build and give me and strength in Omni
+  compasses engine"). Anything available that strengthens the mechanism or its proof is used and named; nothing is built from
+  another orchestrator's or governor's code.
+- **Nothing is pushed until the founder says so** (23 October: "Don't push nothing"; "I don't want you to push shit until I
+  tell you"). Work is built, run and shown here; the push waits for his word. His word came the same evening: "Native is
+  Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And then Omni direct is simply
+  Omni on top of the muscles, no Kubernetes ... they all need to be written in code ... put into the GitHub and push it all";
+  then "Update, push, push, push in the bush". The three arms are always shown together (native, Omni on native, Omni direct;
+  `omni_orchestrator/`, brains `yardstick`, `omni_native`, `omni`), and the push hold is lifted.
+- **The live engine is the operating control panel** (the founder's words: "build a live engine's mechanism, interpreting what it
+  sees, as well as giving it knobs and buttons ... in every canvas section block ... every monitor needs to have a light in it ...
+  gauging a couple percentage before ... there has to be a main button that puts it back"). Every monitor carries a light that reads
+  the series it draws: green inside its lines, amber before the line (within 3% of it, or its own slope over the last readings crossing
+  it within three readings), red over it, grey and said so where there is no line; the wall counts them and prints the engine's own
+  last act beside them, because the brain reads the same slope and acts before the line. One button, on the console, the dock, the
+  wall and every monitor's knobs, returns every knob to the factory tune and says what it put back; native alone stays the kill switch.
+- **The sign explained where the number sits** (the founder's words: "you cannot just put minus 29 gain or down 29% and then say gain
+  ... you need to now explain that wherever things are"). A number beside a word wears the word's sign (the order of 22 October), and
+  wherever it stands the reason stands with it: on the live engine every word and size carries it on hover, and the key says it once in
+  full ("How to read a number beside a word"); in prose a change is said in its verb with its reading ("pods waiting down 29.6%: fewer
+  waiting, GAIN"), never a bare sign beside a word.
+- **The factory beat is the best beat the sweeps read** (the founder's words: "whatever is the best one out of all that helps the best
+  system is the factory set one ... I think 45 you didn't try"). The main engine's beat is whichever the ladder reads best by the key
+  on the organism's gauges, not a number chosen for a reason of its own; the beats the ladder has not read (45, 40, 50, 20 s) are
+  read in the model on the side first, and a beat that reads best lands as the next version through the model gate. The knobs stay for
+  anyone to turn. Read the same evening (`results/model_gate/V17_LADDER.md`, class S): against 60 s in the kind benchmark's setting the
+  minutes over the line GAIN at 20 s (+14.7%) and 40 s (+13.2%), EVEN at 45 and 50 s, every other gauge EVEN, the reads and the
+  governor's own processor power given; in the cloud's setting every gauge EVEN. 60 s is not the beat that reads best on the service.
+- **A LOSS at the factory tune is a fault to fix, never a number to accept** (the founder's words: "nothing should be shown as a loss
+  because it would have been fixed and never gone there. The only way we're going to ever see a loss is ... when people turn knobs").
+  Every LOSS row is still shown (Honesty); each one on the engine that stands is on the next version's list with its cause, and the
+  live engine's knobs are where a reader may break the engine and watch it break.
+- **Omni-Compass at every level** (the founder's words: "OmniCompass can go in the software side, in the hardware bare metal side ...
+  in the brain ... in muscles itself ... into a chip ... every level of mechanism"). Its own muscles, built from the ground up with the
+  compass's mathematics inside, beside the open-source muscles it governs, each benchmarked native,
+  with Omni-Compass on top of native, and all of it together: the next versions' work, each through the model gate. A licensed
+  mechanism is never copied; an interface a project publishes (the Kubernetes API) is talked to, as any client does.
 
 ## Orders of 22 October
 
@@ -330,7 +555,7 @@ the founder overrides one in the conversation.
   box `#tuningBench`, all three manuals). The factory tune is chosen by a declared rule (`docs/THE_TUNE.md`, the Owner's Manual
   section 4.4, `tools/tune_study.py`): admissible = no gauge reads LOSS against native (in a cloud no rise in the bill); the
   factory tune stands when no admissible tune searched dominates it (against it no service gauge LOSS, one GAIN); searched
-  on development seeds (101 to 108), read again on the gate's untouched seeds, landed as the next version only through the toy
+  on development seeds (101 to 108), read again on the gate's untouched seeds, landed as the next version only through the model
   gate; the claim is non-dominance in the tunes searched, never a global optimum. Every new search widens the grid (the cruise
   wait, the trial, the dwell in readings, each muscle's card at each beat).
 - **The heartbeat a dial; the main engine at 60 s** (the founder's words, the afternoon of 22 October, once he had read the reads a
@@ -340,12 +565,12 @@ the founder overrides one in the conversation.
   be able to show the same 15 second beats"). omni-v17 (`docs/OMNI_V17.md`): the main engine takes its full decision every 60 s; any beat can be set
   (`--interval`, 5 to 120 s and every value between); every beat is shown beside native with what it buys (its reads of the
   cluster) and what it costs (its own processor, and every service row against native and against 60 s), in our models
-  (`results/toy_gate/V17_LADDER.md`), on the live engine page (section 1j, "The heartbeat dial") and in its real runs
+  (`results/model_gate/V17_LADDER.md`), on the live engine page (section 2d, "The heartbeat dial") and in its real runs
   (`docs/PACE_PREREGISTRATION.md`, amendment 3: eight arms, native and 5, 15, 30, 60, 75, 90 and 120 s). The monitors scale with
   the beat: the exporter serves the beat the governor runs at (`omni_heartbeat_seconds`), the governor's Grafana screen counts the
   time since its last decision in beats, and the staleness alert fires after three beats at any setting. The engine "can always be
   tweaked, tuned, and turned with any knob, any button"; at each beat the other knobs may want their own combination to reach the organism's
-  best state, and that per-beat tuning is the next study, in the toy first (each beat's combination lands as a version only when it
+  best state, and that per-beat tuning is the next study, in the model first (each beat's combination lands as a version only when it
   reads no LOSS). Nothing is read across beats as one result: every beat is its own row beside native.
 - **The heartbeat at 15 s, "all over"** (the founder's words, once the pace models had read: "15 seconds back to, instead of 60
   seconds in the clock, the heartbeat"; "15 sec all over heart beat fix update code"). Who set 60 s: we did, on 26 September, with
@@ -355,6 +580,36 @@ the founder overrides one in the conversation.
   pace runs (`docs/PACE_PREREGISTRATION.md`) read 15 s for real, against native and against 60, 10 and 5 s; a LOSS at 15 s there
   is root-caused and fixed in the next version. The same afternoon the dial above replaced it: omni-v16 stood at 15 s from the
   morning's landing to omni-v17's, and 15 s is now one setting of the dial, read beside native like every other.
+- **The heartbeat as a knob on the wall** (the founder's words, the same day: "5, 15, 30, 60 ... Then give me 75 90 And after 90,
+  I want 120 ... Heartbeat sweeps. With buttons in my monitor canvas dashboard of that wired mechanism of the heartbeat ... Maybe
+  somebody wants to pick a different one ... somebody might want to tune it to be something different"). The heartbeat sweep
+  (`tools/heartbeat_sweep.py`, our own model, class S; the record `results/model_gate/HEARTBEAT_SWEEP.md`, written again from its
+  runs by `tests/test_heartbeat_sweep.py`) reads the engine that stands and the one before it at every beat from 5 to 120 s,
+  on-site and in the cloud. Each beat is read against native and against the same engine at 15 s and 60 s, with the engine's own
+  cost and the fast check's rescues (a machine added only after a pod waited). The live engine's monitor `beatCv` (section 4c,
+  after the heart) has a button for each beat, setting, engine, zero line and gauge. The factory's beat is the main engine's 60 s since omni-v17
+  (the dial above); another beat is a changed tune, its receipts its own. On omni-v16 (our own model, class S): on-site every beat reads GAIN against native in
+  pods waiting (GAIN +83.5% at 5 to 15 s, +72.9% at 60 s, +57.0% at 120 s), at 5 to 15 s with about 3% more machine-hours (power
+  given +2.9%); a beat slower than 60 s waits more than the factory's 15 s (86% to 160% more, LOSS at 90 s) for at most 0.4 points
+  fewer machines than 60 s, and the fast check's rescues rise from none at 15 s to 3 a day at 120 s. In the cloud, the machines
+  alone, 5 to 15 s cut the machine-hours 1.5% to 1.8% (GAIN) with pods waiting +15% to +17% (LOSS, the engine's, on the next
+  version's list, as omni-v16's own pace study found); from 20 s to 120 s the waiting reads EVEN and the cut 0.7% to 1.4%.
+- **The number beside a word carries the word's sign** (the founder's words, 22 October, night: "If it's a gain, it should be a
+  plus 73 with the word gain. When you put a minus, it confuses me ... that word gain can never have a minus beside the word
+  gain"; the key's own rule of 20 October, said again). GAIN +, LOSS −, EVEN =, power given +: "+73.0% GAIN", "−16.8% LOSS",
+  "=0.9% EVEN"; an interval beside GAIN or LOSS is its two sizes with the word's sign ("+47.3% to +127.5%"), beside EVEN as it
+  lies. The heartbeat monitor had printed the gauge's raw direction ("−73% GAIN"); the key's formatter (`tools/readings.py`
+  `by_word`, `interval_by_word`) now prints every number beside a word in the three-run tables, the receipts, the model gate, the
+  heartbeat sweep and the live engine's trading floor, index, verdict and heartbeat monitor.
+- **The beat, read right** (the same night: "73% gain means you're gaining more pods waiting ... Answer the question").
+  No: down 73% at 60 s means 73% fewer pods waiting than native, down 87% at 15 s means 87% fewer; both GAIN, 15 s the
+  larger. Native keeps its own 15 s autoscaler in both arms, so the benefit is not the beat: it is the governor sizing
+  the pool ahead of the load, where native's autoscaler adds a machine after pods wait; the beat sets only how often the
+  governor looks. The factory's beat was 15 s on omni-v16 and is 60 s on omni-v17 (the dial above). A beat shown to make the engine do too much work for
+  nothing (120 s) is kept on the monitor only to show why nobody would tune there; no run is spent proving it further.
+- **The page's order** (the same night: "my TOC is in order of comprehension ... there's too much shit before people see
+  some metrics ... the real monitor wall ... got to hit them right away"): open order; the founder goes through the
+  contents next.
 - **Another person's cloud account** (the founder's words: he logged into another person's Azure account to use their free credit
   for his benchmark). A key bills only the account it belongs to; nothing merges. Using it is his and that person's matter: only
   with that person's agreement. Asked whether they agreed, he answered "Yes yes yes" the same day: the Azure queue's switch, off while the
@@ -368,7 +623,7 @@ the founder overrides one in the conversation.
 ## Orders of 21 October
 
 - **Push, push, push; the enhanced engine** (the founder's words: "Back to work push push push on GitHub update enhanced engine"):
-  omni-v15 landed the same evening by the standing rules (the fault from the next version's list, the toy gate against omni-v14
+  omni-v15 landed the same evening by the standing rules (the fault from the next version's list, the model gate against omni-v14
   first, no LOSS, told, not asked): the brain's power-cap request through the line's own clear time and every wire in the
   fingerprint (`docs/OMNI_V15.md`). What the gate refused (a dwell with a glide) is written on the same page and is not in it.
 
@@ -405,7 +660,7 @@ the founder overrides one in the conversation.
 - **Every fix lands as the next version, told, not asked** (the founder's words, the night of 19 October: "Of course I want you
   to land a version 12. I want you to keep fixing and building and straightening and enhancing and benchmarking and
   defensibility, and every time you do that to a new version, it becomes a new version ... What you asking me"). A change to
-  the engine is built on its own branch, tried in the toy gate against the engine that stands, and, when it reads no LOSS,
+  the engine is built on its own branch, tried in the model gate against the engine that stands, and, when it reads no LOSS,
   landed at once with `tools/land_engine.py`: the fingerprint, the words on every page, all three manuals, the manifest, the push,
   the branches leveled and every benchmark run again on it. The founder is told what changed and what it read, never asked
   whether to land it. A change that reads a LOSS in the gate is fixed in the model first, or kept on its study branch with the
@@ -423,7 +678,7 @@ the founder overrides one in the conversation.
   disclosures that's how do no harm is meant to mean"). Its meaning is written once, in `DISCLOSURES.md` section 3, and the
   key (`tools/readings.py`), both manuals, the README, the safety case and the theory carry it; the engine that stands
   keeps its strictest form, and the engine's own words and the trade between muscles come with the next version, through
-  the toy gate.
+  the model gate.
 - **Every cloud set gets its three-run reading, to the cap** (the founder's words: "I need a 3-run result ... the cap we can
   run it to ... that's all we can run ... do all, give all, make it the best you can"). Every Azure set runs up to 100 paired
   repetitions a run (the paid cap of 12 October) under the preregistered stopping rule (`tools/stop_rule.py`; looks at 10,
@@ -437,7 +692,7 @@ the founder overrides one in the conversation.
   "at some point ... version 10, 20, 30, 40 for all I know ... keep updating and moving and tightening and coding and writing
   and building along the way to the full final destination organism ... leaving everything intact, only upgrading what keeps
   moving ... It has to live better than it did natively ... We can't make an organism live great for one day and die the second
-  day"). No fault is set aside: each is root-caused and fixed, in the rig or, through the toy gate, in the next engine version.
+  day"). No fault is set aside: each is root-caused and fixed, in the rig or, through the model gate, in the next engine version.
   A version lands with `python3 tools/land_engine.py vN --since <UTC>` (the fingerprint, the version list, the conductor's
   campaign, the grid's manifest and workflows, the package, the root list, a release group), then the words a person writes;
   `tools/land_engine.py --check`, run by `verify.py`, refuses a push where any of those places still names an older engine.
@@ -453,7 +708,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v17` since 23 October, afternoon), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch of the engine that stands (`gpu-omni-v19` from 25 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -481,7 +736,7 @@ the founder overrides one in the conversation.
   both read through `tools/readings.py` now, and every result was re-read: on the engine that stands, no LOSS.
 
 - **Version 9: the fix proven in our own runs first, then pushed** (the founder's words: "Engine fix goes into models
-  first ... Apply the fix, run it, and see in the toy sim that it works ... lock everything else that you're not touching
+  first ... Apply the fix, run it, and see in the model sim that it works ... lock everything else that you're not touching
   ... Get rid of dead weight"; then "go go go"). omni-v9 stood on main and on the branch `v9` from 17 to 18 October, and
   while it stood every page, manual, table and queue pointed at it. **Native as shipped**: MySQL, Redis and MongoDB run with native exactly as the vendor ships them
   beside the operator's setting (`--native shipped`); where the factory setting is already at the knob's top, the knob
@@ -584,7 +839,7 @@ the founder overrides one in the conversation.
   `docs/book/schematics.py` (schemdraw and matplotlib: a wiring schematic for every stack in the grammar of an electrical
   drawing, the governor with its sense and motor terminals, the kill switch, the plug, the native controller, the muscle and
   the meters; the control-loop block diagrams; the flowcharts of the wire check, the paired run, the gate, the verdict, the
-  stops, the toy gate, the reading rule; the timing diagrams and modelled traces, marked class S; the state machines; every
+  stops, the model gate, the reading rule; the timing diagrams and modelled traces, marked class S; the state machines; every
   receipt of the engine that stands charted from its own table; the grids of the organisms and the catalog). A chart of a
   receipt pictures the table and adds nothing to it. Each figure is placed where a manual carries an image line pointing at
   `book/figures/<key>.svg`, numbered, captioned, listed in a List of Figures after the Contents, and written as an SVG file
@@ -709,8 +964,8 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v17` (the engine that stands, 23 October, afternoon), stay in
-  sync, and `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v17`,
+  One version is always the main one; `main` and the working branch, `v18` (the engine that stands, 23 October, night), stay in
+  sync, and `v17`, `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v18`,
   one exact commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.

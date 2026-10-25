@@ -6,7 +6,7 @@
 """The YCSB-on-MongoDB runner (tools/run_ycsb.py) without a server or YCSB: the decision rule (slow reads grow the cache by
 notches only while it is full and missing, calm with the cache's misses under 1% of its requests gives back one notch after the
 dwell and never in a second with no request, the wall adds a quarter of the cover, the cover holds), the plug's one-writer rule
-against a fake server console, the server's own reading from serverStatus,
+against a standin server console, the server's own reading from serverStatus,
 YCSB's raw records and failed-operation summary parsed, and the paired reading over repetitions."""
 import sys
 import tempfile
@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import run_ycsb as Y
 
 
-class FakeAdmin:
+class StandinAdmin:
     def __init__(self, mb):
         self.mb = mb; self.reads = (0, 0)
 
@@ -31,9 +31,9 @@ class FakeAdmin:
         raise AssertionError(cmd)
 
 
-class FakeClient:
+class StandinClient:
     def __init__(self, mb):
-        self.admin = FakeAdmin(mb)
+        self.admin = StandinAdmin(mb)
 
 
 def main():
@@ -55,7 +55,7 @@ def main():
     assert Y.decide(0.3, 0.02, miss_share_last_s=0.0, cur_mb=512, last_change_age=10, full=True)[0] == 512, "inside the cushion nothing moves"
     assert Y.miss_share(5, 1000) == 0.005 and Y.miss_share(0, 0) == 0.0 and Y.GIVEBACK_MISS_SHARE == Y.GROW_MISS_SHARE == 0.01
     # the plug: snapshot once, write and read back, another writer stops it, restore
-    fc = FakeClient(512); plug = Y.CacheSize(fc)
+    fc = StandinClient(512); plug = Y.CacheSize(fc)
     assert plug.attach() == 512 and plug.write(768) == 768 and plug.lever() == 768
     fc.admin.mb = 1024                                           # someone else moved the knob
     try:
@@ -89,7 +89,7 @@ def main():
     assert Y.COVER_MB == (256, 2048) and Y.NATIVE_MB == 512 and lo <= Y.NATIVE_MB <= hi and len(Y.YCSB_SHA256) == 64
     # native as shipped (17 October): MongoDB's own default cache (half of RAM less 1 GB: 7,680 MB on a 16 GB machine) is
     # above the cover; any size Omni wrote would sit below native, so it writes nothing and hands back the untouched setting
-    fc = FakeClient(7680); plug = Y.CacheSize(fc)
+    fc = StandinClient(7680); plug = Y.CacheSize(fc)
     with tempfile.TemporaryDirectory() as t:
         om = Y.Omni(plug, Path(t) / "audit.jsonl")
         om.stop_flag.set(); om.run()

@@ -12,8 +12,9 @@ energy counters when the machine has them. Nothing here is a model.
 Per repetition, per arm: energy, joules per served request, mean power, peak and mean temperature, served and not
 served requests, response time (mean, 95th, 99th percentile), power-limit writes. Across repetitions: for watch and omni
 against native, the paired mean difference with a t-based 95% interval. A difference is clear of the noise when that
-interval excludes zero; otherwise it reads EVEN, no difference beyond the noise (the words of the GPU preregistration's
-amendment of 17 October; before it, "proven" and "not proven", the same rule).
+interval excludes zero (the words of the GPU preregistration's amendment of 17 October; before it, "proven" and "not
+proven", the same rule). Its word is set by its size (the founder's order of 24 October 2026): a change of 0.5% or more of the
+base reads by the gauge's aim, clear of the noise or not beyond it; under 0.5% it reads EVEN, under the floor.
 
 Three contrasts, each paired by repetition: observation = watch − native (does Omni's presence alone move the plant),
 authority = omni − watch (what granting Omni the write adds), total = omni − native (the preregistered comparison).
@@ -36,8 +37,9 @@ try:                                                       # the legal notice ev
     from tools.legal import stamp as _legal_stamp
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
-from tools.readings import word as gel_word, labelled, GAIN, EVEN, LOSS, GIVEN, WORK_PER  # noqa: E402  (the words every table uses)
+from tools.readings import word as gel_word, labelled, GAIN, EVEN, LOSS, GIVEN, WORK_PER, SIZE_FLOOR  # noqa: E402  (the words every table uses)
 CLEAR = "clear of the noise"   # the 95% interval excludes zero (the GPU preregistration, amendment of 17 October)
+NOT_CLEAR = "not beyond the noise"   # a change of 0.5% or more whose interval holds zero (the founder's order of 24 October 2026)
 from pathlib import Path
 
 U_AUTHORITY = 25.0          # omnicompass/core.py: the U-channel command's bound (saturation)
@@ -368,16 +370,22 @@ def label(prim, g_served, g_p95, g_lost, valid, observation=None):
     return "NONINFERIOR / INCONCLUSIVE" if ok else "NOT ESTABLISHED"
 
 
-def verdict(k, mean, half, n):
-    """A gauge's word against the base, by what it is for (GAIN, LOSS, or power given for a resource spent that rose), and
-    when its 95% interval clears zero; EVEN, no difference beyond the noise, when the interval includes zero; EVEN, the same,
-    when it did not move."""
+def verdict(k, mean, half, n, base=None):
+    """A gauge's word against the base, by what it is for (GAIN, LOSS, or power given for a resource spent that rose). The
+    founder's order of 24 October 2026: a change of 0.5% or more of the base is a change, read by its aim, "clear of the noise"
+    when its 95% interval clears zero and "not beyond the noise" when it does not; under 0.5% it is EVEN, under the floor;
+    EVEN, the same, when it did not move. Without a base (no relative size to read) the interval alone decides, as before."""
     if n < 2 or math.isnan(half):
         return "no interval (too few repetitions)"
     if abs(mean) < 1e-12 and half < 1e-12:
         return f"{EVEN}, the same"
     aim = "spent" if k in SPENT else "lower" if k in LOWER else WORK_PER if k in (PRIMARY, WALL) else "higher"
-    if mean - half > 0 or mean + half < 0:
+    clear = mean - half > 0 or mean + half < 0
+    if base is not None and abs(base) > 1e-12:
+        if abs(mean / base) < SIZE_FLOOR:
+            return f"{EVEN}, under the floor"
+        return f"{gel_word(mean < 0, aim)}, {CLEAR if clear else NOT_CLEAR}"
+    if clear:
         return f"{gel_word(mean < 0, aim)}, {CLEAR}"
     return f"{EVEN}, no difference beyond the noise"
 
@@ -468,7 +476,7 @@ def main(root):
             sd = math.sqrt(sum((x - m) ** 2 for x in dd) / (n - 1)) if n > 1 else float("nan")
             half = T95.get(n - 1, 1.96) * sd / math.sqrt(n) if n > 1 else float("nan")
             nb = _mean([runs[b][r][k] for r in reps]); ob = nb + m
-            v = verdict(k, m, half, n)
+            v = verdict(k, m, half, n, nb)
             ch = f"{(ob - nb) / abs(nb) * 100:+.1f}%" if abs(nb) > 1e-12 else f"{m:+.3g}"
             out["paired"][key][k] = {"native" if b == "native" else b: nb, a: ob, "base": nb, "diff": m, "ci95": [m - half, m + half], "verdict": v}
             L.append(f"| {'**' + k + ' (primary)**' if k == PRIMARY else k} | {_f(nb)} | {_f(ob)} | {ch} | {m - half:+.4g} to {m + half:+.4g} | {v} |")

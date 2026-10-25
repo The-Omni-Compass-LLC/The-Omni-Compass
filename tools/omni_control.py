@@ -21,7 +21,10 @@ The buttons (each a POST carrying a bearer token; JSON body):
   POST /v1/dial   {"dial": "max"|"save", "reason": ...}                role operator
         the max (the factory default) or the tune-down
   POST /v1/reset  {"reason": ...}                                       role operator
-        every setting handed back to native; the governor stops (mode off) until the next mode press
+        Return to native: every setting handed back to native; the governor stops (mode off) until the next mode press
+  POST /v1/factory {"reason": ...}                                      role operator
+        Restore factory profile: the released configuration reapplied (autopilot, the max, every muscle driven, the
+        command's own beat), passing through native like every press
   POST /v1/kill   {"reason": ...}                                       role security
         the master switch OFF for every Omni-Compass governor on the machine (omnicompass/master.py): the security switch,
         instant; every governor restores its settings and exits, and none starts while it is OFF
@@ -34,7 +37,7 @@ The buttons (each a POST carrying a bearer token; JSON body):
         governor hands every setting back and starts again with the new list
   POST /v1/beat   {"seconds": 5 to 120, "reason": ...}                  role operator
         the heartbeat, a dial (omni-v17): the governor's full decision every so many seconds (the main engine 60 s; the
-        dial's stops 5, 15, 30, 60, 75, 90 and 120 s and any value between), its fast checks every 5 s at every beat; like
+        dial's stops 10, 15, 30, 60, 90 and 120 s, and any value from 5 to 120 s), its fast checks every 5 s at every beat; like
         a dial press it passes through native, and the governor starts again with --interval set to the beat
 The reads (role viewer): GET /v1/status (the switch, the desired and the actual state, the governor's process, the
 registry and its leases, the age of the last decision), GET /v1/presses (the last presses), GET /metrics. The console
@@ -69,10 +72,10 @@ from tools.legal import PLAIN                     # noqa: E402
 from omni_controller.controller import MUSCLES    # noqa: E402
 
 BUTTONS = {"mode": "operator", "dial": "operator", "reset": "operator", "kill": "security", "arm": "security", "muscle": "operator",
-           "beat": "operator"}
+           "beat": "operator", "factory": "operator"}
 MODES, DIALS = ("autopilot", "watch", "off"), ("max", "save")
 MAIN_BEAT, BEAT_RANGE = 60.0, (5.0, 120.0)            # the heartbeat dial (omni-v17): the main engine's beat and the dial's span
-BEAT_STOPS = (5, 15, 30, 60, 75, 90, 120)              # the stops the console offers; any value in the span can be pressed
+BEAT_STOPS = (10, 15, 30, 60, 90, 120)                 # the stops the console offers (the founder's order of 24 October); any value in the span can be pressed
 ARM_WINDOW_S = 600.0              # the two-person rule: two different holders of the security role within ten minutes
 MAX_BODY = 4096
 
@@ -271,6 +274,17 @@ class Panel:
         out.update(self._start())
         return {"beat_s": s, **out}
 
+    def _factory(self, who, body):
+        """Restore factory profile: the released configuration reapplied, every knob back (autopilot, the max, every muscle driven,
+        the command's own beat); like every press it passes through native. Return to native is the other control (reset)."""
+        factory = {"mode": "autopilot", "dial": "max", "native": [], "beat": None}
+        if {k: self.desired.get(k) for k in factory} == factory and self.running():
+            return {"profile": "factory", "unchanged": True}
+        out = {"hand_back": self._hand_back()}
+        self.desired.update(factory)
+        out.update(self._start())
+        return {"profile": "factory", "mode": "autopilot", "dial": "max", "native": [], "beat_s": self.beat(), **out}
+
     def _reset(self, who, body):
         out = self._hand_back()
         self.desired["mode"] = "off"
@@ -390,7 +404,8 @@ def openapi():
                       "/v1/mode": post("autopilot, watch (decides, writes nothing) or off (hands back and stops)", "operator",
                                        {"mode": {"type": "string", "enum": list(MODES)}}),
                       "/v1/dial": post("the max or the tune-down", "operator", {"dial": {"type": "string", "enum": list(DIALS)}}),
-                      "/v1/reset": post("every setting handed back to native; the governor stops", "operator"),
+                      "/v1/reset": post("Return to native: every setting handed back to native; the governor stops", "operator"),
+                      "/v1/factory": post("Restore factory profile: autopilot, the max, every muscle driven, the command's own beat", "operator"),
                       "/v1/kill": post("the master switch OFF for every governor on the machine (security)", "security"),
                       "/v1/arm": post("the master switch ON again: two holders of the security role within ten minutes", "security"),
                       "/v1/muscle": post("one muscle on (Omni-Compass drives it) or left native (never written); passes through native",
@@ -417,7 +432,7 @@ pre{white-space:pre-wrap;border:1px solid var(--line);padding:8px;overflow-x:aut
 <fieldset><legend>Mode</legend><button onclick="go('mode',{mode:'autopilot'})">Autopilot</button><button onclick="go('mode',{mode:'watch'})">Watch (writes nothing)</button><button onclick="go('mode',{mode:'off'})">Off (hand back)</button></fieldset>
 <fieldset><legend>Dial</legend><button onclick="go('dial',{dial:'max'})">Max</button><button onclick="go('dial',{dial:'save'})">Tune-down</button></fieldset>
 <fieldset><legend>Heartbeat: seconds between full decisions (the main engine 60)</legend>BEAT_ROWS</fieldset>
-<fieldset><legend>Native</legend><button onclick="go('reset',{})">Reset: every setting back to native</button></fieldset>
+<fieldset><legend>The two restoring controls</legend><button onclick="go('factory',{})">Restore factory profile</button><button onclick="go('reset',{})">Return to native: every setting back to native</button></fieldset>
 <fieldset><legend>Muscles: on, or left native</legend>MUSCLE_ROWS</fieldset>
 <fieldset><legend>Security</legend><button class="kill" onclick="if(confirm('Master switch OFF for every governor on this machine?'))go('kill',{})">Kill switch</button><button onclick="go('arm',{})">Arm (two holders)</button></fieldset>
 <button onclick="look()">Refresh status</button><pre id="o"></pre><p><small>NOTICE_TEXT</small></p>
@@ -429,11 +444,39 @@ function show(s,j){document.getElementById('o').textContent=s+'\\n'+JSON.stringi
 </script></body></html>"""
 
 
-def server(panel: Panel, tokens_path: Path, bind: str, port: int, cert=None, key=None) -> ThreadingHTTPServer:
+def server(panel: Panel, tokens_path: Path, bind: str, port: int, cert=None, key=None, allow_origins=()) -> ThreadingHTTPServer:
+    allowed = {o.rstrip("/") for o in allow_origins if o}
+
     class H(BaseHTTPRequestHandler):
+        def _origin(self):
+            """The page that called, where the operator named it (--allow-origin): the live engine page served from its own
+            address may then read the status and press the buttons, each call still carrying its bearer token; any other
+            origin gets no cross-origin header and its browser refuses the answer."""
+            o = (self.headers.get("Origin") or "").rstrip("/")
+            return o if o and o in allowed else None
+
+        def _cors(self):
+            o = self._origin()
+            if o:
+                self.send_header("Access-Control-Allow-Origin", o)
+                self.send_header("Vary", "Origin")
+
+        def do_OPTIONS(self):
+            """The browser's preflight before a cross-origin call with a token: answered only for an origin the operator named."""
+            if not self._origin():
+                return self._send(403, {"error": "this origin is not allowed (serve --allow-origin)"})
+            self.send_response(204)
+            self._cors()
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
+            self.send_header("Access-Control-Max-Age", "600")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
         def _send(self, code, obj, ctype="application/json"):
             data = (obj if isinstance(obj, str) else json.dumps(obj, indent=1)).encode()
             self.send_response(code)
+            self._cors()
             self.send_header("Content-Type", ctype + "; charset=utf-8")
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
@@ -513,6 +556,9 @@ def main(argv=None):
     ap.add_argument("--bind", default=os.environ.get("OMNI_CONTROL_BIND", "127.0.0.1"))
     ap.add_argument("--port", type=int, default=int(os.environ.get("OMNI_CONTROL_PORT", "9465")))
     ap.add_argument("--cert"); ap.add_argument("--key")
+    ap.add_argument("--allow-origin", action="append", default=[o for o in os.environ.get("OMNI_CONTROL_ALLOW_ORIGIN", "").split(",") if o],
+                    help="a page allowed to call the panel from another address (the live engine page's origin, e.g. "
+                         "https://the-omni-compass-llc.github.io); repeat for more; none by default")
     a = ap.parse_args(argv)
     if a.cmd == "token":
         if not a.name:
@@ -524,7 +570,7 @@ def main(argv=None):
         raise SystemExit("--governor is required")
     panel = Panel(shlex.split(a.governor), a.kill_file, a.state, a.log, a.audit,
                   {"kill": a.kill_flag, "dial": a.dial_flag, "watch": a.watch_flag}, a.handback)
-    srv = server(panel, a.tokens, a.bind, a.port, a.cert, a.key)
+    srv = server(panel, a.tokens, a.bind, a.port, a.cert, a.key, a.allow_origin)
     scheme = "https" if a.cert else "http"
     print(f"{PLAIN}\nomni control panel: {scheme}://{a.bind}:{a.port}/ (mode off until a press starts the governor)", flush=True)
     try:

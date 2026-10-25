@@ -56,7 +56,7 @@ measurement exists.
 12. **Outside simulators.** CityLearn 27 GAIN, the power grids 67 GAIN, the robot arms 7 GAIN, the swarm 9 GAIN, 0 LOSS in
    all four on omni-v11, each rebuilt byte for byte. Held at B− by a fault found in the swarm's wire: on a mission draw outside
    the preregistered seeds it let drones collide where native did not. The fix held every drone outside the keep-out on all
-   ten cells and draws tried (`results/toy_gate/V12_SWARM_REFLEX.md`) and landed in omni-v12; the grade moves when its three runs land.
+   ten cells and draws tried (`results/model_gate/V12_SWARM_REFLEX.md`) and landed in omni-v12; the grade moves when its three runs land.
 14. **Reproducibility.** All 23 omni-v11 tables rebuilt from their raw receipts and identical to the byte
    (`tools/reproduce.py`, weekly in `reproduce.yml`); every package pinned with its hashes, every action by its commit.
 15. **Honesty.** The limitations page, the tail-latency page, the runs-disagree rows each explained, every row kept.
@@ -104,7 +104,7 @@ version, and every benchmark runs again on it):
   arm), roles on every button and every press logged. It writes no setting itself: every change goes through the governor's own
   hand-back and a restart with the new arguments, so the engine does not change for it (`docs/OBSERVABILITY.md`). Still to
   build: a row per muscle with its own hand-back and watch-only buttons (the engine that stands takes its mode for the whole
-  governor, so that comes with the next version, through the toy gate); the live native-against-Omni panel; a one-line install
+  governor, so that comes with the next version, through the model gate); the live native-against-Omni panel; a one-line install
   (a Helm chart); two governors with leader election.
 
 **Mathematics.** CERT-10 for every fixture by entry bounds taken cell by cell instead of over the whole box; the bath's

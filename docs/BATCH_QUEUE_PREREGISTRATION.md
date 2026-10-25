@@ -382,7 +382,7 @@ machine. Each is fixed where it was found, the same in every arm, before the cou
   percentile, the time over the line, the failures and the jobs unfinished EVEN. The governor gave machines back during the
   queue on its trial's own gauges, and the queue's last jobs and the tail paid for it. On the engine that stands no muscle may
   fall below native, so this is the engine's to fix, not the table's: the give-back trial on a batch queue must count the
-  queue's finish and the tail among the gauges it judges before a machine is parked, in the next version, through the toy gate
+  queue's finish and the tail among the gauges it judges before a machine is parked, in the next version, through the model gate
   first (`docs/CHANGE_CONTROL.md`). The rows stand until that version's three runs replace them.
 
 ## Amendment 11: KubeRay's two LOSS rows root-caused (written from the runs' own files, 20 October 2026, before any run on the engine that fixes them)

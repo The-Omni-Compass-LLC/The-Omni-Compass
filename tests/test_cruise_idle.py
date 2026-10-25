@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Cruise and idle, the one pedal lifted all the way (rules 7 and 8), through the live controller against the fake kubectl: work waiting
+"""Cruise and idle, the one pedal lifted all the way (rules 7 and 8), through the live controller against the standin kubectl: work waiting
 for a place two decisions in a row puts every machine in service, and they stay until the line has been empty two
 decisions; with nothing waiting and the sensed service's demand at zero the machines go straight to the floor (two) in
 one move, never below it."""
@@ -11,7 +11,7 @@ import json, os, sys, tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Controller, parser
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def cluster(tmp, pending, util, replicas, used="200m"):
@@ -29,12 +29,12 @@ def cluster(tmp, pending, util, replicas, used="200m"):
                         "currentMetrics": [{"type": "Resource", "resource": {"name": "cpu", "current": {"averageUtilization": util}}}]}}]
     st = Path(tmp) / "state.json"
     st.write_text(json.dumps({"nodes": nodes, "pods": pods, "hpas": hpas, "used_per_node": used, "deployments": [], "configmaps": [], "jobs": []}))
-    os.environ["FAKE_KUBE_STATE"] = str(st); os.environ["FAKE_KUBE_LOG"] = str(Path(tmp) / "writes.log")
+    os.environ["STANDIN_KUBE_STATE"] = str(st); os.environ["STANDIN_KUBE_LOG"] = str(Path(tmp) / "writes.log")
 
 
 def main():
     t = tempfile.mkdtemp(); sized = Path(t) / "sized"
-    a = parser().parse_args(["--kubectl", FAKE, "--mode", "nodepool", "--interval", "0", "--min-nodes", "2", "--max-nodes", "6",
+    a = parser().parse_args(["--kubectl", STANDIN, "--mode", "nodepool", "--interval", "0", "--min-nodes", "2", "--max-nodes", "6",
                              "--audit", str(Path(t) / "audit.jsonl"), "--kill-file", str(Path(t) / "kill"),
                              "--sensed", "default/php-apache", "--node-scale-cmd", f"sh -c 'echo {{n}} >> {sized}'"])
     c = Controller(a)
@@ -68,7 +68,7 @@ def main():
     # idle as a served service really stands (amendment 9): one pod, its floor, a probe keeping it at 10% of a 50% target
     def idles(util, replicas):
         t2 = tempfile.mkdtemp()
-        a2 = parser().parse_args(["--kubectl", FAKE, "--mode", "nodepool", "--interval", "0", "--min-nodes", "2", "--max-nodes", "6",
+        a2 = parser().parse_args(["--kubectl", STANDIN, "--mode", "nodepool", "--interval", "0", "--min-nodes", "2", "--max-nodes", "6",
                                   "--audit", str(Path(t2) / "audit.jsonl"), "--kill-file", str(Path(t2) / "kill"),
                                   "--sensed", "default/php-apache", "--node-scale-cmd", "true"])
         c2 = Controller(a2)

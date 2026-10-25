@@ -24,7 +24,7 @@ from omni_controller.muscles import latency_window, latency_p95  # noqa: E402
 STATE = {"served": 100.0, "failed": 3.0}
 
 
-class Fake(BaseHTTPRequestHandler):
+class Standin(BaseHTTPRequestHandler):
     def do_GET(self):
         q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)["query"][0]
         if q.startswith("served"):
@@ -45,7 +45,7 @@ class Fake(BaseHTTPRequestHandler):
 class PromFeed(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.srv = HTTPServer(("127.0.0.1", 0), Fake)
+        cls.srv = HTTPServer(("127.0.0.1", 0), Standin)
         threading.Thread(target=cls.srv.serve_forever, daemon=True).start()
         cls.base = f"http://127.0.0.1:{cls.srv.server_address[1]}"
 

@@ -22,7 +22,7 @@ def main():
     assert A.verdict([r(5, 2, 8), r(6, 3, 9), r(4, 1, 7)], "spent") == "**power given in all three of our runs**", "a resource that grows is power given"
     assert A.verdict([r(5, 2, 8), r(6, 3, 9), r(4, 1, 7)], "lower", "cache_mb_mean") == "**power given in all three of our runs**", "the cache size is a resource"
     assert A.verdict([r(5, 2, 8), r(6, 3, 9), r(4, 1, 7)], "lower") == "**LOSS in all three of our runs**", "a longer wait is a LOSS"
-    assert A.verdict([r(5, 2, 8), r(1, -2, 4), r(4, 1, 7)], "higher") == "EVEN, no difference beyond the noise (1 of 3 runs)"
+    assert A.verdict([r(5, 2, 8), r(1, -2, 4), r(4, 1, 7)], "higher") == "**GAIN by the mean of our three runs, beyond the noise in 2 of 3**"
     assert A.verdict([r(5, 2, 8), r(-6, -9, -3), r(4, 1, 7)], "higher") == "**the runs disagree**"
     assert A.verdict([r(0, -1, 1), r(0, -1, 1), r(0, -1, 1)], "higher") == "EVEN, the same"
     assert A.verdict([r(0, 0, 0), r(1, 1, 1), r(0, 0, 0)], "never more") == "**LOSS in at least one of our runs**", "one failed operation more in any run is marked"

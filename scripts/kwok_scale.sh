@@ -33,10 +33,10 @@ apiVersion: v1
 kind: Node
 metadata:
   name: kwok-{i}
-  annotations: {{node.alpha.kubernetes.io/ttl: "0", kwok.x-k8s.io/node: fake}}
+  annotations: {{node.alpha.kubernetes.io/ttl: "0", kwok.x-k8s.io/node: standin}}
   labels: {{type: kwok, kubernetes.io/role: agent}}
 spec:
-  taints: [{{key: kwok.x-k8s.io/node, value: fake, effect: NoSchedule}}]
+  taints: [{{key: kwok.x-k8s.io/node, value: standin, effect: NoSchedule}}]
 status:
   allocatable: {{cpu: "4", memory: 16Gi, pods: "110"}}
   capacity: {{cpu: "4", memory: 16Gi, pods: "110"}}""")
@@ -53,7 +53,7 @@ spec:
     spec:
       nodeSelector: {{type: kwok}}
       tolerations: [{{key: kwok.x-k8s.io/node, operator: Exists, effect: NoSchedule}}]
-      containers: [{{name: app, image: fake, resources: {{requests: {{cpu: 500m}}, limits: {{cpu: 500m}}}}}}]
+      containers: [{{name: app, image: standin, resources: {{requests: {{cpu: 500m}}, limits: {{cpu: 500m}}}}}}]
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

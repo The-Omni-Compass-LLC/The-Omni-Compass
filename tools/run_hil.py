@@ -410,7 +410,7 @@ def main(argv=None):
     L = ["# The whole stacks with the real card inside", "",
          f"Run {run['started']}, commit `{commit[:12]}`, sizes {scales} (copies of each organism on one clock), paired "
          f"repetitions by size {reps_of}, seeds from {SEED0}, {ORGANISM_STEPS} steps per arm; step length by size and organism "
-         f"(seconds, measured on this machine): {steps_of}. Card: {'SIMULATED (fake nvidia-smi)' if a.sim else 'the real GPU, its own meter'}; "
+         f"(seconds, measured on this machine): {steps_of}. Card: {'SIMULATED (standin nvidia-smi)' if a.sim else 'the real GPU, its own meter'}; "
          f"start power limit {start_w} W; response-time line {slo_ms} ms (ten bare service times). One engine on everything "
          "in the Omni arm: the compass law on every simulated muscle and on the card's two wires. Harness `tools/run_hil.py`.", "",
          "The simulated stacks are models (evidence S). The card's energy and requests are its own meter (evidence P). "

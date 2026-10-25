@@ -5,7 +5,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # The six organisms up the ladder of runs and sizes, on every core of this machine (tools/run_scale.py). Each rung
-# writes results/scale/r<runs>-x<scale>/SCALE.md and is packed at the end. Free GitHub allows 1/10/100/1000 copies and runs. Use the grid conductor for the full ladder,
+# writes results/scale/r<runs>-x<scale>/SCALE.md and is packed at the end. Free GitHub allows 1/10/100/500 copies and runs. Use the grid conductor for the full ladder,
 # which checks memory and time budgets; this local script retains its shorter default.
 # Override: RUNGS="100:1 100:10".
 set -euo pipefail

@@ -134,14 +134,14 @@ class ReleaseCampaign(unittest.TestCase):
         def api(url, **_):
             asked.append(url)
             if '/contents/' in url:
-                if url.endswith('ref=old'):
+                if url.endswith('ref=old') and grid.RIG_FILE in url:
                     raise RuntimeError('gh api ...: gh: Not Found (HTTP 404)')
-                return {'name': 'prepull.yaml'}
+                return {'name': 'file'}
             return {'workflow_runs': runs}
         with unittest.mock.patch.object(grid, 'api', side_effect=api):
             got = grid.reruns_started([('A', 'x', 'kind-addons.yml', {}), ('A', 'y', 'redis.yml', {})])
-        self.assertEqual(got, {'kind-addons.yml': 2, 'redis.yml': 3})   # the old commit's run, and the cancelled one, count for nothing
-        self.assertEqual(sum('/contents/' in u for u in asked), 3)        # each commit read once
+        self.assertEqual(got, {'kind-addons.yml': 2, 'redis.yml': 3})   # the old rig's run, and the cancelled one, count for nothing
+        self.assertEqual(sum('/contents/' in u for u in asked), 6)        # each commit read once for the engine, once for the rig
         self.assertTrue(all(f'created=>={grid.RERUN_SINCE}' in u for u in asked if '/runs?' in u))
 
         def broken(url, **_):
@@ -150,6 +150,21 @@ class ReleaseCampaign(unittest.TestCase):
             return {'workflow_runs': runs}
         with unittest.mock.patch.object(grid, 'api', side_effect=broken), self.assertRaises(RuntimeError):
             grid.reruns_started([('A', 'x', 'kind-addons.yml', {})])     # never counted on a rig it was not read on
+
+    def test_a_run_counts_in_the_campaign_only_on_the_engine_that_stands(self):
+        # 24 October: runs started after the campaign opened but before the engine reached main ran the engine before it
+        self.assertTrue((ROOT / grid.ENGINE_FILE).exists(), grid.ENGINE_FILE)
+        runs = [{'head_sha': 'before', 'conclusion': 'success'}, {'head_sha': 'after', 'conclusion': 'success'}]
+
+        def api(url, **_):
+            if '/contents/' in url:
+                if url.endswith('ref=before') and grid.ENGINE_FILE in url:
+                    raise RuntimeError('gh api ...: gh: Not Found (HTTP 404)')
+                return {'name': 'file'}
+            return {'workflow_runs': runs}
+        with unittest.mock.patch.object(grid, 'api', side_effect=api):
+            self.assertEqual(grid.reruns_started([('A', 'y', 'redis.yml', {}), ('A', 'x', 'kind-addons.yml', {})]),
+                             {'redis.yml': 1, 'kind-addons.yml': 1})
 
     def test_nothing_starts_before_the_campaign_opens(self):
         # every count reads from SINCE: a run the new conductor started before it would be counted in no campaign
@@ -201,6 +216,13 @@ class ReleaseCampaign(unittest.TestCase):
             finally:
                 grid.ROOT = old
 
+    def test_a_conductor_that_failed_before_its_ticks_starts_no_successor(self):
+        # 24 October: the receipt failed in seconds on omni-v18 and each failed conductor started the next, one every 15 s
+        steps = yaml.safe_load((ROOT / '.github/workflows/grid.yml').read_text())['jobs']['tick']['steps']
+        nxt = next(s for s in steps if s.get('name', '').startswith('The next conductor'))
+        self.assertIn('success()', nxt['if'])
+        self.assertNotIn('!cancelled()', nxt['if'])
+
     def test_six_stage_burst_is_the_workflow_and_queue_default(self):
         text = (ROOT / '.github/workflows/aks-metered-full.yml').read_text()
         w = yaml.safe_load(text)
@@ -216,8 +238,8 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertEqual(d['profiles']['eight-card']['physical_gpus'], 8)
         self.assertEqual(len(d['organisms']), 7)
         self.assertEqual(d['reported_run_prefixes'], [1, 10, 100])
-        self.assertEqual(grid.SIZES, (1, 10, 100, 1000))
-        self.assertEqual(grid.RUNS, 1000)
+        self.assertEqual(grid.SIZES, (1, 10, 100, 500))
+        self.assertEqual(grid.RUNS, 500)
         for p in d['profiles'].values():
             self.assertEqual(p['environment']['HIL_SCALES'], '1,10,100')
             self.assertEqual(p['environment']['HIL_REPS_BY_SCALE'], '100,100,100')
