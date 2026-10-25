@@ -53,6 +53,13 @@ Still on the next version's list, LOSS against native in the models and the same
 pod start wait in the conveyance models (up 9%), the card's 95th and 99th percentiles (up 0.9% to 5.8%), the batch's requests
 served (down 2.1%).
 
+The self-pilot (`tests/test_selfpilot.py`: the shipped governor sizing the machines for a day against the HPA and the Cluster
+Autoscaler on the same traffic) reads the same trade: pods waiting down 100% (none waited, GAIN), the HPA's shortfall EVEN,
+machine-hours per core-hour up 18.3% and energy per core-hour up 11.4% (power given). Native's line here is read over the
+machines left as a whole, where the Cluster Autoscaler reads each machine's own share against its 0.5, so the governor holds
+more machines than native would: power given, never a LOSS by the one key. Reading the line machine by machine, as the
+Cluster Autoscaler does, is on the next version's list, through the model gate.
+
 ## Every benchmark runs again
 
 Every benchmark runs again on omni-v19 from the moment it reached main; nothing is read across engines.
