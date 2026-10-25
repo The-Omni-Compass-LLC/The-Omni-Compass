@@ -225,16 +225,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-24 17:29 | [The engine's runs: 500 runs from the jump generator (base 1461518610), one digest](results/engine_runs/ENGINE_RUNS_500_1461518610.md) |  |
-| 2026-10-24 16:44 | [Omni direct's three arms: three runs on GitHub's machines](results/orchestrator/V18_THREE_ARMS_ABC.md) |  |
-| 2026-10-24 16:44 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V17_YCSB_SHIPPED.md) | Across 4 untouched workloads: 3 gauge-rows GAIN, 9 LOSS, 1 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 19 EVEN, 12 where the runs disagree. |
-| 2026-10-24 16:44 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V17_YCSB_SERVICE.md) | Across 4 untouched workloads: 8 gauge-rows GAIN, 7 LOSS, 0 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 14 where the runs disagree. |
-| 2026-10-24 16:44 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V17_YCSB.md) | Across 4 untouched workloads: 11 gauge-rows GAIN, 6 LOSS, 3 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 9 where the runs disagree. |
-| 2026-10-24 16:44 | [sysbench on MySQL, a database's buffer pool as shipped: the A/B/C three-run table](results/live/V17_SYSBENCH_SHIPPED.md) | Across 4 untouched workloads: 15 gauge-rows GAIN, 1 LOSS, 8 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 15 EVEN, 9 where the runs disagree. |
-| 2026-10-24 16:44 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V17_SYSBENCH_SERVICE.md) | Across 4 untouched workloads: 16 gauge-rows GAIN, 0 LOSS, 2 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 14 EVEN, 16 where the runs disagree. |
-| 2026-10-24 16:44 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V17_SYSBENCH.md) | Across 4 untouched workloads: 12 gauge-rows GAIN, 2 LOSS, 1 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 18 EVEN, 15 where the runs disagree. |
-| 2026-10-24 16:44 | [Redis, a cache's memory as shipped (no ceiling): the A/B/C three-run table](results/live/V17_REDIS_SHIPPED.md) | Across 3 untouched workloads: 1 gauge-rows GAIN, 0 LOSS, 0 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 25 EVEN, 10 where the runs disagree. |
-| 2026-10-24 16:44 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V17_REDIS_SERVICE.md) | Across 3 untouched workloads: 11 gauge-rows GAIN, 1 LOSS, 4 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 13 EVEN, 7 where the runs disagree. |
+| 2026-10-25 16:11 | [The engine's runs: 500 runs from the jump generator (base 1555621548), one digest](results/engine_runs/ENGINE_RUNS_500_1555621548.md) |  |
+| 2026-10-25 04:02 | [The orchestrators on the same organisms, with the same injection](results/orchestrators/ORCHESTRATORS.md) |  |
+| 2026-10-25 03:31 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -242,16 +235,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-24 19:42 | health | success | [40126519572](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40126519572) |
-| 2026-10-24 19:38 | benchmark | success | [40124238611](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40124238611) |
-| 2026-10-24 19:12 | raw-sweep | success | [40124199368](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40124199368) |
-| 2026-10-24 19:00 | big-organism-detached collect | success | [40123276024](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40123276024) |
-| 2026-10-24 19:00 | citylearn | success | [40118288651](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40118288651) |
-| 2026-10-24 18:51 | robustness | success | [40119481235](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40119481235) |
-| 2026-10-24 18:17 | swarm | success | [40119476867](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40119476867) |
-| 2026-10-24 18:06 | live-engine | success | [40116337891](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116337891) |
-| 2026-10-24 17:56 | orchestrator push room=busy | success | [40116226797](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116226797) |
-| 2026-10-24 17:29 | aks-client-check | success | [40116249873](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40116249873) |
+| 2026-10-25 16:39 | orchestrator push room=busy | success | [40210395422](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210395422) |
+| 2026-10-25 16:31 | six x10 line orgs 6 runs 10+90 | success | [40206042697](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40206042697) |
+| 2026-10-25 16:29 | raw-sweep | success | [40211868681](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40211868681) |
+| 2026-10-25 16:25 | engine-runs | success | [40211463569](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40211463569) |
+| 2026-10-25 16:21 | cloud-check all | failure | [40208875547](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40208875547) |
+| 2026-10-25 16:20 | monte-carlo | success | [40211051993](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40211051993) |
+| 2026-10-25 16:13 | cloud-check both | failure | [40210327278](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210327278) |
+| 2026-10-25 16:12 | aks-client-check | success | [40210436312](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210436312) |
+| 2026-10-25 16:11 | grid | success | [40210444923](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210444923) |
+| 2026-10-25 16:09 | security-scan | success | [40210327295](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40210327295) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
