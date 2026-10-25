@@ -64,17 +64,23 @@ def test_sysbench_reads_the_workload_not_the_harness():
 
 
 def test_kafka_gives_back_above_the_operators_count():
-    snap = K.NATIVE_CONSUMERS
-    # above native: calm with nothing waiting gives one back after the dwell, no idle consumer needed (every consumer of a
-    # round-robin topic has work, so the omni-v16 rule held a third consumer to the end of the arm)
-    assert K.decide(0.1, -0.5, lag=0, idle=0, cur=snap + 1, last_change_age=30, snapshot=snap)[0] == snap
-    assert K.decide(0.1, -0.5, lag=0, idle=0, cur=snap + 1, last_change_age=2, snapshot=snap)[0] == snap + 1, "not within the dwell"
-    assert K.decide(0.1, -0.5, lag=5, idle=0, cur=snap + 1, last_change_age=30, snapshot=snap)[0] == snap + 1, "not while messages wait"
-    assert K.decide(0.5, 0.35, lag=40, idle=0, cur=snap + 1, last_change_age=30, snapshot=snap)[0] > snap + 1, "slow with messages waiting still adds"
-    assert K.decide(0.96, 0.0, lag=0, idle=0, cur=snap + 1, last_change_age=30, snapshot=snap)[0] == K.COVER[1], "the fail-up still comes first"
-    # at or below native the idle test stays
-    assert K.decide(0.1, -0.5, lag=0, idle=0, cur=snap, last_change_age=30, snapshot=snap)[0] == snap, "at native a busy consumer is never taken"
-    assert K.decide(0.1, -0.5, lag=0, idle=1, cur=snap, last_change_age=30, snapshot=snap)[0] == snap - 1, "an idle one may be, inside the verdict"
+    snap, dw = K.NATIVE_CONSUMERS, K.HANDBACK_DWELL_S
+    # above native: calm with no more waiting than one poll round gives one back after the hand-back dwell, no idle consumer
+    # needed (every consumer of a round-robin topic has work, and the messages in flight keep the lag above zero in 388 of 389
+    # calm seconds, so the omni-v16 rule held a third consumer to the end of the arm)
+    assert K.decide(0.1, -0.5, lag=0, idle=0, cur=snap + 1, last_change_age=dw, snapshot=snap, consumed=980)[0] == snap
+    assert K.decide(0.1, -0.5, lag=8, idle=0, cur=snap + 1, last_change_age=dw, snapshot=snap, consumed=980)[0] == snap, "messages in flight are not waiting"
+    assert K.decide(0.1, -0.5, lag=(snap + 1) * K.POLL_RECORDS + 1, idle=0, cur=snap + 1, last_change_age=dw, snapshot=snap, consumed=980)[0] == snap + 1, "not while more than a poll round waits"
+    assert K.decide(0.1, -0.5, lag=0, idle=0, cur=snap + 1, last_change_age=dw - 1, snapshot=snap, consumed=980)[0] == snap + 1, "not within the hand-back dwell"
+    assert K.decide(0.1, -0.5, lag=0, idle=0, cur=snap + 1, last_change_age=dw, snapshot=snap, consumed=0)[0] == snap + 1, "a second that consumed nothing says nothing"
+    assert K.decide(0.5, 0.35, lag=40, idle=0, cur=snap + 1, last_change_age=dw, snapshot=snap, consumed=980)[0] > snap + 1, "slow with messages waiting still adds"
+    assert K.decide(0.96, 0.0, lag=0, idle=0, cur=snap + 1, last_change_age=dw, snapshot=snap, consumed=980)[0] == K.COVER[1], "the fail-up still comes first"
+    # at or below native the idle test and an empty backlog stay, and a second that consumed nothing gives nothing back (the
+    # omni-v16 arms began their give-back trial on the idle flags of the seconds before the producer started)
+    assert K.decide(0.1, -0.5, lag=0, idle=0, cur=snap, last_change_age=30, snapshot=snap, consumed=290)[0] == snap, "at native a busy consumer is never taken"
+    assert K.decide(0.1, -0.5, lag=0, idle=1, cur=snap, last_change_age=30, snapshot=snap, consumed=290)[0] == snap - 1, "an idle one may be, inside the verdict"
+    assert K.decide(0.1, -0.5, lag=0, idle=2, cur=snap, last_change_age=30, snapshot=snap, consumed=0)[0] == snap, "nothing consumed yet: nothing taken"
+    assert K.decide(0.1, -0.5, lag=3, idle=1, cur=snap, last_change_age=30, snapshot=snap, consumed=290)[0] == snap, "below native only with nothing waiting at all"
     # idle is sustained, and a consumer starts busy
     assert not K.is_idle(100.0, 100.5) and K.is_idle(100.0, 100.0 + K.IDLE_S) and K.IDLE_S >= 1.0
 
@@ -95,7 +101,7 @@ def test_kafka_gives_back_above_the_operators_count():
     finally:
         K.mp.Process = real
     src = inspect.getsource(K.Omni.run)
-    assert "snapshot=snapshot" in src, "the brain hands decide() the operator's count"
+    assert "snapshot=snapshot" in src and "consumed=n_msg" in src and "n_msg > 0" in src, "the brain hands decide() the operator's count and the second's consumption"
 
 
 def test_ycsb_hands_the_cache_back_below_native():
