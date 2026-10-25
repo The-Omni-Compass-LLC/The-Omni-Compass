@@ -1947,8 +1947,8 @@ consists of a governing engine, its muscle adapters, a complete configuration pr
 profile** is the complete, versioned set of defaults shipped together, θ*; a **candidate profile** is a combination under
 evaluation; the **active profile** is the one governing the current run; a **custom profile** is any identifiable configuration
 that differs from θ*. With x the governed system's state, z the governor's internal state, y its observations and Δ ∈ {10, 15, 30, 60,
-90, 120} s the decision interval, z[k+1] = F[θ](z[k], y[k]) and u[req][k] = G[θ](z[k], y[k]), the command Π[C](u[req][k]) inside the
-operating limits C, and the system evolves on the command that actually landed, x[k+1] = Φ(x[k], u[ack][k], w[k]), w the workload
+90, 120} s the decision interval, `z[k+1] = F[θ](z[k], y[k])` and `u[req][k] = G[θ](z[k], y[k])`, the command `Π[C](u[req][k])` inside the
+operating limits C, and the system evolves on the command that actually landed, `x[k+1] = Φ(x[k], u[ack][k], w[k])`, w the workload
 and its disturbances. After release θ = θ* is fixed while x, z and y keep changing: one fixed factory tune governs a changing
 workload. "One setting" is the whole vector θ, evaluated jointly, against one of two explicit objectives: the most healthy
 production P(θ), or the least cost per production completed, B(θ) ⁄ P(θ). The factory baseline is established in eight steps:
@@ -4343,8 +4343,8 @@ place on real software.
 Every organism runs at **1, 10 and 100 copies** (that many instances of the organism on one clock, so the four stacked
 at 100 copies is about 190,000 modelled muscles) and at **1, 10 and 100 paired runs** (that many native-and-omni pairs,
 each from its own seed): the seven organisms × three sizes × three run counts are 63 squares, run modelled and with the
-real cluster inside, both arms shown in every square. On GitHub's own machines the grid also runs the 1,000 tier, 1,000
-copies and nested 1,000 runs (the founder's distinction of 15 October), a cell beyond a free runner's memory or time listed
+real cluster inside, both arms shown in every square. On GitHub's own machines the grid also runs the 500 tier, 500
+copies and nested 500 runs (the ladder of the Python's 500-run Monte Carlo, the founder's order of 25 October), a cell beyond a free runner's memory or time listed
 as pending runner capacity and never rented; paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100
 repetitions (the founder's order of 12 October, kept for everything that costs money). Nothing is rented for the grid
 (`scripts/dispatch_grid.py`, `results/grid_v5/`).
@@ -5104,8 +5104,8 @@ realm's trade adds to the base it stands on; the spine read alone shows whether 
 stack runs on before any trade is put on them.
 
 **The grid.** Each organism runs at 1, 10 and 100 copies of itself on one clock and at 1, 10 and 100 paired runs, modelled
-and with the real cluster inside, both arms shown in every square; on GitHub's own machines the 1,000 tier runs too (the
-founder's distinction of 15 October), a cell beyond a free runner's memory or time listed as pending runner capacity and
+and with the real cluster inside, both arms shown in every square; on GitHub's own machines the 500 tier runs too (the
+ladder of the Python's 500-run Monte Carlo, the founder's order of 25 October), a cell beyond a free runner's memory or time listed as pending runner capacity and
 never rented, while paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100 repetitions. The two axes answer
 two questions. Copies is the size of the body one brain governs: at 100 copies of the four stacked the law computes a force
 for about 190,000 muscles from one reading of one clock, and the question is whether it stays coherent, whether the decision
@@ -7722,7 +7722,7 @@ token generation (memory-bound work).
 ### 53.6 The card inside the seven organisms (`results/hil/run-<stamp>/HIL.md`)
 
 The real card is wired into each of the seven organisms (the spine, the four realms, the four stacked, the whole tower) at four
-sizes (1, 10, 100 and 1,000 copies). Each row is one size, one organism and one part:
+sizes (1, 10, 100 and 500 copies; paid card runs stop at 100). Each row is one size, one organism and one part:
 - **stacks (model)**: the modelled machines (evidence S);
 - **card (meter)**: the real card, its own meter (evidence P);
 - **both**: the two added together.
@@ -8179,7 +8179,7 @@ No run at this level yet, real or modelled, on the engine that stands (`k8s_flee
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
-Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `d97f9b2c3`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
+Every mechanism, harness, receipt and result, read from the files named beside it. Built by `tools/dossier.py` at commit `0ce65f290`. Evidence classes: **T** theorem, **V** verified in code, **S** a model, **L** live software (real Kubernetes), **P** a physical meter. A model is not a meter, and a model written by the people who wrote the law is not an independent test; where a result is a model it says so.
 
 ### 56.1 The mechanism, and proof that it is the one that ran
 
@@ -8377,7 +8377,7 @@ less work was done. The steps below are the whole method.
    is claimed while the time outside the service line is above native's.
 
 **At scale (modelled).** The seven organisms run on GitHub's machines (Actions, workflow `six`) or on any machine
-(`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 1,000 paired runs and at 1, 10, 100 and 1,000 copies of each
+(`bash scripts/scale_ladder.sh`) at 1, 10, 100 and 500 paired runs and at 1, 10, 100 and 500 copies of each
 organism on one clock. Real Kubernetes runs on GitHub's machines (workflow `benchmark-reps`); the seven organisms with
 a real cluster inside as one more muscle run in `six-kube` (1 to 100 copies on GitHub) and `big-organism` and
 `big-organism-detached` (1,000 copies on a rented machine).
@@ -12055,6 +12055,14 @@ stopping on a LOSS), and "to the cap, stopping rule" in each run's title so thei
 is as written for them: the arms, the loads, the windows, the machine families (`e2-standard-2` in `us-central1-a`;
 `m5.large` in `us-east-1`), the tune-down on the machines alone and the 60 s beat of the amendment above. Both queues are switched
 off and neither cloud has run a set on any engine since omni-v10's logins of 18 October; this is written before the first.
+
+
+### 66.54 Amendment (25 October 2026): the ladder is 1, 10, 100 and 500
+
+The founder's order of 25 October: the grid's top rung is 500 copies and 500 runs, in line with the Python's 500-run Monte
+Carlo (`tools/engine_runs.py`), replacing the 1,000 tier of 15 October. Every grid run started from this amendment on runs the
+ladder 1, 10, 100 and 500 (`scripts/dispatch_grid.py`); runs started before it stay as their own record. Paid cloud and GPU runs
+stay at 1, 10 and 100 copies with at most 100 repetitions.
 
 ## 67. The Pod Start Wait on One Shared Host
 
