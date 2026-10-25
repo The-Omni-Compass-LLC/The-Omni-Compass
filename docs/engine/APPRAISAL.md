@@ -35,7 +35,7 @@ the page carries the commit, the time and GitHub's own list of the runs running 
 
 | What | Count |
 |---|---|
-| Three-run tables played back from their raw files (sections 4c and 4d) | 81, with 243 runs |
+| Three-run tables played back from their raw files (sections 5c and 5d) | 81, with 243 runs |
 | Raw files checked against their run's own `SHA256SUMS_ALL.txt` | 165,143 of 165,143 matched; 0 unmatched |
 | Receipts (every judged row of each benchmark's newest table) | 85: omni-v18 8, omni-v16 5, omni-v12 54, omni-v11 10, omni-v10 8 |
 | Omni-Compass against its native (55 tables), as the tables wrote them | 405 GAIN, 113 power given, 564 EVEN, 161 LOSS, 290 the runs disagree, 9 the runs differ, 478 shown, 164 tuning (the page applies the floor of 0.5% at load; after it: 405 GAIN, 113 power given, 564 EVEN, 161 LOSS, 290 the runs disagree, 9 the runs differ, 478 shown, 164 tuning) |
