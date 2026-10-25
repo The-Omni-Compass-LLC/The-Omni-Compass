@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The Crane test's plug (scripts/kubectl_crane.py) against a stand-in cluster where Crane owns the HPA and undoes any write
-to it (tests/fake_crane/kubectl): the engine's own writes land on the EHPA and show on the HPA; the reset hands every
+to it (tests/standin_crane/kubectl): the engine's own writes land on the EHPA and show on the HPA; the reset hands every
 setting back and leaves no record on either; a write the plug cannot carry exactly is refused; reads pass through
 untouched; and the controller's own reset runs through it unchanged."""
 import json, os, subprocess, sys, tempfile, unittest
@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUG = ROOT / "scripts" / "kubectl_crane.py"
-FAKE = ROOT / "tests" / "fake_crane" / "kubectl"
+STANDIN = ROOT / "tests" / "standin_crane" / "kubectl"
 ANN = "omnicompass.io/original-target-utilization"
 RNG = "omnicompass.io/original-replica-range"
 
@@ -42,7 +42,7 @@ class Plug(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(); d = Path(self.tmp.name)
         self.state, self.log = d / "state.json", d / "plug.jsonl"
         self.state.write_text(json.dumps(cluster()))
-        self.env = dict(os.environ, OMNI_KUBECTL=str(FAKE), FAKE_STATE=str(self.state), OMNI_PLUG_LOG=str(self.log),
+        self.env = dict(os.environ, OMNI_KUBECTL=str(STANDIN), STANDIN_STATE=str(self.state), OMNI_PLUG_LOG=str(self.log),
                         OMNI_PLUG_WAIT_S="3")
 
     def tearDown(self):

@@ -11,13 +11,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 import tools.omni_control as C
 
-FAKE = textwrap.dedent(f"""
+STANDIN = textwrap.dedent(f"""
     import json, os, sys, time
     sys.path.insert(0, {str(ROOT)!r})
     from omnicompass import master
     args = sys.argv[1:]
     kill = args[args.index("--kill-file") + 1]
-    out = os.environ["FAKE_OUT"]
+    out = os.environ["STANDIN_OUT"]
     with open(out, "a") as f:
         f.write(json.dumps({{"start": args}}) + "\\n")
     while True:
@@ -32,15 +32,15 @@ FAKE = textwrap.dedent(f"""
 class Panel(unittest.TestCase):
     def setUp(self):
         self.d = Path(tempfile.mkdtemp())
-        self.env = {k: os.environ.get(k) for k in ("OMNI_MASTER_OFF", "OMNI_REGISTRY", "FAKE_OUT")}
+        self.env = {k: os.environ.get(k) for k in ("OMNI_MASTER_OFF", "OMNI_REGISTRY", "STANDIN_OUT")}
         os.environ["OMNI_MASTER_OFF"] = str(self.d / "switch" / "OFF")
         os.environ["OMNI_REGISTRY"] = str(self.d / "switch" / "running")
-        os.environ["FAKE_OUT"] = str(self.d / "fake.jsonl")
-        (self.d / "fake.py").write_text(FAKE)
+        os.environ["STANDIN_OUT"] = str(self.d / "standin.jsonl")
+        (self.d / "standin.py").write_text(STANDIN)
         self.tokens = self.d / "tokens.json"
         self.tok = {n: C.make_token(self.tokens, n, r) for n, r in
                     (("vera", ["viewer"]), ("otto", ["operator"]), ("sam", ["security"]), ("sue", ["security"]))}
-        self.panel = C.Panel([sys.executable, str(self.d / "fake.py")], self.d / "panel.kill", self.d / "state.json",
+        self.panel = C.Panel([sys.executable, str(self.d / "standin.py")], self.d / "panel.kill", self.d / "state.json",
                              self.d / "control.jsonl", handback_s=10)
         self.srv = C.server(self.panel, self.tokens, "127.0.0.1", 0)
         threading.Thread(target=self.srv.serve_forever, daemon=True).start()
@@ -70,7 +70,7 @@ class Panel(unittest.TestCase):
             return e.code, json.loads(e.read().decode())
 
     def starts(self):
-        p = Path(os.environ["FAKE_OUT"])
+        p = Path(os.environ["STANDIN_OUT"])
         return [json.loads(x) for x in p.read_text().splitlines()] if p.exists() else []
 
     def test_reads_need_a_token_and_the_console_and_document_do_not(self):
@@ -151,8 +151,10 @@ class Panel(unittest.TestCase):
         self.assertEqual(self.call("/v1/status", "vera")[1]["beat_s"], 120.0)
         self.assertIn("omni_control_beat_seconds 120", self.call("/metrics", "vera")[1])
         page = self.call("/")[1]
-        for b in (5, 15, 30, 60, 75, 90, 120):
+        for b in (10, 15, 30, 60, 90, 120):                 # the six stops (the founder's order of 24 October)
             self.assertIn(f"go('beat',{{seconds:{b}}})", page)
+        for b in (5, 75):
+            self.assertNotIn(f"go('beat',{{seconds:{b}}})", page)
         self.assertIn("/v1/beat", self.call("/v1/openapi.json")[1]["paths"])
 
     def test_reset_needs_a_reason_then_hands_back_and_stops(self):
@@ -161,6 +163,20 @@ class Panel(unittest.TestCase):
         code, out = self.call("/v1/reset", "otto", {"reason": "maintenance window"})
         self.assertEqual((code, out["mode"], out["reset"]["handed_back"]), (200, "off", True))
         self.assertFalse(self.panel.running())
+
+    def test_restore_factory_profile_reapplies_the_released_configuration(self):
+        # Restore factory profile and Return to native are two controls (the founder's master specification of 24 October)
+        self.call("/v1/mode", "otto", {"mode": "watch"})
+        self.call("/v1/dial", "otto", {"dial": "save"})
+        self.assertEqual(self.call("/v1/factory", "vera", {})[0], 403)                      # a viewer cannot press it
+        code, out = self.call("/v1/factory", "otto", {"reason": "back to the factory profile"})
+        self.assertEqual((code, out["profile"], out["mode"], out["dial"], out["native"]), (200, "factory", "autopilot", "max", []))
+        self.assertTrue(self.panel.running())
+        self.assertTrue(self.call("/v1/factory", "otto", {})[1]["unchanged"])
+        page = self.call("/")[1]
+        self.assertIn("Restore factory profile", page)
+        self.assertIn("Return to native", page)
+        self.assertIn("/v1/factory", self.call("/v1/openapi.json")[1]["paths"])
 
     def test_the_kill_switch_is_security_only_and_holds_until_two_arm_it(self):
         self.call("/v1/mode", "otto", {"mode": "autopilot"})
@@ -192,6 +208,30 @@ class Panel(unittest.TestCase):
         for t in self.tok.values():
             self.assertNotIn(t, stored)
         self.assertEqual(oct(self.tokens.stat().st_mode & 0o777), "0o600")
+
+    def test_only_a_named_origin_may_call_across_and_it_still_needs_a_token(self):
+        page = "https://the-omni-compass-llc.github.io"
+        srv = C.server(self.panel, self.tokens, "127.0.0.1", 0, allow_origins=[page])
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        url = f"http://127.0.0.1:{srv.server_address[1]}"
+        try:
+            def ask(method, origin, token=None):
+                req = urllib.request.Request(url + "/v1/status", method=method)
+                req.add_header("Origin", origin)
+                if token:
+                    req.add_header("Authorization", "Bearer " + token)
+                try:
+                    with urllib.request.urlopen(req, timeout=30) as r:
+                        return r.status, r.headers.get("Access-Control-Allow-Origin"), r.headers.get("Access-Control-Allow-Headers")
+                except urllib.error.HTTPError as e:
+                    return e.code, e.headers.get("Access-Control-Allow-Origin"), e.headers.get("Access-Control-Allow-Headers")
+            self.assertEqual(ask("OPTIONS", page), (204, page, "Authorization, Content-Type"))
+            self.assertEqual(ask("OPTIONS", "https://elsewhere.example")[:2], (403, None))
+            self.assertEqual(ask("GET", page)[:2], (401, page))                      # the header, and still no data without a token
+            self.assertEqual(ask("GET", page, self.tok["vera"])[:2], (200, page))
+            self.assertEqual(ask("GET", "https://elsewhere.example", self.tok["vera"])[:2], (200, None))   # its browser refuses it
+        finally:
+            srv.shutdown(); srv.server_close()
 
     def test_a_bind_beyond_the_loopback_needs_https(self):
         with self.assertRaises(SystemExit):

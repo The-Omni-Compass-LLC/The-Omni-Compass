@@ -89,16 +89,16 @@ class Wiring(unittest.TestCase):
         self.assertIn("github.event.inputs.shakedown != 'yes'", commit["if"])   # a shakedown run is never counted
 
 
-FAKE = ROOT / "tests" / "fake_cruisekube"
+STANDIN = ROOT / "tests" / "standin_cruisekube"
 
 
-def fake_env(t):
-    """The stand-ins first on the path (tests/fake_cruisekube: kubectl, helm, curl, sleep), every pin matched to the
-    stand-in downloads ("fake <name>"), a made-up powercap tree for the meter."""
-    env = dict(os.environ, PATH=f"{FAKE}:{os.environ['PATH']}", FAKE_CALLS=str(t / "calls.jsonl"),
-               FAKE_STATE=str(t / "state.json"), RUNNER_TEMP=str(t),
+def standin_env(t):
+    """The stand-ins first on the path (tests/standin_cruisekube: kubectl, helm, curl, sleep), every pin matched to the
+    stand-in downloads ("standin <name>"), a made-up powercap tree for the meter."""
+    env = dict(os.environ, PATH=f"{STANDIN}:{os.environ['PATH']}", STANDIN_CALLS=str(t / "calls.jsonl"),
+               STANDIN_STATE=str(t / "state.json"), RUNNER_TEMP=str(t),
                CK_CHART_SHA256=hashlib.sha256(b"a made-up chart\n").hexdigest())
-    sha = lambda name, extra="": hashlib.sha256(f"fake {name}\n{extra}".encode()).hexdigest()
+    sha = lambda name, extra="": hashlib.sha256(f"standin {name}\n{extra}".encode()).hexdigest()
     for var, f in (("KSM_SHA256_CRB", "cluster-role-binding.yaml"), ("KSM_SHA256_CR", "cluster-role.yaml"),
                    ("KSM_SHA256_DEPLOY", "deployment.yaml"), ("KSM_SHA256_SA", "service-account.yaml"),
                    ("KSM_SHA256_SVC", "service.yaml"), ("KEPLER_SHA256_NAMESPACE", "namespace.yaml"),
@@ -130,7 +130,7 @@ class DryRun(unittest.TestCase):
     def test_cruisekube_install_learn_end(self):
         with tempfile.TemporaryDirectory() as t:
             t = Path(t); out = t / "bench-compass-1"; out.mkdir()
-            env = fake_env(t)
+            env = standin_env(t)
             self.phase(ADDON, out, env, "install")
             self.phase(ADDON, out, env, "learn", CRUISEKUBE_LEARN="0", LOAD_STEPS="1 2 3 1 2 1")
             self.phase(ADDON, out, env, "end")
@@ -154,11 +154,11 @@ class DryRun(unittest.TestCase):
     def test_a_pod_still_serving_on_a_worker_fails(self):
         with tempfile.TemporaryDirectory() as t:
             t = Path(t); out = t / "bench-native-1"; out.mkdir()
-            env = fake_env(t)
+            env = standin_env(t)
             # the replaced controller never finishes: the stand-in shows it on its worker in every list, not shutting down
             (t / "state.json").write_text(json.dumps({"lists": 0, "stuck": True}))
-            script = (FAKE / "kubectl").read_text()
-            stuck = t / "fake"; stuck.mkdir()
+            script = (STANDIN / "kubectl").read_text()
+            stuck = t / "standin"; stuck.mkdir()
             (stuck / "kubectl").write_text(script.replace('if st["lists"] == 1:', 'if st["lists"] == 1 or st.get("stuck"):')
                                            .replace('terminating=True),\n                  pod("cruisekube-system", "cruisekube-webhook-old"',
                                                     'terminating=False),\n                  pod("cruisekube-system", "cruisekube-webhook-old"'))
@@ -172,7 +172,7 @@ class DryRun(unittest.TestCase):
     def test_kepler_install_read_end(self):
         with tempfile.TemporaryDirectory() as t:
             t = Path(t); out = t / "bench-native-1"; out.mkdir()
-            env = fake_env(t)
+            env = standin_env(t)
             kepler = ROOT / "scripts/kind_addons_kepler.sh"
             self.phase(kepler, out, env, "install")
             self.phase(kepler, out, env, "read", TAG="start")
@@ -191,7 +191,7 @@ class DryRun(unittest.TestCase):
     def test_kepler_refuses_a_machine_without_a_meter(self):
         with tempfile.TemporaryDirectory() as t:
             t = Path(t); out = t / "bench-native-1"; out.mkdir()
-            env = dict(fake_env(t), RAPL_ROOT=str(t / "nothing"))
+            env = dict(standin_env(t), RAPL_ROOT=str(t / "nothing"))
             r = subprocess.run(["bash", str(ROOT / "scripts/kind_addons_kepler.sh")], cwd=ROOT,
                                env=dict(env, OUT_DIR=str(out), PHASE="install"), capture_output=True, text=True, timeout=60)
             self.assertNotEqual(r.returncode, 0)

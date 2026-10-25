@@ -43,8 +43,8 @@ class TheSheet(unittest.TestCase):
                                       ("work", "LOSS", "-5%", "higher")]),
                          "p95 cut 65% to 71% (GAIN); memory up 215% (power given); work down 5.0% (LOSS)")
         self.assertEqual(bs.fmt_pct_words(31.0), "+31% GAIN")
-        self.assertEqual(bs.fmt_pct_words(-25.0), "-25% power given", "a minus with no LOSS is the resources put in")
-        self.assertEqual(bs.fmt_pct_words(-25.0, loss=1), "-25% LOSS")
+        self.assertEqual(bs.fmt_pct_words(-25.0), "+25% power given", "a fall with no LOSS is the resources put in, wearing the word's sign")
+        self.assertEqual(bs.fmt_pct_words(-25.0, loss=1), "−25% LOSS")
         self.assertEqual(bs.fmt_pct_words(0.01), "0%: EVEN")
 
     def test_the_published_sheet_is_what_the_tables_give(self):

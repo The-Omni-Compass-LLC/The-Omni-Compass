@@ -15,11 +15,11 @@ native, the muscle stays native; we only wire out of it".
 
 The rule, the same for every table (every judged gauge counts; "shown, not judged" rows never do):
 
-  write               at least one gauge GAIN in all three of our runs and none LOSS or power given: Omni holds the knob
-  watch               no GAIN in all three of our runs: the knob stays native and Omni only reads it. Where a gauge read LOSS
-                      or power given in all three of our runs it is named and its cause given; where the runs disagree,
+  write               at least one gauge GAIN across our three runs and none LOSS or power given: Omni holds the knob
+  watch               no GAIN across our three runs: the knob stays native and Omni only reads it. Where a gauge read LOSS
+                      or power given across our three runs it is named and its cause given; where the runs disagree,
                       nothing is settled and the knob stays native until it is
-  operator's choice   GAIN, and LOSS or power given, both the same in all three of our runs: a trade. Both readings of the Omni index are printed where the
+  operator's choice   GAIN, and LOSS or power given, both judged across our three runs: a trade. Both readings of the Omni index are printed where the
                       test is in it (the resource reading, the preregistered headline; the service reading, work and
                       speed alone) and the side that pays is named. The operator who wants the gain and can pay the
                       cost wires in; every other operator watches
@@ -76,7 +76,7 @@ def empty():
 
 
 def verdict(gain, away):
-    """The three words. gain: how many judged gauges read GAIN in all three of our runs; away: how many read LOSS or power
+    """The three words. gain: how many judged gauges read GAIN across our three runs; away: how many read LOSS or power
     given."""
     if gain and not away:
         return WRITE
@@ -173,7 +173,7 @@ def _stack_directions():
 
 STACK_DIRECTIONS = _stack_directions()
 
-# Why each gauge that read LOSS or power given in all three of our runs did, read from the preregistration that carries the result (the file is named so a
+# Why each gauge that read LOSS or power given across our three runs did, read from the preregistration that carries the result (the file is named so a
 # reader can check the words against the record). Keyed by (file, workload or test, gauge key); a key of "*" matches any case.
 WHY = {
     ("V7_KAFKA.json", "*", "consumers_mean"): "the knob itself: Omni adds consumers while messages wait and the queue is kept short; the consumers running are the price, declared in advance as the gauge expected to rise: the power given (`docs/KAFKA_PREREGISTRATION.md`, the gauges)",
@@ -183,7 +183,7 @@ WHY = {
     ("V7_REDIS.json", "*", "maxmemory_mb_mean"): "the knob itself: the ceiling grows while the cache is full and misses, so a wide working set is held instead of evicted; the memory is the price of the hit rate, declared in advance as the gauge expected to rise: the power given (`docs/REDIS_PREREGISTRATION.md`, the gauges)",
     ("V7_REDIS.json", "*", "used_mb_mean"): "the memory actually used follows the ceiling: the working set the operator's 64 MB could not hold is held",
     ("V7_PGBENCH.json", "simple_update", "servers_alive_max"): "amendment 1's add rule (\"slow, clients waiting for a server: add\") fired 4 to 15 times an arm on this slow write workload and bought servers above the operator's 20, up to 36 at the peak; work, latency and CPU inside the noise, so nothing was bought for them (`docs/POSTGRES_PREREGISTRATION.md`, the second set). The rule stands as written and the verdict for this workload is to watch",
-    ("V7_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU was cut 4% to 6% for it, a GAIN in all three of our runs, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
+    ("V7_SYSBENCH.json", "read_write", "pool_used_mb_mean"): "memory bought on real misses: a written working set keeps the pool missing above one percent, so the growth gate lets the pool grow to 1.1 to 1.6 GB in the wide notches; the host's CPU was cut 4% to 6% for it, a GAIN across our three runs, and latency did not move (`docs/MYSQL_PREREGISTRATION.md`, the third set)",
 }
 DECLARED_COST = {"V7_KAFKA.json": "consumers", "V7_REDIS.json": "memory"}
 
@@ -302,15 +302,15 @@ def away_cell(j, n=12):
 
 def k8s_why(f, j, v):
     if v == WRITE:
-        return (f"{len(j['gain'])} gauges GAIN in all three of our runs ({fmt_list(j['gain'])}), none LOSS or power given"
+        return (f"{len(j['gain'])} gauges GAIN across our three runs ({fmt_list(j['gain'])}), none LOSS or power given"
                 + (f"; {len(j['noise'])} gauges EVEN, inside the noise" if j["noise"] else "") + ". Omni holds the knob")
     if v == WATCH and not away_of(j):
         return (f"every judged gauge EVEN ({len(j['noise'])} inside the noise, {len(j['same'])} the same), the neighbour's "
                 f"own rows included: beside a noisy neighbour no gauge moved, so under this demand the knob has nothing to move. "
                 f"The same knob writes under the other six demands")
-    return (f"GAIN in all three of our runs: {fmt_list(j['gain'])}"
-            + (f"; LOSS in all three of our runs: {fmt_list(j['loss'])}" if j["loss"] else "")
-            + (f"; power given in all three of our runs: {fmt_list(j['given'])}" if j["given"] else ""))
+    return (f"GAIN across our three runs: {fmt_list(j['gain'])}"
+            + (f"; LOSS across our three runs: {fmt_list(j['loss'])}" if j["loss"] else "")
+            + (f"; power given across our three runs: {fmt_list(j['given'])}" if j["given"] else ""))
 
 
 def stack_why(f, wl, j, v, res, svc):
@@ -741,11 +741,11 @@ def main(check=False):
          "machines, energy, memory, connections, consumers and processor time are resources spent, so a fall is a cut, a GAIN, and a "
          "rise is **power given**, the price named beside what it bought. Each gauge's aim is its preregistration's; an operator whose "
          "aim differs reads the same numbers the other way. A knob reads:", "",
-         "- **write**: at least one gauge GAIN in all three of our runs, and no LOSS and no power given. Omni holds the knob.",
-         "- **watch**: no GAIN in all three of our runs. The knob stays native; Omni reads it and writes nothing. Where a gauge read "
-         "LOSS or power given in all three of our runs, it is named and its cause given below. Where the runs disagree, nothing is "
+         "- **write**: at least one gauge GAIN across our three runs, and no LOSS and no power given. Omni holds the knob.",
+         "- **watch**: no GAIN across our three runs. The knob stays native; Omni reads it and writes nothing. Where a gauge read "
+         "LOSS or power given across our three runs, it is named and its cause given below. Where the runs disagree, nothing is "
          "settled and the knob stays native until it is.",
-         "- **operator's choice**: GAIN, and LOSS or power given, both the same in all three of our runs: a trade. "
+         "- **operator's choice**: GAIN, and LOSS or power given, both judged across our three runs: a trade. "
          "Both readings of the Omni index are shown where the test is in it (the resource reading, the preregistered headline, and "
          "the service reading, work and speed alone), and the side that pays is named. The operator who wants the gain and can pay "
          "the price wires in; every other operator watches.", "",
@@ -772,7 +772,7 @@ def main(check=False):
           "of `results/OMNI_INDEX.md` for that test, where it has one.", ""]
     L += ["### Real Kubernetes: one knob under seven demands", "",
           f"The knob: {K8S_KNOB}, on top of the Horizontal Pod Autoscaler (kind clusters on GitHub, ten pairs a run).", "",
-          "| Demand | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
+          "| Demand | GAIN across our three runs | LOSS or power given across our three runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
     for x in [c for c in real if c["kind"] == "real knob" and "Kubernetes" in c["domain"]]:
         j = x["judged"]
         L.append(f"| {x['case']} | {esc(fmt_list(j['gain'], 12)) or 'none'} | {esc(away_cell(j)) or 'none'} | **{x['verdict']}** | "
@@ -783,7 +783,7 @@ def main(check=False):
         if not rows:
             continue
         L += [f"### {cat}", "", f"The knob: {knob}.", "",
-              "| Workload | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
+              "| Workload | GAIN across our three runs | LOSS or power given across our three runs | Verdict | Index: resource | Index: service | Why | Source |", "|---|---|---|---|---:|---:|---|---|"]
         for x in rows:
             j = x["judged"]
             L.append(f"| {x['case']} | {esc(fmt_list(j['gain'], 12)) or 'none'} | {esc(away_cell(j)) or 'none'} | "
@@ -791,7 +791,7 @@ def main(check=False):
         L.append("")
 
     # every negative
-    L += ["## Every LOSS and every power given in all three of our runs on a real stack, and why", "",
+    L += ["## Every LOSS and every power given across our three runs on a real stack, and why", "",
           "The founder's question was where the negatives are and why each is there. Every gauge that read LOSS or power given in all "
           "three of our runs on a real stack, with its cause read from the preregistration that carries the result:", ""]
     groups = collections.OrderedDict()
@@ -823,7 +823,7 @@ def main(check=False):
     L += ["", ("What these have in common: every one is power given, a resource spent to buy the service the knob exists for (consumers "
                "and the CPU they poll with, memory, pages, connections), each declared in advance in its preregistration as the gauge "
                "expected to rise, or found on the first counted set and disclosed. None is a LOSS: on no real stack did work inside the "
-               "line, p95 or failed requests read LOSS in all three of our runs. " if not losses else
+               "line, p95 or failed requests read LOSS across our three runs. " if not losses else
                f"{len(losses)} of these are a LOSS ({', '.join(sorted(set(losses)))}): each is named above with its cause, and each is a "
                "fault to find and fix, our own wiring first. The rest are power given, a resource spent to buy the service the knob exists "
                "for. ")
@@ -837,7 +837,7 @@ def main(check=False):
         if not rows:
             continue
         L += [f"### {domain}", "", f"The knob: {knob}.", "",
-              "| Case | GAIN in all three of our runs | LOSS or power given in all three of our runs | Verdict | Why | Source |", "|---|---|---|---|---|---|"]
+              "| Case | GAIN across our three runs | LOSS or power given across our three runs | Verdict | Why | Source |", "|---|---|---|---|---|---|"]
         for x in rows:
             j = x["judged"]
             b = esc(fmt_list(j["gain"], 12)) if j else ""
@@ -891,7 +891,7 @@ def main(check=False):
           "is needed.",
           f"- **{len(same_as)} muscles read the same as native**: {len(same_wrote)} of them wrote and nothing moved beyond the noise on work, speed "
           f"or misses, {len(same_as) - len(same_wrote)} wrote nothing because native held the reading and the law had nothing to push. Watch, by rule; "
-          "these are the room the next engine looks for a gain in, in the toy gate first.", "",
+          "these are the room the next engine looks for a gain in, in the model gate first.", "",
           "### Power given, muscle by muscle", "",
           "The max buys work and speed; the energy it takes is **power given**, shown beside what it bought and never a trade or a loss (the "
           "founder's order of 13 October). The write muscles whose power given on their own load is the largest:", "",

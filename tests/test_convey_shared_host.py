@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Conveyance on a shared host (Omni v7, omni_controller/muscles.py, convey): on kind, where every node is a container on
 one machine, no limit is raised while the machine is at or over 75% busy or cannot be read; limits already given stay and
-lowering goes on; a pod starting on the host holds nothing (the toy gate refused that hold: a LOSS on work and speed for
+lowering goes on; a pod starting on the host holds nothing (the model gate refused that hold: a LOSS on work and speed for
 1% of start wait, docs/OMNI_V7.md); each node keeps its own arithmetic, on kind and on separate machines alike. Every case
 reads the same conveyance code the live controller runs."""
 import copy

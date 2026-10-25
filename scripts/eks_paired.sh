@@ -33,14 +33,16 @@ echo "repetition $REP, order: ${order[*]}, work group $TYPE x up to $MAX in $REG
 # on-demand vCPU quota for standard instances (L-1216C47A) has room for the system machine and the whole work group.
 # PREFLIGHT_ONLY=1 (.github/workflows/cloud-check.yml) stops after it; QUOTA_REQUEST=1 files the quota increase with
 # Amazon when the quota is short (the founder's order of 18 October: a quota is raised with the cloud, never shrunk to fit).
+# Amazon's own words for a run's public page: the account, organization and policy numbers it quotes are masked
+aws_words() { tr '\n' ' ' < /tmp/eks-preflight.err | sed -E 's/[0-9]{12}/<account>/g; s/o-[a-z0-9]{10,32}/<organization>/g; s/p-[a-z0-9]{8,128}/<policy>/g' | cut -c1-400; }
 aws sts get-caller-identity --query Arn --output text >/dev/null 2>/tmp/eks-preflight.err \
-  || { echo "pre-flight: Amazon refused the keys (AWS said: $(tr '\n' ' ' < /tmp/eks-preflight.err | cut -c1-400)): nothing built, nothing billed"; exit 2; }
+  || { echo "pre-flight: Amazon refused the keys (AWS said: $(aws_words)): nothing built, nothing billed"; exit 2; }
 vcpu=$(aws ec2 describe-instance-types --region "$REGION" --instance-types "$TYPE" \
   --query 'InstanceTypes[0].VCpuInfo.DefaultVCpus' --output text 2>/tmp/eks-preflight.err || true)
 case "$vcpu" in ''|None)
   # Amazon's own words, so a refusal (a new account not yet verified, a region not enabled, a missing permission) is
   # never read as "not offered"; the keys are never printed, only the error AWS returns
-  why=$(tr '\n' ' ' < /tmp/eks-preflight.err | cut -c1-400)
+  why=$(aws_words)
   if grep -q "explicit deny in a service control policy" /tmp/eks-preflight.err; then
     # the limit Amazon puts on an account on its Free plan (18 October): every machine read is denied above the keys
     echo "pre-flight: the AWS account is on Amazon's Free plan, which denies every machine read; upgrade it to the Paid plan" \
@@ -100,7 +102,18 @@ managedNodeGroups:
 YAML
   eksctl create cluster -f "/tmp/eks-$name.yaml"
   aws eks update-kubeconfig --name "$name" --region "$REGION"
-  kubectl wait --for=condition=Ready nodes --all --timeout=900s
+  # 24 October: in 3 of the steady set's first 9 repetitions the work machines did not read Ready within 600 s and the
+  # repetition ended before any measurement. The nodes' own conditions and the pools' states are kept in the repetition's
+  # files whenever the wait runs out, so the cause is read from the run, and the wait is given once more before it fails
+  if ! kubectl wait --for=condition=Ready nodes --all --timeout=900s; then
+    mkdir -p "bench-$arm-$REP"
+    kubectl get nodes -o wide > "bench-$arm-$REP/nodes_not_ready.txt" 2>&1 || true
+    kubectl describe nodes > "bench-$arm-$REP/nodes_describe.txt" 2>&1 || true
+    kubectl get events -A --sort-by=.lastTimestamp > "bench-$arm-$REP/events.txt" 2>&1 || true
+    : # the node groups' states are in the cluster's own events above
+    echo "######## $name: a node not Ready after 900 s (its conditions kept in bench-$arm-$REP); one more wait of 600 s"
+    kubectl wait --for=condition=Ready nodes --all --timeout=600s
+  fi
   # the Kubernetes cluster autoscaler (EKS ships none): auto-discovery by the work group's tags, AKS's scale-down profile,
   # on the system machine (it tolerates the taint)
   helm repo add autoscaler https://kubernetes.github.io/autoscaler >/dev/null 2>&1 || true

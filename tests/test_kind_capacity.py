@@ -85,7 +85,7 @@ def test_controller_uses_measured_host_share_for_kind_ceiling():
             "selector": {"matchLabels": {"app": "web"}},
         }
     }
-    class FakeKube:
+    class StandinKube:
         def get(self, *args):
             if args[1] == "deployment":
                 return deployment
@@ -96,7 +96,7 @@ def test_controller_uses_measured_host_share_for_kind_ceiling():
             raise AssertionError(args)
 
     ctl = Controller.__new__(Controller)
-    ctl.k = FakeKube()
+    ctl.k = StandinKube()
     ctl.host_cpu = SimpleNamespace(busy_share=0.60)
     hpa = {
         "metadata": {"namespace": "default"},
@@ -113,7 +113,7 @@ def test_controller_rechecks_an_already_raised_replica_cap():
     from types import SimpleNamespace
     from omni_controller.controller import Controller, RANGE_ANN
 
-    class FakeKube:
+    class StandinKube:
         writes = []
         def write(self, command, why):
             self.writes.append((command, why))
@@ -121,7 +121,7 @@ def test_controller_rechecks_an_already_raised_replica_cap():
     ctl = Controller.__new__(Controller)
     ctl.a = SimpleNamespace(replica_ceiling=-1)
     ctl.compass_law = SimpleNamespace(p=0.4, band=SimpleNamespace(center=0.3))
-    ctl.k = FakeKube()
+    ctl.k = StandinKube()
     ctl._app_demand = lambda h: 25.2
     ctl._live_ceiling = lambda h: 46
     hpa = {

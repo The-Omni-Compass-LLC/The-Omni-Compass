@@ -117,7 +117,7 @@ are not rerun.
 ## Amendment 2 (2026-10-19, before omni-v12's runs; written after the omni-v11 runs and the reflex study were seen, and said so)
 
 On a mission draw outside the counted cells the omni-v11 wire let two drones collide where native flew the same draw with
-none (`results/toy_gate/V12_SWARM_REFLEX.md`): a collision voided the cell under the rule above, so a collision Omni-Compass
+none (`results/model_gate/V12_SWARM_REFLEX.md`): a collision voided the cell under the rule above, so a collision Omni-Compass
 caused could only ever be read as a void cell, and a fixed set of seeds could not show it at all. From omni-v12's runs on,
 two readings change, nothing else:
 

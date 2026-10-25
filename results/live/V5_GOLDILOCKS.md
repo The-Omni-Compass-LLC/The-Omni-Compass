@@ -6,6 +6,8 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 | Run | GitHub run | Commit | Engine | Paired repetitions |
 |---|---|---|---|---:|
 | A | 38339821941 | `148565d2550d` | omni-v5 (digest 5648f2902f1fae68, 44 files) | 10 |
@@ -38,7 +40,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | host CPU busy, the real machine under kind (%) | +40.4% (+32.4 to +48.5) | +36.0% (+25.9 to +46.2) | +42.8% (+36.2 to +49.3) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 
-Readings: 4 GAIN in all three of our runs, 2 power given in all three of our runs, 3 EVEN, no difference beyond the noise (all three runs), 2 EVEN, no difference beyond the noise in 2 of 3 runs, 4 EVEN, the same, 8 shown, not judged.
+Readings: 2 WORSE in all three of our runs, 4 better in all three of our runs, 3 no difference beyond the noise, 2 no difference beyond the noise in 2 of 3 runs, 4 same, 8 shown, not judged.
 
 ---
 

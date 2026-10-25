@@ -13,8 +13,10 @@
   python3 scripts/lambda_gpu.py wait ID [--timeout 1800]    until it is running; prints its address
   python3 scripts/lambda_gpu.py status ID                   its state and address
   python3 scripts/lambda_gpu.py list [--prefix omni-]       our machines, with how long each has been up
-  python3 scripts/lambda_gpu.py terminate [ID ...] [--name N]   gives them back (by id, or the machine of that name) and
-                                                            confirms each one; the bill stops
+  python3 scripts/lambda_gpu.py terminate [ID ...] [--name N] [--prefix omni-...] [--run RUN]   gives them back (by id,
+                                                            the machine of that name, every machine whose name starts so
+                                                            (only omni- names), or every machine a workflow run rented,
+                                                            its name ending -r<run id>) and confirms each one; the bill stops
   python3 scripts/lambda_gpu.py keycheck --name K --private-file F   the SSH key pair, at no cost: Lambda holds a key named
                                                             K, and F is its private half; rents nothing
 
@@ -32,6 +34,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -206,11 +209,23 @@ def terminate(a) -> int:
     """Give machines back and confirm each one: a machine already given back is fine; one that Lambda neither lists as
     given back nor reports as terminating is still billing, and that is exit 2 with its id (never a quiet success)."""
     ids = [i for i in a.ids if i]
-    if a.name:
+    prefix = getattr(a, "prefix", "") or ""
+    if prefix and not prefix.startswith("omni-"):
+        # only the machines this workflow names (omni-...); a machine launched by hand on Lambda's page is never touched
+        print(f"refused: --prefix must start with omni- (the names this workflow gives), not {prefix!r}", file=sys.stderr)
+        return 2
+    run = getattr(a, "run", "") or ""
+    if a.name or prefix or run:
+        # a run's own machines by the run number its name ends with (-r<run id>): found even when the launch job was cut off
+        # before it could hand the machine's id on
         ids += [d.get("id") for d in call("GET", "/instances").get("data", [])
-                if d.get("name") == a.name and d.get("id") not in ids]
+                if (d.get("name") == a.name or (prefix and (d.get("name") or "").startswith(prefix))
+                    or (run and (d.get("name") or "").endswith(f"-r{run}")))
+                and d.get("id") not in ids]
     if not ids:
-        print("nothing to give back" + (f" (no machine named {a.name})" if a.name else ""))
+        print("nothing to give back" + (f" (no machine named {a.name})" if a.name else "")
+              + (f" (no machine whose name starts {prefix})" if prefix else "")
+              + (f" (no machine of run {run})" if run else ""))
         return 0
     live = [i for i in ids if state(i) not in GONE]
     for i in ids:
@@ -228,16 +243,63 @@ def terminate(a) -> int:
     return 0
 
 
+PEM = re.compile(r"(-----BEGIN ([A-Z0-9 ]+)-----)(.*?)(-----END \2-----)", re.S)
+
+
+def fix_key(text: str) -> str:
+    """The stored private key as ssh-keygen reads it: carriage returns dropped, anything pasted before its first line dropped,
+    and, where its line breaks were lost on the way in (the whole key on one line, or breaks turned into spaces), the body
+    wrapped again at the width its form uses (64 for PEM, 70 for OpenSSH). A text that is not a key is returned as it was."""
+    t = text.replace("\r", "").strip()
+    i = t.find("-----BEGIN ")
+    if i > 0:
+        t = t[i:]
+    m = PEM.match(t)
+    if not m or any(":" in ln for ln in m.group(3).splitlines()):     # not a key, or an encrypted PEM's header lines
+        return t + "\n"
+    body = re.sub(r"\s+", "", m.group(3))
+    width = 70 if "OPENSSH" in m.group(2) else 64
+    return "\n".join([m.group(1), *(body[k:k + width] for k in range(0, len(body), width)), m.group(4)]) + "\n"
+
+
+def key_shape(text: str) -> str:
+    """What a stored text that ssh-keygen cannot read looks like, from its outline alone: its size and lines, which form its
+    first line names, whether it ends, and whether it is something else (a public key, the API key, a passphrase-locked
+    key). Never a character of the key."""
+    t = text.replace("\r", "").strip()
+    lines = t.splitlines()
+    size = f"{len(t)} characters on {len(lines)} line{'s' if len(lines) != 1 else ''}"
+    if not t:
+        return "it is empty"
+    if t.startswith(("ssh-rsa ", "ssh-ed25519 ", "ecdsa-sha2-", "sk-ssh-", "sk-ecdsa-")):
+        return (f"it holds a public key ({size}), the line Lambda shows on its SSH keys page: GitHub needs the other half, the "
+                "file downloaded when the key was made")
+    if t.startswith("secret_") or (len(lines) == 1 and "-----" not in t and " " not in t):
+        return f"it holds one line with no key markers ({size}): an API key or a name, not the downloaded key file"
+    if "-----BEGIN " not in t:
+        return f"it holds no key's first line ({size}): open the downloaded .pem file and copy all of it"
+    if "ENCRYPTED" in t:
+        return f"it holds a key locked with a passphrase ({size}): make a new key in Lambda (it has none) and store that file"
+    if not PEM.search(t):
+        return f"it starts a key but has no matching last line ({size}): it was cut short when it was copied"
+    form = ("an OpenSSH key" if "OPENSSH" in t else "an RSA key in PEM form" if "RSA" in t else
+            "an EC key in PEM form" if "EC " in t else "a PKCS#8 key in PEM form")
+    return f"it is {form} ({size}), whole in its outline, that ssh-keygen still cannot read: make a new key in Lambda and store that file"
+
+
 def keycheck(a) -> int:
-    """The SSH key pair, checked before anything is rented: Lambda holds a key under the name, and the stored private key
-    is the other half of the public key Lambda holds (ssh-keygen derives the public half; no key material is printed).
-    A wrong pair otherwise shows only after a machine is rented and refuses the login."""
+    """The SSH key pair, checked before anything is rented: the stored private key is the other half of a public key Lambda
+    holds (ssh-keygen derives the public half; no key material is printed). The key is found by its own half, so a name
+    stored a little differently from Lambda's (Lambda keeps a generated key under its file name, "name.pem.") still finds
+    it; the name Lambda holds is written to --resolved-out for the launch. A wrong pair otherwise shows only after a machine
+    is rented and refuses the login."""
     keys = call("GET", "/ssh-keys").get("data", [])
-    held = next((k for k in keys if k.get("name") == a.name), None)
-    if held is None:
-        names = [str(k.get("name", "")) for k in keys]
-        print(f"LAMBDA_SSH_KEY_NAME: Lambda holds no SSH key by that name; it holds {len(names)}: {', '.join(names) or 'none'}")
-        return 7
+    names = [str(k.get("name", "")) for k in keys]
+    raw = open(a.private_file, encoding="utf-8", errors="replace").read()
+    fixed = fix_key(raw)
+    if fixed != raw:              # written back in place, its mode kept: the key every later step uses is the same repair
+        with open(a.private_file, "w", encoding="utf-8") as fh:
+            fh.write(fixed)
     try:
         out = subprocess.run(["ssh-keygen", "-y", "-P", "", "-f", a.private_file], capture_output=True, text=True,
                              timeout=30)
@@ -245,14 +307,43 @@ def keycheck(a) -> int:
         print("ssh-keygen is not installed here: the pair is not checked")
         return 0
     if out.returncode != 0 or not out.stdout.split():
-        print("LAMBDA_SSH_PRIVATE_KEY: not a whole private key without a passphrase (ssh-keygen could not read it): store "
-              "the whole .pem file Lambda downloaded when the key was made")
+        print("LAMBDA_SSH_PRIVATE_KEY: not a whole private key without a passphrase (ssh-keygen could not read it): "
+              f"{key_shape(fixed)}; store the whole .pem file Lambda downloaded when the key was made")
         return 7
-    if out.stdout.split()[:2] != str(held.get("public_key", "")).split()[:2]:
-        print(f"LAMBDA_SSH_PRIVATE_KEY is not the private half of the key Lambda holds as {a.name}: store the .pem file "
-              "downloaded when that key was made, or make a new key and store both again")
+    half = out.stdout.split()[:2]
+    mine = [k for k in keys if str(k.get("public_key", "")).split()[:2] == half]
+    if not mine:
+        named = a.name in names
+        print(("LAMBDA_SSH_PRIVATE_KEY is not the private half of the key Lambda holds under that name"
+               if named else f"LAMBDA_SSH_KEY_NAME: Lambda holds no SSH key by that name; it holds {len(names)}: "
+               f"{', '.join(names) or 'none'}") + ", and the stored private key is the other half of none of Lambda's keys: "
+              "store the .pem file downloaded when one of them was made, or make a new key and store both again")
         return 7
-    print(f"SSH key {a.name}: Lambda holds it, and the stored private key is its other half")
+    held = str(mine[0].get("name", ""))
+    if a.resolved_out:
+        with open(a.resolved_out, "w", encoding="utf-8") as fh:
+            fh.write(held + "\n")
+    note = "" if held == a.name else " (found by its own half; LAMBDA_SSH_KEY_NAME holds another spelling, and Lambda's is used)"
+    print(f"SSH key {held}: Lambda holds it, and the stored private key is its other half{note}")
+    return 0
+
+
+def addkey(a) -> int:
+    """Registers a public key with Lambda under a name (the run's own key, when the stored one cannot be used); prints its id."""
+    pub = open(a.public_file, encoding="utf-8").read().strip()
+    got = call("POST", "/ssh-keys", {"name": a.name, "public_key": pub}).get("data", {})
+    print(got.get("id", ""))
+    return 0
+
+
+def delkey(a) -> int:
+    """Removes every key Lambda holds under the name (the run's own key, at the run's end); a name it does not hold is fine."""
+    gone = 0
+    for k in call("GET", "/ssh-keys").get("data", []):
+        if k.get("name") == a.name and k.get("id"):
+            call("DELETE", f"/ssh-keys/{k['id']}", missing_ok=True)
+            gone += 1
+    print(f"SSH key {a.name}: {'removed from Lambda' if gone else 'not held by Lambda (nothing to remove)'}")
     return 0
 
 
@@ -268,9 +359,17 @@ def main(argv=None) -> int:
     p.add_argument("--every", type=float, default=15.0); p.set_defaults(fn=wait)
     p = sub.add_parser("list"); p.add_argument("--prefix", default="omni-"); p.set_defaults(fn=list_)
     p = sub.add_parser("terminate"); p.add_argument("ids", nargs="*"); p.add_argument("--name", default="")
+    p.add_argument("--prefix", default="", help="every machine whose name starts with this (omni-... only)")
+    p.add_argument("--run", default="", help="every machine a workflow run rented (its name ends -r<run id>)")
     p.set_defaults(fn=terminate)
     p = sub.add_parser("keycheck"); p.add_argument("--name", required=True); p.add_argument("--private-file", required=True)
+    p.add_argument("--resolved-out", default="")
     p.set_defaults(fn=keycheck)
+    p = sub.add_parser("addkey"); p.add_argument("--name", required=True); p.add_argument("--public-file", required=True)
+    p.set_defaults(fn=addkey)
+    p = sub.add_parser("delkey"); p.add_argument("--name", required=True); p.set_defaults(fn=delkey)
+    p = sub.add_parser("fixkey", help="stdin to stdout: the stored private key repaired as keycheck repairs it")
+    p.set_defaults(fn=lambda a: sys.stdout.write(fix_key(sys.stdin.read())) and 0)
     a = ap.parse_args(argv)
     return a.fn(a)
 

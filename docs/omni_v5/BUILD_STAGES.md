@@ -38,7 +38,7 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
   6–11 port it into the live controllers.
 
 ## Stages to build (each: files → math → test → acceptance → rerun)
-2. **Edge & centre as the only two guards, generalised off the toy presets.** Files: realms/compass_arm_v5.py,
+2. **Edge & centre as the only two guards, generalised off the model presets.** Files: realms/compass_arm_v5.py,
    `omnicompass/compass_law.py` (band/cushion read-back). Math: cushion = climb×reaction + z·wobble per knob; centre =
    release_safe + Lindley hole. Test: no muscle over its edge, none stuck in a hole, across all 59 families × seeds.
    Accept: 0 muscles behind native on misses at equal work. Rerun: six organisms, 12 seeds, both hours.
@@ -81,7 +81,7 @@ Each stage lists: files, the math/physics, the test, the acceptance bar, and the
     docs/OMNI_V5.md, `tools/omni_version.py`, `RELEASE_MANIFEST.json`. Rerun: every benchmark on v5 (CPU first), A/B/C,
     the index; the founder hears each result before it goes up. Then GPU on Lambda, one exact commit, add-ons on.
 
-## What is NOT faked
+## What is NOT stood in
 None of stages 2–12 are claimed done until their test passes and their rerun is in. Modelled numbers stay class S; the
 real proof is the clusters and the GPU. The clouds (Azure/GCP/AWS) start when their credentials are in GitHub secrets
 (never asked for, never echoed); GPU waits for the CPU side and one exact commit, per the standing orders.

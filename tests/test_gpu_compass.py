@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The two-wire GPU governor (omni_controller/gpu_compass.py) against the stand-in nvidia-smi (tests/fake_gpu/nvidia-smi),
+"""The two-wire GPU governor (omni_controller/gpu_compass.py) against the stand-in nvidia-smi (tests/standin_gpu/nvidia-smi),
 on a card its own power limit holds at 900 MHz while busy (top clock 1695 MHz), with calm response times:
 
   learn     until the card's own busy clock and draw are learned, neither wire moves below where the card is
@@ -19,13 +19,13 @@ import json, os, sys, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.gpu_compass import GpuCompass, parser
-SMI = str(ROOT / "tests" / "fake_gpu" / "nvidia-smi")
+SMI = str(ROOT / "tests" / "standin_gpu" / "nvidia-smi")
 
 
 def setup(tmp, util=100):
     st = {"limit": {"0": 150.0}, "default": 150.0, "min": 100.0, "max": 150.0, "draw_w": 220.0, "util": util, "temp": 60,
           "clock_top": 1695.0, "busy_clock": 900.0}
-    p = Path(tmp) / "smi.json"; p.write_text(json.dumps(st)); os.environ["FAKE_SMI_STATE"] = str(p)
+    p = Path(tmp) / "smi.json"; p.write_text(json.dumps(st)); os.environ["STANDIN_SMI_STATE"] = str(p)
     return p
 
 

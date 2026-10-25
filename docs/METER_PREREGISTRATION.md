@@ -9,7 +9,7 @@ listed on 12 October (`docs/THE_SEAT.md`): Kepler, the shared energy meter of th
 
 On GitHub's machines every Kubernetes set reports energy from a declared model (class S): kind has no power meter, and
 GitHub's virtual machines show no processor counters. Kepler 0.10 and later carry no model of their own: they read the
-processor's RAPL counters, and without them have only a fake development meter. So the meter runs where the counters
+processor's RAPL counters, and without them have only a stand-in development meter. So the meter runs where the counters
 are: a rented bare-metal machine. There the energy rows become a measurement (class P).
 
 ## What is measured

@@ -11,7 +11,7 @@
 # SHA-256 checked, its image the release's (quay.io/sustainable_computing_io/kepler:v0.11.4, the tag its own README
 # names; pulled once, its digest recorded); its ServiceMonitor left out (no Prometheus Operator runs here). Kepler 0.10 and
 # later read the processor's RAPL counters themselves and carry no model: on a machine without them (a virtual machine,
-# GitHub's runners among them) Kepler has only a fake development meter, so this script installs nothing there
+# GitHub's runners among them) Kepler has only a standin development meter, so this script installs nothing there
 # (tools/rapl.py probe decides), and the run's energy stays the declared model.
 #   PHASE=install          before the load starts: the manifests applied, Kepler running on every node
 #   PHASE=read TAG=start   at the window's opening, and TAG=end at its close: every Kepler pod's metrics, read through the
@@ -40,7 +40,7 @@ retry() { local t; for t in $(seq 1 30); do "$@" && return 0; sleep 5; done; ech
 
 if [ "$PHASE" = install ]; then
   python3 tools/rapl.py probe > "$OUT_DIR/meter_probe.json" \
-    || { echo "no processor meter on this machine (tools/rapl.py probe): Kepler would have only its fake meter; nothing installed"; exit 1; }
+    || { echo "no processor meter on this machine (tools/rapl.py probe): Kepler would have only its standin meter; nothing installed"; exit 1; }
   DL=$(mktemp -d "${RUNNER_TEMP:-/tmp}/omni-kepler.XXXXXX")
   fetch "$RAW/namespace.yaml" "$DL/namespace.yaml" "$SHA_NAMESPACE"
   fetch "$RAW/rbac.yaml" "$DL/rbac.yaml" "$SHA_RBAC"
@@ -58,7 +58,7 @@ if [ "$PHASE" = install ]; then
     [ "${ready:-0}" = "$want" ] && break; sleep 5
   done
   [ "${ready:-0}" = "$want" ] || { echo "Kepler ready on ${ready:-0} of $want nodes"; kubectl -n "$NS" get pods -o wide; exit 1; }
-  # Kepler's own word that it reads the processor's counters (and not a fake meter) on the control plane
+  # Kepler's own word that it reads the processor's counters (and not a standin meter) on the control plane
   cp_pod=$(kubectl -n "$NS" get pods -o json | jq -r '.items[] | select(.spec.nodeName | test("control-plane")) | .metadata.name' | head -n 1)
   for _ in $(seq 1 30); do
     kubectl get --raw "/api/v1/namespaces/$NS/pods/$cp_pod:28282/proxy/metrics" 2>/dev/null | grep '^kepler_node_cpu_joules_total' >/dev/null && break; sleep 5

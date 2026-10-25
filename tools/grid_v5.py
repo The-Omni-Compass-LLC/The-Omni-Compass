@@ -4,7 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The grid of the card version, every square in one page (results/grid_v5/GRID.md), built from the pooled receipts the
-archive keeps: the seven organisms at 1, 10 and 100 copies on one clock, each at its first 1, 10 and 100 runs (nested),
+archive keeps: the seven organisms at 1, 10, 100 and 500 copies on one clock, each at its first 1, 10, 100 and 500 runs (nested),
 native against Omni-Compass on top, twice: modelled (six.yml, pooled by six-pool: SIX_v5-x<size>.json) and with the real
 Kubernetes cluster inside (six-kube.yml, pooled by six-kube-pool: SIX_KUBE_v5-x<size>_r<n>.json). Nothing is
 recomputed here: every cell is the pooled receipt's own reading, and each half names the runs it was pooled from.
@@ -31,7 +31,7 @@ ORGS = ["spine", "compute_ai_cloud", "physics_robotics_autonomous", "energy_faci
 NAMES = {"spine": "The spine", "compute_ai_cloud": "Compute / AI / Cloud", "physics_robotics_autonomous": "Physics / Robotics / Autonomous",
          "energy_facility_industrial": "Energy / Facility / Industrial", "distribution_specialized": "Distribution / Specialized",
          "stack": "The four stacked", "tower": "The whole tower"}
-SIZES, RUNS = (1, 10, 100), ("1", "10", "100")
+SIZES, RUNS = (1, 10, 100, 500), ("1", "10", "100", "500")   # the ladder of the Python's 500-run Monte Carlo (25 October)
 copies = lambda n: f"{n} cop{'y' if int(n) == 1 else 'ies'}"
 
 
@@ -192,7 +192,7 @@ def across(data):
     pg = [100 * s["energy"][0] for s in sq]
     parts = []
     if sq:
-        parts.append("modelled, " + ", ".join(f"{c} of {sum(labs.values())} squares of 10 and 100 runs {lab}"
+        parts.append("modelled, " + ", ".join(f"{c} of {sum(labs.values())} squares of 10 or more runs {lab}"
                                                for lab, c in labs.most_common())
                      + f"; the {len(one)} single runs: {sum(1 for s in one if s['viol_pp'][0] < 0)} with fewer misses"
                      + f"; work {rng([100 * s['work'][0] for s in sq])}; power given {rng(pg)}")
@@ -203,7 +203,7 @@ def across(data):
         gauges = sorted(set().union(*cnt.values()), key=lambda g: (-sum(cnt[w][g] for w in WORDS), g))
         away = lambda g: GIVEN if aim_of(g) in (SPENT, WORK_PER) else LOSS        # the word a gauge reads when it moves away from its aim
         parts.append(f"with the cluster inside, {len(ks)} squares: {len(ks) - len(judged)} single repetitions (no reading); "
-                     f"of the {len(judged)} of 10 and 100 repetitions, by gauge: "
+                     f"of the {len(judged)} of 10 or more repetitions, by gauge: "
                      + (", ".join(f'"{g}" GAIN in {cnt[GAIN][g]}, {away(g)} in {cnt[away(g)][g]}' for g in gauges)
                         or "no gauge clear of the noise")
                      + f"; off the clock in {sum(1 for o in ks if 'OFF THE CLOCK' in o['verdict'])}"
@@ -220,11 +220,11 @@ def main(argv=None):
     mod, kub = modelled(a.modelled), kube(a.kube)
     out = Path(a.out)
     od = out.resolve().parent
-    L = ["# The grid of the card version: seven organisms at 1, 10 and 100 copies, each at 1, 10 and 100 runs", "", *receipt_key(), "",
+    L = ["# The grid of the card version: seven organisms at 1, 10, 100 and 500 copies, each at 1, 10, 100 and 500 runs", "", *receipt_key(), "",
          "Native against Omni-Compass on top of native, engine omni-v5 (digest 5648f290, every muscle its own card), work "
          "waiting in line in every organism. Each square is the pooled receipt's own reading; the 1-, 10- and 100-run "
          "squares of a size are nested (the first N runs). Every square is shown.", "",
-         "How to read a modelled square: its reading, GAIN, EVEN or LOSS (one run carries no label; at 10 and 100 runs the "
+         "How to read a modelled square: its reading, GAIN, EVEN or LOSS (one run carries no label; at 10, 100 and 500 runs the "
          "receipt's own label, its word first), then the change Omni-Compass made against native, averaged over the runs: "
          "misses, the share of time the plants were over their own line, in percentage points (a minus is fewer misses, a "
          "GAIN); work done, in percent; power given, the energy the max took for it, in percent (shown, never called a loss). "
@@ -238,7 +238,7 @@ def main(argv=None):
     data = {"modelled": {}, "kube": {}}
     for size in SIZES:
         rec = mod.get(size, (None,))[0]
-        L += [f"### {copies(size)}", "", "| Organism | 1 run | 10 runs | 100 runs |", "|---|---|---|---|"]
+        L += [f"### {copies(size)}", "", "| Organism | " + " | ".join(f"{n} run" + ("" if n == "1" else "s") for n in RUNS) + " |", "|---" * (len(RUNS) + 1) + "|"]
         for org in ORGS:
             cells = [model_cell((rec or {}).get("summary", {}).get(n, {}).get(org)) for n in RUNS]
             data["modelled"][f"{org}@{size}"] = {n: (rec or {}).get("summary", {}).get(n, {}).get(org) for n in RUNS}
@@ -261,7 +261,7 @@ def main(argv=None):
               "its last steps seeing a cluster whose load schedule had ended: the runner could not step that many muscles in "
               "time.", ""]
         for size in SIZES:
-            L += [f"### {copies(size)}", "", "| Organism | 1 run | 10 runs | 100 runs |", "|---|---|---|---|"]
+            L += [f"### {copies(size)}", "", "| Organism | " + " | ".join(f"{n} run" + ("" if n == "1" else "s") for n in RUNS) + " |", "|---" * (len(RUNS) + 1) + "|"]
             for org in ORGS:
                 cells = []
                 for n in RUNS:

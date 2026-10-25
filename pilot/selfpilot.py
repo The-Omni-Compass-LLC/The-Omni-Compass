@@ -119,11 +119,11 @@ def run_day(seed, omni, out, days, headroom=0.5):
         ctl = Controller(a); ctl.k = SimKube(sim, ctl.audit)
         real_run = __import__("subprocess").run
 
-        def fake_run(cmd, *k, **kw):
+        def standin_run(cmd, *k, **kw):
             if isinstance(cmd, list) and cmd and cmd[0] == "SIMSCALE":
                 sim.resize(int(cmd[1])); return None
             return real_run(cmd, *k, **kw)
-        with mock.patch("omni_controller.controller.subprocess.run", side_effect=fake_run):
+        with mock.patch("omni_controller.controller.subprocess.run", side_effect=standin_run):
             while sim.t < sim.steps:
                 sim.tick()
                 sim.c.alloc = sim.c.pool.nodes * sim.c.pool.cores * ALLOC

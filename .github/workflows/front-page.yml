@@ -93,6 +93,13 @@ jobs:
           python tools/front_page.py | tee plan.json
           summary=$(python tools/front_page.py --summary)
           python tools/front_page.py --apply | tee -a "$GITHUB_STEP_SUMMARY"
+          # the pages read from every table, rebuilt with them, so main is never left behind its own tables (24 October: two
+          # refreshes added v18 tables and left the levels, the loss ledger and the state of play behind, which the next push's
+          # verification refused)
+          python tools/reread.py
+          python tools/levels.py
+          python tools/loss_ledger.py
+          python tools/summary.py --fix
           python tools/readings.py --fix       # a rebuilt table carries the reading key again, word for word (verify checks it)
           python tools/legal.py --fix results docs README.md
           python tools/release_manifest.py --refresh-generated

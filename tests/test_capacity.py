@@ -103,7 +103,8 @@ class CapacityThreeRuns(unittest.TestCase):
             rows = json.loads(out.with_suffix(".json").read_text())["rows"]
             self.assertEqual(rows["1000:work"]["reading"], "GAIN in all three of our runs")
             self.assertEqual(rows["1000:capacity"]["reading"], "GAIN in all three of our runs")
-            self.assertEqual(rows["2000:work"]["reading"], "EVEN, no difference beyond the noise (2 of 3 runs)")
+            # two runs down and one up, each by 0.5% or more: the runs disagree (the founder's order of 24 October 2026)
+            self.assertEqual(rows["2000:work"]["reading"], "the runs disagree")
             self.assertEqual(rows["2000:capacity"]["reading"], "EVEN, the same")
             text = out.read_text()
             self.assertIn("No outside party has reviewed or approved these results.", text)

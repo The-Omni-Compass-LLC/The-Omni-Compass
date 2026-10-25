@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v17 (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files) stands on main since 23 October, afternoon. The founder's order of the afternoon
+Omni v17 (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files) stood on main on 23 October, from the afternoon until omni-v18 landed that night (`docs/OMNI_V18.md`). The founder's order of the afternoon
 before (22 October), once he had read the reads of the cluster a day in the pace study (about 86,000 at 5 s against 39,700 at 60 s): the
 governor's heartbeat, its full decision, is a dial, "5, 15, 30, 60, 75, 90, 120 ... Heartbeat scaled in its monitors. And you're
 going to set OmniCompass is main engine", because "who knows if maybe the purpose is somebody wants to set it at 5 seconds"; and
@@ -13,9 +13,9 @@ because an operator may want a fast beat for its reads and accept what it costs,
 may want their own combination. It is omni-v16 (`docs/OMNI_V16.md`) with two changes, both in `omni_controller/controller.py`
 (54 of its 55 files are omni-v16's bytes): the parser's default period moved from 15 to 60 s; and the cruise rule's wait never
 fewer than two readings, a fault the dial's own ladder found at 90 and 120 s before the version landed (below, "The fault the ladder found"). Every clock
-of the governor counts seconds since omni-v16, so the dial changes only how often it looks. Read in the toy gate against
-omni-v16 on the same seeds (`results/toy_gate/V17_VS_V16.md`), and every beat read beside native and beside 60 s on a plant
-that moves every 5 s (`results/toy_gate/V17_LADDER.md`), before it was pushed. The readings from the toy gate are our own
+of the governor counts seconds since omni-v16, so the dial changes only how often it looks. Read in the model gate against
+omni-v16 on the same seeds (`results/model_gate/V17_VS_V16.md`), and every beat read beside native and beside 60 s on a plant
+that moves every 5 s (`results/model_gate/V17_LADDER.md`), before it was pushed. The readings from the model gate are our own
 models (evidence class S), never a benchmark result. Run and scored by The Omni-Compass LLC's own code. No outside party has
 reviewed or approved these results.
 
@@ -31,10 +31,10 @@ same rows read at every pace. No one beat is right for every operator. The found
 setting, as the tune-down is, and sets the main engine, the one the company ships and benchmarks first, at 60 s, the period
 every engine through omni-v15 decided at; 15 s, native's own pace, is one setting of the dial, run and shown beside it.
 
-## The dial in our own models (`results/toy_gate/V17_LADDER.md`)
+## The dial in our own models (`results/model_gate/V17_LADDER.md`)
 
 The engine alone on a plant that moves every 5 s, the fast checks every 5 s at every beat, eight seeds of a day each, the same
-seeds and plant at every beat: 5, 10, 15 and 60 s from the pace study of omni-v16 (`results/toy_gate/V16_PACE.json`, read
+seeds and plant at every beat: 5, 10, 15 and 60 s from the pace study of omni-v16 (`results/model_gate/V16_PACE.json`, read
 before omni-v16 landed, each run setting its period on the command line, so it reads the same on omni-v17), and 30, 75, 90 and
 120 s run the same way for omni-v17; the native and 60 s runs the two share read the same seed by seed on every modelled gauge
 to the twelfth digit (the two were run under Python 3.11 and 3.12, whose float sums differ in the last bits of one gauge, the
@@ -86,7 +86,7 @@ them go: the rule no longer asked for work that waits "decision after decision",
 (`omni_controller/controller.py`): the cruise wait is never fewer than two readings, `max(2, round(120 / period))`, when it
 is derived from seconds; a count an operator sets by hand (`--cruise-after`) stands as set. At every beat up to 80 s the count
 is what it was (24 at 5 s, 8 at 15 s, 4 at 30 s, 2 at 60 and 75 s), so nothing below 80 s moves; at 90 and 120 s it is 2
-(`tests/test_pace_clocks.py`, which fails on the unfixed rule). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours −1.7% EVEN, the minutes over the line −4.7% EVEN, the pods waiting −12.1% EVEN, the 95th percentile −0.2% EVEN; at 120 s the machine-hours −2.1% EVEN, the minutes over the line −3.7% EVEN, the pods waiting −29.6% GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s. No other count of the
+(`tests/test_pace_clocks.py`, which fails on the unfixed rule). Corrected, the kind benchmark's setting reads at 90 s, against 60 s, the machine-hours down 1.7%, EVEN, the minutes over the line down 4.7%, EVEN, the pods waiting down 12.1%, EVEN, the 95th percentile down 0.2%, EVEN; at 120 s the machine-hours down 2.1%, EVEN, the minutes over the line down 3.7%, EVEN, the pods waiting down 29.6%, GAIN; machines parked over the eight days 190 and 119 against 329 at 60 s. No other count of the
 governor's falls to a single reading between 5 and 120 s: the breach's clear time (180 s) is 2 decisions at 120 s, the strict
 window (300 s) 2, the trial's phase (1,200 s) 10; the brain's dwell is one step by design and its waits round to the nearest
 step. In the cloud's setting (the machines alone, at the tune-down) every service, machine-hour and energy reading at 90 and
@@ -100,7 +100,7 @@ Set at 60 s, the main engine gives up what 15 s bought in the models, and it is 
 setting: in the kind benchmark's setting the minutes over the line are 23.75 a day at 60 s against 20.25 at 15 s (+17.3%: read
 the other way, 15 s against 60 s, −14.7%, GAIN, so 60 s against 15 s is a LOSS by the key), still 12.0% fewer than native's
 27.0 (GAIN against native); in the cloud's setting the energy per core-hour is 2.6% more at 60 s than at 15 s (power given).
-Every other row reads EVEN between the two. The toy gate's own toys read the change as shipped (`cluster_shipped`, each
+Every other row reads EVEN between the two. The model gate's own models read the change as shipped (`cluster_shipped`, each
 checkout started without a period, as an install file starts it: omni-v17 at its 60 s against omni-v16 at its 15 s): every gauge reads EVEN: the machine-hours −2.3%, the energy per core-hour +0.5%, pods waiting for a place +39.8%, the autoscaler's shortfall +0.2%, the 95th percentile +0.3%, the minutes over the line +0.9%; no LOSS against omni-v16.
 
 ## The rows against native that read LOSS (the engine's, at every beat)
@@ -120,7 +120,7 @@ Read by the one key, these rows read LOSS against native in our models (every se
 - the kind benchmark's setting, every 120 s: pods waiting for a place +175.1%.
 
 They are the engine's at every beat, the main engine's included, and stay on the next version's list (`docs/CHANGE_CONTROL.md`)
-to be root-caused, beside the blink toy's alert minutes (LOSS against native at 60 s in every gate since omni-v13).
+to be root-caused, beside the blink model's alert minutes (LOSS against native at 60 s in every gate since omni-v13).
 
 ## The monitors scale with the beat
 
@@ -131,7 +131,7 @@ to be root-caused, beside the blink toy's alert minutes (LOSS against native at 
   last decision in beats of that setting (yellow past one and a half, red past three).
 - The staleness alert (`OmniGovernorStale`, `deploy/prometheus/omni-compass-rules.yaml`) fires after three beats as measured: 180 s
   at the main engine's 60 s, 45 s at 15 s, 360 s at 120 s; the other rules count in minutes and hours, not decisions.
-- The live engine page carries the dial (the page's section 1j, "The heartbeat dial"): every beat beside native, from the ladder, with the
+- The live engine page carries the dial (the page's section 2d, "The heartbeat dial"): every beat beside native, from the ladder, with the
   real runs' place; its manual reads it (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`, section 7.4).
 - The control panel (`tools/omni_control.py`) carries the dial as a button: `POST /v1/beat {"seconds": 5 to 120}`, role
   operator, one console button for each stop (5, 15, 30, 60, 75, 90, 120 s); like a dial press it hands every setting back
@@ -152,8 +152,8 @@ manuals. The levers rig gives each phase the 3, 2 and 3 minutes its checks were 
 
 omni-v17 changes no gain, preset or muscle, and one rule only at beats slower than 80 s: at any beat up to 80 s set on the
 command line it makes omni-v16's decisions at that beat (the cruise wait's count is unchanged there), and at 60 s those are
-omni-v15's (4,578 audit records on the toy cluster, none different, `results/toy_gate/V16_VS_V15.md`). The toy gate against
-omni-v16 (every toy that sets its own period reads identical to omni-v16 on every gauge and every seed (9 toys and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16.). The brain's C++ twin takes the period on every call and is unchanged (`results/SEAL.json`); the brain's
+omni-v15's (4,578 audit records on the model cluster, none different, `results/model_gate/V16_VS_V15.md`). The model gate against
+omni-v16 (every model that sets its own period reads identical to omni-v16 on every gauge and every seed (9 models and the verdict); as shipped, omni-v17 at its 60 s against omni-v16 at its 15 s, every gauge reads EVEN; no LOSS against omni-v16.). The brain's C++ twin takes the period on every call and is unchanged (`results/SEAL.json`); the brain's
 lock takes no amendment.
 
 ## The real runs
@@ -170,7 +170,7 @@ amendment of the same day (`docs/K8S_COMPASS_PREREGISTRATION.md`).
 
 The founder's words: the engine "can always be tweaked, tuned, and turned with any knob, any button", and "when you do this inside,
 you might need to click and change and turn certain things to achieve a more optimal state with a different combination of
-buttons". The per-beat tuning is the next study, in the toy first, on development seeds: at each beat, the combination of the
+buttons". The per-beat tuning is the next study, in the model first, on development seeds: at each beat, the combination of the
 other settings that reads GAIN with no LOSS against the main engine's tune at that beat; a combination that does lands as the
 next version, as that beat's card, never forced.
 
