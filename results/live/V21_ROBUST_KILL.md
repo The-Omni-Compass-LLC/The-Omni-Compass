@@ -10,6 +10,8 @@ Three separate GitHub runs of the same preregistered test on the same frozen eng
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
+> **Read again on 24 October 2026 by the rule that stands** (`tools/reread.py`, `tools/readings.py`): a change of 0.5% or more, the mean of the three runs, is a change and reads GAIN, LOSS or power given by what the gauge is for; EVEN is kept for a change under 0.5%. Where every run moved the same way, clear of zero, the word reads in all three of our runs; otherwise by the mean of our three runs, with the count of runs that stood beyond the noise. The numbers are the runs' own; only the words were read again, and this rule replaces the one the text below describes.
+
 | Run | GitHub run | Commit | Engine | Paired repetitions |
 |---|---|---|---|---:|
 | A | 40240618830 | `4a294bb71d0f` | omni-v21 (digest b658f05d43c1e602, 63 files) | 10 |
@@ -48,7 +50,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | robust: every setting back at the operator's within 60 s of the kill, every repetition (the governor killed outright; the watchdog's hand-back) | yes (10 reps; mean 9 s, max 10 s) | yes (10 reps; mean 9 s, max 11 s) | yes (10 reps; mean 8 s, max 10 s) | **handed back within the allowance in every repetition, in all three of our runs** |
 | robust: a second governor started after the hand-back and governed to the end, every repetition | yes | yes | yes | **the same in all three of our runs** |
 
-Readings: 1 handed back within the allowance in every repetition, in all three of our runs, 1 the same in all three of our runs, 3 EVEN, the same, 3 EVEN, under the floor, 3 GAIN by the mean of our three runs, 4 GAIN in all three of our runs, 1 LOSS by the mean of our three runs, 1 power given by the mean of our three runs, 9 shown, not judged, 3 the runs disagree.
+Readings: 3 EVEN, the same, 3 EVEN, under the floor, 3 GAIN by the mean of our three runs, 4 GAIN in all three of our runs, 1 LOSS by the mean of our three runs, 1 handed back within the allowance in every repetition, in all three of our runs, 1 power given by the mean of our three runs, 9 shown, not judged, 3 the runs disagree, 1 the same in all three of our runs.
 
 ---
 
