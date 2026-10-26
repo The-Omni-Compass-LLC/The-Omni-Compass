@@ -131,7 +131,7 @@ ORGANISMS = [
     (TOWER, "The whole tower", "every catalog muscle once (`realms/catalog_v5.csv`)"),
     (ORCHESTRA, "The orchestra", "every catalog muscle that stands for a knob of the governors and orchestrators the founder "
                                  "named, every one once, as `tools/run_orchestra.py` makes it (`tools/governors_page.py`)"),
-    (LIVE, "The live benchmark engine's organism", "the sixty muscles the live benchmark engine page draws, twelve from the spine and twelve from "
+    (LIVE, "The live engine's organism", "the sixty muscles the live benchmark engine page draws, twelve from the spine and twelve from "
                                          "each realm, in one body (`docs/engine/export_harness_trace.py`)"),
     (WHOLE, "The whole organism, three sectors", "the software (the cluster and the services on it), the cloud as the wire (the "
                                                  "machines it bills) and the bare metal / the data center (the card, the machine), "
