@@ -48,8 +48,10 @@ def main():
     assert C.verdict([same] * 3, "carbon_emissions_total") == "STEADY, the same"
     other = rec(3, 0.98, 1.03, 1.05); other["omni"]["kpis"][COST] = 0.97
     assert C.verdict([same, same, other], COST) == "**the runs differ**", "a run that does not reproduce is a finding"
-    tiny = rec(3, 1.0 + 1e-7, 1.0)
-    assert C.verdict([tiny] * 3, COST) == "STEADY, the same", "a change under one part in a million"
+    tiny = rec(3, 1.0 + 1e-7, 1.0)                                       # measured past the ninth decimal: never "the same"
+    assert C.verdict([tiny] * 3, COST) == "STEADY, under the floor (the three runs' mean 0.00%)", "a change under the floor, measured"
+    same9 = rec(3, 1.0 + 1e-10, 1.0)                                     # equal to nine decimal places (the referee's work order of 25 October)
+    assert C.verdict([same9] * 3, COST) == "STEADY, the same", "equal to nine decimal places"
     with tempfile.TemporaryDirectory() as t:
         broken = {"native": {"error": "ValueError: needs interface='entity'"}, "omni": {"error": "ValueError: needs interface='entity'"}}
         dirs = [write(t, i, {"d_bat": same, "d_nobat": rec(0, 1.0, 1.0), "d_broken": broken}) for i in (1, 2, 3)]

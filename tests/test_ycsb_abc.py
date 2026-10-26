@@ -29,7 +29,10 @@ def main():
     assert A.verdict([r(0, 0, 0), r(0, 0, 0), r(0, 0, 0)], "never more") == "STEADY, the same"
     assert A.verdict([r(1, 0, 2), None, r(1, 0, 2)], "higher") == "no value"
     assert A.verdict([r(9, 1, 2)], "shown") == "shown, not judged"
-    assert A.cell(r(5, 2, 8), "ops") == "+5.0% (+2.0 to +8.0)" and A.cell(r(2, 1, 3, native=0.0), "failed") == "+2 (+1 to +3)"
+    # native → Omni-Compass and the raw change with its true sign (the referee's work order of 25 October); a native at zero in
+    # the gauge's own unit, never a percentage made up
+    assert A.cell(r(5, 2, 8), "ops") == "100 → 105; raw +5.0% (95%: +2.0% to +8.0%)"
+    assert A.cell(r(2, 1, 3, native=0.0), "failed") == "0 → 2; raw +2.0000 in the gauge's unit (95%: +1.0000 to +3.0000)"
     print("PASS  YCSB A/B/C rule: GAIN or LOSS in all three of our runs (by what the gauge is for) only with the same sign and every interval clear of zero in all three runs; an interval over zero reads STEADY, no "
           "difference beyond the noise, with the count; clear runs pointing different ways read as a disagreement; a failed operation added is marked")
 

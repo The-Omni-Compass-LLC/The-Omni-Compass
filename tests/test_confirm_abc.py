@@ -44,10 +44,12 @@ def main():
     assert C.verdict(P95, [single, single, dict(single, diff=20.0, omni=320.0)]) == "single pairs point different ways (one pair a run, no interval)"
     assert C.verdict(C.CAPACITY, [single] * 3).startswith("three single pairs agree: LOSS"), "less work inside the line from three single pairs reads LOSS, and still not a reading of all three of our runs"
     # the size beside a word carries no sign (tools/readings.py by_word, 25 October); with no word, its own direction
-    assert C.cell(fell) == "−50.0% (−66.7 to −33.3)", C.cell(fell)
-    assert C.cell(fell, "GAIN") == "+50.0% (+33.3 to +66.7)", C.cell(fell, "GAIN")
-    assert C.cell(fell, "LOSS") == "−50.0% (−33.3 to −66.7)", C.cell(fell, "LOSS")
-    assert C.cell(r(300, -5, -40, 30), "STEADY, no difference beyond the noise") == "=1.7% (−13.3 to +10.0)", "STEADY: the size with =, the interval as it lies"
+    # every cell: native → Omni-Compass, the raw change with its true sign and its interval as it lies, then the word apart
+    # (the referee's work order of 25 October: a raw change is never turned to wear the verdict's sign)
+    assert C.cell(fell) == "300 → 150; raw −50.0% (95%: −66.7% to −33.3%)", C.cell(fell)
+    assert C.cell(fell, "GAIN") == "300 → 150; raw −50.0% (95%: −66.7% to −33.3%); GAIN", C.cell(fell, "GAIN")
+    assert C.cell(fell, "LOSS") == "300 → 150; raw −50.0% (95%: −66.7% to −33.3%); LOSS", C.cell(fell, "LOSS")
+    assert C.cell(r(300, -5, -40, 30), "STEADY, no difference beyond the noise") == "300 → 295; raw −1.7% (95%: −13.3% to +10.0%); STEADY, no difference beyond the noise", "STEADY: the raw change as it lies"
     with tempfile.TemporaryDirectory() as t:
         d = Path(t) / "run-123" / "live-reps"; d.mkdir(parents=True)
         (d / "LIVE_REPS.json").write_text(json.dumps({"repetitions": {"native": ["1", "2", "3"], "compass": ["1", "2"]},
