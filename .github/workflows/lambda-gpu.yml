@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       test: {description: "8card (the 8-GPU result), 1card (the one-card test), or giveback (give back a stuck run's machine: no test, nothing rented)", default: "8card"}
-      mode: {description: "pooled, fast or full (8card: about 10, 3.5 or 18 hours; 1card: fast about 7, full about 30), or stacks (1card: the whole stacks with the card inside at 1, 10 and 100 copies, about 22 hours)", default: "pooled"}
+      mode: {description: "pooled, fast or full (8card: about 10, 3.5 or 18 hours; 1card: fast about 7, full about 30), or stacks (1card: the whole stacks with the card inside at 1, 10 and 100 copies; 1x and 10x about 23 hours on one A10, 100x after them up to the 33-hour budget)", default: "pooled"}
       tag: {description: "A, B or C: which of the three runs this is (each its own machine, side by side; empty for one run)", default: ""}
       instance_type: {description: "Lambda machine type (empty: gpu_8x_a100_80gb_sxm4 for 8card, gpu_1x_a10 for 1card)", default: ""}
       region: {description: "Lambda region (empty: the first with a machine free)", default: ""}
@@ -118,7 +118,9 @@ jobs:
             1card:full)   SCRIPT=scripts/gpu_rented_run.sh; ENVS="";    BUDGET=32;;
             # the whole stacks with the card inside, nothing else: the wire check and the smoke on the real card first, then the
             # seven organisms at 1, 10 and 100 copies (tools/run_hil.py, the preregistered repetitions 5, 3 and 2 by size)
-            1card:stacks) SCRIPT=scripts/gpu_rented_run.sh; ENVS="SKIP_CONFIRM=1 SKIP_DECODE=1 SKIP_CAP=1 SKIP_DRILL=1 SKIP_LLM=1"; BUDGET=24;;
+            # (24 to 26 October, one A10: 1x and 10x took about 23 hours, so the budget is the six watches' 33 hours, and every
+            # finished arm is fetched however far the run got: scripts/lambda_gpu_watch.sh)
+            1card:stacks) SCRIPT=scripts/gpu_rented_run.sh; ENVS="SKIP_CONFIRM=1 SKIP_DECODE=1 SKIP_CAP=1 SKIP_DRILL=1 SKIP_LLM=1"; BUDGET=32;;
             *) echo "unknown test/mode $TEST/$MODE" | tee -a "$GITHUB_STEP_SUMMARY"; exit 1;;
           esac
           case "$HIL_PROFILE" in
