@@ -22,8 +22,8 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | 12 → 12; raw −0.0% (95%: −0.0% to +0.0%); STEADY | 12 → 12; raw −0.0% (95%: −0.0% to −0.0%); STEADY | 12 → 12; raw −0.0% (95%: −0.0% to −0.0%); STEADY | STEADY, the same |
-| node-hours | 5.027 → 5.026; raw −0.0% (95%: −0.4% to +0.4%); STEADY | 5.033 → 5.018; raw −0.3% (95%: −0.6% to +0.0%); STEADY | 5.022 → 5.026; raw +0.1% (95%: −0.2% to +0.4%); STEADY | STEADY, under the floor (the three runs' mean 0.08%) |
+| worker nodes in service, mean | 12 → 12; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 12 → 12; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 12 → 12; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | STEADY, the same |
+| node-hours | 5.027 → 5.026; raw ±0.0% (95%: −0.4% to +0.4%); STEADY | 5.033 → 5.018; raw −0.3% (95%: −0.6% to ±0.0%); STEADY | 5.022 → 5.026; raw +0.1% (95%: −0.2% to +0.4%); STEADY | STEADY, under the floor (the three runs' mean 0.08%) |
 | energy, parked workers still on at idle power (Wh, declared model) | 525.4 → 504.5; raw −4.0% (95%: −5.0% to −3.0%); GAIN | 527.1 → 503.9; raw −4.4% (95%: −5.0% to −3.8%); GAIN | 522.7 → 504.3; raw −3.5% (95%: −4.2% to −2.9%); GAIN | **GAIN in all three of our runs** |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 525.4 → 504.5; raw −4.0% (95%: −5.0% to −3.0%); GAIN | 527.1 → 503.9; raw −4.4% (95%: −5.0% to −3.8%); GAIN | 522.7 → 504.3; raw −3.5% (95%: −4.2% to −2.9%); GAIN | **GAIN in all three of our runs** |
 | response time (ms), mean | 617.5 → 125.9; raw −79.6% (95%: −122.5% to −36.7%); GAIN | 684 → 137.3; raw −79.9% (95%: −116.8% to −43.0%); GAIN | 385.7 → 102.2; raw −73.5% (95%: −143.2% to −3.8%); GAIN | **GAIN in all three of our runs** |

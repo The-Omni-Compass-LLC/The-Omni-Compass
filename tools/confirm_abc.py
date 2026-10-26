@@ -137,7 +137,8 @@ def load(d):
 def raw_pct(x, digits=1):
     """A raw change with its true sign: + for a rise, − for a fall, whatever the gauge is for (the referee's work order of
     25 October: a raw change is never turned to wear the verdict's sign)."""
-    return f"{'+' if x > 0 else '−' if x < 0 else '±'}{abs(x):.{digits}f}"
+    v = round(x, digits)   # the sign of the number as printed: a change that rounds to zero prints ±0.0, never −0.0
+    return f"{'+' if v > 0 else '−' if v < 0 else '±'}{abs(x):.{digits}f}"
 
 
 def num(x):

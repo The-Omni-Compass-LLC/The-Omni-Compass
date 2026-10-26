@@ -21,8 +21,8 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
 | work inside the response line (requests a second; the capacity test's own gauge) | 22.8 → 33.6; raw +47.4% (95%: +32.5% to +62.2%); GAIN | 18 → 27.6; raw +53.3% (95%: +41.0% to +65.6%); GAIN | 11.4 → 20.4; raw +78.9% (95%: +52.3% to +105.6%); GAIN | **GAIN in all three of our runs** |
-| worker nodes in service, mean | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw −0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw −0.0% (95%: −0.0% to +0.0%); STEADY | STEADY, the same |
-| node-hours | 4.512 → 4.514; raw +0.0% (95%: −0.1% to +0.2%); STEADY | 4.512 → 4.511; raw −0.0% (95%: −0.2% to +0.1%); STEADY | 4.511 → 4.51; raw −0.0% (95%: −0.2% to +0.1%); STEADY | STEADY, under the floor (the three runs' mean 0.00%) |
+| worker nodes in service, mean | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | STEADY, the same |
+| node-hours | 4.512 → 4.514; raw ±0.0% (95%: −0.1% to +0.2%); STEADY | 4.512 → 4.511; raw ±0.0% (95%: −0.2% to +0.1%); STEADY | 4.511 → 4.51; raw ±0.0% (95%: −0.2% to +0.1%); STEADY | STEADY, under the floor (the three runs' mean 0.00%) |
 | energy, parked workers still on at idle power (Wh, declared model) | 511.1 → 509.5; raw −0.3% (95%: −0.4% to −0.2%); STEADY | 520.6 → 520.1; raw −0.1% (95%: −0.4% to +0.2%); STEADY | 530.2 → 529; raw −0.2% (95%: −0.4% to −0.1%); STEADY | STEADY, under the floor (the three runs' mean 0.21%) |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 511.1 → 509.5; raw −0.3% (95%: −0.4% to −0.2%); STEADY | 520.6 → 520.1; raw −0.1% (95%: −0.4% to +0.2%); STEADY | 530.2 → 529; raw −0.2% (95%: −0.4% to −0.1%); STEADY | STEADY, under the floor (the three runs' mean 0.21%) |
 | response time (ms), mean | 249.3 → 135.8; raw −45.5% (95%: −56.8% to −34.2%); GAIN | 291.1 → 167.3; raw −42.5% (95%: −54.0% to −31.0%); GAIN | 355.4 → 221.3; raw −37.7% (95%: −44.4% to −31.1%); GAIN | **GAIN in all three of our runs** |

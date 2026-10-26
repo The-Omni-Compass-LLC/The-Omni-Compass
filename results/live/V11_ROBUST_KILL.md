@@ -20,10 +20,10 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | STEADY, the same |
+| worker nodes in service, mean | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | STEADY, the same |
 | node-hours | 1.514 → 1.515; raw +0.1% (95%: −0.3% to +0.5%); STEADY | 1.511 → 1.515; raw +0.2% (95%: +0.1% to +0.3%); STEADY | 1.512 → 1.517; raw +0.3% (95%: −0.1% to +0.7%); STEADY | STEADY, under the floor (the three runs' mean 0.21%) |
-| energy, parked workers still on at idle power (Wh, declared model) | 178 → 177.9; raw −0.0% (95%: −0.3% to +0.2%); STEADY | 176.7 → 176.8; raw +0.0% (95%: −0.1% to +0.2%); STEADY | 174.8 → 174.9; raw +0.1% (95%: −0.2% to +0.3%); STEADY | STEADY, under the floor (the three runs' mean 0.01%) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 178 → 177.9; raw −0.0% (95%: −0.3% to +0.2%); STEADY | 176.7 → 176.8; raw +0.0% (95%: −0.1% to +0.2%); STEADY | 174.8 → 174.9; raw +0.1% (95%: −0.2% to +0.3%); STEADY | STEADY, under the floor (the three runs' mean 0.01%) |
+| energy, parked workers still on at idle power (Wh, declared model) | 178 → 177.9; raw ±0.0% (95%: −0.3% to +0.2%); STEADY | 176.7 → 176.8; raw ±0.0% (95%: −0.1% to +0.2%); STEADY | 174.8 → 174.9; raw +0.1% (95%: −0.2% to +0.3%); STEADY | STEADY, under the floor (the three runs' mean 0.01%) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 178 → 177.9; raw ±0.0% (95%: −0.3% to +0.2%); STEADY | 176.7 → 176.8; raw ±0.0% (95%: −0.1% to +0.2%); STEADY | 174.8 → 174.9; raw +0.1% (95%: −0.2% to +0.3%); STEADY | STEADY, under the floor (the three runs' mean 0.01%) |
 | response time (ms), mean | 465.8 → 331.3; raw −28.9% (95%: −42.9% to −14.8%); GAIN | 460.4 → 256.3; raw −44.3% (95%: −60.3% to −28.3%); GAIN | 400.8 → 235.2; raw −41.3% (95%: −56.5% to −26.2%); GAIN | **GAIN in all three of our runs** |
 | response time (ms), 95th percentile | 1359 → 828; raw −39.1% (95%: −66.2% to −12.0%); GAIN | 1603 → 671; raw −58.1% (95%: −93.0% to −23.3%); GAIN | 1310 → 620.6; raw −52.6% (95%: −88.8% to −16.5%); GAIN | **GAIN in all three of our runs** |
 | response time (ms), 99th percentile | 4759 → 5956; raw +25.2% (95%: +7.7% to +42.7%); LOSS | 4527 → 3290; raw −27.3% (95%: −60.1% to +5.5%); GAIN | 4207 → 3177; raw −24.5% (95%: −55.7% to +6.8%); GAIN | **the runs disagree** |

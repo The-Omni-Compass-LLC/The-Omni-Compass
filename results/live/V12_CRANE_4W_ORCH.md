@@ -22,10 +22,10 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | STEADY, the same |
+| worker nodes in service, mean | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | STEADY, the same |
 | node-hours | 1.514 → 1.514; raw −0.1% (95%: −0.6% to +0.5%); STEADY | 1.519 → 1.51; raw −0.7% (95%: −1.1% to −0.2%); GAIN | 1.515 → 1.512; raw −0.2% (95%: −0.8% to +0.3%); STEADY | STEADY, under the floor (the three runs' mean 0.32%) |
-| energy, parked workers still on at idle power (Wh, declared model) | 159.1 → 160; raw +0.6% (95%: +0.0% to +1.2%); power given | 159.4 → 159.3; raw −0.1% (95%: −0.6% to +0.4%); STEADY | 159.2 → 159.8; raw +0.4% (95%: −0.1% to +0.9%); STEADY | STEADY, under the floor (the three runs' mean 0.31%) |
-| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 159.1 → 160; raw +0.6% (95%: +0.0% to +1.2%); power given | 159.4 → 159.3; raw −0.1% (95%: −0.6% to +0.4%); STEADY | 159.2 → 159.8; raw +0.4% (95%: −0.1% to +0.9%); STEADY | STEADY, under the floor (the three runs' mean 0.31%) |
+| energy, parked workers still on at idle power (Wh, declared model) | 159.1 → 160; raw +0.6% (95%: ±0.0% to +1.2%); power given | 159.4 → 159.3; raw −0.1% (95%: −0.6% to +0.4%); STEADY | 159.2 → 159.8; raw +0.4% (95%: −0.1% to +0.9%); STEADY | STEADY, under the floor (the three runs' mean 0.31%) |
+| energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 159.1 → 160; raw +0.6% (95%: ±0.0% to +1.2%); power given | 159.4 → 159.3; raw −0.1% (95%: −0.6% to +0.4%); STEADY | 159.2 → 159.8; raw +0.4% (95%: −0.1% to +0.9%); STEADY | STEADY, under the floor (the three runs' mean 0.31%) |
 | response time (ms), mean | 146.9 → 150.6; raw +2.6% (95%: +0.7% to +4.4%); LOSS | 132.1 → 136.3; raw +3.2% (95%: +0.5% to +5.9%); LOSS | 150.4 → 154.8; raw +2.9% (95%: +0.9% to +5.0%); LOSS | **LOSS in all three of our runs** |
 | response time (ms), 95th percentile | 294.4 → 304.2; raw +3.3% (95%: +0.1% to +6.6%); LOSS | 271 → 274.2; raw +1.2% (95%: −2.2% to +4.5%); LOSS | 308.6 → 302.4; raw −2.0% (95%: −4.9% to +0.9%); GAIN | **the runs disagree** |
 | response time (ms), 99th percentile | 421.4 → 405.4; raw −3.8% (95%: −8.8% to +1.2%); GAIN | 367.2 → 391.8; raw +6.7% (95%: +0.3% to +13.1%); LOSS | 429.7 → 416.8; raw −3.0% (95%: −5.9% to −0.1%); GAIN | **the runs disagree** |
@@ -44,7 +44,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 | HPA replicas, mean | 9.031 → 8.898; raw −1.5% (95%: −2.6% to −0.4%); GAIN | 8.92 → 8.852; raw −0.8% (95%: −1.9% to +0.3%); GAIN | 8.965 → 8.91; raw −0.6% (95%: −2.0% to +0.8%); GAIN | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
 | pods started | 4.1 → 4.6; raw +12.2% (95%: −8.4% to +32.8%); power given | 4.9 → 4.9; raw ±0.0% (95%: −11.9% to +11.9%); STEADY | 4.5 → 5; raw +11.1% (95%: +2.7% to +19.5%); power given | **power given by the mean of our three runs, beyond the noise in 1 of 3** |
 | pod start wait, total (s) | 6.8 → 6.8; raw ±0.0% (95%: −17.9% to +17.9%); STEADY | 8 → 6.6; raw −17.5% (95%: −50.7% to +15.7%); GAIN | 7.1 → 7.9; raw +11.3% (95%: −9.9% to +32.4%); LOSS | **the runs disagree** |
-| pod start wait, mean (s) | 1.683 → 1.492; raw −11.4% (95%: −28.6% to +5.8%); GAIN | 1.643 → 1.325; raw −19.4% (95%: −47.8% to +9.0%); GAIN | 1.58 → 1.58; raw −0.0% (95%: −16.7% to +16.7%); STEADY | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
+| pod start wait, mean (s) | 1.683 → 1.492; raw −11.4% (95%: −28.6% to +5.8%); GAIN | 1.643 → 1.325; raw −19.4% (95%: −47.8% to +9.0%); GAIN | 1.58 → 1.58; raw ±0.0% (95%: −16.7% to +16.7%); STEADY | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** |
 | host CPU busy, the real machine under kind (%) | +14.6% (+12.6 to +16.6) | +14.1% (+12.2 to +16.0) | +14.8% (+13.1 to +16.6) | shown, not judged |
 | host cores (the real machine under kind) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | +0.0% (+0.0 to +0.0) | shown, not judged |
 

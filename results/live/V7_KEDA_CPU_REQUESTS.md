@@ -20,7 +20,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw +0.0% (95%: −0.0% to +0.0%); STEADY | 6 → 6; raw +0.0% (95%: +0.0% to +0.0%); STEADY | STEADY, the same |
+| worker nodes in service, mean | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | 6 → 6; raw ±0.0% (95%: ±0.0% to ±0.0%); STEADY | STEADY, the same |
 | node-hours | 1.517 → 1.516; raw −0.1% (95%: −0.7% to +0.5%); STEADY | 1.519 → 1.515; raw −0.3% (95%: −0.8% to +0.3%); STEADY | 1.519 → 1.518; raw −0.1% (95%: −0.6% to +0.5%); STEADY | STEADY, under the floor (the three runs' mean 0.14%) |
 | energy, parked workers still on at idle power (Wh, declared model) | 159.1 → 161.7; raw +1.7% (95%: +0.9% to +2.5%); power given | 159.3 → 161; raw +1.1% (95%: +0.3% to +1.9%); power given | 159.2 → 161.7; raw +1.6% (95%: +0.7% to +2.5%); power given | **power given in all three of our runs** |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 159.1 → 161.7; raw +1.7% (95%: +0.9% to +2.5%); power given | 159.3 → 161; raw +1.1% (95%: +0.3% to +1.9%); power given | 159.2 → 161.7; raw +1.6% (95%: +0.7% to +2.5%); power given | **power given in all three of our runs** |

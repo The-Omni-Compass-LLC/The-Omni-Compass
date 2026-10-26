@@ -117,6 +117,9 @@ def patch_md(md, seq, kind):
                     cs[1:4] = [f" {kind_cell(r, run_word(r, g['aim']))} " for r in g["runs"]]
                 elif kind and readable(g) and len(cs) == 6:      # the capacity test's rows: the cap, then the measure
                     cs[2:5] = [f" {kind_cell(r, run_word(r, g['aim']))} " for r in g["runs"]]
+                elif kind == "store" and len(cs) == 7 and isinstance(g.get("runs"), list) and len(g["runs"]) == 3 \
+                        and all(isinstance(r, dict) and r.get("native") is not None and r.get("diff") is not None for r in g["runs"]):
+                    cs[3:6] = [f" {kind_cell(r, run_word(r, g['aim']) if g.get('aim') else None)} " for r in g["runs"]]   # a data store's rows: native → Omni-Compass on every run
                 lines[i - 1] = "|" + "|".join(cs) + "|"
                 break
     return "\n".join(lines)
@@ -206,7 +209,7 @@ def main(argv):
             if not md.exists():
                 continue
             text = md.read_text()
-            kind = "| Measure | A | B | C | Reading |" in text
+            kind = "| Measure | A | B | C | Reading |" in text or ("store" if "| native (A) | omni (A) | A | B | C | Reading |" in text else False)
             stack = next((m for s, m in STACKS.items() if re.search(rf"_{s}(_|\.json$)", p.name)), None)
             new_text = retally(with_note(patch_md(text, seq, kind)), data, stack) if seq else text
             if n or new_text != text:

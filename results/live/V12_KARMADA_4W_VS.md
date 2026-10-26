@@ -22,9 +22,9 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 | Measure | A | B | C | Reading |
 |---|---|---|---|---|
-| worker nodes in service, mean | 12 → 10.9; raw −9.1% (95%: −19.2% to +0.9%); GAIN | 12 → 10.51; raw −12.4% (95%: −24.8% to +0.0%); GAIN | 12 → 10.01; raw −16.6% (95%: −31.8% to −1.4%); GAIN | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
+| worker nodes in service, mean | 12 → 10.9; raw −9.1% (95%: −19.2% to +0.9%); GAIN | 12 → 10.51; raw −12.4% (95%: −24.8% to ±0.0%); GAIN | 12 → 10.01; raw −16.6% (95%: −31.8% to −1.4%); GAIN | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
 | node-hours | 5.029 → 4.568; raw −9.2% (95%: −19.3% to +1.0%); GAIN | 5.022 → 4.402; raw −12.3% (95%: −24.7% to +0.1%); GAIN | 5.02 → 4.197; raw −16.4% (95%: −31.9% to −0.9%); GAIN | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
-| energy, parked workers still on at idle power (Wh, declared model) | 526.1 → 526.2; raw +0.0% (95%: −0.2% to +0.2%); STEADY | 525 → 525.7; raw +0.1% (95%: −0.2% to +0.4%); STEADY | 525.6 → 525.9; raw +0.1% (95%: −0.5% to +0.6%); STEADY | STEADY, under the floor (the three runs' mean 0.07%) |
+| energy, parked workers still on at idle power (Wh, declared model) | 526.1 → 526.2; raw ±0.0% (95%: −0.2% to +0.2%); STEADY | 525 → 525.7; raw +0.1% (95%: −0.2% to +0.4%); STEADY | 525.6 → 525.9; raw +0.1% (95%: −0.5% to +0.6%); STEADY | STEADY, under the floor (the three runs' mean 0.07%) |
 | energy, parked workers at 25 W standby (Wh, declared model; kind never does this) | 526.1 → 491.7; raw −6.5% (95%: −13.8% to +0.7%); GAIN | 525 → 478.8; raw −8.8% (95%: −17.7% to +0.2%); GAIN | 525.6 → 463.4; raw −11.8% (95%: −23.1% to −0.6%); GAIN | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** |
 | response time (ms), mean | 709.8 → 563.2; raw −20.7% (95%: −30.9% to −10.4%); GAIN | 691.8 → 545.9; raw −21.1% (95%: −30.5% to −11.6%); GAIN | 844.3 → 669.8; raw −20.7% (95%: −33.6% to −7.7%); GAIN | **GAIN in all three of our runs** |
 | response time (ms), 95th percentile | 3269 → 2439; raw −25.4% (95%: −43.1% to −7.7%); GAIN | 3140 → 2366; raw −24.7% (95%: −41.7% to −7.6%); GAIN | 3666 → 2815; raw −23.2% (95%: −39.4% to −7.0%); GAIN | **GAIN in all three of our runs** |

@@ -100,9 +100,9 @@ Disclosure and disclaimer: GAIN, STEADY and LOSS, and the letters behind them, a
 <!-- end of the key -->
 
 **How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
-the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
-in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
-minutes means 2.3% more minutes over the line; STEADY =0.3% means a change under the 0.5% floor; power given +3.1% means 3.1% more
+the word's sign so the two never pull apart: GAIN 29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
+in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS 2.3% on alert
+minutes means 2.3% more minutes over the line; STEADY 0.3% means a change under the 0.5% floor; power given 3.1% means 3.1% more
 of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
 coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
 or fell against native (the page's section 4k, "How to read a number beside a word"; the founder's order of 23 October).
@@ -684,7 +684,9 @@ beside them. Omni-Compass's redline reflex is built never to let a muscle redlin
 before the line; where it cannot move the muscle and native's own twin carries it better, it hands the muscle back to native; where
 native is no better it stays, because redlining less than native is still a benefit against native. The red is still wired on its
 side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill switch's purpose: when something
-redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the same instant.
+redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the same instant. The redline reflex runs in the page's live model (class S);
+the engine that ran the benchmarks, omni-v20, does not carry it yet: it comes to the engine as omni-v21, after its model test, and
+every benchmark runs again on it.
 
 Each light reads what its gauge is for, never the direction of its needle: a wait that falls is GAINING, work that falls is not.
 

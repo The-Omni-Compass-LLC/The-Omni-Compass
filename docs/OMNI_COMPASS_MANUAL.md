@@ -76,20 +76,6 @@ Enterprise License (`ENTERPRISE_LICENSE.md`). What a licensee acquires is the wo
 factory card of every muscle, the harness that measures it against native, and the receipts.
 
 <!-- the key: GAIN, STEADY and LOSS (tools/readings.py) -->
-## Native, Omni-Compass and What Was Benchmarked
-
-**Native** is the stack as it runs today, by itself: its fragmented organisms of muscles (processors, memory, machines, pods,
-caches, queues, power) run by Kubernetes and the open-source orchestrators, schedulers, autoscalers, governors and managers the
-industry runs them with. **Omni-Compass** is the supervisory governor placed on top of that native stack; it never replaces it.
-Every benchmark has two arms, native and Omni-Compass on top of native, on the same work. The Omni-Compass Live Benchmark Engine
-(`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) is the benchmark, analysis and audit engine that shows those benchmarks and nothing
-else.
-
-Only what could be run and proven was benchmarked: where a system could not be seen, run or measured, it is not shown and nothing is
-claimed for it. The rest of the story is written when others benchmark Omni-Compass, critique it and analyse it on their own
-systems; that work needs to be done and will be, and its results are theirs to publish. No outside party has reviewed or approved
-these results.
-
 ## The key: GAIN, STEADY and LOSS
 
 Every judged reading in Omni-Compass is one of three words: **GAIN**, **STEADY** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.

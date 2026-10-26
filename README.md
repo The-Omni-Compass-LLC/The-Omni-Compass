@@ -31,7 +31,7 @@ class S of class L and P.
 | Route | Light | The whole workload against native (its index over the gauges) | Gauge by gauge |
 |---|---|---|---|
 | On site: the software straight on the owner's own hardware (the software end × the bare metal) | green, GAINING | **GAIN 18.5%** (+16.1% to +20.9%, the gauges perfectly correlated) | work **GAIN 24.9%**; speed, the 95th percentile, **GAIN 41.3%**; machines **GAIN 8.5%**; energy **GAIN 2.8%** |
-| Through the cloud: the software through the cloud onto its hardware (the software end × the cloud's wire × the bare metal at the back end) | green, GAINING | **GAIN 14.8%** (+1.6% to +29.6%) | work **GAIN 24.9%**; speed **GAIN 47.5%**; machines **STEADY** =5.9% (−2.3% to +14.9%); energy **GAIN 2.8%**; the bill **STEADY** =0.8% (−18.8% to +21.2%) |
+| Through the cloud: the software through the cloud onto its hardware (the software end × the cloud's wire × the bare metal at the back end) | green, GAINING | **GAIN 14.8%** (+1.6% to +29.6%) | work **GAIN 24.9%**; speed **GAIN 47.5%**; machines **STEADY** 5.9% (−2.3% to +14.9%); energy **GAIN 2.8%**; the bill **STEADY** 0.8% (−18.8% to +21.2%) |
 
 By the index's rule (only what held the same way in all three of our runs) the same two routes read **+18.5%** and **+14.5%**
 GAIN, the second the repository's headline ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md)). Both are the composition's
@@ -104,7 +104,7 @@ it, so it is never claimed here as a measurement.
 |---|---|---|
 | The software end: the cluster and the services on it (class L, 22 and 17 tests) | the index **GAIN 18.5%**: work +24.9%, speed +41.3%, machines +8.5%, energy +2.8%, each GAIN | about 3 to 4% |
 | The bare metal: the card and the machine | not measured in the headline scope: the machine's own layer is not yet run; the card's one run (class P, 2 October, on a controller since replaced) read work per energy **GAIN 3.6%** and its 95th percentile 58.5% slower, a LOSS | 2 to 3% |
-| The cloud's wire alone: the machines it bills (Azure, class L, three one-run tests of 4 and 5 paired repetitions) | speed **STEADY** =4.4% (−21.5% to +38.8%), machines **STEADY** =2.4% (−10.0% to +5.8%), the bill **STEADY** =0.8% (−18.8% to +21.2%) | 1 to 2% |
+| The cloud's wire alone: the machines it bills (Azure, class L, three one-run tests of 4 and 5 paired repetitions) | speed **STEADY** 4.4% (−21.5% to +38.8%), machines **STEADY** 2.4% (−10.0% to +5.8%), the bill **STEADY** 0.8% (−18.8% to +21.2%) | 1 to 2% |
 | The two ends and the wire together | on site **GAIN 18.5%**; through the cloud **GAIN 14.8%** (the bottom line above) | about 5% from the two ends together |
 
 Where a measurement and the expectation differ, the measurement stands.
