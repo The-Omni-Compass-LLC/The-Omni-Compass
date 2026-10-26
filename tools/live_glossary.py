@@ -749,7 +749,7 @@ TERMS = [
       "states and the RK4 step, controlled, uncontrolled (native), aimed at the wrong basin and with the double well's μ at 0; a "
       "run is conveyed when its U has stayed in one basin for 5 macro steps in a row and certified at 10. One digest, and the "
       "live benchmark engine's own port and the C++ twin held to it. Class S.",
-      [("tools/core_runs.py", "The Python's Monte Carlo of the engine's core from the jump generator: N runs, one digest, the live benchmark engine's own port held to it.")],
+      [("tools/core_runs.py", "The Python's Monte Carlo of the engine's core from the jump generator: N runs, one digest, the live engine's own port held to it.")],
       aka=["Monte Carlo"]),
     T("the jump generator", P, "The seed of run k: seed_k = base + k·0x9E3779B9, mod 2³², feeding a mulberry32 stream (the page's "
       "own generator), so the Python, the C++ and the page draw the same runs and prove each other receipt by receipt.",

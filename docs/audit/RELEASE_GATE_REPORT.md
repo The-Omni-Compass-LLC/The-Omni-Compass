@@ -20,6 +20,11 @@ by The Omni-Compass LLC's own code. No outside party has reviewed or approved th
 | I. Release verification | PARTLY | the tests named above, run on the commit | `verify.py` in full and GitHub's verify run on the pushed commit |
 | J. Independent reproducibility | NOT RUN | — | the checks repeated in a separate clean environment from the documented commands |
 
+**The two workflow fixes of 26 October** (commit `0cc26d8cfd`): the injection grid's planner installs its dependencies before
+it imports them, and its first run on the fixed commit finished green (run 40395118932, success, its results on main as
+`results/injection_grid/INJECTION_GRID_1635237724.*`); kwok-scale's node selector and early failure check are committed, and its
+first run on main after the fix (run 40400903184) was still queued when this page was written: that fix is not yet shown to pass.
+
 **No grade is declared.** The directive's rule stands: the repository is not called a solid A while any release-blocking gate
 is unverified. The open items are listed above and in [`README.md`](README.md).
 
