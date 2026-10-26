@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Records the shipped live controller (omni_controller/controller.py) on the toy cluster, tick by tick, for the live
+"""Records the shipped live controller (omni_controller/controller.py) on the model cluster, tick by tick, for the live
 engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html): the one place where the brain drives the muscles, decision by
 decision (the governor's six states, the nerves and each organ's grant, the compass law on the service, the verdict's
 trial, the release gate, the plug's writes).
@@ -12,12 +12,12 @@ Two settings, each as the repository already wires it, on seeds 3000, 3001 and 3
 
   selfpilot  pilot/selfpilot.py run_day: the HPA with the Cluster Autoscaler (native) against the controller in
              nodepool mode on top of the HPA, the Cluster Autoscaler off, the controller's own defaults (the max)
-  cloud      tools/toy_gate.py worker, the cloud's setting: the cloud's own autoscaler makes and deletes machines in both
+  cloud      tools/model_gate.py worker, the cloud's setting: the cloud's own autoscaler makes and deletes machines in both
              arms; the controller (the compass law, the tune-down, --give-back-only) only parks a machine that exists,
              after its verdict's trial, and wakes it on a breach
 
 Every 15 s tick, both arms: machines in service, booting or parked, the pods the HPAs want and the pods waiting for a
-place, the demand, and the response time of a queue on the running pods (the toy gate's own formula, computed the same
+place, the demand, and the response time of a queue on the running pods (the model gate's own formula, computed the same
 in both arms). Every decision of the controller: its audit records (decision, authority, compass, verdict, writes).
 Readings: the paired change per tick over blocks of 40 ticks (ten minutes), Student's t, in each run; the three-run rule.
 Evidence class S. Usage: python3 docs/engine/export_controller_trace.py OUT.json
@@ -43,11 +43,11 @@ from omni_controller.controller import Controller, parser               # noqa: 
 
 SEEDS = (3000, 3001, 3002)
 DAYS = 0.25
-SLO_MS, SERVICE_MS = 200.0, 20.0                                         # the toy gate's line and bare service time
+SLO_MS, SERVICE_MS = 200.0, 20.0                                         # the model gate's line and bare service time
 
 
 class CloudSim(SimCluster):
-    """tools/toy_gate.py CloudSim: the cloud's autoscaler makes machines in both arms; a parked machine is deleted after
+    """tools/model_gate.py CloudSim: the cloud's autoscaler makes machines in both arms; a parked machine is deleted after
     ten minutes empty; the governor only parks a machine that exists and wakes one while it exists."""
     PARK_TICKS = 40
 
@@ -97,12 +97,12 @@ def cloud_kube(sim):
             try:
                 return super().get(*args)
             except ValueError:
-                raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy cluster")
+                raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the model cluster")
     return Kube(sim, None)
 
 
 def observe(sim, lat_rows, lat_path, rng):
-    """One tick's record, and the toy gate's probe file (the requests of this 15 s, timed on the running pods)."""
+    """One tick's record, and the model gate's probe file (the requests of this 15 s, timed on the running pods)."""
     c, p = sim.c, sim.c.pool
     frac = min(1.0, c.alloc / c.reqs) if c.reqs > 0 else 1.0
     cap = sum(w.replicas * w.request * frac for w in c.workloads)
@@ -178,12 +178,12 @@ def run(setting, seed, arm):
         ctl = Controller(parser().parse_args(argv), kube=SimKube(sim, None)); ctl.k.audit = ctl.audit   # pilot/selfpilot.py's own SimKube
     real_run = subprocess.run
 
-    def fake_run(cmd, *k, **kw):
+    def standin_run(cmd, *k, **kw):
         if isinstance(cmd, list) and cmd and cmd[0] == "SIMSCALE":
             sim.resize(int(cmd[1])); return subprocess.CompletedProcess(cmd, 0)
         return real_run(cmd, *k, **kw)
     seen = 0
-    with mock.patch("omni_controller.controller.subprocess.run", side_effect=fake_run):
+    with mock.patch("omni_controller.controller.subprocess.run", side_effect=standin_run):
         while sim.t < sim.steps:
             sim.tick()
             sim.c.alloc = sim.c.pool.nodes * sim.c.pool.cores * ALLOC

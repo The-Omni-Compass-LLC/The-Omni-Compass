@@ -41,8 +41,8 @@ def _test_module(name):
 
 
 def test_sysbench_reads_the_workload_not_the_harness():
-    fake = _test_module("test_run_sysbench")
-    srv = fake.FakeServer(512)
+    standin = _test_module("test_run_sysbench")
+    srv = standin.StandinServer(512)
     two_ms, a_tenth = 2_000_000_000, 120_000_000                         # picoseconds a statement
     srv.events = [(S.USER, "statement/sql/select", 4, 4 * a_tenth),       # the harness's own monitoring SELECTs, every second
                   (S.LOAD_USER, "statement/com/Execute", 3600, 3600 * two_ms),   # sysbench's prepared statements (binary protocol)
@@ -116,8 +116,8 @@ def test_ycsb_hands_the_cache_back_below_native():
     # full at WiredTiger's own eviction target, or evicting
     assert Y.FULL == 0.8 and Y.cache_full(410, 512) and not Y.cache_full(336, 448) and Y.cache_full(336, 448, evicted_last_s=5)
     # serverStatus asked only for the sections read
-    fake = _test_module("test_run_ycsb")
-    fc = fake.FakeClient(512)
+    standin = _test_module("test_run_ycsb")
+    fc = standin.StandinClient(512)
     real_command = fc.admin.command
 
     def command(cmd):

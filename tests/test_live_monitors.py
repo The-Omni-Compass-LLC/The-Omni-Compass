@@ -43,7 +43,8 @@ class LiveMonitors(unittest.TestCase):
 
     def test_the_grafana_wall_has_a_panel_a_monitor(self):
         d = json.loads((ROOT / "deploy" / "grafana" / "omni-compass-wall.json").read_text(encoding="utf-8"))
-        mons = [p for p in d["panels"] if p["type"] != "row" and p.get("id", 0) < 9000]   # 9000 and 9001: the legal notice at the wall's top and end
+        # 9000 and 9001: the legal notice at the wall's top and end; 899 to 904: the signals row (export_grafana.signals_row)
+        mons = [p for p in d["panels"] if p["type"] != "row" and p.get("id", 0) < 9000 and not 899 <= p.get("id", 0) <= 904]
         self.assertEqual(len(mons), len(self.reg["monitors"]))
         notes = [p for p in d["panels"] if p.get("id", 0) >= 9000]
         self.assertEqual([p["id"] for p in notes], [9000, 9001])
@@ -65,6 +66,8 @@ class LiveMonitors(unittest.TestCase):
         for p in d["panels"]:
             if p["type"] == "row":
                 row = p["title"]
+                continue
+            if 899 <= p.get("id", 0) <= 904:  # the signals row, the governor's own state, under its own row before the sections
                 continue
             if p.get("id", 0) >= 9000:      # the legal notice's two panels, at the wall's top and end
                 continue

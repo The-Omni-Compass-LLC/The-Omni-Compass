@@ -442,7 +442,7 @@ under the same rule, the engine's setting for the rest (`realms/muscle_cards_v5.
 
 In the words of `docs/FACTORY_PROFILE.md`, the page is the **live tuning bench**: the interface that operates the engine's
 controls and displays their effects through the connected backend. The **factory profile** is the complete, versioned set of
-Omni-Compass default settings shipped together; on the engine that stands it is omni-v20's (`OMNI_V20.json`): the governor's
+Omni-Compass default settings shipped together; on the engine that stands it is omni-v21's (`OMNI_V20.json`): the governor's
 full decision every 60 s, the fast checks every 5 s, every muscle on the card found for it and on the engine's own setting
 otherwise. The **active profile** is the settings actually governing the current run. An adjustment on the bench produces an
 identifiable active configuration, a **custom profile**; it becomes a new factory profile only after validation and a new
@@ -480,7 +480,7 @@ The page carries five kinds of record, and every monitor says which it plays.
 | The harness | `docs/engine/export_harness_trace.py` | the realms harness (`realms/harness.py`, the max of `realms/compass_arm_v5.py` with the bone, the twins and the immune system): one organism of sixty muscles, and each muscle alone, native and with Omni-Compass on top, decision by decision | S |
 | The controller | `docs/engine/export_controller_trace.py` | the shipped Kubernetes governor (`omni_controller/controller.py`) on the modelled cluster, on top of the autoscaler at the max and in the cloud's setting, every tick and every audited decision, runs A, B and C of six hours | S |
 | The runs | `docs/engine/export_runs.py` | the official runs as recorded: every three-run table's runs A, B and C read back from their raw files, every file's SHA-256 matched against the run's own list, every Kubernetes repetition scored by `tools/live_reps.py` and checked against the run's result | L |
-| The scenarios | `docs/engine/export_scenarios.py` | the GPU card (`realms/gpu_card.py`), the Linux host (the conveyance of `tools/toy_gate.py`), every muscle and organism of the realms table (`results/realms_v5`), and every judged row of the newest receipts (`results/live/`) | S, with the receipts' own classes |
+| The scenarios | `docs/engine/export_scenarios.py` | the GPU card (`realms/gpu_card.py`), the Linux host (the conveyance of `tools/model_gate.py`), every muscle and organism of the realms table (`results/realms_v5`), and every judged row of the newest receipts (`results/live/`) | S, with the receipts' own classes |
 | The build | `docs/engine/build_live_engine.py` | the engine, its digest and the commit; the time; GitHub's runs in progress and queued; every run started for the chips and the clouds (`docs/engine/github_ledger.json`) | the record of the build |
 
 Beside them the page embeds the records its newer sections read, each named where it is used: the real three-run test of
@@ -681,14 +681,17 @@ power given for a resource spent that rose): GAINING and GAIN go together, STEAD
 Every signal shows all four live words at once, the lit one bright and the rest dim, on native's side and on Omni-Compass's side
 alike; a monitor that draws both sides carries a full signal for each, with the result now against native (GAIN, STEADY, LOSS)
 beside them. Omni-Compass's redline reflex is built never to let a muscle redline: at the top of a muscle's band it pushes at once,
-before the line; where it cannot move the muscle and native's own twin carries it better, it hands the muscle back to native; where
-native is no better it stays, because redlining less than native is still a benefit against native. The red is still wired on its
-side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill switch's purpose: when something
-redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the same instant. The engine that ran the benchmarks carries the
-same reflex in its own form: on a response-time breach it hands the knob back to native's own target at once and holds it there
-until the line has been clean for its clear time, and its fast check adds replicas within 5 s from the live queue
-(`omni_controller/controller.py`: the SLO reflex and the pod reflex); the page's live model (class S) applies the same rule to every
-muscle it draws.
+before the line. Where a muscle stays over its line three decisions in a row and is stuck (at its own limit, or not relieved by 5%
+of where the redline began) and native's own twin reads lower by more than 5%, it hands the muscle back to native for 10 decisions,
+the hold doubling for each hand-back in a row up to 160; it takes the muscle back only when its side is under the line and lower
+than native's by 5%. Where native is not stronger it stays, because redlining less than native is still a benefit against native.
+The red is still wired on its side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill
+switch's purpose: when something redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the
+same instant. The engine that stands, omni-v21, carries this rule in its immune system, knob by knob (`omnicompass/immune.py`, its
+C++ twin `cpp/src/immune.cpp`, proven alike on 200 seeded scripts, and the nervous system's `native_hold`; on Kubernetes each
+service's autoscaler target, native's twin the operator's own target), beside the SLO reflex and the pod reflex of the Kubernetes
+governor (`omni_controller/controller.py`); the page's live model (class S) applies the same rule, with the engine's own numbers, to
+every muscle it draws.
 
 Each light reads what its gauge is for, never the direction of its needle: a wait that falls is GAINING, work that falls is not.
 
@@ -1700,7 +1703,7 @@ key reads a resource spent: power given.
 
 Read a row across: a beat whose service words read GAIN or STEADY against native and whose cost columns the operator accepts is a
 beat that can be set. A word of LOSS against native is the engine's at that beat and is listed with every other LOSS row
-(the page's section 2c, chapter 11). The values are our own models (class S, `results/toy_gate/V17_LADDER.json`, `tools/beat_ladder.py`),
+(the page's section 2c, chapter 11). The values are our own models (class S, `results/model_gate/V17_LADDER.json`, `tools/beat_ladder.py`),
 each beat's mean over seeded days on a plant that moves every 5 s, paired by seed; the real runs at every beat
 (`docs/PACE_PREREGISTRATION.md`, amendment 3) take their place in the note above the tables when their three runs land. The dial
 is the tuning bench's own example: the factory profile runs the main engine at 60 s; any other beat is the engine's range on the
@@ -2035,7 +2038,7 @@ print it whole. The beat chosen is framed, and a cursor reads the beats in turn 
 
 Every number is our own model (evidence class S), never a benchmark result. The shipped controller of each engine runs on the
 modelled cluster's 5-second plant, eight seeds of a day each, paired by seed and read by the model gate's own rule
-(`tools/heartbeat_sweep.py`; the record, `results/toy_gate/HEARTBEAT_SWEEP.md`). Every beat on this monitor is read in
+(`tools/heartbeat_sweep.py`; the record, `results/model_gate/HEARTBEAT_SWEEP.md`). Every beat on this monitor is read in
 the model only: a real run reads the one beat it was started with, the governor's `--interval`, and the gauges
 `omni_decisions_total` and `omni_own_cpu_cores` of `tools/omni_exporter.py` show the beat it runs at and what it costs.
 
@@ -2778,7 +2781,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 41.2 The engine's name and the profile
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v20). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v21). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines. Every result the page plays ran the factory profile of the engine its
 table names; the main control panel names the profile governing the live model now, with its fingerprint (section 6.5), and a
 candidate or custom profile there is never a result of record.
@@ -2953,9 +2956,9 @@ A copy whose page, engine or records differ from what these print is not a copy 
   the lease's walk back, the kill switch.
 - **Dial.** The max (every muscle to its own limit, never below native; the default) or the tune-down (never more than native).
 - **Engine that stands.** The engine version on main, named on the page's title block and in `python3 tools/omni_version.py`;
-  omni-v19 for this edition.
+  omni-v21 for this edition.
 - **Factory profile.** The complete, versioned set of Omni-Compass default settings shipped together; on the engine that
-  stands, omni-v20's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
+  stands, omni-v21's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
 - **Fingerprint (of a profile).** The page's FNV-1a hash of every setting of the mechanism, the heartbeat and every muscle's body
   included: one identity for one set of settings.
 - **Golden signals.** Latency, traffic, errors and saturation: on the page, the golden-signal feed of the page's section 2b.

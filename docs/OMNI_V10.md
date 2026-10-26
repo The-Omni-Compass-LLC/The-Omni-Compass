@@ -12,7 +12,7 @@ wire's adjustment may change in an hour (the glide) goes from 0.0625 to 0.0875 o
 receipt now reads every score by the one key, as every table already did.
 
 Its fingerprint is `OMNI_V10.json` (digest `4bf39b0d707784de`, 47 files). Forty-six files are omni-v9's bytes and one differs (the CityLearn
-runner). The change was proven in our own runs of CityLearn and in the toy gate before it was pushed. Every benchmark runs again on
+runner). The change was proven in our own runs of CityLearn and in the model gate before it was pushed. Every benchmark runs again on
 it. Every earlier table stands as its own engine's result until its three runs on v10 land, and results from two versions are never
 pooled. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
@@ -170,11 +170,11 @@ In the first online evaluation, more energy went unserved. That is a miss, a LOS
 is enough to refuse the change, and the founder's rule never raises the bill, so the seventh district was not needed. The batteries
 in outage buildings stay native all year, as in omni-v8 and omni-v9.
 
-## 4. The toy gate
+## 4. The model gate
 
-The change touches no Kubernetes, card or cloud controller, and the toy gate's models (`tools/toy_gate.py`) do not run the
+The change touches no Kubernetes, card or cloud controller, and the model gate's models (`tools/model_gate.py`) do not run the
 CityLearn wire, so they read the same on both checkouts by construction. The gate was run all the same, the candidate against
-omni-v9 on seeds 1 to 8, and is recorded in `results/toy_gate/V10_VS_V9.md`. Every gauge of every toy reads identical to omni-v9
+omni-v9 on seeds 1 to 8, and is recorded in `results/model_gate/V10_VS_V9.md`. Every gauge of every model reads identical to omni-v9
 to the last digit (26 of 26: the cluster at 60 s and at 15 s, and conveyance with the quota readable and unreadable), and so do
 every count and the verdict on noisy work. These are our own models (class S), never a benchmark result.
 

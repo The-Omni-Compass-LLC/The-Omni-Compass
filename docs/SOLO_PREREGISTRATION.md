@@ -46,7 +46,7 @@ On omni-v16 the governor moves a workload's pods only through the pod autoscaler
 autoscaler switched off it has no pod muscle of its own: by itself it holds every workload at the operator's count and moves the
 machines alone. `tools/solo_study.py` reads it on the toy cluster (class S), on the machines as the kind rig has them (every worker
 made at the start, no cluster autoscaler), eight seeds of a day, the three arms on the same seeds; its page is written with the
-version it reads, in `results/toy_gate/`.
+version it reads, in `results/model_gate/`.
 
 ## The next engine version: a pod muscle of its own, and the arm in our models
 

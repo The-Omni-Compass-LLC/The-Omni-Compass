@@ -4,35 +4,35 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-Written by `tools/verdict_audit.py` from the three-run tables as they stand (digest `365e2448ee446c5c`). The engine that stands is omni-v20. The rule: tools/readings.py three_run_reading: a change of 0.5% or more, the mean of the three runs' changes in percent of native, reads by the gauge's aim; under it STEADY, under the floor; every run's two values equal to 1e-09 of the value, STEADY, the same; runs that moved 0.5% or more in opposite directions, the runs disagree. Evidence strength is shown beside the word and never changes it: strong, every run the mean's way and beyond its noise (its 95% interval clear of zero); moderate, all but one; weak, one run beyond its noise; inconclusive, no run beyond its noise (a mean of 0.5% or more, not a change any one run could tell from its noise). STEADY is of three kinds: exactly the same (every run's values equal to nine decimal places), under the floor (a measured change, the three runs' mean under 0.5%) and no difference beyond the noise (a table read by an older key). The runs disagree is unresolved, never a final word: opposite directions each beyond its noise, or opposite directions inside overlapping noise.
+Written by `tools/verdict_audit.py` from the three-run tables as they stand (digest `6fea8ea188698bd0`). The engine that stands is omni-v21. The rule: tools/readings.py three_run_reading: a change of 0.5% or more, the mean of the three runs' changes in percent of native, reads by the gauge's aim; under it STEADY, under the floor; every run's two values equal to 1e-09 of the value, STEADY, the same; runs that moved 0.5% or more in opposite directions, the runs disagree. Evidence strength is shown beside the word and never changes it: strong, every run the mean's way and beyond its noise (its 95% interval clear of zero); moderate, all but one; weak, one run beyond its noise; inconclusive, no run beyond its noise (a mean of 0.5% or more, not a change any one run could tell from its noise). STEADY is of three kinds: exactly the same (every run's values equal to nine decimal places), under the floor (a measured change, the three runs' mean under 0.5%) and no difference beyond the noise (a table read by an older key). The runs disagree is unresolved, never a final word: opposite directions each beyond its noise, or opposite directions inside overlapping noise.
 
 ## The counts
 
 | What | Count |
 |---|---|
-| Three-run tables | 205: 85 standing, 59 superseded, 60 the road, 1 taken out |
+| Three-run tables | 225: 85 standing, 79 superseded, 60 the road, 1 taken out |
 | Standing tables, Omni-Compass against its native | 55 |
-| Standing tables on the engine that stands (omni-v20) | 0 |
-| Standing tables not yet run again on omni-v20 | 85 |
-| Rows recomputed from their stored values | 6460 of 8940 |
+| Standing tables on the engine that stands (omni-v21) | 12 |
+| Standing tables not yet run again on omni-v21 | 73 |
+| Rows recomputed from their stored values | 7511 of 10281 |
 | Stored readings the key reads otherwise | 0 |
 | Markdown readings unlike their JSON twin | 0 |
 
 ### Standing tables: Omni-Compass against its native (the readings do no harm is judged by)
 
-Every word: 412 GAIN, 116 power given, 555 STEADY, 164 LOSS, 286 the runs disagree, 9 the runs differ, 478 shown, 164 tuning. The four categories are exclusive: each row has one word.
+Every word: 426 GAIN, 119 power given, 572 STEADY, 159 LOSS, 278 the runs disagree, 9 the runs differ, 580 shown, 200 tuning. The four categories are exclusive: each row has one word.
 
 | Engine | Words |
 |---|---|
-| omni-v17 | 28 GAIN, 7 power given, 37 STEADY, 9 LOSS, 47 the runs disagree, 22 shown, 27 tuning |
-| omni-v16 | 63 GAIN, 47 power given, 162 STEADY, 28 LOSS, 112 the runs disagree, 62 shown, 126 tuning |
+| omni-v21 | 95 GAIN, 55 power given, 202 STEADY, 29 LOSS, 138 the runs disagree, 183 shown, 174 tuning |
+| omni-v18 | 10 GAIN, 2 power given, 14 STEADY, 3 LOSS, 13 the runs disagree, 3 shown, 15 tuning |
 | omni-v12 | 139 GAIN, 31 power given, 136 STEADY, 113 LOSS, 96 the runs disagree, 216 shown |
 | omni-v11 | 131 GAIN, 21 power given, 172 STEADY, 6 LOSS, 13 the runs disagree, 9 the runs differ, 106 shown, 11 tuning |
 | omni-v10 | 51 GAIN, 10 power given, 48 STEADY, 8 LOSS, 18 the runs disagree, 72 shown |
 
 | Evidence class | Words |
 |---|---|
-| L (the real software) | 315 GAIN, 106 power given, 409 STEADY, 164 LOSS, 286 the runs disagree, 424 shown, 153 tuning |
+| L (the real software) | 329 GAIN, 109 power given, 426 STEADY, 159 LOSS, 278 the runs disagree, 526 shown, 189 tuning |
 | S (an outside simulator driven by our own runner) | 97 GAIN, 10 power given, 146 STEADY, 9 the runs differ, 54 shown, 11 tuning |
 
 Useful work, time waited and resources apart (item 8 of the work order): a resource spent or held that rose is power given, shown beside what it bought, never a gain in work.
@@ -40,38 +40,38 @@ Useful work, time waited and resources apart (item 8 of the work order): a resou
 | The gauge's direction | Words |
 |---|---|
 | a count that must never rise | 6 GAIN, 73 STEADY, 14 tuning |
-| resource spent or held | 240 GAIN, 116 power given, 206 STEADY, 105 the runs disagree, 57 tuning |
-| shown | 7 the runs differ, 478 shown, 25 tuning |
-| time waited, missed or failed | 150 GAIN, 184 STEADY, 157 LOSS, 173 the runs disagree, 2 the runs differ, 39 tuning |
-| work done | 16 GAIN, 92 STEADY, 7 LOSS, 8 the runs disagree, 29 tuning |
+| resource spent or held | 248 GAIN, 119 power given, 224 STEADY, 97 the runs disagree, 63 tuning |
+| shown | 7 the runs differ, 580 shown, 55 tuning |
+| time waited, missed or failed | 155 GAIN, 183 STEADY, 153 LOSS, 173 the runs disagree, 2 the runs differ, 39 tuning |
+| work done | 17 GAIN, 92 STEADY, 6 LOSS, 8 the runs disagree, 29 tuning |
 
 Evidence strength beside the word (it never changes the word):
 
 | Word | Strength |
 |---|---|
-| GAIN | 141 strong, 91 inconclusive, 88 deterministic, reproduced in all three runs, 48 weak, 35 moderate, 9 not recomputable from runs |
-| LOSS | 94 inconclusive, 40 weak, 23 moderate, 7 strong |
-| power given | 39 inconclusive, 27 weak, 23 strong, 17 moderate, 10 deterministic, reproduced in all three runs |
+| GAIN | 140 strong, 115 inconclusive, 88 deterministic, reproduced in all three runs, 38 weak, 36 moderate, 9 not recomputable from runs |
+| LOSS | 93 inconclusive, 37 weak, 22 moderate, 7 strong |
+| power given | 50 inconclusive, 27 weak, 18 strong, 14 moderate, 10 deterministic, reproduced in all three runs |
 
-| STEADY of each kind | 315 exactly the same, 240 under the floor |
+| STEADY of each kind | 320 exactly the same, 252 under the floor |
 |---|---|
-| The runs disagree, by cause | 285 opposite directions inside overlapping noise, 1 opposite directions, each beyond its noise |
+| The runs disagree, by cause | 277 opposite directions inside overlapping noise, 1 opposite directions, each beyond its noise |
 
 ### Every comparison and status
 
 | Status, comparison | Words |
 |---|---|
-| standing | against its native | 412 GAIN, 116 power given, 555 STEADY, 164 LOSS, 286 the runs disagree, 9 the runs differ, 478 shown, 164 tuning |
+| standing | against its native | 426 GAIN, 119 power given, 572 STEADY, 159 LOSS, 278 the runs disagree, 9 the runs differ, 580 shown, 200 tuning |
 | standing | in place of a controller | 109 GAIN, 9 power given, 44 STEADY, 27 LOSS, 24 the runs disagree, 90 shown |
 | standing | the orchestrator's own | 31 GAIN, 12 power given, 78 STEADY, 66 LOSS, 26 the runs disagree, 90 shown |
 | standing | two changes at once | 57 GAIN, 22 power given, 42 STEADY, 78 LOSS, 14 the runs disagree, 90 shown |
-| superseded | against its native | 528 GAIN, 206 power given, 906 STEADY, 114 LOSS, 547 the runs disagree, 10 the runs differ, 399 shown, 556 tuning |
+| superseded | against its native | 669 GAIN, 282 power given, 1213 STEADY, 166 LOSS, 789 the runs disagree, 10 the runs differ, 526 shown, 793 tuning |
 | taken out | against its native | 9 GAIN, 3 power given |
 | the road | against its native | 590 GAIN, 114 power given, 949 STEADY, 55 LOSS, 133 the runs disagree, 17 the runs differ, 519 shown, 192 tuning |
 
 The orchestrator's own rows (ORCH) carry no Omni-Compass in either arm; two changes at once (BOTH) and in place of a controller (VS) are shown, never a reading of Omni-Compass against its native.
 
-## Every LOSS row of Omni-Compass against its native (164)
+## Every LOSS row of Omni-Compass against its native (159)
 
 | Table | Engine | Class | Gauge | Native → Omni-Compass, raw change, each run | Evidence |
 |---|---|---|---|---|---|
@@ -202,43 +202,38 @@ The orchestrator's own rows (ORCH) carry no Omni-Compass in either arm; two chan
 | `results/live/V12_VOLCANO_4W_TOP.md` | omni-v12 | L | pod start wait, total (s) | 0.2 → 0.4 (+100.0%); 0.1 → 1.4 (+1300.0%); 1.2 | inconclusive; 0 of 3 beyond the noise |
 | `results/live/V12_VOLCANO_4W_TOP.md` | omni-v12 | L | pod start wait, mean (s) | 0.2 → 0.4 (+100.0%); 0.1 → 0.7 (+600.0%); 1.2 | inconclusive; 0 of 3 beyond the noise |
 | `results/live/V12_VOLCANO_4W_TOP.md` | omni-v12 | L | queue: job turnaround, submitted to done, mean (s) | 81.51 → 86.72 (+6.4%); 101 → 102.8 (+1.8%); 93.17 → 95.34 (+2.3%) | weak; 1 of 3 beyond the noise |
-| `results/live/V16_KAFKA.md` | omni-v16 | L | burst: p99_ms | 3838 → 3843 (+0.1%); 3646 → 3642 (−0.1%); 3859 → 3934 (+1.9%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_KAFKA.md` | omni-v16 | L | burst: lag_max | 1644 → 1681 (+2.2%); 1627 → 1647 (+1.2%); 1725 → 1734 (+0.5%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_KAFKA.md` | omni-v16 | L | heavy: mean_ms | 325 → 334.4 (+2.9%); 321.9 → 322.9 (+0.3%); 327.7 → 337.4 (+3.0%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_KAFKA.md` | omni-v16 | L | heavy: lag_max | 693.3 → 709.3 (+2.3%); 690.3 → 698.3 (+1.2%); 684 → 699.7 (+2.3%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_KAFKA.md` | omni-v16 | L | heavy: lag_mean | 59.78 → 61.32 (+2.6%); 58.8 → 59.57 (+1.3%); 59.83 → 62.01 (+3.6%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_KAFKA_SERVICE.md` | omni-v16 | L | burst: mean_ms | 376.4 → 380.1 (+1.0%); 386.6 → 388.9 (+0.6%); 365.3 → 368.2 (+0.8%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_PGBENCH.md` | omni-v16 | L | select: p50_ms | 0.1593 → 0.1603 (+0.6%); 0.36 → 0.3643 (+1.2%); 0.2757 → 0.2757 (±0.0%) | weak; 1 of 3 beyond the noise |
-| `results/live/V16_PGBENCH.md` | omni-v16 | L | tpcb_hot: work_inside_line_tps | 1324 → 1237 (−6.5%); 747.3 → 737.7 (−1.3%); 818.8 → 817.8 (−0.1%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_PGBENCH.md` | omni-v16 | L | tpcb_hot: p95_ms | 56.55 → 299.9 (+430.3%); 622.3 → 1091 (+75.3%); 6.154 → 6.142 (−0.2%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_REDIS_SERVICE.md` | omni-v16 | L | small: p99_ms | 5.327 → 5.446 (+2.2%); 5.756 → 5.766 (+0.2%); 5.696 → 5.701 (+0.1%) | weak; 1 of 3 beyond the noise |
-| `results/live/V16_REDIS_SHIPPED.md` | omni-v16 | L | large: p95_ms | 0.165 → 0.1673 (+1.4%); 0.2303 → 0.2341 (+1.7%); 0.1129 → 0.1142 (+1.2%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_SYSBENCH.md` | omni-v16 | L | read_write: work_inside_line_tps | 157.3 → 148.3 (−5.7%); 191.6 → 191.6 (+0.0%); 197.2 → 196.7 (−0.2%) | weak; 1 of 3 beyond the noise |
-| `results/live/V16_SYSBENCH.md` | omni-v16 | L | read_write: mean_ms | 20.1 → 25.82 (+28.5%); 5.368 → 5.361 (−0.1%); 2.578 → 2.756 (+6.9%) | weak; 1 of 3 beyond the noise |
-| `results/live/V16_SYSBENCH_SHIPPED.md` | omni-v16 | L | read_only: mean_ms | 3.01 → 3.056 (+1.5%); 1.275 → 1.283 (+0.6%); 2.771 → 2.766 (−0.2%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | b: p95_ms | 0.3497 → 0.361 (+3.2%); 0.3377 → 0.3463 (+2.6%); 0.1577 → 0.1663 (+5.5%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | b: p99_ms | 0.5383 → 0.5543 (+3.0%); 0.5873 → 0.5887 (+0.2%); 0.3453 → 0.3527 (+2.1%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | b: mean_ms | 0.201 → 0.2051 (+2.1%); 0.2005 → 0.2009 (+0.2%); 0.06931 → 0.07076 (+2.1%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | burst: p99_ms | 0.502 → 0.5003 (−0.3%); 0.49 → 0.4973 (+1.5%); 0.6837 → 0.6897 (+0.9%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | c: p95_ms | 0.2803 → 0.2797 (−0.2%); 0.1893 → 0.1887 (−0.4%); 0.086 → 0.093 (+8.1%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | c: p99_ms | 0.4463 → 0.4447 (−0.4%); 0.36 → 0.365 (+1.4%); 0.2817 → 0.286 (+1.5%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | c: mean_ms | 0.1471 → 0.1487 (+1.1%); 0.1417 → 0.1468 (+3.6%); 0.05555 → 0.05942 (+7.0%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB.md` | omni-v16 | L | f: p95_ms | 0.318 → 0.319 (+0.3%); 0.3547 → 0.353 (−0.5%); 0.1673 → 0.1867 (+11.6%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | L | burst: p95_ms | 0.468 → 0.4737 (+1.2%); 0.2473 → 0.2563 (+3.6%); 0.2283 → 0.2303 (+0.9%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | L | burst: p99_ms | 0.644 → 0.6537 (+1.5%); 0.3797 → 0.3993 (+5.2%); 0.3547 → 0.355 (+0.1%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | L | burst: mean_ms | 0.215 → 0.2166 (+0.8%); 0.0753 → 0.07704 (+2.3%); 0.06965 → 0.06964 (−0.0%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | L | c: p95_ms | 0.092 → 0.09233 (+0.4%); 0.2027 → 0.206 (+1.6%); 0.175 → 0.175 (±0.0%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | L | c: p99_ms | 0.3007 → 0.315 (+4.8%); 0.3803 → 0.3803 (±0.0%); 0.3513 → 0.356 (+1.3%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | L | c: mean_ms | 0.05656 → 0.05705 (+0.9%); 0.1482 → 0.152 (+2.5%); 0.1253 → 0.1255 (+0.2%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V17_PGBENCH_SERVICE.md` | omni-v17 | L | simple_update: p50_ms | 1.518 → 1.522 (+0.3%); 1.397 → 1.917 (+37.2%); 1.634 → 30.65 (+1776.0%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V17_PGBENCH_SERVICE.md` | omni-v17 | L | tpcb_hot: work_inside_line_tps | 1007 → 1007 (−0.0%); 839.7 → 839.9 (+0.0%); 554.8 → 536.1 (−3.4%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | L | b: p95_ms | 0.149 → 0.166 (+11.4%); 0.3417 → 0.351 (+2.7%); 0.3107 → 0.3147 (+1.3%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | L | b: p99_ms | 0.354 → 0.364 (+2.8%); 0.527 → 0.5417 (+2.8%); 0.469 → 0.4697 (+0.1%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | L | b: mean_ms | 0.06809 → 0.06967 (+2.3%); 0.1989 → 0.2021 (+1.6%); 0.1907 → 0.1915 (+0.4%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | L | burst: p95_ms | 0.5033 → 0.5067 (+0.7%); 0.4557 → 0.4597 (+0.9%); 0.4003 → 0.4007 (+0.1%) | inconclusive; 0 of 3 beyond the noise |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | L | burst: mean_ms | 0.2228 → 0.2244 (+0.7%); 0.2162 → 0.2194 (+1.5%); 0.2089 → 0.2104 (+0.7%) | weak; 1 of 3 beyond the noise |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | L | c: p95_ms | 0.3017 → 0.3057 (+1.3%); 0.3107 → 0.3137 (+1.0%); 0.31 → 0.3163 (+2.0%) | moderate; 2 of 3 beyond the noise |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | L | c: mean_ms | 0.1898 → 0.189 (−0.5%); 0.1915 → 0.1935 (+1.0%); 0.192 → 0.196 (+2.1%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V18_KAFKA.md` | omni-v18 | L | burst: lag_max | 1688 → 1707 (+1.1%); 1597 → 1604 (+0.4%); 1689 → 1700 (+0.6%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V18_KAFKA.md` | omni-v18 | L | light: work_inside_line_mps | 732.9 → 731.2 (−0.2%); 732.6 → 731.6 (−0.1%); 725.5 → 715.6 (−1.4%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V18_KAFKA.md` | omni-v18 | L | light: p95_ms | 2293 → 2319 (+1.1%); 2301 → 2323 (+1.0%); 2149 → 3673 (+70.9%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | burst: mean_ms | 362.2 → 371.4 (+2.5%); 385.8 → 384.7 (−0.3%); 405.4 → 418.6 (+3.3%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | burst: lag_max | 1565 → 1574 (+0.5%); 1656 → 1678 (+1.3%); 1737 → 1788 (+2.9%) | weak; 1 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | burst: lag_mean | 158 → 162.6 (+2.9%); 167.4 → 167 (−0.2%); 180.1 → 184.5 (+2.4%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | heavy: mean_ms | 289.1 → 287.8 (−0.4%); 347.2 → 354 (+1.9%); 328.8 → 337.7 (+2.7%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | heavy: lag_max | 646.3 → 654 (+1.2%); 731.7 → 741.3 (+1.3%); 695.7 → 706 (+1.5%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | heavy: lag_mean | 52.71 → 52.45 (−0.5%); 63.84 → 65.04 (+1.9%); 60.45 → 61.5 (+1.7%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | light: work_inside_line_mps | 724.8 → 715.5 (−1.3%); 725.4 → 720.8 (−0.6%); 723.4 → 720.3 (−0.4%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | light: p95_ms | 2272 → 2293 (+0.9%); 2181 → 2238 (+2.6%); 2100 → 2098 (−0.1%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | light: mean_ms | 304.5 → 320.9 (+5.4%); 298.5 → 310.1 (+3.9%); 274.6 → 279.5 (+1.8%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | L | light: lag_mean | 266.5 → 277.3 (+4.0%); 259.2 → 268.7 (+3.7%); 235.9 → 239.9 (+1.7%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_PGBENCH.md` | omni-v21 | L | simple_update: p99_ms | 118.6 → 152.2 (+28.3%); 146 → 148.4 (+1.6%); 141.7 → 159 (+12.2%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_REDIS_SERVICE.md` | omni-v21 | L | small: p99_ms | 5.691 → 5.713 (+0.4%); 5.339 → 5.393 (+1.0%); 5.754 → 5.768 (+0.2%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_SYSBENCH.md` | omni-v21 | L | read_only: mean_ms | 2.397 → 2.492 (+3.9%); 3.203 → 3.199 (−0.1%); 3.159 → 3.173 (+0.4%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_SYSBENCH_SHIPPED.md` | omni-v21 | L | burst: p95_ms | 5.57 → 5.57 (±0.0%); 15.38 → 54.62 (+255.1%); 5.438 → 5.471 (+0.6%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_SYSBENCH_SHIPPED.md` | omni-v21 | L | read_only: mean_ms | 3.052 → 3.041 (−0.4%); 2.3 → 2.499 (+8.7%); 3.347 → 3.344 (−0.1%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_SYSBENCH_SHIPPED.md` | omni-v21 | L | update_index: mean_ms | 1.046 → 1.064 (+1.6%); 1.143 → 1.175 (+2.8%); 0.886 → 0.9053 (+2.2%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB.md` | omni-v21 | L | burst: p95_ms | 0.2567 → 0.2663 (+3.8%); 0.4083 → 0.409 (+0.2%); 0.3047 → 0.321 (+5.4%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB.md` | omni-v21 | L | burst: p99_ms | 0.4247 → 0.4453 (+4.9%); 0.577 → 0.5793 (+0.4%); 0.462 → 0.4737 (+2.5%) | weak; 1 of 3 beyond the noise |
+| `results/live/V21_YCSB_SERVICE.md` | omni-v21 | L | f: p95_ms | 0.38 → 0.3807 (+0.2%); 0.3177 → 0.321 (+1.0%); 0.1807 → 0.1817 (+0.6%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SERVICE.md` | omni-v21 | L | f: mean_ms | 0.2119 → 0.2128 (+0.4%); 0.1874 → 0.1905 (+1.7%); 0.09107 → 0.09106 (−0.0%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | b: p95_ms | 0.3097 → 0.3277 (+5.8%); 0.1267 → 0.1553 (+22.6%); 0.2133 → 0.2173 (+1.9%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | b: p99_ms | 0.5047 → 0.515 (+2.0%); 0.3333 → 0.3507 (+5.2%); 0.4087 → 0.4177 (+2.2%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | b: mean_ms | 0.1866 → 0.1895 (+1.6%); 0.06213 → 0.06473 (+4.2%); 0.1527 → 0.1626 (+6.5%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | burst: p95_ms | 0.378 → 0.385 (+1.9%); 0.4893 → 0.49 (+0.1%); 0.2417 → 0.252 (+4.3%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | burst: p99_ms | 0.5347 → 0.559 (+4.6%); 0.7627 → 0.767 (+0.6%); 0.3813 → 0.3997 (+4.8%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | burst: mean_ms | 0.1386 → 0.142 (+2.5%); 0.2326 → 0.234 (+0.6%); 0.07182 → 0.0752 (+4.7%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | c: p95_ms | 0.178 → 0.1793 (+0.7%); 0.294 → 0.2947 (+0.2%); 0.075 → 0.077 (+2.7%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | c: mean_ms | 0.1313 → 0.1317 (+0.3%); 0.1818 → 0.1839 (+1.2%); 0.04938 → 0.04998 (+1.2%) | inconclusive; 0 of 3 beyond the noise |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | L | f: p95_ms | 0.4157 → 0.418 (+0.6%); 0.162 → 0.1657 (+2.3%); 0.3997 → 0.4007 (+0.3%) | inconclusive; 0 of 3 beyond the noise |
 
 ## Stored readings the key reads otherwise (0)
 
@@ -366,32 +361,40 @@ None: every stored reading is the key's reading of its stored values, and every 
 | `results/live/V14_SYSBENCH_SERVICE.md` | omni-v14 | superseded | against its native | L | A 39623235693 (? reps, `e32bbb605501`), B 39625624640 (? reps, `e32bbb605501`), C 39630651710 (? reps, `67b7cd6bf1e8`) |
 | `results/live/V14_YCSB_SERVICE.md` | omni-v14 | superseded | against its native | L | A 39623244880 (? reps, `e32bbb605501`), B 39628035584 (? reps, `990711a99dc4`), C 39630660108 (? reps, `67b7cd6bf1e8`) |
 | `results/live/V14_YCSB_SHIPPED.md` | omni-v14 | superseded | against its native | L | A 39562510452 (? reps, `418f860a4da6`), B 39590117126 (? reps, `e997ca0d9f65`), C 39616239634 (? reps, `63a093f13de0`) |
-| `results/live/V16_KAFKA.md` | omni-v16 | standing | against its native | L | A 39821402572 (? reps, `611aad4666db`), B 39840024618 (? reps, `d27db5f66c71`), C 39860244280 (? reps, `15915c961cd2`) |
-| `results/live/V16_KAFKA_SERVICE.md` | omni-v16 | standing | against its native | L | A 39823828673 (? reps, `611aad4666db`), B 39844651167 (? reps, `d27db5f66c71`), C 39864227589 (? reps, `681ff70efadd`) |
-| `results/live/V16_PGBENCH.md` | omni-v16 | standing | against its native | L | A 39842347137 (? reps, `d27db5f66c71`), B 39851575564 (? reps, `36cb1cc37947`), C 39860251731 (? reps, `15915c961cd2`) |
+| `results/live/V16_KAFKA.md` | omni-v16 | superseded | against its native | L | A 39821402572 (? reps, `611aad4666db`), B 39840024618 (? reps, `d27db5f66c71`), C 39860244280 (? reps, `15915c961cd2`) |
+| `results/live/V16_KAFKA_SERVICE.md` | omni-v16 | superseded | against its native | L | A 39823828673 (? reps, `611aad4666db`), B 39844651167 (? reps, `d27db5f66c71`), C 39864227589 (? reps, `681ff70efadd`) |
+| `results/live/V16_PGBENCH.md` | omni-v16 | superseded | against its native | L | A 39842347137 (? reps, `d27db5f66c71`), B 39851575564 (? reps, `36cb1cc37947`), C 39860251731 (? reps, `15915c961cd2`) |
 | `results/live/V16_PGBENCH_SERVICE.md` | omni-v16 | superseded | against its native | L | A 39869913163 (? reps, `464fb9e27535`), B 39871667274 (? reps, `464fb9e27535`), C 39873437772 (? reps, `a9694fbc7d2a`) |
-| `results/live/V16_REDIS.md` | omni-v16 | standing | against its native | L | A 39821393310 (? reps, `611aad4666db`), B 39840016313 (? reps, `d27db5f66c71`), C 39860237154 (? reps, `15915c961cd2`) |
-| `results/live/V16_REDIS_SERVICE.md` | omni-v16 | standing | against its native | L | A 39823820262 (? reps, `611aad4666db`), B 39844642925 (? reps, `d27db5f66c71`), C 39862248686 (? reps, `681ff70efadd`) |
-| `results/live/V16_REDIS_SHIPPED.md` | omni-v16 | standing | against its native | L | A 39826081107 (? reps, `611aad4666db`), B 39846960314 (? reps, `d27db5f66c71`), C 39866161041 (? reps, `5f430c111d90`) |
-| `results/live/V16_SYSBENCH.md` | omni-v16 | standing | against its native | L | A 39823802516 (? reps, `611aad4666db`), B 39842355356 (? reps, `d27db5f66c71`), C 39862234914 (? reps, `15915c961cd2`) |
+| `results/live/V16_REDIS.md` | omni-v16 | superseded | against its native | L | A 39821393310 (? reps, `611aad4666db`), B 39840016313 (? reps, `d27db5f66c71`), C 39860237154 (? reps, `15915c961cd2`) |
+| `results/live/V16_REDIS_SERVICE.md` | omni-v16 | superseded | against its native | L | A 39823820262 (? reps, `611aad4666db`), B 39844642925 (? reps, `d27db5f66c71`), C 39862248686 (? reps, `681ff70efadd`) |
+| `results/live/V16_REDIS_SHIPPED.md` | omni-v16 | superseded | against its native | L | A 39826081107 (? reps, `611aad4666db`), B 39846960314 (? reps, `d27db5f66c71`), C 39866161041 (? reps, `5f430c111d90`) |
+| `results/live/V16_SYSBENCH.md` | omni-v16 | superseded | against its native | L | A 39823802516 (? reps, `611aad4666db`), B 39842355356 (? reps, `d27db5f66c71`), C 39862234914 (? reps, `15915c961cd2`) |
 | `results/live/V16_SYSBENCH_SERVICE.md` | omni-v16 | superseded | against its native | L | A 39869901058 (? reps, `464fb9e27535`), B 39869925397 (? reps, `464fb9e27535`), C 39871679567 (? reps, `464fb9e27535`) |
-| `results/live/V16_SYSBENCH_SHIPPED.md` | omni-v16 | standing | against its native | L | A 39826073316 (? reps, `611aad4666db`), B 39846952545 (? reps, `d27db5f66c71`), C 39864234559 (? reps, `681ff70efadd`) |
-| `results/live/V16_YCSB.md` | omni-v16 | standing | against its native | L | A 39823811507 (? reps, `611aad4666db`), B 39842363997 (? reps, `d27db5f66c71`), C 39862241743 (? reps, `681ff70efadd`) |
+| `results/live/V16_SYSBENCH_SHIPPED.md` | omni-v16 | superseded | against its native | L | A 39826073316 (? reps, `611aad4666db`), B 39846952545 (? reps, `d27db5f66c71`), C 39864234559 (? reps, `681ff70efadd`) |
+| `results/live/V16_YCSB.md` | omni-v16 | superseded | against its native | L | A 39823811507 (? reps, `611aad4666db`), B 39842363997 (? reps, `d27db5f66c71`), C 39862241743 (? reps, `681ff70efadd`) |
 | `results/live/V16_YCSB_SERVICE.md` | omni-v16 | superseded | against its native | L | A 39869906902 (? reps, `464fb9e27535`), B 39871660953 (? reps, `464fb9e27535`), C 39871685303 (? reps, `464fb9e27535`) |
-| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | standing | against its native | L | A 39826088859 (? reps, `611aad4666db`), B 39846968680 (? reps, `d27db5f66c71`), C 39866167058 (? reps, `5f430c111d90`) |
+| `results/live/V16_YCSB_SHIPPED.md` | omni-v16 | superseded | against its native | L | A 39826088859 (? reps, `611aad4666db`), B 39846968680 (? reps, `d27db5f66c71`), C 39866167058 (? reps, `5f430c111d90`) |
 | `results/live/V17_KAFKA.md` | omni-v17 | superseded | against its native | L | A 40003710547 (? reps, `b525b7a07a0c`), B 40020507060 (? reps, `6fcdf41aad34`), C 40035619419 (? reps, `6e4b64630bfc`) |
 | `results/live/V17_KAFKA_SERVICE.md` | omni-v17 | superseded | against its native | L | A 40005908588 (? reps, `b525b7a07a0c`), B 40022521256 (? reps, `6fcdf41aad34`), C 40037209884 (? reps, `6e4b64630bfc`) |
 | `results/live/V17_PGBENCH.md` | omni-v17 | superseded | against its native | L | A 40003718316 (? reps, `b525b7a07a0c`), B 40022493643 (? reps, `6fcdf41aad34`), C 40037187971 (? reps, `6e4b64630bfc`) |
-| `results/live/V17_PGBENCH_SERVICE.md` | omni-v17 | standing | against its native | L | A 40043218026 (? reps, `f22776e60a87`), B 40044599601 (? reps, `0d532c7a2dbd`), C 40045930230 (? reps, `e4a97f22dce1`) |
+| `results/live/V17_PGBENCH_SERVICE.md` | omni-v17 | superseded | against its native | L | A 40043218026 (? reps, `f22776e60a87`), B 40044599601 (? reps, `0d532c7a2dbd`), C 40045930230 (? reps, `e4a97f22dce1`) |
 | `results/live/V17_REDIS.md` | omni-v17 | superseded | against its native | L | A 39999416157 (? reps, `9678c8ad4325`), B 40020500663 (? reps, `6fcdf41aad34`), C 40035613178 (? reps, `6e4b64630bfc`) |
 | `results/live/V17_REDIS_SERVICE.md` | omni-v17 | superseded | against its native | L | A 40005899721 (? reps, `b525b7a07a0c`), B 40022515018 (? reps, `6fcdf41aad34`), C 40037204297 (? reps, `6e4b64630bfc`) |
 | `results/live/V17_REDIS_SHIPPED.md` | omni-v17 | superseded | against its native | L | A 40005925354 (? reps, `b525b7a07a0c`), B 40024478954 (? reps, `6fcdf41aad34`), C 40038802348 (? reps, `d02c7052ae50`) |
 | `results/live/V17_SYSBENCH.md` | omni-v17 | superseded | against its native | L | A 40003726359 (? reps, `b525b7a07a0c`), B 40022500639 (? reps, `6fcdf41aad34`), C 40037193927 (? reps, `6e4b64630bfc`) |
-| `results/live/V17_SYSBENCH_SERVICE.md` | omni-v17 | standing | against its native | L | A 40043207507 (? reps, `f22776e60a87`), B 40044589141 (? reps, `0d532c7a2dbd`), C 40045921684 (? reps, `e4a97f22dce1`) |
+| `results/live/V17_SYSBENCH_SERVICE.md` | omni-v17 | superseded | against its native | L | A 40043207507 (? reps, `f22776e60a87`), B 40044589141 (? reps, `0d532c7a2dbd`), C 40045921684 (? reps, `e4a97f22dce1`) |
 | `results/live/V17_SYSBENCH_SHIPPED.md` | omni-v17 | superseded | against its native | L | A 40005917048 (? reps, `b525b7a07a0c`), B 40024472453 (? reps, `6fcdf41aad34`), C 40038796458 (? reps, `d02c7052ae50`) |
 | `results/live/V17_YCSB.md` | omni-v17 | superseded | against its native | L | A 40003734350 (? reps, `b525b7a07a0c`), B 40022507977 (? reps, `6fcdf41aad34`), C 40037199208 (? reps, `6e4b64630bfc`) |
-| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | standing | against its native | L | A 40043212711 (? reps, `f22776e60a87`), B 40044594345 (? reps, `0d532c7a2dbd`), C 40045925918 (? reps, `e4a97f22dce1`) |
+| `results/live/V17_YCSB_SERVICE.md` | omni-v17 | superseded | against its native | L | A 40043212711 (? reps, `f22776e60a87`), B 40044594345 (? reps, `0d532c7a2dbd`), C 40045925918 (? reps, `e4a97f22dce1`) |
 | `results/live/V17_YCSB_SHIPPED.md` | omni-v17 | superseded | against its native | L | A 40008048292 (? reps, `b525b7a07a0c`), B 40024485005 (? reps, `6fcdf41aad34`), C 40038808111 (? reps, `d02c7052ae50`) |
+| `results/live/V18_KAFKA.md` | omni-v18 | standing | against its native | L | A 40062228122 (? reps, `bbf7e12f0467`), B 40067527221 (? reps, `dadeec62a61a`), C 40130177581 (? reps, `791ad0fd93b1`) |
+| `results/live/V18_KAFKA_SERVICE.md` | omni-v18 | superseded | against its native | L | A 40062235164 (? reps, `bbf7e12f0467`), B 40067533814 (? reps, `dadeec62a61a`), C 40131354530 (? reps, `791ad0fd93b1`) |
+| `results/live/V18_PGBENCH_SERVICE.md` | omni-v18 | superseded | against its native | L | A 40135948429 (? reps, `19db275eb391`), B 40137076834 (? reps, `19db275eb391`), C 40138213124 (? reps, `96ebf29137fe`) |
+| `results/live/V18_REDIS.md` | omni-v18 | superseded | against its native | L | A 40062224314 (? reps, `bbf7e12f0467`), B 40067523758 (? reps, `dadeec62a61a`), C 40130173076 (? reps, `791ad0fd93b1`) |
+| `results/live/V18_REDIS_SERVICE.md` | omni-v18 | superseded | against its native | L | A 40062231655 (? reps, `bbf7e12f0467`), B 40067530395 (? reps, `dadeec62a61a`), C 40131350933 (? reps, `791ad0fd93b1`) |
+| `results/live/V18_REDIS_SHIPPED.md` | omni-v18 | superseded | against its native | L | A 40062238903 (? reps, `bbf7e12f0467`), B 40068587953 (? reps, `dadeec62a61a`), C 40132491116 (? reps, `791ad0fd93b1`) |
+| `results/live/V18_SYSBENCH_SERVICE.md` | omni-v18 | superseded | against its native | L | A 40134818204 (? reps, `7743f2e82851`), B 40135957187 (? reps, `19db275eb391`), C 40137084068 (? reps, `19db275eb391`) |
+| `results/live/V18_YCSB_SERVICE.md` | omni-v18 | superseded | against its native | L | A 40135943683 (? reps, `19db275eb391`), B 40137072959 (? reps, `19db275eb391`), C 40138209461 (? reps, `96ebf29137fe`) |
 | `results/live/V1_ALL_FOUR.md` | omni-v1 | the road | against its native | L | A 37384945573 (10 reps, `f162ce8d74e8`), B 37385646550 (10 reps, `f162ce8d74e8`), C 37394444337 (10 reps, `68d9bd172605`) |
 | `results/live/V1_BATCH.md` | omni-v1 | the road | against its native | L | A 37385637932 (10 reps, `f162ce8d74e8`), B 37385654462 (10 reps, `f162ce8d74e8`), C 37394452486 (10 reps, `68d9bd172605`) |
 | `results/live/V1_CITYLEARN.md` | omni-v1 | the road | against its native | S | in its own Markdown |
@@ -402,6 +405,18 @@ None: every stored reading is the key's reading of its stored values, and every 
 | `results/live/V1_PANDAPOWER.md` | omni-v1 | the road | against its native | S | in its own Markdown |
 | `results/live/V1_STEADY.md` | omni-v1 | the road | against its native | L | A 37384939815 (10 reps, `f162ce8d74e8`), B 37385640601 (10 reps, `f162ce8d74e8`), C 37391296025 (10 reps, `029340abf30c`) |
 | `results/live/V1_WANDERING.md` | omni-v1 | the road | against its native | L | A 37384942870 (10 reps, `f162ce8d74e8`), B 37385643291 (10 reps, `f162ce8d74e8`), C 37394436586 (10 reps, `68d9bd172605`) |
+| `results/live/V21_KAFKA_SERVICE.md` | omni-v21 | standing | against its native | L | A 40236926576 (? reps, `23c7e8eb27be`), B 40259312876 (? reps, `b659f0eebc58`), C 40283010023 (? reps, `b11b4d3825b1`) |
+| `results/live/V21_PGBENCH.md` | omni-v21 | standing | against its native | L | A 40235704914 (? reps, `5ce458c7e7d2`), B 40258014810 (? reps, `b659f0eebc58`), C 40281459100 (? reps, `fa6da97bbaa6`) |
+| `results/live/V21_PGBENCH_SERVICE.md` | omni-v21 | standing | against its native | L | A 40289615442 (? reps, `b11b4d3825b1`), B 40293188618 (? reps, `2d426169d766`), C 40295032874 (? reps, `c8b8e2af081f`) |
+| `results/live/V21_REDIS.md` | omni-v21 | standing | against its native | L | A 40235697056 (? reps, `5ce458c7e7d2`), B 40254205224 (? reps, `babd7a2ceac0`), C 40276907808 (? reps, `796063486f34`) |
+| `results/live/V21_REDIS_SERVICE.md` | omni-v21 | standing | against its native | L | A 40236922598 (? reps, `23c7e8eb27be`), B 40259308169 (? reps, `b659f0eebc58`), C 40281475145 (? reps, `fa6da97bbaa6`) |
+| `results/live/V21_REDIS_SHIPPED.md` | omni-v21 | standing | against its native | L | A 40238126261 (? reps, `2d40c4c64109`), B 40260615533 (? reps, `b659f0eebc58`), C 40283020884 (? reps, `b11b4d3825b1`) |
+| `results/live/V21_SYSBENCH.md` | omni-v21 | standing | against its native | L | A 40235709142 (? reps, `5ce458c7e7d2`), B 40258018856 (? reps, `b659f0eebc58`), C 40281464587 (? reps, `fa6da97bbaa6`) |
+| `results/live/V21_SYSBENCH_SERVICE.md` | omni-v21 | standing | against its native | L | A 40286351408 (? reps, `b11b4d3825b1`), B 40291369516 (? reps, `f70084ae1bb3`), C 40293202427 (? reps, `2d426169d766`) |
+| `results/live/V21_SYSBENCH_SHIPPED.md` | omni-v21 | standing | against its native | L | A 40236930776 (? reps, `23c7e8eb27be`), B 40259317345 (? reps, `b659f0eebc58`), C 40283015397 (? reps, `b11b4d3825b1`) |
+| `results/live/V21_YCSB.md` | omni-v21 | standing | against its native | L | A 40236918458 (? reps, `23c7e8eb27be`), B 40259304209 (? reps, `b659f0eebc58`), C 40281469940 (? reps, `fa6da97bbaa6`) |
+| `results/live/V21_YCSB_SERVICE.md` | omni-v21 | standing | against its native | L | A 40287958759 (? reps, `b11b4d3825b1`), B 40291376191 (? reps, `f70084ae1bb3`), C 40293208904 (? reps, `2d426169d766`) |
+| `results/live/V21_YCSB_SHIPPED.md` | omni-v21 | standing | against its native | L | A 40238131083 (? reps, `2d40c4c64109`), B 40260620209 (? reps, `b659f0eebc58`), C 40284624594 (? reps, `b11b4d3825b1`) |
 | `results/live/V3_ALL_FOUR.md` | omni-v3 | the road | against its native | L | A 38013221512 (10 reps, `3aac0ab7d384`), B 38013226173 (10 reps, `3aac0ab7d384`), C 38013230522 (10 reps, `3aac0ab7d384`) |
 | `results/live/V3_BATCH.md` | omni-v3 | the road | against its native | L | A 38013261196 (10 reps, `3aac0ab7d384`), B 38013265986 (10 reps, `3aac0ab7d384`), C 38013269850 (10 reps, `3aac0ab7d384`) |
 | `results/live/V3_CITYLEARN.md` | omni-v3 | the road | against its native | S | in its own Markdown |

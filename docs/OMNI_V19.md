@@ -9,10 +9,10 @@ by itself"; CLAUDE.md, Orders of 23 October), and under the standing order that 
 asked. It is omni-v18 (`docs/OMNI_V18.md`: Omni direct in the fingerprint) with one muscle added to the Kubernetes governor, in
 `omni_controller/controller.py`, and the models' arm that runs it, in `realms/harness.py` and `realms/plants.py`; 59 of its 62
 files are omni-v18's bytes. Nothing moves unless the operator names a workload to the muscle: with no workload named the engine is
-omni-v18, decision for decision (the toy gate below). Preregistered before any run (`docs/SOLO_PREREGISTRATION.md`). Read in the toy
-gate against omni-v18 on the same seeds (`results/toy_gate/V19_VS_V18.md`), by itself against omni-v18 by itself arm by arm
-(`results/toy_gate/SOLO_V19_VS_V18.md`) and by itself beside native and beside Omni-Compass and native
-(`results/toy_gate/SOLO_V19.md`) before it was committed. The readings are our own models (evidence class S), never a benchmark
+omni-v18, decision for decision (the model gate below). Preregistered before any run (`docs/SOLO_PREREGISTRATION.md`). Read in the model
+gate against omni-v18 on the same seeds (`results/model_gate/V19_VS_V18.md`), by itself against omni-v18 by itself arm by arm
+(`results/model_gate/SOLO_V19_VS_V18.md`) and by itself beside native and beside Omni-Compass and native
+(`results/model_gate/SOLO_V19.md`) before it was committed. The readings are our own models (evidence class S), never a benchmark
 result. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ## Why it is omni-v19: one name, two engines
@@ -50,18 +50,18 @@ actuator: there by itself is the same arm as Omni-Compass and native.
 ## The fault found before it landed
 
 On the branch, rebuilt on omni-v17, whose main engine decides every 60 s (as main's omni-v18 does), the first candidate moved its
-pods only at a decision, once a minute. By itself in the toy it then read the minutes over the response line LOSS against native
+pods only at a decision, once a minute. By itself in the model it then read the minutes over the response line LOSS against native
 (34.8 minutes a day against native's 26.4), the 95th percentile still a GAIN. The pod autoscaler it stands in for syncs every 15 s. The muscle now
 reconciles every 15 s between decisions; its window of fewer pods counts those reconciliations (the strict window's 300 s at any
 beat). Two unit tests hold it (`tests/test_own_replicas.py`, 11 in all).
 
-## The toy gate against omni-v18 (`results/toy_gate/V19_VS_V18.md`)
+## The model gate against omni-v18 (`results/model_gate/V19_VS_V18.md`)
 
-Every toy, 8 seeds of a day: the cluster in the cloud's setting at 60 and 15 s, the blink, the shipped default, the four conveyance
-toys, the card and the card near its voltage floor, and the verdict. Every gauge of every toy reads **identical** to omni-v18, seed
+Every model, 8 seeds of a day: the cluster in the cloud's setting at 60 and 15 s, the blink, the shipped default, the four conveyance
+models, the card and the card near its voltage floor, and the verdict. Every gauge of every model reads **identical** to omni-v18, seed
 for seed (95 rows, and the verdict's every share; only the governor's own measured processor time, a clock reading, differs from run
-to run), because no toy names a workload to the muscle. Every table is the one the branch's own gate against omni-v17 printed when
-it landed there, number for number and word for word, as it must be: main's omni-v18 added only Omni direct to omni-v17, and no toy
+to run), because no model names a workload to the muscle. Every table is the one the branch's own gate against omni-v17 printed when
+it landed there, number for number and word for word, as it must be: main's omni-v18 added only Omni direct to omni-v17, and no model
 runs Omni direct. No LOSS against the engine that stands.
 
 In the models, the native arm and the max read byte-identical on both engines (the preregistration's step 3): 806 readings on the
@@ -70,15 +70,15 @@ reading's hash the same on omni-v18 and omni-v19. The switch acts only in the ar
 
 ## The rows against native that read LOSS (the engine's, as on omni-v18)
 
-The same toys read against native carry the rows omni-v18 and omni-v17 carry, unchanged, each on the next version's list with its
+The same models read against native carry the rows omni-v18 and omni-v17 carry, unchanged, each on the next version's list with its
 cause: at a decision every 15 s in the cloud's setting the pods waiting for a place LOSS (up 121.6%) and the 95th percentile LOSS
-(up 0.36%); the alert minutes with the machines blinking out of the reading LOSS (up 2.35%); in the conveyance toy the pod start wait
+(up 0.36%); the alert minutes with the machines blinking out of the reading LOSS (up 2.35%); in the conveyance model the pod start wait
 LOSS (up 8.99%) and its 95th percentile LOSS (up 10.0%), beside the requests served GAIN (up 64.2%) and the 95th percentile GAIN
-(down 53.1%); in the batch toy the requests served LOSS (down 2.11%), the alert minutes LOSS (up 9.82%) and the job turnaround LOSS
+(down 53.1%); in the batch model the requests served LOSS (down 2.11%), the alert minutes LOSS (up 9.82%) and the job turnaround LOSS
 (up 0.05%); the card's 95th percentile LOSS (up 2.38%; near its voltage floor up 5.78%), beside its energy GAIN (down 4.72%; down
 1.30%). Every row is shown.
 
-## By itself, in our own model (`results/toy_gate/SOLO_V19.md`, 8 seeds of a day, class S)
+## By itself, in our own model (`results/model_gate/SOLO_V19.md`, 8 seeds of a day, class S)
 
 On the machines as the kind rig has them (every worker made at the start, no Cluster Autoscaler: 12 machines in every arm):
 
@@ -94,11 +94,11 @@ over the line **GAIN** (down 64.9%: fewer; down 32.4% to 97.5%), machine-hours, 
 machines). Against Omni-Compass and native: the 95th percentile **GAIN** (down 16.0%), the minutes over the line **GAIN** (down
 58.0%), the rest STEADY. Omni-Compass and native against native: the 95th percentile **GAIN** (down 4.0%), the minutes over the
 line **GAIN** (down 16.6%). Its own cost: the governor reads each workload it scales twice at each reconciliation (6,417 reads an
-hour in the toy, twelve workloads, against 660 on top of native), the reads power given.
+hour in the model, twelve workloads, against 660 on top of native), the reads power given.
 
-Against omni-v18 by itself, arm by arm (`results/toy_gate/SOLO_V19_VS_V18.md`): native and Omni-Compass and native read identical on
+Against omni-v18 by itself, arm by arm (`results/model_gate/SOLO_V19_VS_V18.md`): native and Omni-Compass and native read identical on
 both engines, gauge for gauge; by itself, omni-v18 has no pod muscle and holds every workload at the operator's count (its 95th
-percentile 313,407 ms and 1,412 minutes over the line in the day: the toy's queue running away), where omni-v19 reads 64.4 ms and
+percentile 313,407 ms and 1,412 minutes over the line in the day: the model's queue running away), where omni-v19 reads 64.4 ms and
 9.2 minutes: the 95th percentile **GAIN** (down 100.0%), the minutes over the line **GAIN** (down 99.3%), the energy per used
 core-hour **GAIN** (down 4.2%), machine-hours and pods waiting identical. No LOSS in any arm.
 
@@ -133,7 +133,7 @@ it stands), and `ARM=solo` joins the kind sets beside native and Omni-Compass an
 ## What it does not claim
 
 No real run of the arm by itself has been made yet: every reading on this page is our own model (class S). The trade between
-muscles judged on the organism stays the next version's work, through the toy gate. Run and scored by The Omni-Compass LLC's own
+muscles judged on the organism stays the next version's work, through the model gate. Run and scored by The Omni-Compass LLC's own
 code. No outside party has reviewed or approved these results.
 
 ---

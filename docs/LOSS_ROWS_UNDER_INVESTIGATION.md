@@ -4,7 +4,7 @@
 
 Every row of every three-run table is shown, LOSS included (the founder's order of 11 October). Where a LOSS row of Omni-Compass
 against its native has a page in `docs/` that states its cause (as `docs/POD_START_WAIT.md` does for the pod start wait under
-KEDA's HTTP add-on), the live benchmark engine names that page beside the row (section 1g). This page holds the rows whose cause is **not yet
+KEDA's HTTP add-on), the live engine names that page beside the row (section 1d). This page holds the rows whose cause is **not yet
 established**: what each row read, when it was raised, what is known, what is suspected and not yet shown, and what decides it.
 A suspicion is written as a suspicion. Nothing here is a result; the rows stand as their tables read them until the engine that
 stands has run the benchmark again three times. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or

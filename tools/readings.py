@@ -145,7 +145,7 @@ def three_run_reading(rs, aim_, same_rel=EXACT_REL):
     if exactly_same(rs, same_rel):
         return EVEN_SAME
     sig = [significant(r) for r in rs]
-    signs = [(r["diff"] > 0) - (r["diff"] < 0) for r in rs]
+    signs = [int(r["diff"] > 0) - int(r["diff"] < 0) for r in rs]
     if all(r["native"] for r in rs):
         rel = [r["diff"] / abs(r["native"]) for r in rs]
         mean = sum(rel) / len(rel)

@@ -891,7 +891,7 @@ def main(check=False):
           "is needed.",
           f"- **{len(same_as)} muscles read the same as native**: {len(same_wrote)} of them wrote and nothing moved beyond the noise on work, speed "
           f"or misses, {len(same_as) - len(same_wrote)} wrote nothing because native held the reading and the law had nothing to push. Watch, by rule; "
-          "these are the room the next engine looks for a gain in, in the toy gate first.", "",
+          "these are the room the next engine looks for a gain in, in the model gate first.", "",
           "### Power given, muscle by muscle", "",
           "The max buys work and speed; the energy it takes is **power given**, shown beside what it bought and never a trade or a loss (the "
           "founder's order of 13 October). The write muscles whose power given on their own load is the largest:", "",

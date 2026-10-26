@@ -245,11 +245,11 @@ def md_lines() -> list[str]:
         elif re.search(r"pod start wait|start wait", g):
             knob = "the test machine, not the governor: the image unpacked inside the window on the one runner every kind node shares (`docs/POD_START_WAIT.md`); the rig pre-pulls the image in both arms"
         elif re.search(r"response time|turnaround|time over the response line|wait", g):
-            knob = "the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row STEADY in the toy gate, the muscle stays native on this stack"
+            knob = "the compass band's upper cushion on this muscle or the give-back trial's tolerance; where no setting brings the row STEADY in the model gate, the muscle stays native on this stack"
         elif re.search(r"fail|lost|not served|unschedulable|no machine", g):
             knob = "the muscle's floor and the trial's tolerance; a muscle that fails a request native served stays native until the gate reads no LOSS"
         else:
-            knob = "the muscle's own card (its band, cushions and glide); a setting that reads LOSS in the toy gate is refused and the muscle stays native"
+            knob = "the muscle's own card (its band, cushions and glide); a setting that reads LOSS in the model gate is refused and the muscle stays native"
         cz = f" Cause: {cause['title']} (`{cause['file']}`)." if cause else ""
         out.append(f"- **{'Omni-Compass against native' if omni else 'the orchestrator’s own cost'}.** {rc.get('title', '').split(':')[0]} ({rc.get('engine', '')}, `{rc.get('file', '')}`): {r['g']}, A B C {' · '.join(r.get('abc') or [])}.{cz} The knob: {knob}.")
     out += ["", "### Appendix D. Glossary", "",

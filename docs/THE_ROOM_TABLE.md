@@ -168,7 +168,7 @@ The table `docs/THE_ROOM.md` section 5.1 calls for, built by `tools/room_table.p
 | energy_facility_industrial | District Heating & Cooling | process_loop | setpoint | 7 | 0.85 → 1.15; native 1 of setpoint | 0.50 | 0.50 | the loop's band, half a band each side of the middle (design) | 0 | 7 | 0 | 0 |
 | energy_facility_industrial | Energy Storage & Microgrid | energy_storage | admission | 2 | one point: at its limit on native | 0 | 0 | unknown (unknown) | 0 | 0 | 2 | 0 |
 | energy_facility_industrial | Energy Storage & Microgrid | energy_storage | capacity | 4 | a band the preset does not state; native's own setting | 0 | 0 | unknown (unknown) | 4 | 0 | 0 | 0 |
-| energy_facility_industrial | Energy Storage & Microgrid | energy_storage | power | 10 | one point: at its limit on native | 0 | 0 | the battery's power rating; native runs it at full (physics) | 7 | 3 | 0 | 0 |
+| energy_facility_industrial | Energy Storage & Microgrid | energy_storage | power | 10 | one point: at its limit on native | 0 | 0 | the battery's power rating; native runs it at full (physics) | 10 | 0 | 0 | 0 |
 | energy_facility_industrial | Energy Storage & Microgrid | energy_storage | setpoint | 3 | 0.1 → 0.5; native 0.2 share of charge | 0.75 | 0.25 | the reserve the store holds back, between its stress and calm ends (design) | 3 | 0 | 0 | 0 |
 | energy_facility_industrial | Facility & Grid Optimization | energy_storage | admission | 5 | one point: at its limit on native | 0 | 0 | unknown (unknown) | 0 | 0 | 5 | 0 |
 | energy_facility_industrial | Facility & Grid Optimization | energy_storage | capacity | 4 | a band the preset does not state; native's own setting | 0 | 0 | unknown (unknown) | 4 | 0 | 0 | 0 |
@@ -242,7 +242,7 @@ The table `docs/THE_ROOM.md` section 5.1 calls for, built by `tools/room_table.p
 | physics_robotics_autonomous | Spacecraft & Flight Software | motion_axis | capacity | 4 | one point: at its limit on native | 0 | 0 | the axis's peak speed is the machine's own; native's everyday setting is the limit where no peak lies above it (physics) | 0 | 0 | 4 | 0 |
 | physics_robotics_autonomous | Spacecraft & Flight Software | motion_axis | power | 4 | one point: at its limit on native | 0 | 0 | the drive's torque or power limit at full on native (physics) | 0 | 0 | 4 | 0 |
 
-**All rows:** 235 (family, plant, knob); muscles 1107; GAIN 527; STEADY, the same as native 159; STEADY, at its limit on native 421; LOSS 0.
+**All rows:** 235 (family, plant, knob); muscles 1107; GAIN 530; STEADY, the same as native 156; STEADY, at its limit on native 421; LOSS 0.
 
 **How to read a row.** Room up or down near 1.0 with GAIN on most muscles: the law takes the room. Room with STEADY, the same as native: the room exists and the law does not take it; those muscles are the first work of `docs/THE_ROOM.md` section 5.2. A one-point band with STEADY at its limit: nothing to take; a muscle of our own can move the wall only where the wall is the design. A LOSS anywhere is a wiring fault to find (section 2 of that page), never the muscle's.
 

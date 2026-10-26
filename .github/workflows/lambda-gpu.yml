@@ -4,6 +4,7 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 name: lambda-gpu
+run-name: lambda-gpu ${{ github.event.inputs.test || '' }} ${{ github.event.inputs.mode || '' }} ${{ github.event.inputs.tag || '' }}
 # The GPU benchmark on a rented Lambda Cloud machine, one button (Actions -> lambda-gpu -> Run workflow): the 8-GPU result
 # (scripts/gpu_8card.sh) or the one-card test (scripts/gpu_rented_run.sh), at the exact commit the button is pressed on.
 # It shows the price first and rents nothing on a dry run (the default). Otherwise it rents one machine, ships the
@@ -19,7 +20,8 @@ on:
   workflow_dispatch:
     inputs:
       test: {description: "8card (the 8-GPU result), 1card (the one-card test), or giveback (give back a stuck run's machine: no test, nothing rented)", default: "8card"}
-      mode: {description: "pooled, fast or full (8card: about 10, 3.5 or 18 hours; 1card: fast about 7, full about 30)", default: "pooled"}
+      mode: {description: "pooled, fast or full (8card: about 10, 3.5 or 18 hours; 1card: fast about 7, full about 30), or stacks (1card: the whole stacks with the card inside at 1, 10 and 100 copies, about 22 hours)", default: "pooled"}
+      tag: {description: "A, B or C: which of the three runs this is (each its own machine, side by side; empty for one run)", default: ""}
       instance_type: {description: "Lambda machine type (empty: gpu_8x_a100_80gb_sxm4 for 8card, gpu_1x_a10 for 1card)", default: ""}
       region: {description: "Lambda region (empty: the first with a machine free)", default: ""}
       max_cost: {description: "Ceiling in US dollars for the hour budget plus one hour; above it nothing is rented", default: "400"}
@@ -32,7 +34,7 @@ permissions:
   contents: read
 # one run at a time per test: the one-card and the eight-card tests may rent at once (the same money, half the wait), a
 # second dispatch of the same test waits for the first; a push (which runs nothing) never takes a dispatch's place
-concurrency: {group: "lambda-gpu-${{ github.event_name }}-${{ github.event.inputs.test || 'none' }}", cancel-in-progress: false}
+concurrency: {group: "lambda-gpu-${{ github.event_name }}-${{ github.event.inputs.test || 'none' }}${{ github.event.inputs.tag || '' }}", cancel-in-progress: false}
 env:
   OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
   LAMBDA_API_KEY: ${{ secrets.LAMBDA_API_KEY }}
@@ -114,6 +116,9 @@ jobs:
             8card:full)   SCRIPT=scripts/gpu_8card.sh; ENVS="";         BUDGET=26;;
             1card:fast)   SCRIPT=scripts/gpu_rented_run.sh; ENVS="SKIP_DECODE=1 SKIP_CAP=1 SKIP_HIL=1 SKIP_LLM=1"; BUDGET=8;;
             1card:full)   SCRIPT=scripts/gpu_rented_run.sh; ENVS="";    BUDGET=32;;
+            # the whole stacks with the card inside, nothing else: the wire check and the smoke on the real card first, then the
+            # seven organisms at 1, 10 and 100 copies (tools/run_hil.py, the preregistered repetitions 5, 3 and 2 by size)
+            1card:stacks) SCRIPT=scripts/gpu_rented_run.sh; ENVS="SKIP_CONFIRM=1 SKIP_DECODE=1 SKIP_CAP=1 SKIP_DRILL=1 SKIP_LLM=1"; BUDGET=24;;
             *) echo "unknown test/mode $TEST/$MODE" | tee -a "$GITHUB_STEP_SUMMARY"; exit 1;;
           esac
           case "$HIL_PROFILE" in

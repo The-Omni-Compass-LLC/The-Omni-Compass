@@ -142,13 +142,13 @@ LINUX_GAUGES = {   # name: (aim, per-second series)
 
 
 def linux_run(seed, arm):
-    """One run of tools/toy_gate.py worker_convey, unchanged: its own locals read at the end of every one-second tick
+    """One run of tools/model_gate.py worker_convey, unchanged: its own locals read at the end of every one-second tick
     (sys.settrace on the line that adds up the tick), and its own result line."""
     import contextlib
     import inspect
     import io
     import tempfile
-    from tools import toy_gate as TG
+    from tools import model_gate as TG
     src, first = inspect.getsourcelines(TG.worker_convey)
     mark = first + next(i for i, s in enumerate(src) if s.strip().startswith("busy_sum += busy"))
     code = TG.worker_convey.__code__
@@ -172,7 +172,7 @@ def linux_run(seed, arm):
         finally:
             sys.settrace(None)
     sec["summary"] = json.loads(buf.getvalue().strip().splitlines()[-1])
-    # the checkout the engine was imported from, as tools/toy_gate.py checks it: this one, checked here and never recorded (a
+    # the checkout the engine was imported from, as tools/model_gate.py checks it: this one, checked here and never recorded (a
     # machine's own path would make the record differ from one machine to the next)
     got = sec["summary"].pop("engine_tree", None)
     if got is not None and Path(got).resolve() != ROOT.resolve():

@@ -73,7 +73,7 @@ from omni_index import SOURCES, WORKLOAD_TABLES, newest, CAPACITY, CAPACITY_NOW,
 LIVE = ROOT / "results" / "live"
 OUT_MD = ROOT / "results" / "WHOLE_SYSTEM.md"
 OUT_JSON = ROOT / "results" / "WHOLE_SYSTEM.json"
-GPU_RUN = ROOT / "results" / "gpu" / "run-20261002T082232Z"
+GPU_RUN = ROOT / "results" / "gpu" / "run-20261024T091235Z"
 
 GAUGES = ("work", "speed", "machines", "energy", "bill")
 AIM = {"work": "higher", "speed": "lower", "machines": "spent", "energy": "spent", "bill": "spent"}
@@ -152,16 +152,17 @@ def interval(est):
 
 
 def word_for(gauge, est):
-    """The word for a composed ratio: GAIN when its whole interval is above 1; below 1 a LOSS for work and speed and power given
-    for a resource or the bill; STEADY when the interval includes 1."""
+    """The word for a composed ratio by the one key that stands (the founder's order of 24 October 2026): a change of 0.5% or more
+    either way is a change, STEADY only under it. Above 1 a GAIN; below 1 a LOSS for work and speed and power given for a resource or
+    the bill; the interval is printed beside it, the word does not wait on it."""
     if est is None:
         return "not measured"
     r, lo, hi = interval(est)
-    if lo > 1.0:
+    if abs(r - 1.0) < readings.SIZE_FLOOR:
+        return readings.STEADY
+    if r > 1.0:
         return readings.GAIN
-    if hi < 1.0:
-        return readings.LOSS if AIM[gauge] in ("higher", "lower") else readings.GIVEN
-    return readings.STEADY
+    return readings.LOSS if AIM[gauge] in ("higher", "lower") else readings.GIVEN
 
 
 def pct(r):
@@ -317,8 +318,9 @@ def card_tests():
     d = json.loads(p.read_text())
     paired = (d.get("paired") or {}).get("omni") or {}
     n = len([x for x in GPU_RUN.iterdir() if x.name.startswith("rep-")]) or 10
-    t = {"test": f"NVIDIA A10, the card's own meter, Omni-Compass writing the power limit, {n} paired repetitions, one run (2 October, the replaced controller)",
-         "source": "results/gpu/run-20261002T082232Z/GPU_REPS.md", "runs": [], "engine": "the card controller of commit c908054 (2 October), replaced since",
+    t = {"test": (f"NVIDIA A100 (SXM4, 40 GB) on Lambda, the card's own meter, Omni-Compass on the power limit and the clock ceiling, "
+                  f"{n} paired repetitions, one run (24 October; at its limit on native: the governor wrote nothing)"),
+         "source": str((GPU_RUN / "GPU_REPS.md").relative_to(ROOT)), "runs": [], "engine": "omni-v18 (the card governor at commit e3b05dc, the branch gpu-omni-v18)",
          "pairs": [n], "gauges": {}, "primary": None}
     for g, key in CARD_MEASURES.items():
         row = paired.get(key)
@@ -526,11 +528,14 @@ def main(argv=None):
         sp, en = card[0]["gauges"].get("speed"), card[0]["gauges"].get("energy")
         sp_pct = pct(1.0 / interval(sp["est"])[0]) if sp and sp["est"] else "?"
         en_pct = pct(1.0 / interval(en["est"])[0]) if en and en["est"] else "?"
+        r_pr = interval(pr["est"])[0]
+        w_pr = (readings.STEADY if abs(r_pr - 1.0) < readings.SIZE_FLOOR else readings.GAIN if r_pr > 1.0 else readings.GIVEN)
         L.append(f"The card's primary gauge, work per energy (served requests per kJ): {fmt(pr['est'])} in its one run, native {pr['runs'][0][0]:.2f} → "
-                 f"{pr['runs'][0][1]:.2f}, {readings.GAIN} by the one key (work bought with each unit of energy rose); the same run read the 95th percentile "
-                 f"response {sp_pct} ({readings.LOSS}) and the energy drawn {en_pct} ({readings.GAIN}). That controller was replaced (the orders of 12 October: every "
-                 "earlier GPU result is obsolete); the card's omni-v12 run on Lambda replaces this row the day it lands. It is carried here because it is the "
-                 "only real-meter measurement of the chip layer, and the totals are given with and without it.")
+                 f"{pr['runs'][0][1]:.2f}, {w_pr} by the one key; the same run read the 95th percentile response {sp_pct} "
+                 f"({word_for('speed', sp['est']) if sp else 'not measured'}) and the energy drawn {en_pct} "
+                 f"({word_for('energy', en['est']) if en else 'not measured'}). It is omni-v18's card governor at the factory tune, one run (B and C "
+                 "not yet run): the card's own setting already holds both knobs at their top, so the governor wrote nothing (at its limit on native). It is "
+                 "carried here because it is the only real-meter measurement of the chip layer, and the totals are given with and without it.")
         L.append("")
 
     L.append("### Every test behind the layers")

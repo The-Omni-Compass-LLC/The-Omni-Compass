@@ -29,7 +29,9 @@ class LiveContents(unittest.TestCase):
         if sid.startswith("p-"):
             m = re.search(r'<span class="pt">(.*?)</span>', self.body[i:i + 400])
             return html.unescape(m.group(1)) if m else None
-        m = re.search(r"<h2[^>]*>(.*?)</h2>", self.body[i:i + 2000], re.S)
+        win = self.body[i:i + 2000]
+        win = win[:win.find("<section", 1)] if win.find("<section", 1) > 0 else win   # its own element only, never the next section's heading
+        m = re.search(r"<h2[^>]*>(.*?)</h2>", win, re.S)
         if not m:
             return None
         return html.unescape(re.sub(r"<[^>]+>", "", re.sub(r'<span class="sn">.*?</span>', "", m.group(1)))).strip()

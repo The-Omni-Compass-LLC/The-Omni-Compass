@@ -5,7 +5,7 @@
 Omni v15 was the engine on main from 21 October, evening, until omni-v16 (`docs/OMNI_V16.md`) landed on 22 October, under the founder's standing order that every fault found is
 fixed and every fix lands as the next version, told, not asked (19 October), and his word of 21 October ("push, push, push on
 GitHub, update, enhanced engine"). It is omni-v14 (`docs/OMNI_V14.md`) with one change to the brain and one to the fingerprint,
-each written before it was built and read in the toy gate against omni-v14 on the same seeds before it landed: the brain's
+each written before it was built and read in the model gate against omni-v14 on the same seeds before it landed: the brain's
 request for the power cap trims only while the response line has been clean for the governor's own clear time, and every wire
 that holds a governor's rules is inside the fingerprint. Every gain, guard, preset and muscle is omni-v14's, and so is every
 other rule. A third item declared with it is not an engine change: the kill test's reading after the kill is 300 s wide
@@ -20,7 +20,7 @@ brain (`cpp/src/governor.cpp`) carries the same change and is proven equal to th
 on an observation stream that now carries the line's clear flag; `results/SEAL.json`). Every benchmark was to run again on omni-v15,
 A, B and C; none started before omni-v16 replaced it, because the grid's conductor read omni-v15's commits as no engine (its own
 copy of the version tool's scope predated the eight wires; fixed on 22 October, `CHANGELOG.md`). Every earlier table stands as its own engine's result until its three runs on v15 land, and results from two
-versions are never pooled. The readings from the toy gate are our own models (evidence class S), never a benchmark result. Run
+versions are never pooled. The readings from the model gate are our own models (evidence class S), never a benchmark result. Run
 and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 | # | Change | Where | Why |
@@ -58,13 +58,13 @@ with the recorded clear flag, omni-v15's rule leaves 35 moves of 126, 32 reversa
 (`tests/test_cap_band.py`). A fault's fix is read first where the fault was found.
 
 **Refused by the gate.** A second form was written first: a dwell of three calm decisions and a glide of 0.05 a decision toward
-the trim, the release at once. On the run's own decisions it reads 67 moves and 33 reversals; but in the toy gate, where the toy
+the trim, the release at once. On the run's own decisions it reads 67 moves and 33 reversals; but in the model gate, where the model
 cluster's calm stretches are long, the glide turned each trim into seven small moves (the request's moves in a day 149 against
-omni-v14's 38 on one seed, the travel the same), and on the toy card it wrote the limit 25 times against 16 for the same travel
+omni-v14's 38 on one seed, the travel the same), and on the model card it wrote the limit 25 times against 16 for the same travel
 and 0.17% more energy. More writes of smaller size is not the fix the fault asked for; by the gate's rule it is not carried.
 The clear-time gate alone is in omni-v15.
 
-**The card.** With the flag inside the brain the card governor's own gate becomes a second reading of the same rule: the toy
+**The card.** With the flag inside the brain the card governor's own gate becomes a second reading of the same rule: the model
 card reads omni-v15 identical to omni-v14 on every gauge (section 4), as it should, and the GPU's run on Lambda starts from
 `gpu-omni-v15`, one exact commit.
 
@@ -89,20 +89,20 @@ were read over 120 s (`tools/live_reps.py`, `ROBUST_AFTER_KILL_S`). The one tail
 190 s after the kill, past the old window. The omni-v11 kill table stands as read then; omni-v15's kill runs are read over 300 s
 from their first. The rig is unchanged (the probe runs through the whole 900 s window).
 
-## 4. The toy gate against omni-v14
+## 4. The model gate against omni-v14
 
-`results/toy_gate/V15_VS_V14.md`: the shipped controller on the toy cluster in the cloud setting at 60 and 15 s and with every
+`results/model_gate/V15_VS_V14.md`: the shipped controller on the model cluster in the cloud setting at 60 and 15 s and with every
 worker out of service for two minutes, the conveyance on one kind host (readable quota, unreadable quota, a quota that refuses
 every raise, and the batch muscle of KubeRay's rig beside the serving one), the verdict on noisy work, and, new with this version,
 the GPU governor on the modelled card (the card whose voltage falls with its clock and the card near its voltage floor), eight
-seeds each, the same seeds for both engines. Every service gauge of every toy reads identical between omni-v15 and omni-v14:
-machine-hours, energy, pending-pod minutes, the HPA's shortfall, the 95th percentile and the alert minutes on the cluster toys;
-requests served, start waits, the 95th percentile, host busy, limits given, pod seconds and writes on the conveyance toys; the
+seeds each, the same seeds for both engines. Every service gauge of every model reads identical between omni-v15 and omni-v14:
+machine-hours, energy, pending-pod minutes, the HPA's shortfall, the 95th percentile and the alert minutes on the cluster models;
+requests served, start waits, the 95th percentile, host busy, limits given, pod seconds and writes on the conveyance models; the
 batch queue and turnaround; requests served, the 95th and 99th percentiles, energy, peak temperature and the limit's writes,
-moves, reversals and travel on both card toys (the card governor applied the same gate outside the brain, so the brain's gate
+moves, reversals and travel on both card models (the card governor applied the same gate outside the brain, so the brain's gate
 inside changes nothing there: 17 writes, 16 moves and 15 reversals a run on the card whose voltage falls with its clock, 35, 34
 and 33 on the card near its floor, the same in both engines); and the verdict allows the same share of give-back steps at every
-cost. The request's own wear is the one place the two engines differ, and it reads STEADY: on the toy cluster, where the response
+cost. The request's own wear is the one place the two engines differ, and it reads STEADY: on the model cluster, where the response
 line is breached in about 27 of a day's 1,440 minutes and the calm stretches between are long, the request moved 67.3 times a day
 against 64.9 (+3.7%, STEADY), turned back 66.1 times against 63.8 (+3.7%, STEADY) and travelled 20.4 against 19.6 (+3.9%, STEADY) at a
 decision every 60 s; at a decision every 15 s 98.8 moves against 100.1 (−1.4%, STEADY), 96.1 reversals against 97.5 (−1.4%, STEADY),
@@ -110,7 +110,7 @@ decision every 60 s; at a decision every 15 s 98.8 moves against 100.1 (−1.4%,
 what the governor declares: omni-v14 kept trimming while the line was breached by less than the queue guard's 5% (a pressure
 between 0 and 0.05), and omni-v15 releases there too, so in a regime of rare, light breaches it releases a little more often. The
 fault was found in the opposite regime, the long run's clustered breaches (126 switches in 350 decisions), where the same gate
-leaves 35 (section 1); the cluster toy's regime is the cloud setting's, set from a real run's own files, not the long run's, and
+leaves 35 (section 1); the cluster model's regime is the cloud setting's, set from a real run's own files, not the long run's, and
 the next long run on omni-v15 reads the request's moves and reversals an hour in `results/STEERING.md`. No LOSS anywhere: the
 change lands.
 
@@ -119,7 +119,7 @@ change lands.
 Every other engine file, byte for byte; every gain, guard and preset; the conveyance and its hand-back; the verdict. The next
 version's list (`docs/CHANGE_CONTROL.md`) carries what is still to fix, first among them the Redis harness's brain in its own
 process (its model, `tools/redis_brain_probe.py`, is read before the harness changes, with the version that changes it) and the
-toy's web model set from KubeRay's after-queue files. The GPU governors keep their own two levers; the brain they call now
+model's web model set from KubeRay's after-queue files. The GPU governors keep their own two levers; the brain they call now
 reads the line's clear flag from them.
 
 ---

@@ -5,8 +5,8 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The free GitHub grid: all seven organisms (the spine, the four realms, the four stacked, the whole tower) at 1, 10, 100
-and 1,000 copies, with nested
-1, 10, 100 and 1,000 paired runs. Paid cloud and GPU jobs retain their separate 100-copy/100-run ceiling.
+and 500 copies, with nested 1, 10, 100 and 500 paired runs: the ladder of the Python's 500-run Monte Carlo (tools/engine_runs.py),
+the founder's order of 25 October. Paid cloud and GPU jobs retain their separate 100-copy/100-run ceiling.
 The planner never rents hardware for an oversized free cell: memory/time refusals are listed explicitly.
 
 The conductor (tick) starts the grid and keeps every runner GitHub gives this repository busy without flooding the queue:
@@ -44,13 +44,13 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "results" / "grid_v20" / "DISPATCHED.json"
+MANIFEST = ROOT / "results" / "grid_v21" / "DISPATCHED.json"
 REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
-SINCE = "2026-10-25T13:24:19Z"  # only this campaign, omni-v20 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
-ENGINE = "omni-v20"                 # the engine whose grid this is (tools/omni_version.py)
-SIZES = (1, 10, 100, 1000)          # free GitHub only: owner restored 1,000 on 15 October
-RUNS = 1000                        # nested 1/10/100/1000 runs on free GitHub runners
-TIERS = (10, 100, 1000)             # smaller prefixes first
+SINCE = "2026-10-25T17:30:00Z"  # only this campaign, omni-v21 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
+ENGINE = "omni-v21"                 # the engine whose grid this is (tools/omni_version.py)
+SIZES = (1, 10, 100, 500)           # free GitHub only: the ladder of the Python's 500-run Monte Carlo (the founder's order of 25 October)
+RUNS = 500                         # nested 1/10/100/500 runs on free GitHub runners
+TIERS = (10, 100, 500)              # smaller prefixes first
 MAX_JOBS = 250                     # GitHub: at most 256 jobs in one run's matrix (a few kept for the plan and the receipt)
 ORGS = ["1", "2", "3", "4", "5", "6", "7"]   # tools/run_scale.py: the four realms, the four stacked, the whole tower, the spine
 KUBE = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized",
@@ -72,9 +72,9 @@ CAL = {1: {o: 2 for o in ORGS}, 10: {o: 15 for o in ORGS},
 MEM = {1: {o: 0.2 for o in ORGS}, 10: {o: 0.4 for o in ORGS},
        100: {"1": 0.9, "2": 0.9, "3": 0.9, "4": 0.9, "5": 3.2, "6": 1.8, "7": 0.6}}
 # Planning estimates only, extrapolated from the measured 100-copy timings/memory above.
-# They are not 1,000-copy benchmark measurements. Oversized cells remain explicit, never sent to Azure.
+# They are not 500-copy benchmark measurements. Oversized cells remain explicit, never sent to Azure.
 for table in (SEC, CAL, MEM):
-    table[1000] = {o: value * 10 for o, value in table[100].items()}
+    table[500] = {o: value * 5 for o, value in table[100].items()}
 RUNNER_GB, RUNNER_CPUS = 14.0, 4   # GitHub's machine for a public repository: 4 cores, 16 GB (2 kept for the system)
 JOB_S = 4 * 3600                   # a shard's planned work (a single run that needs more gets up to LONG_S)
 LONG_S = 5 * 3600
@@ -82,10 +82,10 @@ DEADLINE_MIN = 320                 # run_scale starts no run that would end afte
 # with the real cluster inside, the organism steps on the window's clock (240 steps), so the window must be long enough
 # for the max's arm to make each step in time (tools/six_kube_report.py marks a repetition more than 5% late OFF THE
 # CLOCK): seconds per arm by size, and by organism where the default is too short
-KUBE_WINDOW = {1: 960, 10: 960, 100: 1440, 1000: 14400}
+KUBE_WINDOW = {1: 960, 10: 960, 100: 1440, 500: 7200}
 KUBE_WINDOW_ORG = {(100, "tower"): 2400, (100, "stack"): 3600,
-                   (1000, "tower"): 24000, (1000, "stack"): 36000}
-KUBE_BUILD = {1: 1, 10: 1, 100: 8, 1000: 80}         # minutes to build the organism (calibration, plants, the max's bone)
+                   (500, "tower"): 12000, (500, "stack"): 18000}
+KUBE_BUILD = {1: 1, 10: 1, 100: 8, 500: 40}         # minutes to build the organism (calibration, plants, the max's bone)
 # the test rig's protocol with the real cluster inside (scripts/kind_bench.sh), carried in each run's name. Protocol 2 (12
 # Oct): the governor at the organism's own CPU priority, never below the rig beside it; its decisions counted inside the
 # measured window; kind, kubectl and the metrics-server manifest tried again when a download is refused. Protocol 3 (13
@@ -106,7 +106,7 @@ MAX_TRIES = 3                      # a repetition whose job failed this many tim
 # then C, and never while a run that goes first waits for a runner. A workflow's runs started since RERUN_SINCE are read
 # back by count, in the queue's own order, so nothing is started twice (a run dispatched by hand counts as started)
 RERUNS = ROOT / "scripts" / "reruns.txt"
-RERUN_SINCE = "2026-10-25T13:24:19Z"   # omni-v20: every benchmark runs again from a little after the moment the engine landed on main (24 October)
+RERUN_SINCE = "2026-10-25T17:30:00Z"   # omni-v21: every benchmark runs again from a little after the moment the engine landed on main (24 October)
 # the kind rig as amended on 18 October (scripts/kind_bench.sh pulls the served image onto every worker before each arm,
 # docs/POD_START_WAIT.md): a run of a workflow that builds a kind cluster counts only when its own commit carries the
 # pre-puller (RIG_FILE, read from GitHub at the run's head commit), so no table mixes the two rigs and no run is counted on
@@ -129,12 +129,18 @@ RERUN_PER_TICK = 6                 # reruns released at most in one tick
 # founder's order of 16 October: the Azure run is the measure of the other two), each behind its own switch line
 # (switch=on | off): off until that cloud's secrets are in the repository, so nothing is rented before the founder says
 AZURE_QUEUE = ROOT / "scripts" / "azure_queue.txt"
-AZURE_SINCE = "2026-10-25T13:24:19Z"   # omni-v20: every Azure set runs again on the engine that stands; the sets of earlier engines already
-                                       # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v20 table
+AZURE_SINCE = "2026-10-25T17:30:00Z"   # omni-v21: every Azure set runs again on the engine that stands; the sets of earlier engines already
+                                       # started run to their end (nothing is cancelled) and stay as their own engine's record, counted in no v21 table
 AZURE_WF = "aks-metered.yml"
+# The clouds whose cluster a tester builds in the provider's own console and hands over by its kubeconfig (byoc-metered.yml,
+# scripts/byoc_paired.sh, docs/BYOC_SETUP.md): the same four sets on the same harness, each queue behind its own switch,
+# off until a tester has the cluster, its kubeconfig in KUBECONFIG_<CLOUD> and the founder's word (written, not yet run).
+BYOC_WF = "byoc-metered.yml"
+BYOC = {"Oracle": "oracle", "DigitalOcean": "digitalocean", "Alibaba Cloud": "alibaba", "Linode": "linode", "IBM Cloud": "ibm"}
 CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
           ("Google Cloud", "gke-metered.yml", ROOT / "scripts" / "google_queue.txt"),
-          ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"))
+          ("Amazon", "eks-metered.yml", ROOT / "scripts" / "amazon_queue.txt"),
+          *((name, BYOC_WF, ROOT / "scripts" / f"{key}_queue.txt") for name, key in BYOC.items()))
 # A cloud starts a set only after its $0 check passed (.github/workflows/cloud-check.yml: the login, the key's shape, the
 # machine type and every quota a set needs; 18 October, when a key cut short and an account on Amazon's Free plan failed
 # every set started there at the login, each using up its A or B; Azure since 22 October, after its stored key held, for a
@@ -142,11 +148,11 @@ CLOUDS = (("Azure", AZURE_WF, AZURE_QUEUE),
 # has none, the last failed CHECK_RETRY_MIN ago or more, or the last pass is CHECK_FRESH_H old; a fix the founder stores is
 # so taken up within the hour, and a cloud that cannot rent never uses up a set.
 CHECK_WF = "cloud-check.yml"
-CHECKS = {"Google Cloud": "google", "Amazon": "amazon", "Azure": "azure"}
+CHECKS = {"Google Cloud": "google", "Amazon": "amazon", "Azure": "azure", **BYOC}
 CHECK_FRESH_H = 24
 CHECK_RETRY_MIN = 60
 FIRST = ("aks-metered-full.yml", "aks-metered.yml", "big-organism-detached.yml", "big-organism.yml", "cloud-organism.yml", "gke-metered.yml",
-         "eks-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
+         "eks-metered.yml", "byoc-metered.yml", "verify.yml", "archive-run.yml", "peek.yml")
 
 
 # ------------------------------------------------------------------------------------------------- shard shapes
@@ -174,7 +180,7 @@ def kube_minutes(size, org, split):
 
 def kube_fits(size, organism):
     org = ORGS[KUBE.index(organism)]
-    return MEM[size][org] <= RUNNER_GB and kube_minutes(size, organism, size >= 1000) < 330
+    return MEM[size][org] <= RUNNER_GB and kube_minutes(size, organism, size >= SIZES[-1]) < 330
 
 
 def free_runner_refusals():
@@ -310,7 +316,7 @@ def next_dispatches(cov):
                                     "title": six_title(size, o, f2, k)})
                         cov.setdefault(("six", size, o), set()).update(range(f2, f2 + k))
             # with the cluster inside: organisms that share a window and the same runs still to start go in one dispatch
-            split, hi = size >= 1000, tier + 1          # both arms of a repetition on one runner (paired)
+            split, hi = size >= SIZES[-1], tier + 1          # both arms of a repetition on one runner (paired)
             groups = {}
             for o in KUBE:
                 if not kube_fits(size, o):
@@ -630,7 +636,8 @@ def reruns_started(queue):
 # group azure-benchmark-<region>, every Google one google-benchmark-<zone>, every Amazon one amazon-benchmark-<region>; all our
 # sets use one region or zone each, so each cloud is one line: one of its runs at a time, and none started while one waits.
 CLOUD_FAMILIES = {"Azure": ("aks-metered.yml", "aks-metered-full.yml", "big-organism.yml"),
-                  "Google Cloud": ("gke-metered.yml",), "Amazon": ("eks-metered.yml",)}
+                  "Google Cloud": ("gke-metered.yml",), "Amazon": ("eks-metered.yml",),
+                  **{name: (BYOC_WF,) for name in BYOC}}     # one workflow for the five: one of their runs at a time
 ACTIVE = ("queued", "in_progress", "waiting", "pending", "requested")
 
 
@@ -675,6 +682,9 @@ def cloud_title(wf, kv):
     room = f" replica room {kv['replica_ceiling']}" if kv.get("replica_ceiling") else ""
     room += " to the cap, stopping rule" if kv.get("stop_looks") else ""   # a set run to the cap under the stopping rule counts on its own (19 October)
     dial = kv.get("dial") or "save"
+    if wf == BYOC_WF:
+        c = kv.get("cloud") or "other"
+        return f"{wf[:-4]} {c} {what}{org}{room} dial {dial} {c} {kv.get('pool') or 'work0'}"
     if wf == "gke-metered.yml":
         loc, fam = kv.get("zone") or "us-central1-a", kv.get("machine") or "e2-standard-2"
     elif wf == "eks-metered.yml":
@@ -1019,7 +1029,7 @@ def main(argv=None):
     print(f"jobs now {running} running, {queued} queued; target {target}")
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     with (open(summary, "a") if summary else contextlib.nullcontext(sys.stdout)) as out:
-        print("## Free GitHub grid: 1, 10, 100 and 1,000 copies; nested runs through 1,000" + (" (dry run: nothing started)" if a.dry else ""), file=out)
+        print("## Free GitHub grid: 1, 10, 100 and 500 copies; nested runs through 500" + (" (dry run: nothing started)" if a.dry else ""), file=out)
         print("", file=out)
         report(cov, started, queued, running, target, out, gave_up=gave_up, first=first)
         for r in reruns:

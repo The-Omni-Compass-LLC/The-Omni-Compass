@@ -21,7 +21,15 @@ NODES="${NODES:-50}"; ITER="${ITER:-12}"; INTERVAL="${INTERVAL:-10}"; OUT="${OUT
 KWOK_VERSION="${KWOK_VERSION:-v0.6.1}"
 mkdir -p "$OUT"
 kind create cluster --name omni-kwok --wait 120s >/dev/null
-kubectl apply -f "https://github.com/kubernetes-sigs/kwok/releases/download/$KWOK_VERSION/kwok.yaml" >/dev/null
+# KWOK's controller takes only the nodes whose annotation kwok.x-k8s.io/node carries the value named in its own selector;
+# this harness's nodes carry "standin", so the selector is set to that value before the controller is applied (left as
+# shipped, the controller takes none of them and no node ever turns Ready: kwok-scale run 40217182233).
+KWOK_YAML=$(mktemp)
+curl -fsSL --retry 3 "https://github.com/kubernetes-sigs/kwok/releases/download/$KWOK_VERSION/kwok.yaml" \
+  | sed -E 's#(--manage-nodes-with-annotation-selector=kwok\.x-k8s\.io/node=)[A-Za-z0-9_-]+#\1standin#' > "$KWOK_YAML"
+grep -q -- '--manage-nodes-with-annotation-selector=kwok.x-k8s.io/node=standin' "$KWOK_YAML" \
+  || { echo "KWOK $KWOK_VERSION: its node selector was not found to set" >&2; exit 1; }
+kubectl apply -f "$KWOK_YAML" >/dev/null
 kubectl apply -f "https://github.com/kubernetes-sigs/kwok/releases/download/$KWOK_VERSION/stage-fast.yaml" >/dev/null
 kubectl -n kube-system rollout status deployment/kwok-controller --timeout=180s >/dev/null
 python3 - "$NODES" > "$OUT/objects.yaml" <<'PY'
@@ -33,10 +41,10 @@ apiVersion: v1
 kind: Node
 metadata:
   name: kwok-{i}
-  annotations: {{node.alpha.kubernetes.io/ttl: "0", kwok.x-k8s.io/node: fake}}
+  annotations: {{node.alpha.kubernetes.io/ttl: "0", kwok.x-k8s.io/node: standin}}
   labels: {{type: kwok, kubernetes.io/role: agent}}
 spec:
-  taints: [{{key: kwok.x-k8s.io/node, value: fake, effect: NoSchedule}}]
+  taints: [{{key: kwok.x-k8s.io/node, value: standin, effect: NoSchedule}}]
 status:
   allocatable: {{cpu: "4", memory: 16Gi, pods: "110"}}
   capacity: {{cpu: "4", memory: 16Gi, pods: "110"}}""")
@@ -53,7 +61,7 @@ spec:
     spec:
       nodeSelector: {{type: kwok}}
       tolerations: [{{key: kwok.x-k8s.io/node, operator: Exists, effect: NoSchedule}}]
-      containers: [{{name: app, image: fake, resources: {{requests: {{cpu: 500m}}, limits: {{cpu: 500m}}}}}}]
+      containers: [{{name: app, image: standin, resources: {{requests: {{cpu: 500m}}, limits: {{cpu: 500m}}}}}}]
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

@@ -4,9 +4,9 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Omni-Compass by itself on the toy cluster (the founder's order of 23 October; docs/SOLO_PREREGISTRATION.md): our own model,
-class S, never a benchmark result. Three arms on the same seeds, each a day of the toy cluster's web day, on the machines as
-the kind rig has them (every worker made at the start, no cluster autoscaler; tools/toy_gate.py, settings static and solo):
+"""Omni-Compass by itself on the model cluster (the founder's order of 23 October; docs/SOLO_PREREGISTRATION.md): our own model,
+class S, never a benchmark result. Three arms on the same seeds, each a day of the model cluster's web day, on the machines as
+the kind rig has them (every worker made at the start, no cluster autoscaler; tools/model_gate.py, settings static and solo):
 
   native                     the pod autoscaler, as Kubernetes ships it
   Omni-Compass and native    the shipped governor on top of it (the compass law at the max, as ARM=compass runs it)
@@ -15,10 +15,10 @@ the kind rig has them (every worker made at the start, no cluster autoscaler; to
 
 With --cand, each arm runs on both checkouts, and the candidate is read against the engine that stands arm by arm.
 
-Each arm is read against the others by the toy gate's own rule (tools/toy_gate.py reading: the mean change over the seeds,
+Each arm is read against the others by the model gate's own rule (tools/model_gate.py reading: the mean change over the seeds,
 its 95% interval by Student t, the word by the gauge's aim). Usage:
 
-  python3 tools/solo_study.py [--tree .] [--seeds 1-8] [--days 1] [--out DIR]   ->  results/toy_gate/SOLO_<engine>.md and .json
+  python3 tools/solo_study.py [--tree .] [--seeds 1-8] [--days 1] [--out DIR]   ->  results/model_gate/SOLO_<engine>.md and .json
 """
 import argparse, json, os, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
@@ -27,7 +27,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve()
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
-from tools import toy_gate as TG                      # noqa: E402
+from tools import model_gate as TG                      # noqa: E402
 from tools.readings import by_word, interval_by_word  # noqa: E402
 from tools.legal import stamp                         # noqa: E402
 
@@ -59,7 +59,7 @@ def main(argv=None):
     lo, _, hi = a.seeds.partition("-"); seeds = list(range(int(lo), int(hi or lo) + 1))
     tree = Path(a.tree).resolve(); eng, eng_line = engine(tree)
     cand = Path(a.cand).resolve() if a.cand else None; ceng, ceng_line = engine(cand) if cand else (None, None)
-    work = Path(a.out or (ROOT / "results" / "toy_gate" / "solo_work")); work.mkdir(parents=True, exist_ok=True)
+    work = Path(a.out or (ROOT / "results" / "model_gate" / "solo_work")); work.mkdir(parents=True, exist_ok=True)
     trees = {"base": tree, **({"cand": cand} if cand else {})}
     jobs = [(arm, s, k) for k in trees for s in seeds for arm in ARMS]
     run = lambda j: TG.run(trees[j[2]], [*ARMS[j[0]], "--seed", str(j[1]), "--days", str(a.days), "--period", "0",
@@ -85,15 +85,15 @@ def main(argv=None):
             xv = [res[x][s][g] for s in seeds]; yv = [res[y][s][g] for s in seeds]
             pairs[f"{x}_vs_{y}"] = TG.reading(g, [p - q for p, q in zip(xv, yv)], yv, gauges)
         rec["gauges"][g] = {"means": means, **pairs}
-    out_md = ROOT / "results" / "toy_gate" / f"SOLO_{eng.replace('omni-', '').upper()}.md"
+    out_md = ROOT / "results" / "model_gate" / f"SOLO_{eng.replace('omni-', '').upper()}.md"
     pct = lambda r: (by_word(100 * r["relative"], r["word"]) if r["relative"] == r["relative"] else "—")
     iv = lambda r, b: interval_by_word(100 * r["ci95"][0] / b, 100 * r["ci95"][1] / b, r["word"]) if b else "—"
-    L = [f"# Omni-Compass by itself on the toy cluster ({eng})", "",
+    L = [f"# Omni-Compass by itself on the model cluster ({eng})", "",
          "Our own model (evidence class S), never a benchmark result. The founder's order of 23 October: beside native and "
          "Omni-Compass and native, a third arm, Omni-Compass by itself, with native's controllers switched off "
-         "(`docs/SOLO_PREREGISTRATION.md`). This page reads what the engine that stands does by itself on the toy cluster: "
-         f"{len(seeds)} seeds of a day, the same seeds in every arm, read by the toy gate's own rule "
-         "(`tools/toy_gate.py`: the mean change over the seeds, its 95% interval by Student t, the word by the gauge's aim; "
+         "(`docs/SOLO_PREREGISTRATION.md`). This page reads what the engine that stands does by itself on the model cluster: "
+         f"{len(seeds)} seeds of a day, the same seeds in every arm, read by the model gate's own rule "
+         "(`tools/model_gate.py`: the mean change over the seeds, its 95% interval by Student t, the word by the gauge's aim; "
          "a resource that rose is power given).", "",
          f"Engine: {eng_line}. Written by `python3 tools/solo_study.py`; every seed's reading of every arm is in its JSON twin (`per_seed`).", "",
          "| Arm | What governs |", "|---|---|",

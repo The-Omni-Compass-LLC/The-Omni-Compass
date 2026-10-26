@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The five added live levers against the fake kubectl: rightsize sets pod CPU requests from use in place and the kill
+"""The five added live levers against the standin kubectl: rightsize sets pod CPU requests from use in place and the kill
 switch restores them; coldstart scales an idle deployment to zero and wakes it when work waits; batch_pace pauses a
 pausable Job under power stress and resumes it when calm; contain puts a quota and scaled limits on an agent namespace
 over budget and lifts them; the cooling connector moves the setpoint with heat and the reset restores it."""
@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from omni_controller.controller import Kube, parser
 from omni_controller.muscles import Muscles, REQ_ANN, REPL_ANN, PACE_ANN
-FAKE = str(ROOT / "tests" / "fake_cluster" / "kubectl")
+STANDIN = str(ROOT / "tests" / "standin_cluster" / "kubectl")
 
 
 def setup(tmp, queue="0"):
@@ -32,7 +32,7 @@ def setup(tmp, queue="0"):
           "deployments": [dep("web"), dep("svc", 3)], "hpas": [], "used_per_node": "0m",
           "configmaps": [{"metadata": {"name": "work"}, "data": {"queue": queue}}], "jobs": [job("train-a", False)]}
     p = Path(tmp) / "state.json"; p.write_text(json.dumps(st))
-    os.environ["FAKE_KUBE_STATE"] = str(p); os.environ["FAKE_KUBE_LOG"] = str(Path(tmp) / "writes.log")
+    os.environ["STANDIN_KUBE_STATE"] = str(p); os.environ["STANDIN_KUBE_LOG"] = str(Path(tmp) / "writes.log")
     return p
 
 
@@ -43,13 +43,13 @@ def main():
     t = tempfile.mkdtemp(); p = setup(t)
     cool = Path(t) / "bms.log"
     # a decision a minute, the default this test was written against before omni-v16 set 15 s (one batch step a minute)
-    a = parser().parse_args(["--interval", "60", "--floor-interval", "15", "--kubectl", FAKE, "--audit", str(Path(t) / "audit.jsonl"),
+    a = parser().parse_args(["--interval", "60", "--floor-interval", "15", "--kubectl", STANDIN, "--audit", str(Path(t) / "audit.jsonl"),
                              "--rightsize-deployments", "default/web", "--coldstart-deployments", "default/svc",
                              "--coldstart-signal", "default/work", "--coldstart-idle", "2", "--batch-pace",
                              "--contain-namespaces", "agents", "--contain-cpu-m", "1000",
                              "--cooling-cmd", f"sh -c 'echo {{c}} >> {cool}'"])
     rec = []
-    m = Muscles(Kube(FAKE, audit=rec.append), a, rec.append)
+    m = Muscles(Kube(STANDIN, audit=rec.append), a, rec.append)
     calm = {"power_stress": 0.5, "thermal": 0.5, "security_block": 0.0, "slo_clean": True}
     m.push({"power_cap": 1.0, "change_permitted": True, "rollback_authorized": False}, calm)
     req = {q["metadata"]["name"]: q["spec"]["containers"][0]["resources"]["requests"]["cpu"] for q in load(p)["pods"] if q["metadata"]["labels"]["app"] == "web"}
@@ -89,7 +89,7 @@ def main():
     Path(p).write_text(json.dumps(s))
     m.push({"power_cap": 1.0, "change_permitted": True, "rollback_authorized": False}, hot)
     assert load(p)["quotas"], "contained again"
-    m = Muscles(Kube(FAKE, audit=rec.append), a, rec.append)
+    m = Muscles(Kube(STANDIN, audit=rec.append), a, rec.append)
     m._setpoint = 18.9
     m.restore()
     assert load(p).get("quotas") == [], "reset from a fresh process deletes the quota"

@@ -52,6 +52,10 @@ TWINS = {
     "the edge (each muscle's balance point and wall, the cushion widened at once and narrowed slowly)": {
         "python": ["omnicompass/edge.py"], "cpp": ["cpp/src/edge.cpp", "cpp/include/omnicompass/edge.hpp"],
         "proof": "tests/test_cpp_edge_parity.py"},
+    "the immune system's self-knowledge (a knob redlining that Omni-Compass cannot lift goes to native where native is stronger, "
+    "stays where it is not)": {
+        "python": ["omnicompass/immune.py"], "cpp": ["cpp/src/immune.cpp", "cpp/include/omnicompass/immune.hpp"],
+        "proof": "tests/test_cpp_immune_parity.py"},
     "Omni direct's brain and room rule (the yardstick, the reflex, the compass, the twin, the verdict's depth, the conveyed walls, "
     "the machines, pack and spread)": {
         "python": ["omni_orchestrator/brain.py", "omni_orchestrator/scheduler.py"],
@@ -108,6 +112,10 @@ def prove():
     test_cpp_student_t_parity.main(str(b / "oc_student_t"), 2000)
     from tests import test_cpp_orchestrator_brain_parity
     test_cpp_orchestrator_brain_parity.main(str(b / "oc_orchestrator_brain"), 300)
+    from tests import test_cpp_immune_parity
+    for seed in range(200):
+        lines = test_cpp_immune_parity.script(seed)
+        assert test_cpp_immune_parity.py_answers(lines) == test_cpp_immune_parity.cpp_answers(b / "oc_immune", lines), seed
     test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 100)
     from tests import test_cpp_core_runs_parity
     test_cpp_core_runs_parity.main(str(b / "oc_core_runs"), 100)

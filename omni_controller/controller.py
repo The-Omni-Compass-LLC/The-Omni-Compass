@@ -411,6 +411,14 @@ class Controller:
         self.lp_hist = []
         self.cmd_nodes = None          # efferent record: the node count last commanded (proprioception reads it back)
         self.cmd_hpa = {}              # efferent record: HPA targets last written
+        self.pod_hold = {}             # (ns, hpa) -> (until, seconds): the pod target held at native's after a pod waited (omni-v19)
+        self.waited = False            # a fast check saw a pod waiting for a place since the last decision (omni-v19)
+        self.req_seen = []             # the requests on the machines at the last decisions, newest last (omni-v19)
+        self.burst_m = 0.0             # the largest rise in requests seen inside two decisions: the immune memory (omni-v19)
+        self.dem_seen = {}             # (ns, hpa) -> the service's demand at the last decisions, newest last (omni-v19)
+        self.immune = {}               # (ns, hpa) -> its knob's self-knowledge (omnicompass/immune.py, omni-v21)
+        self.dem_rise = {}             # (ns, hpa) -> the largest rise in its demand inside two decisions, as a ratio (omni-v19)
+        self.hold_n = {}               # (ns, hpa) -> hand-backs in a row: each doubles the hold, up to two hours
         from omnicompass.compass import Compass
         gp = self.g.p                  # the compass reads the engine in the engine's own parameters
         self.compass = Compass(E_max=gp.E_max, alpha_s=gp.alpha_s, beta_s=gp.beta_s, delta=gp.delta)
@@ -447,6 +455,9 @@ class Controller:
             self.verdict = Verdict(tolerance=getattr(a, "allow", 0.02), min_samples=getattr(a, "verdict_samples", 200),
                                    probe_every=self.n_verdict_every, recheck=self.n_verdict_recheck,
                                    max_trial=self.n_verdict_trial, incremental=True)
+            # immune maturity (omni-v19): no give-back trial before the governor has watched its organism for one recheck
+            # period, so the immune memory has seen the organism's own rises before the first machine is given back
+            self.verdict.last_probe = self.n_verdict_recheck - self.n_verdict_every
         self.n_native = None           # the machines the cluster ran on its own when Omni started (the verdict's step 0)
         self.cruise = False            # cruise (rule 7): work waiting for a place, so every machine in service until the line is empty
         self.cruise_hits = 0; self.cruise_clear = 0
@@ -556,6 +567,48 @@ class Controller:
             self.audit({"refused": {"nodes": n, "now": n_now, "code": e.returncode}, "why": why,
                         "pool_top": None if self.refused_at is None else self.refused_at - 1})
             return False
+
+    def _pod_request_m(self, h):
+        """One pod's CPU request (millicores) of the workload an HPA scales, read from its Deployment; None where unread."""
+        ref = (h.get("spec") or {}).get("scaleTargetRef") or {}
+        if ref.get("kind") != "Deployment" or not ref.get("name"):
+            return None
+        try:
+            dep = self.k.get("get", "deployment", ref["name"], "-n", h["metadata"]["namespace"], "-o", "json")
+        except Exception:
+            return None
+        tpl = dep["spec"]["template"]["spec"]
+        req = sum(to_milli(c.get("resources", {}).get("requests", {}).get("cpu", "0")) for c in tpl.get("containers", []))
+        return req if req > 0 else None
+
+    def _placeable_target(self, h, s, lo_t, hi_t, rise=1.0):
+        """The fail-up's target (omni-v19): the cover's floor lo_t where the machines in service can place the pods it asks
+        for; else the lowest target whose pods they can place, ceil(100 dem / x) <= running + room, and the machines the rest
+        need asked for now, so a pod is never asked for before there is a machine to run it. Unread (no demand, no request,
+        not the node-pool mode): the cover's floor, as before. rise is the immune memory, the largest rise in the service's
+        demand seen inside two decisions: the pods asked for leave room for that rise times themselves, so the next rise of
+        that size finds a place, as native's fewer pods do."""
+        dem, req = self._app_demand(h), self._pod_request_m(h)
+        if dem is None or not req or dem <= 0:
+            return lo_t
+        cur = int((h.get("status") or {}).get("currentReplicas", 0) or 0)
+        place = int((cur + max(0, int((s["alloc_m"] - s["req_m"]) // req))) / max(1.0, rise))
+        if place <= 0:
+            return hi_t
+        fit = 100.0 * dem / place
+        if fit <= lo_t:
+            return lo_t
+        short = int(math.ceil(100.0 * dem / lo_t - 1e-9)) - place
+        if short > 0 and self.a.mode == "nodepool" and self.a.node_scale_cmd and "machines" not in getattr(self.a, "native_muscles", ()):
+            n = max(1, s["open"]); per_node = s["alloc_m"] / max(1, s["nodes"])
+            need = min(self._max_nodes(s), int(math.ceil((s["req_m"] + short * req) * (1.0 + self.a.headroom) / per_node)))
+            if need > n and need > (self.rec_n or 0) and self._pool_command(need, n, "machines first: room for the pods the fail-up asks (omni-v19)",
+                                                                            pods_short=short):
+                self.rec_n = need
+        self.audit({"placeable": {"hpa": f"{h['metadata']['namespace']}/{h['metadata']['name']}", "target": round(min(hi_t, fit), 1),
+                                  "asked": round(lo_t, 1), "pods_placeable": place, "pods_short": max(0, short),
+                                  "largest_rise": round(rise, 3)}})
+        return min(hi_t, fit)
 
     def _live_ceiling(self, h):
         """The most replicas the machines can hold, one pod under it, read live: the allocatable CPU of every ready worker
@@ -954,9 +1007,12 @@ class Controller:
         # controller shares CPUs with the service it protects (on kind, one 4-core runner), so its reads cost latency
         if not str(self.k.get("get", "pods", "-A", "--field-selector=status.phase=Pending", "-o", "name")).strip():
             return None
+        self.waited = True                       # time waited between decisions is harm the next decision's verdict reads
         s = snapshot(self.k, getattr(self.a, "active_nodes_only", False))
         if s["alloc_m"] <= 0:
             return None                          # no machine in service in the reading: blind, nothing to add from it
+        if s["pending"] > 0:
+            self._pods_wait_handback(s)
         n = max(1, s["open"]); per_node = s["alloc_m"] / max(1, s["nodes"])
         floor = max(int(math.ceil(s["req_m"] * (1.0 + self.a.headroom) / per_node)) if s["req_m"] > 0 else self.a.min_nodes, int(math.ceil(s["used_m"] / per_node)))
         floor = min(self._max_nodes(s), floor)
@@ -965,6 +1021,80 @@ class Controller:
                 self.rec_n = floor
                 return floor
         return None
+
+    def _pods_wait_handback(self, s):
+        """The immune hand-back (omni-v19, the founder's rule: where Omni-Compass cannot beat native, native stays). A pod waiting
+        for a place is time waited, a LOSS: while one waits, every pod autoscaler whose target Omni-Compass holds below the
+        operator's own (more pods than native would ask) gets the operator's target back at once, from this fast check, not the
+        next decision, and keeps it for a hold of 10 minutes, doubled for each hand-back in a row up to two hours and halved back
+        after a quiet hold. The machines the waiting pods need are still asked for by the scheduling floor below."""
+        now = time.time()
+        for h in s["hpas"]:
+            ns, name = h["metadata"]["namespace"], h["metadata"]["name"]
+            key = (ns, name)
+            orig, cmd = self.changed.get(key), self.cmd_hpa.get(key)
+            idx, cur = cpu_target(h)
+            if idx is None or orig is None or cmd is None or cur is None:
+                continue
+            # native's target in the pods' own terms: the operator's, times the conveyed gain while a pod's limit is raised
+            # (the same promise in queue terms the decision keeps), never over 100%
+            back_to = min(100, int(round(float(orig) * self._gain(h))))
+            if int(cur) >= back_to:
+                continue
+            until, length = self.pod_hold.get(key, (0.0, 0.0))
+            if until > now:
+                continue                         # already handed back and held
+            n = self.hold_n.get(key, 0)
+            hold = min(7200.0, 600.0 * (2 ** n))
+            self.pod_hold[key], self.hold_n[key] = (now + hold, hold), n + 1
+            if "replicas" in self.a.native_muscles:
+                continue
+            self.k.write(["patch", "hpa", name, "-n", ns, "--type=json", "-p",
+                          json.dumps([{"op": "replace", "path": f"/spec/metrics/{idx}/resource/target/averageUtilization", "value": back_to}])],
+                         f"immune hand-back: a pod waits, the HPA target back to native's {back_to}% for {int(hold)} s (omni-v19)")
+            self.cmd_hpa[key] = back_to; self.target_at[key] = now
+            self.compass_law_x[key] = float(back_to)
+            self.audit({"immune": {"hpa": f"{ns}/{name}", "pending": s["pending"], "target_was": int(cur), "target_back_to": back_to,
+                                   "hold_s": int(hold), "in_a_row": n + 1}})
+
+    def _immune_native(self, h, ns, name, x, hi_t, lo_t, p95):
+        """The immune system's self-knowledge for this service's autoscaler target (omni-v21; omnicompass/immune.py; the
+        founder's order of 25 October): while the service's response time is over its line with Omni-Compass's target on it,
+        and Omni-Compass's own pushing does not bring it back, the target goes to native when native's twin reads the moment
+        lower, and stays where it is when native is not stronger. Native's twin is the same moment under the operator's target:
+        the replicas native's own rule would ask for the measured demand, and the M/M/1 wait they would give, the response time
+        scaled by (1 - rho_omni) / (1 - rho_native) with rho each pod's busy share of its request. True while native holds it."""
+        from omnicompass.immune import Immune
+        slo = float(getattr(self.a, "slo_ms", 0) or 0)
+        key = (ns, name)
+        im = self.immune.setdefault(key, Immune())
+        dem = self._app_demand(h)
+        cur = int((h.get("status") or {}).get("currentReplicas", 0) or 0)
+        orig = int(h["metadata"].get("annotations", {}).get(ANNOTATION, cpu_target(h)[1] or 0) or 0)
+        if not slo or p95 is None or dem is None or cur <= 0 or orig <= 0:
+            return im.mode == "native"
+        native_reps = max(1, int(math.ceil(100.0 * dem / orig - 1e-9)))
+        rho_o, rho_n = min(0.98, dem / cur), min(0.98, dem / native_reps)
+        p_omni = float(p95) / slo
+        p_native = p_omni * (1.0 - rho_o) / (1.0 - rho_n)
+        moved = abs(x - self.compass_law_x.get(key, hi_t)) > 0.5
+        at_limit = x <= lo_t + 1e-9 or cur >= int(h["spec"].get("maxReplicas", 10 ** 9))
+        mode, ev = im.tick(p_omni, p_native, moved, at_limit)
+        if ev:
+            self.audit({"immune": dict(ev, hpa=f"{ns}/{name}", native_replicas=native_reps, replicas=cur)})
+        return mode == "native"
+
+    def _held_native(self, key):
+        """True while a pod autoscaler's target is held at the operator's after a pod waited (_pods_wait_handback); a hold that
+        has passed with no new hand-back for another hold's length halves the next one."""
+        until, length = self.pod_hold.get(key, (0.0, 0.0))
+        now = time.time()
+        if until > now:
+            return True
+        if length and now > until + length and self.hold_n.get(key, 0) > 0:
+            self.hold_n[key] -= 1
+            self.pod_hold[key] = (now, length / 2.0)
+        return False
 
     def _convey_due(self):
         """The conveyance's clock (omni-v16): every check counts, a fast check or a decision, and the conveyance runs on
@@ -1050,7 +1180,9 @@ class Controller:
         rho = max(0.5, min(0.95, float(d["demand"])))
         from omnicompass.nervous_system import from_governor, node_release_gate
         mode = "autopilot" if self.a.mode in ("target", "nodepool") else "observe"
-        auth = from_governor(self.g, obs, d, mode=mode)
+        # an organ every governed knob of which the immune system handed to native has no authority of Omni-Compass's (omni-v21)
+        held = [k for k, im in self.immune.items() if im.mode == "native"]
+        auth = from_governor(self.g, obs, d, mode=mode, native_hold=("pods",) if held and len(held) == len(self.immune) else ())
         self.m.auth = auth
         breach_now = lp > 0.0 or blind.get("latency", False)
         # the machine organ's view: only pressure a machine release could cause (pods waiting for a place, a live
@@ -1100,7 +1232,16 @@ class Controller:
             if self.n_native is None:
                 self.n_native = n
             self.verdict.observe(self._new_latencies())
-            calm = self.compass_law.p < self.compass_law.band.wall_high and s["pending"] == 0 and not breach_now
+            # a pod that waited for a place since the last decision, seen by a fast check, is harm as much as one waiting now
+            waited, self.waited = self.waited or s["pending"] > 0, False
+            calm = self.compass_law.p < self.compass_law.band.wall_high and not waited and not breach_now
+            if waited and self.verdict.allowed > 0:
+                # the immune reaction (omni-v19; Omni direct's own, omni_orchestrator/control.py): work waited under an
+                # allowed depth, so one step goes back toward native and is not tried again until the recheck has passed
+                self.verdict.allowed -= 1
+                self.verdict.refused_until[self.verdict.allowed + 1] = self.verdict.t + self.verdict.recheck
+                self.audit({"verdict": {"verdict": "depth handed back: a pod waited for a place", "step": self.verdict.allowed + 1},
+                            "machines_given_back_allowed": self.verdict.allowed, "machines_native": self.n_native})
             deepest, trial, ev = self.verdict.tick(calm)
             if self.dial == "max":
                 deepest, trial = 0, False          # the max never gives back a machine the cluster had on its own
@@ -1123,6 +1264,30 @@ class Controller:
                          for h in s["hpas"])
         gate = node_release_gate(n, per_node, s["used_m"], s["pending"], scaling_up, breach_now, rho, auth_n,
                                  senses_live=not any(blind.values()), last_command_landed=nodes_landed)
+        # the immune memory (omni-v19): the largest rise in requests seen inside two decisions, about the time a new machine
+        # takes to boot; a machine is given back only when the machines left hold the requests and a reserve of the larger of
+        # one machine and that rise, so the next rise of the same size lands on a machine already up, as it does on native's
+        if s["req_m"] > 0:
+            self.req_seen = (self.req_seen + [float(s["req_m"])])[-3:]
+            self.burst_m = max(self.burst_m, float(s["req_m"]) - min(self.req_seen))
+        reserve = max(per_node, self.burst_m)
+        native_line = float(getattr(self.a, "native_release_util", 0.5) or 0.5)
+        if rec_n < n and (s["req_m"] + reserve > (n - 1) * per_node or s["req_m"] > native_line * (n - 1) * per_node):
+            self.audit({"immune_memory": {"kept": n, "requests_m": int(s["req_m"]), "reserve_m": int(reserve),
+                                          "largest_rise_m": int(self.burst_m), "room_after_m": int((n - 1) * per_node),
+                                          "native_line": native_line}})
+            rec_n = n            # the machines left would not hold the requests and the reserve, or would stand thinner than
+                                 # native's own autoscaler lets them: the machine stays
+        if getattr(self, "verdict", None) is not None and self.verdict.allowed > 0 and rec_n <= n and s["req_m"] > 0:
+            # while machines stand given back, the same rule every decision: when the machines in service no longer hold the
+            # requests and the reserve, or stand thinner than native's own line (native's own autoscaler may have removed one
+            # of its own meanwhile), one machine comes back now, before a pod waits for it
+            need = max(int(math.ceil((s["req_m"] + reserve) / per_node - 1e-9)),
+                       int(math.ceil(s["req_m"] / (native_line * per_node) - 1e-9)))
+            if need > n:
+                self.audit({"immune_memory": {"machine_back": n + 1, "requests_m": int(s["req_m"]), "reserve_m": int(reserve),
+                                              "native_line": native_line, "machines_needed": need}})
+                rec_n = min(self._max_nodes(s), n + 1)
         if rec_n < n and not gate["ok"]:
             rec_n = n            # nervous system: the machine organ may not give a machine back now (reason audited)
         elif rec_n < n and self.last_release is not None and self.decisions - self.last_release < self.n_release:
@@ -1231,7 +1396,8 @@ class Controller:
                     x = self.compass_law_x.get((ns, name), hi_t)
                     load = not any(blind.values()) and s["pending"] == 0 and not obs["slo_clean"]
                     if self.compass_law.p >= self.compass_law.band.wall_high and load:
-                        x = lo_t                                         # fail up: the most pods the cover allows, at once
+                        # fail up: the most pods the cover allows (placed below as far as the machines can hold them)
+                        x = lo_t
                     elif self.compass_law.p >= self.compass_law.band.wall_high:
                         # past the wall, but not from load: a blind sense, or pods waiting for a machine that is gone.
                         # More pods answer neither, so fail up is native's own target, as on the card, where fail up is
@@ -1247,7 +1413,25 @@ class Controller:
                     else:
                         F_ = compass_rec["force"]
                         x = x - (COMPASS_UP if F_ > 0 else COMPASS_DOWN) * F_ * (hi_t - lo_t) * self.step_scale
-                    x = max(lo_t, min(hi_t, x)); self.compass_law_x[(ns, name)] = x
+                    # the immune memory for pods (omni-v19): the largest rise in this service's demand seen inside two decisions
+                    dem_now = self._app_demand(h)
+                    if dem_now and dem_now > 0:
+                        hist = (self.dem_seen.get((ns, name), []) + [dem_now])[-3:]
+                        self.dem_seen[(ns, name)] = hist
+                        self.dem_rise[(ns, name)] = max(self.dem_rise.get((ns, name), 1.0), dem_now / min(hist))
+                    if self._held_native((ns, name)):
+                        # a pod waited while the target stood below the operator's: native's target is held (omni-v19)
+                        x = hi_t
+                    if self._immune_native(h, ns, name, x, hi_t, lo_t, p95):
+                        x = hi_t; back = x != self.compass_law_x.get((ns, name), hi_t)
+                    x = max(lo_t, min(hi_t, x))
+                    if x < hi_t and not back:
+                        # every push for more pods, the fail-up's and the compass's alike, only as far as the machines in
+                        # service can place them; the machines the rest need are asked for at once (omni-v19, Omni direct's
+                        # rule: a unit never waits for a machine; a pod with no machine serves nothing, it only waits), and
+                        # the pods follow as the room appears
+                        x = max(x, self._placeable_target(h, s, x, hi_t, self.dem_rise.get((ns, name), 1.0)))
+                    self.compass_law_x[(ns, name)] = x
                     self._replica_room(h, ns, name, win, obs, s)
                     want = int(round(x))
                 want_h = want if obs["slo_clean"] else min(want, orig)
@@ -1381,6 +1565,8 @@ def parser():
     ap.add_argument("--strict-window", type=int, default=None, help="decisions a scale-down waits for (unset: --strict-window-s)")
     ap.add_argument("--strict-window-s", type=float, default=300.0, help="seconds a scale-down waits for (highest recent recommendation)")
     ap.add_argument("--headroom", type=float, default=0.5, help="spare capacity kept above pod requests (0.5 = 50%%, the default)")
+    ap.add_argument("--native-release-util", type=float, default=float(os.environ.get("NATIVE_RELEASE_UTIL", 0.5)),
+                    help="a machine is given back only while the machines left stay at or under this share of requests to allocatable: native's own line (the Cluster Autoscaler's scale-down utilization threshold, 0.5 by its documented default; set it to the cluster's own), so Omni-Compass never leaves the machines thinner than native's autoscaler would")
     ap.add_argument("--active-nodes-only", action="store_true",
                     help="count only nodes in service (schedulable, or cordoned but still carrying work) and the pods and usage on them")
     ap.add_argument("--node-restore-cmd", default="", help="command run once when the reset fires, returning the node pool to native")

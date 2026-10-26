@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The Redis runner (tools/run_redis.py) without a Redis: the decision rule (misses grow the ceiling by notches, calm with
 nothing evicted gives back one notch after the dwell, the wall puts the whole cover on at once, the cover holds), the
-application's own reading, the Zipf working set, the plug's one-writer rule against a fake console, and the paired
+application's own reading, the Zipf working set, the plug's one-writer rule against a standin console, and the paired
 reading over repetitions."""
 import random
 import tempfile
@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import run_redis as R
 
 
-class FakeRedis:
+class StandinRedis:
     """A console that remembers maxmemory and can be moved by 'someone else'."""
 
     def __init__(self, mb):
@@ -48,7 +48,7 @@ def main():
     assert R.decide(0.1, -0.5, evicted_last_s=0, cur_mb=lo, last_change_age=10, full=False)[0] == lo, "never under the cover"
     assert R.decide(0.3, 0.02, evicted_last_s=0, cur_mb=64, last_change_age=10, full=True)[0] == 64, "inside the cushion nothing moves"
     # the plug: snapshot once, write and read back, another writer stops it, restore
-    fr = FakeRedis(64); plug = R.Ceiling(fr)
+    fr = StandinRedis(64); plug = R.Ceiling(fr)
     assert plug.attach() == 64 * R.MB and plug.write(96) == 96 and plug.lever() == 96 * R.MB
     fr.mm = 200 * R.MB                                            # someone else moved the knob
     try:
@@ -85,7 +85,7 @@ def main():
     assert R.COVER_MB == (16, 512) and R.NATIVE_MB == 64 and R.LINE_MS == 2.0 and R.MISS_PENALTY_MS > R.LINE_MS, "a miss lies outside the line by construction"
     # native as shipped (17 October): no ceiling (maxmemory 0); any ceiling Omni wrote would sit below native, so it writes
     # nothing, says why in its audit, and hands back the untouched setting
-    fr = FakeRedis(0); plug = R.Ceiling(fr)
+    fr = StandinRedis(0); plug = R.Ceiling(fr)
     with tempfile.TemporaryDirectory() as t:
         om = R.Omni(plug, None, Path(t) / "audit.jsonl")
         om.stop_flag.set(); om.run()

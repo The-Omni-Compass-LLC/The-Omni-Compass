@@ -11,7 +11,7 @@ Moved here whole from `docs/STATE_OF_PLAY.md` on 17 October 2026 when the page w
 capacity repair in the Kubernetes controller, conveyance bounded by each namespace's CPU quota (an unreadable quota is no budget
 known, Kubernetes admission is the authority), the verdict reading a trial in the reports' words, every rule in seconds, the
 cloud's rule as one flag. Its first trials as pushed on 15 October found a fault in its quota budget (an unreadable ResourceQuota
-read as a zero allowance, so conveyance never raised a limit), fixed on 16 October in the toy gate first and then in the engine;
+read as a zero allowance, so conveyance never raised a limit), fixed on 16 October in the model gate first and then in the engine;
 the corrected trials are its first runs (below). Every benchmark runs again on the engine that stands (`scripts/reruns.txt`,
 released a few a tick by the grid conductor, A of every benchmark, then B, then C; the grid and every Azure set restarted on it
 the same day); every row stands as its own engine's result (omni-v6 for the four Kubernetes add-on tables of 15 October, omni-v3
@@ -120,7 +120,7 @@ being made), and anything on a real card.
 2. **The grid and Azure on omni-v7**: restarted on 16 October; the v6 shards still running and the queued Azure set finish and
    stand as that engine's record, nothing cancelled.
 3. **Azure at the tune-down**: the receipts of 14 and 15 October into tables (archive requested), checked against the
-   cloud toy's finding that the machines-only setting barely cuts the bill while pods wait for a place.
+   cloud model's finding that the machines-only setting barely cuts the bill while pods wait for a place.
 4. **Google and Amazon**: on the founder's word; the accounts and secrets are his to make (appendices G and H).
 5. **The card**: the founder's runs on Lambda, one exact commit, after the CPU and cloud work.
 6. **Linux**: a machine on the metal for `cpu-power`.
@@ -128,7 +128,7 @@ being made), and anything on a real card.
    (`docs/OMNI_V7.md`) found none under the max's gauges within each muscle's own knob: 147 have no native misses to cut and
    fixed work; the 12 battery power knobs miss only while the charge sits at the operator's reserve, which the power knob may
    not spend. Six process loops miss at most 0.56% of decisions: a card candidate for a later version. The 14 of 26 knob-cases
-   on the real stacks that read watch stay the next engine's question, in the toy gate first.
+   on the real stacks that read watch stay the next engine's question, in the model gate first.
 8. **Omni-Compass 1.0**: when the founder declares the engine final, the engine that stands then is published as 1.0 and
    the older fingerprints go to `docs/history` as the road to it.
 

@@ -7,9 +7,7 @@
 """The A/B/C table for the Kafka benchmark (docs/OMNI_V1.md's readings, docs/KAFKA_PREREGISTRATION.md): the untouched
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_kafka.py), each run holding three
 paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a
-95% interval; across the three runs a gauge reads GAIN or LOSS in all three of our runs (by what it is for, never by its sign; a resource spent that rose reads power given) when all three move the same way with
-every interval clear of zero, STEADY, no difference beyond the noise, when a run's interval includes zero (with the count of such
-runs), and the runs disagree when runs clear of the noise point different ways. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
+95% interval; across the three runs a gauge reads by the one key (tools/readings.py, the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim, in all three of our runs when every run is clear of zero the same way and otherwise by the mean of our three runs with the count beyond the noise; under 0.5% STEADY, under the floor; runs that moved 0.5% or more in opposite ways disagree. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
 LOSS included; no energy is claimed beyond the host's CPU seconds.
 Usage: python tools/kafka_abc.py A_DIR B_DIR C_DIR --out results/live/V3_KAFKA.md
   each DIR is an archived run (results/live/raw/run-<id>/) holding kafka-<workload>/.../<workload>.json"""
@@ -23,7 +21,7 @@ try:                                                       # the legal notice ev
 except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
-from tools.readings import with_own_runs, stack_reading, aim_of, Tally  # noqa: E402  (every table says whose runs these are)
+from tools.readings import with_own_runs, stack_reading, aim_of, Tally, STACK_RULE  # noqa: E402  (every table says whose runs these are)
 from tools.run_kafka import GAUGES, SAME_REL, paired  # noqa: E402
 from tools.knob_verdict import summarize  # noqa: E402
 
@@ -81,10 +79,7 @@ def main(argv=None):
     L = ["# Kafka, a consumer group's operator-set size: the A/B/C three-run table", "",
          "Apache Kafka as shipped (one broker, a topic of 8 partitions) with the consumer group at the operator's count is native; "
          "omni is the compass law on the consumer count inside [1, 8], holding the group's own end-to-end latency at 40% of the 500 ms "
-         "line (`docs/KAFKA_PREREGISTRATION.md`). Each run holds three paired repetitions; the paired difference's 95% interval within a "
-         "run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its sign; a resource spent that rose reads **power given**) "
-         "a run whose interval includes zero reads **STEADY, no difference beyond the noise** (with the count of such runs); "
-         "clear runs pointing different ways read **the runs disagree**. Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The tuning "
+         "line (`docs/KAFKA_PREREGISTRATION.md`). " + STACK_RULE + " Lost messages: any rise in any run reads **LOSS in at least one of our runs**. The tuning "
          "workload is shown and not counted. Every row is shown, LOSS included. The host's CPU-seconds are measured on GitHub's shared "
          "runner, the compass's own cost included; no energy is claimed beyond them.", "",
          "| Run | GitHub run | Commit | Engine | Workloads |", "|---|---|---|---|---:|"]

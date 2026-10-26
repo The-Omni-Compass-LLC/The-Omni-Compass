@@ -242,8 +242,8 @@ class ReleaseCampaign(unittest.TestCase):
         self.assertEqual(d['profiles']['eight-card']['physical_gpus'], 8)
         self.assertEqual(len(d['organisms']), 7)
         self.assertEqual(d['reported_run_prefixes'], [1, 10, 100])
-        self.assertEqual(grid.SIZES, (1, 10, 100, 1000))
-        self.assertEqual(grid.RUNS, 1000)
+        self.assertEqual(grid.SIZES, (1, 10, 100, 500))
+        self.assertEqual(grid.RUNS, 500)
         for p in d['profiles'].values():
             self.assertEqual(p['environment']['HIL_SCALES'], '1,10,100')
             self.assertEqual(p['environment']['HIL_REPS_BY_SCALE'], '100,100,100')

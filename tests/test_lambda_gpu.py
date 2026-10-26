@@ -25,7 +25,7 @@ STATE = {"instances": {}, "polls": 0, "capacity": True, "auth_ok": True, "seen":
 PUBLIC = "ssh-ed25519 AAAAPUBLICHALF"
 
 
-class FakeLambda(BaseHTTPRequestHandler):
+class StandinLambda(BaseHTTPRequestHandler):
     def log_message(self, *a):                       # quiet
         pass
 
@@ -131,7 +131,7 @@ def run(argv):
 
 
 def test_lambda_launcher_end_to_end():
-    srv = HTTPServer(("127.0.0.1", 0), FakeLambda)
+    srv = HTTPServer(("127.0.0.1", 0), StandinLambda)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     os.environ["LAMBDA_API"] = f"http://127.0.0.1:{srv.server_address[1]}/api/v1"
     for v in ("NO_PROXY", "no_proxy"):                # the stand-in is on this machine: never through a proxy
@@ -209,7 +209,7 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
     """A moved address keeps a launch and a give-back what they are (urllib alone resends a POST as a GET without its
     body, so the machine would stay rented and the give-back would look done); a move to a host that is not Lambda's is
     refused; a give-back Lambda does not confirm is exit 2 with the id; the SSH pair is checked before anything is rented."""
-    srv = HTTPServer(("127.0.0.1", 0), FakeLambda)
+    srv = HTTPServer(("127.0.0.1", 0), StandinLambda)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     here = f"http://127.0.0.1:{srv.server_address[1]}"
     for v in ("NO_PROXY", "no_proxy"):
@@ -249,13 +249,13 @@ def test_moved_address_given_back_confirmed_and_key_pair(tmp_path):
         rc, o = run(["status", "no-such-machine"]); printed += o
         assert rc == 0 and o.split()[2] == "terminated", o                            # the watch reads field 3
 
-        fake = tmp_path / "bin"; fake.mkdir()                 # ssh-keygen -y: the public half of a private key file
-        (fake / "ssh-keygen").write_text("#!/bin/sh\nf=''; while [ $# -gt 0 ]; do [ \"$1\" = -f ] && f=\"$2\"; shift; done\n"
+        standin = tmp_path / "bin"; standin.mkdir()                 # ssh-keygen -y: the public half of a private key file
+        (standin / "ssh-keygen").write_text("#!/bin/sh\nf=''; while [ $# -gt 0 ]; do [ \"$1\" = -f ] && f=\"$2\"; shift; done\n"
                                          f"grep -q GOOD-PRIVATE \"$f\" && {{ echo '{PUBLIC} omni'; exit 0; }}\n"
                                          "grep -q OTHER-PRIVATE \"$f\" && { echo 'ssh-ed25519 AAAAOTHER omni'; exit 0; }\n"
                                          "echo 'Load key: invalid format' >&2; exit 1\n")
-        (fake / "ssh-keygen").chmod(0o755)
-        os.environ["PATH"] = f"{fake}{os.pathsep}{os.environ['PATH']}"
+        (standin / "ssh-keygen").chmod(0o755)
+        os.environ["PATH"] = f"{standin}{os.pathsep}{os.environ['PATH']}"
         keys = {}
         for k, body in (("good", "GOOD-PRIVATE"), ("other", "OTHER-PRIVATE"), ("cut", "-----BEGIN OPENSSH"),
                         ("public", "ssh-ed25519 AAAAPUBLICHALF omni"),

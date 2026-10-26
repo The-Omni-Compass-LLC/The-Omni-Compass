@@ -101,6 +101,11 @@ def main():
     dg_runs = test_cpp_engine_runs_parity.main(str(b / "oc_engine_runs"), 50 if a.quick else 500)
     check(f"the Python's runs from the jump generator through the C++ harness (cpp/tools/engine_runs.cpp on the engine's C++ twins): "
           f"every receipt identical to the last bit, one digest {dg_runs[:16]}…", True)
+    # the core's Monte Carlo through its C++ twin, the engine's own ranges and a person's own system (systems/), four ways
+    from tests import test_cpp_core_runs_parity
+    dg_core = test_cpp_core_runs_parity.main(str(b / "oc_core_runs"), 50 if a.quick else 500)
+    check(f"the core's Monte Carlo from the jump generator through its C++ twin (cpp/tools/core_runs.cpp): every U identical, "
+          f"one digest {dg_core[:16]}…", True)
     from tests import test_cpp_shield_parity
     test_cpp_shield_parity.main(str(b / "oc_shield"), 8 if a.quick else 20); check("C++ shield vs Python shield (enforce and violations)", True)
     from tests import test_cpp_shield_adversarial, test_shield_properties
@@ -374,9 +379,15 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "reread.py"), "--check"], capture_output=True, text=True)
     check("every table reads by the rule that stands: a change of 0.5% or more is a change (tools/reread.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
-    r = subprocess.run([sys.executable, str(ROOT / "tools" / "toy_reread.py"), "--check"], capture_output=True, text=True)
-    check("every toy-gate record reads by the rule that stands, from its own runs seed by seed (tools/toy_reread.py)",
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "model_reread.py"), "--check"], capture_output=True, text=True)
+    check("every model-gate record reads by the rule that stands, from its own runs seed by seed (tools/model_reread.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "realms_reread.py"), "--check"], capture_output=True, text=True)
+    check("every muscle of the catalog and the seven organisms read by the rule that stands, from their own seeds (tools/realms_reread.py)",
+          r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "headline.py"), "--check"], capture_output=True, text=True)
+    check("the answer first, on the README and the live engine page, as the engine that stands's own three-run record gives it (tools/headline.py)",
+          r.returncode == 0, (r.stdout + r.stderr).strip()[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "loss_ledger.py"), "--check"], capture_output=True, text=True)
     check("every LOSS row of every newest table on one page: docs/LOSS_LEDGER.md is rebuilt from the tables (tools/loss_ledger.py)",
           r.returncode == 0, (r.stdout.strip().splitlines() or [r.stderr[-300:]])[-1])
@@ -423,6 +434,9 @@ def main():
           r.returncode == 0, (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "benefit_sheet.py"), "--check"], capture_output=True, text=True)
     check("the benefit sheet (one number and one word per benchmark: GAIN, STEADY, LOSS or power given) is in line with every table it is read from (tools/benefit_sheet.py)",
+          r.returncode == 0, (r.stdout + r.stderr)[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "orchestrators_report.py"), "--check"], capture_output=True, text=True)
+    check("the orchestrators on the same organisms: results/orchestrators/ORCHESTRATORS.md is what its record gives (tools/orchestrators_report.py)",
           r.returncode == 0, (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "readings.py"), "--check"], capture_output=True, text=True)
     check("the key to the words (GAIN, STEADY, LOSS; tools/readings.py) stands word for word at the top of the README, the reading guide "

@@ -2,6 +2,8 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+Omni v20 stood on main on 25 October until omni-v21 landed that evening (`docs/OMNI_V21.md`).
+
 Omni v20 (`OMNI_V20.json`, digest `1df07f8e36a97985`, 62 files) lands on 25 October, 13:24 UTC, under the founder's words of
 25 October ("Fix, fix, fix ... The SYS bench, Kafka, whatever ... has got a problem, you got to fucking fix it ... it can be
 fixed") and the standing order that every fault found is fixed and lands as the next version, told, not asked. It is omni-v19
@@ -10,7 +12,7 @@ fixed") and the standing order that every fault found is fixed and lands as the 
 found by tracing why the Omni index read +4.32% before the 0.5% key of 24 October and +3.397% after it
 (`docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md`): seven data-store rows, each with 0 or 1 of its three runs clear of the noise, that
 the new key now counts. Three were faults in our own wiring, two were the test machine. The fixes were read in the store gate
-(`tools/store_gate.py`, `results/toy_gate/STORE_GATE.md`) before they were committed. The gate's readings are our own model
+(`tools/store_gate.py`, `results/model_gate/STORE_GATE.md`) before they were committed. The gate's readings are our own model
 (evidence class S), never a benchmark result. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 or approved these results.
 

@@ -10,19 +10,19 @@ Every record the page replays is made again here by the repository's own code on
 
   harness    docs/engine/export_harness_trace.py: the realms harness (realms/harness.py, the max of
              realms/compass_arm_v5.py with the bone, the twins and the immune system), one organism and each muscle alone
-  ctlrec     docs/engine/export_controller_trace.py: the shipped controller (omni_controller/controller.py) on the toy
+  ctlrec     docs/engine/export_controller_trace.py: the shipped controller (omni_controller/controller.py) on the model
              cluster, on top of the HPA (the max) and in the cloud's setting, every tick and every audited decision
   runs       docs/engine/export_runs.py: the official runs as recorded, every three-run table's runs A, B and C read
              back from their raw files, every file's SHA-256 matched against the run's own list, every Kubernetes
              repetition scored by the repository's own scorer (tools/live_reps.py) and checked against the run's result
-  scen       docs/engine/export_scenarios.py: the GPU card (realms/gpu_card.py), the Linux host (tools/toy_gate.py's
+  scen       docs/engine/export_scenarios.py: the GPU card (realms/gpu_card.py), the Linux host (tools/model_gate.py's
              conveyance), every muscle and organism of the realms table (results/realms_v5) and every judged row of the
              newest engine's receipts (results/live/V<n>_*.md)
   cpptwin    docs/engine/export_cpp_twins.py: the Python's own runs fed through the C++ engine (cpp/): every Python/C++
              twin's parity check, every compass law the runs above wired (recorded as they ran), and the seven organisms
              at the tune-down, every muscle's law, reading by reading through the C++ compass law
   dial       the heartbeat dial (omni-v17): every beat of the Kubernetes governor in our own models, from the newest
-             beat ladder (results/toy_gate/V<n>_LADDER.json, tools/beat_ladder.py), beside native and the main engine's 60 s
+             beat ladder (results/model_gate/V<n>_LADDER.json, tools/beat_ladder.py), beside native and the main engine's 60 s
   build      what was built and from what: the engine (tools/omni_version.py), the commit, the time, and, where a GitHub
              token is present, the runs GitHub is running now (gh run list) and every run started for the chips and the
              clouds (the ledger, kept in docs/engine/github_ledger.json for a build without a token)
@@ -401,17 +401,17 @@ def _clean(v):
 
 
 def beat_sweep() -> dict:
-    """The heartbeat sweep's record (tools/heartbeat_sweep.py --table, results/toy_gate/HEARTBEAT_SWEEP.json) as the page's
+    """The heartbeat sweep's record (tools/heartbeat_sweep.py --table, results/model_gate/HEARTBEAT_SWEEP.json) as the page's
     heartbeat monitor reads it: every beat of each engine in each setting, each gauge's change in percent against native and
     against the same engine at 15 s and at 60 s, with its 95% interval and its word, and the engine's own cost a day."""
-    f = ROOT / "results" / "toy_gate" / "HEARTBEAT_SWEEP.json"
+    f = ROOT / "results" / "model_gate" / "HEARTBEAT_SWEEP.json"
     if not f.exists():
         return {"missing": str(f.relative_to(ROOT)), "periods": [], "rows": {}}
     rec = json.loads(f.read_text(encoding="utf-8"))
     fin = lambda v: v if isinstance(v, (int, float)) and math.isfinite(v) else None
 
     def pct(x, base):
-        # the gate's reading (tools/toy_gate.py reading) in percent of the zero line's mean over the same seeds: the change is
+        # the gate's reading (tools/model_gate.py reading) in percent of the zero line's mean over the same seeds: the change is
         # mean_change/relative's base; where the change is nought, the zero line's mean as recorded
         m, (lo, hi), rel = x["mean_change"], x["ci95"], x["relative"]
         b = m / rel if fin(rel) and rel and m else base
@@ -877,9 +877,9 @@ def register_places(limit: bool = True) -> list:
 
 def dial() -> dict:
     """The heartbeat dial (omni-v17): every beat of the Kubernetes governor read in our own models, from the newest ladder
-    tools/beat_ladder.py wrote (results/toy_gate/V<n>_LADDER.json), without its per-seed records; the real runs' place from
+    tools/beat_ladder.py wrote (results/model_gate/V<n>_LADDER.json), without its per-seed records; the real runs' place from
     the pace entry's three-run tables once they exist (results/live/V<n>_PACE*.md). Empty until a ladder exists."""
-    lads = sorted((ROOT / "results" / "toy_gate").glob("V*_LADDER.json"), key=lambda f: int(re.sub(r"\D", "", f.stem) or 0))
+    lads = sorted((ROOT / "results" / "model_gate").glob("V*_LADDER.json"), key=lambda f: int(re.sub(r"\D", "", f.stem) or 0))
     if not lads:
         return {}
     lad = json.loads(lads[-1].read_text(encoding="utf-8"))
@@ -889,7 +889,7 @@ def dial() -> dict:
                     "not yet run (docs/PACE_PREREGISTRATION.md, amendment 3: eight arms in every repetition, three runs)",
             # the page's key is "models" (the editing seat of 24 October: the retired word is printed nowhere); the ladder file keeps its own
             "models": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
-                              for k, t in (lad.get("models") or lad.get("toys") or {}).items()})}   # a change against a zero (native's power cap) is NaN: null
+                              for k, t in (lad.get("models") or lad.get("models") or {}).items()})}   # a change against a zero (native's power cap) is NaN: null
 
 
 def core_mc() -> dict:

@@ -4,7 +4,7 @@
 
 Omni v14 was the engine on main on 21 October, from 04:47 UTC until omni-v15 (`docs/OMNI_V15.md`) landed that evening. The founder's orders behind it: knobs on every monitor, "to turn off and
 on such a mechanism, a muscle, or tweak and turn any muscle" (20 October, evening), and, the next night, "tune the engine". It is
-omni-v13 (`docs/OMNI_V13.md`) with two changes, each written before it was built and read in the toy gate against omni-v13 on the
+omni-v13 (`docs/OMNI_V13.md`) with two changes, each written before it was built and read in the model gate against omni-v13 on the
 same seeds before it landed: a knob that leaves any one muscle native, and the operator's own commands run without a shell. Every
 setting, gain, preset and muscle is omni-v13's, and so is every other rule. A third change, to the conveyance's reading on a
 shared host, was built, tried in the gate and refused there; it is not in omni-v14 (section 3).
@@ -12,7 +12,7 @@ shared host, was built, tried in the gate and refused there; it is not in omni-v
 Its fingerprint is `OMNI_V14.json` (digest `7afba44615fcff8f`, 47 files). Forty-five files are omni-v13's bytes; two differ, the Kubernetes
 governor (`omni_controller/controller.py`) and its muscles (`omni_controller/muscles.py`). Every benchmark runs again on
 omni-v14, A, B and C. Every earlier table stands as its own engine's result until its three runs on v14 land, and results from
-two versions are never pooled. The readings from the toy gate are our own models (evidence class S), never a benchmark result.
+two versions are never pooled. The readings from the model gate are our own models (evidence class S), never a benchmark result.
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 | # | Change | Where | Why |
@@ -58,7 +58,7 @@ the fallback for a command that needs one.
 
 ## 3. Refused by the gate: the conveyance's reading on a shared host
 
-The fault it was meant to fix: on the toy set from KubeRay's rig (`results/toy_gate/V13_VS_V12.md`), omni-v13 raises the web
+The fault it was meant to fix: on the model set from KubeRay's rig (`results/model_gate/V13_VS_V12.md`), omni-v13 raises the web
 pods' CPU limits once early in the batch queue and hands them back 15 s later, and the batch's job turnaround reads +0.05%
 against native, a LOSS by the key. The governor reads the host's busy share as the change in its processor counters since its
 previous reading (every 15 s); the trace of that raise shows it lands on the reading the second job's pods are starting at,
@@ -69,7 +69,7 @@ Three rules were written and tried, each against omni-v13 on the same eight seed
 - **No raise on any reading older than another workload's newest running pod.** Refused: the web's 95th percentile read 6.4%
   higher than omni-v13's, a LOSS.
 - **No raise on the reading that opens another workload's run** (none of its pods with room running at the previous reading).
-  It never fires in the toy: identical to omni-v13 on every gauge, because the batch is already running when the second job
+  It never fires in the model: identical to omni-v13 on every gauge, because the batch is already running when the second job
   arrives.
 - **That rule, and the starting pods counted:** a pod of another workload still starting ran for none of the interval, so what
   it may use is added to the reading, and nothing is raised when the sum reaches the 70% cushion. It fires where the fault is.
@@ -80,20 +80,20 @@ Three rules were written and tried, each against omni-v13 on the same eight seed
   rode on the batch's delay is gone.
 
 By the gate's rule a LOSS row is not carried into a real run, so none of the three is in omni-v14. They are kept on the branch
-`v14-convey-study` with their tests and the toy's readings. The next version's list (`docs/CHANGE_CONTROL.md`) carries the
-work that comes first: the toy's web model set from a real run's own files (its record already says it is out of its regime on
-the 3-core batch host), then the third rule read again. The gate found one fault in the toy itself and it is fixed for both
+`v14-convey-study` with their tests and the model's readings. The next version's list (`docs/CHANGE_CONTROL.md`) carries the
+work that comes first: the model's web model set from a real run's own files (its record already says it is out of its regime on
+the 3-core batch host), then the third rule read again. The gate found one fault in the model itself and it is fixed for both
 engines: a batch pod was listed as Running from the moment it was made; a cluster lists it as Pending until its container runs
 (the rig's own pod start, about 3 s).
 
-## 4. The toy gate against omni-v13
+## 4. The model gate against omni-v13
 
-`results/toy_gate/V14_VS_V13.md`: the shipped controller on the toy cluster in the cloud setting at 60 and 15 s and with every
+`results/model_gate/V14_VS_V13.md`: the shipped controller on the model cluster in the cloud setting at 60 and 15 s and with every
 worker out of service for two minutes, the conveyance on one kind host (readable quota, unreadable quota, a quota that refuses
 every raise, and the batch muscle of KubeRay's rig beside the serving one), and the verdict on noisy work, eight seeds each, the
 same seeds for both engines. Every one of the 57 gauges reads identical between omni-v14 and omni-v13, and the verdict allows the
 same share of give-back steps at every cost: no LOSS. That is what both changes should read there: with no muscle named, the
-knob leaves nothing native, and no toy calls an operator's command. The knob's own behaviour is proven in its tests (a muscle
+knob leaves nothing native, and no model calls an operator's command. The knob's own behaviour is proven in its tests (a muscle
 named is never written, an unknown name is refused, every other muscle runs as before), and the commands' in theirs.
 
 ## 5. What stays omni-v13's

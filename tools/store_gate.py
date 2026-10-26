@@ -5,8 +5,8 @@
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The store gate: the data stores' wires (tools/run_pgbench.py, run_kafka.py, run_ycsb.py, run_redis.py, run_sysbench.py)
-in our own model (evidence class S) before any real run, the toy gate's rule for wires the toy gate has no model of
-(tools/toy_gate.py models the Kubernetes governor, the card and the verdict, never these five).
+in our own model (evidence class S) before any real run, the model gate's rule for wires the model gate has no model of
+(tools/model_gate.py models the Kubernetes governor, the card and the verdict, never these five).
 
 The model is the stores' own archived seconds. Every omni arm of a real run wrote one audit record a second: the reading the
 brain took (its force and the compass's position, the misses, the waiting, the lag, the idle consumers), the cost sample it
@@ -18,7 +18,7 @@ the knob elsewhere is read on a world that did not answer it. It says what each 
 a store would then have done.
 
 Gauges, each arm one pair (the standing wire against the candidate on the same seconds), read by the gauge's aim
-(tools/readings.py through tools/toy_gate.reading: a change under 0.5% is STEADY; from 0.5% a resource spent that fell is a
+(tools/readings.py through tools/model_gate.reading: a change under 0.5% is STEADY; from 0.5% a resource spent that fell is a
 cut, a GAIN, and one that rose is power given; time waited or missed that rose is a LOSS):
   setting, mean            the knob held (pool size, consumers, cache MB): a resource
   writes                   the knob's moves (a resize, a rebalance, a server closed and opened): wear, a resource
@@ -39,13 +39,14 @@ Redis: the knob's rule is unchanged; the gate checks the two wires decide identi
 apart is a new gauge, read only by runs that record it.
 
   python3 tools/store_gate.py [--base 0364382a54] [--raw results/live/raw] [--engine V16]
-    -> results/toy_gate/STORE_GATE.md, results/toy_gate/STORE_GATE.json
+    -> results/model_gate/STORE_GATE.md, results/model_gate/STORE_GATE.json
 """
 from __future__ import annotations
 
 import argparse
 import importlib.util
 import inspect
+import gzip
 import json
 import re
 import subprocess
@@ -57,7 +58,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band  # noqa: E402
 from tools.knob_verdict import KnobVerdict  # noqa: E402
-from tools.toy_gate import reading  # noqa: E402  (the toy gate's paired reading: the mean change, its 95% interval, the word)
+from tools.model_gate import reading  # noqa: E402  (the model gate's paired reading: the mean change, its 95% interval, the word)
 from tools.readings import by_word  # noqa: E402  (the number beside a word wears the word's sign)
 
 try:
@@ -67,7 +68,7 @@ except ImportError:                                            # pragma: no cove
 
 BASE = "0364382a54"
 LIVE = ROOT / "results" / "live"
-OUT = ROOT / "results" / "toy_gate"
+OUT = ROOT / "results" / "model_gate"
 WINDOW_S = 15.0                                                # Kafka's first-seconds window
 POLL_RECORDS = 50                                              # Kafka's poll round a consumer (max_poll_records), for the idle-calm gauge alike in both wires
 MATCH_MIN = 0.95                                               # a standing replay that reproduces less of its own record is not read
@@ -264,14 +265,15 @@ def sysbench_counters(raw, engine):
         for run in t["runs"]:
             for rep_dir in sorted((Path(raw) / f"run-{run['run']}" / f"sysbench-{wl}" / f"sysbench-{wl}").glob("rep-*")):
                 f = rep_dir / "omni" / "audit.jsonl"
-                logs = sorted((rep_dir / "omni").glob("notch-*.log"))
+                # the archive gzips a large log (archive-run.yml): read it in either form
+                logs = sorted((rep_dir / "omni").glob("notch-*.log")) + sorted((rep_dir / "omni").glob("notch-*.log.gz"))
                 if not f.exists() or not logs:
                     continue
                 rows = [json.loads(x) for x in f.read_text().splitlines() if x.strip()]
                 seen = [r.get("statements", 0) for r in rows if "statements" in r]
                 rw, secs = 0, 0.0
                 for lg in logs:
-                    txt = lg.read_text()
+                    txt = gzip.decompress(lg.read_bytes()).decode() if lg.suffix == ".gz" else lg.read_text()
                     m_r = re.search(r"read:\s+(\d+)", txt); m_w = re.search(r"write:\s+(\d+)", txt); m_t = re.search(r"total time:\s+([0-9.]+)s", txt)
                     if m_r and m_w and m_t:
                         rw += int(m_r.group(1)) + int(m_w.group(1)); secs += float(m_t.group(1))
@@ -352,7 +354,7 @@ def render(r):
          "each with its own verdict fed the recorded cost samples and its own knob. Open-loop: the inputs are those the standing wire's "
          "knob produced, so the gate says what each wire decides on the same seconds, never what a store would then have done. "
          "Each arm is one pair; the reading is the mean change over the arms, its 95% interval and the word by the gauge's aim "
-         "(`tools/toy_gate.py` `reading`, `tools/readings.py`). A reading here shows whether a change shows promise before a real run; "
+         "(`tools/model_gate.py` `reading`, `tools/readings.py`). A reading here shows whether a change shows promise before a real run; "
          "it is never a benchmark result.", ""]
     for wire, d in r["wires"].items():
         L += [f"## {wire}: {d['arms']} omni arms", "",

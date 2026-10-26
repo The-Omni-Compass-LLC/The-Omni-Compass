@@ -373,8 +373,8 @@ LAW, NERV, CORE, ARM5, THEO = ("omnicompass/compass_law.py", "omnicompass/nervou
 TERMS = [
     # ------------------------------------------------------------------------------------------------- reading a result
     T("GAIN", R, "The gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or "
-      "failures, or a resource cut. Decided by what the gauge is for, never by the plus or minus sign of its number; the number "
-      "beside it wears a plus (+73.0% GAIN). G.A.I.N.: Growth, Advantage, Improvement, Net-positive. Green.",
+      "failures, or a resource cut. Decided by what the gauge is for, never by the plus or minus sign of its number; its size is "
+      "printed without a sign (GAIN 73.0%), the raw change apart with its true sign. G.A.I.N.: Growth, Advantage, Improvement, Net-positive. Green.",
       [(RD, "the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures")]),
     T("STEADY", R, "A change under 0.5% (the mean of the three runs' changes under the floor), no change at all, or a knob native "
       "already runs at the top of its range (at its limit on native). A change of 0.5% or more is never STEADY. Of three kinds: "
@@ -384,7 +384,7 @@ TERMS = [
       [(RD, "STEADY is kept for a change under 0.5%"), (RD, "the top of its range is STEADY, at its limit on native")]),
     T("LOSS", R, "The gauge moved away from its declared aim against native: less work done, a longer wait, more misses or "
       "failures. A LOSS row is never cut: its cause is found and fixed (our own wiring first, then native's setup, then the "
-      "scoring) and the test is run again. The number beside it wears − (−16.8% LOSS). L.O.S.S.: Leakage, Off-track, Setback, "
+      "scoring) and the test is run again. Its size is printed without a sign (LOSS 16.8%), the raw change apart with its true sign. L.O.S.S.: Leakage, Off-track, Setback, "
       "Subpar. Red.",
       [(RD, "the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures"),
        (RD, "is found and fixed (our own wiring first, then native's setup, then the scoring)")]),
@@ -711,7 +711,7 @@ TERMS = [
     T("the model gate", P, "Every change to the engine or a live controller runs first in our own models (class S), against the "
       "engine that stands, on the same seeds, before any real run is started. A change goes on to real runs only where it reads "
       "no LOSS there and shows promise; a LOSS there is root-caused and fixed in the model.",
-      [("tools/toy_gate.py", "against the engine that stands, on the same seeds, before any real run is started")],
+      [("tools/model_gate.py", "against the engine that stands, on the same seeds, before any real run is started")],
       aka=["model gate"]),
     T("the fingerprint and its digest", P, "Every engine version fingerprinted file by file: one SHA-256 per file and one over the "
       "sorted list, its digest. A result belongs to a version only if the commit it ran on carries "
@@ -892,9 +892,10 @@ TERMS = [
       "Every signal shows all four live words, the lit one bright and the rest dim, on native's side and on Omni-Compass's side "
       "alike: Omni-Compass's redline reflex is built never to let a muscle redline, and the red is still wired, so that if one does "
       "(a fault, a bug) it is seen at once, and the kill switch hands everything back to native in the same instant. The engine "
-      "that ran the benchmarks carries the same reflex in its own form: on a response-time breach it hands the knob back to native's "
-      "own target at once, and its fast check adds replicas within 5 s from the live queue (omni_controller/controller.py); the "
-      "page's live model applies the same rule to every muscle it draws.",
+      "that stands, omni-v21, carries the rule in its immune system, knob by knob (omnicompass/immune.py and its C++ twin "
+      "cpp/src/immune.cpp): over its line three decisions, stuck, and native's twin lower by more than 5%, the knob is handed to "
+      "native for 10 decisions, doubling up to 160; where native is not stronger Omni-Compass stays. The page's live model applies "
+      "the same rule, with the engine's own numbers, to every muscle it draws.",
       [(PAGE_F, "GAINING: low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN)"),
        (PAGE_F, "STEADY: inside its band, or level with native (STEADY, a change under 0.5%)"),
        (MAN, "| Yellow | STEADY |")], aka=["traffic signal", "traffic light", "light", "lights"]),

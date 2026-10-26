@@ -9,7 +9,7 @@ or 5 seconds do better than 15, is 20 different, what does a faster beat cost th
 60 s do): the shipped controller of a checkout at a decision every 5, 10, 15, 20, 30, 60, 75, 90 and 120 s on one 5-second
 plant, against native, in two settings.
 
-  cloud    the cloud's plant (cloud_toy below, the toy gate's cloud toy with the shipped actuator, cut into 5-second steps):
+  cloud    the cloud's plant (cloud_model below, the model gate's cloud model with the shipped actuator, cut into 5-second steps):
            the cloud's own autoscaler makes and deletes machines in every arm; the governor on the machines alone
            (--give-back-only), as every cloud set runs it.
   onsite   pilot/selfpilot.py's plant cut into 5-second steps: native is the pod autoscaler with the cluster autoscaler;
@@ -23,9 +23,9 @@ cluster and its writes; its fast check's rescues are the machines it added only 
                                    [--periods 5,10,15,20,30,60,75,90,120] [--settings onsite,cloud] [--arms native,cand,base]
   python3 tools/heartbeat_sweep.py --one SETTING ARM SEED PERIOD DIR CAND   (one run, inside the checkout under test)
 
-  python3 tools/heartbeat_sweep.py --table OUT/results.jsonl results/toy_gate/HEARTBEAT_SWEEP.md   (the record)
+  python3 tools/heartbeat_sweep.py --table OUT/results.jsonl results/model_gate/HEARTBEAT_SWEEP.md   (the record)
 
-The record of 22 October is results/toy_gate/HEARTBEAT_SWEEP.md and its .json: native, omni-v16 (the engine that stands) and
+The record of 22 October is results/model_gate/HEARTBEAT_SWEEP.md and its .json: native, omni-v16 (the engine that stands) and
 omni-v15 (the engine before it), each row named by the engine it ran on.
 """
 import argparse, json, math, os, subprocess, sys, time
@@ -34,17 +34,17 @@ from pathlib import Path
 HERE = Path(__file__).resolve()
 
 
-SLO_MS = 200.0                       # the toy service's line (tools/toy_gate.py's)
+SLO_MS = 200.0                       # the model service's line (tools/model_gate.py's)
 SERVICE_MS = 20.0                    # the bare service time of one request
 SAMPLES_PER_TICK = 20                # requests timed every 15 s
 BLINK_EVERY, BLINK = 1440, (700, 708)  # the blink: two minutes (8 ticks of 15 s) out of service every six hours
 
 
-def cloud_toy(seed, days, fine=False, blink=False):
-    """The cloud's plant and the cluster as its API shows it: (sim, kube, STEP_S). The toy gate's cloud toy as it stood on
+def cloud_model(seed, days, fine=False, blink=False):
+    """The cloud's plant and the cluster as its API shows it: (sim, kube, STEP_S). The model gate's cloud model as it stood on
     22 October with the shipped actuator (CloudSim below: a machine the governor parks is tainted idle and deleted by the cloud
     after ten minutes empty; an idle machine still takes pods), kept here whole so every engine the sweep reads runs on the
-    same plant, whatever its own checkout's toy gate holds."""
+    same plant, whatever its own checkout's model gate holds."""
     from pilot.selfpilot import SimCluster, SimKube
     from fleet.harness import hpa_step
     from fleet.sim import ALLOC, _cluster_autoscaler
@@ -60,7 +60,7 @@ def cloud_toy(seed, days, fine=False, blink=False):
         and wakes it, and never adds one. An idle machine is the shipped actuator's (scripts/kind_nodepool.sh, omni-v16's
         gate): marked PreferNoSchedule, Ready, powered and billed; no pod is moved off it; a pod that finds the open
         machines full lands on it at once; once it carries no work it stands empty for the cloud's scale-down time and
-        is deleted. (Until omni-v16 the toy took an idle machine's room away at once, as if drained, which the actuator
+        is deleted. (Until omni-v16 the model took an idle machine's room away at once, as if drained, which the actuator
         never does: pods waited there that wait nowhere on a real cluster.)"""
         PARK_TICKS = 40 * SUB                                  # ten minutes: the autoscaler's scale-down-unneeded time
 
@@ -156,7 +156,7 @@ def cloud_toy(seed, days, fine=False, blink=False):
                                           "spec": {"taints": taints}, "status": {"allocatable": {"cpu": str(p.cores)},
                                           "conditions": [{"type": "Ready", "status": "True"}]}}
                 # the blink (omni-v11): four times a day every machine in service leaves service for two minutes in the
-                # governor's reading, while the toy cluster serves on, as the kind cluster of the CruiseKube test did on 18
+                # governor's reading, while the model cluster serves on, as the kind cluster of the CruiseKube test did on 18
                 # October (run 39120444653, repetition 8)
                 out_now = blink and BLINK[0] <= self.sim.t % BLINK_EVERY < BLINK[1]
                 gone = [{"key": "node.kubernetes.io/unreachable", "effect": "NoSchedule"}] if out_now else []
@@ -197,12 +197,12 @@ def cloud_toy(seed, days, fine=False, blink=False):
             try:
                 return super().get(*args)
             except ValueError:
-                raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy cluster")
+                raise subprocess.CalledProcessError(1, ["kubectl", *args], stderr="not in the model cluster")
 
     return sim, Kube(sim, None), STEP_S
 
 
-def onsite_toy(seed, days, autoscaler):
+def onsite_model(seed, days, autoscaler):
     from pilot.selfpilot import SimCluster, SimKube
     from fleet.harness import hpa_step
     from fleet.sim import ALLOC, _cluster_autoscaler
@@ -252,7 +252,7 @@ def onsite_toy(seed, days, autoscaler):
 
     class Kube(SimKube):
         """pilot/selfpilot.py's SimKube with the fields Kubernetes shows that it leaves out: each HPA's range and target, each
-        deployment, the pending pods by name (as tools/toy_gate.py's cloud toy shows them)."""
+        deployment, the pending pods by name (as tools/model_gate.py's cloud model shows them)."""
         def get(self, *args):
             import subprocess as sp
             if args[:2] == ("get", "hpa"):
@@ -276,7 +276,7 @@ def onsite_toy(seed, days, autoscaler):
             try:
                 return super().get(*args)
             except ValueError:
-                raise sp.CalledProcessError(1, ["kubectl", *args], stderr="not in the toy cluster")
+                raise sp.CalledProcessError(1, ["kubectl", *args], stderr="not in the model cluster")
 
     sim = Fine(seed, days, autoscaler=autoscaler)
     return sim, Kube(sim, None), STEP_S
@@ -291,9 +291,9 @@ def one(setting, arm, seed, period, out, cand, days=1.0):
     (out / "audit.jsonl").unlink(missing_ok=True)
     rng = np.random.default_rng(seed + 7)
     if setting == "cloud":
-        sim, k, STEP_S = cloud_toy(seed, days, fine=True)
+        sim, k, STEP_S = cloud_model(seed, days, fine=True)
     else:
-        sim, k, STEP_S = onsite_toy(seed, days, "ca" if arm == "native" else "none")
+        sim, k, STEP_S = onsite_model(seed, days, "ca" if arm == "native" else "none")
     SUB = int(round(15.0 / STEP_S))
     billed, lat_rows, minute_ms = [], [], {}
     lat_path = out / "latency.csv"
@@ -346,14 +346,14 @@ def one(setting, arm, seed, period, out, cand, days=1.0):
         ctl.k.get = counted_get
         real_run = subprocess.run
 
-        def fake_run(cmd, *kw_a, **kw):
+        def standin_run(cmd, *kw_a, **kw):
             if isinstance(cmd, list) and cmd and cmd[0] == "SIMSCALE":
                 sim.resize(int(cmd[1])); return subprocess.CompletedProcess(cmd, 0)
             return real_run(cmd, *kw_a, **kw)
         every = max(1, int(round(period / STEP_S)))
         from omni_controller import controller as shipped
         fails = 0
-        with mock.patch("omni_controller.controller.subprocess.run", side_effect=fake_run):
+        with mock.patch("omni_controller.controller.subprocess.run", side_effect=standin_run):
             while sim.u < sim.steps:
                 sim.tick(); sim.c.alloc = alloc_now()
                 time_requests(); billed.append(sim.billed())
@@ -424,11 +424,11 @@ SETTING = {"onsite": "On-site: native is the pod autoscaler with the cluster aut
 
 def table(results, out_md):
     """The record: every beat of each engine against native and against the same engine at 60 s, paired by seed, read by the
-    gate's own rule (tools/toy_gate.py reading: the mean change, its 95% interval over the seeds, the word by the gauge's aim);
+    gate's own rule (tools/model_gate.py reading: the mean change, its 95% interval over the seeds, the word by the gauge's aim);
     with the engine's own cost a day."""
     import collections
     sys.path.insert(0, str(HERE.parents[1]))
-    from tools.toy_gate import reading
+    from tools.model_gate import reading
     from tools.legal import stamp
     rows = [json.loads(l) for l in open(results)]
     by = collections.defaultdict(dict)
@@ -450,7 +450,7 @@ def table(results, out_md):
                   "than 60 seconds does (75, 90 and 120), to show whether, and why, it gains or loses. Run by "
                   "`tools/heartbeat_sweep.py` (the shipped controller of each checkout on one 5-second plant, eight seeds of a day "
                   "each, paired by seed; each row named by the engine it ran on: " + ", ".join(engines) + "). Each "
-                  "reading is the gate's rule (`tools/toy_gate.py`): the mean change over the seeds with its 95% interval, the word "
+                  "reading is the gate's rule (`tools/model_gate.py`): the mean change over the seeds with its 95% interval, the word "
                   "by the gauge's aim (`tools/readings.py`). The engine's own cost is a mean a day: its decisions, its processor "
                   "time, its reads of the cluster and its writes; the fast check's rescues are the pool commands its 5-second check "
                   "wrote because a pod already waited for a place, apart from the full decision's own, which size the pool ahead "

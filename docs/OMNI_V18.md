@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v18 (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files) stands on main since 23 October, night. The founder's orders of
+Omni v18 (`OMNI_V18.json`, digest `1cb92edb64c4391d`, 62 files) stood on main from 23 October, night, to 25 October, when omni-v19 (`docs/OMNI_V19.md`) landed. The founder's orders of
 the same evening: "Native is Kubernetes on the muscles. Omni on native is Omni on top of Kubernetes on top of the muscles. And
 then Omni direct is simply Omni on top of the muscles, no Kubernetes ... they all need to be written in code and toned in ...
 and push it all"; and, once it was pushed, "It should be not 17 anymore, it should be 18 ... Give me this new live engine wired
@@ -60,8 +60,8 @@ Our own showing on one host, class L, one run of each arm (`docs/OMNI_ORCHESTRAT
 - **Omni direct against native, full form** (18 steps of 25 s): work GAIN, up 4.7%; the 95th percentile GAIN, down 9.9%; units
   GAIN, a cut, down 10.3%; machines STEADY, down 1.7%; 0 failed and 0 wrong in 20,452 requests.
 
-The toy gate against omni-v17 (`results/toy_gate/V18_VS_V17.md`): every toy reads omni-v17's numbers, because none of omni-v17's
-55 files moved; the gate's toys do not run the orchestrator, whose own gate is the showing above.
+The model gate against omni-v17 (`results/model_gate/V18_VS_V17.md`): every model reads omni-v17's numbers, because none of omni-v17's
+55 files moved; the gate's models do not run the orchestrator, whose own gate is the showing above.
 
 And after it landed, the three runs on GitHub's machines (the full form, A, B and C from one commit) read Omni on native against native work GAIN in all three (up 5.2% to 7.4%) and the 95th percentile GAIN in all three (down 7.5% to 12.1%), Omni direct against native work GAIN in all three (up 5.7% to 9.4%) and the 95th percentile GAIN in all three (down 9.8% to 15.7%), machines STEADY, the units power given or STEADY, and Omni direct against Omni on native STEADY on every gauge; no LOSS in any pair in any run (`results/orchestrator/V18_THREE_ARMS_ABC.md`).
 
@@ -79,7 +79,7 @@ dry run (the default) shows the price and rents nothing. The GPU runs on Lambda 
 ## What it does not claim
 
 The three-run reading is the full form on GitHub's machines from one commit, on one host each; no cloud machine has run it yet. The comparison of Omni direct against Kubernetes itself on the kind rig is the next
-step. The trade between muscles judged on the organism stays the next version's work, through the toy gate. Run and scored by
+step. The trade between muscles judged on the organism stays the next version's work, through the model gate. Run and scored by
 The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ---

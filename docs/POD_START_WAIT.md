@@ -130,11 +130,11 @@ reading. A LOSS is root-caused again and never cut.
   and the load generator. omni-v7's shared-host guard and the window's refusal rules stand as before.
 - **The batch jobs' small image** (`busybox:1.36`, about 4 MB) is still pulled on first use inside the window, as before. It
   unpacks in well under a second.
-- **The toy gate carries the old rig.** The conveyance toy's pod start time (`start_time` in `tools/toy_gate.py`: 8 s up to
+- **The model gate carries the old rig.** The conveyance model's pod start time (`start_time` in `tools/model_gate.py`: 8 s up to
   half busy, rising to 12.4 s near the top) was fitted to the omni-v6 KEDA run's 151 starts. That curve is the empty-node
   unpacking of section 4 in model form, and it is why the gate reads the pod start wait under conveyance LOSS (+9.0% on
   omni-v10 and omni-v11, `docs/OMNI_V11.md`). The curve is refit from the first amended-rig KEDA runs' own files, never
-  guessed. Until then the toy's start-wait row reads this coupling, not the governor.
+  guessed. Until then the model's start-wait row reads this coupling, not the governor.
 
 ## 9. Reproduce
 

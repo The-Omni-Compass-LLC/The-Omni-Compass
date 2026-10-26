@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+# Alertmanager for the mission-control wall: every firing governor alert goes to the alert bridge
+# (tools/omni_alert_bridge.py), which presses the control panel's button listed for it in actions.json, or writes what it
+# would press while it is not told to press. Add your own receivers (mail, chat, paging) beside it.
+route:
+  receiver: omni-bridge
+  group_by: [alertname, instance]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 1h
+receivers:
+  - name: omni-bridge
+    webhook_configs:
+      - url: http://omni-bridge:9466/alerts
+        send_resolved: true
+# © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only; any commercialization or
+# monetization requires a signed, paid Omni-Compass Enterprise License. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com

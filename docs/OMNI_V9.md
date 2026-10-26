@@ -7,13 +7,13 @@ stands: omni-v9 with the battery glide at 0.0875 an hour, the speed that cuts th
 the ladder it was chosen from). This page stays as omni-v9's record, read beside no other engine's.
 
 Omni v9 was the engine on main from 17 October (the founder's orders: "we're going into another version of
-Engine ... Apply the fix, run it, and see in the toy sim that it works"; "Omni-Compass should be tuned to exploit all that can be
+Engine ... Apply the fix, run it, and see in the model sim that it works"; "Omni-Compass should be tuned to exploit all that can be
 and keep all healthy and never raise its bill ... the tuning stays where it doesn't ever hurt anyone"). It is omni-v8
 (`docs/OMNI_V8.md`) with one wire repaired and one statistical table made exact. It was written for one omni-v8 row the table
 printed as LOSS; on 17 October the founder found that word misapplied (section 1): the row was power given. The repair it led to
 stands on its own, because it cuts the bill further in every district. Its fingerprint is `OMNI_V9.json` (digest `7379f3a79ff2c475`, 47 files); 44 are omni-v8's bytes, two
 differ (the CityLearn runner and the realms harness) and one is new (`omnicompass/student_t.py`). It was proven in our own runs of
-CityLearn and in the toy gate before it was pushed. Every benchmark runs again on it, and every earlier table stands as its own
+CityLearn and in the model gate before it was pushed. Every benchmark runs again on it, and every earlier table stands as its own
 engine's result until its three runs on v9 land; results from two versions are never pooled. Run and scored by The Omni-Compass
 LLC's own code. No outside party has reviewed or approved these results.
 
@@ -209,15 +209,15 @@ months in the robustness district, 3 in the tuning district, 1 in each of the 20
 3, 2 and 4); in Alameda and Travis in none. A peak is power held, so each is power given, beside the bill and the energy it bought;
 CityLearn's own scores over the year (the highest peak, the daily peak and the monthly unevenness) read GAIN. A guard that keeps Omni-Compass's added charge under the
 month's top so far cut one of the two months on the robustness district and left every score GAIN; it is a candidate for the next
-version, in the toy gate first.
+version, in the model gate first.
 
-## 4. The toy gate
+## 4. The model gate
 
-The changes touch no Kubernetes, card or cloud controller, and the toy gate's models (`tools/toy_gate.py`) do not run the CityLearn
+The changes touch no Kubernetes, card or cloud controller, and the model gate's models (`tools/model_gate.py`) do not run the CityLearn
 wire, so they read the same on both checkouts by construction; the gate was run all the same, the candidate against omni-v8 on
-seeds 1 to 8, and is recorded in `results/toy_gate/V9_VS_V8.md`: every gauge of every toy (the cluster at 60 s and at 15 s,
+seeds 1 to 8, and is recorded in `results/model_gate/V9_VS_V8.md`: every gauge of every model (the cluster at 60 s and at 15 s,
 conveyance with the quota readable and unreadable, the verdict on noisy work) identical to omni-v8 to the last digit, in every count
-(it ran with the glide at 0.10, a setting no toy reads). The same models show, for omni-v8 and the candidate alike, a pod start wait
+(it ran with the glide at 0.10, a setting no model reads). The same models show, for omni-v8 and the candidate alike, a pod start wait
 +9% against native beside 64% more requests served: the same row the real KEDA HTTP run showed (`docs/OMNI_V7.md`, section 6;
 `docs/STATE_OF_PLAY.md`, Open), the next repair. These are our own models (class S), never a benchmark result.
 

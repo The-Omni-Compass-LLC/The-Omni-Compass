@@ -76,7 +76,7 @@ wear it bought, never called a loss. Where no move passes that test, Omni-Compas
 alone. It takes nothing from one muscle to give to another: that form never harms the organism, but it leaves
 unused any gain that needs one muscle to give way to another. Letting one muscle give way so that the organism's whole
 output comes out ahead, judged on the organism and on every muscle's health, is the next engine version's work. It is
-built and proven in our own models first (the toy gate), every benchmark is run again on it, and no result claims it
+built and proven in our own models first (the model gate), every benchmark is run again on it, and no result claims it
 before its runs exist.
 
 **The factory tune: one tuned engine, and a tuning bench.** The engine in this repository is presented as The Omni-Compass LLC

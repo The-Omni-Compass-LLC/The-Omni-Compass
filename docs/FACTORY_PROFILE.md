@@ -41,8 +41,8 @@ is verified, and no other profile is released before it.
 | Governing engine | The executable mathematical rules that turn observations and internal state into governing decisions. | `omnicompass/` (the compass law, the core, the nervous system, the verdict), `omni_controller/controller.py`, its C++ twin `cpp/src/governor.cpp` |
 | Native baseline | The system's documented configuration and behaviour with no Omni-Compass governing it: every muscle under its own native controller, as its vendor ships it. | the arm `native` in every benchmark; `realms/harness.py`, the plant and its native controller alone |
 | Factory profile | The complete, versioned set of Omni-Compass default settings shipped together. | `OMNI_V19.json` (the fingerprint), the controller's defaults, `realms/muscle_cards_v5.csv` |
-| Candidate profile | A proposed combination of settings under evaluation. | the live benchmark engine's "Try the candidate" (the best beat of a sweep); the model gate's candidates (`tools/toy_gate.py`) |
-| Active profile | The settings actually governing the current run. | the live benchmark engine's "active profile" line, with its fingerprint |
+| Candidate profile | A proposed combination of settings under evaluation. | the live engine's "Try the candidate" (the best beat of a sweep); the model gate's candidates (`tools/model_gate.py`) |
+| Active profile | The settings actually governing the current run. | the live engine's "active profile" line, with its fingerprint |
 | Custom profile | An identifiable configuration that differs from the released factory profile. | any knob turned on the bench; its fingerprint names it; its results are its own |
 | Live tuning bench | The interface that operates the engine's controls and displays their effects through the connected backend. | `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, the main control panel |
 | Harness | The machinery that supplies workloads, executes comparisons, checks requirements and records results. | `realms/harness.py`, `scripts/kind_bench.sh`, `tools/confirm_abc.py`, the workflows under `.github/workflows/` |
@@ -124,8 +124,8 @@ its objective and its exact profile.
 
 The result is called **the best validated factory profile for the declared operating conditions**, which gives "optimal" an
 assessable meaning. Today the repository is at step 1 and step 2 for the next profile (the heartbeat sweep and the beat ladder,
-`results/toy_gate/HEARTBEAT_SWEEP.md`, `results/toy_gate/V17_LADDER.md`, class S); steps 3 to 8 come after the founder confirms the
-mechanisms. Every engine version already passes the model gate (`tools/toy_gate.py`) and the three-run rule before its results stand.
+`results/model_gate/HEARTBEAT_SWEEP.md`, `results/model_gate/V17_LADDER.md`, class S); steps 3 to 8 come after the founder confirms the
+mechanisms. Every engine version already passes the model gate (`tools/model_gate.py`) and the three-run rule before its results stand.
 
 ## 6. Carrying it into C++ and every other implementation
 

@@ -58,6 +58,9 @@ PPU = 36.0                                       # points in one drawing unit (h
 LH = 0.33                                        # one line of 9 pt type with its lead, in drawing units (11.9 pt)
 NAVY, GOLD, RULE, INK, GREY = "#0b1f3a", "#a8801f", "#c9b27a", "#1a1a1a", "#666666"
 PALE, BLUE, MIST, ROSE, RED, GREEN, AMBER = "#faf6ec", "#e8eef7", "#f3f3f1", "#f7e6e6", "#8a1f1f", "#2e6b3a", "#b8860b"
+# the key's colours on paper (the founder's order of 24 October, everywhere a reading is drawn): GAIN green, STEADY yellow, LOSS red,
+# power given blue (Omni-Compass's own colour), native orange
+YELLOW, GIVEN_BLUE, NATIVE_ORANGE = "#c9a000", "#2f6db0", "#e0740c"
 DJV = "/usr/share/fonts/truetype/dejavu/"
 
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": PT, "svg.fonttype": "none", "axes.titlesize": PT,
@@ -100,8 +103,8 @@ FIGURES = {
     "f_release_gate": "Flowchart: the release gate, reasons 1 to 5",
     "f_release_gate_b": "Flowchart: the release gate, reasons 6 to 9 and the release",
     "f_stops": "Flowchart: the three ways a governor stops",
-    "f_toy_gate": "Flowchart: the toy gate before any engine change runs for real",
-    "f_reading": "Flowchart: the three-run reading rule",
+    "f_model_gate": "Flowchart: the model gate before any engine change runs for real",
+    "f_reading": "Flowchart: the three-run reading rule, a change of 0.5% or more a change",
     "f_park": "Flowchart: parking and waking a machine in the cloud",
     "f_conductor": "Flowchart: one tick of the grid conductor",
     "f_trial": "Flowchart: the verdict's trial on one step, from the reference to the reading",
@@ -987,9 +990,9 @@ def f_stops():
                  w=6.2, side_w=4.6)
 
 
-def f_toy_gate():
+def f_model_gate():
     return chart([("start", "a change to a rule, a gain, a guard, a preset or a muscle"),
-                  ("box", "tools/toy_gate.py: the change against the engine that stands, our own models, the same seeds, paired (class S)"),
+                  ("box", "tools/model_gate.py: the change against the engine that stands, our own models, the same seeds, paired (class S)"),
                   ("decision", "any LOSS by the gauge's aim?"),
                   ("decision", "promise shown (GAIN somewhere, STEADY elsewhere)?"),
                   ("box", "its GitHub trials: A, B and C on the real stacks"),
@@ -1001,14 +1004,16 @@ def f_toy_gate():
 
 
 def f_reading():
-    return chart([("start", "one judged row: three runs, three intervals"),
-                  ("decision", "does every interval exclude zero?"),
-                  ("decision", "do all three point the same way?"),
+    return chart([("start", "one judged row: three runs, each a change in percent of native with its 95% interval"),
+                  ("decision", "did two runs each move 0.5% or more, in opposite directions?"),
+                  ("decision", "is the mean of the three changes 0.5% or more, either way?"),
                   ("decision", "is that way the gauge's aim? (time, misses, failures: a fall; work: a rise; a resource spent: a fall is a cut)"),
+                  ("decision", "does every run's interval exclude zero, all three the same way?"),
                   ("end", "GAIN in all three of our runs")],
-                 decisions={1: ("no", "STEADY: no difference beyond the noise (with the count of runs it holds in)"),
-                            2: ("no", "the runs disagree: the test is unstable there; look into it"),
-                            3: ("no", "LOSS in all three of our runs; for a resource spent that rose, power given")},
+                 decisions={1: ("yes", "the runs disagree: the test is unstable there; look into it"),
+                            2: ("no", "STEADY, under the floor"),
+                            3: ("no", "LOSS; for a resource spent that rose, power given (in all three, or by the mean, by the next question)"),
+                            4: ("no", "GAIN by the mean of our three runs, with the count of runs beyond the noise")},
                  w=6.4, side_w=4.4)
 
 
@@ -1149,7 +1154,7 @@ def t_lease():
     reset = [7 if k < 10 else 10 for k in t]
     death = [7 if k < 19 else 10 for k in t]
     walk = [7 if k < 10 else min(10, 7 + 3 * (k - 10) / 24) for k in t]
-    ax.plot(t, native, color=GREY, ls="--", label="native's setting")
+    ax.plot(t, native, color=NATIVE_ORANGE, ls="--", label="native's setting")
     ax.step(t, reset, where="post", color=NAVY, label="the reset, the kill switch: back at once, read back")
     ax.step(t, death, where="post", color=RED, label="a death: the watchdog's restore (kill test: 7 to 11 s, mean 9 s)")
     ax.plot(t, walk, color=GOLD, label="the modelled bodies' lease: walked back over 24 decisions")
@@ -1349,7 +1354,9 @@ def read_table(rel, head_starts):
 def reading_color(word):
     w = word.lower()
     if "power given" in w:
-        return AMBER
+        return GIVEN_BLUE
+    if w.startswith("**even") or w.startswith("even"):
+        return YELLOW
     if w.startswith("**gain") or w.startswith("gain"):
         return GREEN
     if w.startswith("**loss") or w.startswith("loss"):
@@ -1393,7 +1400,7 @@ def receipt_chart(rel, title):
     ax.axvline(0, color=NAVY, lw=1)
     ax.set_yticks(range(len(judged))); ax.set_yticklabels([wrap(j[0], 36) for j in reversed(judged)])
     ax.set_xlim(-115, 115); ax.set_xlabel("paired change against native, %\n(runs A, B, C from top; the interval is 95%)")
-    ax.set_title("the judged rows: green GAIN, amber power given,\nred LOSS, grey STEADY", loc="left")
+    ax.set_title("the judged rows: green GAIN, blue power given,\nred LOSS, yellow STEADY", loc="left")
     fig.suptitle(wrap(title, 78), x=0.01, ha="left", fontsize=PT)
     return fig_svg(fig)
 
@@ -1577,8 +1584,8 @@ def _grid_label(cell):
         if lo and int(lo.group(1)) > 0:
             return f"GAIN {g.group(1)}, LOSS {lo.group(1)}", "#f3c9c9"
         return f"GAIN on {g.group(1)}", "#cfe8cf"
-    if low.startswith(("steady", "even")):
-        return ("STEADY " + pp).strip(), "#e3e3e3"
+    if low.startswith("even"):
+        return ("STEADY " + pp).strip(), "#f6e7a6"
     if "pending" in low:
         return "pending", "white"
     return "·", "white"
@@ -1616,7 +1623,7 @@ def grid_chart(section_start, title, key):
 
 def r_grid():
     return grid_chart("Modelled", "Modelled (class S, our own models): the seven organisms at every size and run count, the change in misses against native",
-                      "Green GAIN, grey STEADY, red LOSS, light grey one run (no label yet), white not in the receipt")
+                      "Green GAIN, yellow STEADY, red LOSS, light grey one run (no label yet), white not in the receipt")
 
 
 def r_grid_kube():

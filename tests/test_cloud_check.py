@@ -227,7 +227,7 @@ class AzureFourBoxes(unittest.TestCase):
             self.assertIn("docs/AZURE_SETUP.md", bad.stdout)
 
 
-def fake_bin(d, name, body):
+def standin_bin(d, name, body):
     p = Path(d) / name
     p.write_text("#!/usr/bin/env bash\n" + body)
     p.chmod(p.stat().st_mode | stat.S_IEXEC)
@@ -260,10 +260,10 @@ esac
 class PreFlight(unittest.TestCase):
     def run_script(self, script, env):
         with tempfile.TemporaryDirectory() as d:
-            fake_bin(d, "gcloud", GCLOUD)
-            fake_bin(d, "aws", AWS)
+            standin_bin(d, "gcloud", GCLOUD)
+            standin_bin(d, "aws", AWS)
             for tool in ("eksctl", "kubectl", "helm"):          # the pre-flight stops before any of them is reached
-                fake_bin(d, tool, f'echo "{tool} reached" >&2; exit 9\n')
+                standin_bin(d, tool, f'echo "{tool} reached" >&2; exit 9\n')
             e = dict(CLEAN, PATH=f"{d}:{os.environ['PATH']}", REP="1", PREFLIGHT_ONLY="1", GCP_PROJECT="p",
                      ASKED=str(Path(d) / "asked"), **env)
             out = subprocess.run(["bash", str(ROOT / "scripts" / script)], env=e, capture_output=True, text=True, cwd=d)
@@ -336,9 +336,13 @@ class ConductorGate(unittest.TestCase):
 
     def test_the_workflow_titles_match_the_conductor(self):
         w = yaml.safe_load((ROOT / ".github" / "workflows" / "cloud-check.yml").read_text())
-        self.assertEqual(w["run-name"], "cloud-check ${{ github.event.inputs.cloud || 'both' }}")
-        self.assertEqual(set(grid.CHECKS.values()), {"google", "amazon", "azure"})
-        self.assertEqual(set(w["jobs"]), set(grid.CHECKS.values()))      # one job a cloud, its title the conductor's
+        self.assertEqual(w["run-name"], "cloud-check ${{ github.event.inputs.cloud || 'azure' }}")
+        byoc = {"oracle", "digitalocean", "alibaba", "linode", "ibm"}
+        self.assertEqual(set(grid.CHECKS.values()), {"google", "amazon", "azure"} | byoc)
+        # one job a cloud, its title the conductor's; the clusters built in a provider's console share one job, by its input
+        self.assertEqual(set(w["jobs"]), {"google", "amazon", "azure", "byoc"})
+        self.assertTrue(byoc <= set(json.loads(w["jobs"]["byoc"]["if"].split("fromJSON('")[1].split("')")[0])))
+        self.assertNotIn('"all"', w["jobs"]["byoc"]["if"])                # no such secret stands until a tester stores one
         text = (ROOT / ".github" / "workflows" / "cloud-check.yml").read_text()
         self.assertEqual(text.count('PREFLIGHT_ONLY: "1"'), 2)          # it never builds a cluster
         self.assertEqual(text.count("azure_capacity.py preflight"), 1)    # Azure's pre-flight waits for nothing and builds nothing
@@ -346,7 +350,7 @@ class ConductorGate(unittest.TestCase):
         self.assertNotIn("az group create", text)
         for cloud, runs in (("google", ("google", "both", "all")), ("amazon", ("amazon", "both", "all")), ("azure", ("azure", "all"))):
             # a push of this file to main runs the two free checks as "both" (23 October); a hand or conductor start names its cloud
-            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), (github.event.inputs.cloud || 'both'))")
+            self.assertEqual(w["jobs"][cloud]["if"], "contains(fromJSON('" + json.dumps(list(runs)) + "'), (github.event.inputs.cloud || 'azure'))")
         self.assertNotIn("eksctl create", text)
         self.assertNotIn("clusters create", text)
 
@@ -375,7 +379,8 @@ class ConductorGate(unittest.TestCase):
         posts = [(p, d) for m, p, d in calls if m == "POST"]
         self.assertTrue(posts)
         self.assertTrue(all("cloud-check.yml/dispatches" in p for p, _ in posts), posts)   # no set started
-        self.assertEqual(sorted(d["inputs"]["cloud"] for _, d in posts), ["amazon", "google"])
+        # every queue switched on but Azure's: a check for each, the five console-built clusters' too
+        self.assertEqual(sorted(d["inputs"]["cloud"] for _, d in posts), ["alibaba", "amazon", "digitalocean", "google", "ibm", "linode", "oracle"])
 
     def test_an_azure_set_waits_for_azures_check(self):
         """22 October: an Azure set that failed at the login counted as started; Azure's sets now wait for its own check."""
@@ -399,6 +404,84 @@ class ConductorGate(unittest.TestCase):
         posts = [(p, d) for m, p, d in calls if m == "POST"]
         self.assertEqual([(p.split("/")[-2], d["inputs"]) for p, d in posts], [("cloud-check.yml", {"cloud": "azure"})])
         self.assertEqual(grid.check_state([], "Azure")[0], "check")
+
+
+KUBE = """apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t
+    server: https://203.0.113.10:6443
+  name: work
+contexts:
+- context: {cluster: work, user: omni}
+  name: work
+current-context: work
+users:
+- name: omni
+  user:
+%s
+"""
+
+
+class Kubeconfig(unittest.TestCase):
+    """A cluster built in a provider's own console (docs/BYOC_SETUP.md): its kubeconfig's shape is read before anything is
+    measured, never a character of it printed, and a kubeconfig that logs in only through a provider's command line (which
+    GitHub's runner does not carry) is refused there."""
+
+    def run_check(self, raw):
+        env = dict(CLEAN, KUBECONFIG_RAW=raw)
+        return subprocess.run(["python3", "tools/cloud_key_check.py", "kubeconfig"], cwd=ROOT, env=env, capture_output=True, text=True)
+
+    def test_a_token_kubeconfig_is_whole_and_never_printed(self):
+        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9tbmkifQ.secret-part-never-printed"
+        r = self.run_check(KUBE % f"    token: {token}")
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertIn("logging in by a token", r.stdout)
+        self.assertNotIn("secret-part", r.stdout + r.stderr)
+        self.assertNotIn("203.0.113.10", r.stdout + r.stderr)
+
+    def test_base64_of_it_is_read_too(self):
+        import base64
+        r = self.run_check(base64.b64encode((KUBE % "    token: abc").encode()).decode())
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_a_provider_plugin_is_refused_by_name(self):
+        r = self.run_check(KUBE % "    exec:\n      apiVersion: client.authentication.k8s.io/v1beta1\n      command: oci")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("oci", r.stdout)
+        self.assertIn("service-account token", r.stdout)
+
+    def test_not_a_kubeconfig_says_what_was_stored(self):
+        r = self.run_check("hello there")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("11 characters stored", r.stdout)
+        self.assertNotIn("hello", r.stdout)
+        self.assertEqual(self.run_check("").returncode, 2)
+
+    def test_the_workflow_reads_it_before_the_run(self):
+        body = (ROOT / ".github/workflows/byoc-metered.yml").read_text()
+        self.assertLess(body.index("cloud_key_check.py kubeconfig"), body.index("bash scripts/byoc_paired.sh"))
+        self.assertNotIn("setup-kubectl", body)
+
+
+class ConsoleClouds(unittest.TestCase):
+    """Oracle, DigitalOcean, Alibaba Cloud, Linode and IBM Cloud: wired as Azure's sets run, switched off, never run."""
+
+    def test_each_queue_is_off_and_carries_the_four_sets(self):
+        for name, key in grid.BYOC.items():
+            with self.subTest(cloud=name):
+                q = ROOT / "scripts" / f"{key}_queue.txt"
+                self.assertFalse(grid.cloud_switch(q))
+                sets = [ln.split("|")[0] for ln in q.read_text().splitlines() if ln and not ln.startswith(("#", "switch="))]
+                self.assertEqual(sets, ["steady", "burst 1 4 1 6 1 9", "burst 1 6 1 8 1 6", "the real day on 1 to 9"])
+                self.assertTrue(all(f"cloud={key}" in ln for ln in q.read_text().splitlines() if "|" in ln and not ln.startswith("#")))
+
+    def test_the_title_is_the_workflows_own(self):
+        w = (ROOT / ".github/workflows/byoc-metered.yml").read_text()
+        self.assertIn("format('byoc-metered {7} {0}{1}{2}{6} dial {3} {4} {5}'", w)
+        kv = {"cloud": "oracle", "replica_ceiling": "0", "stop_looks": "10,20,40,70", "dial": "save"}
+        self.assertEqual(grid.cloud_title("byoc-metered.yml", kv),
+                         "byoc-metered oracle steady replica room 0 to the cap, stopping rule dial save oracle work0")
 
 
 if __name__ == "__main__":

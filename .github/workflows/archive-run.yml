@@ -27,10 +27,10 @@ env:
   # every workflow whose runs hand in raw files (tests/test_archive_sweep.py: every workflow that uploads files is here, or
   # among its reports and checks); a report or a check hands in no run of its own
   ARCHIVE_WORKFLOWS: >-
-    aks-metered-full.yml aks-metered.yml benchmark-reps.yml benchmark.yml big-organism-detached.yml big-organism.yml
+    aks-metered-full.yml aks-metered.yml benchmark-reps.yml benchmark.yml big-organism-detached.yml big-organism.yml byoc-metered.yml
     capacity.yml citylearn.yml cloud-organism.yml cpu-power.yml eks-metered.yml gke-metered.yml gpu-bench.yml injection-grid.yml kafka.yml
     kind-addons.yml kind-crane.yml kind-cruisekube.yml kind-godel.yml kind-goldilocks.yml kind-group.yml kind-orchestrators.yml
-    kind-trial.yml kwok-scale.yml lambda-attach.yml lambda-gpu.yml live-kind-full.yml
+    kind-trial.yml kind-vpa.yml kwok-scale.yml lambda-attach.yml lambda-gpu.yml live-kind-full.yml
     live-kind-levers.yml live-kind.yml live-shadow.yml mujoco.yml orchestra.yml orchestrator.yml pandapower.yml pgbench.yml quota-convey-trial.yml
     realms-v5.yml realms.yml redis.yml restart-aks.yml robustness.yml six-kube-pool.yml six-kube.yml six-pool.yml six.yml
     swarm.yml sysbench.yml ycsb.yml
@@ -59,11 +59,13 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           repo="${{ github.repository }}"
           # the runs asked for by hand first, then every finished run of every listed workflow since ARCHIVE_SINCE, oldest
-          # first; a cancelled run handed in nothing
+          # first; a cancelled run is taken too when it handed in files (24 October: the one-card GPU run's start step was
+          # cancelled at its time limit while its watch finished every repetition and handed in its files; a run that handed
+          # in nothing is passed over below by its size)
           { tr ' ' '\n' < .github/archive_request.txt | grep -E '^[0-9]+$' || true
             for wf in $ARCHIVE_WORKFLOWS; do
               gh api --paginate "repos/$repo/actions/workflows/$wf/runs?status=completed&created=>=$ARCHIVE_SINCE&per_page=100" \
-                --jq '.workflow_runs[] | select(.conclusion != "cancelled" and .conclusion != "skipped") | .id' \
+                --jq '.workflow_runs[] | select(.conclusion != "skipped") | .id' \
                 || echo "::warning::$wf: its runs could not be listed; the next pass lists them again" >&2
             done | sort -n; } | awk '!seen[$0]++' > runs.txt
           # the branch raw's tree is read once (nothing downloaded); a run counts as archived when the branch holds its

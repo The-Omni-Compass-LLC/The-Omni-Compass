@@ -96,7 +96,7 @@ WORKLOAD_TABLES = [
 ]
 DB_FILE = WORKLOAD_TABLES[0][1]
 AIM_LOWER = {"speed", "machines", "energy"}   # the measures whose declared aim is lower (work aims higher)
-PENDING = {"Real cloud (Azure AKS, billed)": "the omni-v20 Azure sets run one at a time at the tune-down with native's cap (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day of Google 2011; A, B and C, `scripts/azure_queue.txt`); the category joins as their three-run tables land",
+PENDING = {"Real cloud (Azure AKS, billed)": "the omni-v21 Azure sets run one at a time at the tune-down with native's cap (the steady set, the bursts 1 4 1 6 1 9 and 1 6 1 8 1 6, the real day of Google 2011; A, B and C, `scripts/azure_queue.txt`); the category joins as their three-run tables land",
            "Real card (NVIDIA, its own meter)": "the rerun on the current card controller (the 2026-10-02 run used the replaced one)"}
 
 
@@ -216,18 +216,19 @@ def pct(x):
 
 
 def pw(x, word):
-    """A ratio's change beside its word, wearing the word's sign (the founder's sign rule, tools/readings.py): GAIN '+', LOSS
-    '−', STEADY '=', power given '+'. A column with no word of its own keeps pct's sign, read by the column's name."""
+    """A ratio's change beside its word: its size alone, no sign, as tools/readings.py by_word prints it (the referee's work order
+    of 25 October: a raw change is never turned to wear the verdict's sign). A column with no word of its own keeps pct's true
+    sign, read by the column's name."""
     if x is None:
         return ""
     v = 100 * (x - 1)
     size = f"{abs(v):.2f}%" if 0 < abs(v) < 0.05 else f"{abs(v):.1f}%"
     sg = word_sign(word)
-    return f"{sg}{size}" if sg else pct(x)
+    return size if sg else pct(x)
 
 
 def with_word(x, word):
-    """'+4.3% GAIN', '+0.1% power given', '=0.0% STEADY'."""
+    """'4.3% GAIN', '0.1% power given', '0.0% STEADY'."""
     return "" if x is None else f"{pw(x, word)} {word}".strip()
 
 
@@ -294,7 +295,7 @@ def main():
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
          "runs counts, as the geometric mean of the runs' ratios; STEADY (no difference beyond the noise) counts as exactly 1, so "
          "nothing inside the noise is claimed either way. " + engines_sentence(ts) + " Real Kubernetes, the real database, real messaging, the real cache, the real database's storage-engine cache and the real "
-         "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v20 runs land, Azure and the card as their three-run tables land. A category's "
+         "database's buffer pool are the real categories in; the steady and wandering Kubernetes tests join when their omni-v21 runs land, Azure and the card as their three-run tables land. A category's "
          "tuning workload is shown in its own table and never counted. Where native sat at its knee by design (nine tenths of its measured capacity), "
          "a queue that Omni keeps short makes the speed ratio large: that is what the test measures, and the resource it takes stands beside it. Each table names the engine it ran on.", "",
          "| Category | Index (work, speed, machines, energy) | Service reading (work and speed only) | More work by | Faster by (native p95 / omni p95) | Fewer machines by | Less energy by | Tests |",

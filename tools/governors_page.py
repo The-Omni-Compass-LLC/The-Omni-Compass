@@ -215,6 +215,42 @@ def runs_of(slug, runs):
     return " ".join(f"[{letter}]({REPO_RUNS}{rid})" for letter, rid in sorted(r.items()) if rid)
 
 
+SAME = ROOT / "results" / "orchestrators" / "ORCHESTRATORS.json"
+
+
+def same_organisms():
+    """The third arm (the founder's order of 25 October): every orchestrator on the same organisms with the same injection, and
+    Omni-Compass on top of each, in our own models (tools/orchestrators_arm.py); each cell the words over every gauge of every
+    organism in that setting."""
+    L = ["## The orchestrators on the same organisms, with the same injection (modelled, class S): the third arm", ""]
+    if not SAME.exists():
+        return L + ["Not yet run (`tools/orchestrators_arm.py`, `docs/ORCHESTRATORS_PREREGISTRATION.md`).", ""]
+    d = json.loads(SAME.read_text())
+    m = d["meta"]
+    from tools.orchestrators_arm import ORCHESTRATORS as NAMES
+    L += [f"The founder's order of 25 October: every orchestrator on the same organisms with the same injection, and Omni-Compass "
+          f"on top of each. {len(m['organisms'])} injections in two settings (the kind rig and the cloud), {m['reps']} repetitions, "
+          f"every arm of a repetition meeting the same random numbers; each orchestrator's rule written from its own release; "
+          f"Omni-Compass the shipped governor of {m['engine']}. A model, never a measurement of the orchestrator itself; every "
+          f"organism and gauge: [`results/orchestrators/ORCHESTRATORS.md`](../orchestrators/ORCHESTRATORS.md).", "",
+          "| Orchestrator | Setting | Against Kubernetes alone | Omni-Compass on top of it, against it |", "|---|---|---|---|"]
+    for orch in m["orchestrators"]:
+        for s in m["settings"]:
+            vs, top = {}, {}
+            for o in m["organisms"]:
+                e = d["readings"][s][o]
+                for r in (e["vs_native"].get(orch) or {}).values():
+                    if r:
+                        vs[r["word"]] = vs.get(r["word"], 0) + 1
+                for r in e["omni_vs_orch"][orch].values():
+                    if r:
+                        top[r["word"]] = top.get(r["word"], 0) + 1
+            words = lambda c: ", ".join(f"{c.get(w, 0)} {w}" for w in ("GAIN", "LOSS", "power given", "STEADY"))
+            L.append(f"| {NAMES[orch]} | {'on-site' if s == 'onsite' else 'cloud'} | "
+                     f"{'it is native' if orch == 'default' else words(vs)} | {words(top)} |")
+    return L + [""]
+
+
 def render(runs=None) -> str:
     runs = json.loads(RUNS.read_text()) if runs is None and RUNS.exists() else (runs or {})
     L = ["# The governors and orchestrators: native under them, Omni-Compass on top", ""]
@@ -291,6 +327,7 @@ def render(runs=None) -> str:
     else:
         L.append("Not yet run (`tools/run_orchestra.py`).")
     L.append("")
+    L += same_organisms()
     for slug, name, row, field, native, test in GOVERNORS:
         L += [f"## {name}", "", f"- **Native**: {native}.", f"- **Its test on real Kubernetes (class L)**: {test}; register row {row}.",
               catalog_line(slug)]

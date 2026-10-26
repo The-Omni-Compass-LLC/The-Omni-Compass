@@ -16,7 +16,7 @@ line number below is this build's. Read-only: nothing in the repository was edit
 opened.
 
 **This seat.** Editing only: the house word rules (compass, one pedal and no "brake", the two arms, GAIN / STEADY / LOSS and power given,
-no "confirmed", no "simulation" for our own models, and since 24 October no "toy" and no "fake"), Unicode formulas, the sign rule; then
+no "confirmed", no "simulation" for our own models, and since 24 October no "model" and no "stand-in"), Unicode formulas, the sign rule; then
 repetitions and padding, typos and grammar, sentences a reader would misread, two places that contradict each other, text that describes
 a control or monitor wrongly (checked against the JavaScript handlers), headings that do not say what the section holds, and jargon left
 undefined at first use.
@@ -33,7 +33,7 @@ key 1930, disclosures 1988), the sign rule is taught rightly in the key (1932, 1
 and never called a loss, every model is marked class S, every outside figure is attributed and disowned (1909), formulas are Unicode
 with no LaTeX, and the notice stands first and last. The removal of the third arm was done cleanly in the prose: no "Omni-Compass
 direct", no violet side and no "thirty" survives in the visible text. What holds the page at B is seventeen majors, almost all of them
-sentences left over from an earlier page: three retired words ("confirming", "simulation"/"simulated", "toy" in printed file paths);
+sentences left over from an earlier page: three retired words ("confirming", "simulation"/"simulated", "model" in printed file paths);
 the page describing an order it no longer has (title page, 1b, 2d); "never by itself" set beside an engine and a default panel that
 run without a native controller (title page, 4d, 3l); the bottom line's yardstick left unnamed now that 3n is gone; two controls
 described wrongly ("five tabs", the glossary's five beats); the kill switch called "native alone" in two places and "separate" in two
@@ -55,20 +55,20 @@ disclosures). Nine of the seventeen are one-line fixes.
 | 2d The benefit board | **A** | "The first thing after the wall" (826) is no longer true: five sections stand between (E4). |
 | 3a The organism, live | **A** | The anatomy's heart beats "every 15 s on omni-v16" (928) under a page whose factory beat is 60 s (E11); "Two engines, one demand" (872) and "a cyborg lives on two nutrients" (933) are minors. |
 | 3b Control console | **A** | "Native alone is the kill switch above" (950) against the reset (E10); one knob still carries three names ("sensor latency" 946, "Sense delay" 954, "sensor delay" in the registry). |
-| 3c The heartbeat dial | **A−** | "the key at the top of the page" (995) points at 4k (E13), and `results/toy_gate/V17_LADDER.json` (989) prints the retired word (E3). |
+| 3c The heartbeat dial | **A−** | "the key at the top of the page" (995) points at 4k (E13), and `results/model_gate/V17_LADDER.json` (989) prints the retired word (E3). |
 | 3d One control cycle | **A** | The cycle's note sends the reader to "the live controller of 5e" (3095), which is now 3l (E13). |
 | 3e Phase plane and scoreboard | **A+** | Exact; the reading rule written out in full (1099). |
 | 3f The brain's internal state | **A+** | Exact; "E_max", "αₛ" and "γ[c]" in three notations on three consecutive lines (1109–1111) is a minor. |
-| 3g The verdict | **A** | `tools/toy_gate.py` (1153, E3); "Above the verdict the max never goes below native at all, so in the default it never runs" (1153) still cannot be followed (minor). |
+| 3g The verdict | **A** | `tools/model_gate.py` (1153, E3); "Above the verdict the max never goes below native at all, so in the default it never runs" (1153) still cannot be followed (minor). |
 | 3h Cloud providers | **A** | Exact on the bill; the whole "THE CLOUD IS A WIRE" box is printed twice, here (1160–1162) and in 4a (1621–1623), word for word (minor). |
 | 3i Orchestrators and governors | **A+** | The four ways and the orchestrators' own cost kept apart in every sentence. |
-| 3j Kubernetes: official run playback | **A−** | The heart is "every 15 s" on omni-v16 (1261, 1262) with no word for the engine that stands (E11), and `results/toy_gate/HEARTBEAT_SWEEP.md` (1270, E3). |
+| 3j Kubernetes: official run playback | **A−** | The heart is "every 15 s" on omni-v16 (1261, 1262) with no word for the engine that stands (E11), and `results/model_gate/HEARTBEAT_SWEEP.md` (1270, E3). |
 | 3k Kubernetes: per-repetition telemetry | **A+** | Exact; class, source and scorer named in one paragraph. |
-| 3l The shipped controller's decision trace | **A−** | The panel opens on a setting whose caption reads "the controller driving the machines itself ... turns the Cluster Autoscaler off in this arm" (3388), against "never by itself" (E6); its cloud note prints `tools/toy_gate.py` (3390, E3). |
-| 3m Hardware: the GPU card and the CPU host | **A−** | "No GPU card ... has been measured on the engine that stands" (1429) and, three paragraphs on, "The engine that stands on a real card" for omni-v18's card governor (1440) (E14); the chip notes print `tools/toy_gate.py` and `TOY_GATE.md` (3487, 3496, E3). |
+| 3l The shipped controller's decision trace | **A−** | The panel opens on a setting whose caption reads "the controller driving the machines itself ... turns the Cluster Autoscaler off in this arm" (3388), against "never by itself" (E6); its cloud note prints `tools/model_gate.py` (3390, E3). |
+| 3m Hardware: the GPU card and the CPU host | **A−** | "No GPU card ... has been measured on the engine that stands" (1429) and, three paragraphs on, "The engine that stands on a real card" for omni-v18's card governor (1440) (E14); the chip notes print `tools/model_gate.py` and `MODEL_GATE.md` (3487, 3496, E3). |
 | 3n Telemetry analytics, Omni-Compass in its own words | **A** | Clean of retired words; the Ask panel's "speaks for itself" (1513) and its chip "Show me your largest GAIN" (1566), and the radar's "helped"/"hurt" (1554), are minors. |
 | 3o The Python's runs in the page | **A** | "On GitHub (the simulation done within GitHub, on its own machines, at no cost)" (1608): our own model called a simulation (E2). |
-| 4a The whole organism | **A−** | "The chip's one measured run (2 October ...)" (1627) against 3m's A100 run of 24 October (E14), and `tools/toy_gate.py` in "Beyond the count" (7553, E3); the heading still has four ways "bought" where the text has two (minor). |
+| 4a The whole organism | **A−** | "The chip's one measured run (2 October ...)" (1627) against 3m's A100 run of 24 October (E14), and `tools/model_gate.py` in "Beyond the count" (7553, E3); the heading still has four ways "bought" where the text has two (minor). |
 | 4b The twenty scenarios | **A** | "The ten organisms" (1669) count this page's sixty-muscle body and the whole stack as organisms, which 4a (1628) and 4c (1680) say are not (E15). |
 | 4c Measured effect in full | **A** | Minors only: its first paragraph is 2d's (1677), "results/live/V10_*.md today" (1709), "OMNI-COMPASS" in capitals (1690). |
 | 4d The C++ twin | **A** | Its "Python only" table prints "Omni direct's control plane, hand, walls and front" (from the record, line 2014), the arm the title page says is not shown (E5). |
@@ -79,7 +79,7 @@ disclosures). Nine of the seventeen are one-line fixes.
 | 4i Self-governed rendering | **A+** | Exact, with its class and its limit in one paragraph. |
 | 4j The problem and the answer | **A** | "on Kubernetes its full read of the state every 15 seconds, the autoscaler's own pace" (1903) against the factory's 60 s (E11). |
 | 4k Executive summary and reading key | **A−** | The key teaches the 0.5% floor (1932) and then "STEADY =0.9% means a 0.9% difference the noise covers" (1933) and "no difference beyond the noise" (1936) (E12); the summary points to "(section 3)" for the composition (6950, E13). |
-| 4l The monitor list | **B+** | The registry it prints gives power given "the accent" (monitor 7), names the A10 of 2 October as "the one real run" awaiting "its omni-v13 run" (monitor 43), and prints `tools/toy_gate.py` in about twenty wiring cells. |
+| 4l The monitor list | **B+** | The registry it prints gives power given "the accent" (monitor 7), names the A10 of 2 October as "the one real run" awaiting "its omni-v13 run" (monitor 43), and prints `tools/model_gate.py` in about twenty wiring cells. |
 | 4m Glossary and index | **A−** | "the heartbeat": "the page offers five, 15, 30, 60, 90 and 120 s" (E9, six buttons from 10 on the page), and the heading's "ten organisms" (E15); "Amber on the page" for native is a minor. |
 | v Disclosures, governing law and contact | **A−** | "OMNI_V16.json, docs/OMNI_V16.md, the engine that stands" (1992, E17) and "The GPU, CPU and cloud places are written and marked not yet run" (1995, E14). |
 | The Live Engine Manual (`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf`) | **B+** | Aligned with the page section by section and in several places more exact (seven tabs, six beats, the reset), but it prints "One pedal, no brake" in a figure caption (2022), carries the page's kill-switch contradiction (714, 1578 against 883, 1323), and reads 1c inside chapter 6 ahead of 1b with no row for 1c in Appendix A. |
@@ -102,9 +102,9 @@ machines, at no cost)" describes the core's Monte Carlo run by the repository's 
 the licence's phrase and for outside simulators. The manual quotes both phrases (849, 2222). **Fix:** "On GitHub (the same runs, on
 GitHub's own machines, at no cost)"; the group label "every beat, modelled".
 
-**E3. "Toy" printed on the page in file paths (3c 989, 3g 1153, 3j 1270, 3l 3390, 3m 3487 and 3496, 4a 7553; 4l, about twenty wiring
-cells from the registry).** The prose calls it "the model gate" everywhere, but the paths `tools/toy_gate.py`,
-`results/toy_gate/V17_LADDER.json`, `results/toy_gate/HEARTBEAT_SWEEP.md` and `results/toy_gate/TOY_GATE.md` print the word the founder's
+**E3. "Model" printed on the page in file paths (3c 989, 3g 1153, 3j 1270, 3l 3390, 3m 3487 and 3496, 4a 7553; 4l, about twenty wiring
+cells from the registry).** The prose calls it "the model gate" everywhere, but the paths `tools/model_gate.py`,
+`results/model_gate/V17_LADDER.json`, `results/model_gate/HEARTBEAT_SWEEP.md` and `results/model_gate/MODEL_GATE.md` print the word the founder's
 order of 24 October says appears nowhere. The manual prints three of them (467, 1661, 1996). **Fix:** rename the tool and its folder in
 the repository (`tools/model_gate.py`, `results/model_gate/`) and let the builder write the new paths; until then, print each path through
 one alias in the builder ("the model gate's record").
@@ -300,7 +300,7 @@ Omni-Compass LLC from the published rule" (2.3). Its majors: (a) the figure capt
 October says is not used; (b) the page's kill-switch contradiction carried whole: "Native alone is not a tune: it is the kill switch" (714,
 1578) against 6.5 and 8.5; (c) the page's section 1c is read as 6.13, inside the chapter on 1a's control panel and before chapter 8 (1b), and
 Appendix A has no row for 1c at all. Its minors: it quotes "every beat, simulated" (849) and the founder's "which is the simulation" (2222)
-without saying the house word is "modelled"; three `toy_gate` paths (467, 1661, 1996); 4j and 4k share one chapter (37) where the page gives
+without saying the house word is "modelled"; three `model_gate` paths (467, 1661, 1996); 4j and 4k share one chapter (37) where the page gives
 each a lettered section; 8.1 copies 1b's "The monitors it drives follow: the wall (the page's section 1a)" (1260); 2.3 has the page's gap on
 the test rig (E7); "the main engine" (417, 1639) undefined; "so no monitor, table, record or button shows a third" (117) while 4d prints
 "Omni direct's control plane" and the note names `V18_THREE_ARMS_ABC.json`.

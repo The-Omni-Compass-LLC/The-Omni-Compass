@@ -29,7 +29,7 @@ restarts a run. The kill switch hands both back to native. Native's side never m
 *native* engages the kill switch, so every Omni-Compass side follows native; *Omni-Compass and native* releases it and puts every
 strip on native; *Omni-Compass by itself* releases it and puts every strip on direct (the harness's arm by itself; on the
 stress-test model every native controller off; the same arm runs on omni-v18 in the kind rig, `ARM=solo`,
-`results/toy_gate/SOLO_V18.md`); *Omni-Compass direct* does the same and opens Omni-Compass direct (`#s-direct`) on its newest
+results/model_gate/SOLO_V18.md (removed)); *Omni-Compass direct* does the same and opens Omni-Compass direct (`#s-direct`) on its newest
 showing. The line under the row names the monitors that moved.
 
 **How to read a monitor under each position.** The note on each strip says what that monitor's Omni-Compass side shows:

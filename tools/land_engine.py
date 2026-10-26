@@ -6,7 +6,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """Land the next engine version in every place that names the engine that stands, in one command, and check that none is left behind.
 
-  python3 tools/land_engine.py v12 --since 2026-10-19T09:00:00Z   once the engine files are final, tested and through the toy gate
+  python3 tools/land_engine.py v12 --since 2026-10-19T09:00:00Z   once the engine files are final, tested and through the model gate
   python3 tools/land_engine.py --check                            every place names the newest engine (verify.py runs it)
 
 The founder's order of 18 October: the engine keeps being tuned, version after version (v11, v20, v30 ...), each one a step that
@@ -147,7 +147,7 @@ def land(n: int, since: str, root: Path = ROOT, fingerprint: bool = True) -> Non
     for w in [f"docs/OMNI_V{n}.md (new)", "README.md", "docs/STATE_OF_PLAY.md", "CLAUDE.md", "CHANGELOG.md",
               "docs/OMNI_COMPASS_MANUAL.md, docs/OMNI_COMPASS_OWNERS_MANUAL.md and docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md (then docs/book/build_book.py, all three)",
               "docs/THE_RECEIPTS.md", "docs/engine/OMNI_COMPASS_LIVE_ENGINE.html and docs/engine/APPRAISAL.md",
-              f"docs/OMNI_V{old}.md (it stood until today)", f"results/toy_gate/V{n}_VS_V{old}.md (tools/toy_gate.py)"]:
+              f"docs/OMNI_V{old}.md (it stood until today)", f"results/model_gate/V{n}_VS_V{old}.md (tools/model_gate.py)"]:
         print("  " + w)
     for b in check(root):
         print("  still to do: " + b)
