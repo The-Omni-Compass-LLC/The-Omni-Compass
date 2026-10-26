@@ -1,6 +1,6 @@
 # Enterprise review handoff and acceptance gates
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Commercial use requires a signed, paid Omni-Compass Enterprise License. See [LICENSE](../LICENSE), [NOTICE](../NOTICE), and [DISCLOSURES.md](../DISCLOSURES.md).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 This document coordinates parallel human and AI engineering reviews without modifying measured results or the running governor. It is a review plan, not a certification.
 
@@ -44,3 +44,7 @@ This document coordinates parallel human and AI engineering reviews without modi
 - [ ] No material claim is detached from its engine version and evidence class.
 - [ ] No raw benchmark receipt or legal notice was modified.
 - [ ] Independent reviewer records outstanding issues before approval.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
