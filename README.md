@@ -241,14 +241,14 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- 2026-10-23 08:11 UTC: `V16_YCSB_SERVICE` rebuilt from runs 39869906902, 39871660953, 39871685303 (ycsb, the service objective, omni-v16): 4 untouched workloads; 1 GAIN, 0 LOSS, 0 power given, 43 EVEN, 0 disagree
-- 2026-10-23 08:11 UTC: `V16_YCSB_SHIPPED` rebuilt from runs 39826088859, 39846968680, 39866167058 (ycsb, the resource objective, native as shipped, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 44 EVEN, 0 disagree
-- 2026-10-23 08:11 UTC: `V16_YCSB` rebuilt from runs 39823811507, 39842363997, 39862241743 (ycsb, the resource objective, omni-v16): 4 untouched workloads; 2 GAIN, 0 LOSS, 0 power given, 42 EVEN, 0 disagree
-- 2026-10-23 08:11 UTC: `V16_SYSBENCH_SERVICE` rebuilt from runs 39869901058, 39869925397, 39871679567 (sysbench, the service objective, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
-- 2026-10-23 08:11 UTC: `V16_SYSBENCH_SHIPPED` rebuilt from runs 39826073316, 39846952545, 39864234559 (sysbench, the resource objective, native as shipped, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 2 power given, 46 EVEN, 0 disagree
-- 2026-10-23 08:11 UTC: `V16_SYSBENCH` rebuilt from runs 39823802516, 39842355356, 39862234914 (sysbench, the resource objective, omni-v16): 4 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 48 EVEN, 0 disagree
-- 2026-10-23 08:11 UTC: `V16_REDIS_SERVICE` rebuilt from runs 39823820262, 39844642925, 39862248686 (redis, the service objective, omni-v16): 3 untouched workloads; 7 GAIN, 0 LOSS, 2 power given, 27 EVEN, 0 disagree
-- 2026-10-23 08:11 UTC: `V16_REDIS_SHIPPED` rebuilt from runs 39826081107, 39846960314, 39866161041 (redis, the resource objective, native as shipped, omni-v16): 3 untouched workloads; 0 GAIN, 0 LOSS, 0 power given, 36 EVEN, 0 disagree
+- 2026-10-26 15:44 UTC: `V21_YCSB_SERVICE` rebuilt from runs 40287958759, 40291376191, 40293208904 (ycsb, the service objective, omni-v21): 4 untouched workloads; 4 GAIN, 2 LOSS, 6 power given, 10 EVEN, 26 disagree
+- 2026-10-26 15:44 UTC: `V21_YCSB_SHIPPED` rebuilt from runs 40238131083, 40260620209, 40284624594 (ycsb, the resource objective, native as shipped, omni-v21): 4 untouched workloads; 0 GAIN, 9 LOSS, 7 power given, 22 EVEN, 10 disagree
+- 2026-10-26 15:44 UTC: `V21_YCSB` rebuilt from runs 40236918458, 40259304209, 40281469940 (ycsb, the resource objective, omni-v21): 4 untouched workloads; 6 GAIN, 2 LOSS, 5 power given, 18 EVEN, 17 disagree
+- 2026-10-26 15:44 UTC: `V21_SYSBENCH_SERVICE` rebuilt from runs 40286351408, 40291369516, 40293202427 (sysbench, the service objective, omni-v21): 4 untouched workloads; 17 GAIN, 0 LOSS, 4 power given, 14 EVEN, 13 disagree
+- 2026-10-26 15:44 UTC: `V21_SYSBENCH_SHIPPED` rebuilt from runs 40236930776, 40259317345, 40283015397 (sysbench, the resource objective, native as shipped, omni-v21): 4 untouched workloads; 1 GAIN, 3 LOSS, 11 power given, 18 EVEN, 15 disagree
+- 2026-10-26 15:44 UTC: `V21_SYSBENCH` rebuilt from runs 40235709142, 40258018856, 40281464587 (sysbench, the resource objective, omni-v21): 4 untouched workloads; 14 GAIN, 1 LOSS, 4 power given, 17 EVEN, 12 disagree
+- 2026-10-26 15:44 UTC: `V21_REDIS_SERVICE` rebuilt from runs 40236922598, 40259308169, 40281475145 (redis, the service objective, omni-v21): 3 untouched workloads; 13 GAIN, 1 LOSS, 4 power given, 13 EVEN, 8 disagree
+- 2026-10-26 15:44 UTC: `V21_REDIS_SHIPPED` rebuilt from runs 40238126261, 40260615533, 40283020884 (redis, the resource objective, native as shipped, omni-v21): 3 untouched workloads; 5 GAIN, 0 LOSS, 0 power given, 27 EVEN, 7 disagree
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -256,6 +256,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-26 15:45 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-26 08:08 | [The engine's runs: 500 runs from the jump generator (base 1635237724), one digest](results/engine_runs/ENGINE_RUNS_500_1635237724.md) |  |
 | 2026-10-25 17:53 | [The engine's runs: 500 runs from the jump generator (base 1563745517), one digest](results/engine_runs/ENGINE_RUNS_500_1563745517.md) |  |
 <!-- front-page:tables:end -->
@@ -265,16 +266,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-26 14:32 | raw-sweep | success | [40340545793](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40340545793) |
-| 2026-10-26 14:12 | live-engine | success | [40331070039](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40331070039) |
-| 2026-10-26 13:50 | orchestrators: koordinator C | success | [40325035166](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40325035166) |
-| 2026-10-26 13:49 | orchestrators: koordinator B | success | [40325027191](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40325027191) |
-| 2026-10-26 13:33 | orchestrators: koordinator A | success | [40322997802](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40322997802) |
-| 2026-10-26 13:31 | orchestrators: binpack C | success | [40322990064](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40322990064) |
-| 2026-10-26 13:21 | security-scan | success | [40329731802](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40329731802) |
-| 2026-10-26 13:15 | orchestrators: vanilla C | success | [40320983060](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40320983060) |
-| 2026-10-26 13:01 | orchestrators: binpack B | success | [40319016286](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40319016286) |
-| 2026-10-26 12:59 | orchestrators: vanilla B | success | [40318895699](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40318895699) |
+| 2026-10-26 15:37 | orchestrators: kai B | success | [40331596005](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40331596005) |
+| 2026-10-26 15:36 | orchestrators: koordinator B | success | [40331603748](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40331603748) |
+| 2026-10-26 15:28 | big-organism-detached collect | success | [40349569488](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40349569488) |
+| 2026-10-26 15:19 | orchestrators: binpack A | success | [40329317736](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40329317736) |
+| 2026-10-26 15:16 | live-engine | success | [40342316373](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40342316373) |
+| 2026-10-26 15:04 | orchestrators: kueue A | success | [40327126672](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40327126672) |
+| 2026-10-26 15:03 | orchestrators: koordinator A | success | [40327119309](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40327119309) |
+| 2026-10-26 15:03 | orchestrators: volcano A | success | [40327134506](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40327134506) |
+| 2026-10-26 14:57 | raw-sweep | success | [40344464988](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40344464988) |
+| 2026-10-26 14:51 | orchestrators: kai A | success | [40325042641](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40325042641) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
