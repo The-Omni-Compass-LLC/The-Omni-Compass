@@ -891,9 +891,10 @@ TERMS = [
       "not a GAIN: each light reads what its gauge is for. The light moves with its monitor: it reads the series the monitor draws. "
       "Every signal shows all four live words, the lit one bright and the rest dim, on native's side and on Omni-Compass's side "
       "alike: Omni-Compass's redline reflex is built never to let a muscle redline, and the red is still wired, so that if one does "
-      "(a fault, a bug) it is seen at once, and the kill switch hands everything back to native in the same instant. The reflex "
-      "runs in the page's live model (class S); the engine that ran the benchmarks, omni-v20, carries it from omni-v21, after its "
-      "model test.",
+      "(a fault, a bug) it is seen at once, and the kill switch hands everything back to native in the same instant. The engine "
+      "that ran the benchmarks carries the same reflex in its own form: on a response-time breach it hands the knob back to native's "
+      "own target at once, and its fast check adds replicas within 5 s from the live queue (omni_controller/controller.py); the "
+      "page's live model applies the same rule to every muscle it draws.",
       [(PAGE_F, "GAINING: low in its band with room to climb, or Omni-Compass ahead of native now (a GAIN)"),
        (PAGE_F, "STEADY: inside its band, or level with native (STEADY, a change under 0.5%)"),
        (MAN, "| Yellow | STEADY |")], aka=["traffic signal", "traffic light", "light", "lights"]),

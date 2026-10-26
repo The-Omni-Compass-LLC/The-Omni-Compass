@@ -684,9 +684,11 @@ beside them. Omni-Compass's redline reflex is built never to let a muscle redlin
 before the line; where it cannot move the muscle and native's own twin carries it better, it hands the muscle back to native; where
 native is no better it stays, because redlining less than native is still a benefit against native. The red is still wired on its
 side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill switch's purpose: when something
-redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the same instant. The redline reflex runs in the page's live model (class S);
-the engine that ran the benchmarks, omni-v20, does not carry it yet: it comes to the engine as omni-v21, after its model test, and
-every benchmark runs again on it.
+redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the same instant. The engine that ran the benchmarks carries the
+same reflex in its own form: on a response-time breach it hands the knob back to native's own target at once and holds it there
+until the line has been clean for its clear time, and its fast check adds replicas within 5 s from the live queue
+(`omni_controller/controller.py`: the SLO reflex and the pod reflex); the page's live model (class S) applies the same rule to every
+muscle it draws.
 
 Each light reads what its gauge is for, never the direction of its needle: a wait that falls is GAINING, work that falls is not.
 
