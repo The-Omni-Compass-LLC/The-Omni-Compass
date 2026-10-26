@@ -2,6 +2,31 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-26: the live benchmark engine on omni-v21; the scoring contract audited; the documents by reader
+
+- **The live benchmark engine rebuilt on omni-v21** (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): main's twelve omni-v21 data-store
+  tables merged in; the page names omni-v21 as the engine that stands in its prose, its manual and its appraisal (the appraisal's
+  engine paragraph had still described omni-v17). The page's redline reflex is omni-v21's immune rule ported line for line
+  (`omnicompass/immune.py`): over the line three decisions, stuck unless relieved by 5%, native's twin stronger by 5%, a hold of 10
+  decisions doubling to 160; every one of its numbers a knob on the mechanism panel (nothing written into the rule), the factory
+  numbers the engine's own. Wide tables scroll inside their own box on a phone.
+- **The scoring contract, metric by metric** (`tools/audit_export.py`, `docs/audit/BENCHMARK_DISCREPANCIES.csv`,
+  `docs/audit/STATISTICAL_VALIDATION.md`): every gauge of every three-run table with native and Omni-Compass in each run, the raw
+  change with its true sign, the aim, the word, its class (GAIN, LOSS, power given, STEADY exactly the same, under the 0.5% floor,
+  statistically inconclusive, the runs disagree), the confidence, the practical significance and the stability, each apart; an
+  independent classifier sharing no code with the key reads 9,424 rows alike and none otherwise; 857 rows cannot be recomputed from
+  the committed tables (101 standing, printed to two decimals), listed as a traceability gap.
+- **The live benchmark engine's acceptance in a real browser** (`tools/live_engine_acceptance.py`,
+  `docs/audit/LIVE_ENGINE_ACCEPTANCE.md`): 13 of 13 checks pass, among them the three shapes as drawn, the reflex on the engine's
+  numbers acting under a surge, the kill switch and a phone's width.
+- **The release gates** (`docs/audit/RELEASE_GATE_REPORT.md`): each marked by what ran; security, the mathematical referee report,
+  the control-safety audit and a clean-room reproduction not yet run, so no grade is declared.
+- **The documents by reader** (`README.md`, `docs/README.md`): the board, the CFO, the CTO, engineering, security and IP, the
+  referee and the live benchmark engine's evaluator, each with what to read first and the evidence after it, and the hierarchy of
+  evidence and claims (the draft pull request #19's navigation, every link checked, STEADY for EVEN).
+- **Derived reports in the one format**: EVEN read STEADY in every file main's merge brought it back into; the index and the
+  benefit sheet print a size beside its word without a sign, the raw change apart.
+
 ## 2026-10-25 (evening): omni-v21 stands: the immune system knows itself, knob by knob
 
 - **omni-v21** (`OMNI_V21.json`, fingerprint `b658f05d43c1e602`, `docs/OMNI_V21.md`): omni-v20 with the immune system's

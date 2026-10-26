@@ -1404,7 +1404,7 @@ respect a limit the wires do not carry.
 
 ### 6.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v20** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
+The engine that stands in this edition is **omni-v21** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
 quoted here ran on omni-v7, whose rules omni-v19 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
@@ -1580,7 +1580,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v20 (digest 1df07f8e36a97985, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v21 (digest b658f05d43c1e602, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
 
 **Level 1 - Watch (read-only).**
 

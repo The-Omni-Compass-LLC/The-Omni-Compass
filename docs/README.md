@@ -2,6 +2,39 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## Start here: the documents by reader
+
+A navigation layer, top down, the way an IP asset is read at a board meeting. It is not a substitute for the evidence and not an
+outside endorsement: every performance claim is read with its engine version, its workload, its native baseline, its evidence
+class (P a physical meter, L live software, S our own models) and its original receipt.
+
+| Reader | Read first | Then the evidence and the decision |
+|---|---|---|
+| CEO, board, strategic acquirer | [Due diligence](DUE_DILIGENCE.md) | [State of play](STATE_OF_PLAY.md), [claims register](CLAIMS_REGISTER.md), [every LOSS kept](LOSS_LEDGER.md), [limitations](LIMITATIONS.md) |
+| CFO, investment committee | [Benefit sheet](BENEFIT_SHEET.md) | [The Omni index](../results/OMNI_INDEX.md), [evidence ledger](EVIDENCE_LEDGER.md), [the cloud bill's setup](AZURE_SETUP.md) |
+| CTO, chief architect | [Mechanism of action](MECHANISM_OF_ACTION.md) | [Canonical engine](CANONICAL_ENGINE.md), [the engine that stands, omni-v21](OMNI_V21.md), [formal status](FORMAL_STATUS.md), [wiring verdicts](WIRING_VERDICTS.md) |
+| Engineering, SRE, operations | [The Operator's Manual](OMNI_COMPASS_MANUAL.md) | [Integration manual](INTEGRATION_MANUAL.md), [pilot protocol](PILOT_PROTOCOL.md), [the benchmark harness](HARNESS.md) |
+| Security, legal, IP | [Repository standards](REPOSITORY_STANDARDS.md) | [Security policy](../SECURITY.md), [threat model](THREAT_MODEL.md), [safety case](SAFETY_CASE.md), [license](../LICENSE), [disclosures](../DISCLOSURES.md) |
+| Independent benchmark referee | [How to read the results](HOW_TO_READ_THE_RESULTS.md) | [The referee's audit pack](audit/README.md), [the verdict audit](../results/verdict_audit/VERDICT_AUDIT.md), [every reading recomputed](audit/STATISTICAL_VALIDATION.md), [preregistrations](K8S_COMPASS_PREREGISTRATION.md) |
+| Live benchmark engine evaluator | [The live benchmark engine](engine/OMNI_COMPASS_LIVE_ENGINE.html) | [The Live Benchmark Engine Manual](OMNI_COMPASS_LIVE_ENGINE_MANUAL.md), [its appraisal](engine/APPRAISAL.md), [native's register](engine/NATIVE_REGISTER.md) |
+
+### The hierarchy of evidence and claims
+
+1. **Canonical source and version.** The engine's fingerprint and the commit before any result is compared
+   (`python3 tools/omni_version.py`).
+2. **Mathematics and contracts.** What is proved, under which assumptions, what is modelled and what is not yet proved
+   ([formal status](FORMAL_STATUS.md)).
+3. **The mechanism at run time.** Observe, decide, admit, actuate, verify, restore; a model is never presented as a live actuator.
+4. **Measurements.** Physical meters (P), live software (L) and our own models (S), kept apart.
+5. **Benchmark readings.** Native and Omni-Compass with their raw values, the raw change with its true sign, the gauge's aim, the
+   uncertainty, the resource it took and every adverse row; STEADY of three kinds, exactly the same to nine decimals, under the
+   0.5% floor, or (an older key) no difference beyond the noise, never mixed.
+6. **Financial implications.** Only costs measured or priced inside a stated boundary; an unpriced bill stays unresolved.
+7. **Board and IP claims.** Each linked to its source, its caveats, its ownership terms and its review status: run and scored by
+   The Omni-Compass LLC's own code; no outside party has reviewed or approved these results.
+
+A generated page or dashboard is changed through its generator, never by hand; historical receipts are never rewritten.
+
 Read in this order. Every page here is current; dated records are in [`history/`](history/README.md).
 
 ## 1. Results

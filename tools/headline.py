@@ -42,9 +42,9 @@ SIGNAL = {"red": ("redlining", "docs/engine/signals/redlining.svg", "the red sto
           "lead": ("steady", "docs/engine/signals/steady.svg", "the yellow yield diamond"),
           "ok": ("accelerating", "docs/engine/signals/accelerating.svg", "the green circle")}
 PAIRS = (("Omni-Compass on top of native", "Omni on native against native",
-          "Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule"),
-         ("Omni-Compass direct", "Omni direct against native",
-          "Omni-Compass alone on the muscles: no Kubernetes autoscaler under it, Omni-Compass the only controller moving the knob"))
+          "Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule"),)
+# native and Omni-Compass on native are the only two sides (the founder's order of 25 October: Omni-Compass is never by itself);
+# the record's third arm, Omni direct, stays in its own table as the road and is not read here
 GAUGES = (("requests", "Work"), ("p95", "Response (95th percentile)"), ("machines", "Machines"), ("units", "Units"))
 
 
@@ -125,8 +125,7 @@ def markdown(m) -> str:
              f"on {eng.split(' (')[0]}, the newest engine with its three runs in (the engine that stands, {stands}, runs them again)")
     L.append(f"**{'Yes' if yes else 'Not in every way'}, {where}, measured on real machines (class L), "
              f"three runs (A, B and C).** Omni-Compass on top of native did {100 * m['scen'][0]['work']:.1f}% more work than native "
-             f"and answered {100 * abs(m['scen'][0]['p95']):.1f}% faster at the 95th percentile; Omni-Compass direct did "
-             f"{100 * m['scen'][1]['work']:.1f}% more work and answered {100 * abs(m['scen'][1]['p95']):.1f}% faster.")
+             f"and answered {100 * abs(m['scen'][0]['p95']):.1f}% faster at the 95th percentile.")
     L += ["", "| Scenario | Signal | Work | Response (95th percentile) | Machines | Units |", "|---|---|---|---|---|---|",
           f"| **Native**: Kubernetes' own autoscaling rule on the muscles | {img('lead')} the baseline | the baseline | the baseline | the baseline | the baseline |"]
     for s in m["scen"]:
@@ -146,10 +145,9 @@ def markdown(m) -> str:
           "(`docs/THE_TUNE.md`, section 8). A component's own percent is a supporting measurement, never the bill. Where a price or a "
           "component is missing the bill reads unresolved; no price is assumed.", "",
           "| Route | The bill: native → Omni-Compass → saving | Supporting measurements |", "|---|---|---|"]
-    on, di = m["scen"][0]["rows"]["machines"], m["scen"][1]["rows"]["machines"]
+    on = m["scen"][0]["rows"]["machines"]
     L.append(f"| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the "
-             f"energy is not yet measured on {eng} | machines, Omni-Compass on top of native: {said(on, 'machines')}. Omni-Compass direct: "
-             f"{said(di, 'machines')} |")
+             f"energy is not yet measured on {eng} | machines, Omni-Compass on top of native: {said(on, 'machines')} |")
     cloud = (f"read in [`{m['azure'][-1].relative_to(ROOT).as_posix()}`]({m['azure'][-1].relative_to(ROOT).as_posix()})" if m["azure"]
              else f"**unresolved**: not yet measured on {eng}; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon "
                   "and the clouds a tester builds are wired and not yet run")

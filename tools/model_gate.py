@@ -67,7 +67,7 @@ BLINK_EVERY, BLINK = 1440, (700, 708)  # the blink model: two minutes (8 ticks o
 # names the tree its engine was imported from, and run() refuses a reading taken on the wrong one
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
-try:   # the number beside a word carries the word's sign (tools/readings.py); only the gate's own process formats a reading,
+try:   # the size beside a word, no sign, the raw change apart (tools/readings.py by_word); only the gate's own process formats a reading,
     from tools.readings import by_word  # noqa: E402  so a worker run against an older checkout's tools never needs it
 except ImportError:
     by_word = None

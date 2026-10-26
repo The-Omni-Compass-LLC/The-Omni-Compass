@@ -43,7 +43,7 @@ def main():
     assert C.verdict(P95, [single] * 3) == "three single pairs agree: GAIN (one pair a run, no interval, so the noise cannot be judged)"
     assert C.verdict(P95, [single, single, dict(single, diff=20.0, omni=320.0)]) == "single pairs point different ways (one pair a run, no interval)"
     assert C.verdict(C.CAPACITY, [single] * 3).startswith("three single pairs agree: LOSS"), "less work inside the line from three single pairs reads LOSS, and still not a reading of all three of our runs"
-    # the number beside a word carries the word's sign (tools/readings.py, 20 October); with no word, its own direction
+    # the size beside a word carries no sign (tools/readings.py by_word, 25 October); with no word, its own direction
     assert C.cell(fell) == "−50.0% (−66.7 to −33.3)", C.cell(fell)
     assert C.cell(fell, "GAIN") == "+50.0% (+33.3 to +66.7)", C.cell(fell, "GAIN")
     assert C.cell(fell, "LOSS") == "−50.0% (−33.3 to −66.7)", C.cell(fell, "LOSS")

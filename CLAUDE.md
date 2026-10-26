@@ -383,6 +383,19 @@ the founder overrides one in the conversation.
   `results/model_gate/` and never presented as a benchmark result. The model's regime is set from a real run's own files
   (the host's busy share, the response time, the replicas), never guessed.
 
+## Orders of 26 October
+
+- **The solid-A directive** (the founder's work order, pasted from a referee, 26 October: "No fake gains. No hidden losses. No
+  invented proofs. No forced controller actions. No changing the measurements to improve a grade"): ten phases, a defect ledger,
+  ten release gates, no gate marked PASS unless it ran, no grade declared while one is open. What has run is in `docs/audit/`
+  (`README.md` there lists what has not).
+- **Nothing hardwired in the reflex** (the founder's words: "Nothing is hardwired. Everything moves with the mechanism ... only the
+  bands are bands"): the page's redline reflex takes the engine's own numbers as its factory setting and carries every one as a
+  knob; each light reads the live reading against its own band.
+- **The repository read top down, by reader** (the founder's words: "lined up in structured hierarchically presentation ... CTO,
+  CFO, CEO, board meeting ... from top to bottom"): the README and `docs/README.md` open with the documents by reader and the
+  hierarchy of evidence and claims, after the headline.
+
 ## Orders of 24 October
 
 - **One factory profile, found and then frozen; the live benchmark engine its tuning bench** (the founder's words of 24 October, late night:

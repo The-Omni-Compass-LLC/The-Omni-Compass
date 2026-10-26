@@ -1118,7 +1118,7 @@ Inside the main control panel, under the profile box, stands a second set of kno
 head). The plant's knobs change the plant's conditions (demand, noise, sense delay, faults, the load profile); these change the
 engine's own equations while it runs. Each knob is a constant of the brain (`omnicompass/core.py`), the governor's law
 (`omnicompass/adapter.py`, `omnicompass/nervous_system.py`), the compass law (`omnicompass/compass_law.py`), Omni-Compass's hand on
-each muscle, the model's native controller, or one muscle's body. Turned, the next decision of the live stress-test model is
+each muscle, the redline reflex (`omnicompass/immune.py`), the model's native controller, or one muscle's body. Turned, the next decision of the live stress-test model is
 computed with it, on Omni-Compass's side; native's controller knobs move every native controller, the one under Omni-Compass on
 native included. Only the live brain reads the panel; every other brain on the page reads the factory's numbers.
 
@@ -1137,7 +1137,7 @@ Omni-Compass on native. The harness replays recorded positions, so turning any k
 
 ### 7.3 Where each group acts
 
-The compass law, Omni-Compass's hand, native's controller and every muscle's body move the muscles at once. The brain's four
+The compass law, Omni-Compass's hand, the redline reflex, native's controller and every muscle's body move the muscles at once. The brain's four
 pieces move the brain's own state (E, U, I[U], S, B on the brain's monitors) and its grants: at the max every organ may add
 capacity unless a security hold stands, so the brain's calm acts through the give-backs; set the dial to the tune-down to watch
 the four pieces move the muscles too.
@@ -1253,7 +1253,30 @@ What an operator sees: a larger push gain makes the Omni-Compass side add capaci
 power given), a smaller lift-off holds it longer after the surge; the four tune-down knobs act only with the dial on the
 tune-down.
 
-### 7.10 Native's own controller under every muscle
+### 7.10 The redline reflex: omni-v21's immune rule, knob by knob
+
+Source: `omnicompass/immune.py`, its C++ twin `cpp/src/immune.cpp`, and the nervous system's `native_hold`
+(`omnicompass/nervous_system.py`). Live reading: the reflex on or off, the muscles held native now, the hand-backs and the stays
+this day, and the chosen muscle's own state (under its line, over it so many decisions in a row, or held native with so many
+decisions of its hold left).
+
+| Knob | Range | Factory | What it sets |
+|---|---|---|---|
+| the reflex on (1) or off (0) | 0 or 1 | 1 | off: no muscle is handed to native by the immune rule; the law's push at the wall still acts |
+| the law's push at the band's wall | 0.80 to 1 | 0.95 | at or past this place in the band the law pushes at once, before the line |
+| redlining: decisions over the line in a row | 1 to 12 | 3 | a muscle redlines when its reading stays over its own line this many decisions in a row |
+| stuck: the relief it must show | 0 to 0.30 | 0.05 | stuck while the reading has not fallen by this share of where the redline began, or the knob is at its own limit |
+| native stronger: by more than | 0 to 0.30 | 0.05 | native's twin reading lower by more than this share hands the muscle to native; the muscle comes back only when Omni-Compass's side reads lower than native's by the same share and is under its line |
+| the hold after a hand-back, decisions | 1 to 60 | 10 | the first hold; it doubles for each hand-back in a row and halves after a quiet hold |
+| the longest hold, decisions | 10 to 640 | 160 | the doubling stops here |
+
+The factory numbers are the engine's own (the defaults of `Immune` in `omnicompass/immune.py`); none is written into the
+rule: every one is a knob on this panel, and each light (GAINING, STEADY, REDLINING, OVER THE LINE) reads the live reading
+against its own band whatever the knobs are set to. What an operator sees: a shorter streak or a smaller margin hands muscles to
+native sooner and more often (more hand-backs in the live reading); a longer hold keeps them native longer after a surge. A
+changed reflex is a variation of the mechanism (class S), its readings its own (section 7.13).
+
+### 7.11 Native's own controller under every muscle
 
 Source: the model's native rule, Kubernetes' published autoscaling rule, written by us.
 Live reading: the settings native's controllers moved this decision, and the chosen muscle's setting and last wish.
@@ -1268,7 +1291,7 @@ Live reading: the settings native's controllers moved this decision, and the cho
 What an operator sees: both sides change, because native's controller runs under Omni-Compass on native too. The phase plane marks
 native's target on native's side while the stress-test model runs.
 
-### 7.11 Every muscle: scale out, scale in, scale up, its response, its switch
+### 7.12 Every muscle: scale out, scale in, scale up, its response, its switch
 
 The model's sixty muscles, twelve to a body part.
 Pick the muscle, then the scope: **this muscle**, **its body part** or **every muscle**. Live reading: the muscle's units on
@@ -1286,7 +1309,7 @@ The group's switch reads **Omni-Compass governs it** and, pressed, hands the mus
 while every other muscle stays governed; pressed again, Omni-Compass governs them again. The kill switch hands every muscle back
 at once.
 
-### 7.12 A changed tune is not a result
+### 7.13 A changed tune is not a result
 
 Every knob of this panel shows a variation of the mechanism (class S, our own model). The benchmarks prove the factory profile
 only; a custom profile is its tuner's, and so are its readings. This is the one place on the page where a person may turn the
@@ -2825,7 +2848,7 @@ window and why. Three outcomes follow, and only these:
 Nothing is ever tuned to make a row read well; no row is steered. What is held to the letter is the mechanism: the code does
 what its rule says, the wire is fastened right, the harness measures as a deployment runs. On the page, each muscle of the stress-test model and of the replay carries its own switch on its card (the page's
 section 3d), and the mechanism panel's last group carries the same switch for a muscle, its body part or every muscle (section
-7.11): the muscles in scope handed back to native while the rest stay governed, to see their part in the result. On a real
+7.12): the muscles in scope handed back to native while the rest stay governed, to see their part in the result. On a real
 machine the same choice is the muscle's wiring (the Operator's Manual's wiring of each muscle).
 
 ### 42.5 On your own system

@@ -211,9 +211,9 @@ Disclosure and disclaimer: GAIN, STEADY and LOSS, and the letters behind them, a
 <!-- end of the key -->
 
 **How to read a number beside a word.** The word comes first and settles the direction; the number is the size, and it wears
-the word's sign so the two never pull apart: GAIN +29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
-in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS −2.3% on alert
-minutes means 2.3% more minutes over the line; STEADY =0.3% means a change under the 0.5% floor; power given +3.1% means 3.1% more
+the word's sign so the two never pull apart: GAIN 29.6% on pods waiting means 29.6% fewer pods waited than under native (a fall
+in waiting is the gain, so it is written with the plus of the word, never with the minus of the gauge); LOSS 2.3% on alert
+minutes means 2.3% more minutes over the line; STEADY 0.3% means a change under the 0.5% floor; power given 3.1% means 3.1% more
 of a resource put in to buy the work beside it. The gauge's own direction is never hidden: on the page, hover any word or any
 coloured number and it says what the word means and why the number wears its sign, and where the page knows the gauge, what rose
 or fell against native (the page's section 4k, "How to read a number beside a word"; the founder's order of 23 October).
@@ -606,10 +606,17 @@ power given for a resource spent that rose): GAINING and GAIN go together, STEAD
 Every signal shows all four live words at once, the lit one bright and the rest dim, on native's side and on Omni-Compass's side
 alike; a monitor that draws both sides carries a full signal for each, with the result now against native (GAIN, STEADY, LOSS)
 beside them. Omni-Compass's redline reflex is built never to let a muscle redline: at the top of a muscle's band it pushes at once,
-before the line; where it cannot move the muscle and native's own twin carries it better, it hands the muscle back to native; where
-native is no better it stays, because redlining less than native is still a benefit against native. The red is still wired on its
-side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill switch's purpose: when something
-redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the same instant.
+before the line. Where a muscle stays over its line three decisions in a row and is stuck (at its own limit, or not relieved by 5%
+of where the redline began) and native's own twin reads lower by more than 5%, it hands the muscle back to native for 10 decisions,
+the hold doubling for each hand-back in a row up to 160; it takes the muscle back only when its side is under the line and lower
+than native's by 5%. Where native is not stronger it stays, because redlining less than native is still a benefit against native.
+The red is still wired on its side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill
+switch's purpose: when something redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the
+same instant. The engine that stands, omni-v21, carries this rule in its immune system, knob by knob (`omnicompass/immune.py`, its
+C++ twin `cpp/src/immune.cpp`, proven alike on 200 seeded scripts, and the nervous system's `native_hold`; on Kubernetes each
+service's autoscaler target, native's twin the operator's own target), beside the SLO reflex and the pod reflex of the Kubernetes
+governor (`omni_controller/controller.py`); the page's live model (class S) applies the same rule, with the engine's own numbers, to
+every muscle it draws.
 
 Each light reads what its gauge is for, never the direction of its needle: a wait that falls is GAINING, work that falls is not.
 
@@ -1045,7 +1052,7 @@ Inside the main control panel, under the profile box, stands a second set of kno
 head). The plant's knobs change the plant's conditions (demand, noise, sense delay, faults, the load profile); these change the
 engine's own equations while it runs. Each knob is a constant of the brain (`omnicompass/core.py`), the governor's law
 (`omnicompass/adapter.py`, `omnicompass/nervous_system.py`), the compass law (`omnicompass/compass_law.py`), Omni-Compass's hand on
-each muscle, the model's native controller, or one muscle's body. Turned, the next decision of the live stress-test model is
+each muscle, the redline reflex (`omnicompass/immune.py`), the model's native controller, or one muscle's body. Turned, the next decision of the live stress-test model is
 computed with it, on Omni-Compass's side; native's controller knobs move every native controller, the one under Omni-Compass on
 native included. Only the live brain reads the panel; every other brain on the page reads the factory's numbers.
 
@@ -1064,7 +1071,7 @@ Omni-Compass on native. The harness replays recorded positions, so turning any k
 
 ### 7.3 Where each group acts
 
-The compass law, Omni-Compass's hand, native's controller and every muscle's body move the muscles at once. The brain's four
+The compass law, Omni-Compass's hand, the redline reflex, native's controller and every muscle's body move the muscles at once. The brain's four
 pieces move the brain's own state (E, U, I[U], S, B on the brain's monitors) and its grants: at the max every organ may add
 capacity unless a security hold stands, so the brain's calm acts through the give-backs; set the dial to the tune-down to watch
 the four pieces move the muscles too.
@@ -1180,7 +1187,30 @@ What an operator sees: a larger push gain makes the Omni-Compass side add capaci
 power given), a smaller lift-off holds it longer after the surge; the four tune-down knobs act only with the dial on the
 tune-down.
 
-### 7.10 Native's own controller under every muscle
+### 7.10 The redline reflex: omni-v21's immune rule, knob by knob
+
+Source: `omnicompass/immune.py`, its C++ twin `cpp/src/immune.cpp`, and the nervous system's `native_hold`
+(`omnicompass/nervous_system.py`). Live reading: the reflex on or off, the muscles held native now, the hand-backs and the stays
+this day, and the chosen muscle's own state (under its line, over it so many decisions in a row, or held native with so many
+decisions of its hold left).
+
+| Knob | Range | Factory | What it sets |
+|---|---|---|---|
+| the reflex on (1) or off (0) | 0 or 1 | 1 | off: no muscle is handed to native by the immune rule; the law's push at the wall still acts |
+| the law's push at the band's wall | 0.80 to 1 | 0.95 | at or past this place in the band the law pushes at once, before the line |
+| redlining: decisions over the line in a row | 1 to 12 | 3 | a muscle redlines when its reading stays over its own line this many decisions in a row |
+| stuck: the relief it must show | 0 to 0.30 | 0.05 | stuck while the reading has not fallen by this share of where the redline began, or the knob is at its own limit |
+| native stronger: by more than | 0 to 0.30 | 0.05 | native's twin reading lower by more than this share hands the muscle to native; the muscle comes back only when Omni-Compass's side reads lower than native's by the same share and is under its line |
+| the hold after a hand-back, decisions | 1 to 60 | 10 | the first hold; it doubles for each hand-back in a row and halves after a quiet hold |
+| the longest hold, decisions | 10 to 640 | 160 | the doubling stops here |
+
+The factory numbers are the engine's own (the defaults of `Immune` in `omnicompass/immune.py`); none is written into the
+rule: every one is a knob on this panel, and each light (GAINING, STEADY, REDLINING, OVER THE LINE) reads the live reading
+against its own band whatever the knobs are set to. What an operator sees: a shorter streak or a smaller margin hands muscles to
+native sooner and more often (more hand-backs in the live reading); a longer hold keeps them native longer after a surge. A
+changed reflex is a variation of the mechanism (class S), its readings its own (section 7.13).
+
+### 7.11 Native's own controller under every muscle
 
 Source: the model's native rule, Kubernetes' published autoscaling rule, written by us.
 Live reading: the settings native's controllers moved this decision, and the chosen muscle's setting and last wish.
@@ -1195,7 +1225,7 @@ Live reading: the settings native's controllers moved this decision, and the cho
 What an operator sees: both sides change, because native's controller runs under Omni-Compass on native too. The phase plane marks
 native's target on native's side while the stress-test model runs.
 
-### 7.11 Every muscle: scale out, scale in, scale up, its response, its switch
+### 7.12 Every muscle: scale out, scale in, scale up, its response, its switch
 
 The model's sixty muscles, twelve to a body part.
 Pick the muscle, then the scope: **this muscle**, **its body part** or **every muscle**. Live reading: the muscle's units on
@@ -1213,7 +1243,7 @@ The group's switch reads **Omni-Compass governs it** and, pressed, hands the mus
 while every other muscle stays governed; pressed again, Omni-Compass governs them again. The kill switch hands every muscle back
 at once.
 
-### 7.12 A changed tune is not a result
+### 7.13 A changed tune is not a result
 
 Every knob of this panel shows a variation of the mechanism (class S, our own model). The benchmarks prove the factory profile
 only; a custom profile is its tuner's, and so are its readings. This is the one place on the page where a person may turn the
@@ -2786,7 +2816,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 41.2 The engine's name and the profile
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v20). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v21). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines. Every result the page plays ran the factory profile of the engine its
 table names; the main control panel names the profile governing the live model now, with its fingerprint (section 6.5), and a
 candidate or custom profile there is never a result of record.
@@ -2832,7 +2862,7 @@ window and why. Three outcomes follow, and only these:
 Nothing is ever tuned to make a row read well; no row is steered. What is held to the letter is the mechanism: the code does
 what its rule says, the wire is fastened right, the harness measures as a deployment runs. On the page, each muscle of the stress-test model and of the replay carries its own switch on its card (the page's
 section 3d), and the mechanism panel's last group carries the same switch for a muscle, its body part or every muscle (section
-7.11): the muscles in scope handed back to native while the rest stay governed, to see their part in the result. On a real
+7.12): the muscles in scope handed back to native while the rest stay governed, to see their part in the result. On a real
 machine the same choice is the muscle's wiring (the Operator's Manual's wiring of each muscle).
 
 ### 42.5 On your own system
@@ -2975,9 +3005,9 @@ A copy whose page, engine or records differ from what these print is not a copy 
   the lease's walk back, the kill switch.
 - **Dial.** The max (every muscle to its own limit, never below native; the default) or the tune-down (never more than native).
 - **Engine that stands.** The engine version on main, named on the page's title block and in `python3 tools/omni_version.py`;
-  omni-v19 for this edition.
+  omni-v21 for this edition.
 - **Factory profile.** The complete, versioned set of Omni-Compass default settings shipped together; on the engine that
-  stands, omni-v20's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
+  stands, omni-v21's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
 - **Fingerprint (of a profile).** The page's FNV-1a hash of every setting of the mechanism, the heartbeat and every muscle's body
   included: one identity for one set of settings.
 - **Golden signals.** Latency, traffic, errors and saturation: on the page, the golden-signal feed of the page's section 2b.

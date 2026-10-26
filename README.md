@@ -8,13 +8,12 @@
 
 ## The answer first: is Omni-Compass a benefit against native?
 
-**Yes, on omni-v18, the newest engine with its three runs in (the engine that stands, omni-v21, runs them again), measured on real machines (class L), three runs (A, B and C).** Omni-Compass on top of native did 6.0% more work than native and answered 9.5% faster at the 95th percentile; Omni-Compass direct did 7.5% more work and answered 12.1% faster.
+**Yes, on omni-v18, the newest engine with its three runs in (the engine that stands, omni-v21, runs them again), measured on real machines (class L), three runs (A, B and C).** Omni-Compass on top of native did 6.0% more work than native and answered 9.5% faster at the 95th percentile.
 
 | Scenario | Signal | Work | Response (95th percentile) | Machines | Units |
 |---|---|---|---|---|---|
 | **Native**: Kubernetes' own autoscaling rule on the muscles | <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> the baseline | the baseline | the baseline | the baseline | the baseline |
 | **Omni-Compass on top of native**: Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 6.0%; the runs 5.2%, 5.3%, 7.4% | GAIN in all three of our runs: down 9.5% (faster); the runs 9.0%, 12.1%, 7.5% | GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% | power given in all three of our runs: up 10.2%; the runs 11.0%, 8.9%, 10.8% |
-| **Omni-Compass direct**: Omni-Compass alone on the muscles: no Kubernetes autoscaler under it, Omni-Compass the only controller moving the knob | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 7.5%; the runs 7.3%, 5.7%, 9.4% | GAIN in all three of our runs: down 12.1% (faster); the runs 9.8%, 15.7%, 10.8% | GAIN by the mean of our three runs, beyond the noise in 0 of 3: down 2.5% (fewer); the runs 2.2%, 3.1%, 2.2% | power given by the mean of our three runs, beyond the noise in 2 of 3: up 5.2%; the runs 6.9%, 0.3%, 9.0% |
 
 The signals: <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> accelerating, a GAIN and no LOSS; <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> steady, every row STEADY; <img src="docs/engine/signals/redlining.svg" alt="the red stop-sign octagon" height="14"> redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, never a LOSS. Source: [`results/orchestrator/V18_THREE_ARMS_ABC.json`](results/orchestrator/V18_THREE_ARMS_ABC.json), Omni direct's three arms, three runs on GitHub's own machines (A, B and C from one commit), the full form: 18 steps of 25 s, clients 1 2 3 2 3 4 ..., the busy room rule; runs A 40023524338, B 40023529155, C 40023534013; commit `0ca2bbdac97f`.
 
@@ -26,14 +25,29 @@ Each route's bill is its native total cost, then Omni-Compass's, then the saving
 
 | Route | The bill: native → Omni-Compass → saving | Supporting measurements |
 |---|---|---|
-| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v18 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4%. Omni-Compass direct: GAIN by the mean of our three runs, beyond the noise in 0 of 3: down 2.5% (fewer); the runs 2.2%, 3.1%, 2.2% |
+| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v18 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% |
 | **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v18; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
 
-Beside it, and never read as omni-v18: the totals composed from earlier engines' tables (`tools/whole_system.py`, omni-v1, omni-v10, omni-v11, omni-v12, omni-v16, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 24.6%, the 95th percentile 43.0% faster, machines 8.7% fewer, energy 3.3% less, the cloud's bill STEADY; the index over the gauges +14.9%. Each benchmark runs again on omni-v18, and each total follows its own engine's tables.
+Beside it, and never read as omni-v18: the totals composed from earlier engines' tables (`tools/whole_system.py`, omni-v1, omni-v10, omni-v11, omni-v12, omni-v18, omni-v21, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 24.7%, the 95th percentile 43.7% faster, machines 9.4% fewer, energy 4.7% less, the cloud's bill STEADY; the index over the gauges +15.5%. Each benchmark runs again on omni-v18, and each total follows its own engine's tables.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 <!-- end headline -->
+
+## Start here, by reader
+
+| Reader | Read first | Then |
+|---|---|---|
+| CEO, board, acquirer | [Due diligence](docs/DUE_DILIGENCE.md) | [State of play](docs/STATE_OF_PLAY.md) · [claims register](docs/CLAIMS_REGISTER.md) · [every LOSS kept](docs/LOSS_LEDGER.md) · [limitations](docs/LIMITATIONS.md) |
+| CFO, investment committee | [Benefit sheet](docs/BENEFIT_SHEET.md) | [The Omni index](results/OMNI_INDEX.md) · [evidence ledger](docs/EVIDENCE_LEDGER.md) |
+| CTO, chief architect | [Mechanism of action](docs/MECHANISM_OF_ACTION.md) | [The engine that stands, omni-v21](docs/OMNI_V21.md) · [canonical engine](docs/CANONICAL_ENGINE.md) · [formal status](docs/FORMAL_STATUS.md) |
+| Engineering, SRE | [The Operator's Manual](docs/OMNI_COMPASS_MANUAL.md) | [Integration manual](docs/INTEGRATION_MANUAL.md) · [pilot protocol](docs/PILOT_PROTOCOL.md) · [harness](docs/HARNESS.md) |
+| Security, legal, IP | [Security policy](SECURITY.md) | [Threat model](docs/THREAT_MODEL.md) · [safety case](docs/SAFETY_CASE.md) · [license](LICENSE) · [disclosures](DISCLOSURES.md) |
+| Benchmark referee | [How to read the results](docs/HOW_TO_READ_THE_RESULTS.md) | [The referee's audit pack](docs/audit/README.md) · [every reading recomputed](docs/audit/STATISTICAL_VALIDATION.md) · [the verdict audit](results/verdict_audit/VERDICT_AUDIT.md) |
+| Live benchmark engine | [The page](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html) | [The Live Benchmark Engine Manual](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md) · [its appraisal](docs/engine/APPRAISAL.md) |
+
+The full index, by reader and by the hierarchy of evidence, is [`docs/README.md`](docs/README.md).
+
 
 ## The bottom line: is Omni-Compass a benefit?
 
@@ -42,7 +56,7 @@ run it, against native alone, in one light and one number. The light is the whol
 Omni-Compass ahead of native; **yellow, a yield diamond, STEADY**, STEADY (a change under 0.5%); **red, a stop-sign octagon,
 REDLINING**, behind native, a LOSS; dark, **AWAITING**, no run yet. A slower service or a failed request turns the light red
 whatever the work. The number is how much more work was done for the same demand, the mean of our three runs, read by the
-key below (the number beside a word carries the word's sign).
+key below (the size beside a word carries no sign; each run's raw change is printed apart with its true sign).
 
 **The way to run it: one real test, three runs on GitHub's own machines** (class L, live software; the full form, 18
 steps of 25 s, the clients stepping 1 2 3 2 3 4 …; engine omni-v18, commit `0ca2bbdac97f`, runs 40023524338, 40023529155 and
