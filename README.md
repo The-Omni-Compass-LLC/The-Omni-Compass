@@ -273,16 +273,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-26 20:45 | six x100 line orgs 4 runs 0+10 | success | [40393344103](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40393344103) |
+| 2026-10-26 20:45 | cloud-check google | failure | [40397989340](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40397989340) |
+| 2026-10-26 20:44 | cloud-check amazon | failure | [40397992684](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40397992684) |
+| 2026-10-26 20:32 | six x100 line orgs 7 runs 0+10 | success | [40393370296](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40393370296) |
+| 2026-10-26 20:31 | lambda-gpu 1card stacks B | cancelled | [40393464531](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40393464531) |
+| 2026-10-26 20:31 | lambda-gpu 1card stacks C | cancelled | [40393468676](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40393468676) |
+| 2026-10-26 20:29 | raw-sweep | success | [40396072908](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40396072908) |
 | 2026-10-26 20:23 | grid | success | [40395225199](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40395225199) |
 | 2026-10-26 20:21 | lambda-gpu 1card stacks A | cancelled | [40393460334](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40393460334) |
 | 2026-10-26 20:18 | lambda-gpu giveback pooled  | success | [40394463354](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40394463354) |
-| 2026-10-26 20:18 | group: karmada C (nativebare native compassbare compass) | success | [40374351480](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40374351480) |
-| 2026-10-26 20:14 | kwok-scale | success | [40393142065](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40393142065) |
-| 2026-10-26 20:08 | raw-sweep | success | [40392937221](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40392937221) |
-| 2026-10-26 20:07 | godel: C (nativebare native compassbare compass) | success | [40374342716](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40374342716) |
-| 2026-10-26 20:07 | engine-runs | success | [40392110747](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40392110747) |
-| 2026-10-26 20:06 | six-kube x1 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 1+10 arms native compass split no window 960 protocol 4 | success | [40386298129](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40386298129) |
-| 2026-10-26 19:53 | six x10 line orgs 5 runs 0+10 | success | [40388655419](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40388655419) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
