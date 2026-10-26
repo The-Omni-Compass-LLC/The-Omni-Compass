@@ -8,7 +8,7 @@ Python's draws from the jump generator are the input (tools/engine_runs.py injec
 mechanism on (the governor's RK4 state equations, the nervous system's authority per organ, the compass law, the verdict), and
 every receipt must equal the Python's to the last bit, with the same SHA-256 digest.
 
-compare() is what the live benchmark engine's C++ twin panel (docs/engine/export_cpp_twins.py) shows run by run.
+compare() is what the live engine's C++ twin panel (docs/engine/export_cpp_twins.py) shows run by run.
 
 Usage: python tests/test_cpp_engine_runs_parity.py OC_ENGINE_RUNS [runs] [base]"""
 import sys

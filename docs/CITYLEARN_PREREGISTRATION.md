@@ -44,7 +44,7 @@ Every other CityLearn district that runs with the native controller: `citylearn_
 `citylearn_challenge_2022_phase_3`, `citylearn_challenge_2022_phase_all`, `citylearn_challenge_2021`,
 `citylearn_challenge_2020_climate_zone_1` to `_4`, and `citylearn_challenge_2023_phase_1`. Each district is one
 deterministic year, native and native + Omni-Compass. Reported per district and across districts: every CityLearn
-score, native, native + Omni-Compass, the change, and read in words (GAIN, STEADY or LOSS), with the number of districts
+score, native, native + Omni-Compass, the change, and read in words (GAIN, EVEN or LOSS), with the number of districts
 lower and higher for each score. Workflow `citylearn`; the report is written to results/citylearn/CITYLEARN.md when it has run.
 
 ## Round 1 result, and the amendment written before round 2 (2026-10-05)

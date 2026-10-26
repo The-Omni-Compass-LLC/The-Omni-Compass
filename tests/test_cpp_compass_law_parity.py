@@ -9,7 +9,7 @@ the same script of readings and plug commands through both, every answer compare
 The script language is oc_compass_law's (cpp/tools/run_compass_law.cpp): L starts a law, F feeds it one reading (and the
 band's center, cushion and kd where the caller moves them between readings, as the organisms' tune-down does), P starts a
 plug on a device with its own resolution, A attaches, W writes, M is another writer moving the lever, S restores.
-py_answers() is the Python side; the live benchmark engine page's C++ twin panel (docs/engine/export_cpp_twins.py) feeds both sides
+py_answers() is the Python side; the live engine page's C++ twin panel (docs/engine/export_cpp_twins.py) feeds both sides
 the organisms' and the live controllers' own readings through the same two functions.
 
 Usage: python tests/test_cpp_compass_law_parity.py OC_COMPASS_LAW [laws]"""

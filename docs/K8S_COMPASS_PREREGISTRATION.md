@@ -506,7 +506,7 @@ peak: the highest load step at which no more than 5% of response samples are ove
 lower step too). The fall is where machines are no longer needed and can be handed back. Over the whole window:
 p95 response time, worker machines in service, energy (declared model; on kind it is not a meter), CPU with Omni's own.
 
-Reported for each, native + Omni against native, paired, with the 95% interval and read in words (GAIN, STEADY or LOSS):
+Reported for each, native + Omni against native, paired, with the 95% interval and read in words (GAIN, EVEN or LOSS):
 work (capacity, requests a second inside the line), speed (p95), machines (worker machines in service, mean), energy.
 
 ## The Omni index: one number for more for the same, or the same for less (written before its first use, 2026-10-04)
@@ -1059,7 +1059,7 @@ shows (its processor use, the requests waiting, the response times), as in every
   every gauge reported; native is Azure's autoscaler and the HPA alone, omni is Omni-Compass on top on the engine that
   stands, its replica room read live (Omni v5 amendment 5).
 - **Reading.** Three separate runs of each setting, A, B and C (`tools/confirm_abc.py`); each row GAIN or LOSS in all
-  three of our runs, STEADY (no difference beyond the noise) or the runs disagree. Replicas, machines and the bill that
+  three of our runs, EVEN (no difference beyond the noise) or the runs disagree. Replicas, machines and the bill that
   rise are power given, shown beside the response times, the time over the line and the failed requests they bought.
 - **Order and dispatch.** The grid conductor starts every Azure set from `scripts/azure_queue.txt`: A of every set, then
   B, then C, one at a time in each machine family's queue, read back by its run's title, never started twice.
@@ -1096,11 +1096,11 @@ every Azure set runs as follows, and nothing else changes:
   hidden. A setting in which the governor in a cloud only gives back (its HPA target never below the operator's) is a
   change to the engine and is proposed for the next version, not made here.
 - **The aim, and the readings.** The bill (machine-hours at list price) and the machines in service aim lower: a cut is
-  GAIN. Work served, response times, time over the line and failed requests must read STEADY or GAIN: a LOSS there is a
+  GAIN. Work served, response times, time over the line and failed requests must read EVEN or GAIN: a LOSS there is a
   LOSS of the test, its cause found and fixed. A rise in the bill is power given and is reported as the setting failing
   its aim.
 - **Disclosed before the run.** Where native is short (at its cap and failing requests, as on the steady load), there is
-  nothing to give back without costing work, and the bill is expected to read STEADY; the cuts are expected where native
+  nothing to give back without costing work, and the bill is expected to read EVEN; the cuts are expected where native
   holds machines it does not need, in the quiet stretches between bursts and in the hours of a day's trough.
 - **The runs of the max.** Steady A (run 38455383137: three repetitions finished at the max) and the burst at
   `1 6 1 8 1 6` (run 38500160429, its first repetition) are stopped and kept as runs of the max, counted in no bill result.
@@ -1171,7 +1171,7 @@ machines alone (`OMNI_MACHINES_ONLY=1` in `aks-metered.yml`; `scripts/kind_bench
   autoscaler. Azure's autoscaler alone makes machines, for native's own pods.
 
 So the omni arm can hold no more pods and no more machines than native's autoscalers give it: the bill can only fall or
-stay. The bill and the machines aim lower (a cut is GAIN); work, response time, failures and alert minutes must read STEADY
+stay. The bill and the machines aim lower (a cut is GAIN); work, response time, failures and alert minutes must read EVEN
 or GAIN. The receipt's commands row shows how often a machine was parked or woken.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
@@ -1269,7 +1269,7 @@ as native or faster. Whatever the runs read is reported.
 The founder's orders of 19 October: every cloud set gets a three-run reading, A, B and C on one engine, measured as finely as
 the cap allows ("the cap we can run it to ... that's all we can run"), at the least cost that still tells what Omni-Compass
 can do. Measured from the twelve Azure runs measured to the end (5 paired repetitions each), a run's bill swings about ±9%
-of native's (the median half-width of its 95% interval, 1.5% to 36% run to run), so a cut under about 9% read STEADY.
+of native's (the median half-width of its 95% interval, 1.5% to 36% run to run), so a cut under about 9% read EVEN.
 
 - **Repetitions.** Every Azure set (the steady set, the bursts `1 4 1 6 1 9` and `1 6 1 8 1 6`, the real day on 1 to 9) runs
   up to 100 paired repetitions a run, the founder's cap for paid runs (12 October). At 100 the bill's interval is about ±2%:
@@ -1277,7 +1277,7 @@ of native's (the median half-width of its 95% interval, 1.5% to 36% run to run),
 - **The stopping rule** (`tools/stop_rule.py`, `aks-metered.yml` input `stop_looks`, set to `10,20,40,70`). At each look, on
   repetitions 1 to that look only, the bill's paired change is read with its 99% interval (four looks at 1% each keep the
   rule's error under 5%). The run stops at the first look where the interval clears zero (a cut: GAIN; a rise: power given),
-  or holds zero within ±2% of native's bill (STEADY, measured to that precision). It never stops while its 95th percentile or
+  or holds zero within ±2% of native's bill (EVEN, measured to that precision). It never stops while its 95th percentile or
   its failed requests read a LOSS at that look: a LOSS is measured to the cap. A stopped run's remaining repetitions start,
   read the rule, and spend nothing on Azure. The table is read as every table is (95% intervals, `tools/live_reps.py`); the
   run's summary carries every look (`STOP_RULE.txt`).

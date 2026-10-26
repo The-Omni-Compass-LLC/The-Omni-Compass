@@ -54,7 +54,7 @@ native with no record left (`scripts/kind_bench.sh`).
 
 By the one key (`tools/readings.py`), from the three runs' receipts (`tools/live_reps.py`, `tools/confirm_abc.py`): each
 pace against native, and each other pace against the compass arm at its default of 15 s, paired within the repetition. A row reads GAIN or LOSS
-only when all three runs agree in sign with every 95% interval clear of zero; STEADY when an interval includes zero; and
+only when all three runs agree in sign with every 95% interval clear of zero; EVEN when an interval includes zero; and
 "the runs disagree" when clear runs point different ways. A resource that rises (pods, machines, energy, the settings
 commands, the governor's own processor) is power given, never a LOSS; it is shown and named.
 
@@ -94,8 +94,8 @@ goes to the next version's list (`docs/CHANGE_CONTROL.md`) to be root-caused as 
 every pace, the default included. Written once the model had read, before the first run, because "no LOSS at that pace" could
 be read either way: in the cloud's setting the pods wait for a machine longer than native's at every pace, the default
 included (pending pod minutes an hour: native 8.2, every 60 s 20.9, every 15, 10 and 5 s 18.4, 15.9 and 16.5), a reading of
-STEADY at 60 and 10 s and of LOSS at 15 and 5 s only because the seeds' spread differs, while against the 60 s default each
-faster pace reads STEADY. The reading kept is the model gate's own, the one every version since 15 October was landed by.
+EVEN at 60 and 10 s and of LOSS at 15 and 5 s only because the seeds' spread differs, while against the 60 s default each
+faster pace reads EVEN. The reading kept is the model gate's own, the one every version since 15 October was landed by.
 
 ## Amendment 2 (22 October, written before any run): the founder sets the heartbeat at 15 s
 

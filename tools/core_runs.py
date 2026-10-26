@@ -3,28 +3,28 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The Python's Monte Carlo of the engine's core from the jump generator: N runs, one digest, the live benchmark engine's own port held to it.
+"""The Python's Monte Carlo of the engine's core from the jump generator: N runs, one digest, the live engine's own port held to it.
 
 The founder's words of 24 October: "the Python's Monte Carlo, our 4K Runge-Kutta, 20-step macro, 10-step micro in each macro ... how
 each Python run comes out and starts at zero, and how long in steps OmniCompass gets it into the basin and holds it there and
 certifies the count"; and "some button that allows them to activate the Python's jump generator ... running it again and again".
 
 Run k draws its seed from the jump generator (seed_k = base + k·0x9E3779B9, mod 2³²) and its starting state and its parameters from
-that seed's mulberry32 stream (the live benchmark engine's own generator, written here bit for bit, as tools/engine_runs.py does): E, U, I_U,
+that seed's mulberry32 stream (the live engine's own generator, written here bit for bit, as tools/engine_runs.py does): E, U, I_U,
 S, B, Ḃ uniform on the ranges benchmarks/core_evidence.py draws, then the 22 parameters in omnicompass/core.py's PARAMETER_RANGES
 order. Each run goes through omnicompass/core.simulate itself (six states, the fourth-order Runge–Kutta step, 20 macro steps of 10
 micro steps, the bounded command held across the four stages) in the four ways benchmarks/core_evidence.py runs its population:
 controlled (toward the nearest basin), uncontrolled (u = 0: the plant alone, native), aimed at the wrong basin, and with the double
 well's μ at 0. A run is conveyed when its U has stayed in one basin (|U ∓ 1| ≤ 0.10) for 5 macro steps in a row and certified at
 10. The digest is the SHA-256 of every run's U at every macro step (six decimals), its convey step and its cert step, one line a
-run, the four ways in order; the live benchmark engine's page runs the same set through its own port of the core and must give the same
+run, the four ways in order; the live engine's page runs the same set through its own port of the core and must give the same
 digest (--verify), and the same draws go through the C++ twin of the core (cpp/tools/core_runs.cpp on cpp/src/core.cpp, --cpp): the
 Python writes every draw (the injection), the C++ puts the mechanism on, and its digest must be the Python's.
 
 Your own system (--system): the same Monte Carlo on ranges you write for your own stack, a JSON block or a file under systems/
 (systems/README.md): a name, and for any of the six states and the 22 parameters a range [low, high] or one value; the rest keep the
 engine's own. The draws keep their one order, so the jump generator gives the same streams; only the ranges they are spread over
-change. It is read as numbers only, never run as code. The live benchmark engine's "Your own system" panel writes the block, runs it in the
+change. It is read as numbers only, never run as code. The live engine's "Your own system" panel writes the block, runs it in the
 page and sends it to GitHub (.github/workflows/monte-carlo.yml), where the Python and the C++ run it and the record is committed.
 Class S: the engine's own mathematics on draws, never a measurement of anyone's stack.
 """
@@ -252,7 +252,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--runs", type=int, default=DEFAULT_RUNS)
     ap.add_argument("--base", type=int, default=DEFAULT_BASE, help="the jump generator's base seed")
-    ap.add_argument("--verify", default="", help="the live benchmark engine page: run its port of the core in node and compare")
+    ap.add_argument("--verify", default="", help="the live engine page: run its port of the core in node and compare")
     ap.add_argument("--out", default="", help="where to write (default results/core_runs/)")
     ap.add_argument("--system", default="", help="your own system: a JSON block, or a file holding one (systems/README.md); empty: the engine's own ranges")
     ap.add_argument("--cpp", default="", help="the C++ harness (cpp/build/oc_core_runs): run the same draws through the C++ twin of the core and record its digest")
@@ -301,9 +301,9 @@ def main() -> int:
     md = [f"# The core's Monte Carlo: {a.runs} runs from the jump generator (base {a.base}), {system['name']}, one digest", "", f"> {TOP}", "",
           f"Each run: omnicompass/core.simulate, {C.MACRO_STEPS} macro steps of {C.MICRO_STEPS} fourth-order Runge–Kutta micro steps "
           f"(Δt {C.MACRO_DT} s a macro step), from the starting state and parameters its own stream draws (seed_k = base + k·0x9E3779B9 "
-          f"mod 2³², mulberry32, the live benchmark engine's own generator). Conveyed: {C.CONVEY_WINDOW} macro steps in a row in one basin "
+          f"mod 2³², mulberry32, the live engine's own generator). Conveyed: {C.CONVEY_WINDOW} macro steps in a row in one basin "
           f"(|U ∓ 1| ≤ {C.BASIN_TOL}); certified: {C.CERT_WINDOW}. Written {data['written']}. Class S.", "",
-          f"**Digest {dg}** (SHA-256 of every run's path at six decimals). The live benchmark engine's page runs the same set through its own port "
+          f"**Digest {dg}** (SHA-256 of every run's path at six decimals). The live engine's page runs the same set through its own port "
           "of the core and shows its own digest beside this one.", "",
           *([f"**The C++ twin** (`cpp/tools/core_runs.cpp` on `cpp/src/core.cpp`) on the same draws: digest {data['cpp']['digest']}, "
              f"{'the same' if data['cpp']['same'] else 'DIFFERENT'}; {data['cpp']['agree']} of {data['cpp']['of']} run-ways agree to 1e-9, largest "
