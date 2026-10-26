@@ -6,7 +6,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Every row of every three-run table stands where its table stands, LOSS included; this page gathers the LOSS rows so none of them is found only by reading every table. A LOSS row is a gauge that moved away from its declared aim by 0.5% or more across the benchmark's three runs, A, B and C (the founder's order of 24 October 2026, `tools/readings.py`): in all three, every run's 95% interval clear of zero, or by the mean of the three, with the count of runs beyond the noise. Each benchmark is read from its newest whole table; an older engine's table stands only until the engine that stands has run that benchmark three times, and the engine each row ran on is printed beside it.
 
-Rows that read LOSS across their three runs: **326**. Against my own native, the readings do no harm is judged by: **155**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v21: 29, omni-v18: 3, omni-v12: 284, omni-v11: 2, omni-v10: 8.
+Rows that read LOSS across their three runs: **327**. Against my own native, the readings do no harm is judged by: **156**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v21: 33, omni-v12: 284, omni-v11: 2, omni-v10: 8.
 
 ## Against my own native
 
@@ -46,9 +46,10 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), mean | 1.4%, 0.9%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), 95th percentile | 1.5%, 3.0%, 0.5% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), 99th percentile | 1.3%, 3.1%, 2.7% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v18 | `results/live/V18_KAFKA.json` | workload burst / lag_max | 1.1%, 0.4%, 0.6% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v18 | `results/live/V18_KAFKA.json` | workload light / work_inside_line_mps | 0.2%, 0.1%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v18 | `results/live/V18_KAFKA.json` | workload light / p95_ms | 1.1%, 1.0%, 70.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload heavy / p95_ms | 0.5%, 0.5%, 1.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload heavy / mean_ms | 0.2%, 0.4%, 3.0% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload light / mean_ms | 1.2%, 1.5%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload light / lag_mean | 0.9%, 1.3%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_KAFKA_SERVICE.json` | workload burst / mean_ms | 2.5%, 0.3%, 3.3% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_KAFKA_SERVICE.json` | workload burst / lag_max | 0.5%, 1.3%, 2.9% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_KAFKA_SERVICE.json` | workload burst / lag_mean | 2.9%, 0.2%, 2.4% | not yet written | — | the benchmark's three runs on the engine that stands |
