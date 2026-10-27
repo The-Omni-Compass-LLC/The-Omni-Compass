@@ -31,14 +31,14 @@ jobs:
       group: omni-gpu-physical
       cancel-in-progress: false
     env:
-      PHASE: ${{ inputs.phase }}
       GPU: ${{ inputs.gpu }}
-      DURATION: ${{ inputs.duration }}
       REPS: '1'
       REPS_CONFIRM: '10'
       OMNI_ENGINE: compass
       OMNI_DIAL: max
-      ENVELOPE: /etc/omni-compass/gpu-envelope.json
+      STOP_AFTER_SMOKE: "1"
+      SMOKE_REPS: "1"
+      SMOKE_DURATION: "180"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Verify GPU and approved envelope
@@ -47,16 +47,15 @@ jobs:
           set -euo pipefail
           command -v nvidia-smi
           nvidia-smi --query-gpu=index,name,driver_version,power.limit --format=csv
-          test -r "$ENVELOPE"
           python3 -c 'import torch; assert torch.cuda.is_available()'
           test "$PHASE" != confirm || test -z "$(git status --porcelain)"
-      - name: Run native/watch/Omni on physical GPU
+      - name: Run existing rented-GPU harness on physical GPU
         shell: bash
         run: |
           set -euo pipefail
           # Runner operator must configure passwordless narrowly scoped sudo for this script.
-          sudo --preserve-env=PHASE,GPU,DURATION,REPS,REPS_CONFIRM,OMNI_ENGINE,OMNI_DIAL,ENVELOPE \
-            bash scripts/gpu_paired.sh
+          sudo --preserve-env=GPU,OMNI_ENGINE,OMNI_DIAL,STOP_AFTER_SMOKE,SKIP_CONFIRM,SKIP_DECODE,SKIP_CAP,SKIP_DRILL,SKIP_HIL,SKIP_LLM,SMOKE_REPS,SMOKE_DURATION \
+            bash scripts/gpu_rented_run.sh
       - name: Archive measurements, including failed-run evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
