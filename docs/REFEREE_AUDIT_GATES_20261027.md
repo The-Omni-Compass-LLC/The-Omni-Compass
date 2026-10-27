@@ -1,6 +1,6 @@
 # Referee audit: evidence and convergence gates (2026-10-27)
 
-> © 2026 The Omni-Compass LLC. All rights reserved. Evaluation and Simulation use only. See LICENSE, NOTICE, DISCLOSURES.md.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 This is an **audit worklist**, not a certification. No independent reviewer has approved the results. Never promote a model, simulation, or finite fixture test into a physical measurement or global theorem.
 
@@ -44,3 +44,7 @@ Use docs/EVIDENCE_LEDGER.md: T theorem under assumptions; V finite verification;
 5. Separate A/B/C results with adverse metrics retained.
 6. Physical claims supported by measured eligible hardware.
 7. Outside replication before describing the whole system as independently validated.
+
+---
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
