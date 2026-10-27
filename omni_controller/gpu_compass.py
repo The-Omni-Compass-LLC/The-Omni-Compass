@@ -264,16 +264,6 @@ class GpuCompass:
                 self.audit({"foreign_writer": {"gpu": g, "reads_w": r["limit"], "expected_w": self.expect},
                             "action": "observe only from now on; both wires left to the other writer"})
             p, ls = self.position(r["util"])
-        # Fail closed on observed queue delay: GPU service-time savings cannot
-        # authorize a slower end-to-end service. A breached SLO already fails up
-        # in position(); this early warning restores native before that wall.
-        if r is not None and ls is not None and p is not None:
-            p95 = ls.get("p95")
-            if p95 is not None and a.slo_ms > 0 and p95 >= a.slo_ms * a.queue_guard_share:
-                p = 1.0
-                self.audit({"queue_guard": {"p95_ms": p95, "slo_ms": a.slo_ms,
-                                            "threshold_share": a.queue_guard_share,
-                                            "action": "native_fail_up"}})
         self.learn(r)
         n_clk, n_draw = self.native()
         thr = throttle(a.smi, [g]) if r is not None else None
@@ -405,8 +395,6 @@ def parser():
     ap.add_argument("--latency-file", default="")
     ap.add_argument("--slo-ms", type=float, default=0.0)
     ap.add_argument("--latency-window-s", type=float, default=5.0, help="seconds of response times the position reads")
-    ap.add_argument("--queue-guard-share", type=float, default=0.8,
-                    help="fail up to native power and clock when observed P95 reaches this share of the declared SLO")
     ap.add_argument("--race-util", type=float, default=0.95, help="utilization at which work is waiting: race, never pace")
     ap.add_argument("--learn-samples", type=int, default=15, help="busy readings of the card on its own before the compass may lower anything")
     ap.add_argument("--floor-w", type=float, default=0.0, help="the declared envelope's lowest watts")
