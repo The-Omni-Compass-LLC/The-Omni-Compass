@@ -184,6 +184,24 @@ def md_only(path):
     return n, "\n".join(out)
 
 
+def reread_pair(p: Path, write: bool = True):
+    """One table (its .json and .md) read again by the rule that stands, as main() reads every table: returns (readings
+    changed, whether the page's text changed). tools/reproduce.py applies it to a table it rebuilds, so a rebuilt table is
+    compared with the published one as both stand under the same rule."""
+    n, data, seq = reread_json(p)
+    md = p.with_suffix(".md")
+    if not md.exists():
+        return n, False
+    text = md.read_text()
+    kind = "| Measure | A | B | C | Reading |" in text
+    stack = next((m for s, m in STACKS.items() if re.search(rf"_{s}(_|\.json$)", p.name)), None)
+    new_text = retally(with_note(patch_md(text, seq, kind)), data, stack) if seq else text
+    if write and (n or new_text != text):
+        p.write_text(json.dumps(data, indent=1) + "\n")
+        md.write_text(new_text if new_text.endswith("\n") else new_text + "\n")
+    return n, new_text != text
+
+
 def main(argv):
     check, total, tables = "--check" in argv, 0, 0
     for d in DIRS:
@@ -199,19 +217,10 @@ def main(argv):
                 tables += changed
                 total += n
                 continue
-            n, data, seq = reread_json(p)
-            if not md.exists():
-                continue
-            text = md.read_text()
-            kind = "| Measure | A | B | C | Reading |" in text
-            stack = next((m for s, m in STACKS.items() if re.search(rf"_{s}(_|\.json$)", p.name)), None)
-            new_text = retally(with_note(patch_md(text, seq, kind)), data, stack) if seq else text
-            if n or new_text != text:
+            n, changed = reread_pair(p, write=not check)
+            if n or changed:
                 tables += 1
                 total += n
-                if not check:
-                    p.write_text(json.dumps(data, indent=1) + "\n")
-                    md.write_text(new_text if new_text.endswith("\n") else new_text + "\n")
         for md in sorted(d.glob("V*_*.md")):
             if md.with_suffix(".json").exists():
                 continue

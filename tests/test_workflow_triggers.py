@@ -39,12 +39,14 @@ class Triggers(unittest.TestCase):
             push = on["push"] or {}
             self.assertTrue(any(k in push for k in ("paths", "branches", "branches-ignore", "tags")), f"{p.name}: every push starts it")
 
-    def test_a_workflow_that_runs_only_when_started_ignores_main(self):
+    def test_a_workflow_that_runs_only_when_started_has_no_push(self):
+        """26 October: a push to any branch but main started 62 runs of the workflows that run only when started by hand, every
+        one skipped (the cloud, chip and benchmark sets among them), so a pull request's checks read as a wall of skipped clouds.
+        A start by hand needs the workflow on main alone, where every one of them is; so none of them carries a push trigger."""
         for p in sorted(WF.glob("*.yml")):
             on = triggers(p)
             push = on.get("push") if isinstance(on, dict) else None
-            if push and "branches-ignore" in push:
-                self.assertIn("main", push["branches-ignore"], p.name)
+            self.assertFalse(push and "branches-ignore" in push, f"{p.name}: a push to a branch starts it only to skip it")
 
     def test_the_live_engine_never_starts_itself(self):
         paths = triggers(WF / "live-engine.yml")["push"]["paths"]
