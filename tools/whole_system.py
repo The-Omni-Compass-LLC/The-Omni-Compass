@@ -502,8 +502,8 @@ def main(argv=None):
              "does not change when the layers under or over it also carry Omni-Compass (separability). Section 4 tests that assumption where the tables can "
              "(the governors' four ways). The stacked run, Omni-Compass at every layer at once against native at every layer, is the measurement that would "
              "replace this composition; until it exists this page is the answer the standing tables give, with its assumptions in the open. The layers "
-             "also stand on different engines (the card on the controller of 2 October, the cluster tests on omni-v10 and omni-v11, the governors on "
-             "omni-v12), so the composition is across engines, said so here, and remade as each layer's omni-v12 three runs land.")
+             "also stand on different engines, each named in its row below (the card on omni-v18's card governor, the A100 run of 24 October), so the "
+             "composition is across engines, said so here, and remade as each layer's three runs on the engine that stands land.")
     L.append("")
 
     L.append("## 2. The layers, each from its own table")

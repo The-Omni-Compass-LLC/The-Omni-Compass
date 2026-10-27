@@ -115,14 +115,64 @@ def model():
     return {"path": path.relative_to(ROOT).as_posix(), "rec": rec, "engine": engine, "scen": scen, "azure": azure_v, "whole": whole_beside()}
 
 
+
+# the newest real runs on the engine that stands lead the answer (the founder's words of 27 October: "Haven't we got new benchmarks
+# with newer dates?"): the Kubernetes tests' own three-run tables on that engine, each gauge as its table read it, every run's raw
+# change beside the word with its true sign
+STANDING_TESTS = (("ALL_FOUR", "Kubernetes, all four loads at once"), ("STEADY", "Kubernetes, steady work"),
+                  ("WANDERING", "Kubernetes, demand that wanders"), ("FAULTS", "Kubernetes, faults injected"))
+STANDING_GAUGES = (("work inside the response line", "Work inside the line"), ("response time (ms), 95th percentile", "Response, 95th percentile"),
+                   ("failed requests", "Failed requests"), ("worker nodes in service", "Machines in service"))
+
+
+def standing_block(stands: str) -> list:
+    v = stands.split("-v")[1]
+    rows = []
+    for key, name in STANDING_TESTS:
+        f = ROOT / "results" / "live" / f"V{v}_{key}.json"
+        if not f.exists():
+            continue
+        d = json.loads(f.read_text(encoding="utf-8"))
+        cells = []
+        for g, _ in STANDING_GAUGES:
+            k = next((x for x in d["rows"] if x.startswith(g)), None)
+            if not k:
+                cells.append("not a gauge of this test")
+                continue
+            r = d["rows"][k]
+            raws = []
+            for x in r.get("runs") or []:
+                if x.get("native"):
+                    c = 100 * x["diff"] / abs(x["native"])
+                    raws.append("±0.0%" if abs(c) < 0.05 else f"{'+' if c > 0 else '−'}{abs(c):.1f}%")
+                elif x.get("native") == 0:
+                    raws.append(f"{x['native']:g} → {x['omni']:g}" if "omni" in x else f"{x['diff']:+g}")
+            word = (r.get("reading") or "").replace("**", "")
+            cells.append(f"{word} (raw {', '.join(raws)})" if raws else word)
+        runs = " · ".join(f"{x['tag']} {x['run']}" for x in d.get("runs", []))
+        rows.append(f"| **{name}** ([`{f.with_suffix('.md').relative_to(ROOT).as_posix()}`]({f.with_suffix('.md').relative_to(ROOT).as_posix()})) | "
+                    + " | ".join(cells) + f" | {runs} |")
+    if not rows:
+        return []
+    return [f"### On the engine that stands, {stands}: the newest real runs", "",
+            f"Three separate runs (A, B and C) of each preregistered test on GitHub's own machines (class L, live software), native against "
+            f"Omni-Compass on top of native, every run on {stands}. Each cell is the table's own reading, then each run's raw change, "
+            "Omni-Compass against native, with its true sign.", "",
+            "| Test | " + " | ".join(n for _, n in STANDING_GAUGES) + " | GitHub runs |",
+            "|---|" + "---|" * len(STANDING_GAUGES) + "---|"] + rows + [""]
+
+
 def markdown(m) -> str:
     rec, eng = m["rec"], m["engine"]
     img = lambda lv: f'<img src="{SIGNAL[lv][1]}" alt="{SIGNAL[lv][2]}" height="14">'
     L = [BEGIN, "", "## The answer first: is Omni-Compass a benefit against native?", ""]
     yes = all(s["signal"] == "ok" for s in m["scen"])
     stands = "omni-v" + re.search(r'VERSIONS = \{"v(\d+)"', (ROOT / "tools" / "omni_version.py").read_text()).group(1)
+    L += standing_block(stands)
+    if not eng.startswith(stands):
+        L += [f"### The three ways to run it, on {eng} (its three runs on the engine that stands are in the campaign)", ""]
     where = (f"on the engine that stands ({eng})" if eng.startswith(stands + " ") or eng == stands else
-             f"on {eng.split(' (')[0]}, the newest engine with its three runs in (the engine that stands, {stands}, runs them again)")
+             f"on {eng.split(' (')[0]}, this test's newest engine with its three runs in (on the engine that stands, {stands}, it runs again)")
     L.append(f"**{'Yes' if yes else 'Not in every way'}, {where}, measured on real machines (class L), "
              f"three runs (A, B and C).** Omni-Compass on top of native did {100 * m['scen'][0]['work']:.1f}% more work than native "
              f"and answered {100 * abs(m['scen'][0]['p95']):.1f}% faster at the 95th percentile.")
