@@ -256,16 +256,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-27 01:55 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V21_YCSB.md) | Across 4 untouched workloads: 7 gauge-rows GAIN, 2 LOSS, 6 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 17 EVEN, 16 where the runs disagree. |
-| 2026-10-27 01:55 | [sysbench on MySQL, a database's operator-set buffer pool: the A/B/C three-run table](results/live/V21_SYSBENCH.md) | Across 4 untouched workloads: 11 gauge-rows GAIN, 0 LOSS, 7 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 18 EVEN, 12 where the runs disagree. |
-| 2026-10-27 01:55 | [Redis, a cache's operator-set memory ceiling: the A/B/C three-run table](results/live/V21_REDIS.md) | Across 3 untouched workloads: 11 gauge-rows GAIN, 1 LOSS, 8 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 16 EVEN, 3 where the runs disagree. |
-| 2026-10-27 01:55 | [PostgreSQL behind PgBouncer, the untouched workloads: the A/B/C three-run table](results/live/V21_PGBENCH.md) | Across 3 workloads: 6 gauge-rows GAIN, 0 LOSS, 5 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 18 EVEN, 7 where the runs disagree. |
-| 2026-10-27 01:55 | [Kafka, a consumer group's operator-set size: the A/B/C three-run table](results/live/V21_KAFKA.md) | Across 3 untouched workloads: 7 gauge-rows GAIN, 5 LOSS, 4 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 14 EVEN, 12 where the runs disagree. |
-| 2026-10-27 01:55 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-26 21:19 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1635237724.md) |  |
-| 2026-10-26 15:45 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V21_YCSB_SHIPPED.md) | Across 4 untouched workloads: 0 gauge-rows GAIN, 9 LOSS, 7 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 22 EVEN, 10 where the runs disagree. |
-| 2026-10-26 15:45 | [YCSB on MongoDB, a database's operator-set cache size: the A/B/C three-run table](results/live/V21_YCSB_SERVICE.md) | Across 4 untouched workloads: 4 gauge-rows GAIN, 2 LOSS, 6 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 10 EVEN, 26 where the runs disagree. |
-| 2026-10-26 15:45 | [sysbench on MySQL, a database's buffer pool as shipped: the A/B/C three-run table](results/live/V21_SYSBENCH_SHIPPED.md) | Across 4 untouched workloads: 1 gauge-rows GAIN, 3 LOSS, 11 power given (each in all three of our runs, or by the mean of the three: a change of 0.5% or more), 18 EVEN, 15 where the runs disagree. |
+| 2026-10-27 06:47 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-27 06:47 | [Wandering demand: load that steps up and down by one (1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1): the A/B/C three-run table (Omni v21)](results/live/V21_WANDERING.md) |  |
+| 2026-10-27 06:47 | [A public day of demand: the Google cluster trace of 2011 replayed one step at a time (2 3 3 3 3 4 4 3 2 2 2 2 2 3 2 3 4 4 3 4 5 6 5 4): the A/B/C three-run table (Omni v21)](results/live/V21_TRACE_GOOGLE2011.md) |  |
+| 2026-10-27 06:47 | [Steady load: the same fixed-rate work sent to both arms: the A/B/C three-run table (Omni v21)](results/live/V21_STEADY.md) |  |
+| 2026-10-27 06:47 | [Robustness: the long run, 7,200 s an arm, the governor's memory and decisions watched: the A/B/C three-run table (Omni v21)](results/live/V21_ROBUST_LONG.md) |  |
+| 2026-10-27 06:47 | [Robustness: the governor killed outright mid-run (the lease), real Kubernetes, 10 pairs: the A/B/C three-run table (Omni v21)](results/live/V21_ROBUST_KILL.md) |  |
+| 2026-10-27 06:47 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v21)](results/live/V21_KEDA_REQUESTS.md) |  |
+| 2026-10-27 06:47 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v21)](results/live/V21_KEDA_CPU_REQUESTS.md) |  |
+| 2026-10-27 06:47 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v21)](results/live/V21_GOLDILOCKS.md) |  |
+| 2026-10-27 06:47 | [Faults: a machine down, a spike, a runaway pod, a blind probe: the A/B/C three-run table (Omni v21)](results/live/V21_FAULTS.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -273,6 +273,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-27 08:39 | cloud-check both | failure | [40471452017](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40471452017) |
+| 2026-10-27 08:23 | engine-runs | success | [40472906468](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40472906468) |
+| 2026-10-27 08:22 | big-organism-detached collect | success | [40473022849](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40473022849) |
+| 2026-10-27 07:46 | live-engine | success | [40463257699](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40463257699) |
+| 2026-10-27 06:48 | security-scan | success | [40463257628](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40463257628) |
+| 2026-10-27 06:44 | raw-sweep | success | [40462890035](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40462890035) |
 | 2026-10-27 06:16 | health | failure | [40460077515](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40460077515) |
 <!-- front-page:runs:end -->
 
