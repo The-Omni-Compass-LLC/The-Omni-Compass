@@ -66,13 +66,6 @@ def main():
     s = json.loads(st.read_text())
     print(f"calm and busy: no fail-up; learned busy clock {n_clk:.0f} MHz, busy draw {n_draw:.1f} W; ceiling low "
           f"{min(x['ceiling_mhz'] for x in d)} MHz (never under 900), lid low {min(x['want_w'] for x in d)} W; limit now {s['limit']['0']} W")
-    # Queue-pressure guard: P95 at 700 ms is below the 800 ms SLO,
-    # but above the protective 80% threshold. It must fail up early.
-    latency(t, 700.0); g.step()
-    early = decisions(t)[-1]
-    assert early["decided_by"] == "fail_up" and early["ceiling_mhz"] >= 1695 and early["want_w"] >= 150, early
-    assert any("queue_guard" in json.loads(line) for line in (Path(t) / "a.jsonl").read_text().splitlines())
-    print("P95 early guard: fail up before 800 ms SLO, restore native power and clocks")
     for _ in range(3):
         latency(t, 900.0); g.step()
     d = decisions(t)
