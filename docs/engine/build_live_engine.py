@@ -1063,6 +1063,12 @@ def records(runs: bool) -> dict:
     gh = github_runs() if runs else None
     runs_read_at = now() if gh is not None else None
     camp = campaign_reading() if gh is not None else None      # the campaign's runs, read with the run list
+    if gh is None and runs and not CHECKING and LEDGER_CACHE.exists():
+        # no token here: the list of running and queued runs kept beside the ledger (its "now", read through GitHub's API by
+        # whoever refreshed the cache), shown with its own reading time, never under this build's
+        kept = (json.loads(LEDGER_CACHE.read_text(encoding="utf-8")).get("now") or {})
+        if kept.get("read_at") and isinstance(kept.get("runs"), list):
+            gh, runs_read_at = kept["runs"], kept["read_at"]
     led = None if CHECKING else ledger(camp)   # a check never reads GitHub: the ledger is a GitHub reading, compared by its own read time
     with tempfile.TemporaryDirectory() as td:
         t = Path(td)
