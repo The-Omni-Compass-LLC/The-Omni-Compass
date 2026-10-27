@@ -78,7 +78,10 @@ jobs:
       - run: python3 -m pip install -q -r requirements.txt
       - run: python3 tools/omni_version.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: The machine, as found
-        run: sudo -E python3 tools/run_cpu_power.py --probe | tee -a "$GITHUB_STEP_SUMMARY"
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -E python3 tools/run_cpu_power.py --probe | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Run every workload, native and omni
         run: |
           set +e
