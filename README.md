@@ -254,6 +254,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-27 21:30 | raw-sweep | success | [40587054966](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40587054966) |
+| 2026-10-27 21:29 | six x500 line orgs 2 runs 10+90 | success | [40552385615](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40552385615) |
 | 2026-10-27 21:11 | six x500 line orgs 6 runs 10+90 | success | [40554888803](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40554888803) |
 | 2026-10-27 21:06 | big-organism-detached collect | success | [40582813120](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40582813120) |
 | 2026-10-27 21:04 | health | failure | [40558528872](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40558528872) |
@@ -261,9 +263,7 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-27 17:32 | six-kube x100 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 61+40 arms native compass split no window 1440 protocol 4 | failure | [40516242202](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40516242202) |
 | 2026-10-27 17:30 | six x100 line orgs 3 runs 10+90 | success | [40502785449](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40502785449) |
 | 2026-10-27 17:20 | six x100 line orgs 1 runs 10+90 | success | [40502771383](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40502771383) |
-| 2026-10-27 17:20 | raw-sweep | success | [40544955268](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40544955268) |
 | 2026-10-27 16:58 | lambda-gpu 1card fast save B | success | [40485602065](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40485602065) |
-| 2026-10-27 16:57 | lambda-gpu 1card fast save C | success | [40485605739](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40485605739) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
