@@ -8,7 +8,20 @@
 
 ## The answer first: is Omni-Compass a benefit against native?
 
-**Yes, on omni-v18, the newest engine with its three runs in (the engine that stands, omni-v21, runs them again), measured on real machines (class L), three runs (A, B and C).** Omni-Compass on top of native did 6.0% more work than native and answered 9.5% faster at the 95th percentile.
+### On the engine that stands, omni-v21: the newest real runs
+
+Three separate runs (A, B and C) of each preregistered test on GitHub's own machines (class L, live software), native against Omni-Compass on top of native, every run on omni-v21. Each cell is the table's own reading, then each run's raw change, Omni-Compass against native, with its true sign.
+
+| Test | Work inside the line | Response, 95th percentile | Failed requests | Machines in service | GitHub runs |
+|---|---|---|---|---|---|
+| **Kubernetes, all four loads at once** ([`results/live/V21_ALL_FOUR.md`](results/live/V21_ALL_FOUR.md)) | GAIN in all three of our runs (raw +30.0%, +51.5%, +40.6%) | GAIN in all three of our runs (raw −51.5%, −59.5%, −56.2%) | GAIN by the mean of our three runs, beyond the noise in 1 of 3 (raw −5.3%, −5.1%, −5.4%) | STEADY, the same (raw ±0.0%, ±0.0%, ±0.0%) | A 40227146512 · B 40250382783 · C 40272629580 |
+| **Kubernetes, steady work** ([`results/live/V21_STEADY.md`](results/live/V21_STEADY.md)) | not a gauge of this test | GAIN in all three of our runs (raw −65.8%, −65.8%, −66.3%) | STEADY, the same (raw 0 → 0, 0 → 0, 0 → 0) | STEADY, the same (raw ±0.0%, ±0.0%, ±0.0%) | A 40223431219 · B 40246652453 · C 40269968227 |
+| **Kubernetes, demand that wanders** ([`results/live/V21_WANDERING.md`](results/live/V21_WANDERING.md)) | not a gauge of this test | GAIN in all three of our runs (raw −59.0%, −56.4%, −58.8%) | GAIN in all three of our runs (raw −13.9%, −14.9%, −12.2%) | STEADY, the same (raw ±0.0%, ±0.0%, ±0.0%) | A 40227141899 · B 40250378687 · C 40271292066 |
+| **Kubernetes, faults injected** ([`results/live/V21_FAULTS.md`](results/live/V21_FAULTS.md)) | not a gauge of this test | GAIN in all three of our runs (raw −51.0%, −57.8%, −54.5%) | GAIN by the mean of our three runs, beyond the noise in 2 of 3 (raw −18.2%, −14.3%, −10.7%) | STEADY, under the floor (the three runs' mean 0.03%) (raw −0.1%, ±0.0%, ±0.0%) | A 40229598467 · B 40250391552 · C 40272639170 |
+
+### The three ways to run it, on omni-v18 (its three runs on the engine that stands are in the campaign)
+
+**Yes, on omni-v18, this test's newest engine with its three runs in (on the engine that stands, omni-v21, it runs again), measured on real machines (class L), three runs (A, B and C).** Omni-Compass on top of native did 6.0% more work than native and answered 9.5% faster at the 95th percentile.
 
 | Scenario | Signal | Work | Response (95th percentile) | Machines | Units |
 |---|---|---|---|---|---|
@@ -57,6 +70,8 @@ Omni-Compass ahead of native; **yellow, a yield diamond, STEADY**, STEADY (a cha
 REDLINING**, behind native, a LOSS; dark, **AWAITING**, no run yet. A slower service or a failed request turns the light red
 whatever the work. The number is how much more work was done for the same demand, the mean of our three runs, read by the
 key below (the size beside a word carries no sign; each run's raw change is printed apart with its true sign).
+
+**On the engine that stands, omni-v21**, the four Kubernetes tests in the answer above read the 95th percentile GAIN in all three runs of each (raw −51% to −66% in every run), work inside the line GAIN in all three runs of the all-four test (raw +30.0%, +51.5%, +40.6%), and the machines STEADY in every test. Below, the three-arm test, whose newest runs are omni-v18's of 24 October.
 
 **The way to run it: one real test, three runs on GitHub's own machines** (class L, live software; the full form, 18
 steps of 25 s, the clients stepping 1 2 3 2 3 4 …; engine omni-v18, commit `0ca2bbdac97f`, runs 40023524338, 40023529155 and

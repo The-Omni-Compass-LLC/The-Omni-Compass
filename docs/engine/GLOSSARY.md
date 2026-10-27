@@ -1979,7 +1979,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 
 | Term | Kind | Where on the page |
 |---|---|---|
-| the 0.5% floor | term | iii (#s-bottom); 3e (#s-plane); 3l (#s-live); 4b (#s-scn); 4g (#s-math); 4k (#s-read) |
+| the 0.5% floor | term | 0 (#s-answer); iii (#s-bottom); 3e (#s-plane); 3l (#s-live); 4b (#s-scn); 4g (#s-math); 4k (#s-read) |
 | the 95% interval on Student's t | term | 2d (#s-board); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4g (#s-math); 4k (#s-read) |
 | A | term | 4g (#s-math) |
 | a changed tune's violet | term | 1a (#s-wall) |
@@ -2045,7 +2045,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | knob | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3g (#s-verdict); 3j (#s-ops); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4i (#s-self); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
 | the lease | term | 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3e (#s-plane); 3j (#s-ops); 4c (#s-fleet); 4g (#s-math) |
 | lift-off | term | 3f (#s-brain); 4g (#s-math) |
-| the line | term | 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
+| the line | term | 0 (#s-answer); 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
 | The live benchmark engine's organism: sixty muscles, twelve in each of five body parts | organism | 3a (#s-engines); 3b (#s-desk); 3n (#s-lab); 4g (#s-math) |
 | the live tuning engine | term | v (#s-disclose) |
 | LOSS | term | 0 (#s-answer); iii (#s-bottom); 1b (#s-health); 2a (#s-status); 2c (#s-loss); 2d (#s-board); 3b (#s-desk); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
@@ -2079,7 +2079,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | piece 4: the governor coupling every muscle to one law | term | 1a (#s-wall) |
 | power given | term | 0 (#s-answer); 2c (#s-loss); 2d (#s-board); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | push | term | 4g (#s-math) |
-| the raw change and the word | term | 2c (#s-loss); 3j (#s-ops); 4k (#s-read) |
+| the raw change and the word | term | 0 (#s-answer); 2c (#s-loss); 3j (#s-ops); 4k (#s-read) |
 | realm | term | 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3n (#s-lab); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | REDLINING | term | iii (#s-bottom); 1a (#s-wall) |
 | the reflex rule | term | 3a (#s-engines); 3c (#s-dial); 4i (#s-self); v (#s-disclose) |
@@ -2093,9 +2093,9 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the spine | term | 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math) |
 | The spine, the muscles every stack runs on | organism | 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math) |
 | the stack | term | 4b (#s-scn); 4c (#s-fleet) |
-| STEADY | term | 0 (#s-answer); iii (#s-bottom); 1a (#s-wall); 2c (#s-loss); 2d (#s-board); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3n (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
+| STEADY | term | 0 (#s-answer); iii (#s-bottom); 1a (#s-wall); 2c (#s-loss); 2d (#s-board); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the stress-test model | term | 1a (#s-wall); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3n (#s-lab); 4g (#s-math) |
-| supervisory governor | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
+| supervisory governor | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
 | the switchboard | term | 1b (#s-health); 4b (#s-scn) |
 | tanh | term | 4g (#s-math) |
 | template | term | 4c (#s-fleet) |

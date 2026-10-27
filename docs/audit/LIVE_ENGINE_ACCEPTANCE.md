@@ -2,18 +2,18 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Read on 2026-10-27 06:59 UTC by `tools/live_engine_acceptance.py` (`docs/engine/accept_live_engine.js`, Chromium through Playwright) from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`. Each line is what the browser read; a check that did not run says so.
+Read on 2026-10-27 08:50 UTC by `tools/live_engine_acceptance.py` (`docs/engine/accept_live_engine.js`, Chromium through Playwright) from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`. Each line is what the browser read; a check that did not run says so.
 
 | Check | Result | What the browser read | The rule |
 |---|---|---|---|
-| The page opens | **PASS** | loaded in 9553 ms; 51.4 MB as rendered | the load event within 180 s |
+| The page opens | **PASS** | loaded in 6029 ms; 51.6 MB as rendered | the load event within 180 s |
 | Its title | **PASS** | “The Omni-Compass Live Benchmark Engine” | The Omni-Compass Live Benchmark Engine |
 | The engine it names | **PASS** | data-engine omni-v21, prose omni-v21; the repository: omni-v21 | the engine `tools/omni_version.py` reads |
 | No error in the page | **PASS** | 0 page errors, 0 console errors | none |
-| Every contents link lands | **PASS** | 1183 links, 0 broken | none broken |
-| GAIN is a green circle | **PASS** | border-radius 50%, rgb(80, 200, 120); drawn 4238 times | round, green |
-| STEADY is a yellow diamond | **PASS** | rotated 45° (matrix(0.707107, 0.707107, -…), rgb(245, 197, 24); drawn 3689 times | a square turned 45°, yellow |
-| LOSS is a red octagonal stop sign | **PASS** | the word's plate clipped to an octagon, rgb(255, 77, 85), a white octagon inside; drawn 3546 times | an octagon, red |
+| Every contents link lands | **PASS** | 1188 links, 0 broken | none broken |
+| GAIN is a green circle | **PASS** | border-radius 50%, rgb(80, 200, 120); drawn 4233 times | round, green |
+| STEADY is a yellow diamond | **PASS** | rotated 45° (matrix(0.707107, 0.707107, -…), rgb(245, 197, 24); drawn 3686 times | a square turned 45°, yellow |
+| LOSS is a red octagonal stop sign | **PASS** | the word's plate clipped to an octagon, rgb(255, 77, 85), a white octagon inside; drawn 3566 times | an octagon, red |
 | The four live words | **PASS** | GAINING, STEADY, REDLINING, AWAITING, OVER THE LINE; 62 monitors, 889 signals | GAINING, STEADY, REDLINING, AWAITING, OVER THE LINE |
 | The reflex runs on the engine's own numbers | **PASS** | the page {"streak": 3, "relief": 0.05, "margin": 0.05, "hold": 10, "holdMax": 160}; `omnicompass/immune.py` {"streak": 3, "relief": 0.05, "margin": 0.05, "hold": 10, "holdMax": 160} | equal, every one a knob on the panel |
 | The reflex acts under a surge | **PASS** | decision 44: 2 hand-backs to native, 21 stays, 1 held native now | a hand-back or a stay recorded |
