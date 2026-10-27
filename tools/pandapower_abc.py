@@ -24,6 +24,7 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, DETERMINISTIC_RULE, ACROSS_HEAD, ACROSS_RULE, across_cells, across_counts, reproduced_reading  # noqa: E402  (every table says whose runs these are)
+from tools.repo import NAME as REPO_NAME  # noqa: E402  (the repository's name, written once)
 
 SAME_REL = 1e-6          # a change under one part in a million of the value reads "same" (amendment 11)
 REPRO_REL = 1e-9         # two runs of a deterministic simulator agree to this, or they did not reproduce
@@ -87,7 +88,7 @@ def verdict(recs, model, k, direction):
 def engine(run):
     """The Omni version the run's commit carries, from the GitHub run record; unknown when it cannot be read."""
     try:
-        sha = subprocess.run(["gh", "api", f"repos/the-omni-compass-llc/the-omni-compass/actions/runs/{run}", "--jq", ".head_sha"],
+        sha = subprocess.run(["gh", "api", f"repos/{REPO_NAME}/actions/runs/{run}", "--jq", ".head_sha"],
                              capture_output=True, text=True, timeout=60).stdout.strip()
         if len(sha) != 40 or any(c not in "0123456789abcdef" for c in sha):
             return "?", "unknown"

@@ -1404,8 +1404,8 @@ respect a limit the wires do not carry.
 
 ### 6.5 The rules of the engine that stands, as an operator meets them
 
-The engine that stands in this edition is **omni-v20** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
-quoted here ran on omni-v7, whose rules omni-v19 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
+The engine that stands in this edition is **omni-v21** (`python3 tools/omni_version.py` prints it; chapter 13); the receipts
+quoted here ran on omni-v7, whose rules omni-v21 carries (omni-v8, omni-v9 and omni-v10 changed one wire, the CityLearn battery,
 and the interval table; omni-v11 added one guard to the Kubernetes governor; omni-v12 holds a raise the cluster's admission
 refused until something changes, and the swarm's wire acts on a neighbour at once; omni-v13 hands the CPU limits it gave back to
 the operator's on a shared host at its top while another workload there has room of its own, and counts every other pod by its
@@ -1424,7 +1424,10 @@ range read from the workload's `omnicompass.io/target-utilization` and `omnicomp
 and handed back by the reset; a workload an autoscaler governs is left to it, and `--native replicas` leaves the muscle native; and the
 conveyance runs every `--convey-every-s` (15 s) whichever check falls due, a quiet deployment is scaled to zero after
 `--coldstart-idle-s` (180 s), and a step that runs past its slot is skipped, never run in a burst, with `behind_s` in the
-audit). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write; a muscle left native shows as `"native_muscles"` at the start and `"held"` on each write
+audit); omni-v20 fixes the five data stores' wires at their causes; and omni-v21 hands a service's
+autoscaler target back to native while its response time stays over its line under Omni-Compass's target and native's own
+rule would hold it lower, keeping it where native is not stronger (each change in the audit as `"immune"`, with the replicas
+native's rule would ask for beside the replicas running). The hand-back shows in the audit as `"convey": "handed back"`, with the host's busy share on each write; a muscle left native shows as `"native_muscles"` at the start and `"held"` on each write
 it withholds. The guard shows in the audit: when the cluster's
 reading shows no machine in service (every worker cordoned, tainted NoSchedule or unreachable at once), the decision is recorded
 as `held: the cluster's reading shows no machine in service; nothing decided, nothing written`, and the governor takes up again
@@ -1517,8 +1520,8 @@ to lock clocks (the wire check's step 3 is where that shows).
 ### 7.2 Get the software and check it
 
 ```
-git clone https://github.com/The-Omni-Compass-LLC/The-Omni-Compass.git
-cd The-Omni-Compass
+git clone https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC.git
+cd The-Omni-Compass-LLC
 pip install -r requirements.txt
 python3 verify.py                       # every check; ends with VERIFICATION: PASS
 ```
@@ -1580,7 +1583,7 @@ python3 tools/run_gpu_card.py results/sim/gpu_two_wire/eval                  # t
 ```
 
 Pass: `VERIFICATION: PASS`. Nothing in your systems is touched.
-What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v20 (digest 1df07f8e36a97985, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
+What you should see: `verify.py` ends `VERIFICATION: PASS`, and `python3 tools/omni_version.py` prints `omni-v21 (digest b658f05d43c1e602, 62 files)`; the modelled run writes a receipt whose organism rows read GAIN on misses with power given beside them, as `results/realms_v5/REALMS_V5.md` does on the same seeds. Anything else means the copy is not the copy: chapter 33.
 
 **Level 1 - Watch (read-only).**
 
@@ -7642,7 +7645,7 @@ block. All four values come from the same app.
 
 1. In the Azure portal, search **App registrations**, click **All applications**, and open the app (or **+ New
    registration**, name `omni-compass-github-2`, **Register**). Its **Overview** shows three numbers; skip **Object ID**.
-2. On GitHub, open **https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/settings/secrets/actions**. For each box
+2. On GitHub, open **https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/settings/secrets/actions**. For each box
    below, click its pencil (or **New repository secret** if it is not listed), paste the one value, and save:
    - `AZURE_CLIENT_ID`: the app's **Application (client) ID**.
    - `AZURE_TENANT_ID`: the app's **Directory (tenant) ID**.

@@ -148,7 +148,7 @@ files, the raw files GitHub archived with their SHA-256 lists, the two other man
 ## Notice and Disclaimer
 
 This manual describes the live engine page as `docs/engine/build_live_engine.py` builds it on the engine that stands
-(omni-v19, `OMNI_V19.json`). The page names its engine on its own `<html>` element (`data-engine`), and the engine its words
+(omni-v21, `OMNI_V21.json`). The page names its engine on its own `<html>` element (`data-engine`), and the engine its words
 were written for (`data-prose`); where the records stand on a newer engine than the words, a banner under the notice says so
 (`#engBanner`). The build stamps the engine that stands on the page and rebuilds every record, and `--check` fails a page whose
 engine differs; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in
@@ -318,7 +318,7 @@ played back.
 **What this manual covers.** Every section of the page in the page's own order; every gauge, with its side, its aim and its
 word; every control, with its backend, its effects and its limits; the factory profile against the active one; the two tickers
 that show the mechanism of action; the trace from any tile to the record it came from; and what to do when a tile reads LOSS.
-It covers the page as built on omni-v19; a later engine renames itself on the page's title block and this book is realigned in
+It covers the page as built on omni-v21; a later engine renames itself on the page's title block and this book is realigned in
 the same push.
 
 **What this manual does not cover.** How the engine is built, its equations beyond the ones the page itself prints, the
@@ -350,7 +350,7 @@ native's colour. "Return to native" in the main control panel is the reset, a se
 (chapter 6).
 
 **The profile** (chapter 6). The active profile reads FACTORY, CANDIDATE or CUSTOM, with its fingerprint. The factory profile is
-the released one, omni-v19's, the heartbeat 60 s; nothing is held when the page opens. *Restore factory profile* puts the
+the released one, omni-v21's, the heartbeat 60 s; nothing is held when the page opens. *Restore factory profile* puts the
 mechanism and the heartbeat back; *Hold the active profile* holds every knob as set; *Try the candidate* applies the sweep's best
 beat as a candidate, never a release. The heartbeat has six buttons, 10, 15, 30, 60, 90 and 120 s; the console's tabs add
 the live model as Prometheus metrics and every press as the request a running governor takes.
@@ -439,8 +439,8 @@ time the repository built the page, the evidence classes (P a meter, L live soft
 ("native · Omni-Compass and native, never Omni-Compass by itself"), and a line that names the engine every table's runs ran on and
 how many benchmarks are being run again on the engine that stands (`#bEngRuns`). Its opening paragraph says the same in full: two
 sides everywhere, and only two, native and Omni-Compass and native; Omni-Compass is never by itself (the founder's order of 25
-October), it always sits on top of a native controller; what omni-v18 and omni-v19 added to run it otherwise is not shown on the
-page, and taking it out of the engine is the next version's. Under it stand two boxes: the live tuning engine box (`#tuningBench`,
+October), it always sits on top of a native controller; what omni-v18 and omni-v19 added to run it otherwise is still in the engine
+and is not shown on the page. Under it stand two boxes: the live tuning engine box (`#tuningBench`,
 section 1.1) and the disclosure of real runs (every run played back read from its own raw files, each checked against its run's
 SHA-256 list; no number typed in by hand). Where the records stand on a newer engine than the page's words were written for, a
 banner above the title says so and says to read the newer engine wherever a sentence names the older one as the engine that
@@ -570,7 +570,7 @@ orange everywhere, Omni-Compass blue, and on every monitor, section and part its
 STEADY, green THRIVING. A section's number is printed before its title; a lettered section (1a, 3h) is a section inside the
 numbered part that holds it.
 
-### 3.2 The sections, as built on omni-v19
+### 3.2 The sections, as built on omni-v21
 
 Appendix A lists every section with its anchor and the chapter of this book that reads it. In the page's order:
 
@@ -878,7 +878,7 @@ The profile group holds three buttons, and the profile box (`#fuseProfile`) unde
 - **Hold the active profile** holds every knob as set: the mechanism's knobs, the heartbeat buttons, the sweep, the heartbeat
   sweep monitor's beat row and the switchboard's beat row are disabled, and the note reads "HELD at decision n: the heartbeat
   … s and every knob held as set; restore the factory profile to turn them again". Unheld, the note reads "every knob turns; the
-  factory profile is the released one (omni-v19: the heartbeat 60 s, every muscle on its card); no other profile is released".
+  factory profile is the released one (omni-v21: the heartbeat 60 s, every muscle on its card); no other profile is released".
 - **Return to native** hands governance back: the reset, the operator's control (`tools/omni_control.py`, `POST /v1/reset`).
   On the page every setting goes to native's own controller and every Omni-Compass side follows native, as with the kill switch,
   but the switch then reads "OFF by the reset · native alone · press to turn ON" and the event log names the reset. A second
@@ -2740,7 +2740,7 @@ Every number on the wall can be walked back to the file it came from.
 ### 41.2 The engine's name and the profile
 
 Every table and every monitor names the engine it ran on; the page's title block names the engine
-the page stands on (omni-v20). A table on an older engine stands only until its runs on the engine that stands land, and the
+the page stands on (omni-v21). A table on an older engine stands only until its runs on the engine that stands land, and the
 board says which it is. Nothing is read across engines. Every result the page plays ran the factory profile of the engine its
 table names; the main control panel names the profile governing the live model now, with its fingerprint (section 6.5), and a
 candidate or custom profile there is never a result of record.
@@ -2915,9 +2915,9 @@ A copy whose page, engine or records differ from what these print is not a copy 
   the lease's walk back, the kill switch.
 - **Dial.** The max (every muscle to its own limit, never below native; the default) or the tune-down (never more than native).
 - **Engine that stands.** The engine version on main, named on the page's title block and in `python3 tools/omni_version.py`;
-  omni-v19 for this edition.
+  omni-v21 for this edition.
 - **Factory profile.** The complete, versioned set of Omni-Compass default settings shipped together; on the engine that
-  stands, omni-v20's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
+  stands, omni-v21's, the heartbeat 60 s, every muscle on its card. Every published result is this profile's.
 - **Fingerprint (of a profile).** The page's FNV-1a hash of every setting of the mechanism, the heartbeat and every muscle's body
   included: one identity for one set of settings.
 - **Golden signals.** Latency, traffic, errors and saturation: on the page, the golden-signal feed of the page's section 2b.
@@ -3144,7 +3144,7 @@ cause and the knob that answers it.
 
 Licensing, pilots, evaluations and the Omni-Compass Enterprise License: **The Omni-Compass LLC**. Owner and developer: AJ Dubra.
 Main office infrastructure: toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1. Landline, registered in
-Florida: 321-746-4411. www.omni-compass.com. Repository: github.com/The-Omni-Compass-LLC/The-Omni-Compass. Any use beyond
+Florida: 321-746-4411. www.omni-compass.com. Repository: github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC. Any use beyond
 evaluation and simulation requires a signed, paid Omni-Compass Enterprise License. Write to The Omni-Compass LLC before any
 production use.
 

@@ -40,8 +40,8 @@ the download is small):
 
 ```bash
 apt-get update && apt-get install -y git
-git clone --filter=blob:none --no-checkout https://github.com/The-Omni-Compass-LLC/The-Omni-Compass.git
-cd The-Omni-Compass
+git clone --filter=blob:none --no-checkout https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC.git
+cd The-Omni-Compass-LLC
 git sparse-checkout set --no-cone '/*' '!/results/live/raw/*'
 git checkout COMMIT
 ```
@@ -56,20 +56,20 @@ tail -f metal.log
 The first lines check the machine. If it says *"this machine is a virtual machine"* or *"no processor meter here"*, the
 server is not bare metal: cancel it and rent a dedicated one. Otherwise it installs what it needs and starts the 10
 repetitions. `Ctrl+C` stops watching; the run keeps going. You can close the laptop and log in again later
-(`ssh root@SERVER_ADDRESS`, then `cd The-Omni-Compass && tail -f metal.log`).
+(`ssh root@SERVER_ADDRESS`, then `cd The-Omni-Compass-LLC && tail -f metal.log`).
 
 ## Step 5. Send the result back
 
 At the end the log prints one line:
 
 ```
-== send this one file back: /root/The-Omni-Compass/metal-<time>.tar.gz
+== send this one file back: /root/The-Omni-Compass-LLC/metal-<time>.tar.gz
 ```
 
 On your laptop (a new terminal, not the server):
 
 ```bash
-scp root@SERVER_ADDRESS:/root/The-Omni-Compass/metal-*.tar.gz .
+scp root@SERVER_ADDRESS:/root/The-Omni-Compass-LLC/metal-*.tar.gz .
 ```
 
 Send that file in the chat. Then run Step 4 again for run B, and again for run C (same server, same commit). After run

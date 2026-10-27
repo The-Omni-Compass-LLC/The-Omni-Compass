@@ -41,8 +41,8 @@ Older GPU results (2 October, `results/gpu/run-20261002T082232Z/`) are obsolete 
 | Cloud | State | Detail | Receipt |
 |---|---|---|---|
 | Azure | **On, running** | The 100-repetition set (run 40069633316) started 24 October on omni-v18: 57 of 100 repetitions done, every one passed; it finishes as omni-v18's record. The steady set of 24 October (run 40126991719, omni-v18) finished. No omni-v21 Azure set has started: Azure runs one set at a time. | `results/live/AKS_BILL.md` (omni-v1: the bill EVEN) |
-| Google Cloud | **Never run** | Its keys are not in the repository's secrets: `GCP_CREDENTIALS` and `GCP_PROJECT` (the $0 check of 26 October says so). Wired; switched off. | none |
-| Amazon | **Never run** | `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are not stored, and the account is on the Free plan. Wired; switched off. | none |
+| Google Cloud | **Never run** | Its keys are not in the repository's secrets: `GCP_CREDENTIALS` and `GCP_PROJECT` (the $0 check, `cloud-check`, read them absent on 26 October and again on 27 October, run 40471452017). Wired; switched off. | none |
+| Amazon | **Never run** | `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are not stored (the $0 check of 27 October, run 40471452017), and the account is on the Free plan. Wired; switched off. | none |
 | Oracle, DigitalOcean, Alibaba, Linode, IBM, other | Never run | wired through `byoc-metered`, no cluster connected | none |
 
 ## 4. Kubernetes, the data stores and the outside simulators on omni-v21
@@ -56,12 +56,18 @@ Older GPU results (2 October, `results/gpu/run-20261002T082232Z/`) are obsolete 
 | The big organisms with the real cluster inside, 1,000 copies on Azure | `results/live/V3_BIG_ORGANISM.md` (omni-v3) | an Azure set on omni-v21 |
 | The 945 modelled muscles as one tower | `results/realms/REALMS.md` (omni-v3) | its table from the omni-v21 realms runs |
 
-The drone swarms' table reads two engines (omni-v12 and omni-v21): the swarm runner stands outside the fingerprint since
-omni-v12, so its runs name both; to be looked into.
+Every omni-v21 table was rebuilt on 27 October from its three archived runs by `tools/reproduce.py` (the recipes in
+`results/live/RECIPES.json` and the front page's own for the five data stores): all 31 tables (18 Kubernetes and simulator
+tables, 13 data-store tables; 58 files), identical to the byte, and every one names omni-v21 alone (the drone swarms' table names
+omni-v12 only as the engine before whose runs its preregistration's amendment 2 was written).
 
 ## 5. Open, in one list
 
-1. GPU: the three omni-v21 stacks runs finish by about 05:30 UTC on 28 October; then their three-run table.
+1. GPU: the three omni-v21 stacks runs finish by about 05:30 UTC on 28 October; then their three-run table. The one-card
+   `cap` runs (an operator's power cap underneath, the cap alone against the cap with Omni-Compass on top) follow, A, B and C
+   on A100s, since the A100's counted run read EVEN with no write (its limit already at the top on native).
+   And the tune-down on the same card (`dial save`, A, B and C): the card averaged 253 W of its 400 W limit in that run, room
+   the factory tune (the max, which never steps the clock below the top) leaves unused.
 2. Azure: the omni-v18 set finishes; then the omni-v21 sets start.
 3. Google and Amazon: their keys (`docs/GOOGLE_SETUP.md` section 4, `docs/AMAZON_SETUP.md` section 1a).
 4. CPU: a bare-metal machine, or it stays not run.

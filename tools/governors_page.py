@@ -25,7 +25,7 @@ OUT = ROOT / "results" / "live" / "GOVERNORS.md"
 RUNS = ROOT / "results" / "live" / "governors_runs.json"
 CATALOG_FILE = ROOT / "realms" / "catalog_v5.csv"
 ENGINE = "omni-v12"
-REPO_RUNS = "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/"
+from tools.repo import RUNS as REPO_RUNS  # noqa: E402  (the repository's name, written once)
 
 # (slug, name, register row, what it governs, native under it, its test) in the founder's order of naming, the
 # Kubernetes scheduler first because every other one stands on it

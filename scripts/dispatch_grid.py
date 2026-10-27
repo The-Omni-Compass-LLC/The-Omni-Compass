@@ -45,7 +45,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "results" / "grid_v21" / "DISPATCHED.json"
-REPO = os.environ.get("GITHUB_REPOSITORY", "the-omni-compass-llc/the-omni-compass")
+REPO = os.environ.get("GITHUB_REPOSITORY", "The-Omni-Compass-LLC/The-Omni-Compass-LLC")   # tools/repo.py HOME: the conductor runs from its own fetched copy, alone
 SINCE = "2026-10-25T17:30:00Z"  # only this campaign, omni-v21 (the founder's order of 17 October: every fix makes the next version and everything runs again); earlier engines are historical
 ENGINE = "omni-v21"                 # the engine whose grid this is (tools/omni_version.py)
 SIZES = (1, 10, 100, 500)           # free GitHub only: the ladder of the Python's 500-run Monte Carlo (the founder's order of 25 October)

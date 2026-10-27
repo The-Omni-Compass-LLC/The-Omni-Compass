@@ -8,20 +8,11 @@ repository runs it, and does every word on the page say only what the parts do? 
 repository's own code by an independent path and compared, value by value. Run and scored by The Omni-Compass LLC's own
 code. No outside party has reviewed or approved these results.
 
-**Engine.** The engine that stands is **omni-v17** (`OMNI_V17.json`, digest `7c937d09e4031cc7`, 55 files, since 23 October, afternoon): omni-v16 with the governor's default decision period moved from 15 to 60 s, the heartbeat a dial from 5 to 120 s, and its cruise wait never under two readings at a slow beat; the page's port of the brain runs a decision every 60 s, so the port is unchanged by it. omni-v16 was omni-v15 with every clock of the Kubernetes governor in seconds, so its decision period changes only how often it looks; at a decision every 60 s, the step the page's port of the brain runs, every value is omni-v15's, so the port is unchanged by it. omni-v15 was omni-v14 with the brain's power-cap request trimming only while the response line has been clean for the governor's own clear time, and every wire that holds a governor's rules inside the fingerprint; the page's port of the brain computes its states, push and headroom, not the power-cap request, so the port is unchanged by it. omni-v14 was omni-v13 with a knob that leaves any muscle native and the operator's commands run without a shell, neither of which the page's ports run.
-Since omni-v8 it has changed `tools/run_citylearn.py` (outage buildings' batteries stay native, omni-v8; the wire reads the
-coming hour, omni-v9; the glide that cuts the bill most, omni-v10), the realms harness's t table and the Kubernetes governor (a
-reading with no machine in service is held, never read as an overload, omni-v11; a CPU-limit raise the cluster's admission
-refused is held, not written again at every check, omni-v12; the CPU limits it gave go back to the operator's on a shared host at its
-top beside another workload's room, omni-v13; a muscle left native on the operator's word, the operator's commands without a shell, omni-v14; the brain's power-cap request through the line's own clear time, omni-v15; every clock of the governor in seconds, omni-v16; the heartbeat a dial, the main engine at 60 s, omni-v17), and added `omnicompass/student_t.py` (the
-exact Student t); every other engine file is unchanged since omni-v8. Every record on the page was made again on the omni-v9
-tree, whose bytes omni-v17 keeps in every file the page reads but the governor and the brain, whose clocks read as before at a decision every 60 s and whose new guards act only on a reading
-with no machine in service, on a raise the cluster refused, on a shared host at its top, on a muscle left native and on a response line not yet clean (the page's controller trace has none: recorded again on the
-omni-v12 tree on 19 October, it is identical to the record on the page), and its workflow rebuilds them on omni-v17: every run, tick and
-decision is identical to the one it replaced, and the intervals are drawn with the exact t (the waiting line's interval widens
-in its fourth digit; every word stays). The receipts of the real runs are each benchmark's newest engine's table; their engines, their words and every LOSS row of
-Omni-Compass against its native are in the counts below, written by the build from the records at every run (21 October: the
-counts had stood still while the tables moved), and replaced as omni-v17's three runs land.
+**Engine.** The engine that stands is **omni-v21** (`OMNI_V21.json`, digest `b658f05d43c1e602`, 63 files, since 25 October,
+evening); each earlier engine, what it changed and what its model gate read, is on its own page (`docs/OMNI_V<n>.md`). The
+page's records are rebuilt from the engine that stands and the repository's own results by its workflow (`live-engine.yml`,
+`docs/engine/build_live_engine.py`) on every push to main; each record names the commit and the engine it was made on, and
+`python3 docs/engine/build_live_engine.py --check` fails when any record differs from what the files give.
 
 **Wired to the engine.** The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`,
 `docs/engine/build_live_engine.py`) on every change to the engine, a model, a harness or a result on main, after every

@@ -106,7 +106,7 @@ def github_runs() -> list | None:
 LEDGER = {"aks-metered.yml": "Azure", "gke-metered.yml": "Google Cloud", "eks-metered.yml": "Amazon Web Services",
           "cloud-check.yml": "the $0 cloud check", "lambda-gpu.yml": "the GPU on Lambda", "cpu-power.yml": "the CPU package"}
 LEDGER_CACHE = HERE / "github_ledger.json"
-REPO = "The-Omni-Compass-LLC/The-Omni-Compass"
+from tools.repo import NAME as REPO   # noqa: E402  (the repository, written once in tools/repo.py)
 LEDGER_GAUGES = ["machines billed, machine-hours", "compute bill at list price ($)", "worker nodes in service, mean", "response time (ms), 95th percentile",
                  "failed requests (%)", "time over the response line (% of samples)"]
 
