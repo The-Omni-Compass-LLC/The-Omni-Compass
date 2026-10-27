@@ -273,16 +273,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-26 23:01 | redis | success | [40400989005](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40400989005) |
-| 2026-10-26 22:58 | raw-sweep | success | [40415273400](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40415273400) |
-| 2026-10-26 22:58 | sysbench | success | [40401032384](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40401032384) |
-| 2026-10-26 22:56 | pgbench | success | [40400963499](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40400963499) |
-| 2026-10-26 22:56 | ycsb | success | [40401042132](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40401042132) |
-| 2026-10-26 22:48 | live-engine | cancelled | [40411279599](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40411279599) |
-| 2026-10-26 22:36 | swarm | success | [40401023560](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40401023560) |
-| 2026-10-26 22:36 | six-kube: start every square of the grid | success | [40401014912](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40401014912) |
-| 2026-10-26 22:35 | mujoco | success | [40401425203](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40401425203) |
-| 2026-10-26 22:18 | orchestra: A B C | failure | [40401395525](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40401395525) |
+| 2026-10-27 00:33 | raw-sweep | success | [40423963585](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40423963585) |
+| 2026-10-27 00:33 | grid | success | [40425654065](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40425654065) |
+| 2026-10-27 00:19 | live-engine | success | [40417388919](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40417388919) |
+| 2026-10-26 23:48 | six x1 line orgs 5 runs 10+90 | success | [40420878612](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40420878612) |
+| 2026-10-26 23:44 | six x1 line orgs 6 runs 10+90 | success | [40420885819](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40420885819) |
+| 2026-10-26 23:39 | six x1 line orgs 4 runs 10+90 | success | [40420871437](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40420871437) |
+| 2026-10-26 23:38 | six x1 line orgs 7 runs 10+90 | success | [40420892057](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40420892057) |
+| 2026-10-26 23:24 | six x1 line orgs 2 runs 10+90 | success | [40419069048](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40419069048) |
+| 2026-10-26 23:23 | six x1 line orgs 3 runs 10+90 | success | [40419075229](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40419075229) |
+| 2026-10-26 23:22 | six x1 line orgs 1 runs 10+90 | success | [40419062485](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/actions/runs/40419062485) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
