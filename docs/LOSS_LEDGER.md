@@ -6,7 +6,7 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 Every row of every three-run table stands where its table stands, LOSS included; this page gathers the LOSS rows so none of them is found only by reading every table. A LOSS row is a gauge that moved away from its declared aim by 0.5% or more across the benchmark's three runs, A, B and C (the founder's order of 24 October 2026, `tools/readings.py`): in all three, every run's 95% interval clear of zero, or by the mean of the three, with the count of runs beyond the noise. Each benchmark is read from its newest whole table; an older engine's table stands only until the engine that stands has run that benchmark three times, and the engine each row ran on is printed beside it.
 
-Rows that read LOSS across their three runs: **330**. Against my own native, the readings do no harm is judged by: **159**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v21: 29, omni-v18: 3, omni-v12: 284, omni-v11: 6, omni-v10: 8.
+Rows that read LOSS across their three runs: **334**. Against my own native, the readings do no harm is judged by: **163**. In place of a controller: **27**. Without me, or two changes at once: **144**. By engine: omni-v21: 50, omni-v12: 284.
 
 ## Against my own native
 
@@ -14,6 +14,7 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 
 | Engine | Benchmark | Gauge | Each run's size | Cause | Fixed in | What decides it |
 |---|---|---|---|---|---|---|
+| omni-v21 | `results/live/V21_ALL_FOUR.json` | pod start wait, total (s) | 15.7%, 42.2%, 19.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_ARMADA_4W_BARE.json` | response time (ms), 95th percentile | 2.4%, 6.5%, 7.7% | suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent slower on a shared host); not yet shown on this rig (`docs/LOSS_ROWS_UNDER_INVESTIGATION.md`) | omni-v13, if the suspicion holds | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_ARMADA_4W_BARE.json` | response time (ms), 99th percentile | 3.2%, 6.3%, 9.7% | suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent slower on a shared host); not yet shown on this rig (`docs/LOSS_ROWS_UNDER_INVESTIGATION.md`) | omni-v13, if the suspicion holds | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_ARMADA_4W_BARE.json` | failed requests (%) | 12.0%, 0 to 0, 0 to 0 | suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent slower on a shared host); not yet shown on this rig (`docs/LOSS_ROWS_UNDER_INVESTIGATION.md`) | omni-v13, if the suspicion holds | the benchmark's three runs on the engine that stands |
@@ -23,9 +24,9 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v12 | `results/live/V12_ARMADA_4W_BARE.json` | batch: queue finished (s) | 1.4%, 2.3%, 1.6% | suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent slower on a shared host); not yet shown on this rig (`docs/LOSS_ROWS_UNDER_INVESTIGATION.md`) | omni-v13, if the suspicion holds | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_ARMADA_4W_BARE.json` | queue: job turnaround, submitted to done, mean (s) | 5.1%, 8.9%, 9.1% | suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent slower on a shared host); not yet shown on this rig (`docs/LOSS_ROWS_UNDER_INVESTIGATION.md`) | omni-v13, if the suspicion holds | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_ARMADA_4W_TOP.json` | pod start wait, total (s) | 400.0%, 0 to 2.3, 6.7% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_BATCH.json` | pod start wait, total (s) | 142.4%, 0 to 18, 0.0% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_BATCH.json` | pod start wait, mean (s) | 27.3%, 0 to 13.1, 0.0% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_BATCH.json` | batch: queue finished (s) | 0.5%, 0.9%, 0.8% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_BATCH.json` | failed requests (%) | 0 to 0.01036, 0 to 0, 0 to 0 | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_BATCH.json` | pod start wait, total (s) | 0 to 0.9, 0 to 4, 0 to 1.5 | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_BATCH.json` | pod start wait, mean (s) | 0 to 0.9, 0 to 2.2, 0 to 0.8333 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_BINPACK.json` | response time (ms), 99th percentile | 2.9%, 2.4%, 2.7% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_BINPACK.json` | time over the response line (% of samples) | 40.0%, 27.7%, 14.8% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_BINPACK.json` | alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | 75.0%, 44.4%, 0.0% | not yet written | — | the benchmark's three runs on the engine that stands |
@@ -40,19 +41,22 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v12 | `results/live/V12_BINPACK_4W_TOP.json` | pod start wait, total (s) | 80.0%, 100.0%, 0 to 0.6 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_BINPACK_4W_TOP.json` | pod start wait, mean (s) | 260.0%, 62.5%, 0 to 0.6 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_BINPACK_4W_TOP.json` | queue: job turnaround, submitted to done, mean (s) | 2.2%, 2.4%, 5.2% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v11 | `results/live/V11_CAPACITY.json` | 1000:work | 6.8%, 1.6%, 2.0% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v11 | `results/live/V11_CAPACITY.json` | 2000:capacity | 0.0%, 0.0%, 6.5% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v11 | `results/live/V11_CAPACITY.json` | 3000:work | 1.7%, 0.3%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v11 | `results/live/V11_CAPACITY.json` | 3000:capacity | 2.7%, 5.4%, 2.6% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_CAPACITY.json` | 3000:work | 0.6%, 1.1%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_CRANE_4W_BARE.json` | pod start wait, total (s) | 60.3%, 28.8%, 69.0% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_CRANE_4W_TOP.json` | pod start wait, total (s) | 80.9%, 104.5%, 54.4% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_CRANE_4W_TOP.json` | pod start wait, mean (s) | 8.6%, 21.3%, 0.9% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), mean | 1.4%, 0.9%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), 95th percentile | 1.5%, 3.0%, 0.5% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_CRUISEKUBE.json` | response time (ms), 99th percentile | 1.3%, 3.1%, 2.7% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v18 | `results/live/V18_KAFKA.json` | workload burst / lag_max | 1.1%, 0.4%, 0.6% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v18 | `results/live/V18_KAFKA.json` | workload light / work_inside_line_mps | 0.2%, 0.1%, 1.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v18 | `results/live/V18_KAFKA.json` | workload light / p95_ms | 1.1%, 1.0%, 70.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_CRUISEKUBE.json` | response time (ms), mean | 0.9%, 1.4%, 2.4% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_CRUISEKUBE.json` | response time (ms), 95th percentile | 0.0%, 1.8%, 1.0% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_CRUISEKUBE.json` | time over the response line (% of samples) | 4.3%, 0 to 0, 0 to 0 | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_FAIRNESS.json` | pod start wait, mean (s) | 4.9%, 10.1%, 51.0% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_FAIRNESS.json` | second app: failed requests (%) | 1.1%, 1.1%, 3.7% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_GOLDILOCKS.json` | pod start wait, total (s) | 75.0%, 102.3%, 137.0% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_GOLDILOCKS.json` | pod start wait, mean (s) | 19.4%, 32.1%, 11.2% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload heavy / mean_ms | 0.4%, 3.0%, 2.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload heavy / lag_mean | 0.1%, 3.1%, 3.9% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload light / p99_ms | 0.6%, 0.8%, 9.1% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload light / mean_ms | 1.5%, 0.1%, 11.8% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KAFKA.json` | workload light / lag_mean | 1.3%, 0.1%, 11.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_KAFKA_SERVICE.json` | workload burst / mean_ms | 2.5%, 0.3%, 3.3% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_KAFKA_SERVICE.json` | workload burst / lag_max | 0.5%, 1.3%, 2.9% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_KAFKA_SERVICE.json` | workload burst / lag_mean | 2.9%, 0.2%, 2.4% | not yet written | — | the benchmark's three runs on the engine that stands |
@@ -95,7 +99,7 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v12 | `results/live/V12_KARMADA_4W_TOP.json` | pod start wait, mean (s) | 32.1%, 59.0%, 44.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KARMADA_4W_TOP.json` | batch: queue finished (s) | 4.3%, 4.1%, 3.0% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KARMADA_4W_TOP.json` | queue: job turnaround, submitted to done, mean (s) | 15.7%, 14.2%, 9.6% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v11 | `results/live/V11_KEDA_REQUESTS.json` | failed requests (%) | 0 to 0.01198, 0 to 0, 0 to 0 | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_KEDA_CPU_REQUESTS.json` | pod start wait, total (s) | 84.1%, 30.9%, 27.5% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KOORDINATOR.json` | pod start wait, total (s) | 300.0%, 300.0%, 350.0% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KOORDINATOR.json` | pod start wait, mean (s) | 200.0%, 300.0%, 225.0% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_KOORDINATOR_4W_BARE.json` | response time (ms), 95th percentile | 5.8%, 6.9%, 5.8% | not yet written | — | the benchmark's three runs on the engine that stands |
@@ -139,14 +143,15 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v12 | `results/live/V12_OCM_4W_TOP.json` | queue: job wait, submitted to its first pod running, mean (s) | 210.8%, 168.7%, 358.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_OCM_4W_TOP.json` | queue: job wait, submitted to its first pod running, 95th percentile (s) | 304.8%, 88.9%, 6.333 to 94.33 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_OCM_4W_TOP.json` | queue: job turnaround, submitted to done, mean (s) | 15.6%, 6.9%, 19.6% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v21 | `results/live/V21_PGBENCH.json` | workload simple_update / p99_ms | 28.3%, 1.6%, 12.2% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_REDIS.json` | workload small / p99_ms | 0.2%, 0.2%, 1.7% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_REDIS_SERVICE.json` | workload small / p99_ms | 0.4%, 1.0%, 0.2% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v11 | `results/live/V11_ROBUST_LONG.json` | pod start wait, total (s) | 268.2%, 135.7%, 138.1% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v21 | `results/live/V21_SYSBENCH.json` | workload read_only / mean_ms | 3.9%, 0.1%, 0.4% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_ROBUST_KILL.json` | pod start wait, total (s) | 10.1%, 24.4%, 78.6% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_ROBUST_LONG.json` | pod start wait, total (s) | 90.0%, 221.7%, 324.0% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_ROBUST_LONG.json` | pod start wait, mean (s) | 24.5%, 27.0%, 25.6% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_SYSBENCH_SHIPPED.json` | workload burst / p95_ms | 0.0%, 255.1%, 0.6% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_SYSBENCH_SHIPPED.json` | workload read_only / mean_ms | 0.4%, 8.7%, 0.1% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_SYSBENCH_SHIPPED.json` | workload update_index / mean_ms | 1.6%, 2.8%, 2.2% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_TRACE_GOOGLE2011.json` | pod start wait, total (s) | 76.1%, 116.3%, 45.1% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_TRACE_GOOGLE2011.json` | pod start wait, total (s) | 109.0%, 87.9%, 279.2% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_VANILLA.json` | response time (ms), 95th percentile | 0.2%, 9.1%, 5.3% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_VANILLA.json` | response time (ms), 99th percentile | 1.0%, 5.7%, 4.5% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_VANILLA.json` | alert minutes (whole minutes whose 95th percentile, failed requests counted over, was over the line) | 0.0%, 28.9%, 22.1% | not yet written | — | the benchmark's three runs on the engine that stands |
@@ -159,9 +164,8 @@ Omni-Compass on top of a native controller, against that native alone: the readi
 | omni-v12 | `results/live/V12_VOLCANO_4W_TOP.json` | pod start wait, total (s) | 100.0%, 0.1 to 1.4, 0 to 1.2 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_VOLCANO_4W_TOP.json` | pod start wait, mean (s) | 100.0%, 600.0%, 0 to 1.2 | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v12 | `results/live/V12_VOLCANO_4W_TOP.json` | queue: job turnaround, submitted to done, mean (s) | 6.4%, 1.8%, 2.3% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v10 | `results/live/V10_WANDERING.json` | pod start wait, total (s) | 32.8%, 4.5%, 14.7% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v21 | `results/live/V21_YCSB.json` | workload burst / p95_ms | 3.8%, 0.2%, 5.4% | not yet written | — | the benchmark's three runs on the engine that stands |
-| omni-v21 | `results/live/V21_YCSB.json` | workload burst / p99_ms | 4.9%, 0.4%, 2.5% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_YCSB.json` | workload burst / p95_ms | 0.2%, 5.4%, 0.7% | not yet written | — | the benchmark's three runs on the engine that stands |
+| omni-v21 | `results/live/V21_YCSB.json` | workload burst / p99_ms | 0.4%, 2.5%, 1.7% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_YCSB_SERVICE.json` | workload f / p95_ms | 0.2%, 1.0%, 0.6% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_YCSB_SERVICE.json` | workload f / mean_ms | 0.4%, 1.7%, 0.0% | not yet written | — | the benchmark's three runs on the engine that stands |
 | omni-v21 | `results/live/V21_YCSB_SHIPPED.json` | workload b / p95_ms | 5.8%, 22.6%, 1.9% | not yet written | — | the benchmark's three runs on the engine that stands |

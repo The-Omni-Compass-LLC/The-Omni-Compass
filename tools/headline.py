@@ -66,7 +66,7 @@ def word_of(reading: str) -> str:
     for w in (K.LOSS, K.GIVEN, K.GAIN):
         if reading.startswith(w):
             return w
-    return K.STEADY if reading.startswith(("STEADY", "EVEN")) else reading
+    return K.STEADY if reading.startswith(("STEADY", "STEADY")) else reading
 
 
 def mean_change(r) -> float:

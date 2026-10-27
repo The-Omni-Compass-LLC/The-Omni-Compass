@@ -23,8 +23,8 @@
   the control-safety audit and a clean-room reproduction not yet run, so no grade is declared.
 - **The documents by reader** (`README.md`, `docs/README.md`): the board, the CFO, the CTO, engineering, security and IP, the
   referee and the live benchmark engine's evaluator, each with what to read first and the evidence after it, and the hierarchy of
-  evidence and claims (the draft pull request #19's navigation, every link checked, STEADY for EVEN).
-- **Derived reports in the one format**: EVEN read STEADY in every file main's merge brought it back into; the index and the
+  evidence and claims (the draft pull request #19's navigation, every link checked, STEADY for STEADY).
+- **Derived reports in the one format**: STEADY read STEADY in every file main's merge brought it back into; the index and the
   benefit sheet print a size beside its word without a sign, the raw change apart.
 
 ## 2026-10-25 (evening): omni-v21 stands: the immune system knows itself, knob by knob

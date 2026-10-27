@@ -81,6 +81,10 @@ def rebuild(name: str, r: dict, scratch: Path):
                        capture_output=True, text=True, cwd=ROOT)
     if p.returncode != 0:
         return [(name, f"{r['tool']} failed: {(p.stdout + p.stderr).strip()[-300:]}")]
+    built_json = scratch / f"{name}.json"
+    if built_json.exists() and not isinstance(json.loads(built_json.read_text()).get("rows"), list):
+        from tools.reread import reread_pair   # every published table stands read again by the rule that stands (verify.py)
+        reread_pair(built_json)
     res = []
     for built in sorted(scratch.glob(f"{name}.*")):
         mine = LIVE / built.name

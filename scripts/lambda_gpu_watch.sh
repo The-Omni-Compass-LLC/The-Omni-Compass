@@ -24,14 +24,15 @@ SSH=(ssh -i "${SSH_KEY:?set SSH_KEY}" -o StrictHostKeyChecking=accept-new -o Con
 SCP=(scp -i "$SSH_KEY" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20)
 give_back() { if [ "${GIVE_BACK:-yes}" = no ]; then echo "the machine is kept (GIVE_BACK=no): it bills until its owner gives it back"; return 0; fi
   python3 scripts/lambda_gpu.py terminate "$ID" || python3 scripts/lambda_gpu.py terminate "$ID"; }
-fetch() {   # every result file the run packed, its log, and the machine's own card list; partial if the run was cut
+fetch() {   # every result file the run packed, its log, the machine's own card list, and always the live result folders as they
+            # stand: the whole stacks (results/hil) write each arm as it ends but are packed only when they finish, so a run cut
+            # at its deadline came back without one arm of them (lambda-gpu runs 40143765437, 40143770324, 40143775773: 24 hours
+            # of stacks on each card, none fetched)
   "${SCP[@]}" "$LOGIN@$IP:omni/results/gpu/omni-*.tar.gz" "$OUT/" 2>/dev/null || true
   "${SCP[@]}" "$LOGIN@$IP:omni/run.log" "$OUT/run.log" 2>/dev/null || true
   "${SSH[@]}" "nvidia-smi --query-gpu=index,name,power.limit,power.default_limit --format=csv" > "$OUT/cards.csv" 2>/dev/null || true
-  if ! ls "$OUT"/omni-*.tar.gz >/dev/null 2>&1; then
-    "${SSH[@]}" "cd omni && tar czf /tmp/omni-partial.tar.gz results/gpu run.log 2>/dev/null; true" || true
-    "${SCP[@]}" "$LOGIN@$IP:/tmp/omni-partial.tar.gz" "$OUT/omni-partial.tar.gz" 2>/dev/null || true
-  fi
+  "${SSH[@]}" "cd omni && tar czf /tmp/omni-live.tar.gz --ignore-failed-read --exclude='results/gpu/omni-*.tar.gz' results/gpu results/hil run.log 2>/dev/null; true" || true
+  "${SCP[@]}" "$LOGIN@$IP:/tmp/omni-live.tar.gz" "$OUT/omni-live.tar.gz" 2>/dev/null || true
   ( cd "$OUT" && sha256sum ./* > SHA256SUMS.txt 2>/dev/null ) || true
 }
 T_END=$(( $(date +%s) + MINUTES * 60 ))
@@ -55,7 +56,8 @@ while :; do
     echo "the deadline has passed: fetching what exists and giving the machine back"; fetch; give_back
     echo deadline > "$OUT/state"; exit 0
   fi
-  if [ "$(date +%s)" -ge "$T_END" ]; then echo watching > "$OUT/state"; echo "still running; the next watch carries on"; exit 0; fi
+  # a watch that hands over to the next takes what exists first, so every watch's artifact holds the run so far
+  if [ "$(date +%s)" -ge "$T_END" ]; then fetch; echo watching > "$OUT/state"; echo "still running; the run so far fetched; the next watch carries on"; exit 0; fi
   "${SSH[@]}" "tail -n 2 omni/run.log" 2>/dev/null | sed 's/^/  run: /' || echo "  (no answer from the machine this time)"
   sleep "$EVERY"
 done
