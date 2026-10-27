@@ -31,6 +31,7 @@ OUT = ROOT / "deploy" / "grafana" / "omni-compass-wall.json"
 W, H, COLS = 12, 8, 2
 sys.path.insert(0, str(HERE.parents[1]))
 from tools.legal import PLAIN as NOTICE   # noqa: E402  (the notice, written once in tools/legal.py, without its Markdown)
+from tools.repo import URL as REPO_URL   # noqa: E402  (the repository, written once in tools/repo.py)
 
 
 def page_order() -> list:
@@ -193,7 +194,7 @@ def dashboard(reg: dict) -> dict:
                       {"title": "The control panel's buttons: Restore factory profile, Return to native, mode, dial, beat, each muscle", "type": "link",
                        "url": "${control}/", "targetBlank": True, "icon": "bolt"},
                       {"title": "Alertmanager: the alarms and their silences", "type": "link", "url": "http://localhost:9093", "targetBlank": True},
-                      {"title": "The live engine", "type": "link", "url": "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
+                      {"title": "The live engine", "type": "link", "url": f"{REPO_URL}/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
             "description": NOTICE,
             # the notice at the top and the end of the wall, where Grafana shows it (the underwriting seat of 24 October)
             "panels": [notice_panel(-1)] + signals_row() + panels + [notice_panel(max([p["gridPos"]["y"] + p["gridPos"]["h"] for p in panels] or [0]))],

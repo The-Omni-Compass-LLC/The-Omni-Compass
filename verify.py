@@ -435,6 +435,9 @@ def main():
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "benefit_sheet.py"), "--check"], capture_output=True, text=True)
     check("the benefit sheet (one number and one word per benchmark: GAIN, EVEN, LOSS or power given) is in line with every table it is read from (tools/benefit_sheet.py)",
           r.returncode == 0, (r.stdout + r.stderr)[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "whole_system.py"), "--check"], capture_output=True, text=True)
+    check("the whole system, every layer composed, is what the tables that stand give (tools/whole_system.py)",
+          r.returncode == 0, (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "orchestrators_report.py"), "--check"], capture_output=True, text=True)
     check("the orchestrators on the same organisms: results/orchestrators/ORCHESTRATORS.md is what its record gives (tools/orchestrators_report.py)",
           r.returncode == 0, (r.stdout + r.stderr)[-300:])
