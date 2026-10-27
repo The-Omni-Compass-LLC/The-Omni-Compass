@@ -1,6 +1,6 @@
 # Software composition analysis and license identification
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Commercial and production rights require a separate signed, paid enterprise license. See [LICENSE](../LICENSE), [NOTICE](../NOTICE), and [DISCLOSURES.md](../DISCLOSURES.md).
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 ## Ownership and licensing
 
@@ -25,3 +25,7 @@ Record scanner name, tool version, repository commit SHA, exact scan scope, time
 ## Required notices in exports
 
 An export must preserve LICENSE, NOTICE, DISCLOSURES.md and relevant third-party notices, with the ownership notice in generated reports. Existing repository artifact/export workflows implement their own bundling; this page does not establish that every possible external export has been checked. Validate generated ZIPs and archives independently.
+
+---
+
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
