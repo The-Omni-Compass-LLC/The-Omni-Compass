@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only. See LICENSE, NOTICE and DISCLOSURES.md.
+# Manual GPU benchmark: runs ONLY on a self-hosted runner explicitly labeled omni-gpu.
+# No secrets are echoed; this workflow does not provision or SSH into Lambda instances.
+name: gpu-lambda-manual
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'smoke or confirm; confirm requires approved envelope and frozen clean code'
+        required: true
+        type: choice
+        options: [smoke, confirm]
+        default: smoke
+      gpu:
+        description: 'GPU device index'
+        required: true
+        default: '0'
+      duration:
+        description: 'Seconds per arm (smoke)'
+        required: true
+        default: '300'
+permissions:
+  contents: read
+jobs:
+  paired-gpu:
+    runs-on: [self-hosted, linux, x64, omni-gpu]
+    timeout-minutes: 300
+    concurrency:
+      group: omni-gpu-physical
+      cancel-in-progress: false
+    env:
+      PHASE: ${{ inputs.phase }}
+      GPU: ${{ inputs.gpu }}
+      DURATION: ${{ inputs.duration }}
+      REPS: '1'
+      REPS_CONFIRM: '10'
+      OMNI_ENGINE: compass
+      OMNI_DIAL: max
+      ENVELOPE: /etc/omni-compass/gpu-envelope.json
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Verify GPU and approved envelope
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v nvidia-smi
+          nvidia-smi --query-gpu=index,name,driver_version,power.limit --format=csv
+          test -r "$ENVELOPE"
+          python3 -c 'import torch; assert torch.cuda.is_available()'
+          test "$PHASE" != confirm || test -z "$(git status --porcelain)"
+      - name: Run native/watch/Omni on physical GPU
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Runner operator must configure passwordless narrowly scoped sudo for this script.
+          sudo --preserve-env=PHASE,GPU,DURATION,REPS,REPS_CONFIRM,OMNI_ENGINE,OMNI_DIAL,ENVELOPE \
+            bash scripts/gpu_paired.sh
+      - name: Archive measurements, including failed-run evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gpu-physical-receipts-${{ github.run_id }}
+          path: results/gpu/run-*/
+          if-no-files-found: warn
+          retention-days: 30
