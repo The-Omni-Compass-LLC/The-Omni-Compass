@@ -237,16 +237,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-27 11:01 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1830829613.md) |  |
+| 2026-10-27 10:11 | [The engine's runs: 500 runs from the jump generator (base 1830829613), one digest](results/engine_runs/ENGINE_RUNS_500_1830829613.md) |  |
+| 2026-10-27 09:46 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1818200804.md) |  |
+| 2026-10-27 08:23 | [The engine's runs: 500 runs from the jump generator (base 1818200804), one digest](results/engine_runs/ENGINE_RUNS_500_1818200804.md) |  |
 | 2026-10-27 06:47 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-27 06:47 | [Wandering demand: load that steps up and down by one (1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1): the A/B/C three-run table (Omni v21)](results/live/V21_WANDERING.md) |  |
 | 2026-10-27 06:47 | [A public day of demand: the Google cluster trace of 2011 replayed one step at a time (2 3 3 3 3 4 4 3 2 2 2 2 2 3 2 3 4 4 3 4 5 6 5 4): the A/B/C three-run table (Omni v21)](results/live/V21_TRACE_GOOGLE2011.md) |  |
 | 2026-10-27 06:47 | [Steady load: the same fixed-rate work sent to both arms: the A/B/C three-run table (Omni v21)](results/live/V21_STEADY.md) |  |
 | 2026-10-27 06:47 | [Robustness: the long run, 7,200 s an arm, the governor's memory and decisions watched: the A/B/C three-run table (Omni v21)](results/live/V21_ROBUST_LONG.md) |  |
 | 2026-10-27 06:47 | [Robustness: the governor killed outright mid-run (the lease), real Kubernetes, 10 pairs: the A/B/C three-run table (Omni v21)](results/live/V21_ROBUST_KILL.md) |  |
-| 2026-10-27 06:47 | [Kubernetes with KEDA's HTTP add-on on the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v21)](results/live/V21_KEDA_REQUESTS.md) |  |
-| 2026-10-27 06:47 | [Kubernetes with KEDA on the CPU target and the live requests in flight: Omni-Compass on top: the A/B/C three-run table (Omni v21)](results/live/V21_KEDA_CPU_REQUESTS.md) |  |
-| 2026-10-27 06:47 | [Goldilocks: Omni-Compass on top of a service rightsized with Goldilocks and the VPA's recommender: the A/B/C three-run table (Omni v21)](results/live/V21_GOLDILOCKS.md) |  |
-| 2026-10-27 06:47 | [Faults: a machine down, a spike, a runaway pod, a blind probe: the A/B/C three-run table (Omni v21)](results/live/V21_FAULTS.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -254,13 +254,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-27 08:39 | cloud-check both | failure | [40471452017](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40471452017) |
-| 2026-10-27 08:23 | engine-runs | success | [40472906468](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40472906468) |
-| 2026-10-27 08:22 | big-organism-detached collect | success | [40473022849](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40473022849) |
-| 2026-10-27 07:46 | live-engine | success | [40463257699](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40463257699) |
-| 2026-10-27 06:48 | security-scan | success | [40463257628](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40463257628) |
-| 2026-10-27 06:44 | raw-sweep | success | [40462890035](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40462890035) |
-| 2026-10-27 06:16 | health | failure | [40460077515](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40460077515) |
+| 2026-10-27 13:41 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,tower,spine reps 81+20 arms native compass split no window 960 protocol 4 | success | [40496727808](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40496727808) |
+| 2026-10-27 13:41 | six-kube x10 orgs tower reps 48+1 arms native compass split no window 960 protocol 4 | success | [40502764423](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40502764423) |
+| 2026-10-27 13:41 | six-kube x10 orgs stack reps 81+20 arms native compass split no window 960 protocol 4 | success | [40500702398](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40500702398) |
+| 2026-10-27 13:41 | six-kube x10 orgs stack reps 36+1 arms native compass split no window 960 protocol 4 | success | [40500694980](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40500694980) |
+| 2026-10-27 13:22 | grid | success | [40476362712](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40476362712) |
+| 2026-10-27 12:32 | health | failure | [40504573126](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40504573126) |
+| 2026-10-27 12:26 | live-engine | success | [40493014123](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40493014123) |
+| 2026-10-27 12:00 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 46+35 arms native compass split no window 960 protocol 4 | failure | [40488587348](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40488587348) |
+| 2026-10-27 11:52 | six-kube x500 orgs physics_robotics_autonomous reps 10+1 arms native compass split yes window 7200 protocol 4 | success | [40476562860](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40476562860) |
+| 2026-10-27 11:27 | six-kube x500 orgs energy_facility_industrial reps 3+1 arms native compass split yes window 7200 protocol 4 | success | [40476569601](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40476569601) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
