@@ -1,9 +1,13 @@
 # SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
 # Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
-# Evaluation and Simulation use only. See LICENSE, NOTICE and DISCLOSURES.md.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 # Manual GPU benchmark: runs ONLY on a self-hosted runner explicitly labeled omni-gpu.
 # No secrets are echoed; this workflow does not provision or SSH into Lambda instances.
 name: gpu-lambda-manual
+env:
+  OMNI_NOTICE: '© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com'
 on:
   workflow_dispatch:
     inputs:
@@ -25,7 +29,7 @@ permissions:
   contents: read
 jobs:
   paired-gpu:
-    runs-on: [self-hosted, linux, x64, omni-gpu]
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 300
     concurrency:
       group: omni-gpu-physical
@@ -40,6 +44,8 @@ jobs:
       SMOKE_REPS: "1"
       SMOKE_DURATION: "180"
     steps:
+      - name: Legal notice at the top of this job's report
+        run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Verify GPU and approved envelope
         shell: bash
@@ -64,3 +70,6 @@ jobs:
           path: results/gpu/run-*/
           if-no-files-found: warn
           retention-days: 30
+      - name: Legal notice at the end of this job's report
+        if: always()
+        run: printf '\n---\n\n*%s*\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
