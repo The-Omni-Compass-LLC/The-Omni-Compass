@@ -254,16 +254,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-28 02:13 | six-kube x500 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,spine reps 11+25 arms native compass split yes window 7200 protocol 4 | failure | [40560479662](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40560479662) |
+| 2026-10-28 02:09 | raw-sweep | success | [40618870755](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40618870755) |
 | 2026-10-28 02:01 | live-engine | success | [40610499074](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40610499074) |
 | 2026-10-28 01:43 | big-organism-detached collect | success | [40616719802](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40616719802) |
 | 2026-10-28 01:37 | health | failure | [40615960478](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40615960478) |
-| 2026-10-28 00:56 | raw-sweep | success | [40610583312](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40610583312) |
 | 2026-10-28 00:49 | six x500 line orgs 7 runs 10+90 | success | [40557963275](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40557963275) |
 | 2026-10-27 23:00 | six-kube x100 orgs tower reps 11+90 arms native compass split no window 2400 protocol 4 | success | [40534406213](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40534406213) |
 | 2026-10-27 22:59 | six-kube x100 orgs stack reps 11+90 arms native compass split no window 3600 protocol 4 | success | [40529045596](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40529045596) |
 | 2026-10-27 22:59 | six-kube x100 orgs spine reps 78+1 arms native compass split no window 1440 protocol 4 | success | [40552365685](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40552365685) |
 | 2026-10-27 22:28 | six x500 line orgs 4 runs 10+90 | success | [40554879766](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40554879766) |
-| 2026-10-27 22:12 | grid | success | [40591806961](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40591806961) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
