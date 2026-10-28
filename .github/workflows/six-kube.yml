@@ -88,8 +88,30 @@ jobs:
     steps:
       - name: Legal notice at the top of this job's report
         run: printf '> %s\n\n' "$OMNI_NOTICE" >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4: the code the cluster and the organism need, not the 82,000 result files
-        with: {sparse-checkout: "deploy\nscripts\ntools\npilot\nfleet\ntuning\nomni_controller\nomnicompass\nrealms\nhardware\nresults/hardware"}
+      # Include root-level requirements and legal inputs as well as runtime sources.
+      # Cone mode would treat root filenames as directories, so use explicit patterns.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            deploy/
+            scripts/
+            tools/
+            pilot/
+            fleet/
+            tuning/
+            omni_controller/
+            omnicompass/
+            realms/
+            hardware/
+            results/hardware/
+            requirements.txt
+            README.md
+            LICENSE
+            NOTICE
+            DISCLOSURES.md
+            PATENTS.md
+            TRADEMARKS.md
       - name: Engine and source receipt
         run: |
           set -euo pipefail
