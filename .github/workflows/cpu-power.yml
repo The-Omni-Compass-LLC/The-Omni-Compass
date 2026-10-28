@@ -89,9 +89,11 @@ jobs:
           code=$?
           sudo chown -R "$(id -u):$(id -g)" out run.log || true
           tail -40 run.log
-          grep "^==\|^   " run.log | tee -a "$GITHUB_STEP_SUMMARY"
+          # A summary without matching lines must not overwrite the actual benchmark exit status.
+          { grep -E "^(==|   )" run.log || true; } | tee -a "$GITHUB_STEP_SUMMARY"
+          mkdir -p out
           mv run.log out/run.log
-          exit $code
+          exit "$code"
       - run: cd out && find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
       - run: cat out/CPU_POWER.md >> "$GITHUB_STEP_SUMMARY"
       - name: Attach README, licenses and disclosures to this artifact
