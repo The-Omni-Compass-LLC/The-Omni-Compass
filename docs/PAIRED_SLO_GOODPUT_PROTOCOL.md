@@ -1,6 +1,6 @@
 # Paired SLO goodput: inference and cloud comparison admission
 
-> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Commercial use requires a signed, paid Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 ## Why this benchmark exists
 
@@ -32,3 +32,7 @@ and signed relative differences against native. A lower energy bill is not an ad
 - Microsoft CLEO: https://www.microsoft.com/en-us/research/project/cloud-efficiency-optimization-cleo/
 
 This is a new benchmark *evaluation protocol and comparator*, not a completed external-system benchmark or a result.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

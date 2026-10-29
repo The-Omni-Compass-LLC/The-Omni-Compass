@@ -1,5 +1,7 @@
 # Evidence integrity audit and release claim boundaries — 2026-10-29
 
+> © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+
 Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only. See LICENSE, NOTICE and DISCLOSURES.md.
 
 **Status:** targeted source-and-report audit; NOT a whole-repository certification or independent referee review. No finding here establishes intentional deception. Retain raw evidence and historic reports.
@@ -33,3 +35,7 @@ Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only. See
 The README now carries an upfront warning. Existing generated files must be changed at their generator source, with outputs regenerated and checked together; manual edits to generated sections will drift. Pending further audit: `tools/omni_index.py`, `tools/readings.py`, `tools/headline.py`, `tools/summary.py`, their regression tests, the raw three-run records, workflows and all artifact provenance. Do not claim these items are repaired merely because this audit exists.
 
 This audit is not a finding of fraud and not an assertion that all benchmarks are false. It documents where the current presentation exceeds the available inference.
+
+---
+
+*© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*
