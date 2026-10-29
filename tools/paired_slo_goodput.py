@@ -35,6 +35,10 @@ def evaluate(data):
                     raise ValueError(f"pair {index} {label}.{field}: invalid measurement")
             if record["completed"] + record["failed"] > record["offered_requests"]:
                 raise ValueError(f"pair {index}: impossible request accounting")
+        for label, record in (("native", n), ("omni", o)):
+            offered = record["offered_requests"]
+            if isinstance(offered, bool) or not isinstance(offered, int) or offered < 0:
+                raise ValueError(f"pair {index} {label}.offered_requests: invalid count")
         for identity in ("workload_id", "hardware_id", "offered_requests"):
             if n[identity] != o[identity]:
                 raise ValueError(f"pair {index}: unmatched {identity}")
