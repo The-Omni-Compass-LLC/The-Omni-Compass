@@ -240,6 +240,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-29 10:15 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2190676988.md) |  |
+| 2026-10-29 08:54 | [The engine's runs: 500 runs from the jump generator (base 2190676988), one digest](results/engine_runs/ENGINE_RUNS_500_2190676988.md) |  |
 | 2026-10-28 12:04 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2005802494.md) |  |
 | 2026-10-28 09:17 | [The engine's runs: 500 runs from the jump generator (base 2005802494), one digest](results/engine_runs/ENGINE_RUNS_500_2005802494.md) |  |
 | 2026-10-27 11:01 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1830829613.md) |  |
@@ -248,8 +250,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-27 08:23 | [The engine's runs: 500 runs from the jump generator (base 1818200804), one digest](results/engine_runs/ENGINE_RUNS_500_1818200804.md) |  |
 | 2026-10-27 06:47 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
 | 2026-10-27 06:47 | [Wandering demand: load that steps up and down by one (1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1): the A/B/C three-run table (Omni v21)](results/live/V21_WANDERING.md) |  |
-| 2026-10-27 06:47 | [A public day of demand: the Google cluster trace of 2011 replayed one step at a time (2 3 3 3 3 4 4 3 2 2 2 2 2 3 2 3 4 4 3 4 5 6 5 4): the A/B/C three-run table (Omni v21)](results/live/V21_TRACE_GOOGLE2011.md) |  |
-| 2026-10-27 06:47 | [Steady load: the same fixed-rate work sent to both arms: the A/B/C three-run table (Omni v21)](results/live/V21_STEADY.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -257,16 +257,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-29 07:56 | live-engine | success | [40832734346](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40832734346) |
+| 2026-10-29 13:43 | big-organism-detached collect | success | [40884527492](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40884527492) |
+| 2026-10-29 13:42 | raw-sweep | success | [40884311181](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40884311181) |
+| 2026-10-29 10:58 | live-engine | success | [40856142979](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40856142979) |
+| 2026-10-29 10:15 | injection-grid | success | [40845576518](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40845576518) |
+| 2026-10-29 09:44 | grid | success | [40851966607](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40851966607) |
+| 2026-10-29 09:21 | health | success | [40848927191](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40848927191) |
+| 2026-10-29 08:54 | engine-runs | success | [40845382652](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40845382652) |
 | 2026-10-29 07:02 | aks-client-check | success | [40832734491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40832734491) |
 | 2026-10-29 07:01 | security-scan | success | [40832734241](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40832734241) |
-| 2026-10-29 06:38 | raw-sweep | success | [40830379086](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40830379086) |
-| 2026-10-29 06:28 | big-organism-detached collect | success | [40829356673](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40829356673) |
 | 2026-10-29 04:34 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 346+35 arms native compass split no window 960 protocol 4 | failure | [40818396777](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40818396777) |
-| 2026-10-29 04:02 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 311+35 arms native compass split no window 960 protocol 4 | failure | [40815357188](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40815357188) |
-| 2026-10-29 03:14 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 276+35 arms native compass split no window 960 protocol 4 | failure | [40810898765](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40810898765) |
-| 2026-10-29 02:53 | health | success | [40809014926](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40809014926) |
-| 2026-10-29 02:26 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 241+35 arms native compass split no window 960 protocol 4 | failure | [40806263813](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40806263813) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
