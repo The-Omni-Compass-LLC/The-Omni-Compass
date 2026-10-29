@@ -82,13 +82,13 @@ def word_of_pct(x, loss=False):
 
 def moved(what, x, unit, nd=3):
     """A measured change in its verb, never a bare sign beside a word: 'misses down 0.145 pp', 'misses up 0.020 pp'."""
-    return f"{what} the same" if x == 0 else f"{what} {'down' if x < 0 else 'up'} {abs(x):.{nd}f}{unit}"
+    return f"{what} the same" if abs(x) < 0.5 * 10 ** -nd else f"{what} {'down' if x < 0 else 'up'} {abs(x):.{nd}f}{unit}"
 
 
 def energy_moved(e, nd=3):
     """The energy beside its word: a rise is power given and wears its '+', a fall is a cut."""
     x = 100 * e
-    if x == 0:
+    if abs(x) < 0.5 * 10 ** -nd:
         return "energy the same"
     return f"power given +{x:.{nd}f}%" if x > 0 else f"energy cut {abs(x):.{nd}f}%"
 
