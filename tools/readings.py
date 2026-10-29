@@ -105,7 +105,7 @@ def word(fell: bool, aim_: str) -> str:
     return GAIN if fell else LOSS                     # lower, never more
 
 
-SIZE_FLOOR = 0.005           # original operational EVEN reporting band: below 0.5%; not exact equality or a statistical test
+SIZE_FLOOR = 0.005           # the founder's floor of 20 October 2026 (and 24 October): a mean change under half of one percent either way reads EVEN
 EVEN_FLOOR = f"{EVEN}, under the floor"              # held the same way in all three runs, every run's change under SIZE_FLOOR
 SIGN_OF = {GAIN: "+", LOSS: "−", EVEN: "="}          # the number beside a word carries the word's sign, never the gauge's raw direction (20 October)
 
