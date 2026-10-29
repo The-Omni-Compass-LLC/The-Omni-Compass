@@ -12,7 +12,7 @@ Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only. See
 | HIGH | results/OMNI_INDEX.md | Kubernetes energy includes a declared model; service energy uses CPU seconds; machine proxies include connections, consumers, and memory | Do not call these measured joules or physical machine-hours |
 | HIGH | README.md, results/WHOLE_SYSTEM.md | Whole-system totals compose evidence from different engine versions and evidence classes | Not one end-to-end same-version physical run |
 | HIGH | README.md | +6.0% work result is three specific omni-v18 runs, not an omni-v21 verified universal result | Label exact run and engine; retain raw per-run values and costs |
-| MEDIUM | docs/STATE_OF_PLAY.md, tools/readings.py | EVEN can include nonzero effects within a 0.5% threshold | Report signed raw difference, threshold/equivalence label, and statistical uncertainty separately |
+| MEDIUM | docs/STATE_OF_PLAY.md, tools/readings.py | EVEN can include nonzero effects within a 0.25% threshold | Report signed raw difference, threshold/equivalence label, and statistical uncertainty separately |
 | MEDIUM | tools/readings.py | 'power given' describes increases in spent resources | Show raw signed resource regression and whether work/cost constraints still pass |
 | MEDIUM | docs/REFEREE_GRADES.md | Grades are internally assigned | Never describe as external referee certification |
 | MEDIUM | README.md, docs/STATE_OF_PLAY.md | 22/25 benefit-sheet and 23/26 standing benchmark counts differ | Identify scope and inclusion rule before combining |
@@ -24,7 +24,7 @@ Copyright (c) 2026 The Omni-Compass LLC. Evaluation and Simulation use only. See
 2. Preserve raw signed changes in all metrics, including losses and additional expenditure. The signal verdict must not conceal a cost/SLO regression.
 3. Distinguish modeled energy, CPU-time proxy, metered joules and invoiced dollars. Never aggregate them as if they share units.
 4. A mixed-version composition cannot be described as a single deployed system's observed performance.
-5. Treat the three-run and 0.5% conventions as descriptive, not statistical proof or exact equality.
+5. Treat the three-run and 0.25% conventions as descriptive, not statistical proof or exact equality.
 6. Link to source records and verify reproducibility on the exact commit. External claims require independent replication where claimed.
 7. Never delete unfavorable original results. Corrections should be versioned with rationale and retained inputs.
 
