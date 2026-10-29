@@ -257,16 +257,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-29 19:56 | big-organism-detached collect | success | [40943901610](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40943901610) |
+| 2026-10-29 19:56 | raw-sweep | success | [40943561716](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40943561716) |
+| 2026-10-29 19:15 | cloud-check azure | success | [40938130483](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40938130483) |
+| 2026-10-29 16:56 | live-engine | success | [40910756740](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40910756740) |
 | 2026-10-29 16:20 | health | success | [40910495439](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40910495439) |
-| 2026-10-29 14:54 | live-engine | success | [40886802940](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40886802940) |
-| 2026-10-29 13:58 | raw-sweep | success | [40886803103](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40886803103) |
-| 2026-10-29 13:43 | big-organism-detached collect | success | [40884527492](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40884527492) |
 | 2026-10-29 10:15 | injection-grid | success | [40845576518](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40845576518) |
 | 2026-10-29 09:44 | grid | success | [40851966607](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40851966607) |
 | 2026-10-29 08:54 | engine-runs | success | [40845382652](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40845382652) |
 | 2026-10-29 07:02 | aks-client-check | success | [40832734491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40832734491) |
 | 2026-10-29 07:01 | security-scan | success | [40832734241](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40832734241) |
-| 2026-10-29 04:34 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 346+35 arms native compass split no window 960 protocol 4 | failure | [40818396777](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40818396777) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
