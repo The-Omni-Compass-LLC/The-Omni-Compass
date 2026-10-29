@@ -257,12 +257,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-29 16:20 | health | success | [40910495439](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40910495439) |
+| 2026-10-29 14:54 | live-engine | success | [40886802940](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40886802940) |
+| 2026-10-29 13:58 | raw-sweep | success | [40886803103](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40886803103) |
 | 2026-10-29 13:43 | big-organism-detached collect | success | [40884527492](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40884527492) |
-| 2026-10-29 13:42 | raw-sweep | success | [40884311181](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40884311181) |
-| 2026-10-29 10:58 | live-engine | success | [40856142979](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40856142979) |
 | 2026-10-29 10:15 | injection-grid | success | [40845576518](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40845576518) |
 | 2026-10-29 09:44 | grid | success | [40851966607](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40851966607) |
-| 2026-10-29 09:21 | health | success | [40848927191](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40848927191) |
 | 2026-10-29 08:54 | engine-runs | success | [40845382652](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40845382652) |
 | 2026-10-29 07:02 | aks-client-check | success | [40832734491](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40832734491) |
 | 2026-10-29 07:01 | security-scan | success | [40832734241](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40832734241) |
