@@ -112,7 +112,7 @@ def gmean(xs):
 
 
 def measure(row, m):
-    """One measure's ratio over the three runs, as its reading allows: judged across our three runs (a change of 0.25% or more) gives the geometric mean
+    """One measure's ratio over the three runs, as its reading allows: judged across our three runs (a change of 0.5% or more) gives the geometric mean
     of the runs' ratios (a LOSS, or power given, in all three of our runs counts below 1); anything else is exactly 1, nothing claimed."""
     reading = row["reading"]
     rs = [ratio(m, r["native"], r["omni"]) for r in row["runs"]]
@@ -289,7 +289,7 @@ def main():
          "mean of the real categories, each weighted the same. Modelled muscles are shown beside it, never inside it. "
          "Every number is read from the test's own newest three-run table (`results/live/V<n>_*.json`, the newest engine with all three runs, made by "
          "`tools/confirm_abc.py`, `tools/pgbench_abc.py`, `tools/kafka_abc.py`, `tools/redis_abc.py`, `tools/ycsb_abc.py` and `tools/sysbench_abc.py` from the three archived runs; `tools/omni_index.py`).", "",
-         f"## Headline: Omni-Compass on top of native, real machines, judged across our three runs (a change of 0.25% or more): **{pw(head, index_word(head, head_s))}, "
+         f"## Headline: Omni-Compass on top of native, real machines, judged across our three runs (a change of 0.5% or more): **{pw(head, index_word(head, head_s))}, "
          f"{index_word(head, head_s)}** (more for the same, or the same for less, across work, speed, machines and energy)", "",
          "A measure enters only as its three-run reading allows (`docs/OMNI_V1.md`): GAIN, LOSS or power given in all three of our "
          "runs counts, as the geometric mean of the runs' ratios; EVEN (no difference beyond the noise) counts as exactly 1, so "
