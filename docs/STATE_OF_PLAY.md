@@ -140,6 +140,7 @@ Each with its receipt, run by run, in `docs/RUN_LEDGER.md`.
 | `docs/THE_CHIPS.md` | the chips: every GPU run, what the card shows by the one key, what its own files say about the mechanism, and what the chip proof still needs with each step's cost |
 | `docs/AUDIT_2026-10-27.md` | the repository audited top to bottom on 27 October: every finding, its fix at its source, and what holds it |
 | `docs/AUDIT_2026-10-30.md` | the repository graded top to bottom on 30 October: every area's grade on its record, what broke and was fixed, the founder's week, and what is open |
+| `docs/REPORT_CARD.md` | the report card: every section and piece of the repository graded on its record on the engine that stands, with the count of everything and what moves each grade up |
 | `docs/history/STATE_OF_PLAY_2026-10-10.md` | this page as it stood on 10 October, on Omni v3, moved here whole |
 | `docs/history/STATE_OF_PLAY_2026-10-27.md` | this page's chronology as it stood on 27 October, moved here whole |
 

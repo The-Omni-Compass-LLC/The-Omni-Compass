@@ -63,7 +63,8 @@ Where each part of it comes from:
   ([`results/live/AKS_BILL.md`](results/live/AKS_BILL.md)), so neither route's bill is resolved yet.
 - **Every LOSS row**, with its cause: [`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md). **Every chip, cloud and machine run**, what
   it cost and what came back: [`docs/RUN_LEDGER.md`](docs/RUN_LEDGER.md). **The chips**, where the GPU proof stands and what it
-  still needs: [`docs/THE_CHIPS.md`](docs/THE_CHIPS.md).
+  still needs: [`docs/THE_CHIPS.md`](docs/THE_CHIPS.md). **The report card**, every section and piece graded on its record:
+  [`docs/REPORT_CARD.md`](docs/REPORT_CARD.md).
 
 The live engine page opens on the same answer ([`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
