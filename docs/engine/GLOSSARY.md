@@ -2,7 +2,7 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-This is the back of the live benchmark engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): every term a reader of the page meets, the 10 organisms it shows, its 2 arms and their 20 combinations, every one of the catalog's 1,107 muscles bulked by its realms, and an index of where each term stands on the page. Every definition is drawn from the file it names, and the file still carries the words quoted from it; nothing here is typed twice. It is written by `tools/live_glossary.py`, which writes the same content as `docs/engine/glossary.json` for the page. Engine: omni-v21 (digest b658f05d43c1e602).
+This is the back of the live benchmark engine page (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`): every term a reader of the page meets, the 10 organisms it shows, its 2 arms and their 20 combinations, every one of the catalog's 1,107 muscles bulked by its realms, and an index of where each term stands on the page. Every definition is drawn from the file it names, and the file still carries the words quoted from it; nothing here is typed twice. It is written by `tools/live_glossary.py`, which writes the same content as `docs/engine/glossary.json` for the page. Engine: omni-v22 (digest 0e23a0bc561b900a).
 
 The organisms and the muscles' plants are our own models (evidence class S) unless a line says otherwise; a model is a statement about the model, and nothing here is a result. See `DISCLOSURES.md`.
 
@@ -1979,7 +1979,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 
 | Term | Kind | Where on the page |
 |---|---|---|
-| the 0.5% floor | term | 0 (#s-answer); iii (#s-bottom); 3e (#s-plane); 3l (#s-live); 4b (#s-scn); 4g (#s-math); 4k (#s-read) |
+| the 0.5% floor | term | iii (#s-bottom); 3e (#s-plane); 3l (#s-live); 4b (#s-scn); 4g (#s-math); 4k (#s-read) |
 | the 95% interval on Student's t | term | 2d (#s-board); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4g (#s-math); 4k (#s-read) |
 | A | term | 4g (#s-math) |
 | a changed tune's violet | term | 1a (#s-wall) |
@@ -2044,7 +2044,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | knob | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3g (#s-verdict); 3j (#s-ops); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4i (#s-self); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
 | the lease | term | 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3e (#s-plane); 3j (#s-ops); 4c (#s-fleet); 4g (#s-math) |
 | lift-off | term | 3f (#s-brain); 4g (#s-math) |
-| the line | term | 0 (#s-answer); 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
+| the line | term | 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3f (#s-brain); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
 | The live benchmark engine's organism: sixty muscles, twelve in each of five body parts | organism | 3a (#s-engines); 3b (#s-desk); 3n (#s-lab); 4g (#s-math) |
 | the live tuning engine | term | v (#s-disclose) |
 | LOSS | term | 0 (#s-answer); iii (#s-bottom); 1b (#s-health); 2a (#s-status); 2c (#s-loss); 2d (#s-board); 3b (#s-desk); 3c (#s-dial); 3e (#s-plane); 3g (#s-verdict); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
@@ -2078,7 +2078,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | piece 4: the governor coupling every muscle to one law | term | 1a (#s-wall) |
 | power given | term | 0 (#s-answer); 2c (#s-loss); 2d (#s-board); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4c (#s-fleet); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | push | term | 4g (#s-math) |
-| the raw change and the word | term | 0 (#s-answer); 2c (#s-loss); 3j (#s-ops); 4k (#s-read) |
+| the raw change and the word | term | 2c (#s-loss); 3j (#s-ops); 4k (#s-read) |
 | realm | term | 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3n (#s-lab); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | REDLINING | term | iii (#s-bottom); 1a (#s-wall) |
 | the reflex rule | term | 3a (#s-engines); 3c (#s-dial); 4g (#s-math); 4i (#s-self) |

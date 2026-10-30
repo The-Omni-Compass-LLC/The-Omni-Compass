@@ -216,11 +216,13 @@ def card_tables() -> list:
              "dial": d.group(1) if d else None, "runs": rec.get("runs")}
         rows = rec.get("rows", {})
         if isinstance(rows, list):                  # the stacked box: the card's own meter, its primary measure, size by size
-            sizes = {}
+            sizes, reps = {}, {}
             for r in rows:
                 if r.get("part") == "card" and r.get("measure") == "primary":
                     c = sizes.setdefault(str(r["copies"]), {}); h = _head(r.get("reading", "")); c[h] = c.get(h, 0) + 1
+                    k = str(r["copies"]); reps[k] = min([reps.get(k, 10 ** 9)] + list(r.get("repetitions") or []))
             t["kind"] = "stacks"; t["card_primary_by_copies"] = sizes
+            t["reps_by_copies"] = {k: v for k, v in reps.items() if v < 10 ** 9}   # the fewest paired repetitions any run made at that size
         else:
             counts, by = {}, {}
             for gauge, r in rows.items():
