@@ -4,17 +4,17 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-Written by `tools/verdict_audit.py` from the three-run tables as they stand (digest `7db3720b2218dcf2`). The engine that stands is omni-v21. The rule: tools/readings.py three_run_reading: a change of 0.5% or more, the mean of the three runs' changes in percent of native, reads by the gauge's aim; under it STEADY, under the floor; every run's two values equal to 1e-09 of the value, STEADY, the same; runs that moved 0.5% or more in opposite directions, the runs disagree. Evidence strength is shown beside the word and never changes it: strong, every run the mean's way and beyond its noise (its 95% interval clear of zero); moderate, all but one; weak, one run beyond its noise; inconclusive, no run beyond its noise (a mean of 0.5% or more, not a change any one run could tell from its noise). STEADY is of three kinds: exactly the same (every run's values equal to nine decimal places), under the floor (a measured change, the three runs' mean under 0.5%) and no difference beyond the noise (a table read by an older key). The runs disagree is unresolved, never a final word: opposite directions each beyond its noise, or opposite directions inside overlapping noise.
+Written by `tools/verdict_audit.py` from the three-run tables as they stand (digest `99aede116769207a`). The engine that stands is omni-v21. The rule: tools/readings.py three_run_reading: a change of 0.5% or more, the mean of the three runs' changes in percent of native, reads by the gauge's aim; under it STEADY, under the floor; every run's two values equal to 1e-09 of the value, STEADY, the same; runs that moved 0.5% or more in opposite directions, the runs disagree. Evidence strength is shown beside the word and never changes it: strong, every run the mean's way and beyond its noise (its 95% interval clear of zero); moderate, all but one; weak, one run beyond its noise; inconclusive, no run beyond its noise (a mean of 0.5% or more, not a change any one run could tell from its noise). STEADY is of three kinds: exactly the same (every run's values equal to nine decimal places), under the floor (a measured change, the three runs' mean under 0.5%) and no difference beyond the noise (a table read by an older key). The runs disagree is unresolved, never a final word: opposite directions each beyond its noise, or opposite directions inside overlapping noise.
 
 ## The counts
 
 | What | Count |
 |---|---|
-| Three-run tables | 244: 85 standing, 98 superseded, 60 the road, 1 taken out |
+| Three-run tables | 245: 85 standing, 98 superseded, 60 the road, 2 taken out |
 | Standing tables, Omni-Compass against its native | 55 |
 | Standing tables on the engine that stands (omni-v21) | 31 |
 | Standing tables not yet run again on omni-v21 | 54 |
-| Rows recomputed from their stored values | 8063 of 11057 |
+| Rows recomputed from their stored values | 8063 of 11069 |
 | Stored readings the key reads otherwise | 0 |
 | Markdown readings unlike their JSON twin | 0 |
 
@@ -63,7 +63,7 @@ Evidence strength beside the word (it never changes the word):
 | standing | the orchestrator's own | 31 GAIN, 12 power given, 78 STEADY, 66 LOSS, 26 the runs disagree, 90 shown |
 | standing | two changes at once | 57 GAIN, 22 power given, 42 STEADY, 78 LOSS, 14 the runs disagree, 90 shown |
 | superseded | against its native | 861 GAIN, 315 power given, 1447 STEADY, 183 LOSS, 833 the runs disagree, 19 the runs differ, 707 shown, 819 tuning |
-| taken out | against its native | 9 GAIN, 3 power given |
+| taken out | against its native | 15 GAIN, 5 power given, 1 LOSS, 3 the runs disagree |
 | the road | against its native | 590 GAIN, 114 power given, 949 STEADY, 55 LOSS, 133 the runs disagree, 17 the runs differ, 519 shown, 192 tuning |
 
 The orchestrator's own rows (ORCH) carry no Omni-Compass in either arm; two changes at once (BOTH) and in place of a controller (VS) are shown, never a reading of Omni-Compass against its native.
@@ -488,6 +488,7 @@ None: every stored reading is the key's reading of its stored values, and every 
 | `results/live/V7_TRACE_GOOGLE2011.md` | omni-v7 | the road | against its native | L | A 38933435153 (10 reps, `1ccba53a74fe`), B 38945578014 (10 reps, `cf8dccec0604`), C 38955589372 (10 reps, `cf8dccec0604`) |
 | `results/live/V7_YCSB.md` | omni-v7 | the road | against its native | L | A 38935435045 (? reps, `1ccba53a74fe`), B 38947615453 (? reps, `cf8dccec0604`), C 38957530830 (? reps, `cf8dccec0604`) |
 | `results/orchestrator/V18_THREE_ARMS_ABC.md` | omni-v18 | taken out | against its native | L | in its own Markdown |
+| `results/orchestrator/V21_THREE_ARMS_ABC.md` | omni-v21 | taken out | against its native | L | in its own Markdown |
 
 ---
 

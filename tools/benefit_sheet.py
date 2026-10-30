@@ -43,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, STEADY, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN  # noqa: E402
+from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, STEADY, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, reading_kind  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools import wiring_verdicts as wv                            # noqa: E402
 
@@ -493,6 +493,43 @@ def newest_table(fname):
     return next((n for _, n in reversed(found) if landed(LIVE / n)), found[-1][1]) if found else fname
 
 
+def card_line() -> str:
+    """The card's paragraph, from the newest engine's three-run card tables on disk (tools/gpu_abc.py), never written by hand.
+    The card is not on the sheet: at the factory dial (the max) native already runs both knobs at their top and the governor
+    writes nothing; the tune-down and the cap are other tunes, their results their own."""
+    def version(f):
+        m = re.match(r"V(\d+)_", f.name)
+        return int(m.group(1)) if m else -1
+    found = sorted((ROOT / "results" / "gpu").glob("V*_ABC.json"), key=lambda f: (version(f), f.name))
+    newest = [f for f in found if version(f) == version(found[-1])] if found else []
+    if not newest:
+        return ("- **The card (NVIDIA)**: no three-run card table on disk; every rental, its cost and what came back is in "
+                "`docs/RUN_LEDGER.md`.")
+    parts = []
+    for f in newest:
+        rec = json.loads(f.read_text())
+        rows = rec.get("rows", {})
+        if isinstance(rows, list):                     # the stacked box (tools/hil_abc.py): the card's work per energy, size by size
+            by_size = {}
+            for r in rows:
+                if r.get("part") == "card" and r.get("measure") == "primary":
+                    by_size.setdefault(r["copies"], []).append(reading_kind(r["reading"]))
+            sizes = []
+            for copies, kinds in sorted(by_size.items()):
+                counts = {}
+                for k in kinds:
+                    counts[k] = counts.get(k, 0) + 1
+                sizes.append(f"at {copies} {'copy' if copies == 1 else 'copies'} " + ", ".join(f"{n} {k}" for k, n in sorted(counts.items(), key=lambda kv: -kv[1])) + f" of {len(kinds)} organisms")
+            parts.append(f"{rec.get('title', f.stem)}: the card's work per energy " + "; ".join(sizes) + f" (`{f.with_suffix('.md').relative_to(ROOT)}`)")
+            continue
+        row = rows.get("work per energy (served requests per kJ)", {})
+        parts.append(f"{rec.get('title', f.stem)}: work per energy {row.get('reading', 'no value')} "
+                     f"(`{f.with_suffix('.md').relative_to(ROOT)}`)")
+    return ("- **The card (NVIDIA)**: at the factory dial (the max) native already runs both knobs at their top and the "
+            "governor writes nothing, so the card is not on the sheet; the other tunes, each its own result: "
+            + "; ".join(parts) + ". Every rental, its cost and what came back is in `docs/RUN_LEDGER.md`.")
+
+
 def manual_block(rows) -> str:
     """The Owner's Manual's evidence table: every row of the sheet, each naming the engine its table ran on."""
     L = [M_BEGIN, "", "| What (engine, three runs each) | Benefit? | How much | Every change judged across our three runs, in words | Table |",
@@ -595,7 +632,7 @@ def main(check=False):
     L += ["", "## Not on the sheet, and why", "",
           "- **Azure's managed Kubernetes, the bill** (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): Omni v1, a 4-worker fleet, every gauge STEADY, inside the noise: 0%, and too small a fleet to show one machine.",
           "- **The governor's own share of the machine** (`results/live/V3_OWN_COST.md`): 0.6% to 1.3% of one core at every size; shown, not a benchmark against native.",
-          "- **The card (NVIDIA)**: one finished result, omni-v18 on an A100 (`results/gpu/run-20261024T091235Z/GPU_REPS.md`: every service gauge STEADY, both knobs already at their top on native); every rental, its cost and what came back, the engine that stands's runs included, is in `docs/RUN_LEDGER.md`. The results of 2 October are obsolete.",
+          card_line(),
           "- **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.", ""]
     md = "\n".join(legal_stamp(with_own_runs(L))) + "\n"
     js = json.dumps({"rows": rows}, indent=1) + "\n"

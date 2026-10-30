@@ -1173,7 +1173,7 @@ every one a sentence, a count or a drawing. Each is closed here, in the page, it
   native runs it (the card, the cluster with its add-ons and governors, the services on it, the cloud's bill), composed by the
   product law Rℓ(g) = oℓ/nℓ or nℓ/oℓ toward the gauge's aim, R(g) = ∏ℓ Rℓ(g), with every interval carried through (the delta
   method on each run's paired interval, the runs pooled by inverse variance, the layers added in the log), read two ways (by
-  the index's rule, an STEADY or one-run gauge counting as exactly 1; and with every interval carried), and the separability the
+  the index's rule, a STEADY or one-run gauge counting as exactly 1; and with every interval carried), and the separability the
   product assumes tested on the governors' four ways (Omni-Compass on the organism alone against on top of the orchestrator, in
   the same repetitions). The composition is class S over class P and L tables and across engines, said so on the page; the
   stacked run is named as the measurement that would replace it. The modelled organisms and the omni-v3 organisms with the

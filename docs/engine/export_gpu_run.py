@@ -29,7 +29,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.readings import SIZE_FLOOR  # noqa: E402  (the one floor, written once)
+from tools.readings import SIZE_FLOOR, reading_kind  # noqa: E402  (the one floor and the reading's kind, written once)
 
 RUN = ROOT / "results" / "gpu" / "run-20261024T091235Z"
 ARMS = ("native", "watch", "omni")
@@ -189,6 +189,47 @@ def total_table(md: str) -> list[dict]:
     return rows
 
 
+HEADS = ("GAIN", "LOSS", "STEADY", "power given")
+
+
+def _head(reading: str) -> str:
+    """A three-run reading's word alone: GAIN, LOSS, STEADY, power given, or the runs disagree."""
+    k = reading_kind(reading)
+    return next((h for h in HEADS if k.startswith(h)), "the runs disagree")
+
+
+def card_tables() -> list:
+    """The newest engine's three-run card tables (results/gpu/V*_ABC.json, tools/gpu_abc.py and tools/hil_abc.py), each read
+    from its own file: its title, engine, runs and every row's word counted; for the stacked box, the card's own primary
+    measure counted size by size. Nothing typed: a table that is not on disk is not on the page."""
+    def version(f):
+        m = re.match(r"V(\d+)_", f.name)
+        return int(m.group(1)) if m else -1
+    found = sorted((ROOT / "results" / "gpu").glob("V*_ABC.json"), key=lambda f: (version(f), f.name))
+    newest = [f for f in found if found and version(f) == version(found[-1])]
+    out = []
+    for f in newest:
+        rec = json.loads(f.read_text(encoding="utf-8"))
+        eng = rec.get("engine"); eng = " ".join(eng) if isinstance(eng, list) else (eng or "")
+        m = re.search(r"(omni-v\d+)", eng); d = re.search(r"dial: (\w+)", eng)
+        t = {"file": str(f.with_suffix(".md").relative_to(ROOT)), "title": rec.get("title", f.stem), "engine": m.group(1) if m else None,
+             "dial": d.group(1) if d else None, "runs": rec.get("runs")}
+        rows = rec.get("rows", {})
+        if isinstance(rows, list):                  # the stacked box: the card's own meter, its primary measure, size by size
+            sizes = {}
+            for r in rows:
+                if r.get("part") == "card" and r.get("measure") == "primary":
+                    c = sizes.setdefault(str(r["copies"]), {}); h = _head(r.get("reading", "")); c[h] = c.get(h, 0) + 1
+            t["kind"] = "stacks"; t["card_primary_by_copies"] = sizes
+        else:
+            counts, by = {}, {}
+            for gauge, r in rows.items():
+                h = _head(r.get("reading", "")); counts[h] = counts.get(h, 0) + 1; by.setdefault(h, []).append(gauge)
+            t["kind"] = "card"; t["counts"] = counts; t["gauges_by_word"] = by
+        out.append(t)
+    return out
+
+
 def main(out: str) -> None:
     if not RUN.exists():
         Path(out).write_text(json.dumps({"missing": str(RUN.relative_to(ROOT))}), encoding="utf-8")
@@ -227,7 +268,7 @@ def main(out: str) -> None:
             "workload": receipt.get("workload"), "bin_s": BIN_S, "req_bin_s": REQ_BIN_S, "arms": list(ARMS),
             "arm_words": {"native": "the card as shipped, its own driver governing", "watch": "Omni-Compass wired, watching only (the switch OFF: it reads, writes nothing)",
                           "omni": "Omni-Compass governing the power limit"},
-            "total": total_table(md), "reps": reps}
+            "total": total_table(md), "reps": reps, "tables": card_tables()}
     Path(out).write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False), encoding="utf-8")
 
 

@@ -2,11 +2,11 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Read on 2026-10-30 07:41 UTC by `tools/live_engine_acceptance.py` (`docs/engine/accept_live_engine.js`, Chromium through Playwright) from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` and, the same thirteen checks with the same result, from its one-file copy `docs/live/index.html`. Each line is what the browser read; a check that did not run says so.
+Read on 2026-10-30 12:25 UTC by `tools/live_engine_acceptance.py` (`docs/engine/accept_live_engine.js`, Chromium through Playwright) from `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` and, the same thirteen checks with the same result, from its one-file copy `docs/live/index.html`. Each line is what the browser read; a check that did not run says so.
 
 | Check | Result | What the browser read | The rule |
 |---|---|---|---|
-| The page opens | **PASS** | loaded in 1124 ms; 66.1 MB as rendered | the load event within 180 s |
+| The page opens | **PASS** | loaded in 5434 ms; 52.4 MB as rendered | the load event within 180 s |
 | Its title | **PASS** | “The Omni-Compass Live Benchmark Engine” | The Omni-Compass Live Benchmark Engine |
 | The engine it names | **PASS** | data-engine omni-v21, prose omni-v21; the repository: omni-v21 | the engine `tools/omni_version.py` reads |
 | No error in the page | **PASS** | 0 page errors, 0 console errors | none |
@@ -16,7 +16,7 @@ Read on 2026-10-30 07:41 UTC by `tools/live_engine_acceptance.py` (`docs/engine/
 | LOSS is a red octagonal stop sign | **PASS** | the word's plate clipped to an octagon, rgb(255, 77, 85), a white octagon inside; drawn 3568 times | an octagon, red |
 | The four live words | **PASS** | GAINING, STEADY, REDLINING, AWAITING, OVER THE LINE; 62 monitors, 889 signals | GAINING, STEADY, REDLINING, AWAITING, OVER THE LINE |
 | The reflex runs on the engine's own numbers | **PASS** | the page {"streak": 3, "relief": 0.05, "margin": 0.05, "hold": 10, "holdMax": 160}; `omnicompass/immune.py` {"streak": 3, "relief": 0.05, "margin": 0.05, "hold": 10, "holdMax": 160} | equal, every one a knob on the panel |
-| The reflex acts under a surge | **PASS** | decision 45: 2 hand-backs to native, 22 stays, 1 held native now | a hand-back or a stay recorded |
+| The reflex acts under a surge | **PASS** | decision 46: 3 hand-backs to native, 23 stays, 2 held native now | a hand-back or a stay recorded |
 | The kill switch | **PASS** | pressed: every side native (True); pressed again: Omni-Compass on (True) | off at once, on again |
 | A phone, 390 px | **PASS** | page 390 px wide on a 390 px screen; wide tables scroll inside their own box | no sideways scroll of the page |
 

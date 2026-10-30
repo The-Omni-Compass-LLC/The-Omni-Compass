@@ -4,7 +4,7 @@
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
-Written by `tools/audit_export.py` from `results/verdict_audit/VERDICT_AUDIT.json` (its digest `7db3720b2218dcf2`), which `tools/verdict_audit.py` writes from every three-run table's stored native, Omni-Compass and difference. The engine that stands: omni-v21. Every row is in `docs/audit/BENCHMARK_DISCREPANCIES.csv`, one line per gauge, with each run's native and Omni-Compass values, the raw change with its true sign, the key's word, its class, the confidence, the practical significance and the run-to-run stability, apart from one another.
+Written by `tools/audit_export.py` from `results/verdict_audit/VERDICT_AUDIT.json` (its digest `99aede116769207a`), which `tools/verdict_audit.py` writes from every three-run table's stored native, Omni-Compass and difference. The engine that stands: omni-v21. Every row is in `docs/audit/BENCHMARK_DISCREPANCIES.csv`, one line per gauge, with each run's native and Omni-Compass values, the raw change with its true sign, the key's word, its class, the confidence, the practical significance and the run-to-run stability, apart from one another.
 
 ## The rule
 
@@ -17,13 +17,13 @@ Written by `tools/audit_export.py` from `results/verdict_audit/VERDICT_AUDIT.jso
 
 ## The independent check
 
-Every one of the 11,057 rows was classed twice: as the key wrote it, and by `independent()` in `tools/audit_export.py`, written from the rule above with no code shared with `tools/readings.py` and each run's difference recomputed as Omni-Compass minus native from the stored values. **10,085 agree; 0 differ**; 972 cannot be recomputed from the committed record, for the reasons counted here (none of them is changed by this report: a table's words stay as its runner printed them).
+Every one of the 11,069 rows was classed twice: as the key wrote it, and by `independent()` in `tools/audit_export.py`, written from the rule above with no code shared with `tools/readings.py` and each run's difference recomputed as Omni-Compass minus native from the stored values. **10,085 agree; 0 differ**; 984 cannot be recomputed from the committed record, for the reasons counted here (none of them is changed by this report: a table's words stay as its runner printed them).
 
 | Why a row cannot be recomputed | the road | superseded | standing | taken out |
 |---|---:|---:|---:|---:|
 | not recomputable at nine decimals: the committed table printed its changes to two decimals; the runner's raw files hold the values | 73 | 201 | 101 | 0 |
 | not recomputable: the printed changes round across the 0.5% floor | 1 | 0 | 0 | 0 |
-| not recomputable: the record declares no aim for this gauge (a table of an earlier engine, its words kept as printed) | 570 | 0 | 14 | 12 |
+| not recomputable: the record declares no aim for this gauge (a table of an earlier engine, its words kept as printed) | 570 | 0 | 14 | 24 |
 
 A standing table that cannot be recomputed at nine decimals from the committed table is a traceability gap: its runner's raw files (on the branch `raw`, `scripts/raw_archive.sh open`) hold the values, and the next export reads them there.
 

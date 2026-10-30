@@ -88,13 +88,15 @@ class PlantFiles(unittest.TestCase):
 
 class PairedRun(unittest.TestCase):
     def test_short_paired_run(self):
+        from tools.cpu_power_model import ModelService          # the modelled machine's service as the model's own queue (30 October 2026)
         R.VERDICT_KW = dict(min_samples=3, probe_every=4, recheck=10, max_trial=12, settle_s=1.0)   # short trials for the test
         R.Service.JITTER = (0.9, 1.1)
+        real_service, R.Service = R.Service, ModelService
         try:
             sim = tempfile.mkdtemp(); out = Path(tempfile.mkdtemp()) / "out"
             rc = R.main(["--plant", "sim", "--sim-dir", sim, "--workloads", "tuning", "--reps", "1", "--step-s", "4", "--out", str(out)])
         finally:
-            R.VERDICT_KW = {}; R.Service.JITTER = (0.5, 1.5)
+            R.VERDICT_KW = {}; R.Service = real_service; R.Service.JITTER = (0.5, 1.5)
         self.assertEqual(rc, 0)
         rec = json.loads((out / "cpu-power-tuning" / "tuning.json").read_text())
         self.assertTrue(rec["machine"]["modelled"])

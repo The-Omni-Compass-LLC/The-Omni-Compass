@@ -95,6 +95,56 @@ class PodEvidence(unittest.TestCase):
             self.assertIn('resourceVersion=11', urls[1])
             self.assertTrue(json.loads((root / 'pod_watch_receipt.json').read_text())['complete'])
 
+    def collect_with(self, root, segments):
+        """Run the collector over scripted watch requests: (stdout text, exit code, stderr text) each."""
+        listing = {'metadata': {'resourceVersion': '10'}, 'items': [pod()]}
+        urls = []
+        def run(args, **kwargs):
+            return subprocess.CompletedProcess(args, 0, json.dumps(listing))
+        class Process:
+            def __init__(self, text, code):
+                self.stdout = io.StringIO(text); self.code = code
+            def wait(self, **kwargs): return self.code
+            def poll(self): return self.code
+        def popen(args, stderr=None, **kwargs):
+            urls.append(args[3])
+            text, code, said = segments[len(urls) - 1]
+            if said:
+                stderr.write(said); stderr.flush()
+            if len(urls) == len(segments):
+                (root / 'pod_watch.stop').touch()
+            return Process(text, code)
+        integrity.collect(root, run=run, popen=popen, sleep=lambda s: None)
+        return urls
+
+    def test_client_timeout_resumes_at_the_last_version_and_drops_the_cut_line(self):
+        # run 40938221203, repetition 360: one client timeout after 11 clean segments refused the whole arm
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            seen = json.dumps({'type': 'BOOKMARK', 'object': {'metadata': {'resourceVersion': '12'}}}) + '\n'
+            urls = self.collect_with(root, [
+                (seen + '{"type": "MODIFIED", "obj', 1, 'error: net/http: request canceled (Client.Timeout)\n'),
+                (json.dumps({'type': 'MODIFIED', 'object': pod(True, True)}) + '\n', 0, '')])
+            self.assertIn('resourceVersion=12', urls[1])
+            receipt = json.loads((root / 'pod_watch_receipt.json').read_text())
+            self.assertTrue(receipt['complete'])
+            self.assertEqual((receipt['segments'], receipt['client_retries']), (1, 1))
+            self.assertEqual(len((root / 'pod_watch.json').read_text().splitlines()), 3)
+
+    def test_expired_history_is_never_resumed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(RuntimeError, 'expired'):
+                self.collect_with(root, [('', 1, 'Error from server (Expired): too old resource version\n')])
+            self.assertFalse(json.loads((root / 'pod_watch_receipt.json').read_text())['complete'])
+
+    def test_repeated_client_failures_fail_the_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(RuntimeError, 'in a row'):
+                self.collect_with(root, [('', 1, 'error: context deadline exceeded\n')] * integrity.RETRIES)
+            self.assertFalse(json.loads((root / 'pod_watch_receipt.json').read_text())['complete'])
+
     def test_client_failure_writes_failed_receipt(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -134,21 +184,43 @@ class RolloutCleanup(unittest.TestCase):
         with self.assertRaises(subprocess.CalledProcessError):
             integrity.restore_rollout('default/web', run=run)
 
+    def test_conflict_with_the_autoscaler_is_read_again_and_retried(self):
+        # run 40938221203, repetition 349: the HPA wrote the Deployment between the reset's read and its patch
+        state = {'metadata': {'resourceVersion': '7', 'annotations': {integrity.PAUSE: 'true'}}, 'spec': {'paused': True}}
+        versions = []
+        def run(args, **kwargs):
+            if args[1] == 'patch':
+                versions.append(json.loads(args[args.index('-p') + 1])['metadata']['resourceVersion'])
+                if len(versions) == 1:
+                    state['metadata']['resourceVersion'] = '8'
+                    raise subprocess.CalledProcessError(1, args, stderr='Operation cannot be fulfilled on '
+                        'deployments.apps "web": the object has been modified; please apply your changes')
+                state['spec']['paused'] = False; state['metadata']['annotations'] = {}
+            return subprocess.CompletedProcess(args, 0, json.dumps(state))
+        self.assertTrue(integrity.restore_rollout('default/web', run=run))
+        self.assertEqual(versions, ['7', '8'])
+
 
 class SparseEngineCheckout(unittest.TestCase):
     def test_actual_matrix_checkout_can_identify_the_engine(self):
-        # Exercise the YAML's patterns against a real sparse Git index, not a mirrored string assertion.
+        # Exercise the YAML's patterns against a real sparse Git index, not a mirrored string assertion. A worktree of this
+        # repository, never a clone of it: a clone copies every object (7 GB where the raw runs' pack is present), and a partial
+        # or shallow clone, as a cloud session checks the repository out, cannot serve one at all (30 October 2026).
         workflow = yaml.safe_load((ROOT / '.github/workflows/six-kube.yml').read_text())
         checkout = next(s for s in workflow['jobs']['run']['steps'] if s.get('uses', '').startswith('actions/checkout@'))
         patterns = checkout['with']['sparse-checkout']
         with tempfile.TemporaryDirectory() as directory:
+            tree = str(Path(directory) / 'sparse')
             def git(*args, **kwargs):
                 return subprocess.run(['git', *args], check=True, capture_output=True, text=True, **kwargs)
-            git('clone', '--shared', '--no-checkout', str(ROOT), directory)
-            git('-C', directory, 'sparse-checkout', 'init', '--no-cone')
-            git('-C', directory, 'sparse-checkout', 'set', '--no-cone', '--stdin', input=patterns)
-            git('-C', directory, 'checkout', 'HEAD')
-            result = subprocess.run(['python3', 'tools/omni_version.py'], cwd=directory, capture_output=True, text=True)
+            git('-C', str(ROOT), 'worktree', 'add', '--detach', '--no-checkout', tree, 'HEAD')
+            try:
+                git('-C', tree, 'sparse-checkout', 'init', '--no-cone')
+                git('-C', tree, 'sparse-checkout', 'set', '--no-cone', '--stdin', input=patterns)
+                git('-C', tree, 'checkout', 'HEAD')
+                result = subprocess.run(['python3', 'tools/omni_version.py'], cwd=tree, capture_output=True, text=True)
+            finally:
+                subprocess.run(['git', '-C', str(ROOT), 'worktree', 'remove', '--force', tree], capture_output=True)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('omni-v21', result.stdout)
 

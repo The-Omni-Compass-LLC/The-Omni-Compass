@@ -27,14 +27,14 @@ Three separate runs (A, B and C) of each preregistered test on GitHub's own mach
 | **Kubernetes, faults injected** ([`results/live/V21_FAULTS.md`](results/live/V21_FAULTS.md)) | not a gauge of this test | GAIN in all three of our runs (raw −51.0%, −57.8%, −54.5%) | GAIN by the mean of our three runs, beyond the noise in 2 of 3 (raw −18.2%, −14.3%, −10.7%) | STEADY, under the floor (the three runs' mean 0.03%) (raw −0.1%, ±0.0%, ±0.0%) | A 40229598467 · B 40250391552 · C 40272639170 |
 
 
-The real test of the whole loop, on omni-v18, the newest engine with its three runs in (the engine that stands, omni-v21, runs it again), three runs on GitHub's own machines: Omni-Compass on top of native did 6.0% more work than native and answered 9.5% faster at the 95th percentile.
+The real test of the whole loop, on the engine that stands (omni-v21), three runs on GitHub's own machines: Omni-Compass on top of native did 8.5% more work than native and answered 13.0% faster at the 95th percentile.
 
 | Scenario | Signal | Work | Response (95th percentile) | Machines | Units |
 |---|---|---|---|---|---|
 | **Native**: Kubernetes' own autoscaling rule on the muscles | <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> the baseline | the baseline | the baseline | the baseline | the baseline |
-| **Omni-Compass on top of native**: Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 6.0%; the runs 5.2%, 5.3%, 7.4% | GAIN in all three of our runs: down 9.5% (faster); the runs 9.0%, 12.1%, 7.5% | GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% | power given in all three of our runs: up 10.2%; the runs 11.0%, 8.9%, 10.8% |
+| **Omni-Compass on top of native**: Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 8.5%; the runs 10.3%, 8.2%, 7.0% | GAIN in all three of our runs: down 13.0% (faster); the runs 12.6%, 14.2%, 12.0% | GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.2% (fewer); the runs 2.0%, 2.8%, 4.8% | power given by the mean of our three runs, beyond the noise in 1 of 3: up 4.0%; the runs 3.3%, 5.0%, 3.7% |
 
-The signals: <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> accelerating, a GAIN and no LOSS; <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> steady, every row STEADY; <img src="docs/engine/signals/redlining.svg" alt="the red stop-sign octagon" height="14"> redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, never a LOSS. Source: [`results/orchestrator/V18_THREE_ARMS_ABC.json`](results/orchestrator/V18_THREE_ARMS_ABC.json), three runs on GitHub's own machines (A, B and C from one commit); runs A 40023524338, B 40023529155, C 40023534013; commit `0ca2bbdac97f`. The record's other arm, Omni-Compass alone on the muscles, stays in the record and is not carried here: Omni-Compass is never by itself (the founder's order of 25 October).
+The signals: <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> accelerating, a GAIN and no LOSS; <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> steady, every row STEADY; <img src="docs/engine/signals/redlining.svg" alt="the red stop-sign octagon" height="14"> redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, never a LOSS. Source: [`results/orchestrator/V21_THREE_ARMS_ABC.json`](results/orchestrator/V21_THREE_ARMS_ABC.json), three runs on GitHub's own machines (A, B and C from one commit); runs A 40474220398, B 40474223636, C 40474227699; commit `9d2bea96a878`. The record's other arm, Omni-Compass alone on the muscles, stays in the record and is not carried here: Omni-Compass is never by itself (the founder's order of 25 October).
 
 ### The two bills
 
@@ -44,7 +44,7 @@ Each route's bill is its native total cost, then Omni-Compass's, then the saving
 
 | Route | The bill: native → Omni-Compass → saving | Supporting measurements |
 |---|---|---|
-| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v21 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% |
+| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v21 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.2% (fewer); the runs 2.0%, 2.8%, 4.8% |
 | **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v21; its omni-v21 Azure set runs now (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
 
 Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md), `tools/whole_system.py`; omni-v1, omni-v12, omni-v21, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 17.2%, the 95th percentile 43.2% faster, machines 9.5% fewer, energy 5.1% less, the cloud's bill STEADY; the index over the gauges +14.0%. A composition across engines (class S over class P and L tables), never read as one engine's result; each total follows its tables as every benchmark runs again on omni-v21.
@@ -269,16 +269,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-30 07:35 | [The engine's runs: 500 runs from the jump generator (base 2361771918), one digest](results/engine_runs/ENGINE_RUNS_500_2361771918.md) |  |
+| 2026-10-30 06:11 | [The stacked box on omni-v21: the seven organisms with an A10 inside, three runs on rented cards](results/gpu/V21_STACKS_A10_ABC.md) |  |
+| 2026-10-30 01:13 | [Omni direct's three arms: three runs on GitHub's machines](results/orchestrator/V21_THREE_ARMS_ABC.md) |  |
+| 2026-10-30 01:13 | [The card on omni-v21, the tune-down (dial save): three runs on an A100](results/gpu/V21_A100_SAVE_ABC.md) |  |
+| 2026-10-30 01:13 | [The card on omni-v21, the power cap at 70% of the card's top (cap-full): three runs on an A100](results/gpu/V21_A100_CAP_FULL_ABC.md) |  |
+| 2026-10-30 01:13 | [The card on omni-v21, the power cap at 70% of the card's top (cap): three runs on an A100](results/gpu/V21_A100_CAP_ABC.md) |  |
 | 2026-10-29 10:15 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2190676988.md) |  |
 | 2026-10-29 08:54 | [The engine's runs: 500 runs from the jump generator (base 2190676988), one digest](results/engine_runs/ENGINE_RUNS_500_2190676988.md) |  |
 | 2026-10-28 12:04 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2005802494.md) |  |
 | 2026-10-28 09:17 | [The engine's runs: 500 runs from the jump generator (base 2005802494), one digest](results/engine_runs/ENGINE_RUNS_500_2005802494.md) |  |
-| 2026-10-27 11:01 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1830829613.md) |  |
-| 2026-10-27 10:11 | [The engine's runs: 500 runs from the jump generator (base 1830829613), one digest](results/engine_runs/ENGINE_RUNS_500_1830829613.md) |  |
-| 2026-10-27 09:46 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1818200804.md) |  |
-| 2026-10-27 08:23 | [The engine's runs: 500 runs from the jump generator (base 1818200804), one digest](results/engine_runs/ENGINE_RUNS_500_1818200804.md) |  |
-| 2026-10-27 06:47 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-27 06:47 | [Wandering demand: load that steps up and down by one (1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1): the A/B/C three-run table (Omni v21)](results/live/V21_WANDERING.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -286,16 +286,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-30 00:56 | engine-runs | success | [40982488133](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40982488133) |
-| 2026-10-30 00:54 | aks-client-check | success | [40982488094](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40982488094) |
-| 2026-10-30 00:45 | grid | success | [40981628347](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40981628347) |
-| 2026-10-30 00:37 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,distribution_specialized,stack reps 478+23 arms native compass split no window 960 protocol 4 | failure | [40975980767](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40975980767) |
-| 2026-10-30 00:37 | raw-sweep | success | [40980805679](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40980805679) |
-| 2026-10-30 00:22 | big-organism-detached collect | success | [40979266417](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40979266417) |
-| 2026-10-29 23:53 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,distribution_specialized,stack reps 416+62 arms native compass split no window 960 protocol 4 | failure | [40965557864](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40965557864) |
-| 2026-10-29 22:16 | six-kube x10 orgs compute_ai_cloud,physics_robotics_autonomous,energy_facility_industrial,distribution_specialized,stack,tower,spine reps 381+35 arms native compass split no window 960 protocol 4 | failure | [40952383446](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40952383446) |
-| 2026-10-29 22:15 | live-engine | success | [40960533081](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40960533081) |
-| 2026-10-29 21:31 | health | success | [40956614118](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40956614118) |
+| 2026-10-30 07:42 | six x100 line orgs 2 runs 100+400 | success | [40995094302](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995094302) |
+| 2026-10-30 07:42 | six x100 line orgs 5 runs 100+400 | success | [40995110040](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995110040) |
+| 2026-10-30 07:37 | secret-names | success | [41016555622](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016555622) |
+| 2026-10-30 07:36 | health | success | [41018795997](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41018795997) |
+| 2026-10-30 07:35 | engine-runs | success | [41016477582](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016477582) |
+| 2026-10-30 07:32 | aks-client-check | success | [41016555703](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016555703) |
+| 2026-10-30 07:29 | security-scan | success | [41016477564](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016477564) |
+| 2026-10-30 07:27 | raw-sweep | success | [41015842005](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41015842005) |
+| 2026-10-30 06:27 | big-organism-detached collect | success | [41014121164](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41014121164) |
+| 2026-10-30 03:46 | six-kube x10 orgs spine reps 461+1 arms native compass split no window 960 protocol 4 | success | [40995084759](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995084759) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
