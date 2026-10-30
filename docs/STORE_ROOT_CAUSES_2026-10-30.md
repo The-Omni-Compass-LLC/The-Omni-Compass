@@ -59,15 +59,15 @@ assignor then gives the members these shares of the load:
 
 | Consumers | The busiest member's share | What the group sustains (μ, one member's rate) |
 |---|---|---|
-| 2 (native) | 5/8 | μ plus the 3/8 member's arrivals: 825 a second at 2 ms of work, as the runs read |
+| 2 (native) | 5/8 | 1.6 μ: 792 a second at 2 ms of work; offered the burst's 880, the group serves 825 (the 5/8 member at μ, the 3/8 member its arrivals), as the runs read |
 | 3 | 4/8 | 2.0 μ |
 | 4 | 4/8 | 2.0 μ: no more than 3 |
 | 5 to 8 | 2/8 | 4.0 μ |
 
 A backlogged consumer serves 495 messages a second at 2 ms of work, 199 at 5 ms and 981 at 1 ms, in its own record
 (`python3 tools/store_causes.py rate .`). The harness measured the group's "capacity" from a backlog it had filled first
-(975 a second at 2 ms, which is 2 μ) and set each workload's peak at 90% of it. Under keyed arrivals two consumers sustain
-825, so every peak offers about 107% of what the operator's two consumers carry. Both arms face the same peak: it is a fair
+(975 a second at 2 ms, which is 2 μ) and set each workload's peak at 90% of it. Under keyed arrivals two consumers keep up
+with at most 1.6 μ (792 a second at 2 ms), so every peak offers about 111% of what the operator's two consumers keep up with. Both arms face the same peak: it is a fair
 test of a governor, and the governor that adds the third consumer in time wins it. A wire that adds one consumer at a time
 wastes the fourth, and the verdict's trials cannot tell why.
 
