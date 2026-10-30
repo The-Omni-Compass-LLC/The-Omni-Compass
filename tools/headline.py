@@ -286,7 +286,7 @@ def page_html(m) -> str:
         elif ln.strip():
             out.append(f"<p>{inline(ln)}</p>")
     flush()
-    return ('<section class="stack" id="s-answer" aria-label="The answer first">\n  <h2><span class="sn">0</span>The answer first: is Omni-Compass a benefit against native?</h2>\n  '
+    return ('<section class="stack" id="s-answer" aria-label="The answer first">\n  <h2><span class="sn">iii</span>The answer first: is Omni-Compass a benefit against native?</h2>\n  '
             + "\n  ".join(out) + "\n</section>")
 
 
