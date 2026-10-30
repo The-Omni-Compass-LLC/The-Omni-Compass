@@ -76,6 +76,7 @@ BURST = "1 6 1 8 1 6"
 ZIPF_S = 0.5              # the working set's key distribution (Zipf exponent): a hot core and a long tail, as application caches see
 FULL = 0.9                # the cache counts as full when memory used is 90% of the ceiling or more
 HOLD_WINDOW_S = 60.0      # omni-v22: the ceiling is never handed back below what the working set occupied in this window (the twin)
+MISS_WORTH = 0.10         # omni-v22: memory is spent only where the misses are at least this share of the service's latency
 from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 SAME_REL = 1e-6
 
@@ -190,6 +191,16 @@ class App(threading.Thread):
             lat = [l for _, l in self.recent]
         return (sum(lat) / len(lat) / 1000.0) if lat else 0.0
 
+    def split(self, since_s=1.0):
+        """The last second's hits and misses apart: (a hit's mean latency ms, a miss's, the miss share), or Nones."""
+        cut = time.time() - since_s
+        with self.lock:
+            recent = [(lat, hit) for t, lat, hit in self.records[-20000:] if t >= cut]
+        hits = [l for l, h in recent if h]; misses = [l for l, h in recent if not h]
+        if not recent:
+            return None, None, None
+        return (sum(hits) / len(hits) if hits else None, sum(misses) / len(misses) if misses else None, len(misses) / len(recent))
+
     def last_second(self, line_ms, since_s=1.0):
         """The brain's sample: (requests answered, of them inside the line, mean latency in s) over the last second."""
         now = time.time()
@@ -288,6 +299,15 @@ class Brain:
         peak = max((u for _, u in self.used), default=0.0) / FULL
         return min(COVER_MB[1], max(self.native_mb, int(math.ceil(peak / STEP_MB)) * STEP_MB))
 
+    @staticmethod
+    def miss_worth(obs):
+        """The share of the last second's latency that the misses are: miss share x (a miss's latency less a hit's) / the mean.
+        None where the second carries no hit and miss latencies (the wire's older records), and the spend is not gated."""
+        hit, miss, share, mean = obs.get("hit_ms"), obs.get("miss_ms"), obs.get("miss_share"), obs.get("reading_s")
+        if hit is None or miss is None or share is None or not mean:
+            return None
+        return max(0.0, share * (miss - hit) / (1000.0 * mean))
+
     def step(self, t, obs):
         reading = obs["reading_s"]; cur = obs["ceiling_mb"]; ev_last = obs["evicted_last_s"]
         full = obs["used_mb"] >= FULL * cur
@@ -298,7 +318,14 @@ class Brain:
         want, why = decide(self.law.p, f, ev_last, cur, t - self.last_change, full, wall=self.law.band.wall_high)
         fail_up = why.startswith("fail up")
         info = {"verdict_phase": None, "verdict_direction": None, "allowed_low": self.verdict.allowed_low, "allowed_high": self.verdict.allowed_high}
-        if want > cur:
+        worth = self.miss_worth(obs)
+        info["miss_worth"] = None if worth is None else round(worth, 3)
+        if want > cur and worth is not None and worth < MISS_WORTH:
+            # the misses are not what makes the service slow (MySQL on a runner whose page cache holds the data files: a pool
+            # "miss" costs nothing, and memory given for it would buy nothing): the ceiling holds, the cause is elsewhere
+            target = cur
+            why = f"misses are {100 * worth:.0f}% of the latency, under {100 * MISS_WORTH:.0f}%: memory would buy nothing; held"
+        elif want > cur:
             target = want                                              # the spend the service asks for: never clamped
             why += "; power given inside the cover"
             if fail_up:
@@ -361,8 +388,9 @@ class Omni(threading.Thread):
                     cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
                     cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
                     cost = sample_cost(self.objective, inside, mean_s, cur, cpu_share)
+                    hit_ms, miss_ms, miss_share = self.app.split(1.0)
                     obs = {"reading_s": reading, "n": n_req, "inside": inside, "evicted_last_s": ev_last, "ceiling_mb": cur, "used_mb": used,
-                           "cpu_share": cpu_share}
+                           "cpu_share": cpu_share, "hit_ms": hit_ms, "miss_ms": miss_ms, "miss_share": miss_share}
                     target, why, vinfo = self.brain.step(tick - t0, obs)       # omni-v22: the Brain's decision (above)
                     wrote = None
                     if target != cur:

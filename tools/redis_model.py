@@ -97,18 +97,20 @@ def run_arm(workload, ceiling_of, seed, step_s=30.0, start_mb=64.0):
     for notch in [int(x) for x in steps.split()]:
         n = base * notch; cum = zipf_cum(n); prefix = n
         for _ in range(int(step_s)):
-            sec = []; ev0 = cache.evicted
+            sec = []; ev0 = cache.evicted; hits = []; misses = []
             for _ in range(int(RATE)):
                 k = (prefix, bisect.bisect_left(cum, rng.random()))
                 if cache.get(k):
-                    l = draw_q(HIT_MS, lat_rng)
+                    l = draw_q(HIT_MS, lat_rng); hits.append(l)
                 else:
-                    l = MISS_PENALTY_MS + draw_q(MISS_EXTRA_MS, lat_rng); cache.put(k)
+                    l = MISS_PENALTY_MS + draw_q(MISS_EXTRA_MS, lat_rng); cache.put(k); misses.append(l)
                 sec.append(l)
             t += 1.0
             lats.extend(sec)
             obs = {"reading_s": sum(sec) / len(sec) / 1000.0, "n": len(sec), "inside": sum(1 for x in sec if x <= LINE_MS),
-                   "evicted_last_s": cache.evicted - ev0, "ceiling_mb": cache.ceiling / MB, "used_mb": cache.used() / MB}
+                   "evicted_last_s": cache.evicted - ev0, "ceiling_mb": cache.ceiling / MB, "used_mb": cache.used() / MB,
+                   "hit_ms": sum(hits) / len(hits) if hits else None, "miss_ms": sum(misses) / len(misses) if misses else None,
+                   "miss_share": len(misses) / len(sec)}
             per_second.append(obs); ceilings.append(cache.ceiling / MB); used.append(cache.used() / MB)
             new = ceiling_of(t, obs)
             if new is not None and abs(new - cache.ceiling / MB) > 1e-9:

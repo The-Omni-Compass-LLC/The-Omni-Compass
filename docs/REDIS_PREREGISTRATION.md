@@ -203,6 +203,10 @@ the cache's wire to the max.
   store's price: the sawtooth the model showed on the first candidate, which read LOSS against omni-v21 in two workloads);
 - the floor: the operator's ceiling, the max's native, handed back at the end as before; the verdict's allowance and its trials
   stand for the tune-down below it (`dial save`), where giving memory back is the aim.
+- the price of a miss: memory is spent only where the misses are at least a tenth of the service's latency (the miss share times
+  a miss's latency less a hit's, over the mean, from the application's own records of the last second); where a miss costs the
+  service nothing (MySQL on a runner whose page cache holds the data files: 9% to 12% of page reads missing the pool with the
+  statement latency unmoved, `docs/STORE_ROOT_CAUSES_2026-10-30.md`), memory would buy nothing, and the ceiling holds.
 
 **The model gate** (`tools/redis_model.py --compare`, seeds 101 to 103, 30 s a notch, against omni-v21's own loop read from git): work
 inside the line GAIN in every workload (small up 22.9%, burst up 17.6%, tuning up 10.3%, large up 7.7%), the mean latency GAIN

@@ -66,5 +66,23 @@ class Max(unittest.TestCase):
         self.assertTrue(why.startswith("fail up"), why)
 
 
+
+class MissPrice(unittest.TestCase):
+    def test_memory_is_spent_only_where_misses_cost_the_service(self):
+        # MySQL on a runner whose page cache holds the data files: a miss costs nothing, so memory would buy nothing
+        cheap = dict(obs(1.5, 61.0, 64, evicted=80), hit_ms=0.12, miss_ms=0.14, miss_share=0.4)   # slow, the cache full: the compass asks
+        b = R.Brain(64, "resource")
+        for t in range(1, 15):
+            target, why, info = b.step(float(t), cheap)
+        self.assertEqual(target, 64, why); self.assertIn("buy nothing", why)
+        # Redis behind a 5 ms store trip: the misses are the latency, the spend goes through
+        dear = dict(obs(2.2, 61.0, 64, evicted=80), hit_ms=0.12, miss_ms=5.5, miss_share=0.37)
+        b = R.Brain(64, "resource")
+        for t in range(1, 15):
+            target, why, info = b.step(float(t), dear)
+        self.assertGreater(target, 64, why)
+        self.assertIsNone(R.Brain.miss_worth(obs(0.8, 61.0, 64)), "a wire without the split does not gate")
+
+
 if __name__ == "__main__":
     unittest.main()
