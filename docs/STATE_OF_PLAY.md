@@ -16,7 +16,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 **Where things stand, read from the result files.** Written by `python3 tools/summary.py --fix` from the files it names; `verify.py` fails a push in which this block no longer matches them. Nothing in it is typed by hand. The live results run on the engines named in their own tables, and every one of them runs again on the newest engine.
 
-- **The engine on this checkout:** omni-v21, fingerprint b658f05d43c1e602 (63 files).
+- **The engine on this checkout:** omni-v22, fingerprint 0e23a0bc561b900a (65 files).
 - The muscles and the seven organisms on engine omni-v8 at the max (evidence class S, our own models; run 2026-10-17 15:39 UTC, commit 9819a903cba3, 1107 muscles; source: results/realms_v5/REALMS_V5.md):
   - every muscle alone, over its loads: EVEN 577, GAIN 530
   - the organisms under the normal load: the spine: GAIN (fewer misses), misses down 0.145 pp, power given +0.011%; Compute / AI / Cloud: GAIN (fewer misses), misses down 0.070 pp, power given +0.009%; Physics / Robotics / Autonomous: GAIN (fewer misses), misses down 0.121 pp, power given +0.010%; Energy / Facility / Industrial: GAIN (fewer misses), misses down 0.118 pp, energy the same; Distribution / Specialized: GAIN (fewer misses), misses down 0.067 pp, power given +0.002%; the four stacked: GAIN (fewer misses), misses down 0.092 pp, energy the same; the whole tower: GAIN (fewer misses), misses down 0.051 pp, energy the same
@@ -31,7 +31,7 @@ the live evidence and the verification receipt), which `verify.py` checks agains
   - Real database cache (MongoDB under YCSB, GitHub): −0.6% LOSS
   - Real messaging (Apache Kafka, GitHub): +1.0% power given
 
-**On the engine that stands (omni-v21): 23 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
+**On the engine that stands (omni-v22): 0 of 26 benchmarks so far.** Every other row is that engine's own result, named in its Engine column, and runs again on the engine that stands (`scripts/reruns.txt`); results are never read across engines.
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
@@ -68,12 +68,19 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 ## The engine that stands
 
-**omni-v21** (`OMNI_V21.json`, digest `b658f05d43c1e602`, 63 files; `docs/OMNI_V21.md`), on main from the evening of 25 October:
-the immune system knows itself, knob by knob (a knob redlining past its line that Omni-Compass's own pushing cannot bring back
-goes to native where native's twin reads it lower, and stays with Omni-Compass where native is not stronger), in the Python and
-its C++ twin (`omnicompass/immune.py`, `cpp/src/immune.cpp`, sealed by `tests/test_cpp_immune_parity.py`); the model gate
-against omni-v20 read no LOSS in any model. Every benchmark runs again on it from 17:30 UTC on 25 October (`scripts/reruns.txt`,
-released by the conductor). The block above is written from the result files on every push: each row names the engine its
+**omni-v22** (`OMNI_V22.json`, digest `0e23a0bc561b900a`, 65 files; `docs/OMNI_V22.md`), on main from 30 October: the five data
+stores' wires brought to the max. What a wire's own rule asks goes through unclamped, up to the operator's cover and never below
+native; memory is spent only where the store's own account of a miss (MySQL's performance schema timer on the data files' reads,
+WiredTiger's page-read time for the application's threads, the Redis application's own split) says the misses are at least the one
+key's floor of the service's time, and only while the host keeps its 5% cushion; a hand-back never goes below the working set's
+floor; Kafka's group has a twin of its arrivals and a reflex; PostgreSQL's pool is never taken below the pooler's own setting
+(`tools/store_brain.py`, the five `tools/run_*.py` wires, `tools/knob_verdict.py`, all in the fingerprint). The model gate against
+omni-v21 (class S) read no LOSS at the counted setting on every store wire; the Kubernetes governor's models read omni-v21's own
+numbers on every gauge (the one governor change, the hand-back tried five times against a transient failure of the cluster's API, moves
+no decision). Every benchmark runs again on it from the moment it reached main (`scripts/reruns.txt`,
+released by the conductor), the five stores first. omni-v21 (`docs/OMNI_V21.md`, the immune system knows itself, knob by knob) stood
+from the evening of 25 October to 30 October; its tables stand as its own record until omni-v22's three runs of each benchmark land.
+The block above is written from the result files on every push: each row names the engine its
 table ran on, and every three-run table of omni-v21 is rebuilt byte for byte from its archived runs by `tools/reproduce.py`
 (all 31 on 27 October). Each earlier engine is on its own page (`docs/OMNI_V<n>.md`); the chronology this page carried until
 27 October is whole in `docs/history/STATE_OF_PLAY_2026-10-27.md`.

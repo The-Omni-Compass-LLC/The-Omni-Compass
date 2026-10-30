@@ -222,7 +222,8 @@ class SparseEngineCheckout(unittest.TestCase):
             finally:
                 subprocess.run(['git', '-C', str(ROOT), 'worktree', 'remove', '--force', tree], capture_output=True)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn('omni-v21', result.stdout)
+            from tools.omni_version import VERSIONS
+            self.assertIn(f"omni-{next(iter(VERSIONS))}", result.stdout, "the sparse checkout names the engine that stands")
 
 
 class FailedArmEvidence(unittest.TestCase):

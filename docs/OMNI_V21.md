@@ -2,7 +2,9 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Omni v21 (`OMNI_V21.json`) is omni-v20 with the immune system's self-knowledge, the founder's order of 25 October:
+Omni v21 (`OMNI_V21.json`, digest `b658f05d43c1e602`, 63 files) stood on main from the evening of 25 October to 30 October, when
+omni-v22 (`docs/OMNI_V22.md`, the data stores' wires at the max) landed on it; its tables stand as its own record. It is omni-v20 with
+the immune system's self-knowledge, the founder's order of 25 October:
 
 > "OmniCompass's mechanism must know when something is redlining out of its band when OmniCompass is on it. And if OmniCompass
 > couldn't fix it to stop it redlining, then OmniCompass's own mechanism must know that if native is better, then it switches

@@ -2,6 +2,29 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
+## 2026-10-30: omni-v22 stands: the data stores' wires at the max, through each store's own account of a miss
+- **The hand-back lands** (`omni_controller/controller.py`, `omni_controller/muscles.py`, in omni-v22): every step of the Kubernetes
+  governor's hand-back is tried 5 times against a transient failure of the cluster's API, each muscle on its own, and what did not
+  land is raised and audited. Six-kube run 41044680505, repetition 346: one 500 from the API on the autoscaler list at the reset ended
+  the whole hand-back on its first read, the conveyed CPU limits and the replica range stayed behind, and the arm was marked
+  invalid; that is the failure the founder saw in GitHub's mail. `tests/test_restore_retry.py`.
+- **omni-v22** (`OMNI_V22.json`, fingerprint `0e23a0bc561b900a`, 65 files; `docs/OMNI_V22.md`): omni-v21 with the five data stores'
+  wires brought to the max, the founder's order of 30 October ("bring to a solid A mechanism"). What a wire's own rule asks goes
+  through unclamped, up to the operator's cover, never below native; memory is spent only where the store's own account (MySQL's
+  performance schema timer on the data files' reads, WiredTiger's page-read time for the application's threads, the Redis
+  application's own split) says the misses are at least the one key's floor of the service's time, and only while the host keeps
+  its 5% cushion; a hand-back never goes below the working set's floor; Kafka's group has a twin of its arrivals and a reflex;
+  PostgreSQL's pool is never taken below the pooler's own setting. `OMNI_DIAL=save` keeps omni-v21's loop on every wire;
+  `tools/store_brain.py` and `tools/knob_verdict.py` join the fingerprint. The store gate (every candidate on omni-v21's archived
+  seconds), the Redis closed-loop model and the Kafka closed-loop model at the counted 30 s read no LOSS (class S); the Kafka model
+  at 20 s a notch reads one LOSS row (the burst's peak queue, inside the seeds' spread), on the next version's list.
+- **The root-cause page's correction** (`docs/STORE_ROOT_CAUSES_2026-10-30.md`): the morning's reading that a MySQL or MongoDB miss
+  cost the statement nothing is withdrawn; the server's own meter, read on a machine of our own, puts the misses at 3% to 32% of a
+  statement's time (a tuning-bench reading, class L on that host). A slope of latency on miss share was tried as the price and is not
+  used anywhere: it reads the host's noise as a price.
+- **The audit of 30 October** (`docs/AUDIT_2026-10-30.md`): the six-kube evidence races fixed at their cause (`tools/bench_integrity.py`),
+  the A100 card and A10 stacks three-run tables, the GPU rig's readiness barrier (amendment 15), the two load-sensitive tests fixed
+  at their cause, the secret-names check, the LOSS ledger's causes for the stores.
 ## 2026-10-25 (evening): omni-v21 stands: the immune system knows itself, knob by knob
 
 - **omni-v21** (`OMNI_V21.json`, fingerprint `b658f05d43c1e602`, `docs/OMNI_V21.md`): omni-v20 with the immune system's
