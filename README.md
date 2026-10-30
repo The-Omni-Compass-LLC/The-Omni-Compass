@@ -242,10 +242,12 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-30 15:29 | [The model gate: the candidate against the engine that stands, in our own models](results/model_gate/V22_VS_V21.md) |  |
-| 2026-10-30 15:29 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-30 15:04 | [The store gate: the data stores' wires, standing against candidate, on their own archived seconds](results/model_gate/V22_STORE_GATE.md) |  |
-| 2026-10-30 15:04 | [The Redis cache in our own model, closed loop: omni-v22's candidate against omni-v21's loop and native (class S)](results/model_gate/V22_REDIS_MODEL.md) |  |
+| 2026-10-30 18:23 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2441267659.md) |  |
+| 2026-10-30 17:08 | [The engine's runs: 500 runs from the jump generator (base 2441267659), one digest](results/engine_runs/ENGINE_RUNS_500_2441267659.md) |  |
+| 2026-10-30 16:55 | [The model gate: the candidate against the engine that stands, in our own models](results/model_gate/V22_VS_V21.md) |  |
+| 2026-10-30 16:55 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-30 16:55 | [The store gate: the data stores' wires, standing against candidate, on their own archived seconds](results/model_gate/V22_STORE_GATE.md) |  |
+| 2026-10-30 16:55 | [The Redis cache in our own model, closed loop: omni-v22's candidate against omni-v21's loop and native (class S)](results/model_gate/V22_REDIS_MODEL.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -253,16 +255,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-25 08:38 | six x10 line orgs 5 runs 0+10 | success | [40176577661](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176577661) |
-| 2026-10-25 08:34 | six x10 line orgs 6 runs 0+10 | success | [40176581513](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176581513) |
-| 2026-10-25 08:32 | group: karmada C (nativebare native compassbare compass) | success | [40168704570](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40168704570) |
-| 2026-10-25 08:30 | six x10 line orgs 3 runs 0+10 | success | [40176569943](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176569943) |
-| 2026-10-25 08:30 | six x10 line orgs 1 runs 0+10 | success | [40176562767](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176562767) |
-| 2026-10-25 08:30 | six x10 line orgs 2 runs 0+10 | success | [40176566128](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176566128) |
-| 2026-10-25 08:30 | six x10 line orgs 4 runs 0+10 | success | [40176573923](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176573923) |
-| 2026-10-25 08:28 | six x10 line orgs 7 runs 0+10 | success | [40176585045](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176585045) |
-| 2026-10-25 08:24 | godel: C (nativebare native compassbare compass) | success | [40168701665](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40168701665) |
-| 2026-10-25 07:55 | orchestrators: kuberay C | success | [40165922486](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40165922486) |
+| 2026-10-30 19:35 | health | success | [41116470501](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41116470501) |
+| 2026-10-30 19:16 | cpu-power | success | [41113752748](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41113752748) |
+| 2026-10-30 19:15 | realms-v5 | success | [41111557263](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41111557263) |
+| 2026-10-30 19:14 | live-engine | success | [41106609460](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41106609460) |
+| 2026-10-30 19:12 | realms | success | [41111549667](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41111549667) |
+| 2026-10-30 19:11 | benchmark | success | [41109427748](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109427748) |
+| 2026-10-30 19:07 | live-kind | success | [41109435843](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109435843) |
+| 2026-10-30 19:06 | live-kind-full | success | [41109444596](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109444596) |
+| 2026-10-30 19:05 | kwok-scale | success | [41111543718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41111543718) |
+| 2026-10-30 19:01 | live-shadow | success | [41109460505](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109460505) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
