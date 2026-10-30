@@ -43,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, word_sign  # noqa: E402
+from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, word_sign, reading_kind  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools import wiring_verdicts as wv                            # noqa: E402
 
@@ -507,7 +507,21 @@ def card_line() -> str:
     parts = []
     for f in newest:
         rec = json.loads(f.read_text())
-        row = rec.get("rows", {}).get("work per energy (served requests per kJ)", {})
+        rows = rec.get("rows", {})
+        if isinstance(rows, list):                     # the stacked box (tools/hil_abc.py): the card's work per energy, size by size
+            by_size = {}
+            for r in rows:
+                if r.get("part") == "card" and r.get("measure") == "primary":
+                    by_size.setdefault(r["copies"], []).append(reading_kind(r["reading"]))
+            sizes = []
+            for copies, kinds in sorted(by_size.items()):
+                counts = {}
+                for k in kinds:
+                    counts[k] = counts.get(k, 0) + 1
+                sizes.append(f"at {copies} {'copy' if copies == 1 else 'copies'} " + ", ".join(f"{n} {k}" for k, n in sorted(counts.items(), key=lambda kv: -kv[1])) + f" of {len(kinds)} organisms")
+            parts.append(f"{rec.get('title', f.stem)}: the card's work per energy " + "; ".join(sizes) + f" (`{f.with_suffix('.md').relative_to(ROOT)}`)")
+            continue
+        row = rows.get("work per energy (served requests per kJ)", {})
         parts.append(f"{rec.get('title', f.stem)}: work per energy {row.get('reading', 'no value')} "
                      f"(`{f.with_suffix('.md').relative_to(ROOT)}`)")
     return ("- **The card (NVIDIA)**: at the factory dial (the max) native already runs both knobs at their top and the "

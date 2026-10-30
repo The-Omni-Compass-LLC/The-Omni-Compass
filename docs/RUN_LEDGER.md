@@ -65,7 +65,7 @@ omni-v12 only as the engine before whose runs its preregistration's amendment 2 
 
 1. GPU: the A100's three-run tables on omni-v21 are written (`results/gpu/V21_A100_SAVE_ABC.md`, `V21_A100_CAP_ABC.md`,
    `V21_A100_CAP_FULL_ABC.md`; `docs/AUDIT_2026-10-30.md` section 2). The three stacks runs on A10s reached their deadline with
-   sizes 1 and 10 finished and 100 in part: no table until a scorer reads a part-finished run.
+   sizes 1 and 10 finished and 100 in part: read as far as they got, `results/gpu/V21_STACKS_A10_ABC.md` (the card EVEN at 1 and 10).
 2. Azure: the omni-v18 set finishes; then the omni-v21 sets start.
 3. Google and Amazon: their keys (`docs/GOOGLE_SETUP.md` section 4, `docs/AMAZON_SETUP.md` section 1a).
 4. CPU: a bare-metal machine, or it stays not run.

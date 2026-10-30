@@ -66,8 +66,9 @@ class CardTables(unittest.TestCase):
         stands = json.loads((ROOT / "OMNI_V21.json").read_text())
         for f in sorted((ROOT / "results" / "gpu").glob("V21_*_ABC.json")):
             record = json.loads(f.read_text())
-            self.assertTrue(record["engine"][0].startswith("omni-v21"), f)
-            self.assertIn(stands.get("digest", "b658f05d43c1e602")[:16], record["engine"][0], f)
+            engine = record["engine"][0] if isinstance(record["engine"], list) else record["engine"]
+            self.assertTrue(engine.startswith("omni-v21"), f)
+            self.assertIn(stands.get("digest", "b658f05d43c1e602")[:16], engine, f)
 
 
 class SecretNames(unittest.TestCase):

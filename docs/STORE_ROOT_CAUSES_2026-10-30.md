@@ -53,7 +53,7 @@ LOSS rows come from.
 
 ## 3. Kafka: the keys land on six partitions, so a fourth consumer buys nothing
 
-The harness's producer keys each message `str(seq % 8)`, and Kafka places a key by murmur2 (`tools/kafka_model.py`, checked
+The harness's producer keys each message `str(seq % 8)`, and Kafka places a key by murmur2 (the model's own murmur2, on the branch v22-stores, checked
 against Kafka's own test vectors). The eight keys land on six partitions: 6 and 7 two keys each, 2 and 5 none. Kafka's range
 assignor then gives the members these shares of the load:
 
@@ -89,8 +89,8 @@ gives memory back where the service allows (the pool held down 4% to 22% in the 
 
 ## 6. The fix, the next version's, through the model gate first
 
-**Kafka** (a candidate written, `tools/run_kafka.py` `Brain` on the study branch `v22-stores`; the closed-loop model
-`tools/kafka_model.py`, every input set from these runs' own files):
+**Kafka** (a candidate written on the study branch v22-stores: the wire's `Brain`, and the closed-loop model kafka_model.py,
+every input set from these runs' own files; neither is on main until the model gate reads no LOSS):
 
 - **The rate twin**: each partition's arrivals (the topic's log-end offsets, read from the broker once a second) placed on the
   members by the range assignor; one member's rate learned from a second in which the queue grew (the group consumed

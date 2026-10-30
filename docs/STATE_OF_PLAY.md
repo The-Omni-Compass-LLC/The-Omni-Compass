@@ -96,7 +96,8 @@ Each with its receipt, run by run, in `docs/RUN_LEDGER.md`.
    The tune-down (dial save): work per energy GAIN by the mean of our three runs (up 0.75%, beyond the noise in 1 of 3), every
    service gauge EVEN. The cap at 70%: the mean response time LOSS by the mean (beyond the noise in 0 of 3, run A alone). The
    tune-down as the card's factory dial goes through the model gate as the next version on the founder's word; the cap's rows
-   are on the next version's list. The stacked box (three A10s) reached its deadline part-finished: no table yet.
+   are on the next version's list. The stacked box (three A10s, `results/gpu/V21_STACKS_A10_ABC.md`): at 1 and 10 copies, complete in all
+   three runs, the card EVEN in every organism; 100 copies one repetition a run, shown, not judged.
 2. **The three-arm showing on omni-v21** landed (`results/orchestrator/V21_THREE_ARMS_ABC.md`, runs 40474220398,
    40474223636, 40474227699): Omni-Compass on top of native against native, work GAIN in all three of our runs (up 8.5%), the
    95th percentile GAIN in all three (down 13.0%); the answer at the top of the README reads it.
