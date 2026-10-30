@@ -266,7 +266,7 @@ NUM = r"[-+\u2212=]?\d[\d,]*(?:\.\d+)?(?:e[-+]?\d+)?"   # a cell beside STEADY c
 
 
 def even_reason(abc):
-    """Why an STEADY row is STEADY, read from its three runs' own cells (each 'change (low to high)', or a change alone): the
+    """Why a STEADY row is STEADY, read from its three runs' own cells (each 'change (low to high)', or a change alone): the
     kind and the bound. 'same': every run reads zero with a zero-wide interval (Omni-Compass held it native); 'split': a run
     is clear of zero but not all three the same way (STEADY by the three-run rule); else the largest change any run's interval
     still allows: 'tight' within 2%, 'within' within 10%, 'wide' past 10% (too noisy to tell at these repetitions); a table

@@ -698,7 +698,7 @@ TERMS = [
     # ------------------------------------------------------------------------------------------------ proof and evidence
     T("the verdict", P, "Omni-Compass moves a knob only where it measures that the muscle loses nothing by it. The trial step is "
       "read as a report reads a row: the 95% interval of its change in cost, on the logarithm of each piece of work's cost. "
-      "Wholly above zero is a LOSS: refused and undone. A GAIN or an STEADY step is kept only within the 2% allowance. The 2% "
+      "Wholly above zero is a LOSS: refused and undone. A GAIN or a STEADY step is kept only within the 2% allowance. The 2% "
       "verdict is the engine's trigger, not a stamp on a report.",
       [("omnicompass/verdict.py", "The verdict: Omni-Compass moves a knob only where it measures that the muscle loses nothing by it."),
        (CL, "is the engine's trigger, not a stamp on a report")], aka=["verdict", "2% allowance"]),

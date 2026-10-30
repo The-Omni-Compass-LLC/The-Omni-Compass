@@ -21,6 +21,7 @@ from __future__ import annotations
 import csv
 import datetime
 import json
+import subprocess
 import re
 import sys
 from pathlib import Path
@@ -212,8 +213,11 @@ def main(out: str) -> None:
                 a["audit"] = audit(ad / "audit.jsonl", ws)
             rep["arms"][arm] = a
         reps.append(rep)
+    ver = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", receipt.get("git") or ""],
+                         capture_output=True, text=True, cwd=ROOT).stdout     # the engine its commit carries, by the version tool
+    eng = re.search(r"(omni-v\d+) \(digest", ver)
     data = {"source": str(RUN.relative_to(ROOT)), "table": str((RUN / "GPU_REPS.md").relative_to(ROOT)),
-            "card": receipt.get("gpu_name"), "driver": receipt.get("driver"), "engine_commit": receipt.get("git"),
+            "card": receipt.get("gpu_name"), "driver": receipt.get("driver"), "engine_commit": receipt.get("git"), "engine": eng.group(1) if eng else None,
             "engine_note": ("omni-v18's card governor (commit e3b05dc, the branch gpu-omni-v18) at the factory tune, the max: on this "
                             "card native already runs both knobs at their top (the power limit 400 W of 400 W, the clock unlocked to "
                             "1,410 MHz), so in its 3,050 decisions the governor asked for exactly that and wrote nothing: at its limit "

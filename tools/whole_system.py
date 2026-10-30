@@ -36,7 +36,7 @@ of the total is exp(μ ± 1.96 σ). The index over the gauges is the mean of the
 two bounds, the gauges independent (Var = Σσ²/k²) and the gauges perfectly correlated inside a run (σ = Σσ/k).
 
 Two readings of the same numbers. By the index's rule a gauge of a test enters only when its three-run reading is GAIN,
-LOSS or power given in all three of our runs; an STEADY gauge, a disagreement, or a table of one run enters as exactly 1 with
+LOSS or power given in all three of our runs; a STEADY gauge, a disagreement, or a table of one run enters as exactly 1 with
 no variance (nothing inside the noise is claimed either way). With every interval carried, every measured gauge enters with
 its pooled estimate and its variance whatever its reading, and the total's interval says what the noise allows.
 
@@ -493,7 +493,7 @@ def main(argv=None):
              "its interval is given under two bounds, the gauges independent (Var = Σσ² / k²) and the gauges perfectly correlated inside a run (σ = Σσ / k).")
     L.append("")
     L.append("Two readings of the same numbers. **By the index's rule** a gauge of a test enters only when its three-run reading is GAIN, LOSS or power "
-             "given in all three of our runs; an STEADY gauge, a disagreement, or a table of one run enters as exactly 1 with no variance (nothing inside the "
+             "given in all three of our runs; a STEADY gauge, a disagreement, or a table of one run enters as exactly 1 with no variance (nothing inside the "
              "noise is claimed either way). **With every interval carried**, every measured gauge enters with its pooled estimate and its variance whatever "
              "its reading, and the total's interval says what the noise allows.")
     L.append("")

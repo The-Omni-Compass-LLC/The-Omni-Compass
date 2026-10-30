@@ -81,7 +81,7 @@ def main(out: str) -> None:
         reps.append(rep)
     data = {"source": str(RUN.relative_to(ROOT)), "table": str((RUN / "CPU_POWER.md").relative_to(ROOT)), "cls": "S",
             "note": "the harness tools/run_cpu_power.py on its own modelled machine (--plant sim): a model, never a measurement; the real run "
-                    "waits for a Linux machine with its energy counter (RAPL) and a writable frequency ceiling (register row 79, cpu-power.yml)",
+                    "waits for a Linux machine with its energy counter (RAPL) and a writable frequency ceiling (register row 18, cpu-power.yml)",
             "machine": tuning.get("machine"), "engine": tuning.get("engine"), "workload": tuning.get("workload"), "steps": tuning.get("steps"),
             "step_s": tuning.get("step_s"), "line_ms": tuning.get("line_ms"), "unit_rps": tuning.get("unit_rps"), "cover_khz": tuning.get("cover_khz"),
             "notch_khz": tuning.get("notch_khz"), "objective": tuning.get("objective"),

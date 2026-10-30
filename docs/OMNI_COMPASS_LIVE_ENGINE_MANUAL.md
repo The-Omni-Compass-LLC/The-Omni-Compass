@@ -1848,7 +1848,7 @@ grants or refuses a controller, and a blind sense or a security hold changes not
 Before a knob moves one step past native, the step runs as a
 trial: costs at native first, then at the step. The engine reads the change exactly as a report reads a row, on the log of
 each cost, with its 95% interval. Each step is kept unless the measurement reads LOSS or its estimated cost exceeds the 2%
-allowance; an STEADY result (no difference resolvable from the noise) is accepted, so on a high-variance workload a step with a
+allowance; a STEADY result (no difference resolvable from the noise) is accepted, so on a high-variance workload a step with a
 small true cost can pass, and the lab under the monitor measures that false-acceptance rate.
 
 ![Block diagram: the verdict's paired trial around a slow knob, read GAIN, STEADY or LOSS. The reference is the cost of n pieces of work at the deepest step already allowed; the trial is the cost of n pieces at the step. Both on the log of the cost, with the 95% interval of their difference: an interval wholly above zero refuses the step; one inside the allowance keeps it; one wider than the allowance measures on, up to three times n each side. The verdict monitor runs this rule live at any true cost the viewer sets.](book/figures/c_verdict.svg)
