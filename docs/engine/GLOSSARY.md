@@ -186,7 +186,7 @@ The organisms and the muscles' plants are our own models (evidence class S) unle
 - **a changed tune's violet.** Violet (#c77dff, the page's --tuned): a knob or a profile turned from the factory tune; never a side and never a reading's colour. *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **the mechanism panel.** The engine's own knobs, live: the four pieces of the brain, the compass law, Omni-Compass's hand on each muscle (the max's push and lift-off, the tune-down's floor, step and dwell), native's own controller (its target, tolerance, step and window) and every muscle's scale out, scale in, scale up, response time and sensing delay. They turn the engine's own equations while it runs, on both governed arms; a knob turned from the factory turns violet, ↺ puts it back, and the factory button puts every one back. A tune other than the factory's is a variation of the mechanism (class S). *Source: `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`.*
 - **the switchboard.** One set of knobs that sets the arm, the organism, the copies, the runs, the run letter and the beat on every monitor that carries that variation, and names the ones that do not. *Source: `CLAUDE.md`.*
-- **the monitor wall.** Every monitor of the page in one view, numbered 1 upward in its order of appearance and read left to right; every canvas the page draws is one monitor, its small copy on the wall a tile. *Source: `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`; `docs/engine/monitors.json`.*
+- **the monitor wall.** Every monitor of the page in one view, the first thing on the page, numbered 1 upward by importance: the first twelve the system's most important, then four more blocks of about twelve, each its own subject, read left to right; every canvas the page draws is one monitor, its small copy on the wall a tile. *Source: `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`; `docs/engine/monitors.json`.*
 - **golden signals.** Latency, traffic, errors and saturation: on the wall, the work waiting, the work done, the decisions past their line and the capacity held. *Source: `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`.*
 
 ## 2. The arms
@@ -1939,7 +1939,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 
 | Section | Anchor | Title |
 |---|---|---|
-| 0 | #s-wall | The monitor wall: every monitor, numbered 1 upward in its order of appearance, read left to right |
+| 0 | #s-wall | The monitor wall: every monitor by importance, the twelve that matter most first, then four blocks of about twelve |
 | iii | #s-answer | The answer first: is Omni-Compass a benefit against native? |
 | iv | #s-bottom | The bottom line: is Omni-Compass a benefit? One light and one number for each way to run it, against native |
 | 1a | #s-health | The control panel and the kill switch: one switch for the whole organism, the Python's runs, the three manuals |
@@ -2068,7 +2068,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | one pedal | term | 3j (#s-ops); 4i (#s-self); vi (#s-disclose) |
 | the orchestra | term | 3i (#s-orch); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet) |
 | The orchestra, every governor's muscle once | organism | 3i (#s-orch); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet) |
-| the organism | term | 1a (#s-health); 1b (#s-dash); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4j (#s-problem); vi (#s-disclose) |
+| the organism | term | 0 (#s-wall); 1a (#s-health); 1b (#s-dash); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4f (#s-master); 4g (#s-math); 4j (#s-problem); vi (#s-disclose) |
 | organisms stacked | term | 4b (#s-scn) |
 | the organs and their grants (θ) | term | 0 (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3f (#s-brain); 3l (#s-live); 3o (#s-proof); 4g (#s-math) |
 | OVER THE LINE | term | 0 (#s-wall); 3j (#s-ops); 3n (#s-lab); 4b (#s-scn); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |

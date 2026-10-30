@@ -1023,8 +1023,9 @@ TERMS = [
       "every monitor that carries that variation, and names the ones that do not.",
       [(CL, "one switchboard sets the arm, the organism, the copies, the runs, the run letter and the beat on every monitor that carries that variation")],
       aka=["switchboard"]),
-    T("the monitor wall", W, "Every monitor of the page in one view, numbered 1 upward in its order of appearance and read left to "
-      "right; every canvas the page draws is one monitor, its small copy on the wall a tile.",
+    T("the monitor wall", W, "Every monitor of the page in one view, the first thing on the page, numbered 1 upward by importance: the "
+      "first twelve the system's most important, then four more blocks of about twelve, each its own subject, read left to right; "
+      "every canvas the page draws is one monitor, its small copy on the wall a tile.",
       [(MAN, "Every monitor of the page in one view"), ("docs/engine/monitors.json", "every canvas the page draws is one monitor")],
       aka=["monitor wall", "the wall", "monitor", "monitors"]),
     T("golden signals", W, "Latency, traffic, errors and saturation: on the wall, the work waiting, the work done, the decisions "

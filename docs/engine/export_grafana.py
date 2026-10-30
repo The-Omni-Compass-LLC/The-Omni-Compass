@@ -43,6 +43,14 @@ def page_order() -> list:
     return [m.group(1) for m in re.finditer(r'<canvas\b[^>]*\bid="([^"]+)"', body)]
 
 
+def wall_order() -> list:
+    """The wall's order: the registry's blocks by importance (the founder's order of 30 October), the first twelve the system's most
+    important; a registered monitor in no block follows in the page's own order."""
+    reg = json.loads(REG.read_text(encoding="utf-8")) if REG.exists() else {}
+    ranked = [i for b in reg.get("blocks", []) for i in b["ids"]]
+    return ranked + [c for c in page_order() if c not in ranked]
+
+
 def page_sections() -> dict:
     """Each canvas's section as the page numbers it, {canvas id: (number, title)}: the nearest section around it whose heading
     carries a number, read from the page's own markup."""
@@ -156,17 +164,20 @@ def thresholds(mid: str) -> dict:
 
 def dashboard(reg: dict) -> dict:
     panels = []
-    order = {cid: i for i, cid in enumerate(page_order())}   # every panel numbered as the page numbers its monitor, laid out left to right
+    order = {cid: i for i, cid in enumerate(wall_order())}   # every panel numbered as the wall numbers its monitor, by importance, laid out left to right
+    blocks = {i: (k, b) for k, b in enumerate(reg.get("blocks", []), 1) for i in b["ids"]}
     sec, last, col, y = page_sections(), None, 0, 6       # under the signals row
     for i, m in enumerate(sorted(reg["monitors"], key=lambda m: order.get(m["id"], len(order)))):
         n = i + 1
         sn, st = sec.get(m["id"], ("", ""))
-        if (sn, st) != last:   # each section of the page a row of the wall, its monitors under it
+        k, blk = blocks.get(m["id"], (0, None))
+        head = (f"Block {k} · {blk['title']}" if blk else (f"{sn} · {st}" if sn else (st or "the page")))
+        if head != last:   # each block of the wall a row, its monitors under it in rank order (the founder's order of 30 October)
             if col:
                 col, y = 0, y + H
-            panels.append({"id": 1000 + sum(1 for p in panels if p["type"] == "row"), "type": "row", "title": f"{sn} · {st}" if sn else (st or "the page"),
+            panels.append({"id": 1000 + sum(1 for p in panels if p["type"] == "row"), "type": "row", "title": head,
                            "collapsed": False, "gridPos": {"x": 0, "y": y, "w": COLS * W, "h": 1}, "panels": []})
-            y, last = y + 1, (sn, st)
+            y, last = y + 1, head
         x = col * W
         title = f"{n} · {m['name']}"
         base = {"id": n, "title": title, "gridPos": {"x": x, "y": y, "w": W, "h": H},
