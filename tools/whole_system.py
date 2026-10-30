@@ -643,7 +643,7 @@ def main(argv=None):
     L.append("")
     L.append(f"*{legal.NOTICE}*")
     L.append("")
-    OUT_MD.write_text("\n".join(L), encoding="utf-8")
+    md_text = "\n".join(L)
 
     out = {"layers": {k: [{**t, "gauges": {g: {**m, "est": list(m["est"]) if m.get("est") else None} for g, m in t["gauges"].items()},
                            "primary": ({**t["primary"], "est": list(t["primary"]["est"])} if t.get("primary") else None)} for t in v]
@@ -654,7 +654,15 @@ def main(argv=None):
                       for (scope, rule), (by_layer, total, idx) in results.items()},
            "separability": [{**s, "top": list(s["top"]), "bare": list(s["bare"])} for s in sep],
            "beside": side}
-    OUT_JSON.write_text(json.dumps(jsonable(out), indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    js_text = json.dumps(jsonable(out), indent=1, ensure_ascii=False) + "\n"
+    if "--check" in (argv if argv is not None else sys.argv[1:]):
+        # 27 October 2026: the composition had stood on older tables while the engine that stands landed its own, because
+        # nothing rebuilt it; verify.py now fails a push where it is not what the tables give
+        bad = [str(q.relative_to(ROOT)) for q, t in ((OUT_MD, md_text), (OUT_JSON, js_text)) if not q.exists() or q.read_text(encoding="utf-8") != t]
+        print("whole system: out of date (python3 tools/whole_system.py): " + ", ".join(bad) if bad else "whole system: in line with the tables")
+        return 1 if bad else 0
+    OUT_MD.write_text(md_text, encoding="utf-8")
+    OUT_JSON.write_text(js_text, encoding="utf-8")
     (by_layer, total, idx) = results[("without the card (the cluster, the services and the cloud)", "index")]
     print(f"whole system, without the card, by the index's rule: {pct(math.exp(idx[0]))} over the gauges; "
           + "; ".join(f"{g} {pct(interval(total[g])[0])}" for g in GAUGES if total[g]))

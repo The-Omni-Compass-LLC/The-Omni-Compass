@@ -8,18 +8,11 @@ repository runs it, and does every word on the page say only what the parts do? 
 repository's own code by an independent path and compared, value by value. Run and scored by The Omni-Compass LLC's own
 code. No outside party has reviewed or approved these results.
 
-**Engine.** The engine that stands is **omni-v21** (`OMNI_V21.json`, digest `b658f05d43c1e602`, 63 files, since the evening
-of 25 October, `docs/OMNI_V21.md`): omni-v20 with the immune system knowing itself knob by knob (`omnicompass/immune.py` and its
-C++ twin `cpp/src/immune.cpp`, the nervous system's `native_hold`): a knob over its line three decisions in a row that Omni-Compass
-cannot bring back is handed to native when native's twin reads lower by more than 5%, and kept where native is not stronger. Its
-road since omni-v17 (the heartbeat a dial, 23 October): omni-v18 put Omni direct in the fingerprint; omni-v19 added a pod muscle
-to run Omni-Compass by itself, shown nowhere on this page; omni-v20 fixed the five data stores' wires at their causes; omni-v21
-the immune rule. The earlier road (omni-v8 to omni-v17: the CityLearn battery wire, the blind reading, the refused raise, the
-shared host's limits, a muscle left native, the power-cap request's clear time, every clock in seconds, the heartbeat dial) is in
-each version's own page, `docs/OMNI_V8.md` to `docs/OMNI_V17.md`. The page's records are made again by the build on the engine
-that stands at every run; the receipts of the real runs are each benchmark's newest table, on the engine its table names (the
-counts below say how many are on omni-v21 and how many still stand on an older engine until their runs on omni-v21 land). This
-paragraph is written by hand at each landing; the counts under it are written by the build and never edited by hand.
+**Engine.** The engine that stands is **omni-v21** (`OMNI_V21.json`, digest `b658f05d43c1e602`, 63 files, since 25 October,
+evening); each earlier engine, what it changed and what its model gate read, is on its own page (`docs/OMNI_V<n>.md`). The
+page's records are rebuilt from the engine that stands and the repository's own results by its workflow (`live-engine.yml`,
+`docs/engine/build_live_engine.py`) on every push to main; each record names the commit and the engine it was made on, and
+`python3 docs/engine/build_live_engine.py --check` fails when any record differs from what the files give.
 
 **Wired to the engine.** The page is rebuilt by GitHub itself (`.github/workflows/live-engine.yml`,
 `docs/engine/build_live_engine.py`) on every change to the engine, a model, a harness or a result on main, after every

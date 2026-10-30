@@ -46,7 +46,7 @@ def where(f):
     return f.relative_to(ROOT).as_posix() if f.is_relative_to(ROOT) else f.name
 
 
-RAW_BRANCH = "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass/blob/raw/"   # the raw receipts' own branch
+from tools.repo import RAW as RAW_BRANCH  # noqa: E402  (the raw receipts' own branch, on the repository's name written once)
 
 
 def link(md, out_dir):

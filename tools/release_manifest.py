@@ -26,6 +26,11 @@ MANIFEST = ROOT / "RELEASE_MANIFEST.json"
 RECEIPT = ROOT / "results" / "VERIFY_RECEIPT.txt"
 
 GROUPS = {
+    "benchmark_integrity": ["tools/bench_integrity.py", "tests/test_bench_integrity.py", "pilot/bench_report.py",
+                            "scripts/kind_bench.sh", "scripts/kind_paired.sh", "scripts/aks_paired.sh",
+                            ".github/workflows/six-kube.yml", "docs/REPAIR_20261029.md",
+                            "tools/omni_switch.py", "scripts/kind_faults.sh", "tests/test_faults_extended.py",
+                            "tests/test_switch_trust.py", "verify.py"],
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
     "engine_v21": ["OMNI_V21.json", "tools/omni_version.py", "docs/OMNI_V21.md"],   # extend with the files omni-v21 changed
     "engine_v20": ["OMNI_V20.json", "tools/omni_version.py", "docs/OMNI_V20.md", "tools/run_sysbench.py", "tools/run_kafka.py", "tools/run_ycsb.py", "tools/run_redis.py", "tools/run_pgbench.py", ".github/workflows/pgbench.yml", "tools/store_gate.py", "results/model_gate/STORE_GATE.md", "results/model_gate/STORE_GATE.json", "tests/test_store_wires.py", "tests/test_store_gate.py", "docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md"],

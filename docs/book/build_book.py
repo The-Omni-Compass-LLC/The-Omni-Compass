@@ -92,6 +92,7 @@ RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER
 EDITION = "October 2026"
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.legal import TOP, _drop_end, normalize_markdown  # noqa: E402  (the one notice, written once)
+from tools.repo import URL as REPO_URL  # noqa: E402  (the repository, written once in tools/repo.py)
 BANNER_MD = f"> {TOP}"
 FILED = ("All patents, copyrights and trademarks covering the Omni-Compass engine, its "
          "mathematics and its software have been filed in the United States by The Omni-Compass LLC.")
@@ -1100,7 +1101,7 @@ def special(name, nb=None):
             "Main office infrastructure: toll-free direct 1-888-339-9551, system route asset 1-888-DEX-YLL-1", "",
             "Landline, registered in Florida: 321-746-4411", "",
             "www.omni-compass.com", "",
-            "Repository: github.com/The-Omni-Compass-LLC/The-Omni-Compass", "",
+            f"Repository: {REPO_URL.removeprefix('https://')}", "",
             "Any use beyond evaluation and simulation requires a signed, paid Omni-Compass Enterprise License. "
             "Write to The Omni-Compass LLC before any production use."])
     raise KeyError(name)

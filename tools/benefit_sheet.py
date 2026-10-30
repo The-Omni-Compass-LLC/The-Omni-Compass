@@ -50,6 +50,10 @@ from tools import wiring_verdicts as wv                            # noqa: E402
 LIVE = ROOT / "results" / "live"
 OUT_MD = ROOT / "docs" / "BENEFIT_SHEET.md"
 OUT_JSON = ROOT / "results" / "BENEFIT_SHEET.json"
+# the Owner's Manual's own evidence table (section 3.5) is these rows, written here on every push so the book never quotes an
+# engine's numbers after the next engine's tables land (27 October 2026: its hand-typed table still read omni-v10 and omni-v11)
+MANUAL = ROOT / "docs" / "OMNI_COMPASS_OWNERS_MANUAL.md"
+M_BEGIN, M_END = "<!-- the evidence, one row per benchmark (tools/benefit_sheet.py) -->", "<!-- end of the evidence -->"
 ENGINE_RE = re.compile(r"\bomni-v(\d+)\b")
 
 
@@ -72,6 +76,37 @@ def recorded_engine(rel):
     return next((r.get("engine") or "not named" for r in rows if r.get("file") == rel), "not named")
 
 
+def stated_engines(p: Path) -> set:
+    """The engines a table states for its own runs: its run table's Engine column, else its JSON's "engine" field; empty when
+    it states neither. Only these are read where they exist, so an engine a table names in passing (the drone swarms' table
+    names omni-v12 as the engine before whose runs its preregistration's amendment was written) is never filed as an engine
+    it ran on (27 October 2026: the sheet had filed that table under "omni-v12 and omni-v21")."""
+    found = set()
+    try:
+        lines = p.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        lines = []
+    for i, ln in enumerate(lines):
+        cells = [c.strip() for c in ln.strip().strip("|").split("|")] if ln.startswith("|") else []
+        if "Engine" not in cells:
+            continue
+        col = cells.index("Engine")
+        for row in lines[i + 1:]:
+            if not row.startswith("|"):
+                break
+            vals = [c.strip() for c in row.strip().strip("|").split("|")]
+            if col < len(vals) and not set(vals[col]) <= set("-: "):
+                found |= {int(m.group(1)) for m in ENGINE_RE.finditer(vals[col])}
+    if found:
+        return found
+    try:
+        d = json.loads(p.with_suffix(".json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return found
+    v = d.get("engine") if isinstance(d, dict) else None
+    return {int(m.group(1)) for m in ENGINE_RE.finditer(v if isinstance(v, str) else " ".join(map(str, v or [])))}
+
+
 def engine_of(rel):
     """The engines a row's table ran on, read from the table itself (its run table's Engine column, or the engine its JSON
     names), oldest first: "omni-v6", or "omni-v1 and omni-v3" for a table built from several; "not named" where the table
@@ -86,7 +121,7 @@ def engine_of(rel):
                 texts.append(q.read_text(encoding="utf-8"))
             except OSError:
                 pass
-        found = {int(m.group(1)) for t in texts for m in ENGINE_RE.finditer(t)}
+        found = stated_engines(p) or {int(m.group(1)) for t in texts for m in ENGINE_RE.finditer(t)}
         if not found:                                              # a table named for its engine (V3_...), or one that says "Omni v3"
             m = re.match(r"V(\d+)_", p.name)
             found = {int(m.group(1))} if m else {int(x) for t in texts for x in re.findall(r"\bOmni v(\d+)\b", t)}
@@ -458,6 +493,16 @@ def newest_table(fname):
     return next((n for _, n in reversed(found) if landed(LIVE / n)), found[-1][1]) if found else fname
 
 
+def manual_block(rows) -> str:
+    """The Owner's Manual's evidence table: every row of the sheet, each naming the engine its table ran on."""
+    L = [M_BEGIN, "", "| What (engine, three runs each) | Benefit? | How much | Every change judged across our three runs, in words | Table |",
+         "|---|---|---:|---|---|"]
+    for r in rows:
+        L.append(f"| {r['benchmark']} ({r['engine']}) | **{r['benefit']}** | {fmt_pct_words(r['pct'], r.get('loss', 0))} | "
+                 f"{r.get('words', '')} | `{r['file']}` |")
+    return "\n".join(L + ["", M_END])
+
+
 def main(check=False):
     rows = from_index()
     for fname, name, what in [
@@ -550,18 +595,26 @@ def main(check=False):
     L += ["", "## Not on the sheet, and why", "",
           "- **Azure's managed Kubernetes, the bill** (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): Omni v1, a 4-worker fleet, every gauge STEADY, inside the noise: 0%, and too small a fleet to show one machine.",
           "- **The governor's own share of the machine** (`results/live/V3_OWN_COST.md`): 0.6% to 1.3% of one core at every size; shown, not a benchmark against native.",
-          "- **The card (NVIDIA)**: every earlier result is obsolete; the current governor has not run on a real card.",
+          "- **The card (NVIDIA)**: one finished result, omni-v18 on an A100 (`results/gpu/run-20261024T091235Z/GPU_REPS.md`: every service gauge EVEN, both knobs already at their top on native); every rental, its cost and what came back, the engine that stands's runs included, is in `docs/RUN_LEDGER.md`. The results of 2 October are obsolete.",
           "- **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.", ""]
     md = "\n".join(legal_stamp(with_own_runs(L))) + "\n"
     js = json.dumps({"rows": rows}, indent=1) + "\n"
+    book = MANUAL.read_text(encoding="utf-8") if MANUAL.exists() else ""
+    if M_BEGIN in book and M_END in book:
+        a, z = book.index(M_BEGIN), book.index(M_END) + len(M_END)
+        book = book[:a] + manual_block(rows) + book[z:]
     if check:
-        bad = [str(p.relative_to(ROOT)) for p, text in ((OUT_MD, md), (OUT_JSON, js)) if not p.exists() or p.read_text() != text]
+        bad = [str(p.relative_to(ROOT)) for p, text in ((OUT_MD, md), (OUT_JSON, js), (MANUAL, book)) if not p.exists() or p.read_text() != text]
+        if M_BEGIN not in book:
+            bad.append(f"{MANUAL.relative_to(ROOT)} (its evidence block is missing)")
         if bad:
             print("benefit sheet out of date (python3 tools/benefit_sheet.py): " + ", ".join(bad))
             return 1
         print("benefit sheet: in line with the tables")
         return 0
     OUT_MD.write_text(md); OUT_JSON.write_text(js)
+    if M_BEGIN in book:
+        MANUAL.write_text(book, encoding="utf-8")
     print(f"{OUT_MD.relative_to(ROOT)}: {len(rows)} rows; {OUT_JSON.relative_to(ROOT)}")
     return 0
 

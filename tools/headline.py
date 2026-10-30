@@ -41,10 +41,15 @@ BEGIN, END = "<!-- headline: written by tools/headline.py from the result files;
 SIGNAL = {"red": ("redlining", "docs/engine/signals/redlining.svg", "the red stop-sign octagon"),
           "lead": ("steady", "docs/engine/signals/steady.svg", "the yellow yield diamond"),
           "ok": ("accelerating", "docs/engine/signals/accelerating.svg", "the green circle")}
+SHEET = ROOT / "results" / "BENEFIT_SHEET.json"
+INDEX_FILE = "results/OMNI_INDEX.md"
+# the two sides, and only two (the founder's order of 25 October 2026: Omni-Compass is never by itself); a record's other pairs
+# stay in the record itself, every row shown there
 PAIRS = (("Omni-Compass on top of native", "Omni on native against native",
           "Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule"),)
 # native and Omni-Compass on native are the only two sides (the founder's order of 25 October: Omni-Compass is never by itself);
 # the record's third arm, Omni direct, stays in its own table as the road and is not read here
+WORD_ORDER = (K.GAIN, K.GAIN_GIVEN, K.GAIN_AND_LOSS, K.EVEN, K.LOSS)
 GAUGES = (("requests", "Work"), ("p95", "Response (95th percentile)"), ("machines", "Machines"), ("units", "Units"))
 
 
@@ -103,6 +108,26 @@ def whole_beside():
             "work": g.get("work"), "speed": g.get("speed"), "machines": g.get("machines"), "energy": g.get("energy"), "bill": g.get("bill") or 0.0}
 
 
+def the_engine_that_stands() -> str:
+    return "omni-v" + re.search(r'VERSIONS = \{"v(\d+)"', (ROOT / "tools" / "omni_version.py").read_text()).group(1)
+
+
+def standing(stands: str):
+    """The engine that stands across every benchmark, from the benefit sheet (tools/benefit_sheet.py): the Omni index's row, the
+    benchmarks read on its own three-run tables with the count of each word, and those still on an older engine."""
+    rows = json.loads(SHEET.read_text(encoding="utf-8"))["rows"]
+    idx = next((r for r in rows if r.get("file") == INDEX_FILE), None)
+    bench = [r for r in rows if r.get("file") != INDEX_FILE]
+    on = [r for r in bench if r.get("engine") == stands]
+    words = {}
+    for r in on:
+        words[r["benefit"]] = words.get(r["benefit"], 0) + 1
+    order = [w for w in WORD_ORDER if w in words] + sorted(w for w in words if w not in WORD_ORDER)
+    older = sorted({r.get("engine", "not named") for r in bench if r.get("engine") != stands}, key=lambda e: (len(e), e))
+    return {"index": idx, "bench": len(bench), "on": len(on), "words": [(w, words[w]) for w in order],
+            "older": len(bench) - len(on), "older_engines": older}
+
+
 def model():
     path, rec = newest_record()
     engine = rec["engine"].split(" (")[0]
@@ -112,7 +137,14 @@ def model():
         scen.append({"name": name, "how": how, "signal": signal([rows["requests"], rows["p95"]]), "rows": rows,
                      "work": mean_change(rows["requests"]), "p95": mean_change(rows["p95"])})
     azure_v = sorted(ROOT.glob(f"results/live/{engine.upper().replace('OMNI-', '')}_AKS*.md"))
-    return {"path": path.relative_to(ROOT).as_posix(), "rec": rec, "engine": engine, "scen": scen, "azure": azure_v, "whole": whole_beside()}
+    stands = the_engine_that_stands()
+    return {"path": path.relative_to(ROOT).as_posix(), "rec": rec, "engine": engine, "scen": scen, "azure": azure_v, "whole": whole_beside(),
+            "stands": stands, "standing": standing(stands)}
+
+
+def index_word(pct: float) -> str:
+    """The Omni index's own word: above one is a GAIN by its construction (results/OMNI_INDEX.md), EVEN under the floor."""
+    return K.EVEN if abs(pct) < 100 * K.SIZE_FLOOR else (K.GAIN if pct > 0 else K.LOSS)
 
 
 
@@ -166,16 +198,28 @@ def markdown(m) -> str:
     rec, eng = m["rec"], m["engine"]
     img = lambda lv: f'<img src="{SIGNAL[lv][1]}" alt="{SIGNAL[lv][2]}" height="14">'
     L = [BEGIN, "", "## The answer first: is Omni-Compass a benefit against native?", ""]
-    yes = all(s["signal"] == "ok" for s in m["scen"])
-    stands = "omni-v" + re.search(r'VERSIONS = \{"v(\d+)"', (ROOT / "tools" / "omni_version.py").read_text()).group(1)
-    L += standing_block(stands)
-    if not eng.startswith(stands):
-        L += [f"### The three ways to run it, on {eng} (its three runs on the engine that stands are in the campaign)", ""]
-    where = (f"on the engine that stands ({eng})" if eng.startswith(stands + " ") or eng == stands else
-             f"on {eng.split(' (')[0]}, this test's newest engine with its three runs in (on the engine that stands, {stands}, it runs again)")
-    L.append(f"**{'Yes' if yes else 'Not in every way'}, {where}, measured on real machines (class L), "
-             f"three runs (A, B and C).** Omni-Compass on top of native did {100 * m['scen'][0]['work']:.1f}% more work than native "
-             f"and answered {100 * abs(m['scen'][0]['p95']):.1f}% faster at the 95th percentile.")
+    stands, st = m["stands"], m["standing"]
+    idx = st["index"]
+    if idx and idx.get("engine") == stands:
+        w = index_word(float(idx["pct"]))
+        way = "unchanged" if w == K.EVEN else f"{'up' if idx['pct'] > 0 else 'down'} {abs(idx['pct']):.1f}%"
+        counts = "; ".join(f"{n} {word}" for word, n in st["words"])
+        older = (f" {st['older']} still stand on an older engine ({', '.join(st['older_engines'])}) until their {stands} runs land."
+                 if st["older"] else "")
+        L.append(f"**{'Yes' if w == K.GAIN else 'No'}, on the engine that stands ({stands}), by the Omni index: {w}, {way}**, every real "
+                 f"test together ([`{INDEX_FILE}`]({INDEX_FILE})), each benchmark run three times (A, B and C) on GitHub's own "
+                 f"machines. Of the {st['bench']} benchmarks on the benefit sheet ([`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md)), "
+                 f"{st['on']} read {stands}'s own three-run table: {counts}; every LOSS row is named with its cause in "
+                 f"[`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md).{older}")
+    else:
+        L.append(f"**Not yet read on the engine that stands ({stands})**: the Omni index stands on "
+                 f"{(idx or {}).get('engine', 'no engine')} until {stands}'s tables land ([`{INDEX_FILE}`]({INDEX_FILE})).")
+    L += [""] + standing_block(stands)
+    s0 = m["scen"][0]
+    where = (f"on the engine that stands ({eng})" if eng == stands else
+             f"on {eng}, the newest engine with its three runs in (the engine that stands, {stands}, runs it again)")
+    L += ["", f"The real test of the whole loop, {where}, three runs on GitHub's own machines: Omni-Compass on top of native did "
+          f"{100 * s0['work']:.1f}% more work than native and answered {100 * abs(s0['p95']):.1f}% faster at the 95th percentile."]
     L += ["", "| Scenario | Signal | Work | Response (95th percentile) | Machines | Units |", "|---|---|---|---|---|---|",
           f"| **Native**: Kubernetes' own autoscaling rule on the muscles | {img('lead')} the baseline | the baseline | the baseline | the baseline | the baseline |"]
     for s in m["scen"]:
@@ -184,8 +228,10 @@ def markdown(m) -> str:
                  + " | ".join(said(r[g], g) if r[g] else "not read" for g, _ in GAUGES) + " |")
     L += ["", f"The signals: {img('ok')} accelerating, a GAIN and no LOSS; {img('lead')} steady, every row STEADY; {img('red')} "
           "redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, "
-          f"never a LOSS. Source: [`{m['path']}`]({m['path']}), {rec['what']}; runs {', '.join(f'{k} {v}' for k, v in rec['runs'].items())}; "
-          f"commit `{rec['commit'][:12]}`.", ""]
+          f"never a LOSS. Source: [`{m['path']}`]({m['path']}), three runs on GitHub's own machines (A, B and C from one commit); runs "
+          f"{', '.join(f'{k} {v}' for k, v in rec['runs'].items())}; commit `{rec['commit'][:12]}`. The record's other arm, Omni-Compass "
+          "alone on the muscles, stays in the record and is not carried here: Omni-Compass is never by itself (the founder's order of "
+          "25 October).", ""]
     L += ["### The two bills", "",
           "**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. Omni-Compass on the cloud alone can give only a "
           "small cut in the bill, from the machines the cloud's own autoscaler made; the benefit lives at the two ends, in the software "
@@ -205,12 +251,13 @@ def markdown(m) -> str:
              f"the provider's energy is not metered to the tenant |")
     w = m["whole"]
     if w and w["index"] is not None:
-        bill = "STEADY" if abs(w["bill"]) < 100 * K.SIZE_FLOOR else f"{w['bill']:+.1f}%"
-        L += ["", f"Beside it, and never read as {eng}: the totals composed from earlier engines' tables (`tools/whole_system.py`, "
-              f"{', '.join(w['engines'])}), the cluster, the services on it and the cloud, by the rule that counts only what held in "
-              f"all three runs: work up {w['work']:.1f}%, the 95th percentile {w['speed']:.1f}% faster, machines {w['machines']:.1f}% "
-              f"fewer, energy {w['energy']:.1f}% less, the cloud's bill {bill}; the index over the gauges {w['index']:+.1f}%. Each "
-              f"benchmark runs again on {eng}, and each total follows its own engine's tables."]
+        bill = K.EVEN if abs(w["bill"]) < 100 * K.SIZE_FLOOR else f"{w['bill']:+.1f}%"
+        L += ["", f"Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`]"
+              f"(results/WHOLE_SYSTEM.md), `tools/whole_system.py`; {', '.join(w['engines'])}), the cluster, the services on it and the "
+              f"cloud, by the rule that counts only what held in all three runs: work up {w['work']:.1f}%, the 95th percentile "
+              f"{w['speed']:.1f}% faster, machines {w['machines']:.1f}% fewer, energy {w['energy']:.1f}% less, the cloud's bill {bill}; "
+              f"the index over the gauges {w['index']:+.1f}%. A composition across engines (class S over class P and L tables), never "
+              f"read as one engine's result; each total follows its tables as every benchmark runs again on {stands}."]
     L += ["", "Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.", "", END]
     return "\n".join(L)
 

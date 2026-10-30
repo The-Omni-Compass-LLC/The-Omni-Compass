@@ -26,6 +26,7 @@ except ImportError:
     import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).resolve().parents[1])); from tools.legal import stamp as _legal_stamp
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from tools.readings import OWN_RUNS, receipt_key, in_all_three, word, aim, EVEN_SAME, even_noise, SHOWN, three_run_reading, run_word, LOWER as AIMS_LOWER, HIGHER as AIMS_HIGHER  # noqa: E402
+from tools.repo import NAME as REPO_NAME  # noqa: E402  (the repository's name, written once)
 from tools.live_reps import KEYS, LABEL, NEUTRAL, SAME_REL
 from tools.readings import by_word, interval_by_word, word_sign, reading_kind
 
@@ -205,7 +206,7 @@ def rig(d):
 def engine(run):
     """The Omni version the run's commit carries (tools/omni_version.py), from the GitHub run record."""
     try:
-        sha = subprocess.run(["gh", "api", f"repos/the-omni-compass-llc/the-omni-compass/actions/runs/{run}", "--jq", ".head_sha"],
+        sha = subprocess.run(["gh", "api", f"repos/{REPO_NAME}/actions/runs/{run}", "--jq", ".head_sha"],
                              capture_output=True, text=True, timeout=60).stdout.strip()
         if len(sha) != 40 or any(c not in "0123456789abcdef" for c in sha):
             return "?", "unknown"                          # a run whose commit cannot be read is never called v1

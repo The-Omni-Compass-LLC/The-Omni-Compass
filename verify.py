@@ -43,7 +43,8 @@ def build_cpp(tmp):
                            ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
                            ("run_compass_law.cpp", "oc_compass_law"), ("run_verdict.cpp", "oc_verdict"),
                            ("engine_runs.cpp", "oc_engine_runs"), ("run_edge.cpp", "oc_edge"),
-                           ("run_student_t.cpp", "oc_student_t"), ("run_orchestrator_brain.cpp", "oc_orchestrator_brain")):
+                           ("run_student_t.cpp", "oc_student_t"), ("run_orchestrator_brain.cpp", "oc_orchestrator_brain"),
+                           ("core_runs.cpp", "oc_core_runs"), ("run_immune.cpp", "oc_immune")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
 
@@ -434,6 +435,9 @@ def main():
           r.returncode == 0, (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "benefit_sheet.py"), "--check"], capture_output=True, text=True)
     check("the benefit sheet (one number and one word per benchmark: GAIN, STEADY, LOSS or power given) is in line with every table it is read from (tools/benefit_sheet.py)",
+          r.returncode == 0, (r.stdout + r.stderr)[-300:])
+    r = subprocess.run([sys.executable, str(ROOT / "tools" / "whole_system.py"), "--check"], capture_output=True, text=True)
+    check("the whole system, every layer composed, is what the tables that stand give (tools/whole_system.py)",
           r.returncode == 0, (r.stdout + r.stderr)[-300:])
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "orchestrators_report.py"), "--check"], capture_output=True, text=True)
     check("the orchestrators on the same organisms: results/orchestrators/ORCHESTRATORS.md is what its record gives (tools/orchestrators_report.py)",

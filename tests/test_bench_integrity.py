@@ -1,0 +1,173 @@
+# SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0
+# Copyright (c) 2026 The Omni-Compass LLC. All rights reserved.
+# Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
+# Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
+# All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
+"""Incomplete watches cannot turn missing Ready transitions into measured waiting."""
+import io
+import json
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+
+import yaml
+from tools import bench_integrity as integrity
+from pilot.bench_report import pod_starts
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def pod(ready=False, scheduled=False):
+    conditions = []
+    for name, yes in [('Ready', ready), ('PodScheduled', scheduled)]:
+        if yes:
+            conditions.append({'type': name, 'status': 'True', 'lastTransitionTime': '1970-01-01T00:01:50Z'})
+    return {'metadata': {'uid': 'one', 'creationTimestamp': '1970-01-01T00:01:45Z', 'resourceVersion': '11'},
+            'status': {'conditions': conditions}}
+
+
+class PodEvidence(unittest.TestCase):
+    def fixture(self, root, events, final=None):
+        (root / 'window_start.txt').write_text('100\n')
+        (root / 'window_end.txt').write_text('120\n')
+        (root / 'pod_watch.json').write_text('\n'.join(json.dumps({'type': 'MODIFIED', 'object': p}) for p in events))
+        (root / 'pods_end.json').write_text(json.dumps({'items': [final or pod(True, True)]}))
+        (root / 'pod_watch_receipt.json').write_text(json.dumps(
+            {'schema': 1, 'complete': True, 'started_at': 99, 'ended_at': 121, 'segments': 2}))
+
+    def test_missing_ready_transition_rejects_gauge_instead_of_end_snapshot_imputation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.fixture(root, [pod(False, True)])
+            with self.assertRaisesRegex(ValueError, 'missed Ready'):
+                pod_starts(root)
+
+    def test_missing_scheduled_transition_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.fixture(root, [pod(True, False)])
+            with self.assertRaisesRegex(ValueError, 'missed PodScheduled'):
+                integrity.validate(root)
+
+    def test_complete_stream_uses_the_event_timestamp(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.fixture(root, [pod(), pod(True, True)])
+            self.assertEqual(pod_starts(root)['pod start wait, total (s)'], 5)
+
+    def test_transition_after_window_is_censored_at_window_end(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); late = pod(True, True)
+            for condition in late['status']['conditions']:
+                condition['lastTransitionTime'] = '1970-01-01T00:02:30Z'
+            self.fixture(root, [pod(), late], late)
+            self.assertEqual(pod_starts(root)['pod start wait, total (s)'], 15)
+
+    def test_partial_json_and_api_error_are_rejected(self):
+        for text in ['{"type": "ADDED"', '{"type":"ERROR","object":{"code":410}}']:
+            with self.assertRaises(ValueError):
+                list(integrity.read_events(text))
+
+    def test_failed_collector_receipt_is_never_admitted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.fixture(root, [pod(True, True)])
+            (root / 'pod_watch_receipt.json').write_text('{"complete":false,"error":"expired history"}')
+            with self.assertRaisesRegex(ValueError, 'expired history'):
+                integrity.validate(root)
+
+    def test_collector_continues_bookmark_version_without_relisting(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); urls = []
+            listing = {'metadata': {'resourceVersion': '10'}, 'items': [pod()]}
+            def run(args, **kwargs):
+                return subprocess.CompletedProcess(args, 0, json.dumps(listing))
+            class Process:
+                def __init__(self, text):
+                    self.stdout = io.StringIO(text)
+                def wait(self, **kwargs): return 0
+                def poll(self): return 0
+            def popen(args, **kwargs):
+                urls.append(args[3])
+                if len(urls) == 1:
+                    return Process(json.dumps({'type': 'BOOKMARK', 'object': {'metadata': {'resourceVersion': '11'}}}) + '\n')
+                (root / 'pod_watch.stop').touch()
+                return Process(json.dumps({'type': 'MODIFIED', 'object': pod(True, True)}) + '\n')
+            integrity.collect(root, run=run, popen=popen)
+            self.assertIn('resourceVersion=10', urls[0])
+            self.assertIn('resourceVersion=11', urls[1])
+            self.assertTrue(json.loads((root / 'pod_watch_receipt.json').read_text())['complete'])
+
+    def test_client_failure_writes_failed_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            def fail(args, **kwargs): raise subprocess.CalledProcessError(1, args)
+            with self.assertRaises(subprocess.CalledProcessError):
+                integrity.collect(root, run=fail)
+            self.assertFalse(json.loads((root / 'pod_watch_receipt.json').read_text())['complete'])
+
+
+class RolloutCleanup(unittest.TestCase):
+    def test_owned_pause_is_restored_atomically_even_if_already_resumed(self):
+        for paused in [True, False]:
+            state = {'metadata': {'resourceVersion': '7', 'annotations': {integrity.PAUSE: 'true'}}, 'spec': {'paused': paused}}
+            writes = []
+            def run(args, **kwargs):
+                if args[1] == 'patch':
+                    patch = json.loads(args[args.index('-p') + 1]); writes.append(patch)
+                    self.assertEqual(patch['metadata']['resourceVersion'], '7')
+                    state['spec']['paused'] = False; state['metadata']['annotations'] = {}
+                return subprocess.CompletedProcess(args, 0, json.dumps(state))
+            self.assertTrue(integrity.restore_rollout('default/web', run=run))
+            self.assertFalse(integrity.restore_rollout('default/web', run=run))
+            self.assertEqual(len(writes), 1)
+
+    def test_foreign_paused_deployment_is_untouched(self):
+        state = {'metadata': {'resourceVersion': '7'}, 'spec': {'paused': True}}
+        def run(args, **kwargs):
+            self.assertEqual(args[1], 'get')
+            return subprocess.CompletedProcess(args, 0, json.dumps(state))
+        self.assertFalse(integrity.restore_rollout('default/web', run=run))
+
+    def test_permission_or_concurrent_write_failure_propagates(self):
+        state = {'metadata': {'resourceVersion': '7', 'annotations': {integrity.PAUSE: 'true'}}, 'spec': {'paused': False}}
+        def run(args, **kwargs):
+            if args[1] == 'patch': raise subprocess.CalledProcessError(1, args)
+            return subprocess.CompletedProcess(args, 0, json.dumps(state))
+        with self.assertRaises(subprocess.CalledProcessError):
+            integrity.restore_rollout('default/web', run=run)
+
+
+class SparseEngineCheckout(unittest.TestCase):
+    def test_actual_matrix_checkout_can_identify_the_engine(self):
+        # Exercise the YAML's patterns against a real sparse Git index, not a mirrored string assertion.
+        workflow = yaml.safe_load((ROOT / '.github/workflows/six-kube.yml').read_text())
+        checkout = next(s for s in workflow['jobs']['run']['steps'] if s.get('uses', '').startswith('actions/checkout@'))
+        patterns = checkout['with']['sparse-checkout']
+        with tempfile.TemporaryDirectory() as directory:
+            def git(*args, **kwargs):
+                return subprocess.run(['git', *args], check=True, capture_output=True, text=True, **kwargs)
+            git('clone', '--shared', '--no-checkout', str(ROOT), directory)
+            git('-C', directory, 'sparse-checkout', 'init', '--no-cone')
+            git('-C', directory, 'sparse-checkout', 'set', '--no-cone', '--stdin', input=patterns)
+            git('-C', directory, 'checkout', 'HEAD')
+            result = subprocess.run(['python3', 'tools/omni_version.py'], cwd=directory, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn('omni-v21', result.stdout)
+
+
+class FailedArmEvidence(unittest.TestCase):
+    def test_failed_arm_is_marked_and_all_diagnostic_hashes_verify(self):
+        script = (ROOT / 'scripts/kind_bench.sh').read_text()
+        start = script.index('finish_evidence() {')
+        end = script.index('trap finish_evidence EXIT', start) + len('trap finish_evidence EXIT')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'diagnostic with spaces.txt').write_text('original failure details\n')
+            result = subprocess.run(['bash', '-c', 'set -euo pipefail\nOUT_DIR="$1"\n' + script[start:end] + '\nexit 7',
+                                     'arm', directory], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 7, result.stderr)
+            self.assertIn('exit 7', (root / 'INVALID').read_text())
+            checked = subprocess.run(['sha256sum', '-c', 'SHA256SUMS.txt'], cwd=root, capture_output=True, text=True)
+            self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+
+
+if __name__ == '__main__':
+    unittest.main()
