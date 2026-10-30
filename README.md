@@ -257,16 +257,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-30 14:29 | six-kube x100 orgs physics_robotics_autonomous reps 197+1 arms native compass split no window 1440 protocol 4 | success | [41062610789](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41062610789) |
+| 2026-10-30 14:28 | six-kube x100 orgs compute_ai_cloud reps 451+50 arms native compass split no window 1440 protocol 4 | success | [41060363268](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41060363268) |
+| 2026-10-30 14:28 | six-kube x100 orgs physics_robotics_autonomous reps 126+1 arms native compass split no window 1440 protocol 4 | success | [41062601725](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41062601725) |
+| 2026-10-30 14:28 | six-kube x100 orgs compute_ai_cloud reps 346+1 arms native compass split no window 1440 protocol 4 | success | [41062584342](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41062584342) |
+| 2026-10-30 14:28 | six-kube x100 orgs physics_robotics_autonomous reps 110+1 arms native compass split no window 1440 protocol 4 | success | [41062592156](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41062592156) |
+| 2026-10-30 14:23 | raw-sweep | success | [41071247133](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41071247133) |
+| 2026-10-30 14:23 | health | success | [41070343707](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41070343707) |
 | 2026-10-30 14:09 | big-organism-detached collect | success | [41064385588](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41064385588) |
-| 2026-10-30 14:09 | raw-sweep | success | [41063841295](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41063841295) |
 | 2026-10-30 13:11 | six-kube x100 orgs compute_ai_cloud reps 201+250 arms native compass split no window 1440 protocol 4 | failure | [41044680505](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41044680505) |
 | 2026-10-30 13:00 | engine-runs | success | [41059410874](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41059410874) |
-| 2026-10-30 12:47 | live-engine | success | [41046907054](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41046907054) |
-| 2026-10-30 12:04 | six-kube x100 orgs compute_ai_cloud reps 110+1 arms native compass split no window 1440 protocol 4 | success | [41044654061](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41044654061) |
-| 2026-10-30 12:02 | six-kube x100 orgs compute_ai_cloud reps 143+1 arms native compass split no window 1440 protocol 4 | success | [41044667211](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41044667211) |
-| 2026-10-30 12:02 | six-kube x100 orgs compute_ai_cloud reps 146+1 arms native compass split no window 1440 protocol 4 | success | [41044673990](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41044673990) |
-| 2026-10-30 12:02 | six-kube x100 orgs compute_ai_cloud reps 129+1 arms native compass split no window 1440 protocol 4 | success | [41044660819](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41044660819) |
-| 2026-10-30 11:16 | injection-grid | success | [41034906268](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41034906268) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
