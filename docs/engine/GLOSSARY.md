@@ -2006,7 +2006,6 @@ Every term, organism and arm with the sections of the page that print it, by the
 | console | term | 1a (#s-wall); 1c (#s-dash); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3n (#s-lab); 4c (#s-fleet); 4h (#s-fail) |
 | the conveyance | term | 3c (#s-dial); 3h (#s-cloud); 3o (#s-proof); 4g (#s-math); v (#s-disclose) |
 | the cover | term | 4g (#s-math) |
-| cruise | term | 4g (#s-math) |
 | the cushion | term | 3a (#s-engines); 3d (#s-decision); 3j (#s-ops); 4i (#s-self); 4j (#s-problem) |
 | the dashboards | term | 1c (#s-dash) |
 | the dial | term | 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3j (#s-ops); 4j (#s-problem); v (#s-disclose) |
@@ -2014,7 +2013,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | do no harm | term | 3b (#s-desk); 4j (#s-problem); v (#s-disclose) |
 | the edge | term | 2d (#s-board); 3a (#s-engines) |
 | Energy / Facility / Industrial | organism | 3b (#s-desk); 4j (#s-problem) |
-| the engine that stands | term | 0 (#s-answer); 3a (#s-engines); 3g (#s-verdict); 3i (#s-orch); 3j (#s-ops); 3m (#s-stacks); 3o (#s-proof); 4a (#s-whole); 4c (#s-fleet); 4e (#s-github); v (#s-disclose) |
+| the engine that stands | term | 0 (#s-answer); 3a (#s-engines); 3g (#s-verdict); 3i (#s-orch); 3j (#s-ops); 3m (#s-stacks); 3o (#s-proof); 4a (#s-whole); 4c (#s-fleet); 4e (#s-github); 4g (#s-math); v (#s-disclose) |
 | evidence classes P, L, S | term | 0 (#s-answer); iii (#s-bottom); 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4i (#s-self); 4j (#s-problem); 4l (#s-monlist); v (#s-disclose) |
 | factory profile | term | v (#s-disclose) |
 | the factory tune | term | 1a (#s-wall); 3b (#s-desk); 3m (#s-stacks); 4b (#s-scn); v (#s-disclose) |
@@ -2032,7 +2031,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | h | term | 3f (#s-brain) |
 | harness | term | 1a (#s-wall); 3a (#s-engines); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
 | health | term | 1a (#s-wall); 3f (#s-brain); 3j (#s-ops); 4a (#s-whole) |
-| the heartbeat | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3j (#s-ops); 3k (#s-runs); 4g (#s-math); 4j (#s-problem); v (#s-disclose) |
+| the heartbeat | term | 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3j (#s-ops); 3k (#s-runs); 4j (#s-problem); v (#s-disclose) |
 | the heat debt | term | 3a (#s-engines); 4g (#s-math) |
 | the immune system | term | 3a (#s-engines); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the injection | term | 3b (#s-desk); 3o (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4h (#s-fail) |
@@ -2082,7 +2081,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the raw change and the word | term | 0 (#s-answer); 2c (#s-loss); 3j (#s-ops); 4k (#s-read) |
 | realm | term | 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3n (#s-lab); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | REDLINING | term | iii (#s-bottom); 1a (#s-wall) |
-| the reflex rule | term | 3a (#s-engines); 3c (#s-dial); 4i (#s-self) |
+| the reflex rule | term | 3a (#s-engines); 3c (#s-dial); 4g (#s-math); 4i (#s-self) |
 | the release gate | term | 3b (#s-desk); 3d (#s-decision); 3l (#s-live); 4g (#s-math) |
 | RK4 | term | 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3f (#s-brain); 3o (#s-proof); 4g (#s-math) |
 | the runs disagree | term | 2a (#s-status); 2c (#s-loss); 2d (#s-board); 4c (#s-fleet); 4k (#s-read) |
@@ -2116,7 +2115,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | ρ* | term | 4g (#s-math) |
 | σ | term | 3b (#s-desk); 3f (#s-brain); 3g (#s-verdict); 3o (#s-proof); 4g (#s-math) |
 
-Not printed in the page's own words at this build (defined above, not yet on the page): a cell's reference; active profile; AWAITING; candidate profile; the contract, this decision; custom profile; defensive system; governing engine; the heartbeat's six buttons; the injection batch; live tuning bench; the monitor wall stack; native baseline; preset; protocol 4; Restore factory profile; Return to native; the seal; the yardstick.
+Not printed in the page's own words at this build (defined above, not yet on the page): a cell's reference; active profile; AWAITING; candidate profile; the contract, this decision; cruise; custom profile; defensive system; governing engine; the heartbeat's six buttons; the injection batch; live tuning bench; the monitor wall stack; native baseline; preset; protocol 4; Restore factory profile; Return to native; the seal; the yardstick.
 
 ---
 

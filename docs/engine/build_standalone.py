@@ -18,9 +18,12 @@ import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parents[1]))
+from tools import repo  # noqa: E402  (the repository's name, written once)
+
 PAGE = HERE / "OMNI_COMPASS_LIVE_ENGINE.html"
 OUT = HERE.parent / "live" / "index.html"
-MANUALS = "https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/blob/main/docs/"
+MANUALS = f"{repo.URL}/blob/main/docs/"
 PDFS = ("OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf", "OMNI_COMPASS_MANUAL.pdf", "OMNI_COMPASS_OWNERS_MANUAL.pdf")
 LOADER = """<div id="omni-unpack" style="position:fixed;inset:auto 0 0 0;padding:10px 16px;background:#111;color:#eee;font:14px/1.5 sans-serif;z-index:99999">Opening the engine's records&hellip;</div>
 <script type="application/octet-stream" id="omni-records">%s</script>
