@@ -189,6 +189,91 @@ def replay_redis(mod, rows, native):
     return [mod.decide(r["p"], r["force"], r["evicted_last_s"], r["maxmemory_mb"], 99.0, r["full"], wall=wall) for r in rows]
 
 
+def replay_sysbench(mod, rows, native):
+    """The buffer-pool wire as omni-v21's Omni.run calls it, on the recorded seconds (the standing wire)."""
+    v = KnobVerdict(native, mod.STEP_MB, mod.COVER_MB, objective="resource", settle_s=mod.TAU, max_trial=120)
+    wall = wall_of(mod, mod.LINE_STMT_MS)
+    cur, last_change, out = native, -1e9, []
+    for r in rows:
+        t, f, p, share, rq = r["t"], r["force"], r["p"], r["miss_share"], r["read_requests_last_s"]
+        resizing = mod.resizing(r.get("resize") or "") if hasattr(mod, "resizing") else False
+        full = r["full"] if cur == r["pool_mb"] else r["used_mb"] >= mod.FULL * cur
+        v.observe(r.get("cost"), t, settled=not resizing)
+        target, why = mod.decide(p, f, share, cur, t - last_change, full, wall=wall, reads=rq > 0)
+        target, why, _ = v.decide(target, spend_ok=(f > 0.05 and full and share >= mod.GROW_MISS_SHARE),
+                                  give_ok=(f < -0.05 and rq > 0 and share < mod.GIVEBACK_MISS_SHARE),
+                                  t=t, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=why.startswith("fail up"))
+        wrote = target != cur and not resizing
+        out.append({"t": t, "cur": cur, "short": rq > 0 and share >= mod.GROW_MISS_SHARE, "idle_calm": False, "wrote": wrote})
+        if wrote:
+            last_change = t; cur = target
+    return out
+
+
+def replay_redis_traj(mod, rows, native):
+    """The ceiling wire as omni-v21's Omni.run calls it, on the recorded seconds (the standing wire)."""
+    v = KnobVerdict(native, mod.STEP_MB, mod.COVER_MB, objective="resource", settle_s=mod.TAU)
+    wall = wall_of(mod, mod.LINE_MS)
+    cur, last_change, out = native, -1e9, []
+    for r in rows:
+        t, f, p, ev = r["t"], r["force"], r["p"], r["evicted_last_s"]
+        full = r["full"] if cur == r["maxmemory_mb"] else r["used_mb"] >= mod.FULL * cur
+        v.observe(r.get("cost"), t)
+        target, why = mod.decide(p, f, ev, cur, t - last_change, full, wall=wall)
+        target, why, _ = v.decide(target, spend_ok=(f > 0.05 and full), give_ok=(f < -0.05 and ev == 0), t=t, why=why,
+                                  stress=f > 0.05, calm=f < -0.05, fail_up=why.startswith("fail up"))
+        out.append({"t": t, "cur": cur, "short": ev > 0 and f > 0.05, "idle_calm": False, "wrote": target != cur})
+        if target != cur:
+            if target > cur:
+                last_change = t
+            cur = target
+    return out
+
+
+def replay_brain(mod, rows, native, wire):
+    """A candidate wire's Brain (omni-v22: the max) on the recorded seconds: its knob moves by its own decisions, the world's
+    readings are the recorded ones (open-loop, as the gate's header says). The observation each wire's Brain reads is built from
+    the standing audit's fields; a field the old audits lack (Kafka's arrivals, Redis's hit and miss latencies) is None, and the
+    Brain decides as it does without it."""
+    brain = mod.Brain(native, "resource")
+    cur, out = native, []
+    for r in rows:
+        t = r["t"]; reading = r["reading_ms"] / 1000.0
+        if wire == "sysbench":
+            full = r["full"] if cur == r["pool_mb"] else r["used_mb"] >= mod.FULL * cur
+            obs = {"reading_s": reading, "statements": r.get("statements", 0), "miss_share": r["miss_share"], "pool_mb": cur, "used_mb": r["used_mb"],
+                   "full": full, "reads": r["read_requests_last_s"] > 0, "resizing": mod.resizing(r.get("resize") or "") if hasattr(mod, "resizing") else False,
+                   "cpu_share": r.get("cpu_share")}
+            short = obs["reads"] and r["miss_share"] >= mod.GROW_MISS_SHARE
+        elif wire == "ycsb":
+            ev = r.get("evicted_last_s", 0)
+            full = r["full"] if cur == r["cache_mb"] else (mod.cache_full(r["used_mb"], cur, ev) if hasattr(mod, "cache_full") else r["used_mb"] >= mod.FULL * cur)
+            obs = {"reading_s": reading, "reads": r.get("reads", 0), "miss_share": r["miss_share"], "cache_mb": cur, "used_mb": r["used_mb"], "full": full,
+                   "requested": r["pages_requested_last_s"] > 0, "cpu_share": r.get("cpu_share")}
+            short = obs["requested"] and r["miss_share"] >= mod.GROW_MISS_SHARE
+        elif wire == "redis":
+            obs = {"reading_s": reading, "n": r.get("requests_last_s", 0), "inside": r.get("inside_last_s", 0), "evicted_last_s": r["evicted_last_s"],
+                   "ceiling_mb": cur, "used_mb": r["used_mb"], "cpu_share": r.get("cpu_share")}
+            short = r["evicted_last_s"] > 0 and r["force"] > 0.05
+        elif wire == "kafka":
+            obs = {"reading": reading if r.get("consumed_last_s", 0) else None, "n_msg": r.get("consumed_last_s", 0), "inside": r.get("inside_last_s", 0),
+                   "lag": r["lag"], "idle": r["idle"], "consumers": cur, "cpu_share": r.get("cpu_share"), "arrivals": None}
+            short = r["lag"] > 0 and r["force"] > 0.05
+        elif wire == "pgbench":
+            obs = {"reading_s": reading, "wait_share": r["wait_share"], "idle": r["idle"], "pool": cur, "queue_share": r["queue_share"],
+                   "served": r["served"]}
+            short = r["queue_share"] >= mod.GIVEBACK_WAIT_SHARE
+        else:
+            raise ValueError(wire)
+        target, why, info = brain.step(t, obs)
+        wrote = target != cur and not (wire == "sysbench" and obs["resizing"])
+        idle_calm = wire == "kafka" and r["force"] < -0.05 and r["lag"] <= cur * POLL_RECORDS
+        out.append({"t": t, "cur": cur, "short": short, "idle_calm": idle_calm, "wrote": wrote})
+        if wrote:
+            cur = target
+    return out
+
+
 def gauges_of(traj, native, recorded_key=None, rows=None):
     n = len(traj) or 1
     g = {"setting_mean": sum(x["cur"] for x in traj) / n, "writes": sum(x["wrote"] for x in traj),
@@ -207,6 +292,8 @@ WIRES = {
     "pgbench": ("PGBENCH", "pgbench", ("select", "simple_update", "tpcb_hot"), "pool", 20, replay_pgbench),
     "kafka": ("KAFKA", "kafka", ("burst", "heavy", "light"), "consumers", 2, replay_kafka),
     "ycsb": ("YCSB", "ycsb", ("b", "burst", "c", "f"), "cache_mb", 512, replay_ycsb),
+    "sysbench": ("SYSBENCH", "sysbench", ("burst", "read_only", "read_write", "update_index"), "pool_mb", 512, replay_sysbench),
+    "redis": ("REDIS", "redis", ("burst", "large", "small"), "maxmemory_mb", 64, replay_redis_traj),
 }
 
 
@@ -222,6 +309,19 @@ NOTES = {   # what each candidate changes, in the gate's words (the store fix of
             "missing and evicting, which the standing wire read as 'slow with room to spare' at 90%: spend trials above native, power given, "
             "allowed by the verdict on the recorded cost samples, which in an open-loop replay never show what the larger cache would have "
             "bought. The writes rise with the hand-backs and the spends: wear, power given.",
+    "sysbench": "omni-v22, the max: the pool never below the operator's (the seconds below native fall to none), and memory spent only where "
+                "the server's own account (the performance schema's timer on the data files' reads) says the misses cost the statements and "
+                "the host has a chunk to spare. omni-v21's audits carry neither account, so in this replay the candidate holds at native and "
+                "writes nothing: the first run on omni-v22 reads them; the memory the tune-down gave back is the tune-down's (dial save).",
+    "ycsb": "omni-v22, the max: the cache never below the operator's (the seconds below native fall to none), and memory spent only where "
+            "WiredTiger's own account (its time reading pages from disk for the application's threads) says the misses cost the reads and "
+            "the host has a notch to spare. omni-v21's audits carry neither account, so in this replay the candidate holds at native and "
+            "writes nothing: the first run on omni-v22 reads them.",
+    "redis": "omni-v22, the max: misses with the cache full go through unclamped (the standing wire's allowance refused them in 4,426 of "
+             "the 4,581 seconds over the line) where the application's own split says they cost the service and the host has a notch to "
+             "spare, and the ceiling is never handed back below the working set's floor nor below the operator's. omni-v21's audits carry "
+             "neither the split nor the host's memory, so in this replay the candidate holds at native; the closed-loop model, which carries "
+             "both, shows what the larger cache buys (tools/redis_model.py).",
 }
 
 
@@ -324,7 +424,9 @@ def main(argv=None):
         for wl in wls:
             pairs = []
             for tag, rep, rows in audits(a.raw, a.engine, table, prefix, wl):
-                b = gauges_of(replay(base_mod, rows, native), native, key, rows); c = gauges_of(replay(cand_mod, rows, native), native)
+                b = gauges_of(replay(base_mod, rows, native), native, key, rows)
+                # a candidate with a Brain (omni-v22, the max) is replayed through it; one without, as the standing wire is
+                c = gauges_of(replay_brain(cand_mod, rows, native, wire) if hasattr(cand_mod, "Brain") else replay(cand_mod, rows, native), native)
                 matches.append(b["matches_record"])
                 if b["matches_record"] < MATCH_MIN:
                     unread.append({"workload": wl, "run": tag, "rep": rep, "matches_record": round(b["matches_record"], 3)})

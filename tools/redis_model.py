@@ -32,6 +32,7 @@ sys.path.insert(0, str(ROOT))
 
 MB = 1024 * 1024
 RATE = 1500.0
+MODEL_HOST_AVAIL_MB, MODEL_HOST_TOTAL_MB = 4096.0, 7168.0   # the model's host (class S): a GitHub runner's 7 GB with 4 GB available, room for every notch
 LINE_MS = 2.0
 MISS_PENALTY_MS = 5.0
 ZIPF_S = 0.5
@@ -110,7 +111,7 @@ def run_arm(workload, ceiling_of, seed, step_s=30.0, start_mb=64.0):
             obs = {"reading_s": sum(sec) / len(sec) / 1000.0, "n": len(sec), "inside": sum(1 for x in sec if x <= LINE_MS),
                    "evicted_last_s": cache.evicted - ev0, "ceiling_mb": cache.ceiling / MB, "used_mb": cache.used() / MB,
                    "hit_ms": sum(hits) / len(hits) if hits else None, "miss_ms": sum(misses) / len(misses) if misses else None,
-                   "miss_share": len(misses) / len(sec)}
+                   "miss_share": len(misses) / len(sec), "host_avail_mb": MODEL_HOST_AVAIL_MB, "host_total_mb": MODEL_HOST_TOTAL_MB}
             per_second.append(obs); ceilings.append(cache.ceiling / MB); used.append(cache.used() / MB)
             new = ceiling_of(t, obs)
             if new is not None and abs(new - cache.ceiling / MB) > 1e-9:

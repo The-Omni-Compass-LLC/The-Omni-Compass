@@ -64,6 +64,7 @@ SMOOTH = 0.5
 NATIVE_CONSUMERS = 2      # the operator's count
 COVER = (1, PARTITIONS)   # never under one consumer, never more than partitions
 DWELL_S = 5.0             # no taking back within five seconds of a change
+DIAL = os.environ.get("OMNI_DIAL", "max")   # omni-v22: max, the factory tune; save, the tune-down
 POLL_RECORDS = 50         # the most messages a consumer takes in one poll (KafkaConsumer max_poll_records)
 HEARTBEAT_MS = 3000       # the consumers' heartbeat (KafkaConsumer heartbeat_interval_ms, the client's own default): a member learns of a
                           # rebalance at its next heartbeat, so a change reaches every member within one interval
@@ -724,7 +725,7 @@ def run_workload(name, out: Path, reps, step_s, calib_s, line_ms, objective=DEFA
     print(f"   native capacity with {NATIVE_CONSUMERS} consumers: {cap:.0f} messages a second; base rate {base:.1f}/s (peak notch {peak} offers {PEAK_SHARE:.0%} of it)", flush=True)
     rec = {"workload": name, "tuning": tuning, "service_ms": service_ms, "payload_bytes": payload, "steps": steps, "step_s": step_s,
            "line_ms": line_ms, "native_consumers": NATIVE_CONSUMERS, "cover": list(COVER), "capacity_mps": cap, "base_rate_mps": base,
-           "objective": objective, "engine": engine(), "reps": []}
+           "objective": objective, "dial": DIAL, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
         r = {}

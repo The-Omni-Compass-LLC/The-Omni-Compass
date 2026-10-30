@@ -52,6 +52,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
 from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 2: the brain's own verdict)
+from tools.store_brain import MemoryMax, read_meminfo  # noqa: E402  (omni-v22: the max on the cache)
 from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, EVEN_NOISE, SHOWN  # noqa: E402  (the words every table uses)
 
 URL = os.environ.get("MONGO_URL", "mongodb://127.0.0.1:27017")
@@ -69,6 +70,7 @@ COVER_MB = (256, 2048)    # never under 256 MB (the server's own floor), never o
 STEP_MB = 64              # one notch of the knob
 FAILUP_MB = 448           # past the wall: a quarter of the cover at once, and again the next second if still past it
 DWELL_S = 5.0             # after growing, no taking back within five seconds; giving back is a notch a second
+DIAL = os.environ.get("OMNI_DIAL", "max")   # omni-v22: max, the factory tune (the Brain); save, the tune-down (omni-v21's loop)
 FULL = 0.8                # the cache counts as full when the bytes in it are 80% of its size or more (WiredTiger's own eviction_target, which
                           # its eviction workers hold the cache at), or when it evicted a page in the last second (store fix of 25 October:
                           # at 0.9 the cache read full in only 2 to 61 of about 460 seconds of every omni-v16 arm, so the grow path never opened)
@@ -197,6 +199,24 @@ def miss_share(pages_read_last_s, requested_last_s):
     return pages_read_last_s / requested_last_s if requested_last_s > 0 else 0.0
 
 
+# omni-v22: the server's own account of what a cache miss costs: WiredTiger's time reading pages from disk for the application's
+# threads (the reads that stood in a request's way; the server's own eviction and read-ahead threads are not counted), in
+# microseconds, beside the server's own read latency (opLatencies, microseconds).
+MISS_TIME_KEY = "application threads page read from disk to cache time (usecs)"
+MISS_COUNT_KEY = "application threads page read from disk to cache count"
+REQUIRED_CACHE_KEYS = ("maximum bytes configured", "bytes currently in the cache", "pages read into cache", "pages requested from the cache",
+                       MISS_TIME_KEY, MISS_COUNT_KEY)
+
+
+def miss_time(st):
+    """(the application threads' page reads from disk, their time in microseconds) from one serverStatus; None where the server
+    gives no account of them (the attach check stops a run on such a server before it starts)."""
+    c = st["wiredTiger"]["cache"]
+    if MISS_TIME_KEY not in c:
+        return None, None
+    return int(c.get(MISS_COUNT_KEY, 0)), int(c[MISS_TIME_KEY])
+
+
 def read_latency(st):
     """(total read latency in microseconds, read operations) from one serverStatus (opLatencies)."""
     r = st["opLatencies"]["reads"]
@@ -252,22 +272,69 @@ def _decide(p, force, miss_share_last_s, cur_mb, last_change_age, full, wall=0.9
     return cur_mb, "hold"
 
 
+# omni-v22: the max on the WiredTiger cache (docs/YCSB_PREREGISTRATION.md, amendment 5; docs/STORE_ROOT_CAUSES_2026-10-30.md): the
+# wire's own rule (decide) with the spend never clamped by an allowance where the server's own account says the misses cost the
+# reads (WiredTiger's time reading pages from disk for the application's threads against the server's own read latency:
+# tools/store_brain.py), held where they cost nothing (on a runner whose page cache holds the data files a cache miss is a read from
+# memory: 12% to 16% of pages missing with the read latency unmoved), held while the host has no notch to spare, and no give-back
+# below the working set's floor nor below the operator's cache. `--dial save` keeps omni-v21's loop, the verdict under the resource
+# objective, where giving memory back is the aim.
+METER = "WiredTiger's time reading pages from disk for the application's threads against the server's own read latency"
+
+
+class Brain:
+    """The knob's decision, one a second: obs holds reading_s (the mean read latency), reads (operations this second), miss_share,
+    cache_mb, used_mb, full, requested (any page requested this second), cpu_share, miss_time_s (the application threads' time
+    reading pages from disk this second), service_time_s (the reads' own latency summed this second), host_avail_mb and
+    host_total_mb (the host's memory, None unread)."""
+
+    def __init__(self, native, objective=DEFAULT_OBJECTIVE, line_ms=LINE_MS):
+        self.native, self.objective = native, objective
+        self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
+        self.max = MemoryMax(native, STEP_MB, COVER_MB, FULL, METER)
+        self.last_change = -1e9
+
+    @property
+    def failups(self):
+        return self.max.failups
+
+    def record(self):
+        return self.max.record(self.objective)
+
+    def step(self, t, obs):
+        reading, cur = obs["reading_s"], obs["cache_mb"]
+        f = self.law.force(reading)
+        want, why = decide(self.law.p, f, obs["miss_share"], cur, t - self.last_change, obs["full"], wall=self.law.band.wall_high,
+                           reads=obs.get("requested", True), native_mb=self.native)
+        target, why, info = self.max.step(t, want, why, cur, obs["used_mb"], obs.get("miss_time_s"), obs.get("service_time_s"),
+                                          obs.get("host_avail_mb"), obs.get("host_total_mb"), fail_up=why.startswith("fail up"))
+        info.update({"p": round(self.law.p, 4), "force": round(f, 4)})
+        return target, why, info
+
+
 class Omni(threading.Thread):
     """The brain, one decision a second, reading the server's own read latency, writing the audit; the knob is handed back at
     the end and read back. Amendment 2 (the brain's own verdict, 2026-10-09): the cache starts in watch and is written only
     inside the allowance a paired trial on the server itself has earned under the declared objective (tools/knob_verdict.py
     around the engine's own Verdict), one notch a trial; a trial holds the cache; a fail-up never spends beyond the allowance."""
 
-    def __init__(self, plug: CacheSize, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE):
+    def __init__(self, plug: CacheSize, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE, dial=DIAL):
         super().__init__(daemon=True)
         self.plug, self.audit, self.objective = plug, audit_path, objective
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event(); self.last_change = -1e9; self.writes = 0; self.failups = 0
-        self.foreign = False; self.handed_back = False; self.error = None; self.verdict = None
+        self.foreign = False; self.handed_back = False; self.error = None; self.verdict = None; self.brain = None; self.dial = dial; self.line_ms = line_ms
+
+    def govern_record(self):
+        """The record of what governed the knob: the max's counts (omni-v22) or the verdict's allowance (the tune-down)."""
+        if self.brain is not None:
+            return self.brain.record()
+        return self.verdict.record() if self.verdict else None
 
     def run(self):
         try:
             native = self.plug.attach(); st = self.plug._status(); lat0, ops0 = read_latency(st); _, _, rd0, ev0, rq0 = cache_stats(st)
+            mr0, mt0 = miss_time(st)
             if native > COVER_MB[1]:
                 # MongoDB as shipped (its default, half of RAM less 1 GB) holds more cache than the most Omni may set: the knob
                 # is at its limit on native, and any size Omni wrote would sit below native (the max never goes below native)
@@ -282,12 +349,16 @@ class Omni(threading.Thread):
             return
         t0 = time.monotonic(); cpu_prev = cpu_times()
         self.verdict = KnobVerdict(native, STEP_MB, COVER_MB, objective=self.objective, settle_s=TAU)
+        if self.dial == "max":
+            self.brain = Brain(native, self.objective, self.line_ms); self.verdict = None
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
                 try:
                     st = self.plug._status()
                     lat, ops = read_latency(st); dl, do = lat - lat0, ops - ops0; lat0, ops0 = lat, ops
+                    mr, mt = miss_time(st)
+                    mr_last, mt_last = (None, None) if mt is None else (mr - mr0, mt - mt0); mr0, mt0 = mr, mt
                     reading = (dl / do / 1e6) if do > 0 else 0.0           # the mean read latency of the last second, in seconds; no reads reads calm
                     f = self.law.force(reading)
                     cur, used, rd, ev, rq = cache_stats(st); ev_last = ev - ev0; ev0 = ev
@@ -297,20 +368,31 @@ class Omni(threading.Thread):
                     cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
                     cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
                     cost = sample_cost(self.objective, do, reading if do > 0 else None, cur, cpu_share)
-                    self.verdict.observe(cost, tick - t0)                                   # measured under the cache of the last second
-                    target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high, reads=rq_last > 0,
-                                         native_mb=native)
-                    missing_below = cur < native and rq_last > 0 and share >= GROW_MISS_SHARE     # the size below native no longer holds the working set
-                    target, why, vinfo = self.verdict.decide(
-                        target, spend_ok=(f > 0.05 and full and share >= GROW_MISS_SHARE),
-                        give_ok=(f < -0.05 and rq_last > 0 and share < GIVEBACK_MISS_SHARE),
-                        t=tick - t0, why=why, stress=(f > 0.05 or missing_below), calm=f < -0.05, fail_up=why.startswith("fail up"))
+                    if self.brain is not None:                                           # the max (omni-v22)
+                        h_avail, h_total = read_meminfo()
+                        obs = {"reading_s": reading, "reads": do, "miss_share": share, "cache_mb": cur, "used_mb": used, "full": full,
+                               "requested": rq_last > 0, "cpu_share": cpu_share,
+                               "miss_time_s": None if mt_last is None else mt_last / 1e6, "service_time_s": dl / 1e6,
+                               "host_avail_mb": h_avail, "host_total_mb": h_total}
+                        self.brain.last_change = self.last_change - t0
+                        target, why, vinfo = self.brain.step(tick - t0, obs)
+                        vinfo["disk_reads_last_s"] = mr_last
+                        self.failups = self.brain.failups
+                    else:                                                                # the tune-down: omni-v21's loop
+                        self.verdict.observe(cost, tick - t0)                               # measured under the cache of the last second
+                        target, why = decide(self.law.p, f, share, cur, tick - self.last_change, full, wall=self.law.band.wall_high, reads=rq_last > 0,
+                                             native_mb=native)
+                        missing_below = cur < native and rq_last > 0 and share >= GROW_MISS_SHARE     # the size below native no longer holds the working set
+                        target, why, vinfo = self.verdict.decide(
+                            target, spend_ok=(f > 0.05 and full and share >= GROW_MISS_SHARE),
+                            give_ok=(f < -0.05 and rq_last > 0 and share < GIVEBACK_MISS_SHARE),
+                            t=tick - t0, why=why, stress=(f > 0.05 or missing_below), calm=f < -0.05, fail_up=why.startswith("fail up"))
                     wrote = None
                     if target != cur:
                         wrote = self.plug.write(target); self.writes += 1
                         if target > cur:
                             self.last_change = tick
-                        if why.startswith("fail up"):
+                        if why.startswith("fail up") and self.brain is None:
                             self.failups += 1
                     fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "reads": do, "p": round(self.law.p, 4), "force": round(f, 4),
                                          "evicted_last_s": ev_last, "pages_read_last_s": rd_last, "pages_requested_last_s": rq_last, "miss_share": round(share, 4),
@@ -542,7 +624,7 @@ def run_arm(arm, wl_dir: Path, rep, workload_file, base, steps, step_s, line_ms,
          "handed_back": (omni.handed_back if omni else True), "foreign_writer": (omni.foreign if omni else False), "failups": (omni.failups if omni else 0),
          "controller_error": (omni.error if omni else None),
          **cpu_apart,
-         "verdict": (omni.verdict.record() if omni and omni.verdict else None)}
+         "verdict": (omni.govern_record() if omni else None)}
     (d / "arm.json").write_text(json.dumps(g, indent=1))
     print(f"   {arm} rep {rep}: {n} operations, inside the line {g['work_inside_line_ops']:.0f}/s, p95 {g['p95_ms']:.2f} ms, cache {g['cache_mb_mean']:.0f} MB, "
           f"in cache {g['cache_used_mb_mean']:.0f} MB, pages read {g['pages_read']:,}, CPU {cpu_s:.1f} s, handed back {g['handed_back']}"
@@ -610,14 +692,14 @@ def run_workload(name, out: Path, reps, step_s, line_ms, objective=DEFAULT_OBJEC
           f"the verdict's objective {objective}", flush=True)
     c0 = fresh_server(NATIVE_MB)
     have = c0.admin.command("serverStatus")["wiredTiger"]["cache"]
-    for key in ("maximum bytes configured", "bytes currently in the cache", "pages read into cache", "pages requested from the cache"):
-        if key not in have:                                        # the gate reads these; a server that lacks one must stop the run, not run native in Omni's name
-            raise SystemExit(f"serverStatus().wiredTiger.cache has no '{key}' on this server: the miss-share gate cannot be read")
+    for key in REQUIRED_CACHE_KEYS:
+        if key not in have:                                        # the brain reads these; a server that lacks one must stop the run, not run native in Omni's name
+            raise SystemExit(f"serverStatus().wiredTiger.cache has no '{key}' on this server: the brain's account of a miss cannot be read")
     load_dataset(workload_file, base * top, wl_dir / "load.log")
     rec = {"workload": name, "tuning": tuning, "ycsb_workload": workload_file, "base_records": base, "steps": steps, "step_s": step_s,
            "line_ms": line_ms, "rate_ops": RATE, "threads": THREADS, "record_bytes": RECORD_BYTES, "native": NATIVE,
            "native_mb": NATIVE_MB if NATIVE_MB is not None else int(have["maximum bytes configured"]) // MB, "cover_mb": list(COVER_MB),
-           "mongodb_version": ver, "ycsb_version": YCSB_VERSION, "ycsb_sha256": YCSB_SHA256, "objective": objective, "engine": engine(), "reps": []}
+           "mongodb_version": ver, "ycsb_version": YCSB_VERSION, "ycsb_sha256": YCSB_SHA256, "objective": objective, "dial": DIAL, "engine": engine(), "reps": []}
     for rep in range(1, reps + 1):
         order = ("native", "omni") if rep % 2 else ("omni", "native")
         r = {}

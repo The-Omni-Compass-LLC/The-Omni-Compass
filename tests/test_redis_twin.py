@@ -11,10 +11,15 @@ import unittest
 from tools import run_redis as R
 
 
-def obs(reading_ms, used_mb, ceiling_mb, evicted=0, n=1500):
+def obs(reading_ms, used_mb, ceiling_mb, evicted=0, n=1500, split=True):
+    """One second as the wire's Omni hands it to the Brain: with the application's split (a miss the 5 ms store trip beyond a
+    hit, 37% of requests missing) and the host's memory, unless `split` is False (the wire's older records)."""
     inside = int(n * 0.6)
-    return {"reading_s": reading_ms / 1000.0, "n": n, "inside": inside, "evicted_last_s": evicted, "ceiling_mb": ceiling_mb,
-            "used_mb": used_mb, "cpu_share": 0.3}
+    o = {"reading_s": reading_ms / 1000.0, "n": n, "inside": inside, "evicted_last_s": evicted, "ceiling_mb": ceiling_mb,
+         "used_mb": used_mb, "cpu_share": 0.3, "host_avail_mb": 4096.0, "host_total_mb": 7168.0}
+    if split:
+        o.update({"hit_ms": 0.12, "miss_ms": 5.2, "miss_share": 0.37})
+    return o
 
 
 class Max(unittest.TestCase):
@@ -36,9 +41,27 @@ class Max(unittest.TestCase):
             cur = target
         return b, cur
 
-    def test_the_spend_is_never_clamped_by_the_allowance(self):
+    def test_the_spend_is_never_clamped_by_an_allowance(self):
         b, cur = self.grown()
-        self.assertGreater(cur, b.verdict.allowed_high, "the allowance never earned the spend; the max does not ask it")
+        self.assertGreater(b.max.counts["spend"], 0, "the max spends where the misses cost; no allowance is asked")
+        self.assertIsNone(b.record()["allowed_high"], "the max keeps no allowance")
+        self.assertIn("the max", b.record()["state"])
+
+    def test_nothing_is_taken_where_the_split_or_the_host_is_unread(self):
+        b = R.Brain(64, "resource")
+        for t in range(1, 15):                                 # the wire's older records: no split, so no account of a miss's cost
+            target, why, info = b.step(float(t), obs(3.0, 61.0, 64, evicted=50, split=False))
+        self.assertEqual(target, 64, why); self.assertIn("not read", why)
+        b = R.Brain(64, "resource")
+        for t in range(1, 15):                                 # the host's memory unread
+            o = obs(3.0, 61.0, 64, evicted=50); o["host_avail_mb"] = None
+            target, why, info = b.step(float(t), o)
+        self.assertEqual(target, 64, why); self.assertIn("host", why)
+        b = R.Brain(64, "resource")
+        for t in range(1, 15):                                 # the host has no notch over its cushion
+            o = obs(3.0, 61.0, 64, evicted=50); o["host_avail_mb"] = 0.05 * 7168.0 + 4.0
+            target, why, info = b.step(float(t), o)
+        self.assertEqual(target, 64, why); self.assertIn("cushion", why)
 
     def test_calm_hands_back_only_to_the_working_sets_floor(self):
         b, cur = self.grown()
@@ -81,7 +104,10 @@ class MissPrice(unittest.TestCase):
         for t in range(1, 15):
             target, why, info = b.step(float(t), dear)
         self.assertGreater(target, 64, why)
-        self.assertIsNone(R.Brain.miss_worth(obs(0.8, 61.0, 64)), "a wire without the split does not gate")
+        self.assertEqual(R.miss_time(obs(0.8, 61.0, 64, split=False)), (None, None), "a wire without the split gives no account")
+        miss_s, service_s = R.miss_time(dear)
+        self.assertAlmostEqual(service_s, 1500 * 2.2e-3)
+        self.assertAlmostEqual(miss_s, 1500 * 0.37 * (5.5 - 0.12) / 1000.0)
 
 
 if __name__ == "__main__":
