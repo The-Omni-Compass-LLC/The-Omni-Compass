@@ -78,14 +78,33 @@ workflows' default of 20 s a notch; runs A and B at the counted 30 s (`scripts/r
 benchmark run three times. Every store workflow's default is now the counted 30 s (`tests/test_audit_2026_10_30.py`), and on the
 next engine every store table runs again at one setting.
 
-## 5. Redis and MySQL: the cache was never allowed to grow
+## 5. Redis, MySQL and MongoDB: where a miss costs the service, and where it does not
 
-Redis's 95th percentile stands at 5.2 to 5.7 ms in both arms against its 2 ms line: a miss costs the trip to the store. Only a
-larger cache cuts the misses, and the allowance held the cache at 64 to 80 MB (a mean of 62 to 66 MB held) while the working
-set needs more than twice that. Under the resource objective a step must cut latency by more than the share of memory it adds;
-on a cache's hit curve, which flattens as the cache grows, each step buys less than its share, so the trial refuses it even
-when the trial is allowed to finish. MySQL's buffer pool shows the same gate (its allowance's top at 512 or 640 MB) while it
-gives memory back where the service allows (the pool held down 4% to 22% in the burst and read-only workloads, GAIN).
+Redis's 95th percentile stands at 5.2 to 5.7 ms in both arms against its 2 ms line: a miss costs the trip to the store (5 ms).
+Only a larger cache cuts the misses, and the allowance held the cache at 64 to 80 MB while the working set needs more. In our own
+model of the cache (class S; its hit and miss latencies the omni-v21 native arms' own records; redis_model.py on the branch
+v22-stores, not on main until the model gate reads no LOSS) a ceiling the working set fits under raises the small workload's hit share from 63% to 72% at 256 MB; the misses
+that remain are each notch's first touch of a new keyspace, which no ceiling mends.
+
+MySQL and MongoDB are the other case. Their omni arms' own seconds (`tools/store_causes.py` over the raw runs; the pool or cache,
+the misses and the latency of each second):
+
+| Store | Working set | Knob | Misses | Latency |
+|---|---|---|---|---|
+| MySQL, read-only, 6 tables | about 1.3 GB | pool 384 MB | 12.4% of page reads | 0.138 ms a statement |
+| | | pool 512 MB | 10.9% | 0.138 ms |
+| | | pool 640 MB | 9.1% | 0.141 ms |
+| MongoDB, workload b, 6 × 250,000 records | | cache 512 MB | 15.8% of pages | 0.082 ms a read |
+| MongoDB, tuning, 6 × 250,000 records | | cache 512 MB | 12.6% | 0.073 ms |
+| | | cache 576 MB | 12.1% | 0.074 ms |
+| | | cache 640 MB | 11.7% | 0.075 ms |
+
+A third of the misses gone and the latency unmoved: on the runner the data files sit in the machine's own page cache, so a pool or
+cache "miss" is a read from memory, and the memory the brain asked for in the over-line seconds would have bought nothing. The
+over-line seconds there are the host's, not the misses'. So the store wires need two things, not one: the wall never clamped by
+the allowance where a miss costs the service (Redis), and a gate on what a miss costs where it does not (MySQL, MongoDB): the
+miss share times a miss's latency less a hit's, over the mean latency, at least a tenth before a notch of memory is spent. The
+Redis candidate carries both (`docs/REDIS_PREREGISTRATION.md`, amendment 5).
 
 ## 6. The fix, the next version's, through the model gate first
 

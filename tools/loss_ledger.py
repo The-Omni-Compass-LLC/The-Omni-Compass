@@ -76,25 +76,27 @@ CAUSES = {
     ("KAFKA_SERVICE", ""): (STORE_GATE + "; and the hand-back gave back a consumer the load still needed, each give-back and "
                             "re-add a rebalance of the whole group (a median 2.58 s and 1.24 s of every message waiting)",
                             STORE_PAGE, STORE_NEXT, STORE_DECIDES),
-    ("REDIS", ""): ("suspected: " + STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more); not yet "
-                    "shown which move raised the small workload's 99th percentile", STORE_PAGE, "the next version, if the "
-                    "suspicion holds", STORE_DECIDES),
-    ("REDIS_SERVICE", ""): ("suspected: " + STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more); not "
-                            "yet shown which move raised the small workload's 99th percentile", STORE_PAGE, "the next version, "
-                            "if the suspicion holds", STORE_DECIDES),
+    ("REDIS", ""): (STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more; in our own model a ceiling the "
+                    "working set fits under reads work inside the line GAIN, up 7.7% to 22.9%, and the 99th percentile GAIN or EVEN)",
+                    STORE_PAGE, STORE_NEXT, STORE_DECIDES),
+    ("REDIS_SERVICE", ""): (STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more)", STORE_PAGE, STORE_NEXT,
+                            STORE_DECIDES),
     ("SYSBENCH_SHIPPED", "workload update_index"): (NO_WRITE + " (the pool at the shipped 128 MB in both arms)", STORE_PAGE, "",
                                                     NO_WRITE_DECIDES),
-    ("SYSBENCH_SHIPPED", "workload "): ("under investigation: one repetition of run B carries the mean of three (the burst's 95th "
-                                        "percentile: run B up 255.1%, its interval from 554% down to 1,065% up; runs A and C "
-                                        "within 0.6%)", STORE_PAGE, "", "the benchmark's three runs, read repetition by repetition"),
+    ("SYSBENCH_SHIPPED", "workload "): ("one repetition of run B carries the mean of three (the burst's 95th percentile: run B up "
+                                        "255.1%, its interval from 554% down to 1,065% up; runs A and C within 0.6%); on this rig a "
+                                        "pool miss costs the statement nothing (the data files in the machine's page cache: 9% to 12% "
+                                        "of page reads missing with the latency unmoved), so no move of the pool explains it",
+                                        STORE_PAGE, "", "the benchmark's three runs, read repetition by repetition"),
     ("YCSB_SHIPPED", ""): (NO_WRITE + ": MongoDB's shipped cache (7,482 MB) is above the knob's cover, at its limit on native "
                            "(docs/YCSB_PREREGISTRATION.md, amendment 4)", STORE_PAGE, "", NO_WRITE_DECIDES),
-    ("YCSB", ""): ("under investigation: latencies of 0.3 to 0.6 ms that moved 0.2% to 5.4%, beyond the noise in no run; the "
-                   "cache's few moves (2 to 12 an arm) or the rig's noise", STORE_PAGE, "", "the benchmark's three runs at one "
-                   "setting on the next engine"),
-    ("YCSB_SERVICE", ""): ("under investigation: latencies of 0.3 to 0.6 ms that moved 0.2% to 1.7%, beyond the noise in no "
-                           "run; the cache's few moves or the rig's noise", STORE_PAGE, "", "the benchmark's three runs on the "
-                           "next engine"),
+    ("YCSB", ""): ("latencies of 0.3 to 0.6 ms that moved 0.2% to 5.4%, beyond the noise in no run: on this rig a cache miss costs "
+                   "the read nothing (12% to 16% of pages missing with the read latency unmoved at 0.07 to 0.08 ms), so the cache's "
+                   "few moves (2 to 12 an arm) bought and cost nothing; the rig's noise", STORE_PAGE, "", "the benchmark's three "
+                   "runs at one setting on the next engine"),
+    ("YCSB_SERVICE", ""): ("latencies of 0.3 to 0.6 ms that moved 0.2% to 1.7%, beyond the noise in no run: a cache miss costs the "
+                           "read nothing on this rig, so the cache's few moves bought and cost nothing; the rig's noise", STORE_PAGE,
+                           "", "the benchmark's three runs on the next engine"),
 }
 
 

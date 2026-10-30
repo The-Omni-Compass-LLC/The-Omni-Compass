@@ -203,18 +203,24 @@ class RolloutCleanup(unittest.TestCase):
 
 class SparseEngineCheckout(unittest.TestCase):
     def test_actual_matrix_checkout_can_identify_the_engine(self):
-        # Exercise the YAML's patterns against a real sparse Git index, not a mirrored string assertion.
+        # Exercise the YAML's patterns against a real sparse Git index, not a mirrored string assertion. A worktree of this
+        # repository, never a clone of it: a clone copies every object (7 GB where the raw runs' pack is present), and a partial
+        # or shallow clone, as a cloud session checks the repository out, cannot serve one at all (30 October 2026).
         workflow = yaml.safe_load((ROOT / '.github/workflows/six-kube.yml').read_text())
         checkout = next(s for s in workflow['jobs']['run']['steps'] if s.get('uses', '').startswith('actions/checkout@'))
         patterns = checkout['with']['sparse-checkout']
         with tempfile.TemporaryDirectory() as directory:
+            tree = str(Path(directory) / 'sparse')
             def git(*args, **kwargs):
                 return subprocess.run(['git', *args], check=True, capture_output=True, text=True, **kwargs)
-            git('clone', '--shared', '--no-checkout', str(ROOT), directory)
-            git('-C', directory, 'sparse-checkout', 'init', '--no-cone')
-            git('-C', directory, 'sparse-checkout', 'set', '--no-cone', '--stdin', input=patterns)
-            git('-C', directory, 'checkout', 'HEAD')
-            result = subprocess.run(['python3', 'tools/omni_version.py'], cwd=directory, capture_output=True, text=True)
+            git('-C', str(ROOT), 'worktree', 'add', '--detach', '--no-checkout', tree, 'HEAD')
+            try:
+                git('-C', tree, 'sparse-checkout', 'init', '--no-cone')
+                git('-C', tree, 'sparse-checkout', 'set', '--no-cone', '--stdin', input=patterns)
+                git('-C', tree, 'checkout', 'HEAD')
+                result = subprocess.run(['python3', 'tools/omni_version.py'], cwd=tree, capture_output=True, text=True)
+            finally:
+                subprocess.run(['git', '-C', str(ROOT), 'worktree', 'remove', '--force', tree], capture_output=True)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('omni-v21', result.stdout)
 
