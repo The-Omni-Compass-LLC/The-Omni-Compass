@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+from collections import deque
 import os
 import random
 import subprocess
@@ -74,6 +75,7 @@ STEPS = "1 2 3 2 3 4 5 6 5 4 3 2 1 2 1"
 BURST = "1 6 1 8 1 6"
 ZIPF_S = 0.5              # the working set's key distribution (Zipf exponent): a hot core and a long tail, as application caches see
 FULL = 0.9                # the cache counts as full when memory used is 90% of the ceiling or more
+HOLD_WINDOW_S = 60.0      # omni-v22: the ceiling is never handed back below what the working set occupied in this window (the twin)
 from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 SAME_REL = 1e-6
 
@@ -252,6 +254,74 @@ def decide(p, force, evicted_last_s, cur_mb, last_change_age, full, wall=0.95):
     return cur_mb, "hold"
 
 
+# omni-v22: the max on the cache's ceiling (docs/REDIS_PREREGISTRATION.md, amendment 5; docs/STORE_ROOT_CAUSES_2026-10-30.md).
+# On omni-v21 the verdict's allowance clamped every move, the wall's fail-up included, and the wall abandoned every spend trial,
+# so in 4,426 of the 4,581 seconds the service stood over its line the brain asked for memory and was refused; the cache stayed at
+# 64 to 80 MB while the working set needed more. Under the max (the factory tune, the founder's order of 12 October) memory the
+# cache takes inside the operator's cover is power given, shown beside the hits it bought; the verdict's allowance judges the
+# give-back below the operator's ceiling (the tune-down's ground), never a spend the service asks for.
+class Brain:
+    """The knob's decision, one a second: the code the real run (Omni) and the closed-loop model (tools/redis_model.py) drive.
+    obs: reading_s (the application's mean latency over the last second), n, inside, evicted_last_s, ceiling_mb, used_mb,
+    cpu_share (or None).
+
+      the spend     misses with the cache full (the compass asking, by its own law: ceil(force / 0.1) notches a second; at the
+                    wall a quarter of the cover at once) go through unclamped, up to the cover's top; the memory is power given
+      the hold      calm with nothing evicted for the dwell gives one notch back a second, down to the operator's ceiling freely;
+                    below it only inside the allowance a give-back trial has earned (omni-v21's rule, kept)
+      the floor     never under the cover's floor; the operator's ceiling handed back at the end
+      the audit     every decision with the verdict's allowance beside it, as before"""
+
+    def __init__(self, native_mb, objective=DEFAULT_OBJECTIVE, line_ms=LINE_MS):
+        self.native_mb, self.objective = native_mb, objective
+        self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
+        self.verdict = KnobVerdict(native_mb, STEP_MB, COVER_MB, objective=objective, settle_s=TAU)
+        self.last_change = -1e9; self.failups = 0
+        self.used = deque()                                            # (t, memory used MB) over the hold's window: the working set's twin
+
+    def floor_mb(self, t):
+        """The twin's floor for a hand-back: the most memory the working set occupied in the last HOLD_WINDOW_S, with the fullness
+        margin, rounded up to a notch, never under the operator's ceiling. A ceiling handed back below it evicts keys the
+        service is still asking for, and the next rise buys them back at the store's price (the sawtooth the model showed)."""
+        while self.used and t - self.used[0][0] > HOLD_WINDOW_S:
+            self.used.popleft()
+        peak = max((u for _, u in self.used), default=0.0) / FULL
+        return max(self.native_mb, int(math.ceil(peak / STEP_MB)) * STEP_MB)
+
+    def step(self, t, obs):
+        reading = obs["reading_s"]; cur = obs["ceiling_mb"]; ev_last = obs["evicted_last_s"]
+        full = obs["used_mb"] >= FULL * cur
+        self.used.append((t, obs["used_mb"]))
+        f = self.law.force(reading)
+        cost = sample_cost(self.objective, obs["inside"], reading if obs["n"] else None, cur, obs.get("cpu_share"))
+        self.verdict.observe(cost, t)
+        want, why = decide(self.law.p, f, ev_last, cur, t - self.last_change, full, wall=self.law.band.wall_high)
+        fail_up = why.startswith("fail up")
+        info = {"verdict_phase": None, "verdict_direction": None, "allowed_low": self.verdict.allowed_low, "allowed_high": self.verdict.allowed_high}
+        if want > cur:
+            target = want                                              # the spend the service asks for: never clamped
+            why += "; power given inside the cover"
+            if fail_up:
+                self.failups += 1
+        elif want < cur:
+            floor = self.floor_mb(t)
+            if want >= floor:
+                target = want                                          # a notch back, above what the working set occupied: free
+                why += f"; the working set's last {HOLD_WINDOW_S:.0f} s fit under {floor} MB"
+            elif cur > floor:
+                target = max(want, floor)                              # down to the twin's floor, never under it
+                why = f"calm: handed back to the working set's floor, {floor} MB"
+            else:
+                target = cur
+                why = f"hold: {cur} MB is what the working set's last {HOLD_WINDOW_S:.0f} s occupied"
+        else:
+            target = cur
+        if target > cur:
+            self.last_change = t                                       # the dwell runs from the last growth
+        info.update({"p": round(self.law.p, 4), "force": round(f, 4), "floor_mb": self.floor_mb(t)})
+        return target, why, info
+
+
 class Omni(threading.Thread):
     """The brain, one decision a second, writing the audit; the knob is handed back at the end and read back. Amendment 2 (the
     brain's own verdict, 2026-10-09): the ceiling starts in watch and is written only inside the allowance a paired trial on
@@ -277,7 +347,7 @@ class Omni(threading.Thread):
             self.stop_flag.wait()
             self.handed_back = self.plug.restore()
             return
-        self.verdict = KnobVerdict(native_mb, STEP_MB, COVER_MB, objective=self.objective, settle_s=TAU)
+        self.brain = Brain(native_mb, self.objective, self.line_ms); self.verdict = self.brain.verdict
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
@@ -291,18 +361,14 @@ class Omni(threading.Thread):
                     cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
                     cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
                     cost = sample_cost(self.objective, inside, mean_s, cur, cpu_share)
-                    self.verdict.observe(cost, tick - t0)                                # measured under the ceiling of the last second
-                    target, why = decide(self.law.p, f, ev_last, cur, tick - self.last_change, full, wall=self.law.band.wall_high)
-                    target, why, vinfo = self.verdict.decide(target, spend_ok=(f > 0.05 and full), give_ok=(f < -0.05 and ev_last == 0),
-                                                             t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=why.startswith("fail up"))
+                    obs = {"reading_s": reading, "n": n_req, "inside": inside, "evicted_last_s": ev_last, "ceiling_mb": cur, "used_mb": used,
+                           "cpu_share": cpu_share}
+                    target, why, vinfo = self.brain.step(tick - t0, obs)       # omni-v22: the Brain's decision (above)
                     wrote = None
                     if target != cur:
                         wrote = self.plug.write(target); self.writes += 1
-                        if target > cur:
-                            self.last_change = tick                  # the dwell runs from the last growth
-                        if why.startswith("fail up"):
-                            self.failups += 1
-                    fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3), "p": round(self.law.p, 4), "force": round(f, 4),
+                    self.failups = self.brain.failups
+                    fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 3),
                                          "evicted_last_s": ev_last, "maxmemory_mb": cur, "used_mb": round(used, 1), "full": full, "target_mb": target, "wrote_mb": wrote,
                                          "requests_last_s": n_req, "inside_last_s": inside, "cpu_share": None if cpu_share is None else round(cpu_share, 4),
                                          "cost": None if cost is None else round(cost, 9), **vinfo, "why": why}) + "\n")

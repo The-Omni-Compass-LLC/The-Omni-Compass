@@ -126,7 +126,21 @@ def main(argv=None):
     ap.add_argument("--workloads", default="tuning,small,large,burst")
     ap.add_argument("--seeds", type=int, default=2)
     ap.add_argument("--step-s", type=float, default=30.0)
+    ap.add_argument("--compare", action="store_true", help="native, omni-v21's loop (from git at --base) and the candidate, seed for seed")
+    ap.add_argument("--base", default="29370eec0b")
     a = ap.parse_args(argv)
+    if a.compare:
+        import tools.run_redis as cand
+        def maker():
+            b = cand.Brain(64, "resource")
+            def step(t, obs):
+                o = dict(obs); o["cpu_share"] = CPU_SHARE
+                target, why, info = b.step(t, o)
+                return target
+            return step
+        maker = maker if hasattr(cand, "Brain") else None
+        print_compare(compare(a.workloads.split(","), list(range(101, 101 + a.seeds)), a.base, a.step_s, maker))
+        return
     for wl in a.workloads.split(","):
         print(f"== {wl}")
         for mb in [float(x) for x in a.fixed.split(",")]:
@@ -134,6 +148,87 @@ def main(argv=None):
             m = {k: statistics.mean(r[k] for r in rs) for k in rs[0]}
             print(f"   fixed {mb:>5.0f} MB: work inside the line {m['work_inside_line_rps']:7.1f} a second, hits {100 * m['hit_share']:5.1f}%, "
                   f"mean {m['mean_ms']:5.2f} ms, p95 {m['p95_ms']:5.2f}, p99 {m['p99_ms']:5.2f}, used {m['used_mean_mb']:6.1f} MB")
+
+
+# ------------------------------------------------------------------------------------------- the brains on the model
+def load_module(path, name):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec); sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def standing_wire(base):
+    """omni-v21's Redis wire and its verdict, read from git at base into a scratch directory (never this checkout's files)."""
+    import subprocess, tempfile
+    tmp = Path(tempfile.mkdtemp()); (tmp / "tools").mkdir()
+    for rel in ("tools/run_redis.py", "tools/knob_verdict.py"):
+        src = subprocess.run(["git", "-C", str(ROOT), "show", f"{base}:{rel}"], check=True, capture_output=True, text=True).stdout
+        (tmp / rel).write_text(src)
+    kv = load_module(str(tmp / "tools" / "knob_verdict.py"), "redis_model_standing_knob_verdict")
+    saved = sys.modules.get("tools.knob_verdict"); sys.modules["tools.knob_verdict"] = kv
+    try:
+        wire = load_module(str(tmp / "tools" / "run_redis.py"), "redis_model_standing_run_redis")
+    finally:
+        if saved is not None:
+            sys.modules["tools.knob_verdict"] = saved
+    return wire
+
+
+CPU_SHARE = 0.3          # the host's busy share in the omni-v21 runs (0.26 to 0.32): a constant in the model, the same in every arm
+
+
+class StandingBrain:
+    """omni-v21's loop body (tools/run_redis.py Omni.run at the base commit), one decision a second, on the model's seconds."""
+
+    def __init__(self, wire, native_mb, objective="resource"):
+        self.w = wire
+        self.law = wire.CompassLaw(wire.Band(0.0, wire.LINE_MS / 1000.0, center=wire.CENTER), dt=wire.DT, tau=wire.TAU, smooth=wire.SMOOTH)
+        self.verdict = wire.KnobVerdict(native_mb, wire.STEP_MB, wire.COVER_MB, objective=objective, settle_s=wire.TAU)
+        self.objective = objective; self.last_change = -1e9
+
+    def __call__(self, t, obs):
+        w = self.w
+        f = self.law.force(obs["reading_s"])
+        cur = obs["ceiling_mb"]; full = obs["used_mb"] >= w.FULL * cur
+        cost = w.sample_cost(self.objective, obs["inside"], obs["reading_s"], cur, CPU_SHARE)
+        self.verdict.observe(cost, t)
+        target, why = w.decide(self.law.p, f, obs["evicted_last_s"], cur, t - self.last_change, full, wall=self.law.band.wall_high)
+        target, why, _ = self.verdict.decide(target, spend_ok=(f > 0.05 and full), give_ok=(f < -0.05 and obs["evicted_last_s"] == 0),
+                                             t=t, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=why.startswith("fail up"))
+        if target != cur and target > cur:
+            self.last_change = t
+        return target if target != cur else None
+
+
+def compare(workloads, seeds, base, step_s, candidate=None):
+    """Native (the operator's 64 MB), omni-v21's loop and, where the checkout has one, the candidate, seed for seed."""
+    wire = standing_wire(base)
+    arms = {"native": lambda: (lambda t, o: None), "standing": lambda: StandingBrain(wire, 64)}
+    if candidate is not None:
+        arms["candidate"] = candidate
+    out = {}
+    for wl in workloads:
+        out[wl] = {arm: [run_arm(wl, make(), s, step_s) for s in seeds] for arm, make in arms.items()}
+    return out
+
+
+def print_compare(res):
+    keys = [("work_inside_line_rps", "work inside the line (requests a second)"), ("mean_ms", "latency, mean (ms)"), ("p95_ms", "latency, 95th percentile (ms)"),
+            ("p99_ms", "latency, 99th percentile (ms)"), ("hit_share", "hit share"), ("ceiling_mean_mb", "ceiling held, mean (MB)"), ("used_mean_mb", "memory used, mean (MB)")]
+    for wl, arms in res.items():
+        print(f"== {wl}")
+        names = list(arms)
+        print("   gauge".ljust(44) + "".join(n.rjust(12) for n in names) + "   standing vs native, candidate vs standing (%)")
+        for k, label in keys:
+            means = {n: statistics.mean(r[k] for r in arms[n]) for n in names}
+            rel = []
+            if "standing" in means and means["native"]:
+                rel.append(f"{100 * (means['standing'] - means['native']) / means['native']:+.1f}")
+            if "candidate" in means and means.get("standing"):
+                rel.append(f"{100 * (means['candidate'] - means['standing']) / means['standing']:+.1f}")
+            print(f"   {label.ljust(41)}" + "".join(f"{means[n]:12.2f}" for n in names) + "   " + "  ".join(rel))
 
 
 if __name__ == "__main__":
