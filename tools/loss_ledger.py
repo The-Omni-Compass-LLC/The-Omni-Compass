@@ -47,6 +47,14 @@ SECTIONS = ("against my own native", "in place of a controller", "without me, or
 V13_FIX = ("on a shared host at its top, beside another workload's room, a CPU limit I raised was kept through a saturated batch "
            "queue, so the batch pods ran slower while the web served no faster", "docs/OMNI_V13.md", "omni-v13",
            "the benchmark's three runs on the engine that stands")
+STORE_PAGE = "docs/STORE_ROOT_CAUSES_2026-10-30.md"
+STORE_GATE = ("the verdict's gate: the allowance clamped every move, the wall's fail-up included, and the wall abandoned every "
+              "spend trial, so in the seconds the service stood over its line the brain asked to go up and was kept from it")
+STORE_NEXT = "the next version (its candidate on the branch v22-stores, the model gate first)"
+STORE_DECIDES = "the benchmark's three runs at one setting on the next engine"
+NO_WRITE = ("Omni-Compass wrote nothing in any repetition, so the two arms are one system and the difference is the rig's own "
+            "noise between two native arms")
+NO_WRITE_DECIDES = "no engine moves it: more repetitions a run, to shrink the rig's noise"
 CAUSES = {
     ("KUBERAY_4W_BARE", ""): V13_FIX,
     ("ARMADA_4W_BARE", ""): ("suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent "
@@ -61,6 +69,32 @@ CAUSES = {
     ("OCM_4W_TOP", "alert minutes"): ("under investigation: the third run's size is far from the first two",
                                       "docs/LOSS_ROWS_UNDER_INVESTIGATION.md", "", "the benchmark's three runs on the engine "
                                       "that stands, read repetition by repetition"),
+    # the data stores on omni-v21, from their own files (docs/STORE_ROOT_CAUSES_2026-10-30.md, tools/store_causes.py)
+    ("KAFKA", ""): (STORE_GATE + "; and the hand-back gave back a consumer the load still needed, each give-back and re-add a "
+                    "rebalance of the whole group (a median 2.58 s and 1.24 s of every message waiting); run C ran at 20 s a notch, "
+                    "A and B at 30 s, so the table is two settings", STORE_PAGE, STORE_NEXT, STORE_DECIDES),
+    ("KAFKA_SERVICE", ""): (STORE_GATE + "; and the hand-back gave back a consumer the load still needed, each give-back and "
+                            "re-add a rebalance of the whole group (a median 2.58 s and 1.24 s of every message waiting)",
+                            STORE_PAGE, STORE_NEXT, STORE_DECIDES),
+    ("REDIS", ""): ("suspected: " + STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more); not yet "
+                    "shown which move raised the small workload's 99th percentile", STORE_PAGE, "the next version, if the "
+                    "suspicion holds", STORE_DECIDES),
+    ("REDIS_SERVICE", ""): ("suspected: " + STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more); not "
+                            "yet shown which move raised the small workload's 99th percentile", STORE_PAGE, "the next version, "
+                            "if the suspicion holds", STORE_DECIDES),
+    ("SYSBENCH_SHIPPED", "workload update_index"): (NO_WRITE + " (the pool at the shipped 128 MB in both arms)", STORE_PAGE, "",
+                                                    NO_WRITE_DECIDES),
+    ("SYSBENCH_SHIPPED", "workload "): ("under investigation: one repetition of run B carries the mean of three (the burst's 95th "
+                                        "percentile: run B up 255.1%, its interval from 554% down to 1,065% up; runs A and C "
+                                        "within 0.6%)", STORE_PAGE, "", "the benchmark's three runs, read repetition by repetition"),
+    ("YCSB_SHIPPED", ""): (NO_WRITE + ": MongoDB's shipped cache (7,482 MB) is above the knob's cover, at its limit on native "
+                           "(docs/YCSB_PREREGISTRATION.md, amendment 4)", STORE_PAGE, "", NO_WRITE_DECIDES),
+    ("YCSB", ""): ("under investigation: latencies of 0.3 to 0.6 ms that moved 0.2% to 5.4%, beyond the noise in no run; the "
+                   "cache's few moves (2 to 12 an arm) or the rig's noise", STORE_PAGE, "", "the benchmark's three runs at one "
+                   "setting on the next engine"),
+    ("YCSB_SERVICE", ""): ("under investigation: latencies of 0.3 to 0.6 ms that moved 0.2% to 1.7%, beyond the noise in no "
+                           "run; the cache's few moves or the rig's noise", STORE_PAGE, "", "the benchmark's three runs on the "
+                           "next engine"),
 }
 
 
