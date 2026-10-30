@@ -52,7 +52,7 @@ sys.path.insert(0, str(ROOT))
 from omnicompass import master
 from omnicompass.adapter import Governor, mode_law, OBSERVE, REF_PERIOD_S
 from omnicompass.shield import enforce, ShieldLimits
-from omni_controller.muscles import Muscles, add_args as add_muscle_args, run_operator_cmd
+from omni_controller.muscles import Muscles, add_args as add_muscle_args, run_operator_cmd, RESTORE_TRIES
 from omni_controller.capacity import HostCpuSampler, bounded_replica_cap, kind_replica_ceiling, one_host
 
 ANNOTATION = "omnicompass.io/original-target-utilization"
@@ -725,44 +725,80 @@ class Controller:
         return (os.environ.get("OMNI_KILL") == "1" or (self.a.kill_file and Path(self.a.kill_file).exists())
                 or master.is_off())
 
+    def _persist(self, what, fn):
+        """One step of the hand-back, tried RESTORE_TRIES times against a transient failure of the cluster's API; every
+        failed try is in the audit. Returns (the step's value, whether it landed)."""
+        for attempt in range(1, RESTORE_TRIES + 1):
+            try:
+                return fn(), True
+            except (subprocess.CalledProcessError, OSError) as e:
+                self.audit({"error": f"restore: {what}: {e!r}"[:500], "stderr": str(getattr(e, "stderr", "") or "")[-300:],
+                            "attempt": attempt, "of": RESTORE_TRIES})
+                if attempt < RESTORE_TRIES:
+                    time.sleep(min(4.0, 2.0 ** (attempt - 1)))
+        return None, False
+
     def restore(self):
-        for h in self.k.get("get", "hpa", "-A", "-o", "json")["items"]:
+        """Every setting handed back to the operator's, from the records kept on the objects themselves. Each read and write
+        is tried RESTORE_TRIES times, each muscle's hand-back on its own, and what did not land is raised at the end (the
+        caller's audit records it; the master switch's watchdog runs the hand-back again)."""
+        missed = []
+        hpas, ok = self._persist("list the autoscalers", lambda: self.k.get("get", "hpa", "-A", "-o", "json")["items"])
+        if not ok:
+            missed.append("the autoscalers' replica ranges and targets (the list could not be read)")
+        for h in hpas or []:
+            ns, name = h["metadata"]["namespace"], h["metadata"]["name"]
             rng = h["metadata"].get("annotations", {}).get(RANGE_ANN)
             if rng:
                 lo0, hi0 = (int(x) for x in rng.split(","))
-                ns, name = h["metadata"]["namespace"], h["metadata"]["name"]
-                self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"minReplicas": lo0, "maxReplicas": hi0}})],
-                             "reset: restore the HPA's own replica range")
-                self.k.write(["annotate", "hpa", name, "-n", ns, f"{RANGE_ANN}-"], "reset: remove range record")
-        for h in self.k.get("get", "hpa", "-A", "-o", "json")["items"]:
+
+                def put_range(ns=ns, name=name, lo0=lo0, hi0=hi0):
+                    self.k.write(["patch", "hpa", name, "-n", ns, "--type=merge", "-p", json.dumps({"spec": {"minReplicas": lo0, "maxReplicas": hi0}})],
+                                 "reset: restore the HPA's own replica range")
+                    self.k.write(["annotate", "hpa", name, "-n", ns, f"{RANGE_ANN}-"], "reset: remove range record")
+                if not self._persist(f"{ns}/{name}: the HPA's own replica range", put_range)[1]:
+                    missed.append(f"{ns}/{name}: the replica range")
             orig = h["metadata"].get("annotations", {}).get(ANNOTATION)
-            if orig is None:
-                continue
-            ns, name = h["metadata"]["namespace"], h["metadata"]["name"]
-            idx, _ = cpu_target(h)
-            if idx is not None:
-                self.k.write(["patch", "hpa", name, "-n", ns, "--type=json", "-p",
-                              json.dumps([{"op": "replace", "path": f"/spec/metrics/{idx}/resource/target/averageUtilization", "value": int(orig)}])],
-                             "reset: restore original HPA target")
-            self.k.write(["annotate", "hpa", name, "-n", ns, f"{ANNOTATION}-"], "reset: remove record")
+            if orig is not None:
+                idx, _ = cpu_target(h)
+
+                def put_target(ns=ns, name=name, idx=idx, orig=orig):
+                    if idx is not None:
+                        self.k.write(["patch", "hpa", name, "-n", ns, "--type=json", "-p",
+                                      json.dumps([{"op": "replace", "path": f"/spec/metrics/{idx}/resource/target/averageUtilization", "value": int(orig)}])],
+                                     "reset: restore original HPA target")
+                    self.k.write(["annotate", "hpa", name, "-n", ns, f"{ANNOTATION}-"], "reset: remove record")
+                if not self._persist(f"{ns}/{name}: the operator's target", put_target)[1]:
+                    missed.append(f"{ns}/{name}: the target")
         for ns, name in getattr(self, "own", []):
-            try:
-                dep = self.k.get("get", "deployment", name, "-n", ns, "-o", "json")
-            except Exception:
+            dep, ok = self._persist(f"{ns}/{name}: read the workload", lambda ns=ns, name=name: self.k.get("get", "deployment", name, "-n", ns, "-o", "json"))
+            if not ok:
+                missed.append(f"{ns}/{name}: the operator's own count (the workload could not be read)")
                 continue
             orig = (dep["metadata"].get("annotations", {}) or {}).get(OWN_REPL_ANN)
             if orig is None:
                 continue
-            self.k.write(["scale", "deployment", name, "-n", ns, f"--replicas={int(orig)}"], "reset: restore the operator's own count")
-            self.k.write(["annotate", "deployment", name, "-n", ns, f"{OWN_REPL_ANN}-"], "reset: remove the count's record")
+
+            def put_count(ns=ns, name=name, orig=orig):
+                self.k.write(["scale", "deployment", name, "-n", ns, f"--replicas={int(orig)}"], "reset: restore the operator's own count")
+                self.k.write(["annotate", "deployment", name, "-n", ns, f"{OWN_REPL_ANN}-"], "reset: remove the count's record")
+            if not self._persist(f"{ns}/{name}: the operator's own count", put_count)[1]:
+                missed.append(f"{ns}/{name}: the operator's own count")
         self.changed.clear()
-        self.m.restore()
+        try:
+            missed += [f"the muscle's hand-back: {n}" for n in (self.m.restore() or [])]   # each lever tried on its own (muscles.py)
+        except Exception as e:  # noqa: BLE001
+            self.audit({"error": f"restore: the muscles' hand-back: {e!r}"[:500]})
+            missed.append("the muscles' hand-back")
         cmd = getattr(self.a, "node_restore_cmd", "")
         if cmd and not self.nodes_restored:
             self.audit({"write": shlex.split(cmd), "why": "reset: restore node pool", "dry_run": self.a.dry_run})
-            if not self.a.dry_run:
-                subprocess.run(shlex.split(cmd), check=True)
-            self.nodes_restored = True
+            if self.a.dry_run or self._persist("the node pool", lambda: subprocess.run(shlex.split(cmd), check=True))[1]:
+                self.nodes_restored = True
+            else:
+                missed.append("the node pool")
+        if missed:
+            raise RuntimeError("hand-back incomplete after %d tries each: %s" % (RESTORE_TRIES, "; ".join(missed)))
 
     def _gain(self, h):
         """The CPU each pod of the HPA's deployment is guaranteed, over the operator's limit (1 when nothing conveyed):

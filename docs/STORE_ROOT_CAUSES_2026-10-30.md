@@ -99,12 +99,38 @@ the misses and the latency of each second):
 | | | cache 576 MB | 12.1% | 0.074 ms |
 | | | cache 640 MB | 11.7% | 0.075 ms |
 
-A third of the misses gone and the latency unmoved: on the runner the data files sit in the machine's own page cache, so a pool or
-cache "miss" is a read from memory, and the memory the brain asked for in the over-line seconds would have bought nothing. The
-over-line seconds there are the host's, not the misses'. So the store wires need two things, not one: the wall never clamped by
-the allowance where a miss costs the service (Redis), and a gate on what a miss costs where it does not (MySQL, MongoDB): the
-miss share times a miss's latency less a hit's, over the mean latency, at least a tenth before a notch of memory is spent. The
-Redis candidate carries both (`docs/REDIS_PREREGISTRATION.md`, amendment 5).
+Read across the pool sizes, a third of the misses gone with the latency unmoved looked, this morning, like misses that cost the
+statement nothing (the data files in the machine's page cache). That reading was too coarse, and it is withdrawn here. The change
+one notch of pool makes to the miss share (about three points) is worth about 5% of the statement time, inside the arms' own spread,
+so the level comparison could not have seen it. A slope of latency on miss share inside the arms was tried next as the price of a
+miss and read 0.5 to 1.3 ms a unit of miss share (MySQL) and 0.4 to 2.0 (MongoDB), which overstates it several times over: the
+host's noise moves the misses and the latency together, and a regression reads that as a price. It is not used anywhere.
+
+What is used is the store's own account of its misses. MySQL's performance schema times every read of the data files
+(`file_summary_by_event_name`, `wait/io/file/innodb/innodb_data_file`, enabled and timed as MySQL 8.0 ships) beside the workload's
+statement timer; WiredTiger counts and times the pages its application threads read from disk (`application threads page read from
+disk to cache time (usecs)`) beside the server's own read latency; the Redis harness's application records each request as a hit
+or a miss. The ratio, the misses' time over the service's time, read over the last 10 s, is the share of the service's own time that
+its misses are. Read on this machine on 30 October with MySQL 8.0.46 and sysbench's own workloads at their six-table notch, the
+operator's 512 MB pool (a tuning-bench reading on this host, class L, no benchmark result; `tools/store_brain.py` names the meter):
+
+| Workload on this machine | Statements a second | A statement | Page reads missing | A data file read | The misses' share of the statements' time |
+|---|---:|---:|---:|---:|---|
+| point selects, 6 tables, pool 512 MB (the first arm, the dataset just written and still flushing) | 3,001 | 137 µs | 17.3% | 70 µs | median 32% (quartiles 24% and 37%) |
+| read-only transactions, 6 tables, 512 MB | 4,484 | 95 µs | 10.9% | 14 µs | median 12% (quartiles 8% and 19%) |
+| point selects, 3 tables, 512 MB | 3,017 | 95 µs | 8.8% | 9 µs | median 2.8% (quartiles 2.3% and 3.9%) |
+| point selects, 6 tables, 128 MB (MySQL as shipped) | 2,997 | 93 µs | 23.4% | 7 µs | median 7.0% (quartiles 6.2% and 7.9%) |
+| read-only transactions, 6 tables, 128 MB | 4,455 | 80 µs | 15.3% | 5 µs | median 7.3% (quartiles 7.1% and 7.5%) |
+| point selects, 3 tables, 128 MB | 3,005 | 92 µs | 21.8% | 6 µs | median 5.7% (quartiles 5.5% and 6.2%) |
+
+The miss shares are the rig's own (10.9% at 512 MB on the read-only workload), and the first arm's statement latency is the rig's
+(0.138 ms): the rig, like that arm, runs each workload straight after its dataset is prepared, while the host is still writing it
+out, and a data file read then costs 70 µs; once the host has settled a read costs 5 to 14 µs. The misses are not nothing: 3% to
+32% of what a statement waits for is a page the pool did not hold, every arm above the key's floor, and only the pool can cut it.
+The account is read live, second by second, so the brain reads what the misses cost on the machine it runs on, not this one. So the store wires need the wall never clamped by an allowance (every store), the spend gated on the store's own
+account at the one key's floor (a half of one percent of the service's time: under it the misses are nothing the record could read,
+and memory could buy nothing it could read), the host's room (a notch only while the host keeps 5% of its memory available), and
+the hand-back never below what the working set occupied. The five candidates carry them (section 6).
 
 ## 6. The fix, the next version's, through the model gate first
 
@@ -132,8 +158,25 @@ The 20 s row is the physics of a change, not a tuning to be hidden: native's pea
 second, 1,100 in 20 s and 1,650 in 30 s); any added consumer costs one rebalance's worth of arrivals (880 a second × 1.24 s
 median, about 1,100). It is on the next version's list with its cause.
 
-**Redis and MySQL**: the same reflex principle (the wall never clamped by the allowance; a hold that never shrinks the cache
-into the working set it carries), each through a closed-loop cache model set from its runs' own files before it lands.
+**Redis, MySQL, MongoDB and PostgreSQL** (candidates on the same branch; `tools/store_brain.py` is what the three cache wires
+share; each wire's `Brain` keeps its own compass law and its own rule): the max on each knob. The spend the wire's own rule asks
+for goes through unclamped, up to the cover, where the store's own account says the misses are at least the key's floor of the
+service's time and the host keeps its 5% cushion after the notch; it holds, and says why, where the misses are under the floor,
+where the account or the host's memory is unread, or where the host has no room; a hand-back never goes below the most the working
+set occupied in the last 60 s nor below native; the pooler's pool is never taken below the pooler's own setting. `OMNI_DIAL=save`
+keeps omni-v21's loop on every wire (the tune-down, where giving the resource back is the aim), and every record carries its dial.
+`tools/store_brain.py` and `tools/knob_verdict.py` join the fingerprint with the version that carries this (`tools/omni_version.py`).
+
+The store gate (`tools/store_gate.py`, class S, the omni-v21 arms' recorded seconds replayed open-loop through each candidate;
+`results/model_gate/V22_STORE_GATE.md` on the branch): no LOSS on any wire or workload. omni-v21's audits carry neither the stores'
+accounts of their misses nor the host's memory, so the three cache candidates hold at native in the replay (seconds below native
+97.9 → 0 an arm on MySQL, 12.5 → 0 on MongoDB, 36.6 → 0 on Redis; the knob's moves 7.5, 5.6 and 12.3 → 0, GAIN +100.0%); the
+pooler's candidate holds servers +28.2% (power given) and its seconds below native while clients waited fall 7.5 → 0 (GAIN
++100.0%); Kafka's twin as in the table above. The replay cannot show what the memory buys; the closed-loop Redis model (class S,
+`tools/redis_model.py --compare`, seeds 101 to 103) can: against omni-v21's own loop, work inside the line GAIN in every workload
+(small up 22.9%, burst up 17.6%, tuning up 10.3%, large up 7.7%), the mean latency GAIN (down 36% to 59%), the 95th and 99th
+percentiles GAIN or STEADY, the memory held power given (201 to 304 MB against 62 to 66 MB); no LOSS row. MySQL's and MongoDB's
+accounts are read for real on the first runs of the next engine, and a closed-loop model of each is set from those files.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 

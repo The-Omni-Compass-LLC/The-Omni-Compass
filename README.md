@@ -13,21 +13,10 @@
 
 ## The answer first: is Omni-Compass a benefit against native?
 
-**Yes, on the engine that stands (omni-v21), by the Omni index: GAIN, up 5.2%**, every real test together ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)), each benchmark run three times (A, B and C) on GitHub's own machines. Of the 25 benchmarks on the benefit sheet ([`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md)), 22 read omni-v21's own three-run table: 4 GAIN; 6 GAIN, power given; 11 GAIN AND LOSS; 1 LOSS; every LOSS row is named with its cause in [`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md). 3 still stand on an older engine (omni-v3) until their omni-v21 runs land.
-
-### On the engine that stands, omni-v21: the newest real runs
-
-Three separate runs (A, B and C) of each preregistered test on GitHub's own machines (class L, live software), native against Omni-Compass on top of native, every run on omni-v21. Each cell is the table's own reading, then each run's raw change, Omni-Compass against native, with its true sign.
-
-| Test | Work inside the line | Response, 95th percentile | Failed requests | Machines in service | GitHub runs |
-|---|---|---|---|---|---|
-| **Kubernetes, all four loads at once** ([`results/live/V21_ALL_FOUR.md`](results/live/V21_ALL_FOUR.md)) | GAIN in all three of our runs (raw +30.0%, +51.5%, +40.6%) | GAIN in all three of our runs (raw −51.5%, −59.5%, −56.2%) | GAIN by the mean of our three runs, beyond the noise in 1 of 3 (raw −5.3%, −5.1%, −5.4%) | STEADY, the same (raw ±0.0%, ±0.0%, ±0.0%) | A 40227146512 · B 40250382783 · C 40272629580 |
-| **Kubernetes, steady work** ([`results/live/V21_STEADY.md`](results/live/V21_STEADY.md)) | not a gauge of this test | GAIN in all three of our runs (raw −65.8%, −65.8%, −66.3%) | STEADY, the same (raw 0 → 0, 0 → 0, 0 → 0) | STEADY, the same (raw ±0.0%, ±0.0%, ±0.0%) | A 40223431219 · B 40246652453 · C 40269968227 |
-| **Kubernetes, demand that wanders** ([`results/live/V21_WANDERING.md`](results/live/V21_WANDERING.md)) | not a gauge of this test | GAIN in all three of our runs (raw −59.0%, −56.4%, −58.8%) | GAIN in all three of our runs (raw −13.9%, −14.9%, −12.2%) | STEADY, the same (raw ±0.0%, ±0.0%, ±0.0%) | A 40227141899 · B 40250378687 · C 40271292066 |
-| **Kubernetes, faults injected** ([`results/live/V21_FAULTS.md`](results/live/V21_FAULTS.md)) | not a gauge of this test | GAIN in all three of our runs (raw −51.0%, −57.8%, −54.5%) | GAIN by the mean of our three runs, beyond the noise in 2 of 3 (raw −18.2%, −14.3%, −10.7%) | STEADY, under the floor (the three runs' mean 0.03%) (raw −0.1%, ±0.0%, ±0.0%) | A 40229598467 · B 40250391552 · C 40272639170 |
+**Not yet read on the engine that stands (omni-v22)**: the Omni index stands on omni-v21 until omni-v22's tables land ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
 
 
-The real test of the whole loop, on the engine that stands (omni-v21), three runs on GitHub's own machines: Omni-Compass on top of native did 8.5% more work than native and answered 13.0% faster at the 95th percentile.
+The real test of the whole loop, on omni-v21, the newest engine with its three runs in (the engine that stands, omni-v22, runs it again), three runs on GitHub's own machines: Omni-Compass on top of native did 8.5% more work than native and answered 13.0% faster at the 95th percentile.
 
 | Scenario | Signal | Work | Response (95th percentile) | Machines | Units |
 |---|---|---|---|---|---|
@@ -44,10 +33,10 @@ Each route's bill is its native total cost, then Omni-Compass's, then the saving
 
 | Route | The bill: native → Omni-Compass → saving | Supporting measurements |
 |---|---|---|
-| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v21 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.2% (fewer); the runs 2.0%, 2.8%, 4.8% |
-| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v21; its omni-v21 Azure set runs now (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
+| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v22 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.2% (fewer); the runs 2.0%, 2.8%, 4.8% |
+| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v22; its omni-v22 Azure set runs now (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
 
-Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md), `tools/whole_system.py`; omni-v1, omni-v12, omni-v21, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 17.2%, the 95th percentile 43.2% faster, machines 9.5% fewer, energy 5.1% less, the cloud's bill STEADY; the index over the gauges +14.0%. A composition across engines (class S over class P and L tables), never read as one engine's result; each total follows its tables as every benchmark runs again on omni-v21.
+Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md), `tools/whole_system.py`; omni-v1, omni-v12, omni-v21, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 17.2%, the 95th percentile 43.2% faster, machines 9.5% fewer, energy 5.1% less, the cloud's bill STEADY; the index over the gauges +14.0%. A composition across engines (class S over class P and L tables), never read as one engine's result; each total follows its tables as every benchmark runs again on omni-v22.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
@@ -91,7 +80,8 @@ Where each part of it comes from:
   ([`docs/FACTORY_PROFILE.md`](docs/FACTORY_PROFILE.md), section 8); today only the cloud's compute is metered in money
   ([`results/live/AKS_BILL.md`](results/live/AKS_BILL.md)), so neither route's bill is resolved yet.
 - **Every LOSS row**, with its cause: [`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md). **Every chip, cloud and machine run**, what
-  it cost and what came back: [`docs/RUN_LEDGER.md`](docs/RUN_LEDGER.md).
+  it cost and what came back: [`docs/RUN_LEDGER.md`](docs/RUN_LEDGER.md). **The chips**, where the GPU proof stands and what it
+  still needs: [`docs/THE_CHIPS.md`](docs/THE_CHIPS.md).
 
 The live engine page opens on the same answer (<https://claude.ai/artifact/PmGS8ogFLMQiuyjU2YEFn3>; its source, [`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
@@ -104,9 +94,9 @@ Omni-Compass consists of a **governing engine**, its **muscle adapters**, a **co
 
 - **The governing engine** is the executable mathematical rules that turn observations and internal state into governing
   decisions (`omnicompass/`, `omni_controller/controller.py` and its C++ twin `cpp/src/governor.cpp`). The engine that stands
-  is omni-v21 (`OMNI_V21.json`; `python3 tools/omni_version.py`).
+  is omni-v22 (`OMNI_V22.json`; `python3 tools/omni_version.py`).
 - **The factory profile** is the complete, versioned set of Omni-Compass default settings shipped together: the governing
-  rules, gains, margins, the decision interval and every other default. The released factory profile is omni-v21's: the
+  rules, gains, margins, the decision interval and every other default. The released factory profile is omni-v22's: the
   governor's full decision every 60 s, its fast checks every 5 s, every muscle on the card found for it
   (`realms/muscle_cards_v5.csv`) and on the engine's own setting otherwise. It is the profile every published result ran on.
   Freezing a profile fixes the released rules and default tuning, θ(k + 1) = θ(k) = θ[factory], while the system's state, the
@@ -248,7 +238,7 @@ Everything between the markers below is written by the repository itself (`tools
 it, and nothing older than the newest result stands in front of it. Earlier front pages are kept whole in `docs/history/`.
 
 <!-- front-page:status:begin -->
-- **Engine on main:** omni-v21, fingerprint `b658f05d43c1e602` (63 files); package 0.21.0.
+- **Engine on main:** omni-v22, fingerprint `0e23a0bc561b900a` (65 files); package 0.22.0.
 <!-- front-page:status:end -->
 
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
@@ -269,16 +259,10 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
-| 2026-10-30 07:35 | [The engine's runs: 500 runs from the jump generator (base 2361771918), one digest](results/engine_runs/ENGINE_RUNS_500_2361771918.md) |  |
-| 2026-10-30 06:11 | [The stacked box on omni-v21: the seven organisms with an A10 inside, three runs on rented cards](results/gpu/V21_STACKS_A10_ABC.md) |  |
-| 2026-10-30 01:13 | [Omni direct's three arms: three runs on GitHub's machines](results/orchestrator/V21_THREE_ARMS_ABC.md) |  |
-| 2026-10-30 01:13 | [The card on omni-v21, the tune-down (dial save): three runs on an A100](results/gpu/V21_A100_SAVE_ABC.md) |  |
-| 2026-10-30 01:13 | [The card on omni-v21, the power cap at 70% of the card's top (cap-full): three runs on an A100](results/gpu/V21_A100_CAP_FULL_ABC.md) |  |
-| 2026-10-30 01:13 | [The card on omni-v21, the power cap at 70% of the card's top (cap): three runs on an A100](results/gpu/V21_A100_CAP_ABC.md) |  |
-| 2026-10-29 10:15 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2190676988.md) |  |
-| 2026-10-29 08:54 | [The engine's runs: 500 runs from the jump generator (base 2190676988), one digest](results/engine_runs/ENGINE_RUNS_500_2190676988.md) |  |
-| 2026-10-28 12:04 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2005802494.md) |  |
-| 2026-10-28 09:17 | [The engine's runs: 500 runs from the jump generator (base 2005802494), one digest](results/engine_runs/ENGINE_RUNS_500_2005802494.md) |  |
+| 2026-10-30 15:29 | [The model gate: the candidate against the engine that stands, in our own models](results/model_gate/V22_VS_V21.md) |  |
+| 2026-10-30 15:29 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
+| 2026-10-30 15:04 | [The store gate: the data stores' wires, standing against candidate, on their own archived seconds](results/model_gate/V22_STORE_GATE.md) |  |
+| 2026-10-30 15:04 | [The Redis cache in our own model, closed loop: omni-v22's candidate against omni-v21's loop and native (class S)](results/model_gate/V22_REDIS_MODEL.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -286,25 +270,25 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-30 07:42 | six x100 line orgs 2 runs 100+400 | success | [40995094302](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995094302) |
-| 2026-10-30 07:42 | six x100 line orgs 5 runs 100+400 | success | [40995110040](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995110040) |
-| 2026-10-30 07:37 | secret-names | success | [41016555622](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016555622) |
-| 2026-10-30 07:36 | health | success | [41018795997](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41018795997) |
-| 2026-10-30 07:35 | engine-runs | success | [41016477582](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016477582) |
-| 2026-10-30 07:32 | aks-client-check | success | [41016555703](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016555703) |
-| 2026-10-30 07:29 | security-scan | success | [41016477564](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016477564) |
-| 2026-10-30 07:27 | raw-sweep | success | [41015842005](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41015842005) |
-| 2026-10-30 06:27 | big-organism-detached collect | success | [41014121164](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41014121164) |
-| 2026-10-30 03:46 | six-kube x10 orgs spine reps 461+1 arms native compass split no window 960 protocol 4 | success | [40995084759](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995084759) |
+| 2026-10-25 08:38 | six x10 line orgs 5 runs 0+10 | success | [40176577661](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176577661) |
+| 2026-10-25 08:34 | six x10 line orgs 6 runs 0+10 | success | [40176581513](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176581513) |
+| 2026-10-25 08:32 | group: karmada C (nativebare native compassbare compass) | success | [40168704570](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40168704570) |
+| 2026-10-25 08:30 | six x10 line orgs 3 runs 0+10 | success | [40176569943](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176569943) |
+| 2026-10-25 08:30 | six x10 line orgs 1 runs 0+10 | success | [40176562767](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176562767) |
+| 2026-10-25 08:30 | six x10 line orgs 2 runs 0+10 | success | [40176566128](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176566128) |
+| 2026-10-25 08:30 | six x10 line orgs 4 runs 0+10 | success | [40176573923](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176573923) |
+| 2026-10-25 08:28 | six x10 line orgs 7 runs 0+10 | success | [40176585045](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40176585045) |
+| 2026-10-25 08:24 | godel: C (nativebare native compassbare compass) | success | [40168701665](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40168701665) |
+| 2026-10-25 07:55 | orchestrators: kuberay C | success | [40165922486](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40165922486) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
 native, is Omni-Compass on top of native.** Omni-Compass is never by itself (the founder's order of 25 October): it needs
 muscles with their own native controllers under it, never replaces native, and every comparison is read against native.
 
-## The engine that stands: omni-v21 (the immune system knows itself, knob by knob)
+## The engine that stands: omni-v22 (the data stores' wires at the max, through each store's own account of a miss)
 
-The engine on main is **omni-v21** (`OMNI_V21.json`, fingerprint `b658f05d43c1e602`, 63 files; [`docs/OMNI_V21.md`](docs/OMNI_V21.md)), the evening of 25 October: the immune system knows itself, knob by knob (a knob redlining past its line that Omni-Compass cannot bring back goes to native where native's twin reads it lower, and stays where native is not stronger), in the Python and its C++ twin, carried through the nervous system; the model gate against omni-v20 read no LOSS in any model. `python3 tools/omni_version.py` prints the engine of a checkout, and `--commit <sha>` the engine of any pushed commit.
+The engine on main is **omni-v22** (`OMNI_V22.json`, fingerprint `0e23a0bc561b900a`, 65 files; [`docs/OMNI_V22.md`](docs/OMNI_V22.md)), 30 October: the five data stores' wires brought to the max. What a wire's own rule asks goes through unclamped, up to the operator's cover and never below native; memory is spent only where the store's own account of a miss (MySQL's performance schema timer on the data files' reads, WiredTiger's page-read time for the application's threads, the Redis application's own split) says the misses are at least the one key's floor of the service's time, and only while the host keeps its 5% cushion; a hand-back never goes below the working set's floor; Kafka's group has a twin of its arrivals and a reflex; PostgreSQL's pool is never taken below the pooler's own setting. The model gate against omni-v21 (our own models, class S) read no LOSS at the counted setting on every store wire. omni-v21 (the immune system knows itself, knob by knob; [`docs/OMNI_V21.md`](docs/OMNI_V21.md)) stood from 25 to 30 October, and its tables stand as its own record until omni-v22's three runs of each benchmark land. `python3 tools/omni_version.py` prints the engine of a checkout, and `--commit <sha>` the engine of any pushed commit.
 
 Every engine before it is on its own page, `docs/OMNI_V<n>.md`, with what it changed, why, and what its model gate read; the road from omni-v1 is in [`CHANGELOG.md`](CHANGELOG.md) and `docs/history/`. No result is read across engines: every benchmark runs again on the engine that stands (`scripts/reruns.txt`, released by the conductor, `scripts/dispatch_grid.py`), and a row still on an older engine names it until its three runs on the engine that stands land.
 
@@ -559,7 +543,7 @@ the request logs, the Kafka consumer logs) gzipped; read one with `gunzip -c FIL
 |---|---|
 | **The register: every muscle wired, every benchmark run, every benchmark still to run** | [`docs/REGISTER.md`](docs/REGISTER.md) |
 | **The proof program: every benchmark at full size, every open native engine, the referee-grade package** | [`docs/PROOF_PROGRAM.md`](docs/PROOF_PROGRAM.md) |
-| **The engine that stands, omni-v21, fingerprinted; Omni-Compass by itself; Omni direct and the three arms; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V19.md`](docs/OMNI_V19.md), [`docs/OMNI_V18.md`](docs/OMNI_V18.md), [`docs/OMNI_V17.md`](docs/OMNI_V17.md), [`docs/OMNI_V16.md`](docs/OMNI_V16.md), [`docs/OMNI_V15.md`](docs/OMNI_V15.md), [`docs/OMNI_V14.md`](docs/OMNI_V14.md), [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
+| **The engine that stands, omni-v22, fingerprinted; Omni-Compass by itself; Omni direct and the three arms; the v5 law at the max, the bone, the lease, the dial** | [`docs/OMNI_V22.md`](docs/OMNI_V22.md), [`docs/OMNI_V21.md`](docs/OMNI_V21.md), [`docs/OMNI_V19.md`](docs/OMNI_V19.md), [`docs/OMNI_V18.md`](docs/OMNI_V18.md), [`docs/OMNI_V17.md`](docs/OMNI_V17.md), [`docs/OMNI_V16.md`](docs/OMNI_V16.md), [`docs/OMNI_V15.md`](docs/OMNI_V15.md), [`docs/OMNI_V14.md`](docs/OMNI_V14.md), [`docs/OMNI_V13.md`](docs/OMNI_V13.md), [`docs/OMNI_V5.md`](docs/OMNI_V5.md), `python3 tools/omni_version.py` (the earlier engines stay with their own results as the road to 1.0: [`docs/history/`](docs/history/)) |
 | **The heartbeat dial: every beat of the governor beside native, what it buys and what it costs** | [`results/model_gate/V17_LADDER.md`](results/model_gate/V17_LADDER.md), [`docs/PACE_PREREGISTRATION.md`](docs/PACE_PREREGISTRATION.md), on the live engine page, the page's section 1j |
 | Every result, every platform, where each stands | [`docs/STATE_OF_PLAY.md`](docs/STATE_OF_PLAY.md), [`results/OMNI_INDEX.md`](results/OMNI_INDEX.md) |
 | How to read a result table | [`docs/HOW_TO_READ_THE_RESULTS.md`](docs/HOW_TO_READ_THE_RESULTS.md) |

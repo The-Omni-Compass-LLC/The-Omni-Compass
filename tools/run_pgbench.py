@@ -509,23 +509,80 @@ class PoolPlug(Plug):
         self.b.set_pool_size(int(round(value)))
 
 
+# omni-v22: the max on the pooler's pool (docs/POSTGRES_PREREGISTRATION.md, amendment 4): the wire's own rule (decide) with a server
+# added while clients wait never clamped by an allowance, up to the cover, and the pool never taken below the pooler's own setting
+# (native); the hand-back by the queue line (amendment 2) above it. The servers it holds are power given, shown beside the waiting
+# they cut. `--dial save` keeps omni-v21's loop, the verdict under the resource objective, where giving servers back is the aim.
+DIAL = os.environ.get("OMNI_DIAL", "max")
+
+
+class Brain:
+    """The knob's decision, one a second: obs holds reading_s (the pooler's service time per transaction, wait included),
+    wait_share, idle (idle servers), pool (the pool size now), queue_share and served (amendment 2's queue line)."""
+
+    def __init__(self, snapshot, objective=DEFAULT_OBJECTIVE, line_ms=LINE_MS):
+        self.snapshot, self.objective = int(snapshot), objective
+        self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
+        self.last_dir, self.last_change = 0, -1e9
+        self.counts = {"spend": 0, "failups": 0, "handed_back": 0, "held_native": 0, "hold": 0}
+
+    def step(self, t, obs):
+        cur = int(obs["pool"])
+        f = self.law.force(obs["reading_s"])
+        want, d, why = decide(self.law.p, f, obs["wait_share"], obs["idle"], cur, self.snapshot, self.last_dir, t - self.last_change,
+                              wall=self.law.band.wall_high, queue_share=obs.get("queue_share", 0.0), served=obs.get("served", True))
+        if want > cur:
+            target = want; self.counts["spend"] += 1                  # clients waiting for a server: never clamped, up to the cover
+            if why.startswith("fail up"):
+                self.counts["failups"] += 1
+            why += "; power given inside the cover"
+        elif want < cur:
+            if want >= self.snapshot:
+                target = want; self.counts["handed_back"] += 1
+            elif cur > self.snapshot:
+                target = self.snapshot; self.counts["handed_back"] += 1
+                why = "calm: handed back to the pooler's own setting, never below it"
+            else:
+                target = cur; self.counts["held_native"] += 1
+                why = f"hold: {cur} is the pooler's own setting; the max never goes below native"
+        else:
+            target = cur; self.counts["hold"] += 1
+        if target != cur:                                             # the dwell runs from the last change, as the loop's own clock did
+            self.last_dir, self.last_change = (0, t) if why.startswith("fail up") else ((target > cur) - (target < cur), t)
+        info = {"verdict_phase": None, "verdict_direction": None, "allowed_low": None, "allowed_high": None, "dial": "max",
+                "p": round(self.law.p, 4), "force": round(f, 4)}
+        return target, why, info
+
+    def record(self):
+        return {"dial": "max", "objective": self.objective, "native": self.snapshot, "notch": 1, "cover": [FLOOR, CEILING],
+                "state": "the max: a server added while clients wait, never clamped; never below the pooler's own setting; no allowance",
+                "allowed_low": None, "allowed_high": None, "counts": dict(self.counts)}
+
+
 class Omni(threading.Thread):
-    """The brain, one decision a second, writing the audit. Amendment 3 (the brain's own verdict, 2026-10-09): the pool starts in
+    """The brain, one decision a second, writing the audit. Under the max (omni-v22, the factory tune) the Brain above decides;
+    under the tune-down (`--dial save`) amendment 3's loop (the brain's own verdict, 2026-10-09): the pool starts in
     watch and is written only inside the allowance a paired trial on the pooler itself has earned under the declared objective
     (tools/knob_verdict.py around the engine's own Verdict): one server fewer while calm, one more while clients wait, each step
     judged on the pooler's own second-by-second readings; a trial holds the pool; the fail-up back to the operator's setting is
     always free, a spend beyond the allowance never."""
 
-    def __init__(self, plug: PoolPlug, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE):
+    def __init__(self, plug: PoolPlug, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE, dial=DIAL):
         super().__init__(daemon=True)
-        self.plug, self.audit, self.objective = plug, audit_path, objective
+        self.plug, self.audit, self.objective, self.dial = plug, audit_path, objective, dial
         self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
         self.stop_flag = threading.Event()
         self.last_dir, self.last_change = 0, -1e9
         self.writes, self.failups = 0, 0
         self.foreign, self.handed_back = False, False
         self.error = None                                           # a fault before the first decision, written into the arm's record
-        self.verdict = None
+        self.verdict = None; self.brain = None
+
+    def govern_record(self):
+        """The record of what governed the knob: the max's counts (omni-v22) or the verdict's allowance (the tune-down)."""
+        if self.brain is not None:
+            return self.brain.record()
+        return self.verdict.record() if self.verdict else None
 
     def run(self):
         try:
@@ -536,6 +593,8 @@ class Omni(threading.Thread):
             return
         t0 = time.monotonic(); cpu_prev = cpu_times()
         self.verdict = KnobVerdict(int(snapshot), 1, (FLOOR, CEILING), objective=self.objective, settle_s=TAU)
+        if self.dial == "max":
+            self.brain = Brain(int(snapshot), self.objective); self.verdict = None
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
@@ -547,15 +606,20 @@ class Omni(threading.Thread):
                     cpu_now = cpu_times(); d_busy = cpu_now[0] - cpu_prev[0]; d_total = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
                     cpu_share = (d_busy / d_total) if d_total > 0 else None
                     cost = sample_cost(self.objective, self.plug.last_xacts, self.plug.last_latency_s if self.plug.served else None, cur, cpu_share)
-                    self.verdict.observe(cost, tick - t0)                       # measured under the pool of the last second
-                    target, d, why = decide(self.law.p, f, self.plug.wait_share, idle, cur, int(snapshot), self.last_dir,
-                                            tick - self.last_change, wall=self.law.band.wall_high,
-                                            queue_share=self.plug.queue_share, served=self.plug.served)
-                    fail_up = why.startswith("fail up")
-                    target, why, vinfo = self.verdict.decide(
-                        target, spend_ok=(f > DEAD and self.plug.wait_share >= WAIT_SHARE),
-                        give_ok=(f < -DEAD and self.plug.served and self.plug.queue_share < GIVEBACK_WAIT_SHARE and idle >= 1),
-                        t=tick - t0, why=why, stress=f > DEAD, calm=f < -DEAD, fail_up=fail_up)
+                    if self.brain is not None:                                           # the max (omni-v22): the Brain keeps its own dwell clock
+                        target, why, vinfo = self.brain.step(tick - t0, {"reading_s": reading, "wait_share": self.plug.wait_share, "idle": idle, "pool": cur,
+                                                                          "queue_share": self.plug.queue_share, "served": self.plug.served})
+                        fail_up = why.startswith("fail up")
+                    else:                                                                # the tune-down: omni-v21's loop
+                        self.verdict.observe(cost, tick - t0)                       # measured under the pool of the last second
+                        target, d, why = decide(self.law.p, f, self.plug.wait_share, idle, cur, int(snapshot), self.last_dir,
+                                                tick - self.last_change, wall=self.law.band.wall_high,
+                                                queue_share=self.plug.queue_share, served=self.plug.served)
+                        fail_up = why.startswith("fail up")
+                        target, why, vinfo = self.verdict.decide(
+                            target, spend_ok=(f > DEAD and self.plug.wait_share >= WAIT_SHARE),
+                            give_ok=(f < -DEAD and self.plug.served and self.plug.queue_share < GIVEBACK_WAIT_SHARE and idle >= 1),
+                            t=tick - t0, why=why, stress=f > DEAD, calm=f < -DEAD, fail_up=fail_up)
                     d = (target > cur) - (target < cur)
                     wrote = None
                     if target != cur:
@@ -678,7 +742,7 @@ def run_arm(arm, b, wl_dir, rep, dbname, user, port, script, steps, step_s, base
         omni.stop_flag.set(); omni.join(timeout=10)
         g.update({"writes": omni.writes, "fail_ups": omni.failups, "handed_back": bool(omni.handed_back),
                   "foreign_writer": omni.foreign, "controller_error": omni.error, "pool_read_back": b.pool_size(),
-                  "verdict": (omni.verdict.record() if omni.verdict else None)})
+                  "verdict": omni.govern_record()})
     else:
         g.update({"writes": 0, "handed_back": True, "pool_read_back": b.pool_size()})
     if b.pool_size() != NATIVE_POOL:                             # belt and braces: the next arm starts native
@@ -712,7 +776,7 @@ def run_workload(name, out, pg, dbname, user, password, port, reps, steps, step_
         print(f"== {name}: native capacity {cap:.0f} tps unlimited; base rate {base:.0f} tps (peak notch {100 * PEAK:.0f}% of it); steps {steps}", flush=True)
         rec = {"workload": name, "script": script_flag or "tpcb (default)", "scale": scale, "line_ms": line_ms, "steps": steps,
                "step_s": step_s, "clients": clients, "jobs": jobs, "native_capacity_tps": cap, "base_tps": base,
-               "snapshot_pool": snapshot, "cover": [FLOOR, CEILING], "center": CENTER, "objective": objective, "engine": engine(), "reps": []}
+               "snapshot_pool": snapshot, "cover": [FLOOR, CEILING], "center": CENTER, "objective": objective, "dial": DIAL, "engine": engine(), "reps": []}
         prepare = lambda d: reset_tables(pg, dbname, user, password, scale, d)   # noqa: E731  (the same state before every arm)
         for rep in range(1, reps + 1):
             order = ["native", "omni"] if rep % 2 else ["omni", "native"]

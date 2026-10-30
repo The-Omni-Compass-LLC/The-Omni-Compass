@@ -436,6 +436,36 @@ balanced; the omni-v16 `tpcb_hot` runs showed write stalls of 1 to 6 s landing i
 Each run takes about a third longer per workload (eight arms of about 7.5 minutes instead of six). The rules, the gauges, the line,
 the notches and the three-run reading are unchanged.
 
+## Amendment 4 (2026-10-30, declared before any run on it): the max on the pooler's pool (the next engine's candidate)
+
+**The cause, from the omni-v21 runs' own files** (`docs/STORE_ROOT_CAUSES_2026-10-30.md`). The pooler stood over its line in 28
+seconds of the omni-v21 resource set and amendment 3's allowance refused none of the brain's own rule there; what the allowance
+did do, in every arm, was let the calm give-back take the pool below the pooler's own 20 servers (seconds below native, 223 an arm
+on average), where a rising load found fewer servers than the operator had set and the queue line (amendment 2) added them back.
+The store wires were written on 9 and 10 October, before the founder's order of 12 October that the max is the default brain, and
+never brought to it; this brings the pool's wire to it.
+
+**From this amendment** (`tools/run_pgbench.py` `Brain`):
+
+- the spend: clients waiting for a server (amendment 2's rule, ceil(force / 0.1) servers a second) is never clamped by an
+  allowance, up to the cover (90 servers; the fail-up to the pooler's own setting as before); the servers held are power given,
+  shown beside the waiting they cut;
+- the hand-back: the calm give-back and the slow-inside-the-server shrink take a server back only down to the pooler's own
+  setting, never below it (the max never goes below native); above it the queue line of amendment 2 and the dwell stand as written;
+- the record: the arm's record carries the max's counts (servers added, hand-backs, holds at the pooler's setting) where it carried
+  the verdict's allowance; every workload record carries its `dial`; `OMNI_DIAL=save` keeps omni-v21's loop, the verdict under the
+  resource objective, where giving servers back is the aim; `tools/knob_verdict.py` joins the fingerprint with this version.
+
+**The model gate** (`tools/store_gate.py`, class S, the omni-v21 arms' recorded seconds replayed open-loop through the candidate,
+26 arms): seconds below the pooler's setting 223.5 → 0 an arm (shown), seconds below it while clients waited 7.5 → 0 (GAIN +100.0%),
+the pool held 19.3 → 24.7 servers (+28.2%, power given), the knob's moves 18.4 → 23.7 (+28.8%, power given, inside the arms' noise);
+no LOSS. The replay cannot show what the servers buy; the first runs on the next engine read it.
+
+**Expected before the runs**, three paired repetitions a run (the proposed fourth repetition stays proposed): the server connections
+alive power given; the time clients waited for a server and the latency GAIN or EVEN; the work inside the line GAIN or EVEN; no
+second below the pooler's own setting. A LOSS row is a fault to fix, never a number to accept. The counted runs on this amendment run
+on the next engine version, which lands only when the model gate reads no LOSS for every store wire it changes.
+
 ---
 
 *© 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. All patents, copyrights and trademarks filed in the USA. www.omni-compass.com*

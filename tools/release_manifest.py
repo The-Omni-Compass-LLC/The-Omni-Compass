@@ -32,6 +32,13 @@ GROUPS = {
                             "tools/omni_switch.py", "scripts/kind_faults.sh", "tests/test_faults_extended.py",
                             "tests/test_switch_trust.py", "verify.py"],
     "engine_v8_citylearn": ["OMNI_V8.json", "tools/run_citylearn.py", "docs/OMNI_V8.md", "docs/CITYLEARN_PREREGISTRATION.md"],
+    "engine_v22": ["OMNI_V22.json", "tools/omni_version.py", "docs/OMNI_V22.md", "tools/store_brain.py", "tools/knob_verdict.py",
+                   "tools/run_sysbench.py", "tools/run_ycsb.py", "tools/run_redis.py", "tools/run_kafka.py", "tools/run_pgbench.py",
+                   "tools/store_gate.py", "tools/kafka_model.py", "tools/redis_model.py", "tests/test_store_brain.py", "tests/test_redis_twin.py",
+                   "tests/test_kafka_twin.py", "results/model_gate/V22_STORE_GATE.md", "results/model_gate/V22_STORE_GATE.json",
+                   "results/model_gate/V22_REDIS_MODEL.md", "results/model_gate/V22_KAFKA_MODEL.md", "results/model_gate/V22_KAFKA_MODEL_UNTOUCHED.md",
+                   "results/model_gate/V22_KAFKA_MODEL_20S.md", "docs/STORE_ROOT_CAUSES_2026-10-30.md", "docs/MYSQL_PREREGISTRATION.md",
+                   "docs/YCSB_PREREGISTRATION.md", "docs/POSTGRES_PREREGISTRATION.md", "docs/REDIS_PREREGISTRATION.md", "docs/KAFKA_PREREGISTRATION.md"],
     "engine_v21": ["OMNI_V21.json", "tools/omni_version.py", "docs/OMNI_V21.md"],   # extend with the files omni-v21 changed
     "engine_v20": ["OMNI_V20.json", "tools/omni_version.py", "docs/OMNI_V20.md", "tools/run_sysbench.py", "tools/run_kafka.py", "tools/run_ycsb.py", "tools/run_redis.py", "tools/run_pgbench.py", ".github/workflows/pgbench.yml", "tools/store_gate.py", "results/model_gate/STORE_GATE.md", "results/model_gate/STORE_GATE.json", "tests/test_store_wires.py", "tests/test_store_gate.py", "docs/STORE_LOSS_ROOT_CAUSES_2026-10-25.md"],
     "engine_v19": ["OMNI_V19.json", "tools/omni_version.py", "docs/OMNI_V19.md", "omni_controller/controller.py", "realms/harness.py",

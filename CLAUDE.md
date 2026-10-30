@@ -43,9 +43,35 @@ the founder overrides one in the conversation.
 - Scaling: floor of 2 machines, no ceiling, every machine usable. Traffic tests step by one (1 2 3 2 3 4 …).
 - Nothing is hardwired. Anything that doesn't work is removed, not just switched off.
 
-## The engine: Omni v21 stands (v19, v18, v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
+## The engine: Omni v22 stands (v21, v20, v19, v18, v17, v16, v15, v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v3, v2 and v1 kept for their results)
 
-- **Omni v21** (`OMNI_V21.json`, digest `b658f05d43c1e602`, 63 files; `docs/OMNI_V21.md`) stands on main from 25 October, evening, on the
+- **Omni v22** (`OMNI_V22.json`, digest `0e23a0bc561b900a`, 65 files; `docs/OMNI_V22.md`) stands on main from 30 October, on the founder's
+  order of that morning ("find out why they went one way or the other and tweak it and turn it and tune it to the best possible way for
+  an Omni Compass engine to interact with this as a system governor ... bring to a solid A mechanism"): omni-v21 with the five data
+  stores' wires brought to the max. The store wires were written on 9 and 10 October, before the order of 12 October that the max is
+  the default brain, and had never been brought to it; on omni-v21 they carried 33 of the 50 LOSS rows, because the wall abandoned every
+  spend trial and the fail-up was clamped to the allowance those trials never earned (`docs/STORE_ROOT_CAUSES_2026-10-30.md`). Now what a
+  wire's own rule asks goes through unclamped, up to the operator's cover, never below native, the resource power given; memory is spent
+  only where **the store's own account of a miss** (MySQL: the performance schema's timer on the data files' reads against the statement
+  timer; MongoDB: WiredTiger's page-read time for the application's threads against its read latency; Redis: the application's own split)
+  says the misses are at least the one key's floor (0.5%) of the service's time, and only while the host keeps 5% of its memory available
+  after the notch; a hand-back never goes below the working set's floor (the most the store held in 60 s); Kafka's group has a twin of its
+  arrivals and a reflex that goes at once to the count that carries them; PostgreSQL's pool is never taken below the pooler's own setting
+  (`tools/store_brain.py`, the five `tools/run_*.py` wires' `Brain`). `OMNI_DIAL=save` keeps omni-v21's loop on every wire (the tune-down);
+  `tools/store_brain.py` and `tools/knob_verdict.py` join the fingerprint (`STORE_WIRES`). Declared before any run: MySQL amendment 6, YCSB
+  6, PostgreSQL 4, Redis 5, Kafka 4. The model gate (class S): the store gate on omni-v21's archived seconds no LOSS on any wire; the Redis
+  closed-loop model work inside the line GAIN (up 7.7% to 22.9%), latency GAIN, memory power given, no LOSS; the Kafka closed-loop model
+  at the counted 30 s no LOSS on the development and the untouched seeds, one LOSS row at 20 s a notch (the burst's peak queue, +30.6%,
+  inside the seeds' spread; run C's setting, not the counted one, on the next version's list); the Kubernetes governor's models identical
+  to omni-v21 on every gauge. With it, **the hand-back lands**: every step of the Kubernetes governor's hand-back (`omni_controller/controller.py`
+  `_persist`, `omni_controller/muscles.py` `_guard_restore`, `RESTORE_TRIES` 5) is tried five times against a transient failure of the
+  cluster's API, each muscle on its own, and what did not land is raised and audited, never silent (six-kube run 41044680505, repetition 346:
+  one 500 on the autoscaler list at the reset had ended the whole hand-back on its first read and left the conveyed limits and the replica
+  range behind, the arm marked invalid). A slope of latency on miss share was tried as the price of a miss and is not used anywhere (it
+  reads the host's noise as a price); the morning's reading that a MySQL or MongoDB miss costs nothing is withdrawn on the root-cause page
+  (the server's own meter on a machine of our own: 3% to 32% of a statement's time, class L there). Every benchmark runs again on it, the
+  five stores first, every store table at the counted 30 s a notch.
+- **Omni v21** (`OMNI_V21.json`, digest `b658f05d43c1e602`, 63 files; `docs/OMNI_V21.md`) stood on main from 25 October, evening, to 30 October, when omni-v22 landed on it, on the
   founder's order of that afternoon: the immune system knows itself, knob by knob. A knob redlining past its line that Omni-Compass's
   own pushing cannot bring back goes to native when native's twin reads it lower, and stays with Omni-Compass when native is not
   stronger (redlining less than native would is still a benefit against native). `omnicompass/immune.py` and its C++ twin
@@ -742,7 +768,7 @@ the founder overrides one in the conversation.
   at a time in each machine-family queue, at the tune-down with native's cap, as on Azure; the free credits pay first
   (Google $300, Amazon $100 to $200). A set that fails for a quota (a new account's processor limit) is raised with the
   cloud, never shrunk to fit. The GPU on Lambda: his word came the evening of 18 October ("we're running them all today");
-  from the GPU branch of the engine that stands (`gpu-omni-v21` from omni-v19's push, 24 October), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
+  from the GPU branch (`gpu-omni-v21`, omni-v21 with the GPU rig's readiness barrier, 30 October; the next rental starts from the engine that stands then), the three Lambda secrets first (`docs/LAMBDA_SETUP.md`), then the free dry run, then the real runs,
   one exact commit given to him. The same morning both first
   sets stopped at the login at no cost (Google's stored key cut short when copied from Cloud Shell's screen; Amazon's new
   account on the Free plan, whose organization policy denies every machine read); those runs were on omni-v10 and stay its
@@ -998,9 +1024,10 @@ the founder overrides one in the conversation.
 ## Repository
 
 - Referee and underwriter level. Only finals up front; old material goes to `docs/history` / `archive/` or is removed.
-  One version is always the main one; `main` and the working branch, `v19` (the engine that stands, 24 October), stay in
-  sync, and `v18`, `v17`, `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v19`,
-  one exact commit. **The `v5` branch
+  One version is always the main one; `main` and the working branch, `v22` (the engine that stands, 30 October), stay in
+  sync, and `v21`, `v19`, `v18`, `v17`, `v16`, `v15`, `v14`, `v13`, `v12`, `v11`, `v10`, `v9`, `v8`, `v7` and `v7-candidate` are kept level with them; the GPU runs on Lambda start from `gpu-omni-v21`
+  (7770532ed5, omni-v21 with the GPU rig's readiness barrier), one exact commit, until the founder's next GPU rental, which starts from the
+  engine that stands then. `main` stays linear: a branch is rebased onto it and fast-forwarded, never merged with a merge commit. **The `v5` branch
   is history** (the founder's order of 17 October: "We won long past 5"): it is never merged into `main` and `main` is
   never merged or pushed into it; nothing is read across engines.
 - **The raw receipts live on the branch `raw`** (18 October): its root is what `results/live/raw/` held (every archived run,

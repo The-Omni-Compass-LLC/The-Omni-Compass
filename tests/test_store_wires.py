@@ -100,8 +100,9 @@ def test_kafka_gives_back_above_the_operators_count():
             assert g.idle() == 0, "a consumer starts busy: no give-back trial before it has had a second to consume"
     finally:
         K.mp.Process = real
-    src = inspect.getsource(K.Omni.run)
-    assert "snapshot=snapshot" in src and "consumed=n_msg" in src and "n_msg > 0" in src, "the brain hands decide() the operator's count and the second's consumption"
+    src = inspect.getsource(K.Brain.step)      # omni-v22: the decision is the Brain's, the code the real run and the model drive
+    assert "snapshot=self.snapshot" in src and "consumed=n_msg" in src, "the brain hands decide() the operator's count and the second's consumption"
+    assert "give_ok=False" in src and "max(lo, v_target)" in src, "never below the operator's count at the max"
 
 
 def test_ycsb_hands_the_cache_back_below_native():
