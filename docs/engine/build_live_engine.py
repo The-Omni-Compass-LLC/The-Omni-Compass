@@ -789,6 +789,37 @@ def orchestra() -> dict | None:
             "bodies": {k: len(v) for k, v in (run.get("bodies") or {}).items()}, "loads": loads}
 
 
+def run_engines(started: dict) -> dict:
+    """The engine each run ran on, so a table read at the build names its engine like every other: the run's commit from GitHub's
+    run record (its head_sha) read by tools/omni_version.py --commit, as tools/confirm_abc.py reads it; where GitHub cannot be asked,
+    the engine CHANGELOG.md records the run started on (the entry that names the run and says "started on omni-vN"); else none.
+    {"engines": {"A": "omni-v13", ...}, "engine_from": {"A": "where it was read", ...}}"""
+    log = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8") if (ROOT / "CHANGELOG.md").exists() else ""
+    items = re.split(r"\n(?=- )", log)
+    out, src = {}, {}
+    for L, rid in sorted((started or {}).items()):
+        eng = None
+        try:
+            sha = subprocess.run(["gh", "api", f"repos/{REPO}/actions/runs/{rid}", "--jq", ".head_sha"], capture_output=True, text=True,
+                                 cwd=ROOT, timeout=60).stdout.strip()
+            if re.fullmatch(r"[0-9a-f]{40}", sha):
+                v = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_version.py"), "--commit", sha], cwd=ROOT,
+                                   capture_output=True, text=True, timeout=120).stdout
+                m = re.search(r"\b(omni-v\d+)\b", v)
+                if m:
+                    eng, src[L] = m.group(1), f"GitHub's run record (commit {sha[:12]}), read by tools/omni_version.py"
+        except (OSError, subprocess.SubprocessError):
+            pass                                            # GitHub not reachable from here: the repository's own record below
+        if eng is None:
+            for it in items:
+                m = re.search(r"started on (omni-v\d+)", it) if str(rid) in it else None
+                if m:
+                    eng, src[L] = m.group(1), "CHANGELOG.md, its entry naming the run as started on that engine"
+                    break
+        out[L] = eng
+    return {"engines": out, "engine_from": src}
+
+
 def four_ways_from_runs(GP, system: str, started: dict) -> dict:
     """{way: receipt} for one system's four ways read at the build from its three runs' own scored files on the branch raw
     (each run's live-reps/LIVE_REPS.json and its arms' preflight.txt, byte for byte) by the repository's own three-run tool
@@ -813,7 +844,9 @@ def four_ways_from_runs(GP, system: str, started: dict) -> dict:
             lr = json.loads((t / f"run-{rid}" / "live-reps" / "LIVE_REPS.json").read_text(encoding="utf-8").replace("NaN", "null"))
             reps[L] = len(next(iter((lr.get("repetitions") or {}).values()), []) or [])
             dirs.append(str(t / f"run-{rid}"))
-        # the tool's engine line asks GitHub for each run's commit; the rows do not depend on it, so it is not asked here
+        # the tool's engine line asks GitHub for each run's commit; the rows do not depend on it, so the tool is not let ask it, and
+        # each run's engine is read once here instead (run_engines), so the table names the engine its runs ran on
+        engines = run_engines(started)
         nogh = t / "nogh"; nogh.mkdir(); (nogh / "gh").write_text("#!/bin/sh\nexit 1\n"); (nogh / "gh").chmod(0o755)
         env = dict(os.environ, PATH=f"{nogh}:{os.environ.get('PATH', '')}")
         for tag, arms, label in GP.FOUR_WAYS:
@@ -826,7 +859,7 @@ def four_ways_from_runs(GP, system: str, started: dict) -> dict:
                 rc = XS.receipt(md.stem, md)
                 out[tag] = {"file": None, "count": rc["count"], "rows": [{"g": x["g"], "abc": x["abc"], "w": x["w"]} for x in rc["rows"]],
                             "read": "at the build, from runs A, B and C's own scored files on the branch raw, by tools/confirm_abc.py --pair; the repository's own table is not yet written",
-                            "reps": reps}
+                            "reps": reps} | engines
     return out
 
 
@@ -884,12 +917,80 @@ def dial() -> dict:
         return {}
     lad = json.loads(lads[-1].read_text(encoding="utf-8"))
     pace = sorted((ROOT / "results" / "live").glob("V*_PACE*.md"))
+    eng_of = _ladder_engines(lad)
+    standing = engine()[0]
+    newest = max((e for e in eng_of.values() if e), key=lambda e: int(e.split("-v")[1]), default=None)
     return {"file": str(lads[-1].relative_to(ROOT)), "seeds": lad["seeds"], "days": lad["days"], "main_s": lad["main_s"],
             "real": ("three-run tables in " + ", ".join(f"results/live/{f.name}" for f in pace)) if pace else
                     "not yet run (docs/PACE_PREREGISTRATION.md, amendment 3: eight arms in every repetition, three runs)",
+            # the engine each beat was read on, from the ladder's own sources (the first source that holds a beat gives it, as
+            # tools/beat_ladder.py merges them), and what the governor's files changed between the newest of them and the engine that
+            # stands, read from the two fingerprints: a row is its own engine's, never read as the engine that stands's
+            "engine_of_beat": eng_of, "standing": standing,
+            "since": _engine_change(newest, standing, ("omni_controller/", "omnicompass/")) if newest else None,
+            "newer_60": _newer_pace(lad),
             # the page's key is "models" (the editing seat of 24 October: the retired word is printed nowhere); the ladder file keeps its own
             "models": _clean({k: {"setting": t["setting"], "beats": t["beats"], "native": t["native"], "rows": t["rows"]}
                               for k, t in (lad.get("models") or lad.get("models") or {}).items()})}   # a change against a zero (native's power cap) is NaN: null
+
+
+def _ladder_engines(lad: dict) -> dict:
+    """{beat: engine} read from the ladder's own sources: a model-gate record by its candidate's engine, a run described in words by
+    the engine it names ("on omni-vN") and its --pace-periods; the first source that holds a beat gives it, as tools/beat_ladder.py
+    merges its reports (the first report holding a beat keeps it)."""
+    out = {}
+    for src in lad.get("sources") or []:
+        eng, beats = None, set()
+        f = ROOT / src
+        if src.endswith(".json") and f.exists():
+            r = json.loads(f.read_text(encoding="utf-8"))
+            eng = r.get("cand_engine") if re.fullmatch(r"omni-v\d+", str(r.get("cand_engine") or "")) else None
+            for t in (r.get("models") or {}).values():
+                beats |= {k for k in (t.get("per_seed") or {}) if k != "native"}
+        else:
+            m = re.search(r"\bon (omni-v\d+)", src)
+            eng = m.group(1) if m else None
+            pm = re.search(r"--pace-periods ([\d,.]+)", src)
+            beats = set(pm.group(1).split(",")) if pm else set()
+        for b in beats:
+            out.setdefault(f"{float(b):g}", eng)
+    return out
+
+
+def _engine_change(old: str, new: str, prefixes: tuple) -> dict | None:
+    """The files under the given prefixes that changed, or were added, between two engines' fingerprints (OMNI_V<n>.json)."""
+    def files(name):
+        f = ROOT / f"OMNI_V{name.split('-v')[-1]}.json"
+        if not f.exists():
+            return None
+        d = json.loads(f.read_text(encoding="utf-8")).get("files") or {}
+        return d if isinstance(d, dict) else {x["path"]: x.get("sha256") for x in d}
+    a, b = files(old), files(new)
+    if a is None or b is None or old == new:
+        return None
+    keep = lambda k: k.startswith(prefixes)
+    return {"from": old, "to": new, "changed": sorted(k for k in a if k in b and a[k] != b[k] and keep(k)),
+            "added": sorted(k for k in b if k not in a and keep(k))}
+
+
+def _newer_pace(lad: dict) -> dict | None:
+    """The newest pace record of the model gate (results/model_gate/V<n>_PACE.json) newer than every source of the ladder: its
+    decision every 60 s against native on the same seeds, setting by setting, read as its record writes it (its candidate's own words,
+    its base engine), so the dial's 60 s row stands beside the newer reading of the same beat, never replaced by it."""
+    srcs = [s for s in (lad.get("sources") or []) if s.endswith(".json")]
+    top = max((int(m.group(1)) for s in srcs for m in [re.search(r"V(\d+)_", s)] if m), default=0)
+    paces = sorted(((int(re.match(r"V(\d+)_", f.name).group(1)), f) for f in (ROOT / "results" / "model_gate").glob("V*_PACE.json")), key=lambda x: x[0])
+    paces = [(n, f) for n, f in paces if n > top]
+    if not paces:
+        return None
+    n, f = paces[-1]
+    r = json.loads(f.read_text(encoding="utf-8"))
+    if [int(s) for s in r.get("seeds") or []] != [int(s) for s in lad.get("seeds") or []]:
+        return None
+    return _clean({"file": str(f.relative_to(ROOT)), "candidate": r.get("cand_engine"), "base": r.get("base_engine"), "days": r.get("days"),
+                   "models": {k: {g: {"value": v.get("ref"), "native": v.get("native"), "vs_native": v.get("ref_vs_native")}
+                                  for g, v in (t.get("reference_rows") or {}).items()}
+                              for k, t in (r.get("models") or {}).items() if float(t.get("reference") or 0) == float(lad.get("main_s") or 60)}})
 
 
 def core_mc() -> dict:
@@ -1009,16 +1110,26 @@ def verdict_audit() -> dict:
     import sys as _s
     _s.path.insert(0, str(ROOT))
     from tools.verdict_audit import build as audit_build, digest as audit_digest, loss_rows
+    from tools.loss_ledger import cause as ledger_cause
     rec = audit_build()
     by_t = {t["stem"]: t for t in rec["tables"]}
     r4 = lambda x: None if x is None else round(x, 4)
 
-    def row(r):
+    def ledger_gauge(r, t):
+        """The gauge as docs/LOSS_LEDGER.md names it (tools/loss_ledger.py build): its section first where the table has one."""
+        where = (f"workload {r['section']} / " if t["stack"] == "Linux services" else f"{r['section']} / ") if r["section"] else ""
+        return where + r["gauge"]
+
+    def row(r, cz=False):
         t = by_t[r["table"]]
-        return {"t": r["table"], "f": t["file"], "e": t["engine"], "c": t["class"], "s": r["section"], "g": r["gauge"],
-                "d": r["direction"], "w": r["word"], "rd": r["stored"],
-                "runs": [[r4(x.get("native")), r4(x.get("omni")), r4(x.get("raw_pct")), r4(x.get("raw_unit")), bool(x.get("clear"))]
-                         for x in r["runs"]], "ev": r.get("evidence")}
+        out = {"t": r["table"], "f": t["file"], "e": t["engine"], "c": t["class"], "s": r["section"], "g": r["gauge"],
+               "d": r["direction"], "w": r["word"], "rd": r["stored"],
+               "runs": [[r4(x.get("native")), r4(x.get("omni")), r4(x.get("raw_pct")), r4(x.get("raw_unit")), bool(x.get("clear"))]
+                        for x in r["runs"]], "ev": r.get("evidence")}
+        if cz:   # the LOSS ledger's own cause, page, fix and what decides it (tools/loss_ledger.py CAUSES), never composed on the page
+            c = ledger_cause(t["stem"].split("_", 1)[1], ledger_gauge(r, t))
+            out["cz"] = list(c) if c else None
+        return out
     disc = ROOT / "results" / "verdict_audit" / "DISCREPANCIES.json"
     dd = json.loads(disc.read_text(encoding="utf-8")) if disc.exists() else {"rows": []}
     kinds = {}
@@ -1032,7 +1143,11 @@ def verdict_audit() -> dict:
             "tables": [{k: t[k] for k in ("stem", "file", "engine", "status", "comparison", "stack", "class", "on_the_engine_that_stands")}
                        | {"runs": [[x.get("tag"), x.get("run"), x.get("paired_repetitions"), str(x.get("commit") or "")[:12]] for x in t["runs"]]}
                        for t in rec["tables"]],
-            "losses": [row(r) for r in loss_rows(rec)],
+            "losses": [row(r, cz=True) for r in loss_rows(rec)],
+            # the LOSS rows of the other three comparisons of the standing tables (docs/LOSS_LEDGER.md, its second and third parts):
+            # in place of a controller (VS), the orchestrator's own (ORCH) and two changes at once (BOTH), each with its comparison
+            "losses_apart": [row(r) | {"k": by_t[r["table"]]["comparison"]} for r in rec["rows"]
+                             if r["word"] == "LOSS" and by_t[r["table"]]["status"] == "standing" and by_t[r["table"]]["comparison"] != "against its native"],
             "armada": [row(r) for r in rec["rows"] if r["table"] == "V12_ARMADA_4W_BARE" and r["word"] in ("LOSS", "GAIN", "power given")],
             "discrepancies": {"base": dd.get("base"), "kinds": kinds, "rows": len(dd["rows"]),
                               "words": [{k: (re.sub(r"\bEVEN\b", "STEADY", d[k]) if k == "old_reading" else d[k]) for k in ("table", "status", "gauge", "old_reading", "new_reading")}

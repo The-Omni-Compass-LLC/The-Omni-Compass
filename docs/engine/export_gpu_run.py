@@ -29,7 +29,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.readings import SIZE_FLOOR, reading_kind  # noqa: E402  (the one floor and the reading's kind, written once)
+from tools.readings import SIZE_FLOOR, reading_kind, word_of  # noqa: E402  (the one floor, the reading's kind and its one word, written once)
 
 RUN = ROOT / "results" / "gpu" / "run-20261024T091235Z"
 ARMS = ("native", "watch", "omni")
@@ -189,13 +189,18 @@ def total_table(md: str) -> list[dict]:
     return rows
 
 
-HEADS = ("GAIN", "LOSS", "STEADY", "power given")
+HEADS = ("GAIN", "LOSS", "STEADY", "power given", "the runs disagree", "the runs differ", "shown, not judged")
 
 
 def _head(reading: str) -> str:
-    """A three-run reading's word alone: GAIN, LOSS, STEADY, power given, or the runs disagree."""
+    """A three-run reading's word alone, by the key's one reader (tools/readings.py word_of): GAIN, LOSS, STEADY, power given, the
+    runs disagree or the runs differ; a row shown and not judged (one repetition in a run, no interval) is "shown, not judged"; any
+    other reading keeps its own kind, never another word."""
+    w = word_of(reading)
+    if w:
+        return w
     k = reading_kind(reading)
-    return next((h for h in HEADS if k.startswith(h)), "the runs disagree")
+    return "shown, not judged" if "shown, not judged" in k or not k else k
 
 
 def card_tables() -> list:
@@ -216,20 +221,75 @@ def card_tables() -> list:
              "dial": d.group(1) if d else None, "runs": rec.get("runs")}
         rows = rec.get("rows", {})
         if isinstance(rows, list):                  # the stacked box: the card's own meter, its primary measure, size by size
-            sizes, reps = {}, {}
+            sizes, reps, counts, by_part, flagged = {}, {}, {}, {}, []
             for r in rows:
+                h = _head(r.get("reading", ""))
+                counts[h] = counts.get(h, 0) + 1
+                bp = by_part.setdefault(str(r.get("part")), {}); bp[h] = bp.get(h, 0) + 1
                 if r.get("part") == "card" and r.get("measure") == "primary":
-                    c = sizes.setdefault(str(r["copies"]), {}); h = _head(r.get("reading", "")); c[h] = c.get(h, 0) + 1
+                    c = sizes.setdefault(str(r["copies"]), {}); c[h] = c.get(h, 0) + 1
                     k = str(r["copies"]); reps[k] = min([reps.get(k, 10 ** 9)] + list(r.get("repetitions") or []))
-            t["kind"] = "stacks"; t["card_primary_by_copies"] = sizes
+                if h in ("GAIN", "LOSS", "power given", "the runs disagree", "the runs differ"):
+                    # every judged row that is not STEADY, named by its organism, size, part and measure, with each run's raw change in
+                    # percent of native (None where native stood at zero), so a LOSS row is listed, never only counted
+                    pcs = [None if not isinstance(x.get("native"), (int, float)) or not x.get("native") or not isinstance(x.get("diff"), (int, float))
+                           else round(100 * x["diff"] / abs(x["native"]), 4) for x in (r.get("runs") or [])]
+                    flagged.append({"organism": r.get("organism"), "copies": r.get("copies"), "part": r.get("part"), "measure": r.get("measure"),
+                                    "w": h, "rd": r.get("reading", ""), "pct": pcs})
+            t["kind"] = "stacks"; t["card_primary_by_copies"] = sizes; t["counts"] = counts; t["by_part"] = by_part; t["flagged"] = flagged
             t["reps_by_copies"] = {k: v for k, v in reps.items() if v < 10 ** 9}   # the fewest paired repetitions any run made at that size
         else:
-            counts, by = {}, {}
+            counts, by, judged = {}, {}, []
             for gauge, r in rows.items():
                 h = _head(r.get("reading", "")); counts[h] = counts.get(h, 0) + 1; by.setdefault(h, []).append(gauge)
-            t["kind"] = "card"; t["counts"] = counts; t["gauges_by_word"] = by
+                # each row as its table writes it: its word, its reading and each run's raw change in percent of native (None where
+                # native stood at zero), so a LOSS row is shown with its sizes and its engine, never only by name
+                pcs = [None if not isinstance(x.get("native"), (int, float)) or not x.get("native") or not isinstance(x.get("diff"), (int, float))
+                       else round(100 * x["diff"] / abs(x["native"]), 4) for x in (r.get("runs") or [])]
+                judged.append({"g": gauge, "w": h, "rd": r.get("reading", ""), "pct": pcs})
+            t["kind"] = "card"; t["counts"] = counts; t["gauges_by_word"] = by; t["rows"] = judged
         out.append(t)
     return out
+
+
+def chip_ledger() -> dict:
+    """Every chip run's state as docs/RUN_LEDGER.md section 1 records it (read from GitHub's own run records): for each GitHub run its
+    row's "What", "Finished?", "What came back" and "Receipt" cells, and whether the run was measured to its end ("Yes" or "To its
+    deadline"); a row that names a span of runs ("14 runs, 24 Oct 02:57 to 08:41") is kept as that span, matched on the page by each
+    run's start. Nothing is decided here: the page prints the ledger's own words."""
+    f = ROOT / "docs" / "RUN_LEDGER.md"
+    if not f.exists():
+        return {"file": None, "runs": {}, "spans": []}
+    lines, grab = f.read_text(encoding="utf-8").splitlines(), False
+    runs, spans, head = {}, [], None
+    clean = lambda c: re.sub(r"\*\*|`", "", c).strip()
+    for ln in lines:
+        if ln.startswith("## 1."):
+            grab = True
+            continue
+        if grab and ln.startswith("## "):
+            break
+        if not grab or not ln.startswith("|") or ln.startswith("|---"):
+            continue
+        cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+        if head is None:
+            head = cells
+            continue
+        row = dict(zip(head, cells))
+        fin = clean(row.get("Finished?", ""))
+        rec = {"what": clean(row.get("What", "")), "finished": fin, "came_back": clean(row.get("What came back", "")), "receipt": clean(row.get("Receipt", "")),
+               "measured": bool(re.match(r"(Yes|To its deadline)\b", fin))}
+        ids = re.findall(r"\b(\d{11})\b", row.get("GitHub run", ""))
+        if ids:
+            for i in ids:
+                runs[i] = rec
+        else:
+            m = re.match(r"(\d+) runs, (\d+) (\w{3}) (\d\d:\d\d) to (\d\d:\d\d)", clean(row.get("GitHub run", "")))
+            if m:
+                mon = {"Oct": "10", "Nov": "11", "Sep": "09"}.get(m.group(3), "10")
+                day = f"2026-{mon}-{int(m.group(2)):02d}"
+                spans.append(rec | {"n": int(m.group(1)), "from": f"{day}T{m.group(4)}:00Z", "to": f"{day}T{m.group(5)}:59Z"})
+    return {"file": str(f.relative_to(ROOT)), "runs": runs, "spans": spans}
 
 
 def main(out: str) -> None:
@@ -270,7 +330,7 @@ def main(out: str) -> None:
             "workload": receipt.get("workload"), "bin_s": BIN_S, "req_bin_s": REQ_BIN_S, "arms": list(ARMS),
             "arm_words": {"native": "the card as shipped, its own driver governing", "watch": "Omni-Compass wired, watching only (the switch OFF: it reads, writes nothing)",
                           "omni": "Omni-Compass governing the power limit"},
-            "total": total_table(md), "reps": reps, "tables": card_tables()}
+            "total": total_table(md), "reps": reps, "tables": card_tables(), "chip_ledger": chip_ledger()}
     Path(out).write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False), encoding="utf-8")
 
 
