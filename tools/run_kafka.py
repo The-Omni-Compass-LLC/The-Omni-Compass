@@ -40,6 +40,7 @@ import subprocess
 import sys
 import threading
 import time
+from collections import deque
 from pathlib import Path
 
 try:                                                       # the legal notice every generated report carries
@@ -49,6 +50,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from omnicompass.compass_law import Band, CompassLaw  # noqa: E402
+from omnicompass.immune import Immune  # noqa: E402  (omni-v22: the immune system's self-knowledge on the group's knob)
 from tools.knob_verdict import KnobVerdict, sample_cost, OBJECTIVES, RESOURCE as DEFAULT_OBJECTIVE  # noqa: E402  (amendment 2: the brain's own verdict)
 from tools.readings import word as gel_word, aim as gel_aim, EVEN_SAME, EVEN_NOISE, SHOWN  # noqa: E402  (the words every table uses)
 
@@ -63,6 +65,9 @@ NATIVE_CONSUMERS = 2      # the operator's count
 COVER = (1, PARTITIONS)   # never under one consumer, never more than partitions
 DWELL_S = 5.0             # no taking back within five seconds of a change
 POLL_RECORDS = 50         # the most messages a consumer takes in one poll (KafkaConsumer max_poll_records)
+HEARTBEAT_MS = 3000       # the consumers' heartbeat (KafkaConsumer heartbeat_interval_ms, the client's own default): a member learns of a
+                          # rebalance at its next heartbeat, so a change reaches every member within one interval
+SESSION_MS = 10000        # the consumers' session timeout (KafkaConsumer session_timeout_ms, the client's own default)
 HANDBACK_DWELL_S = 30.0   # store fix of 25 October: a consumer above the operator's count is handed back only 30 s after the last change (each
                           # change rebalances the whole group, and a hand-back that is undone at once is two pauses for nothing)
 IDLE_S = 1.0              # store fix of 25 October: a consumer is idle only after a full second with no message (a sustained state, never one
@@ -142,7 +147,7 @@ def consumer_proc(topic, group, service_ms, consumed, stop_evt, rec_path, idle_f
     """One consumer of the group: poll, spend the service time per message, record (consume time, latency ms)."""
     from kafka import KafkaConsumer
     c = KafkaConsumer(topic, bootstrap_servers=BOOTSTRAP, group_id=group, auto_offset_reset="earliest",
-                      enable_auto_commit=True, max_poll_records=POLL_RECORDS, session_timeout_ms=10000, heartbeat_interval_ms=3000)
+                      enable_auto_commit=True, max_poll_records=POLL_RECORDS, session_timeout_ms=SESSION_MS, heartbeat_interval_ms=HEARTBEAT_MS)
     n = 0
     last_msg = time.monotonic()                                 # a consumer starts busy: idle only after IDLE_S with no message
     with open(rec_path, "a") as rec:
@@ -259,58 +264,293 @@ def decide(p, force, lag, idle, cur, last_change_age, wall=0.95, snapshot=None, 
     return cur, 0, "hold"
 
 
+# omni-v22: the group's twin and the immune reflex (docs/KAFKA_PREREGISTRATION.md, amendment 4; docs/STORE_ROOT_CAUSES_2026-10-30.md).
+# On omni-v21 the verdict's allowance clamped every move, the wall's fail-up included, and the wall abandoned every spend trial, so in
+# 1,413 of the 1,428 seconds the service stood over its line the brain asked for consumers and was refused; and the hand-back gave
+# a consumer back that the load still needed, each give-back and re-add a rebalance of the whole group (a median 2.58 s and 1.24 s
+# of every message waiting). The twin knows which count carries the load; the reflex goes there and holds it.
+RHO_SPEND = 0.9           # the twin spends to the smallest count whose busiest member runs at or under nine tenths of its rate
+RHO_HAND = 0.7            # it hands back only to a count whose busiest member stays at or under seven tenths at the window's peak
+HANDBACK_WINDOW_S = 60.0  # the window the hand-back reads the arrivals' peak over
+DRAIN_S = 2 * TAU         # a backlog the twin finds, and the one a change's own rebalance makes, is drained within this
+MU_KEEP = 15              # the member's rate: the median of the twin's last 15 estimates
+STALL_KEEP = 9            # a change's own stall: the median of the last 9 the group showed
+
+
+class RateTwin:
+    """The consumer group's twin: each partition's arrivals (the topic's log-end offsets, once a second) placed on the members by
+    Kafka's range assignor, and one member's rate learned from the group's own seconds. In a second in which the queue grew
+    and no change was settling, the group consumed sum(min(load_i, mu)) over its members (the members over their rate serve
+    mu, the others their load), solved for mu. The stall a change costs is learned the same way: the seconds after a change in
+    which the group consumed under half its rate before it. Nothing in it is a number written for a workload."""
+
+    def __init__(self, partitions=PARTITIONS):
+        self.partitions = partitions
+        self.mu_est = deque(maxlen=MU_KEEP)
+        self.stalls = deque(maxlen=STALL_KEEP)
+        self.watch = None                       # (time of the change, the rate consumed before it, seconds stalled so far)
+
+    @property
+    def mu(self):
+        return statistics.median(self.mu_est) if self.mu_est else None
+
+    @property
+    def stall_s(self):
+        """A change's own stall: the median the group showed, or, before it has shown one, the protocol's bound (a rebalance
+        reaches every member within one heartbeat interval, the consumers' own setting)."""
+        return statistics.median(self.stalls) if self.stalls else HEARTBEAT_MS / 1000.0
+
+    def ranges(self, c):
+        c = max(1, min(c, self.partitions))
+        n, extra = divmod(self.partitions, c)
+        out, start = [], 0
+        for i in range(c):
+            size = n + (1 if i < extra else 0)
+            out.append(range(start, start + size)); start += size
+        return out
+
+    def loads(self, c, arrivals, backlog=None):
+        """Each member's load (messages a second) at count c: its partitions' arrivals, and a backlog to drain within DRAIN_S."""
+        total = sum(arrivals) or 1.0
+        out = []
+        for r in self.ranges(c):
+            a = sum(arrivals[p] for p in r)
+            if backlog:
+                a += backlog * (a / total) / DRAIN_S       # the backlog sits where the messages arrive
+            out.append(a)
+        return out
+
+    def learn(self, c, arrivals, consumed):
+        loads = self.loads(c, arrivals)
+        total = sum(loads)
+        if consumed <= 0 or consumed >= 0.98 * total:
+            return None
+        lo, hi = 0.0, max(loads)
+        for _ in range(48):
+            mid = (lo + hi) / 2
+            if sum(min(x, mid) for x in loads) < consumed:
+                lo = mid
+            else:
+                hi = mid
+        mu = (lo + hi) / 2
+        if mu > 0:
+            self.mu_est.append(mu)
+        return mu
+
+    def changed(self, t, consumed_before):
+        self.watch = [t, consumed_before, 0]
+
+    def after_change(self, t, consumed):
+        """Counts the seconds after a change the group consumed under half its rate before it: the change's own stall."""
+        if self.watch is None:
+            return
+        t0, before, stalled = self.watch
+        if before > 0 and consumed < 0.5 * before and t - t0 <= 10:
+            self.watch[2] = stalled + 1
+            return
+        if t - t0 >= 1:
+            self.stalls.append(float(stalled)); self.watch = None
+
+    def busiest(self, c, arrivals, backlog=0.0):
+        mu = self.mu
+        return None if mu is None else max(self.loads(c, arrivals, backlog)) / mu
+
+    def needed(self, arrivals, lo, hi, rho, backlog=0.0):
+        """The smallest count in [lo, hi] whose busiest member runs at or under rho; where none does, the smallest count with the
+        least busy busiest member (a count that adds no relief is never chosen over a smaller one)."""
+        best = None
+        for c in range(lo, hi + 1):
+            b = self.busiest(c, arrivals, backlog)
+            if b is None:
+                return None
+            if b <= rho:
+                return c
+            if best is None or b < best[0] - 1e-9:
+                best = (b, c)
+        return best[1]
+
+
+class Brain:
+    """The knob's decision, one a second (omni-v22): the same code the real run (Omni) and the closed-loop model
+    (tools/kafka_model.py) drive. obs: reading (s, or None), n_msg, inside, lag, idle, consumers, cpu_share and arrivals (each
+    partition's messages a second, or None while unread).
+
+      the reflex   with the twin's rate known: the count cannot carry the arrivals and the backlog (its own and the one a change's
+                   stall would add) at nine tenths of its rate, so the knob goes at once to the smallest count that can, up to the
+                   partitions; the immune system's reflex, never clamped by the verdict's allowance (the allowance judges the
+                   compass's own moves). At the wall with no rate known, the compass's fail-up goes one consumer up, and the
+                   twin learns the rate from the second it sees the queue grow
+      the hold     above the operator's count the knob stays where the reflex put it; it is handed back, in one move (one
+                   rebalance), only to the smallest count at or above the operator's whose busiest member stays at or under seven
+                   tenths of its rate at the arrivals' peak of the last 60 s, 30 s after the last change, calm, nothing waiting
+                   beyond one poll round a consumer
+      the floor    never below the operator's count (the max, the factory tune)
+      the immune   Omni-Compass's count redlining past the line, stuck, and native's twin (the operator's count on the same
+                   arrivals) reading lower: the knob goes back to native for the immune hold (omnicompass/immune.py)
+      the rest     the compass law and the verdict as on omni-v21, inside the allowance, never under the reflex's count"""
+
+    def __init__(self, snapshot, objective=DEFAULT_OBJECTIVE, line_ms=LINE_MS):
+        self.snapshot = snapshot; self.objective = objective; self.line_s = line_ms / 1000.0
+        self.law = CompassLaw(Band(0.0, self.line_s, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
+        self.verdict = KnobVerdict(snapshot, 1, COVER, objective=objective, settle_s=2 * TAU)   # a consumer that joins rebalances the group first
+        self.twin = RateTwin()
+        self.immune = Immune()
+        self.window = deque()                    # (t, arrivals) over HANDBACK_WINDOW_S
+        self.last_change = -1e9; self.prev_lag = None; self.prev_consumed = 0; self.failups = 0
+
+    def step(self, t, obs):
+        lo, hi = max(COVER[0], self.snapshot), COVER[1]
+        reading = obs["reading"]; lag, n_msg, cur, idle = obs["lag"], obs["n_msg"], obs["consumers"], obs["idle"]
+        if reading is None:
+            reading = min(self.line_s, 0.0 if lag == 0 else self.line_s)        # waiting with no one consuming: the line
+        f = self.law.force(reading)
+        cost = sample_cost(self.objective, obs["inside"], reading if n_msg else None, cur, obs["cpu_share"])
+        self.verdict.observe(cost, t)
+        arrivals = obs.get("arrivals")
+        settling = t - self.last_change < 2 * TAU
+        self.twin.after_change(t, n_msg)
+        if arrivals is not None:
+            self.window.append((t, list(arrivals)))
+            while self.window and t - self.window[0][0] > HANDBACK_WINDOW_S:
+                self.window.popleft()
+            grew = self.prev_lag is not None and lag > self.prev_lag
+            if grew and not settling:
+                self.twin.learn(cur, arrivals, n_msg)
+        self.prev_lag = lag
+        info = {"mu": None if self.twin.mu is None else round(self.twin.mu, 1), "stall_s": round(self.twin.stall_s, 2)}
+        target, why = None, None
+        if arrivals is not None and self.twin.mu is not None:
+            rate = sum(arrivals)
+            backlog = lag + self.twin.stall_s * rate             # what waits now, and what one change's stall would add
+            busy_now = self.twin.busiest(cur, arrivals, lag)
+            info["busiest"] = round(busy_now, 3)
+            if busy_now > RHO_SPEND and not settling:
+                want = self.twin.needed(arrivals, max(lo, cur), hi, RHO_SPEND, backlog)
+                if want is not None and want > cur:
+                    target, why = want, f"the twin: the busiest member at {busy_now:.2f} of its rate; {want} consumers carry it"
+            elif cur > lo and not settling and t - self.last_change >= HANDBACK_DWELL_S and f < -0.05 and lag <= cur * POLL_RECORDS:
+                peak = [max(a[p] for _, a in self.window) for p in range(PARTITIONS)]
+                want = self.twin.needed(peak, lo, cur, RHO_HAND, 0.0)
+                if want is not None and want < cur:
+                    target, why = want, f"calm, and {want} consumers carry the last {HANDBACK_WINDOW_S:.0f} s's peak at {RHO_HAND} of their rate: handed back in one move"
+        if target is None:
+            d_target, _, d_why = decide(self.law.p, f, lag, idle, cur, t - self.last_change, wall=self.law.band.wall_high,
+                                        snapshot=self.snapshot, consumed=n_msg)
+            fail_up = d_why.startswith("fail up")
+            if fail_up and self.twin.mu is None:
+                target, why = min(hi, cur + 1), "fail up, the twin's rate not yet known: one consumer up"
+                self.failups += 1
+            else:
+                v_target, why, vinfo = self.verdict.decide(d_target, spend_ok=(f > 0.05 and lag > 0), give_ok=False, t=t, why=d_why,
+                                                           stress=f > 0.05, calm=f < -0.05, fail_up=fail_up)
+                info.update(vinfo)
+                target = max(lo, v_target)
+                if cur > lo and target < cur:
+                    target, why = cur, f"{why}; held at the reflex's count until the hand-back's terms are met"
+                if target > cur and (settling or (arrivals is not None and self.twin.mu is not None)):
+                    # a change's own stall is not demand, and where the twin knows the group only the twin adds: the compass's
+                    # add, read on the seconds a hand-back's rebalance stalled the group, re-added the consumer just handed back
+                    # (the model, heavy, seeds 105 and 108: 2 -> 3 -> 2 every 30 s)
+                    target, why = cur, f"{why}; the twin carries the spend: held"
+        # the immune system's self-knowledge: Omni-Compass's count redlining and stuck, native's twin reading lower
+        p_omni = reading / self.line_s
+        p_native = p_omni
+        if arrivals is not None and self.twin.mu is not None:
+            b_nat = self.twin.busiest(self.snapshot, arrivals, lag)
+            b_cur = self.twin.busiest(cur, arrivals, lag)
+            p_native = p_omni * (b_nat / b_cur) if b_cur else p_omni
+        mode, ev = self.immune.tick(p_omni, p_native, moved=target != cur, at_limit=cur >= hi)
+        if mode == "native":
+            target, why = self.snapshot, "the immune system: Omni-Compass's count redlined, stuck, and native's twin reads lower: native holds the knob"
+            if ev:
+                info["immune"] = ev
+        if target != cur:
+            self.twin.changed(t, n_msg)
+            self.last_change = t
+        info.update({"p": round(self.law.p, 4), "force": round(f, 4)})
+        return target, why, info
+
+
+class Offsets:
+    """The topic's log-end offset of each partition, read from the broker once a second (one wire in): each partition's arrivals,
+    as any deployment reads them (the consumer group tool's LOG-END-OFFSET)."""
+
+    def __init__(self, topic):
+        from kafka import KafkaConsumer, TopicPartition
+        self.c = KafkaConsumer(bootstrap_servers=BOOTSTRAP, group_id=None, enable_auto_commit=False)
+        self.tps = [TopicPartition(topic, p) for p in range(PARTITIONS)]
+        self.last, self.last_t = None, None
+
+    def rates(self, now):
+        try:
+            end = self.c.end_offsets(self.tps)
+        except Exception:
+            return None
+        cur = [end.get(tp, 0) for tp in self.tps]
+        out = None
+        if self.last is not None and now > self.last_t:
+            out = [max(0.0, (a - b) / (now - self.last_t)) for a, b in zip(cur, self.last)]
+        self.last, self.last_t = cur, now
+        return out
+
+    def close(self):
+        try:
+            self.c.close()
+        except Exception:
+            pass
+
+
 class Omni(threading.Thread):
     """The brain, one decision a second, writing the audit; the knob is handed back at the end and read back. Amendment 2 (the
-    brain's own verdict, 2026-10-09): the group's size starts in watch and is written only inside the allowance a paired trial
-    on the group itself has earned under the declared objective (tools/knob_verdict.py around the engine's own Verdict); a
-    trial holds the count; a fail-up never spends beyond the allowance."""
+    brain's own verdict, 2026-10-09): the compass's own moves are written only inside the allowance a paired trial on the group
+    itself has earned under the declared objective (tools/knob_verdict.py around the engine's own Verdict). From omni-v22 the
+    decision is the Brain's (above): the twin's reflex and hold, the floor at the operator's count, the immune system."""
 
-    def __init__(self, grp: Group, produced, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE):
+    def __init__(self, grp: Group, produced, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE, topic=None):
         super().__init__(daemon=True)
-        self.grp, self.produced, self.audit, self.line_ms, self.objective = grp, produced, audit_path, line_ms, objective
-        self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)
-        self.stop_flag = threading.Event(); self.last_change = -1e9; self.failups = 0; self.handed_back = False; self.verdict = None
+        self.grp, self.produced, self.audit, self.line_ms, self.objective, self.topic = grp, produced, audit_path, line_ms, objective, topic
+        self.stop_flag = threading.Event(); self.failups = 0; self.handed_back = False; self.verdict = None; self.brain = None
 
     def run(self):
         snapshot = self.grp.count()                        # read once, before the first write: the operator's count
         t0 = time.monotonic(); cpu_prev = cpu_times()
-        self.verdict = KnobVerdict(snapshot, 1, COVER, objective=self.objective, settle_s=2 * TAU)   # a consumer that joins rebalances the group first
+        self.brain = Brain(snapshot, self.objective, self.line_ms); self.verdict = self.brain.verdict
+        offsets = None
+        if self.topic:
+            try:
+                offsets = Offsets(self.topic)
+            except Exception:
+                offsets = None                             # unread arrivals: the twin waits, the compass decides as on omni-v21
         with open(self.audit, "w") as fh:
             while not self.stop_flag.is_set():
                 tick = time.monotonic()
                 recs = [self.grp.out / f"consumer-{k}.log" for k in range(1, self.grp.k + 1)]
                 lag = max(0, self.produced.value - self.grp.consumed.value)
                 reading, n_msg, inside = service_sample(recs, 1.0, self.line_ms)
-                if reading is None:
-                    reading = min(LINE_MS / 1000.0, 0.0 if lag == 0 else LINE_MS / 1000.0)   # waiting with no one consuming: the line
-                f = self.law.force(reading)
                 cur = self.grp.count(); idle = self.grp.idle()
                 cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
                 cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
-                cost = sample_cost(self.objective, inside, reading if n_msg else None, cur, cpu_share)
-                self.verdict.observe(cost, tick - t0)                                    # measured under the count of the last second
-                target, d, why = decide(self.law.p, f, lag, idle, cur, tick - self.last_change, wall=self.law.band.wall_high, snapshot=snapshot,
-                                        consumed=n_msg)
-                fail_up = why.startswith("fail up")
-                # a give-back above the operator's count is the hand-back of a spend, inside the allowance: no give-back trial (whose
-                # steps run below native) is started for it
-                target, why, vinfo = self.verdict.decide(target, spend_ok=(f > 0.05 and lag > 0), give_ok=(f < -0.05 and idle > 0 and lag == 0 and cur <= snapshot and n_msg > 0),
-                                                         t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=fail_up)
+                arrivals = offsets.rates(tick) if offsets else None
+                obs = {"reading": reading, "n_msg": n_msg, "inside": inside, "lag": lag, "idle": idle, "consumers": cur,
+                       "cpu_share": cpu_share, "arrivals": arrivals}
+                target, why, info = self.brain.step(tick - t0, obs)
                 if target > cur:
                     for _ in range(target - cur):
                         self.grp.start_one()
-                    self.last_change = tick
-                    if fail_up:
-                        self.failups += 1
                 elif target < cur:
                     for _ in range(cur - target):
                         self.grp.stop_one()
-                    self.last_change = tick
-                fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(reading * 1000, 2), "p": round(self.law.p, 4), "force": round(f, 4),
-                                     "lag": lag, "idle": idle, "consumers": cur, "target": target, "consumed_last_s": n_msg, "inside_last_s": inside,
-                                     "cpu_share": None if cpu_share is None else round(cpu_share, 4), "cost": None if cost is None else round(cost, 9),
-                                     **vinfo, "why": why}) + "\n")
+                shown = reading if reading is not None else min(LINE_MS / 1000.0, 0.0 if lag == 0 else LINE_MS / 1000.0)
+                fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(shown * 1000, 2), "lag": lag, "idle": idle,
+                                     "consumers": cur, "target": target, "consumed_last_s": n_msg, "inside_last_s": inside,
+                                     "cpu_share": None if cpu_share is None else round(cpu_share, 4),
+                                     "arrivals": None if arrivals is None else [round(x, 1) for x in arrivals],
+                                     "allowed_low": self.verdict.allowed_low, "allowed_high": self.verdict.allowed_high,
+                                     **info, "why": why}) + "\n")
                 time.sleep(max(0.0, DT - (time.monotonic() - tick)))
+        self.failups = self.brain.failups
+        if offsets:
+            offsets.close()
         # the hand-back: the operator's count, read back
         while self.grp.count() > snapshot:
             self.grp.stop_one(prefer_idle=False)
@@ -368,7 +608,7 @@ def run_arm(arm, wl_dir: Path, rep, service_ms, payload, steps, step_s, base, li
     sampler = Sampler(grp, produced); sampler.start()
     omni = None
     if arm == "omni":
-        omni = Omni(grp, produced, d / "audit.jsonl", line_ms, objective); omni.start()
+        omni = Omni(grp, produced, d / "audit.jsonl", line_ms, objective, topic=topic); omni.start()
     cpu0 = cpu_times(); t0 = time.time()
     prod = mp.Process(target=producer_proc, args=(topic, rates, step_s, payload, produced, stop_prod, str(d / "producer.log")))
     prod.start(); prod.join()
