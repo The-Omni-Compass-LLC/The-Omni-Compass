@@ -91,13 +91,16 @@ copied here.
 
 Each with its receipt, run by run, in `docs/RUN_LEDGER.md`.
 
-1. **The card.** The one finished counted run, omni-v18 on an A100 (`results/gpu/run-20261024T091235Z/GPU_REPS.md`), reads EVEN
-   on every judged gauge with no write: the card's power limit was already at its top on native, so the factory tune had nothing
-   to raise and left it alone. The three omni-v21 runs of the whole stacks with the card inside (A, B and C on Lambda A10s) and
-   the runs with an operator's power cap underneath (the `cap` mode: the cap alone against the cap with Omni-Compass on top) are
-   the next card results; each lands as its three-run table.
-2. **The three-arm showing on omni-v21** (`orchestrator.yml`, A, B and C from one commit): its record, written by
-   `tools/three_arms_abc.py`, replaces omni-v18's in the answer at the top of the README when it lands.
+1. **The card.** omni-v21 on an A100, three runs each (`results/gpu/V21_A100_SAVE_ABC.md`, `V21_A100_CAP_ABC.md`,
+   `V21_A100_CAP_FULL_ABC.md`). At the factory dial (the max) EVEN with no write: native already runs both knobs at their top.
+   The tune-down (dial save): work per energy GAIN by the mean of our three runs (up 0.75%, beyond the noise in 1 of 3), every
+   service gauge EVEN. The cap at 70%: the mean response time LOSS by the mean (beyond the noise in 0 of 3, run A alone). The
+   tune-down as the card's factory dial goes through the model gate as the next version on the founder's word; the cap's rows
+   are on the next version's list. The stacked box (three A10s, `results/gpu/V21_STACKS_A10_ABC.md`): at 1 and 10 copies, complete in all
+   three runs, the card EVEN in every organism; 100 copies one repetition a run, shown, not judged.
+2. **The three-arm showing on omni-v21** landed (`results/orchestrator/V21_THREE_ARMS_ABC.md`, runs 40474220398,
+   40474223636, 40474227699): Omni-Compass on top of native against native, work GAIN in all three of our runs (up 8.5%), the
+   95th percentile GAIN in all three (down 13.0%); the answer at the top of the README reads it.
 3. **Azure**: the omni-v18 set of 100 paired repetitions finishes as omni-v18's record; then the omni-v21 sets, one at a time,
    each behind Azure's own $0 check (`scripts/azure_queue.txt`).
 4. **Google and Amazon**: wired as Azure's sets are and switched off; GitHub's own check of 27 October (`cloud-check`) reads
@@ -125,6 +128,7 @@ Each with its receipt, run by run, in `docs/RUN_LEDGER.md`.
 | `docs/OMNI_V21.md` | the engine that stands, what changed and how it was read; each earlier engine's page beside it (`docs/OMNI_V<n>.md`) |
 | `docs/RUN_LEDGER.md` | every chip, cloud and machine run, what it cost, whether it finished, and where its receipt is |
 | `docs/AUDIT_2026-10-27.md` | the repository audited top to bottom on 27 October: every finding, its fix at its source, and what holds it |
+| `docs/AUDIT_2026-10-30.md` | the repository graded top to bottom on 30 October: every area's grade on its record, what broke and was fixed, the founder's week, and what is open |
 | `docs/history/STATE_OF_PLAY_2026-10-10.md` | this page as it stood on 10 October, on Omni v3, moved here whole |
 | `docs/history/STATE_OF_PLAY_2026-10-27.md` | this page's chronology as it stood on 27 October, moved here whole |
 

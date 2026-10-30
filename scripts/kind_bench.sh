@@ -55,6 +55,22 @@ IDLE_W="${IDLE_W:-100}"; DYN_W="${DYN_W:-150}"
 PARK_FRAC="${PARK_FRAC:-0.25}"
 STANDBY_W="${STANDBY_W:-$(python -c "print($IDLE_W * $PARK_FRAC)")}"; export IDLE_W DYN_W STANDBY_W
 mkdir -p "$OUT_DIR"
+# Preserve every failed arm and its diagnostics, including failures before the final checks.
+finish_evidence() {
+  local code=$?
+  trap - EXIT
+  if [ -n "${watch_pid:-}" ]; then
+    touch "$OUT_DIR/pod_watch.stop"
+    wait "$watch_pid" || { [ "$code" -ne 0 ] || code=1; }
+  fi
+  if [ "$code" -ne 0 ] && declare -F stop_governors >/dev/null; then
+    stop_governors || true
+  fi
+  [ "$code" -eq 0 ] || echo "arm failed with exit $code; measurements not admitted" >> "$OUT_DIR/INVALID"
+  (cd "$OUT_DIR" && find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt) || code=1
+  exit "$code"
+}
+trap finish_evidence EXIT
 if [ "${OMNI_MACHINES_ONLY:-0}" = "1" ]; then   # the receipt names this arm as it ran (tools/live_reps.py)
   echo "machines alone: no pod autoscaler moved, no processor conveyed, no power capped" > "$OUT_DIR/machines_only.txt"
 fi
@@ -531,6 +547,17 @@ if [ -n "${ORGANISM:-}" ]; then
   kil_pid=$!
 fi
 echo "== warm-up ${WARMUP}s (both arms)"; sleep "$WARMUP"
+# LIST first, then continue from its resourceVersion across bounded API watches.
+# Start before the workload and measured window; never infer missing events from a final snapshot.
+rm -f "$OUT_DIR/pod_watch.stop" "$OUT_DIR/pod_watch.ready"
+python3 tools/bench_integrity.py collect "$OUT_DIR" > "$OUT_DIR/pod_collector.log" 2>&1 &
+watch_pid=$!
+for i in $(seq 1 60); do
+  [ -f "$OUT_DIR/pod_watch.ready" ] && break
+  kill -0 "$watch_pid" 2>/dev/null || { echo "pod collector failed before the window"; exit 1; }
+  sleep 1
+done
+[ -f "$OUT_DIR/pod_watch.ready" ] || { echo "pod collector did not become ready"; exit 1; }
 if [ -n "${GROUP_BARRIER:-}" ]; then
   # a member of a group of clusters (scripts/kind_group.sh): every member opens its window together, so the group's stream,
   # sent when the last member is ready, falls inside every member's window; a member not ready in 30 minutes fails the arm
@@ -644,8 +671,6 @@ if [ "$PLATFORM" != aks ]; then
       echo "$(date -u +%s),$(awk -v dt=$((t-pt)) -v di=$((i-pi)) 'BEGIN{printf "%.4f", (dt > 0 ? 1 - di / dt : 0)}'),$(nproc),$(awk '/^MemAvailable:/ {printf "%d", $2 / 1024}' /proc/meminfo)"; pt=$t; pi=$i; done ) > "$OUT_DIR/host_cpu.csv" &
   host_pid=$!
 fi
-kubectl get pods -n default -l run=php-apache -w --output-watch-events -o json > "$OUT_DIR/pod_watch.json" 2>"$OUT_DIR/pod_watch.err" &
-watch_pid=$!
 omni_pid=""
 # the governor's full decision every OMNI_INTERVAL seconds and its fast checks (the scheduling floor, the pod reflex, and
 # the conveyance every 15 s) every OMNI_FLOOR_INTERVAL seconds: 60 and 5 by default (omni-v17, the founder's word of 22
@@ -737,11 +762,14 @@ if [ -n "$rapl_pid" ]; then
 fi
 [ -n "$meter_pid" ] && { kill "$meter_pid" 2>/dev/null || true; }
 [ -n "$host_pid" ] && { kill "$host_pid" 2>/dev/null || true; }
-kill "$watch_pid" 2>/dev/null || true; wait "$watch_pid" 2>/dev/null || true
 # the end-of-window record: a read the API server does not answer is tried again, never the end of the run
 end_read() { local f="$1"; shift; for t in 1 2 3 4 5 6; do kubectl "$@" --request-timeout=20s > "$f" 2>>"$OUT_DIR/end_reads.err" && return 0; sleep 10; done
-  echo "the API server did not answer: kubectl $*" >> "$OUT_DIR/end_reads.err"; }
+  echo "the API server did not answer: kubectl $*" >> "$OUT_DIR/end_reads.err"; return 1; }
 end_read "$OUT_DIR/pods_end.json" get pods -n default -l run=php-apache -o json
+touch "$OUT_DIR/pod_watch.stop"
+wait "$watch_pid"
+watch_pid=""
+python3 tools/bench_integrity.py validate "$OUT_DIR" > "$OUT_DIR/pod_watch_validation.json"
 if [ -n "$robust_pid" ]; then
   wait "$robust_pid" || { echo "INVALID RUN: robustness helper failed; see robust.out"; exit 1; }
   # the second governor of the kill scenario was started by the robustness script: wait for it to finish its decisions
@@ -820,6 +848,8 @@ elif [ -z "$NATIVE" ]; then
     echo "Omni-Compass stayed native: $decisions decisions recorded, no write" | tee "$OUT_DIR/omni_stayed_native.txt"
   fi
   stop_governors        # no write of the window's governor can land after the reset is checked
+  # Reconcile the benchmark-owned pause atomically even when another writer already resumed it.
+  python3 tools/bench_integrity.py restore-rollout default/php-apache --kubectl "$KUBECTL" > "$OUT_DIR/rollout_reset.json"
   python -m omni_controller.controller --kubectl "$KUBECTL" --mode nodepool --active-nodes-only --iterations 1 \
     $CAP_ARGS --rollout-guard default/php-apache $OWN \
     --node-restore-cmd "bash scripts/kind_nodepool.sh $WORKERS" --audit "$OUT_DIR/audit_kill.jsonl" --kill-file "$OUT_DIR/kill"

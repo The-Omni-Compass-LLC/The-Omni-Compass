@@ -99,6 +99,11 @@ def bench():
     assert r.returncode == 0, r.stdout[-3000:] + r.stderr[-2000:]
     out = json.loads((d / "run" / "GPU_REPS.json").read_text())
     assert not out["problems"], out["problems"]
+    # the window opens only once the governor stands (its snapshot written), in every governed arm, never in native
+    for arm in ("watch", "omni"):
+        ready = d / "run" / "rep-1" / arm / "governor_ready.txt"; start = d / "run" / "rep-1" / arm / "window_start.txt"
+        assert ready.exists() and float(ready.read_text()) <= float(start.read_text()), f"{arm}: the window opened before the governor stood"
+    assert not (d / "run" / "rep-1" / "native" / "governor_ready.txt").exists()
     assert {c["writes"] for c in out["checks"]["watch"].values()} == {0}
     assert all(c["writes"] > 0 for c in out["checks"]["omni"].values())
     assert "energy, GPU (J)" in out["paired"]["omni"] and (d / "run" / "SHA256SUMS.txt").exists()

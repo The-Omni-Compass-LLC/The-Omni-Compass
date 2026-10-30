@@ -43,7 +43,8 @@ def build_cpp(tmp):
                            ("run_closure.cpp", "oc_closure"), ("run_conveyance.cpp", "oc_conveyance"), ("run_twins.cpp", "oc_twins"),
                            ("run_compass_law.cpp", "oc_compass_law"), ("run_verdict.cpp", "oc_verdict"),
                            ("engine_runs.cpp", "oc_engine_runs"), ("run_edge.cpp", "oc_edge"),
-                           ("run_student_t.cpp", "oc_student_t"), ("run_orchestrator_brain.cpp", "oc_orchestrator_brain")):
+                           ("run_student_t.cpp", "oc_student_t"), ("run_orchestrator_brain.cpp", "oc_orchestrator_brain"),
+                           ("core_runs.cpp", "oc_core_runs"), ("run_immune.cpp", "oc_immune")):
             subprocess.run([cxx, "-std=c++20", "-O2", "-I", str(src / "include"), *srcs, str(src / "tools" / tool), "-o", str(b / name)], check=True)
     return b
 
