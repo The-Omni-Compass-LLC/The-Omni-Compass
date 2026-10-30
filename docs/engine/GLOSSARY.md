@@ -1998,7 +1998,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the climb | term | 4c (#s-fleet); 4g (#s-math) |
 | the cloud as the wire | term | 0 (#s-answer); iii (#s-bottom); 2d (#s-board); 3h (#s-cloud); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read) |
 | collector | term | 1c (#s-dash) |
-| Commands | term | 1a (#s-wall); 4g (#s-math); 4j (#s-problem); v (#s-disclose) |
+| Commands | term | 1a (#s-wall); 4g (#s-math); 4j (#s-problem) |
 | the compass | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3n (#s-lab); 3o (#s-proof); 4d (#s-cpp); 4g (#s-math); 4i (#s-self); v (#s-disclose) |
 | the compass law | term | 1a (#s-wall); 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3l (#s-live); 3o (#s-proof); 4d (#s-cpp); 4g (#s-math); 4i (#s-self); v (#s-disclose) |
 | Compute / AI / Cloud | organism | 3b (#s-desk); 4j (#s-problem) |
@@ -2006,7 +2006,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | console | term | 1a (#s-wall); 1c (#s-dash); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3h (#s-cloud); 3n (#s-lab); 4c (#s-fleet); 4h (#s-fail) |
 | the conveyance | term | 3c (#s-dial); 3h (#s-cloud); 3o (#s-proof); 4g (#s-math); v (#s-disclose) |
 | the cover | term | 4g (#s-math) |
-| cruise | term | 4g (#s-math); v (#s-disclose) |
+| cruise | term | 4g (#s-math) |
 | the cushion | term | 3a (#s-engines); 3d (#s-decision); 3j (#s-ops); 4i (#s-self); 4j (#s-problem) |
 | the dashboards | term | 1c (#s-dash) |
 | the dial | term | 1a (#s-wall); 2b (#s-feed); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3j (#s-ops); 4j (#s-problem); v (#s-disclose) |
@@ -2020,7 +2020,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the factory tune | term | 1a (#s-wall); 3b (#s-desk); 3m (#s-stacks); 4b (#s-scn); v (#s-disclose) |
 | fail up | term | 3e (#s-plane); 4g (#s-math) |
 | family | term | 2d (#s-board); 4c (#s-fleet) |
-| the fast checks | term | 3c (#s-dial); 3j (#s-ops); 4j (#s-problem); v (#s-disclose) |
+| the fast checks | term | 3c (#s-dial); 3j (#s-ops); 4j (#s-problem) |
 | the fingerprint and its digest | term | 1b (#s-health); 2b (#s-feed); 3o (#s-proof); 4b (#s-scn); 4d (#s-cpp); 4g (#s-math); v (#s-disclose) |
 | the four pieces | term | 1a (#s-wall) |
 | The four stacked, every shared muscle in each | organism | 4b (#s-scn); 4c (#s-fleet) |
@@ -2052,7 +2052,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the max | term | 1a (#s-wall); 3a (#s-engines); 3b (#s-desk); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4c (#s-fleet); 4g (#s-math); v (#s-disclose) |
 | the mechanism panel | term | 1a (#s-wall) |
 | Metrics (Prometheus) | term | 1c (#s-dash); 2b (#s-feed); 3c (#s-dial); 4e (#s-github); 4l (#s-monlist) |
-| the model gate | term | 3g (#s-verdict) |
+| the model gate | term | 3g (#s-verdict); v (#s-disclose) |
 | modelled | term | 2b (#s-feed); 3a (#s-engines); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | the monitor wall | term | 1a (#s-wall); 1b (#s-health); 2b (#s-feed); 3a (#s-engines); 3h (#s-cloud); 3j (#s-ops); 3m (#s-stacks); 3o (#s-proof); 4b (#s-scn); 4c (#s-fleet); 4d (#s-cpp); 4e (#s-github); 4f (#s-master); 4g (#s-math); 4l (#s-monlist); v (#s-disclose) |
 | Monte Carlo | term | 1b (#s-health); 3o (#s-proof); 4b (#s-scn) |
@@ -2061,7 +2061,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | native's colour | term | 1b (#s-health); 1c (#s-dash); 2b (#s-feed); 3a (#s-engines); 3e (#s-plane); 3h (#s-cloud); 4f (#s-master); 4k (#s-read) |
 | the nervous system | term | 3a (#s-engines); 3d (#s-decision); 3f (#s-brain); 3l (#s-live); 4d (#s-cpp); 4g (#s-math); 4k (#s-read); v (#s-disclose) |
 | observer | term | 1c (#s-dash) |
-| Omni index | term | 2d (#s-board); 4c (#s-fleet); 4k (#s-read) |
+| Omni index | term | 0 (#s-answer); 2d (#s-board); 4c (#s-fleet); 4k (#s-read) |
 | Omni-Compass | term | 0 (#s-answer); iii (#s-bottom); 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2a (#s-status); 2b (#s-feed); 2c (#s-loss); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3c (#s-dial); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3g (#s-verdict); 3h (#s-cloud); 3i (#s-orch); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 3n (#s-lab); 3o (#s-proof); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4f (#s-master); 4g (#s-math); 4h (#s-fail); 4i (#s-self); 4j (#s-problem); 4k (#s-read); 4l (#s-monlist); v (#s-disclose) |
 | Omni-Compass on native | term, arm | 0 (#s-answer); 1a (#s-wall); 1b (#s-health); 1c (#s-dash); 2d (#s-board); 3a (#s-engines); 3b (#s-desk); 3e (#s-plane); 3j (#s-ops); 3k (#s-runs); 3l (#s-live); 3m (#s-stacks); 4a (#s-whole); 4b (#s-scn); 4c (#s-fleet); 4i (#s-self); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | Omni-Compass's blue | term | 1c (#s-dash); 2b (#s-feed); 2d (#s-board); 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3h (#s-cloud); 4a (#s-whole); 4e (#s-github); 4k (#s-read) |
@@ -2082,7 +2082,7 @@ Every term, organism and arm with the sections of the page that print it, by the
 | the raw change and the word | term | 0 (#s-answer); 2c (#s-loss); 3j (#s-ops); 4k (#s-read) |
 | realm | term | 3a (#s-engines); 3d (#s-decision); 3e (#s-plane); 3f (#s-brain); 3n (#s-lab); 4b (#s-scn); 4c (#s-fleet); 4g (#s-math); 4j (#s-problem); 4k (#s-read); v (#s-disclose) |
 | REDLINING | term | iii (#s-bottom); 1a (#s-wall) |
-| the reflex rule | term | 3a (#s-engines); 3c (#s-dial); 4i (#s-self); v (#s-disclose) |
+| the reflex rule | term | 3a (#s-engines); 3c (#s-dial); 4i (#s-self) |
 | the release gate | term | 3b (#s-desk); 3d (#s-decision); 3l (#s-live); 4g (#s-math) |
 | RK4 | term | 1b (#s-health); 3a (#s-engines); 3b (#s-desk); 3f (#s-brain); 3o (#s-proof); 4g (#s-math) |
 | the runs disagree | term | 2a (#s-status); 2c (#s-loss); 2d (#s-board); 4c (#s-fleet); 4k (#s-read) |
