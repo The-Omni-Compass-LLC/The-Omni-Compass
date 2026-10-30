@@ -286,7 +286,7 @@ class Brain:
         while self.used and t - self.used[0][0] > HOLD_WINDOW_S:
             self.used.popleft()
         peak = max((u for _, u in self.used), default=0.0) / FULL
-        return max(self.native_mb, int(math.ceil(peak / STEP_MB)) * STEP_MB)
+        return min(COVER_MB[1], max(self.native_mb, int(math.ceil(peak / STEP_MB)) * STEP_MB))
 
     def step(self, t, obs):
         reading = obs["reading_s"]; cur = obs["ceiling_mb"]; ev_last = obs["evicted_last_s"]

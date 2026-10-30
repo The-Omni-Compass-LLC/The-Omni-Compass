@@ -31,7 +31,7 @@ class Max(unittest.TestCase):
         self.assertGreater(cur, 64)
         self.assertLessEqual(cur, R.COVER_MB[1], "never past the cover's top")
         self.assertTrue(spends and all("power given" in w for w in spends), spends)
-        for t in range(40, 70):                                # the working set settles at 180 MB under the ceiling
+        for t in range(40, 110):                               # the working set settles at 180 MB; the growth's seconds leave the window
             target, why, info = b.step(float(t), obs(0.3, 180.0, cur))
             cur = target
         return b, cur
@@ -42,9 +42,9 @@ class Max(unittest.TestCase):
 
     def test_calm_hands_back_only_to_the_working_sets_floor(self):
         b, cur = self.grown()
-        floor = b.floor_mb(70.0)
-        self.assertGreaterEqual(floor, int(180 / R.FULL))
-        for t in range(70, 200):
+        floor = b.floor_mb(110.0)
+        self.assertEqual(floor, 200, "180 MB occupied, the fullness margin, rounded up to a notch")
+        for t in range(110, 240):
             target, why, info = b.step(float(t), obs(0.3, 180.0, cur))
             self.assertGreaterEqual(target, floor, why)
             cur = target
@@ -52,7 +52,7 @@ class Max(unittest.TestCase):
 
     def test_the_floor_falls_with_the_working_set_and_never_under_native(self):
         b, cur = self.grown()
-        for t in range(70, 400):                               # the working set shrinks to 20 MB: the floor follows it after the window
+        for t in range(110, 400):                              # the working set shrinks to 20 MB: the floor follows it after the window
             target, why, info = b.step(float(t), obs(0.3, 20.0, cur))
             self.assertGreaterEqual(target, 64, why)
             cur = target
