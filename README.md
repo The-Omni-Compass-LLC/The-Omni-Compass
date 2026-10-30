@@ -255,6 +255,8 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-30 19:42 | big-organism-detached collect | success | [41117416250](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41117416250) |
+| 2026-10-30 19:37 | raw-sweep | success | [41116658082](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41116658082) |
 | 2026-10-30 19:35 | health | success | [41116470501](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41116470501) |
 | 2026-10-30 19:16 | cpu-power | success | [41113752748](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41113752748) |
 | 2026-10-30 19:15 | realms-v5 | success | [41111557263](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41111557263) |
@@ -263,8 +265,6 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 | 2026-10-30 19:11 | benchmark | success | [41109427748](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109427748) |
 | 2026-10-30 19:07 | live-kind | success | [41109435843](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109435843) |
 | 2026-10-30 19:06 | live-kind-full | success | [41109444596](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109444596) |
-| 2026-10-30 19:05 | kwok-scale | success | [41111543718](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41111543718) |
-| 2026-10-30 19:01 | live-shadow | success | [41109460505](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109460505) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
