@@ -255,16 +255,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-30 19:42 | big-organism-detached collect | success | [41117416250](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41117416250) |
-| 2026-10-30 19:37 | raw-sweep | success | [41116658082](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41116658082) |
-| 2026-10-30 19:35 | health | success | [41116470501](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41116470501) |
-| 2026-10-30 19:16 | cpu-power | success | [41113752748](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41113752748) |
-| 2026-10-30 19:15 | realms-v5 | success | [41111557263](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41111557263) |
-| 2026-10-30 19:14 | live-engine | success | [41106609460](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41106609460) |
-| 2026-10-30 19:12 | realms | success | [41111549667](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41111549667) |
-| 2026-10-30 19:11 | benchmark | success | [41109427748](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109427748) |
-| 2026-10-30 19:07 | live-kind | success | [41109435843](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109435843) |
-| 2026-10-30 19:06 | live-kind-full | success | [41109444596](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41109444596) |
+| 2026-10-30 23:58 | ycsb | success | [41134119360](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41134119360) |
+| 2026-10-30 23:57 | benchmark-reps | success | [41141150094](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41141150094) |
+| 2026-10-30 23:55 | redis | success | [41137746935](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41137746935) |
+| 2026-10-30 23:51 | citylearn | success | [41139480336](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41139480336) |
+| 2026-10-30 23:45 | sysbench | success | [41134112744](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41134112744) |
+| 2026-10-30 23:44 | engine-runs | success | [41145999674](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41145999674) |
+| 2026-10-30 23:36 | robustness | success | [41141138276](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41141138276) |
+| 2026-10-30 23:26 | pgbench | success | [41134106235](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41134106235) |
+| 2026-10-30 23:16 | live-engine | success | [41139356421](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41139356421) |
+| 2026-10-30 23:14 | health | success | [41143289786](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41143289786) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
