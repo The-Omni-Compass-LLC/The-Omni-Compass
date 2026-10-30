@@ -27,10 +27,11 @@ Four pieces, each read from the store's and the host's own meters, nothing writt
                             archived runs it read 0.5 to 1.2 ms a unit of miss share inside the arms, while the controlled
                             comparison across pool sizes (a third of the misses gone, the latency unmoved) read none; the
                             seconds' noise is shared by both, and the slope reads it as a price
-  the gate                  memory is spent only where that share is MISS_WORTH or more; where the misses cost the service
-                            nothing (a runner whose page cache holds the data files: a pool "miss" is a read from memory), the
-                            knob holds and says so; where the store's account is not read this second, nothing is known and
-                            nothing is taken
+  the gate                  memory is spent only where that share is MISS_WORTH or more, the one key's own floor (a change of
+                            0.5% or more is a change, the founder's order of 24 October): under it the misses are nothing the
+                            key could read, so memory could buy nothing it could read, and the knob holds and says so; where the
+                            store's account is not read this second, nothing is known and nothing is taken. The floor is not a
+                            tuning: it is the smallest change the record reads at all
   the host's room           a notch is taken only while the host keeps HOST_CUSHION of its memory available after it (the
                             compass's cushion; the host is a muscle too, and never past its own limit); unread, nothing is taken
 """
@@ -41,7 +42,8 @@ from collections import deque
 
 HOLD_WINDOW_S = 60.0
 WORTH_WINDOW_S = 10.0
-MISS_WORTH = 0.10
+MISS_WORTH = 0.005              # the one key's floor, tools/readings.py SIZE_FLOOR (a change under 0.5% reads EVEN, under the floor); written
+                                # here as a number because this file is in the engine's fingerprint and readings.py is not
 HOST_CUSHION = 0.05
 MEMINFO = "/proc/meminfo"
 KINDS = ("spend", "held_unread", "held_worth", "held_host", "handed_back", "handed_to_floor", "held_floor", "failups")

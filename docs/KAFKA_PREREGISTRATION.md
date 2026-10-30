@@ -199,6 +199,14 @@ notch (run C's setting, not the counted one) one row reads LOSS: the burst's mos
 seeds' spread, because native's queue grows about 1,100 messages in a 20 s notch and one change's rebalance costs about the
 same; it is on the next version's list with that cause.
 
+**The dial and the fingerprint** (30 October, the same candidate): `OMNI_DIAL=save` keeps omni-v21's loop on this wire (the
+tune-down, where giving consumers back is the aim; the verdict's allowance and its trials as amendments 2 and 3 wrote them), the
+max (the Brain above) is the factory tune, and every workload record carries its `dial`; `tools/knob_verdict.py`, which every
+store wire's tune-down runs through, joins the fingerprint with this version (`tools/omni_version.py`, `STORE_WIRES`). In the
+open-loop replay of the omni-v21 arms' recorded seconds (`tools/store_gate.py`, class S) the twin reads no arrivals (the audits
+carry none) and the reflex adds consumers from the compass's own wanting: consumers held 2.1 → 4.9 (+130.6%, power given), no second
+below the operator's count in either wire; no LOSS.
+
 **Expected before the runs**, at the counted 30 s a notch, three paired repetitions a run: the work inside the line and every
 latency and lag gauge GAIN in every untouched workload; the consumers running power given; the consumer changes shown. The
 counted runs on this amendment run on the next engine version, which lands only when the model gate reads no LOSS for every

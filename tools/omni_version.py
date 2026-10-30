@@ -43,8 +43,12 @@ LATE_WIRES = ("tools/run_redis.py", "tools/run_kafka.py", "tools/run_pgbench.py"
 ORCHESTRATOR_WIRES = ("omni_orchestrator/__init__.py", "omni_orchestrator/agent.py", "omni_orchestrator/brain.py",
                       "omni_orchestrator/cgroup.py", "omni_orchestrator/control.py", "omni_orchestrator/front.py",
                       "omni_orchestrator/scheduler.py")
+# omni-v22 (30 October): the store wires' shared rules are part of the engine: the max on a store's memory knob (the working set's
+# floor, the store's own account of a miss's cost, the gate, the host's room) and the knob verdict every store wire's tune-down runs
+# through, so neither changes without the version changing. A version declared before omni-v22 never covered them
+STORE_WIRES = ("tools/store_brain.py", "tools/knob_verdict.py")
 SCOPE = ("omnicompass", "omni_controller", "realms", "tools/run_kil.py", "tools/run_citylearn.py", "tools/run_pandapower.py",
-         *LATE_WIRES, *ORCHESTRATOR_WIRES)
+         *LATE_WIRES, *ORCHESTRATOR_WIRES, *STORE_WIRES)
 
 
 def engine_files(commit: str | None = None) -> dict[str, str]:
@@ -85,6 +89,8 @@ def own_files(files: dict[str, str], want: dict[str, str]) -> dict[str, str]:
         out = {n: h for n, h in out.items() if n not in LATE_WIRES}
     if not any(n in want for n in ORCHESTRATOR_WIRES):   # a version declared before omni-v18 took Omni direct in
         out = {n: h for n, h in out.items() if n not in ORCHESTRATOR_WIRES}
+    if not any(n in want for n in STORE_WIRES):          # a version declared before omni-v22 took the store wires' shared rules in
+        out = {n: h for n, h in out.items() if n not in STORE_WIRES}
     return out
 
 

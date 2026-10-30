@@ -27,10 +27,16 @@ class Cost(unittest.TestCase):
 
     def test_a_miss_that_costs_nothing_reads_under_the_floor(self):
         c = B.MissCost()
-        for t in range(10):                                   # MySQL on a runner whose page cache holds the files: 3,000 statements of 138 µs, 1,000 file reads of 20 µs
-            c.observe(float(t), 1000 * 20e-6, 3000 * 138e-6)
-        self.assertAlmostEqual(c.worth(), 20.0 / 414.0, places=6)
+        for t in range(10):                                   # a store whose "misses" are nothing: 3,000 statements of 138 µs, 1,000 file reads of 1 µs
+            c.observe(float(t), 1000 * 1e-6, 3000 * 138e-6)
+        self.assertAlmostEqual(c.worth(), 1.0 / 414.0, places=6)
         self.assertLess(c.worth(), B.MISS_WORTH)
+        from tools.readings import SIZE_FLOOR
+        self.assertEqual(B.MISS_WORTH, SIZE_FLOOR, "the gate's floor is the one key's floor, a change of 0.5%")
+        d = B.MissCost()
+        for t in range(10):                                   # MySQL on this machine (30 October): 3,000 statements of 137 µs, 17% of 3 page reads each missing, a file read 70 µs
+            d.observe(float(t), 3000 * 3 * 0.173 * 70e-6, 3000 * 137e-6)
+        self.assertGreater(d.worth(), B.MISS_WORTH, "the misses are a quarter of the statements' time: memory is spent")
 
     def test_nothing_known_until_a_second_with_service_is_read_and_the_window_slides(self):
         c = B.MissCost(window_s=10.0)
@@ -84,8 +90,9 @@ class Target(unittest.TestCase):
     def test_a_spend_goes_through_where_misses_cost_and_holds_where_they_do_not(self):
         self.assertEqual(B.max_target(640, 512, 512, 512, 0.6, True, "grow")[0], 640)
         self.assertEqual(B.max_target(640, 512, 512, 512, 0.6, True, "grow")[2], "spend")
-        target, why, kind = B.max_target(640, 512, 512, 512, 0.02, True, "grow")
+        target, why, kind = B.max_target(640, 512, 512, 512, 0.002, True, "grow")
         self.assertEqual((target, kind), (512, "held_worth")); self.assertIn("buy nothing", why)
+        self.assertEqual(B.max_target(640, 512, 512, 512, 0.02, True, "grow")[2], "spend", "2% of the service's time is a change the key reads")
         target, why, kind = B.max_target(640, 512, 512, 512, None, True, "grow")
         self.assertEqual((target, kind), (512, "held_unread")); self.assertIn("not read", why)
         target, why, kind = B.max_target(640, 512, 512, 512, 0.6, None, "grow")
@@ -116,12 +123,12 @@ def ycsb_obs(reading_ms, share, cache, used, miss_time_s, full=True, reads=3000,
 
 
 class Wires(unittest.TestCase):
-    def test_mysql_holds_its_pool_where_the_data_files_reads_are_a_sliver_of_the_statements_time(self):
+    def test_mysql_holds_its_pool_where_the_data_files_reads_are_nothing_of_the_statements_time(self):
         b = S.Brain(512)
         cur = 512
-        for t in range(1, 90):                               # the runner's own physics: 11% of page reads missing, each a 20 µs read from the page cache
+        for t in range(1, 90):                               # a store whose misses cost nothing the key could read: 11% of page reads missing, each 0.3 µs
             share = 0.09 + 0.03 * ((t % 4) / 3.0)
-            target, why, info = b.step(float(t), sys_obs(0.5, share, cur, 0.95 * cur, miss_time_s=3000 * 3 * share * 20e-6))
+            target, why, info = b.step(float(t), sys_obs(0.5, share, cur, 0.95 * cur, miss_time_s=3000 * 3 * share * 0.3e-6))
             self.assertGreaterEqual(target, 512, why)
             cur = target
         self.assertEqual(cur, 512, why)
@@ -129,16 +136,17 @@ class Wires(unittest.TestCase):
         self.assertGreater(b.record()["counts"]["held_worth"], 0)
         self.assertEqual(b.record()["dial"], "max")
 
-    def test_mysql_spends_where_the_data_files_reads_are_the_statements_time(self):
-        b = S.Brain(512)
-        cur = 512
-        for t in range(1, 90):                               # a store on a disk: 11% of page reads missing, each a 2 ms read
-            share = 0.09 + 0.03 * ((t % 4) / 3.0)
-            target, why, info = b.step(float(t), sys_obs(0.5, share, cur, 0.95 * cur, miss_time_s=3000 * 3 * share * 2e-3))
-            cur = target
-        self.assertGreater(cur, 512, why)
-        self.assertLessEqual(cur, S.COVER_MB[1])
-        self.assertGreater(b.record()["counts"]["spend"], 0)
+    def test_mysql_spends_where_the_data_files_reads_are_a_share_of_the_statements_time(self):
+        for us_a_read in (70e-6, 2e-3):                      # this machine's page cache (70 µs a file read, 30 October) and a disk (2 ms)
+            b = S.Brain(512)
+            cur = 512
+            for t in range(1, 90):
+                share = 0.15 + 0.03 * ((t % 4) / 3.0)
+                target, why, info = b.step(float(t), sys_obs(0.5, share, cur, 0.95 * cur, miss_time_s=3000 * 3 * share * us_a_read))
+                cur = target
+            self.assertGreater(cur, 512, why)
+            self.assertLessEqual(cur, S.COVER_MB[1])
+            self.assertGreater(b.record()["counts"]["spend"], 0)
 
     def test_mysql_holds_where_the_account_is_not_read(self):
         b = S.Brain(512)
@@ -157,9 +165,9 @@ class Wires(unittest.TestCase):
     def test_mongodb_holds_its_cache_where_a_miss_costs_the_read_nothing_and_spends_where_it_does(self):
         b = Y.Brain(512)
         cur = 512
-        for t in range(1, 90):                               # 14% of pages missing, each a 15 µs read from the page cache, the read 0.6 ms
+        for t in range(1, 90):                               # 14% of pages missing, each 0.3 µs (nothing the key could read), the read 0.6 ms
             share = 0.12 + 0.04 * ((t % 4) / 3.0)
-            target, why, info = b.step(float(t), ycsb_obs(0.6, share, cur, 0.9 * cur, miss_time_s=3000 * 2 * share * 15e-6))
+            target, why, info = b.step(float(t), ycsb_obs(0.6, share, cur, 0.9 * cur, miss_time_s=3000 * 2 * share * 0.3e-6))
             cur = target
         self.assertEqual(cur, 512, why)
         b = Y.Brain(512)

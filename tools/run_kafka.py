@@ -507,15 +507,22 @@ class Omni(threading.Thread):
     itself has earned under the declared objective (tools/knob_verdict.py around the engine's own Verdict). From omni-v22 the
     decision is the Brain's (above): the twin's reflex and hold, the floor at the operator's count, the immune system."""
 
-    def __init__(self, grp: Group, produced, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE, topic=None):
+    def __init__(self, grp: Group, produced, audit_path: Path, line_ms=LINE_MS, objective=DEFAULT_OBJECTIVE, topic=None, dial=DIAL):
         super().__init__(daemon=True)
-        self.grp, self.produced, self.audit, self.line_ms, self.objective, self.topic = grp, produced, audit_path, line_ms, objective, topic
-        self.stop_flag = threading.Event(); self.failups = 0; self.handed_back = False; self.verdict = None; self.brain = None
+        self.grp, self.produced, self.audit, self.line_ms, self.objective, self.topic, self.dial = grp, produced, audit_path, line_ms, objective, topic, dial
+        self.law = CompassLaw(Band(0.0, line_ms / 1000.0, center=CENTER), dt=DT, tau=TAU, smooth=SMOOTH)   # the tune-down's own law
+        self.stop_flag = threading.Event(); self.failups = 0; self.handed_back = False; self.verdict = None; self.brain = None; self.last_change = -1e9
+
+    def govern_record(self):
+        """The record of what governed the knob: the max's twin and verdict (omni-v22) or the verdict alone (the tune-down)."""
+        return self.verdict.record() if self.verdict else None
 
     def run(self):
         snapshot = self.grp.count()                        # read once, before the first write: the operator's count
         t0 = time.monotonic(); cpu_prev = cpu_times()
-        self.brain = Brain(snapshot, self.objective, self.line_ms); self.verdict = self.brain.verdict
+        self.verdict = KnobVerdict(snapshot, 1, COVER, objective=self.objective, settle_s=2 * TAU)   # a consumer that joins rebalances the group first
+        if self.dial == "max":
+            self.brain = Brain(snapshot, self.objective, self.line_ms); self.verdict = self.brain.verdict
         offsets = None
         if self.topic:
             try:
@@ -532,16 +539,34 @@ class Omni(threading.Thread):
                 cpu_now = cpu_times(); d_total = cpu_now[0] - cpu_prev[0]; d_idle = cpu_now[1] - cpu_prev[1]; cpu_prev = cpu_now
                 cpu_share = (1.0 - d_idle / d_total) if d_total > 0 else None
                 arrivals = offsets.rates(tick) if offsets else None
-                obs = {"reading": reading, "n_msg": n_msg, "inside": inside, "lag": lag, "idle": idle, "consumers": cur,
-                       "cpu_share": cpu_share, "arrivals": arrivals}
-                target, why, info = self.brain.step(tick - t0, obs)
+                shown = reading if reading is not None else min(LINE_MS / 1000.0, 0.0 if lag == 0 else LINE_MS / 1000.0)
+                if self.brain is not None:                                               # the max (omni-v22): the twin, the reflex, the hold
+                    obs = {"reading": reading, "n_msg": n_msg, "inside": inside, "lag": lag, "idle": idle, "consumers": cur,
+                           "cpu_share": cpu_share, "arrivals": arrivals}
+                    target, why, info = self.brain.step(tick - t0, obs)
+                    fail_up = False
+                else:                                                                    # the tune-down: omni-v21's loop
+                    f = self.law.force(shown)
+                    cost = sample_cost(self.objective, inside, shown if n_msg else None, cur, cpu_share)
+                    self.verdict.observe(cost, tick - t0)                                 # measured under the count of the last second
+                    target, d, why = decide(self.law.p, f, lag, idle, cur, tick - self.last_change, wall=self.law.band.wall_high, snapshot=snapshot,
+                                            consumed=n_msg)
+                    fail_up = why.startswith("fail up")
+                    # a give-back above the operator's count is the hand-back of a spend, inside the allowance: no give-back trial (whose
+                    # steps run below native) is started for it
+                    target, why, info = self.verdict.decide(target, spend_ok=(f > 0.05 and lag > 0), give_ok=(f < -0.05 and idle > 0 and lag == 0 and cur <= snapshot and n_msg > 0),
+                                                            t=tick - t0, why=why, stress=f > 0.05, calm=f < -0.05, fail_up=fail_up)
+                    info.update({"p": round(self.law.p, 4), "force": round(f, 4), "cost": None if cost is None else round(cost, 9), "dial": "save"})
                 if target > cur:
                     for _ in range(target - cur):
                         self.grp.start_one()
+                    self.last_change = tick
+                    if fail_up:
+                        self.failups += 1
                 elif target < cur:
                     for _ in range(cur - target):
                         self.grp.stop_one()
-                shown = reading if reading is not None else min(LINE_MS / 1000.0, 0.0 if lag == 0 else LINE_MS / 1000.0)
+                    self.last_change = tick
                 fh.write(json.dumps({"t": round(tick - t0, 2), "reading_ms": round(shown * 1000, 2), "lag": lag, "idle": idle,
                                      "consumers": cur, "target": target, "consumed_last_s": n_msg, "inside_last_s": inside,
                                      "cpu_share": None if cpu_share is None else round(cpu_share, 4),
@@ -549,7 +574,8 @@ class Omni(threading.Thread):
                                      "allowed_low": self.verdict.allowed_low, "allowed_high": self.verdict.allowed_high,
                                      **info, "why": why}) + "\n")
                 time.sleep(max(0.0, DT - (time.monotonic() - tick)))
-        self.failups = self.brain.failups
+        if self.brain is not None:
+            self.failups = self.brain.failups
         if offsets:
             offsets.close()
         # the hand-back: the operator's count, read back

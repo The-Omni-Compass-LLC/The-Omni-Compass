@@ -298,12 +298,13 @@ WIRES = {
 
 
 NOTES = {   # what each candidate changes, in the gate's words (the store fix of 25 October)
-    "pgbench": "The candidate waits thirty seconds after adding a server before it gives one back (five before): fewer give-backs that "
-               "the next seconds undo, each a server closed and a new one opened.",
-    "kafka": "The candidate starts no give-back trial on the seconds before the producer starts, when nothing was consumed (the standing "
-             "wire's trial gave a consumer back at 8 s and failed up at 11 s in every arm: two rebalances), and hands a consumer above the "
-             "operator's count back once the service is calm with no more waiting than one poll round, thirty seconds after the change (the "
-             "standing wire's idle test and empty backlog never held: the third consumer stayed to the end of the arm).",
+    "pgbench": "omni-v22, the max: a server added while clients wait is never clamped by an allowance, and the pool is never taken below the "
+               "pooler's own setting (the standing wire's calm give-back took it below, inside the allowance, and the queue line added the "
+               "servers back when the load rose): the seconds below native fall to none, the servers held rise, power given.",
+    "kafka": "omni-v22, the max: the group's twin (each partition's arrivals placed on the members by the range assignor) and the reflex, "
+             "never clamped by an allowance, with a hold that hands a consumer back only to a count that carries the last minute's peak. "
+             "omni-v21's audits carry no arrivals, so in this replay the twin reads none and the reflex adds consumers from the compass's "
+             "own wanting; the closed-loop model, which carries them, shows the twin at work (tools/kafka_model.py).",
     "ycsb": "The candidate holds more cache. Below native it hands a notch back each second while the cache misses 1% or more (the seconds "
             "below native while short fall), and its full (WiredTiger's own 80%, or evicting) opens the grow path on seconds that were slow, "
             "missing and evicting, which the standing wire read as 'slow with room to spare' at 90%: spend trials above native, power given, "

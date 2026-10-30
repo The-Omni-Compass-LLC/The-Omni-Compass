@@ -120,7 +120,7 @@ def main(argv=None):
             objs = sorted({v["objective"] for vs in vr.values() for v in vs})
             L += ["", "The brain's own verdict on the knob in the omni arms, one trial at a time on the stack itself (the objective: " + ", ".join(objs) + "): "
                   + "; ".join(f"run {t}: {summarize(vs)}" for t, vs in vr.items() if vs) + "."]
-            out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "spend_allowed_steps", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
+            out.setdefault("verdicts", {})[wl] = {t: [{k: v.get(k) for k in ("objective", "state", "dial", "spend_allowed_steps", "give_back_allowed_steps", "allowed_low", "allowed_high", "counts")} for v in vs] for t, vs in vr.items()}
     missing = {t: [w for w in wls if w not in r] for t, (_, r) in zip("ABC", runs)}
     if any(missing.values()):                           # 21 October: a table written from runs that failed said nothing at its foot
         L += ["", "> **Warning:** a run lacks a workload: " + "; ".join(f"run {t} lacks {', '.join(ws)}" for t, ws in missing.items() if ws)

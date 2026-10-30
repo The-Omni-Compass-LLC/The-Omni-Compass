@@ -203,15 +203,27 @@ the cache's wire to the max.
   store's price: the sawtooth the model showed on the first candidate, which read LOSS against omni-v21 in two workloads);
 - the floor: the operator's ceiling, the max's native, handed back at the end as before; the verdict's allowance and its trials
   stand for the tune-down below it (`dial save`), where giving memory back is the aim.
-- the price of a miss: memory is spent only where the misses are at least a tenth of the service's latency (the miss share times
-  a miss's latency less a hit's, over the mean, from the application's own records of the last second); where a miss costs the
-  service nothing (MySQL on a runner whose page cache holds the data files: 9% to 12% of page reads missing the pool with the
-  statement latency unmoved, `docs/STORE_ROOT_CAUSES_2026-10-30.md`), memory would buy nothing, and the ceiling holds.
+- the account of a miss (`tools/store_brain.py`, what the three cache wires share): memory is spent only where the misses are at
+  least the one key's floor (a half of one percent, `tools/readings.py` `SIZE_FLOOR`) of the service's own time over the last 10 s,
+  from the application's own split of each request into hits and misses (the misses' count times what a miss cost beyond a hit,
+  over the requests times their mean); under the floor the misses are nothing the record could read, memory could buy nothing it
+  could read, and the ceiling holds and says why; where the split is not read this second (the wire's older records), nothing is
+  known and nothing is taken;
+- the host's room: a notch is taken only while the host keeps 5% of its memory available after it (`/proc/meminfo`, the compass's
+  cushion); unread, nothing is taken;
+- the record: every second's split and the misses' share of the service's time, the floor and the host's room in the audit; the
+  arm's record carries the max's counts where it carried the verdict's allowance; every workload record carries its `dial`;
+  `OMNI_DIAL=save` keeps omni-v21's loop (the tune-down); `tools/store_brain.py` and `tools/knob_verdict.py` join the fingerprint
+  with this version (`tools/omni_version.py`, `STORE_WIRES`).
 
-**The model gate** (`tools/redis_model.py --compare`, seeds 101 to 103, 30 s a notch, against omni-v21's own loop read from git): work
-inside the line GAIN in every workload (small up 22.9%, burst up 17.6%, tuning up 10.3%, large up 7.7%), the mean latency GAIN
-(down 36% to 59%), the 95th and 99th percentiles GAIN or EVEN, the memory held power given (201 to 304 MB against 62 to 66 MB);
-no LOSS row.
+**The model gate** (`tools/redis_model.py --compare`, seeds 101 to 103, 30 s a notch, against omni-v21's own loop read from git; the
+model's host has room for every notch; `results/model_gate/V22_REDIS_MODEL.md`): work inside the line GAIN in every workload (small
+up 22.9%, burst up 17.6%, tuning up 10.3%, large up 7.7%), the mean latency GAIN (down 36% to 59%), the 95th and 99th percentiles
+GAIN or EVEN (the large workload's 95th down 95.1%), the memory held power given (201 to 304 MB against 62 to 66 MB); no LOSS row.
+In the open-loop replay of the omni-v21 arms' recorded seconds (`tools/store_gate.py`, class S), whose audits carry neither the
+split nor the host's memory, the candidate holds at the operator's ceiling: seconds below native 36.6 → 0 an arm (shown), seconds
+below native while missing 1.5 → 0 (GAIN +100.0%), the knob's moves 12.3 → 0 (GAIN +100.0%), the ceiling held 64.2 → 64.0 MB
+(EVEN); no LOSS.
 
 **Expected before the runs**, at the counted 30 s a notch, three paired repetitions a run: work inside the line and the mean latency
 GAIN in every untouched workload; the 95th percentile EVEN or GAIN (the misses that remain are cold); the memory ceiling and the

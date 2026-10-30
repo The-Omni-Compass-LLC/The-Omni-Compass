@@ -93,7 +93,7 @@ class Max(unittest.TestCase):
 class MissPrice(unittest.TestCase):
     def test_memory_is_spent_only_where_misses_cost_the_service(self):
         # MySQL on a runner whose page cache holds the data files: a miss costs nothing, so memory would buy nothing
-        cheap = dict(obs(1.5, 61.0, 64, evicted=80), hit_ms=0.12, miss_ms=0.14, miss_share=0.4)   # slow, the cache full: the compass asks
+        cheap = dict(obs(1.5, 61.0, 64, evicted=80), hit_ms=0.12, miss_ms=0.125, miss_share=0.4)   # slow, the cache full: the compass asks; a miss 5 µs beyond a hit
         b = R.Brain(64, "resource")
         for t in range(1, 15):
             target, why, info = b.step(float(t), cheap)
