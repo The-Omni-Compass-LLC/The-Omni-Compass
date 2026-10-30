@@ -243,9 +243,9 @@ def markdown(m) -> str:
           "| Route | The bill: native → Omni-Compass → saving | Supporting measurements |", "|---|---|---|"]
     on = m["scen"][0]["rows"]["machines"]
     L.append(f"| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the "
-             f"energy is not yet measured on {eng} | machines, Omni-Compass on top of native: {said(on, 'machines')} |")
+             f"energy is not yet measured on {m['stands']} | machines, Omni-Compass on top of native: {said(on, 'machines')} |")
     cloud = (f"read in [`{m['azure'][-1].relative_to(ROOT).as_posix()}`]({m['azure'][-1].relative_to(ROOT).as_posix()})" if m["azure"]
-             else f"**unresolved**: not yet measured on {eng}; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon "
+             else f"**unresolved**: not yet measured on {m['stands']}; its {m['stands']} Azure set runs now (`scripts/azure_queue.txt`); Google, Amazon "
                   "and the clouds a tester builds are wired and not yet run")
     L.append(f"| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | {cloud} | the software end's, as on-site; "
              f"the provider's energy is not metered to the tenant |")

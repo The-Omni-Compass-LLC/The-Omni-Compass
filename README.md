@@ -4,6 +4,8 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
+**Open the live benchmark engine (the running page):** <https://claude.ai/artifact/PmGS8ogFLMQiuyjU2YEFn3>. The file in this repository, [`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html), is its source: GitHub shows a page's source as text and does not run it, so open the link above, or download the file and open it in a browser.
+
 > **Evidence-integrity notice (2026-10-29).** The +5.2% Omni index is an internally computed geometric-mean composite of heterogeneous benchmark ratios, **not** a measured 5.2% reduction in total compute bills or a universal throughput improvement. Its Kubernetes energy values include modeled estimates; database, messaging and cache energy values can use CPU-time proxies, and the “machines” axis can mean connections, consumers, or allocated memory rather than physical machines. The +6.0% useful-work result is a specific three-run comparison on omni-v18, not a result proven for all engines or workloads. Results from different engines must not be represented as one end-to-end physical trial. “STEADY” can mean a nonzero difference below the existing 0.5% reporting threshold; it does not establish exact equality. All results are internally run and scored, not independently certified. See [the evidence-integrity audit](docs/EVIDENCE_INTEGRITY_AUDIT_20261029.md) before quoting performance or savings figures.
 
 
@@ -42,8 +44,8 @@ Each route's bill is its native total cost, then Omni-Compass's, then the saving
 
 | Route | The bill: native → Omni-Compass → saving | Supporting measurements |
 |---|---|---|
-| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v18 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% |
-| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v18; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
+| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v21 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.1% (fewer); the runs 2.2%, 4.6%, 2.4% |
+| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v21; its omni-v21 Azure set runs now (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
 
 Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md), `tools/whole_system.py`; omni-v1, omni-v12, omni-v21, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 17.2%, the 95th percentile 43.2% faster, machines 9.5% fewer, energy 5.1% less, the cloud's bill STEADY; the index over the gauges +14.0%. A composition across engines (class S over class P and L tables), never read as one engine's result; each total follows its tables as every benchmark runs again on omni-v21.
 
@@ -91,7 +93,7 @@ Where each part of it comes from:
 - **Every LOSS row**, with its cause: [`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md). **Every chip, cloud and machine run**, what
   it cost and what came back: [`docs/RUN_LEDGER.md`](docs/RUN_LEDGER.md).
 
-The live engine page opens on the same answer ([`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html)).
+The live engine page opens on the same answer (<https://claude.ai/artifact/PmGS8ogFLMQiuyjU2YEFn3>; its source, [`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ## The engine, the factory profile, the live tuning bench and the two routes
