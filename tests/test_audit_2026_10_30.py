@@ -101,5 +101,19 @@ class ThreeArmsV21(unittest.TestCase):
         self.assertIn("omni-v21", json.dumps(record)[:4000])
 
 
+class StoreNotch(unittest.TestCase):
+    def test_a_dispatch_left_at_its_defaults_runs_the_counted_notch(self):
+        # omni-v21's run C of all five data-store tables (40400868003, 40401042132, 40400989005, 40400963499, 40401032384) ran
+        # at the workflows' default of 20 s a notch, runs A and B at the counted 30 s (scripts/reruns.txt)
+        import re
+        reruns = (ROOT / "scripts/reruns.txt").read_text()
+        for wf in ("kafka", "ycsb", "redis", "pgbench", "sysbench"):
+            workflow = yaml.safe_load((ROOT / f".github/workflows/{wf}.yml").read_text())
+            on = workflow.get("on") or workflow.get(True)
+            default = str(on["workflow_dispatch"]["inputs"]["step_s"]["default"])
+            counted = set(re.findall(rf"\|{wf}\.yml\|[^\n]*step_s=(\d+)", reruns))
+            self.assertEqual(counted, {default}, f"{wf}.yml: default {default}, counted {counted}")
+
+
 if __name__ == "__main__":
     unittest.main()
