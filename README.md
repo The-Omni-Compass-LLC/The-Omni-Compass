@@ -240,16 +240,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-30 07:35 | [The engine's runs: 500 runs from the jump generator (base 2361771918), one digest](results/engine_runs/ENGINE_RUNS_500_2361771918.md) |  |
+| 2026-10-30 06:11 | [The stacked box on omni-v21: the seven organisms with an A10 inside, three runs on rented cards](results/gpu/V21_STACKS_A10_ABC.md) |  |
+| 2026-10-30 01:13 | [Omni direct's three arms: three runs on GitHub's machines](results/orchestrator/V21_THREE_ARMS_ABC.md) |  |
+| 2026-10-30 01:13 | [The card on omni-v21, the tune-down (dial save): three runs on an A100](results/gpu/V21_A100_SAVE_ABC.md) |  |
+| 2026-10-30 01:13 | [The card on omni-v21, the power cap at 70% of the card's top (cap-full): three runs on an A100](results/gpu/V21_A100_CAP_FULL_ABC.md) |  |
+| 2026-10-30 01:13 | [The card on omni-v21, the power cap at 70% of the card's top (cap): three runs on an A100](results/gpu/V21_A100_CAP_ABC.md) |  |
 | 2026-10-29 10:15 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2190676988.md) |  |
 | 2026-10-29 08:54 | [The engine's runs: 500 runs from the jump generator (base 2190676988), one digest](results/engine_runs/ENGINE_RUNS_500_2190676988.md) |  |
 | 2026-10-28 12:04 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2005802494.md) |  |
 | 2026-10-28 09:17 | [The engine's runs: 500 runs from the jump generator (base 2005802494), one digest](results/engine_runs/ENGINE_RUNS_500_2005802494.md) |  |
-| 2026-10-27 11:01 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1830829613.md) |  |
-| 2026-10-27 10:11 | [The engine's runs: 500 runs from the jump generator (base 1830829613), one digest](results/engine_runs/ENGINE_RUNS_500_1830829613.md) |  |
-| 2026-10-27 09:46 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_1818200804.md) |  |
-| 2026-10-27 08:23 | [The engine's runs: 500 runs from the jump generator (base 1818200804), one digest](results/engine_runs/ENGINE_RUNS_500_1818200804.md) |  |
-| 2026-10-27 06:47 | [The Omni index: more for the same, or the same for less](results/OMNI_INDEX.md) |  |
-| 2026-10-27 06:47 | [Wandering demand: load that steps up and down by one (1 2 3 2 3 4 5 6 5 4 5 6 7 8 7 6 5 4 3 4 3 2 1 2 1): the A/B/C three-run table (Omni v21)](results/live/V21_WANDERING.md) |  |
 <!-- front-page:tables:end -->
 
 **Benchmark runs that just finished on GitHub** (a run becomes a result when its three-run set is complete):
@@ -257,16 +257,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
+| 2026-10-30 07:42 | six x100 line orgs 2 runs 100+400 | success | [40995094302](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995094302) |
+| 2026-10-30 07:42 | six x100 line orgs 5 runs 100+400 | success | [40995110040](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995110040) |
+| 2026-10-30 07:37 | secret-names | success | [41016555622](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016555622) |
+| 2026-10-30 07:36 | health | success | [41018795997](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41018795997) |
+| 2026-10-30 07:35 | engine-runs | success | [41016477582](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016477582) |
+| 2026-10-30 07:32 | aks-client-check | success | [41016555703](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016555703) |
+| 2026-10-30 07:29 | security-scan | success | [41016477564](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41016477564) |
+| 2026-10-30 07:27 | raw-sweep | success | [41015842005](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41015842005) |
 | 2026-10-30 06:27 | big-organism-detached collect | success | [41014121164](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41014121164) |
-| 2026-10-30 06:25 | raw-sweep | success | [41013951225](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41013951225) |
 | 2026-10-30 03:46 | six-kube x10 orgs spine reps 461+1 arms native compass split no window 960 protocol 4 | success | [40995084759](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995084759) |
-| 2026-10-30 03:45 | six-kube x10 orgs spine reps 438+1 arms native compass split no window 960 protocol 4 | success | [40995079277](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40995079277) |
-| 2026-10-30 02:59 | six-kube x10 orgs spine reps 416+85 arms native compass split no window 960 protocol 4 | failure | [40990556832](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40990556832) |
-| 2026-10-30 02:58 | six-kube x10 orgs spine reps 395+1 arms native compass split no window 960 protocol 4 | success | [40990551195](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40990551195) |
-| 2026-10-30 02:57 | six-kube x10 orgs spine reps 391+1 arms native compass split no window 960 protocol 4 | success | [40990546271](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40990546271) |
-| 2026-10-30 02:13 | six-kube x10 orgs tower reps 416+85 arms native compass split no window 960 protocol 4 | success | [40985945538](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40985945538) |
-| 2026-10-30 02:11 | six-kube x10 orgs stack reps 444+1 arms native compass split no window 960 protocol 4 | success | [40985928437](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40985928437) |
-| 2026-10-30 02:11 | six-kube x10 orgs tower reps 410+1 arms native compass split no window 960 protocol 4 | success | [40985940075](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/40985940075) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
