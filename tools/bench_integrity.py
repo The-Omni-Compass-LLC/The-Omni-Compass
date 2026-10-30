@@ -16,6 +16,16 @@ import time
 from urllib.parse import urlencode
 
 PAUSE = 'omnicompass.io/paused-by-omni'
+# A watch request cut by the client (its own timeout on a loaded API server, a reset connection) is resumed at the last
+# resourceVersion written: the server replays every event after it, so nothing is lost. Expired history is a gap and
+# fails; so does a run of failed requests that delivers nothing (run 40938221203, repetitions 360 and 371: one client
+# timeout each, 11 and 26 clean segments before it, and the arm was refused for it).
+EXPIRED = ('Expired', 'too old resource version', '(410)', 'Gone')
+RETRIES = 5
+# A write refused by its resourceVersion precondition is read again and retried while the object is still ours: on a
+# live cluster the HPA and the Deployment controller write the same object (run 40938221203, repetition 349: the reset's
+# one patch lost that race and the arm was refused for it).
+CONFLICT = ('the object has been modified', 'Conflict')
 
 
 def read_events(text):
@@ -28,16 +38,18 @@ def read_events(text):
         text = text.lstrip()[end:]
 
 
-def collect(directory, kubectl='kubectl', run=subprocess.run, popen=subprocess.Popen):
+def collect(directory, kubectl='kubectl', run=subprocess.run, popen=subprocess.Popen, sleep=time.sleep):
     """A LIST followed by watches at its resourceVersion; never relist across a gap.
 
-    Every clean server timeout resumes the last event/bookmark's resourceVersion.
-    Expired history, malformed JSON and nonzero client exits fail the receipt.
+    Every clean server timeout resumes the last event/bookmark's resourceVersion, and so does a request the client
+    cut, its unfinished last line dropped (the resumed watch delivers that event again). Expired history, malformed
+    JSON and RETRIES failed requests in a row fail the receipt.
     A stop file drains the current bounded request before the collector exits.
     """
     directory = Path(directory)
-    receipt = {'schema': 1, 'complete': False, 'started_at': time.time(), 'segments': 0}
+    receipt = {'schema': 1, 'complete': False, 'started_at': time.time(), 'segments': 0, 'client_retries': 0}
     stop = directory / 'pod_watch.stop'
+    err_path = directory / 'pod_watch.err'
     for name in ('pod_watch.ready', 'pod_watch_receipt.json'):
         (directory / name).unlink(missing_ok=True)
     try:
@@ -50,28 +62,49 @@ def collect(directory, kubectl='kubectl', run=subprocess.run, popen=subprocess.P
                 output.write(json.dumps({'type': 'ADDED', 'object': pod}) + '\n')
             output.flush()
             (directory / 'pod_watch.ready').touch()
-            with (directory / 'pod_watch.err').open('w') as errors:
+            failures = 0
+            with err_path.open('w') as errors:
                 while not stop.exists():
                     query = urlencode({'watch': 'true', 'labelSelector': 'run=php-apache',
                                        'resourceVersion': version, 'allowWatchBookmarks': 'true',
                                        'timeoutSeconds': 30})
+                    errors.flush()
+                    before = err_path.stat().st_size
                     process = popen([kubectl, 'get', '--raw', '/api/v1/namespaces/default/pods?' + query,
-                                     '--request-timeout=40s'], stdout=subprocess.PIPE, stderr=errors, text=True)
+                                     '--request-timeout=60s'], stdout=subprocess.PIPE, stderr=errors, text=True)
+                    cut = ''
                     try:
                         for line in process.stdout:
                             if not line.strip():
+                                continue
+                            if not line.endswith('\n'):
+                                cut = line          # the stream's last line, unfinished: judged once the exit is known
                                 continue
                             for event in read_events(line):
                                 version = event['object']['metadata']['resourceVersion']
                                 output.write(json.dumps(event) + '\n')
                                 output.flush()
-                        if process.wait() != 0:
-                            raise RuntimeError('pod watch client failed; see pod_watch.err')
+                        code = process.wait()
                     finally:
                         process.stdout.close()
                         if process.poll() is None:
                             process.terminate()
                             process.wait(timeout=5)
+                    if code != 0:
+                        said = err_path.read_bytes()[before:].decode(errors='replace') if err_path.exists() else ''
+                        if any(word in said for word in EXPIRED):
+                            raise RuntimeError('pod watch history expired; see pod_watch.err')
+                        failures += 1
+                        receipt['client_retries'] += 1
+                        if failures >= RETRIES:
+                            raise RuntimeError('pod watch client failed %d times in a row; see pod_watch.err' % failures)
+                        sleep(1)
+                        continue
+                    for event in read_events(cut):
+                        version = event['object']['metadata']['resourceVersion']
+                        output.write(json.dumps(event) + '\n')
+                        output.flush()
+                    failures = 0
                     receipt['segments'] += 1
                     receipt['last_resource_version'] = version
         receipt['complete'] = True
@@ -122,20 +155,29 @@ def validate(directory):
 def restore_rollout(target, kubectl='kubectl', run=subprocess.run):
     """Reset only the rollout this benchmark owns; one atomic, idempotent patch.
 
-    A resourceVersion precondition rejects concurrent changes. An API/permission
+    A resourceVersion precondition rejects concurrent changes; a rejected patch is
+    read again, checked still ours, and retried (RETRIES times). An API/permission
     error propagates, and the reread must confirm both unpaused and unannotated.
     """
     namespace, name = target.split('/', 1)
     def get():
         return json.loads(run([kubectl, 'get', 'deployment', name, '-n', namespace, '-o', 'json',
                                '--request-timeout=20s'], check=True, capture_output=True, text=True).stdout)
-    deployment = get()
-    if (deployment['metadata'].get('annotations') or {}).get(PAUSE) != 'true':
-        return False
-    patch = {'metadata': {'resourceVersion': deployment['metadata']['resourceVersion'],
-                          'annotations': {PAUSE: None}}, 'spec': {'paused': False}}
-    run([kubectl, 'patch', 'deployment', name, '-n', namespace, '--type=merge', '-p', json.dumps(patch),
-         '--request-timeout=20s'], check=True, capture_output=True, text=True)
+    for attempt in range(1, RETRIES + 1):
+        deployment = get()
+        if (deployment['metadata'].get('annotations') or {}).get(PAUSE) != 'true':
+            if attempt == 1:
+                return False
+            break                   # another writer cleared the mark between our read and our patch: verified below
+        patch = {'metadata': {'resourceVersion': deployment['metadata']['resourceVersion'],
+                              'annotations': {PAUSE: None}}, 'spec': {'paused': False}}
+        try:
+            run([kubectl, 'patch', 'deployment', name, '-n', namespace, '--type=merge', '-p', json.dumps(patch),
+                 '--request-timeout=20s'], check=True, capture_output=True, text=True)
+            break
+        except subprocess.CalledProcessError as error:
+            if attempt == RETRIES or not any(word in (error.stderr or '') for word in CONFLICT):
+                raise
     restored = get()
     if restored['spec'].get('paused') or PAUSE in (restored['metadata'].get('annotations') or {}):
         raise ValueError('rollout reset did not restore the deployment')

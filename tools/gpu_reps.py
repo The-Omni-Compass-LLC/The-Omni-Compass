@@ -52,7 +52,11 @@ from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of
 LOWER = {"energy, whole machine at the wall (J)", "energy, GPU (J)", "energy per served request (J)", "power, GPU mean (W)", "temperature, peak (C)",
          "temperature, mean (C)", "requests not served", "response time, mean (ms)", "response time, 95th percentile (ms)",
          "response time, 99th percentile (ms)", "energy, CPU package (J)", "energy, rest of the machine (J)",
-         "energy, DRAM (J)", "energy, platform psys (J)", "energy, GPU device counter (J)"}
+         "energy, DRAM (J)", "energy, platform psys (J)", "energy, GPU device counter (J)",
+         # the share of the card's samples held at its power limit: power held, never work (30 October 2026: unlisted, it
+         # fell through to work, so a card pinned less often at its limit for the same requests read LOSS on omni-v21's
+         # tune-down, runs 40485597269, 40485602065 and 40485605739)
+         "power-capped share of samples"}
 # the resources a card spends (energy, power and the heat they make): a fall is a cut, a GAIN; a rise is power given, never
 # a loss (tools/readings.py). Time waited and requests not served are LOSS when they rise; work aims higher; work per energy that falls is power
 # given (it falls when more power is given for the work).

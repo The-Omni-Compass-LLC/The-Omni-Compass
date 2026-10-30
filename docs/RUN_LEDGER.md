@@ -63,11 +63,9 @@ omni-v12 only as the engine before whose runs its preregistration's amendment 2 
 
 ## 5. Open, in one list
 
-1. GPU: the three omni-v21 stacks runs finish by about 05:30 UTC on 28 October; then their three-run table. The one-card
-   `cap` runs (an operator's power cap underneath, the cap alone against the cap with Omni-Compass on top) follow, A, B and C
-   on A100s, since the A100's counted run read EVEN with no write (its limit already at the top on native).
-   And the tune-down on the same card (`dial save`, A, B and C): the card averaged 253 W of its 400 W limit in that run, room
-   the factory tune (the max, which never steps the clock below the top) leaves unused.
+1. GPU: the A100's three-run tables on omni-v21 are written (`results/gpu/V21_A100_SAVE_ABC.md`, `V21_A100_CAP_ABC.md`,
+   `V21_A100_CAP_FULL_ABC.md`; `docs/AUDIT_2026-10-30.md` section 2). The three stacks runs on A10s reached their deadline with
+   sizes 1 and 10 finished and 100 in part: no table until a scorer reads a part-finished run.
 2. Azure: the omni-v18 set finishes; then the omni-v21 sets start.
 3. Google and Amazon: their keys (`docs/GOOGLE_SETUP.md` section 4, `docs/AMAZON_SETUP.md` section 1a).
 4. CPU: a bare-metal machine, or it stays not run.
