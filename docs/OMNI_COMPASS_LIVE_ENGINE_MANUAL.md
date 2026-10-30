@@ -145,15 +145,17 @@ machines in service, the energy drawn, a bill). On the page each gauge is drawn 
 change from native, its 95% interval, and its word. The word is decided by what the gauge is for (the key, above), never by the
 sign of its number.
 
-**How to read the page, in order.** The page's own order, the founder's order of 24 October, night: the bottom line first (the
-page's section iii), one light and one number for each way to run a workload; then Part 1, the monitor wall with the main
-control panel and the control panel with the kill switch (the page's sections 1a and 1b); then Part 2, the synopses (the status
-board, the golden signals and the event log, every LOSS row, the benefit board); then Part 3, every monitor spread out (the
-organism live, the console, the heartbeat dial, one control cycle, the phase plane, the brain, the verdict, then the evidence
-from the cloud down to the chip, the telemetry analytics and the Python's runs); then Part 4, the organisms
-and everything else (the whole organism, the twenty scenarios, every table, the C++ twin, the pipeline, the master switch's
-wiring, the mathematics, the failure modes, the page's own rendering, the problem and the answer, the summary and the key, the
-monitor list, and the glossary and index). This manual follows that order, chapter by chapter.
+**How to read the page, in order.** The page's own order, the founder's orders of 24 October, night, and of 30 October: the
+monitor wall first, the moment the page opens (the page's section 0), every monitor live, then its explanation and the main
+control panel under it; then the front matter (the title page, the answer first, the bottom line, the page's section iv, one
+light and one number for each way to run a workload, and the table of contents); then Part 1, the control panel with the kill
+switch and the dashboards (the page's sections 1a and 1b); then Part 2, the synopses (the status board, the golden signals and
+the event log, every LOSS row, the benefit board); then Part 3, every monitor spread out (the organism live, the console, the
+heartbeat dial, one control cycle, the phase plane, the brain, the verdict, then the evidence from the cloud down to the chip,
+the telemetry analytics and the Python's runs); then Part 4, the organisms and everything else (the whole organism, the twenty
+scenarios, every table, the C++ twin, the pipeline, the master switch's wiring, the mathematics, the failure modes, the page's
+own rendering, the problem and the answer, the summary and the key, the monitor list, and the glossary and index). This manual
+reads the page part by part; the wall, which opens the page, is read in its own chapter with the main control panel.
 
 **What this manual is, and is not.** It is the interpretation of the page: how to follow the dashboard, read each gauge, turn
 each knob, and see the mechanism of action of Omni-Compass against native as the monitors show it. It defines every control,
@@ -168,7 +170,7 @@ This manual describes the live benchmark engine page as `docs/engine/build_live_
 were written for (`data-prose`); where the records stand on a newer engine than the words, a banner under the notice says so
 (`#engBanner`). The build stamps the engine that stands on the page and rebuilds every record, and `--check` fails a page whose
 engine differs; where the page you are reading names a newer engine, the page is right and this manual is realigned with it in
-the same push. The page's own table of contents (its section iv, "Engine table of contents") is the authority on the order and
+the same push. The page's own table of contents (its section v, "Engine table of contents") is the authority on the order and
 the numbering of its sections; this manual names every section by its title and its anchor (`#s-wall`, `#s-ops`, and so on),
 which do not move when sections are renumbered.
 
@@ -359,7 +361,7 @@ landed, never green.
 
 **The bottom line** (chapter 2). One light and one number for each way to run it against native, and the two bills.
 
-**The kill switch** (chapter 8). The first row of the main control panel, the head of the page's section 1b, every monitor's
+**The kill switch** (chapter 8). The first row of the main control panel, the head of the page's section 1a, every monitor's
 strip, every section's controls and the dock. Green ON: the governor's outputs reach the muscles. Red: engaged, every setting
 handed back to native at once, the decisions shaded red. White OFF: every Omni-Compass side follows native in a tint of
 native's colour. "Return to native" in the main control panel is the reset, a separate button with the same effect on the page
@@ -516,7 +518,7 @@ copy.
 
 ### 2.1 What it answers
 
-The page's section iii, `#s-bottom`, stands before the contents and asks one question: is Omni-Compass a benefit? It answers
+The page's section iv, `#s-bottom`, stands before the contents and asks one question: is Omni-Compass a benefit? It answers
 with one light and one number for each way to run a workload, against native alone on the same work, read from the
 repository's own records. The line at its head (`#blHead`) puts the answer in one sentence: Omni-Compass on native, with its
 signal word and its change in work against native in the real three-run test. The same number stands in the dock at the foot of
@@ -731,7 +733,7 @@ beside a reading of GitHub ("read 06:16 UTC, 41 min 07 s ago") counts up every s
 ### 5.1 The numbered monitors
 
 Every monitor of the page (every chart canvas) carries its number in a badge above it, counted in its order of appearance from
-1 at the top of the page to the last at the bottom; the page's section 1a shows them all at once on the monitor wall, numbered,
+1 at the top of the page to the last at the bottom; the page's section 0 shows them all at once on the monitor wall, numbered,
 read left to right and then down, as any page is read (the founder's order of 21 October), and a click on a tile scrolls to the
 monitor it copies. Two monitors that sit side by side in their section, native beside Omni-Compass, sit side by side on the
 wall too: a pair never splits across two rows, on the wall or on the page at any width. Each section names its monitors in the
@@ -742,7 +744,7 @@ under its number.
 
 ### 5.2 What the wall is
 
-The wall (the page's section 1a, `#s-wall`) is every monitor of the page in one view: the same canvases the sections draw, copied
+The wall (the page's section 0, `#s-wall`) is every monitor of the page in one view: the same canvases the sections draw, copied
 small four times a second, so nothing is drawn twice from different data. Every tile carries at its top its number and its title
 in capital letters, what the monitor shows, and under them its section and its state (live, replay, from the records, a model, or
 awaiting its run), so a tile says where its monitor is and what it represents before it is opened. Click a tile and the page
@@ -822,7 +824,7 @@ the dock and in the main control panel.
 
 ### 6.1 What it is
 
-The main control panel (`#fuseBox`, inside the page's section 1a, under the wall) switches every monitor from one box, laid out
+The main control panel (`#fuseBox`, inside the page's section 0, under the wall) switches every monitor from one box, laid out
 as a console. Its first row is the master switches, always in view: each acts on the whole page at once, through the same code as
 the console and the dock, both sides alike. Under it stand seven tabs, one shown at a time:
 
@@ -1083,9 +1085,9 @@ muscle driven and nothing held, and the live benchmark engine governs from the f
 mechanism on the live tuning bench (class S); the benchmarks prove the factory profile only, and a changed profile's results are
 its own.
 
-### 6.13 The dashboards (the page's section 1c)
+### 6.13 The dashboards (the page's section 1b)
 
-Under the control panel the page's section 1c draws the same live benchmark engine in nine forms an operations team already reads, each
+Under the control panel the page's section 1b draws the same live benchmark engine in nine forms an operations team already reads, each
 fed by the page's own model as it runs (class S), native in orange beside Omni-Compass in blue, each
 change with its word by the key. The forms are the industry's; the numbers are this engine's; no vendor's product is drawn or
 implied.
@@ -1319,11 +1321,11 @@ engine away from its factory profile, break it by hand and watch it break; the f
 
 ### 8.1 What the section holds
 
-The control panel (the page's section 1b, `#s-health`) drives every monitor of the page. The kill switch stands at its head;
+The control panel (the page's section 1a, `#s-health`) drives every monitor of the page. The kill switch stands at its head;
 under it, the buttons that run the Python's runs in the page (*Run the Python's 500 runs here*; *Run the Monte Carlo 500: the
 Python, the C++ and this page, linked*; *Run your own system through it (here or on GitHub)*; *The proof monitor*), the Python's
 jump generator, the switchboard, the four reports, the three manuals and the wall as a Grafana dashboard. The monitors it
-drives follow: the wall (the page's section 1a), the monitor list (4l), the status board (2a), the master switch's wiring (4f),
+drives follow: the wall (the page's section 0), the monitor list (4l), the status board (2a), the master switch's wiring (4f),
 the Python's runs in the page (3o), every LOSS row (2c), the golden signals (2b) and GitHub's pipeline (4e). No value here is
 typed in: each is computed at runtime from the live benchmark engine or from the repository's records embedded at build time.
 
@@ -2598,7 +2600,7 @@ Azure run queued and nothing else starting is the conductor holding, by its rule
 
 ### 33.1 One switch for the whole organism
 
-The master switch (the page's section 4f, `#s-master`; its kill switch heads the page's section 1b) is wired at the top of the
+The master switch (the page's section 4f, `#s-master`; its kill switch heads the page's section 1a) is wired at the top of the
 organism: switch, brain, organism, every muscle, as the repository builds it (`omnicompass/master.py`,
 `tools/omni_switch.py`). It holds the brain's outputs. Every governor on the page is registered with it and obeys it at once;
 on a real machine every governor exits at the switch.
@@ -2963,7 +2965,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **AWAITING.** The signal word of a monitor whose run has not landed: dark, never green.
 - **Band.** A reading's safe range, from calm (p = 0) through its center (p = 0.5) to its line (p = 1), with 5% cushions.
 - **Beat.** One turn of the governor's loop: read, decide, write, renew the lease. The heart.
-- **Bottom line.** The page's section iii: one light and one number for each way to run a workload against native, and the two
+- **Bottom line.** The page's section iv: one light and one number for each way to run a workload against native, and the two
   bills.
 - **Breaker.** One monitor's switch in the main control panel: ON draws it live; REST stops its drawing.
 - **Calm.** κ·h·(1 − (σ − 1)⁺)·(1 − min(ν, 1)): the nerves' one number, against which each organ's threshold θ grants a hand-back.
@@ -3021,7 +3023,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 - **Twenty scenarios.** Ten organisms, each native and with Omni-Compass on native, each read against native.
 - **Verdict.** The paired trial every step past native must pass: kept unless it reads LOSS or exceeds the 2% allowance.
 - **Violet.** A knob or a profile turned from the factory tune (`--tuned`); never a side and never a reading.
-- **Wall.** Every monitor of the page in one view (the page's section 1a), numbered 1 upward in its order of appearance and read left to right.
+- **Wall.** Every monitor of the page in one view (the page's section 0), numbered 1 upward in its order of appearance and read left to right.
 
 ## Appendix A - The Page, Section by Section
 
@@ -3076,7 +3078,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 
 | Control | Where | Acts on | Leaves alone |
 |---|---|---|---|
-| Kill switch | the main control panel; the head of the page's section 1b; every section's controls; every monitor's strip; the console; the dock | every lever of every governor on the page, to native at once; shades every time axis red; a second press releases it | the records: nothing recorded is modified |
+| Kill switch | the main control panel; the head of the page's section 1a; every section's controls; every monitor's strip; the console; the dock | every lever of every governor on the page, to native at once; shades every time axis red; a second press releases it | the records: nothing recorded is modified |
 | Return to native (the reset) | the main control panel's profile row; the switchboard's native arm | the same hand-back, named the reset; the switch reads "OFF by the reset" | the records: nothing recorded is modified |
 | Turn Omni-Compass OFF / ON | the console | the brain's outputs: OFF, read in shadow, nothing leaves; ON, outputs reach the muscles | the native side, which never stops |
 | The max / Tune-down | the main control panel; the console; the page's section 3d | the dial of the live benchmark engine's governor | the records; the official runs' own dial, named in each |
@@ -3100,7 +3102,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | The same day again / A new day | the console; the page's section 3d | the seed replayed or redrawn, with the knobs as set | the knobs |
 | Every knob to its start | the console | demand, noise and delay, back to the day as written | the dial and the switch |
 | Back to the factory tune | above the wall; the main control panel; the console; the dock; every monitor's strip; the key `f` | the factory profile and the plant at rest (section 14.2) | the records |
-| Arm, Organism, Organisms, Runs, Run, Beat (the switchboard) | the page's section 1b | every monitor that carries the variation (section 8.5) | every monitor that does not |
+| Arm, Organism, Organisms, Runs, Run, Beat (the switchboard) | the page's section 1a | every monitor that carries the variation (section 8.5) | every monitor that does not |
 | A / B / C | the page's sections 3j, 3k, 3l, 3m | which run is played | the other runs |
 | Benchmark, run, repetition | the page's sections 3j, 3k | which record is played | the record itself |
 | This muscle; Every muscle back under Omni-Compass | the page's section 3d, on the muscle's card; the mechanism panel's last group | one muscle of the stress-test model run by native's own controller alone, or in a replay shown by native's own record, while every other muscle stays governed | the body's recorded totals in a replay; the kill switch, which hands every muscle back at once |
@@ -3111,7 +3113,7 @@ A copy whose page, engine or records differ from what these print is not a copy 
 | Copy the exposition | the page's section 2b | the clipboard | the page |
 | Inspect; Full screen | every monitor's strip | the monitor's reason, feed, wiring and downloads; the monitor full screen | the monitor's data |
 | Run the Python's 500 runs here; a new set (base seed, count); print and download the receipts | the page's sections 1b and 3o | the page's own run of the Python's seeded runs, its digest against the Python's | the Python's record, `results/engine_runs/` |
-| Jump generator · OFF / ON | the page's section 1b | set after set from the Python's jump generator, through the proof monitor and the Monte Carlo monitor | the records the page plays when it is OFF |
+| Jump generator · OFF / ON | the page's section 1a | set after set from the Python's jump generator, through the proof monitor and the Monte Carlo monitor | the records the page plays when it is OFF |
 | Speak aloud / Ask Omni-Compass / Stop | the page's section 3n | the viewer's browser voice; a question composed on the viewer's own account | the records |
 | The glossary's search, letters and four parts | the page's section 4m | which terms, organisms or muscles are shown | the glossary's record |
 

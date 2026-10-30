@@ -976,7 +976,7 @@ TERMS = [
       "writes through a two-way plug, reads each write back, audits, hands back gradually and stops at the kill switch, on top of "
       "every native controller.", [(FP, "| Supervisory governor | reads the whole body every beat, decides with one law across every muscle")],
       aka=["supervisory governor", "governor"]),
-    T("the dashboards", W, "The page's section 1c: the live benchmark engine in nine forms an operations team reads (a board of panels, a host "
+    T("the dashboards", W, "The page's section 1b: the live benchmark engine in nine forms an operations team reads (a board of panels, a host "
       "map, a graph, an event stream, a cluster console, a one-line diagram, a wall of numbers, the cost by body part, and "
       "Omni-Compass's own two-way pipeline), by muscle, body part or the whole organism.",
       [(PAGE_F, "The dashboards: the live benchmark engine in every form an operations team reads a system")], aka=["dashboards", "host map"]),
