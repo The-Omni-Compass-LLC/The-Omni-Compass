@@ -595,7 +595,7 @@ def main(check=False):
     L += ["", "## Not on the sheet, and why", "",
           "- **Azure's managed Kubernetes, the bill** (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): Omni v1, a 4-worker fleet, every gauge STEADY, inside the noise: 0%, and too small a fleet to show one machine.",
           "- **The governor's own share of the machine** (`results/live/V3_OWN_COST.md`): 0.6% to 1.3% of one core at every size; shown, not a benchmark against native.",
-          "- **The card (NVIDIA)**: one finished result, omni-v18 on an A100 (`results/gpu/run-20261024T091235Z/GPU_REPS.md`: every service gauge EVEN, both knobs already at their top on native); every rental, its cost and what came back, the engine that stands's runs included, is in `docs/RUN_LEDGER.md`. The results of 2 October are obsolete.",
+          "- **The card (NVIDIA)**: one finished result, omni-v18 on an A100 (`results/gpu/run-20261024T091235Z/GPU_REPS.md`: every service gauge STEADY, both knobs already at their top on native); every rental, its cost and what came back, the engine that stands's runs included, is in `docs/RUN_LEDGER.md`. The results of 2 October are obsolete.",
           "- **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.", ""]
     md = "\n".join(legal_stamp(with_own_runs(L))) + "\n"
     js = json.dumps({"rows": rows}, indent=1) + "\n"

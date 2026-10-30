@@ -3,7 +3,7 @@
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 Read from GitHub's own run records on 27 October 2026 (the `lambda-gpu`, `aks-metered`, `cloud-check` and benchmark
-workflows), not from memory. Dollar figures are the hours a machine was rented times the hourly price each launch printed
+workflows), not from memory; the chip and cloud rows brought up to 30 October, 00:22 UTC, from the same records. Dollar figures are the hours a machine was rented times the hourly price each launch printed
 (`gpu_1x_a10`: $1.29 an hour). Lambda's own billing page is the exact figure; this page is the record of what each rental
 was for, whether it finished, and where its receipt is.
 
@@ -16,16 +16,19 @@ was for, whether it finished, and where its receipt is.
 | 40143765437, 40143770324, 40143775773 | 24 Oct 23:41 | the whole stacks with the card inside, A, B and C, omni-v18 | A10 ×3 | 25.1, 25.1, 25.0 | about $97 | **No**: each reached its 25-hour limit inside the stacks (1x copies done, 5 repetitions; 10x in its third) | the wire check and the smoke only: the stacks write each arm on the card and pack them only when they finish, and the watcher fetched only packed files, so every stacks arm stayed on the card when it was given back (fixed 26 October, commit `8e62252e1f`) | `raw` branch, `run-40143765437/` and the other two |
 | 40218532131, 40218534998, 40218537259 | 25 Oct 17:52 | the stacks, A, B and C, omni-v21 | none | 0 | $0 | No: started as dry runs by mistake (priced, nothing rented) | the price only | none |
 | 40393460334, 40393464531, 40393468676 | 26 Oct 20:11 | the stacks, A, B and C, omni-v21 | A10 ×3 | 0.1, 0.3, 0.3 | about $0.90 | Stopped on the founder's decision: they carried the watcher fault above | nothing | none |
-| 40394988327, 40394992822, 40394997159 | 26 Oct 20:22 | the stacks, A, B and C, omni-v21, the watcher fixed | A10 ×3 | about 10 each so far; budget 33 | about $39 so far; at most about $128 | Running | every watch fetches the run so far: watch 1 returned 20.7 MB of live results on each card | `raw` branch, `run-<id>/` as each watch lands |
+| 40394988327, 40394992822, 40394997159 | 26 Oct 20:22 | the stacks, A, B and C, omni-v21, the watcher fixed | A10 ×3 | about 33 each, the budget | at most about $128 | **Yes**: all three finished on 28 Oct, 05:30 to 05:41 UTC | every run's files, on the `raw` branch; their three-run table is not yet written | `raw` branch, `run-40394988327/`, `run-40394992822/`, `run-40394997159/` |
+| 40461604089 | 27 Oct 06:31 | one card, fast, omni-v21 | one card | about 7 | at the card's hourly price (billing page) | **Yes**, 13:36 UTC | its files, on the `raw` branch; no table yet | `raw` branch, `run-40461604089/` |
+| 40485597269, 40485602065, 40485605739 | 27 Oct 10:04 | one card, fast, the saving dial, A, B and C, omni-v21 | one card ×3 | about 7 each | at the card's hourly price (billing page) | **Yes**, about 16:57 UTC | their files, on the `raw` branch; no three-run table yet | `raw` branch, `run-<id>/` |
+| 40485609401, 40485613546, 40485617318 | 27 Oct 10:04 | one card, the operator's power cap underneath, A, B and C, omni-v21 | one card ×3 | about 4.6 each | at the card's hourly price (billing page) | **Yes**, 14:39 UTC | their files, on the `raw` branch; no three-run table yet | `raw` branch, `run-<id>/` |
 | 14 runs, 24 Oct 02:57 to 08:41 | | launches that stopped before renting (the key and the shipping being set up) | none | 0 | $0 | No | nothing | none |
 | 40400845313 | 26 Oct 21:01 | eight cards, pooled | none | 0 | $0 | dry run (priced only) | the price only | none |
 
-**Rented so far:** about 106 A10 hours (about $137) and 6.7 A100 hours. When the three runs now going reach their limit,
-the A10 total is about 175 hours (about $226).
+**Rented so far:** about 175 A10 hours for the runs through 26 October (about $226), 6.7 A100 hours, and at most about 41 card hours on
+27 October (the fast, saving-dial and cap runs). Lambda's billing page is the exact figure.
 
 **What the record says about the chip:** one finished result on omni-v18 (the A100: STEADY, because native already ran both
-knobs at their top), and no finished stacks result yet. The first stacks results on the engine that stands come from the
-three runs now going.
+knobs at their top). On omni-v21 the stacks' three runs and the one-card runs of 27 October all finished and their files are
+on the `raw` branch; no three-run table has been written from them yet, so the page reads no chip result on omni-v21.
 
 Older GPU results (2 October, `results/gpu/run-20261002T082232Z/`) are obsolete by the founder's order and stay as history.
 
@@ -40,7 +43,7 @@ Older GPU results (2 October, `results/gpu/run-20261002T082232Z/`) are obsolete 
 
 | Cloud | State | Detail | Receipt |
 |---|---|---|---|
-| Azure | **On, running** | The 100-repetition set (run 40069633316) started 24 October on omni-v18: 57 of 100 repetitions done, every one passed; it finishes as omni-v18's record. The steady set of 24 October (run 40126991719, omni-v18) finished. No omni-v21 Azure set has started: Azure runs one set at a time. | `results/live/AKS_BILL.md` (omni-v1: the bill EVEN) |
+| Azure | **On, running** | The omni-v18 100-repetition set (run 40069633316) ended on 29 October, 15:12 UTC, as a failure; the repair note of 29 October (`docs/REPAIR_20261029.md`) names its repetitions 90 and 91 as not validated, and it stays omni-v18's record. The $0 check passed on 29 October, 19:13 UTC (run 40938130483), and the omni-v21 steady set (run 40940616527, up to 100 repetitions under the stopping rule) started at 19:30: at 00:22 UTC on 30 October, 2 repetitions passed, repetition 3 failed in its measurement step (its files kept, artifact `aks-3`), repetition 4 running. | `results/live/AKS_BILL.md` (omni-v1: the bill STEADY) |
 | Google Cloud | **Never run** | Its keys are not in the repository's secrets: `GCP_CREDENTIALS` and `GCP_PROJECT` (the $0 check, `cloud-check`, read them absent on 26 October and again on 27 October, run 40471452017). Wired; switched off. | none |
 | Amazon | **Never run** | `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are not stored (the $0 check of 27 October, run 40471452017), and the account is on the Free plan. Wired; switched off. | none |
 | Oracle, DigitalOcean, Alibaba, Linode, IBM, other | Never run | wired through `byoc-metered`, no cluster connected | none |
@@ -65,7 +68,7 @@ omni-v12 only as the engine before whose runs its preregistration's amendment 2 
 
 1. GPU: the three omni-v21 stacks runs finish by about 05:30 UTC on 28 October; then their three-run table. The one-card
    `cap` runs (an operator's power cap underneath, the cap alone against the cap with Omni-Compass on top) follow, A, B and C
-   on A100s, since the A100's counted run read EVEN with no write (its limit already at the top on native).
+   on A100s, since the A100's counted run read STEADY with no write (its limit already at the top on native).
    And the tune-down on the same card (`dial save`, A, B and C): the card averaged 253 W of its 400 W limit in that run, room
    the factory tune (the max, which never steps the clock below the top) leaves unused.
 2. Azure: the omni-v18 set finishes; then the omni-v21 sets start.

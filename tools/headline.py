@@ -49,7 +49,7 @@ PAIRS = (("Omni-Compass on top of native", "Omni on native against native",
           "Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule"),)
 # native and Omni-Compass on native are the only two sides (the founder's order of 25 October: Omni-Compass is never by itself);
 # the record's third arm, Omni direct, stays in its own table as the road and is not read here
-WORD_ORDER = (K.GAIN, K.GAIN_GIVEN, K.GAIN_AND_LOSS, K.EVEN, K.LOSS)
+WORD_ORDER = (K.GAIN, K.GAIN_GIVEN, K.GAIN_AND_LOSS, K.STEADY, K.LOSS)
 GAUGES = (("requests", "Work"), ("p95", "Response (95th percentile)"), ("machines", "Machines"), ("units", "Units"))
 
 
@@ -143,8 +143,8 @@ def model():
 
 
 def index_word(pct: float) -> str:
-    """The Omni index's own word: above one is a GAIN by its construction (results/OMNI_INDEX.md), EVEN under the floor."""
-    return K.EVEN if abs(pct) < 100 * K.SIZE_FLOOR else (K.GAIN if pct > 0 else K.LOSS)
+    """The Omni index's own word: above one is a GAIN by its construction (results/OMNI_INDEX.md), STEADY under the floor."""
+    return K.STEADY if abs(pct) < 100 * K.SIZE_FLOOR else (K.GAIN if pct > 0 else K.LOSS)
 
 
 
@@ -202,7 +202,7 @@ def markdown(m) -> str:
     idx = st["index"]
     if idx and idx.get("engine") == stands:
         w = index_word(float(idx["pct"]))
-        way = "unchanged" if w == K.EVEN else f"{'up' if idx['pct'] > 0 else 'down'} {abs(idx['pct']):.1f}%"
+        way = "unchanged" if w == K.STEADY else f"{'up' if idx['pct'] > 0 else 'down'} {abs(idx['pct']):.1f}%"
         counts = "; ".join(f"{n} {word}" for word, n in st["words"])
         older = (f" {st['older']} still stand on an older engine ({', '.join(st['older_engines'])}) until their {stands} runs land."
                  if st["older"] else "")
@@ -251,7 +251,7 @@ def markdown(m) -> str:
              f"the provider's energy is not metered to the tenant |")
     w = m["whole"]
     if w and w["index"] is not None:
-        bill = K.EVEN if abs(w["bill"]) < 100 * K.SIZE_FLOOR else f"{w['bill']:+.1f}%"
+        bill = K.STEADY if abs(w["bill"]) < 100 * K.SIZE_FLOOR else f"{w['bill']:+.1f}%"
         L += ["", f"Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`]"
               f"(results/WHOLE_SYSTEM.md), `tools/whole_system.py`; {', '.join(w['engines'])}), the cluster, the services on it and the "
               f"cloud, by the rule that counts only what held in all three runs: work up {w['work']:.1f}%, the 95th percentile "

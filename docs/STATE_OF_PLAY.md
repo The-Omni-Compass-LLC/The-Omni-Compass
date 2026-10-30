@@ -35,32 +35,32 @@ the live evidence and the verification receipt), which `verify.py` checks agains
 
 | Benchmark | Engine | Its one number | Its word | Class |
 |---|---|---:|---|---|
-| Every real test together: the Omni index | omni-v21 | +5.2% | GAIN AND LOSS | L |
-| Robustness: the two-hour run | omni-v21 | −3.8% | GAIN AND LOSS | L |
-| Robustness: the governor killed outright mid-run | omni-v21 | +8.1% | GAIN AND LOSS | L |
-| Robot arms (MuJoCo), the three untouched robots | omni-v21 | +3.8% | GAIN | S |
-| Redis, the cache's memory ceiling | omni-v21 | =0.0% | GAIN AND LOSS | L |
-| Real Kubernetes, steady work | omni-v21 | +30.9% | GAIN | L |
-| Real Kubernetes, faults | omni-v21 | +30.2% | GAIN, power given | L |
-| Real Kubernetes, demand that wanders | omni-v21 | +33.6% | GAIN, power given | L |
-| Real Kubernetes, all four at once | omni-v21 | +33.5% | GAIN AND LOSS | L |
-| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v21 | +34.7% | GAIN AND LOSS | L |
-| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v21 | −0.4% | LOSS | L |
-| Real Kubernetes, a queue of jobs | omni-v21 | +13.7% | GAIN AND LOSS | L |
-| Real Kubernetes, a public day of demand (Google 2011) | omni-v21 | +37.6% | GAIN AND LOSS | L |
-| Real Kubernetes, a noisy neighbour | omni-v21 | +2.2% | GAIN AND LOSS | L |
-| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v21 | +94.7% | GAIN, power given | L |
-| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v21 | +29.8% | GAIN AND LOSS | L |
-| Power grids (SimBench), both load models | omni-v21 | +5.8% | GAIN, power given | S |
-| PostgreSQL, the pooler's pool size | omni-v21 | +4.1% | GAIN, power given | L |
-| MySQL, the buffer pool's size | omni-v21 | +3.2% | GAIN, power given | L |
-| MongoDB, the storage engine's cache size | omni-v21 | −0.6% | GAIN AND LOSS | L |
-| Kafka, the consumer group's size | omni-v21 | −1.0% | GAIN AND LOSS | L |
-| Drone swarms, the three untouched cells | omni-v21 | +3.0% | GAIN | S |
-| Buildings and batteries (CityLearn), the districts with batteries | omni-v21 | +1.5% | GAIN | S |
-| The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | +5.3% | GAIN, power given | L, the cluster; S, the organism around it |
-| The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | +155.0% | GAIN | L, the cluster; S, the organism around it |
-| The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | +0.3% | GAIN | S |
+| Every real test together: the Omni index | omni-v21 | 5.2% | GAIN AND LOSS | L |
+| Robustness: the two-hour run | omni-v21 | 3.8% | GAIN AND LOSS | L |
+| Robustness: the governor killed outright mid-run | omni-v21 | 8.1% | GAIN AND LOSS | L |
+| Robot arms (MuJoCo), the three untouched robots | omni-v21 | 3.8% | GAIN | S |
+| Redis, the cache's memory ceiling | omni-v21 | 0.0% | GAIN AND LOSS | L |
+| Real Kubernetes, steady work | omni-v21 | 30.9% | GAIN | L |
+| Real Kubernetes, faults | omni-v21 | 30.2% | GAIN, power given | L |
+| Real Kubernetes, demand that wanders | omni-v21 | 33.6% | GAIN, power given | L |
+| Real Kubernetes, all four at once | omni-v21 | 33.5% | GAIN AND LOSS | L |
+| Real Kubernetes, a service rightsized by Goldilocks and the VPA's recommender, Omni-Compass on top, ten pairs, three runs | omni-v21 | 34.7% | GAIN AND LOSS | L |
+| Real Kubernetes, a service rightsized by CruiseKube applying its own recommendations, Omni-Compass on top, ten pairs, three runs | omni-v21 | 0.4% | LOSS | L |
+| Real Kubernetes, a queue of jobs | omni-v21 | 13.7% | GAIN AND LOSS | L |
+| Real Kubernetes, a public day of demand (Google 2011) | omni-v21 | 37.6% | GAIN AND LOSS | L |
+| Real Kubernetes, a noisy neighbour | omni-v21 | 2.2% | GAIN AND LOSS | L |
+| Real Kubernetes, With its add-ons: KEDA's HTTP add-on on the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v21 | 94.7% | GAIN, power given | L |
+| Real Kubernetes, With its add-ons: KEDA on the CPU target and the live requests in flight, Omni-Compass on top, ten pairs, three runs | omni-v21 | 29.8% | GAIN AND LOSS | L |
+| Power grids (SimBench), both load models | omni-v21 | 5.8% | GAIN, power given | S |
+| PostgreSQL, the pooler's pool size | omni-v21 | 4.1% | GAIN, power given | L |
+| MySQL, the buffer pool's size | omni-v21 | 3.2% | GAIN, power given | L |
+| MongoDB, the storage engine's cache size | omni-v21 | 0.6% | GAIN AND LOSS | L |
+| Kafka, the consumer group's size | omni-v21 | 1.0% | GAIN AND LOSS | L |
+| Drone swarms, the three untouched cells | omni-v21 | 3.0% | GAIN | S |
+| Buildings and batteries (CityLearn), the districts with batteries | omni-v21 | 1.5% | GAIN | S |
+| The six organisms with the real cluster inside, 10 and 100 copies | omni-v3 | 5.3% | GAIN, power given | L, the cluster; S, the organism around it |
+| The big organisms with the real cluster inside, 1,000 copies on Azure | omni-v3 | 155.0% | GAIN | L, the cluster; S, the organism around it |
+| The 945 modelled muscles as one tower, every muscle written at once | omni-v3 | 0.3% | GAIN | S |
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 
@@ -91,7 +91,7 @@ copied here.
 
 Each with its receipt, run by run, in `docs/RUN_LEDGER.md`.
 
-1. **The card.** The one finished counted run, omni-v18 on an A100 (`results/gpu/run-20261024T091235Z/GPU_REPS.md`), reads EVEN
+1. **The card.** The one finished counted run, omni-v18 on an A100 (`results/gpu/run-20261024T091235Z/GPU_REPS.md`), reads STEADY
    on every judged gauge with no write: the card's power limit was already at its top on native, so the factory tune had nothing
    to raise and left it alone. The three omni-v21 runs of the whole stacks with the card inside (A, B and C on Lambda A10s) and
    the runs with an operator's power cap underneath (the `cap` mode: the cap alone against the cap with Omni-Compass on top) are
