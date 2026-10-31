@@ -299,7 +299,7 @@ def markdown(m) -> str:
         ledger = (f" The LOSS ledger ([`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md)) lists every LOSS row of the newest tables, "
                   f"{led['all']} in all, {led['native']} of them Omni-Compass against its own native, the rows do no harm is judged by, "
                   f"each with its cause where one is written." if led else "")
-        L.append(f"**Not Yet Read on {stands}**: the Omni index stands on "
+        L.append(f"**Not yet read on the engine that stands ({stands})**: the Omni index stands on "
                  f"{(idx or {}).get('engine', 'no engine')} until {stands}'s tables land ([`{INDEX_FILE}`]({INDEX_FILE})).{on_its}{ledger}")
     L += [""] + standing_block(stands)
     s0 = m["scen"][0]
