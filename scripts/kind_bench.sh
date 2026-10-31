@@ -479,6 +479,7 @@ if [ -z "$NATIVE" ]; then
     echo "patch pods (make before break: which pods leave first): $(can patch pods -n default)"
     echo "get pods/resize (power cap reads before it writes): $(can get pods --subresource=resize -n default)"
     echo "patch deployment/php-apache (rollout guard, cap record): $(can patch deployment/php-apache -n default)"
+    echo "patch deployment/php-apache --subresource=scale (pod muscle of its own, --own-replicas: what kubectl scale writes): $(can patch deployment/php-apache --subresource=scale -n default)"
     echo "get configmap/omni-security (security afferent): $(can get configmap/omni-security -n default)"
     [ -z "$KEDA" ] || echo "patch scaledobject/php-apache (the add-on's knob: KEDA rebuilds the HPA from it): $(can patch scaledobjects.keda.sh/php-apache -n default)"
     [ -z "$CRANE" ] || echo "patch ehpa/php-apache (Crane's knob: Crane rebuilds the HPA from it): $(can patch effectivehorizontalpodautoscalers.autoscaling.crane.io/php-apache -n default)"
@@ -488,6 +489,7 @@ if [ -z "$NATIVE" ]; then
     echo "delete pods: $(can delete pods -n default)"
     echo "delete deployments: $(can delete deployments -n default)"
     echo "patch deployment/load-generator: $(can patch deployment/load-generator -n default)"
+    echo "patch deployment/load-generator --subresource=scale (the pod muscle of its own writes the named workload alone): $(can patch deployment/load-generator --subresource=scale -n default)"
     echo "patch deployments in kube-system: $(can patch deployments -n kube-system)"
     echo "patch hpa in kube-system: $(can patch hpa -n kube-system)"
     echo "get secrets (any namespace): $(can get secrets -A)"
@@ -787,7 +789,10 @@ if [ "$LOADGEN" = meter ]; then
   echo "work meter: $(jq -c .total "$OUT_DIR/work_meter.json")" | tee -a "$OUT_DIR/preflight.txt"
 fi
 end_read "$OUT_DIR/nodes_end.txt" get nodes -o wide
-end_read "$OUT_DIR/hpa_end.json" get hpa "$HPA_NAME" -o json
+# by itself the pod autoscaler is removed by design, so its read is the workload's own (this read of the autoscaler, added
+# 29 October, ended every solo arm of the omni-v22 campaign's first two runs with exit 1: docs/SOLO_PREREGISTRATION.md, amendment 1)
+if [ "$ARM" = "solo" ]; then end_read "$OUT_DIR/workload_end.json" get deployment php-apache -o json
+else end_read "$OUT_DIR/hpa_end.json" get hpa "$HPA_NAME" -o json; fi
 if [ -n "$KEDA" ]; then   # the add-on's own record of the window: its ScaledObject and the last words of each part
   end_read "$OUT_DIR/scaledobject_end.json" get scaledobject php-apache -o json
   for d in keda-operator keda-add-ons-http-scaler keda-add-ons-http-interceptor; do

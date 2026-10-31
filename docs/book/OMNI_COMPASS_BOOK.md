@@ -1418,7 +1418,8 @@ makes the beat a dial, the full decision every 60 s by default (the main engine)
 line; omni-v18 carries Omni direct, Omni-Compass run on the muscles with no Kubernetes beneath it (`omni_orchestrator/`), as
 part of the engine, so its three arms (native, Omni on native, Omni direct) run from one fingerprint; omni-v19 takes
 `--own-replicas namespace/name,...` (or `OMNI_OWN_REPLICAS`), Omni-Compass by itself on Kubernetes: for a workload no autoscaler
-governs, the governor sets its replica count itself through the workload's own scale, every `--own-every-s` (15 s), its target and
+governs, the governor sets its replica count itself through the workload's own scale (the grant: `get`, `patch` and `update` on
+`deployments/scale` by name, `deploy/rbac-own-pods.yaml`, chapter 15), every `--own-every-s` (15 s), its target and
 range read from the workload's `omnicompass.io/target-utilization` and `omnicompass.io/replica-range` annotations (else
 `--own-target`), never below the workload's own count at the max (the tune-down may go to the range's floor), the count recorded on the workload
 and handed back by the reset; a workload an autoscaler governs is left to it, and `--native replicas` leaves the muscle native; and the
@@ -2595,6 +2596,7 @@ The table is the complete list. A verb not in it is not needed at that level and
 | Machines | core | `pods` | `patch` | mark the pods on a parked machine first to go (the `pod-deletion-cost` annotation), so the autoscaler's own scale-down removes them first |
 | Pod target (not in the cloud mode) | `autoscaling` | `horizontalpodautoscalers` (each governed one, by name) | `patch`, `update` | move the autoscaler's CPU target inside its cover, and record the operator's own target on the object |
 | Processor conveyance (not in the cloud mode) | core | `pods/resize` | `get`, `patch` | resize a running pod's processor limit in place; no pod is restarted |
+| Pod muscle of its own (`--own-replicas`; not in the cloud mode) | `apps` | `deployments/scale` (each named workload) | `get`, `patch`, `update` | set the replica count of a workload no autoscaler governs through its own scale subresource, never below the operator's count (`deploy/rbac-own-pods.yaml`); under RBAC `deployments/scale` is a resource of its own, which a grant on `deployments` does not carry |
 | Batch admission (where wired) | `batch` | `jobs` | `patch` | admit held work |
 
 Two verbs are absent from every level and are refused by review if they appear: `delete` on anything, and `create` on
@@ -2637,15 +2639,18 @@ and keeps the output with the installation record:
 ```bash
 SA=system:serviceaccount:omni-compass:omni-compass
 for v in "get nodes" "list pods" "get horizontalpodautoscalers.autoscaling" "list deployments.apps" \
-         "patch nodes" "patch pods" "patch horizontalpodautoscalers.autoscaling" "patch pods/resize" \
+         "patch nodes" "patch pods" "patch horizontalpodautoscalers.autoscaling" "patch pods/resize" "patch deployments/scale" \
          "delete pods" "create pods/eviction" "delete nodes" "create pods"; do
   printf '%-48s %s\n' "$v" "$(kubectl auth can-i $v --as=$SA -A)"
 done
 ```
 
 In the cloud mode the answers are `yes` for the four reads and for `patch nodes` and `patch pods`, and `no` for
-everything else, including `patch horizontalpodautoscalers.autoscaling` and `patch pods/resize`. Any other answer is a
-grant to correct before the governor starts, not after.
+everything else, including `patch horizontalpodautoscalers.autoscaling`, `patch pods/resize` and `patch deployments/scale`.
+Any other answer is a grant to correct before the governor starts, not after. Where `--own-replicas` names a workload,
+prove its scale write by name (`kubectl auth can-i patch deployment/NAME --subresource=scale -n NAMESPACE --as=$SA`): a
+grant on `deployments` alone answers `yes` to `patch deployment/NAME` and `no` here, and the governor's every pod write
+would be refused.
 
 ### 15.5 No cloud credential
 
