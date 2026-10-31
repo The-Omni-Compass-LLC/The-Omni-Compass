@@ -132,7 +132,44 @@ Mean wait: native 1.58 s, omni 1.70 s, ΔW̄ = +0.13 s (+8.0%). Of it, the shift
 
 `results/live/V21_FAIRNESS.md`, runs 40227151053, 40250387280, 40272634568: the second app's failed requests (1.1%, 1.1%, 3.7% more), and the pod start wait's mean (section 1). The rig (`scripts/kind_bench.sh`, `TWO_APP=1`, `deploy/kind/noisy.yaml`): php-apache, the governed service, and php-noisy, a neighbour with its own autoscaler (target 50%, 1 to 10 replicas) and its own surging load, on the same six workers; both deployments ask 200m and are limited to 500m a pod. Every write the governor made in run A's ten repetitions names php-apache: 312 conveyances (idle CPU on a worker given to its serving pod, 122 of them handed back "the shared host at its top"), its autoscaler target (to 75%, and to 30% on the SLO reflex), the rollout guard; none names php-noisy. Run A's means: the neighbour's 95th percentile 331.9 ms against 395.1 ms with Omni-Compass on top, its time over the line 15.68% against 16.15%, its failed requests 13.65% against 13.8%; the governed app's own failed requests fell (4.359% to 4.139%) and its alert minutes fell (9 to 8.6).
 
-**The mechanism.** Conveyance reads a worker's idle CPU and gives it to the governed app's pod by raising its limit. The CPU is idle at that moment; when the neighbour's load surges, its pods find it taken until the hand-back, which comes at the shared host's top, not at the neighbour's line. The governor watches php-apache's response line and its own markers; the neighbour's line is not a marker it reads, so omni-v21's immune system, which hands a muscle back when its own markers turn against native, cannot see this harm. It is a harm at the organism (do no harm, `DISCLOSURES.md` section 3), small (the neighbour's failures up 1.1% to 3.7% of its own 13.7%) and real in all three runs. **The next version's work, through the model gate:** conveyance on a shared worker reads every other serving pod's response line where the rig publishes one, and hands back when a neighbour's line is threatened, as it hands back at the host's top today; and a conveyance is never larger than the worker's idle CPU less the other pods' requests (the neighbour's 200m a pod is what the scheduler promised it). The same stratum's +0.19 s on the neighbour's pod starts is the same CPU: a neighbour pod created on a worker whose idle CPU was conveyed away starts slower.
+**Where the neighbour's requests failed, read second by second.** The neighbour's own latency file (`latency_noisy.csv`, every probe
+request with its time and whether it was answered) placed against the host's busy share, the neighbour's own load phase (its load
+generator at 6 replicas for 150 s, then 0 for 150 s, `noisy_schedule.log`) and the governed app's conveyance state from the audit
+(a php pod's limit above the operator's 500m, or every limit at the operator's), over all 30 repetitions of the three runs:
+
+| Host busy, neighbour's phase | native: requests, mean, 95th percentile, failed | Omni-Compass's arm, limits at the operator's: the same | Omni-Compass's arm, a limit conveyed: the same |
+|---|---|---|---|
+| 0 to 50%, quiet | 9,348; 161.8 ms; 213.3 ms; 0.24% | 347; 224.4 ms; 280.7 ms; 0.58% | 8,949; 167.8 ms; 209.1 ms; 0.30% |
+| 0 to 50%, surge | 73; 1,975 ms; 10,010 ms; 23.3% | none | 71; 2,028 ms; 10,011 ms; 16.9% |
+| 50 to 70%, quiet | 174; 659 ms; 7,689 ms; 4.0% | 41; 2,768 ms; 10,011 ms; 22.0% | 62; 974 ms; 7,947 ms; 4.8% |
+| 50 to 70%, surge | 26; 8,550 ms; 12,045 ms; 92.3% | none | 30; 7,962 ms; 10,011 ms; 93.3% |
+| 70 to 100%, quiet | 857; 7,568 ms; 10,015 ms; 72.1% | 875; 7,449 ms; 10,015 ms; 71.3% | 4; 97 ms; 99 ms; 0% |
+| 70 to 100%, surge | 1,192; 6,059 ms; 10,015 ms; 55.5% | 1,091; 6,402 ms; 10,014 ms; 59.2% | 40; 6,398 ms; 15,161 ms; 52.5% |
+
+**What it says.** The neighbour's failures are its own surge's: six load replicas saturate it and the one shared host for 150 s
+at a time, and in those seconds its probe requests time out at 10 s in both arms (55% to 72% failed, the host 70% to 100%
+busy); there the governor had already handed every conveyed limit back (the omni-v13 rule at the host's top: 4 and 40
+requests of 2,010 saw a conveyed limit), and the two autoscalers ran the same pods in both arms (19.2 on the two autoscalers
+at the top in each arm, 5,541 against 5,534 millicores requested, `capture.csv`). The row's LOSS (1.1%, 1.1%, 3.7% of the
+neighbour's own 13.7%, about half a request a repetition) sits in that saturated band, where Omni-Compass's arm failed
+59.2% of the surge requests against native's 55.5%, with the same pods and the limits at the operator's: the shared machine's
+own noise at saturation, read in 1,091 against 1,192 requests. The cost conveyance itself puts on the neighbour is in the
+quiet band, where the governed app's limits stand conveyed for 8,949 of the neighbour's 9,296 requests: its mean response 3.7%
+longer (167.8 against 161.8 ms, clear of the noise at this count), its 95th percentile 2.0% shorter, its failures 0.30%
+against 0.24%. That is the kernel's run queue: a serving pod whose quota is lifted runs in longer bursts, and a lightly
+loaded neighbour's short request waits for a core more often, while the neighbour keeps its throughput (its share by request
+is untouched). The same shows in its pods' starts (section 1, the same-stratum +0.19 s).
+
+**What this is, and what it is not.** It is the price conveyance puts on a neighbour sharing the machine: small, measured,
+and bought with the governed app's own gains in the same table (its failed requests 4.359% against 4.139%, its alert minutes 9
+against 8.6, its work inside the line GAIN). It is not a muscle Omni-Compass governs reading below native, and it is not the
+cause of the neighbour's failures, which are its own surge in both arms. On the engine that stands nothing is traded between
+muscles; a rule that pays the governed app's gain back to the neighbour (a cap on the conveyed limit where another serving
+workload shares the node, or a hand-back when a neighbour's own line is threatened) is the organism-level trade the founder's
+order of 19 October reserves for the next version, through the model gate, with the two-app model set from these strata (the
+neighbour's service time 3.7% longer while a limit on its node stands conveyed; its own saturation at its surge). What decides
+the row: the benchmark's three runs on the engine that stands, and the neighbour's line read beside the governed app's on the
+receipt.
 
 ## 5. The fixed-capacity test at its top cap: 3 cores, the completed work
 

@@ -61,8 +61,9 @@ POD_SHIFT = ("the shared test machine: Omni-Compass's arm starts its pods while 
              "a pod created on a host 70% to 100% busy waits longer at the kubelet than one created at 0% to 50%, a stratum a real "
              "cluster's own node never enters")
 POD_DECIDES = "the benchmark's three runs on the engine that stands, the host's busy share read beside the row"
-NEIGHBOUR_NEXT = ("the next version (conveyance that reads the neighbours' response lines where the rig publishes them and leaves "
-                  "every other pod its requests, the model gate first)")
+NEIGHBOUR_NEXT = ("the next version's organism-level trade (a cap on the conveyed limit where another serving workload shares the "
+                  "node, or a hand-back when a neighbour's own line is threatened), the model gate first, its two-app model set from "
+                  "these runs' own strata")
 CAUSES = {
     ("KUBERAY_4W_BARE", ""): V13_FIX,
     ("ARMADA_4W_BARE", ""): ("suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent "
@@ -129,12 +130,15 @@ CAUSES = {
     ("FAIRNESS", "pod start wait"): (POD_SHIFT + " (the shift 0.19 s of the 0.39 s; the other 0.19 s in the same stratum is the "
                                      "neighbour's pods, created on a worker whose idle CPU was conveyed to the governed app)",
                                      CAUSES_PAGE, NEIGHBOUR_NEXT, POD_DECIDES),
-    ("FAIRNESS", "second app"): ("conveyance gave the governed app's pods a worker's idle CPU (312 writes in run A, every one "
-                                 "naming php-apache, none the neighbour), and when the neighbour's load surged its pods found that "
-                                 "CPU taken until the hand-back at the shared host's top; the governor reads the governed app's line, "
-                                 "not the neighbour's, so the immune system could not see the harm (the neighbour's 95th percentile "
-                                 "331.9 against 395.1 ms in run A's means)", CAUSES_PAGE, NEIGHBOUR_NEXT,
-                                 "the benchmark's three runs on the next engine, the neighbour's line read beside the governed app's"),
+    ("FAIRNESS", "second app"): ("the neighbour's failures are its own surge's, in both arms: six load replicas saturate it and the "
+                                 "shared host for 150 s at a time and its probe requests time out at 10 s (55% to 72% failed at 70% to "
+                                 "100% host busy), with every conveyed limit already handed back and the same pods in both arms (19.2 on "
+                                 "the two autoscalers); the row's half a request a repetition sits in that saturated band (59.2% against "
+                                 "55.5% of the surge requests failed), the shared machine's noise at saturation. Conveyance's own price on "
+                                 "the neighbour is in the quiet band: its mean response 3.7% longer (167.8 against 161.8 ms over 8,949 "
+                                 "requests), its 95th percentile 2.0% shorter, failures 0.30% against 0.24%: the kernel's run queue under "
+                                 "a serving pod's lifted quota", CAUSES_PAGE, NEIGHBOUR_NEXT,
+                                 "the benchmark's three runs on the engine that stands, the neighbour's line read beside the governed app's"),
     ("CRUISEKUBE", ""): ("Omni-Compass wrote nothing in any of the 30 repetitions (the CPU limit is CruiseKube's alone, the machines "
                          "are kind's, fixed, and the service stayed inside its line, so the replica range had nothing to carry): the "
                          "two arms are one system and the rows are the rig's noise between two native arms", CAUSES_PAGE, "",
