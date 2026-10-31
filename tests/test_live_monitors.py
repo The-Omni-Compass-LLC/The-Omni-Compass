@@ -118,7 +118,7 @@ class LiveMonitors(unittest.TestCase):
     def test_the_kill_switch_words(self):
         self.assertIn('class="onword">ON</span>', self.body)
         self.assertIn('class="offword">OFF</span>', self.body)
-        self.assertIn("Engine table of contents", self.body)
+        self.assertIn('<h2 class="tocH">Contents</h2>', self.body)
 
 
 if __name__ == "__main__":

@@ -146,7 +146,7 @@ CAUSES = {
                          "no engine moves it: more repetitions a run, or a load that takes the service to its line"),
     ("CAPACITY", "3000:work"): ("at the 3-core cap the service is inside its line in both arms and the only moves are conveyances of "
                                 "idle CPU to the serving pods; the completed count fell 0.6% by the mean with every run's interval "
-                                "across zero (run A's own table reads the row EVEN): the rig's noise at the cap", CAUSES_PAGE, "",
+                                "across zero (run A's own table reads the row STEADY): the rig's noise at the cap", CAUSES_PAGE, "",
                                 "the benchmark's three runs on the engine that stands, and more pairs a cap"),
 }
 

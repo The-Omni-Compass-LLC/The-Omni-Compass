@@ -728,7 +728,7 @@ TERMS = [
       [("tools/seal.py", "The seal: every law that exists in Python and in C++, locked together.")], aka=["seal", "sealed"]),
     T("the C++ twin", P, "The engine's laws written again in C++ (the core, the governor, the compass law, the verdict), each held "
       "equal to its Python by a parity test under the seal; the Python's runs fed through the C++ engine give the same digest.",
-      [(PAGE_F, "The C++ twin: the Python's runs through the C++ engine"),
+      [(PAGE_F, "C++ Twin"),
        ("tools/seal.py", "A change to either side of a twin breaks the seal until its parity test passes")],
       aka=["C++ twin", "C++"]),
     T("evidence classes P, L, S", P, "The class every number carries: P a physical meter (a real card's own power meter), L live "
@@ -983,7 +983,7 @@ TERMS = [
     T("the dashboards", W, "The page's section 3i: the live benchmark engine in nine forms an operations team reads (a board of panels, a host "
       "map, a graph, an event stream, a cluster console, a one-line diagram, a wall of numbers, the cost by body part, and "
       "Omni-Compass's own two-way pipeline), by muscle, body part or the whole organism.",
-      [(PAGE_F, "The dashboards: the live benchmark engine in every form an operations team reads a system")], aka=["dashboards", "host map"]),
+      [(PAGE_F, "Dashboards")], aka=["dashboards", "host map"]),
     T("the contract, this decision", W, "The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the "
       "settings requested u[req](k), commanded u[cmd](k) = Π[C](u[req](k)) and acknowledged u[ack](k) = R(u[cmd](k)), computed on the "
       "live model.", [(FP, "u[cmd](k) = Π[C](u[req](k))"), (PAGE_F, "the contract, this decision")], aka=["the contract"]),
