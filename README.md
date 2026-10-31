@@ -242,9 +242,9 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:tables:begin -->
 | Last changed (UTC) | Table | Reading |
 |---|---|---|
+| 2026-10-31 06:03 | [Azure Kubernetes Service, the steady set of 100 paired repetitions on omni-v18: the bill, the machines, the service](results/live/AKS_STEADY_100_OMNI_V18.md) |  |
 | 2026-10-31 03:29 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2505286458.md) |  |
 | 2026-10-31 02:27 | [The engine's runs: 500 runs from the jump generator (base 2505286458), one digest](results/engine_runs/ENGINE_RUNS_500_2505286458.md) |  |
-| 2026-10-31 01:46 | [Azure Kubernetes Service, the steady set of 100 paired repetitions on omni-v18: the bill, the machines, the service](results/live/AKS_STEADY_100_OMNI_V18.md) |  |
 | 2026-10-30 18:23 | [The injection grid: the Python's 500 injections through every organism and every governor (modelled)](results/injection_grid/INJECTION_GRID_2441267659.md) |  |
 | 2026-10-30 17:08 | [The engine's runs: 500 runs from the jump generator (base 2441267659), one digest](results/engine_runs/ENGINE_RUNS_500_2441267659.md) |  |
 | 2026-10-30 16:55 | [The model gate: the candidate against the engine that stands, in our own models](results/model_gate/V22_VS_V21.md) |  |
@@ -258,16 +258,16 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 <!-- front-page:runs:begin -->
 | Finished (UTC) | Benchmark | Outcome | Run |
 |---|---|---|---|
-| 2026-10-31 05:56 | benchmark-reps | success | [41170398379](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41170398379) |
+| 2026-10-31 06:18 | big-organism-detached collect | success | [41175997574](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41175997574) |
+| 2026-10-31 06:15 | kwok-scale | success | [41175600009](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41175600009) |
+| 2026-10-31 06:11 | benchmark-reps | success | [41171450757](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41171450757) |
+| 2026-10-31 06:11 | engine-runs | success | [41175415977](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41175415977) |
+| 2026-10-31 06:10 | ycsb | success | [41167149416](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41167149416) |
+| 2026-10-31 06:08 | live-shadow | success | [41174534033](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41174534033) |
+| 2026-10-31 06:03 | raw-sweep | success | [41175003566](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41175003566) |
+| 2026-10-31 06:03 | live-kind-full | success | [41173543151](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41173543151) |
 | 2026-10-31 05:51 | benchmark | success | [41172505664](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41172505664) |
 | 2026-10-31 05:48 | live-kind-levers | success | [41173546412](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41173546412) |
-| 2026-10-31 05:47 | live-kind | success | [41172509416](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41172509416) |
-| 2026-10-31 05:43 | sysbench | success | [41166081875](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41166081875) |
-| 2026-10-31 05:39 | redis | success | [41167145710](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41167145710) |
-| 2026-10-31 05:39 | ycsb | success | [41164995489](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41164995489) |
-| 2026-10-31 05:33 | citylearn | success | [41168256440](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41168256440) |
-| 2026-10-31 05:20 | robustness | success | [41169377322](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41169377322) |
-| 2026-10-31 05:11 | grid | success | [41171593647](https://github.com/The-Omni-Compass-LLC/The-Omni-Compass-LLC/actions/runs/41171593647) |
 <!-- front-page:runs:end -->
 
 **Two sides, always shown together, and only two: native is the system as it runs on its own; omni, Omni-Compass on
