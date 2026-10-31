@@ -455,6 +455,9 @@ def fleet() -> dict:
         if oj.exists():   # each category's own reading, so the page can say what carries the headline
             oij = json.loads(oj.read_text(encoding="utf-8"))
             out["index"]["categories"] = oij.get("categories") or {}
+            # each category's service reading (work and speed), so the page words a category as the index does (tools/omni_index.py
+            # index_word: a minus is a LOSS where the service reading is below one too, else power given; the referee of 30 October)
+            out["index"]["service_categories"] = oij.get("service_categories") or {}
             # the figure of record as the index's own record holds it, never read back out of a sentence (the mathematics seat of
             # 24 October: the headline's first percent is the 0.5% floor it names, not the index)
             out["index"]["headline_pct"] = oij.get("headline_pct")
@@ -1045,6 +1048,17 @@ def core_sets() -> list:
 ON_NATIVE_PAIR = "Omni on native against native"
 
 
+def on_native_what(path: Path, d: dict) -> str:
+    """Omni-Compass on native against native, in the record's own words: its 'what' after its lead ("three runs on GitHub's own
+    machines ..., the full form: <steps> of <length>, clients ...") and native as its .md says it ("Native is ...;")."""
+    w = str(d.get("what") or "")
+    m = re.search(r"(three runs on GitHub.*)$", w)
+    form = m.group(1) if m else w
+    md = path.with_suffix(".md")
+    nat = re.search(r"Native is (.+?);", md.read_text(encoding="utf-8")) if md.exists() else None
+    return (f"Omni-Compass on native against native, {form.rstrip('.')}" + (f"; native is {nat.group(1)}, and Omni-Compass sits on top of it." if nat else "."))
+
+
 def on_native_abc() -> dict:
     """The newest real three-run test on GitHub's own machines of Omni-Compass on native against native, the page's bottom line
     (results/orchestrator/*_THREE_ARMS_ABC.json, tools/orchestrator_abc.py, class L): native is Kubernetes' published autoscaling
@@ -1056,9 +1070,9 @@ def on_native_abc() -> dict:
     d = json.loads(fs[-1].read_text(encoding="utf-8"))
     return {"file": str(fs[-1].relative_to(ROOT)), "class": d.get("class"), "commit": d.get("commit"), "engine": d.get("engine"),
             "runs": d.get("runs"),
-            "what": "Omni-Compass on native against native, three runs on GitHub's own machines (A, B and C from one commit), the full "
-                    "form: 18 steps of 25 s, clients 1 2 3 2 3 4 ...; native is Kubernetes' published autoscaling rule on the muscles, "
-                    "written by us, and Omni-Compass sits on top of it.",
+            # the test as its record describes it, never typed here (the referee of 30 October): the record's own form (its steps, their
+            # length, the clients) after its lead, and native's words from the record's own .md, the same ones tools/headline.py reads
+            "what": on_native_what(fs[-1], d),
             "rows": [r for r in d.get("rows", []) if r.get("pair") == ON_NATIVE_PAIR],
             "totals": {k: {a: v.get(a) for a in ("yardstick", "omni_native") if a in v} for k, v in (d.get("totals") or {}).items()}}
 
@@ -1101,6 +1115,15 @@ def injection_grid() -> dict:
     d = json.loads(f.read_text(encoding="utf-8"))
     d.pop("best", None)
     return {"file": str(f.relative_to(ROOT)), **d}
+
+
+def _wrote(path: Path) -> dict | None:
+    """The commit that last wrote a file, its time and its parents (a merge has two: the second is the branch it merged)."""
+    try:
+        sha, when, parents = git("log", "-1", "--format=%H%x09%cI%x09%P", "--", str(path.relative_to(ROOT))).split("\t")
+    except ValueError:
+        return None
+    return {"commit": sha, "at": when, "parents": parents.split()}
 
 
 def verdict_audit() -> dict:
@@ -1149,7 +1172,9 @@ def verdict_audit() -> dict:
             "losses_apart": [row(r) | {"k": by_t[r["table"]]["comparison"]} for r in rec["rows"]
                              if r["word"] == "LOSS" and by_t[r["table"]]["status"] == "standing" and by_t[r["table"]]["comparison"] != "against its native"],
             "armada": [row(r) for r in rec["rows"] if r["table"] == "V12_ARMADA_4W_BARE" and r["word"] in ("LOSS", "GAIN", "power given")],
-            "discrepancies": {"base": dd.get("base"), "kinds": kinds, "rows": len(dd["rows"]),
+            # the report names its base as the tool was given it; where that is a moving name (origin/main), the commit that wrote the
+            # report and that commit's parents are recorded beside it, so the comparison can be traced (the referee of 31 October)
+            "discrepancies": {"base": dd.get("base"), "written_in": _wrote(disc), "kinds": kinds, "rows": len(dd["rows"]),
                               "words": [{k: (re.sub(r"\bEVEN\b", "STEADY", d[k]) if k == "old_reading" else d[k]) for k in ("table", "status", "gauge", "old_reading", "new_reading")}
                                         for d in dd["rows"] if d["word_changed"]]}}   # the old word EVEN is shown as STEADY, its name now (counted apart as "renamed")
 
@@ -1159,6 +1184,32 @@ def glossary() -> dict:
     the file it names, the ten organisms, the two arms and their twenty scenarios, every muscle of the catalog, and the index."""
     f = ROOT / "docs" / "engine" / "glossary.json"
     return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
+def field() -> dict:
+    """The ones that compete, as docs/THE_FIELD.md ranks them (section 3i's table, the referee of 31 October: never typed into the
+    page): the five it names to run first, each with the ranked table's reason, rig and cost as that file reads them, the day the
+    file was read, and whether results/ holds a table that names the product (none yet: "not yet run")."""
+    f = ROOT / "docs" / "THE_FIELD.md"
+    if not f.exists():
+        return {"missing": "docs/THE_FIELD.md"}
+    text = f.read_text(encoding="utf-8")
+    read = re.search(r"Read on (\d{1,2} \w+ \d{4})", text)
+    rows = {}
+    for line in text.splitlines():
+        m = re.match(r"\|\s*(\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$", line)
+        if m:
+            rows[m.group(2)] = {"rank": int(m.group(1)), "product": m.group(2), "why": m.group(3), "rig": m.group(4), "cost": m.group(5), "free": m.group(6)}
+    first = []
+    part = text.split("**The first five to run**", 1)
+    for m in re.finditer(r"^\d+\.\s+\*\*(.+?)\*\*:\s*(.+?)(?=^\d+\.|^\s*$)", part[1] if len(part) > 1 else "", re.M | re.S):
+        name = next((p for p in rows if m.group(1).startswith(p)), None)
+        if name is None:
+            continue
+        slug = re.sub(r"[^a-z0-9]+", "", name.lower())
+        hits = sorted(str(x.relative_to(ROOT)) for x in (ROOT / "results").rglob("*.md") if slug and slug in re.sub(r"[^a-z0-9]+", "", x.stem.lower()))
+        first.append(dict(rows[name], plan=m.group(1), first=" ".join(m.group(2).split()), tables=hits))
+    return {"file": "docs/THE_FIELD.md", "read": read.group(1) if read else None, "first": first}
 
 
 LAW_SCOPE = ("omni_controller/*.py", "omni_orchestrator/*.py", "realms/*.py", "tools/run_*.py")
@@ -1284,7 +1335,7 @@ def records(runs: bool) -> dict:
     return {"harness": h, "ctlrec": pack_controller(c), "scen": s, "runs": rr, "fleet": fleet(), "build": build, "whole": wh,
             "gpurun": gpu, "cpuhost": cpu, "monitors": reg, "engineruns": eruns, "heldout": ho, "cpptwin": x,
             "beatsweep": beat_sweep(), "dial": dial(), "coremc": core_mc(), "onnative": on_native_abc(), "scenarios": scenarios20(), "injgrid": injection_grid(), "audit": verdict_audit(), "glossary": glossary(),
-            "lawwires": law_wires()}
+            "lawwires": law_wires(), "field": field()}
 
 
 def embedded(page: str, key: str):
@@ -1314,6 +1365,24 @@ def first_difference(a, b, path="$"):
         if len(a) != len(b):
             return f"{path} (length)", str(len(a)), str(len(b))
     return path, repr(a)[:120], repr(b)[:120]
+
+
+def stamp_fallbacks(page: str, build: dict) -> str:
+    """What a reader sees where the page's script does not run (the referee of 30 October): every element of the page's markup
+    marked data-rec="build.engine" or data-rec="build.digest" carries the build record's own value, and the engine's two files
+    (engJson, engDoc) their names, so no older engine is printed even before the script fills them. Only the markup before the
+    first script is touched; the records and the engine's code are never rewritten here."""
+    import html as _html
+    cut = page.find("<script")
+    cut = len(page) if cut < 0 else cut
+    head, tail = page[:cut], page[cut:]
+    head = re.sub(r'(<[^<>]*\bdata-rec="build\.(engine|digest)"[^<>]*>)[^<]*(?=<)',
+                  lambda m: m.group(1) + _html.escape(str(build.get(m.group(2)) or "")), head)
+    n = str(build.get("engine") or "").rsplit("v", 1)[-1]
+    if n.isdigit():
+        head = re.sub(r'(<code id="engJson">)[^<]*(?=<)', lambda m: m.group(1) + f"OMNI_V{n}.json", head)
+        head = re.sub(r'(<code id="engDoc">)[^<]*(?=<)', lambda m: m.group(1) + f"docs/OMNI_V{n}.md", head)
+    return head + tail
 
 
 def inject(page: str, key: str, value) -> str:
@@ -1449,7 +1518,7 @@ def main() -> int:
               "the prose stays as written for the older engine until it is realigned, and the page says so")
     if a.check:
         bad = [k for k in ("harness", "ctlrec", "scen", "runs", "fleet", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "audit", "glossary")
+                          "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "audit", "glossary", "field")
                if embedded(page, k) != rec[k]]
         # the build block: what the repository alone decides (the engine, its digest, the engines of the tables and the realms,
         # every benchmark's place and its tables) must be the page's; what GitHub said when the page was built (the run list,
@@ -1460,6 +1529,8 @@ def main() -> int:
             bad.append("build")
         if not write_appraisal(rec, check=True):
             bad.append("the appraisal's counts (docs/engine/APPRAISAL.md)")
+        if stamp_fallbacks(page, rec["build"]) != page:
+            bad.append("the static fallbacks (the engine's name and digest in the markup)")
         print("every record on the page is the repository's own run" if not bad else "differs from the repository's own run: " + ", ".join(bad))
         for k in bad:
             if k not in rec:          # the appraisal's counts are a file, not a record: named above, no record to compare
@@ -1469,8 +1540,9 @@ def main() -> int:
                 print(f"  {k}: first difference at {where[0]}: the page {where[1]}, the rebuild {where[2]}")
         return 1 if bad else 0
     for k in ("harness", "ctlrec", "scen", "runs", "fleet", "build", "whole", "gpurun", "cpuhost", "monitors", "engineruns", "heldout", "cpptwin",
-              "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "audit", "glossary"):
+              "beatsweep", "dial", "coremc", "onnative", "scenarios", "injgrid", "audit", "glossary", "field"):
         page = inject(page, k, rec[k])
+    page = stamp_fallbacks(page, rec["build"])   # the markup's fallbacks follow the build record, never a hand
     PAGE.write_text(page, encoding="utf-8")
     write_appraisal(rec)                      # the appraisal's counts follow the records, never a hand
     b = rec["build"]

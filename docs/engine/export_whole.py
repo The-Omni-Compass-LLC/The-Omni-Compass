@@ -186,8 +186,8 @@ def main(out):
             "groups": groups, "scenarios": [{"key": k, "name": n, "groups": list(g), "two_piece": list(t) if t else None} for k, n, g, t in SCENARIOS],
             "results": results, "separability": {"pairs": sep, "n": len(sep), "agree": sum(1 for s in sep if s.get("agree"))}, "beside": d.get("beside") or {},
             "rule": "R(g) = ∏ℓ Rℓ(g), log R = Σℓ log Rℓ, the variances added; a scenario sums the layers it stacks; the index is the mean of the gauge logarithms, "
-                    "its 95% interval under two bounds (the gauges independent; perfectly correlated); by the index's rule only what held the same way in all three "
-                    "of our runs enters, with every interval carried everything measured enters with its interval; each composed factor's word by the key's "
+                    "its 95% interval under two bounds (the gauges independent; perfectly correlated); two readings: by the index's rule, only what held the same way "
+                    "in all three of our runs enters; with every interval carried, everything measured enters with its interval; each composed factor's word by the key's "
                     "floor (0.5% or more by the gauge's aim, STEADY under it), whether its interval stands clear of no change said beside it"}
     Path(out).write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False), encoding="utf-8")
     for sk, R in results.items():

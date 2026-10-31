@@ -502,7 +502,7 @@ TERMS = [
       "and opposite push. Chosen for critical damping, k[d] = max(0, 2√(k[p]·τ/dt) − 1)·dt, the reading glides to the centre and "
       "stops, no overshoot, no ringing. Some wires set it at three times that, so a rising load is met before it reaches the wall "
       "(the Kubernetes governor, the GPU governors, the realms' arms and the grid's runner); the data stores' runners, the "
-      "orchestrator's brain and the other simulators keep the class's critical damping. The page's section 4g lists every wire, "
+      "orchestrator's brain and the other simulators keep the class's critical damping. The page's section 5h lists every wire, "
       "read from the repository at each build.",
       [(LAW, "K_D x velocity: whatever is shoving the position"),
        ("omni_controller/controller.py", "self.compass_law.kd *= 3.0"),
@@ -766,7 +766,7 @@ TERMS = [
       [(IGT, "one seed: every plant of every organism draws its demand noise, its weather and its disturbances from it"),
        (IGT, "The same injection reaches every organism and every arm.")], aka=["injection", "injections"]),
     T("the injection batch", G, "One set of the Python's 500 injections, named by its base and by the SHA-256 digest of the Python's "
-      "runs of it; the C++ engine runs the same seeds and must give the same digest (section 3o). Every cell of the injection grid is "
+      "runs of it; the C++ engine runs the same seeds and must give the same digest (section 5a). Every cell of the injection grid is "
       "drawn from one batch; another batch is another run in the key's sense, and three batches make a three-run reading.",
       [(IGT, "The batch. One set of the Python's jump generator (tools/engine_runs.py): base B, 500 injections, injection k drawing its")],
       aka=["injection batch", "batch of 500"]),
@@ -778,7 +778,7 @@ TERMS = [
       aka=["injection grid"]),
     T("organisms stacked", G, "In the injection grid, M copies of one organism run side by side on one clock, each on its own "
       "injection: separate clusters sharing no power line or room, every gauge the mean of the copies' per muscle. The scale grid "
-      "of section 4c stacks its copies in one body instead.",
+      "of section 5e stacks its copies in one body instead.",
       [(IGT, "copies are separate clusters on one clock: they share no power line or room, so a stacked run's every gauge is the mean of its")],
       aka=["stacked organisms"]),
     T("a governor's way", A, "The third arm in our models: a governor or orchestrator (the Kubernetes scheduler and its bin-packing "
@@ -786,7 +786,7 @@ TERMS = [
       "KubeEdge, Nephio) as the body of the catalog muscles that stand for its knobs, sitting on the organism's clock on the same "
       "injections; Omni-Compass on top of the governor governs both bodies. Read per muscle, like for like. Its knobs run under "
       "their own native controllers, so it reads native's work index by construction; the governors as their projects ship them "
-      "run on real Kubernetes in section 3i (class L).",
+      "run on real Kubernetes in section 4e (class L).",
       [(IGT, "The governors, the third arm. Each of the fourteen governors and orchestrators the founder named is its own body of the"),
        (IGT, "Per muscle. Every gauge is read per muscle")], aka=["third arm", "governor's way"]),
     T("a cell's reference", G, "IG/base/organism/way|against/NxM/gauge: the name of one cell of the injection grid (for example "
@@ -980,7 +980,7 @@ TERMS = [
       "writes through a two-way plug, reads each write back, audits, hands back gradually and stops at the kill switch, on top of "
       "every native controller.", [(FP, "| Supervisory governor | reads the whole body every beat, decides with one law across every muscle")],
       aka=["supervisory governor", "governor"]),
-    T("the dashboards", W, "The page's section 1b: the live benchmark engine in nine forms an operations team reads (a board of panels, a host "
+    T("the dashboards", W, "The page's section 3i: the live benchmark engine in nine forms an operations team reads (a board of panels, a host "
       "map, a graph, an event stream, a cluster console, a one-line diagram, a wall of numbers, the cost by body part, and "
       "Omni-Compass's own two-way pipeline), by muscle, body part or the whole organism.",
       [(PAGE_F, "The dashboards: the live benchmark engine in every form an operations team reads a system")], aka=["dashboards", "host map"]),
