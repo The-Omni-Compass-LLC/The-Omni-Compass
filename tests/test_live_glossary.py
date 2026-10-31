@@ -26,17 +26,17 @@ REQUIRED = ["GAIN", "STEADY", "LOSS", "power given", "the runs disagree", "do no
             "the compass", "the compass law", "the band", "the cushion", "the centre",
             "the two antagonist forces", "k[p]", "k[d]", "A", "tanh", "the max", "the tune-down", "the dial", "one pedal",
             "lift-off", "cruise", "the lease", "the kill switch", "the snapshot", "the two-way plug", "the four pieces",
-            "piece 1: the state (E, U, I[U], the basin)", "piece 2: the basin's potential and flow (S, Φ(S))",
-            "piece 3: the bath (B, Ḃ)", "piece 4: the governor coupling every muscle to one law", "ρ*", "κ", "h", "calm", "σ",
-            "ν", "the organs and their grants (θ)", "the immune system", "the nervous system", "the heat debt", "the twin",
+            "piece 1, the state and the basin", "piece 2, the basin's potential and flow",
+            "piece 3, the bath", "piece 4, the governor's law", "ρ*", "κ", "h", "calm", "σ",
+            "ν", "the organs and their grants", "the immune system", "the nervous system", "the heat debt", "the twin",
             "the bone", "the edge", "the verdict", "the give-back trial", "the model gate", "the fingerprint and its digest",
             "the seal", "evidence classes P, L, S", "three runs A, B and C", "the 95% interval on Student's t", "the 0.5% floor",
             "the heartbeat", "the fast checks", "the conveyance", "the organism", "muscle", "realm", "family", "template",
-            "knob", "the spine", "the stack", "the tower", "the orchestra", "the grid (copies × runs)", "protocol 4",
+            "knob", "the spine", "the stack", "the tower", "the orchestra", "the grid", "protocol 4",
             "the conductor", "Omni index", "the benefit board", "the traffic signal", "REDLINING", "STEADY", "GAINING",
             "native's colour", "Omni-Compass's blue", "a changed tune's violet", "the cloud as the wire",
             "the three places Omni-Compass lives", "Monte Carlo", "RK4", "the jump generator", "the C++ twin",
-            "the mechanism panel"]
+            "Mechanism Knobs"]
 
 
 class LiveGlossary(unittest.TestCase):

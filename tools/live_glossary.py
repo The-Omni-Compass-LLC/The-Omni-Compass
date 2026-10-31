@@ -148,12 +148,12 @@ def groups(rows) -> list[dict]:
                 for fid, v in f.items()]
 
     spine = [r for r in rows if is_spine(r)]
-    out.append({"key": RR.SPINE, "title": f"The spine: {len(spine)} muscles in all four realms, an organism of its own",
+    out.append({"key": RR.SPINE, "title": "Spine", "note": f"{len(spine)} muscles in all four realms; an organism of its own",
                 "families": fams(spine)})
     for k in REALM_KEYS:
         own = [r for r in rows if r["realm"] == k and not is_spine(r)]
         n = sum(1 for r in rows if k in r["realms"].split(";"))
-        out.append({"key": k, "title": f"{REALM_NAMES[k]}: {len(own)} muscles of its own, {n} in its organism with the spine",
+        out.append({"key": k, "title": REALM_NAMES[k], "note": f"{len(own)} muscles of its own; {n} in its organism with the spine",
                     "families": fams(own)})
     return out
 
@@ -202,10 +202,10 @@ def organisms(rows) -> list[dict]:
     orch = bodies(rows)
     six = sixty_rows()
     out = [{
-        "key": RR.SPINE, "name": RR.NAMES[RR.SPINE], "class": "S", "muscles": len(spine), "families": family_list(spine),
+        "key": RR.SPINE, "name": "Spine", "class": "S", "muscles": len(spine), "families": family_list(spine),
         "meaning": (f"The {len(spine)} muscles every real stack runs on, every one in all four realms: the computers' scheduling, "
                     f"placement, processors and memory, network, storage, observability, security, power and cooling, "
-                    f"{len(family_list(spine))} families. An organism in its own right since 16 October, the seventh, run "
+                    f"{len(family_list(spine))} families. An organism in its own right, the seventh, run "
                     "native and with Omni-Compass on top of native like the other six: the base every stack runs on, as an "
                     "operating system is the base of every program. Each spine muscle is also part of every realm's organism, "
                     "counted once in the tower and four times in the stack."),
@@ -231,7 +231,7 @@ def organisms(rows) -> list[dict]:
             "aka": realm_aka[k]})
     stack_n = sum(len(by[k]) for k in REALM_KEYS)
     out.append({
-        "key": STACK, "name": RR.NAMES[STACK], "class": "S", "muscles": stack_n, "distinct": len(rows),
+        "key": STACK, "name": "Four Stacked", "class": "S", "muscles": stack_n, "distinct": len(rows),
         "families": family_list(rows, weight=lambda r: len(r["realms"].split(";"))),
         "meaning": (f"The four realms stacked on one clock with every duplicate of the spine kept ({stack_n:,} muscles: the "
                     f"spine once in each realm's body). Each realm keeps its own body, so every muscle in the stack runs exactly "
@@ -240,9 +240,9 @@ def organisms(rows) -> list[dict]:
                     {"file": "CLAUDE.md", "quote": "the four stacked (1,908, the spine once in each realm's body)"}],
         "aka": ["the four stacked", "four stacked"]})
     out.append({
-        "key": TOWER, "name": RR.NAMES[TOWER], "class": "S", "muscles": len(rows), "families": family_list(rows),
+        "key": TOWER, "name": "Whole Tower", "class": "S", "muscles": len(rows), "families": family_list(rows),
         "meaning": (f"The whole catalog as one body, every muscle once: {len(rows):,} distinct muscles in "
-                    f"{len(family_list(rows))} families, the founder's nine open-source pieces among them (Kepler, Climatik, "
+                    f"{len(family_list(rows))} families, nine open-source pieces among them (Kepler, Climatik, "
                     "EAR, CruiseKube, Goldilocks, the Kubernetes Power Manager, PEAKS, Adaptive GPU Power Capping, NVIDIA's "
                     "platform power manager)."),
         "sources": [{"file": "CLAUDE.md", "quote": "the whole tower (1,107 distinct muscles in 70 families"},
@@ -250,14 +250,14 @@ def organisms(rows) -> list[dict]:
         "aka": ["the whole tower", "the tower"]})
     govs = [{"slug": slug, "name": name, "muscles": len(orch[slug])} for slug, name, *_ in GOVERNORS]
     out.append({
-        "key": ORCHESTRA, "name": "The orchestra, every governor's muscle once", "class": "S", "muscles": len(orch[ORCHESTRA]),
+        "key": ORCHESTRA, "name": "Orchestra Organism", "class": "S", "muscles": len(orch[ORCHESTRA]),
         "families": family_list(orch[ORCHESTRA]), "governors": govs,
-        "meaning": (f"The eighth organism (the founder's word of 19 October, night): every catalog muscle that stands for a knob "
-                    f"of a governor or orchestrator he named ({len(govs)}: " + ", ".join(g["name"] for g in govs) +
+        "meaning": (f"The eighth organism: every catalog muscle that stands for a knob "
+                    f"of one of {len(govs)} governors and orchestrators (" + ", ".join(g["name"] for g in govs) +
                     f"), each governor's muscles a body of its own and all of them together one body, {len(orch[ORCHESTRA])} "
                     "muscles, native and with Omni-Compass on top, modelled. The governors themselves run live on real "
                     "Kubernetes, each as its project ships it with Omni-Compass on top."),
-        "sources": [{"file": "tools/run_orchestra.py", "quote": "every catalog muscle that stands for a knob of a governor or orchestrator he named"},
+        "sources": [{"file": "tools/run_orchestra.py", "quote": "every catalog muscle that stands for a knob of a governor or orchestrator"},
                     {"file": "CLAUDE.md", "quote": "governors and orchestrators in their own"}],
         "aka": ["the orchestra", "orchestra"]})
     parts = OrderedDict()
@@ -265,7 +265,7 @@ def organisms(rows) -> list[dict]:
         parts.setdefault(r["part"], []).append(r["muscle_id"])
     dup = sorted(n for n, c in Counter(r["muscle"] for r in rows).items() if c > 1)
     out.append({
-        "key": SIXTY, "name": "The live benchmark engine's organism: sixty muscles, twelve in each of five body parts", "class": "S",
+        "key": SIXTY, "name": "Live Organism", "class": "S",
         "muscles": len(six), "families": family_list(six),
         "parts": [{"part": p, "muscles": ids, "organ": PART_ORGAN[p][0], "theta": PART_ORGAN[p][1]} for p, ids in parts.items()],
         "meaning": ("The sixty muscles the page draws, twelve from the spine and twelve from each realm, put in one organism of "
@@ -300,7 +300,7 @@ def whole_organism() -> dict:
                         "layers": [no.get(n) or EXPORT_WHOLE.NOT_RUN.get(n, f"layer {n}: not yet run") for n in nos]})
     ways = [{"key": k, "name": name, "pieces": list(p)} for k, name, p, _ in EXPORT_WHOLE.SCENARIOS]
     return {
-        "key": WHOLE, "name": "The whole organism, every way it is bought", "class": "S of P and L", "muscles": None,
+        "key": WHOLE, "name": "Whole Organism", "class": "S of P and L", "muscles": None,
         "layers": len([s for g in sectors for s in g["layers"]]), "families": [], "sectors": sectors, "ways": ways,
         "meaning": ("Omni-Compass at every layer of a stack, each layer measured against its own native with the layer under it "
                     "as native runs it, composed by the product law into one benefit for the whole stack. Three sectors: the "
@@ -361,9 +361,9 @@ def T(term, group, d, sources, aka=(), note=None):
     return t
 
 
-R, A, L, B, D, P, C, G, W = ("Reading a result", "The arms and where Omni-Compass sits", "The law and the plug", "The brain and its nerves",
-                             "Driving it", "Proof and evidence", "The catalog and the organisms", "The runs and the grid",
-                             "The page")
+R, A, L, B, D, P, C, G, W = ("Result Readings", "Arms and Placement", "Compass Law and Plug", "Brain and Nervous System",
+                             "Controls and Tuning", "Proof and Evidence", "Catalog and Organisms", "Runs and Grid",
+                             "Page and Monitors")
 IGT = "tools/injection_grid.py"   # the injection grid (25 October)
 FP = "docs/FACTORY_PROFILE.md"    # the common language of the factory profile, the tuning bench and the bill (24 October)
 PAGE_F, CL, DIS, RD, MAN = ("docs/engine/OMNI_COMPASS_LIVE_ENGINE.html", "CLAUDE.md", "DISCLOSURES.md", "tools/readings.py",
@@ -401,12 +401,11 @@ TERMS = [
       "Grey.", [(RD, "SHOWN = \"shown, not judged\"                 # declared in advance as shown only")], aka=["shown, not judged"]),
     T("the 0.5% floor", R, "A change of half of one percent (0.5%) or more either way is a change: GAIN, LOSS or power given by "
       "what the gauge is for. The change is the mean of the three runs' changes, each in percent of native; a mean under 0.5% "
-      "reads STEADY, under the floor, with its size. The floor is the founder's order of 20 October 2026; that every change of "
-      "0.5% or more shows its word, his order of 24 October.",
+      "reads STEADY, under the floor, with its size; every change of 0.5% or more shows its word.",
       [(RD, "percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge "),
        (RD, "A mean under 0.5% reads **STEADY, under the floor**, with its size.")],
       aka=["the floor", "under the floor", "0.5%"]),
-    T("the raw change and the word", R, "Two numbers, never mixed (the referee's work order of 25 October): every row shows native's "
+    T("the raw change and the word", R, "Two numbers, never mixed: every row shows native's "
       "value, Omni-Compass's value and the raw change, (Omni-Compass − native) / native, with its true sign; the word beside it is "
       "judged by what the gauge is for, and the size printed beside a word carries no sign. A wait that fell 3% prints raw −3.0% and "
       "GAIN 3.0%; failed requests that rose 2% print raw +2.0% and LOSS 2.0%.",
@@ -449,14 +448,14 @@ TERMS = [
       [(CL, "Omni on native is Omni on top of Kubernetes on top of the muscles")],
       aka=["Omni-Compass on native", "Omni-Compass and native", "Omni on native", "on top of native"]),
     T("the yardstick", A, "Kubernetes' published autoscaling rule, written by us from its documentation (a description of a rule, "
-      "not Kubernetes' code): the native that Omni-Compass on native is read against in the real three-run test of the page's "
-      "bottom line.",
+      "not Kubernetes' code): the native that Omni-Compass on native is read against in the real three-run test of section 2a, "
+      "the Scorecard.",
       [("docs/OMNI_ORCHESTRATOR.md", "as the yardstick Omni is read against")], aka=["yardstick"]),
     T("the three places Omni-Compass lives", A, "Omni-Compass sits at both ends of the cloud's wire and at every layer between: "
       "the software end (the cluster, Kubernetes, its add-ons, its governors and the services on it), the cloud between them (the "
       "machines it bills, metered) and the bare metal (the card, the chip, and the machine: the kernel, bare metal, Kepler).",
       [("tools/whole_system.py", "Omni-Compass sits at both ends and at every layer between"),
-       ("docs/engine/export_whole.py", "The bare metal: the card (the chip) and the machine (the kernel, bare metal, Kepler)")],
+       ("tools/whole_system.py", "the machine (the kernel, bare metal, Kepler)")],
       aka=["bare metal", "the software end"]),
     T("the cloud as the wire", A, "The cloud is the wire between the chip at one end and the software at the other. A cloud run "
       "can show only the bill of the machines it parks: through the cloud the bare metal belongs to the provider (no tenant can "
@@ -535,27 +534,27 @@ TERMS = [
       "(piece 4). The mechanism panel turns each piece's constants live.",
       [(THEO, "the four pieces appear as the engine's state equations (piece 1: deviation, alignment, memory and basin)")],
       aka=["four pieces", "the brain's four pieces"]),
-    T("piece 1: the state (E, U, I[U], the basin)", B, "Energy E (dE/dt = −α_E E + β_int + β_ext + v_eff: how fast stress energy "
+    T("piece 1, the state and the basin", B, "Energy E (dE/dt = −α_E E + β_int + β_ext + v_eff: how fast stress energy "
       "drains), unity U on a double well with two basins at U = ±1 (dU/dt = μU(1 − U²) − (dE/dt)/E_max − λ_U U + u), and its "
       "integral I[U], the remembered shortfall (dI_U/dt = (1 − U) − σ₁E − δS − λ_I I_U). The command u = −U̇ + K[P]·(1 − U), "
       "bounded by U[auth], brings unity back to its basin at U = 1.",
-      [(PAGE_F, "Piece 1 · the state: energy E, unity U, its integral I[U], the basin"),
+      [(PAGE_F, "Piece 1, State and Basin"),
        (CORE, "(2) dU/dt = mu U (1 - U^2) - (dE/dt)/E_max - lambda_U U + u")],
       aka=["E, U, I[U]", "I_U", "I[U]", "unity U", "the basin"]),
-    T("piece 2: the basin's potential and flow (S, Φ(S))", B, "dS/dt = δ − α_s S − ¾β_s S² = −Φ′(S), with "
+    T("piece 2, the basin's potential and flow", B, "dS/dt = δ − α_s S − ¾β_s S² = −Φ′(S), with "
       "Φ(S) = α_s S²/2 + β_s S³/4 − δS: the basin state S rolls down its potential Φ(S) to a stable bottom, S*, the root of "
       "dS/dt = 0.",
       [(CORE, "(5) Phi(S) = alpha_s S^2 / 2 + beta_s S^3 / 4 - delta S"),
        (THEO, "the basin state S rolls down its potential Phi(S) to a stable bottom")], aka=["Φ(S)", "Phi(S)"]),
-    T("piece 3: the bath (B, Ḃ)", B, "A damped oscillator driven by the flow: dB/dt = Ḃ, dḂ/dt = γ_c δS − (ω_B/Q_B)Ḃ − ω_B² B; its "
+    T("piece 3, the bath", B, "A damped oscillator driven by the flow: dB/dt = Ḃ, dḂ/dt = γ_c δS − (ω_B/Q_B)Ḃ − ω_B² B; its "
       "beat enters energy through v_eff = cos(ω_B t/2)·c·tanh(λ₀ + λ₁(U − ½) + λ₂S). In the theory, the bath that absorbs and "
       "redistributes.",
       [(CORE, "(7) dB/dt = B_dot ; dB_dot/dt = gamma_c delta S - (omega_B/Q_B) B_dot - omega_B^2 B"),
-       (PAGE_F, "Piece 3 · the bath: B, Ḃ")], aka=["the bath", "B_dot"]),
-    T("piece 4: the governor coupling every muscle to one law", B, "The governor's law (omnicompass/adapter.py, nervous_system.py): "
+       (PAGE_F, "Piece 3, Bath")], aka=["the bath", "B_dot"]),
+    T("piece 4, the governor's law", B, "The governor's law (omnicompass/adapter.py, nervous_system.py): "
       "push and the utilisation target ρ* from the state, and the nerves' grants to every organ: one law for every muscle, with "
       "no outside authority.",
-      [(PAGE_F, "Piece 4 · the governor: one law coupling every muscle"),
+      [(PAGE_F, "Piece 4, Governor Law"),
        (THEO, "the one governor that couples every muscle to one law with no outside authority (piece 4)")],
       aka=["one law coupling every muscle", "the governor's law"]),
     T("RK4", B, "The fourth-order Runge–Kutta step that integrates the engine's six states (E, U, I_U, S, B, Ḃ): ten micro steps "
@@ -585,7 +584,7 @@ TERMS = [
       "at most the calm share of their surplus a decision.",
       [(NERV, "in [0, 1]; 1 means fully settled"),
        (MAN, "the nerves' one number, against which each organ's threshold θ grants a hand-back")], aka=["calm"]),
-    T("the organs and their grants (θ)", B, "The organ families the nerves grant authority to: pods, nodes, cpufreq, gpu, power, "
+    T("the organs and their grants", B, "The organ families the nerves grant authority to: pods, nodes, cpufreq, gpu, power, "
       "batch, routing and rollback. Expanding is always allowed except during a security hold; contracting (giving capacity "
       "back) only when calm ≥ the organ's reversibility threshold θ (pods 0.5; nodes 0.7, since a node costs a boot to reverse; "
       "cpufreq, gpu and power 0.3; routing 0.5) and the service is clean.",
@@ -633,7 +632,7 @@ TERMS = [
       [("realms/plants.py", "through a release gate (nothing waiting, and after the release the rest runs at or under the engine's utilisation target)")],
       aka=["release gate"]),
     # ------------------------------------------------------------------------------------------------------- driving it
-    T("the max", D, "The default brain (12 October): every muscle runs at its own limit, never past it and never below native; it "
+    T("the max", D, "The default brain: every muscle runs at its own limit, never past it and never below native; it "
       "rides the edge, not the middle. The energy it takes is power given, shown beside the work, the speed and the wear it "
       "bought, never called a loss.",
       [(CL, "every muscle runs at its own limit, never past it and never below native; it rides the edge, not the middle")],
@@ -772,7 +771,7 @@ TERMS = [
       aka=["injection batch", "batch of 500"]),
     T("the injection grid", G, "Every organism with a plant, each native and with Omni-Compass on native, and each of the fourteen "
       "governors sitting on it, on one injection batch, at 1, 10, 100 and 500 runs × 1, 10, 100 and 500 organisms stacked (section "
-      "4b). Run k of a cell stacks M copies, copy c on injection k + c (mod 500); each cell is read by the key over its N runs. The "
+      "5c). Run k of a cell stacks M copies, copy c on injection k + c (mod 500); each cell is read by the key over its N runs. The "
       "page re-hashes the record and recomputes every cell's mean from the runs' means. Class S.",
       [(IGT, "The grid. Runs N in 1, 10, 100, 500 and organisms stacked M in 1, 10, 100, 500.")],
       aka=["injection grid"]),
@@ -787,7 +786,7 @@ TERMS = [
       "injections; Omni-Compass on top of the governor governs both bodies. Read per muscle, like for like. Its knobs run under "
       "their own native controllers, so it reads native's work index by construction; the governors as their projects ship them "
       "run on real Kubernetes in section 4e (class L).",
-      [(IGT, "The governors, the third arm. Each of the fourteen governors and orchestrators the founder named is its own body of the"),
+      [(IGT, "The governors, the third arm. Each of the fourteen governors and orchestrators"),
        (IGT, "Per muscle. Every gauge is read per muscle")], aka=["third arm", "governor's way"]),
     T("a cell's reference", G, "IG/base/organism/way|against/NxM/gauge: the name of one cell of the injection grid (for example "
       "IG/1488855732/tower/on_native|native/500x1/work), printed under the cell, copied by its button and typed back into the "
@@ -838,11 +837,11 @@ TERMS = [
       aka=["the four stacked", "four stacked"]),
     T("the tower", C, "The whole catalog as one body, every muscle once: 1,107 distinct muscles in 70 families.",
       [(CL, "the whole tower (1,107 distinct muscles in 70 families")], aka=["the whole tower", "tower"]),
-    T("the orchestra", C, "The eighth organism: every catalog muscle that stands for a knob of the governors and orchestrators the "
-      "founder named (the Kubernetes scheduler, Kueue, Volcano, the KAI scheduler, Koordinator, CruiseKube, Crane, KubeRay, Gödel, "
+    T("the orchestra", C, "The eighth organism: every catalog muscle that stands for a knob of the fourteen governors and orchestrators "
+      "(the Kubernetes scheduler, Kueue, Volcano, the KAI scheduler, Koordinator, CruiseKube, Crane, KubeRay, Gödel, "
       "Armada, Karmada, Open Cluster Management, KubeEdge, Nephio), each governor's muscles a body of its own and all together "
       "one body, native and with Omni-Compass on top, modelled.",
-      [("tools/run_orchestra.py", "every catalog muscle that stands for a knob of a governor or orchestrator he named")],
+      [("tools/run_orchestra.py", "every catalog muscle that stands for a knob of a governor or orchestrator")],
       aka=["the orchestra", "orchestra"]),
     T("the seven organisms", C, "The spine, the four realms, the four stacked and the whole tower: each run native and with "
       "Omni-Compass on top of native on the same seed, the same load and the same clock.",
@@ -863,7 +862,7 @@ TERMS = [
       [("realms/harness.py", "the line: work already waiting when the run starts, a quarter of the work the run itself brings"),
        ("tools/run_realms_v5.py", "the arm that clears it sooner is faster")],
       aka=["work waiting in line", "waiting in line"]),
-    T("the grid (copies × runs)", G, "Each organism native and with Omni-Compass at 1, 10 and 100 copies × 1, 10 and 100 paired "
+    T("the grid", G, "Each organism native and with Omni-Compass at 1, 10 and 100 copies × 1, 10 and 100 paired "
       "runs, modelled and with the real cluster inside, both values in every square; the 1,000 tier on GitHub's own machines "
       "only; paid cloud and GPU runs stay at 1, 10 and 100 copies with at most 100 repetitions. Copies is the size of the body one "
       "brain governs; runs is the number of independent paired trials.",
@@ -887,8 +886,8 @@ TERMS = [
     T("the benefit board", W, "Every benchmark's measured effect in one board, native against Omni-Compass on top of native, by "
       "domain and by gauge family, with the Omni index that weighs them together; every bar is its table's own word (GAIN green, "
       "STEADY yellow, LOSS red, power given blue) beside its size.",
-      [(PAGE_F, "every benchmark's measured effect in one board")], aka=["benefit board"]),
-    T("the traffic signal", W, "Every monitor's light, read on its band (the founder's words of 25 October): green GAINING, low in its "
+      [(PAGE_F, "measured effect in one board")], aka=["benefit board"]),
+    T("the traffic signal", W, "Every monitor's light, read on its band: green GAINING, low in its "
       "band with room to climb; yellow STEADY, inside its band; red REDLINING, at the top of its band and holding there, blinking red "
       "and black; red OVER THE LINE, past its band, blinking red and white; grey, and said so, where there is no line. On a record "
       "the colour is the reading's word: GAIN green, STEADY yellow, LOSS red. A needle that falls is not a LOSS and one that rises is "
@@ -917,8 +916,8 @@ TERMS = [
       "it does.", [(PAGE_F, "AWAITING: the run that fills this monitor has not landed yet; its light stays dark until it does, never green")],
       aka=["AWAITING"]),
     T("native's colour", W, "Orange (#ff8a1f, the page's --steel): the word native and every line, bar, lane, tile and number that "
-      "belongs to native's side wear it, the founder's order of 24 October. Red is only a LOSS and the alarm.",
-      [(PAGE_F, "the sides: --brass is Omni-Compass (blue), --steel is Native (orange, the founder's order of 24 October; red is only LOSS and the alarm)"),
+      "belongs to native's side wear it. Red is only a LOSS and the alarm.",
+      [(PAGE_F, "the sides: --brass is Omni-Compass (blue), --steel is Native (orange"),
        (MAN, "| Orange | native |")], aka=["orange"]),
     T("the heartbeat's six buttons", D, "On the page the governor's full decision comes at one of six beats, 10, 15, 30, 60, 90 or "
       "120 s; 10 s shows a beat below the 15 s standard. The factory's beat is the engine's own (60 s on omni-v19). The page's "
@@ -984,18 +983,18 @@ TERMS = [
       "map, a graph, an event stream, a cluster console, a one-line diagram, a wall of numbers, the cost by body part, and "
       "Omni-Compass's own two-way pipeline), by muscle, body part or the whole organism.",
       [(PAGE_F, "Dashboards")], aka=["dashboards", "host map"]),
-    T("the contract, this decision", W, "The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the "
+    T("contract, this decision", W, "The decision on screen in the symbols of the factory profile's mathematics: k, Δ, θ, the "
       "settings requested u[req](k), commanded u[cmd](k) = Π[C](u[req](k)) and acknowledged u[ack](k) = R(u[cmd](k)), computed on the "
-      "live model.", [(FP, "u[cmd](k) = Π[C](u[req](k))"), (PAGE_F, "the contract, this decision")], aka=["the contract"]),
-    T("the same press on a running system", D, "The line under the main control panel's master row: after every press, the request "
+      "live model.", [(FP, "u[cmd](k) = Π[C](u[req](k))"), (PAGE_F, "contract, this decision")], aka=["the contract"]),
+    T("governor request", D, "The row under the fuse box's master switches: after every press, the request "
       "a running governor takes for it through its control panel (tools/omni_control.py), with its role; the page sends nothing.",
-      [(PAGE_F, "the same press on a running system")], aka=["the same press"]),
-    T("Metrics (Prometheus)", W, "The control panel's tab that prints the live model in Prometheus's text exposition format, with the "
+      [(PAGE_F, "governor request")], aka=["governor request", "the same press"]),
+    T("Prometheus Metrics", W, "The fuse box's tab that prints the live model in Prometheus's text exposition format, with the "
       "series a running system serves beside each one and the PromQL the Grafana wall draws it with.",
-      [(PAGE_F, "Metrics: this page's live model as a Prometheus endpoint")], aka=["Metrics tab", "Prometheus"]),
-    T("Commands", D, "The control panel's tab that lists every control beside the request a running governor takes for it and its "
+      [(PAGE_F, "Prometheus Metrics Endpoint")], aka=["Metrics tab", "Prometheus"]),
+    T("Commands", D, "The fuse box's tab that lists every control beside the request a running governor takes for it and its "
       "role; the mechanism's knobs and the plant's conditions have none.",
-      [(PAGE_F, "Commands: every control beside what a running system takes for it")], aka=["Commands tab"]),
+      [(PAGE_F, "Governor API Commands")], aka=["Commands tab"]),
     T("the monitor wall stack", W, "deploy/wall: Prometheus, Grafana with the Omni-Compass wall loaded, Alertmanager with the "
       "governor's alert rules, node_exporter and the governor's exporter, in one command; it reads and writes nothing.",
       [("deploy/wall/README.md", "One command stands up the wall an operations team already knows how to read")], aka=["deploy/wall"]),
@@ -1015,21 +1014,21 @@ TERMS = [
       "a side and never a reading's colour.",
       [(PAGE_F, "a knob or profile turned from the factory tune: violet, never a side and never a reading's colour")],
       aka=["violet"]),
-    T("the mechanism panel", W, "The engine's own knobs, live: the four pieces of the brain, the compass law, Omni-Compass's hand on "
+    T("Mechanism Knobs", W, "The engine's own knobs, live: the four pieces of the brain, the compass law, Omni-Compass's hand on "
       "each muscle (the max's push and lift-off, the tune-down's floor, step and dwell), native's own controller (its target, "
       "tolerance, step and window) and every muscle's scale out, scale in, scale up, response time and sensing delay. They turn "
       "the engine's own equations while it runs, on both governed arms; a knob turned from the factory turns violet, ↺ puts it "
       "back, and the factory button puts every one back. A tune other than the factory's is a variation of the mechanism (class "
       "S).",
-      [(PAGE_F, "the mechanism panel (24 October): the engine's own knobs, live"),
+      [(PAGE_F, "the engine's own knobs, live"),
        (PAGE_F, "these turn the engine's own equations while it runs")], aka=["mechanism panel", "the mechanism's own knobs"]),
-    T("the switchboard", W, "One set of knobs that sets the arm, the organism, the copies, the runs, the run letter and the beat on "
+    T("Variation Switchboard", W, "One set of knobs that sets the arm, the organism, the copies, the runs, the run letter and the beat on "
       "every monitor that carries that variation, and names the ones that do not.",
       [(CL, "one switchboard sets the arm, the organism, the copies, the runs, the run letter and the beat on every monitor that carries that variation")],
       aka=["switchboard"]),
-    T("the monitor wall", W, "Every monitor of the page in one view, the first thing on the page, numbered 1 upward by importance: the "
-      "first twelve the system's most important, then four more blocks of about twelve, each its own subject, read left to right; "
-      "every canvas the page draws is one monitor, its small copy on the wall a tile.",
+    T("the monitor wall", W, "Every monitor of the page in one view (section 0), numbered 1 upward in five blocks of about twelve, "
+      "each its own subject (Benefit and Organism; Real Runs on GitHub; Brain and Mechanism; Clouds, Chips, Orchestrators and "
+      "Scale; Proof and Telemetry), read left to right; every canvas the page draws is one monitor, its small copy on the wall a tile.",
       [(MAN, "Every monitor of the page in one view"), ("docs/engine/monitors.json", "every canvas the page draws is one monitor")],
       aka=["monitor wall", "the wall", "monitor", "monitors"]),
     T("golden signals", W, "Latency, traffic, errors and saturation: on the wall, the work waiting, the work done, the decisions "

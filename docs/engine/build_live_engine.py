@@ -353,15 +353,15 @@ def board(runs: list, camp: dict | None = None) -> list:
                    else None if any(t["engine"] == stands for t in tables)
                    else ("run: every run stopped short" if "measured" not in sts else "run: its three-run table not yet written") if len(sts) == 3
                    else "in the reruns queue")
-        out.append({"group": "every benchmark, run again on the engine that stands", "name": name, "workflow": wf,
+        out.append({"group": "Reruns on the Engine That Stands", "name": name, "workflow": wf,
                     "tables": tables, "now": now, **({"abc": abc} if abc is not None else {})})
         if name == "1107 muscles and seven organisms":    # the eighth organism, the orchestra, beside the seven: its own runner
             oj = ROOT / "results" / "orchestra" / "ORCHESTRA.json"
-            out.append({"group": "every benchmark, run again on the engine that stands", "name": "the orchestra, the eighth organism (modelled)",
+            out.append({"group": "Reruns on the Engine That Stands", "name": "Orchestra Organism · Class S",
                         "workflow": "orchestra.yml", "tables": ([{"file": "results/orchestra/ORCHESTRA.md", "engine": json.loads(oj.read_text(encoding="utf-8"))["run"]["engine"]}]
                                                                if oj.exists() else []), "now": state("orchestra.yml") or (None if oj.exists() else "not yet run")})
     for t in found.values():   # a three-run table no campaign entry names: listed all the same, never left out
-        out.append({"group": "every benchmark, run again on the engine that stands", "name": XS.table_title(t["stem"]), "workflow": "",
+        out.append({"group": "Reruns on the Engine That Stands", "name": XS.table_title(t["stem"]), "workflow": "",
                     "tables": [{"file": f"results/live/{t['stem']}.md", "engine": f"omni-v{t['n']}"}], "now": None})
     for cloud, f, wf in (("Azure", "azure_queue.txt", "aks-metered.yml"), ("Google Cloud", "google_queue.txt", "gke-metered.yml"),
                          ("Amazon Web Services", "amazon_queue.txt", "eks-metered.yml")):
@@ -375,17 +375,17 @@ def board(runs: list, camp: dict | None = None) -> list:
             if "|" not in x:
                 continue
             label = x.split("|")[0]
-            out.append({"group": f"the cloud: {cloud}, at the tune-down on the machines alone (the bill)", "name": label, "workflow": wf,
+            out.append({"group": f"{cloud} Bill at the Tune-Down", "name": label, "workflow": wf,
                         "tables": [], "now": ("running now" if label.split()[0] in running_titles else "in the queue") if on else
-                        "not yet run: switched off until the founder turns it on"})
+                        "not yet run: its queue's switch is off"})
     gp = ROOT / "scripts" / "gpu_campaign_profiles.json"
     if gp.exists():
         g = json.loads(gp.read_text(encoding="utf-8"))
         for prof, v in g.get("profiles", {}).items():
             for scale in g.get("organism_scales", []):
-                out.append({"group": "the GPU chips on Lambda (class P, the card's own meter)", "name": f"{prof} ({v.get('physical_gpus')} "
+                out.append({"group": "GPU Chips on Lambda · Class P", "name": f"{prof} ({v.get('physical_gpus')} "
                             f"GPU{'s' if v.get('physical_gpus', 1) > 1 else ''}), {scale} cop{'y' if scale == 1 else 'ies'} of each organism",
-                            "workflow": v.get("script", ""), "tables": [], "now": "launched" if g.get("launch") else "not yet launched (the founder's exact commit first)"})
+                            "workflow": v.get("script", ""), "tables": [], "now": "launched" if g.get("launch") else "not yet launched: its runs start from one exact commit of the engine that stands"})
     return out
 
 

@@ -263,7 +263,7 @@ def standing_block(stands: str) -> list:
                     + " | ".join(cells) + f" | {runs} |")
     if not rows:
         return []
-    return [f"### On the engine that stands, {stands}: the newest real runs", "",
+    return [f"### Newest Real Runs on {stands}", "",
             f"Three separate runs (A, B and C) of each preregistered test on GitHub's own machines (class L, live software), native against "
             f"Omni-Compass on top of native, every run on {stands}. Each cell is the table's own reading, then each run's raw change, "
             "Omni-Compass against native, with its true sign.", "",
@@ -283,7 +283,7 @@ def markdown(m) -> str:
         counts = "; ".join(f"{n} {word}" for word, n in st["words"])
         older = (f" {st['older']} still stand on an older engine ({', '.join(st['older_engines'])}) until their {stands} runs land."
                  if st["older"] else "")
-        L.append(f"**{'Yes' if w == K.GAIN else 'No'}, on the engine that stands ({stands}), by the Omni index: {w}, {way}**, every real "
+        L.append(f"**On the engine that stands ({stands}), the Omni index reads {w}, {way}**, every real "
                  f"test together ([`{INDEX_FILE}`]({INDEX_FILE})), each benchmark run three times (A, B and C) on GitHub's own "
                  f"machines. Of the {st['bench']} benchmarks on the benefit sheet ([`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md)), "
                  f"{st['on']} read {stands}'s own three-run table: {counts}; every LOSS row is named with its cause in "
@@ -299,7 +299,7 @@ def markdown(m) -> str:
         ledger = (f" The LOSS ledger ([`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md)) lists every LOSS row of the newest tables, "
                   f"{led['all']} in all, {led['native']} of them Omni-Compass against its own native, the rows do no harm is judged by, "
                   f"each with its cause where one is written." if led else "")
-        L.append(f"**Not yet read on the engine that stands ({stands})**: the Omni index stands on "
+        L.append(f"**Not Yet Read on {stands}**: the Omni index stands on "
                  f"{(idx or {}).get('engine', 'no engine')} until {stands}'s tables land ([`{INDEX_FILE}`]({INDEX_FILE})).{on_its}{ledger}")
     L += [""] + standing_block(stands)
     s0 = m["scen"][0]
@@ -310,7 +310,7 @@ def markdown(m) -> str:
           f"{A['native']}, and the other side is {A['on_native']}. It is one test, not the figure of record. On top of native, "
           f"Omni-Compass did {100 * s0['work']:.1f}% more work than native, its 95th-percentile response time "
           f"{100 * abs(s0['p95']):.1f}% {'shorter' if s0['p95'] < 0 else 'longer'}."]
-    L += ["", "| Scenario | Signal | Work | Response (95th percentile) | Machines | Units |", "|---|---|---|---|---|---|",
+    L += ["", "| Arm | Signal | Work | Response, 95th percentile | Machines | Units |", "|---|---|---|---|---|---|",
           f"| **Native**: {A['native']}, on {A['where']} | {img('lead')} the baseline | the baseline | the baseline | the baseline | the baseline |"]
     for s in m["scen"]:
         r = s["rows"]
@@ -321,17 +321,15 @@ def markdown(m) -> str:
           "with its true sign, labelled raw. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, "
           f"never a LOSS. Source: [`{m['path']}`]({m['path']}), three runs on GitHub's own machines (A, B and C from one commit); runs "
           f"{', '.join(f'{k} {v}' for k, v in rec['runs'].items())}; commit `{rec['commit'][:12]}`. The record's other arm, Omni-Compass "
-          "alone on the muscles, stays in the record and is not carried here: Omni-Compass is never by itself (the founder's order of "
-          "25 October).", ""]
-    L += ["### The two bills", "",
-          "**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. Omni-Compass on the cloud alone can give only a "
-          "small cut in the bill, from the machines the cloud's own autoscaler made; the benefit lives at the two ends, in the software "
-          "and in the bare metal, and the cloud carries it.**", "",
+          "alone on the muscles, stays in the record and is not carried here: Omni-Compass is never by itself.", ""]
+    L += ["### Bill by Route", "",
+          "Omni-Compass on the cloud alone can give only a small cut in the bill, from the machines the cloud's own autoscaler made; the "
+          "benefit lives at the two ends, in the software and in the bare metal, and the cloud carries it.", "",
           "Each route's bill is its native total cost, then Omni-Compass's, then the saving: 1 − (the Omni-Compass total ÷ the native total), "
           "each total the sum of its non-overlapping cost components inside the declared boundary, on a matched workload "
           "(`docs/THE_TUNE.md`, section 8). A component's own percent is a supporting measurement, never the bill. Where a price or a "
           "component is missing the bill reads unresolved; no price is assumed.", "",
-          "| Route | The bill: native → Omni-Compass → saving | Supporting measurements |", "|---|---|---|"]
+          "| Route | Bill, native → Omni-Compass → saving | Supporting measurements |", "|---|---|---|"]
     on = m["scen"][0]["rows"]["machines"]
     L.append(f"| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the "
              f"energy is not yet measured on {m['stands']} | machines, Omni-Compass on top of native: {said(on, 'machines')} |")

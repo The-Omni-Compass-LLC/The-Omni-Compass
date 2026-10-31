@@ -237,7 +237,7 @@ def organisms():
                 if law is not None and getattr(law, "_twin", None) is not None:
                     law._twin["organism"] = name
                     law._twin["muscle"] = r["muscle_id"] + (f"@{REALMS[bi]}" if name == STACK else "")
-        out[name] = {"title": NAMES[name], "muscles": sum(len(rs) for rs in groups[name]), "laws": rec.laws}
+        out[name] = {"title": {SPINE: "Spine", STACK: "Four Stacked", TOWER: "Whole Tower"}.get(name, NAMES[name]), "muscles": sum(len(rs) for rs in groups[name]), "laws": rec.laws}
     return out
 
 

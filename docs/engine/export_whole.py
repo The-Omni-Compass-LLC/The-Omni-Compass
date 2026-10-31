@@ -49,19 +49,19 @@ GAUGE_WORDS = {"work": "work (more)", "speed": "speed (the 95th percentile respo
                "energy": "energy (less)", "bill": "the bill (smaller)"}
 # the three pieces a stack is bought in, each a group of the file's layers (matched by the layer's number in the file's own names)
 GROUPS = [
-    ("software", "The software: the cluster (Kubernetes, its add-ons, its governors) and the services on it", (3, 4)),
-    ("hardware", "The bare metal: the card (the chip) and the machine (the kernel, bare metal, Kepler)", (1, 2)),
-    ("cloud", "The cloud: the machines it bills, metered", (5,)),
+    ("software", "Software", (3, 4)),
+    ("hardware", "Bare Metal", (1, 2)),
+    ("cloud", "Cloud", (5,)),
 ]
 # every way a stack is bought (the founder's order of 20 October): on-site bare metal; through the cloud (three pieces, and the
 # cloud as two pieces beside it); in the device (the bare metal alone: Omni-Compass built into the card and the machine, nothing
 # else wired); as a service (the software alone: the owner has neither the bare metal nor the cloud account, Omni-Compass sits in
 # the software run for them). Each sums the layers of the pieces it names; a piece with no factor counts as exactly 1.
 SCENARIOS = [
-    ("onsite", "On-site bare metal: the software on the owner's own bare metal", ("software", "hardware"), None),
-    ("cloud", "Through the cloud: the cloud's build, its bare metal at the back end, the software", ("cloud", "hardware", "software"), ("cloud", "software")),
-    ("device", "In the device: the bare metal alone, Omni-Compass built into the card and the machine", ("hardware",), None),
-    ("service", "As a service: the software alone, run for an owner with neither bare metal nor a cloud account", ("software",), None),
+    ("onsite", "On-Site Bare Metal", ("software", "hardware"), None),
+    ("cloud", "Through the Cloud", ("cloud", "hardware", "software"), ("cloud", "software")),
+    ("device", "In the Device", ("hardware",), None),
+    ("service", "As a Service", ("software",), None),
 ]
 NOT_RUN = {2: "the machine (the kernel, bare metal, Kepler): not yet run (register row 79), enters as exactly 1"}
 Z95 = 1.959963984540054

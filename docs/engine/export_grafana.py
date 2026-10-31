@@ -104,12 +104,12 @@ def knobs() -> list:
                                    "query": {"query": query, "refId": name}, "definition": query, "includeAll": True, "multi": True,
                                    "allValue": ".*", "current": {"selected": True, "text": "All", "value": "$__all"}, "refresh": 2, "sort": 1}
     return [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "query": "prometheus", "current": {}, "hide": 0},
-            q("route", "Route (on-site or cloud)", "label_values(up, route)"),
+            q("route", "Route", "label_values(up, route)"),
             q("provider", "Provider", 'label_values(up{route=~"$route"}, provider)'),
             q("instance", "Machine", 'label_values(up{route=~"$route",provider=~"$provider"}, instance)'),
-            {"name": "window", "label": "Rate window", "type": "interval", "query": "1m,5m,15m,1h", "auto": False,
+            {"name": "window", "label": "Rate Window", "type": "interval", "query": "1m,5m,15m,1h", "auto": False,
              "current": {"text": "5m", "value": "5m"}},
-            {"name": "control", "label": "Control panel", "type": "textbox", "query": "http://localhost:9465",
+            {"name": "control", "label": "Control Panel URL", "type": "textbox", "query": "http://localhost:9465",
              "current": {"text": "http://localhost:9465", "value": "http://localhost:9465"}}]
 
 
@@ -130,16 +130,16 @@ def signals_row() -> list:
                                              "mappings": [{"type": "range", "options": {"from": a, "to": b, "result": {"text": w}}} for a, b, w in words]},
                                 "overrides": []}}
     g, y, r = "#50c878", "#f5c518", "#ff4d55"
-    return [{"id": 899, "type": "row", "title": "The signals: redlining, steady, accelerating", "collapsed": False, "gridPos": {"x": 0, "y": 0, "w": COLS * W, "h": 1}, "panels": []},
-            stat(1, 0, "The heartbeat: beats since the last decision", "(time() - omni_last_decision_timestamp_seconds) / clamp_min(omni_heartbeat_seconds, 5)",
+    return [{"id": 899, "type": "row", "title": "Governor Signals", "collapsed": False, "gridPos": {"x": 0, "y": 0, "w": COLS * W, "h": 1}, "panels": []},
+            stat(1, 0, "Beats Since Last Decision", "(time() - omni_last_decision_timestamp_seconds) / clamp_min(omni_heartbeat_seconds, 5)",
                  [{"color": g, "value": None}, {"color": y, "value": 1.5}, {"color": r, "value": 3}],
                  [(0, 1.5, "accelerating"), (1.5, 3, "steady"), (3, 1e9, "redlining")],
                  "Beats since the governor's last decision; three beats is the staleness alert's line (OmniGovernorStale)."),
-            stat(2, 6, "The senses: blind readings", "omni_sense_blind", [{"color": g, "value": None}, {"color": r, "value": 1}],
+            stat(2, 6, "Blind Sense Readings", "omni_sense_blind", [{"color": g, "value": None}, {"color": r, "value": 1}],
                  [(0, 0.5, "accelerating"), (0.5, 1e9, "redlining")], "1 while a sense the governor needs is unread; the engine holds and says why."),
-            stat(3, 12, "The master switch", "omni_master_switch", [{"color": r, "value": None}, {"color": g, "value": 1}],
+            stat(3, 12, "Master Switch", "omni_master_switch", [{"color": r, "value": None}, {"color": g, "value": 1}],
                  [(-1, 0.5, "OFF: native alone"), (0.5, 2, "ON")], "ON: Omni-Compass governs; OFF: the kill switch is pulled and native runs alone."),
-            stat(4, 18, "Alerts firing", 'sum(ALERTS{alertstate="firing"}) or vector(0)', [{"color": g, "value": None}, {"color": y, "value": 1}, {"color": r, "value": 2}],
+            stat(4, 18, "Alerts Firing", 'sum(ALERTS{alertstate="firing"}) or vector(0)', [{"color": g, "value": None}, {"color": y, "value": 1}, {"color": r, "value": 2}],
                  [(0, 0.5, "accelerating"), (0.5, 1.5, "steady"), (1.5, 1e9, "redlining")], "Alerts firing now across the wall (Prometheus's ALERTS series).")]
 
 
@@ -198,14 +198,14 @@ def dashboard(reg: dict) -> dict:
                            f"**{m['name']}** ({reg['layers'].get(m['layer'], m['layer'])}).\n\n{m['what']}\n\nSource: {m['feed']['exporter']}. "
                            f"No Prometheus series carries this panel: the live benchmark engine draws it from the repository's own records or from its own clock; "
                            f"this panel marks its place on the wall (monitor {n}).{LIGHT_WORDS}"}})
-    return {"uid": "omni-compass-wall", "title": "Omni-Compass: the monitor wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
+    return {"uid": "omni-compass-wall", "title": "Omni-Compass Monitor Wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "time": {"from": "now-6h", "to": "now"}, "refresh": "30s",
             "templating": {"list": knobs()},
-            "links": [{"title": "The governor's own screen", "type": "dashboards", "tags": ["omni-compass"], "asDropdown": False},
-                      {"title": "The control panel's buttons: Restore factory profile, Return to native, mode, dial, beat, each muscle", "type": "link",
+            "links": [{"title": "Governor Dashboard", "type": "dashboards", "tags": ["omni-compass"], "asDropdown": False},
+                      {"title": "Control Panel", "type": "link",
                        "url": "${control}/", "targetBlank": True, "icon": "bolt"},
-                      {"title": "Alertmanager: the alarms and their silences", "type": "link", "url": "http://localhost:9093", "targetBlank": True},
-                      {"title": "The live engine", "type": "link", "url": f"{REPO_URL}/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
+                      {"title": "Alertmanager", "type": "link", "url": "http://localhost:9093", "targetBlank": True},
+                      {"title": "Live Benchmark Engine", "type": "link", "url": f"{REPO_URL}/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
             "description": NOTICE,
             # the notice at the top and the end of the wall, where Grafana shows it (the underwriting seat of 24 October)
             "panels": [notice_panel(-1)] + signals_row() + panels + [notice_panel(max([p["gridPos"]["y"] + p["gridPos"]["h"] for p in panels] or [0]))],

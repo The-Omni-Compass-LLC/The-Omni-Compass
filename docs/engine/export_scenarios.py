@@ -250,9 +250,9 @@ def table_title(stem):
     title = text.splitlines()[0].lstrip("# ").split(": the A/B/C")[0].strip()
     for obj in ("service", "resource"):
         if f"(the objective: {obj})" in text:
-            title += f" (the verdict's objective: {obj})"
+            title += f", {obj} objective"
     if stem.endswith("_SHIPPED") and "as shipped" not in title:
-        title += " (native exactly as the vendor ships it)"
+        title += ", native as shipped"
     return title
 
 
@@ -449,10 +449,10 @@ def receipts():
 
 
 # ---- every muscle of the catalog and the seven organisms, on the engine that stands -----------------------------------
-ORGANISMS = {"spine": "The spine, the muscles every stack runs on", "compute_ai_cloud": "Compute / AI / Cloud",
+ORGANISMS = {"spine": "Spine", "compute_ai_cloud": "Compute / AI / Cloud",
              "physics_robotics_autonomous": "Physics / Robotics / Autonomous", "energy_facility_industrial": "Energy / Facility / Industrial",
-             "distribution_specialized": "Distribution / Specialized", "stack": "The four stacked, every shared muscle in each",
-             "tower": "The whole tower, every muscle once"}
+             "distribution_specialized": "Distribution / Specialized", "stack": "Four Stacked",
+             "tower": "Whole Tower"}
 REALM_CODE = {"compute_ai_cloud": "C", "physics_robotics_autonomous": "P", "energy_facility_industrial": "E", "distribution_specialized": "D"}
 
 
