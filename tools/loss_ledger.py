@@ -55,6 +55,14 @@ STORE_DECIDES = "the benchmark's three runs at one setting on the next engine"
 NO_WRITE = ("Omni-Compass wrote nothing in any repetition, so the two arms are one system and the difference is the rig's own "
             "noise between two native arms")
 NO_WRITE_DECIDES = "no engine moves it: more repetitions a run, to shrink the rig's noise"
+CAUSES_PAGE = "docs/LOSS_CAUSES_2026-10-31.md"
+POD_SHIFT = ("the shared test machine: Omni-Compass's arm starts its pods while the one runner every kind node shares is busier, "
+             "and starts more of them where its target moves, each start a wait native never paid because it never started the pod; "
+             "a pod created on a host 70% to 100% busy waits longer at the kubelet than one created at 0% to 50%, a stratum a real "
+             "cluster's own node never enters")
+POD_DECIDES = "the benchmark's three runs on the engine that stands, the host's busy share read beside the row"
+NEIGHBOUR_NEXT = ("the next version (conveyance that reads the neighbours' response lines where the rig publishes them and leaves "
+                  "every other pod its requests, the model gate first)")
 CAUSES = {
     ("KUBERAY_4W_BARE", ""): V13_FIX,
     ("ARMADA_4W_BARE", ""): ("suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent "
@@ -97,6 +105,44 @@ CAUSES = {
     ("YCSB_SERVICE", ""): ("latencies of 0.3 to 0.6 ms that moved 0.2% to 1.7%, beyond the noise in no run: a cache miss costs the "
                            "read nothing on this rig, so the cache's few moves bought and cost nothing; the rig's noise", STORE_PAGE,
                            "", "the benchmark's three runs on the next engine"),
+    # the 17 rows read from their own files on 31 October (docs/LOSS_CAUSES_2026-10-31.md): the pod start wait with
+    # tools/pod_phases.py, the rest from the governor's audit
+    ("ALL_FOUR", "pod start wait"): (POD_SHIFT + " (in the same stratum of host busy share its pods start 0.02 s faster; the "
+                                     "whole rise is the shift to a busier host)", CAUSES_PAGE, "", POD_DECIDES),
+    ("GOLDILOCKS", "pod start wait"): (POD_SHIFT + " (167 starts against native's 100, 125 of them while the host stood over 50% "
+                                       "busy; in the same stratum 0.03 s slower, the shift 0.27 s of the 0.31 s)", CAUSES_PAGE, "",
+                                       POD_DECIDES),
+    ("KEDA_CPU_REQUESTS", "pod start wait"): (POD_SHIFT + " (in the same stratum 0.01 s faster; the rise is the count of starts "
+                                              "and the shift)", CAUSES_PAGE, "", POD_DECIDES),
+    ("ROBUST_KILL", "pod start wait"): (POD_SHIFT + " (194 starts against native's 163; the shift 0.16 s of the 0.25 s, the same "
+                                        "stratum 0.09 s)", CAUSES_PAGE, "", POD_DECIDES),
+    ("ROBUST_LONG", "pod start wait"): (POD_SHIFT + " (in the same stratum 0.07 s faster; the shift 0.38 s against a rise of 0.31 s)",
+                                        CAUSES_PAGE, "", POD_DECIDES),
+    ("TRACE_GOOGLE2011", "pod start wait"): (POD_SHIFT + " (in the same stratum 0.11 s faster; the shift 0.23 s against a rise of "
+                                             "0.13 s)", CAUSES_PAGE, "", POD_DECIDES),
+    ("BATCH", "pod start wait"): ("22 pods started inside the windows where native started none (the web service's target moved "
+                                  "beside the queue): 17 on serving nodes at 1.29 s each and 5 on an empty node at 8.40 s each while "
+                                  "the host stood 70% to 100% busy; native's zero is no start at all", CAUSES_PAGE, "", POD_DECIDES),
+    ("BATCH", "failed requests"): ("one request of 965 in one repetition of ten timed out at 10 s, 20 s into the window, under the "
+                                   "queue's load, before any replica, limit or machine had moved; no other request failed in the 30 "
+                                   "arms", CAUSES_PAGE, "", "the benchmark's three runs on the engine that stands"),
+    ("FAIRNESS", "pod start wait"): (POD_SHIFT + " (the shift 0.19 s of the 0.39 s; the other 0.19 s in the same stratum is the "
+                                     "neighbour's pods, created on a worker whose idle CPU was conveyed to the governed app)",
+                                     CAUSES_PAGE, NEIGHBOUR_NEXT, POD_DECIDES),
+    ("FAIRNESS", "second app"): ("conveyance gave the governed app's pods a worker's idle CPU (312 writes in run A, every one "
+                                 "naming php-apache, none the neighbour), and when the neighbour's load surged its pods found that "
+                                 "CPU taken until the hand-back at the shared host's top; the governor reads the governed app's line, "
+                                 "not the neighbour's, so the immune system could not see the harm (the neighbour's 95th percentile "
+                                 "331.9 against 395.1 ms in run A's means)", CAUSES_PAGE, NEIGHBOUR_NEXT,
+                                 "the benchmark's three runs on the next engine, the neighbour's line read beside the governed app's"),
+    ("CRUISEKUBE", ""): ("Omni-Compass wrote nothing in any of the 30 repetitions (the CPU limit is CruiseKube's alone, the machines "
+                         "are kind's, fixed, and the service stayed inside its line, so the replica range had nothing to carry): the "
+                         "two arms are one system and the rows are the rig's noise between two native arms", CAUSES_PAGE, "",
+                         "no engine moves it: more repetitions a run, or a load that takes the service to its line"),
+    ("CAPACITY", "3000:work"): ("at the 3-core cap the service is inside its line in both arms and the only moves are conveyances of "
+                                "idle CPU to the serving pods; the completed count fell 0.6% by the mean with every run's interval "
+                                "across zero (run A's own table reads the row EVEN): the rig's noise at the cap", CAUSES_PAGE, "",
+                                "the benchmark's three runs on the engine that stands, and more pairs a cap"),
 }
 
 
