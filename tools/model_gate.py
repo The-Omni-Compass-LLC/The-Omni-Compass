@@ -41,7 +41,7 @@ the cloud setting). The card models read the requests served and not served, the
 energy and peak temperature, and the power limit's writes, moves, reversals and travel in watts.
 The candidate is read against the standing engine paired by seed: the mean change, its 95% interval over the seeds
 (Student's t), and the word by the gauge's aim (tools/readings.py): a fall in time waited, missed or over the line is a
-GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; a mean change under 0.5% is EVEN, and
+GAIN; a resource spent that fell is a cut, a GAIN, and one that rose is power given; a mean change under 0.5% is STEADY, and
 from 0.5% up every change reads by its aim, with whether it stands beyond the seeds' noise beside it (24 October 2026).
 """
 from __future__ import annotations
@@ -67,7 +67,7 @@ BLINK_EVERY, BLINK = 1440, (700, 708)  # the blink model: two minutes (8 ticks o
 # names the tree its engine was imported from, and run() refuses a reading taken on the wrong one
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
-try:   # the number beside a word carries the word's sign (tools/readings.py); only the gate's own process formats a reading,
+try:   # the size beside a word, no sign, the raw change apart (tools/readings.py by_word); only the gate's own process formats a reading,
     from tools.readings import by_word  # noqa: E402  so a worker run against an older checkout's tools never needs it
 except ImportError:
     by_word = None
@@ -864,11 +864,11 @@ def reading(gauge, diffs, base_vals, gauges=None):
     b = sum(base_vals) / n
     rel = m / b if b else float("nan")
     # the founder's order of 24 October 2026: a change of 0.5% or more (the seeds' mean) is a change, read by the gauge's aim;
-    # EVEN is kept for a change under 0.5%; whether the change stands beyond the seeds' noise is kept beside the word
+    # STEADY is kept for a change under 0.5%; whether the change stands beyond the seeds' noise is kept beside the word
     if lo == hi == 0.0:
-        word = "EVEN (identical)"
+        word = "STEADY (identical)"
     elif (b and abs(rel) < 0.005) or m == 0.0:
-        word = "EVEN"
+        word = "STEADY"
     elif (m < 0) == (aim == "lower"):
         word = "GAIN"
     else:

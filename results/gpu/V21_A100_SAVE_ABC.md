@@ -10,14 +10,14 @@ Three runs on rented cards (A, B and C), NVIDIA A100-SXM4-40GB, 10 paired repeti
 | energy, GPU (J) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** | GAIN, +0.85% | GAIN, +0.70% | GAIN, +0.68% |
 | energy per served request (J) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** | GAIN, +0.85% | GAIN, +0.70% | GAIN, +0.68% |
 | power, GPU mean (W) | **GAIN by the mean of our three runs, beyond the noise in 1 of 3** | GAIN, +0.86% | GAIN, +0.70% | GAIN, +0.68% |
-| requests served | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| requests not served | EVEN, the same | — | — | — |
-| response time, mean (ms) | EVEN, under the floor (the three runs' mean 0.19%) | EVEN, =0.25% | EVEN, =0.13% | EVEN, =0.19% |
-| response time, 95th percentile (ms) | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.03% | EVEN, =0.10% | EVEN, =0.04% |
-| response time, 99th percentile (ms) | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, =0.06% | EVEN, =0.24% | EVEN, =0.12% |
-| temperature, peak (C) | EVEN, under the floor (the three runs' mean 0.22%) | power given, +0.79% | EVEN, =0.00% | EVEN, =0.14% |
-| temperature, mean (C) | **the runs disagree** | power given, +0.77% | EVEN, =0.36% | GAIN, +0.52% |
-| energy, GPU device counter (J) | **GAIN by the mean of our three runs, beyond the noise in 2 of 3** | EVEN, =0.33% | GAIN, +0.84% | GAIN, +1.15% |
+| requests served | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| requests not served | STEADY, the same | — | — | — |
+| response time, mean (ms) | STEADY, under the floor (the three runs' mean 0.19%) | STEADY, =0.25% | STEADY, =0.13% | STEADY, =0.19% |
+| response time, 95th percentile (ms) | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.03% | STEADY, =0.10% | STEADY, =0.04% |
+| response time, 99th percentile (ms) | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, =0.06% | STEADY, =0.24% | STEADY, =0.12% |
+| temperature, peak (C) | STEADY, under the floor (the three runs' mean 0.22%) | power given, +0.79% | STEADY, =0.00% | STEADY, =0.14% |
+| temperature, mean (C) | **the runs disagree** | power given, +0.77% | STEADY, =0.36% | GAIN, +0.52% |
+| energy, GPU device counter (J) | **GAIN by the mean of our three runs, beyond the noise in 2 of 3** | STEADY, =0.33% | GAIN, +0.84% | GAIN, +1.15% |
 | power-capped share of samples | **GAIN in all three of our runs** | GAIN, +7.00% | GAIN, +16.90% | GAIN, +18.23% |
 
 Each arm's means in each run (native, then Omni-Compass on top of native):

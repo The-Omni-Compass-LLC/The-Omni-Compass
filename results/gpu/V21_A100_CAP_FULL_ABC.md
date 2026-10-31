@@ -6,19 +6,19 @@ Three runs on rented cards (A, B and C), NVIDIA A100-SXM4-40GB, 5 paired repetit
 
 | Gauge | Three runs | A | B | C |
 |---|---|---|---|---|
-| work per energy (served requests per kJ) | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, =0.03% | EVEN, =0.23% | EVEN, =0.02% |
-| energy, GPU (J) | EVEN, under the floor (the three runs' mean 0.23%) | EVEN, =0.43% | EVEN, =0.21% | EVEN, =0.04% |
-| energy per served request (J) | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, =0.03% | EVEN, =0.23% | EVEN, =0.02% |
-| power, GPU mean (W) | EVEN, under the floor (the three runs' mean 0.26%) | EVEN, =0.47% | EVEN, =0.25% | EVEN, =0.04% |
-| requests served | EVEN, under the floor (the three runs' mean 0.15%) | EVEN, =0.46% | EVEN, =0.03% | EVEN, =0.02% |
-| requests not served | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −2.18% | EVEN, =0.13% | EVEN, =0.11% |
-| response time, mean (ms) | EVEN, under the floor (the three runs' mean 0.47%) | LOSS, −1.32% | EVEN, =0.12% | EVEN, =0.03% |
-| response time, 95th percentile (ms) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −1.50% | EVEN, =0.06% | EVEN, =0.11% |
-| response time, 99th percentile (ms) | EVEN, under the floor (the three runs' mean 0.50%) | LOSS, −1.43% | EVEN, =0.03% | EVEN, =0.09% |
-| temperature, peak (C) | EVEN, under the floor (the three runs' mean 0.23%) | power given, +1.00% | EVEN, =0.30% | EVEN, =0.00% |
-| temperature, mean (C) | EVEN, under the floor (the three runs' mean 0.25%) | EVEN, =0.44% | GAIN, +1.31% | EVEN, =0.13% |
-| energy, GPU device counter (J) | EVEN, under the floor (the three runs' mean 0.23%) | EVEN, =0.45% | EVEN, =0.24% | EVEN, =0.01% |
-| power-capped share of samples | **GAIN by the mean of our three runs, beyond the noise in 2 of 3** | GAIN, +58.31% | GAIN, +25.41% | EVEN, =0.07% |
+| work per energy (served requests per kJ) | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, =0.03% | STEADY, =0.23% | STEADY, =0.02% |
+| energy, GPU (J) | STEADY, under the floor (the three runs' mean 0.23%) | STEADY, =0.43% | STEADY, =0.21% | STEADY, =0.04% |
+| energy per served request (J) | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, =0.03% | STEADY, =0.23% | STEADY, =0.02% |
+| power, GPU mean (W) | STEADY, under the floor (the three runs' mean 0.26%) | STEADY, =0.47% | STEADY, =0.25% | STEADY, =0.04% |
+| requests served | STEADY, under the floor (the three runs' mean 0.15%) | STEADY, =0.46% | STEADY, =0.03% | STEADY, =0.02% |
+| requests not served | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −2.18% | STEADY, =0.13% | STEADY, =0.11% |
+| response time, mean (ms) | STEADY, under the floor (the three runs' mean 0.47%) | LOSS, −1.32% | STEADY, =0.12% | STEADY, =0.03% |
+| response time, 95th percentile (ms) | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −1.50% | STEADY, =0.06% | STEADY, =0.11% |
+| response time, 99th percentile (ms) | STEADY, under the floor (the three runs' mean 0.50%) | LOSS, −1.43% | STEADY, =0.03% | STEADY, =0.09% |
+| temperature, peak (C) | STEADY, under the floor (the three runs' mean 0.23%) | power given, +1.00% | STEADY, =0.30% | STEADY, =0.00% |
+| temperature, mean (C) | STEADY, under the floor (the three runs' mean 0.25%) | STEADY, =0.44% | GAIN, +1.31% | STEADY, =0.13% |
+| energy, GPU device counter (J) | STEADY, under the floor (the three runs' mean 0.23%) | STEADY, =0.45% | STEADY, =0.24% | STEADY, =0.01% |
+| power-capped share of samples | **GAIN by the mean of our three runs, beyond the noise in 2 of 3** | GAIN, +58.31% | GAIN, +25.41% | STEADY, =0.07% |
 
 Each arm's means in each run (native, then Omni-Compass on top of native):
 

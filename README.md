@@ -4,40 +4,58 @@
 
 **More work, faster, on fewer machines, with less energy, on top of the stack you already run.**
 
-> **Evidence-integrity notice (2026-10-29).** The +5.2% Omni index is an internally computed geometric-mean composite of heterogeneous benchmark ratios, **not** a measured 5.2% reduction in total compute bills or a universal throughput improvement. Its Kubernetes energy values include modeled estimates; database, messaging and cache energy values can use CPU-time proxies, and the “machines” axis can mean connections, consumers, or allocated memory rather than physical machines. The +6.0% useful-work result is a specific three-run comparison on omni-v18, not a result proven for all engines or workloads. Results from different engines must not be represented as one end-to-end physical trial. “EVEN” can mean a nonzero difference below the existing 0.5% reporting threshold; it does not establish exact equality. All results are internally run and scored, not independently certified. See [the evidence-integrity audit](docs/EVIDENCE_INTEGRITY_AUDIT_20261029.md) before quoting performance or savings figures.
+**Open the live benchmark engine (the running page):** <https://claude.ai/artifact/PmGS8ogFLMQiuyjU2YEFn3>. The file in this repository, [`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html), is its source: GitHub shows a page's source as text and does not run it, so open the link above, or download the file and open it in a browser. **The whole engine in one file** (every monitor, knob and record inside it, about 15 MB, for a phone, a laptop or a website): [`docs/live/index.html`](docs/live/index.html), built from the page by `docs/engine/build_standalone.py`; with GitHub Pages serving `docs/` it opens at <https://the-omni-compass-llc.github.io/The-Omni-Compass-LLC/live/>.
+
+> **Evidence-integrity notice (2026-10-29).** The +5.2% Omni index is an internally computed geometric-mean composite of heterogeneous benchmark ratios, **not** a measured 5.2% reduction in total compute bills or a universal throughput improvement. Its Kubernetes energy values include modeled estimates; database, messaging and cache energy values can use CPU-time proxies, and the “machines” axis can mean connections, consumers, or allocated memory rather than physical machines. The +6.0% useful-work result is a specific three-run comparison on omni-v18, not a result proven for all engines or workloads. Results from different engines must not be represented as one end-to-end physical trial. “STEADY” can mean a nonzero difference below the existing 0.5% reporting threshold; it does not establish exact equality. All results are internally run and scored, not independently certified. See [the evidence-integrity audit](docs/EVIDENCE_INTEGRITY_AUDIT_20261029.md) before quoting performance or savings figures.
 
 
 <!-- headline: written by tools/headline.py from the result files; never edited by hand -->
 
-## The answer first: is Omni-Compass a benefit against native?
+## Benefit Against Native
 
-**Not yet read on the engine that stands (omni-v22)**: the Omni index stands on omni-v21 until omni-v22's tables land ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)).
+**Not yet read on the engine that stands (omni-v22)**: the Omni index stands on omni-v21 until omni-v22's tables land ([`results/OMNI_INDEX.md`](results/OMNI_INDEX.md)). On omni-v21, the figure of record reads **GAIN 5.2%**, every real test together by the index's own rule, its tables holding 105 rows GAIN, 16 LOSS and 45 power given (the benefit sheet reads it GAIN AND LOSS), never read as omni-v22's. The LOSS ledger ([`docs/LOSS_LEDGER.md`](docs/LOSS_LEDGER.md)) lists every LOSS row of the newest tables, 334 in all, 163 of them Omni-Compass against its own native, the rows do no harm is judged by, each with its cause where one is written.
 
-The real test of the whole loop, on omni-v21, the newest engine with its three runs in (the engine that stands, omni-v22, runs it again), three runs on GitHub's own machines: Omni-Compass on top of native did 8.5% more work than native and answered 13.0% faster at the 95th percentile.
 
-| Scenario | Signal | Work | Response (95th percentile) | Machines | Units |
+One real test of the whole loop, on omni-v21, the newest engine with its three runs in (the engine that stands, omni-v22, runs it again), three runs on GitHub's own machines, on Omni-Compass's own orchestrator (`omni_orchestrator`), the organism run without Kubernetes: native is Kubernetes' published autoscaling rule on the muscles, as written by The Omni-Compass LLC, and the other side is Omni-Compass on top of the same rule. It is one test, not the figure of record. On top of native, Omni-Compass did 8.5% more work than native, its 95th-percentile response time 13.0% shorter.
+
+| Arm | Signal | Work | Response, 95th percentile | Machines | Units |
 |---|---|---|---|---|---|
-| **Native**: Kubernetes' own autoscaling rule on the muscles | <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> the baseline | the baseline | the baseline | the baseline | the baseline |
-| **Omni-Compass on top of native**: Omni-Compass on top of Kubernetes' own autoscaling rule on the muscles, never fewer units than the rule | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **accelerating** | GAIN in all three of our runs: up 8.5%; the runs 10.3%, 8.2%, 7.0% | GAIN in all three of our runs: down 13.0% (faster); the runs 12.6%, 14.2%, 12.0% | GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.2% (fewer); the runs 2.0%, 2.8%, 4.8% | power given by the mean of our three runs, beyond the noise in 1 of 3: up 4.0%; the runs 3.3%, 5.0%, 3.7% |
+| **Native**: Kubernetes' published autoscaling rule on the muscles, as written by The Omni-Compass LLC, on Omni-Compass's own orchestrator (`omni_orchestrator`), the organism run without Kubernetes | <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> the baseline | the baseline | the baseline | the baseline | the baseline |
+| **Omni-Compass on top of native**: Omni-Compass on top of the same rule, never fewer units than the rule | <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> **GAINING** | GAIN in all three of our runs: 8.5% more work; raw +8.5% (runs A +10.3%, B +8.2%, C +7.0%) | GAIN in all three of our runs: the time 13.0% shorter; raw −13.0% (runs A −12.6%, B −14.2%, C −12.0%) | GAIN by the mean of our three runs, beyond the noise in 1 of 3: 3.2% fewer; raw −3.2% (runs A −2.0%, B −2.8%, C −4.8%) | power given by the mean of our three runs, beyond the noise in 1 of 3: 4.0% more; raw +4.0% (runs A +3.3%, B +5.0%, C +3.7%) |
 
-The signals: <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> accelerating, a GAIN and no LOSS; <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> steady, every row EVEN; <img src="docs/engine/signals/redlining.svg" alt="the red stop-sign octagon" height="14"> redlining, a LOSS. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, never a LOSS. Source: [`results/orchestrator/V21_THREE_ARMS_ABC.json`](results/orchestrator/V21_THREE_ARMS_ABC.json), three runs on GitHub's own machines (A, B and C from one commit); runs A 40474220398, B 40474223636, C 40474227699; commit `9d2bea96a878`. The record's other arm, Omni-Compass alone on the muscles, stays in the record and is not carried here: Omni-Compass is never by itself (the founder's order of 25 October).
+The signals: <img src="docs/engine/signals/accelerating.svg" alt="the green circle" height="14"> GAINING, a GAIN and no LOSS; <img src="docs/engine/signals/steady.svg" alt="the yellow yield diamond" height="14"> STEADY, every row STEADY; <img src="docs/engine/signals/redlining.svg" alt="the red stop-sign octagon" height="14"> REDLINING, a LOSS. Each word carries its size with no sign; the raw change, Omni-Compass − native over native, stands apart with its true sign, labelled raw. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, never a LOSS. Source: [`results/orchestrator/V21_THREE_ARMS_ABC.json`](results/orchestrator/V21_THREE_ARMS_ABC.json), three runs on GitHub's own machines (A, B and C from one commit); runs A 40474220398, B 40474223636, C 40474227699; commit `9d2bea96a878`. The record's other arm, Omni-Compass alone on the muscles, stays in the record and is not carried here.
 
-### The two bills
+### Bill by Route
 
-**THE CLOUD IS ONLY A WIRE BETWEEN THE SOFTWARE END AND THE HARDWARE END. Omni-Compass on the cloud alone can give only a small cut in the bill, from the machines the cloud's own autoscaler made; the benefit lives at the two ends, in the software and in the bare metal, and the cloud carries it.**
+On the cloud alone Omni-Compass parks only machines the cloud's own autoscaler made, so a cloud run can show only a small cut in the bill.
 
 Each route's bill is its native total cost, then Omni-Compass's, then the saving: 1 − (the Omni-Compass total ÷ the native total), each total the sum of its non-overlapping cost components inside the declared boundary, on a matched workload (`docs/THE_TUNE.md`, section 8). A component's own percent is a supporting measurement, never the bill. Where a price or a component is missing the bill reads unresolved; no price is assumed.
 
-| Route | The bill: native → Omni-Compass → saving | Supporting measurements |
+| Route | Bill, native → Omni-Compass → saving | Supporting measurements |
 |---|---|---|
-| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v21 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: down 3.2% (fewer); the runs 2.0%, 2.8%, 4.8% |
-| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v21; its Azure sets run now, A, B and C (`scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
+| **On-site**: the software on your own bare metal | **unresolved**: no machine-hour or energy price is declared, and the energy is not yet measured on omni-v22 | machines, Omni-Compass on top of native: GAIN by the mean of our three runs, beyond the noise in 1 of 3: 3.2% fewer; raw −3.2% (runs A −2.0%, B −2.8%, C −4.8%) |
+| **Through the cloud**: the cloud's build, its bare metal at the back end, the software | **unresolved**: not yet measured on omni-v22; on Azure the omni-v21 steady set (run 40940616527) runs first, one set at a time, and the omni-v22 sets queue behind it (`docs/RUN_LEDGER.md`, section 3; `scripts/azure_queue.txt`); Google, Amazon and the clouds a tester builds are wired and not yet run | the software end's, as on-site; the provider's energy is not metered to the tenant |
 
-Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md), `tools/whole_system.py`; omni-v1, omni-v12, omni-v21, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work up 17.2%, the 95th percentile 43.2% faster, machines 9.5% fewer, energy 5.1% less, the cloud's bill EVEN; the index over the gauges +14.0%. A composition across engines (class S over class P and L tables), never read as one engine's result; each total follows its tables as every benchmark runs again on omni-v22.
+Beside it: the totals composed from the tables that stand, each on its own engine ([`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md), `tools/whole_system.py`; omni-v1, omni-v12, omni-v21, the engine of commit 5b2832f (4 October 2026)), the cluster, the services on it and the cloud, by the rule that counts only what held in all three runs: work 17.2% more, the 95th-percentile response time 30.2% shorter (native's time over Omni-Compass's, ×1.432), machines 9.5% fewer, energy 5.1% less, the cloud's bill not counted: its Azure tests are one run each, and a table of one run enters as exactly 1 by this rule (with every interval carried it reads power given 0.8%, its 95% interval including no change); the index over the gauges GAIN 14.0%. A composition across engines (class S over class L tables), never read as one engine's result; each total follows its tables as every benchmark runs again on omni-v22.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 <!-- end headline -->
+
+## Start here, by reader
+
+| Reader | Read first | Then |
+|---|---|---|
+| CEO, board, acquirer | [Due diligence](docs/DUE_DILIGENCE.md) | [State of play](docs/STATE_OF_PLAY.md) · [claims register](docs/CLAIMS_REGISTER.md) · [every LOSS kept](docs/LOSS_LEDGER.md) · [limitations](docs/LIMITATIONS.md) |
+| CFO, investment committee | [Benefit sheet](docs/BENEFIT_SHEET.md) | [The Omni index](results/OMNI_INDEX.md) · [evidence ledger](docs/EVIDENCE_LEDGER.md) |
+| CTO, chief architect | [Mechanism of action](docs/MECHANISM_OF_ACTION.md) | [The engine that stands, omni-v22](docs/OMNI_V22.md) · [canonical engine](docs/CANONICAL_ENGINE.md) · [formal status](docs/FORMAL_STATUS.md) |
+| Engineering, SRE | [The Operator's Manual](docs/OMNI_COMPASS_MANUAL.md) | [Integration manual](docs/INTEGRATION_MANUAL.md) · [pilot protocol](docs/PILOT_PROTOCOL.md) · [harness](docs/HARNESS.md) |
+| Security, legal, IP | [Security policy](SECURITY.md) | [Threat model](docs/THREAT_MODEL.md) · [safety case](docs/SAFETY_CASE.md) · [license](LICENSE) · [disclosures](DISCLOSURES.md) |
+| Benchmark referee | [How to read the results](docs/HOW_TO_READ_THE_RESULTS.md) | [The referee's audit pack](docs/audit/README.md) · [every reading recomputed](docs/audit/STATISTICAL_VALIDATION.md) · [the verdict audit](results/verdict_audit/VERDICT_AUDIT.md) |
+| Live benchmark engine | [The page](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html) | [The Live Benchmark Engine Manual](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md) · [its appraisal](docs/engine/APPRAISAL.md) |
+
+The full index, by reader and by the hierarchy of evidence, is [`docs/README.md`](docs/README.md).
+
 
 ## The bottom line: is Omni-Compass a benefit?
 
@@ -66,7 +84,7 @@ Where each part of it comes from:
   still needs: [`docs/THE_CHIPS.md`](docs/THE_CHIPS.md). **The report card**, every section and piece graded on its record:
   [`docs/REPORT_CARD.md`](docs/REPORT_CARD.md).
 
-The live engine page opens on the same answer ([`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html)).
+The live engine page opens on the same answer (<https://claude.ai/artifact/PmGS8ogFLMQiuyjU2YEFn3>; its source, [`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html)).
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.
 
 ## The engine, the factory profile, the live tuning bench and the two routes
@@ -89,7 +107,7 @@ Omni-Compass consists of a **governing engine**, its **muscle adapters**, a **co
   workloads; validate on fresh ones; record every adverse result; freeze the profile with its identity and receipts; verify
   every implementation, the C++ included; release), and the repository stands at steps 1 and 2 for the next profile. No profile
   is locked as the baseline before those steps.
-- **The live tuning bench** is the live engine page: its controls expose the governing mechanism and show how an adjustment
+- **The live tuning bench** is the live benchmark engine page: its controls expose the governing mechanism and show how an adjustment
   moves the connected system. An adjustment produces an identifiable active configuration, a custom profile named by its
   fingerprint, which becomes a new factory configuration only after validation and a new release declaration. Two controls
   carry separate meanings: **Restore factory profile** reapplies the released configuration; **Return to native** hands
@@ -102,7 +120,7 @@ Omni-Compass consists of a **governing engine**, its **muscle adapters**, a **co
 
 **The factory tune.** The engine here is presented as The Omni-Compass LLC tuned it and ships it: self-running, set at the factory. Every muscle is wired, each on its own setting (its own card where one was found, the engine's setting for the rest), frozen and fingerprinted by version. No single setting is universal across muscles, families, sectors, domains or realms. A licensee may then add on, retune, upgrade or tune down any muscle or combination; a changed tune is the licensee's own configuration and its results are its own ([`DISCLOSURES.md`](DISCLOSURES.md), section 3).
 
-**One tuned engine, and a tuning bench.** Every benchmark below is one engine at one tune: the main engine, the engine that stands, at its factory tune. The live engine page is a different thing, a live tuning engine: every knob, button and monitor on it can be turned in real time (the beat, the dial, the pedal, each muscle driven or left native, up or down, in or out, minus or plus) to show the mechanism of action with native alone, with Omni-Compass on top of native, or both side by side, and what it shows at any other setting is the engine's range, never a benchmark result. As on any engine, where the mixture, the intake, the exhaust, the firing and the pistons each change what it delivers, **turning any knob can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many ways, for many outputs. Among the tunes tried so far the released one is chosen by a declared rule: of the tunes that harm no gauge against native, the one against which no other tried tune reads GAIN on one service gauge and LOSS on none, searched on development seeds and read again on untouched ones ([`docs/THE_TUNE.md`](docs/THE_TUNE.md)).
+**One tuned engine, and a tuning bench.** Every benchmark below is one engine at one tune: the main engine, the engine that stands, at its factory tune. The live benchmark engine page is a different thing, a live tuning engine: every knob, button and monitor on it can be turned in real time (the beat, the dial, the pedal, each muscle driven or left native, up or down, in or out, minus or plus) to show the mechanism of action with native alone, with Omni-Compass on top of native, or both side by side, and what it shows at any other setting is the engine's range, never a benchmark result. As on any engine, where the mixture, the intake, the exhaust, the firing and the pistons each change what it delivers, **turning any knob can change every metric, up or down, in any direction a tuner chooses**: one engine for many vessels, tuned many ways, for many outputs. Among the tunes tried so far the released one is chosen by a declared rule: of the tunes that harm no gauge against native, the one against which no other tried tune reads GAIN on one service gauge and LOSS on none, searched on development seeds and read again on untouched ones ([`docs/THE_TUNE.md`](docs/THE_TUNE.md)).
 
 ## The cloud is a wire
 
@@ -120,7 +138,7 @@ it, so it is never claimed here as a measurement.
 | Place | Measured so far (each on its page, written from its runs) | The company's expectation (the founder's figures of 24 October: an expectation, never a result) |
 |---|---|---|
 | The software end: the cluster and the services on it (class L) | composed layer by layer in [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md) (the cluster, the services), each test on its own engine; one number per benchmark in [`docs/BENEFIT_SHEET.md`](docs/BENEFIT_SHEET.md) | about 3 to 4% |
-| The bare metal: the card and the machine | the card's one finished counted run, omni-v18 on an A100 ([`results/gpu/run-20261024T091235Z/GPU_REPS.md`](results/gpu/run-20261024T091235Z/GPU_REPS.md), class P): every judged gauge EVEN with no write, the power limit already at its top on native; the machine's own layer not yet run; every card rental in [`docs/RUN_LEDGER.md`](docs/RUN_LEDGER.md) | 2 to 3% |
+| The bare metal: the card and the machine | the card's one finished counted run, omni-v18 on an A100 ([`results/gpu/run-20261024T091235Z/GPU_REPS.md`](results/gpu/run-20261024T091235Z/GPU_REPS.md), class P): every judged gauge STEADY with no write, the power limit already at its top on native; the machine's own layer not yet run; every card rental in [`docs/RUN_LEDGER.md`](docs/RUN_LEDGER.md) | 2 to 3% |
 | The cloud's wire alone: the machines it bills (Azure, class L) | [`results/live/AKS_BILL.md`](results/live/AKS_BILL.md), and the omni-v21 sets as they land | 1 to 2% |
 | The two ends and the wire together | the two routes composed in [`results/WHOLE_SYSTEM.md`](results/WHOLE_SYSTEM.md), quoted in the answer at the top | about 5% from the two ends together |
 
@@ -184,15 +202,15 @@ Simulation use only (`LICENSE`); any commercial use, monetization or production 
 Enterprise License (`ENTERPRISE_LICENSE.md`). What a licensee acquires is the working whole: the engine, the wiring and the
 factory card of every muscle, the harness that measures it against native, and the receipts.
 
-<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
-## The key: GAIN, EVEN and LOSS
+<!-- the key: GAIN, STEADY and LOSS (tools/readings.py) -->
+## The key: GAIN, STEADY and LOSS
 
-Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
+Every judged reading in Omni-Compass is one of three words: **GAIN**, **STEADY** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
 
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **STEADY** | **S** Stable (zero variance); **T** True to baseline (expected norm); **E** Equilibrium (balanced risk); **A** At par (no net change); **D** Drift-free (within the 0.5% floor); **Y** Yield held (nothing lost) | the par baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is STEADY, at its limit on native |
 | **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
 
 How the sign of a number becomes a word:
@@ -202,16 +220,16 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
-- **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; EVEN is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the 0.5% floor reads EVEN =0.3%.
+- **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; STEADY is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **STEADY, under the floor**, with its size.
+- **Two numbers, never mixed** (the referee's work order of 25 October): every row shows native's value and Omni-Compass's, the **raw change** (Omni-Compass − native) / native with its true sign, + for a rise and − for a fall whatever the gauge is for, labelled raw, and apart from it the word with its size and no sign. A bill cut 3% reads raw −3.0%, GAIN 3.0%; failed requests up 2% read raw +2.0%, LOSS 2.0%; a pod start wait from 0.22 s to 0.83 s reads raw +275.0%, LOSS 275.0%; a change under the 0.5% floor reads STEADY 0.3%. No raw sign is ever turned to match a word.
 
-Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
+Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads STEADY (the same as native); AT ITS LIMIT ON NATIVE reads STEADY (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads STEADY (inside the noise, within the guardrails); NOT ESTABLISHED reads STEADY (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
-Every reading is one of these. **GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, every 95% interval clear of zero. **GAIN, LOSS or power given by the mean of our three runs**: the runs' mean moved 0.5% or more, with the count of runs that stood beyond the noise beside it. **EVEN, under the floor**: the mean moved less than 0.5%. **EVEN, the same**: no change at all. **The runs disagree**: runs moved 0.5% or more in opposite directions, so the test is unstable there and is looked into. **Shown, not judged**: a gauge declared in advance as shown only, such as the knob's own setting.
+Every reading is one of these. **GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, every 95% interval clear of zero. **GAIN, LOSS or power given by the mean of our three runs**: the runs' mean moved 0.5% or more, with the count of runs that stood beyond the noise beside it. **STEADY, under the floor**: the mean moved less than 0.5%. **STEADY, the same**: no change at all. **The runs disagree**: runs moved 0.5% or more in opposite directions, so the test is unstable there and is looked into. **Shown, not judged**: a gauge declared in advance as shown only, such as the knob's own setting.
 
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, par or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (STEADY). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
-Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+Disclosure and disclaimer: GAIN, STEADY and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
 
 ## Latest, newest first
@@ -227,14 +245,14 @@ it, and nothing older than the newest result stands in front of it. Earlier fron
 **Results the repository rebuilt by itself on the engine that stands** (each live product from its three newest runs; the earlier engines' lines are kept in [`docs/history/FRONT_PAGE_2026-10-12.md`](docs/history/FRONT_PAGE_2026-10-12.md)):
 
 <!-- front-page:begin -->
-- 2026-10-27 01:55 UTC: `V21_YCSB` rebuilt from runs 40259304209, 40281469940, 40401042132 (ycsb, the resource objective, omni-v21): 4 untouched workloads; 7 GAIN, 2 LOSS, 6 power given, 17 EVEN, 16 disagree
-- 2026-10-27 01:55 UTC: `V21_SYSBENCH` rebuilt from runs 40258018856, 40281464587, 40401032384 (sysbench, the resource objective, omni-v21): 4 untouched workloads; 11 GAIN, 0 LOSS, 7 power given, 18 EVEN, 12 disagree
-- 2026-10-27 01:55 UTC: `V21_REDIS` rebuilt from runs 40254205224, 40276907808, 40400989005 (redis, the resource objective, omni-v21): 3 untouched workloads; 11 GAIN, 1 LOSS, 8 power given, 16 EVEN, 3 disagree
-- 2026-10-27 01:55 UTC: `V21_PGBENCH` rebuilt from runs 40258014810, 40281459100, 40400963499 (pgbench, the resource objective, omni-v21): 3 workloads; 6 GAIN, 0 LOSS, 5 power given, 18 EVEN, 7 disagree
-- 2026-10-27 01:55 UTC: `V21_KAFKA` rebuilt from runs 40256717947, 40279909158, 40400868003 (kafka, the resource objective, omni-v21): 3 untouched workloads; 7 GAIN, 5 LOSS, 4 power given, 14 EVEN, 12 disagree
-- 2026-10-26 22:16 UTC: `V21_KAFKA` rebuilt from runs 40235701004, 40256717947, 40279909158 (kafka, the resource objective, omni-v21): 3 untouched workloads; 14 GAIN, 4 LOSS, 4 power given, 14 EVEN, 6 disagree
-- 2026-10-26 15:44 UTC: `V21_YCSB_SERVICE` rebuilt from runs 40287958759, 40291376191, 40293208904 (ycsb, the service objective, omni-v21): 4 untouched workloads; 4 GAIN, 2 LOSS, 6 power given, 10 EVEN, 26 disagree
-- 2026-10-26 15:44 UTC: `V21_YCSB_SHIPPED` rebuilt from runs 40238131083, 40260620209, 40284624594 (ycsb, the resource objective, native as shipped, omni-v21): 4 untouched workloads; 0 GAIN, 9 LOSS, 7 power given, 22 EVEN, 10 disagree
+- 2026-10-27 01:55 UTC: `V21_YCSB` rebuilt from runs 40259304209, 40281469940, 40401042132 (ycsb, the resource objective, omni-v21): 4 untouched workloads; 7 GAIN, 2 LOSS, 6 power given, 17 STEADY, 16 disagree
+- 2026-10-27 01:55 UTC: `V21_SYSBENCH` rebuilt from runs 40258018856, 40281464587, 40401032384 (sysbench, the resource objective, omni-v21): 4 untouched workloads; 11 GAIN, 0 LOSS, 7 power given, 18 STEADY, 12 disagree
+- 2026-10-27 01:55 UTC: `V21_REDIS` rebuilt from runs 40254205224, 40276907808, 40400989005 (redis, the resource objective, omni-v21): 3 untouched workloads; 11 GAIN, 1 LOSS, 8 power given, 16 STEADY, 3 disagree
+- 2026-10-27 01:55 UTC: `V21_PGBENCH` rebuilt from runs 40258014810, 40281459100, 40400963499 (pgbench, the resource objective, omni-v21): 3 workloads; 6 GAIN, 0 LOSS, 5 power given, 18 STEADY, 7 disagree
+- 2026-10-27 01:55 UTC: `V21_KAFKA` rebuilt from runs 40256717947, 40279909158, 40400868003 (kafka, the resource objective, omni-v21): 3 untouched workloads; 7 GAIN, 5 LOSS, 4 power given, 14 STEADY, 12 disagree
+- 2026-10-26 22:16 UTC: `V21_KAFKA` rebuilt from runs 40235701004, 40256717947, 40279909158 (kafka, the resource objective, omni-v21): 3 untouched workloads; 14 GAIN, 4 LOSS, 4 power given, 14 STEADY, 6 disagree
+- 2026-10-26 15:44 UTC: `V21_YCSB_SERVICE` rebuilt from runs 40287958759, 40291376191, 40293208904 (ycsb, the service objective, omni-v21): 4 untouched workloads; 4 GAIN, 2 LOSS, 6 power given, 10 STEADY, 26 disagree
+- 2026-10-26 15:44 UTC: `V21_YCSB_SHIPPED` rebuilt from runs 40238131083, 40260620209, 40284624594 (ycsb, the resource objective, native as shipped, omni-v21): 4 untouched workloads; 0 GAIN, 9 LOSS, 7 power given, 22 STEADY, 10 disagree
 <!-- front-page:end -->
 
 **Every result table, by when it last changed:**
@@ -318,12 +336,12 @@ stands (`realms-v5.yml`, `scripts/reruns.txt`), and until its table lands this o
 | of them: clear the waiting line sooner | 493 | 493 |
 | of them: over their line less often | 409 | 398 |
 | of them: more work | 33 | 32 |
-| EVEN, at its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
-| EVEN, the same as native (as the realms table reads it, nothing beyond the noise to gain: native already did all the work that came) | 159 | 169 |
+| STEADY, at its limit on native (native already runs the knob at the top of its range: full clock, full torque, full battery power, nothing turned away; the max writes nothing) | 421 | 421 |
+| STEADY, the same as native (as the realms table reads it, nothing beyond the noise to gain: native already did all the work that came) | 159 | 169 |
 | **LOSS, or GAIN AND LOSS** | **0** | 0 |
 
 The realms table was written before the rule of 24 October 2026 and reads its words by the noise; it is not among the tables
-read again by that rule (`tools/reread.py` reads `results/live/` and the model gate), so a muscle it counts EVEN may hold a
+read again by that rule (`tools/reread.py` reads `results/live/` and the model gate), so a muscle it counts STEADY may hold a
 change of 0.5% or more.
 
 | Kind | With work waiting in line (one global setting in brackets) | Power given | Wear |
@@ -374,18 +392,18 @@ Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed
 
 **Ten organisms, two ways: the twenty scenarios** (our own models, class S, three runs, seeds 3000 to 3002,
 [`results/scenarios/SCENARIOS_20.md`](results/scenarios/SCENARIOS_20.md), written by `python3 tools/scenarios_20.py`). The
-seven organisms of the catalog, the orchestra (the governors' and orchestrators' muscles), the live engine's own sixty-muscle
+seven organisms of the catalog, the orchestra (the governors' and orchestrators' muscles), the live benchmark engine's own sixty-muscle
 organism and the whole organism in its three places (the software end, the cloud's wire, the bare metal) make ten organisms;
 each is read native and with Omni-Compass on top of native: twenty scenarios. Every one of the nine modelled organisms reads
 its muscles over the line GAIN in all three of our runs (from +1.58% in the whole tower to +63.34% in the orchestra), its work
-EVEN; the orchestra's power is given (+52.38%) and the others' power EVEN or a cut. The whole organism, a composition of the
-real tables, reads +14.5% GAIN by the index's rule. No LOSS row. The record of 24 October also carried a third way,
+STEADY; the orchestra's power is given (+52.38%) and the others' power STEADY or a cut. The whole organism, a composition of the
+real tables, reads GAIN 14.5% by the index's rule. No LOSS row. The record of 24 October also carried a third way,
 Omni-Compass by itself (each pool's own autoscaler switched off), which read LOSS in all three of our runs on work and on
 muscles over the line in eight organisms, 32 rows; the founder's order of 25 October took that way out (Omni-Compass is never
 by itself), and its record is kept whole in
 [`docs/history/SCENARIOS_30_2026-10-24.md`](docs/history/SCENARIOS_30_2026-10-24.md).
 
-## The manuals: the Operator's Manual, the Owner's Manual and the Live Engine Manual
+## The manuals: the Operator's Manual, the Owner's Manual and the Live Benchmark Engine Manual
 
 [`docs/OMNI_COMPASS_MANUAL.pdf`](docs/OMNI_COMPASS_MANUAL.pdf), the Operator's Manual, is the manual for the glove box, built from the
 repository whenever it changes (`docs/book/build_book.py`): how to embed, wire, tune, run and check Omni-Compass on a
@@ -423,8 +441,8 @@ mathematics, the mechanism, the engine that stands and the road to it, every Pyt
 full, every result, the wiring, and every legal paper bound in). Its text is
 [`docs/OMNI_COMPASS_OWNERS_MANUAL.md`](docs/OMNI_COMPASS_OWNERS_MANUAL.md).
 
-[`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf), the Live Engine Manual, is the third book (the
-founder's order of 20 October: three in the end): nothing more than the interpretation of the live engine page,
+[`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf), the Live Benchmark Engine Manual, is the third book (the
+founder's order of 20 October: three in the end): nothing more than the interpretation of the live benchmark engine page,
 [`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html), for the operator at the dashboard: how to
 follow the wall and the switch, read every gauge and turn every knob, trace any tile to the record it came from, and see the
 mechanism of action of Omni-Compass against native as the monitors show it (the two tickers, the phase plane, the brain's
@@ -433,12 +451,12 @@ does not tell you. It explains neither how the engine is built nor how it is wir
 --live`, and its text is [`docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md`](docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md). Its last appendix
 is the page word for word, written from the page itself at every build (`docs/book/build_live_manual.py`): every section, every
 monitor with its number, evidence class, feed and knobs, and every control, so the book and the page read each other both
-ways; the control panel at the top of the live engine downloads all three books.
+ways; the control panel at the top of the live benchmark engine downloads all three books.
 
-**The live engine page**, the tuning bench, opens on the bottom line, then the monitor wall and the main control panel. Native
+**The live benchmark engine page**, the tuning bench, opens on the bottom line, then the monitor wall and the main control panel. Native
 is orange everywhere, Omni-Compass on native blue; red is never a side, only the alarm. Every
-monitor carries its light and its word: green and round, **THRIVING** (working inside its lines with room to give, or a
-GAIN); yellow, a yield diamond, **STEADY** (EVEN, inside 0.5%, or heading for its line and watched); red, a stop-sign octagon,
+monitor carries its light and its word: green and round, **GAINING** (working inside its lines with room to give, or a
+GAIN); yellow, a yield diamond, **STEADY** (STEADY, inside 0.5%, or heading for its line and watched); red, a stop-sign octagon,
 blinking, **REDLINING** (over its line, or a LOSS: the alarm); dark, **AWAITING** (the run that fills it has not landed; never
 green). The main control panel holds the kill switch, the heartbeat's six buttons,
 **10, 15, 30, 60, 90 and 120 s**, a sweep that runs every beat on the page's own model for three model days each, **Try the
@@ -449,7 +467,7 @@ steps of [`docs/FACTORY_PROFILE.md`](docs/FACTORY_PROFILE.md) choose the next. A
 (`tools/live_glossary.py`): every term in the words of the file it names, the ten organisms and their twenty scenarios, every
 one of the 1,107 muscles of the catalog by realm and family, and the sections where each is used.
 
-The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for line where a twin exists. The live engine's section 10b ([`#s-cpp`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#s-cpp)) feeds the Python's own runs into the C++ at every rebuild and sets the two side by side, number by number: every twin's parity check, every compass law the page's runs wire, and every muscle of the seven organisms at the tune-down. The Python's 500 seeded runs (`tools/engine_runs.py`, the jump generator) run whole through the C++ harness too ([`cpp/tools/engine_runs.cpp`](cpp/tools/engine_runs.cpp): the Python's draws are the input, the governor, the nerves, the compass law and the verdict in C++ put the mechanism on): every receipt and the SHA-256 digest identical to the Python's, on GitHub with every set (`engine-runs`) and on the page's proof monitor ([`#proofPanel`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#proofPanel)) beside the page's own run. What still runs in Python only is listed there by file (`tools/seal.py`).
+The engine is written twice, in Python and in C++ ([`cpp/`](cpp/)), line for line where a twin exists. The live benchmark engine's section 10b ([`#s-cpp`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#s-cpp)) feeds the Python's own runs into the C++ at every rebuild and sets the two side by side, number by number: every twin's parity check, every compass law the page's runs wire, and every muscle of the seven organisms at the tune-down. The Python's 500 seeded runs (`tools/engine_runs.py`, the jump generator) run whole through the C++ harness too ([`cpp/tools/engine_runs.cpp`](cpp/tools/engine_runs.cpp): the Python's draws are the input, the governor, the nerves, the compass law and the verdict in C++ put the mechanism on): every receipt and the SHA-256 digest identical to the Python's, on GitHub with every set (`engine-runs`) and on the page's proof monitor ([`#proofPanel`](docs/engine/OMNI_COMPASS_LIVE_ENGINE.html#proofPanel)) beside the page's own run. What still runs in Python only is listed there by file (`tools/seal.py`).
 
 ## What is real and what is a model
 
@@ -467,13 +485,13 @@ Omni-Compass also runs the organism as its own orchestrator, with no Kubernetes 
 Three arms are always shown together: native (Kubernetes' published autoscaling rule on the muscles, written by us as the
 yardstick), Omni on native (Omni on top of that rule) and Omni direct (Omni alone on the muscles). In the full form on one host
 (one run of each arm, class L) Omni direct read against native by the one key: work GAIN (up 4.7%), the 95th percentile GAIN
-(down 9.9%), units GAIN, a cut (down 10.3%), machines EVEN, nothing failed. The three arms together, quick form (one run each):
+(down 9.9%), units GAIN, a cut (down 10.3%), machines STEADY, nothing failed. The three arms together, quick form (one run each):
 Omni on native against native, work GAIN (up 8.3%); Omni direct against native, work GAIN (up 9.1%); Omni direct against Omni
 on native, the 95th percentile GAIN (down 13.2%) and units GAIN, a cut (down 9.5%); no LOSS in any pair, after the fault the
 first three-arm showing found was fixed (a trial the traffic kept abandoning still cost a unit). The three-run reading on GitHub
 (`orchestrator.yml`) has landed and is the bottom line at the top of this page: both Omni-Compass arms against native read work
 GAIN and the 95th percentile GAIN in all three of our runs, and no pair reads LOSS on any gauge
-([`results/orchestrator/V18_THREE_ARMS_ABC.md`](results/orchestrator/V18_THREE_ARMS_ABC.md)). Why a muscle reads EVEN and where the room is, in theory and mathematics: [`docs/THE_ROOM.md`](docs/THE_ROOM.md).
+([`results/orchestrator/V18_THREE_ARMS_ABC.md`](results/orchestrator/V18_THREE_ARMS_ABC.md)). Why a muscle reads STEADY and where the room is, in theory and mathematics: [`docs/THE_ROOM.md`](docs/THE_ROOM.md).
 
 ## How it works
 

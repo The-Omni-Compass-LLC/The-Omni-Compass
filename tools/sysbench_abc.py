@@ -7,7 +7,7 @@
 """The A/B/C table for the sysbench on MySQL benchmark (docs/OMNI_V1.md's readings, docs/MYSQL_PREREGISTRATION.md): the untouched
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_sysbench.py), each run holding three
 paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a 95%
-interval; across the three runs a gauge reads by the one key (tools/readings.py, the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim, in all three of our runs when every run is clear of zero the same way and otherwise by the mean of our three runs with the count beyond the noise; under 0.5% EVEN, under the floor; runs that moved 0.5% or more in opposite ways disagree. Errors: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves
+interval; across the three runs a gauge reads by the one key (tools/readings.py, the founder's order of 24 October 2026): a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim, in all three of our runs when every run is clear of zero the same way and otherwise by the mean of our three runs with the count beyond the noise; under 0.5% STEADY, under the floor; runs that moved 0.5% or more in opposite ways disagree. Errors: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves
 are shown, never judged. The tuning workload is shown and not counted. Every row is reported, LOSS included; no energy is
 claimed beyond the host's CPU seconds.
 Usage: python tools/sysbench_abc.py A_DIR B_DIR C_DIR --out results/live/V3_SYSBENCH.md

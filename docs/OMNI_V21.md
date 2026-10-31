@@ -44,9 +44,9 @@ evidence class S): no LOSS against omni-v20 in any model.
 | Model | Against omni-v20 |
 |---|---|
 | the cluster (the cloud's setting), at 60 s, at 15 s, with blinks, as shipped | pods waiting for a place down 12.9% to 13.3%, fewer waiting, GAIN; machine-hours up 0.9% to 1.3% and energy per core-hour up 0.8% to 1.0%, power given; the power cap's moves, reversals and travel down 1.3% to 1.4%, GAIN |
-| the conveyance, its quota cases, the batch beside the service | every gauge the same as omni-v20, EVEN |
-| the card, the card near its floor | every gauge the same as omni-v20, EVEN |
-| the verdict | the same as omni-v20, EVEN |
+| the conveyance, its quota cases, the batch beside the service | every gauge the same as omni-v20, STEADY |
+| the card, the card near its floor | every gauge the same as omni-v20, STEADY |
+| the verdict | the same as omni-v20, STEADY |
 
 Against native the gate reads the LOSS rows omni-v18, omni-v19 and omni-v20 carry, none caused by this version and each on the
 next version's list: the pod start wait in the conveyance models (up 9.0% and 10.0%), the batch beside the service (requests

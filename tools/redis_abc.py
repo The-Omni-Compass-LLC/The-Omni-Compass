@@ -8,7 +8,7 @@
 workloads run three times as separate GitHub runs on the same frozen engine (tools/run_redis.py), each run holding three
 paired repetitions of native and omni. Within a run the paired difference (omni minus native) over its repetitions gives a
 95% interval; across the three runs a gauge reads GAIN or LOSS in all three of our runs (by what it is for, never by its sign; a resource spent that rose reads power given) when all three move the same way with
-every interval clear of zero, EVEN, no difference beyond the noise, when a run's interval includes zero (with the count of such
+every interval clear of zero, STEADY, no difference beyond the noise, when a run's interval includes zero (with the count of such
 runs), and the runs disagree when runs clear of the noise point different ways. Failed requests: any rise in any run reads **LOSS in at least one of our runs**. The knob's moves are shown, never judged. The tuning workload is shown and not counted. Every row is reported,
 LOSS included; no energy is claimed beyond the host's CPU seconds.
 Usage: python tools/redis_abc.py A_DIR B_DIR C_DIR --out results/live/V3_REDIS.md
@@ -55,18 +55,17 @@ def engine(run_dir):
 
 def verdict(rs, direction, key=None):
     """The three-run reading of one gauge, by rule, from its three within-run paired results: GAIN, LOSS, power given,
-    EVEN or the runs disagree, by what the gauge is for (tools/readings.py)."""
+    STEADY or the runs disagree, by what the gauge is for (tools/readings.py)."""
     return stack_reading(rs, direction, SAME_REL, key)
 
 
 def cell(r, key):
+    """One run in separate fields (the referee's work order of 25 October): native's value → Omni-Compass's, the raw change with its
+    true sign and its 95% interval (tools/confirm_abc.py cell, one format for every table)."""
     if r is None:
         return "n/a"
-    nat, d, lo, hi = r["native"], r["diff"], r["ci95"][0], r["ci95"][1]
-    if key == "failed" or not nat:
-        return f"{d:+.3g} ({lo:+.3g} to {hi:+.3g})"
-    return f"{100 * d / abs(nat):+.1f}% ({100 * lo / abs(nat):+.1f} to {100 * hi / abs(nat):+.1f})"
-
+    from tools.confirm_abc import cell as fields
+    return fields(r)
 
 def fmt(v):
     return f"{v:.3g}" if abs(v) < 10 else f"{v:,.1f}" if abs(v) < 1000 else f"{v:,.0f}"
@@ -88,7 +87,7 @@ def main(argv=None):
          "through Redis's own console inside [16, 512] MB, holding the application's own request latency at 40% of the 2 ms line, a hit "
          "inside and a miss with its store trip outside (`docs/REDIS_PREREGISTRATION.md`). Each run holds three paired repetitions; the "
          "paired difference's 95% interval within a run, and the same sign with every interval clear of zero across the three runs, make "
-         "a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **EVEN, no difference beyond the "
+         "a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by the sign of its number; a resource spent that rose reads **power given**, never a loss); a run whose interval includes zero reads **STEADY, no difference beyond the "
          "noise** (with the count of such runs); clear runs pointing different ways read **the runs disagree**. Failed requests: any "
          "rise in any run reads **LOSS in at least one of our runs**. Memory held is the resource; the host's CPU-seconds, the compass's own cost included, are "
          "measured on GitHub's shared runner, and no energy is claimed beyond them. The tuning workload is shown and not counted. Every "

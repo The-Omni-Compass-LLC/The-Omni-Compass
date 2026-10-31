@@ -7,7 +7,7 @@
 side by side in each of three GitHub runs, A, B and C, from one commit, and each run's summary.json carries every pair's paired
 change a step with its 95% interval. Each pair and gauge is read by the one key (tools/readings.py): a change of 0.5% or more is
 a GAIN, a LOSS or power given by the gauge's aim, "in all three of our runs" when every run moved the same way clear of the noise,
-"by the mean of our three runs" otherwise, with the count beyond the noise; EVEN under 0.5%. Every pair the runs carry is shown;
+"by the mean of our three runs" otherwise, with the count beyond the noise; STEADY under 0.5%. Every pair the runs carry is shown;
 the README and the live engine page read the pair Omni on native against native from it (tools/headline.py). Until 27 October
 2026 the omni-v18 record was written by hand from its runs; this tool rebuilds it from them, byte for byte.
 Usage: python tools/three_arms_abc.py A_DIR B_DIR C_DIR --out results/orchestrator/V<n>_THREE_ARMS_ABC.md
@@ -115,7 +115,7 @@ def markdown(rec) -> list:
          "paired by step; the three runs are combined by the one rule (tools/readings.py, the founder's order of 24 October 2026): "
          "a change of 0.5% or more, the mean of the three runs, reads GAIN, LOSS or power given by the gauge's aim, in all three "
          "of our runs where every run moved the same way clear of zero, otherwise by the mean of our three runs with the count of "
-         "runs beyond the noise; EVEN under 0.5%; the runs disagree when runs moved 0.5% or more in opposite directions. Each "
+         "runs beyond the noise; STEADY under 0.5%; the runs disagree when runs moved 0.5% or more in opposite directions. Each "
          "run's own word stands beside its number by the same floor.", "",
          "| Pair | Gauge | Three runs | " + " | ".join(rec["runs"]) + " |", "|---|---|---|" + "---|" * len(rec["runs"])]
     for r in rec["rows"]:

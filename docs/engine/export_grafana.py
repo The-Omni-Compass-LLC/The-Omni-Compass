@@ -5,7 +5,7 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The monitor wall as a Grafana dashboard: one panel a monitor, each on the open-source feed that carries it live.
 
-The live engine's monitors (docs/engine/monitors.json) are, in the founder's words, nothing more than a Grafana-type dashboard
+The live benchmark engine's monitors (docs/engine/monitors.json) are, in the founder's words, nothing more than a Grafana-type dashboard
 wired to the organism. This writes that dashboard (deploy/grafana/omni-compass-wall.json, Grafana's dashboard model, schema 39):
 a monitor with a Prometheus expression becomes a panel on that expression (the datasource a variable, ${DS_PROMETHEUS}); a
 monitor the page computes from the repository's tables, or from its own clock, becomes a text panel saying so and where the
@@ -41,6 +41,14 @@ def page_order() -> list:
         return []
     body = re.sub(r"<script[^>]*>.*?</script>", "", PAGE.read_text(encoding="utf-8"), flags=re.S)
     return [m.group(1) for m in re.finditer(r'<canvas\b[^>]*\bid="([^"]+)"', body)]
+
+
+def wall_order() -> list:
+    """The wall's order: the registry's blocks by importance (the founder's order of 30 October), the first twelve the system's most
+    important; a registered monitor in no block follows in the page's own order."""
+    reg = json.loads(REG.read_text(encoding="utf-8")) if REG.exists() else {}
+    ranked = [i for b in reg.get("blocks", []) for i in b["ids"]]
+    return ranked + [c for c in page_order() if c not in ranked]
 
 
 def page_sections() -> dict:
@@ -96,12 +104,12 @@ def knobs() -> list:
                                    "query": {"query": query, "refId": name}, "definition": query, "includeAll": True, "multi": True,
                                    "allValue": ".*", "current": {"selected": True, "text": "All", "value": "$__all"}, "refresh": 2, "sort": 1}
     return [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource", "query": "prometheus", "current": {}, "hide": 0},
-            q("route", "Route (on-site or cloud)", "label_values(up, route)"),
+            q("route", "Route", "label_values(up, route)"),
             q("provider", "Provider", 'label_values(up{route=~"$route"}, provider)'),
             q("instance", "Machine", 'label_values(up{route=~"$route",provider=~"$provider"}, instance)'),
-            {"name": "window", "label": "Rate window", "type": "interval", "query": "1m,5m,15m,1h", "auto": False,
+            {"name": "window", "label": "Rate Window", "type": "interval", "query": "1m,5m,15m,1h", "auto": False,
              "current": {"text": "5m", "value": "5m"}},
-            {"name": "control", "label": "Control panel", "type": "textbox", "query": "http://localhost:9465",
+            {"name": "control", "label": "Control Panel URL", "type": "textbox", "query": "http://localhost:9465",
              "current": {"text": "http://localhost:9465", "value": "http://localhost:9465"}}]
 
 
@@ -122,16 +130,16 @@ def signals_row() -> list:
                                              "mappings": [{"type": "range", "options": {"from": a, "to": b, "result": {"text": w}}} for a, b, w in words]},
                                 "overrides": []}}
     g, y, r = "#50c878", "#f5c518", "#ff4d55"
-    return [{"id": 899, "type": "row", "title": "The signals: redlining, steady, accelerating", "collapsed": False, "gridPos": {"x": 0, "y": 0, "w": COLS * W, "h": 1}, "panels": []},
-            stat(1, 0, "The heartbeat: beats since the last decision", "(time() - omni_last_decision_timestamp_seconds) / clamp_min(omni_heartbeat_seconds, 5)",
+    return [{"id": 899, "type": "row", "title": "Governor Signals", "collapsed": False, "gridPos": {"x": 0, "y": 0, "w": COLS * W, "h": 1}, "panels": []},
+            stat(1, 0, "Beats Since Last Decision", "(time() - omni_last_decision_timestamp_seconds) / clamp_min(omni_heartbeat_seconds, 5)",
                  [{"color": g, "value": None}, {"color": y, "value": 1.5}, {"color": r, "value": 3}],
                  [(0, 1.5, "accelerating"), (1.5, 3, "steady"), (3, 1e9, "redlining")],
                  "Beats since the governor's last decision; three beats is the staleness alert's line (OmniGovernorStale)."),
-            stat(2, 6, "The senses: blind readings", "omni_sense_blind", [{"color": g, "value": None}, {"color": r, "value": 1}],
+            stat(2, 6, "Blind Sense Readings", "omni_sense_blind", [{"color": g, "value": None}, {"color": r, "value": 1}],
                  [(0, 0.5, "accelerating"), (0.5, 1e9, "redlining")], "1 while a sense the governor needs is unread; the engine holds and says why."),
-            stat(3, 12, "The master switch", "omni_master_switch", [{"color": r, "value": None}, {"color": g, "value": 1}],
+            stat(3, 12, "Master Switch", "omni_master_switch", [{"color": r, "value": None}, {"color": g, "value": 1}],
                  [(-1, 0.5, "OFF: native alone"), (0.5, 2, "ON")], "ON: Omni-Compass governs; OFF: the kill switch is pulled and native runs alone."),
-            stat(4, 18, "Alerts firing", 'sum(ALERTS{alertstate="firing"}) or vector(0)', [{"color": g, "value": None}, {"color": y, "value": 1}, {"color": r, "value": 2}],
+            stat(4, 18, "Alerts Firing", 'sum(ALERTS{alertstate="firing"}) or vector(0)', [{"color": g, "value": None}, {"color": y, "value": 1}, {"color": r, "value": 2}],
                  [(0, 0.5, "accelerating"), (0.5, 1.5, "steady"), (1.5, 1e9, "redlining")], "Alerts firing now across the wall (Prometheus's ALERTS series).")]
 
 
@@ -140,9 +148,9 @@ def signals_row() -> list:
 # a series whose good side is high (the master switch ON, the error budget left) reads the other way
 LIGHT = {"feed2": (0.2, False), "feed3": (0.75, False), "opsCandle": (200.0, False), "orchCv": (1.0, False), "ruStrip": (1.0, False),
          "immCv": (1.0, False), "cStrip": (0.95, False), "band": (0.95, False), "masterCv": (1.0, True), "tSlo": (0.999, True), "tBurn": (0.1, True)}
-LIGHT_WORDS = (" Its light on the live engine, a signal standing as a traffic signal does, red on top, yellow in the middle, green at the"
+LIGHT_WORDS = (" Its light on the live benchmark engine, a signal standing as a traffic signal does, red on top, yellow in the middle, green at the"
                " bottom: red, an alert, over its line or a LOSS row; yellow, heading for its line (within 3% of it, or its slope crossing"
-               " it within three readings), or EVEN on a record; green, working inside its lines.")
+               " it within three readings), or STEADY on a record; green, working inside its lines.")
 
 
 def thresholds(mid: str) -> dict:
@@ -156,21 +164,24 @@ def thresholds(mid: str) -> dict:
 
 def dashboard(reg: dict) -> dict:
     panels = []
-    order = {cid: i for i, cid in enumerate(page_order())}   # every panel numbered as the page numbers its monitor, laid out left to right
+    order = {cid: i for i, cid in enumerate(wall_order())}   # every panel numbered as the wall numbers its monitor, by importance, laid out left to right
+    blocks = {i: (k, b) for k, b in enumerate(reg.get("blocks", []), 1) for i in b["ids"]}
     sec, last, col, y = page_sections(), None, 0, 6       # under the signals row
     for i, m in enumerate(sorted(reg["monitors"], key=lambda m: order.get(m["id"], len(order)))):
         n = i + 1
         sn, st = sec.get(m["id"], ("", ""))
-        if (sn, st) != last:   # each section of the page a row of the wall, its monitors under it
+        k, blk = blocks.get(m["id"], (0, None))
+        head = (f"Block {k} · {blk['title']}" if blk else (f"{sn} · {st}" if sn else (st or "the page")))
+        if head != last:   # each block of the wall a row, its monitors under it in rank order (the founder's order of 30 October)
             if col:
                 col, y = 0, y + H
-            panels.append({"id": 1000 + sum(1 for p in panels if p["type"] == "row"), "type": "row", "title": f"{sn} · {st}" if sn else (st or "the page"),
+            panels.append({"id": 1000 + sum(1 for p in panels if p["type"] == "row"), "type": "row", "title": head,
                            "collapsed": False, "gridPos": {"x": 0, "y": y, "w": COLS * W, "h": 1}, "panels": []})
-            y, last = y + 1, (sn, st)
+            y, last = y + 1, head
         x = col * W
         title = f"{n} · {m['name']}"
         base = {"id": n, "title": title, "gridPos": {"x": x, "y": y, "w": W, "h": H},
-                "description": (f"Section {sn}, {st}. " if sn else "") + f"{m['what']} Evidence class {m['cls']}; on the live engine: {m['status']}. Feed: {m['feed']['exporter']}."
+                "description": (f"Section {sn}, {st}. " if sn else "") + f"{m['what']} Evidence class {m['cls']}; on the live benchmark engine: {m['status']}. Feed: {m['feed']['exporter']}."
                                + (f" Awaiting: {m['awaiting']}." if m.get("awaiting") else "") + wiring(m) + LIGHT_WORDS}
         col += 1
         if col == COLS:
@@ -185,16 +196,16 @@ def dashboard(reg: dict) -> dict:
         else:
             panels.append({**base, "type": "text", "options": {"mode": "markdown", "content":
                            f"**{m['name']}** ({reg['layers'].get(m['layer'], m['layer'])}).\n\n{m['what']}\n\nSource: {m['feed']['exporter']}. "
-                           f"No Prometheus series carries this panel: the live engine draws it from the repository's own records or from its own clock; "
+                           f"No Prometheus series carries this panel: the live benchmark engine draws it from the repository's own records or from its own clock; "
                            f"this panel marks its place on the wall (monitor {n}).{LIGHT_WORDS}"}})
-    return {"uid": "omni-compass-wall", "title": "Omni-Compass: the monitor wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
+    return {"uid": "omni-compass-wall", "title": "Omni-Compass Monitor Wall", "tags": ["omni-compass", "wall"], "timezone": "utc", "schemaVersion": 39, "version": 1,
             "editable": True, "graphTooltip": 1, "time": {"from": "now-6h", "to": "now"}, "refresh": "30s",
             "templating": {"list": knobs()},
-            "links": [{"title": "The governor's own screen", "type": "dashboards", "tags": ["omni-compass"], "asDropdown": False},
-                      {"title": "The control panel's buttons: Restore factory profile, Return to native, mode, dial, beat, each muscle", "type": "link",
+            "links": [{"title": "Governor Dashboard", "type": "dashboards", "tags": ["omni-compass"], "asDropdown": False},
+                      {"title": "Control Panel", "type": "link",
                        "url": "${control}/", "targetBlank": True, "icon": "bolt"},
-                      {"title": "Alertmanager: the alarms and their silences", "type": "link", "url": "http://localhost:9093", "targetBlank": True},
-                      {"title": "The live engine", "type": "link", "url": f"{REPO_URL}/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
+                      {"title": "Alertmanager", "type": "link", "url": "http://localhost:9093", "targetBlank": True},
+                      {"title": "Live Benchmark Engine", "type": "link", "url": f"{REPO_URL}/blob/main/docs/engine/OMNI_COMPASS_LIVE_ENGINE.html"}],
             "description": NOTICE,
             # the notice at the top and the end of the wall, where Grafana shows it (the underwriting seat of 24 October)
             "panels": [notice_panel(-1)] + signals_row() + panels + [notice_panel(max([p["gridPos"]["y"] + p["gridPos"]["h"] for p in panels] or [0]))],

@@ -18,7 +18,7 @@ The ten organisms, in this order:
   6  the four stacked             each realm's own body on one clock (tools/run_realms_v5.py organism_run, STACK)
   7  the whole tower              every catalog muscle once (realms/catalog_v5.csv)
   8  the orchestra                the governors' and orchestrators' muscles, every one once (tools/run_orchestra.py bodies)
-  9  the live engine's organism   the sixty muscles the live engine page draws (docs/engine/export_harness_trace.py)
+  9  the live benchmark engine's organism   the sixty muscles the live benchmark engine page draws (docs/engine/export_harness_trace.py)
   10 the whole organism           three sectors (the software, the cloud as the wire, the bare metal / the data center),
                                   a composition of the real tables (results/WHOLE_SYSTEM.json, regrouped by
                                   docs/engine/export_whole.py)
@@ -30,7 +30,7 @@ The two arms, on the same seeds (the same demand, weather and disturbances in bo
 
 Organisms 1-8 run here, under the climb (realms/harness.py CLIMB: the load stepping by one, 1 2 3 2 3 4 ..., level 4 the
 organism's own load, 8 twice it), on run_bodies exactly as tools/run_realms_v5.py runs its organisms, for the full 240
-decisions of 15 s, recording every decision as the live engine's harness record does (the service position the law reads,
+decisions of 15 s, recording every decision as the live benchmark engine's harness record does (the service position the law reads,
 the decisions over the line, the work each plant did, the body's power). Organism 9 is read from the harness export's own
 functions (docs/engine/export_harness_trace.py run, gauges and interval), and checked decision by decision against the same
 organism run here. Runs A, B and C are seeds 3000, 3001 and 3002 (the harness record's runs: the first three of the realms'
@@ -40,7 +40,7 @@ The reading, gauge by gauge, of Omni-Compass on native against native: the harne
 (export_harness_trace.gauges: the work index against native's own rate, the muscles over their line, the body's power, and
 the spread of the service positions, shown), the paired change per decision averaged over blocks of ten decisions with its
 95% interval by Student t over the blocks (export_harness_trace.interval), in each run; the word by the key (tools/readings.py
-stack_reading, the founder's half-percent floor by in_all_three): GAIN, LOSS or power given in all three of our runs, EVEN (the
+stack_reading, the founder's half-percent floor by in_all_three): GAIN, LOSS or power given in all three of our runs, STEADY (the
 same, no difference beyond the noise, or under the floor), the runs disagree. The realms runner's own contrasts
 (tools/run_realms_v5.py: paired_organism, plant_harms, the wear) and its label over the three seeds (label_max, 95% intervals
 over the seeds) stand beside them. Evidence class S (our own models).
@@ -67,7 +67,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools.legal import stamp  # noqa: E402
-from tools.readings import (GAIN, EVEN, LOSS, GIVEN, DISAGREE, SHOWN, IN_ALL_THREE, OWN_RUNS, HIGHER, LOWER, SPENT,  # noqa: E402
+from tools.readings import (GAIN, STEADY, LOSS, GIVEN, DISAGREE, SHOWN, IN_ALL_THREE, OWN_RUNS, HIGHER, LOWER, SPENT,  # noqa: E402
                             SHOWN_AIM, aim, by_word, classify, in_all_three, interval_by_word, labelled, receipt_key,
                             stack_reading, with_own_runs)
 import tools.run_realms_v5 as R  # noqa: E402
@@ -85,7 +85,7 @@ def _load(name, rel):
     return mod
 
 
-H = _load("export_harness_trace", "docs/engine/export_harness_trace.py")   # the live engine's harness record
+H = _load("export_harness_trace", "docs/engine/export_harness_trace.py")   # the live benchmark engine's harness record
 W = _load("export_whole", "docs/engine/export_whole.py")                   # the whole organism, regrouped
 
 OUT = ROOT / "results" / "scenarios"
@@ -93,7 +93,7 @@ RUNS = dict(zip("ABC", H.SEEDS))                    # runs A, B and C: the harne
 assert list(RUNS.values()) == R.PREREG_SEEDS[:3]
 LOAD = "climb"
 DECISION_S = 15
-SAME_REL = 1e-6                                     # under one part in a million of the value: EVEN, the same (amendment 11)
+SAME_REL = 1e-9          # "the same" only to nine decimal places of the value (tools/readings.py EXACT_REL; the referee's work order of 25 October)
 ORCHESTRA, LIVE, WHOLE = "orchestra", "live_engine", "whole"
 ARMS = ("native", "on_native")
 ARM_NAMES = {"native": "Native (Omni-Compass off)", "on_native": "Omni-Compass on native"}
@@ -129,9 +129,9 @@ ORGANISMS = [
     (STACK, "The four stacked", "each realm's own body on one clock, every shared muscle in each (the spine once in each realm's "
                                 "body), each realm keeping its own native"),
     (TOWER, "The whole tower", "every catalog muscle once (`realms/catalog_v5.csv`)"),
-    (ORCHESTRA, "The orchestra", "every catalog muscle that stands for a knob of the governors and orchestrators the founder "
-                                 "named, every one once, as `tools/run_orchestra.py` makes it (`tools/governors_page.py`)"),
-    (LIVE, "The live engine's organism", "the sixty muscles the live engine page draws, twelve from the spine and twelve from "
+    (ORCHESTRA, "The orchestra", "every catalog muscle that stands for a knob of the governors and orchestrators "
+                                 "named in `tools/governors_page.py`, every one once, as `tools/run_orchestra.py` makes it"),
+    (LIVE, "The live engine's organism", "the sixty muscles the live benchmark engine page draws, twelve from the spine and twelve from "
                                          "each realm, in one body (`docs/engine/export_harness_trace.py`)"),
     (WHOLE, "The whole organism, three sectors", "the software (the cluster and the services on it), the cloud as the wire (the "
                                                  "machines it bills) and the bare metal / the data center (the card, the machine), "
@@ -159,7 +159,7 @@ def flat(name, rs):
 
 def recorded_run(name, rs, seed, arm, load=LOAD):
     """One organism, one arm, on realms/harness.py run_bodies exactly as tools/run_realms_v5.py organism_run runs it (the four
-    stacked: each realm's own body on one clock), every decision recorded as the live engine's harness record records it:
+    stacked: each realm's own body on one clock), every decision recorded as the live benchmark engine's harness record records it:
     the service position the law reads, the decisions over the line and the work of every plant, the body's power, and the
     machines in service and starting over every pool whose own count is its knob. The
     record is read after each body's step and changes nothing in it. Returns (record, run_bodies' own result)."""
@@ -265,7 +265,7 @@ def organism_job(args):
 def three_run(runs, aim_):
     """The key's three-run reading of one gauge (tools/readings.py stack_reading, the founder's rule of 24 October: GAIN, LOSS or
     power given in all three of our runs, or by the mean of our three runs with the count beyond the noise, by the gauge's aim;
-    EVEN under the floor or the same; the runs disagree), with the half-percent floor (in_all_three with the largest run's
+    STEADY under the floor or the same; the runs disagree), with the half-percent floor (in_all_three with the largest run's
     change) where the reference is not zero."""
     rs = [{"native": r["base"], "diff": r["diff"], "significant": r["lo"] > 0 or r["hi"] < 0} for r in runs]
     reading = stack_reading(rs, aim_, SAME_REL)
@@ -277,13 +277,13 @@ def three_run(runs, aim_):
 def short(reading, aim_):
     """The reading's one word, as the key classifies it."""
     c = classify(reading, aim(aim_))
-    return {"gain": GAIN, "loss": LOSS, "given": GIVEN, "noise": EVEN, "same": EVEN, "disagree": DISAGREE}.get(c, SHOWN)
+    return {"gain": GAIN, "loss": LOSS, "given": GIVEN, "noise": STEADY, "same": STEADY, "disagree": DISAGREE}.get(c, SHOWN)
 
 
 def cell(r, word):
     """One run's change and its 95% interval as the key prints them: in percent of the reference where it is not zero, the
     number carrying the word's sign (tools/readings.py by_word, interval_by_word)."""
-    w = word if word in (GAIN, LOSS, GIVEN, EVEN) else None
+    w = word if word in (GAIN, LOSS, GIVEN, STEADY) else None
     if r["base"]:
         b = abs(r["base"])
         return f"{by_word(100 * r['diff'] / b, w, digits=2)} ({interval_by_word(100 * r['lo'] / b, 100 * r['hi'] / b, w, digits=2)})"
@@ -393,7 +393,7 @@ def whole_organism(no, key, name, what):
 
 # ------------------------------------------------------------------------------------------------------------------- the page
 def pct(x, word, unit="%", digits=2):
-    return by_word(100 * x if unit == "%" else x, word if word in (GAIN, LOSS, GIVEN, EVEN) else None, unit=unit, digits=digits)
+    return by_word(100 * x if unit == "%" else x, word if word in (GAIN, LOSS, GIVEN, STEADY) else None, unit=unit, digits=digits)
 
 
 def summary_cell(rd):
@@ -418,7 +418,7 @@ def write_md(out, rec):
           f"the law is not an independent test. Engine **{run['engine']}** (`tools/omni_version.py`, digest {run['engine_digest'][:16]}), "
           f"commit `{run['commit'][:12]}`{' (uncommitted changes in the files it stands on)' if run['dirty'] else ''}, run "
           f"{run['started']}, {run['elapsed_s']} s on {run['workers']} processes. Runs A, B and C are seeds "
-          f"{', '.join(str(s) for s in run['seeds'])} (the live engine's harness record's runs, the first three of the realms' "
+          f"{', '.join(str(s) for s in run['seeds'])} (the live benchmark engine's harness record's runs, the first three of the realms' "
           f"preregistered seeds 3000-3009), the same seed in every arm. The load is the climb (the load stepping by one, "
           f"{' '.join(str(x) for x in CLIMB[:8])} ..., level 4 the organism's own load, 8 twice it), for {run['steps']} decisions "
           f"of {DECISION_S} s (an hour, every organism at full length); at {int(KILL_AT * 100)}% of every run the brain goes "
@@ -436,7 +436,7 @@ def write_md(out, rec):
           "change per decision, averaged over blocks of ten decisions, with its 95% interval by Student t over the 24 blocks. The "
           "word is the key's (`tools/readings.py` `stack_reading`, with the founder's half-percent floor through `in_all_three`): "
           "**GAIN**, **LOSS** or **power given in all three of our runs** when all three runs point the same way with every interval "
-          "clear of zero, judged by what the gauge is for and never by its sign; **EVEN** when an interval includes zero (no "
+          "clear of zero, judged by what the gauge is for and never by its sign; **STEADY** when an interval includes zero (no "
           "difference beyond the noise), when nothing moved (the same), or when every run's change is under half of one percent "
           "(under the floor); **the runs disagree** when clear runs point different ways. The number beside a word carries the "
           "word's sign. The gauges:", "",

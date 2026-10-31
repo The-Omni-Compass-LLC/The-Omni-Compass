@@ -15,7 +15,7 @@ editing seat's report of 23 October and the consensus audit of 22 October. This 
 line number below is this build's. Read-only: nothing in the repository was edited and no builder was run. No other seat's report was
 opened.
 
-**This seat.** Editing only: the house word rules (compass, one pedal and no "brake", the two arms, GAIN / EVEN / LOSS and power given,
+**This seat.** Editing only: the house word rules (compass, one pedal and no "brake", the two arms, GAIN / STEADY / LOSS and power given,
 no "confirmed", no "simulation" for our own models, and since 24 October no "model" and no "stand-in"), Unicode formulas, the sign rule; then
 repetitions and padding, typos and grammar, sentences a reader would misread, two places that contradict each other, text that describes
 a control or monitor wrongly (checked against the JavaScript handlers), headings that do not say what the section holds, and jargon left
@@ -37,7 +37,7 @@ sentences left over from an earlier page: three retired words ("confirming", "si
 the page describing an order it no longer has (title page, 1b, 2d); "never by itself" set beside an engine and a default panel that
 run without a native controller (title page, 4d, 3l); the bottom line's yardstick left unnamed now that 3n is gone; two controls
 described wrongly ("five tabs", the glossary's five beats); the kill switch called "native alone" in two places and "separate" in two
-others; the heartbeat stated as 15 s in three sections and 60 s in three; EVEN defined two ways in the key itself; nine stale
+others; the heartbeat stated as 15 s in three sections and 60 s in three; STEADY defined two ways in the key itself; nine stale
 cross-references to sections that no longer exist; the one GPU run named four ways; ten organisms against seven and an eighth; and two
 majors of 22 October back again (power given "the accent" in the registry; `OMNI_V16.json` as "the engine that stands" in the
 disclosures). Nine of the seventeen are one-line fixes.
@@ -45,7 +45,7 @@ disclosures). Nine of the seventeen are one-line fixes.
 | Section | Grade | Why, in one sentence |
 |---|---|---|
 | ii Title page and build | **B+** | "finding and confirming the best" (662), a book order the page no longer has (647, 659), and "never by itself" beside an engine that "added ... to run Omni-Compass by itself" (647): three majors. |
-| iii The bottom line | **A−** | The yardstick is labelled "Kubernetes' published autoscaling rule" with no word that the rig is the company's own, without Kubernetes (E7), and STEADY is "no difference beyond 0.5% or the noise" and "EVEN only inside 0.5%" in one paragraph (674, E12). |
+| iii The bottom line | **A−** | The yardstick is labelled "Kubernetes' published autoscaling rule" with no word that the rig is the company's own, without Kubernetes (E7), and STEADY is "no difference beyond 0.5% or the noise" and "STEADY only inside 0.5%" in one paragraph (674, E12). |
 | 1a The monitor wall, with the main control panel | **B+** | "five tabs" where the panel builds seven (703), "Native alone is the kill switch" (698) against the reset's own label, and the Drive tab's group "every beat, simulated" (5507). |
 | 1b The control panel and the kill switch | **A−** | "The first view after the front matter" and "The monitors it drives follow: the wall of every monitor (1a)" (728) describe the old order, and "the proof monitor, 1f" twice (735) points at a section that is gone. |
 | 1c The dashboards | **A+** | The nine forms named as the code builds them (5635), the who-does-what table and the five products exact and attributed; nothing to fault but the founder's date in the contents. |
@@ -78,7 +78,7 @@ disclosures). Nine of the seventeen are one-line fixes.
 | 4h Failure modes | **A+** | Exact. |
 | 4i Self-governed rendering | **A+** | Exact, with its class and its limit in one paragraph. |
 | 4j The problem and the answer | **A** | "on Kubernetes its full read of the state every 15 seconds, the autoscaler's own pace" (1903) against the factory's 60 s (E11). |
-| 4k Executive summary and reading key | **A−** | The key teaches the 0.5% floor (1932) and then "EVEN =0.9% means a 0.9% difference the noise covers" (1933) and "no difference beyond the noise" (1936) (E12); the summary points to "(section 3)" for the composition (6950, E13). |
+| 4k Executive summary and reading key | **A−** | The key teaches the 0.5% floor (1932) and then "STEADY =0.9% means a 0.9% difference the noise covers" (1933) and "no difference beyond the noise" (1936) (E12); the summary points to "(section 3)" for the composition (6950, E13). |
 | 4l The monitor list | **B+** | The registry it prints gives power given "the accent" (monitor 7), names the A10 of 2 October as "the one real run" awaiting "its omni-v13 run" (monitor 43), and prints `tools/model_gate.py` in about twenty wiring cells. |
 | 4m Glossary and index | **A−** | "the heartbeat": "the page offers five, 15, 30, 60, 90 and 120 s" (E9, six buttons from 10 on the page), and the heading's "ten organisms" (E15); "Amber on the page" for native is a minor. |
 | v Disclosures, governing law and contact | **A−** | "OMNI_V16.json, docs/OMNI_V16.md, the engine that stands" (1992, E17) and "The GPU, CPU and cloud places are written and marked not yet run" (1995, E14). |
@@ -177,15 +177,15 @@ tune "the 60 s beat". The three 15 s sentences are each true of omni-v16, but no
 omni-v16 ran it every 15 s" in 928 and 1261; in 1903 "its full read of the state every 60 s at the factory, 15 s or faster on the dial, and
 its fast checks every 5 s".
 
-**E12. EVEN defined two ways, inside the key (4k 1932, 1933, 1936; iii 674; the contents 686 and Part 2's lede 783).** 1932: "a change
-under the 0.5% floor reads EVEN =0.3%"; "a change under half of one percent either way, in every run, reads EVEN". 1933: "EVEN =0.9% means a
-0.9% difference the noise covers, no direction claimed". 1936: EVEN is "the same, or no difference beyond the noise". iii, in one
-paragraph: STEADY is "no difference beyond 0.5% or the noise", then "EVEN only inside 0.5%". The code (`threeRun`, 3242) reads the floor
+**E12. STEADY defined two ways, inside the key (4k 1932, 1933, 1936; iii 674; the contents 686 and Part 2's lede 783).** 1932: "a change
+under the 0.5% floor reads STEADY =0.3%"; "a change under half of one percent either way, in every run, reads STEADY". 1933: "STEADY =0.9% means a
+0.9% difference the noise covers, no direction claimed". 1936: STEADY is "the same, or no difference beyond the noise". iii, in one
+paragraph: STEADY is "no difference beyond 0.5% or the noise", then "STEADY only inside 0.5%". The code (`threeRun`, 3242) reads the floor
 alone: a mean of 0.5% or more is GAIN, LOSS or power given whatever its interval, so the bottom line prints "GAIN by the mean of our three
-runs, beyond the noise in 1 of 3" for the machines. Under 1933 and 1936 a reader expects that row to read EVEN, and 0.9% can never read EVEN.
-"In every run" (1932) also differs from the code's "the mean of the three runs". **Fix:** one sentence in all six places: "EVEN: the change
+runs, beyond the noise in 1 of 3" for the machines. Under 1933 and 1936 a reader expects that row to read STEADY, and 0.9% can never read STEADY.
+"In every run" (1932) also differs from the code's "the mean of the three runs". **Fix:** one sentence in all six places: "STEADY: the change
 is under the 0.5% floor (the mean of the three runs' changes); from 0.5% the word follows the gauge's aim, and the count of runs beyond the
-noise is printed beside it." Change the 1933 example to "EVEN =0.3%", and the key row to "native and Omni-Compass within 0.5% of each
+noise is printed beside it." Change the 1933 example to "STEADY =0.3%", and the key row to "native and Omni-Compass within 0.5% of each
 other".
 
 **E13. Nine cross-references, in seven sections, to sections that are not on the page (1b 735 twice; 2b 810; 3c 995; 3d 3095; 4f 7880; 4g 1773 and 1804;
@@ -211,7 +211,7 @@ with two arms, not an organism of the catalog". **Fix:** in 4b and 4m, "ten bodi
 page's sixty-muscle body and the whole stack's composition", or count the last two as organisms in 4a and 4c too; one count everywhere.
 
 **E16. Power given "the accent" again (the registry's monitor 7, line 2011; printed on wall tile 7 and in 4l).** "its colour its reading
-(GAIN green, LOSS red, EVEN yellow, power given the accent, an orchestrator's own cost grey and dashed)". The key: "or blue for power given,
+(GAIN green, LOSS red, STEADY yellow, power given the accent, an orchestrator's own cost grey and dashed)". The key: "or blue for power given,
 and no other"; 2d's prose (848) now says "blue where it gave power". This is E4 of 23 October, closed in the prose and not in the registry.
 **Fix:** "power given blue" in `docs/engine/monitors.json`, and a grep for "accent" in the registry's texts in `check_live_engine.py`.
 
@@ -226,7 +226,7 @@ the title page already does, and add this paragraph to `tools/land_engine.py --c
 3e 1097, 3l 1410, 3m 1448, 4i 1877), "Omni-Compass on native" (4b 1667, the bottom line's row), "Omni-Compass on top of native" (the key
 1930) and "Omni-Compass" (3a's instance head, 889). The chip "native · Omni-Compass and native" reads at first as a list of three. Pick one label for
 tables ("Omni-Compass on native") and keep the key's sentence for the definition. m2 Bare "Omni": "Omni direct" (647), "native and Omni
-could not be told apart" (the key's EVEN row, 1936), "Omni's own processor" (the dial's table head, 3602). m3 "Two engines, one
+could not be told apart" (the key's STEADY row, 1936), "Omni's own processor" (the dial's table head, 3602). m3 "Two engines, one
 demand" (872) uses "engine" for an arm; "Two sides, one demand". m4 "REDLINING" means "behind native" on the lights (674), while the max by
 design runs each muscle to its own limit, its redline: an engineer will read the word the other way; the definition is printed beside it,
 so it is a minor. m5 The bottom line's heading and the contents still say "One light and one number for each way to run it" (672, 686),
@@ -310,9 +310,9 @@ the test rig (E7); "the main engine" (417, 1639) undefined; "so no monitor, tabl
 - **The third arm came out cleanly in the prose.** No "Omni-Compass direct", no "by itself" arm, no violet side and no thirty scenarios
   survive in the visible text; the key (1930), the chip (657), the title (647), 4b (1669) and the disclosures (1988) say "two sides, and
   only two" in matching words, and violet is now a changed tune and nothing else (713, the glossary's "a changed tune's violet").
-- **The sign rule is right where it is taught.** The key (1932–1933) and 4c (1677) print "GAIN +, LOSS −, EVEN =, power given +", with
+- **The sign rule is right where it is taught.** The key (1932–1933) and 4c (1677) print "GAIN +, LOSS −, STEADY =, power given +", with
   worked examples (1947–1951); E3 of 23 October is closed on the page and in the manual (4.2).
-- **The words of the key hold.** GAIN, EVEN, LOSS and power given everywhere, decided by the gauge's aim; power given is never called a
+- **The words of the key hold.** GAIN, STEADY, LOSS and power given everywhere, decided by the gauge's aim; power given is never called a
   loss; "better" and "worse" appear only in the sentences that forbid them (1953, the Ask panel's rules 4386), "confirmed" only in
   the Ask panel's rule (its one other form is E1), and "standalone" and "competitor" only in negations (1988).
 - **Every model is marked.** Class S at every model view, class L at every played-back run, class P at the one metered card; "never

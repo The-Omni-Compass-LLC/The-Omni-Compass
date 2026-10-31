@@ -321,7 +321,7 @@ preregistered one with every rule unchanged but native's cache: MongoDB exactly 
 own default (half of the machine's memory less 1 GB, at least 256 MB: about 7.5 GB on GitHub's 16 GB machines;
 `tools/run_ycsb.py --native shipped`, workflow input `native: shipped`). That is above the cover's top (2,048 MB): the knob is at
 its limit on native, and any size Omni-Compass wrote would sit below native, which the max never does. So in the shipped set
-omni reads the server, writes nothing and says so in its audit, and every row reads EVEN; that is the result, said before the
+omni reads the server, writes nothing and says so in its audit, and every row reads STEADY; that is the result, said before the
 run. The record carries native's size as the server reported it. The preregistered set keeps its name; the shipped set's tables
 are named for it (`…_YCSB_SHIPPED.md`).
 

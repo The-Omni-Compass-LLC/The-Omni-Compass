@@ -6,188 +6,188 @@ Three runs on rented cards (A, B and C), engine omni-v21 (digest b658f05d43c1e60
 
 | Copies | Organism | Part | Repetitions (A, B, C) | Measure | Three runs | A | B | C |
 |---:|---|---|---|---|---|---|---|---|
-| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, -0.07 pp | EVEN, -0.07 pp | EVEN, -0.07 pp |
-| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.25% | EVEN, =0.07% | EVEN, =0.32% |
-| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.25% | EVEN, =0.07% | EVEN, =0.31% |
-| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.03%) | EVEN, +0.03 pp | EVEN, -0.01 pp | EVEN, +0.08 pp |
-| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.31%) | EVEN, =0.43% | EVEN, =0.11% | LOSS, −0.62% |
-| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, -0.07 pp | EVEN, -0.07 pp | EVEN, -0.07 pp |
-| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.10%) | EVEN, -0.10 pp | EVEN, -0.10 pp | EVEN, -0.10 pp |
-| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.11% | EVEN, =0.07% | EVEN, =0.14% |
-| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, =0.12% | EVEN, =0.07% | EVEN, =0.13% |
-| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, -0.04 pp | EVEN, +0.02 pp | EVEN, -0.01 pp |
-| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.38%) | GAIN, +1.33% | EVEN, =0.05% | EVEN, =0.23% |
-| 1 | Distribution / Specialized | both together | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Distribution / Specialized | both together | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Distribution / Specialized | both together | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Distribution / Specialized | both together | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.10%) | EVEN, -0.10 pp | EVEN, -0.10 pp | EVEN, -0.10 pp |
-| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.12%) | EVEN, -0.12 pp | EVEN, -0.12 pp | EVEN, -0.12 pp |
-| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.12%) | EVEN, =0.03% | EVEN, =0.16% | EVEN, =0.18% |
-| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.12%) | EVEN, =0.03% | EVEN, =0.16% | EVEN, =0.17% |
-| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, -0.01 pp | EVEN, +0.01 pp | EVEN, +0.01 pp |
-| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −0.79% | EVEN, =0.35% | LOSS, −0.69% |
-| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.12%) | EVEN, -0.12 pp | EVEN, -0.12 pp | EVEN, -0.12 pp |
-| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.12%) | EVEN, -0.12 pp | EVEN, -0.12 pp | EVEN, -0.12 pp |
-| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.27% | EVEN, =0.03% | EVEN, =0.17% |
-| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.28% | EVEN, =0.03% | EVEN, =0.16% |
-| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, -0.03 pp | EVEN, +0.04 pp | EVEN, +0.01 pp |
-| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.23%) | EVEN, =0.05% | EVEN, =0.29% | EVEN, =0.37% |
-| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.12%) | EVEN, -0.12 pp | EVEN, -0.12 pp | EVEN, -0.12 pp |
-| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.15%) | EVEN, -0.15 pp | EVEN, -0.15 pp | EVEN, -0.15 pp |
-| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.08%) | EVEN, =0.12% | EVEN, =0.19% | EVEN, =0.09% |
-| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.08%) | EVEN, =0.13% | EVEN, =0.20% | EVEN, =0.08% |
-| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, -0.05 pp | EVEN, +0.01 pp | EVEN, -0.01 pp |
-| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.01% | EVEN, =0.32% | EVEN, =0.19% |
-| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, =0.01% | EVEN, =0.01% | EVEN, =0.01% |
-| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.15%) | EVEN, -0.15 pp | EVEN, -0.15 pp | EVEN, -0.15 pp |
-| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.10%) | EVEN, -0.10 pp | EVEN, -0.10 pp | EVEN, -0.10 pp |
-| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, =0.13% | EVEN, =0.05% | EVEN, =0.18% |
-| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, =0.14% | EVEN, =0.05% | EVEN, =0.19% |
-| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.03%) | EVEN, +0.09 pp | EVEN, +0.02 pp | EVEN, -0.01 pp |
-| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | **the runs disagree** | GAIN, +1.24% | LOSS, −0.55% | EVEN, =0.16% |
-| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.10%) | EVEN, -0.10 pp | EVEN, -0.10 pp | EVEN, -0.10 pp |
-| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, -0.05 pp | EVEN, -0.05 pp | EVEN, -0.05 pp |
-| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | work per energy | EVEN, under the floor (the three runs' mean 0.25%) | EVEN, =0.03% | EVEN, =0.23% | GAIN, +0.50% |
-| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | energy | EVEN, under the floor (the three runs' mean 0.25%) | EVEN, =0.03% | EVEN, =0.23% | EVEN, =0.50% |
-| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, -0.03 pp | EVEN, +0.01 pp | EVEN, +0.01 pp |
-| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.35% | EVEN, =0.11% | EVEN, =0.32% |
-| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, -0.05 pp | EVEN, -0.05 pp | EVEN, -0.05 pp |
-| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, -0.07 pp | EVEN, -0.07 pp | EVEN, -0.07 pp |
-| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.31%) | EVEN, =0.36% | EVEN, =0.05% | GAIN, +0.61% |
-| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.30%) | EVEN, =0.36% | EVEN, =0.05% | GAIN, +0.61% |
-| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.03%) | EVEN, -0.10 pp | EVEN, +0.02 pp | EVEN, -0.01 pp |
-| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.39%) | GAIN, +0.97% | EVEN, =0.21% | EVEN, =0.01% |
-| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, -0.07 pp | EVEN, -0.07 pp | EVEN, -0.07 pp |
-| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, =0.02% | EVEN, =0.02% | EVEN, =0.02% |
-| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, =0.02% | EVEN, =0.02% | EVEN, =0.02% |
-| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.10%) | EVEN, -0.10 pp | EVEN, -0.10 pp | EVEN, -0.10 pp |
-| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.15%) | EVEN, =0.26% | EVEN, =0.45% | EVEN, =0.27% |
-| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.16%) | EVEN, =0.26% | EVEN, =0.45% | EVEN, =0.28% |
-| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, +0.02 pp | EVEN, +0.03 pp | EVEN, +0.01 pp |
-| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.24%) | GAIN, +1.11% | EVEN, =0.27% | EVEN, =0.12% |
-| 10 | Distribution / Specialized | both together | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, =0.02% | EVEN, =0.02% | EVEN, =0.02% |
-| 10 | Distribution / Specialized | both together | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Distribution / Specialized | both together | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.02%) | EVEN, =0.02% | EVEN, =0.02% | EVEN, =0.02% |
-| 10 | Distribution / Specialized | both together | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.10%) | EVEN, -0.10 pp | EVEN, -0.10 pp | EVEN, -0.10 pp |
-| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, -0.09 pp | EVEN, -0.09 pp | EVEN, -0.09 pp |
-| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, =0.01% | EVEN, =0.06% | EVEN, =0.16% |
-| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, =0.01% | EVEN, =0.06% | EVEN, =0.16% |
-| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.08%) | EVEN, -0.21 pp | EVEN, -0.03 pp | EVEN, -0.01 pp |
-| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** | GAIN, +1.48% | EVEN, =0.08% | EVEN, =0.24% |
-| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, -0.09 pp | EVEN, -0.09 pp | EVEN, -0.09 pp |
-| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.04% | EVEN, =0.04% | EVEN, =0.04% |
-| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.04% | EVEN, =0.04% | EVEN, =0.04% |
-| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, -0.09 pp | EVEN, -0.09 pp | EVEN, -0.09 pp |
-| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | work per energy | **power given by the mean of our three runs, beyond the noise in 0 of 3** | EVEN, =0.27% | EVEN, =0.28% | power given, +1.22% |
-| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | energy | **power given by the mean of our three runs, beyond the noise in 0 of 3** | EVEN, =0.28% | EVEN, =0.28% | power given, +1.26% |
-| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.06%) | EVEN, +0.04 pp | EVEN, +0.10 pp | EVEN, +0.02 pp |
+| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Compute / AI / Cloud | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, -0.07 pp | STEADY, -0.07 pp | STEADY, -0.07 pp |
+| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.25% | STEADY, =0.07% | STEADY, =0.32% |
+| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.25% | STEADY, =0.07% | STEADY, =0.31% |
+| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.03%) | STEADY, +0.03 pp | STEADY, -0.01 pp | STEADY, +0.08 pp |
+| 1 | Compute / AI / Cloud | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.31%) | STEADY, =0.43% | STEADY, =0.11% | LOSS, −0.62% |
+| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Compute / AI / Cloud | both together | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, -0.07 pp | STEADY, -0.07 pp | STEADY, -0.07 pp |
+| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Distribution / Specialized | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.10%) | STEADY, -0.10 pp | STEADY, -0.10 pp | STEADY, -0.10 pp |
+| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.11% | STEADY, =0.07% | STEADY, =0.14% |
+| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, =0.12% | STEADY, =0.07% | STEADY, =0.13% |
+| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, -0.04 pp | STEADY, +0.02 pp | STEADY, -0.01 pp |
+| 1 | Distribution / Specialized | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.38%) | GAIN, +1.33% | STEADY, =0.05% | STEADY, =0.23% |
+| 1 | Distribution / Specialized | both together | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Distribution / Specialized | both together | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Distribution / Specialized | both together | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Distribution / Specialized | both together | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.10%) | STEADY, -0.10 pp | STEADY, -0.10 pp | STEADY, -0.10 pp |
+| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Energy / Facility / Industrial | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.12%) | STEADY, -0.12 pp | STEADY, -0.12 pp | STEADY, -0.12 pp |
+| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.12%) | STEADY, =0.03% | STEADY, =0.16% | STEADY, =0.18% |
+| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.12%) | STEADY, =0.03% | STEADY, =0.16% | STEADY, =0.17% |
+| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, -0.01 pp | STEADY, +0.01 pp | STEADY, +0.01 pp |
+| 1 | Energy / Facility / Industrial | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −0.79% | STEADY, =0.35% | LOSS, −0.69% |
+| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Energy / Facility / Industrial | both together | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.12%) | STEADY, -0.12 pp | STEADY, -0.12 pp | STEADY, -0.12 pp |
+| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.12%) | STEADY, -0.12 pp | STEADY, -0.12 pp | STEADY, -0.12 pp |
+| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.27% | STEADY, =0.03% | STEADY, =0.17% |
+| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.28% | STEADY, =0.03% | STEADY, =0.16% |
+| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, -0.03 pp | STEADY, +0.04 pp | STEADY, +0.01 pp |
+| 1 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.23%) | STEADY, =0.05% | STEADY, =0.29% | STEADY, =0.37% |
+| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | Physics / Robotics / Autonomous | both together | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.12%) | STEADY, -0.12 pp | STEADY, -0.12 pp | STEADY, -0.12 pp |
+| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.15%) | STEADY, -0.15 pp | STEADY, -0.15 pp | STEADY, -0.15 pp |
+| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.08%) | STEADY, =0.12% | STEADY, =0.19% | STEADY, =0.09% |
+| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.08%) | STEADY, =0.13% | STEADY, =0.20% | STEADY, =0.08% |
+| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, -0.05 pp | STEADY, +0.01 pp | STEADY, -0.01 pp |
+| 1 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.01% | STEADY, =0.32% | STEADY, =0.19% |
+| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, =0.01% | STEADY, =0.01% | STEADY, =0.01% |
+| 1 | The spine, the muscles every stack runs on | both together | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.15%) | STEADY, -0.15 pp | STEADY, -0.15 pp | STEADY, -0.15 pp |
+| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The four stacked, duplicates kept | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.10%) | STEADY, -0.10 pp | STEADY, -0.10 pp | STEADY, -0.10 pp |
+| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, =0.13% | STEADY, =0.05% | STEADY, =0.18% |
+| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, =0.14% | STEADY, =0.05% | STEADY, =0.19% |
+| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.03%) | STEADY, +0.09 pp | STEADY, +0.02 pp | STEADY, -0.01 pp |
+| 1 | The four stacked, duplicates kept | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | **the runs disagree** | GAIN, +1.24% | LOSS, −0.55% | STEADY, =0.16% |
+| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The four stacked, duplicates kept | both together | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.10%) | STEADY, -0.10 pp | STEADY, -0.10 pp | STEADY, -0.10 pp |
+| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The whole tower, every muscle once | the stacks (our own models, class S) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, -0.05 pp | STEADY, -0.05 pp | STEADY, -0.05 pp |
+| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | work per energy | STEADY, under the floor (the three runs' mean 0.25%) | STEADY, =0.03% | STEADY, =0.23% | GAIN, +0.50% |
+| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | energy | STEADY, under the floor (the three runs' mean 0.25%) | STEADY, =0.03% | STEADY, =0.23% | STEADY, =0.50% |
+| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, -0.03 pp | STEADY, +0.01 pp | STEADY, +0.01 pp |
+| 1 | The whole tower, every muscle once | the card (its own meter, class P) | 5, 5, 5 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.35% | STEADY, =0.11% | STEADY, =0.32% |
+| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 1 | The whole tower, every muscle once | both together | 5, 5, 5 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, -0.05 pp | STEADY, -0.05 pp | STEADY, -0.05 pp |
+| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | Compute / AI / Cloud | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, -0.07 pp | STEADY, -0.07 pp | STEADY, -0.07 pp |
+| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.31%) | STEADY, =0.36% | STEADY, =0.05% | GAIN, +0.61% |
+| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.30%) | STEADY, =0.36% | STEADY, =0.05% | GAIN, +0.61% |
+| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.03%) | STEADY, -0.10 pp | STEADY, +0.02 pp | STEADY, -0.01 pp |
+| 10 | Compute / AI / Cloud | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.39%) | GAIN, +0.97% | STEADY, =0.21% | STEADY, =0.01% |
+| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | Compute / AI / Cloud | both together | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, -0.07 pp | STEADY, -0.07 pp | STEADY, -0.07 pp |
+| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, =0.02% | STEADY, =0.02% | STEADY, =0.02% |
+| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, =0.02% | STEADY, =0.02% | STEADY, =0.02% |
+| 10 | Distribution / Specialized | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.10%) | STEADY, -0.10 pp | STEADY, -0.10 pp | STEADY, -0.10 pp |
+| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.15%) | STEADY, =0.26% | STEADY, =0.45% | STEADY, =0.27% |
+| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.16%) | STEADY, =0.26% | STEADY, =0.45% | STEADY, =0.28% |
+| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, +0.02 pp | STEADY, +0.03 pp | STEADY, +0.01 pp |
+| 10 | Distribution / Specialized | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.24%) | GAIN, +1.11% | STEADY, =0.27% | STEADY, =0.12% |
+| 10 | Distribution / Specialized | both together | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, =0.02% | STEADY, =0.02% | STEADY, =0.02% |
+| 10 | Distribution / Specialized | both together | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Distribution / Specialized | both together | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.02%) | STEADY, =0.02% | STEADY, =0.02% | STEADY, =0.02% |
+| 10 | Distribution / Specialized | both together | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.10%) | STEADY, -0.10 pp | STEADY, -0.10 pp | STEADY, -0.10 pp |
+| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Energy / Facility / Industrial | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, -0.09 pp | STEADY, -0.09 pp | STEADY, -0.09 pp |
+| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, =0.01% | STEADY, =0.06% | STEADY, =0.16% |
+| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, =0.01% | STEADY, =0.06% | STEADY, =0.16% |
+| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.08%) | STEADY, -0.21 pp | STEADY, -0.03 pp | STEADY, -0.01 pp |
+| 10 | Energy / Facility / Industrial | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | **GAIN by the mean of our three runs, beyond the noise in 0 of 3** | GAIN, +1.48% | STEADY, =0.08% | STEADY, =0.24% |
+| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Energy / Facility / Industrial | both together | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, -0.09 pp | STEADY, -0.09 pp | STEADY, -0.09 pp |
+| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.04% | STEADY, =0.04% | STEADY, =0.04% |
+| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.04% | STEADY, =0.04% | STEADY, =0.04% |
+| 10 | Physics / Robotics / Autonomous | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, -0.09 pp | STEADY, -0.09 pp | STEADY, -0.09 pp |
+| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | work per energy | **power given by the mean of our three runs, beyond the noise in 0 of 3** | STEADY, =0.27% | STEADY, =0.28% | power given, +1.22% |
+| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | energy | **power given by the mean of our three runs, beyond the noise in 0 of 3** | STEADY, =0.28% | STEADY, =0.28% | power given, +1.26% |
+| 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.06%) | STEADY, +0.04 pp | STEADY, +0.10 pp | STEADY, +0.02 pp |
 | 10 | Physics / Robotics / Autonomous | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −1.22% | LOSS, −0.97% | LOSS, −1.79% |
-| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.04% | EVEN, =0.04% | EVEN, =0.04% |
-| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, =0.04% | EVEN, =0.04% | EVEN, =0.04% |
-| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, -0.09 pp | EVEN, -0.09 pp | EVEN, -0.09 pp |
-| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.14%) | EVEN, -0.14 pp | EVEN, -0.14 pp | EVEN, -0.14 pp |
-| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.06%) | EVEN, =0.35% | EVEN, =0.16% | EVEN, =0.00% |
-| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, =0.35% | EVEN, =0.16% | EVEN, =0.01% |
-| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, -0.01 pp | EVEN, -0.02 pp | EVEN, -0.01 pp |
-| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.28%) | EVEN, =0.02% | EVEN, =0.34% | EVEN, =0.48% |
-| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.05%) | EVEN, =0.05% | EVEN, =0.05% | EVEN, =0.05% |
-| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.14%) | EVEN, -0.14 pp | EVEN, -0.14 pp | EVEN, -0.14 pp |
-| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, -0.09 pp | EVEN, -0.09 pp | EVEN, -0.09 pp |
-| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, =0.12% | EVEN, =0.15% | EVEN, =0.25% |
-| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, =0.12% | EVEN, =0.15% | EVEN, =0.25% |
-| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.01%) | EVEN, +0.03 pp | EVEN, -0.03 pp | EVEN, +0.03 pp |
-| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | EVEN, under the floor (the three runs' mean 0.27%) | EVEN, =0.23% | LOSS, −0.53% | EVEN, =0.49% |
-| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.00%) | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.09%) | EVEN, -0.09 pp | EVEN, -0.09 pp | EVEN, -0.09 pp |
-| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, -0.04 pp | EVEN, -0.04 pp | EVEN, -0.04 pp |
-| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | work per energy | EVEN, under the floor (the three runs' mean 0.12%) | EVEN, =0.32% | EVEN, =0.40% | EVEN, =0.43% |
-| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | energy | EVEN, under the floor (the three runs' mean 0.13%) | EVEN, =0.33% | EVEN, =0.38% | EVEN, =0.44% |
-| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.07%) | EVEN, +0.04 pp | EVEN, +0.03 pp | EVEN, +0.14 pp |
+| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.04% | STEADY, =0.04% | STEADY, =0.04% |
+| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, =0.04% | STEADY, =0.04% | STEADY, =0.04% |
+| 10 | Physics / Robotics / Autonomous | both together | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, -0.09 pp | STEADY, -0.09 pp | STEADY, -0.09 pp |
+| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | The spine, the muscles every stack runs on | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.14%) | STEADY, -0.14 pp | STEADY, -0.14 pp | STEADY, -0.14 pp |
+| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.06%) | STEADY, =0.35% | STEADY, =0.16% | STEADY, =0.00% |
+| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, =0.35% | STEADY, =0.16% | STEADY, =0.01% |
+| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, -0.01 pp | STEADY, -0.02 pp | STEADY, -0.01 pp |
+| 10 | The spine, the muscles every stack runs on | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.28%) | STEADY, =0.02% | STEADY, =0.34% | STEADY, =0.48% |
+| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.05%) | STEADY, =0.05% | STEADY, =0.05% | STEADY, =0.05% |
+| 10 | The spine, the muscles every stack runs on | both together | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.14%) | STEADY, -0.14 pp | STEADY, -0.14 pp | STEADY, -0.14 pp |
+| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The four stacked, duplicates kept | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, -0.09 pp | STEADY, -0.09 pp | STEADY, -0.09 pp |
+| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, =0.12% | STEADY, =0.15% | STEADY, =0.25% |
+| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, =0.12% | STEADY, =0.15% | STEADY, =0.25% |
+| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.01%) | STEADY, +0.03 pp | STEADY, -0.03 pp | STEADY, +0.03 pp |
+| 10 | The four stacked, duplicates kept | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | STEADY, under the floor (the three runs' mean 0.27%) | STEADY, =0.23% | LOSS, −0.53% | STEADY, =0.49% |
+| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.00%) | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The four stacked, duplicates kept | both together | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.09%) | STEADY, -0.09 pp | STEADY, -0.09 pp | STEADY, -0.09 pp |
+| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The whole tower, every muscle once | the stacks (our own models, class S) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, -0.04 pp | STEADY, -0.04 pp | STEADY, -0.04 pp |
+| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | work per energy | STEADY, under the floor (the three runs' mean 0.12%) | STEADY, =0.32% | STEADY, =0.40% | STEADY, =0.43% |
+| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | energy | STEADY, under the floor (the three runs' mean 0.13%) | STEADY, =0.33% | STEADY, =0.38% | STEADY, =0.44% |
+| 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.07%) | STEADY, +0.04 pp | STEADY, +0.03 pp | STEADY, +0.14 pp |
 | 10 | The whole tower, every muscle once | the card (its own meter, class P) | 3, 3, 3 | the card's 95th percentile | **LOSS by the mean of our three runs, beyond the noise in 0 of 3** | LOSS, −1.05% | LOSS, −0.74% | LOSS, −5.81% |
-| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | work per energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | work | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | energy | EVEN, the same | EVEN, =0.00% | EVEN, =0.00% | EVEN, =0.00% |
-| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | time over the line (percentage points) | EVEN, under the floor (the three runs' mean 0.04%) | EVEN, -0.04 pp | EVEN, -0.04 pp | EVEN, -0.04 pp |
+| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | work per energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | work | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | energy | STEADY, the same | STEADY, =0.00% | STEADY, =0.00% | STEADY, =0.00% |
+| 10 | The whole tower, every muscle once | both together | 3, 3, 3 | time over the line (percentage points) | STEADY, under the floor (the three runs' mean 0.04%) | STEADY, -0.04 pp | STEADY, -0.04 pp | STEADY, -0.04 pp |
 | 100 | Compute / AI / Cloud | the stacks (our own models, class S) | 1, 1, 1 | work per energy | one repetition in a run: shown, not judged | −0.06% | −0.06% | −0.06% |
 | 100 | Compute / AI / Cloud | the stacks (our own models, class S) | 1, 1, 1 | work | one repetition in a run: shown, not judged | ±0.00% | ±0.00% | ±0.00% |
 | 100 | Compute / AI / Cloud | the stacks (our own models, class S) | 1, 1, 1 | energy | one repetition in a run: shown, not judged | +0.06% | +0.06% | +0.06% |

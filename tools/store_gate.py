@@ -18,7 +18,7 @@ the knob elsewhere is read on a world that did not answer it. It says what each 
 a store would then have done.
 
 Gauges, each arm one pair (the standing wire against the candidate on the same seconds), read by the gauge's aim
-(tools/readings.py through tools/model_gate.reading: a change under 0.5% is EVEN; from 0.5% a resource spent that fell is a
+(tools/readings.py through tools/model_gate.reading: a change under 0.5% is STEADY; from 0.5% a resource spent that fell is a
 cut, a GAIN, and one that rose is power given; time waited or missed that rose is a LOSS):
   setting, mean            the knob held (pool size, consumers, cache MB): a resource
   writes                   the knob's moves (a resize, a rebalance, a server closed and opened): wear, a resource
@@ -405,7 +405,7 @@ def fmt_word(r):
     if r.get("word") in (None, "shown"):
         return "shown"
     rel, w = r.get("relative"), r["word"]
-    noise = "" if r.get("beyond_noise") or w.startswith("EVEN") else ", inside the arms' noise"
+    noise = "" if r.get("beyond_noise") or w.startswith("STEADY") else ", inside the arms' noise"
     if rel is not None and rel == rel:
         return f"{by_word(100 * rel, w)} {w}{noise}"
     return f"{by_word(r['mean_change'], w, unit=' a arm', digits=2)} {w}{noise} (the standing wire's mean is 0)"

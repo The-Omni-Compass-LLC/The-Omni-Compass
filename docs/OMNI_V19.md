@@ -90,9 +90,9 @@ On the machines as the kind rig has them (every worker made at the start, no Clu
 | minutes over the response line (a day) | 26.4 | 22.0 | 9.2 |
 
 By the one key, Omni-Compass by itself against native: the 95th percentile **GAIN** (down 19.4%: faster; its 95% interval down 12.2% to 26.6%), the minutes
-over the line **GAIN** (down 64.9%: fewer; down 32.4% to 97.5%), machine-hours, energy per core-hour and pods waiting EVEN (the same
+over the line **GAIN** (down 64.9%: fewer; down 32.4% to 97.5%), machine-hours, energy per core-hour and pods waiting STEADY (the same
 machines). Against Omni-Compass and native: the 95th percentile **GAIN** (down 16.0%), the minutes over the line **GAIN** (down
-58.0%), the rest EVEN. Omni-Compass and native against native: the 95th percentile **GAIN** (down 4.0%), the minutes over the
+58.0%), the rest STEADY. Omni-Compass and native against native: the 95th percentile **GAIN** (down 4.0%), the minutes over the
 line **GAIN** (down 16.6%). Its own cost: the governor reads each workload it scales twice at each reconciliation (6,417 reads an
 hour in the model, twelve workloads, against 660 on top of native), the reads power given.
 

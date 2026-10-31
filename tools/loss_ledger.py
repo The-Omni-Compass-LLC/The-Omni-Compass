@@ -6,8 +6,9 @@
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 """The LOSS ledger: every row that reads LOSS across its three runs (in all three, or by their mean), in every benchmark's newest three-run table, on one page.
 
-Built from the tables as they stand (results/live/V<n>_*.json and results/orchestrator/V<n>_*.json, each benchmark read from
-its newest whole table by tools/readings.py `landed`), never typed in. Every row is placed by what its two arms are:
+Built from the verdict audit's one selection (tools/verdict_audit.py: each benchmark's newest whole three-run table from omni-v8
+on, tools/readings.py `landed`; the third arm, taken out on 25 October, never counted), never typed in; the live benchmark engine's
+appraisal counts the same rows. Every row is placed by what its two arms are:
 
   against my own native     Omni-Compass on top of a native controller against that native alone (every plain table, and the
                             four ways' TOP and BARE): the readings "do no harm" is judged by (DISCLOSURES.md, section 3)
@@ -62,7 +63,7 @@ POD_SHIFT = ("the shared test machine: Omni-Compass's arm starts its pods while 
              "cluster's own node never enters")
 POD_DECIDES = "the benchmark's three runs on the engine that stands, the host's busy share read beside the row"
 NEIGHBOUR_NEXT = ("no engine change: the price is flat in the lift (a limit at 2,000m costs the neighbour the same 6 ms of mean "
-                  "response as one at 3,800m, so a cap buys nothing; read in the gate's two-app model, EVEN on every gauge) and "
+                  "response as one at 3,800m, so a cap buys nothing; read in the gate's two-app model, STEADY on every gauge) and "
                   "smaller than the governed app's gains in the same table, so on the organism conveyance beside a neighbour comes "
                   "out ahead")
 CAUSES = {
@@ -87,7 +88,7 @@ CAUSES = {
                             "re-add a rebalance of the whole group (a median 2.58 s and 1.24 s of every message waiting)",
                             STORE_PAGE, STORE_NEXT, STORE_DECIDES),
     ("REDIS", ""): (STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more; in our own model a ceiling the "
-                    "working set fits under reads work inside the line GAIN, up 7.7% to 22.9%, and the 99th percentile GAIN or EVEN)",
+                    "working set fits under reads work inside the line GAIN, up 7.7% to 22.9%, and the 99th percentile GAIN or STEADY)",
                     STORE_PAGE, STORE_NEXT, STORE_DECIDES),
     ("REDIS_SERVICE", ""): (STORE_GATE + " (the cache held at 64 to 80 MB while the working set needs more)", STORE_PAGE, STORE_NEXT,
                             STORE_DECIDES),
@@ -146,7 +147,7 @@ CAUSES = {
                          "no engine moves it: more repetitions a run, or a load that takes the service to its line"),
     ("CAPACITY", "3000:work"): ("at the 3-core cap the service is inside its line in both arms and the only moves are conveyances of "
                                 "idle CPU to the serving pods; the completed count fell 0.6% by the mean with every run's interval "
-                                "across zero (run A's own table reads the row EVEN): the rig's noise at the cap", CAUSES_PAGE, "",
+                                "across zero (run A's own table reads the row STEADY): the rig's noise at the cap", CAUSES_PAGE, "",
                                 "the benchmark's three runs on the engine that stands, and more pairs a cap"),
 }
 
@@ -218,14 +219,25 @@ def sizes(row):
 
 
 def build():
+    """Every LOSS row of every standing table, from the verdict audit's one selection (tools/verdict_audit.py): the same tables,
+    words and categories the live benchmark engine's appraisal counts, so the two can never differ."""
+    from tools.verdict_audit import build as audit
+    rec = audit()
+    by_t = {t["stem"]: t for t in rec["tables"]}
+    section_of = {"against its native": SECTIONS[0], "in place of a controller": SECTIONS[1],
+                  "the orchestrator's own": SECTIONS[2], "two changes at once": SECTIONS[2]}
     rows = {s: [] for s in SECTIONS}
     engines = defaultdict(int)
-    for n, name, p in newest_tables():
-        data = json.loads(p.read_text())
-        for gauge, row in loss_rows(data):
-            s = section(name)
-            rows[s].append((n, name, p, gauge, row, data.get("title", "")))
-            engines[n] += 1
+    for r in rec["rows"]:
+        t = by_t[r["table"]]
+        if r["word"] != "LOSS" or t["status"] != "standing":
+            continue
+        n, name = int(t["engine"][len("omni-v"):]), t["stem"].split("_", 1)[1]
+        where = (f"workload {r['section']} / " if t["stack"] == "Linux services" else f"{r['section']} / ") if r["section"] else ""
+        rows[section_of[t["comparison"]]].append((n, name, ROOT / (t["json"] or t["file"]), where + r["gauge"], r, t["title"]))
+        engines[n] += 1
+    for s in SECTIONS:
+        rows[s].sort(key=lambda x: (x[1], x[0]))
     return rows, engines
 
 

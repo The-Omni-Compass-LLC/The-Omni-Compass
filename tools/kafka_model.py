@@ -316,15 +316,15 @@ GAUGES = [("work_inside_line_mps", "work inside the response line (messages a se
 
 
 def paired_reading(xs, ys, aim):
-    """Seeds paired: the mean change of y against x in percent of x, and its word by the one key (a change under 0.5% EVEN)."""
+    """Seeds paired: the mean change of y against x in percent of x, and its word by the one key (a change under 0.5% STEADY)."""
     from tools.readings import word as gel_word, SIZE_FLOOR
     rel = [(y - x) / abs(x) for x, y in zip(xs, ys) if x and x == x and y == y]
     if not rel:
         same = all(abs(y - x) < 1e-9 for x, y in zip(xs, ys))
-        return 0.0, "EVEN, the same" if same else "no value"
+        return 0.0, "STEADY, the same" if same else "no value"
     mean = sum(rel) / len(rel)
     if abs(mean) < SIZE_FLOOR:
-        return mean, f"EVEN, under the floor ({100 * abs(mean):.2f}%)"
+        return mean, f"STEADY, under the floor ({100 * abs(mean):.2f}%)"
     sd = statistics.stdev(rel) if len(rel) > 1 else 0.0
     half = 2.0 * sd / math.sqrt(len(rel)) if len(rel) > 1 else 0.0
     clear = (mean - half > 0) or (mean + half < 0)

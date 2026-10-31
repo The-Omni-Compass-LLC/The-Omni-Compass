@@ -87,7 +87,7 @@ tools/omni_version.py`); no setting is presented as universal. **Every published
 factory tune**: the engine its table names (`python3 tools/omni_version.py`), run again on each engine that stands. From
 omni-v17 that tune is held to a declared rule (`docs/THE_TUNE.md`, `tools/tune_study.py`): of the tunes that harm no gauge against native, the
 one against which no other tune tried reads GAIN on one service gauge and LOSS on none, searched on development seeds and read
-again on untouched ones; the claim is non-dominance among the tunes searched, never a global optimum. The live engine page and the
+again on untouched ones; the claim is non-dominance among the tunes searched, never a global optimum. The live benchmark engine page and the
 control panel are a live tuning engine: every knob, button and monitor turns in real time (the beat, the dial, the pedal, each
 muscle driven or left native, up or down, in or out, minus or plus) to show the mechanism of action with native alone, with
 Omni-Compass on top, or both side by side; what it shows at any other setting is the engine's range, never a benchmark result. As
@@ -97,7 +97,7 @@ ways, for many outputs. A licensee may add on, retune, upgrade or tune down any 
 bands and the service lines are exposed); a changed tune is the licensee's own, and so are its results. The factory tune is published only where it reads no LOSS: a LOSS found
 in The Omni-Compass LLC's own runs is treated as a fault in the mechanism or its wiring, found and fixed before the result is
 published, never as a number to live with (the founder's order of 23 October 2026). The one place a LOSS is meant to be seen
-is the live engine, when a person turns its knobs away from the factory tune (the dial, the heartbeat, the sizes, the load)
+is the live benchmark engine, when a person turns its knobs away from the factory tune (the dial, the heartbeat, the sizes, the load)
 to watch the system react and the brain hold or recover: that showing is the proof that the mechanism can be broken only by
 leaving it, and a changed tune's readings are the licensee's own.
 
@@ -106,7 +106,7 @@ profile: every governing rule, gain, margin, decision interval and default setti
 Today's is omni-v19's. The best validated factory profile for the declared operating conditions is not yet established: it is
 chosen only after every mechanism is verified, every knob combination is tested together on development workloads, and the choice
 is validated on fresh ones; then it is frozen, carried into every implementation (the C++ harness included) and released under its
-own identity. Until then no other profile is presented as the baseline; on the live engine a candidate is evaluated, never
+own identity. Until then no other profile is presented as the baseline; on the live benchmark engine a candidate is evaluated, never
 released, and a custom profile's readings are its own. The words, the mathematics and the bill's arithmetic are written once in
 `docs/FACTORY_PROFILE.md`.
 
@@ -174,11 +174,11 @@ machines.
 | The license, in plain answers, and third-party components | `LICENSE`, `LICENSING_FAQ.md`, `ENTERPRISE_LICENSE.md`, `NOTICE`, `THIRD_PARTY_NOTICES.md`, `PATENTS.md`, `TRADEMARKS.md`, `SECURITY.md`, `.github/CLA.md` |
 | The muscles, what each is for and how it is wired | `docs/MUSCLE_CATALOG.md` |
 | Proof the code is the code that ran | `python3 verify.py`, `RELEASE_MANIFEST.json`, `results/SEAL.json` |
-| The live engine: every monitor, its feed and its knobs; the third manual, how to read and operate it | `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`, `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf` (the Live Engine Manual's Appendix L, the page word for word: `docs/engine/PAGE_WORD_FOR_WORD.md`) |
+| The live benchmark engine: every monitor, its feed and its knobs; the third manual, how to read and operate it | `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`, `docs/engine/monitors.json`, `docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md` and `.pdf` (the Live Benchmark Engine Manual's Appendix L, the page word for word: `docs/engine/PAGE_WORD_FOR_WORD.md`) |
 | The whole organism, composed every way it is bought | `results/WHOLE_SYSTEM.md`, `tools/whole_system.py`, `docs/engine/export_whole.py`, `docs/WHOLE_SYSTEM_PREREGISTRATION.md` |
-| The Python's runs that the live engine runs again | `tools/engine_runs.py`, `results/engine_runs/`, `results/heldout_seed_*/` |
+| The Python's runs that the live benchmark engine runs again | `tools/engine_runs.py`, `results/engine_runs/`, `results/heldout_seed_*/` |
 
-## 9. The whole organism, the cloud's back end, and the live engine
+## 9. The whole organism, the cloud's back end, and the live benchmark engine
 
 **The composition is a model of measurements.** `results/WHOLE_SYSTEM.md` (`tools/whole_system.py`) composes each layer's own
 measured ratio, native against Omni-Compass on top of native, into one benefit for a whole stack: the product law
@@ -218,13 +218,13 @@ an expectation, written as such wherever they appear, never a result; the measur
 differ the measurement stands.
 
 **The organisms.** The seven organisms of the catalog (the spine, the four realms, the four stacked, the tower), the orchestra
-beside them, the live engine's own sixty-muscle organism, and the whole organism in its three places (the software end, the
+beside them, the live benchmark engine's own sixty-muscle organism, and the whole organism in its three places (the software end, the
 cloud's wire, the bare metal) composed above: ten organisms. Each is read two ways, native and Omni-Compass on top of native
 (Omni-Compass is never by itself, the founder's order of 25 October): twenty scenarios, recorded in
 `results/scenarios/SCENARIOS_20.json` (class S, our own models, three runs), every cell with no run reading "not yet run".
 None is a product.
 
-**The live engine.** `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` is a monitor of the repository's records and of the engine's
+**The live benchmark engine.** `docs/engine/OMNI_COMPASS_LIVE_ENGINE.html` is a monitor of the repository's records and of the engine's
 own mathematics running in the page, and the live tuning bench: a setting other than the factory profile shows a variation of
 the mechanism, never a result. Every monitor carries its evidence class (P a physical meter, L live software, S our own models)
 and its state: live (the engine's port, proven equal to the Python and the C++ on every build by
@@ -234,7 +234,7 @@ what runs in the page, and a recorded result changes its colour, never a value, 
 Prometheus, the page only reads it: it writes to no system.
 
 **The three manuals.** The Operator's Manual wires and runs Omni-Compass, the Owner's holds the whole mechanism and every
-result, the Live Engine Manual reads the page; each carries this notice, the `LICENSE`, the `NOTICE` and this page.
+result, the Live Benchmark Engine Manual reads the page; each carries this notice, the `LICENSE`, the `NOTICE` and this page.
 
 ---
 

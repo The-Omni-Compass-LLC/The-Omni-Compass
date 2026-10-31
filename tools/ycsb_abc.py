@@ -56,18 +56,17 @@ def engine(run_dir):
 
 def verdict(rs, direction, key=None):
     """The three-run reading of one gauge, by rule, from its three within-run paired results: GAIN, LOSS, power given,
-    EVEN or the runs disagree, by what the gauge is for (tools/readings.py)."""
+    STEADY or the runs disagree, by what the gauge is for (tools/readings.py)."""
     return stack_reading(rs, direction, SAME_REL, key)
 
 
 def cell(r, key):
+    """One run in separate fields (the referee's work order of 25 October): native's value → Omni-Compass's, the raw change with its
+    true sign and its 95% interval (tools/confirm_abc.py cell, one format for every table)."""
     if r is None:
         return "n/a"
-    nat, d, lo, hi = r["native"], r["diff"], r["ci95"][0], r["ci95"][1]
-    if key == "failed" or not nat:
-        return f"{d:+.3g} ({lo:+.3g} to {hi:+.3g})"
-    return f"{100 * d / abs(nat):+.1f}% ({100 * lo / abs(nat):+.1f} to {100 * hi / abs(nat):+.1f})"
-
+    from tools.confirm_abc import cell as fields
+    return fields(r)
 
 def fmt(v):
     return f"{v:.3g}" if abs(v) < 10 else f"{v:,.1f}" if abs(v) < 1000 else f"{v:,.0f}"
@@ -86,7 +85,7 @@ def main(argv=None):
          "(`docs/YCSB_PREREGISTRATION.md`). YCSB's published core workloads ask for records from a key space that steps through the cache "
          "and past it, the same operations in both arms. Each run holds three paired repetitions; the paired difference's 95% interval "
          "within a run, and the same sign with every interval clear of zero across the three runs, make a reading **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its sign; a resource spent that rose reads **power given**) "
-         "a run whose interval includes zero reads **EVEN, no difference beyond the noise** (with the count of such runs); "
+         "a run whose interval includes zero reads **STEADY, no difference beyond the noise** (with the count of such runs); "
          "clear runs pointing different ways read **the runs disagree**. Failed operations: any rise in any run reads **LOSS in at least one of our runs**. Memory held is "
          "the resource; the host's CPU-seconds, the compass's own cost included, are measured on GitHub's shared runner, and no energy is "
          "claimed beyond them. The tuning workload is shown and not counted. Every row is shown, LOSS included.", "",

@@ -3,7 +3,7 @@
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
 <!-- read again by the rule of 24 October 2026 (tools/reread_key.py) -->
-**Read again by the founder's rule of 24 October 2026** (tools/reread_key.py (since folded into tools/readings.py); the one rule, `tools/readings.py` judge_one, as `tools/model_gate.py` reads a model now): a paired change of 0.5% or more either way is a change and never reads EVEN; it reads its word by the gauge's aim, with "(not clear of the noise)" beside it where its 95% interval over the seeds crosses zero; under 0.5% it reads EVEN, under the floor. Each reading was decided again from the JSON twin's own mean, interval and relative change, and every row whose words moved is printed again, its numbers wearing their words' signs; every seed, number and row is as first written. Where a paragraph below says EVEN for an interval across zero, this rule replaces it. Evidence class S, our own models, never a benchmark result.
+**Read again by the founder's rule of 24 October 2026** (tools/reread_key.py (since folded into tools/readings.py); the one rule, `tools/readings.py` judge_one, as `tools/model_gate.py` reads a model now): a paired change of 0.5% or more either way is a change and never reads STEADY; it reads its word by the gauge's aim, with "(not clear of the noise)" beside it where its 95% interval over the seeds crosses zero; under 0.5% it reads STEADY, under the floor. Each reading was decided again from the JSON twin's own mean, interval and relative change, and every row whose words moved is printed again, its numbers wearing their words' signs; every seed, number and row is as first written. Where a paragraph below says STEADY for an interval across zero, this rule replaces it. Evidence class S, our own models, never a benchmark result.
 <!-- end: read again -->
 
 Our own model (evidence class S), never a benchmark result. The founder's order of 23 October: beside native and Omni-Compass and native, a third arm, Omni-Compass by itself, with native's controllers switched off (`docs/SOLO_PREREGISTRATION.md`). This page reads what the candidate does by itself on the model cluster, arm by arm against omni-v18, the engine that stood when it was read: 8 seeds of a day, the same seeds in every arm, read by the model gate's own rule (`tools/model_gate.py`: the mean change over the seeds, its 95% interval by Student t, the word by the gauge's aim; a resource that rose is power given).
@@ -31,9 +31,9 @@ Engines: the candidate, which differed from omni-v18 in omni_controller/controll
 
 | Gauge | Change | 95% interval | Reading |
 |---|---:|---:|---|
-| machine-hours | =0.0% | ±0.0% to ±0.0% | **EVEN (identical)** |
-| energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **EVEN, under the floor** |
-| pods waiting for a place (pod-minutes an hour) | — | — | **EVEN (identical)** |
+| machine-hours | =0.0% | ±0.0% to ±0.0% | **STEADY (identical)** |
+| energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **STEADY, under the floor** |
+| pods waiting for a place (pod-minutes an hour) | — | — | **STEADY (identical)** |
 | the pod autoscaler's shortfall (minutes an hour) | — | — | not read: by itself there is no pod autoscaler to fall short |
 | 95th percentile response (ms) | +19.4% | +12.2% to +26.6% | **GAIN** |
 | minutes over the response line | +64.9% | +32.4% to +97.5% | **GAIN** |
@@ -42,9 +42,9 @@ Engines: the candidate, which differed from omni-v18 in omni_controller/controll
 
 | Gauge | Change | 95% interval | Reading |
 |---|---:|---:|---|
-| machine-hours | =0.0% | ±0.0% to ±0.0% | **EVEN (identical)** |
-| energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **EVEN, under the floor** |
-| pods waiting for a place (pod-minutes an hour) | — | — | **EVEN (identical)** |
+| machine-hours | =0.0% | ±0.0% to ±0.0% | **STEADY (identical)** |
+| energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **STEADY, under the floor** |
+| pods waiting for a place (pod-minutes an hour) | — | — | **STEADY (identical)** |
 | the pod autoscaler's shortfall (minutes an hour) | — | — | not read: by itself there is no pod autoscaler to fall short |
 | 95th percentile response (ms) | +16.0% | +9.9% to +22.2% | **GAIN** |
 | minutes over the response line | +58.0% | +25.8% to +90.1% | **GAIN** |
@@ -53,9 +53,9 @@ Engines: the candidate, which differed from omni-v18 in omni_controller/controll
 
 | Gauge | Change | 95% interval | Reading |
 |---|---:|---:|---|
-| machine-hours | =0.0% | ±0.0% to ±0.0% | **EVEN (identical)** |
-| energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **EVEN, under the floor** |
-| pods waiting for a place (pod-minutes an hour) | — | — | **EVEN (identical)** |
+| machine-hours | =0.0% | ±0.0% to ±0.0% | **STEADY (identical)** |
+| energy per used core-hour (kWh) | =0.0% | −0.0% to +0.0% | **STEADY, under the floor** |
+| pods waiting for a place (pod-minutes an hour) | — | — | **STEADY (identical)** |
 | the pod autoscaler's shortfall (minutes an hour) | −1.1% | −3.3% to +5.5% | **LOSS (not clear of the noise)** |
 | 95th percentile response (ms) | +4.0% | +2.5% to +5.5% | **GAIN** |
 | minutes over the response line | +16.6% | +2.6% to +30.6% | **GAIN** |
@@ -64,12 +64,12 @@ Engines: the candidate, which differed from omni-v18 in omni_controller/controll
 
 | Gauge | native | Omni-Compass and native | Omni-Compass by itself |
 |---|---|---|---|
-| machine-hours | EVEN (identical) | EVEN (identical) | EVEN (identical) |
-| energy per used core-hour (kWh) | EVEN (identical) | EVEN (identical) | GAIN +4.2% |
-| pods waiting for a place (pod-minutes an hour) | EVEN (identical) | EVEN (identical) | EVEN (identical) |
-| the pod autoscaler's shortfall (minutes an hour) | EVEN (identical) | EVEN (identical) | not read |
-| 95th percentile response (ms) | EVEN (identical) | EVEN (identical) | GAIN +100.0% |
-| minutes over the response line | EVEN (identical) | EVEN (identical) | GAIN +99.3% |
+| machine-hours | STEADY (identical) | STEADY (identical) | STEADY (identical) |
+| energy per used core-hour (kWh) | STEADY (identical) | STEADY (identical) | GAIN +4.2% |
+| pods waiting for a place (pod-minutes an hour) | STEADY (identical) | STEADY (identical) | STEADY (identical) |
+| the pod autoscaler's shortfall (minutes an hour) | STEADY (identical) | STEADY (identical) | not read |
+| 95th percentile response (ms) | STEADY (identical) | STEADY (identical) | GAIN +100.0% |
+| minutes over the response line | STEADY (identical) | STEADY (identical) | GAIN +99.3% |
 
 ## What it says
 

@@ -20,7 +20,7 @@ file list (tools/layout_check.py); a release group for the version (tools/releas
 the files the version changed); and the catalog's and the index's lines that name the engine.
 
 The words are written by a person, because they say what changed and why: docs/OMNI_VN.md, the README, the state of play,
-CLAUDE.md, the CHANGELOG, both manuals, the receipts and the live engine's page. --check reads every one of them and names any
+CLAUDE.md, the CHANGELOG, both manuals, the receipts and the live benchmark engine's page. --check reads every one of them and names any
 that still calls an older engine the one that stands. Nothing else moves: every earlier fingerprint, table and result stays
 where it is, as that engine's record.
 """

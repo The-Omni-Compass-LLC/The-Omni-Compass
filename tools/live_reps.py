@@ -20,7 +20,7 @@ from pilot.bench_report import gauges, latency, pod_starts
 from tools.readings import word as gel_word, aim as gel_aim, receipt_key  # noqa: E402  (the words every table uses)
 from tools.readings import by_word, interval_by_word  # noqa: E402  (a number beside a word carries the word's sign)
 
-SAME_REL = 1e-6   # a change under one part in a million of the value reads "same" (amendment 11)
+SAME_REL = 1e-9          # "the same" only to nine decimal places of the value (tools/readings.py EXACT_REL; the referee's work order of 25 October)
 from omnicompass.student_t import T95  # noqa: E402  (the two-sided 95% point of Student's t, any degrees of freedom)
 KEYS = ["worker nodes in service, mean", "node-hours", "energy, parked workers still on at idle power (Wh)", "energy (Wh)", "response time (ms), mean", "response time (ms), 95th percentile",
         "response time (ms), 99th percentile", "time over the response line (% of samples)", "failed requests (%)", "pods with no machine to take them (unschedulable)", "time pods had no machine to take them, pod-minutes",
@@ -825,12 +825,12 @@ def main(root):
             nb = float(np.nanmean([runs[base][r].get(k, np.nan) for r in reps])); ob = nb + float(d.mean())
             half = T95.get(len(d) - 1, 1.96) * (d.std(ddof=1) / math.sqrt(len(d))) if len(d) > 1 else float("nan")
             sig = len(d) > 1 and (d.mean() - half > 0 or d.mean() + half < 0)
-            # a change under one part in a million of the value is rounding, not a difference: read "same" (SAME_REL)
+            # a change under one part in a billion of the value (nine decimal places) is rounding, not a difference: read "same" (SAME_REL)
             same = abs(d.mean()) <= SAME_REL * max(abs(nb), 1e-12)
             sig = sig and not same
             ch = (ob - nb) / abs(nb) * 100 if abs(nb) > 1e-12 else None
             out["paired"][key][k] = {"native": nb, "omni": ob, "diff": float(d.mean()), "ci95": [float(d.mean() - half), float(d.mean() + half)], "significant": bool(sig)}
-            wd = 'EVEN, the same (under one part in a million)' if same and d.mean() != 0 else sig_word(k, d.mean()) if sig else 'no'
+            wd = 'STEADY, the same (to nine decimal places)' if same and d.mean() != 0 else sig_word(k, d.mean()) if sig else 'no'
             ch_s = by_word(ch, wd) if ch is not None else f"{by_word(ob - nb, wd, unit='', digits=3)} (native is 0)"
             L.append(f"| {LABEL.get(k, k)} | {nb:.4g} | {ob:.4g} | {ch_s} | {interval_by_word(d.mean() - half, d.mean() + half, wd, unit='', digits=4)} | "
                      f"{wd} |")

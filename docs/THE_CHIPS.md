@@ -4,7 +4,7 @@
 
 Written 30 October 2026 from the run records (`docs/RUN_LEDGER.md`, GitHub's own run pages), the card's three-run tables
 (`results/gpu/`) and the card governor's own files; every number here is a table's, read by the one key (`tools/readings.py`:
-GAIN, EVEN, LOSS by what the gauge is for, the floor at 0.5%, the word before the number). The card's meter is class P; the
+GAIN, STEADY, LOSS by what the gauge is for, the floor at 0.5%, the word before the number). The card's meter is class P; the
 organisms modelled around the card in the stacked box are class S and are never presented as proof. Run and scored by The
 Omni-Compass LLC's own code. No outside party has reviewed or approved these results. This page is kept current with every
 chip run; the ledger of every rental, hour and dollar is `docs/RUN_LEDGER.md`, section 1.
@@ -36,10 +36,10 @@ the A100 price is on Lambda's billing page.
 
 | Run (GitHub) | Date (UTC) | Engine | Card | What | Hours | What came back |
 |---|---|---|---|---|---:|---|
-| 40079645681 | 24 Oct | omni-v18 | A100 SXM4 40 GB | one card, the factory dial | 6.7 | every gauge EVEN; 0 writes in 3,050 decisions: both knobs already at their top on native |
+| 40079645681 | 24 Oct | omni-v18 | A100 SXM4 40 GB | one card, the factory dial | 6.7 | every gauge STEADY; 0 writes in 3,050 decisions: both knobs already at their top on native |
 | 40143765437, 40143770324, 40143775773 | 24 to 25 Oct | omni-v18 | A10 ×3 | the stacked box, A, B, C | 25.1, 25.1, 25.0 | the wire check and the smoke only: the watcher fetched packed files alone (fixed 26 Oct, `8e62252e1f`) |
 | 40394988327, 40394992822, 40394997159 | 26 to 28 Oct | omni-v21 | A10 ×3 | the stacked box, A, B, C | 33.1 each | sizes 1 and 10 complete (5 and 3 repetitions a run), 100 copies one repetition a run: `results/gpu/V21_STACKS_A10_ABC.md` |
-| 40461604089 | 27 Oct | omni-v21 | A100 SXM4 40 GB | one card, the factory dial, 10 paired repetitions | 7.1 | every gauge EVEN, under the floor; 0 writes |
+| 40461604089 | 27 Oct | omni-v21 | A100 SXM4 40 GB | one card, the factory dial, 10 paired repetitions | 7.1 | every gauge STEADY, under the floor; 0 writes |
 | 40485597269, 40485602065, 40485605739 | 27 Oct | omni-v21 | A100 SXM4 40 GB | one card, the tune-down, A, B, C, 10 paired repetitions each | 6.9 each | `results/gpu/V21_A100_SAVE_ABC.md` |
 | 40485609401, 40485613546, 40485617318 | 27 Oct | omni-v21 | A100 SXM4 40 GB | one card under the operator's power cap at 70% of its top, A, B, C, 5 paired repetitions each, the normal load and the card fully loaded | 4.6 each | `results/gpu/V21_A100_CAP_ABC.md`, `results/gpu/V21_A100_CAP_FULL_ABC.md` |
 
@@ -50,11 +50,11 @@ rented before the founder's word; every launch prints its price first and rents 
 
 | Tune, three runs | Work per energy | Requests served | Response time | Writes |
 |---|---|---|---|---|
-| The factory dial (the max), one run | EVEN, under the floor (up 0.12%) | EVEN, the same | EVEN | 0 |
-| The tune-down (dial save) | **GAIN by the mean of our three runs** (up 0.84%, 0.71%, 0.69%; beyond the noise in 1 of 3); the energy a cut, GAIN (down 0.85%, 0.70%, 0.68%) | EVEN, the same in every run | EVEN, under the floor: the mean, the 95th and the 99th percentile | 312, 540, 485 |
-| The cap at 70%, the normal load | EVEN, under the floor (0.11%) | EVEN, the same | the mean **LOSS by the mean of our three runs** (A 1.87% slower, B EVEN, C 0.79% slower; beyond the noise in 0 of 3); the 95th percentile: the runs disagree (A 3.21% slower, B 1.20% faster, C EVEN) | 7 to 78 |
-| The cap at 70%, the card fully loaded | EVEN, under the floor (0.07%) | EVEN, under the floor; requests not served **LOSS by the mean** (A 2.18% more, B and C EVEN; 0 of 3) | the 95th percentile **LOSS by the mean** (A 1.50% slower, B and C EVEN; 0 of 3) | 7 to 78 |
-| The stacked box, an A10 inside the seven organisms, sizes 1 and 10 | the card EVEN, under the floor, in every organism | EVEN, the same | EVEN, under the floor; the card's 95th percentile LOSS by the mean in three rows (none beyond the noise): Energy at 1 copy (A 0.79% slower, B EVEN, C 0.69% slower), Physics at 10 (1.22%, 0.97%, 1.79% slower), the tower at 10 (1.05%, 0.74%, 5.81% slower) | the factory max: 0 |
+| The factory dial (the max), one run | STEADY, under the floor (up 0.12%) | STEADY, the same | STEADY | 0 |
+| The tune-down (dial save) | **GAIN by the mean of our three runs** (up 0.84%, 0.71%, 0.69%; beyond the noise in 1 of 3); the energy a cut, GAIN (down 0.85%, 0.70%, 0.68%) | STEADY, the same in every run | STEADY, under the floor: the mean, the 95th and the 99th percentile | 312, 540, 485 |
+| The cap at 70%, the normal load | STEADY, under the floor (0.11%) | STEADY, the same | the mean **LOSS by the mean of our three runs** (A 1.87% slower, B STEADY, C 0.79% slower; beyond the noise in 0 of 3); the 95th percentile: the runs disagree (A 3.21% slower, B 1.20% faster, C STEADY) | 7 to 78 |
+| The cap at 70%, the card fully loaded | STEADY, under the floor (0.07%) | STEADY, under the floor; requests not served **LOSS by the mean** (A 2.18% more, B and C STEADY; 0 of 3) | the 95th percentile **LOSS by the mean** (A 1.50% slower, B and C STEADY; 0 of 3) | 7 to 78 |
+| The stacked box, an A10 inside the seven organisms, sizes 1 and 10 | the card STEADY, under the floor, in every organism | STEADY, the same | STEADY, under the floor; the card's 95th percentile LOSS by the mean in three rows (none beyond the noise): Energy at 1 copy (A 0.79% slower, B STEADY, C 0.69% slower), Physics at 10 (1.22%, 0.97%, 1.79% slower), the tower at 10 (1.05%, 0.74%, 5.81% slower) | the factory max: 0 |
 
 Two readings carry the power the card held: the share of samples at the power limit fell in every tune-down run (down 7.0%,
 16.9%, 18.2%, a cut, GAIN) and under the cap by the mean (GAIN, beyond the noise in 2 of 3). Every row of every table is in
@@ -65,7 +65,7 @@ Two readings carry the power the card held: the share of samples at the power li
 **At the factory dial the card benefit is zero, and that is the mechanism reading right.** The A100 as Lambda ships it runs
 with its power limit at the top of its range (400 W) and its clock at the top under load. Omni-Compass's max pushes a muscle
 to its own limit and never past it; a knob native already runs at the top of its range is "at its limit on native". So the
-governor read 3,050 decisions on omni-v18 and 10 repetitions on omni-v21 and wrote nothing: EVEN, under the floor, no harm,
+governor read 3,050 decisions on omni-v18 and 10 repetitions on omni-v21 and wrote nothing: STEADY, under the floor, no harm,
 and no benefit, because there was none to be had on an uncapped card running flat out. This is not a fault in the wire; it is
 what do no harm requires there.
 
@@ -77,17 +77,17 @@ had little leverage at this load; the load, not the knob, bounded the gain.
 
 **Under the operator's power cap the record is run A's.** With the cap at 70% the firmware's limiter holds the card; the
 governor wrote 7 to 78 times in 5 repetitions. Every LOSS row of both cap tables comes from run A alone (the mean 1.87%
-slower, fully loaded 2.18% more requests not served and the 95th percentile 1.50% slower); B and C read EVEN or faster,
+slower, fully loaded 2.18% more requests not served and the 95th percentile 1.50% slower); B and C read STEADY or faster,
 and none of the three is clear of the noise. Five repetitions is few: the card's own spread at the cap is wider than the
 effect being read, and run A's files on `raw` (`run-40485609401/`) are where its cause is to be found before another
 dollar is spent there.
 
 **In the stacked box the card reads its spread, not a mechanism.** The card sat at its factory max (0 writes), the
-organisms around it (class S) read EVEN, and the three 95th-percentile rows that read LOSS by the mean are 1% to 2% in
+organisms around it (class S) read STEADY, and the three 95th-percentile rows that read LOSS by the mean are 1% to 2% in
 two runs and 5.8% in one, none beyond the noise, in a box where the card is not the organism's limit.
 
 So the chip has two doors, and the record has opened each once. The **energy door**: with energy the aim (the tune-down),
-the card gives back watts the work does not need, GAIN by the mean of our three runs, every service gauge EVEN. The **budget
+the card gives back watts the work does not need, GAIN by the mean of our three runs, every service gauge STEADY. The **budget
 door**: under an operator's power budget (the cap), Omni-Compass must serve as much, as fast, inside the same budget as the
 firmware alone, and today that door reads LOSS by the mean from one run of three, none beyond the noise. At the factory max
 on an uncapped card there is no door: the firmware is already at the top.

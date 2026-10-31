@@ -48,7 +48,7 @@ class CardTables(unittest.TestCase):
             text, record = gpu_abc.table("card", dirs, ["1", "2", "3"])
             self.assertIn("omni-v21", text)
             self.assertTrue(record["rows"][gpu_reps.PRIMARY]["reading"].startswith("GAIN"))
-            self.assertEqual(record["rows"]["requests served"]["reading"], "EVEN, the same")
+            self.assertEqual(record["rows"]["requests served"]["reading"], "STEADY, the same")
             self.assertTrue(record["rows"]["power-capped share of samples"]["reading"].startswith("GAIN"))
 
     def test_three_runs_of_different_engines_are_refused(self):

@@ -4,7 +4,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The whole organism, two ways, for the live engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html, section 11).
+"""The whole organism, two ways, for the live benchmark engine page (docs/engine/OMNI_COMPASS_LIVE_ENGINE.html, section 11).
 
 The repository composes the layers of the whole system by the product law in one place, tools/whole_system.py, which writes
 results/WHOLE_SYSTEM.json and results/WHOLE_SYSTEM.md: for every gauge g and layer ℓ an oriented ratio Rℓ(g) (above 1 is
@@ -40,7 +40,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tools.readings import GAIN, EVEN, LOSS, GIVEN  # noqa: E402
+from tools.readings import GAIN, STEADY, LOSS, GIVEN  # noqa: E402
 
 WS = ROOT / "results" / "WHOLE_SYSTEM.json"
 GAUGES = ("work", "speed", "machines", "energy", "bill")
@@ -49,19 +49,19 @@ GAUGE_WORDS = {"work": "work (more)", "speed": "speed (the 95th percentile respo
                "energy": "energy (less)", "bill": "the bill (smaller)"}
 # the three pieces a stack is bought in, each a group of the file's layers (matched by the layer's number in the file's own names)
 GROUPS = [
-    ("software", "The software: the cluster (Kubernetes, its add-ons, its governors) and the services on it", (3, 4)),
-    ("hardware", "The bare metal: the card (the chip) and the machine (the kernel, bare metal, Kepler)", (1, 2)),
-    ("cloud", "The cloud: the machines it bills, metered", (5,)),
+    ("software", "Software", (3, 4)),
+    ("hardware", "Bare Metal", (1, 2)),
+    ("cloud", "Cloud", (5,)),
 ]
 # every way a stack is bought (the founder's order of 20 October): on-site bare metal; through the cloud (three pieces, and the
 # cloud as two pieces beside it); in the device (the bare metal alone: Omni-Compass built into the card and the machine, nothing
 # else wired); as a service (the software alone: the owner has neither the bare metal nor the cloud account, Omni-Compass sits in
 # the software run for them). Each sums the layers of the pieces it names; a piece with no factor counts as exactly 1.
 SCENARIOS = [
-    ("onsite", "On-site bare metal: the software on the owner's own bare metal", ("software", "hardware"), None),
-    ("cloud", "Through the cloud: the cloud's build, its bare metal at the back end, the software", ("cloud", "hardware", "software"), ("cloud", "software")),
-    ("device", "In the device: the bare metal alone, Omni-Compass built into the card and the machine", ("hardware",), None),
-    ("service", "As a service: the software alone, run for an owner with neither bare metal nor a cloud account", ("software",), None),
+    ("onsite", "On-Site Bare Metal", ("software", "hardware"), None),
+    ("cloud", "Through the Cloud", ("cloud", "hardware", "software"), ("cloud", "software")),
+    ("device", "In the Device", ("hardware",), None),
+    ("service", "As a Service", ("software",), None),
 ]
 NOT_RUN = {2: "the machine (the kernel, bare metal, Kepler): not yet run (register row 79), enters as exactly 1"}
 Z95 = 1.959963984540054
@@ -74,11 +74,11 @@ def layer_no(name: str) -> int | None:
 
 def word_of(gauge: str, mu: float, sigma: float) -> str:
     """The word of a composed factor by the key's floor (tools/readings.py, the founder's order of 24 October 2026; the mathematics
-    seat of 24 October): a change of 0.5% or more reads by the gauge's aim, whatever its interval, EVEN only under 0.5%. Whether
+    seat of 24 October): a change of 0.5% or more reads by the gauge's aim, whatever its interval, STEADY only under 0.5%. Whether
     its 95% interval stands clear of no change is carried beside it (clear_of), never as the word."""
     from tools.readings import SIZE_FLOOR
     if abs(math.exp(mu) - 1) < SIZE_FLOOR:
-        return EVEN
+        return STEADY
     if mu > 0:
         return GAIN
     return GIVEN if gauge in SPENT else LOSS
@@ -136,6 +136,10 @@ def main(out):
             if n in layer_names:
                 ln = layer_names[n]
                 tests = d["layers"][ln]
+                for t in tests:   # a table's title as the page prints it: the word "brake" is retired (the founder's order of 12 October)
+                    for k in ("test", "title"):
+                        if isinstance(t.get(k), str):
+                            t[k] = t[k].replace("emergency brake", "emergency stop")
                 layers.append({"no": n, "name": ln, "state": "measured", "tests": tests, "n_tests": len(tests),
                                "cls": (re.search(r"class ([PLS])", ln) or [None, None])[1]})
             else:
@@ -182,9 +186,9 @@ def main(out):
             "groups": groups, "scenarios": [{"key": k, "name": n, "groups": list(g), "two_piece": list(t) if t else None} for k, n, g, t in SCENARIOS],
             "results": results, "separability": {"pairs": sep, "n": len(sep), "agree": sum(1 for s in sep if s.get("agree"))}, "beside": d.get("beside") or {},
             "rule": "R(g) = ∏ℓ Rℓ(g), log R = Σℓ log Rℓ, the variances added; a scenario sums the layers it stacks; the index is the mean of the gauge logarithms, "
-                    "its 95% interval under two bounds (the gauges independent; perfectly correlated); by the index's rule only what held the same way in all three "
-                    "of our runs enters, with every interval carried everything measured enters with its interval; each composed factor's word by the key's "
-                    "floor (0.5% or more by the gauge's aim, EVEN under it), whether its interval stands clear of no change said beside it"}
+                    "its 95% interval under two bounds (the gauges independent; perfectly correlated); two readings: by the index's rule, only what held the same way "
+                    "in all three of our runs enters; with every interval carried, everything measured enters with its interval; each composed factor's word by the key's "
+                    "floor (0.5% or more by the gauge's aim, STEADY under it), whether its interval stands clear of no change said beside it"}
     Path(out).write_text(json.dumps(data, separators=(",", ":"), ensure_ascii=False, allow_nan=False), encoding="utf-8")
     for sk, R in results.items():
         for rd in readings:

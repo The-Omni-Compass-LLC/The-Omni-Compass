@@ -175,7 +175,7 @@ preregistered one with every rule unchanged but native's two settings: Redis exa
 (`maxmemory 0`) and `noeviction` (`tools/run_redis.py --native shipped`, workflow input `native: shipped`). A cache with no
 ceiling holds every key it is given: the knob is at its limit on native, and any ceiling Omni-Compass wrote would sit below
 native, which the max never does. So in the shipped set omni reads the cache, writes nothing and says so in its audit ("native
-has no ceiling: at its limit on native"), and every row reads EVEN; that is the result, said before the run. The value of the
+has no ceiling: at its limit on native"), and every row reads STEADY; that is the result, said before the run. The value of the
 compass on this knob is where an operator has set a ceiling, which the preregistered set measures; its tables keep their name,
 and the shipped set's are named for it (`…_REDIS_SHIPPED.md`).
 

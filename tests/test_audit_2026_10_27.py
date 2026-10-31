@@ -100,7 +100,7 @@ class ThreeArms(unittest.TestCase):
     def test_under_half_a_percent_reads_even(self):
         rec = self.build({k: {"requests": 0.001, "p95_ms": -0.002, "machines": 0.0, "units": 0.003} for k in "ABC"})
         words = {r["gauge"]: r["reading"] for r in rec["rows"] if r["pair"] == "Omni on native against native"}
-        self.assertTrue(all(w.startswith("EVEN") for w in words.values()), words)
+        self.assertTrue(all(w.startswith("STEADY") for w in words.values()), words)
 
     def test_the_published_v18_record_is_the_tools(self):
         """The hand-written record, rebuilt from its own runs, byte for byte (tools/reproduce.py --table V18_THREE_ARMS_ABC

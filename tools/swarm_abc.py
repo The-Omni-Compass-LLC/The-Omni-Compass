@@ -9,8 +9,8 @@ times as separate GitHub runs on the same frozen engine (tools/run_swarm.py). Py
 so the runs must give the same numbers to within one part in a thousand (PyBullet's floating point differs by that much
 from one GitHub machine to the next; amendment 1 of the preregistration, made after the first A, B, C were seen and said
 so): a gauge reads GAIN or LOSS in all three of our runs when all three runs agree on the sign (judged by what the gauge is
-for, never by its sign; energy is a resource spent, so a rise reads power given), EVEN when the change is under one part in a
-million, and "the runs differ" when they do not reproduce. A cell whose paired physics trial left the cruise native is listed
+for, never by its sign; energy is a resource spent, so a rise reads power given), STEADY when the change is under one part in a
+billion (nine decimal places), and "the runs differ" when they do not reproduce. A cell whose paired physics trial left the cruise native is listed
 as "nothing for Omni to move"; a cell with a collision in either arm is void and listed as such. From omni-v12's runs on
 (amendment 2, written before them) a cell is void only when native itself collides, and a collision with Omni-Compass on top
 is a judged row, any increase a LOSS. Every row is reported, LOSS included.
@@ -30,7 +30,7 @@ from tools.readings import with_own_runs, in_all_three, aim, EVEN_SAME, SHOWN, D
 from tools.repo import NAME as REPO_NAME  # noqa: E402  (the repository's name, written once)
 from tools.run_swarm import GAUGES, TRIAL_OVERRIDE, with_collisions
 
-SAME_REL = 1e-6
+SAME_REL = 1e-9          # "the same" only to nine decimal places of the value (tools/readings.py EXACT_REL; the referee's work order of 25 October)
 REPRO_REL = 1e-3        # PyBullet reproduces to about one part in a thousand across GitHub's machines, not to the bit (amendment 1)
 COUNTS = {"late_share", "reserve_breaches", "near_miss_ticks", "collisions"}      # differences, not ratios
 
@@ -63,7 +63,7 @@ def reproduced(recs, k):
 
 def verdict(recs, k, direction):
     """The gauge's word over the three runs: GAIN, LOSS or power given in all three of our runs by what the gauge is for (its
-    declared aim: a resource spent, higher, never more or never less), EVEN, or the runs differ."""
+    declared aim: a resource spent, higher, never more or never less), STEADY, or the runs differ."""
     if not reproduced(recs, k):
         return "**the runs differ**"
     ch = [change(r, k) for r in recs]
@@ -111,7 +111,7 @@ def main(argv=None):
          "charged over the whole fleet window. Three separate GitHub runs on the same frozen engine: PyBullet reproduces to about one "
          "part in a thousand across GitHub's machines (disclosed in the preregistration's amendment 1, made after the first three runs "
          "were seen), so a gauge reads **GAIN** or **LOSS in all three of our runs** (judged by what the gauge is for, never by its "
-         "sign; energy is a resource spent, so a rise reads **power given**) when all three runs reproduce to that tolerance and give the same sign, **EVEN, the same** under one part in a million, and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster "
+         "sign; energy is a resource spent, so a rise reads **power given**) when all three runs reproduce to that tolerance and give the same sign, **STEADY, the same** under one part in a billion (nine decimal places), and **the runs differ** when they do not reproduce. A cell whose paired physics trial found a faster "
          "mission no cheaper, or not inside the safe tracking error, is listed as nothing for Omni to move; a cell with a "
          "collision in either arm is void. Every row is shown, LOSS included.", "",
          "| Run | GitHub run | Commit | Engine | Cells in the run |", "|---|---|---|---|---:|"]

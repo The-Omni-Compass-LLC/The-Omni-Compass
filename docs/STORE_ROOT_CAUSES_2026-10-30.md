@@ -175,7 +175,7 @@ pooler's candidate holds servers +28.2% (power given) and its seconds below nati
 +100.0%); Kafka's twin as in the table above. The replay cannot show what the memory buys; the closed-loop Redis model (class S,
 `tools/redis_model.py --compare`, seeds 101 to 103) can: against omni-v21's own loop, work inside the line GAIN in every workload
 (small up 22.9%, burst up 17.6%, tuning up 10.3%, large up 7.7%), the mean latency GAIN (down 36% to 59%), the 95th and 99th
-percentiles GAIN or EVEN, the memory held power given (201 to 304 MB against 62 to 66 MB); no LOSS row. MySQL's and MongoDB's
+percentiles GAIN or STEADY, the memory held power given (201 to 304 MB against 62 to 66 MB); no LOSS row. MySQL's and MongoDB's
 accounts are read for real on the first runs of the next engine, and a closed-loop model of each is set from those files.
 
 Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results.

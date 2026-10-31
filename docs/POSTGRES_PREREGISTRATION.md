@@ -139,13 +139,13 @@ capacity (5,626 transactions a second, peak notch 90% of it). Not counted; the u
 | Gauge | native | omni | reading |
 |---|---:|---:|---|
 | server connections alive, mean (the machines) | 20.0 | 9.3 | GAIN, cut (−53%, interval −57% to −50%) |
-| work inside the 50 ms line (tps) | 2,137 | 2,152 | EVEN, no difference beyond the noise |
-| throughput (tps) | 2,437 | 2,474 | EVEN, no difference beyond the noise |
-| latency p95 (ms) | 1,361 | 433 | EVEN, no difference beyond the noise (native's own p95 swung from 86 to 3,331 ms between repetitions) |
-| latency p99 / median (ms) | 2,888 / 0.98 | 862 / 1.09 | EVEN, no difference beyond the noise |
-| failed transactions | 0 | 0 | EVEN, the same |
+| work inside the 50 ms line (tps) | 2,137 | 2,152 | STEADY, no difference beyond the noise |
+| throughput (tps) | 2,437 | 2,474 | STEADY, no difference beyond the noise |
+| latency p95 (ms) | 1,361 | 433 | STEADY, no difference beyond the noise (native's own p95 swung from 86 to 3,331 ms between repetitions) |
+| latency p99 / median (ms) | 2,888 / 0.98 | 862 / 1.09 | STEADY, no difference beyond the noise |
+| failed transactions | 0 | 0 | STEADY, the same |
 | host CPU-seconds | 433 | 480 | **power given** (+11%, interval +8% to +14%) |
-| CPU-seconds per 1,000 transactions inside the line | 0.68 | 0.74 | EVEN, no difference beyond the noise |
+| CPU-seconds per 1,000 transactions inside the line | 0.68 | 0.74 | STEADY, no difference beyond the noise |
 | pool size, mean (the knob) | 20 | 9.5 | shown |
 
 The knob was handed back and read back at the end of every omni arm; Omni wrote 161 to 175 times an arm and failed up
@@ -163,8 +163,8 @@ kept here as it came, and it is a LOSS:
 | Workload | Work inside the line | Throughput | p95 (ms) | Servers alive | Host CPU-seconds |
 |---|---|---|---|---|---|
 | `select` (read-only) | 11,423 → 5,995 tps, **LOSS** | 11,428 → 10,373, **LOSS** | 4 → 3,886, **LOSS** | 19.2 → 2.5, GAIN | −1%, GAIN |
-| `simple_update` | EVEN, no difference beyond the noise | EVEN, no difference beyond the noise | 65 → 554, EVEN, no difference beyond the noise | 20 → 8.1, GAIN | +10%, **power given** |
-| `tpcb_hot` (two branches) | EVEN, no difference beyond the noise | EVEN, no difference beyond the noise | 8 → 54, EVEN, no difference beyond the noise | 19 → 5.3, GAIN | +18%, **power given** |
+| `simple_update` | STEADY, no difference beyond the noise | STEADY, no difference beyond the noise | 65 → 554, STEADY, no difference beyond the noise | 20 → 8.1, GAIN | +10%, **power given** |
+| `tpcb_hot` (two branches) | STEADY, no difference beyond the noise | STEADY, no difference beyond the noise | 8 → 54, STEADY, no difference beyond the noise | 19 → 5.3, GAIN | +18%, **power given** |
 
 **What happened on `select`.** The compass read the pooler's service time per transaction, 0.11 ms against a 50 ms
 line, and gave back one idle connection a second until the pool stood at its floor of two (18 writes an arm, no fail-up).

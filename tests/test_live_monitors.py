@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""Every monitor of the live engine is registered, on the wall, knobbed and in the Grafana dashboard (the founder's order of 20
+"""Every monitor of the live benchmark engine is registered, on the wall, knobbed and in the Grafana dashboard (the founder's order of 20
 October: every monitor numbered, on the wall, with its own knobs and its open-source feed)."""
 import json
 import re
@@ -54,14 +54,15 @@ class LiveMonitors(unittest.TestCase):
                 self.assertTrue(p["targets"] and all(t["expr"] for t in p["targets"]), p["title"])
 
     def test_every_grafana_panel_sits_under_its_section(self):
-        """The founder's order of 21 October: every dashboard wired to its section. Each panel lies under the row of the page's
-        section that holds its monitor, numbered as the page numbers it."""
+        """The founder's orders of 21 and 30 October: every panel numbered as the wall numbers its monitor, by importance, under the
+        row of its block of the wall; its section named in its description."""
         sys.path.insert(0, str(ROOT / "docs" / "engine"))
         import export_grafana as XGF
         sec = XGF.page_sections()
         d = json.loads((ROOT / "deploy" / "grafana" / "omni-compass-wall.json").read_text(encoding="utf-8"))
-        order = {c: i for i, c in enumerate(XGF.page_order())}
+        order = {c: i for i, c in enumerate(XGF.wall_order())}
         ids = [m["id"] for m in sorted(self.reg["monitors"], key=lambda m: order.get(m["id"], len(order)))]
+        blocks = {i: (k, b["title"]) for k, b in enumerate(self.reg.get("blocks", []), 1) for i in b["ids"]}
         row, n = None, 0
         for p in d["panels"]:
             if p["type"] == "row":
@@ -74,7 +75,8 @@ class LiveMonitors(unittest.TestCase):
             n += 1
             cid = ids[n - 1]
             self.assertTrue(p["title"].startswith(f"{n} · "), p["title"])
-            self.assertEqual(row, f"{sec[cid][0]} · {sec[cid][1]}", (cid, row))
+            want = f"Block {blocks[cid][0]} · {blocks[cid][1]}" if cid in blocks else f"{sec[cid][0]} · {sec[cid][1]}"
+            self.assertEqual(row, want, (cid, row))   # each panel under its block of the wall (the founder's order of 30 October)
 
     def test_every_monitor_is_in_a_numbered_section(self):
         sys.path.insert(0, str(ROOT / "docs" / "engine"))
@@ -116,7 +118,7 @@ class LiveMonitors(unittest.TestCase):
     def test_the_kill_switch_words(self):
         self.assertIn('class="onword">ON</span>', self.body)
         self.assertIn('class="offword">OFF</span>', self.body)
-        self.assertIn("Engine table of contents", self.body)
+        self.assertIn('<h2 class="tocH">Contents</h2>', self.body)
 
 
 if __name__ == "__main__":

@@ -2,15 +2,15 @@
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-<!-- the key: GAIN, EVEN and LOSS (tools/readings.py) -->
-## The key: GAIN, EVEN and LOSS
+<!-- the key: GAIN, STEADY and LOSS (tools/readings.py) -->
+## The key: GAIN, STEADY and LOSS
 
-Every judged reading in Omni-Compass is one of three words: **GAIN**, **EVEN** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
+Every judged reading in Omni-Compass is one of three words: **GAIN**, **STEADY** or **LOSS**. Better, same and worse are not used anywhere. The word is decided by what the gauge is for, never by the plus or minus sign of its number: who sets the aim differs from one system to the next, and each gauge's aim is written in its preregistration before the runs.
 
 | Word | What each letter stands for | Its sense in underwriting | What it means in a table |
 |---|---|---|---|
 | **GAIN** | **G** Growth (asset appreciation); **A** Advantage (risk reduction); **I** Improvement (margin expansion); **N** Net-positive (profitable outcome) | surplus and positive variance | the gauge moved toward its declared aim against native: more work done, a shorter wait, fewer misses or failures, or a resource cut |
-| **EVEN** | **E** Equalized (zero variance); **V** Verified baseline (expected norm); **E** Equilibrium (balanced risk); **N** Neutral (no net change) | the break-even baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is EVEN, at its limit on native |
+| **STEADY** | **S** Stable (zero variance); **T** True to baseline (expected norm); **E** Equilibrium (balanced risk); **A** At par (no net change); **D** Drift-free (within the 0.5% floor); **Y** Yield held (nothing lost) | the par baseline: equilibrium | native and Omni-Compass within 0.5% of each other: the mean of the three runs' changes under the 0.5% floor, or no change at all; a knob native already runs at the top of its range is STEADY, at its limit on native |
 | **LOSS** | **L** Leakage (capital drain); **O** Off-track (adverse selection); **S** Setback (claim liability); **S** Subpar (negative variance) | actuarial deficit and exposure | the gauge moved away from its declared aim: less work done, a longer wait, more misses or failures |
 
 How the sign of a number becomes a word:
@@ -20,16 +20,16 @@ How the sign of a number becomes a word:
 - **A resource spent or held** (energy, the power drawn and its peaks and swings, machines, memory, processor time, a bill, wear on a part): a fall is a **cut**, and a cut is GAIN. A rise is **power given**: what Omni put in to buy the work and the speed shown beside it. Power given is always shown and never hidden, and it is never called a loss (the founder's order of 12 October 2026: the max rides every muscle's edge; it never shaves). A peak is power held, so a peak that rose is power given, in a data centre and in a building alike (17 October).
 - **Work bought with each unit of a resource** (work per energy): a rise is a cut in what each unit of work took, a GAIN; a fall is power given, because it falls when more power is given for the same work.
 - So a minus can read GAIN (a response time cut 65%, a bill cut 30%) and a plus can read LOSS (failed requests up).
-- **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; EVEN is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **EVEN, under the floor**, with its size.
-- **The sign beside a word** (the same order): the number next to a word carries the word's sign, never the gauge's raw direction, so that no one mistakes which way a number went: GAIN **+**, LOSS **−**, EVEN **=**. A bill cut 3% reads GAIN +3%, failed requests up 2% read LOSS −2%, and a change under the 0.5% floor reads EVEN =0.3%.
+- **The floor, and every change above it** (the founder's orders of 20 and 24 October 2026): a change of half of one percent (0.5%) or more either way is a change, and reads **GAIN** or **LOSS** (or **power given**) by what the gauge is for; STEADY is kept for a change under 0.5%. The change is the mean of the three runs' changes, each in percent of native. Where every run moved the same way with its 95% interval clear of zero, the word reads **in all three of our runs**; otherwise it reads **by the mean of our three runs** and says in how many of the three runs it stood beyond the noise, so a reader sees how firmly it stands. Where runs moved 0.5% or more in opposite directions, the reading is **the runs disagree**. A mean under 0.5% reads **STEADY, under the floor**, with its size.
+- **Two numbers, never mixed** (the referee's work order of 25 October): every row shows native's value and Omni-Compass's, the **raw change** (Omni-Compass − native) / native with its true sign, + for a rise and − for a fall whatever the gauge is for, labelled raw, and apart from it the word with its size and no sign. A bill cut 3% reads raw −3.0%, GAIN 3.0%; failed requests up 2% read raw +2.0%, LOSS 2.0%; a pod start wait from 0.22 s to 0.83 s reads raw +275.0%, LOSS 275.0%; a change under the 0.5% floor reads STEADY 0.3%. No raw sign is ever turned to match a word.
 
-Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads EVEN (the same as native); AT ITS LIMIT ON NATIVE reads EVEN (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads EVEN (inside the noise, within the guardrails); NOT ESTABLISHED reads EVEN (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
+Some preregistrations name their outcome with a label written before the runs (for example SUPERIOR WITHIN GUARDRAILS in the card protocol). The label stays as it was frozen, and every table shows it with its word first: TOWARD ITS AIMS reads GAIN; BOTH WAYS reads GAIN AND LOSS; AWAY FROM ITS AIMS reads LOSS; SAME AS NATIVE reads STEADY (the same as native); AT ITS LIMIT ON NATIVE reads STEADY (at its limit on native); SUPERIOR WITHIN GUARDRAILS reads GAIN (within the guardrails); ENERGY IMPROVEMENT WITH SERVICE TRADEOFF reads GAIN AND LOSS (energy cut, service traded for it); SERVICE IMPROVEMENT WITH ENERGY TRADEOFF reads GAIN, power given (service GAIN, energy given for it); NONINFERIOR / INCONCLUSIVE reads STEADY (inside the noise, within the guardrails); NOT ESTABLISHED reads STEADY (not established: inside the noise, a guardrail crossed on the mean). A run that breaks its own validity checks reads INVALID and carries no word.
 
-Every reading is one of these. **GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, every 95% interval clear of zero. **GAIN, LOSS or power given by the mean of our three runs**: the runs' mean moved 0.5% or more, with the count of runs that stood beyond the noise beside it. **EVEN, under the floor**: the mean moved less than 0.5%. **EVEN, the same**: no change at all. **The runs disagree**: runs moved 0.5% or more in opposite directions, so the test is unstable there and is looked into. **Shown, not judged**: a gauge declared in advance as shown only, such as the knob's own setting.
+Every reading is one of these. **GAIN, LOSS or power given in all three of our runs**: A, B and C moved the same way, every 95% interval clear of zero. **GAIN, LOSS or power given by the mean of our three runs**: the runs' mean moved 0.5% or more, with the count of runs that stood beyond the noise beside it. **STEADY, under the floor**: the mean moved less than 0.5%. **STEADY, the same**: no change at all. **The runs disagree**: runs moved 0.5% or more in opposite directions, so the test is unstable there and is looked into. **Shown, not judged**: a gauge declared in advance as shown only, such as the knob's own setting.
 
-Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, break-even or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (EVEN). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
+Why these three words: they are the words of underwriting and actuarial work, where every outcome is graded as surplus, par or deficit, and each letter spells out the same rule. Omni-Compass is there to add (GAIN), never to take (LOSS), and to hand a muscle back to its own native setting where it cannot add (STEADY). Its first rule is do no harm, in the founder's meaning of 19 October 2026: the organism Omni-Compass governs is never left turning out less than its native controllers make it turn out, nor less healthy, and every muscle works only as far as its own limit (`DISCLOSURES.md`, section 3). So **LOSS should never appear**: where it does, the row stays in the table, its cause is found and fixed (our own wiring first, then native's setup, then the scoring) and the test is run again.
 
-Disclosure and disclaimer: GAIN, EVEN and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
+Disclosure and disclaimer: GAIN, STEADY and LOSS, and the letters behind them, are The Omni-Compass LLC's own convention for reading its own results. The underwriting senses explain the words; they are not an actuarial, financial or insurance opinion, and no outside body defined, reviewed or approved them. A reading states what our own runs measured against native under the declared aims, not a promise about any other system; every number stands beside its word, so a reader can judge it by any other convention. Run and scored by The Omni-Compass LLC's own code. No outside party has reviewed or approved these results. Preregistered means the rules were written down in our own repository before the runs; nothing was filed with any outside body.
 <!-- end of the key -->
 
 This chapter teaches you to read every table Omni-Compass produces. You do not need to know Kubernetes or GPUs to
@@ -57,8 +57,8 @@ follow it. Read the five ideas first, then go to the table you have in front of 
      does not show that they are equal; how small a difference the run could have seen is the interval's half-width,
      printed beside it. Since the founder's order of 24 October the word is decided by the size first: a change of 0.5%
      or more reads its word even where a run's range includes zero ("by the mean of our three runs", with the count of
-     runs beyond the noise), and only a mean under 0.5% reads EVEN (the key above; section "The verdict rules" below).
-4. **The word, not the sign.** Every judged reading is GAIN, EVEN or LOSS (the key above). For response time,
+     runs beyond the noise), and only a mean under 0.5% reads STEADY (the key above; section "The verdict rules" below).
+4. **The word, not the sign.** Every judged reading is GAIN, STEADY or LOSS (the key above). For response time,
    failures and time over the line a fall is GAIN; for work and work per energy a rise is GAIN; for energy, machines
    and every other resource spent or held a fall is a cut, a GAIN, and a rise is **power given**, never a loss.
    Every table gives the word beside the number.
@@ -95,7 +95,7 @@ that governed it: the **factory profile** (the complete, versioned set of Omni-C
 released one is omni-v19's, the governor's full decision every 60 s with its fast checks every 5 s and every muscle on its card
 or the engine's setting), a **candidate profile** (a proposed combination under evaluation) or a **custom profile** (an
 identifiable configuration that differs from the released factory profile, whose results are its own). The **active profile**
-is the one governing the run in front of you; the live engine names it with its fingerprint. A matching fingerprint establishes
+is the one governing the run in front of you; the live benchmark engine names it with its fingerprint. A matching fingerprint establishes
 identity; the validation receipts establish what that identified implementation demonstrated. A result is never read across
 engines, and never across profiles. The best validated factory profile for the declared operating conditions has not yet been
 established (`docs/FACTORY_PROFILE.md`, section 5): until it is, every published result is the released factory profile's.
@@ -117,7 +117,7 @@ read on its own gauge (time over the line, failed requests, alert minutes) and n
 
 **The verdict rules.** Every judged gauge is read by the one key (`tools/readings.py`, the key at the top of this page): the
 word by what the gauge is for, never by its sign; over runs A, B and C the change is the mean of the three runs' changes in
-percent of native; a mean under 0.5% reads EVEN, under the floor (EVEN, the same where nothing moved); from 0.5% up GAIN, LOSS
+percent of native; a mean under 0.5% reads STEADY, under the floor (STEADY, the same where nothing moved); from 0.5% up GAIN, LOSS
 or power given **in all three of our runs** where every run moved the same way with its 95% interval clear of zero, otherwise
 **by the mean of our three runs** with the count of runs beyond the noise; runs that moved 0.5% or more in opposite directions
 read **the runs disagree**; a count that must never rise (failed requests, lost messages) reads LOSS on any rise in any run.
@@ -154,7 +154,7 @@ Read it in this order:
 1. **The verdict line** at the top, one of the labels chosen by rule (`docs/GPU_PREREGISTRATION.md`, amendment 1):
    SUPERIOR WITHIN GUARDRAILS, ENERGY IMPROVEMENT WITH SERVICE TRADEOFF, NONINFERIOR / INCONCLUSIVE, NOT ESTABLISHED,
    AWAY FROM ITS AIM, NOT ATTRIBUTABLE or INVALID; each gauge reads GAIN, LOSS or power given **clear of the noise**, or
-   **EVEN, no difference beyond the noise** (amendment 14; the first counted run of 2 October printed "proven" and "not
+   **STEADY, no difference beyond the noise** (amendment 14; the first counted run of 2 October printed "proven" and "not
    proven" for the same rule).
 2. **Work per energy** (requests per kilojoule): the headline. A plus sign with a range wholly above zero is a GAIN
    clear of the noise.
@@ -197,7 +197,7 @@ Every benchmark since the engine was frozen runs three separate times, A, B and 
 shows all three beside each gauge, each with its own 95% interval. Read the last column first, by the verdict rules above:
 **GAIN**, **LOSS** or **power given in all three of our runs** (the mean moved 0.5% or more, every run the same way with its
 interval clear of zero), **by the mean of our three runs** (the mean moved 0.5% or more; the count of runs beyond the noise
-beside it), **EVEN, under the floor** or **EVEN, the same**, or **the runs disagree** (runs of 0.5% or more pointing opposite
+beside it), **STEADY, under the floor** or **STEADY, the same**, or **the runs disagree** (runs of 0.5% or more pointing opposite
 ways: the test is unstable there and is looked into). Every table was read again from its own data by that rule on 24
 October (`tools/reread.py`). Nothing reads "confirmed" or "not
 confirmed": nobody outside The Omni-Compass LLC has reviewed or approved these results. The `V<n>_` in a table's name (`V10_`, `V11_`, `V12_` and so on) is the engine the runs carried (`python3 tools/omni_version.py --commit <sha>`);
@@ -218,7 +218,7 @@ bound assumes the three runs independent; runs on the same kind of machine can s
 remove and the bound does not cover. The price of "in all three of our runs" is power: a small true difference must clear
 the noise three times, so many rows read by the mean of our three runs are differences too small for a run's pairs to resolve
 (with 3 pairs a run, t = 4.303 and the interval is wide). Every reading is printed with the three intervals behind it. The deterministic simulators (CityLearn,
-pandapower, MuJoCo) reproduce to the digit, so there the three runs check the harness, not the noise; their EVEN means
+pandapower, MuJoCo) reproduce to the digit, so there the three runs check the harness, not the noise; their STEADY means
 the same to one part in a million.
 
 ## The workload tables (`V<engine>_PGBENCH.md`, `_KAFKA.md`, `_REDIS.md`, `_YCSB.md`, `_SYSBENCH.md`) and the swarm table (`V<engine>_SWARM.md`)
@@ -258,14 +258,14 @@ pairing stands, the mark stays, and the remedy is a longer window for that size 
 Every measure is a ratio oriented so that above 1 is a GAIN for Omni-Compass on top of native: work, speed, machines,
 energy. A test's index is the geometric mean of its ratios, a category's of its tests, the headline of the real
 categories, each weighted the same. A measure enters only as its three-run reading allows: GAIN, LOSS or power given in
-all three of our runs enters as the geometric mean of the runs' ratios; anything else (EVEN, the runs disagree, a word read by
+all three of our runs enters as the geometric mean of the runs' ratios; anything else (STEADY, the runs disagree, a word read by
 the mean of our three runs) enters as exactly 1. Modelled muscles are shown beside the index, never inside it.
 
 ## The real test, the twenty scenarios and the whole organism
 
 - **The real test** (`results/orchestrator/V18_THREE_ARMS_ABC.md`): one row per pair and gauge, each run's own word beside its
   number, the three-run reading in bold; below, each arm's totals in each run (requests answered, failed, wrong). The bottom line
-  on the README and the live engine page reads its pair Omni-Compass on native against native, takes the work row's mean of the
+  on the README and the live benchmark engine page reads its pair Omni-Compass on native against native, takes the work row's mean of the
   three runs as its number and turns its light red on any slower service or failed request. The record's third arm, Omni-Compass
   alone on the muscles, is not carried there: Omni-Compass is never by itself (the founder's order of 25 October).
 - **The twenty scenarios** (`results/scenarios/SCENARIOS_20.md`, class S): ten organisms, each native and with Omni-Compass on
@@ -295,9 +295,9 @@ Real Kubernetes at 50, 500 and 1,000 nodes (KWOK nodes: real Kubernetes objects 
 ## One number, one word (`docs/BENEFIT_SHEET.md`)
 
 In the tables a change keeps its raw sign: a response time that fell reads "-65%", a cache that grew reads "+300%", and
-the Reading column gives its word, GAIN, EVEN or LOSS, by what the gauge is for (the key above). The benefit sheet turns
+the Reading column gives its word, GAIN, STEADY or LOSS, by what the gauge is for (the key above). The benefit sheet turns
 every gauge the same way round against **its declared aim**: plus is a GAIN, minus a LOSS or power given, whatever the
-gauge measures, and 0% is EVEN. Beside it every change the same in all three of our runs is
+gauge measures, and 0% is STEADY. Beside it every change the same in all three of our runs is
 written out in words, never as a bare sign: "p95 cut 65% (GAIN)", "memory ceiling held up 215% (power given)", so
 neither can be misread against a table that shows the same changes as "-65%" and "+215%". One number per benchmark, by
 the index's own rule, with its word beside it. Read that sheet first; read the tables for

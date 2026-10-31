@@ -161,7 +161,7 @@ def main():
             {"native": {"tps": 2890.0, "pool_mb_mean": 512.0, "failed": 0}, "omni": {"tps": 2945.0, "pool_mb_mean": 920.0, "failed": 0}}]
     assert S.paired(reps, "tps", "higher")["reading"] == "GAIN"
     assert S.paired(reps, "pool_mb_mean", "spent")["reading"] == "power given", "more pool held is power given"
-    assert S.paired(reps, "failed", "never more")["reading"] == "EVEN, the same"
+    assert S.paired(reps, "failed", "never more")["reading"] == "STEADY, the same"
     assert S.COVER_MB == (128, 2048) and S.NATIVE_MB == 512 and lo <= S.NATIVE_MB <= hi and S.STEP_MB == S.CHUNK_MB == 128 and S.NATIVE_MB % S.CHUNK_MB == 0
     assert all(s_ >= 1 and r_ > 0 for _, s_, r_, _, _ in S.WORKLOADS.values()) and sum(1 for w in S.WORKLOADS.values() if w[4]) == 1, "one tuning workload"
     print("PASS  sysbench runner: slow statements with the pool full and missing grow the pool by chunks, calm with misses under 1% of reads gives one back after the dwell, "

@@ -10,8 +10,8 @@ Three books (the founder's orders of 14 and 20 October): the Operator's Manual (
 check Omni-Compass, with the muscle catalog and the license papers and nothing on how the engine is built; and, with
 --owner, the Owner's Manual, the master, docs/OMNI_COMPASS_OWNERS_MANUAL.pdf and docs/book/OMNI_COMPASS_OWNERS_BOOK.md,
 with everything: the theory and the declaration in docs/book/, the full manual, the repository's documents, the muscle
-catalog and the engine's source; and, with --live, the Live Engine Manual (docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf and
-docs/book/OMNI_COMPASS_LIVE_ENGINE_BOOK.md), how to read the live engine page, docs/engine/OMNI_COMPASS_LIVE_ENGINE.html: its
+catalog and the engine's source; and, with --live, the Live Benchmark Engine Manual (docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf and
+docs/book/OMNI_COMPASS_LIVE_ENGINE_BOOK.md), how to read the live benchmark engine page, docs/engine/OMNI_COMPASS_LIVE_ENGINE.html: its
 monitors, gauges and knobs, native beside Omni-Compass, and nothing on how the engine is built or wired. Each in the order set
 in its outline below. US Letter, mirrored margins for binding,
 running heads, roman numerals in the front matter, a contents with page
@@ -27,7 +27,7 @@ height, headings scaled up from it; only the running heads and footers are small
 
     python3 docs/book/build_book.py            # the Operator's Manual
     python3 docs/book/build_book.py --owner    # the Owner's Manual, the master
-    python3 docs/book/build_book.py --live     # the Live Engine Manual: how to read the live engine page
+    python3 docs/book/build_book.py --live     # the Live Benchmark Engine Manual: how to read the live benchmark engine page
 """
 from __future__ import annotations
 
@@ -65,18 +65,18 @@ BOOK = ROOT / "docs" / "book"
 # philosophy, the mathematics, the mechanism, the engine's source and every result (--owner). Both stay in the repository
 # until the founder takes the Owner's Manual out.
 OWNER = "--owner" in sys.argv
-LIVE = "--live" in sys.argv          # the third book (the founder's order of 20 October): how to read the live engine page
+LIVE = "--live" in sys.argv          # the third book (the founder's order of 20 October): how to read the live benchmark engine page
 MANUAL_REL = ("docs/OMNI_COMPASS_OWNERS_MANUAL.md" if OWNER else "docs/OMNI_COMPASS_LIVE_ENGINE_MANUAL.md" if LIVE
               else "docs/OMNI_COMPASS_MANUAL.md")
 OUT_PDF = ROOT / "docs" / ("OMNI_COMPASS_OWNERS_MANUAL.pdf" if OWNER else "OMNI_COMPASS_LIVE_ENGINE_MANUAL.pdf" if LIVE
                            else "OMNI_COMPASS_MANUAL.pdf")
 OUT_MD = BOOK / ("OMNI_COMPASS_OWNERS_BOOK.md" if OWNER else "OMNI_COMPASS_LIVE_ENGINE_BOOK.md" if LIVE else "OMNI_COMPASS_BOOK.md")
-EDITION_NAME = "Owner's Manual" if OWNER else "Live Engine Manual" if LIVE else "Operator's Manual"
+EDITION_NAME = "Owner's Manual" if OWNER else "Live Benchmark Engine Manual" if LIVE else "Operator's Manual"
 SUBTITLE = ("The Master Manual: Its Philosophy, Its Mathematics, Its Mechanism, Its Results, and How to Wire It onto Your Stack"
-            if OWNER else "How to Read the Live Engine: Its Monitors, Gauges and Knobs, Native beside Omni-Compass" if LIVE
+            if OWNER else "How to Read the Live Benchmark Engine: Its Monitors, Gauges and Knobs, Native beside Omni-Compass" if LIVE
             else "How to Embed, Wire, Tune and Run Omni-Compass on Your Stack")
 SUBTITLE_HTML = ("The Master Manual:<br/>Its Philosophy, Its Mathematics, Its Mechanism, Its Results,<br/>and How to Wire It "
-                 "onto Your Stack" if OWNER else "How to Read the Live Engine:<br/>Its Monitors, Gauges and Knobs,<br/>Native beside "
+                 "onto Your Stack" if OWNER else "How to Read the Live Benchmark Engine:<br/>Its Monitors, Gauges and Knobs,<br/>Native beside "
                  "Omni-Compass" if LIVE else "How to Embed, Wire, Tune and Run<br/>Omni-Compass on Your Stack")
 LICENSE_APPENDIX = "Appendix I" if OWNER else "Appendix F" if LIVE else "Appendix O"
 INTRO = ("Introduction: The Idea and the Promise" if OWNER else
@@ -85,7 +85,7 @@ INTRO = ("Introduction: The Idea and the Promise" if OWNER else
 PROBLEM = "The Problem and the Answer"   # the front matter opens with it (the founder's order of 21 October)
 PRELUDE = "Prelude: A Night at the Wall" if LIVE else "Prelude: A Night on the Cluster"
 RESULTS_LINE = ("Every result in this book carries its evidence class." if OWNER else
-                "This book is the reading manual of the live engine page and carries no benchmark results of its own; every "
+                "This book is the reading manual of the live benchmark engine page and carries no benchmark results of its own; every "
                 "published result carries its evidence class." if LIVE else
                 "This book is the wiring and operating manual and carries no benchmark results; every published result "
                 "carries its evidence class.")
@@ -966,55 +966,61 @@ OWNER_OUTLINE = [
 ]
 
 LIVE_OUTLINE = [
-    ("PART", "The Front of the Page",
-     "The title page and the records the page carries, the bottom line, the engine table of contents and its numbering, and the sides, colours and signal words."),
-    ("A Monitor, Not a Drawing", ("M", "A Monitor, Not a Drawing")),
-    ("The Bottom Line", ("M", "The Bottom Line")),
-    ("The Engine Table of Contents and the Numbering", ("M", "The Engine Table of Contents and the Numbering")),
-    ("The Sides, the Colours and the Signal Words", ("M", "The Sides, the Colours and the Signal Words")),
-    ("PART", "The Monitors and the Main Control Panel",
-     "The monitor wall, the main control panel with its heartbeat, its profile, its actuation and each route's bill, the mechanism's own knobs, and the control panel with the kill switch."),
-    ("The Monitor Wall", ("M", "The Monitor Wall")),
-    ("The Main Control Panel", ("M", "The Main Control Panel")),
-    ("The Mechanism's Own Knobs", ("M", "The Mechanism's Own Knobs")),
-    ("The Control Panel and the Kill Switch", ("M", "The Control Panel and the Kill Switch")),
-    ("PART", "What the Monitors Say: the Synopses",
-     "The status board, the golden signals and the event log, every LOSS row with its cause and its knob, and the benefit board."),
-    ("The Status Board: Tiles, Alarms and Watch Items", ("M", "The Status Board: Tiles, Alarms and Watch Items")),
-    ("The Golden Signals, the Event Log and the Metrics", ("M", "The Golden Signals, the Event Log and the Metrics")),
-    ("Every LOSS Row: Its Cause and Its Knob", ("M", "Every LOSS Row: Its Cause and Its Knob")),
-    ("The Benefit Board", ("M", "The Benefit Board")),
-    ("PART", "Every Monitor, Spread Out",
-     "In the page's order: the organism live, the console, the heartbeat dial, one control cycle, the phase plane, the brain, the verdict, the clouds, the orchestrators, the official Kubernetes runs, the decision trace, the chip and the host, the telemetry analytics and the Python's runs."),
-    ("The Organism, Live", ("M", "The Organism, Live")),
-    ("The Control Console", ("M", "The Control Console")),
-    ("The Heartbeat Dial", ("M", "The Heartbeat Dial")),
-    ("One Control Cycle, Traced", ("M", "One Control Cycle, Traced")),
-    ("The Phase Plane and the Scoreboard", ("M", "The Phase Plane and the Scoreboard")),
-    ("The Brain's Internal State", ("M", "The Brain's Internal State")),
-    ("The Verdict", ("M", "The Verdict")),
-    ("The Clouds", ("M", "The Clouds")),
-    ("The Orchestrators and Governors", ("M", "The Orchestrators and Governors")),
-    ("Kubernetes: the Official Run Playback", ("M", "Kubernetes: the Official Run Playback")),
-    ("Kubernetes: Per-Repetition Telemetry", ("M", "Kubernetes: Per-Repetition Telemetry")),
-    ("The Shipped Controller's Decision Trace", ("M", "The Shipped Controller's Decision Trace")),
-    ("The Chip and the Host", ("M", "The Chip and the Host")),
-    ("The Telemetry Analytics and Omni-Compass in Its Own Words", ("M", "The Telemetry Analytics and Omni-Compass in Its Own Words")),
-    ("The Python's Runs in the Page and the Core's Monte Carlo", ("M", "The Python's Runs in the Page and the Core's Monte Carlo")),
-    ("PART", "The Organisms and Everything Else",
-     "The whole organism, the twenty scenarios and the injection grid, the measured effect in full, the C++ twin, the pipeline, the master switch's wiring, the component specification, the failure modes, the page's own rendering, the problem and the summary as the page prints them, the monitor list, and the glossary and index."),
-    ("The Whole Organism, Every Way It Is Bought", ("M", "The Whole Organism, Every Way It Is Bought")),
-    ("The Twenty Scenarios and the Injection Grid", ("M", "The Twenty Scenarios and the Injection Grid")),
-    ("Measured Effect in Full: the Organisms, the Register, the Grid and Every Table", ("M", "Measured Effect in Full: the Organisms, the Register, the Grid and Every Table")),
-    ("The C++ Twin", ("M", "The C++ Twin")),
-    ("The Pipeline That Rebuilds the Page", ("M", "The Pipeline That Rebuilds the Page")),
-    ("The Master Switch's Wiring", ("M", "The Master Switch's Wiring")),
-    ("The Component Specification", ("M", "The Component Specification")),
-    ("Failure Modes, Controls and Residual Risk", ("M", "Failure Modes, Controls and Residual Risk")),
-    ("The Page Governs Its Own Drawing", ("M", "The Page Governs Its Own Drawing")),
-    ("The Problem, the Summary and the Key on the Page", ("M", "The Problem, the Summary and the Key on the Page")),
-    ("The Monitor List", ("M", "The Monitor List")),
+    # one chapter for each section of the live benchmark engine page, in the page's own order: the wall, the control panel,
+    # the contents, Parts 2 to 5 section by section, the page's appendixes A to G; then the book's own reading and license parts
+    ("PART", "Monitor Wall, Control Panel and Contents",
+     "The monitor wall, the control panel directly under it, and the page's contents."),
+    ("Monitor Wall", ("M", "Monitor Wall")),
+    ("Control Panel", ("M", "Control Panel")),
+    ("Contents: the Page's Order and Its Numbering", ("M", "Contents: the Page's Order and Its Numbering")),
+    ("PART", "Results",
+     "The page's Part 2: what Omni-Compass did against native, every LOSS row included."),
+    ("Scorecard", ("M", "Scorecard")),
+    ("Benefit Against Native", ("M", "Benefit Against Native")),
+    ("Benefit Board", ("M", "Benefit Board")),
+    ("LOSS Register", ("M", "LOSS Register")),
+    ("Status Board", ("M", "Status Board")),
+    ("PART", "Live Operation",
+     "The page's Part 3: the engine at work, live, native beside Omni-Compass, from the organism to the dashboards."),
+    ("Live Organism", ("M", "Live Organism")),
+    ("Golden Signals and Event Log", ("M", "Golden Signals and Event Log")),
+    ("Control Console", ("M", "Control Console")),
+    ("Heartbeat Dial", ("M", "Heartbeat Dial")),
+    ("Control Cycle", ("M", "Control Cycle")),
+    ("Phase Plane and Scoreboard", ("M", "Phase Plane and Scoreboard")),
+    ("Brain State", ("M", "Brain State")),
+    ("Verdict", ("M", "Verdict")),
+    ("Dashboards", ("M", "Dashboards")),
+    ("PART", "Real Runs and Platforms",
+     "The page's Part 4: the real runs played back, and the platforms they ran on."),
+    ("Kubernetes Run Playback", ("M", "Kubernetes Run Playback")),
+    ("Repetition Telemetry", ("M", "Repetition Telemetry")),
+    ("Controller Decision Trace", ("M", "Controller Decision Trace")),
+    ("Cloud Providers", ("M", "Cloud Providers")),
+    ("Orchestrators and Governors", ("M", "Orchestrators and Governors")),
+    ("GPU and CPU Hardware", ("M", "GPU and CPU Hardware")),
+    ("CI Pipeline", ("M", "CI Pipeline")),
+    ("PART", "Proof and Models",
+     "The page's Part 5: the engine's own runs, its twin, its models and its specification."),
+    ("Python Runs and Monte Carlo", ("M", "Python Runs and Monte Carlo")),
+    ("C++ Twin", ("M", "C++ Twin")),
+    ("Scenarios and Injection Grid", ("M", "Scenarios and Injection Grid")),
+    ("Whole Organism", ("M", "Whole Organism")),
+    ("Measured Effect", ("M", "Measured Effect")),
+    ("Telemetry Analytics", ("M", "Telemetry Analytics")),
+    ("Master Switch Wiring", ("M", "Master Switch Wiring")),
+    ("Specification and Mathematics", ("M", "Specification and Mathematics")),
+    ("Failure Modes and Controls", ("M", "Failure Modes and Controls")),
+    ("Self-Governed Rendering", ("M", "Self-Governed Rendering")),
+    ("PART", "The Page's Appendixes",
+     "The page's appendixes A to G, where it keeps its build, its explanations, its key and its disclosures."),
+    ("Title Page and Build", ("M", "Title Page and Build")),
+    ("Reading Guide", ("M", "Reading Guide")),
+    ("Problem and Answer", ("M", "Problem and Answer")),
+    ("Executive Summary and Reading Key", ("M", "Executive Summary and Reading Key")),
+    ("Monitor List", ("M", "Monitor List")),
     ("The Glossary and Index", ("M", "The Glossary and Index")),
+    ("Disclosures, Law and Contact", ("M", "Disclosures, Law and Contact")),
     ("PART", "Reading a Result off the Page",
      "The mechanism of action side by side, the trace from a tile to its record, what to do when a tile reads LOSS, and what the page does not tell you."),
     ("The Mechanism of Action, Side by Side", ("M", "The Mechanism of Action, Side by Side")),
@@ -1127,9 +1133,9 @@ PART_REF = re.compile(r"\bPart ([IVX]+)\b")
 # a reference that follows another document's name (`DISCLOSURES.md`, section 4; `LICENSE`, section 10; the Operator's
 # Manual, Appendix L; the founder's manuscript) carries that document's numbering and is left as written; the book's own
 # manual, named in full, is not another document
-EXTERNAL = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual|the page['’]s)\W*$")   # the page's section 4c: the live engine's own numbering
+EXTERNAL = re.compile(r"(\.md`|\.md\)|LICENSE`|Manual,|Manual's|DISCLOSURES|of the manual|the page['’]s)\W*$")   # the page's section 4c: the live benchmark engine's own numbering
 MANUSCRIPT = re.compile(r"[Mm]anuscript")
-OWN_NAME = (re.compile(r"Owner's Manual|OWNERS_MANUAL\.md") if OWNER else re.compile(r"Live Engine Manual|LIVE_ENGINE_MANUAL\.md") if LIVE
+OWN_NAME = (re.compile(r"Owner's Manual|OWNERS_MANUAL\.md") if OWNER else re.compile(r"Live Benchmark Engine Manual|LIVE_ENGINE_MANUAL\.md") if LIVE
             else re.compile(r"Operator's Manual|OMNI_COMPASS_MANUAL\.md"))
 # the repository's pages ("the manual, section 4.5") cite the Operator's Manual; bound into the Owner's book they are
 # read through this map onto the Owner's own sections that carry the same text (identity in the Operator's book)
@@ -1199,7 +1205,7 @@ def rewrite_refs(text, kind, key, own, prev=""):
         return bool(EXTERNAL.search(ctx)) and not OWN_NAME.search(ctx[-70:])
 
     def man_chapter(t):
-        if not t.isdigit():                        # a lettered section (the live engine page's 1j) is no chapter of a manual
+        if not t.isdigit():                        # a lettered section (the live benchmark engine page's 1j) is no chapter of a manual
             return None, None
         n = CHAPNUM.get(MAN_NUM.get(int(t), ""))
         return (str(n), "chapter") if n else (None, None)
@@ -1694,28 +1700,28 @@ are kept as they were written, because the record of how a result was reached is
 chapters give different figures for the same thing, the later run and the State of Play govern."""
 
 
-LIVE_PREFACE = """This is the Live Engine Manual, the third book: how to read the live engine page, the monitor of the engine and of
+LIVE_PREFACE = """This is the Live Benchmark Engine Manual, the third book: how to read the live benchmark engine page, the monitor of the engine and of
 the benchmark runs GitHub ran. It is for the operator at the dashboard: which tile means what, which knob does what, where every
 number comes from, and how the mechanism of action of Omni-Compass against native shows on the monitors. It explains neither how
 the engine is built (the Owner's Manual) nor how it is wired onto a stack (the Operator's Manual).
 
-The book is in seven parts, in the page's own order (the Contents follow), and it can be read in two ways.
+The book is in eight parts, in the page's own order (the Contents follow), and it can be read in two ways.
 
 | You are | Read |
 |---|---|
-| The operator at the wall | the Quick Reference card; Parts Two and Three; when a tile reads LOSS (Part Six) |
-| CTO, architect, head of platform | the bottom line (chapter 2); the main control panel's tabs (chapter 6); Part Five |
-| CEO, CFO, CIO, board member | the Problem and the Answer; the Disclosures; chapters 2, 12 and 20 |
-| Site reliability engineer | Part Two; the golden signals and metrics (chapter 10); the wall stack, `deploy/wall` (chapter 6) |
-| Control or plant engineer | the contract (chapter 6); the mechanism's knobs (chapter 7); chapters 16 to 19 |
-| Auditor, diligence team | Part One; Part Six; the pipeline (chapter 32); the page word for word (Appendix L) |
+| The operator at the wall | the Quick Reference card; Parts One and Two; when a tile reads LOSS (Part Seven) |
+| CTO, architect, head of platform | the scorecard (chapter 4); the fuse box and its tabs (chapter 2); Part Five |
+| CEO, CFO, CIO, board member | the Problem and the Answer; the Disclosures; chapters 4, 5, 6 and 21 |
+| Site reliability engineer | Part Two; the golden signals and metrics (chapter 10); the wall stack, `deploy/wall` (chapter 2) |
+| Control or plant engineer | the contract and the mechanism knobs (chapter 2); chapters 13 to 16 |
+| Auditor, diligence team | Part Six; Part Seven; the pipeline (chapter 24); the page word for word (Appendix L) |
 | Procurement and counsel | the Disclosures and the papers bound into the back matter |
 
 **Conventions.** `Code` is a command, file, anchor or switch exactly as typed. "Native" is the system by itself, orange;
-"Omni-Compass" is Omni-Compass on top of native, blue. Those are the two sides, and the only two: Omni-Compass is never by itself
-(the founder's order of 25 October). Violet marks only a knob or profile turned from the factory tune. Red is never a side: it is
-the stop sign of a line crossed. "A section" is a numbered part of the page, named by its anchor; "a chapter"
-is a chapter of this book. A knob marked **LIVE** acts on the live engine; one marked **RECORDED** chooses a record and modifies
+"Omni-Compass" is Omni-Compass on top of native, blue. Those are the two sides, and the only two: Omni-Compass is never by
+itself. Violet marks only a knob or profile turned from the factory tune. Red is never a side: it is
+the stop sign of a line crossed. "A section" is a numbered part of the page, named by its number, its title and its anchor;
+"a chapter" is a chapter of this book. A knob marked **LIVE** acts on the live benchmark engine; one marked **RECORDED** chooses a record and modifies
 nothing. Every number carries its evidence class: P a physical meter, L live software, S our own
 models (modelled); a model is never proof."""
 
@@ -1760,7 +1766,7 @@ def build():
     story += front_chapter(doc, "Preface", preface_lines())
     story += front_chapter(doc, PRELUDE, MAN[PRELUDE])
     story += front_chapter(doc, INTRO, MAN[INTRO])
-    story += front_chapter(doc, "The key: GAIN, EVEN and LOSS", MAN["The key: GAIN, EVEN and LOSS"])
+    story += front_chapter(doc, "The key: GAIN, STEADY and LOSS", MAN["The key: GAIN, STEADY and LOSS"])
     story += front_chapter(doc, "What You Are Looking At", MAN["What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report"])
     story += front_chapter(doc, "Quick Reference: The Card for the Glove Box", MAN["Quick Reference: The Card for the Glove Box"])
     if OWNER:
@@ -1772,7 +1778,7 @@ def build():
     md_parts += [f"## {PROBLEM}", ""] + front_lines(MAN[PROBLEM]) + [""]
     md_parts += ["## Foreword", ""] + front_lines(MAN["Foreword"]) + ["## Preface", ""] + front_lines(preface_lines()) + [""]
     for sec in (PRELUDE, INTRO,
-                "The key: GAIN, EVEN and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report",
+                "The key: GAIN, STEADY and LOSS", "What You Are Looking At: Omni-Compass, Hooked Up, and How to Read Its Report",
                 "Quick Reference: The Card for the Glove Box") + (("Executive Summary",) if OWNER else ()):
         md_parts += [f"## {sec}", ""] + front_lines(MAN[sec]) + [""]
 
@@ -1810,9 +1816,12 @@ def build():
         title, src = item
         num = CHAPNUM.get(title)
         flow = chapter_flow(src, NUMBERERS[title])
-        story += ([] if after_part else [ChapterBreak()]) + [Marker("chapter", title=title)]
-        story += chapter_opener(num, title, None if num else ("APPENDIX" if title.startswith("Appendix") else "BACK MATTER"),
-                                top=0.25 * inch if after_part or title == "Contact" else 0.9 * inch)   # the last chapter keeps the end notice on its page
+        opener = [Marker("chapter", title=title)] + chapter_opener(
+            num, title, None if num else ("APPENDIX" if title.startswith("Appendix") else "BACK MATTER"),
+            top=0.25 * inch if after_part or title == "Contact" else 0.9 * inch)   # the last chapter keeps the end notice on its page
+        if after_part and LIVE:          # the live book: a part's heading stays on its page with its first chapter's opening
+            keep_with_next(opener)
+        story += ([] if after_part else [ChapterBreak()]) + opener
         story += flow
         after_part = False
         md_parts += ["", f"## {str(num) + '. ' if num else ''}{title}", ""]

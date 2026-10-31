@@ -124,7 +124,7 @@ def main(argv=None):
                 r = rec["against_base"][arm][g]
                 if g == "hpa_shortfall_minutes_per_hour" and arm == "solo":
                     cells.append("not read"); continue
-                cells.append(r["word"] if r["word"].startswith("EVEN") else f"{r['word']} {pct(r)}")
+                cells.append(r["word"] if r["word"].startswith("STEADY") else f"{r['word']} {pct(r)}")
             L.append(f"| {GAUGE_NAME[g]} | " + " | ".join(cells) + " |")
     m = lambda k, arm, g: sum(both[k][arm][s][g] for s in seeds) / len(seeds)
     base_eng = engine(tree)[0]

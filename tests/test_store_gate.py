@@ -29,7 +29,7 @@ def test_gauges_and_reading():
               {"setting_mean": 10.0, "writes": 2, "below_native_s": 1, "below_native_short_s": 1, "above_native_idle_s": 0, "first_writes": 0})] * 3
     r = G.read_pairs("x", pairs)
     assert r["writes"]["word"] == "GAIN" and r["below_native_short_s"]["word"] == "GAIN" and r["below_native_s"]["word"] == "shown"
-    assert r["setting_mean"]["word"].startswith("EVEN")
+    assert r["setting_mean"]["word"].startswith("STEADY")
     worse = [(c, b) for b, c in pairs]
     assert G.read_pairs("x", worse)["below_native_short_s"]["word"] == "LOSS" and G.read_pairs("x", worse)["writes"]["word"] == "power given"
 

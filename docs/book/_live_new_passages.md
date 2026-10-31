@@ -1,8 +1,8 @@
-# New passages for the Live Engine Manual (draft, not bound into any book)
+# New passages for the Live Benchmark Engine Manual (draft, not bound into any book)
 
 > © 2026 The Omni-Compass LLC. All rights reserved. **Evaluation and Simulation use only.** Any commercial use, commercialization, monetization, production use, redistribution or hosted service of any part of Omni-Compass requires a signed, paid Omni-Compass Enterprise License from The Omni-Compass LLC. Every copy, export, report and printout carries this notice with `LICENSE`, `NOTICE` and `DISCLOSURES.md`. `SPDX-License-Identifier: LicenseRef-OmniCompass-Evaluation-1.0` All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
 
-Self-contained passages written from the live engine page as it stood at commit 77130d306e (the seven-part order of 24 October)
+Self-contained passages written from the live benchmark engine page as it stood at commit 77130d306e (the seven-part order of 24 October)
 and its source (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`: `MECH0`, `MECH_SPEC`, `MUS_SPEC`, `DIRECT_FOLLOW`, `viewNote`,
 `swSet`, `LAMP`). They name sections by anchor, not number, because the page's order is changing again; monitor numbers are given
 by canvas id with the number they carried at 77130d306e. Colours are named only where the page's tokens fix them (`--direct`,
@@ -50,7 +50,7 @@ itself against native: the work done fell 4.3%, 4.1% and 5.1% (less work: LOSS i
 line rose 178%, 181% and 200% (more over the line: LOSS in all three runs); the power drawn fell by less than 0.01% in each run
 (the record reads it GAIN; a change that small is under the key's 0.5% floor). Each muscle alone, by itself against native: the
 muscle-decisions over the line fell 29.2%, 20.9% and 26.1% (GAIN in all three runs), the share of its run each muscle took to
-clear its line fell 26.6%, 24.4% and 24.1% (GAIN), the work and the power EVEN. Why: the max is built to ride on top of native's
+clear its line fell 26.6%, 24.4% and 24.1% (GAIN), the work and the power STEADY. Why: the max is built to ride on top of native's
 controller; alone, the floor it holds is the snapshot, not native's controller, so in one body the pools that native would have
 grown stand at their snapshot while the climb passes them. That is why Omni-Compass sits on top of native; the organism's reading
 by itself is a LOSS at the factory tune and is on the next version's list with its cause (Honesty: the row stands). A LOSS seen on
@@ -75,7 +75,7 @@ these included. The count beside it reads either "every knob at the factory: the
 "a variation of the mechanism (class S); its readings are its own". Every turn is written to the console's event log with its
 decision. Each group prints a live reading of the quantities its knobs act on, every decision, and the line at the top of the
 panel prints the live model's decision with the muscles past the line, the work served, the work failed and the work waiting this
-day, native beside the Omni-Compass side in view. The harness replays recorded positions, so turning any knob moves the live engine
+day, native beside the Omni-Compass side in view. The harness replays recorded positions, so turning any knob moves the live benchmark engine
 to the stress-test model (the log says so); the knobs act on that model only. The proof engine, the core's Monte Carlo and
 `docs/engine/check_live_engine.py` read the factory numbers, so every digest stays the Python's.
 
@@ -221,16 +221,16 @@ button puts it back.
 
 ---
 
-## The lights: EVEN only inside ±0.5%
+## The lights: STEADY only inside ±0.5%
 
 A light that compares Omni-Compass against native at this moment reads by the key: GAIN where the Omni-Compass side helps the
-muscle and the organism, LOSS where it hurts, EVEN where the two cannot be told apart. From 24 October EVEN is held to a change
+muscle and the organism, LOSS where it hurts, STEADY where the two cannot be told apart. From 24 October STEADY is held to a change
 inside ±0.5% of native's value (`LAMP.near` = 0.005; the founder's order: "Any gauge that gives anything over a 0.5 percent change
 either way is a change"). On a cluster replay, a 95th percentile 0.5% or more faster than native's at the same moment lights GAIN,
-0.5% or more slower lights LOSS, and only a difference inside ±0.5% lights EVEN; the light's own words say "within 0.5% of
+0.5% or more slower lights LOSS, and only a difference inside ±0.5% lights STEADY; the light's own words say "within 0.5% of
 native's". Where a light counts (the muscles over their line, the pods waiting), any difference of one is a change. The 0.5% rule
 is the light's; the three-run tables keep their own rule (every interval clear of zero in all three runs, and under the key's
-0.5% floor a change reads EVEN, under the floor), so a light that turns for a moment is a moment, and the judged reading stays in
+0.5% floor a change reads STEADY, under the floor), so a light that turns for a moment is a moment, and the judged reading stays in
 the table. The heading light is unchanged: a gauge within 3% of its line, or whose own slope crosses it within three readings,
 lights the middle lamp.
 

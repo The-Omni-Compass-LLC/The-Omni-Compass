@@ -9,7 +9,7 @@ every governor at 1, 10, 100 and 500 runs × 1, 10, 100 and 500 organisms stacke
 The stacking wraps inside the one batch; every gauge is read per muscle, so two ways on the same muscles read what they read in
 counts and a governor's way is read like for like; the shards deal out every body once; the readings carry their run count's
 words; and the record, when one is written, re-hashes to its own digest, names a batch the Python ran (and the C++ engine ran the
-same), and every cell's mean recomputes from its runs' means as the live engine's page recomputes it."""
+same), and every cell's mean recomputes from its runs' means as the live benchmark engine's page recomputes it."""
 import json
 import math
 import unittest
@@ -146,12 +146,12 @@ class Record(unittest.TestCase):
         self.assertLess(worst, 1e-5)
 
     def test_no_number_without_its_word(self):
-        words = {"GAIN", "EVEN", "LOSS", "power given", "the runs disagree"}
+        words = {"GAIN", "STEADY", "LOSS", "power given", "the runs disagree"}
         for org, pairs in self.rec["cells"].items():
             for p, cells in pairs.items():
                 for nm, c in cells.items():
                     for g in ("work", "over", "power"):
-                        self.assertIn(c[g]["word"], words)
+                        self.assertIn({"EVEN": "STEADY"}.get(c[g]["word"], c[g]["word"]), words)   # the grid's tool writes the old word; the key reads it as STEADY
                         self.assertTrue(math.isfinite(c[g]["mean"]))
 
 

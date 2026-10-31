@@ -14,7 +14,7 @@ The standing wire's replay reproduces its own recorded knob in 97.4% of the seco
 
 | Gauge | Standing (mean a arm) | Candidate (mean a arm) | Candidate against standing |
 |---|---:|---:|---|
-| setting, mean (the knob held) | 19.13 | 19.21 | =0.4% EVEN |
+| setting, mean (the knob held) | 19.13 | 19.21 | =0.4% STEADY |
 | writes (the knob's moves) | 31.12 | 24.58 | +21.0% GAIN |
 | seconds below native | 242.42 | 217.85 | shown |
 | seconds below native while short (waiting, missing, lagging) | 19.31 | 16.85 | +12.7% GAIN |
@@ -24,8 +24,8 @@ By workload:
 | Workload | Arms | setting, mean (the knob held) | writes (the knob's moves) | seconds below native | seconds below native while short (waiting, missing, lagging) |
 |---|---:|---|---|---|---|
 | select | 8 | 18.1 → 18.3: +0.8% power given | 31.1 → 21.1: +32.1% GAIN | 344.5 → 304.0: shown | 20.9 → 16.6: +20.4% GAIN |
-| simple_update | 9 | 19.7 → 19.8: =0.3% EVEN | 36.2 → 31.0: +14.4% GAIN | 188.7 → 171.1: shown | 21.8 → 20.7: +5.1% GAIN, inside the arms' noise |
-| tpcb_hot | 9 | 19.4 → 19.4: =0.2% EVEN | 26.0 → 21.2: +18.4% GAIN | 205.4 → 188.0: shown | 15.4 → 13.2: +14.4% GAIN |
+| simple_update | 9 | 19.7 → 19.8: =0.3% STEADY | 36.2 → 31.0: +14.4% GAIN | 188.7 → 171.1: shown | 21.8 → 20.7: +5.1% GAIN, inside the arms' noise |
+| tpcb_hot | 9 | 19.4 → 19.4: =0.2% STEADY | 26.0 → 21.2: +18.4% GAIN | 205.4 → 188.0: shown | 15.4 → 13.2: +14.4% GAIN |
 
 ## kafka: 27 omni arms
 
@@ -48,8 +48,8 @@ By workload:
 
 | Workload | Arms | setting, mean (the knob held) | writes (the knob's moves) | seconds below native | seconds below native while short (waiting, missing, lagging) | seconds above native, calm with nothing waiting | writes in the first 15 s (rebalances) |
 |---|---:|---|---|---|---|---|---|
-| burst | 9 | 2.0 → 2.0: +0.8% power given | 2.0 → 0.0: +100.0% GAIN | 3.0 → 0.0: shown | 0.8 → 0.0: +100.0% GAIN | 0.0 → 0.0: =0.00 a arm EVEN (identical) (the standing wire's mean is 0) | 2.0 → 0.0: +100.0% GAIN |
-| heavy | 9 | 2.0 → 2.0: =0.3% EVEN | 2.0 → 0.0: +100.0% GAIN | 3.0 → 0.0: shown | 0.9 → 0.0: +100.0% GAIN | 0.0 → 0.0: =0.00 a arm EVEN (identical) (the standing wire's mean is 0) | 2.0 → 0.0: +100.0% GAIN |
+| burst | 9 | 2.0 → 2.0: +0.8% power given | 2.0 → 0.0: +100.0% GAIN | 3.0 → 0.0: shown | 0.8 → 0.0: +100.0% GAIN | 0.0 → 0.0: =0.00 a arm STEADY (identical) (the standing wire's mean is 0) | 2.0 → 0.0: +100.0% GAIN |
+| heavy | 9 | 2.0 → 2.0: =0.3% STEADY | 2.0 → 0.0: +100.0% GAIN | 3.0 → 0.0: shown | 0.9 → 0.0: +100.0% GAIN | 0.0 → 0.0: =0.00 a arm STEADY (identical) (the standing wire's mean is 0) | 2.0 → 0.0: +100.0% GAIN |
 | light | 9 | 2.1 → 2.0: +3.0% GAIN, inside the arms' noise | 2.2 → 0.4: +80.0% GAIN | 3.0 → 0.0: shown | 1.0 → 0.0: +100.0% GAIN | 37.6 → 6.3: +83.1% GAIN, inside the arms' noise | 2.0 → 0.0: +100.0% GAIN |
 
 ## ycsb: 36 omni arms

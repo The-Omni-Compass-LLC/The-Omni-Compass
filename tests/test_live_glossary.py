@@ -3,7 +3,7 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The live engine's glossary and index (tools/live_glossary.py, the founder's words of 24 October: "a glossary and index and
+"""The live benchmark engine's glossary and index (tools/live_glossary.py, the founder's words of 24 October: "a glossary and index and
 what that means ... all 1,000 muscles and every other thing that should be in this"): every catalog muscle once, every term
 defined and sourced in words its source still carries, the counts the catalog's own, and a file that can sit inside the page's
 <script> element."""
@@ -22,21 +22,21 @@ MD = ROOT / "docs" / "engine" / "GLOSSARY.md"
 PAGE = ROOT / "docs" / "engine" / "OMNI_COMPASS_LIVE_ENGINE.html"
 CATALOG = ROOT / "realms" / "catalog_v5.csv"
 REALMS = ["compute_ai_cloud", "physics_robotics_autonomous", "energy_facility_industrial", "distribution_specialized"]
-REQUIRED = ["GAIN", "EVEN", "LOSS", "power given", "the runs disagree", "do no harm", "native", "Omni-Compass on native",
+REQUIRED = ["GAIN", "STEADY", "LOSS", "power given", "the runs disagree", "do no harm", "native", "Omni-Compass on native",
             "the compass", "the compass law", "the band", "the cushion", "the centre",
             "the two antagonist forces", "k[p]", "k[d]", "A", "tanh", "the max", "the tune-down", "the dial", "one pedal",
             "lift-off", "cruise", "the lease", "the kill switch", "the snapshot", "the two-way plug", "the four pieces",
-            "piece 1: the state (E, U, I[U], the basin)", "piece 2: the basin's potential and flow (S, Φ(S))",
-            "piece 3: the bath (B, Ḃ)", "piece 4: the governor coupling every muscle to one law", "ρ*", "κ", "h", "calm", "σ",
-            "ν", "the organs and their grants (θ)", "the immune system", "the nervous system", "the heat debt", "the twin",
+            "piece 1, the state and the basin", "piece 2, the basin's potential and flow",
+            "piece 3, the bath", "piece 4, the governor's law", "ρ*", "κ", "h", "calm", "σ",
+            "ν", "the organs and their grants", "the immune system", "the nervous system", "the heat debt", "the twin",
             "the bone", "the edge", "the verdict", "the give-back trial", "the model gate", "the fingerprint and its digest",
             "the seal", "evidence classes P, L, S", "three runs A, B and C", "the 95% interval on Student's t", "the 0.5% floor",
             "the heartbeat", "the fast checks", "the conveyance", "the organism", "muscle", "realm", "family", "template",
-            "knob", "the spine", "the stack", "the tower", "the orchestra", "the grid (copies × runs)", "protocol 4",
-            "the conductor", "Omni index", "the benefit board", "the traffic signal", "REDLINING", "STEADY", "THRIVING",
+            "knob", "the spine", "the stack", "the tower", "the orchestra", "the grid", "protocol 4",
+            "the conductor", "Omni index", "the benefit board", "the traffic signal", "REDLINING", "STEADY", "GAINING",
             "native's colour", "Omni-Compass's blue", "a changed tune's violet", "the cloud as the wire",
             "the three places Omni-Compass lives", "Monte Carlo", "RK4", "the jump generator", "the C++ twin",
-            "the mechanism panel"]
+            "Mechanism Knobs"]
 
 
 class LiveGlossary(unittest.TestCase):
@@ -108,7 +108,7 @@ class LiveGlossary(unittest.TestCase):
         from tools.live_glossary import quote_found
         names = [t["term"] for t in self.d["terms"]]
         self.assertEqual([n for n, k in Counter(names).items() if k > 1], [], "a term written twice")
-        self.assertEqual([t for t in REQUIRED if t not in names], [], "a term the live engine's reader meets is missing")
+        self.assertEqual([t for t in REQUIRED if t not in names], [], "a term the live benchmark engine's reader meets is missing")
         for item in self.d["terms"] + self.d["organisms"] + self.d["arms"]:
             name = item.get("term") or item["name"]
             self.assertTrue((item.get("def") or item.get("meaning") or "").strip(), f"{name}: no definition")

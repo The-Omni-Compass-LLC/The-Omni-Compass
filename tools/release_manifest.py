@@ -265,7 +265,7 @@ def main(argv=None):
          "files": {g: {p: sha(p) for p in fs} for g, fs in GROUPS.items()},
          "live_evidence": LIVE,
          "physical_meter_results": ("NVIDIA A100 SXM4 40 GB on Lambda, 2026-10-24, omni-v18's card governor (commit e3b05dc), one run of "
-                                    "10 paired repetitions (results/gpu/run-20261024T091235Z/GPU_REPS.md): every service gauge EVEN "
+                                    "10 paired repetitions (results/gpu/run-20261024T091235Z/GPU_REPS.md): every service gauge STEADY "
                                     "(work per energy up 0.2%, the 95th percentile up 0.2%, requests served the same), the temperature "
                                     "up 1.4% to 1.5% (power given); the governor wrote nothing, both knobs at their top on native (at its "
                                     "limit on native). The NVIDIA A10 run of 2026-10-02 (results/gpu/run-20261002T082232Z, the "

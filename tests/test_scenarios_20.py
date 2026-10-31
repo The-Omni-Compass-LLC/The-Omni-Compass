@@ -14,10 +14,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 import tools.scenarios_20 as S  # noqa: E402
-from tools.readings import GAIN, EVEN, LOSS, GIVEN, DISAGREE, SHOWN, SHOWN_AIM, HIGHER, LOWER, SPENT, OWN_RUNS, classify, aim  # noqa: E402
+from tools.readings import GAIN, STEADY, LOSS, GIVEN, DISAGREE, SHOWN, SHOWN_AIM, HIGHER, LOWER, SPENT, OWN_RUNS, classify, aim  # noqa: E402
 
 RESULT = ROOT / "results" / "scenarios"
-WORDS = {GAIN, EVEN, LOSS, GIVEN, DISAGREE}
+WORDS = {GAIN, STEADY, LOSS, GIVEN, DISAGREE}
 
 
 def record():
@@ -54,7 +54,7 @@ class Shape(unittest.TestCase):
                     self.assertEqual(set(g["runs"]), set(S.RUNS))
                     for x in S.RUNS:                    # each run's change and interval, as the key prints them
                         self.assertRegex(g["runs"][x]["cell"], r"^[+−=±]\d")
-                self.assertIn(rd["runner"]["labelled"].split(" ")[0].strip(","), {GAIN, EVEN, LOSS, "INVALID"}, (o["key"], pk))
+                self.assertIn(rd["runner"]["labelled"].split(" ")[0].strip(","), {GAIN, STEADY, LOSS, "INVALID"}, (o["key"], pk))
 
     def test_the_whole_organism_is_the_composition_of_the_real_tables(self):
         w = record()["organisms"][9]
@@ -65,7 +65,7 @@ class Shape(unittest.TestCase):
         for sc in comp["scopes"].values():
             for rd in ("index", "carried"):
                 for g in sc[rd]["whole"]["gauges"].values():
-                    self.assertIn(g["word"], {GAIN, EVEN, LOSS, GIVEN})
+                    self.assertIn(g["word"], {GAIN, STEADY, LOSS, GIVEN})
 
     def test_run_on_committed_code_with_the_harness_records_seeds(self):
         run = record()["run"]
@@ -101,9 +101,9 @@ class Reading(unittest.TestCase):
         self.assertTrue(S.three_run(self.runs(5, 6, 7), SPENT).strip("*").startswith("power given in all three"))
         # a change of 0.5% or more shows its word, with how many runs were clear of the noise (the founder's order of 24 October)
         self.assertEqual(S.three_run(self.runs(5, 0.5, 7), HIGHER), "**GAIN by the mean of our three runs, beyond the noise in 2 of 3**")
-        self.assertTrue(S.three_run(self.runs(0.3, 0.2, 0.4, half=0.1), HIGHER).startswith("EVEN, under the floor"))
+        self.assertTrue(S.three_run(self.runs(0.3, 0.2, 0.4, half=0.1), HIGHER).startswith("STEADY, under the floor"))
         self.assertEqual(S.three_run(self.runs(5, -6, 7), HIGHER).strip("*"), DISAGREE)
-        self.assertTrue(S.three_run(self.runs(0, 0, 0, half=0), HIGHER).startswith("EVEN, the same"))
+        self.assertTrue(S.three_run(self.runs(0, 0, 0, half=0), HIGHER).startswith("STEADY, the same"))
         self.assertEqual(S.three_run(self.runs(5, 6, 7), SHOWN_AIM), SHOWN)
 
 

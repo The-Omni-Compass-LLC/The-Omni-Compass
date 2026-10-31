@@ -4,9 +4,9 @@
 
 The founder's orders of 24 October 2026, late night: one complete factory-tuned profile becomes the packaged baseline, once every
 mechanism is verified and every knob has been simulated and tuned together for the most benefit; "we ain't got to the basic yet";
-the live engine shows the governing mechanism so that profile can be moved, demonstrated and studied; and every manual, instruction
+the live benchmark engine shows the governing mechanism so that profile can be moved, demonstrated and studied; and every manual, instruction
 and reading guide carries the same words for it. This page is the one place those words are written. The Operator's Manual, the
-Owner's Manual, the Live Engine Manual, the README, the live engine's glossary and the reading guide point here.
+Owner's Manual, the Live Benchmark Engine Manual, the README, the live benchmark engine's glossary and the reading guide point here.
 
 ## 1. What Omni-Compass consists of
 
@@ -20,7 +20,7 @@ on fresh workloads.
 Freezing the factory profile fixes the released rules and default tuning. The engine's internal state, its commands and the
 resources it allocates go on responding to changing conditions.
 
-The **live engine** (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) is an interactive tuning bench. Its controls expose the governing
+The **live benchmark engine** (`docs/engine/OMNI_COMPASS_LIVE_ENGINE.html`) is an interactive tuning bench. Its controls expose the governing
 mechanism and show how an adjustment moves the connected system. An adjustment produces an identifiable active configuration. It
 becomes a new factory configuration only after validation and a new release declaration.
 
@@ -133,13 +133,13 @@ The Python, the C++ and the browser port share one behavioural contract: the sam
 governing intervals and time-based rules; the same authority and constraint decisions; the same handling of stale observations,
 refused commands and recovery; exact agreement for discrete decisions, with tolerances fixed in advance where floating-point
 arithmetic needs them. The seal holds the twins to it (`tools/seal.py`, `results/SEAL.json`, the parity tests under `tests/`), and
-the live engine is held to the Python and the C++ on every build (`docs/engine/check_live_engine.py`).
+the live benchmark engine is held to the Python and the C++ on every build (`docs/engine/check_live_engine.py`).
 
 A release record identifies the engine version and its fingerprint (`OMNI_V19.json`), the profile, the implementations' parity
 receipts and the validation receipts. A matching fingerprint establishes identity; the validation receipts establish what that
 identified implementation demonstrated.
 
-## 7. What the live engine shows
+## 7. What the live benchmark engine shows
 
 - **Architecture:** native, or Omni-Compass on native; Omni-Compass is never by itself (the founder's order of 25 October).
 - **Deployment route:** on-site hardware, or through the cloud.
@@ -185,7 +185,7 @@ for a positive native cost and a valid, matched workload comparison. That gives 
 A component's percentage is a supporting measurement. The bill's percentage comes from adding the actual costs inside the declared
 boundary. A missing price or an incomplete workload stays visibly unresolved: today only the cloud's compute is metered in money
 (Azure, machine-hours at the list price, `results/live/AKS_BILL.md`); energy, machines, storage, network and operation carry no
-recorded price, so neither route's total is resolved yet, and the live engine shows each component as unresolved beside its measured
+recorded price, so neither route's total is resolved yet, and the live benchmark engine shows each component as unresolved beside its measured
 change. The company's expected ranges for the three places Omni-Compass lives (`DISCLOSURES.md` section 9) are an expectation, never
 a result.
 
@@ -196,12 +196,12 @@ a result.
 | README | the engine, the factory profile, the tuning bench and the two deployment routes, at once |
 | The Operator's Manual | starting from the factory profile, making a custom profile, reading the command acknowledgements, the two restoring controls |
 | The Owner's Manual | healthy production, how a configuration is chosen, the whole-workload benefit, the scope of the validation |
-| The Live Engine Manual | every control, its backend, its effects, its limits, and the factory against the active settings |
+| The Live Benchmark Engine Manual | every control, its backend, its effects, its limits, and the factory against the active settings |
 | The engine's own pages (`docs/OMNI_V19.md`, `cpp/`, `tools/seal.py`) | the equations, units, profile loading, timing, parity checks and release fingerprints |
 | The reading guide (`docs/HOW_TO_READ_THE_RESULTS.md`) | the workload contract, the measurement boundary, the profile's identity, the costs, the requirements and the verdict rules |
 
 That is the common language: build and verify the mechanisms; tune and validate the complete profile; freeze its release identity;
-expose deliberate, traceable adjustment through the live engine.
+expose deliberate, traceable adjustment through the live benchmark engine.
 
 ---
 

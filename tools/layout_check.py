@@ -69,7 +69,7 @@ def prose_only(text: str) -> str:
 
 STANDS = [re.compile(r"\b[Oo]mni[- ]v(\d+)\b\**`?\)?[^.;()]{0,25}\bstands\b(?! (?:as|for|with|in|at|beside))"),
           re.compile(r"stands on main[^.;]{0,20}[Oo]mni[- ]v(\d+)"),
-          re.compile(r"\bthe (?:newest )?engine (?:on main|that stands)[^.;]{0,15}\b[Oo]mni[- ]v(\d+)"),
+          re.compile(r"\bthe (?:newest )?engine (?:on main|that stands)[^.;]{0,15}?\b[Oo]mni[- ]v(\d+)"),   # the first engine named after it
           re.compile(r"[Ee]ngine that stands[,:]?\s*\(?\**`?omni-v(\d+)")]
 
 

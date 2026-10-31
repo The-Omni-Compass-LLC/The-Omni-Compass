@@ -7,10 +7,10 @@ name: injection-grid
 # The founder's order of 25 October: every batch of the Python's 500 Monte Carlo injections runs through every organism, native and
 # with Omni-Compass on native, and through every governor sitting on each organism (the third arm), at 1, 10, 100 and 500 runs and
 # 1, 10, 100 and 500 organisms stacked, "every time [the Python] is ran", so anyone can pick any scenario of that one batch on the
-# live engine. Each set engine-runs commits on main starts it (its base is the newest record in results/engine_runs), and a dispatch
+# live benchmark engine. Each set engine-runs commits on main starts it (its base is the newest record in results/engine_runs), and a dispatch
 # runs any base the Python has run. Eight shards run the bodies, heaviest first (tools/injection_grid.py --shard I/8 --cache-only);
 # the last job reads every shard's runs, writes results/injection_grid/INJECTION_GRID_<base>.json and .md, commits them, and on main
-# rebuilds the live engine with them. Class S, our own models. Nothing is billed: GitHub's own machines.
+# rebuilds the live benchmark engine with them. Class S, our own models. Nothing is billed: GitHub's own machines.
 on:
   workflow_dispatch:
     inputs:
@@ -228,7 +228,7 @@ jobs:
             echo "::warning::push attempt $attempt failed (the branch moved); trying again"; sleep 15
           done
           echo "::error::the record could not be pushed after six attempts"; exit 1
-      - name: On main, the live engine rebuilt with this grid
+      - name: On main, the live benchmark engine rebuilt with this grid
         if: github.event_name == 'workflow_run' || github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

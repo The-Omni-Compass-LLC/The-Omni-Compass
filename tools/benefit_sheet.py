@@ -4,11 +4,11 @@
 # Evaluation and Simulation use only; any commercialization, monetization or other use requires a signed, paid
 # Omni-Compass Enterprise License. See LICENSE, NOTICE and DISCLOSURES.md.
 # All patents, copyrights and trademarks filed in the USA. www.omni-compass.com
-"""The benefit sheet: one number per benchmark, its word (GAIN, EVEN or LOSS), and every change said in words.
+"""The benefit sheet: one number per benchmark, its word (GAIN, STEADY or LOSS), and every change said in words.
 
 The founder's orders of 9 and 13 October 2026: next to every benchmark, say whether Omni-Compass on top was a benefit to the
 system and by how much, in one number whose sign always means the same thing, whatever the gauge measures; and say it in
-GAIN, EVEN and LOSS, judged by what each gauge is for and never by the sign of its number (tools/readings.py, the key). So the
+GAIN, STEADY and LOSS, judged by what each gauge is for and never by the sign of its number (tools/readings.py, the key). So the
 sign here is the system's own declared aims, gauge by gauge: plus is a GAIN; a minus is a LOSS on work, speed, misses or
 failures, and power given on a resource spent (energy, machines, memory). The tables keep their raw signs (a response time
 that fell reads "-65%" there); this sheet turns every one the same way round, and says each change in words: which way it
@@ -18,14 +18,14 @@ How the number is made, the same rule as the Omni index (tools/omni_index.py):
 
   every judged gauge becomes a ratio oriented so that above 1 is a GAIN against the gauge's declared aim (native / omni for a
   gauge that aims lower or is a resource spent, omni / native for one that aims higher); a gauge counts only where its reading is
-  judged across our three runs, anything else (EVEN: inside the noise or the same; the runs disagree) counts as exactly 1; the number is the geometric mean of
+  judged across our three runs, anything else (STEADY: inside the noise or the same; the runs disagree) counts as exactly 1; the number is the geometric mean of
   those ratios, minus one, in percent. For the tests inside the index the number IS the index's own resource reading of
   that test; for a stack with several workloads the stack's number is its index category. For the simulators and the
   organisms, which the index does not score, the same arithmetic runs over every judged gauge of their tables.
 
   "Benefit?" reads GAIN (gauges GAIN across our three runs, none LOSS or power given), GAIN, power given (a GAIN bought with a
   resource put in), GAIN AND LOSS (both; the number says which way the trade nets by this scoring), LOSS (a LOSS, no GAIN), power
-  given (a resource put in, nothing gained), or EVEN (nothing moved 0.5% or more across our three runs).
+  given (a resource put in, nothing gained), or STEADY (nothing moved 0.5% or more across our three runs).
 
   python3 tools/benefit_sheet.py            ->  docs/BENEFIT_SHEET.md, results/BENEFIT_SHEET.json
   python3 tools/benefit_sheet.py --check    ->  exit 1 if the committed files differ from what the tables give
@@ -43,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.legal import stamp as legal_stamp                       # noqa: E402
-from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, EVEN, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, word_sign, reading_kind  # noqa: E402
+from tools.readings import with_own_runs, receipt_key, row_gain, landed, word as gel_word, aim as gel_aim, GAIN, STEADY, LOSS, GIVEN, GAIN_AND_LOSS, GAIN_GIVEN, reading_kind  # noqa: E402
 from tools import omni_index                                       # noqa: E402
 from tools import wiring_verdicts as wv                            # noqa: E402
 
@@ -171,15 +171,16 @@ def fmt_pct(x):
 
 
 def fmt_pct_words(x, loss=0):
-    """The one number with its word, the number wearing the word's sign (the founder's sign rule, tools/readings.py): '+31%
-    GAIN'; a fall is a LOSS where a gauge read LOSS ('−25% LOSS'), otherwise power given, the resources put in outweighing
-    what they bought by this scoring ('+25% power given'); '0%: EVEN'."""
+    """The one number with its word, its size alone beside the word, as tools/readings.py by_word prints it (the referee's work
+    order of 25 October: a number beside a word carries no sign, so it is never read as a raw direction): '31% GAIN'; a fall
+    is a LOSS where a gauge read LOSS ('25% LOSS'), otherwise power given, the resources put in outweighing what they bought by
+    this scoring ('25% power given'); '0%: STEADY'."""
     if x is None:
         return "no number"
     if abs(x) < 0.05:
-        return f"0%: {EVEN}"
+        return f"0%: {STEADY}"
     w = GAIN if x > 0 else LOSS if loss else GIVEN
-    return f"{word_sign(w)}{fmt_pct(abs(x))[1:]} {w}"
+    return f"{fmt_pct(abs(x))[1:]} {w}"
 
 
 def verb(fell, aim):
@@ -225,7 +226,7 @@ def in_words(items):
         f = (lambda x: f"{x:.0f}%") if mags[-1] >= 10 else (lambda x: f"{x:.1f}%")
         m = f(mags[0]) if f(mags[0]) == f(mags[-1]) else f"{f(mags[0])} to {f(mags[-1])}"
         out.append(f"{name} {verb(fell, aim)} {m} ({w})")
-    return "; ".join(out) if out else f"{EVEN}: nothing moved 0.5% or more across our three runs"
+    return "; ".join(out) if out else f"{STEADY}: nothing moved 0.5% or more across our three runs"
 
 
 def benefit_word(gain, loss, given=0):
@@ -240,7 +241,7 @@ def benefit_word(gain, loss, given=0):
         return LOSS
     if given:
         return GIVEN
-    return EVEN
+    return STEADY
 
 
 WORD_OF = {"gain": GAIN, "loss": LOSS, "given": GIVEN}
@@ -406,8 +407,8 @@ def from_sim(fname, name, moved_titles, what, left_native_title=None):
         if left_native_title and sec["title"].startswith(left_native_title):
             for r in sec["table"][1:]:                             # nothing moved: nothing gained, nothing lost
                 if r and r[0]:
-                    cases.append({"case": r[0] + " (left native by the engine's own trial)", "pct": 0.0, "benefit": EVEN, "gain": 0, "loss": 0, "given": 0,
-                                  "words": f"{EVEN}: nothing moved", "items": []})
+                    cases.append({"case": r[0] + " (left native by the engine's own trial)", "pct": 0.0, "benefit": STEADY, "gain": 0, "loss": 0, "given": 0,
+                                  "words": f"{STEADY}: nothing moved", "items": []})
             continue
         tag = next((t for t in moved_titles if sec["title"].startswith(t)), None)
         if tag is None:
@@ -479,7 +480,7 @@ def from_realms():
     return {"date": updated(ROOT / "results" / "realms" / "REALMS.md"), "benchmark": "The 945 modelled muscles as one tower, every muscle written at once",
             "benefit": benefit_word(g, l_), "pct": 100 * prim[0] if clear else 0.0, "gain": g, "loss": l_, "given": given,
             "words": (f"work per energy up {100 * prim[0]:.1f}% ({GAIN})" if clear and prim[0] > 0
-                      else f"work per energy down {abs(100 * prim[0]):.1f}% ({GIVEN})" if clear else f"{EVEN}: nothing moved 0.5% or more across our three runs"),
+                      else f"work per energy down {abs(100 * prim[0]):.1f}% ({GIVEN})" if clear else f"{STEADY}: nothing moved 0.5% or more across our three runs"),
             "what": "the tower's work per energy over ten paired seeds; a model, evidence class S", "file": "results/realms/REALMS.md"}
 
 
@@ -597,7 +598,7 @@ def main(check=False):
 
     L = ["# The benefit sheet: one number per benchmark, its word, and every change said in words", "", *receipt_key(), "",
          "The founder's orders of 9 and 13 October 2026: next to every benchmark, say whether Omni-Compass on top was a benefit to the "
-         "system and by how much, in one number whose sign always means the same thing, and say it in **GAIN**, **EVEN** and **LOSS**, "
+         "system and by how much, in one number whose sign always means the same thing, and say it in **GAIN**, **STEADY** and **LOSS**, "
          "judged by what each gauge is for and never by the sign of its number (the key: `docs/HOW_TO_READ_THE_RESULTS.md`). **On this sheet "
          "the sign is the system's own declared aims, gauge by gauge: a plus is a GAIN; a minus is a LOSS on work, speed, misses or "
          "failures, and power given on a resource spent (energy, machines, memory).** The number carries its word. Beside it every change "
@@ -614,7 +615,7 @@ def main(check=False):
          "**Benefit?** reads **GAIN** (gauges GAIN across our three runs, none LOSS or power given), **GAIN, power given** (a GAIN bought "
          "with a resource put in, named beside it), **GAIN AND LOSS** (both; the number says which way the trade nets by this scoring, and "
          "the wiring page `docs/WIRING_VERDICTS.md` says what pays for what), **LOSS** (a LOSS and no GAIN), **power given** (a resource put "
-         "in and nothing gained) or **EVEN** (nothing moved 0.5% or more across our three runs). LOSS should never appear: where it "
+         "in and nothing gained) or **STEADY** (nothing moved 0.5% or more across our three runs). LOSS should never appear: where it "
          "does, the row stands and its cause is found and fixed.", "",
          "Every row names the engine its table ran on (read from the table). Results are never read across engines: a row on an "
          "older engine stands as that engine's result until the same benchmark's three runs on the engine that stands replace "
@@ -629,7 +630,7 @@ def main(check=False):
         if r.get("parts"):
             L.append(f"- **{r['benchmark']}**: " + "; ".join(f"{p_['case']} {fmt_pct_words(p_['pct'], p_.get('loss', 0))} ({p_['benefit']}" + (f": {p_['words']}" if p_.get('words') else "") + ")" for p_ in r["parts"]) + ".")
     L += ["", "## Not on the sheet, and why", "",
-          "- **Azure's managed Kubernetes, the bill** (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): Omni v1, a 4-worker fleet, every gauge EVEN, inside the noise: 0%, and too small a fleet to show one machine.",
+          "- **Azure's managed Kubernetes, the bill** (`results/live/V1_AKS_STEADY.md`, `V1_AKS_BURST.md`): Omni v1, a 4-worker fleet, every gauge STEADY, inside the noise: 0%, and too small a fleet to show one machine.",
           "- **The governor's own share of the machine** (`results/live/V3_OWN_COST.md`): 0.6% to 1.3% of one core at every size; shown, not a benchmark against native.",
           card_line(),
           "- **The index's second reading** (service alone, `results/OMNI_INDEX.md`): a second true number for the same tests, not repeated here; this sheet carries the preregistered one.", ""]

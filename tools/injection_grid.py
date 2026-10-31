@@ -15,7 +15,7 @@ organism. And there lies the third arm."
 
 The batch. One set of the Python's jump generator (tools/engine_runs.py): base B, 500 injections, injection k drawing its
 seed from seed_k = B + k·0x9E3779B9 mod 2³² (engine_runs.jump), the same seeds the Python's 500 runs of the engine use, the
-same seeds the C++ engine runs (cpp/tools/engine_runs.cpp) and the live engine's page recomputes; the batch is named by its
+same seeds the C++ engine runs (cpp/tools/engine_runs.cpp) and the live benchmark engine's page recomputes; the batch is named by its
 base and by the SHA-256 digest of those runs' receipts, and carries the C++ engine's digest of the same runs. An injection is
 one seed: every plant of every organism draws its demand noise, its weather and its disturbances from it
 (realms/harness.py seed_for, keyed by the muscle and the seed), under the climb (CLIMB: the load stepping by one, 1 2 3 2 3
@@ -23,7 +23,7 @@ one seed: every plant of every organism draws its demand noise, its weather and 
 walking every setting back to native. The same injection reaches every organism and every arm.
 
 The organisms. The nine organisms the realms harness runs (tools/scenarios_20.py ORGANISMS: the spine, the four realms, the
-four stacked, the whole tower, the orchestra, the live engine's sixty muscles); the tenth, the whole organism, is a
+four stacked, the whole tower, the orchestra, the live benchmark engine's sixty muscles); the tenth, the whole organism, is a
 composition of real measured tables and takes no injection (tools/scenarios_20.py reads it).
 
 The arms. Native (every plant under its own native controller) and Omni-Compass on native (the max, realms/compass_arm_v5.py
@@ -55,7 +55,7 @@ on top of the governor against the governor, and against native) and each gauge 
 spent), each run's change per decision against its reference, averaged over the run's 24 blocks of ten decisions, with its
 95% interval by Student t over the blocks (docs/engine/export_harness_trace.py gauges, interval), relative to the reference's
 mean; the cell's word by the founder's rule of 24 October (tools/readings.py three_run_reading) over its N runs: the mean of
-the runs' changes, under 0.5% EVEN, from 0.5% up GAIN, LOSS or power given by the gauge's aim, in all N of our runs when every
+the runs' changes, under 0.5% STEADY, from 0.5% up GAIN, LOSS or power given by the gauge's aim, in all N of our runs when every
 run is clear of the noise the same way, else by the mean of our N runs with the count beyond the noise; runs that moved 0.5%
 or more in opposite directions disagree. One batch is one run in the sense of the key's three-run rule; its three-run reading
 is three batches (three bases). Evidence class S (our own models).
@@ -84,7 +84,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools.legal import stamp  # noqa: E402
-from tools.readings import (GAIN, EVEN, LOSS, GIVEN, DISAGREE, IN_ALL_THREE, MEAN_OF_THREE, OWN_RUNS, HIGHER, LOWER,  # noqa: E402
+from tools.readings import (GAIN, STEADY, LOSS, GIVEN, DISAGREE, IN_ALL_THREE, MEAN_OF_THREE, OWN_RUNS, HIGHER, LOWER,  # noqa: E402
                             SPENT, aim, classify, three_run_reading)
 from omnicompass.student_t import t95  # noqa: E402
 import tools.scenarios_20 as S  # noqa: E402
@@ -269,7 +269,7 @@ def cell_reading(rel, lo, hi, base, diff, n, aim_):
     allw, meanw = words_for(n)
     text = text.replace(IN_ALL_THREE, allw).replace(MEAN_OF_THREE, meanw).replace("the three runs' mean", f"the {n} runs' mean")
     c = classify(text, aim_)
-    word = {"gain": GAIN, "loss": LOSS, "given": GIVEN, "noise": EVEN, "same": EVEN, "disagree": DISAGREE}.get(c, EVEN)
+    word = {"gain": GAIN, "loss": LOSS, "given": GIVEN, "noise": STEADY, "same": STEADY, "disagree": DISAGREE}.get(c, STEADY)
     return text, word
 
 
@@ -397,7 +397,7 @@ def write_md(out: Path, rec):
           "|---|---:|" + "---|" * len(tiers)]
     from tools.readings import by_word
     def short(c):
-        return " · ".join(f"{c[g]['word']} {by_word(100 * c[g]['mean'], c[g]['word'] if c[g]['word'] in (GAIN, LOSS, GIVEN, EVEN) else None, digits=2)}" for g, *_ in GAUGES)
+        return " · ".join(f"{c[g]['word']} {by_word(100 * c[g]['mean'], c[g]['word'] if c[g]['word'] in (GAIN, LOSS, GIVEN, STEADY) else None, digits=2)}" for g, *_ in GAUGES)
     for o in rec["organisms"]:
         cells = rec["cells"][o["key"]]["on_native|native"]
         L.append(f"| {o['name']} | {o['muscles']:,} | " + " | ".join(short(cells[t]) for t in tiers if t in cells) + " |")

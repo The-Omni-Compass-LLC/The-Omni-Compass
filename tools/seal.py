@@ -72,7 +72,7 @@ PYTHON_ONLY = {
     "omni_controller/gpu_governor.py (device I/O)": "reading nvidia-smi and writing power limits; its decision rules are twinned above",
     "omni_controller/muscles.py": "Kubernetes and hardware muscles (convey, rightsize, coldstart, batch, contain, cooling, CPU/GPU connectors)",
     "omni_controller/controller.py": "Kubernetes controller (HPA target, pod reflex, machines, strict replicas)",
-    "hardware/node_exchange.py": "CPU + GPU on one power budget (simulation harness; the law itself is twinned above)",
+    "hardware/node_exchange.py": "CPU + GPU on one power budget (modelled harness; the law itself is twinned above)",
     "realms/compass_arm_v5.py": "the max, the default brain of every organism (max_apply, max_body_step, the Bone, the twins, the "
                                 "heat debt); its tune-down runs the compass law, twinned above",
     "realms/harness.py, realms/plants.py": "the organisms' body and its plants (the modelled muscles the harness drives)",
