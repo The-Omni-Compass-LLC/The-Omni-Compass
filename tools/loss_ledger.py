@@ -61,9 +61,10 @@ POD_SHIFT = ("the shared test machine: Omni-Compass's arm starts its pods while 
              "a pod created on a host 70% to 100% busy waits longer at the kubelet than one created at 0% to 50%, a stratum a real "
              "cluster's own node never enters")
 POD_DECIDES = "the benchmark's three runs on the engine that stands, the host's busy share read beside the row"
-NEIGHBOUR_NEXT = ("the next version's organism-level trade (a cap on the conveyed limit where another serving workload shares the "
-                  "node, or a hand-back when a neighbour's own line is threatened), the model gate first, its two-app model set from "
-                  "these runs' own strata")
+NEIGHBOUR_NEXT = ("no engine change: the price is flat in the lift (a limit at 2,000m costs the neighbour the same 6 ms of mean "
+                  "response as one at 3,800m, so a cap buys nothing; read in the gate's two-app model, EVEN on every gauge) and "
+                  "smaller than the governed app's gains in the same table, so on the organism conveyance beside a neighbour comes "
+                  "out ahead")
 CAUSES = {
     ("KUBERAY_4W_BARE", ""): V13_FIX,
     ("ARMADA_4W_BARE", ""): ("suspected: the conveyance fault fixed in omni-v13 (its shape fits: a batch gauge a few percent "

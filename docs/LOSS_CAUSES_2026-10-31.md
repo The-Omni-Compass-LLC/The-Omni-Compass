@@ -160,16 +160,32 @@ against 0.24%. That is the kernel's run queue: a serving pod whose quota is lift
 loaded neighbour's short request waits for a core more often, while the neighbour keeps its throughput (its share by request
 is untouched). The same shows in its pods' starts (section 1, the same-stratum +0.19 s).
 
-**What this is, and what it is not.** It is the price conveyance puts on a neighbour sharing the machine: small, measured,
-and bought with the governed app's own gains in the same table (its failed requests 4.359% against 4.139%, its alert minutes 9
-against 8.6, its work inside the line GAIN). It is not a muscle Omni-Compass governs reading below native, and it is not the
-cause of the neighbour's failures, which are its own surge in both arms. On the engine that stands nothing is traded between
-muscles; a rule that pays the governed app's gain back to the neighbour (a cap on the conveyed limit where another serving
-workload shares the node, or a hand-back when a neighbour's own line is threatened) is the organism-level trade the founder's
-order of 19 October reserves for the next version, through the model gate, with the two-app model set from these strata (the
-neighbour's service time 3.7% longer while a limit on its node stands conveyed; its own saturation at its surge). What decides
-the row: the benchmark's three runs on the engine that stands, and the neighbour's line read beside the governed app's on the
-receipt.
+**Does the price grow with the lift?** No. The same quiet-band requests, placed by the highest limit the governed app's pods
+stood at on the shared host at that second (the audit's resize writes; 1,017 writes in the three runs, 403 of them at or under
+999m, 394 between 1,000m and 1,999m, 220 at 2,500m and above):
+
+| The governed app's highest limit in force | The neighbour's requests | mean | median | 95th percentile | failed |
+|---|---:|---:|---:|---:|---:|
+| native (no governor) | 9,348 | 161.8 ms | 125.9 ms | 213.3 ms | 0.24% |
+| at the operator's 500m (Omni-Compass's arm) | 347 | 224.4 ms | 173.6 ms | 280.7 ms | 0.58% |
+| lifted, up to 2,000m | 2,930 | 168.8 ms | 127.7 ms | 222.0 ms | 0.27% |
+| lifted, above 2,000m | 6,019 | 167.3 ms | 123.4 ms | 204.3 ms | 0.32% |
+
+A limit lifted to 2,000m costs the neighbour the same 6 ms of mean response as one lifted to 3,800m, and above 2,000m its median
+and its 95th percentile read shorter than native's. So a cap on the conveyed limit beside a neighbour would buy the neighbour
+nothing: this was read in the model gate's two-app model before anything was written into the engine (`tools/model_gate.py`,
+`convey_neighbour`, set from these strata: a cap at twice the operator's limit read EVEN against omni-v22 on every gauge of the
+neighbour's and the governed app's), and the engine is unchanged. The only rule that removes the 6 ms is no conveyance beside a
+neighbour at all, which forfeits the governed app's gains in the same table (its requests 3.0% to 4.4% more, its failed requests
+4.359% against 4.139%, its alert minutes 9 against 8.6, its 95th percentile GAIN) for a neighbour whose own 95th percentile and
+failures in the quiet band are no worse. On the organism (do no harm, `DISCLOSURES.md` section 3) conveyance beside a neighbour
+comes out ahead, and the engine that stands keeps it.
+
+**What this is, and what it is not.** It is the price conveyance puts on a neighbour sharing the machine: 6 ms of mean response,
+flat in the lift, measured, and smaller than what it buys. It is not a muscle Omni-Compass governs reading below native, and it is
+not the cause of the neighbour's failures, which are its own surge in both arms. The row stands as its table reads it, with this
+cause beside it. What decides it: the benchmark's three runs on the engine that stands, and the neighbour's line read beside the
+governed app's on the receipt, so the price is printed where the gain is.
 
 ## 5. The fixed-capacity test at its top cap: 3 cores, the completed work
 
