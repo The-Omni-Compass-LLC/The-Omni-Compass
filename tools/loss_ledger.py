@@ -63,7 +63,7 @@ POD_SHIFT = ("the shared test machine: Omni-Compass's arm starts its pods while 
              "cluster's own node never enters")
 POD_DECIDES = "the benchmark's three runs on the engine that stands, the host's busy share read beside the row"
 NEIGHBOUR_NEXT = ("no engine change: the price is flat in the lift (a limit at 2,000m costs the neighbour the same 6 ms of mean "
-                  "response as one at 3,800m, so a cap buys nothing; read in the gate's two-app model, EVEN on every gauge) and "
+                  "response as one at 3,800m, so a cap buys nothing; read in the gate's two-app model, STEADY on every gauge) and "
                   "smaller than the governed app's gains in the same table, so on the organism conveyance beside a neighbour comes "
                   "out ahead")
 CAUSES = {

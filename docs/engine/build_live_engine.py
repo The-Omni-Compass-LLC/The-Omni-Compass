@@ -1112,7 +1112,7 @@ def injection_grid() -> dict:
     if not fs:
         return {}
     f = max(fs, key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("run", {}).get("started", ""), f.name))
-    d = json.loads(f.read_text(encoding="utf-8"))
+    d = json.loads(f.read_text(encoding="utf-8").replace('"EVEN"', '"STEADY"'))   # the grid's tool still writes EVEN; the page shows its name now, STEADY
     d.pop("best", None)
     return {"file": str(f.relative_to(ROOT)), **d}
 
