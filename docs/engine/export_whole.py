@@ -136,6 +136,10 @@ def main(out):
             if n in layer_names:
                 ln = layer_names[n]
                 tests = d["layers"][ln]
+                for t in tests:   # a table's title as the page prints it: the word "brake" is retired (the founder's order of 12 October)
+                    for k in ("test", "title"):
+                        if isinstance(t.get(k), str):
+                            t[k] = t[k].replace("emergency brake", "emergency stop")
                 layers.append({"no": n, "name": ln, "state": "measured", "tests": tests, "n_tests": len(tests),
                                "cls": (re.search(r"class ([PLS])", ln) or [None, None])[1]})
             else:
