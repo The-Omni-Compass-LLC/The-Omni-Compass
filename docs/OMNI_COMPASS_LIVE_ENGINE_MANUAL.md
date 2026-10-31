@@ -689,7 +689,7 @@ the hold doubling for each hand-back in a row up to 160; it takes the muscle bac
 than native's by 5%. Where native is not stronger it stays, because redlining less than native is still a benefit against native.
 The red is still wired on its side, so that if a muscle does redline there (a fault, a bug), it is seen at once. That is the kill
 switch's purpose: when something redlines that Omni-Compass itself cannot stop, one press hands every muscle back to native in the
-same instant. The engine that stands, omni-v21, carries this rule in its immune system, knob by knob (`omnicompass/immune.py`, its
+same instant. The engine that stands, omni-v22, carries this rule in its immune system, knob by knob (`omnicompass/immune.py`, its
 C++ twin `cpp/src/immune.cpp`, proven alike on 200 seeded scripts, and the nervous system's `native_hold`; on Kubernetes each
 service's autoscaler target, native's twin the operator's own target), beside the SLO reflex and the pod reflex of the Kubernetes
 governor (`omni_controller/controller.py`); the page's live model (class S) applies the same rule, with the engine's own numbers, to
