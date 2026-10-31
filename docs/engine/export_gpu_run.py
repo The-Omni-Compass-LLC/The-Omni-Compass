@@ -256,7 +256,7 @@ def chip_ledger() -> dict:
     """Every chip run's state as docs/RUN_LEDGER.md section 1 records it (read from GitHub's own run records): for each GitHub run its
     row's "What", "Finished?", "What came back" and "Receipt" cells, and whether the run was measured to its end ("Yes" or "To its
     deadline"); a row that names a span of runs ("14 runs, 24 Oct 02:57 to 08:41") is kept as that span, matched on the page by each
-    run's start. Nothing is decided here: the page prints the ledger's own words."""
+    run's start. Nothing is decided here: the page prints the ledger's own words, with no person named."""
     f = ROOT / "docs" / "RUN_LEDGER.md"
     if not f.exists():
         return {"file": None, "runs": {}, "spans": []}
@@ -276,7 +276,7 @@ def chip_ledger() -> dict:
             head = cells
             continue
         row = dict(zip(head, cells))
-        fin = clean(row.get("Finished?", ""))
+        fin = clean(row.get("Finished?", "")).replace(" on the founder's decision", "")   # the ledger's words, nobody's name in them
         rec = {"what": clean(row.get("What", "")), "finished": fin, "came_back": clean(row.get("What came back", "")), "receipt": clean(row.get("Receipt", "")),
                "measured": bool(re.match(r"(Yes|To its deadline)\b", fin))}
         ids = re.findall(r"\b(\d{11})\b", row.get("GitHub run", ""))

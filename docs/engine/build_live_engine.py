@@ -389,6 +389,25 @@ def board(runs: list, camp: dict | None = None) -> list:
     return out
 
 
+# Words a record carries from the repository's documents that name a person or an order instead of saying what is there; the page
+# prints the rest of each sentence as written (T35 to T38: docs/REGISTER.md, the preregistrations, results/scenarios, the grid's rule).
+PLAIN = ((", the gap the tree showed at the founder's reading", ", the gap the tree showed"), (" at the founder's second sweep", ""),
+         (" at the founder's final sweep", ""), (" at the founder's sweep", ""), (", the founder's list, ", ", "), (", the founder's list (", " ("),
+         (", the founder's list; ", "; "), (", the founder's list)", ")"), ("of the founder's list", "on the list"),
+         (", the founder's order to run every product", ", to run every product"),
+         ("until the founder opens an account and", "until an account is opened and"),
+         ("the founder's own laptop can run it", "a Windows laptop can run it"), ("on the founder's own laptop or tower", "on a Windows laptop or tower"),
+         ("the founder's own tower or laptop", "a tower or laptop"), (", at the founder's order of that night", ""),
+         ("the governors and orchestrators the founder named", "the fourteen governors and orchestrators of section 4e"),
+         ("by the founder's rule of 24 October", "by the key and its 0.5% floor"))
+
+
+def plain(t):
+    for a, b in PLAIN:
+        t = t.replace(a, b)
+    return t
+
+
 def _clean(v):
     """NaN and infinity, which JSON cannot carry, as null."""
     if isinstance(v, float):
@@ -650,7 +669,7 @@ def _prereg(path: Path) -> dict:
     """A preregistration as it writes itself: its title, when it was declared, its question, what is measured and its known
     limits (markdown stripped; each line cut at a sentence end where it runs long)."""
     t = path.read_text(encoding="utf-8")
-    clean = lambda x: re.sub(r"\s+", " ", re.sub(r"\*\*|`|\[([^\]]*)\]\([^)]*\)", lambda m: m.group(1) or "", x)).strip()
+    clean = lambda x: plain(re.sub(r"\s+", " ", re.sub(r"\*\*|`|\[([^\]]*)\]\([^)]*\)", lambda m: m.group(1) or "", x)).strip())
     def cut(x, n=320):
         x = clean(x)
         if len(x) <= n:
@@ -899,7 +918,7 @@ def register_places(limit: bool = True) -> list:
     text = reg.read_text(encoding="utf-8")
     sec = text[text.find("## 4."):] if "## 4." in text else ""
     sec = sec[:sec.find("\n## ", 5)] if "\n## " in sec[5:] else sec
-    clean = lambda t: re.sub(r"\s+", " ", re.sub(r"\*\*|`|\[([^\]]*)\]\([^)]*\)", lambda m: m.group(1) or "", t)).strip()
+    clean = lambda t: plain(re.sub(r"\s+", " ", re.sub(r"\*\*|`|\[([^\]]*)\]\([^)]*\)", lambda m: m.group(1) or "", t)).strip())
     out = []
     for ln in sec.splitlines():
         if not re.match(r"\|\s*\d+\s*\|", ln):
@@ -1092,6 +1111,7 @@ def scenarios20() -> dict:
     orgs = []
     for o in d.get("organisms", []):
         x = {k: o.get(k) for k in ("no", "key", "name", "what", "class", "muscles", "source")}
+        x["what"] = plain(x["what"]) if isinstance(x["what"], str) else x["what"]
         r = o.get("readings") or {}
         on = r.get("on_native_vs_native") if isinstance(r, dict) else None
         if isinstance(on, dict) and on.get("state") == "composed":   # the whole organism: its composition, the headline scope only
@@ -1112,7 +1132,9 @@ def injection_grid() -> dict:
     if not fs:
         return {}
     f = max(fs, key=lambda f: (json.loads(f.read_text(encoding="utf-8")).get("run", {}).get("started", ""), f.name))
-    d = json.loads(f.read_text(encoding="utf-8").replace('"EVEN"', '"STEADY"'))   # the grid's tool still writes EVEN; the page shows its name now, STEADY
+    d = json.loads(f.read_text(encoding="utf-8").replace('"EVEN"', '"STEADY"').replace('"EVEN, ', '"STEADY, '))   # the grid's tool still writes EVEN, as a word and at the head of each reading; the page shows its name now, STEADY
+    if isinstance(d.get("rule"), str):
+        d["rule"] = plain(d["rule"])
     d.pop("best", None)
     return {"file": str(f.relative_to(ROOT)), **d}
 

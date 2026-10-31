@@ -60,13 +60,19 @@ def model(page: str) -> dict:
     canv = [c for c in canv if c != "wallCv"]
     number = {c: i + 1 for i, c in enumerate(canv)}
     items = []
-    tp = re.search(r'<header class="head" id="title-page">(.*?)</header>', body, re.S)
-    if tp:
-        words = [("p", text(x)) for x in re.findall(r'<p class="lede"[^>]*>(.*?)</p>|<div class="realDisclose"[^>]*>(.*?)</div>', tp.group(1), re.S) for x in x if x]
-        items.append({"kind": "section", "id": "title-page", "n": "ii", "title": "Title page and build", "summary": "", "controls": "", "words": [w for w in words if w[1]], "panels": [], "monitors": []})
-    for m in re.finditer(r'<div class="partHead" id="([^"]+)"><span class="pn">([^<]*)</span><span class="pt">([^<]*)</span></div>|<section class="[^"]*" id="([^"]+)"', body):
+    # the title page is a section of the page in its own place (appendix A on the page built in the page's order of
+    # 31 October), numbered and titled by its own heading
+    for m in re.finditer(r'<div class="partHead[^"]*" id="([^"]+)"><span class="pn">([^<]*)</span><span class="pt">([^<]*)</span></div>|<section class="[^"]*" id="([^"]+)"|<header class="head" id="title-page">(.*?)</header>', body, re.S):
         if m.group(1):
             items.append({"kind": "part", "id": m.group(1), "n": m.group(2), "title": html.unescape(m.group(3))})
+            continue
+        if m.group(5) is not None:
+            tp = m.group(5)
+            h2 = re.search(r'<h2[^>]*>(?:<span class="sn">([^<]*)</span>)?(.*?)</h2>', tp, re.S)
+            words = [("p", text(x)) for x in re.findall(r'<p class="lede"[^>]*>(.*?)</p>|<div class="realDisclose"[^>]*>(.*?)</div>', tp, re.S) for x in x if x]
+            items.append({"kind": "section", "id": "title-page", "n": (h2.group(1) or "") if h2 else "",
+                          "title": text(h2.group(2)) if h2 else "Title page and build", "summary": "", "controls": "",
+                          "words": [w for w in words if w[1]], "panels": [], "monitors": []})
             continue
         sid = m.group(4)
         i, depth, j = m.start(), 0, None
@@ -162,7 +168,7 @@ def md_lines() -> list[str]:
             "Each part below is one section of the page, in the page's order and under its number: what the page says it is, its controls, its panels, and every monitor in it under its own number, with what it shows, its evidence and state, the feed that would carry it live, its knobs, how to read it and what to do with it.", ""]
     for it in M["items"]:
         if it["kind"] == "part":
-            out += [f"### Part {it['n']} of the page: {it['title']}", ""]
+            out += [f"### Part {it['n']} of the page: {it['title']}" if it["n"] else f"### The page's {it['title']}", ""]
             continue
         title = f"{it['n']} {it['title']}".strip()
         out += [f"### {title}", ""]
@@ -185,7 +191,7 @@ def md_lines() -> list[str]:
                 "**Its monitors.** This section draws no canvas: its views are tables and text the page builds from its records.", ""]
         for cid in it["monitors"]:
             m = by.get(cid, {"name": cid, "what": "", "cls": "", "status": "", "feed": {"exporter": "", "metrics": [], "promql": []}, "knobs": [], "layer": "page"})
-            n = M["number"].get(cid, "?")
+            n = m.get("n") or M["number"].get(cid, "?")       # the number its badge carries: its place on the wall (monitors.json)
             out += [f"#### Monitor {n}: {m['name']}", ""]
             if m.get("what"):
                 out += [m["what"], ""]
@@ -220,9 +226,9 @@ def md_lines() -> list[str]:
         if it["kind"] == "section":
             for c in it["monitors"]:
                 sec_of[c] = f"{it['n']} {it['title'].split(':')[0]}"
-    for c in M["canvases"]:
+    for c in sorted(M["canvases"], key=lambda c: (by.get(c, {}).get("n") or 10 ** 6, M["number"][c])):   # in the wall's order
         m = by.get(c, {"name": c, "cls": "", "status": ""})
-        out.append(f"| {M['number'][c]} | {m['name']} | {sec_of.get(c, '')} | {m.get('cls', '')} | {'awaiting its run' if m.get('awaiting') else m.get('status', '')} |")
+        out.append(f"| {m.get('n') or M['number'][c]} | {m['name']} | {sec_of.get(c, '')} | {m.get('cls', '')} | {'awaiting its run' if m.get('awaiting') else m.get('status', '')} |")
     out += ["", "### Appendix B. Every knob", "", "| Knob | What it does | Where it is |", "|---|---|---|"]
     for k, v in K.items():
         out.append(f"| {v['label']} | {v['what']} | {v['where']} |")

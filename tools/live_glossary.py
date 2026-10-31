@@ -354,6 +354,16 @@ def scenarios(orgs, arm_list) -> list[dict]:
 
 
 # ------------------------------------------------------------------------------------------------------------ the terms
+def run_live(s: str) -> str:
+    """A family's live cell (docs/wiring_recipes.csv) as the page prints it after "Run live:": its leading "live" said once, and
+    nobody's name in it."""
+    s = s.replace(" by the founder's order", "")
+    for a, b in (("live: ", "yes, "), ("live in part: ", "in part, "), ("live on ", "on ")):
+        if s.startswith(a):
+            return b + s[len(a):]
+    return s
+
+
 def T(term, group, d, sources, aka=(), note=None):
     t = {"term": term, "group": group, "aka": list(aka), "def": d, "sources": [{"file": f, "quote": q} for f, q in sources]}
     if note:
@@ -489,7 +499,7 @@ TERMS = [
     T("the centre", L, "The bottom of the compass, 0.5 by default, where the two forces balance: below it the force pulls capacity "
       "back, above it pushes capacity in.",
       [(LAW, "the brain pulls it to the bottom of the compass, the center (0.5 by default)"),
-       (PAGE_F, "the centre, where the two forces balance")], aka=["the centre", "the center"]),
+       (PAGE_F, "where the two forces balance; below it the force pulls capacity back, above it pushes capacity in")], aka=["the centre", "the center"]),
     T("the two antagonist forces", L, "Up: a positive force adds capacity, power, cooling or speed (scale out, raise a clock, start "
       "a chiller). Down: a negative force takes it back (scale in, lower a limit, warm a setpoint). Each side has its own gain, "
       "because adding and taking back do not cost the same.",
@@ -917,7 +927,7 @@ TERMS = [
       aka=["AWAITING"]),
     T("native's colour", W, "Orange (#ff8a1f, the page's --steel): the word native and every line, bar, lane, tile and number that "
       "belongs to native's side wear it. Red is only a LOSS and the alarm.",
-      [(PAGE_F, "the sides: --brass is Omni-Compass (blue), --steel is Native (orange"),
+      [(PAGE_F, "the sides: --brass is Omni-Compass (blue), --steel is Native (orange; red is only LOSS and the alarm)"),
        (MAN, "| Orange | native |")], aka=["orange"]),
     T("the heartbeat's six buttons", D, "On the page the governor's full decision comes at one of six beats, 10, 15, 30, 60, 90 or "
       "120 s; 10 s shows a beat below the 15 s standard. The factory's beat is the engine's own (60 s on omni-v19). The page's "
@@ -1221,7 +1231,7 @@ def build_core() -> dict:
         rc = recipes[r["family"]]
         fams[r["family_id"]] = {"name": r["family"], "template": r["template"], "preset": r["preset"], "n": 1,
                                 "spine": is_spine(r), "native": rc["native_controller"], "read": rc["read"],
-                                "write": rc["write"], "restore": rc["restore"], "live": rc["live"]}
+                                "write": rc["write"], "restore": rc["restore"], "live": run_live(rc["live"])}
     muscles, does_list = [], []
     for r in sorted(rows, key=lambda r: order[r["muscle_id"]]):
         t, p, k = r["template"], r["preset"], r["knob"]

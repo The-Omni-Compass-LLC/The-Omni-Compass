@@ -321,10 +321,10 @@ def markdown(m) -> str:
           "with its true sign, labelled raw. Units are the service's own copies: Omni-Compass adds them to buy the work and the speed, power given, "
           f"never a LOSS. Source: [`{m['path']}`]({m['path']}), three runs on GitHub's own machines (A, B and C from one commit); runs "
           f"{', '.join(f'{k} {v}' for k, v in rec['runs'].items())}; commit `{rec['commit'][:12]}`. The record's other arm, Omni-Compass "
-          "alone on the muscles, stays in the record and is not carried here: Omni-Compass is never by itself.", ""]
+          "alone on the muscles, stays in the record and is not carried here.", ""]
     L += ["### Bill by Route", "",
-          "Omni-Compass on the cloud alone can give only a small cut in the bill, from the machines the cloud's own autoscaler made; the "
-          "benefit lives at the two ends, in the software and in the bare metal, and the cloud carries it.", "",
+          "On the cloud alone Omni-Compass parks only machines the cloud's own autoscaler made, so a cloud run can show only a small cut "
+          "in the bill.", "",
           "Each route's bill is its native total cost, then Omni-Compass's, then the saving: 1 − (the Omni-Compass total ÷ the native total), "
           "each total the sum of its non-overlapping cost components inside the declared boundary, on a matched workload "
           "(`docs/THE_TUNE.md`, section 8). A component's own percent is a supporting measurement, never the bill. Where a price or a "

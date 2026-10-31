@@ -323,7 +323,7 @@ Every muscle of `realms/catalog_v5.csv` once: the spine's families first, then e
 
 #### Cloud VM & Capacity (21 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `node`, a fleet of machines or VMs that boot in minutes, reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Native: the cloud's autoscaling group or scale set: AWS Auto Scaling, Azure VMSS, GCP MIG. Run live? live on AKS through the node pool (family 5); the cloud SDK path itself is written, not yet run live.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `node`, a fleet of machines or VMs that boot in minutes, reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Native: the cloud's autoscaling group or scale set: AWS Auto Scaling, Azure VMSS, GCP MIG. Run live? on AKS through the node pool (family 5); the cloud SDK path itself is written, not yet run live.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -351,7 +351,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### Container Resources (25 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the pod's own resource requests and limits (the Deployment template) and, where it runs, the VPA, Goldilocks or CruiseKube recommender. Run live? live: omni_controller/muscles.py convey() (conveyance); KEDA and Goldilocks tables.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the pod's own resource requests and limits (the Deployment template) and, where it runs, the VPA, Goldilocks or CruiseKube recommender. Run live? yes, omni_controller/muscles.py convey() (conveyance); KEDA and Goldilocks tables.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -444,7 +444,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### Kubernetes Workload Scaling (32 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the HorizontalPodAutoscaler, KEDA ScaledObject or VPA that owns the workload's scale. Run live? live: scripts/kind_bench.sh and omni_controller (HPA target, KEDA, Goldilocks, CruiseKube), three-run tables in results/live.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the HorizontalPodAutoscaler, KEDA ScaledObject or VPA that owns the workload's scale. Run live? yes, scripts/kind_bench.sh and omni_controller (HPA target, KEDA, Goldilocks, CruiseKube), three-run tables in results/live.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -483,7 +483,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### GPU Hardware (22 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `gpu`, GPU serving with a response-time target, reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Native: the card's own firmware limits through NVML and nvidia-smi (power limit, application clocks, MIG, compute mode). Run live? live: omni_controller/gpu_governor.py and scripts/gpu_paired.sh on a rented A10 (results/gpu); the new card runs wait on Lambda by the founder's order.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `gpu`, GPU serving with a response-time target, reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Native: the card's own firmware limits through NVML and nvidia-smi (power limit, application clocks, MIG, compute mode). Run live? yes, omni_controller/gpu_governor.py and scripts/gpu_paired.sh on a rented A10 (results/gpu); the new card runs wait on Lambda.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -512,7 +512,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### Node Fleet & Karpenter-Class Control (24 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `node`, a fleet of machines or VMs that boot in minutes, reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Native: the cluster's own node autoscaler: Karpenter (NodePool), the Cluster Autoscaler, a MachineSet, a cloud node pool. Run live? live: omni_controller nodepool mode on kind and on AKS (results/live/V1_AKS_*, the capacity and steady tables).
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `node`, a fleet of machines or VMs that boot in minutes, reached through the node pool's size command (Karpenter, Cluster Autoscaler, MachineSet, cloud ASG). Native: the cluster's own node autoscaler: Karpenter (NodePool), the Cluster Autoscaler, a MachineSet, a cloud node pool. Run live? yes, omni_controller nodepool mode on kind and on AKS (results/live/V1_AKS_*, the capacity and steady tables).
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -585,7 +585,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### Reliability, Security & Recovery (12 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch. Run live? live in part: the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch. Run live? in part, the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -683,7 +683,7 @@ Plant `energy_storage`, a battery, UPS or microgrid store with a load and a grid
 
 #### AI Inference Serving (24 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `gpu`, GPU serving with a response-time target, reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Native: the serving engine's own autoscaler and batcher (vLLM, Triton, KServe, Ray Serve): replicas, batch size, concurrency, KV cache. Run live? live in part: GPU serving under the card governor (results/gpu); the vLLM run is ready and waits on Lambda.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `gpu`, GPU serving with a response-time target, reached through nvidia-smi (clock ceiling and power limit) or the serving autoscaler. Native: the serving engine's own autoscaler and batcher (vLLM, Triton, KServe, Ray Serve): replicas, batch size, concurrency, KV cache. Run live? in part, GPU serving under the card governor (results/gpu); the vLLM run is ready and waits on Lambda.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -1613,7 +1613,7 @@ Plant `process_loop`, a regulated process: a temperature, pressure, flow, level,
 
 #### Cache & Memory Services (16 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the cache's own configuration: Redis CONFIG SET, Memcached runtime settings. Run live? live: tools/run_redis.py, V3_REDIS.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the cache's own configuration: Redis CONFIG SET, Memcached runtime settings. Run live? yes, tools/run_redis.py, V3_REDIS.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -1680,7 +1680,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### Database & Transactions (19 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `database`, a database cluster, reached through the database operator (replicas, connection pools). Native: the database's own pooler and server settings: PgBouncer's admin console, MySQL SET GLOBAL, MongoDB setParameter, the database operator. Run live? live: tools/run_pgbench.py, run_sysbench.py, run_ycsb.py, three-run tables V3_PGBENCH, V3_SYSBENCH, V3_YCSB.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `database`, a database cluster, reached through the database operator (replicas, connection pools). Native: the database's own pooler and server settings: PgBouncer's admin console, MySQL SET GLOBAL, MongoDB setParameter, the database operator. Run live? yes, tools/run_pgbench.py, run_sysbench.py, run_ycsb.py, three-run tables V3_PGBENCH, V3_SYSBENCH, V3_YCSB.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -1706,7 +1706,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### Messaging & Streaming (22 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the broker's own controls: Kafka's admin API and consumer group, RabbitMQ policies, MQTT broker settings. Run live? live: tools/run_kafka.py, V3_KAFKA.
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the broker's own controls: Kafka's admin API and consumer group, RabbitMQ policies, MQTT broker settings. Run live? yes, tools/run_kafka.py, V3_KAFKA.
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -1922,7 +1922,7 @@ Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a st
 
 #### Reliability, Security & Recovery (6 muscles)
 
-Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch. Run live? live in part: the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
+Plant `compute_pool`, a pool of servers, pods, GPUs, links or disks serving a stream of requests or jobs; class `server`, an application service on servers or pods, reached through the Kubernetes API (HPA target and floor, pod resize). Native: the platform's own recovery and security controls: rollout and rollback, PodDisruptionBudgets, the security hold, a kill switch. Run live? in part, the security hold and kill switch run in every Kubernetes benchmark (omnicompass/master.py).
 
 | # | Muscle | Knob | What Omni-Compass does with it | Organisms |
 |---:|---|---|---|---|
@@ -1988,22 +1988,22 @@ Every term, organism and arm with the sections of the page that print it, by the
 | active profile | term | B (#s-guide) |
 | actuation feedback | term | 3b (#s-feed); B (#s-guide) |
 | alert minute | term | C (#s-problem); D (#s-read) |
-| at its limit on native | term | 3a (#s-engines); 4f (#s-stacks); 5e (#s-fleet); D (#s-read) |
+| at its limit on native | term | 4f (#s-stacks); 5e (#s-fleet); B (#s-guide); D (#s-read) |
 | automatic optimizer | term | 3i (#s-dash) |
 | AWAITING | term | B (#s-guide) |
 | the band | term | 3a (#s-engines); 3b (#s-feed); 3e (#s-decision); 3f (#s-plane); 4a (#s-ops); 4b (#s-runs); 5d (#s-whole); 5f (#s-lab); 5h (#s-math); 5j (#s-self); B (#s-guide); C (#s-problem) |
-| the benefit board | term | 2c (#s-board); 3c (#s-desk); B (#s-guide); C (#s-problem) |
+| the benefit board | term | 2c (#s-board); B (#s-guide); C (#s-problem) |
 | the bill of a route | term | 2b (#s-answer); 4d (#s-cloud); 5d (#s-whole); 5h (#s-math); B (#s-guide); C (#s-problem) |
 | the bone | term | 3a (#s-engines); 5h (#s-math); B (#s-guide) |
-| the C++ twin | term | 1 (#s-health); 3c (#s-desk); 4g (#s-github); 5a (#s-proof); 5b (#s-cpp); 5h (#s-math); B (#s-guide); E (#s-monlist); G (#s-disclose) |
+| the C++ twin | term | 1 (#s-health); 4g (#s-github); 5a (#s-proof); 5b (#s-cpp); 5h (#s-math); B (#s-guide); E (#s-monlist); G (#s-disclose) |
 | calm | term | 3e (#s-decision); 3g (#s-brain); 4a (#s-ops); 4b (#s-runs); 5f (#s-lab); 5h (#s-math); B (#s-guide); C (#s-problem) |
 | the centre | term | 3a (#s-engines); 5f (#s-lab); 5h (#s-math); B (#s-guide) |
 | the climb | term | 5e (#s-fleet); 5h (#s-math); B (#s-guide) |
 | the cloud as the wire | term | 2b (#s-answer); 4a (#s-ops); 4d (#s-cloud); 5d (#s-whole); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read) |
 | collector | term | 3i (#s-dash) |
 | Commands | term | 1 (#s-health); 5h (#s-math); B (#s-guide); C (#s-problem) |
-| the compass | term | 1 (#s-health); 3a (#s-engines); 3c (#s-desk); 3e (#s-decision); 3f (#s-plane); 4a (#s-ops); 4b (#s-runs); 4c (#s-live); 5a (#s-proof); 5b (#s-cpp); 5f (#s-lab); 5h (#s-math); 5j (#s-self); B (#s-guide); G (#s-disclose) |
-| the compass law | term | 1 (#s-health); 3a (#s-engines); 3c (#s-desk); 3f (#s-plane); 4c (#s-live); 5a (#s-proof); 5b (#s-cpp); 5h (#s-math); 5j (#s-self); B (#s-guide); G (#s-disclose) |
+| the compass | term | 1 (#s-health); 3a (#s-engines); 3e (#s-decision); 3f (#s-plane); 4a (#s-ops); 4b (#s-runs); 4c (#s-live); 5a (#s-proof); 5b (#s-cpp); 5f (#s-lab); 5h (#s-math); 5j (#s-self); B (#s-guide); G (#s-disclose) |
+| the compass law | term | 1 (#s-health); 3a (#s-engines); 3f (#s-plane); 4c (#s-live); 5a (#s-proof); 5b (#s-cpp); 5h (#s-math); 5j (#s-self); B (#s-guide); G (#s-disclose) |
 | Compute / AI / Cloud | organism | 3c (#s-desk); C (#s-problem) |
 | the conductor | term | 3c (#s-desk) |
 | console | term | 1 (#s-health); 2c (#s-board); 3a (#s-engines); 3c (#s-desk); 3e (#s-decision); 3f (#s-plane); 3g (#s-brain); 3i (#s-dash); 4d (#s-cloud); 5e (#s-fleet); 5f (#s-lab); 5i (#s-fail); B (#s-guide) |
@@ -2045,11 +2045,11 @@ Every term, organism and arm with the sections of the page that print it, by the
 | k[p] | term | 5h (#s-math) |
 | the key | term | 2a (#s-bottom); 2e (#s-status); 3d (#s-dial); 3i (#s-dash); 4a (#s-ops); 4d (#s-cloud); 4f (#s-stacks); 5c (#s-scn); 5d (#s-whole); B (#s-guide); C (#s-problem); D (#s-read) |
 | the kill switch | term | 1 (#s-health); 2c (#s-board); 3b (#s-feed); 3c (#s-desk); 3e (#s-decision); 3f (#s-plane); 3i (#s-dash); 5g (#s-master); 5h (#s-math); B (#s-guide) |
-| knob | term | 1 (#s-health); 2d (#s-loss); 3a (#s-engines); 3b (#s-feed); 3c (#s-desk); 3d (#s-dial); 3h (#s-verdict); 3i (#s-dash); 4a (#s-ops); 4f (#s-stacks); 5a (#s-proof); 5d (#s-whole); 5e (#s-fleet); 5f (#s-lab); B (#s-guide); D (#s-read); E (#s-monlist); G (#s-disclose) |
+| knob | term | 1 (#s-health); 2d (#s-loss); 3a (#s-engines); 3b (#s-feed); 3c (#s-desk); 3h (#s-verdict); 3i (#s-dash); 4a (#s-ops); 4f (#s-stacks); 5a (#s-proof); 5d (#s-whole); 5e (#s-fleet); 5f (#s-lab); B (#s-guide); D (#s-read); E (#s-monlist); G (#s-disclose) |
 | the lease | term | 1 (#s-health); 3a (#s-engines); 3f (#s-plane); 4a (#s-ops); 5e (#s-fleet); 5h (#s-math); B (#s-guide) |
 | lift-off | term | 3g (#s-brain); 5h (#s-math); B (#s-guide) |
 | the line | term | 3a (#s-engines); 3c (#s-desk); 3f (#s-plane); 3g (#s-brain); 4a (#s-ops); 4b (#s-runs); 4c (#s-live); 4f (#s-stacks); 5a (#s-proof); 5c (#s-scn); 5e (#s-fleet); 5f (#s-lab); 5h (#s-math); 5j (#s-self); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
-| Live Organism | organism | 3a (#s-engines); 3b (#s-feed); 3c (#s-desk); 3f (#s-plane); 5f (#s-lab); 5g (#s-master); 5h (#s-math); B (#s-guide) |
+| Live Organism | organism | 3a (#s-engines); 3b (#s-feed); 3f (#s-plane); 5f (#s-lab); 5g (#s-master); 5h (#s-math); B (#s-guide) |
 | the live tuning engine | term | G (#s-disclose) |
 | LOSS | term | 2a (#s-bottom); 2b (#s-answer); 2c (#s-board); 2d (#s-loss); 2e (#s-status); 3c (#s-desk); 3d (#s-dial); 3f (#s-plane); 3h (#s-verdict); 4a (#s-ops); 4c (#s-live); 4d (#s-cloud); 4f (#s-stacks); 5c (#s-scn); 5d (#s-whole); 5e (#s-fleet); 5f (#s-lab); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
 | the max | term | 3a (#s-engines); 3c (#s-desk); 3e (#s-decision); 3f (#s-plane); 3g (#s-brain); 3h (#s-verdict); 4c (#s-live); 5e (#s-fleet); 5f (#s-lab); 5h (#s-math); B (#s-guide); G (#s-disclose) |
@@ -2065,12 +2065,12 @@ Every term, organism and arm with the sections of the page that print it, by the
 | observer | term | 3i (#s-dash) |
 | Omni index | term | 2b (#s-answer); B (#s-guide); D (#s-read) |
 | Omni-Compass | term | 1 (#s-health); 2a (#s-bottom); 2b (#s-answer); 2c (#s-board); 2d (#s-loss); 2e (#s-status); 3a (#s-engines); 3b (#s-feed); 3c (#s-desk); 3d (#s-dial); 3e (#s-decision); 3f (#s-plane); 3g (#s-brain); 3h (#s-verdict); 3i (#s-dash); 4a (#s-ops); 4b (#s-runs); 4c (#s-live); 4d (#s-cloud); 4e (#s-orch); 4f (#s-stacks); 5a (#s-proof); 5c (#s-scn); 5d (#s-whole); 5e (#s-fleet); 5f (#s-lab); 5g (#s-master); 5h (#s-math); 5i (#s-fail); 5j (#s-self); B (#s-guide); C (#s-problem); D (#s-read); E (#s-monlist); G (#s-disclose) |
-| Omni-Compass on native | term, arm | 1 (#s-health); 2b (#s-answer); 3a (#s-engines); 3c (#s-desk); 3f (#s-plane); 3i (#s-dash); 4a (#s-ops); 5c (#s-scn); 5d (#s-whole); 5j (#s-self); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
+| Omni-Compass on native | term, arm | 1 (#s-health); 2b (#s-answer); 3c (#s-desk); 3f (#s-plane); 3i (#s-dash); 4a (#s-ops); 5c (#s-scn); 5d (#s-whole); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
 | Omni-Compass's blue | term | 2c (#s-board); 3a (#s-engines); 3b (#s-feed); 3e (#s-decision); 3f (#s-plane); 3i (#s-dash); 4d (#s-cloud); 4g (#s-github); 5d (#s-whole); B (#s-guide); D (#s-read) |
 | one pedal | term | 3c (#s-desk); 4a (#s-ops); B (#s-guide); G (#s-disclose) |
 | the orchestra | term | 4e (#s-orch); 5d (#s-whole); 5e (#s-fleet); B (#s-guide) |
 | Orchestra Organism | organism | 4e (#s-orch); 5d (#s-whole); 5e (#s-fleet); B (#s-guide) |
-| the organism | term | 1 (#s-health); 2b (#s-answer); 3a (#s-engines); 3b (#s-feed); 3e (#s-decision); 3f (#s-plane); 3i (#s-dash); 4d (#s-cloud); 4e (#s-orch); 4f (#s-stacks); 5b (#s-cpp); 5c (#s-scn); 5d (#s-whole); 5e (#s-fleet); 5g (#s-master); 5h (#s-math); B (#s-guide); C (#s-problem); G (#s-disclose) |
+| the organism | term | 1 (#s-health); 2b (#s-answer); 3a (#s-engines); 3b (#s-feed); 3e (#s-decision); 3f (#s-plane); 3i (#s-dash); 4e (#s-orch); 4f (#s-stacks); 5b (#s-cpp); 5c (#s-scn); 5d (#s-whole); 5e (#s-fleet); 5g (#s-master); 5h (#s-math); B (#s-guide); C (#s-problem); G (#s-disclose) |
 | organisms stacked | term | 5c (#s-scn) |
 | the organs and their grants | term | 3a (#s-engines); 3b (#s-feed); 3c (#s-desk); 3e (#s-decision); 3g (#s-brain); 4c (#s-live); 5a (#s-proof); 5h (#s-math); B (#s-guide); C (#s-problem) |
 | OVER THE LINE | term | 4a (#s-ops); 5c (#s-scn); 5f (#s-lab); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read) |
@@ -2082,39 +2082,39 @@ Every term, organism and arm with the sections of the page that print it, by the
 | power given | term | 2b (#s-answer); 2c (#s-board); 2d (#s-loss); 3d (#s-dial); 3e (#s-decision); 3f (#s-plane); 4a (#s-ops); 4c (#s-live); 4d (#s-cloud); 5c (#s-scn); 5d (#s-whole); 5e (#s-fleet); 5f (#s-lab); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
 | Prometheus Metrics | term | 3b (#s-feed); 3d (#s-dial); 3i (#s-dash); 4g (#s-github); B (#s-guide); E (#s-monlist) |
 | push | term | 5h (#s-math); B (#s-guide) |
-| the raw change and the word | term | 2a (#s-bottom); 2b (#s-answer); 2d (#s-loss); 4a (#s-ops); D (#s-read) |
+| the raw change and the word | term | 2a (#s-bottom); 2b (#s-answer); 2d (#s-loss); 4a (#s-ops); B (#s-guide); D (#s-read) |
 | realm | term | 3a (#s-engines); 3b (#s-feed); 3e (#s-decision); 3g (#s-brain); 5e (#s-fleet); 5f (#s-lab); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
 | REDLINING | term | 2a (#s-bottom); 2b (#s-answer); B (#s-guide) |
 | the reflex rule | term | 3a (#s-engines); 3d (#s-dial); 5h (#s-math); B (#s-guide) |
 | the release gate | term | 3c (#s-desk); 3e (#s-decision); 4c (#s-live); 5h (#s-math) |
 | Restore factory profile | term | B (#s-guide) |
 | Return to native | term | B (#s-guide) |
-| RK4 | term | 1 (#s-health); 3a (#s-engines); 3c (#s-desk); 5a (#s-proof); 5h (#s-math); B (#s-guide) |
+| RK4 | term | 1 (#s-health); 3a (#s-engines); 5a (#s-proof); 5h (#s-math); B (#s-guide) |
 | the runs disagree | term | 2c (#s-board); 2d (#s-loss); 2e (#s-status); 5e (#s-fleet); D (#s-read) |
 | the seven organisms | term | 3a (#s-engines); 5e (#s-fleet); B (#s-guide) |
-| shown, not judged | term | 5e (#s-fleet); 5i (#s-fail); D (#s-read) |
+| shown, not judged | term | 5e (#s-fleet); D (#s-read) |
 | the snapshot | term | 3a (#s-engines); 5h (#s-math) |
 | Spine | organism | 1 (#s-health); 3a (#s-engines); 3c (#s-desk); 5h (#s-math); B (#s-guide) |
 | the spine | term | 1 (#s-health); 3a (#s-engines); 3c (#s-desk); 5h (#s-math); B (#s-guide) |
 | the stack | term | B (#s-guide) |
 | STEADY | term | 2a (#s-bottom); 2b (#s-answer); 2c (#s-board); 2d (#s-loss); 3d (#s-dial); 3f (#s-plane); 3h (#s-verdict); 4a (#s-ops); 4c (#s-live); 4d (#s-cloud); 4f (#s-stacks); 5d (#s-whole); 5e (#s-fleet); 5f (#s-lab); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
-| the stress-test model | term | 3a (#s-engines); 3c (#s-desk); 3e (#s-decision); 3f (#s-plane); 5f (#s-lab); 5h (#s-math); B (#s-guide) |
+| the stress-test model | term | 3a (#s-engines); 3e (#s-decision); 3f (#s-plane); 5f (#s-lab); 5h (#s-math); B (#s-guide) |
 | supervisory governor | term | 1 (#s-health); 3a (#s-engines); 3c (#s-desk); 3d (#s-dial); 3i (#s-dash); 4a (#s-ops); 4b (#s-runs); 4c (#s-live); 4e (#s-orch); 4f (#s-stacks); 5b (#s-cpp); 5c (#s-scn); 5d (#s-whole); 5e (#s-fleet); 5f (#s-lab); 5g (#s-master); 5h (#s-math); 5j (#s-self); B (#s-guide); C (#s-problem); E (#s-monlist); G (#s-disclose) |
 | tanh | term | 5h (#s-math) |
 | template | term | 5e (#s-fleet) |
-| the three places Omni-Compass lives | term | 2b (#s-answer); 4d (#s-cloud); 5d (#s-whole); 5h (#s-math); B (#s-guide) |
+| the three places Omni-Compass lives | term | 2b (#s-answer); 5d (#s-whole); 5h (#s-math); B (#s-guide) |
 | three runs A, B and C | term | 2a (#s-bottom); 2b (#s-answer); 2c (#s-board); 3d (#s-dial); 3e (#s-decision); 3f (#s-plane); 3i (#s-dash); 4b (#s-runs); 4c (#s-live); 4d (#s-cloud); 4e (#s-orch); 4f (#s-stacks); 4g (#s-github); 5c (#s-scn); 5d (#s-whole); 5h (#s-math); 5i (#s-fail); B (#s-guide); C (#s-problem); D (#s-read) |
 | the tower | term | 1 (#s-health); B (#s-guide) |
 | the traffic signal | term | 0 (#s-wall); 2a (#s-bottom); B (#s-guide) |
-| the tune-down | term | 3c (#s-desk); 3e (#s-decision); 4c (#s-live); 4d (#s-cloud); 5b (#s-cpp); 5d (#s-whole); 5h (#s-math); B (#s-guide); G (#s-disclose) |
+| the tune-down | term | 3c (#s-desk); 3e (#s-decision); 4c (#s-live); 4d (#s-cloud); 5b (#s-cpp); 5h (#s-math); B (#s-guide); G (#s-disclose) |
 | the twin | term | 3a (#s-engines); 5h (#s-math); B (#s-guide) |
 | the two antagonist forces | term | 3a (#s-engines); 3e (#s-decision) |
 | the two-way plug | term | 3a (#s-engines); 3e (#s-decision); 3i (#s-dash); 4a (#s-ops); 4c (#s-live); 5a (#s-proof); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read) |
 | Variation Switchboard | term | 1 (#s-health); 5c (#s-scn) |
-| the verdict | term | 2a (#s-bottom); 2d (#s-loss); 3a (#s-engines); 3b (#s-feed); 3c (#s-desk); 3h (#s-verdict); 4a (#s-ops); 4c (#s-live); 4f (#s-stacks); 5a (#s-proof); 5b (#s-cpp); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
+| the verdict | term | 2a (#s-bottom); 2d (#s-loss); 3a (#s-engines); 3b (#s-feed); 3h (#s-verdict); 4a (#s-ops); 4c (#s-live); 4f (#s-stacks); 5a (#s-proof); 5b (#s-cpp); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
 | Whole Organism | organism | 3i (#s-dash); 4f (#s-stacks); 5d (#s-whole); 5g (#s-master); 5h (#s-math); B (#s-guide); C (#s-problem); D (#s-read); G (#s-disclose) |
 | Whole Tower | organism | B (#s-guide) |
-| work waiting in line | term | 3b (#s-feed); 5e (#s-fleet); B (#s-guide) |
+| work waiting in line | term | 3b (#s-feed); B (#s-guide) |
 | κ | term | 3g (#s-brain); 5h (#s-math) |
 | ν | term | 3g (#s-brain); 5h (#s-math) |
 | ρ* | term | 5h (#s-math) |
